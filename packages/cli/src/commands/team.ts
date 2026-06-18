@@ -590,8 +590,7 @@ async function buildTeamPlanningContext(input: {
     if (parallelResult && parallelResult.ok && parallelResult.evidence && Array.isArray(parallelResult.evidence.candidates)) {
       for (const candidate of parallelResult.evidence.candidates) {
         const finding = candidate.finding;
-        if (finding && Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
-          // Consumer-side compensation: override verdict to 'blocked-cid-conflict'
+        if (finding && finding.verdict === 'blocked-cid-conflict') {
           parallelFindings.push(buildPermissionFinding({
             level: 'error',
             code: 'blocked-cid-conflict',

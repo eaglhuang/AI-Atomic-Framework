@@ -73,15 +73,17 @@ try {
   const queue = runJson(['tasks', 'parallel', '--task', 'TASK-AAO-0130', '--queue']);
   assert(queue.ok === true, 'tasks parallel queue analysis should succeed');
   assert(Array.isArray(queue.evidence?.candidates), 'queue analysis should return candidates');
-  const cidConflictCandidate = (queue.evidence?.candidates as Array<{ taskId?: unknown; finding?: { verdict?: unknown; overlappingAtomIds?: unknown } }> | undefined)?.find(
+  const cidConflictCandidate = (queue.evidence?.candidates as Array<{ taskId?: unknown; finding?: { verdict?: unknown; overlappingAtomIds?: unknown; brokerAdmission?: { mutationIntentStatus?: unknown; confirmedConflict?: unknown } } }> | undefined)?.find(
     (candidate) => candidate.taskId === 'TASK-AAO-0099'
   );
   assert(Boolean(cidConflictCandidate), 'queue analysis should include TASK-AAO-0099');
-  assert(cidConflictCandidate?.finding?.verdict === 'blocked-cid-conflict', 'TASK-AAO-0099 should be classified as a CID conflict');
+  assert(cidConflictCandidate?.finding?.verdict === 'insufficient-mutation-intent', 'TASK-AAO-0099 should require Broker mutation intent instead of being classified as a confirmed CID conflict');
   assert(
     Array.isArray(cidConflictCandidate?.finding?.overlappingAtomIds) && cidConflictCandidate?.finding?.overlappingAtomIds.includes('atom-cli-router'),
     'TASK-AAO-0099 should report atom-cli-router as an overlapping atom id'
   );
+  assert(cidConflictCandidate?.finding?.brokerAdmission?.confirmedConflict === false, 'TASK-AAO-0099 must not report a confirmed Broker conflict without mutation intent');
+  assert(cidConflictCandidate?.finding?.brokerAdmission?.mutationIntentStatus === 'missing', 'TASK-AAO-0099 must explain the missing mutation intent');
 
   const report = runJson(['tasks', 'parallel', '--queue', '--report']);
   assert(report.ok === true, 'tasks parallel queue report should succeed');

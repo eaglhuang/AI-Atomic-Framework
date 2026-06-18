@@ -599,23 +599,22 @@ scopePaths:
       status: 'ready'
     });
 
-    const conflictClaimBlocked = await runNext([
+    const conflictClaimAdmitted = await runNext([
       '--cwd', tempRoot,
       '--claim',
       '--actor', 'prompt-scope-test',
       '--prompt', 'TASK-CONFLICT-0002'
-    ]).catch((error: any) => ({ ok: false, error }));
-    const conflictClaimError = (conflictClaimBlocked as any).error;
-    assert(conflictClaimError && conflictClaimError.code === 'ATM_NEXT_CLAIM_BLOCKED', 'next --claim on CID conflict task must throw ATM_NEXT_CLAIM_BLOCKED');
-    assert(conflictClaimError.details?.conflictWithTaskId === 'TASK-CONFLICT-0001', 'details must report conflict task id');
-    assert(conflictClaimError.details?.verdict === 'blocked-cid-conflict', 'details must report verdict blocked-cid-conflict');
+    ]);
+    assert(conflictClaimAdmitted.ok === true, 'next --claim must not hard-block same-atom metadata overlap without Broker mutation intent');
+    const claimEvidence = conflictClaimAdmitted.evidence as any;
+    assert(claimEvidence?.nextAction?.teamRecommendation?.parallelAdvisory?.verdict === 'insufficient-mutation-intent', 'claim advisory must report insufficient mutation intent');
+    assert(claimEvidence?.nextAction?.teamRecommendation?.parallelAdvisory?.brokerAdmission?.confirmedConflict === false, 'claim advisory must not report a confirmed Broker conflict');
 
     const teamPlanResult = await runTeam(['plan', '--task', 'TASK-CONFLICT-0002', '--cwd', tempRoot, '--json']);
-    assert(teamPlanResult.ok === false, 'team plan with CID conflict must fail validation');
+    assert(teamPlanResult.ok === true, 'team plan must not fail validation on unconfirmed same-atom metadata overlap');
     const teamEvidence = teamPlanResult.evidence as any;
-    assert(teamEvidence?.validation?.ok === false, 'validation ok must be false');
-    assert(teamEvidence?.validation?.findings?.some((f: any) => f.code === 'blocked-cid-conflict'), 'findings must include blocked-cid-conflict');
-    assert(teamEvidence?.teamPlan?.briefingContract?.parallelAdvisory?.verdict === 'blocked-cid-conflict', 'briefing contract must carry parallelAdvisory');
+    assert(teamEvidence?.validation?.ok === true, 'validation ok must stay true for unconfirmed same-atom metadata overlap');
+    assert(!teamEvidence?.validation?.findings?.some((f: any) => f.code === 'blocked-cid-conflict'), 'findings must not include blocked-cid-conflict without Broker confirmation');
   } finally {
     if (previousGitCeilingDirectories === undefined) {
       delete process.env.GIT_CEILING_DIRECTORIES;

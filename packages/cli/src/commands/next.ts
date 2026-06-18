@@ -764,7 +764,7 @@ async function claimNextImportedTask(input: {
       for (const candidate of parallelResult.evidence.candidates) {
         const finding = candidate.finding;
         if (finding) {
-          if (Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
+          if (finding.verdict === 'blocked-cid-conflict') {
             // TASK-CID-0024: same-file / same-atom overlap only blocks the
             // claim when the overlapping task is actively write-claimed by
             // another actor. Queued-but-idle overlaps and closeout-only
@@ -802,6 +802,16 @@ async function claimNextImportedTask(input: {
                   : 'cid-overlap-without-active-write-claim'
               };
             }
+            continue;
+          }
+          if (Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0 && !parallelAdvisory) {
+            parallelAdvisory = {
+              ...finding,
+              verdict: finding.verdict ?? 'insufficient-mutation-intent',
+              conflictWithTaskId: candidate.taskId,
+              admitted: true,
+              admissionReason: 'broker-conflict-not-confirmed'
+            };
             continue;
           }
           if (finding.verdict !== 'parallel-safe' && !parallelAdvisory) {

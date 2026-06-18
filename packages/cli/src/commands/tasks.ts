@@ -3496,6 +3496,7 @@ interface ParallelAdvisorFinding {
     | 'blocked-cid-conflict'
     | 'blocked-shared-surface'
     | 'blocked-active-lease'
+    | 'insufficient-mutation-intent'
     | 'insufficient-atom-map'
     | 'needs-physical-split';
   readonly overlappingFiles: readonly string[];
@@ -3505,6 +3506,26 @@ interface ParallelAdvisorFinding {
   readonly sharedProjections: readonly string[];
   readonly sharedArtifacts: readonly string[];
   readonly activeLeaseConflicts: readonly string[];
+  readonly brokerAdmission: BrokerAdmissionExplanation;
+}
+
+interface BrokerAdmissionExplanation {
+  readonly schemaId: 'atm.brokerAdmissionExplanation.v1';
+  readonly authority: 'broker-conflict-engine';
+  readonly confirmedConflict: boolean;
+  readonly mutationIntentStatus: 'not-required' | 'missing' | 'available';
+  readonly reason: string;
+  readonly conflictKeys: readonly string[];
+  readonly adapterExplanations: readonly BrokerAdapterExplanation[];
+}
+
+interface BrokerAdapterExplanation {
+  readonly filePath: string;
+  readonly adapterId: string;
+  readonly conflictSurface: 'projection' | 'owner-shard' | 'json-record' | 'text-range' | 'scalar' | 'file-lock' | 'unknown';
+  readonly mutationIntentStatus: 'missing' | 'not-required';
+  readonly reason: string;
+  readonly canonicalPathHint?: string;
 }
 
 function runTasksParallel(argv: string[]) {
@@ -3749,14 +3770,21 @@ function analyzeParallelPair(left: ParallelAdvisorTaskRef, right: ParallelAdviso
   const sharedProjections = overlappingFiles.filter((entry) => /projection|map|registry|index/i.test(entry));
   const sharedArtifacts = overlappingFiles.filter((entry) => /artifact|report|jsonl/i.test(entry));
   const activeLeaseConflicts = overlappingFiles.filter((entry) => /\.atm\/history\//i.test(entry));
+  const brokerAdmission = buildBrokerAdmissionExplanation({
+    overlappingFiles,
+    overlappingAtomIds,
+    sharedProjections
+  });
 
   let verdict: ParallelAdvisorFinding['verdict'] = 'parallel-safe';
-  if (overlappingAtomIds.length > 0) {
+  if (brokerAdmission.confirmedConflict) {
     verdict = 'blocked-cid-conflict';
-  } else if (sharedValidators.length > 0 || sharedGenerators.length > 0 || sharedProjections.length > 0 || sharedArtifacts.length > 0) {
-    verdict = 'blocked-shared-surface';
   } else if (activeLeaseConflicts.length > 0) {
     verdict = 'blocked-active-lease';
+  } else if (sharedGenerators.length > 0 || sharedArtifacts.length > 0 || hasUnexplainedSharedProjection(sharedProjections, brokerAdmission)) {
+    verdict = 'blocked-shared-surface';
+  } else if (overlappingAtomIds.length > 0 || brokerAdmission.mutationIntentStatus === 'missing') {
+    verdict = 'insufficient-mutation-intent';
   } else if (overlappingFiles.length > 0) {
     verdict = 'needs-physical-split';
   } else if (left.allowedFiles.length === 0 || right.allowedFiles.length === 0) {
@@ -3771,8 +3799,91 @@ function analyzeParallelPair(left: ParallelAdvisorTaskRef, right: ParallelAdviso
     sharedGenerators,
     sharedProjections,
     sharedArtifacts,
-    activeLeaseConflicts
+    activeLeaseConflicts,
+    brokerAdmission
   };
+}
+
+function buildBrokerAdmissionExplanation(input: {
+  readonly overlappingFiles: readonly string[];
+  readonly overlappingAtomIds: readonly string[];
+  readonly sharedProjections: readonly string[];
+}): BrokerAdmissionExplanation {
+  const adapterExplanations = input.overlappingFiles.flatMap((filePath) => explainBrokerAdapterForPath(filePath));
+  const needsMutationIntent = input.overlappingAtomIds.length > 0
+    || adapterExplanations.some((entry) => entry.mutationIntentStatus === 'missing');
+  return {
+    schemaId: 'atm.brokerAdmissionExplanation.v1',
+    authority: 'broker-conflict-engine',
+    confirmedConflict: false,
+    mutationIntentStatus: needsMutationIntent ? 'missing' : 'not-required',
+    reason: needsMutationIntent
+      ? 'Task metadata exposes overlapping ownership or shared non-code surfaces, but no Broker mutation request / conflict key is available. Admission must not present this as a confirmed CID conflict.'
+      : 'No Broker mutation conflict evidence is required for this pair.',
+    conflictKeys: [],
+    adapterExplanations
+  };
+}
+
+function explainBrokerAdapterForPath(filePath: string): BrokerAdapterExplanation[] {
+  const normalized = filePath.replace(/\\/g, '/');
+  if (normalized === 'atomic_workbench/atomization-coverage/path-to-atom-map.json') {
+    return [{
+      filePath: normalized,
+      adapterId: 'path-to-atom-map',
+      conflictSurface: 'projection',
+      mutationIntentStatus: 'missing',
+      reason: 'path-to-atom-map.json is a derived projection. Row-level conflict keys require owner-shard mutation targets, not the projection file alone.',
+      canonicalPathHint: 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-*.json'
+    }];
+  }
+  if (/atomic_workbench\/atomization-coverage\/path-to-atom-map-shards\/owner-shard-[^/]+\.json$/.test(normalized)) {
+    return [{
+      filePath: normalized,
+      adapterId: 'path-to-atom-map',
+      conflictSurface: 'owner-shard',
+      mutationIntentStatus: 'missing',
+      reason: 'Owner-shard path is adapter-aware, but task ledgers do not declare the row mutation target (path_pattern::atom_id), so the Broker cannot confirm a row conflict at claim time.'
+    }];
+  }
+  if (normalized.endsWith('.scalars.json') || normalized.endsWith('.counter.json')) {
+    return [{
+      filePath: normalized,
+      adapterId: 'numeric-scalar',
+      conflictSurface: 'scalar',
+      mutationIntentStatus: 'missing',
+      reason: 'Scalar JSON can be adapter-merged only when mutation requests declare the scalar target and operation.'
+    }];
+  }
+  if (normalized.endsWith('.json')) {
+    return [{
+      filePath: normalized,
+      adapterId: 'json-record',
+      conflictSurface: 'json-record',
+      mutationIntentStatus: 'missing',
+      reason: 'JSON record conflicts require JSON pointer mutation targets; task file scope alone is insufficient.'
+    }];
+  }
+  if (normalized.endsWith('.md') || normalized.endsWith('.txt')) {
+    return [{
+      filePath: normalized,
+      adapterId: 'text-range',
+      conflictSurface: 'text-range',
+      mutationIntentStatus: 'missing',
+      reason: 'Text conflicts require line-range or anchor mutation targets; task file scope alone is insufficient.'
+    }];
+  }
+  return [];
+}
+
+function hasUnexplainedSharedProjection(
+  sharedProjections: readonly string[],
+  brokerAdmission: BrokerAdmissionExplanation
+): boolean {
+  return sharedProjections.some((projection) => {
+    const normalized = projection.replace(/\\/g, '/');
+    return !brokerAdmission.adapterExplanations.some((entry) => entry.filePath === normalized);
+  });
 }
 
 function buildParallelHotspotReport(tasks: readonly ParallelAdvisorTaskRef[]) {
