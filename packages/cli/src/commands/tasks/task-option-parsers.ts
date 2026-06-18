@@ -209,6 +209,7 @@ export function parseScopeAddOptions(argv: string[]) {
     cwd: process.cwd(),
     taskId: '',
     actorId: null as string | null,
+    claimFirst: false,
     emergencyApproval: null as string | null,
     addPaths: [] as string[],
     /** 修改類型：doc-sync | help-snapshot-sync | test-alignment | generated-artifact | linked-surface */
@@ -232,6 +233,10 @@ export function parseScopeAddOptions(argv: string[]) {
     if (arg === '--actor') {
       options.actorId = requireValue(argv, index, '--actor');
       index += 1;
+      continue;
+    }
+    if (arg === '--claim-first') {
+      options.claimFirst = true;
       continue;
     }
     if (arg === '--emergency-approval') {

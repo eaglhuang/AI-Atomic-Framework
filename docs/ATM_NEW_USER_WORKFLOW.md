@@ -171,6 +171,14 @@ node atm.mjs tasks scope add --task TASK-XXXX-0001 --actor <actor> --add docs/fo
 
 This records a `scope-amendment` event with its class, phase, and `mode: normal`, and that history stays visible at closeout. `tasks scope repair` is the protected emergency variant — it needs `--emergency-approval` and `--reason` and records `mode: repair`. Reach for it only when a human approved a maintenance exception.
 
+If the task has a reserve/promote lane ready but no active claim yet, add
+`--claim-first` and ATM will resolve the common precondition for you before it
+widens the scope:
+
+```bash
+node atm.mjs tasks scope add --task TASK-XXXX-0001 --actor <actor> --claim-first --add docs/foo.md --json
+```
+
 ## Step 6: Preview the close
 
 When you need one read-only answer for "where is this task?" without chaining `next`, `tasks status`, `evidence show`, and `doctor`, use:

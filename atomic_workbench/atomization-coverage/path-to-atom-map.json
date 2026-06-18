@@ -479,7 +479,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-direction-map",
-      "capability": "tasks scope add: formal scope amendment CLI; appends paths to active taskDirectionLock.allowedFiles via CLI, records scope-amendment transition event, returns ATM_SCOPE_AMENDMENT_APPLIED. Agents must not edit .atm/runtime/locks/** directly; all scope widening goes through this command (TASK-AAO-0010).",
+      "capability": "tasks scope add: formal scope amendment CLI; appends paths to active taskDirectionLock.allowedFiles via CLI, records scope-amendment transition events, returns ATM_SCOPE_AMENDMENT_APPLIED, rewrites ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK with explicit active-claim guidance, and supports --claim-first auto-claim precondition resolution with scope-amendment.claim-first-resolved audit events. Agents must not edit .atm/runtime/locks/** directly; all scope widening goes through this command (TASK-AAO-0010, TASK-MAO-0056).",
       "coverage_status": "active"
     },
     {
@@ -580,7 +580,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks/task-option-parsers.ts",
       "atom_id": "atm.task-option-parsers-map",
-      "capability": "Pure option parsing and CLI flags validators for task sub-commands (reconcile, deliver-and-close, scope add, create, mirror, close, reset, audit, queue, lock cleanup, legacy ledger migration, and claim lifecycle)",
+      "capability": "Pure option parsing and CLI flags validators for task sub-commands (reconcile, deliver-and-close, scope add including --claim-first, create, mirror, close, reset, audit, queue, lock cleanup, legacy ledger migration, and claim lifecycle)",
       "coverage_status": "active"
     },
     {

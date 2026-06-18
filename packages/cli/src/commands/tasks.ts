@@ -3175,19 +3175,107 @@ async function runTasksScope(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add, repair`, { exitCode: 2 });
 }
 
-function runTasksScopeAdd(argv: string[]) {
+type ScopeAmendmentPreconditionResolution = {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly lockState: 'missing' | 'active' | 'released' | 'unreadable';
+  readonly claimState: string;
+  readonly leaseState: 'none' | 'active' | 'expired';
+  readonly claimActorId: string | null;
+  readonly leaseId: string | null;
+  readonly resolvedBy: 'none' | 'claim-first';
+  readonly claimCommand: string;
+};
+
+function inspectScopeAmendmentPreconditions(cwd: string, taskId: string, actorId: string): ScopeAmendmentPreconditionResolution {
+  const taskPath = taskPathFor(cwd, taskId);
+  const taskDocument = existsSync(taskPath) ? readJsonRecord(taskPath) : {};
+  const claim = parseClaimRecord(taskDocument.claim);
+  const nowIso = new Date().toISOString();
+  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+  let lockState: ScopeAmendmentPreconditionResolution['lockState'] = 'missing';
+  if (existsSync(lockPath)) {
+    try {
+      const outerLock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+      lockState = outerLock.released === true || outerLock.status === 'released' ? 'released' : 'active';
+    } catch {
+      lockState = 'unreadable';
+    }
+  }
+  return {
+    taskId,
+    actorId,
+    lockState,
+    claimState: claim?.state ?? 'none',
+    leaseState: claim?.leaseId ? (isClaimExpired(claim, nowIso) ? 'expired' : 'active') : 'none',
+    claimActorId: claim?.actorId ?? null,
+    leaseId: claim?.leaseId ?? null,
+    resolvedBy: 'none',
+    claimCommand: `node atm.mjs next --claim --task ${taskId} --actor ${actorId} --auto-intent --json`
+  };
+}
+
+function buildScopeAmendmentNoClaimMessage(input: ScopeAmendmentPreconditionResolution): string {
+  return [
+    `Scope amendment for ${input.taskId} requires an active claim, not a bare lock or renewed lease.`,
+    `Current state: lock=${input.lockState}, claim=${input.claimState}, lease=${input.leaseState}.`,
+    'Run one of:',
+    `  - ${input.claimCommand} (recommended)`,
+    `  - node atm.mjs tasks renew --task ${input.taskId} --actor ${input.actorId} --json (if lease only)`,
+    'Then retry the scope amendment.'
+  ].join('\n');
+}
+
+async function resolveScopeAmendmentClaimFirst(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+}): Promise<ScopeAmendmentPreconditionResolution> {
+  const precondition = inspectScopeAmendmentPreconditions(input.cwd, input.taskId, input.actorId);
+  if (precondition.claimState === 'active' && precondition.claimActorId === input.actorId) {
+    return precondition;
+  }
+  const taskDocument = readJsonRecord(taskPathFor(input.cwd, input.taskId));
+  const files = extractTaskCloseDeclaredFiles(taskDocument, input.cwd, input.taskId);
+  await runTasksClaimLifecycle('claim', [
+    '--cwd', input.cwd,
+    '--task', input.taskId,
+    '--actor', input.actorId,
+    '--auto-intent',
+    '--files', files.join(','),
+    '--json'
+  ]);
+  return {
+    ...inspectScopeAmendmentPreconditions(input.cwd, input.taskId, input.actorId),
+    resolvedBy: 'claim-first'
+  };
+}
+
+async function runTasksScopeAdd(argv: string[]) {
   const options = parseScopeAddOptions(argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks scope add requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  let preconditionResolution = inspectScopeAmendmentPreconditions(options.cwd, options.taskId, actorId);
+  if (options.claimFirst) {
+    preconditionResolution = await resolveScopeAmendmentClaimFirst({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId
+    });
+  }
 
   const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
   if (!existsSync(lockPath)) {
-    throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `No active direction lock found for task ${options.taskId}. The task must be claimed before amending its scope.`, {
+    throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', buildScopeAmendmentNoClaimMessage(preconditionResolution), {
       exitCode: 1,
-      details: { taskId: options.taskId }
+      details: {
+        ...preconditionResolution,
+        taskId: options.taskId,
+        requiredCommand: preconditionResolution.claimCommand
+      }
     });
   }
 
@@ -3197,14 +3285,22 @@ function runTasksScopeAdd(argv: string[]) {
   } catch {
     throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Could not read direction lock for task ${options.taskId}.`, {
       exitCode: 1,
-      details: { taskId: options.taskId }
+      details: {
+        ...preconditionResolution,
+        taskId: options.taskId,
+        requiredCommand: preconditionResolution.claimCommand
+      }
     });
   }
 
   if (outerLock.released === true || outerLock.status === 'released') {
     throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; claim the task first.`, {
       exitCode: 1,
-      details: { taskId: options.taskId }
+      details: {
+        ...preconditionResolution,
+        taskId: options.taskId,
+        requiredCommand: preconditionResolution.claimCommand
+      }
     });
   }
 
@@ -3212,7 +3308,11 @@ function runTasksScopeAdd(argv: string[]) {
   if (!embeddedLock || typeof embeddedLock !== 'object' || Array.isArray(embeddedLock)) {
     throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Lock file for ${options.taskId} does not contain an embedded taskDirectionLock.`, {
       exitCode: 1,
-      details: { taskId: options.taskId }
+      details: {
+        ...preconditionResolution,
+        taskId: options.taskId,
+        requiredCommand: preconditionResolution.claimCommand
+      }
     });
   }
   const embeddedLockRecord = embeddedLock as Record<string, unknown>;
@@ -3240,6 +3340,19 @@ function runTasksScopeAdd(argv: string[]) {
   };
   if (existsSync(taskPath)) {
     const taskDocument = readJsonRecord(taskPath);
+    if (preconditionResolution.resolvedBy === 'claim-first') {
+      appendTaskTransitionEvent({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        action: 'scope-amendment.claim-first-resolved',
+        actorId,
+        fromStatus: String(taskDocument.status ?? 'running'),
+        toStatus: String(taskDocument.status ?? 'running'),
+        taskPath,
+        taskDocument,
+        command: preconditionResolution.claimCommand
+      });
+    }
     const commandLine = buildScopeAmendmentCommand({
       mode: 'normal',
       taskId: options.taskId,
@@ -3280,6 +3393,7 @@ function runTasksScopeAdd(argv: string[]) {
           addedPaths,
           alreadyPresent,
           allowedFiles: mergedAllowed,
+          preconditionResolution,
           amendmentMetadata,
           requiredCommand: `node atm.mjs tasks scope add --task ${options.taskId} --actor ${actorId} --add <paths> --json`
         }
@@ -3293,6 +3407,7 @@ function runTasksScopeAdd(argv: string[]) {
       addedPaths,
       alreadyPresent,
       allowedFiles: mergedAllowed,
+      preconditionResolution,
       amendmentMetadata
     }
   });
