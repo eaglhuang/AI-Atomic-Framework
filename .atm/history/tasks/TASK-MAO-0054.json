@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0054",
   "title": "tasks reserve planning-card precheck and auto-import",
-  "status": "running",
+  "status": "done",
   "milestone": "M8",
   "dependencies": [
     "TASK-MAO-0049"
@@ -66,8 +66,8 @@
     "hash": "768f50a149a59922"
   },
   "importedAt": "2026-06-18T07:20:43.562Z",
-  "lastTransitionId": "2026-06-18T07-20-50-967Z-claim-bd034ffb117e",
-  "lastTransitionAt": "2026-06-18T07:20:50.967Z",
+  "lastTransitionId": "2026-06-18T10-33-57-076Z-close-6a20cbec4f79",
+  "lastTransitionAt": "2026-06-18T10:33:57.076Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-18T07:20:50.925Z",
@@ -76,7 +76,7 @@
     "actorId": "captain",
     "leaseId": "lease-fb1ec735ef69",
     "claimedAt": "2026-06-18T07:20:50.931Z",
-    "heartbeatAt": "2026-06-18T07:20:50.931Z",
+    "heartbeatAt": "2026-06-18T10:33:57.073Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-MAO-0054.json",
@@ -87,8 +87,8 @@
       "packages/cli/src/commands/tasks/task-transition-helpers.ts",
       "tests/cli/tasks-reserve-planning-precheck.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-18T07:20:50.931Z",
   "startedByActor": "captain",
@@ -119,5 +119,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-18T07:20:50.966Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T10:33:57.073Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260618072050-captain-TASK-MAO-0054-94fbd20858",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0054.closure-packet.json"
 }
