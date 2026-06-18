@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T15-22-17-362Z-close-11490bfe7f62",
+  "taskId": "TASK-AAO-0116",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260618151832-cursor-gpt-5.2-TASK-AAO-0116-80c8f9c36c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0116.json",
+  "taskSha256": "sha256:303a55885a51b230559162617c70038dd8ad9c0241e68113c6c183c29e524c4e",
+  "createdAt": "2026-06-18T15:22:17.362Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0116 --actor cursor-gpt-5.2 --status done --historical-delivery 3ad6d63ed",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618151832-cursor-gpt-5.2-TASK-AAO-0116-80c8f9c36c",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0116.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T15:22:17.354Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0116-actor-adopt.task.md",
+        ".atm/history/evidence/TASK-AAO-0116.*",
+        ".atm/history/task-events/TASK-AAO-0116/**",
+        ".atm/history/tasks/TASK-AAO-0116.json",
+        "docs/governance/actor-identity-model.md",
+        "packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
+        "packages/cli/src/commands/actor-registry.ts",
+        "packages/cli/src/commands/actor.ts",
+        "packages/cli/src/commands/command-specs/actor.spec.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/__tests__/actor-adopt.spec.ts",
+        "packages/cli/src/commands/actor-registry.ts",
+        "packages/cli/src/commands/actor.ts",
+        "packages/cli/src/commands/command-specs/actor.spec.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
