@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0112",
+  "title": "Broker explicit-input mutation-intent seed",
+  "status": "running",
+  "milestone": "M20",
+  "dependencies": [
+    "TASK-CID-0097"
+  ],
+  "acceptance": [
+    "Broker contracts expose a typed mutation-intent input surface for explicit mutation requests.",
+    "Supported inputs include `MutationRequest[]`, `PatchProposal[]`, owner-shard row target, JSON pointer, text range, and scalar operation.",
+    "Missing target, region, or operation data returns a structured `missingInputs` result.",
+    "Tests prove that vague or incomplete input does not produce guessed conflict keys.",
+    "Existing adapter-aware conflict behavior continues to work for callers that already provide structured request data."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/adapters/index.ts",
+    "packages/core/src/broker/adapters/registry.ts",
+    "packages/core/src/broker/__tests__/**",
+    "schemas/broker/**"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/**",
+    "packages/cli/src/commands/broker.ts",
+    "schemas/broker/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm test",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not build a general automatic mutation-intent guesser.",
+    "Do not infer read/write regions from vague natural-language task text.",
+    "Do not hard-block insufficient mutation intent in this card."
+  ],
+  "nonGoals": [
+    "Do not replace existing broker adapter conflict logic."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-mutation-intent",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0112-broker-explicit-input-mutation-intent-seed.task.md",
+    "sectionTitle": "TASK-CID-0112",
+    "headingLine": 38,
+    "hash": "1ff03ea6cd209857"
+  },
+  "importedAt": "2026-06-18T06:24:56.909Z",
+  "lastTransitionId": "2026-06-18T15-43-38-521Z-claim-0f9bf0d76b1c",
+  "lastTransitionAt": "2026-06-18T15:43:38.521Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-18T15:43:38.436Z",
+  "promotedAt": "2026-06-18T15:43:38.443Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-5fbe6fbdc05e",
+    "claimedAt": "2026-06-18T15:43:38.446Z",
+    "heartbeatAt": "2026-06-18T15:43:38.446Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0112.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/**",
+      "schemas/broker/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T15:22:48.743Z",
+  "startedByActor": "cursor-composer-2.5",
+  "startedBySessionId": "session-20260618154338-codex-gpt-5.4-mini-TASK-CID-0112-7eb3ce7144",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0112",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0112.*",
+      ".atm/history/task-events/TASK-CID-0112/**",
+      ".atm/history/tasks/TASK-CID-0112.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/**",
+      "schemas/broker/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "99189a33e76db208f5d96b816a096962dac215ffc35e62c5053b82f81e9e8e5f",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-18T15:43:38.520Z",
+    "status": "active"
+  }
+}

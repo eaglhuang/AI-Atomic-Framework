@@ -245,6 +245,30 @@ export interface MutationRequest {
   readonly value?: unknown;
 }
 
+export type ExplicitMutationIntentKind =
+  | 'mutation-request'
+  | 'patch-proposal'
+  | 'owner-shard-row-target'
+  | 'json-pointer'
+  | 'text-range'
+  | 'scalar-operation';
+
+export interface MutationIntentMissingInput {
+  readonly requestId: string;
+  readonly filePath: string;
+  readonly kind: ExplicitMutationIntentKind | 'unknown';
+  readonly field: 'filePath' | 'op' | 'target' | 'value';
+  readonly reason: string;
+}
+
+export interface ExplicitMutationIntentInputSummary {
+  readonly requestId: string;
+  readonly filePath: string;
+  readonly kind: ExplicitMutationIntentKind;
+  readonly op: string;
+  readonly target: string;
+}
+
 /**
  * An adapter-normalized mutation: the registry-neutral request after the
  * adapter has resolved/validated the operation against the parsed document.
