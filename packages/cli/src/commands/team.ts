@@ -118,6 +118,39 @@ type TeamRuntimeContract = {
   agentsSpawned: boolean;
   executionSurface: 'agent-runtime' | 'editor-subagent' | 'broker-governance';
   selectionReason: string;
+  editorSubagentBridge: TeamEditorSubagentBridgeContract;
+};
+
+type TeamEditorSubagentRoleEnvelope = {
+  schemaId: 'atm.teamEditorSubagentRoleEnvelope.v1';
+  agentId: string;
+  role: string;
+  profile: string | null;
+  language: string | null;
+  permissions: string[];
+  allowedFiles: string[];
+  leaseMetadata: {
+    permissionLeases: PermissionLease[];
+    leaseOwner: string;
+  };
+  artifactMetadata: {
+    expectedReports: string[];
+    evidenceRequired: string;
+  };
+  retryMetadata: {
+    retryPolicy: 'atm-governed';
+    maxAttempts: number;
+  };
+};
+
+type TeamEditorSubagentBridgeContract = {
+  schemaId: 'atm.teamEditorSubagentBridgeContract.v1';
+  enabled: boolean;
+  lifecycleOwner: 'atm';
+  disabledReason: string | null;
+  editorNeutral: true;
+  allowedFiles: string[];
+  roleEnvelopes: TeamEditorSubagentRoleEnvelope[];
 };
 
 type TeamPatrolFinding = {
@@ -453,7 +486,12 @@ export async function runTeam(argv: string[]) {
     runtimeAdapterId: parsed.options.runtimeAdapter,
     providerId: parsed.options.provider,
     sdkId: parsed.options.sdk,
-    modelId: parsed.options.model
+    modelId: parsed.options.model,
+    editorBridgeDisabled: parsed.options.disableEditorBridge,
+    recipe,
+    allowedFiles: deriveWritePaths(task, cwd),
+    permissionLeases: teamPlan.suggestedPermissionLeases,
+    evidenceRequired: String(task.evidenceRequired ?? 'command-backed')
   });
 
   if (action === 'validate') {
@@ -602,6 +640,11 @@ export function buildTeamRuntimeContract(input: {
   providerId?: unknown;
   sdkId?: unknown;
   modelId?: unknown;
+  editorBridgeDisabled?: unknown;
+  recipe?: TeamRecipe;
+  allowedFiles?: readonly string[];
+  permissionLeases?: readonly PermissionLease[];
+  evidenceRequired?: unknown;
 }): TeamRuntimeContract {
   const runtimeMode = normalizeTeamRuntimeMode(input.runtimeMode);
   const runtimeLanguage = normalizeOptionalRuntimeString(input.runtimeLanguage) ?? 'node';
@@ -609,6 +652,7 @@ export function buildTeamRuntimeContract(input: {
   const providerId = normalizeOptionalRuntimeString(input.providerId);
   const sdkId = normalizeOptionalRuntimeString(input.sdkId);
   const modelId = normalizeOptionalRuntimeString(input.modelId);
+  const editorBridgeDisabled = Boolean(input.editorBridgeDisabled);
   const agentsSpawned = runtimeMode !== 'broker-only';
   const executionSurface = runtimeMode === 'real-agent'
     ? 'agent-runtime'
@@ -626,7 +670,76 @@ export function buildTeamRuntimeContract(input: {
     modelId,
     agentsSpawned,
     executionSurface,
-    selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId })
+    selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId }),
+    editorSubagentBridge: buildEditorSubagentBridgeContract({
+      enabled: runtimeMode === 'editor-subagent' && !editorBridgeDisabled,
+      disabledReason: runtimeMode !== 'editor-subagent'
+        ? 'runtime-mode-is-not-editor-subagent'
+        : editorBridgeDisabled
+          ? 'disabled-by-run-option'
+          : null,
+      recipe: input.recipe,
+      allowedFiles: input.allowedFiles ?? [],
+      permissionLeases: input.permissionLeases ?? [],
+      evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
+    })
+  };
+}
+
+function buildEditorSubagentBridgeContract(input: {
+  enabled: boolean;
+  disabledReason: string | null;
+  recipe?: TeamRecipe;
+  allowedFiles: readonly string[];
+  permissionLeases: readonly PermissionLease[];
+  evidenceRequired: string;
+}): TeamEditorSubagentBridgeContract {
+  const allowedFiles = uniqueStrings(input.allowedFiles.map((entry) => String(entry).trim()).filter(Boolean));
+  const leasesByAgent = new Map<string, PermissionLease[]>();
+  for (const lease of input.permissionLeases) {
+    leasesByAgent.set(lease.agentId, [...(leasesByAgent.get(lease.agentId) ?? []), {
+      permission: lease.permission,
+      agentId: lease.agentId,
+      paths: lease.paths ? [...lease.paths] : undefined
+    }]);
+  }
+  const roleEnvelopes = (input.recipe?.agents ?? []).map((agent) => {
+    const permissionLeases = leasesByAgent.get(agent.agentId) ?? [];
+    return {
+      schemaId: 'atm.teamEditorSubagentRoleEnvelope.v1' as const,
+      agentId: agent.agentId,
+      role: agent.role,
+      profile: agent.profile ?? null,
+      language: agent.language ?? input.recipe?.language ?? null,
+      permissions: [...agent.permissions],
+      allowedFiles,
+      leaseMetadata: {
+        permissionLeases,
+        leaseOwner: agent.agentId
+      },
+      artifactMetadata: {
+        expectedReports: [
+          'agent report',
+          'validator evidence',
+          'team summary'
+        ],
+        evidenceRequired: input.evidenceRequired
+      },
+      retryMetadata: {
+        retryPolicy: 'atm-governed' as const,
+        maxAttempts: 1
+      }
+    };
+  });
+
+  return {
+    schemaId: 'atm.teamEditorSubagentBridgeContract.v1',
+    enabled: input.enabled,
+    lifecycleOwner: 'atm',
+    disabledReason: input.disabledReason,
+    editorNeutral: true,
+    allowedFiles,
+    roleEnvelopes
   };
 }
 

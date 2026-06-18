@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0032",
+  "title": "Editor subagent bridge contract",
+  "status": "running",
+  "milestone": "M5R",
+  "dependencies": [
+    "TASK-TEAM-0031"
+  ],
+  "acceptance": [
+    "Team runtime can represent editor-subagent execution without losing role, lease, or artifact information.",
+    "Editor-subagent mode still respects task `allowedFiles`.",
+    "The bridge can be disabled per run without changing Team governance semantics."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case editor-subagent-bridge",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Editor-specific UI implementation",
+    "Auto-installing plugins or editor extensions",
+    "Replacing ATM governance with editor-native policy"
+  ],
+  "nonGoals": [
+    "Do not make the editor the lifecycle owner",
+    "Do not skip lease or evidence rules for editor mode"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert editor bridge contract, role-envelope serialization, and validator coverage.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This card defines the bridge contract only. It does not yet ship a full editor-specific implementation.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0032-editor-subagent-bridge-contract.task.md",
+    "sectionTitle": "TASK-TEAM-0032",
+    "headingLine": 47,
+    "hash": "00c71c63145768ff"
+  },
+  "importedAt": "2026-06-17T16:55:21.053Z",
+  "lastTransitionId": "2026-06-18T17-21-12-396Z-claim-76e438bc70b0",
+  "lastTransitionAt": "2026-06-18T17:21:12.396Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-18T17:20:53.817Z",
+  "promotedAt": "2026-06-18T17:21:05.660Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-43e88ad36329",
+    "claimedAt": "2026-06-18T17:21:11.527Z",
+    "heartbeatAt": "2026-06-18T17:21:11.527Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T17:04:29.140Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260618172111-codex-gpt-5.4-mini-TASK-TEAM-0032-10c704223b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0032",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0032.*",
+      ".atm/history/task-events/TASK-TEAM-0032/**",
+      ".atm/history/tasks/TASK-TEAM-0032.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f02fb7f2b154074dfd73e7f8fbc8ffcdeba2f601f6ae250d37b08e419d0f55be",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-18T17:21:12.395Z",
+    "status": "active"
+  }
+}

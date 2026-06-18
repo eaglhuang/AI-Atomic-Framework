@@ -23,6 +23,7 @@ export const teamSpecCommandSurface = {
     { flag: '--provider', value: 'id', summary: 'Optional provider metadata recorded on the runtime contract.' },
     { flag: '--sdk', value: 'id', summary: 'Optional SDK metadata recorded on the runtime contract.' },
     { flag: '--model', value: 'id', summary: 'Optional model metadata recorded on the runtime contract.' },
+    { flag: '--disable-editor-bridge', summary: 'Disable the editor-subagent bridge contract for this run while preserving Team governance semantics.' },
     { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },
     { flag: '--mode', value: 'name', summary: 'Team patrol mode: claim-preflight, close-preflight, big-script, or daily-noon.' },
     { flag: '--compact', summary: 'Return a compact status payload.' },
@@ -124,6 +125,7 @@ export const teamSpecRuntimeStatus = {
   examples: [
     'node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json',
     'node atm.mjs team start --task TASK-TEAM-0031 --actor codex-main --runtime-mode broker-only --runtime-adapter atm.node.broker --json',
+    'node atm.mjs team start --task TASK-TEAM-0032 --actor codex-main --runtime-mode editor-subagent --runtime-adapter codex.desktop.subagent --json',
     'node atm.mjs team status --compact --json'
   ]
 };
