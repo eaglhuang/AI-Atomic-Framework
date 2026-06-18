@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0018",
+  "title": "closure packet runner binding",
+  "status": "running",
+  "milestone": "M5",
+  "dependencies": [
+    "TASK-MAO-0017"
+  ],
+  "acceptance": [
+    "Schema validation passes for old packets without the field and new ATM-core packets with the field.",
+    "ATM-core closure without a binding fails with a clear diagnostic.",
+    "Non-core closure does not require the field.",
+    "Tests prove digest mismatch rejection and successful binding verification.",
+    "The task text makes clear it is a later precision upgrade, not a blocker for v1 stewardship."
+  ],
+  "deliverables": [
+    "schemas/governance/closure-packet.schema.json",
+    "tests/cli/closure-runner-binding.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "schemas/governance/closure-packet.schema.json",
+    "packages/cli/src/commands/tasks/closeout-provenance.ts",
+    "packages/cli/src/commands/tasks/closeout-signaling.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "scripts/validate-framework-development-governance.ts",
+    "tests/cli/closure-runner-binding.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:schemas",
+    "node --strip-types tests/cli/closure-runner-binding.test.ts",
+    "npm run validate:framework-development-governance",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Cross-repo adopter binding",
+    "Changing closure authority rules",
+    "Replacing existing closure packet fields"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert closure packet schema/additive binding logic, tests, and map entries.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-closure-binding-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0018-closure-runner-binding.task.md",
+    "sectionTitle": "TASK-MAO-0018",
+    "headingLine": 47,
+    "hash": "8f6a0d2d6d148870"
+  },
+  "importedAt": "2026-06-17T15:12:34.119Z",
+  "lastTransitionId": "2026-06-18T04-08-54-550Z-claim-acc8c34a0af2",
+  "lastTransitionAt": "2026-06-18T04:08:54.550Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-4-7",
+  "reservedAt": "2026-06-18T04:08:52.701Z",
+  "promotedAt": "2026-06-18T04:08:53.269Z",
+  "claim": {
+    "actorId": "claude-code-opus-4-7",
+    "leaseId": "lease-8edabf901c43",
+    "claimedAt": "2026-06-18T04:08:54.496Z",
+    "heartbeatAt": "2026-06-18T04:08:54.496Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "tests/cli/closure-runner-binding.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T04:08:54.496Z",
+  "startedByActor": "claude-code-opus-4-7",
+  "startedBySessionId": "session-20260618040854-claude-code-opus-4-7-TASK-MAO-0018-b488d7b38c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0018",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0018.*",
+      ".atm/history/task-events/TASK-MAO-0018/**",
+      ".atm/history/tasks/TASK-MAO-0018.json",
+      "tests/cli/closure-runner-binding.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "688d5343df9705ba3f1f097c22ad3f986a871caa9685fd7d20a0c560bfb8122e",
+    "actorId": "claude-code-opus-4-7",
+    "createdAt": "2026-06-18T04:08:54.549Z",
+    "status": "active"
+  }
+}
