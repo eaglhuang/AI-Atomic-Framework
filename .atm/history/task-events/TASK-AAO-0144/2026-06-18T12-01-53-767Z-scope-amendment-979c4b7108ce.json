@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T12-01-53-767Z-scope-amendment-979c4b7108ce",
+  "taskId": "TASK-AAO-0144",
+  "action": "scope-amendment",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0144.json",
+  "taskSha256": "sha256:8153a32bea77e878e15cd992268f00c2b1eb3c30d8f1e6be23eb5c5b9e7b57a7",
+  "createdAt": "2026-06-18T12:01:53.767Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0144 --actor cursor-gpt-5.2 --add tests/cli/build-release-hygiene.test.ts --reason \"0144 build hygiene regression test\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "0144 build hygiene regression test"
+  }
+}

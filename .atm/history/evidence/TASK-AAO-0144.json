@@ -1,0 +1,398 @@
+{
+  "taskId": "TASK-AAO-0144",
+  "updatedAt": "2026-06-18T13:27:30.023Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T11:57:20.042Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-18T11:57:20.384Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b4ced1214615539ee15fc3a4a955500bdbd111f8b936bd7b7557468b9bb2d5bd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T11:58:01.285Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-18T11:58:01.466Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:952a72d417b228046e860fadcdbf652ab5c1829fb0a61871fe1675b743ad3c5e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T11:58:02.880Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-06-18T11:58:03.286Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ed5a98fa0ccce37def6da9e11cd45d23bd8a57a53cb4b0b7fea6ee31e1d84209",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T13:14:32.223Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-06-18T13:14:32.357Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0e5fea729d387da0f6742a48109720c894053728afa8796ba704fac83a61cbc3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T13:15:48.562Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:governance-commands"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:75a57b566263de48753fb22c99048185a8116e74b374b7b697f13bc1ba6a2b2e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:governance-commands"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ab84470792352b3f222368cf0fa54412313ff6f7561c6fb17fc05a49f92793fe",
+            "cached": false,
+            "generatedAt": "2026-06-18T13:15:48.660Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:075238cf80317b59706b5db262820e369ee4e382467286d550490de981df54a9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:onefile-release",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T13:27:00.144Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:onefile-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:onefile-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:01cbceef86029c9bbc1907fd6d28377066d0d7be65540b2e86f25378cf58364d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:onefile-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:03e00687f6f7e371391267d7b243b240fc4328f38a8e6c3cc68830bf43514dcc",
+            "cached": false,
+            "generatedAt": "2026-06-18T13:27:00.259Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e4d1fe5250dfaad247477da1b72613a6e23dc31f949eec1e230063e919a6c761",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:root-drop-release",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+      "createdAt": "2026-06-18T13:27:30.023Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260618110354-cursor-gpt-5.2-TASK-AAO-0144-447e857c14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:root-drop-release"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "path_pattern: \"packages/cli/src/commands/git-governance.ts",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:root-drop-release",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:root-drop-release"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:5a5719d94d4f01b4bb7322f5d6add0c96e83a55de922eb88f506045f5e9f87b6",
+            "cached": false,
+            "generatedAt": "2026-06-18T13:27:30.116Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:06be5600eb06d6a2da01429ef9f061307561155db8c93b465bd1e651ce328f6a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

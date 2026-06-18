@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T11-04-48-621Z-scope-amendment-faafc004f31a",
+  "taskId": "TASK-AAO-0144",
+  "action": "scope-amendment",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0144.json",
+  "taskSha256": "sha256:8153a32bea77e878e15cd992268f00c2b1eb3c30d8f1e6be23eb5c5b9e7b57a7",
+  "createdAt": "2026-06-18T11:04:48.621Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0144 --actor cursor-gpt-5.2 --add \"packages/cli/src/commands/git-governance.ts,packages/cli/src/commands/hook.ts,packages/cli/src/commands/next.ts,packages/cli/src/commands/framework-development.ts,packages/cli/src/commands/command-specs/git.spec.ts,scripts/build-onefile-release.ts,scripts/build-release-hygiene.ts,scripts/build-root-drop-release.ts,package.json,docs/governance/git-governance-contract.md,docs/ATM_NEW_USER_WORKFLOW.md,docs/governance/build-release-hygiene.md\" --reason \"TASK-AAO-0144 deliverables\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-AAO-0144 deliverables"
+  }
+}
