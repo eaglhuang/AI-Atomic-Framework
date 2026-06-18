@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T09-14-20-958Z-close-9e1aa1c26548",
+  "taskId": "TASK-MAO-0057",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618072559-captain-TASK-MAO-0057-855fb1e4fa",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0057.json",
+  "taskSha256": "sha256:97e227f3c4cc64d2ba41d54c9196e549c3ac10f34cadead4ece2992d30308f58",
+  "createdAt": "2026-06-18T09:14:20.958Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0057 --actor captain --status done --historical-delivery 5fb80222398c2175a4de64a3639ff969ebb6d34d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618072559-captain-TASK-MAO-0057-855fb1e4fa",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0057.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/taskflow-close-defer-governance-dirty.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T09:14:20.954Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0057-taskflow-close-defer-governance-dirty.task.md",
+        ".atm/history/evidence/TASK-MAO-0057.*",
+        ".atm/history/task-events/TASK-MAO-0057/**",
+        ".atm/history/tasks/TASK-MAO-0057.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ATM_NEW_USER_WORKFLOW.md",
+        "docs/governance/git-governance-contract.md",
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli/taskflow-close-defer-governance-dirty.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli/taskflow-close-defer-governance-dirty.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

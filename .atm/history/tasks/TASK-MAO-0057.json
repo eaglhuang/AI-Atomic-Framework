@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0057",
   "title": "taskflow close --defer-governance-dirty and operator lane discoverability",
-  "status": "running",
+  "status": "done",
   "milestone": "M8",
   "dependencies": [
     "TASK-MAO-0040",
@@ -76,8 +76,8 @@
     "hash": "97cc74c0eb5b02ee"
   },
   "importedAt": "2026-06-18T07:25:55.329Z",
-  "lastTransitionId": "2026-06-18T07-25-59-731Z-claim-a3fd293ad006",
-  "lastTransitionAt": "2026-06-18T07:25:59.731Z",
+  "lastTransitionId": "2026-06-18T09-14-20-958Z-close-9e1aa1c26548",
+  "lastTransitionAt": "2026-06-18T09:14:20.958Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-18T07:25:59.626Z",
@@ -86,7 +86,7 @@
     "actorId": "captain",
     "leaseId": "lease-301afe441160",
     "claimedAt": "2026-06-18T07:25:59.636Z",
-    "heartbeatAt": "2026-06-18T07:25:59.636Z",
+    "heartbeatAt": "2026-06-18T09:14:20.956Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-MAO-0057.json",
@@ -101,8 +101,8 @@
       "packages/cli/src/commands/tasks.ts",
       "tests/cli/taskflow-close-defer-governance-dirty.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-18T07:25:59.636Z",
   "startedByActor": "captain",
@@ -137,5 +137,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-18T07:25:59.730Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T09:14:20.956Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260618072559-captain-TASK-MAO-0057-855fb1e4fa",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0057.closure-packet.json"
 }
