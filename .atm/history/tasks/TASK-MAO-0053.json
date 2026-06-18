@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-MAO-0053",
   "title": "Per-actor identity slot routing for parallel-agent commits",
-  "status": "running",
+  "status": "done",
   "milestone": "M8",
   "dependencies": [
     "TASK-MAO-0049"
@@ -69,8 +69,8 @@
     "hash": "f6986d006e3d4d38"
   },
   "importedAt": "2026-06-18T10:58:40.858Z",
-  "lastTransitionId": "2026-06-18T10-58-48-113Z-claim-265c5501606b",
-  "lastTransitionAt": "2026-06-18T10:58:48.113Z",
+  "lastTransitionId": "2026-06-18T11-16-43-109Z-close-351243e31e54",
+  "lastTransitionAt": "2026-06-18T11:16:43.109Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-18T10:58:47.369Z",
@@ -79,7 +79,7 @@
     "actorId": "captain",
     "leaseId": "lease-fde64a78f82a",
     "claimedAt": "2026-06-18T10:58:47.375Z",
-    "heartbeatAt": "2026-06-18T10:58:47.375Z",
+    "heartbeatAt": "2026-06-18T11:16:43.107Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-MAO-0053.json",
@@ -92,8 +92,8 @@
       "packages/cli/src/commands/identity.ts",
       "tests/cli/identity-per-actor-routing.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-18T10:58:47.375Z",
   "startedByActor": "captain",
@@ -126,5 +126,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-18T10:58:48.112Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T11:16:43.107Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260618105847-captain-TASK-MAO-0053-77c603b6ac",
+  "closurePacket": ".atm/history/evidence/TASK-MAO-0053.closure-packet.json"
 }

@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T11-16-43-109Z-close-351243e31e54",
+  "taskId": "TASK-MAO-0053",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618105847-captain-TASK-MAO-0053-77c603b6ac",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0053.json",
+  "taskSha256": "sha256:61dc7ba10a12a45ce5fe4f3f47663d27e3c00c119d4d719458ba3fc2e0aeb554",
+  "createdAt": "2026-06-18T11:16:43.109Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0053 --actor captain --status done --historical-delivery fbf020be1486c424aa7a9c5ffaafb5e3c645372d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618105847-captain-TASK-MAO-0053-77c603b6ac",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0053.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T11:16:43.104Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0053-per-actor-identity-slot-routing.task.md",
+        ".atm/history/evidence/TASK-MAO-0053.*",
+        ".atm/history/task-events/TASK-MAO-0053/**",
+        ".atm/history/tasks/TASK-MAO-0053.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/git-governance-contract.md",
+        "packages/cli/src/commands/actor-registry.ts",
+        "packages/cli/src/commands/actor.ts",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/command-specs/identity.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/identity.ts",
+        "tests/cli/identity-per-actor-routing.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/actor-registry.ts",
+        "packages/cli/src/commands/actor.ts",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/command-specs/identity.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/identity.ts",
+        "tests/cli/identity-per-actor-routing.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
