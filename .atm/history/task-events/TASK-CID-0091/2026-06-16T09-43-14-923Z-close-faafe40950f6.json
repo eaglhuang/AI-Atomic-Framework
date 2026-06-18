@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-16T09-43-14-923Z-close-faafe40950f6",
+  "taskId": "TASK-CID-0091",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260615171149-captain-TASK-CID-0091-33f8135afb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0091.json",
+  "taskSha256": "sha256:e0c88ef70356009b1fc294b05e50ac6b8ee6426a88d6813bc34e725f13b4cedf",
+  "createdAt": "2026-06-16T09:43:14.923Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0091 --actor captain --status done --historical-delivery 68ba34ea",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260615171149-captain-TASK-CID-0091-33f8135afb",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0091.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-16T09:43:14.916Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0091-broker-format-adapter-architecture-rfc.task.md",
+        ".atm/history/evidence/TASK-CID-0091.*",
+        ".atm/history/task-events/TASK-CID-0091/**",
+        ".atm/history/tasks/TASK-CID-0091.json",
+        "docs/ai_atomic_framework/cid-hardening/CID硬化計畫書2.md",
+        "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0091-broker-format-adapter-architecture-rfc.task.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
