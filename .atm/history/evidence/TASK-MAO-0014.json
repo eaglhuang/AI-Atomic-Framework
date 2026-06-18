@@ -1,0 +1,327 @@
+{
+  "taskId": "TASK-MAO-0014",
+  "updatedAt": "2026-06-17T16:24:42.070Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for TASK-MAO-0014: codex-captain -> claude-code-opus-4-7.",
+      "artifactPaths": [
+        ".atm/history/tasks/TASK-MAO-0014.json"
+      ],
+      "producedBy": "claude-code-opus-4-7",
+      "createdAt": "2026-06-17T16:17:15.993Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "codex-captain",
+          "leaseId": "lease-e70ae2bf4f40",
+          "claimedAt": "2026-06-17T15:11:14.080Z",
+          "heartbeatAt": "2026-06-17T15:11:14.080Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/tasks/TASK-MAO-0014.json",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/broker.ts",
+            "packages/cli/src/commands/command-specs/broker.spec.ts",
+            "packages/core/src/broker/__tests__/runner-ref-store.test.ts",
+            "packages/core/src/broker/runner-ref-store.ts",
+            "scripts/validate-runner-refs.ts"
+          ],
+          "state": "active"
+        },
+        "newClaim": {
+          "actorId": "claude-code-opus-4-7",
+          "leaseId": "lease-c176e9929c75",
+          "claimedAt": "2026-06-17T16:17:15.956Z",
+          "heartbeatAt": "2026-06-17T16:17:15.956Z",
+          "ttlSeconds": 1800,
+          "files": [
+            "packages/core/src/broker/runner-ref-store.ts"
+          ],
+          "state": "active",
+          "reason": "Human approved 2026-06-18: takeover codex-captain's stale lease on TASK-MAO-0014 for MAO-0014..0022 batch completion"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+      "createdAt": "2026-06-17T16:24:09.732Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-ref-store-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-06-17T16:24:09.782Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:82a48b4ceeba3850eceed7d23e7152af0be6acfaba7e8df1ff06fc0061ad78f6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+      "createdAt": "2026-06-17T16:24:26.584Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-ref-store-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-06-17T16:24:26.642Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9cbc55370067523d9dd92844d21acf68140ff5ea0bb6ebd7185d937352605d2b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+      "createdAt": "2026-06-17T16:24:40.255Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-ref-store-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-06-17T16:24:40.316Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:12087f62307e44354a1bde5aa3461eef23b42f81686d4898524f7ea443d8b0a9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/broker/__tests__/runner-ref-store.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+      "createdAt": "2026-06-17T16:24:41.283Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "runner-ref-store-test"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-ref-store-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/broker/__tests__/runner-ref-store.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:de9113bede92b7fec843ad5b303209ebb6c41b7f2b6d8f132f82ca224b99eadd",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "runner-ref-store-test"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:c6f45b660d47755c54d04d6a449464ae82a219a8b106109b89238d65121e589c",
+            "cached": false,
+            "generatedAt": "2026-06-17T16:24:41.332Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:64b450aebc0089d747a3f5833ab50cd2dea7dcd85e2da122dbf43523f9fb62ed",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-runner-refs.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-code-opus-4-7",
+      "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+      "createdAt": "2026-06-17T16:24:42.070Z",
+      "details": {
+        "actorId": "claude-code-opus-4-7",
+        "sessionId": "session-20260617161715-claude-code-opus-4-7-TASK-MAO-0014-328d1986ad",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-runner-refs"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.runner-ref-store-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-runner-refs.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a4aa774d814c671c2c373606ae7edce9e7269663aefefd1f54e05430584c877d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate-runner-refs"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:98a4d3fe6f81ed93c7e7f0160afbbf297a9b2f2cfaef694a4172c5e51ee9b6fa",
+            "cached": false,
+            "generatedAt": "2026-06-17T16:24:42.120Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:660c7230e1cf66321ed59a50f663632a318bd11479301af95fc4bcbd7fc6ca6a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
