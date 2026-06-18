@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0126",
+  "title": "allow release runner outputs as task deliverables",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Historical delivery for TASK-AAO-0125-style runner sync recognizes scoped onefile runner outputs as real deliverables.",
+    "Ordinary feature tasks still exclude generic build, runtime, scratch, and generated noise from deliverable credit.",
+    "Regression proves a declared runner-output scope can pass while unrelated release output outside declared scope still fails.",
+    "No runner build outputs, release artifacts, dist artifacts, runtime locks, or TEAM mirror/import residue are generated or committed by this source card."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "validators": [],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "runner build outputs",
+    "task runtime state",
+    "unrelated TEAM mirror/import residue",
+    "push or remote synchronization"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ]
+  },
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
+      "field": "scopePaths",
+      "alias": "allowed_files",
+      "canonical": "scopePaths"
+    }
+  ],
+  "tags": [],
+  "notes": "TASK-AAO-0125 successfully produced a runner delivery commit and command-backed evidence, but `tasks close --status done --historical-delivery <commit>` still reported `no-scoped-deliverable-files`.\nRead-only code inspection showed the close gate filters historical commit files through `isRealDeliverablePath()` before matching declared scope.\nThat helper currently excludes release output directories globally, which is correct for ordinary feature tasks but wrong for explicit runner-sync tasks whose delivery contract is the runner artifact itself.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0126-allow-release-runner-outputs-as-task-deliverables.task.md",
+    "sectionTitle": "TASK-AAO-0126",
+    "headingLine": 34,
+    "hash": "7eaf711ccd51df71"
+  },
+  "importedAt": "2026-06-18T16:05:40.352Z",
+  "lastTransitionId": "2026-06-18T16-26-04-934Z-close-a0ee35348fce",
+  "lastTransitionAt": "2026-06-18T16:26:04.934Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "closedAt": "2026-06-18T16:26:04.931Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit fad1bce4d5d789618aa5496799cffa4cdc054228",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0126.closure-packet.json"
+}
