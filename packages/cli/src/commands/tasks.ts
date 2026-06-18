@@ -2170,25 +2170,16 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
   const actorId = resolvedActor.actorId;
   const taskPath = taskPathFor(options.cwd, options.taskId);
   const nowIso = new Date().toISOString();
-  const taskDocument: Record<string, unknown> = existsSync(taskPath)
-    ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
-    : {
-      schemaVersion: 'atm.workItem.v0.2',
-      workItemId: options.taskId,
-      title: options.title ?? options.taskId,
-      status: 'planned',
-      dependencies: [],
-      acceptance: [],
-      deliverables: [],
-      tags: [],
-      source: {
-        planPath: 'manual',
-        sectionTitle: options.taskId,
-        headingLine: 1,
-        hash: createHash('sha256').update(`${options.taskId}|manual`).digest('hex').slice(0, 16)
-      },
+  let importEvidencePath: string | null = null;
+  if (!existsSync(taskPath)) {
+    const imported = importPlanningTaskForReservation({
+      cwd: options.cwd,
+      taskId: options.taskId,
       importedAt: nowIso
-    };
+    });
+    importEvidencePath = imported.evidencePath;
+  }
+  const taskDocument: Record<string, unknown> = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
 
   if (action === 'reserve') {
     const previousStatus = String(taskDocument.status ?? '');
@@ -2221,7 +2212,8 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
         actorId,
         status: taskDocument.status,
         taskPath: relativePathFrom(options.cwd, taskPath),
-        transitionPath
+        transitionPath,
+        importEvidencePath
       }
     });
   }
@@ -2272,6 +2264,140 @@ async function runTasksReservation(action: 'reserve' | 'promote', argv: string[]
       transitionPath
     }
   });
+}
+
+function importPlanningTaskForReservation(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly importedAt: string;
+}): { evidencePath: string | null; taskPath: string } {
+  const planCandidates = findPlanningTaskCardCandidates(input.cwd, input.taskId);
+  if (planCandidates.length === 0) {
+    throw new CliError('ATM_TASK_RESERVE_PLANNING_CARD_REQUIRED', `tasks reserve requires a human-authored planning card for ${input.taskId}; no matching task card was found in sibling planning repositories.`, {
+      exitCode: 1,
+      details: {
+        taskId: input.taskId,
+        searchedFrom: path.dirname(input.cwd)
+      }
+    });
+  }
+  if (planCandidates.length > 1) {
+    throw new CliError('ATM_TASK_RESERVE_PLANNING_CARD_AMBIGUOUS', `tasks reserve found multiple planning cards for ${input.taskId}; import the intended card first or remove the ambiguity.`, {
+      exitCode: 1,
+      details: {
+        taskId: input.taskId,
+        candidates: planCandidates.map((candidate) => relativePathFrom(input.cwd, candidate))
+      }
+    });
+  }
+  const planAbsolute = planCandidates[0];
+  const planText = readFileSync(planAbsolute, 'utf8');
+  const task = parseSingleCard({
+    planText,
+    planRelativePath: relativePathFrom(input.cwd, planAbsolute),
+    importedAt: input.importedAt
+  });
+  if (!task || task.workItemId !== input.taskId) {
+    throw new CliError('ATM_TASK_RESERVE_PLANNING_CARD_INVALID', `tasks reserve found a planning card for ${input.taskId}, but ATM could not import a valid single-card contract from it.`, {
+      exitCode: 1,
+      details: {
+        taskId: input.taskId,
+        planPath: relativePathFrom(input.cwd, planAbsolute)
+      }
+    });
+  }
+  const writeResult = writeTaskFiles({
+    cwd: input.cwd,
+    tasks: [task],
+    force: false,
+    forceOverwriteClaims: false,
+    resetOpen: false,
+    reopen: false
+  });
+  const blockingDiagnostics = writeResult.diagnostics.filter((entry) => entry.level === 'error');
+  if (blockingDiagnostics.length > 0) {
+    throw new CliError('ATM_TASK_RESERVE_IMPORT_FAILED', `tasks reserve could not auto-import ${input.taskId} before reservation.`, {
+      exitCode: 1,
+      details: {
+        taskId: input.taskId,
+        planPath: relativePathFrom(input.cwd, planAbsolute),
+        diagnostics: blockingDiagnostics
+      }
+    });
+  }
+  const evidencePath = writeImportEvidence({
+    cwd: input.cwd,
+    tasks: [task],
+    planPath: relativePathFrom(input.cwd, planAbsolute),
+    generatedAt: input.importedAt,
+    writtenPaths: writeResult.writtenPaths
+  });
+  return {
+    evidencePath,
+    taskPath: taskPathFor(input.cwd, input.taskId)
+  };
+}
+
+function findPlanningTaskCardCandidates(cwd: string, taskId: string): string[] {
+  const parentDirectory = path.dirname(cwd);
+  if (!existsSync(parentDirectory)) return [];
+  let siblingEntries: Dirent[];
+  try {
+    siblingEntries = readdirSync(parentDirectory, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const normalizedCwd = path.resolve(cwd);
+  const matches: string[] = [];
+  for (const entry of siblingEntries) {
+    if (!entry.isDirectory()) continue;
+    const siblingRoot = path.resolve(parentDirectory, entry.name);
+    if (siblingRoot === normalizedCwd) continue;
+    collectPlanningTaskCardsForReservation({
+      root: siblingRoot,
+      current: siblingRoot,
+      taskId,
+      depth: 0,
+      matches
+    });
+  }
+  return matches.sort((left, right) => {
+    const leftPriority = left.includes(`${path.sep}docs${path.sep}ai_atomic_framework${path.sep}`) ? 0 : 1;
+    const rightPriority = right.includes(`${path.sep}docs${path.sep}ai_atomic_framework${path.sep}`) ? 0 : 1;
+    return leftPriority - rightPriority || left.localeCompare(right);
+  });
+}
+
+function collectPlanningTaskCardsForReservation(input: {
+  readonly root: string;
+  readonly current: string;
+  readonly taskId: string;
+  readonly depth: number;
+  readonly matches: string[];
+}) {
+  if (input.depth > 6 || input.matches.length > 12) return;
+  let entries: Dirent[];
+  try {
+    entries = readdirSync(input.current, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const absolutePath = path.join(input.current, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name.startsWith('.git') || entry.name === 'node_modules' || entry.name === '.atm') continue;
+      collectPlanningTaskCardsForReservation({
+        ...input,
+        current: absolutePath,
+        depth: input.depth + 1
+      });
+      continue;
+    }
+    if (!entry.isFile() || !entry.name.endsWith('.task.md')) continue;
+    if (entry.name === `${input.taskId}.task.md` || entry.name.startsWith(`${input.taskId}-`)) {
+      input.matches.push(absolutePath);
+    }
+  }
 }
 
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';

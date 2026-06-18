@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T07-22-39-800Z-scope-amendment-fd51cca52950",
+  "taskId": "TASK-MAO-0054",
+  "action": "scope-amendment",
+  "actorId": "captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0054.json",
+  "taskSha256": "sha256:45a5de96c96c91f2d52d0281da4337decf3f4abaf8328e0817de0afd39fe825f",
+  "createdAt": "2026-06-18T07:22:39.800Z",
+  "command": "node atm.mjs tasks scope add --task TASK-MAO-0054 --actor captain --add \"packages/cli/src/commands/hook.ts,tests/cli/git-commit-task-scoped-staging.test.ts\" --reason \"TASK-MAO-0054 owns task-open/import commit lane; pre-commit hook and regression test must match git wrapper semantics.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-MAO-0054 owns task-open/import commit lane; pre-commit hook and regression test must match git wrapper semantics."
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0054",
+  "title": "tasks reserve planning-card precheck and auto-import",
+  "status": "running",
+  "milestone": "M8",
+  "dependencies": [
+    "TASK-MAO-0049"
+  ],
+  "acceptance": [
+    "`tasks reserve --task TASK-MAO-XXXX --actor <ai>` for a card that exists in",
+    "`tasks reserve` for a card not in planning_repo fails fast with a message",
+    "Re-running TASK-MAO-0014..0022 batch closeback under this lane does not",
+    "`atm git commit --task <new-task>` can commit a task-open import bundle made",
+    "A test fixture simulates AI-actor reserve against (a) existing planning"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "tests/cli/tasks-reserve-planning-precheck.test.ts",
+    "docs/ATM_NEW_USER_WORKFLOW.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+    "packages/cli/src/commands/command-specs/tasks.spec.ts",
+    "tests/cli/tasks-reserve-planning-precheck.test.ts",
+    "docs/ATM_NEW_USER_WORKFLOW.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types tests/cli/tasks-reserve-planning-precheck.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Mutating planning-repo cards from the reserve lane (still read-only there).",
+    "Replacing tasks import; reserve only delegates to it when applicable."
+  ],
+  "nonGoals": [
+    "Do not change AI-manual-task audit semantics — they remain the safety net."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert reserve precheck; reserve falls back to current direct-create behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-reserve-planning-precheck-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "`tasks reserve --task TASK-XXXX --actor <ai>` currently creates a ledger entry\nunconditionally, then the pre-commit audit later flags\n`ATM_TASK_AUDIT_AI_MANUAL_TASK_IN_LEDGER` because the entry has no provenance\nto a human-authored planning card. The check happens too late — by the time\nthe agent hits a commit, they've already done substantial implementation work\nunder what turns out to be an audit-rejected reservation.\n\nField evidence: TASK-MAO-0014..0022 implementation by claude-code-opus-4-7\nrequired a full rewind (release claims, delete ledger entries, re-import from\nplanning) after the audit fired at first commit attempt.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/multi-agent-orchestration/tasks/TASK-MAO-0054-tasks-reserve-planning-card-precheck.task.md",
+    "sectionTitle": "TASK-MAO-0054",
+    "headingLine": 48,
+    "hash": "768f50a149a59922"
+  },
+  "importedAt": "2026-06-18T07:20:43.562Z",
+  "lastTransitionId": "2026-06-18T07-20-50-967Z-claim-bd034ffb117e",
+  "lastTransitionAt": "2026-06-18T07:20:50.967Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-18T07:20:50.925Z",
+  "promotedAt": "2026-06-18T07:20:50.928Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-fb1ec735ef69",
+    "claimedAt": "2026-06-18T07:20:50.931Z",
+    "heartbeatAt": "2026-06-18T07:20:50.931Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0054.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T07:20:50.931Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260618072050-captain-TASK-MAO-0054-94fbd20858",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0054",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0054.*",
+      ".atm/history/task-events/TASK-MAO-0054/**",
+      ".atm/history/tasks/TASK-MAO-0054.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ATM_NEW_USER_WORKFLOW.md",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+      "tests/cli/tasks-reserve-planning-precheck.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0a832f2a4f3e4942f85eda11e7385624d5d723be4628b33e18347d586fa7a389",
+    "actorId": "captain",
+    "createdAt": "2026-06-18T07:20:50.966Z",
+    "status": "active"
+  }
+}

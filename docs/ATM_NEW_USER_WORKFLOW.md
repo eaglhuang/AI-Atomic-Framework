@@ -22,6 +22,8 @@ This is the whole normal flow. Everything else in this guide expands on it.
 6. **AI implements, validates, and records command-backed evidence.**
 7. **`taskflow close --write`** closes the target and planning repos, and produces the dual-repo governed commit bundle.
 
+`tasks reserve` is now a guarded backend lane: when the ledger entry is missing, it looks for a human-authored planning card, auto-imports the single matching card, and fails closed instead of creating a manual AI ledger entry.
+
 That is the whole loop. Steps 3 and 7 are the only two "magic" commands you really need to memorize.
 
 ## Roles in this guide
