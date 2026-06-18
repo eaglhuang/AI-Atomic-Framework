@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0094",
   "title": "path-to-atom-map domain adapter",
-  "status": "planned",
+  "status": "running",
   "milestone": "M19",
   "dependencies": [
     "TASK-CID-0093"
@@ -67,7 +67,60 @@
     "hash": "bcae262f6fe0a063"
   },
   "importedAt": "2026-06-15T16:53:16.660Z",
-  "lastTransitionId": "2026-06-15T16-53-16-665Z-import-fc325cd510fb",
-  "lastTransitionAt": "2026-06-15T16:53:16.665Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-18T06-15-36-279Z-claim-c0075d533b2c",
+  "lastTransitionAt": "2026-06-18T06:15:36.279Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-18T06:15:36.230Z",
+  "promotedAt": "2026-06-18T06:15:36.234Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-0aea47f76875",
+    "claimedAt": "2026-06-18T06:15:36.238Z",
+    "heartbeatAt": "2026-06-18T06:15:36.238Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0094.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+      "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+      "packages/core/src/broker/adapters/atom-map.ts",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "state": "active",
+    "intent": "closeout-only"
+  },
+  "startedAt": "2026-06-18T06:15:36.238Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260618061536-captain-TASK-CID-0094-3de49ba22a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0094",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0094.*",
+      ".atm/history/task-events/TASK-CID-0094/**",
+      ".atm/history/tasks/TASK-CID-0094.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/__tests__/atom-map-adapter.test.ts",
+      "packages/core/src/broker/__tests__/fixtures/owner-shard-fixture.json",
+      "packages/core/src/broker/adapters/atom-map.ts",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b0175cd48558e25611c53235a76432f1081090f62770beb3c14446b8a368e488",
+    "actorId": "captain",
+    "createdAt": "2026-06-18T06:15:36.279Z",
+    "status": "active"
+  }
 }
