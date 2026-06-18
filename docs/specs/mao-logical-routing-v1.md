@@ -73,10 +73,16 @@ V1 defines command shape only. Individual commands are implemented by later task
 
 - `route open`: create or inspect a route context for a claimed task.
 - `route admit`: classify route scope and decide whether the route can proceed.
-- `route freeze`: pause mutation while preserving context and reason.
-- `route resume`: re-check prerequisites and continue a frozen route.
+- `route pause` (`route freeze` vocabulary): pause mutation while preserving context and reason. The CLI `route pause` action calls the broker freeze protocol (`createFreezeSignal`, `acknowledgeFreeze`, `resolveFreezeDecision`) and persists a freeze sidecar under `.atm/runtime/routes/<routeId>.freeze.json`.
+- `route resume`: consume `resumeFreeze`, surface whether broker admission must be re-checked, and clear the freeze sidecar. Pass `--admission-rechecked` only after admission is actually revalidated.
 - `route status`: show route, claim, lock, and evidence readiness.
 - `route close`: retire a route context after task close or abandonment.
+
+Reserved for later MAO tasks (not implemented in `route pause`/`resume` today):
+
+- automatic in-flight LLM interruption;
+- patch envelope submission or apply;
+- automatic WIP snapshot persistence beyond protocol defaults.
 
 These commands must report stable JSON envelopes. They must not mutate task status unless they call the existing task lifecycle surfaces.
 
@@ -151,3 +157,5 @@ Runner Sync Steward V1 is the generated-artifact single-writer lane for ATM runn
 `TASK-MAO-0004` should connect `next` route selection to route context hints while preserving existing normal and batch playbooks.
 
 `TASK-MAO-0005` and later Broker cards may add richer intent registry and conflict semantics, but they must adapt to this route model instead of replacing it.
+
+`TASK-MAO-0046` connects `route pause` / `route resume` to `packages/core/src/broker/freeze.ts` without changing the `atm.routeContext.v1` schema. Freeze protocol state lives in the route freeze sidecar and in CLI JSON evidence (`freezeProtocol`).

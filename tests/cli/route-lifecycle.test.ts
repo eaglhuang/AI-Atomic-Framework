@@ -44,10 +44,12 @@ try {
   assert.equal(paused.ok, true);
   assert.equal(readRouteEvidence(paused).route.state, 'frozen');
   assert.equal(readRouteEvidence(paused).route.admission?.verdict, 'freeze');
+  assert.equal((paused.evidence.freezeProtocol as { resolution: { decision: { state: string } } }).resolution.decision.state, 'acknowledged');
 
-  const resumed = await runRoute(['resume', '--cwd', tempDir, '--route', routeId, '--actor', 'captain']);
+  const resumed = await runRoute(['resume', '--cwd', tempDir, '--route', routeId, '--actor', 'captain', '--admission-rechecked']);
   assert.equal(resumed.ok, true);
   assert.equal(readRouteEvidence(resumed).route.state, 'open');
+  assert.equal((resumed.evidence.freezeProtocol as { resume: { decision: { state: string } } }).resume.decision.state, 'resumed');
 
   const abandoned = await runRoute(['abandon', '--cwd', tempDir, '--route', routeId, '--actor', 'captain', '--reason', 'superseded']);
   assert.equal(abandoned.ok, true);

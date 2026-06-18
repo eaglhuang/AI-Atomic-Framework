@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'route',
-  summary: 'Manage MAO route lifecycle records and legacy steward takeover.',
+  summary: 'Manage MAO route lifecycle records and legacy steward takeover. route pause exercises the broker freeze protocol (createFreezeSignal, acknowledgeFreeze, resolveFreezeDecision) and persists a freeze sidecar; route resume consumes resumeFreeze and reports admission recheck requirements. Patch envelope submission and automatic WIP snapshot apply remain reserved for later MAO tasks.',
   positional: [
     { name: 'action', summary: 'open | status | list | pause | resume | abandon | takeover', required: true }
   ],
@@ -25,6 +25,7 @@ export default defineCommandSpec({
     { flag: '--virtual-atom-cids', value: 'csv', summary: 'Comma-separated target virtual atom CIDs.' },
     { flag: '--patch-envelope-ref', value: 'ref', summary: 'Optional patch envelope reference.' },
     { flag: '--reason', value: 'text', summary: 'Reason for pause, resume, or abandon.' },
+    { flag: '--admission-rechecked', summary: 'For route resume: confirm broker admission was re-checked before continuing after a freeze.' },
     { flag: '--ttl-seconds', value: 'seconds', summary: 'Route lease TTL in seconds.' },
     { flag: '--max-seconds', value: 'seconds', summary: 'Route lease maximum lifetime in seconds.' },
     { flag: '--merge-plan-file', value: 'path', summary: 'Path to merge plan file.' },
@@ -40,7 +41,7 @@ export default defineCommandSpec({
     'node atm.mjs route open --task TASK-MAO-0003 --actor captain --write-set packages/cli/src/commands/route.ts',
     'node atm.mjs route status --route route-TASK-MAO-0003-captain',
     'node atm.mjs route pause --route route-TASK-MAO-0003-captain --actor captain --reason review',
-    'node atm.mjs route resume --route route-TASK-MAO-0003-captain --actor captain',
+    'node atm.mjs route resume --route route-TASK-MAO-0003-captain --actor captain --admission-rechecked',
     'node atm.mjs route abandon --route route-TASK-MAO-0003-captain --actor captain --reason superseded',
     'node atm.mjs route takeover --merge-plan-file plan.json --proposal-file prop.json'
   ]

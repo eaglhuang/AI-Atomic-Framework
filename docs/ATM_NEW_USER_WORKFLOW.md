@@ -562,6 +562,13 @@ If a step does not feel smooth, that is a product gap, not a user error — plea
 
 ## Running several cards in parallel (Team Agents Wave Mode)
 
+When parallel agents share a worktree, use `route pause` / `route resume` for
+logical freeze instead of ad-hoc file locks. `route pause` exercises the broker
+freeze protocol and returns `freezeProtocol` JSON (signal, ack, resolution).
+`route resume` consumes `resumeFreeze`; pass `--admission-rechecked` only after
+broker admission is actually revalidated. Patch envelope apply and automatic WIP
+snapshots remain reserved for later MAO tasks.
+
 When several cards are safe to advance together, a coordinator can schedule them
 as a wave instead of one-at-a-time:
 

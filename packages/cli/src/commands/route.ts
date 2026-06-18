@@ -3,6 +3,14 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import type { RouteClaimIntent, RouteContext, RouteContextState, RouteResourceSet } from '../../../core/src/routing/index.ts';
 import { applyStewardPlan } from '../../../core/src/broker/steward.ts';
+import {
+  acknowledgeFreeze,
+  createFreezeSignal,
+  resolveFreezeDecision,
+  resumeFreeze
+} from '../../../core/src/broker/freeze.ts';
+import type { RouteFreezeRuntimeRecord } from '../../../core/src/broker/types.ts';
+import { createRouteFreezeRuntimeRecord } from '../../../core/src/broker/types.ts';
 import type { StewardIdentity } from '../../../core/src/broker/steward.ts';
 import type { MergePlan, PatchProposal } from '../../../core/src/broker/types.ts';
 import { CliError, makeResult, message } from './shared.ts';
@@ -55,20 +63,39 @@ function runLifecycleRoute(options: ReturnType<typeof parseRouteArgs>) {
   }
 
   if (options.action === 'pause') {
-    const updated = transitionRoute(route, 'frozen', options);
-    writeJson(routeContextPath(options.cwd, route.routeId), updated);
-    return makeLifecycleResult(options.cwd, 'pause', 'ATM_ROUTE_PAUSED', `Paused route ${route.routeId}.`, { route: updated });
+    const freezeRuntime = buildRouteFreezeRuntime(route, options);
+    const updated = transitionRoute(route, 'frozen', options, freezeRuntime.resolution);
+    const routePath = routeContextPath(options.cwd, route.routeId);
+    writeJson(routePath, updated);
+    writeRouteFreezeRuntime(options.cwd, freezeRuntime);
+    return makeLifecycleResult(options.cwd, 'pause', 'ATM_ROUTE_PAUSED', `Paused route ${route.routeId}.`, {
+      route: updated,
+      freezeProtocol: serializeFreezeProtocolEvidence(freezeRuntime)
+    });
   }
 
   if (options.action === 'resume') {
-    const updated = transitionRoute(route, 'open', options);
-    writeJson(routeContextPath(options.cwd, route.routeId), updated);
-    return makeLifecycleResult(options.cwd, 'resume', 'ATM_ROUTE_RESUMED', `Resumed route ${route.routeId}.`, { route: updated });
+    const freezeRuntime = readRouteFreezeRuntime(options.cwd, route.routeId);
+    const resumeResolution = resumeFreeze(freezeRuntime.signal, {
+      admissionRechecked: options.admissionRechecked
+    });
+    const updated = transitionRoute(route, 'open', options, resumeResolution);
+    const routePath = routeContextPath(options.cwd, route.routeId);
+    writeJson(routePath, updated);
+    clearRouteFreezeRuntime(options.cwd, route.routeId);
+    return makeLifecycleResult(options.cwd, 'resume', 'ATM_ROUTE_RESUMED', `Resumed route ${route.routeId}.`, {
+      route: updated,
+      freezeProtocol: {
+        ...serializeFreezeProtocolEvidence(freezeRuntime),
+        resume: resumeResolution
+      }
+    });
   }
 
   if (options.action === 'abandon') {
     const updated = transitionRoute(route, 'abandoned', options);
     writeJson(routeContextPath(options.cwd, route.routeId), updated);
+    clearRouteFreezeRuntime(options.cwd, route.routeId);
     return makeLifecycleResult(options.cwd, 'abandon', 'ATM_ROUTE_ABANDONED', `Abandoned route ${route.routeId}.`, { route: updated });
   }
 
@@ -278,21 +305,33 @@ function buildOpenedRoute(options: ReturnType<typeof parseRouteArgs>): RouteCont
   };
 }
 
-function transitionRoute(route: RouteContext, state: RouteContextState, options: ReturnType<typeof parseRouteArgs>): RouteContext {
+function transitionRoute(
+  route: RouteContext,
+  state: RouteContextState,
+  options: ReturnType<typeof parseRouteArgs>,
+  freezeResolution?: ReturnType<typeof resolveFreezeDecision> | ReturnType<typeof resumeFreeze>
+): RouteContext {
   const now = new Date().toISOString();
+  const freezeReason = freezeResolution?.decision.reason ?? options.reason ?? null;
   const next: RouteContext = {
     ...route,
     state,
     updatedAt: now,
     closedAt: state === 'abandoned' ? now : route.closedAt,
     blockedBy: state === 'frozen'
-      ? [{ kind: 'steward', id: options.actorId ?? 'route-operator', reason: options.reason ?? 'route paused' }]
+      ? [{ kind: 'steward', id: options.actorId ?? 'route-operator', reason: freezeReason ?? 'route paused' }]
       : route.blockedBy,
     admission: state === 'frozen'
-      ? { verdict: 'freeze', reason: options.reason ?? 'route paused' }
+      ? {
+        verdict: 'freeze',
+        reason: freezeReason ?? options.reason ?? 'route paused via freeze protocol'
+      }
       : state === 'abandoned'
         ? { verdict: 'blocked', reason: options.reason ?? 'route abandoned' }
-        : { verdict: 'watch', reason: options.reason ?? 'route resumed' }
+        : {
+          verdict: 'watch',
+          reason: freezeResolution?.decision.reason ?? options.reason ?? 'route resumed via freeze protocol'
+        }
   };
   const validation = validateRouteContext(next);
   if (!validation.ok) {
@@ -437,6 +476,77 @@ function routeContextPath(cwd: string, routeId: string) {
   return path.join(routeContextDir(cwd), `${sanitizeRouteFileName(routeId)}.json`);
 }
 
+function routeFreezeRuntimePath(cwd: string, routeId: string) {
+  return path.join(routeContextDir(cwd), `${sanitizeRouteFileName(routeId)}.freeze.json`);
+}
+
+function buildRouteFreezeRuntime(route: RouteContext, options: ReturnType<typeof parseRouteArgs>): RouteFreezeRuntimeRecord {
+  const now = Date.now();
+  const actorId = options.actorId ?? route.actorId;
+  const signal = createFreezeSignal({
+    taskId: route.taskId,
+    actorId,
+    now,
+    blockingRoute: route.routeId,
+    blockingTask: route.blockedBy.find((entry) => entry.kind === 'task')?.id
+  });
+  const ack = acknowledgeFreeze(signal, { now });
+  const resolution = resolveFreezeDecision({
+    signal,
+    acknowledgedAt: ack.acknowledgedAt,
+    now
+  });
+  return createRouteFreezeRuntimeRecord({
+    routeId: route.routeId,
+    signal,
+    ack,
+    resolution,
+    pauseReason: options.reason ?? 'route paused',
+    updatedAt: new Date(now).toISOString()
+  });
+}
+
+function readRouteFreezeRuntime(cwd: string, routeId: string): RouteFreezeRuntimeRecord {
+  const freezePath = routeFreezeRuntimePath(cwd, routeId);
+  if (!existsSync(freezePath)) {
+    throw new CliError('ATM_ROUTE_FREEZE_RECORD_MISSING', `Route ${routeId} has no freeze protocol sidecar. Re-run route pause to create one before resume.`, {
+      exitCode: 1,
+      details: { routeId, freezePath: relativePath(cwd, freezePath) }
+    });
+  }
+  const record = JSON.parse(readFileSync(freezePath, 'utf8')) as RouteFreezeRuntimeRecord;
+  if (record.schemaId !== 'atm.routeFreezeRuntime.v1' || record.routeId !== routeId) {
+    throw new CliError('ATM_ROUTE_FREEZE_RECORD_INVALID', `Stored freeze protocol record for ${routeId} is invalid.`, {
+      exitCode: 1,
+      details: { routeId, freezePath: relativePath(cwd, freezePath) }
+    });
+  }
+  return record;
+}
+
+function writeRouteFreezeRuntime(cwd: string, record: RouteFreezeRuntimeRecord) {
+  writeJson(routeFreezeRuntimePath(cwd, record.routeId), record);
+}
+
+function clearRouteFreezeRuntime(cwd: string, routeId: string) {
+  const freezePath = routeFreezeRuntimePath(cwd, routeId);
+  if (existsSync(freezePath)) {
+    rmSync(freezePath, { force: true });
+  }
+}
+
+function serializeFreezeProtocolEvidence(record: RouteFreezeRuntimeRecord) {
+  return {
+    schemaId: 'atm.routeFreezeProtocolEvidence.v1',
+    routeId: record.routeId,
+    signal: record.signal,
+    ack: record.ack,
+    resolution: record.resolution,
+    pauseReason: record.pauseReason,
+    snapshotDefaultsReserved: 'patch-envelope submission and WIP snapshot apply remain deferred to later MAO tasks'
+  };
+}
+
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
@@ -489,6 +599,7 @@ function parseRouteArgs(argv: string[]) {
     targetVirtualAtomCids: [] as string[],
     patchEnvelopeRef: null as string | null,
     reason: null as string | null,
+    admissionRechecked: false,
     mergePlanFile: null as string | null,
     proposalFile: null as string | null,
     stewardId: null as string | null,
@@ -566,6 +677,10 @@ function parseRouteArgs(argv: string[]) {
     if (arg === '--reason') {
       state.reason = requireValue(argv, index, '--reason');
       index += 1;
+      continue;
+    }
+    if (arg === '--admission-rechecked') {
+      state.admissionRechecked = true;
       continue;
     }
     if (arg === '--merge-plan-file') {
