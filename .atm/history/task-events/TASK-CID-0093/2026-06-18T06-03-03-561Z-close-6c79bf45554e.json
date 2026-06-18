@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T06-03-03-561Z-close-6c79bf45554e",
+  "taskId": "TASK-CID-0093",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260618055934-captain-TASK-CID-0093-e43c1dfc07",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0093.json",
+  "taskSha256": "sha256:8b6f41337e4ed0d3e6d7f75f058321efd2533babff2d642d04338bf61db5456a",
+  "createdAt": "2026-06-18T06:03:03.561Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0093 --actor captain --status done --historical-delivery 31fd89ff0b359edf8641e0a6c11d4449c11a9ca8 --historical-delivery ca59a88a9adf19a5295541a738919ecf5cc6ffec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618055934-captain-TASK-CID-0093-e43c1dfc07",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0093.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T06:03:03.557Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0093-generic-json-record-adapter-and-conflict-keys.task.md",
+        ".atm/history/evidence/TASK-CID-0093.*",
+        ".atm/history/task-events/TASK-CID-0093/**",
+        ".atm/history/tasks/TASK-CID-0093.json",
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/json-record-adapter.test.ts",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/json-record.ts",
+        "packages/core/src/broker/types.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
