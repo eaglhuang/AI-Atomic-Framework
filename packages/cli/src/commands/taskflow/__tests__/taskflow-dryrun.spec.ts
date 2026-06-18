@@ -185,6 +185,116 @@ function initGitRepo(repo: string) {
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 }
 
+function writeBrokerRegistry(repo: string, activeIntents: unknown[]) {
+  writeJson(path.join(repo, '.atm/runtime/write-broker.registry.json'), {
+    schemaId: 'atm.writeBrokerRegistry.v1',
+    specVersion: '0.1.0',
+    repoId: 'fixture-repo',
+    workspaceId: 'main',
+    activeIntents
+  });
+}
+
+function makeActiveIntent(input: {
+  taskId: string;
+  actorId: string;
+  files: string[];
+  atomIds?: string[];
+  atomCids?: string[];
+}) {
+  return {
+    intentId: `intent-${input.taskId}`,
+    taskId: input.taskId,
+    teamRunId: null,
+    actorId: input.actorId,
+    baseCommit: 'base-fixture',
+    resourceKeys: {
+      files: input.files,
+      atomIds: input.atomIds ?? [],
+      atomCids: input.atomCids ?? [],
+      generators: [],
+      projections: [],
+      registries: [],
+      validators: [],
+      artifacts: []
+    },
+    leaseEpoch: 1,
+    leaseSeconds: 1800,
+    leaseMaxSeconds: 1800,
+    heartbeatAt: '2026-06-18T00:00:00.000Z',
+    lane: 'direct-brokered',
+    expiresAt: '2026-06-18T00:30:00.000Z'
+  };
+}
+
+async function makeBrokerCloseFixture(label: string) {
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-broker-close-${label}-`));
+  const targetRepo = path.join(tempRoot, 'target');
+  const planningRepo = path.join(tempRoot, 'planning');
+  initGitRepo(targetRepo);
+  initGitRepo(planningRepo);
+  writeJson(path.join(targetRepo, 'package.json'), { name: `broker-close-${label}`, type: 'module' });
+  writeJson(path.join(targetRepo, '.atm/config.json'), {
+    schemaVersion: 'atm.config.v0.1',
+    layoutVersion: 2,
+    paths: {
+      tasks: '.atm/history/tasks',
+      taskEvents: '.atm/history/task-events'
+    },
+    taskLedger: {
+      enabled: true,
+      mode: 'auto',
+      mirrorExternalTasks: true,
+      requireCliTransitions: true,
+      provider: 'atm-local'
+    }
+  });
+  writeJson(path.join(targetRepo, '.atm/runtime/identity/default.json'), {
+    actorId: 'validator',
+    gitName: 'ATM Validator',
+    gitEmail: 'validator@example.invalid',
+    updatedAt: new Date().toISOString()
+  });
+  const taskId = `TASK-BROKER-${label.toUpperCase()}`;
+  const taskPath = path.join(targetRepo, '.atm/history/tasks', `${taskId}.json`);
+  writeJson(taskPath, {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title: `${label} broker close fixture`,
+    status: 'running',
+    deliverables: ['src/app.ts'],
+    scopePaths: ['src/app.ts'],
+    targetAllowedFiles: ['src/app.ts'],
+    validators: [],
+    planningRepo: 'planning',
+    targetRepo: 'target',
+    closureAuthority: 'target_repo',
+    source: {
+      planPath: `../planning/docs/tasks/${taskId}.task.md`,
+      sectionTitle: taskId,
+      headingLine: 1,
+      hash: 'fixture'
+    },
+    claim: {
+      actorId: 'validator',
+      leaseId: `lease-${taskId}`,
+      claimedAt: '2026-06-18T00:00:00.000Z',
+      heartbeatAt: '2026-06-18T00:00:00.000Z',
+      ttlSeconds: 1800,
+      files: ['src/app.ts'],
+      state: 'active',
+      intent: 'write'
+    }
+  });
+  writeText(path.join(targetRepo, 'src/app.ts'), 'export const app = 1;\n');
+  writeText(path.join(planningRepo, 'docs/tasks', `${taskId}.task.md`), `---\ntask_id: ${taskId}\nstatus: planned\n---\n`);
+  execFileSync('git', ['add', '.'], { cwd: targetRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'base broker close fixture'], { cwd: targetRepo, stdio: 'ignore' });
+  execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'base broker close planning fixture'], { cwd: planningRepo, stdio: 'ignore' });
+  return { targetRepo, planningRepo, taskId };
+}
+
 async function makeDualRepoCloseFixture(label: string, options: { closePlanningStatus?: string } = {}) {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-close-${label}-`));
   const targetRepo = path.join(tempRoot, 'target');
@@ -337,6 +447,96 @@ async function makeDualRepoCloseFixture(label: string, options: { closePlanningS
   writeText(path.join(targetRepo, 'scratch.txt'), 'unrelated noise\n');
   return { targetRepo, planningRepo, taskId: fixtureTaskId, planPath, deliveryCommit, profilePath: path.join(planningRepo, 'taskflow.profile.json') };
 }
+
+const brokerConfirmedFixture = await makeBrokerCloseFixture('confirmed');
+writeBrokerRegistry(brokerConfirmedFixture.targetRepo, [
+  makeActiveIntent({
+    taskId: brokerConfirmedFixture.taskId,
+    actorId: 'validator',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-A'],
+    atomCids: ['CID-SHARED']
+  }),
+  makeActiveIntent({
+    taskId: 'TASK-OTHER-CONFIRMED',
+    actorId: 'other',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-B'],
+    atomCids: ['CID-SHARED']
+  })
+]);
+const brokerConfirmedPreClose = await runTaskflow([
+  'pre-close',
+  '--cwd', brokerConfirmedFixture.targetRepo,
+  '--task', brokerConfirmedFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(brokerConfirmedPreClose.evidence.writeReadinessHint.brokerConflictGate.verdict, 'confirmedConflict');
+const brokerConfirmedDryRun = await runTaskflow([
+  'close',
+  '--cwd', brokerConfirmedFixture.targetRepo,
+  '--task', brokerConfirmedFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(brokerConfirmedDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'confirmedConflict');
+assert.ok(
+  brokerConfirmedDryRun.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT'),
+  'confirmed broker conflict must block taskflow close --write readiness'
+);
+
+const brokerInsufficientFixture = await makeBrokerCloseFixture('insufficient');
+writeBrokerRegistry(brokerInsufficientFixture.targetRepo, [
+  makeActiveIntent({
+    taskId: brokerInsufficientFixture.taskId,
+    actorId: 'validator',
+    files: ['src/app.ts']
+  }),
+  makeActiveIntent({
+    taskId: 'TASK-OTHER-INSUFFICIENT',
+    actorId: 'other',
+    files: ['src/app.ts']
+  })
+]);
+const brokerInsufficientDryRun = await runTaskflow([
+  'close',
+  '--cwd', brokerInsufficientFixture.targetRepo,
+  '--task', brokerInsufficientFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(brokerInsufficientDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'insufficientMutationIntent');
+assert.ok(
+  brokerInsufficientDryRun.evidence.writeReadinessHint.blockers.every((entry: any) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT'),
+  'insufficient mutation intent must remain advisory'
+);
+
+const brokerCleanFixture = await makeBrokerCloseFixture('clean');
+writeBrokerRegistry(brokerCleanFixture.targetRepo, [
+  makeActiveIntent({
+    taskId: brokerCleanFixture.taskId,
+    actorId: 'validator',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-A'],
+    atomCids: ['CID-A']
+  }),
+  makeActiveIntent({
+    taskId: 'TASK-OTHER-CLEAN',
+    actorId: 'other',
+    files: ['src/other.ts'],
+    atomIds: ['ATOM-Z'],
+    atomCids: ['CID-Z']
+  })
+]);
+const brokerCleanDryRun = await runTaskflow([
+  'close',
+  '--cwd', brokerCleanFixture.targetRepo,
+  '--task', brokerCleanFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(brokerCleanDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'noConflict');
 
 const dryRunFixture = await makeDualRepoCloseFixture('dryrun');
 const dryRunClose = await runTaskflow([

@@ -240,6 +240,21 @@ function classifyTaskResidue(input: {
     }
   }
 
+  if (
+    hasOnlyStatusDivergence(input.divergence)
+    && isOpenPlanningParityStatus(input.liveLedger.status)
+    && isOpenPlanningParityStatus(input.planningFrontmatter.status)
+    && (input.liveLedger.claimState === 'active' || input.lastTransitionEvent?.action === 'claim')
+  ) {
+    return {
+      bucket: 'no-residue',
+      truth: 'planning mirror is stale, but the active live claim already defines a unique governed lane',
+      residue: 'Planning-mirror parity drift is advisory while the active claim remains authoritative.',
+      nextCommand: 'node atm.mjs tasks status --task <id> --json',
+      reason: 'The live ledger claim state already identifies the governed operator lane, so draft/open planning status should not force import repair or ambiguous-manual-review.'
+    };
+  }
+
   if (planningMirrorOnly) {
     return {
       bucket: 'planning-mirror-only',
@@ -271,4 +286,19 @@ function classifyTaskResidue(input: {
 
 function normalizeOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function normalizeLifecycleValue(value: string | null): string | null {
+  const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+  return normalized || null;
+}
+
+function isOpenPlanningParityStatus(status: string | null): boolean {
+  const normalized = normalizeLifecycleValue(status);
+  if (!normalized) return false;
+  return ['draft', 'planned', 'open', 'ready', 'running', 'in_progress'].includes(normalized);
+}
+
+function hasOnlyStatusDivergence(divergence: readonly TaskResidueDivergence[]): boolean {
+  return divergence.length > 0 && divergence.every((entry) => entry.field === 'status');
 }

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T16-14-40-065Z-scope-amendment-5b1a31cd3184",
+  "taskId": "TASK-CID-0113",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-CID-0113.json",
+  "taskSha256": "sha256:5ff35442bd446cb1c8cbfcb1ef6068e3a70374c34a2fb36ccfdac9989ff0c0b2",
+  "createdAt": "2026-06-18T16:14:40.065Z",
+  "command": "node atm.mjs tasks scope add --task TASK-CID-0113 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts --class linked-surface --phase during-implementation --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

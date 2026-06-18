@@ -495,7 +495,7 @@ function normalizeParityLifecycleValue(value: string | null): string | null {
 
 function isOpenPlanningParityStatus(status: string | null): boolean {
   if (!status) return false;
-  return ['planned', 'open', 'ready', 'running', 'in_progress', 'review'].includes(status);
+  return ['draft', 'planned', 'open', 'ready', 'running', 'in_progress'].includes(status);
 }
 
 function hasOnlyStatusDivergence(divergence: readonly TaskResidueDivergence[]): boolean {

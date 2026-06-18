@@ -54,6 +54,9 @@ import { resolveActorWorkSession } from './actor-session.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { runAtmGit } from './git-governance.ts';
 import { quoteCliValue, relativePathFrom } from './shared.ts';
+import { loadRegistry } from '../../../core/src/broker/registry.ts';
+import { calculateBrokerDecision } from '../../../core/src/broker/decision.ts';
+import type { ActiveWriteIntent, WriteIntent, WriteIntentAtomRef } from '../../../core/src/broker/types.ts';
 import {
   acquireCloseWindowStagedIndexLock,
   assertCloseWindowStagingAllowed,
@@ -338,6 +341,17 @@ interface TaskflowCloseWriteReadinessHint {
   readonly blockers: readonly TaskflowCloseKnownBlocker[];
   readonly nextCommand: string | null;
   readonly operatorLane: 'taskflow close';
+  readonly brokerConflictGate: TaskflowBrokerConflictGate;
+}
+
+interface TaskflowBrokerConflictGate {
+  readonly schemaId: 'atm.taskflowBrokerConflictGate.v1';
+  readonly verdict: 'confirmedConflict' | 'insufficientMutationIntent' | 'noConflict';
+  readonly confirmedConflict: boolean;
+  readonly overlappingTaskIds: readonly string[];
+  readonly summary: string;
+  readonly requiredCommand: string | null;
+  readonly brokerVerdict: string | null;
 }
 
 function buildWriteReadinessHint(input: {
@@ -413,6 +427,169 @@ function readTaskflowClaimContext(taskDocument: Record<string, unknown>) {
   };
 }
 
+function wildcardToRegExp(pattern: string): RegExp {
+  const normalizedPattern = pattern.replace(/\\/g, '/');
+  const escaped = normalizedPattern.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  const regexSource = `^${escaped.replace(/\*\*/g, '::DOUBLE_STAR::').replace(/\*/g, '[^/]*').replace(/::DOUBLE_STAR::/g, '.*')}$`;
+  return new RegExp(regexSource);
+}
+
+function brokerPathMatches(filePath: string, declaredPath: string): boolean {
+  const file = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+  const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
+  if (!file || !declared) return false;
+  if (declared.includes('*')) {
+    return wildcardToRegExp(declared).test(file);
+  }
+  return file === declared || file.startsWith(`${declared}/`);
+}
+
+function activeIntentToWriteIntent(intent: ActiveWriteIntent): WriteIntent {
+  const rangeByCid = new Map<string, Array<NonNullable<ActiveWriteIntent['resourceKeys']['atomRanges']>[number]>>();
+  for (const range of intent.resourceKeys.atomRanges ?? []) {
+    const bucket = rangeByCid.get(range.atomCid) ?? [];
+    bucket.push(range);
+    rangeByCid.set(range.atomCid, bucket);
+  }
+  const atomRefs: WriteIntentAtomRef[] = intent.resourceKeys.atomIds.map((atomId, index) => {
+    const atomCid = intent.resourceKeys.atomCids[index] ?? atomId;
+    const range = rangeByCid.get(atomCid)?.[0];
+    return {
+      atomId,
+      atomCid,
+      operation: 'modify' as const,
+      ...(range ? {
+        sourceRange: {
+          filePath: range.filePath,
+          lineStart: range.lineStart,
+          lineEnd: range.lineEnd
+        }
+      } : {})
+    };
+  }).filter((ref) => ref.atomId && ref.atomCid);
+  return {
+    schemaId: 'atm.writeIntent.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'derived-from-active-broker-intent' },
+    taskId: intent.taskId,
+    actorId: intent.actorId,
+    baseCommit: intent.baseCommit,
+    targetFiles: intent.resourceKeys.files,
+    atomRefs,
+    sharedSurfaces: {
+      generators: intent.resourceKeys.generators,
+      projections: intent.resourceKeys.projections,
+      registries: intent.resourceKeys.registries,
+      validators: intent.resourceKeys.validators,
+      artifacts: intent.resourceKeys.artifacts
+    },
+    requestedLane: intent.lane
+  };
+}
+
+function evaluateTaskflowBrokerConflictGate(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+}): TaskflowBrokerConflictGate {
+  const registryPath = path.join(input.cwd, '.atm', 'runtime', 'write-broker.registry.json');
+  const currentFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+  if (!existsSync(registryPath) || currentFiles.length === 0) {
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'noConflict',
+      confirmedConflict: false,
+      overlappingTaskIds: [],
+      summary: 'No broker conflict evidence is available for this close.',
+      requiredCommand: null,
+      brokerVerdict: null
+    };
+  }
+
+  const registry = loadRegistry(registryPath);
+  const currentIntent = registry.activeIntents.find((entry) => entry.taskId === input.taskId) ?? null;
+  const overlapping = registry.activeIntents.filter((entry) =>
+    entry.taskId !== input.taskId
+    && entry.resourceKeys.files.some((entryFile) => currentFiles.some((file) => brokerPathMatches(file, entryFile) || brokerPathMatches(entryFile, file)))
+  );
+
+  if (overlapping.length === 0) {
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'noConflict',
+      confirmedConflict: false,
+      overlappingTaskIds: [],
+      summary: 'No overlapping broker-tracked write intents affect this close.',
+      requiredCommand: null,
+      brokerVerdict: null
+    };
+  }
+
+  if (!currentIntent) {
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'insufficientMutationIntent',
+      confirmedConflict: false,
+      overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+      summary: 'Broker found overlapping active write intents, but this task has no registered broker mutation intent to confirm whether the overlap is real. Supplement mutation intent for precision; close remains advisory here.',
+      requiredCommand: null,
+      brokerVerdict: null
+    };
+  }
+
+  const currentWriteIntent = activeIntentToWriteIntent(currentIntent);
+  if (currentWriteIntent.atomRefs.length === 0) {
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'insufficientMutationIntent',
+      confirmedConflict: false,
+      overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+      summary: 'Broker found overlapping active write intents, but the registered mutation intent lacks atom-level detail. Supplement mutation intent for precision; close remains advisory here.',
+      requiredCommand: null,
+      brokerVerdict: null
+    };
+  }
+
+  const comparisonRegistry = {
+    ...registry,
+    activeIntents: overlapping
+  };
+  const decision = calculateBrokerDecision(currentWriteIntent, comparisonRegistry);
+  if (decision.verdict === 'blocked-cid-conflict') {
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'confirmedConflict',
+      confirmedConflict: true,
+      overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+      summary: 'Broker reports a confirmed CID/read-set conflict with another active write intent. taskflow close --write must stop until the conflict is resolved.',
+      requiredCommand: null,
+      brokerVerdict: decision.verdict,
+    };
+  }
+
+  if (decision.verdict === 'needs-physical-split' || decision.verdict === 'blocked-shared-surface' || decision.verdict === 'blocked-active-lease') {
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'insufficientMutationIntent',
+      confirmedConflict: false,
+      overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+      summary: 'Broker found overlapping write surfaces, but not a confirmed CID conflict. Supplement mutation intent for precision; close remains advisory here.',
+      requiredCommand: null,
+      brokerVerdict: decision.verdict
+    };
+  }
+
+  return {
+    schemaId: 'atm.taskflowBrokerConflictGate.v1',
+    verdict: 'noConflict',
+    confirmedConflict: false,
+    overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+    summary: 'Broker re-check found no confirmed CID conflict for this close.',
+    requiredCommand: null,
+    brokerVerdict: decision.verdict
+  };
+}
+
 function buildTaskflowCloseWriteReadinessHint(input: {
   cwd: string;
   taskId: string;
@@ -432,6 +609,11 @@ function buildTaskflowCloseWriteReadinessHint(input: {
   };
 }): TaskflowCloseWriteReadinessHint {
   const blockers: TaskflowCloseKnownBlocker[] = [];
+  const brokerConflictGate = evaluateTaskflowBrokerConflictGate({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    taskDocument: input.taskDocument
+  });
   const taskStatus = normalizeTaskflowLifecycleStatus(input.taskDocument.status);
   const claim = readTaskflowClaimContext(input.taskDocument);
   const activeSession = input.actorId
@@ -536,6 +718,14 @@ function buildTaskflowCloseWriteReadinessHint(input: {
     }
   }
 
+  if (brokerConflictGate.confirmedConflict) {
+    blockers.push({
+      code: 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT',
+      summary: brokerConflictGate.summary,
+      requiredCommand: brokerConflictGate.requiredCommand
+    });
+  }
+
   const status = blockers.length === 0 ? 'ready' : 'blocked';
   return {
     schemaId: 'atm.taskflowCloseWriteReadinessHint.v1',
@@ -545,7 +735,8 @@ function buildTaskflowCloseWriteReadinessHint(input: {
       : `taskflow close --write has ${blockers.length} known blocker(s) that dry-run can already disclose.`,
     blockers,
     nextCommand: blockers[0]?.requiredCommand ?? null,
-    operatorLane: 'taskflow close'
+    operatorLane: 'taskflow close',
+    brokerConflictGate
   };
 }
 
