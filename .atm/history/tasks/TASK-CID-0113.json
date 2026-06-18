@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0113",
   "title": "Taskflow close confirmed broker conflict gate",
-  "status": "running",
+  "status": "done",
   "milestone": "M20",
   "dependencies": [
     "TASK-CID-0112"
@@ -62,8 +62,8 @@
     "hash": "4a9a2ae3ac6f0092"
   },
   "importedAt": "2026-06-18T06:24:56.945Z",
-  "lastTransitionId": "2026-06-18T16-00-53-464Z-claim-f740d5bdd2c6",
-  "lastTransitionAt": "2026-06-18T16:00:53.464Z",
+  "lastTransitionId": "2026-06-18T16-37-11-708Z-close-937d84af6e2b",
+  "lastTransitionAt": "2026-06-18T16:37:11.708Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-06-18T16:00:53.360Z",
@@ -72,7 +72,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-9fbe49d75d24",
     "claimedAt": "2026-06-18T16:00:53.378Z",
-    "heartbeatAt": "2026-06-18T16:00:53.378Z",
+    "heartbeatAt": "2026-06-18T16:37:11.705Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0113.json",
@@ -81,8 +81,8 @@
       "packages/core/src/broker/**",
       "tests/cli/**"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-18T16:00:53.378Z",
   "startedByActor": "codex-gpt-5.4-mini",
@@ -111,5 +111,9 @@
     "actorId": "codex-gpt-5.4-mini",
     "createdAt": "2026-06-18T16:00:53.462Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-18T16:37:11.705Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260618160053-codex-gpt-5.4-mini-TASK-CID-0113-843b2f840a",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0113.closure-packet.json"
 }

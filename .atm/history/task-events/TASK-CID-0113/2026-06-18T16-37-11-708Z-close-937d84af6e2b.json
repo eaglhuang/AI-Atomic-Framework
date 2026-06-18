@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T16-37-11-708Z-close-937d84af6e2b",
+  "taskId": "TASK-CID-0113",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260618160053-codex-gpt-5.4-mini-TASK-CID-0113-843b2f840a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0113.json",
+  "taskSha256": "sha256:7eb1b0a08e16b6f3a5d83c4e164bc36db772b48a645cecdff6f19abe8b9b7863",
+  "createdAt": "2026-06-18T16:37:11.708Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0113 --actor codex-gpt-5.4-mini --status done --historical-delivery 1f07c32b1c5c271dc9e27d42985a654bd22efc40",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618160053-codex-gpt-5.4-mini-TASK-CID-0113-843b2f840a",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0113.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-18T16:37:11.700Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0113-taskflow-close-confirmed-broker-conflict-gate.task.md",
+        ".atm/history/evidence/TASK-CID-0113.*",
+        ".atm/history/task-events/TASK-CID-0113/**",
+        ".atm/history/tasks/TASK-CID-0113.json",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/core/src/broker/**",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/residue-diagnostics.ts",
+        "packages/core/src/broker/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
