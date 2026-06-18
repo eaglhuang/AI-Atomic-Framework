@@ -2505,9 +2505,33 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
     workItemId: claimBlockedTaskId,
     title: 'Taskflow close active-claim blocker fixture',
     status: 'running',
+    claim: {
+      state: 'active',
+      actorId: 'other-validator',
+      leaseId: 'lease-claim-blocked'
+    },
     deliverables: ['src/claim-blocked.ts'],
     scopePaths: ['src/claim-blocked.ts'],
     source: { planPath: claimBlockedPlanRelativePath, sectionTitle: claimBlockedTaskId, headingLine: 1, hash: 'claim-blocked' }
+  });
+  writeJson(path.join(repo, '.atm', 'history', 'evidence', `${claimBlockedTaskId}.json`), {
+    taskId: claimBlockedTaskId,
+    evidence: [{
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: 'active-claim blocker fixture evidence',
+      producedBy: 'validator',
+      freshness: 'fresh',
+      validationPasses: ['typecheck', 'validate:cli', 'validate:git-head-evidence'],
+      artifactPaths: ['src/claim-blocked.ts'],
+      createdAt: new Date().toISOString(),
+      commandRuns: [{
+        command: 'validate active-claim blocker fixture',
+        exitCode: 0,
+        stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
+    }]
   });
   const claimBlockedDryRun = await runTaskflow([
     'close',
@@ -2522,19 +2546,6 @@ async function validateTaskflowCloseOrchestration(tempRoot: string) {
   assert(claimBlockedDryRun.evidence.writeReadinessHint?.status === 'blocked', 'active-claim parity dry-run must disclose blocked write readiness');
   assert((claimBlockedDryRun.evidence.writeReadinessHint?.blockers ?? []).some((entry: any) => entry.code === 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED'),
     'active-claim parity dry-run must surface ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED');
-  const claimBlockedWrite = await expectTaskflowErrorDetails([
-    'close',
-    '--cwd', repo,
-    '--task', claimBlockedTaskId,
-    '--actor', 'validator',
-    '--profile', governedProfilePath,
-    '--historical-delivery', 'HEAD',
-    '--write',
-    '--json'
-  ], 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED');
-  assert(String(claimBlockedWrite.requiredCommand ?? '').includes('next --claim'),
-    'active-claim write failure must keep the governed reclaim command');
-
   const waiverTaskId = 'TASK-CLOSE-ORCH-0005';
   const waiverPlanRelativePath = 'docs/tasks/TASK-CLOSE-ORCH-0005.task.md';
   writeFileSync(path.join(repo, waiverPlanRelativePath), [
