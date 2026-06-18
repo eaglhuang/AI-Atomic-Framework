@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0122",
+  "title": "repair-closure protected-state commit context alignment",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-task-ledger-governance.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "packages/cli/src/commands/rescue.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "release/**",
+    "packages/cli/dist/**",
+    "scratch/**",
+    ".playwright-mcp/**"
+  ],
+  "nonGoals": [
+    "Do not mutate AAF source files in Phase 0.",
+    "Do not treat TASK-AAO-0113 evidence repair as this card's implementation target.",
+    "Do not handle push, license merge, or remote-behind-1 recovery in this card.",
+    "Do not stage or commit unrelated dirty files."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0122-repair-closure-protected-state-commit-context-alignment.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "`tasks repair-closure` on the current HEAD can misidentify `targetCommit`, and staged evidence can fail the protected-state pre-commit when same-task task JSON or task-event context is missing.\nThis is a toolchain bug in ATM, not a simple operator mistake.\nPhase 0 only opens the planning card and keeps AAF source untouched.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0122-repair-closure-protected-state-commit-context-alignment.task.md",
+    "sectionTitle": "TASK-AAO-0122",
+    "headingLine": 66,
+    "hash": "060bcabd7cebe54b"
+  },
+  "importedAt": "2026-06-18T15:57:28.670Z",
+  "lastTransitionId": "2026-06-18T16-01-22-680Z-close-fee4b39f884f",
+  "lastTransitionAt": "2026-06-18T16:01:22.680Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-18T15:57:29.262Z",
+  "promotedAt": "2026-06-18T15:57:29.946Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-c1b4c193d666",
+    "claimedAt": "2026-06-18T15:57:32.506Z",
+    "heartbeatAt": "2026-06-18T16:01:22.674Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0122.json",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-18T15:57:32.506Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260618155732-cursor-gpt-5.2-TASK-AAO-0122-9077207095",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0122",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0122.*",
+      ".atm/history/task-events/TASK-AAO-0122/**",
+      ".atm/history/tasks/TASK-AAO-0122.json",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-task-ledger-governance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "44a0abd5537997fa1658e7d2f5e8698c911b28d03f0a5c03c5bac42c83c4f6eb",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-18T15:57:32.950Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-18T16:01:22.674Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260618155732-cursor-gpt-5.2-TASK-AAO-0122-9077207095",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0122.closure-packet.json"
+}
