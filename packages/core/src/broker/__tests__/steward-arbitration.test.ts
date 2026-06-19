@@ -104,6 +104,16 @@ function runTests() {
     });
 
     assert.equal(applyRes.ok, true, 'Apply should succeed');
+    assert.equal(applyRes.evidence.brokerOperationRun?.schemaId, 'atm.brokerOperationRunRecordEnvelope.v1');
+    const runRecord = applyRes.evidence.brokerOperationRun?.records[0];
+    assert.ok(runRecord, 'Broker operation run record should be attached');
+    assert.deepEqual(runRecord.request_identity, ['prop-1'], 'Run record should link proposal identity');
+    assert.deepEqual(runRecord.task_ids, ['TASK-TEST'], 'Run record should link task ids');
+    assert.deepEqual(runRecord.request_files, [tempFilePath], 'Run record should link request files');
+    assert.deepEqual(runRecord.applied_files, [tempFilePath], 'Run record should link applied files');
+    assert.equal(runRecord.adapter_choice, 'steward.patch-apply');
+    assert.equal(runRecord.lane_decision, 'neutral-steward');
+    assert.equal(runRecord.merge_verdict, 'mergeable');
     const newContent = readFileSync(tempFilePath, 'utf8');
     assert.equal(newContent.includes('modified content'), true, 'Content should be modified');
     assert.equal(newContent.includes('line2'), true, 'Unchanged line should be preserved');
@@ -152,6 +162,13 @@ function runTests() {
     });
 
     assert.equal(applyRes.ok, false, 'Apply should be blocked');
+    assert.equal(applyRes.evidence.brokerOperationRun?.schemaId, 'atm.brokerOperationRunRecordEnvelope.v1');
+    const blockedRunRecord = applyRes.evidence.brokerOperationRun?.records[0];
+    assert.ok(blockedRunRecord, 'Blocked apply should still attach broker operation run evidence');
+    assert.deepEqual(blockedRunRecord.request_identity, ['prop-2'], 'Blocked run should link proposal identity');
+    assert.deepEqual(blockedRunRecord.task_ids, ['TASK-TEST'], 'Blocked run should link task ids');
+    assert.equal(blockedRunRecord.merge_verdict, 'conflict', 'Blocked run should report conflict verdict');
+    assert.deepEqual(blockedRunRecord.applied_files, [], 'Blocked run should not report applied files');
 
     console.log('  ✅ Test Case 2: Unsafe merge plan rejection - PASSED');
   } finally {
