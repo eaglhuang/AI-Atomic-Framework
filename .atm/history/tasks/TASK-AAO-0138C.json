@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0138C",
+  "title": "residue classification and finalization operator flow",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0135",
+    "TASK-AAO-0137",
+    "TASK-AAO-0138A"
+  ],
+  "acceptance": [
+    "ATM can classify at least these buckets:",
+    "`complete-but-unfinalized`",
+    "`planning-mirror-only`",
+    "`interrupted-close`",
+    "`stale-import`",
+    "`ambiguous-manual-review`",
+    "Each bucket maps to one explicit command or next action.",
+    "Operator-facing output clearly distinguishes:",
+    "truth",
+    "residue",
+    "next command",
+    "No silent deletion path exists for ambiguous or unsafe states.",
+    "The implementation reuses existing governed commands instead of creating parallel closure machinery."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/framework-development.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validate-governance-commands.ts",
+    "tests/**"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/framework-development.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "scripts/validate-governance-commands.ts",
+    "tests/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate",
+    "node --strip-types scripts/validate-governance-commands.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/.atm/history/**",
+    "C:/Users/User/AI-Atomic-Framework/.atm/runtime/**",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "unrelated source surfaces",
+    "scratch / unrelated dirty"
+  ],
+  "nonGoals": [
+    "Do not silently delete residue.",
+    "Do not make manual .atm/history/** editing the primary operator path.",
+    "Do not rebuild close/reconcile from scratch.",
+    "Do not duplicate opener orchestration logic."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-closure-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0138C-residue-classification-and-finalization-operator-flow.task.md",
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/README.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-aao.json",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/framework-development.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-ledger-governance.ts",
+      "C:/Users/User/AI-Atomic-Framework/scripts/validate-governance-commands.ts",
+      "C:/Users/User/AI-Atomic-Framework/tests/**",
+      "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "blocked_by": [
+      "TASK-AAO-0135",
+      "TASK-AAO-0137",
+      "TASK-AAO-0138A"
+    ],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0138C-residue-classification-and-finalization-operator-flow.task.md",
+    "sectionTitle": "TASK-AAO-0138C",
+    "headingLine": 99,
+    "hash": "a02ec870e1263b05"
+  },
+  "importedAt": "2026-06-18T06:49:48.589Z",
+  "lastTransitionId": "2026-06-19T00-56-18-669Z-close-820077394c0c",
+  "lastTransitionAt": "2026-06-19T00:56:18.669Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "closedAt": "2026-06-19T00:56:18.667Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 146fc8526ad8e6df2d45306b25412fb3b5c77c1b",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0138C.closure-packet.json"
+}

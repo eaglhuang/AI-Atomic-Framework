@@ -1,0 +1,39 @@
+{
+  "taskId": "TASK-AAO-0138C",
+  "updatedAt": "2026-06-19T00:56:15.387Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-AAO-0138C against commit 146fc8526ad8e6df2d45306b25412fb3b5c77c1b.",
+      "artifactPaths": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0138C-residue-classification-and-finalization-operator-flow.task.md",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "tests/**"
+      ],
+      "producedBy": "codex-gpt-5.4-mini",
+      "createdAt": "2026-06-19T00:56:15.387Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 146fc8526ad8e6df2d45306b25412fb3b5c77c1b",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:736262606326ac11dd3f150e415923c8b4d0e8d585460b5c335d344abdcb6e7d",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "146fc8526ad8e6df2d45306b25412fb3b5c77c1b"
+      }
+    }
+  ]
+}
