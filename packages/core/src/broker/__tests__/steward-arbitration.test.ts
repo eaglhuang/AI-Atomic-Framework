@@ -115,6 +115,7 @@ function runTests() {
     assert.equal(runRecord.adapter_choice, 'steward.patch-apply');
     assert.equal(runRecord.lane_decision, 'neutral-steward');
     assert.equal(runRecord.merge_verdict, 'mergeable');
+    assert.equal(applyRes.evidence.permissions.selfClose, false, 'Steward apply evidence must deny self-close authority');
     const newContent = readFileSync(tempFilePath, 'utf8');
     assert.equal(newContent.includes('modified content'), true, 'Content should be modified');
     assert.equal(newContent.includes('line2'), true, 'Unchanged line should be preserved');
@@ -171,6 +172,7 @@ function runTests() {
     assert.equal(blockedRunRecord.commit_sha, headCommit, 'Blocked run should link proposal base commit');
     assert.equal(blockedRunRecord.merge_verdict, 'conflict', 'Blocked run should report conflict verdict');
     assert.deepEqual(blockedRunRecord.applied_files, [], 'Blocked run should not report applied files');
+    assert.equal(applyRes.evidence.permissions.selfClose, false, 'Blocked steward evidence must deny self-close authority');
 
     console.log('  ✅ Test Case 2: Unsafe merge plan rejection - PASSED');
   } finally {
