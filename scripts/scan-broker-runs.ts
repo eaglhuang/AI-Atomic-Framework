@@ -13,6 +13,7 @@ interface BrokerOperationRunRecordEnvelope {
     readonly lane_decision?: string | null;
     readonly merge_verdict?: string | null;
     readonly evidence_path?: string | null;
+    readonly task_ids?: readonly string[] | null;
   }[] | null;
 }
 
@@ -22,6 +23,7 @@ interface BrokerRunSummary {
   requestCount: number;
   actorCount: number;
   files: string;
+  tasks: string;
   adapter: string;
   lane: string;
   verdict: string;
@@ -118,6 +120,7 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
   const requestIds = new Set<string>();
   const actorIds = new Set<string>();
   const files = new Set<string>();
+  const taskIds = new Set<string>();
   const adapters = new Set<string>();
   const lanes = new Set<string>();
   const verdicts = new Set<string>();
@@ -133,6 +136,9 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
     }
     for (const file of getUniqueSet(record.applied_files)) {
       files.add(file);
+    }
+    for (const taskId of getUniqueSet(record.task_ids)) {
+      taskIds.add(taskId);
     }
     if (record.adapter_choice) {
       adapters.add(record.adapter_choice);
@@ -151,6 +157,7 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
     requestCount: requestIds.size || records.length,
     actorCount: actorIds.size || 1,
     files: [...files].join(',') || path.basename(filePath),
+    tasks: [...taskIds].join(',') || 'n/a',
     adapter: adapters.size === 1 ? [...adapters][0] : [...adapters].join(',') || 'n/a',
     lane: lanes.size === 1 ? [...lanes][0] : [...lanes].join(',') || 'mixed',
     verdict: verdicts.size === 1 ? [...verdicts][0] : [...verdicts].join(',') || 'unknown',
@@ -163,14 +170,14 @@ function buildMarkdownSection(runs: BrokerRunSummary[]) {
     return '';
   }
   const rows = runs.map((run) => {
-    return `| ${run.runId} | ${run.planId} | ${run.requestCount} | ${run.actorCount} | ${run.files} | ${run.adapter} | ${run.lane} | ${run.verdict} | ${run.evidence} |`;
+    return `| ${run.runId} | ${run.planId} | ${run.requestCount} | ${run.actorCount} | ${run.files} | ${run.tasks} | ${run.adapter} | ${run.lane} | ${run.verdict} | ${run.evidence} |`;
   });
   return [
     '',
     '## Scan Result',
     `- Scan time: ${new Date().toISOString()}`,
-    '| runId | planId | requestCount | actorCount | files | adapter | lane | verdict | evidence |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| runId | planId | requestCount | actorCount | files | tasks | adapter | lane | verdict | evidence |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
     ...rows
   ].join('\n') + '\n';
 }

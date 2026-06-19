@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_TEAM_STEWARD_ID,
   buildTeamBrokerRuntimeActivationHandshake,
+  buildTeamBrokerRunRecord,
+  buildTeamBrokerRunRecordEnvelope,
   evaluateTeamBrokerLane,
   registerIntent,
   saveRegistry
@@ -117,6 +119,51 @@ function seedRegistry(cwd: string, intent: WriteIntent) {
   const registry = registerIntent(emptyRegistry, intent, 'direct-brokered');
   saveRegistry(registryPath, registry);
   return registryPath;
+}
+
+function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
+  const runDir = path.join(cwd, 'broker-runs');
+  const logPath = path.join(cwd, 'broker-run-log.md');
+  mkdirSync(runDir, { recursive: true });
+
+  const request = {
+    schemaId: 'atm.mutationRequest.v1' as const,
+    specVersion: '0.1.0' as const,
+    migration: { strategy: 'none' as const, fromVersion: null, notes: 'team broker log fixture' },
+    requestId: 'req-team-log-1',
+    actorId: 'coordinator-1',
+    taskId: 'TASK-TEAM-BROKER-LOG',
+    filePath: 'src/shared-target.ts',
+    op: 'append',
+    target: 'EOF',
+    value: 'beta'
+  };
+  const record = buildTeamBrokerRunRecord({
+    runId: 'run-team-log-1',
+    planId: 'plan-team-log-1',
+    request,
+    adapterChoice: 'text-range',
+    laneDecision: 'neutral-steward',
+    mergeVerdict: 'mergeable',
+    evidencePath: '.atm/history/evidence/broker-runs/run-team-log-1.json',
+    appliedFiles: ['src/shared-target.ts']
+  });
+  const envelope = buildTeamBrokerRunRecordEnvelope({
+    runId: 'run-team-log-1',
+    planId: 'plan-team-log-1',
+    records: [record]
+  });
+  writeJson(path.join(runDir, 'run-team-log-1.json'), envelope);
+
+  const result = spawnSync(
+    process.execPath,
+    ['--strip-types', path.join(root, 'scripts', 'scan-broker-runs.ts'), '--run-dir', runDir, '--log-file', logPath, '--compact'],
+    { encoding: 'utf8' }
+  );
+  check(result.status === 0, `scan-broker-runs failed: ${result.stderr || result.stdout}`);
+  const logText = readFileSync(logPath, 'utf8');
+  check(logText.includes('| runId | planId | requestCount | actorCount | files | tasks | adapter | lane | verdict | evidence |'), 'broker run log must expose tasks column');
+  check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | src/shared-target.ts | TASK-TEAM-BROKER-LOG | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task id linkage');
 }
 
 ensureRequiredFiles();
@@ -250,6 +297,8 @@ try {
   const runtimeEvidence = runtimeCliHandshake.parsed.evidence as Record<string, unknown>;
   check((runtimeEvidence.handshake as Record<string, unknown>)?.activationState === 'activated', 'broker runtime activate CLI evidence must include activated handshake');
   check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.gitWrite === false, 'broker runtime activate CLI evidence must keep git.write denied');
+
+  assertBrokerRunLogKeepsTaskLinkage(tempRoot);
 
   console.log(`[team-brokered-write:${mode}] ok`);
 } finally {
