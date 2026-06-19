@@ -930,20 +930,19 @@ function writeRepairClosureTransition(input: {
   if (!existsSync(taskPath)) return null;
   const taskDocument = readJsonRecord(taskPath);
   const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
-  const transition = appendTaskTransitionEvent({
+  const transitionPath = writeTaskDocumentWithTransition({
     cwd: input.cwd,
+    taskPath,
     taskId: input.taskId,
     action: 'repair-closure',
-    actorId: input.actorId,
     sessionId: typeof taskDocument.closedBySessionId === 'string' ? taskDocument.closedBySessionId : null,
-    fromStatus: previousStatus,
-    toStatus: previousStatus,
-    taskPath,
     taskDocument,
+    actorId: input.actorId,
+    previousStatus,
     command: input.command
   });
-  execFileSync('git', ['-C', input.cwd, 'add', '--', transition.eventPath], { stdio: 'ignore' });
-  return transition.eventPath;
+  execFileSync('git', ['-C', input.cwd, 'add', '--', taskPath, transitionPath], { stdio: 'ignore' });
+  return transitionPath;
 }
 
 interface ParsedRepairClaimOptions {

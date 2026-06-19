@@ -1105,7 +1105,9 @@ try {
   const repairedTaskDoc = readJson(path.join(repairRepo, '.atm', 'history', 'tasks', `${repairTaskId}.json`));
   assert(typeof repairedTaskDoc.closedAt === 'string' && repairedTaskDoc.closedAt.length > 0, 'tasks repair-closure must restore missing closedAt on the task ledger');
   assert(repairedTaskDoc.closurePacket === repairClosurePacketPath, 'tasks repair-closure must persist closurePacket path on the task ledger');
-  execFileSync('git', ['commit', '--no-verify', '-m', 'repair closure packet fixture'], { cwd: repairRepo, stdio: 'ignore' });
+  const repairTransitionId = String(repairedTaskDoc.lastTransitionId ?? '');
+  assert(repairTransitionId.includes('-repair-closure-'), 'tasks repair-closure must update lastTransitionId to the staged repair transition');
+  execFileSync(process.execPath, [path.join(root, 'atm.dev.mjs'), 'git', 'commit', '--cwd', repairRepo, '--actor', 'validator', '--name', 'Validator Fixture', '--email', 'validator@example.com', '--task', repairTaskId, '--message', 'chore: repair closure packet fixture', '--json'], { cwd: repairRepo, stdio: 'ignore' });
 
   const amendUnavailableDetails = await expectTaskErrorDetails(['repair-closure', '--cwd', repairRepo, '--task', repairTaskId, '--amend'], 'ATM_CLOSURE_REPAIR_AMEND_WRAPPER_UNAVAILABLE');
   assert(String(amendUnavailableDetails.requiredCommand ?? '').includes(`node atm.mjs git commit --actor <actor-id> --task ${repairTaskId}`), 'repair-closure --amend must redirect to the governed git commit wrapper');

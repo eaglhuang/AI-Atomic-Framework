@@ -1075,10 +1075,12 @@ function inspectHistoricalLedgerRestoreStagedArtifacts(
   const expectedTaskPath = `.atm/history/tasks/${taskId}.json`.toLowerCase();
   const expectedEvidencePath = `.atm/history/evidence/${taskId}.json`.toLowerCase();
   const expectedClosurePacketPath = `.atm/history/evidence/${taskId}.closure-packet.json`.toLowerCase();
+  const expectedGitHeadEvidencePath = '.atm/history/evidence/git-head.jsonl';
   let hasTaskLedger = false;
   let hasEvidenceBundle = false;
   let hasClosurePacket = false;
   let hasTaskEvent = false;
+  let hasGitHeadEvidence = false;
 
   for (const file of stagedFiles) {
     const normalized = normalizeRelativePath(file);
@@ -1095,6 +1097,10 @@ function inspectHistoricalLedgerRestoreStagedArtifacts(
       hasClosurePacket = true;
       continue;
     }
+    if (lower === expectedGitHeadEvidencePath) {
+      hasGitHeadEvidence = true;
+      continue;
+    }
     if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) {
       hasTaskEvent = true;
       continue;
@@ -1103,7 +1109,6 @@ function inspectHistoricalLedgerRestoreStagedArtifacts(
   }
 
   if (!hasTaskLedger) return { ok: false, taskId, stagedFiles, reason: 'missing-task-ledger' };
-  if (!hasEvidenceBundle) return { ok: false, taskId, stagedFiles, reason: 'missing-evidence-bundle' };
   if (!hasClosurePacket) return { ok: false, taskId, stagedFiles, reason: 'missing-closure-packet' };
   if (!hasTaskEvent) return { ok: false, taskId, stagedFiles, reason: 'missing-task-event' };
   const taskDocument = readStagedJsonFile(cwd, `.atm/history/tasks/${taskId}.json`);
@@ -1113,20 +1118,32 @@ function inspectHistoricalLedgerRestoreStagedArtifacts(
     return { ok: false, taskId, stagedFiles, reason: 'task-id-mismatch' };
   }
 
-  const evidence = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.json`);
-  if (!evidence || evidence.taskId !== taskId) {
-    return { ok: false, taskId, stagedFiles, reason: 'evidence-task-id-mismatch' };
-  }
   const closurePacket = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.closure-packet.json`);
   if (!closurePacket || closurePacket.taskId !== taskId) {
     return { ok: false, taskId, stagedFiles, reason: 'closure-packet-task-id-mismatch' };
   }
+  const evidence = readStagedJsonFile(cwd, `.atm/history/evidence/${taskId}.json`);
   for (const eventPath of stagedFiles.filter((file) => normalizeRelativePath(file).toLowerCase().startsWith(`.atm/history/task-events/${normalizedTaskId}/`))) {
     const event = readStagedJsonFile(cwd, eventPath);
     const command = typeof event?.command === 'string' ? event.command.trim() : '';
     if (!event || event.schemaId !== 'atm.taskTransition.v1' || event.taskId !== taskId || typeof event.transitionId !== 'string' || !command.startsWith('node atm.mjs ')) {
       return { ok: false, taskId, stagedFiles, reason: `task-event-invalid:${normalizeRelativePath(eventPath)}` };
     }
+  }
+  if (!hasEvidenceBundle) {
+    if (!hasGitHeadEvidence) {
+      return { ok: false, taskId, stagedFiles, reason: 'missing-evidence-bundle' };
+    }
+    const repairEventPaths = stagedFiles.filter((file) => normalizeRelativePath(file).toLowerCase().startsWith(`.atm/history/task-events/${normalizedTaskId}/`));
+    const repairOnly = repairEventPaths.length > 0 && repairEventPaths.every((eventPath) => {
+      const event = readStagedJsonFile(cwd, eventPath);
+      return event?.action === 'repair-closure';
+    });
+    if (!repairOnly) {
+      return { ok: false, taskId, stagedFiles, reason: 'missing-evidence-bundle' };
+    }
+  } else if (!evidence || evidence.taskId !== taskId) {
+    return { ok: false, taskId, stagedFiles, reason: 'evidence-task-id-mismatch' };
   }
 
   return { ok: true, taskId, stagedFiles, reason: null };
