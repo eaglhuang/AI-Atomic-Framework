@@ -1218,6 +1218,19 @@ try {
   const legacyAuditBefore = auditTasks(legacyRepo);
   assert(legacyAuditBefore.ok === false, 'legacy done tasks without transition evidence must fail audit before migration');
   assert(legacyAuditBefore.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_MANUAL_DONE'), 'legacy done tasks must be reported as manual done before migration');
+  const malformedRepo = makeHostRepo(tempRoot, 'malformed-ledger');
+  mkdirSync(path.join(malformedRepo, '.atm', 'history', 'tasks'), { recursive: true });
+  writeFileSync(path.join(malformedRepo, '.atm', 'history', 'tasks', 'TASK-MALFORMED-0001.json'), [
+    '{',
+    '  "schemaVersion": "atm.workItem.v0.2",',
+    '  "workItemId": "TASK-MALFORMED-0001",',
+    '  "status": "done",',
+    '  "title": "Malformed task',
+    '}'
+  ].join('\n'), 'utf8');
+  const malformedAudit = auditTasks(malformedRepo);
+  assert(malformedAudit.ok === false, 'malformed task ledger JSON must fail audit');
+  assert(malformedAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_TASK_JSON_MALFORMED'), 'malformed task ledger JSON must be reported explicitly');
   const legacyDryRun = await runTasks(['migrate-legacy-ledger', '--cwd', legacyRepo, '--actor', 'validator', '--dry-run']);
   assert(legacyDryRun.ok === true, 'legacy ledger dry-run must succeed');
   assert(evidenceReport(legacyDryRun).migratableTaskCount === 2, 'legacy ledger dry-run must find both JSON and Markdown legacy tasks');

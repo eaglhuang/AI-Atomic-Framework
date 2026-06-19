@@ -322,6 +322,15 @@ export interface TaskAuditReport {
   readonly ok: boolean;
 }
 
+interface AuditedTaskDocument {
+  readonly relativePath: string;
+  readonly taskId: string;
+  readonly status: string;
+  readonly document: Record<string, unknown>;
+  readonly format: 'json' | 'markdown';
+  readonly parseError: string | null;
+}
+
 interface FrameworkModeOptions {
   readonly cwd: string;
   readonly files?: readonly string[];
@@ -894,6 +903,16 @@ export function auditTasks(cwd: string): TaskAuditReport {
   const mirrorKeys = new Set<string>();
 
   for (const task of taskDocs) {
+    if (task.parseError) {
+      findings.push({
+        level: 'error',
+        code: 'ATM_TASK_AUDIT_TASK_JSON_MALFORMED',
+        path: task.relativePath,
+        taskId: task.taskId,
+        detail: `Task ${task.taskId} ledger JSON is malformed and could not be parsed: ${task.parseError}`
+      });
+      continue;
+    }
     const planningOnlyTask = isPlanningOnlyAuthorityTask(root, task.document);
     const manualTaskActor = firstAiIssuedManualTaskActor(task.document);
     if (manualTaskActor && task.taskId !== bootstrapTaskId) {
@@ -2158,17 +2177,20 @@ function buildRepairClosureNextActionCommand(taskId: string, actorId: string | n
   return `node atm.mjs git commit --actor ${resolvedActor} --task ${taskId} --message "${messageText}" --json`;
 }
 
-function readTaskDocuments(root: string): ReadonlyArray<{ relativePath: string; taskId: string; status: string; document: Record<string, unknown> }> {
+function readTaskDocuments(root: string): ReadonlyArray<AuditedTaskDocument> {
   const taskLedger = readTaskLedgerPolicy(root);
   const jsonTasks = listFiles(path.join(root, taskLedger.taskRoot), (filePath) => filePath.endsWith('.json'))
     .map((absolutePath) => {
-      const document = readJsonIfExists(absolutePath) ?? {};
+      const parsed = readJsonDocumentWithParseError(absolutePath);
+      const document = parsed.document ?? {};
       const taskId = normalizeOptionalString(document.workItemId ?? document.id ?? document.task_id ?? document.taskId) ?? path.basename(absolutePath, '.json');
       return {
         relativePath: relativePathFrom(root, absolutePath),
         taskId,
         status: normalizeStatus(document.status),
-        document
+        document,
+        format: 'json' as const,
+        parseError: parsed.parseError
       };
     });
   const markdownTasks = listFiles(root, (filePath) => filePath.endsWith('.task.md'))
@@ -2179,10 +2201,31 @@ function readTaskDocuments(root: string): ReadonlyArray<{ relativePath: string; 
         relativePath: relativePathFrom(root, absolutePath),
         taskId,
         status: normalizeStatus(frontmatter.status),
-        document: frontmatter
+        document: frontmatter,
+        format: 'markdown' as const,
+        parseError: null
       };
     });
   return [...jsonTasks, ...markdownTasks].sort((left, right) => left.relativePath.localeCompare(right.relativePath));
+}
+
+function readJsonDocumentWithParseError(filePath: string): {
+  readonly document: Record<string, unknown> | null;
+  readonly parseError: string | null;
+} {
+  if (!existsSync(filePath)) {
+    return { document: null, parseError: null };
+  }
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as unknown;
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return { document: {}, parseError: 'expected top-level JSON object' };
+    }
+    return { document: parsed as Record<string, unknown>, parseError: null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return { document: {}, parseError: message };
+  }
 }
 
 function readEvidenceDocuments(root: string): ReadonlyArray<{ relativePath: string; document: unknown }> {
