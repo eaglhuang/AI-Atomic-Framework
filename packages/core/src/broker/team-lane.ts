@@ -327,7 +327,7 @@ export function buildTeamBrokerWriteTransactionEvidence(input: {
     taskId: input.taskId,
     principalId: input.actorId,
     actorId: input.actorId,
-    sessionId: null,
+    sessionId: readSessionId(),
     instanceId: `${input.actorId}@local`,
     worktreeId: cwd,
     branchRef: readGitBranchRef(cwd),
@@ -346,6 +346,14 @@ export function buildTeamBrokerWriteTransactionEvidence(input: {
     expiresAt,
     heartbeatAt: startedAt
   };
+}
+
+function readSessionId(): string | null {
+  for (const key of ['ATM_SESSION_ID', 'CODEX_SESSION_ID', 'GITHUB_RUN_ID']) {
+    const value = process.env[key]?.trim();
+    if (value) return value;
+  }
+  return null;
 }
 
 function readGitBranchRef(cwd: string): string | null {

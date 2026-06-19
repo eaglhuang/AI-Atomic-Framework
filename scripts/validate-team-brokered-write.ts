@@ -177,7 +177,9 @@ ensureRequiredFiles();
 ensureConfigWiring();
 
 const tempRoot = createTempWorkspace('atm-team-brokered-write-');
+const previousAtmSessionId = process.env.ATM_SESSION_ID;
 try {
+  process.env.ATM_SESSION_ID = 'team-broker-session-fixture';
   initializeGitRepository(tempRoot);
   writeFileSync(path.join(tempRoot, 'package.json'), `${JSON.stringify({ name: 'atm-team-brokered-write-temp', private: true, type: 'module' }, null, 2)}\n`, 'utf8');
   const sharedFile = 'src/shared-target.ts';
@@ -235,6 +237,7 @@ try {
   check(overlapResult.evidence.writeTransaction.taskId === overlapTaskId, 'write transaction must carry task id');
   check(overlapResult.evidence.writeTransaction.principalId === 'team-planner', 'write transaction must carry principal id');
   check(overlapResult.evidence.writeTransaction.actorId === 'team-planner', 'write transaction must carry actor id');
+  check(overlapResult.evidence.writeTransaction.sessionId === 'team-broker-session-fixture', 'write transaction must carry session id when available');
   check(overlapResult.evidence.writeTransaction.instanceId === 'team-planner@local', 'write transaction must carry instance id');
   check(overlapResult.evidence.writeTransaction.worktreeId === tempRoot, 'write transaction must carry worktree id');
   check(overlapResult.evidence.writeTransaction.branchRef === tempBranchRef, 'write transaction must carry current branch ref');
@@ -329,5 +332,10 @@ try {
 
   console.log(`[team-brokered-write:${mode}] ok`);
 } finally {
+  if (previousAtmSessionId === undefined) {
+    delete process.env.ATM_SESSION_ID;
+  } else {
+    process.env.ATM_SESSION_ID = previousAtmSessionId;
+  }
   rmSync(tempRoot, { recursive: true, force: true });
 }
