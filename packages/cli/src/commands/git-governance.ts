@@ -718,6 +718,18 @@ function runGitCommit(options: ParsedGitOptions) {
     });
   }
   const commitSha = readHeadCommitSha(options.cwd);
+  const branchCommitQueue = {
+    schemaId: 'atm.branchCommitQueueEvidence.v1',
+    serializedBy: 'branch-commit-queue',
+    actorId,
+    taskId: options.taskId,
+    branchRef: branchRef ?? 'detached-head',
+    branchName,
+    headShaAtAcquire: headShaBeforeCommit,
+    headShaAfterCommit: commitSha,
+    retryableBusyCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY',
+    retryableRaceCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'
+  };
   return makeResult({
     ok: true,
     command: 'git',
@@ -726,7 +738,8 @@ function runGitCommit(options: ParsedGitOptions) {
       actorId,
       taskId: options.taskId,
       sessionId: session?.sessionId ?? null,
-      commitSha
+      commitSha,
+      branchCommitQueue
     })],
     evidence: {
       action: 'commit',
@@ -735,6 +748,7 @@ function runGitCommit(options: ParsedGitOptions) {
       claimLeaseId: claimForTrailers?.leaseId ?? null,
       sessionId: session?.sessionId ?? null,
       commitSha,
+      branchCommitQueue,
       trailers,
       git: profile,
       gitExecutable: resolveGitExecutable(),

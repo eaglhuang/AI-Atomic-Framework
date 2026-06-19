@@ -154,6 +154,8 @@ try {
   ]);
   assert.equal(importCommit.ok, true, 'ATM git wrapper must commit task import bundles without claiming the new planned task');
   assert.equal(typeof importCommit.evidence?.commitSha, 'string');
+  assert.equal((importCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
+  assert.equal((importCommit.evidence as any).branchCommitQueue?.retryableRaceCode, 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE');
 
   const unstagedCommit = expectCliError(
     runAtmGit([
@@ -224,6 +226,8 @@ try {
   ]);
   assert.equal(autoStageCommit.ok, true);
   assert.equal(typeof autoStageCommit.evidence?.commitSha, 'string');
+  assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
+  assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.taskId, taskId);
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
   rmSync(path.join(tempDir, outsideFile), { force: true });
 
