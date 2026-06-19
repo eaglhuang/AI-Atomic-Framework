@@ -18,6 +18,7 @@ import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
+import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
@@ -522,7 +523,24 @@ async function main() {
   }
 
   if (taskCase === 'start-status') {
-    const start = await runTeam(['start', '--task', 'TASK-TEAM-0011', '--actor', 'codex-main', '--cwd', process.cwd(), '--json']);
+    const cwd = createTempWorkspace('atm-team-start-status-');
+    initializeGitRepository(cwd);
+    const taskId = 'TASK-TEAM-0011';
+    mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: taskId,
+      title: 'Team start/status runtime',
+      status: 'running',
+      targetRepo: 'AI-Atomic-Framework',
+      scopePaths: ['packages/cli/src/commands/team.ts'],
+      deliverables: ['packages/cli/src/commands/team.ts'],
+      validators: ['node --strip-types scripts/validate-team-agents.ts --case start-status'],
+      atomizationImpact: { ownerAtomOrMap: 'atm.team-agents-map' }
+    }, null, 2)}\n`, 'utf8');
+    mkdirSync(path.join(cwd, 'packages', 'cli', 'src', 'commands'), { recursive: true });
+    writeFileSync(path.join(cwd, 'packages', 'cli', 'src', 'commands', 'team.ts'), 'export const teamStartStatusFixture = true;\n', 'utf8');
+    const start = await runTeam(['start', '--task', taskId, '--actor', 'codex-main', '--cwd', cwd, '--json']);
     const startEvidence = start.evidence as any;
     assert.equal(start.ok, true);
     assert.equal(startEvidence?.action, 'start');
@@ -533,7 +551,7 @@ async function main() {
     const teamRun = startEvidence?.teamRun;
     assert.equal(teamRun?.schemaId, 'atm.teamRun.v1');
     assert.match(teamRun?.teamRunId, /^team-[a-f0-9]{12}$/);
-    assert.equal(teamRun?.taskId, 'TASK-TEAM-0011');
+    assert.equal(teamRun?.taskId, taskId);
     assert.equal(teamRun?.actorId, 'codex-main');
     assert.equal(teamRun?.recipeId, 'atm.default.normal.typescript');
     assert.equal(teamRun?.status, 'active');
@@ -563,13 +581,13 @@ async function main() {
     assert.match(teamRun?.createdAt, /^\d{4}-\d{2}-\d{2}T/);
     assert.match(teamRun?.updatedAt, /^\d{4}-\d{2}-\d{2}T/);
 
-    const status = await runTeam(['status', '--compact', '--cwd', process.cwd(), '--json']);
+    const status = await runTeam(['status', '--compact', '--cwd', cwd, '--json']);
     const statusEvidence = status.evidence as any;
     assert.equal(status.ok, true);
     assert.equal(statusEvidence?.action, 'status');
     assert.ok(statusEvidence?.teamRunCount >= 1);
     const summary = statusEvidence?.teamRuns?.find((entry: any) => entry.teamRunId === teamRun.teamRunId);
-    assert.equal(summary?.taskId, 'TASK-TEAM-0011');
+    assert.equal(summary?.taskId, taskId);
     assert.equal(summary?.actorId, 'codex-main');
     assert.equal(summary?.recipeId, 'atm.default.normal.typescript');
     assert.equal(summary?.status, 'active');
@@ -579,6 +597,7 @@ async function main() {
     assert.equal(summary?.brokerDecisionSurface, 'brokerLane');
     assert.equal(summary?.brokerStewardId, 'neutral-write-steward');
     assert.equal(summary?.brokerGovernanceSummaryId, 'atm.teamBrokerGovernanceSummary.v1');
+    assert.deepEqual(summary?.brokerEvidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
     assert.equal(summary?.commitLaneSerializedBy, 'branch-commit-queue');
     assert.equal(summary?.commitLaneOwnerRole, 'coordinator');
     assert.equal(summary?.workerGitWrite, false);
@@ -586,9 +605,9 @@ async function main() {
     assert.equal(summary?.workerSelfClose, false);
     assert.equal(summary?.agentsSpawned, false);
 
-    const runtimePath = path.join(process.cwd(), '.atm', 'runtime', 'team-runs', `${teamRun.teamRunId}.json`);
+    const runtimePath = path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRun.teamRunId}.json`);
     assert.equal(existsSync(runtimePath), true);
-    rmSync(runtimePath, { force: true });
+    rmSync(cwd, { recursive: true, force: true });
 
     console.log('[validate-team-agents] ok (start-status)');
     return;

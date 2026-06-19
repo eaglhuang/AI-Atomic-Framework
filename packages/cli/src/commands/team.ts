@@ -3038,6 +3038,9 @@ function compactTeamRun(run: any) {
     brokerDecisionSurface: run.brokerSubagent?.decisionSurface ?? run.runtimeContract?.brokerSubagent?.decisionSurface ?? null,
     brokerStewardId: run.brokerSubagent?.stewardId ?? run.runtimeContract?.brokerSubagent?.stewardId ?? null,
     brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
+    brokerEvidenceRequired: normalizeStringArray(
+      brokerGovernance?.brokerEvidenceRequired ?? run.brokerSubagent?.evidenceRequired ?? run.runtimeContract?.brokerSubagent?.evidenceRequired
+    ),
     commitLaneSerializedBy: brokerGovernance?.commitLaneSerializedBy ?? run.runtimeContract?.commitLane?.serializedBy ?? null,
     commitLaneOwnerRole: brokerGovernance?.commitLaneOwnerRole ?? run.runtimeContract?.commitLane?.ownerRole ?? null,
     workerGitWrite: brokerGovernance?.workerGitWrite ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.gitWrite ?? null,
