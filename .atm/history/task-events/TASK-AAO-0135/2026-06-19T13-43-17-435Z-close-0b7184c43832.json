@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-19T13-43-17-435Z-close-0b7184c43832",
+  "taskId": "TASK-AAO-0135",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260619004217-cursor-gpt-5.2-TASK-AAO-0135-d8b7b5ffbe",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0135.json",
+  "taskSha256": "sha256:cd45d0761e8435c398894f92ef5a5a126d8606bbb2443ff4c2dacd4ead1cf16c",
+  "createdAt": "2026-06-19T13:43:17.435Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0135 --actor cursor-gpt-5.2 --status done --historical-delivery f0d0e18c3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260619004217-cursor-gpt-5.2-TASK-AAO-0135-d8b7b5ffbe",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0135.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-import",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-19T13:43:17.424Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0135-closure-evidence-integrity-and-import-claim-safety.task.md",
+        ".atm/history/evidence/TASK-AAO-0135.*",
+        ".atm/history/task-events/TASK-AAO-0135/**",
+        ".atm/history/tasks/TASK-AAO-0135.json",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

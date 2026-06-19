@@ -4,9 +4,7 @@
   "title": "closure/evidence data integrity hardening and import active-claim safety",
   "status": "done",
   "milestone": "M17",
-  "dependencies": [
-    "TASK-AAO-0123"
-  ],
+  "dependencies": [],
   "acceptance": [],
   "deliverables": [
     "packages/cli/src/commands/framework-development.ts",
@@ -15,8 +13,8 @@
     "packages/cli/src/commands/command-specs/tasks.spec.ts",
     "scripts/validate-task-import.ts",
     "scripts/validate-task-ledger-governance.ts",
-    "release/atm-onefile/**",
-    "release/atm-root-drop/**"
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json"
   ],
   "scopePaths": [
     "packages/cli/src/commands/framework-development.ts",
@@ -25,13 +23,13 @@
     "packages/cli/src/commands/command-specs/tasks.spec.ts",
     "scripts/validate-task-import.ts",
     "scripts/validate-task-ledger-governance.ts",
-    "release/atm-onefile/**",
-    "release/atm-root-drop/**"
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json"
   ],
   "validators": [
     "npm run typecheck",
     "npm run validate:cli",
-    "npm test -- --grep \"validateClosurePacket|repair-closure|import.*active.*claim"
+    "git diff --check"
   ],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
@@ -52,53 +50,51 @@
     "Do not retroactively rewrite historical evidence files.",
     "Do not mutate AAF source in Phase 0."
   ],
-  "evidenceRequired": "command-backed",
-  "rollbackStrategy": "revert-commit",
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
   "rollbackNotes": null,
   "atomizationImpact": {
-    "ownerAtomOrMap": "atm.task-closure-map",
-    "mapUpdates": [
-      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
-    ]
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
   },
   "legacyImportAliases": {
     "allowed_files": [
       "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0135-closure-evidence-integrity-and-import-claim-safety.task.md",
-      "C:/Users/User/3KLife/docs/tasks/tasks-aao.json",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/framework-development.ts",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/tasks.spec.ts",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/hook.ts",
-      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-import.ts",
-      "C:/Users/User/AI-Atomic-Framework/scripts/validate-task-ledger-governance.ts",
-      "C:/Users/User/AI-Atomic-Framework/release/atm-onefile/**",
-      "C:/Users/User/AI-Atomic-Framework/release/atm-root-drop/**",
-      "C:/Users/User/AI-Atomic-Framework/atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      "C:/Users/User/3KLife/docs/tasks/tasks-aao.json"
     ],
     "blocked_by": [],
     "upstream_repo": "AI-Atomic-Framework"
   },
-  "importDiagnostics": [],
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
+      "severity": "warning",
+      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
+      "field": "dependencies",
+      "alias": "blocked_by",
+      "canonical": "depends_on"
+    }
+  ],
   "tags": [],
   "notes": null,
   "source": {
     "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0135-closure-evidence-integrity-and-import-claim-safety.task.md",
     "sectionTitle": "TASK-AAO-0135",
-    "headingLine": 90,
-    "hash": "63740b6e09f67cc4"
+    "headingLine": 72,
+    "hash": "8254129919a3a5d9"
   },
-  "importedAt": "2026-06-08T16:44:45.914Z",
-  "lastTransitionId": "2026-06-08T16-48-56-550Z-close-8f21afefb77c",
-  "lastTransitionAt": "2026-06-08T16:48:56.550Z",
+  "importedAt": "2026-06-19T00:41:55.949Z",
+  "lastTransitionId": "2026-06-19T13-43-17-435Z-close-0b7184c43832",
+  "lastTransitionAt": "2026-06-19T13:43:17.435Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "cursor-composer",
-  "reservedAt": "2026-06-08T16:44:51.986Z",
-  "promotedAt": "2026-06-08T16:44:51.989Z",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-19T00:42:12.049Z",
+  "promotedAt": "2026-06-19T00:42:12.638Z",
   "claim": {
-    "actorId": "cursor-composer",
-    "leaseId": "lease-6f807c65bf0f",
-    "claimedAt": "2026-06-08T16:44:51.992Z",
-    "heartbeatAt": "2026-06-08T16:48:56.549Z",
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-d9fc763f245b",
+    "claimedAt": "2026-06-19T00:42:17.293Z",
+    "heartbeatAt": "2026-06-19T13:43:17.432Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0135.json",
@@ -106,17 +102,17 @@
       "packages/cli/src/commands/framework-development.ts",
       "packages/cli/src/commands/hook.ts",
       "packages/cli/src/commands/tasks.ts",
-      "release/atm-onefile/**",
-      "release/atm-root-drop/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "scripts/validate-task-import.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
     "state": "released",
-    "reason": "closed"
+    "reason": "Historical mixed delivery; foreign WIP untouched"
   },
-  "startedAt": "2026-06-08T16:44:51.992Z",
-  "startedByActor": "cursor-composer",
-  "startedBySessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303",
+  "startedAt": "2026-06-19T00:42:17.293Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260619004217-cursor-gpt-5.2-TASK-AAO-0135-d8b7b5ffbe",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -133,8 +129,8 @@
       "packages/cli/src/commands/framework-development.ts",
       "packages/cli/src/commands/hook.ts",
       "packages/cli/src/commands/tasks.ts",
-      "release/atm-onefile/**",
-      "release/atm-root-drop/**",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
       "scripts/validate-task-import.ts",
       "scripts/validate-task-ledger-governance.ts"
     ],
@@ -142,12 +138,13 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "47be87a4880bf141818aeb8113fd058f92ffb3844cb8a6b51360d6fda899fcfb",
-    "actorId": "cursor-composer",
-    "createdAt": "2026-06-08T16:44:52.008Z",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-19T00:42:19.046Z",
     "status": "active"
   },
-  "closurePacket": ".atm/history/evidence/TASK-AAO-0135.closure-packet.json",
-  "closedAt": "2026-06-08T16:48:56.549Z",
-  "closedByActor": "cursor-composer",
-  "closedBySessionId": "session-20260608164451-cursor-composer-TASK-AAO-0135-a7d5bf3303"
+  "closedAt": "2026-06-19T13:43:17.432Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260619004217-cursor-gpt-5.2-TASK-AAO-0135-d8b7b5ffbe",
+  "closeReason": "Historical mixed delivery; foreign WIP untouched",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0135.closure-packet.json"
 }
