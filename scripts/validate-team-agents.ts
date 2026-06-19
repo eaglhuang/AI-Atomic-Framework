@@ -1677,6 +1677,24 @@ async function main() {
     const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-patrol');
     const taskId = 'TASK-PATROL-0001';
     const teamRunId = 'team-patrol-fixture';
+    const evidenceDriftRunId = 'team-patrol-evidence-drift';
+    const evidenceDriftBrokerSubagent = {
+      schemaId: 'atm.teamBrokerSubagentContract.v1',
+      enabled: true,
+      subagentId: 'team-broker-subagent',
+      lifecycleOwner: 'atm',
+      decisionSurface: 'brokerLane',
+      governs: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+      stewardId: 'neutral-write-steward',
+      evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
+      authorityBoundary: {
+        fileWrite: false,
+        gitWrite: false,
+        taskLifecycle: false,
+        selfClose: false
+      },
+      escalationTarget: 'coordinator'
+    };
     rmSync(cwd, { recursive: true, force: true });
     mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
     mkdirSync(path.join(cwd, '.atm', 'runtime', 'team-runs'), { recursive: true });
@@ -1718,6 +1736,34 @@ async function main() {
       createdAt: '2026-06-18T00:00:00.000Z',
       updatedAt: '2026-06-18T00:00:00.000Z'
     }, null, 2)}\n`, 'utf8');
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${evidenceDriftRunId}.json`), `${JSON.stringify({
+      schemaId: 'atm.teamRun.v1',
+      teamRunId: evidenceDriftRunId,
+      taskId,
+      actorId: 'captain',
+      status: 'active',
+      executionMode: 'manual-team',
+      agentsSpawned: false,
+      brokerSubagent: evidenceDriftBrokerSubagent,
+      runtimeContract: {
+        brokerSubagent: evidenceDriftBrokerSubagent,
+        commitLane: {
+          schemaId: 'atm.teamCommitLaneContract.v1',
+          ownerRole: 'coordinator',
+          workerGitWrite: false,
+          serializedBy: 'branch-commit-queue'
+        },
+        workerAdapter: {
+          authorityBoundary: {
+            gitWrite: false,
+            taskLifecycle: false,
+            selfClose: false
+          }
+        }
+      },
+      createdAt: '2026-06-18T00:00:00.000Z',
+      updatedAt: '2026-06-18T00:00:00.000Z'
+    }, null, 2)}\n`, 'utf8');
 
     try {
       const beforeHistory = listRelativeFiles(path.join(cwd, '.atm', 'history'));
@@ -1746,6 +1792,20 @@ async function main() {
       assert.ok(evidence?.findings?.some((finding: any) => finding.category === 'scope'));
       assert.equal(typeof evidence?.suggestedCommand, 'string');
       assert.ok(Array.isArray(evidence?.followUp) && evidence.followUp.length > 0);
+      assert.deepEqual(listRelativeFiles(path.join(cwd, '.atm', 'history')), beforeHistory);
+      assert.deepEqual(listRelativeFiles(path.join(cwd, '.atm', 'runtime')), beforeRuntime);
+
+      const evidenceDriftPatrol = await runTeam(['patrol', '--task', taskId, '--team', evidenceDriftRunId, '--cwd', cwd, '--json']);
+      const evidenceDrift = evidenceDriftPatrol.evidence as any;
+      assert.equal(evidenceDriftPatrol.ok, true);
+      assert.equal(evidenceDrift?.severity, 'blocker');
+      assert.equal(evidenceDrift?.safeToProceed, false);
+      assert.ok(evidenceDrift?.findings?.some((finding: any) => (
+        finding.level === 'blocker'
+        && finding.category === 'broker-governance'
+        && finding.code === 'ATM_TEAM_PATROL_BROKER_EVIDENCE_GATE_DRIFT'
+        && finding.details?.missingEvidence?.includes('atm.stewardApplyEvidence.v1')
+      )));
       assert.deepEqual(listRelativeFiles(path.join(cwd, '.atm', 'history')), beforeHistory);
       assert.deepEqual(listRelativeFiles(path.join(cwd, '.atm', 'runtime')), beforeRuntime);
 

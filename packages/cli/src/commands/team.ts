@@ -2888,6 +2888,27 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
         }
       }));
     }
+    const expectedEvidenceRequired = [
+      'atm.teamBrokerLaneEvidence.v1',
+      'atm.stewardApplyEvidence.v1',
+      'atm.brokerOperationRunRecordEnvelope.v1'
+    ];
+    const evidenceRequired = normalizeStringArray(brokerSubagent.evidenceRequired);
+    const missingEvidence = expectedEvidenceRequired.filter((entry) => !evidenceRequired.includes(entry));
+    if (missingEvidence.length > 0) {
+      findings.push(teamPatrolFinding({
+        level: 'blocker',
+        code: 'ATM_TEAM_PATROL_BROKER_EVIDENCE_GATE_DRIFT',
+        category: 'broker-governance',
+        summary: `Team run ${teamRun.teamRunId} broker subagent evidence gates are incomplete.`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        details: {
+          evidenceRequired,
+          expectedEvidenceRequired,
+          missingEvidence
+        }
+      }));
+    }
     const boundary = brokerSubagent.authorityBoundary ?? {};
     if (boundary.fileWrite === true || boundary.gitWrite === true || boundary.taskLifecycle === true || boundary.selfClose === true) {
       findings.push(teamPatrolFinding({
