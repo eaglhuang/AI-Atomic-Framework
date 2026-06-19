@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0114",
+  "title": "Shared hot file broker rearbitration and auto-stage boundary hardening",
+  "status": "running",
+  "milestone": "M20",
+  "dependencies": [
+    "TASK-CID-0113"
+  ],
+  "acceptance": [
+    "Shared hot file overlap is detected before hook-time failure.",
+    "The operator gets a broker-first remediation path instead of only direction-lock or scope-drift fallout.",
+    "`auto-stage` excludes unrelated runtime residue and foreign task bundles from the governed staged bundle.",
+    "CLI coverage reproduces the shared-hot-file collision and verifies the broker-first repair path."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/core/src/broker/**",
+    "tests/cli/**"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/core/src/broker/**",
+    "tests/cli/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not redesign the whole task lifecycle.",
+    "Do not broaden broker arbitration beyond shared-hot-file closeout and staging governance.",
+    "Do not absorb foreign work such as AAO-0126 into this lane."
+  ],
+  "nonGoals": [
+    "No generic auto-merge system.",
+    "No replacement of direction-lock diagnostics."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shared-hot-file-broker-rearbitration",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0114-shared-hot-file-broker-rearbitration-and-auto-stage-boundary-hardening.task.md",
+    "sectionTitle": "TASK-CID-0114",
+    "headingLine": 39,
+    "hash": "04070edcc6096dc1"
+  },
+  "importedAt": "2026-06-18T16:39:27.865Z",
+  "lastTransitionId": "2026-06-18T16-40-08-896Z-claim-dd07b1458671",
+  "lastTransitionAt": "2026-06-18T16:40:08.896Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-18T16:40:08.843Z",
+  "promotedAt": "2026-06-18T16:40:08.849Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-aec3e45c4e01",
+    "claimedAt": "2026-06-18T16:40:08.852Z",
+    "heartbeatAt": "2026-06-18T16:40:08.852Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0114.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/**",
+      "tests/cli/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-18T16:40:08.852Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260618164008-codex-gpt-5.4-mini-TASK-CID-0114-226c6c28b8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0114",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0114.*",
+      ".atm/history/task-events/TASK-CID-0114/**",
+      ".atm/history/tasks/TASK-CID-0114.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/**",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9e20cb29d6e6b73f81e723d2e071ba59903dec4d661745162459ea735439465b",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-18T16:40:08.895Z",
+    "status": "active"
+  }
+}

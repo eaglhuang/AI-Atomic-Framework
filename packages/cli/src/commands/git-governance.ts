@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
@@ -32,6 +33,24 @@ function runGitCommand(cwd: string, args: readonly string[], stdio: ['ignore', '
   });
 }
 
+function runGitCommandWithEnv(
+  cwd: string,
+  args: readonly string[],
+  env: NodeJS.ProcessEnv,
+  stdio: ['ignore', 'pipe', 'pipe'] | ['ignore', 'pipe', 'ignore'] = ['ignore', 'pipe', 'ignore']
+): string {
+  return execFileSync(resolveGitExecutable(), args, {
+    cwd,
+    encoding: 'utf8',
+    stdio,
+    env
+  });
+}
+
+function isRuntimeCommitSideEffect(filePath: string): boolean {
+  return normalizeRelativePath(filePath).toLowerCase().startsWith('.atm/runtime/');
+}
+
 const branchCommitQueueLockTimeoutMs = 15_000;
 const branchCommitQueueLockRetryMs = 200;
 
@@ -48,6 +67,7 @@ export interface TaskScopedCommitBundleReport {
   readonly ok: boolean;
   readonly apply: boolean;
   readonly stageFiles: readonly string[];
+  readonly commitFiles: readonly string[];
   readonly skippedExternalDirtyFiles: readonly string[];
   readonly unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[];
   readonly outOfScopeStagedFiles: readonly string[];
@@ -535,23 +555,47 @@ function runGitCommit(options: ParsedGitOptions) {
       branchName,
       headShaAtAcquire: headShaBeforeCommit
     }, () => {
-      execFileSync(resolveGitExecutable(), args, {
+      const commitEnv = {
+        ...process.env,
+        GIT_AUTHOR_NAME: gitName,
+        GIT_AUTHOR_EMAIL: gitEmail,
+        GIT_COMMITTER_NAME: gitName,
+        GIT_COMMITTER_EMAIL: gitEmail,
+        ATM_COMMIT_ACTOR_ID: actorId,
+        ATM_COMMIT_TASK_ID: options.taskId ?? '',
+        ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
+        ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
+        ATM_COMMIT_TRAILERS: trailers.join('\n')
+      };
+      const bundleFiles = options.taskId !== null && taskDocument && !bypassesActiveSession
+        ? resolveTaskScopedCommitBundle({
+          cwd: options.cwd,
+          taskId: options.taskId,
+          taskDocument,
+          apply: false,
+          autoStage: options.autoStage,
+          deferForeignStaged: options.deferForeignStaged,
+          message: options.message!,
+          actorId,
+          trailers
+        }).commitFiles
+        : [];
+      const runCommit = (env: NodeJS.ProcessEnv) => execFileSync(resolveGitExecutable(), args, {
         cwd: options.cwd,
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
-        env: {
-          ...process.env,
-          GIT_AUTHOR_NAME: gitName,
-          GIT_AUTHOR_EMAIL: gitEmail,
-          GIT_COMMITTER_NAME: gitName,
-          GIT_COMMITTER_EMAIL: gitEmail,
-          ATM_COMMIT_ACTOR_ID: actorId,
-          ATM_COMMIT_TASK_ID: options.taskId ?? '',
-          ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
-          ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
-          ATM_COMMIT_TRAILERS: trailers.join('\n')
-        }
+        env
       });
+      if (bundleFiles.length > 0) {
+        withTaskScopedCommitIndex(options.cwd, bundleFiles, (scopedEnv) => {
+          runCommit({
+            ...commitEnv,
+            ...scopedEnv
+          });
+        });
+      } else {
+        runCommit(commitEnv);
+      }
     });
   } catch (error) {
     if (error instanceof CliError && (error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY' || error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE')) {
@@ -1218,6 +1262,30 @@ function deferForeignStagedFiles(
   return snapshotPath;
 }
 
+function withTaskScopedCommitIndex<T>(
+  cwd: string,
+  files: readonly string[],
+  run: (env: NodeJS.ProcessEnv) => T
+): T {
+  const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+  if (normalizedFiles.length === 0) {
+    return run({ ...process.env });
+  }
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-task-commit-index-'));
+  const tempIndexFile = path.join(tempDir, 'index');
+  const env = {
+    ...process.env,
+    GIT_INDEX_FILE: tempIndexFile
+  };
+  try {
+    runGitCommandWithEnv(cwd, ['read-tree', 'HEAD'], env, ['ignore', 'pipe', 'pipe']);
+    runGitCommandWithEnv(cwd, ['add', '-A', '--', ...normalizedFiles], env, ['ignore', 'pipe', 'pipe']);
+    return run(env);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
 export function resolveTaskScopedCommitBundle(input: {
   cwd: string;
   taskId: string;
@@ -1248,37 +1316,42 @@ export function resolveTaskScopedCommitBundle(input: {
   const stagedSet = new Set(stagedFiles);
   const unstagedDirtyFiles = dirtyFiles.filter((filePath) => !stagedSet.has(filePath));
   const inScopeUnstagedDirty = unstagedDirtyFiles.filter((filePath) =>
-    declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
-    || isAllowedGovernanceArtifactPath(filePath, input.taskId)
+    !isRuntimeCommitSideEffect(filePath)
+    && (
+      declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+      || isAllowedGovernanceArtifactPath(filePath, input.taskId)
+    )
   );
   const skippedExternalDirtyFiles = unstagedDirtyFiles.filter((filePath) =>
     !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
     && !isIgnorableCommitStagingSideEffect(filePath, input.taskId)
   );
+  const inScopeStagedFiles = stagedFiles.filter((filePath) => isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
   const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
+  const inScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) =>
+    isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope)
+  );
   const outOfScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) =>
     !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope)
   );
   const governanceBundleWarnings: string[] = [];
   const stageCandidates = input.autoStage ? uniqueSorted(inScopeUnstagedDirty) : [];
+  const commitFiles = uniqueSorted([
+    ...inScopeStagedFiles,
+    ...inScopeStagedDeletions,
+    ...stageCandidates
+  ]);
 
   let blockedCode: string | null = null;
   let blockedSummary: string | null = null;
-  if (unexpectedStagedTasks.length > 0 && !input.deferForeignStaged) {
-    blockedCode = 'ATM_GIT_COMMIT_FOREIGN_STAGED_TASKS';
-    blockedSummary = `git commit for ${input.taskId} found staged governance files for other tasks (${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}). Use --defer-foreign-staged under a governed command or wait for the other agent to commit.`;
-  } else if (outOfScopeStagedFiles.length > 0 || outOfScopeStagedDeletions.length > 0) {
-    blockedCode = 'ATM_GIT_COMMIT_OUT_OF_SCOPE_STAGED';
-    blockedSummary = `git commit for ${input.taskId} found out-of-scope source changes already staged; stage only task-allowed files or defer foreign staged bundles explicitly.`;
-  }
 
   if (!blockedCode && input.apply && stageCandidates.length > 0) {
     runGitCommand(input.cwd, ['add', '--', ...stageCandidates], ['ignore', 'pipe', 'pipe']);
     stagedFiles = readStagedFiles(input.cwd);
   }
 
-  if (!blockedCode && unexpectedStagedTasks.length > 0) {
-    governanceBundleWarnings.push(`Foreign staged tasks remain in the index: ${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}`);
+  if (unexpectedStagedTasks.length > 0) {
+    governanceBundleWarnings.push(`Foreign staged tasks remain in the shared index but will be excluded from the governed commit bundle: ${unexpectedStagedTasks.map((entry) => entry.taskId).join(', ')}`);
   }
 
   return {
@@ -1287,6 +1360,7 @@ export function resolveTaskScopedCommitBundle(input: {
     ok: blockedCode === null,
     apply: input.apply,
     stageFiles: input.apply && input.autoStage ? stageCandidates : inScopeUnstagedDirty,
+    commitFiles,
     skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
     unexpectedStagedTasks,
     outOfScopeStagedFiles: uniqueSorted([...outOfScopeStagedFiles, ...outOfScopeStagedDeletions]),
@@ -1333,16 +1407,6 @@ function inspectTaskScopedStagedGovernanceBundle(
     const outOfScopeStaged = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
     if (outOfScopeStaged.length > 0) {
       warnings.push(`Pre-commit warning: staged files outside allowedFiles for ${taskId}: ${outOfScopeStaged.join(', ')}`);
-      return {
-        ok: false,
-        code: 'ATM_GIT_COMMIT_GOVERNANCE_BUNDLE_TASK_MISMATCH',
-        summary: `git commit for ${taskId} found staged files outside the active claim allowedFiles or with mismatched governance task ids.`,
-        warnings,
-        details: {
-          outOfScopeStagedFiles: uniqueSorted(outOfScopeStaged),
-          mismatchedTaskIds: uniqueSorted(mismatchedTaskIds)
-        }
-      };
     }
     if (mismatchedTaskIds.length > 0) {
       return {
@@ -1408,13 +1472,6 @@ function inspectTaskScopedUnstagedCommit(
     };
   }
 
-  if (outOfScopeStagedFiles.length > 0 && (unstagedDeliverableDirty.length > 0 || stagedFiles.some((file) => isFileAllowedInTaskBundle(file, taskId, declaredScope)))) {
-    return {
-      kind: 'mixed-scope',
-      inScopeDirtyFiles: uniqueSorted(unstagedInScopeDirty.length > 0 ? unstagedInScopeDirty : deliverableDirtyFiles),
-      outOfScopeStagedFiles: uniqueSorted(outOfScopeStagedFiles)
-    };
-  }
   if (stagedFiles.length > 0) {
     return null;
   }

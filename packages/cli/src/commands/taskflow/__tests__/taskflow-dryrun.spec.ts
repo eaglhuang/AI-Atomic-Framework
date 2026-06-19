@@ -201,6 +201,7 @@ function makeActiveIntent(input: {
   files: string[];
   atomIds?: string[];
   atomCids?: string[];
+  expiresAt?: string;
 }) {
   return {
     intentId: `intent-${input.taskId}`,
@@ -223,7 +224,7 @@ function makeActiveIntent(input: {
     leaseMaxSeconds: 1800,
     heartbeatAt: '2026-06-18T00:00:00.000Z',
     lane: 'direct-brokered',
-    expiresAt: '2026-06-18T00:30:00.000Z'
+    expiresAt: input.expiresAt ?? '2099-01-01T00:00:00.000Z'
   };
 }
 
@@ -510,6 +511,43 @@ assert.equal(brokerInsufficientDryRun.evidence.writeReadinessHint.brokerConflict
 assert.ok(
   brokerInsufficientDryRun.evidence.writeReadinessHint.blockers.every((entry: any) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT'),
   'insufficient mutation intent must remain advisory'
+);
+
+const brokerStaleLeaseFixture = await makeBrokerCloseFixture('stale-lease');
+writeBrokerRegistry(brokerStaleLeaseFixture.targetRepo, [
+  makeActiveIntent({
+    taskId: brokerStaleLeaseFixture.taskId,
+    actorId: 'validator',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-SELF'],
+    atomCids: ['CID-SELF']
+  }),
+  makeActiveIntent({
+    taskId: 'TASK-OTHER-STALE-LEASE',
+    actorId: 'other',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-OTHER'],
+    atomCids: ['CID-OTHER'],
+    expiresAt: '2000-01-01T00:00:00.000Z'
+  })
+]);
+const brokerStaleLeaseDryRun = await runTaskflow([
+  'close',
+  '--cwd', brokerStaleLeaseFixture.targetRepo,
+  '--task', brokerStaleLeaseFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'blocked-active-lease');
+assert.ok(
+  brokerStaleLeaseDryRun.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'),
+  'stale lease takeover must block taskflow close --write readiness before hook-time drift'
+);
+assert.match(
+  String(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''),
+  /tasks repair-claim --task TASK-OTHER-STALE-LEASE --actor "?validator"? --json/,
+  'stale lease remediation must point to diagnose-first claim repair'
 );
 
 const brokerCleanFixture = await makeBrokerCloseFixture('clean');

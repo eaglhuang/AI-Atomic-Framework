@@ -346,12 +346,16 @@ interface TaskflowCloseWriteReadinessHint {
 
 interface TaskflowBrokerConflictGate {
   readonly schemaId: 'atm.taskflowBrokerConflictGate.v1';
-  readonly verdict: 'confirmedConflict' | 'insufficientMutationIntent' | 'noConflict';
+  readonly verdict: 'confirmedConflict' | 'takeoverRequired' | 'insufficientMutationIntent' | 'noConflict';
   readonly confirmedConflict: boolean;
   readonly overlappingTaskIds: readonly string[];
   readonly summary: string;
   readonly requiredCommand: string | null;
   readonly brokerVerdict: string | null;
+}
+
+function uniqueTaskIds(values: readonly string[]): readonly string[] {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
 }
 
 function buildWriteReadinessHint(input: {
@@ -491,6 +495,7 @@ function evaluateTaskflowBrokerConflictGate(input: {
   cwd: string;
   taskId: string;
   taskDocument: Record<string, unknown>;
+  actorId?: string | null;
 }): TaskflowBrokerConflictGate {
   const registryPath = path.join(input.cwd, '.atm', 'runtime', 'write-broker.registry.json');
   const currentFiles = extractTaskflowDeclaredFiles(input.taskDocument);
@@ -567,7 +572,30 @@ function evaluateTaskflowBrokerConflictGate(input: {
     };
   }
 
-  if (decision.verdict === 'needs-physical-split' || decision.verdict === 'blocked-shared-surface' || decision.verdict === 'blocked-active-lease') {
+  if (decision.verdict === 'blocked-active-lease') {
+    const staleLeaseBlockingTasks = uniqueTaskIds(
+      (decision.conflictMatrix?.conflicts ?? [])
+        .filter((entry) => entry.kind === 'lease' && typeof entry.blockingTask === 'string' && entry.blockingTask !== 'self')
+        .map((entry) => entry.blockingTask)
+    );
+    const repairTarget = staleLeaseBlockingTasks[0] ?? overlapping[0]?.taskId ?? null;
+    const actorId = input.actorId?.trim() || currentIntent.actorId || '<actor>';
+    return {
+      schemaId: 'atm.taskflowBrokerConflictGate.v1',
+      verdict: 'takeoverRequired',
+      confirmedConflict: false,
+      overlappingTaskIds: overlapping.map((entry) => entry.taskId),
+      summary: staleLeaseBlockingTasks.length > 0
+        ? `Broker found stale or malformed active lease state (${staleLeaseBlockingTasks.join(', ')}). Repair or take over the stale broker lane before continuing, so shared hot files do not fall through to hook-time scope drift.`
+        : 'Broker found stale or malformed active lease state. Repair or take over the stale broker lane before continuing, so shared hot files do not fall through to hook-time scope drift.',
+      requiredCommand: repairTarget
+        ? `node atm.mjs tasks repair-claim --task ${repairTarget} --actor ${quoteCliValue(actorId)} --json`
+        : null,
+      brokerVerdict: decision.verdict
+    };
+  }
+
+  if (decision.verdict === 'needs-physical-split' || decision.verdict === 'blocked-shared-surface') {
     return {
       schemaId: 'atm.taskflowBrokerConflictGate.v1',
       verdict: 'insufficientMutationIntent',
@@ -612,7 +640,8 @@ function buildTaskflowCloseWriteReadinessHint(input: {
   const brokerConflictGate = evaluateTaskflowBrokerConflictGate({
     cwd: input.cwd,
     taskId: input.taskId,
-    taskDocument: input.taskDocument
+    taskDocument: input.taskDocument,
+    actorId: input.actorId
   });
   const taskStatus = normalizeTaskflowLifecycleStatus(input.taskDocument.status);
   const claim = readTaskflowClaimContext(input.taskDocument);
@@ -721,6 +750,13 @@ function buildTaskflowCloseWriteReadinessHint(input: {
   if (brokerConflictGate.confirmedConflict) {
     blockers.push({
       code: 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT',
+      summary: brokerConflictGate.summary,
+      requiredCommand: brokerConflictGate.requiredCommand
+    });
+  }
+  if (brokerConflictGate.verdict === 'takeoverRequired') {
+    blockers.push({
+      code: 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED',
       summary: brokerConflictGate.summary,
       requiredCommand: brokerConflictGate.requiredCommand
     });

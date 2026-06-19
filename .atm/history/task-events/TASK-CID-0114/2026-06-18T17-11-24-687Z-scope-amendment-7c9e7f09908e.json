@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-18T17-11-24-687Z-scope-amendment-7c9e7f09908e",
+  "taskId": "TASK-CID-0114",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-CID-0114.json",
+  "taskSha256": "sha256:5eaac2d1d2e9f78b336f50226a26718d19cac0f28ac0789c9c855e62b089af80",
+  "createdAt": "2026-06-18T17:11:24.687Z",
+  "command": "node atm.mjs tasks scope add --task TASK-CID-0114 --actor codex-gpt-5.4-mini --add packages/cli/src/commands/git-governance.ts --class linked-surface --phase during-implementation --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

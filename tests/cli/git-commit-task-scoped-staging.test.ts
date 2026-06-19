@@ -209,6 +209,7 @@ try {
   assert.equal(dryRun.ok, true);
   assert.equal((dryRun.evidence as any).commitBundle.schemaId, 'atm.taskScopedCommitBundle.v1');
   assert.deepEqual((dryRun.evidence as any).commitBundle.stageFiles, [scopedFile]);
+  assert.deepEqual((dryRun.evidence as any).commitBundle.commitFiles, [scopedFile]);
   assert.deepEqual((dryRun.evidence as any).commitBundle.skippedExternalDirtyFiles, [outsideFile]);
 
   const autoStageCommit = await runAtmGit([
@@ -262,22 +263,21 @@ try {
   const foreignEvidence = `.atm/history/evidence/${foreignTaskId}.json`;
   writeJson(path.join(tempDir, foreignEvidence), { taskId: foreignTaskId, evidence: [] });
   runGit(tempDir, ['add', foreignEvidence]);
-  const foreignBlocked = expectCliError(
-    runAtmGit([
-      'commit',
-      '--cwd', tempDir,
-      '--actor', 'fixture-agent',
-      '--task', taskId,
-      '--session', sessionId,
-      '--message', 'feat: foreign staged bundle',
-      '--auto-stage',
-      '--json'
-    ]),
-    'ATM_GIT_COMMIT_FOREIGN_STAGED_TASKS'
-  );
-  const foreignDetails = (await foreignBlocked).details ?? {};
-  assert.ok(Array.isArray(foreignDetails.unexpectedStagedTasks));
+  const foreignIsolatedCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: foreign staged bundle',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(foreignIsolatedCommit.ok, true);
+  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(foreignEvidence), false);
+  assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignEvidence), true);
 
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer";\n', 'utf8');
   const bundle = resolveTaskScopedCommitBundle({
     cwd: tempDir,
     taskId,
@@ -291,6 +291,7 @@ try {
   });
   assert.equal(bundle.ok, true);
   assert.ok(bundle.deferredForeignStagedSnapshot);
+  assert.deepEqual(bundle.commitFiles, [scopedFile]);
   assert.equal(readFileSync(path.join(tempDir, foreignEvidence), 'utf8').includes(foreignTaskId), true);
 
   const deferredCommit = await runAtmGit([
@@ -305,6 +306,25 @@ try {
     '--json'
   ]);
   assert.equal(deferredCommit.ok, true);
+
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "isolated";\n', 'utf8');
+  const unrelatedStagedFile = 'src/unrelated.ts';
+  writeFileSync(path.join(tempDir, unrelatedStagedFile), 'export const unrelated = true;\n', 'utf8');
+  runGit(tempDir, ['add', unrelatedStagedFile]);
+  const isolatedCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: isolated task bundle commit',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(isolatedCommit.ok, true);
+  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(scopedFile), true);
+  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(unrelatedStagedFile), false);
+  assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(unrelatedStagedFile), true);
 
   console.log('[git-commit-task-scoped-staging] ok');
 } finally {
