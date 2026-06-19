@@ -224,6 +224,7 @@ export interface ClosurePacketValidationIssue {
 export interface ClosurePacketRepairResult {
   readonly taskId: string;
   readonly packetPath: string;
+  readonly taskPath: string | null;
   readonly previousHead: string | null;
   readonly repairedHead: string | null;
   readonly targetCommit: string | null;
@@ -1892,7 +1893,7 @@ export function repairClosurePacketForTask(input: {
 
   const commitMessage = buildRepairClosureCommitMessage(taskId);
   const nextActionCommand = buildRepairClosureNextActionCommand(taskId, input.actorId ?? null);
-  const remediation = 'ATM staged the repaired closure packet and git-head evidence only. Finish by running the governed git commit wrapper; ATM does not provide an amend-capable wrapper for this flow yet.';
+  const remediation = 'ATM staged the repaired closure packet, required git-head evidence, and any missing task ledger close fields. Finish by running the governed git commit wrapper; ATM does not provide an amend-capable wrapper for this flow yet.';
   if (input.amend === true) {
     throw new CliError('ATM_CLOSURE_REPAIR_AMEND_WRAPPER_UNAVAILABLE', 'tasks repair-closure --amend is not available because ATM only exposes a governed git commit wrapper without amend support.', {
       exitCode: 1,
@@ -1945,9 +1946,19 @@ export function repairClosurePacketForTask(input: {
   };
 
   if (input.dryRun) {
+    const normalizedTaskStatus = String(taskDocument?.status ?? '').trim().toLowerCase().replace(/-/g, '_');
+    const dryRunTaskPath = taskDocument && (
+      normalizeOptionalString(taskDocument.closedAt ?? taskDocument.closed_at) === null
+      || normalizeOptionalString(taskDocument.closedByActor ?? taskDocument.closed_by_actor) === null
+      || normalizeOptionalString(taskDocument.closurePacket ?? taskDocument.closure_packet) === null
+      || normalizedTaskStatus !== 'done'
+    )
+      ? normalizeRelativePath(path.relative(cwd, taskDocPath))
+      : null;
     return {
       taskId,
       packetPath,
+      taskPath: dryRunTaskPath,
       previousHead: headDetails.commitSha,
       repairedHead: headDetails.commitSha,
       targetCommit,
@@ -1967,6 +1978,38 @@ export function repairClosurePacketForTask(input: {
 
   writeFileSync(packetAbsolutePath, after, 'utf8');
   stageGitPath(cwd, packetPath);
+
+  let repairedTaskPath: string | null = null;
+  if (taskDocument) {
+    let taskChanged = false;
+    const normalizedTaskStatus = String(taskDocument.status ?? '').trim().toLowerCase().replace(/-/g, '_');
+    if (normalizedTaskStatus !== 'done') {
+      taskDocument.status = 'done';
+      taskChanged = true;
+    }
+    if (normalizeOptionalString(taskDocument.closedAt ?? taskDocument.closed_at) === null) {
+      taskDocument.closedAt = repairedPacket.closedAt;
+      taskChanged = true;
+    }
+    if (normalizeOptionalString(taskDocument.closedByActor ?? taskDocument.closed_by_actor) === null) {
+      taskDocument.closedByActor = repairedPacket.closedByActor;
+      taskChanged = true;
+    }
+    if (normalizeOptionalString(taskDocument.closedBySessionId ?? taskDocument.closed_by_session_id) === null && repairedPacket.sessionId) {
+      taskDocument.closedBySessionId = repairedPacket.sessionId;
+      taskChanged = true;
+    }
+    if (normalizeOptionalString(taskDocument.closurePacket ?? taskDocument.closure_packet) === null) {
+      taskDocument.closurePacket = packetPath;
+      taskChanged = true;
+    }
+    if (taskChanged) {
+      writeFileSync(taskDocPath, `${JSON.stringify(taskDocument, null, 2)}\n`, 'utf8');
+      repairedTaskPath = normalizeRelativePath(path.relative(cwd, taskDocPath));
+      stageGitPath(cwd, repairedTaskPath);
+    }
+  }
+
   appendRepairGitHeadEvidence(cwd, {
     commitSha: closureCommitSha,
     treeSha: governedTreeSha,
@@ -1977,6 +2020,7 @@ export function repairClosurePacketForTask(input: {
   return {
     taskId,
     packetPath,
+    taskPath: repairedTaskPath,
     previousHead: headDetails.commitSha,
     repairedHead: headDetails.commitSha,
     targetCommit,
