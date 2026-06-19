@@ -2162,9 +2162,13 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
     : resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
   const selectedTaskPool = promptScope?.selectedTasks ?? [];
   const explicitSingleTaskRoute = isExplicitSingleTaskRoute(promptScope, taskIntent);
-  const selectedTask = explicitSingleTaskRoute
-    ? selectedTaskPool[0] ?? null
-    : selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById, cwd)) ?? null;
+  const selectedTask = selectImportedTaskForPromptScope(
+    selectedTaskPool,
+    promptScope?.status === 'queue',
+    explicitSingleTaskRoute,
+    statusById,
+    cwd
+  );
   const claimableTask = selectedTask
     && selectedTask.format === 'json'
     && (isSelectedTaskClaimableForIntent(selectedTask, claimIntent) || isTaskAlreadyActivelyClaimed(selectedTask))
@@ -2181,6 +2185,19 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
     promptScope,
     planningRootWarnings: planningRootResolution.warnings
   };
+}
+
+function selectImportedTaskForPromptScope(
+  selectedTaskPool: readonly ImportedTaskSummary[],
+  isActiveQueue: boolean,
+  explicitSingleTaskRoute: boolean,
+  statusById: ReadonlyMap<string, string>,
+  cwd: string
+): ImportedTaskSummary | null {
+  if (isActiveQueue || explicitSingleTaskRoute) {
+    return selectedTaskPool[0] ?? null;
+  }
+  return selectedTaskPool.find((task) => areTaskDependenciesSatisfied(task, statusById, cwd)) ?? null;
 }
 
 function isSelectedTaskClaimableForIntent(task: ImportedTaskSummary, claimIntent: NextClaimIntent) {
