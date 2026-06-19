@@ -414,7 +414,7 @@ export const TEAM_ATOM_BOUNDARIES = {
   },
   'team.patrol-report': {
     anchor: 'packages/cli/src/commands/team.ts#buildTeamPatrolReport',
-    capability: 'Read-only patrol report for runtime mode, rework readiness, missing artifacts, and retry-budget risk.',
+    capability: 'Read-only patrol report for runtime mode, broker-governance evidence gates, rework readiness, missing artifacts, and retry-budget risk.',
     downstreamTasks: ['TASK-TEAM-0014']
   },
   'team.permission-lease-validator': {

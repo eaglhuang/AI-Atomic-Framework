@@ -5,7 +5,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { assessLieutenantEscalation, buildAtomizationChecklist, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
 import {
   validateScopeLeaseEpoch,
@@ -734,6 +734,7 @@ async function main() {
     assert.ok(teamSpecRuntimeStatus.examples.some((entry) => entry.includes('team status --compact')));
     assert.ok(teamSpecPatrolReport.summary.includes('broker-governance drift'));
     assert.ok(teamSpecPatrolReport.examples.some((entry) => entry.includes('--team <teamRunId>')));
+    assert.ok(TEAM_ATOM_BOUNDARIES['team.patrol-report'].capability.includes('broker-governance evidence gates'));
 
     console.log('[validate-team-agents] ok (command-spec-broker-surface)');
     return;
