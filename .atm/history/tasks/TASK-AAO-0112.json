@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0112",
   "title": "AAF taskflow dry-run skeleton",
-  "status": "running",
+  "status": "done",
   "milestone": "M16",
   "dependencies": [],
   "acceptance": [
@@ -105,7 +105,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-824c433c331d",
     "claimedAt": "2026-06-19T03:13:48.294Z",
-    "heartbeatAt": "2026-06-19T03:13:48.294Z",
+    "heartbeatAt": "2026-06-19T06:07:37.946Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0112.json",
@@ -114,8 +114,8 @@
       "packages/cli/src/commands/command-specs/taskflow.spec.ts",
       "packages/cli/src/commands/taskflow.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Historical commit 9f54ec1968aac19a508481343120052fbbceb818 contains one TASK-AAO-0112 scoped deliverable (packages/cli/src/commands/taskflow.ts); unrelated files are not credited to TASK-AAO-0112."
   },
   "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-06-19T02:39:43.625Z",
@@ -145,7 +145,12 @@
     "createdAt": "2026-06-19T03:13:48.330Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-06-19T06-00-14-111Z-import-0b6e66fac09b",
-  "lastTransitionAt": "2026-06-19T06:00:14.111Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-19T06-07-37-948Z-close-8bed0e37283a",
+  "lastTransitionAt": "2026-06-19T06:07:37.948Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-06-19T06:07:37.946Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260619031348-codex-gpt-5.4-mini-TASK-AAO-0112-0555c54ca6",
+  "closeReason": "Historical commit 9f54ec1968aac19a508481343120052fbbceb818 contains one TASK-AAO-0112 scoped deliverable (packages/cli/src/commands/taskflow.ts); unrelated files are not credited to TASK-AAO-0112.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0112.closure-packet.json"
 }
