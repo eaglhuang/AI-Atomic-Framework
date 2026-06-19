@@ -1333,6 +1333,7 @@ async function main() {
           brokerDecisionSurface: 'brokerLane',
           brokerStewardId: 'neutral-write-steward',
           brokerGoverns: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+          brokerEvidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
           commitLaneSerializedBy: 'branch-commit-queue',
           commitLaneOwnerRole: 'coordinator',
           workerGitWrite: false,
@@ -1361,6 +1362,7 @@ async function main() {
       assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerDecisionSurface, 'brokerLane');
       assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerStewardId, 'neutral-write-steward');
       assert.deepEqual((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerGoverns, ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane']);
+      assert.deepEqual((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerEvidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
       assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.commitLaneSerializedBy, 'branch-commit-queue');
       assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.commitLaneOwnerRole, 'coordinator');
       assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.workerGitWrite, false);

@@ -112,6 +112,7 @@
                 "brokerDecisionSurface",
                 "brokerStewardId",
                 "brokerGoverns",
+                "brokerEvidenceRequired",
                 "commitLaneSerializedBy",
                 "commitLaneOwnerRole",
                 "workerGitWrite",
@@ -124,6 +125,10 @@
                 "brokerDecisionSurface": { "type": ["string", "null"] },
                 "brokerStewardId": { "type": ["string", "null"] },
                 "brokerGoverns": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "brokerEvidenceRequired": {
                   "type": "array",
                   "items": { "type": "string", "minLength": 1 }
                 },

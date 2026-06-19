@@ -2635,6 +2635,7 @@ function buildTeamBrokerGovernanceSummary(runtimeContract: TeamRuntimeContract) 
     brokerDecisionSurface: runtimeContract.brokerSubagent.decisionSurface,
     brokerStewardId: runtimeContract.brokerSubagent.stewardId,
     brokerGoverns: [...runtimeContract.brokerSubagent.governs],
+    brokerEvidenceRequired: [...runtimeContract.brokerSubagent.evidenceRequired],
     commitLaneSerializedBy: runtimeContract.commitLane.serializedBy,
     commitLaneOwnerRole: runtimeContract.commitLane.ownerRole,
     workerGitWrite: runtimeContract.workerAdapter.authorityBoundary.gitWrite,
