@@ -194,6 +194,16 @@ type TeamRetryBudgetContract = {
   status: 'within-budget' | 'escalation-required';
 };
 
+type TeamCommitLaneContract = {
+  schemaId: 'atm.teamCommitLaneContract.v1';
+  ownerRole: 'coordinator';
+  ownerPermissions: readonly ['task.lifecycle', 'git.write', 'evidence.write'];
+  workerGitWrite: false;
+  serializedBy: 'branch-commit-queue';
+  lockSchemaId: 'atm.branchCommitQueueLock.v1';
+  retryableCodes: readonly ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'];
+};
+
 type TeamRuntimeContract = {
   schemaId: 'atm.teamRuntimeContract.v1';
   runtimeMode: TeamRuntimeMode;
@@ -208,6 +218,7 @@ type TeamRuntimeContract = {
   workerAdapter: TeamWorkerAdapterContract;
   artifactHandoff: TeamArtifactHandoffContract;
   retryBudget: TeamRetryBudgetContract;
+  commitLane: TeamCommitLaneContract;
   editorSubagentBridge: TeamEditorSubagentBridgeContract;
 };
 
@@ -792,6 +803,7 @@ export function buildTeamRuntimeContract(input: {
       producedArtifacts: []
     }),
     retryBudget: buildTeamRetryBudgetContract({}),
+    commitLane: buildTeamCommitLaneContract(),
     editorSubagentBridge: buildEditorSubagentBridgeContract({
       enabled: runtimeMode === 'editor-subagent' && !editorBridgeDisabled,
       disabledReason: runtimeMode !== 'editor-subagent'
@@ -804,6 +816,18 @@ export function buildTeamRuntimeContract(input: {
       permissionLeases: input.permissionLeases ?? [],
       evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
     })
+  };
+}
+
+function buildTeamCommitLaneContract(): TeamCommitLaneContract {
+  return {
+    schemaId: 'atm.teamCommitLaneContract.v1',
+    ownerRole: 'coordinator',
+    ownerPermissions: ['task.lifecycle', 'git.write', 'evidence.write'],
+    workerGitWrite: false,
+    serializedBy: 'branch-commit-queue',
+    lockSchemaId: 'atm.branchCommitQueueLock.v1',
+    retryableCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE']
   };
 }
 

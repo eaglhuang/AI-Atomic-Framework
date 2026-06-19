@@ -575,6 +575,13 @@ async function main() {
     assert.equal(defaultContract.runtimeLanguage, 'node');
     assert.equal(defaultContract.executionSurface, 'broker-governance');
     assert.equal(defaultContract.agentsSpawned, false);
+    assert.equal(defaultContract.commitLane.schemaId, 'atm.teamCommitLaneContract.v1');
+    assert.equal(defaultContract.commitLane.ownerRole, 'coordinator');
+    assert.deepEqual(defaultContract.commitLane.ownerPermissions, ['task.lifecycle', 'git.write', 'evidence.write']);
+    assert.equal(defaultContract.commitLane.workerGitWrite, false);
+    assert.equal(defaultContract.commitLane.serializedBy, 'branch-commit-queue');
+    assert.equal(defaultContract.commitLane.lockSchemaId, 'atm.branchCommitQueueLock.v1');
+    assert.deepEqual(defaultContract.commitLane.retryableCodes, ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE']);
     assert.ok(defaultContract.selectionReason.includes('broker-only selected'));
 
     const realAgentContract = buildTeamRuntimeContract({
@@ -957,6 +964,8 @@ async function main() {
     assert.equal(realRuntime.workerAdapter.adapterId, 'atm.node.reference-worker');
     assert.equal(realRuntime.workerAdapter.authorityBoundary.gitWrite, false);
     assert.equal(realRuntime.workerAdapter.authorityBoundary.taskLifecycle, false);
+    assert.equal(realRuntime.commitLane.workerGitWrite, false);
+    assert.equal(realRuntime.commitLane.serializedBy, 'branch-commit-queue');
     assert.equal(realRuntime.agentsSpawned, true);
     assert.equal(realRuntime.artifactHandoff.schemaId, 'atm.teamArtifactHandoffContract.v1');
     assert.equal(realRuntime.retryBudget.schemaId, 'atm.teamRetryBudgetContract.v1');
@@ -965,6 +974,7 @@ async function main() {
     assert.equal(brokerRuntime.runtimeAdapterId, 'atm.node.broker-only-fallback');
     assert.equal(brokerRuntime.workerAdapter.brokerFallback.enabled, true);
     assert.equal(brokerRuntime.workerAdapter.authorityBoundary.selfClose, false);
+    assert.equal(brokerRuntime.commitLane.ownerRole, 'coordinator');
     assert.equal(brokerRuntime.agentsSpawned, false);
     assert.equal(brokerRuntime.executionSurface, 'broker-governance');
     assert.equal(brokerRuntime.artifactHandoff.schemaId, realRuntime.artifactHandoff.schemaId);
