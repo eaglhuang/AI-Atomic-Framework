@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 import {
   DEFAULT_TEAM_STEWARD_ID,
   buildTeamBrokerRuntimeActivationHandshake,
@@ -28,6 +30,16 @@ function check(condition: unknown, message: string) {
 
 function readJson(relativePath: string) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
+}
+
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+const validateWriteTransaction = ajv.compile(readJson('schemas/team-agents/team-broker-write-transaction.schema.json'));
+
+function formatAjvErrors(errors: typeof validateWriteTransaction.errors) {
+  return (errors ?? [])
+    .map((error) => `${error.instancePath || '/'} ${error.message}`)
+    .join('; ');
 }
 
 function writeJson(filePath: string, value: unknown) {
@@ -295,6 +307,10 @@ try {
   check(overlapResult.evidence.writeTransaction.brokerDecision.lane === overlapResult.evidence.decision.lane, 'write transaction broker decision lane must match lane decision');
   check(overlapResult.evidence.writeTransaction.leaseEpoch > 0, 'write transaction must carry lease epoch');
   check(Date.parse(overlapResult.evidence.writeTransaction.expiresAt) > Date.parse(overlapResult.evidence.writeTransaction.startedAt), 'write transaction expiresAt must be after startedAt');
+  check(
+    validateWriteTransaction(overlapResult.evidence.writeTransaction),
+    `real team broker write transaction must match schema: ${formatAjvErrors(validateWriteTransaction.errors)}`
+  );
 
   const blockedResult = evaluateTeamBrokerLane({
     cwd: tempRoot,
