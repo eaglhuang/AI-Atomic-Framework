@@ -1158,6 +1158,14 @@ async function main() {
     assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.gitWrite, false);
     assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.taskLifecycle, false);
     assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.selfClose, false);
+    assert.equal(satisfiedAttestation.commitLane.schemaId, 'atm.teamCommitLaneContract.v1');
+    assert.equal(satisfiedAttestation.commitLane.serializedBy, 'branch-commit-queue');
+    assert.equal(satisfiedAttestation.commitLane.ownerRole, 'coordinator');
+    assert.equal(satisfiedAttestation.commitLane.workerGitWrite, false);
+    assert.equal(satisfiedAttestation.workerAuthorityBoundary.gitWrite, false);
+    assert.equal(satisfiedAttestation.workerAuthorityBoundary.taskLifecycle, false);
+    assert.equal(satisfiedAttestation.workerAuthorityBoundary.selfClose, false);
+    assert.equal(satisfiedAttestation.workerAuthorityBoundary.evidenceWriteOwner, 'coordinator');
     assert.equal(satisfiedAttestation.reviewerIndependence.satisfied, true);
     assert.equal(unsatisfiedAttestation.reviewerIndependence.satisfied, false);
 

@@ -906,6 +906,8 @@ export function buildTeamClosureAttestation(input: TeamClosureAttestationInput):
     sandboxPolicyHash: `sha256:${sandboxPolicyHash.replace(/^sha256:/, '')}`,
     attestationSigner: normalizeOptionalRuntimeString(input.attestationSigner) ?? 'coordinator',
     brokerSubagent: buildBrokerSubagentAttestation(runtime?.brokerSubagent),
+    commitLane: buildCommitLaneAttestation(runtime?.commitLane),
+    workerAuthorityBoundary: buildWorkerAuthorityBoundaryAttestation(runtime?.workerAdapter),
     reviewerIndependence: buildReviewerIndependenceAttestation(input.reviewerIndependence),
     attestedAt: normalizeOptionalRuntimeString(input.attestedAt) ?? new Date().toISOString(),
     localRuntimeWrapperIsSecureSandboxProof: false,
@@ -929,6 +931,26 @@ function buildBrokerSubagentAttestation(input: TeamRuntimeContract['brokerSubage
       taskLifecycle: boundary?.taskLifecycle === true,
       selfClose: boundary?.selfClose === true
     }
+  };
+}
+
+function buildCommitLaneAttestation(input: TeamRuntimeContract['commitLane'] | null | undefined) {
+  const lane = (input ?? {}) as Record<string, unknown>;
+  return {
+    schemaId: normalizeOptionalRuntimeString(input?.schemaId),
+    serializedBy: normalizeOptionalRuntimeString(input?.serializedBy),
+    ownerRole: normalizeOptionalRuntimeString(input?.ownerRole),
+    workerGitWrite: lane.workerGitWrite === true
+  };
+}
+
+function buildWorkerAuthorityBoundaryAttestation(input: TeamWorkerAdapterContract | null | undefined) {
+  const boundary = (input?.authorityBoundary ?? {}) as Record<string, unknown>;
+  return {
+    gitWrite: boundary.gitWrite === true,
+    taskLifecycle: boundary.taskLifecycle === true,
+    selfClose: boundary.selfClose === true,
+    evidenceWriteOwner: normalizeOptionalRuntimeString(boundary?.evidenceWriteOwner)
   };
 }
 

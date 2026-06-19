@@ -85,6 +85,20 @@ export interface TeamClosureBrokerSubagentEvidence {
   };
 }
 
+export interface TeamClosureCommitLaneEvidence {
+  readonly schemaId: string | null;
+  readonly serializedBy: string | null;
+  readonly ownerRole: string | null;
+  readonly workerGitWrite: boolean;
+}
+
+export interface TeamClosureWorkerAuthorityBoundaryEvidence {
+  readonly gitWrite: boolean;
+  readonly taskLifecycle: boolean;
+  readonly selfClose: boolean;
+  readonly evidenceWriteOwner: string | null;
+}
+
 export interface TeamClosureAttestationEvidence {
   readonly schemaId: typeof TEAM_CLOSURE_ATTESTATION_SCHEMA_ID;
   readonly teamRunId: string;
@@ -99,6 +113,8 @@ export interface TeamClosureAttestationEvidence {
   readonly sandboxPolicyHash: string;
   readonly attestationSigner: string;
   readonly brokerSubagent: TeamClosureBrokerSubagentEvidence;
+  readonly commitLane: TeamClosureCommitLaneEvidence;
+  readonly workerAuthorityBoundary: TeamClosureWorkerAuthorityBoundaryEvidence;
   readonly reviewerIndependence: TeamClosureReviewerIndependenceEvidence;
   readonly attestedAt: string;
   readonly localRuntimeWrapperIsSecureSandboxProof: false;

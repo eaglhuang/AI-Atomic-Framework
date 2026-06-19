@@ -187,6 +187,8 @@
         "sandboxPolicyHash",
         "attestationSigner",
         "brokerSubagent",
+        "commitLane",
+        "workerAuthorityBoundary",
         "reviewerIndependence",
         "attestedAt",
         "localRuntimeWrapperIsSecureSandboxProof",
@@ -243,6 +245,28 @@
                 "selfClose": { "type": "boolean" }
               }
             }
+          }
+        },
+        "commitLane": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schemaId", "serializedBy", "ownerRole", "workerGitWrite"],
+          "properties": {
+            "schemaId": { "type": ["string", "null"] },
+            "serializedBy": { "type": ["string", "null"] },
+            "ownerRole": { "type": ["string", "null"] },
+            "workerGitWrite": { "type": "boolean" }
+          }
+        },
+        "workerAuthorityBoundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gitWrite", "taskLifecycle", "selfClose", "evidenceWriteOwner"],
+          "properties": {
+            "gitWrite": { "type": "boolean" },
+            "taskLifecycle": { "type": "boolean" },
+            "selfClose": { "type": "boolean" },
+            "evidenceWriteOwner": { "type": ["string", "null"] }
           }
         },
         "reviewerIndependence": {
