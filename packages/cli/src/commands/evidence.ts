@@ -69,6 +69,22 @@ export interface TeamClosureReviewerIndependenceEvidence {
   readonly reason: string;
 }
 
+export interface TeamClosureBrokerSubagentEvidence {
+  readonly schemaId: string | null;
+  readonly enabled: boolean;
+  readonly subagentId: string | null;
+  readonly decisionSurface: string | null;
+  readonly stewardId: string | null;
+  readonly governs: readonly string[];
+  readonly evidenceRequired: readonly string[];
+  readonly authorityBoundary: {
+    readonly fileWrite: boolean;
+    readonly gitWrite: boolean;
+    readonly taskLifecycle: boolean;
+    readonly selfClose: boolean;
+  };
+}
+
 export interface TeamClosureAttestationEvidence {
   readonly schemaId: typeof TEAM_CLOSURE_ATTESTATION_SCHEMA_ID;
   readonly teamRunId: string;
@@ -82,6 +98,7 @@ export interface TeamClosureAttestationEvidence {
   readonly runtimeVersion: string | null;
   readonly sandboxPolicyHash: string;
   readonly attestationSigner: string;
+  readonly brokerSubagent: TeamClosureBrokerSubagentEvidence;
   readonly reviewerIndependence: TeamClosureReviewerIndependenceEvidence;
   readonly attestedAt: string;
   readonly localRuntimeWrapperIsSecureSandboxProof: false;

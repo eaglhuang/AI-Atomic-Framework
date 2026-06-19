@@ -102,6 +102,7 @@
         "runtimeVersion",
         "sandboxPolicyHash",
         "attestationSigner",
+        "brokerSubagent",
         "reviewerIndependence",
         "attestedAt",
         "localRuntimeWrapperIsSecureSandboxProof",
@@ -120,6 +121,46 @@
         "runtimeVersion": { "type": ["string", "null"] },
         "sandboxPolicyHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
         "attestationSigner": { "type": "string", "minLength": 1 },
+        "brokerSubagent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaId",
+            "enabled",
+            "subagentId",
+            "decisionSurface",
+            "stewardId",
+            "governs",
+            "evidenceRequired",
+            "authorityBoundary"
+          ],
+          "properties": {
+            "schemaId": { "type": ["string", "null"] },
+            "enabled": { "type": "boolean" },
+            "subagentId": { "type": ["string", "null"] },
+            "decisionSurface": { "type": ["string", "null"] },
+            "stewardId": { "type": ["string", "null"] },
+            "governs": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "evidenceRequired": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "authorityBoundary": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fileWrite", "gitWrite", "taskLifecycle", "selfClose"],
+              "properties": {
+                "fileWrite": { "type": "boolean" },
+                "gitWrite": { "type": "boolean" },
+                "taskLifecycle": { "type": "boolean" },
+                "selfClose": { "type": "boolean" }
+              }
+            }
+          }
+        },
         "reviewerIndependence": {
           "type": "object",
           "additionalProperties": false,

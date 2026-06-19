@@ -1087,6 +1087,16 @@ async function main() {
     assert.equal(satisfiedAttestation.schemaId, 'atm.teamClosureAttestation.v1');
     assert.equal(satisfiedAttestation.localRuntimeWrapperIsSecureSandboxProof, false);
     assert.equal(satisfiedAttestation.commandBackedEvidenceRequired, true);
+    assert.equal(satisfiedAttestation.brokerSubagent.schemaId, 'atm.teamBrokerSubagentContract.v1');
+    assert.equal(satisfiedAttestation.brokerSubagent.enabled, true);
+    assert.equal(satisfiedAttestation.brokerSubagent.decisionSurface, 'brokerLane');
+    assert.equal(satisfiedAttestation.brokerSubagent.stewardId, 'neutral-write-steward');
+    assert.deepEqual(satisfiedAttestation.brokerSubagent.governs, ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane']);
+    assert.deepEqual(satisfiedAttestation.brokerSubagent.evidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
+    assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.fileWrite, false);
+    assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.gitWrite, false);
+    assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.taskLifecycle, false);
+    assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.selfClose, false);
     assert.equal(satisfiedAttestation.reviewerIndependence.satisfied, true);
     assert.equal(unsatisfiedAttestation.reviewerIndependence.satisfied, false);
 

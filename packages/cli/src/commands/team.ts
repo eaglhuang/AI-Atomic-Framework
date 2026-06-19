@@ -905,10 +905,30 @@ export function buildTeamClosureAttestation(input: TeamClosureAttestationInput):
     runtimeVersion: normalizeOptionalRuntimeString(input.runtimeVersion),
     sandboxPolicyHash: `sha256:${sandboxPolicyHash.replace(/^sha256:/, '')}`,
     attestationSigner: normalizeOptionalRuntimeString(input.attestationSigner) ?? 'coordinator',
+    brokerSubagent: buildBrokerSubagentAttestation(runtime?.brokerSubagent),
     reviewerIndependence: buildReviewerIndependenceAttestation(input.reviewerIndependence),
     attestedAt: normalizeOptionalRuntimeString(input.attestedAt) ?? new Date().toISOString(),
     localRuntimeWrapperIsSecureSandboxProof: false,
     commandBackedEvidenceRequired: true
+  };
+}
+
+function buildBrokerSubagentAttestation(input: TeamRuntimeContract['brokerSubagent'] | null | undefined) {
+  const boundary = (input?.authorityBoundary ?? {}) as Record<string, unknown>;
+  return {
+    schemaId: normalizeOptionalRuntimeString(input?.schemaId),
+    enabled: input?.enabled === true,
+    subagentId: normalizeOptionalRuntimeString(input?.subagentId),
+    decisionSurface: normalizeOptionalRuntimeString(input?.decisionSurface),
+    stewardId: normalizeOptionalRuntimeString(input?.stewardId),
+    governs: normalizeStringArray(input?.governs),
+    evidenceRequired: normalizeStringArray(input?.evidenceRequired),
+    authorityBoundary: {
+      fileWrite: boundary?.fileWrite === true,
+      gitWrite: boundary?.gitWrite === true,
+      taskLifecycle: boundary?.taskLifecycle === true,
+      selfClose: boundary?.selfClose === true
+    }
   };
 }
 
