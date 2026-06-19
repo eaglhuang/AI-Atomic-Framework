@@ -499,7 +499,7 @@ if (!teamBrokerWriteTransactionSchema) {
         decisionSurface: 'brokerLane',
         governs: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
         stewardId: 'neutral-write-steward',
-        evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
+        evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
         authorityBoundary: {
           fileWrite: false,
           gitWrite: false,

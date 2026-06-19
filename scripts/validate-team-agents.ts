@@ -621,7 +621,7 @@ async function main() {
     assert.equal(defaultContract.brokerSubagent.decisionSurface, 'brokerLane');
     assert.deepEqual(defaultContract.brokerSubagent.governs, ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane']);
     assert.equal(defaultContract.brokerSubagent.stewardId, 'neutral-write-steward');
-    assert.deepEqual(defaultContract.brokerSubagent.evidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
+    assert.deepEqual(defaultContract.brokerSubagent.evidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
     assert.equal(defaultContract.brokerSubagent.authorityBoundary.fileWrite, false);
     assert.equal(defaultContract.brokerSubagent.authorityBoundary.gitWrite, false);
     assert.equal(defaultContract.brokerSubagent.authorityBoundary.taskLifecycle, false);
@@ -1133,7 +1133,7 @@ async function main() {
     assert.equal(satisfiedAttestation.brokerSubagent.decisionSurface, 'brokerLane');
     assert.equal(satisfiedAttestation.brokerSubagent.stewardId, 'neutral-write-steward');
     assert.deepEqual(satisfiedAttestation.brokerSubagent.governs, ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane']);
-    assert.deepEqual(satisfiedAttestation.brokerSubagent.evidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
+    assert.deepEqual(satisfiedAttestation.brokerSubagent.evidenceRequired, ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1']);
     assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.fileWrite, false);
     assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.gitWrite, false);
     assert.equal(satisfiedAttestation.brokerSubagent.authorityBoundary.taskLifecycle, false);
