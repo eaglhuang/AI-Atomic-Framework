@@ -578,6 +578,12 @@ async function main() {
     assert.equal(summary?.brokerSubagentEnabled, true);
     assert.equal(summary?.brokerDecisionSurface, 'brokerLane');
     assert.equal(summary?.brokerStewardId, 'neutral-write-steward');
+    assert.equal(summary?.brokerGovernanceSummaryId, 'atm.teamBrokerGovernanceSummary.v1');
+    assert.equal(summary?.commitLaneSerializedBy, 'branch-commit-queue');
+    assert.equal(summary?.commitLaneOwnerRole, 'coordinator');
+    assert.equal(summary?.workerGitWrite, false);
+    assert.equal(summary?.workerTaskLifecycle, false);
+    assert.equal(summary?.workerSelfClose, false);
     assert.equal(summary?.agentsSpawned, false);
 
     const runtimePath = path.join(process.cwd(), '.atm', 'runtime', 'team-runs', `${teamRun.teamRunId}.json`);

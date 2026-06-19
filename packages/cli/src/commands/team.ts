@@ -3005,6 +3005,7 @@ function buildTeamPatrolFollowUp(taskId: string, mode: TeamPatrolMode, findings:
 }
 
 function compactTeamRun(run: any) {
+  const brokerGovernance = run.teamSummary?.brokerGovernance ?? null;
   return {
     teamRunId: run.teamRunId,
     taskId: run.taskId,
@@ -3016,6 +3017,12 @@ function compactTeamRun(run: any) {
     brokerSubagentEnabled: run.brokerSubagent?.enabled === true || run.runtimeContract?.brokerSubagent?.enabled === true,
     brokerDecisionSurface: run.brokerSubagent?.decisionSurface ?? run.runtimeContract?.brokerSubagent?.decisionSurface ?? null,
     brokerStewardId: run.brokerSubagent?.stewardId ?? run.runtimeContract?.brokerSubagent?.stewardId ?? null,
+    brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
+    commitLaneSerializedBy: brokerGovernance?.commitLaneSerializedBy ?? run.runtimeContract?.commitLane?.serializedBy ?? null,
+    commitLaneOwnerRole: brokerGovernance?.commitLaneOwnerRole ?? run.runtimeContract?.commitLane?.ownerRole ?? null,
+    workerGitWrite: brokerGovernance?.workerGitWrite ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.gitWrite ?? null,
+    workerTaskLifecycle: brokerGovernance?.workerTaskLifecycle ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.taskLifecycle ?? null,
+    workerSelfClose: brokerGovernance?.workerSelfClose ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.selfClose ?? null,
     agentsSpawned: run.agentsSpawned === true,
     createdAt: run.createdAt ?? null,
     updatedAt: run.updatedAt ?? null
