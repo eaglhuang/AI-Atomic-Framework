@@ -4,29 +4,31 @@
   "title": "AAF taskflow dry-run skeleton",
   "status": "done",
   "milestone": "M16",
-  "dependencies": [],
+  "dependencies": [
+    "TASK-AAO-0111"
+  ],
   "acceptance": [
     "`TASK-AAO-0111` is the planning permit anchor for this route.",
     "The AAF work card must point at the target repo, not at the planning repo.",
     "The Phase 1 implementation surface is limited to the explicit whitelist below."
   ],
   "deliverables": [
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow.ts",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/taskflow.spec.ts",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs.ts",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/atm.ts"
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/command-specs.ts",
+    "packages/cli/src/atm.ts"
   ],
   "scopePaths": [
-    "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0112-atm-taskflow-dry-run-skeleton.task.md",
-    "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
-    "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
-    "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow.ts",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/taskflow.spec.ts",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs.ts",
-    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/atm.ts"
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/command-specs.ts",
+    "packages/cli/src/atm.ts"
   ],
-  "validators": [],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
   "closureAuthority": "target_repo",
@@ -64,93 +66,67 @@
     "allowed_files": [
       "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0112-atm-taskflow-dry-run-skeleton.task.md",
       "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
-      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
-      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow.ts",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs/taskflow.spec.ts",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/command-specs.ts",
-      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/atm.ts"
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-12.json"
     ],
     "blocked_by": [],
     "upstream_repo": "AI-Atomic-Framework"
   },
-  "importDiagnostics": [
-    {
-      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
-      "severity": "warning",
-      "message": "Front-matter uses legacy alias `allowed_files`; ATM imports the value as `scopePaths` to preserve target-repo scope. Prefer `scopePaths` in new task cards.",
-      "field": "scopePaths",
-      "alias": "allowed_files",
-      "canonical": "scopePaths"
-    },
-    {
-      "code": "ATM_TASK_IMPORT_LEGACY_ALIAS",
-      "severity": "warning",
-      "message": "Front-matter uses legacy alias `blocked_by`; ATM imports the value as `dependencies`. Prefer `depends_on` or `dependencies`.",
-      "field": "dependencies",
-      "alias": "blocked_by",
-      "canonical": "depends_on"
-    }
-  ],
+  "importDiagnostics": [],
   "tags": [],
   "notes": "The 004 / 005 / 006 / 007 decisions converged on C plan: AAF taskflow macro + 3KLife profile adapter.\nThis card is the formal AAF target-repo Phase 1 implementation card, but the current turn is still Phase 0 planning work in 3KLife.\n\nThe macro must never become a second writer.\nAll writes remain delegated to the repo-profile specified opener.\nDry-run mode must stay read-only for task card, ledger, and shard files.",
   "source": {
     "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0112-atm-taskflow-dry-run-skeleton.task.md",
     "sectionTitle": "TASK-AAO-0112",
-    "headingLine": 59,
-    "hash": "b82f04ad74a36d8e"
+    "headingLine": 70,
+    "hash": "b44a4852b289d179"
   },
-  "importedAt": "2026-06-19T06:00:14.105Z",
+  "importedAt": "2026-06-19T14:14:07.918Z",
+  "reopenedAt": "2026-06-19T14:14:07.923Z",
+  "lastTransitionId": "2026-06-19T14-27-29-219Z-close-6c065f0b53bf",
+  "lastTransitionAt": "2026-06-19T14:27:29.219Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-19T14:15:05.216Z",
+  "promotedAt": "2026-06-19T14:15:05.979Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-824c433c331d",
-    "claimedAt": "2026-06-19T03:13:48.294Z",
-    "heartbeatAt": "2026-06-19T06:07:37.946Z",
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-d8c47c0798d9",
+    "claimedAt": "2026-06-19T14:15:06.705Z",
+    "heartbeatAt": "2026-06-19T14:27:29.216Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/TASK-AAO-0112.json",
-      "packages/cli/src/atm.ts",
-      "packages/cli/src/commands/command-specs.ts",
-      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
-      "packages/cli/src/commands/taskflow.ts"
+      ".atm/history/tasks/TASK-AAO-0112.json"
     ],
     "state": "released",
-    "reason": "Historical commit 9f54ec1968aac19a508481343120052fbbceb818 contains one TASK-AAO-0112 scoped deliverable (packages/cli/src/commands/taskflow.ts); unrelated files are not credited to TASK-AAO-0112."
+    "reason": "Historical close TASK-AAO-0112 delivery 04d67737f; foreign WIP and staged untouched"
   },
-  "owner": "codex-gpt-5.4-mini",
-  "startedAt": "2026-06-19T02:39:43.625Z",
-  "startedBySessionId": "session-20260619031348-codex-gpt-5.4-mini-TASK-AAO-0112-0555c54ca6",
+  "startedAt": "2026-06-19T14:15:06.705Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260619141506-cursor-gpt-5.2-TASK-AAO-0112-18de48409b",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-AAO-0112",
-    "batchId": null,
-    "scopeKey": null,
-    "queueId": null,
-    "queueIndex": null,
+    "batchId": "batch-a01e9b257ff1",
+    "scopeKey": "TASK-AAO",
+    "queueId": "queue-32189a6e2461f1c9",
+    "queueIndex": 0,
     "allowedFiles": [
       ".atm/history/evidence/TASK-AAO-0112.*",
       ".atm/history/task-events/TASK-AAO-0112/**",
-      ".atm/history/tasks/TASK-AAO-0112.json",
-      "packages/cli/src/atm.ts",
-      "packages/cli/src/commands/command-specs.ts",
-      "packages/cli/src/commands/command-specs/taskflow.spec.ts",
-      "packages/cli/src/commands/taskflow.ts"
+      ".atm/history/tasks/TASK-AAO-0112.json"
     ],
     "planningReadOnlyPaths": [],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "f22a1da43f7b4070b07002baafb51d6e8ca9b69b09687d5caee28479e9809d68",
-    "actorId": "codex-gpt-5.4-mini",
-    "createdAt": "2026-06-19T03:13:48.330Z",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-19T14:15:09.922Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-06-19T06-07-37-948Z-close-8bed0e37283a",
-  "lastTransitionAt": "2026-06-19T06:07:37.948Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "closedAt": "2026-06-19T06:07:37.946Z",
-  "closedByActor": "codex-gpt-5.4-mini",
-  "closedBySessionId": "session-20260619031348-codex-gpt-5.4-mini-TASK-AAO-0112-0555c54ca6",
-  "closeReason": "Historical commit 9f54ec1968aac19a508481343120052fbbceb818 contains one TASK-AAO-0112 scoped deliverable (packages/cli/src/commands/taskflow.ts); unrelated files are not credited to TASK-AAO-0112.",
+  "closedAt": "2026-06-19T14:27:29.216Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260619141506-cursor-gpt-5.2-TASK-AAO-0112-18de48409b",
+  "closeReason": "Historical close TASK-AAO-0112 delivery 04d67737f; foreign WIP and staged untouched",
   "closurePacket": ".atm/history/evidence/TASK-AAO-0112.closure-packet.json"
 }

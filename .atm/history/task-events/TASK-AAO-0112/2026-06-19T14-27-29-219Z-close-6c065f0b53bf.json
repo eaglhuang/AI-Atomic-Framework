@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-19T14-27-29-219Z-close-6c065f0b53bf",
+  "taskId": "TASK-AAO-0112",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260619141506-cursor-gpt-5.2-TASK-AAO-0112-18de48409b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0112.json",
+  "taskSha256": "sha256:abbfdd4d0a25d3593314e62fe0200b2e3c20f7ac4e645c5e43d432c3a2d6c8c7",
+  "createdAt": "2026-06-19T14:27:29.219Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0112 --actor cursor-gpt-5.2 --status done --historical-delivery 04d67737f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260619141506-cursor-gpt-5.2-TASK-AAO-0112-18de48409b",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0112.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "taskflow-open-dry-run",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-19T14:27:29.202Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0112-atm-taskflow-dry-run-skeleton.task.md",
+        ".atm/history/evidence/TASK-AAO-0112.*",
+        ".atm/history/task-events/TASK-AAO-0112/**",
+        ".atm/history/tasks/TASK-AAO-0112.json",
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs.ts",
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/taskflow.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/atm.ts",
+        "packages/cli/src/commands/command-specs.ts",
+        "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+        "packages/cli/src/commands/taskflow.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
