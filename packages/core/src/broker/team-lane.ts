@@ -111,10 +111,12 @@ export interface BrokerRunRecordInput {
   readonly evidencePath: string;
   readonly appliedFiles?: readonly string[];
   readonly commitSha?: string | null;
+  readonly transactionIds?: readonly string[];
 }
 
 export function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOperationRunRecord {
   const taskId = input.request.taskId?.trim();
+  const transactionIds = normalizeStringList(input.transactionIds ?? []);
   return {
     schemaId: 'atm.brokerOperationRunRecord.v1',
     specVersion: '0.1.0',
@@ -134,7 +136,8 @@ export function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOpe
     merge_verdict: input.mergeVerdict,
     evidence_path: input.evidencePath,
     ...(taskId ? { task_ids: [taskId] } : {}),
-    ...(input.commitSha ? { commit_sha: input.commitSha } : {})
+    ...(input.commitSha ? { commit_sha: input.commitSha } : {}),
+    ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
   };
 }
 
@@ -364,6 +367,10 @@ function readGitBranchRef(cwd: string): string | null {
 }
 
 function normalizePathList(entries: readonly string[]): readonly string[] {
+  return normalizeStringList(entries.map((entry) => entry.replace(/\\/g, '/')));
+}
+
+function normalizeStringList(entries: readonly string[]): readonly string[] {
   return [...new Set(entries.map((entry) => entry.replace(/\\/g, '/').trim()).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
 }

@@ -15,6 +15,7 @@ interface BrokerOperationRunRecordEnvelope {
     readonly evidence_path?: string | null;
     readonly task_ids?: readonly string[] | null;
     readonly commit_sha?: string | null;
+    readonly transaction_ids?: readonly string[] | null;
   }[] | null;
 }
 
@@ -26,6 +27,7 @@ interface BrokerRunSummary {
   files: string;
   tasks: string;
   commits: string;
+  transactions: string;
   adapter: string;
   lane: string;
   verdict: string;
@@ -124,6 +126,7 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
   const files = new Set<string>();
   const taskIds = new Set<string>();
   const commits = new Set<string>();
+  const transactions = new Set<string>();
   const adapters = new Set<string>();
   const lanes = new Set<string>();
   const verdicts = new Set<string>();
@@ -146,6 +149,9 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
     if (record.commit_sha) {
       commits.add(record.commit_sha);
     }
+    for (const transactionId of getUniqueSet(record.transaction_ids)) {
+      transactions.add(transactionId);
+    }
     if (record.adapter_choice) {
       adapters.add(record.adapter_choice);
     }
@@ -165,6 +171,7 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
     files: [...files].join(',') || path.basename(filePath),
     tasks: [...taskIds].join(',') || 'n/a',
     commits: [...commits].join(',') || 'n/a',
+    transactions: [...transactions].join(',') || 'n/a',
     adapter: adapters.size === 1 ? [...adapters][0] : [...adapters].join(',') || 'n/a',
     lane: lanes.size === 1 ? [...lanes][0] : [...lanes].join(',') || 'mixed',
     verdict: verdicts.size === 1 ? [...verdicts][0] : [...verdicts].join(',') || 'unknown',
@@ -177,14 +184,14 @@ function buildMarkdownSection(runs: BrokerRunSummary[]) {
     return '';
   }
   const rows = runs.map((run) => {
-    return `| ${run.runId} | ${run.planId} | ${run.requestCount} | ${run.actorCount} | ${run.files} | ${run.tasks} | ${run.commits} | ${run.adapter} | ${run.lane} | ${run.verdict} | ${run.evidence} |`;
+    return `| ${run.runId} | ${run.planId} | ${run.requestCount} | ${run.actorCount} | ${run.files} | ${run.tasks} | ${run.commits} | ${run.transactions} | ${run.adapter} | ${run.lane} | ${run.verdict} | ${run.evidence} |`;
   });
   return [
     '',
     '## Scan Result',
     `- Scan time: ${new Date().toISOString()}`,
-    '| runId | planId | requestCount | actorCount | files | tasks | commits | adapter | lane | verdict | evidence |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| runId | planId | requestCount | actorCount | files | tasks | commits | transactions | adapter | lane | verdict | evidence |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
     ...rows
   ].join('\n') + '\n';
 }

@@ -153,8 +153,10 @@ function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
     mergeVerdict: 'mergeable',
     evidencePath: '.atm/history/evidence/broker-runs/run-team-log-1.json',
     appliedFiles: ['src/shared-target.ts'],
-    commitSha: 'abc123teamlogcommit'
+    commitSha: 'abc123teamlogcommit',
+    transactionIds: ['txn-team-log-1']
   });
+  check(record.transaction_ids?.[0] === 'txn-team-log-1', 'broker run record must preserve transaction id linkage');
   const envelope = buildTeamBrokerRunRecordEnvelope({
     runId: 'run-team-log-1',
     planId: 'plan-team-log-1',
@@ -169,8 +171,8 @@ function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
   );
   check(result.status === 0, `scan-broker-runs failed: ${result.stderr || result.stdout}`);
   const logText = readFileSync(logPath, 'utf8');
-  check(logText.includes('| runId | planId | requestCount | actorCount | files | tasks | commits | adapter | lane | verdict | evidence |'), 'broker run log must expose tasks and commits columns');
-  check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | src/shared-target.ts | TASK-TEAM-BROKER-LOG | abc123teamlogcommit | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task and commit linkage');
+  check(logText.includes('| runId | planId | requestCount | actorCount | files | tasks | commits | transactions | adapter | lane | verdict | evidence |'), 'broker run log must expose tasks, commits, and transactions columns');
+  check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | src/shared-target.ts | TASK-TEAM-BROKER-LOG | abc123teamlogcommit | txn-team-log-1 | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task, commit, and transaction linkage');
 }
 
 ensureRequiredFiles();

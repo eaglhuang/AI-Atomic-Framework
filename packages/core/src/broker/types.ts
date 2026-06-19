@@ -397,6 +397,7 @@ export interface BrokerOperationRunRecord {
   readonly evidence_path: string;
   readonly task_ids?: readonly string[];
   readonly commit_sha?: string;
+  readonly transaction_ids?: readonly string[];
 }
 
 export interface BrokerOperationRunRecordEnvelope {
