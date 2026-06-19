@@ -549,6 +549,8 @@ function buildStewardBrokerOperationRun(input: {
     .sort((left, right) => left.localeCompare(right));
   const commitShas = [...new Set(sortedProposals.map((proposal) => proposal.baseCommit).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
+  const transactionIds = [...new Set(sortedProposals.flatMap((proposal) => extractProposalTransactionIds(proposal)))]
+    .sort((left, right) => left.localeCompare(right));
   const appliedFiles = [...new Set(input.appliedFiles)].sort((left, right) => left.localeCompare(right));
   const mergeVerdict = mapStewardMergeVerdict(input.mergePlan.verdict);
   const record = {
@@ -566,7 +568,8 @@ function buildStewardBrokerOperationRun(input: {
     merge_verdict: mergeVerdict,
     evidence_path: input.evidencePath ?? 'inline:steward-apply-evidence',
     ...(taskIds.length > 0 ? { task_ids: taskIds } : {}),
-    ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {})
+    ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {}),
+    ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
   };
 
   return {
@@ -577,6 +580,17 @@ function buildStewardBrokerOperationRun(input: {
     planId: input.mergePlan.mergePlanId,
     records: [record]
   };
+}
+
+function extractProposalTransactionIds(proposal: PatchProposal): readonly string[] {
+  const values = [
+    proposal.transactionId,
+    ...(proposal.transactionIds ?? []),
+    ...(proposal.transaction_ids ?? [])
+  ];
+  return values
+    .map((value) => typeof value === 'string' ? value.trim() : '')
+    .filter(Boolean);
 }
 
 function mapStewardMergeVerdict(verdict: MergePlan['verdict']): MergeVerdict {

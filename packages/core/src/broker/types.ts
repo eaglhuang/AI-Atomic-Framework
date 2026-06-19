@@ -81,6 +81,9 @@ export interface PatchProposal {
   readonly proposalId: string;
   readonly taskId: string;
   readonly actorId: string;
+  readonly transactionId?: string;
+  readonly transactionIds?: readonly string[];
+  readonly transaction_ids?: readonly string[];
   readonly baseCommit: string;
   readonly fileBeforeHash: string;
   readonly targetFile: string;

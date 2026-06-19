@@ -335,6 +335,35 @@ if (!brokerOperationRunRecordSchema) {
   }
 }
 
+const patchProposalSchema = ajv.getSchema('patch-proposal');
+if (!patchProposalSchema) {
+  fail('patch proposal schema must be registered');
+} else {
+  const transactionLinkedProposal = {
+    schemaId: 'atm.patchProposal.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'schema transaction proposal fixture' },
+    proposalId: 'prop-schema-transaction-link',
+    taskId: 'TASK-TEAM-SCHEMA-PROP-TXN',
+    actorId: 'schema-validator',
+    transactionId: 'txn-proposal-single',
+    transactionIds: ['txn-proposal-camel'],
+    transaction_ids: ['txn-proposal-snake'],
+    baseCommit: 'abc123schema',
+    fileBeforeHash: 'sha256:abc123schema',
+    targetFile: 'docs/broker-proposal-transaction-link.md',
+    atomRefs: [{ atomId: 'atom-schema', atomCid: 'cid-schema' }],
+    anchors: [{ kind: 'line', hint: 'EOF' }],
+    intent: 'schema proposal transaction linkage',
+    patch: '@@ -0,0 +1 @@\n+schema proposal transaction linkage',
+    validators: ['node --strip-types scripts/validate-schemas.ts --mode validate'],
+    rollback: 'revert proposal transaction linkage fixture'
+  };
+  if (!patchProposalSchema(transactionLinkedProposal)) {
+    fail(`patch proposal schema must accept transaction linkage fields: ${formatErrors(patchProposalSchema.errors)}`);
+  }
+}
+
 const versionIndexSchema = schemas.get('version-index');
 if (versionIndexSchema?.minProperties !== 1) {
   fail('version-index must require at least one row');

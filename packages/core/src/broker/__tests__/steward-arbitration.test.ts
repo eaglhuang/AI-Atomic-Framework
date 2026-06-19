@@ -74,6 +74,9 @@ function runTests() {
     const proposal = makeProposal({
       proposalId: 'prop-1',
       targetFile: tempFilePath,
+      transactionId: 'txn-steward-single',
+      transactionIds: ['txn-steward-camel'],
+      transaction_ids: ['txn-steward-snake'],
       fileBeforeHash: originalHash,
       patch: '@@ -1,2 +1,2 @@\n-original content\n+modified content\n line2'
     });
@@ -112,6 +115,7 @@ function runTests() {
     assert.deepEqual(runRecord.request_files, [tempFilePath], 'Run record should link request files');
     assert.deepEqual(runRecord.applied_files, [tempFilePath], 'Run record should link applied files');
     assert.equal(runRecord.commit_sha, headCommit, 'Run record should link proposal base commit');
+    assert.deepEqual(runRecord.transaction_ids, ['txn-steward-camel', 'txn-steward-single', 'txn-steward-snake'], 'Run record should link proposal transaction ids');
     assert.equal(runRecord.adapter_choice, 'steward.patch-apply');
     assert.equal(runRecord.lane_decision, 'neutral-steward');
     assert.equal(runRecord.merge_verdict, 'mergeable');
@@ -133,6 +137,7 @@ function runTests() {
     const proposal = makeProposal({
       proposalId: 'prop-2',
       targetFile: tempFilePath,
+      transactionId: 'txn-steward-blocked',
       fileBeforeHash: originalHash,
       patch: '@@ -1,1 +1,1 @@\n-some content\n+unsafe content'
     });
@@ -170,6 +175,7 @@ function runTests() {
     assert.deepEqual(blockedRunRecord.request_identity, ['prop-2'], 'Blocked run should link proposal identity');
     assert.deepEqual(blockedRunRecord.task_ids, ['TASK-TEST'], 'Blocked run should link task ids');
     assert.equal(blockedRunRecord.commit_sha, headCommit, 'Blocked run should link proposal base commit');
+    assert.deepEqual(blockedRunRecord.transaction_ids, ['txn-steward-blocked'], 'Blocked run should link proposal transaction ids');
     assert.equal(blockedRunRecord.merge_verdict, 'conflict', 'Blocked run should report conflict verdict');
     assert.deepEqual(blockedRunRecord.applied_files, [], 'Blocked run should not report applied files');
     assert.equal(applyRes.evidence.permissions.selfClose, false, 'Blocked steward evidence must deny self-close authority');
