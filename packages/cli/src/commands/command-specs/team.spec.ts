@@ -121,7 +121,7 @@ export const teamSpecLieutenantEscalation = {
 
 export const teamSpecRuntimeStatus = {
   summary:
-    'Start and inspect a team runtime record with neutral runtime mode and adapter metadata (TASK-TEAM-0011 owns status; TASK-TEAM-0031 owns runtime contract fields).',
+    'Start and inspect a team runtime record with neutral runtime mode, adapter metadata, serialized commit lane, and broker subagent status fields (TASK-TEAM-0011 owns status; TASK-TEAM-0031 owns runtime contract fields).',
   examples: [
     'node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json',
     'node atm.mjs team start --task TASK-TEAM-0031 --actor codex-main --runtime-mode broker-only --runtime-adapter atm.node.broker --json',
@@ -132,10 +132,11 @@ export const teamSpecRuntimeStatus = {
 
 export const teamSpecPatrolReport = {
   summary:
-    'Read-only Team patrol report for runtime mode, rework readiness, missing artifacts, retry-budget risk, and close/claim preflight guidance (TASK-TEAM-0014).',
+    'Read-only Team patrol report for runtime mode, broker-governance drift, rework readiness, missing artifacts, retry-budget risk, and close/claim preflight guidance (TASK-TEAM-0014).',
   examples: [
     'node atm.mjs team patrol --task TASK-TEAM-0014 --json',
-    'node atm.mjs team patrol --task TASK-TEAM-0014 --mode close-preflight --json'
+    'node atm.mjs team patrol --task TASK-TEAM-0014 --mode close-preflight --json',
+    'node atm.mjs team patrol --task TASK-TEAM-0014 --team <teamRunId> --json'
   ]
 };
 

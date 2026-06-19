@@ -17,6 +17,7 @@ import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/t
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
+import { teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
@@ -676,6 +677,17 @@ async function main() {
     assert.ok(String(evidence?.teamRun?.teamSummary?.implementationSummary).includes('broker-only selected'));
 
     console.log('[validate-team-agents] ok (runtime-mode-contract)');
+    return;
+  }
+
+  if (taskCase === 'command-spec-broker-surface') {
+    assert.ok(teamSpecRuntimeStatus.summary.includes('broker subagent status fields'));
+    assert.ok(teamSpecRuntimeStatus.summary.includes('serialized commit lane'));
+    assert.ok(teamSpecRuntimeStatus.examples.some((entry) => entry.includes('team status --compact')));
+    assert.ok(teamSpecPatrolReport.summary.includes('broker-governance drift'));
+    assert.ok(teamSpecPatrolReport.examples.some((entry) => entry.includes('--team <teamRunId>')));
+
+    console.log('[validate-team-agents] ok (command-spec-broker-surface)');
     return;
   }
 
