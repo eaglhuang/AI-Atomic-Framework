@@ -2713,6 +2713,17 @@ async function runTasksClose(argv: string[]) {
     : null;
   if (frameworkStatus?.repoRole === 'framework') {
     const closeWorktree = inspectFrameworkCloseWorktree(options.cwd, options.taskId);
+    const historicalDeliveredFiles = uniqueStrings(
+      effectiveHistoricalDeliveryRefs.flatMap((ref) => inspectHistoricalDelivery({
+        cwd: options.historicalDeliveryRepo ?? options.cwd,
+        taskId: options.taskId,
+        requestedRef: ref,
+        declaredFiles: taskDeclaredFiles,
+        enforceDeclaredScope: true,
+        waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery === true,
+        waiverReason: options.reason ?? null
+      }).deliverableFiles)
+    );
     const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
       ? [
           `.atm/history/evidence/${options.taskId}.json`,
@@ -2724,7 +2735,9 @@ async function runTasksClose(argv: string[]) {
       cwd: options.cwd,
       taskId: options.taskId,
       taskDeclaredFiles,
+      taskDeliverableFiles: extractTaskDeliverableFiles(taskDocument),
       trackedDirtyFiles: closeWorktree.trackedDirtyFiles,
+      historicalDeliveredFiles,
       allowedAdvisoryGovernanceFiles
     });
     if (closeScopedDiffIsolation) {
@@ -5147,6 +5160,10 @@ function extractStringList(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
     : [];
+}
+
+function extractTaskDeliverableFiles(taskDocument: Record<string, unknown>): readonly string[] {
+  return extractStringList(taskDocument.deliverables);
 }
 
 function normalizeTaskScopePaths(cwd: string, values: readonly string[]): readonly string[] {

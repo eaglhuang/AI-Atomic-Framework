@@ -99,6 +99,22 @@ function extractGovernanceTaskId(filePath: string): string | null {
   return null;
 }
 
+function isSameTaskAdvisoryStagedFile(taskId: string, filePath: string): boolean {
+  const normalizedTaskId = normalizeTaskId(taskId);
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  const bundleManifest = `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`.toLowerCase();
+  const closurePacket = `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`.toLowerCase();
+  if (normalized === bundleManifest || normalized === closurePacket) {
+    return true;
+  }
+  const foreignSnapshotPattern = new RegExp(`^\\.atm/runtime/snapshots/(?:close-window-)?foreign-staged-${normalizedTaskId.toLowerCase()}-\\d+\\.json$`);
+  if (foreignSnapshotPattern.test(normalized)) {
+    return true;
+  }
+  const governanceDirtyPattern = new RegExp(`^\\.atm/runtime/snapshots/close-window-governance-dirty-[^.]+-\\.atm__history__evidence__${normalizedTaskId.toLowerCase()}(?:\\.[^.]+)?\\.json\\.json$`);
+  return governanceDirtyPattern.test(normalized);
+}
+
 function readTrackedDirtyFiles(repoRoot: string): string[] {
   try {
     const output = execFileSync('git', ['diff', '--name-only', 'HEAD'], {
@@ -186,6 +202,7 @@ function buildUnexpectedNonBundleStagedFiles(input: {
     const expected = new Set(existingBundleFiles(repo.repoRoot, repo.stageFiles));
     const unexpected = readStagedFiles(repo.repoRoot).filter((file) => {
       if (expected.has(file)) return false;
+      if (isSameTaskAdvisoryStagedFile(input.taskId, file)) return false;
       const foreignTaskId = extractGovernanceTaskId(file);
       return !foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId);
     });
@@ -372,6 +389,12 @@ export function extractTaskflowDeclaredFiles(taskDocument: Record<string, unknow
   ]);
 }
 
+function extractTaskflowDeliverableFiles(taskDocument: Record<string, unknown>): string[] {
+  const value = taskDocument.deliverables;
+  if (!Array.isArray(value)) return [];
+  return uniqueStrings(value.filter((entry): entry is string => typeof entry === 'string'));
+}
+
 export function buildHistoricalClosePreflight(input: {
   cwd: string;
   taskId: string;
@@ -383,6 +406,7 @@ export function buildHistoricalClosePreflight(input: {
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
   const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+  const deliverableFiles = extractTaskflowDeliverableFiles(input.taskDocument);
   const expectedCloseBundleFiles = uniqueStrings([
     ...input.previewCommitBundle.targetRepo.stageFiles,
     ...(input.previewCommitBundle.planningRepo.repoRoot ? input.previewCommitBundle.planningRepo.stageFiles : [])
@@ -398,11 +422,24 @@ export function buildHistoricalClosePreflight(input: {
     actorId: input.actorId,
     historicalDeliveryRef: input.historicalDeliveryRefs[0] ?? null
   });
+  const historicalDeliveredFiles = uniqueStrings(
+    input.historicalDeliveryRefs.flatMap((ref) => inspectHistoricalDelivery({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      requestedRef: ref,
+      declaredFiles,
+      enforceDeclaredScope: true,
+      waiverOutOfScopeDelivery: false,
+      waiverReason: null
+    }).deliverableFiles)
+  );
   const dirtyGuard = evaluateFrameworkCloseDirtyGuard({
     cwd: input.cwd,
     taskId: input.taskId,
     taskDeclaredFiles: declaredFiles,
+    taskDeliverableFiles: deliverableFiles,
     trackedDirtyFiles,
+    historicalDeliveredFiles,
     allowedAdvisoryGovernanceFiles: uniqueStrings([
       ...expectedCloseBundleFiles.filter((filePath) => filePath.startsWith('.atm/')),
       ...(input.historicalDeliveryRefs.length > 0
@@ -450,7 +487,6 @@ export function buildHistoricalClosePreflight(input: {
   const operationalBlockers = [
     buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
     buildIncorrectPlanningMirrorBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
-    buildUnexpectedStagedBlocker(unexpectedStagedTasks),
     buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
     buildMixedDeliveryBlocker({
       taskId: input.taskId,

@@ -1086,7 +1086,7 @@ function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean): Deferr
       createdAt: new Date().toISOString(),
       restoredAt: null
     }, null, 2)}\n`, 'utf8');
-    runGitOrThrow(repoRoot, ['checkout', 'HEAD', '--', file]);
+    runGitOrThrow(repoRoot, ['restore', '--worktree', '--', file]);
     report.files.push({
       file,
       snapshotPath: normalizeRepoRelativePath(repoRoot, snapshotPath),

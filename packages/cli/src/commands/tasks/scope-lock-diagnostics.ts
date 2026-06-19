@@ -68,6 +68,17 @@ interface DirtyBucketInput {
   readonly declaredFiles: readonly string[];
 }
 
+function isHistoricalDeliveredFile(
+  filePath: string,
+  deliverableFiles: readonly string[],
+  historicalDeliveredFiles: readonly string[]
+): boolean {
+  return deliverableFiles.some((declared) =>
+    pathMatchesTaskScope(filePath, declared)
+    && historicalDeliveredFiles.some((historical) => pathMatchesTaskScope(historical, declared))
+  );
+}
+
 const dirtyBucketStrategies: readonly DirtyBucketStrategy[] = [
   {
     id: 'regenerableArtifactFiles',
@@ -130,13 +141,17 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   readonly cwd: string;
   readonly taskId: string;
   readonly taskDeclaredFiles: readonly string[];
+  readonly taskDeliverableFiles?: readonly string[];
   readonly trackedDirtyFiles: readonly string[];
+  readonly historicalDeliveredFiles?: readonly string[];
   readonly allowedAdvisoryGovernanceFiles?: readonly string[];
   readonly correctPlanningMirrorPreEditFiles?: readonly string[];
   readonly incorrectPlanningMirrorPreEditFiles?: readonly string[];
 }): FrameworkCloseDirtyGuardReport {
   const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
+  const deliverableFiles = normalizeTaskScopePaths(input.cwd, input.taskDeliverableFiles ?? []);
   const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
+  const historicalDeliveredFiles = uniqueStrings((input.historicalDeliveredFiles ?? []).map(normalizeRelativePath).filter(Boolean));
   const allowedAdvisoryGovernanceFiles = new Set(
     uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean))
   );
@@ -156,7 +171,18 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     buckets[strategy?.id ?? 'advisoryTrackedDirtyFiles'].push(filePath);
   }
 
-  const scopeTrackedDirtyFiles = uniqueStrings(buckets.scopeTrackedDirtyFiles);
+  const historicalCloseback = historicalDeliveredFiles.length > 0;
+  const scopeTrackedDirtyFiles = uniqueStrings(buckets.scopeTrackedDirtyFiles.filter((filePath) => {
+    if (!historicalCloseback) return true;
+    const matchesDeliverable = deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared));
+    if (!matchesDeliverable) {
+      return false;
+    }
+    return !isHistoricalDeliveredFile(filePath, deliverableFiles, historicalDeliveredFiles);
+  }));
+  const historicalAdvisoryScopeTrackedFiles = historicalCloseback
+    ? uniqueStrings(buckets.scopeTrackedDirtyFiles.filter((filePath) => !scopeTrackedDirtyFiles.includes(filePath)))
+    : [];
   const governanceTrackedDirtyFiles = uniqueStrings(
     buckets.governanceTrackedDirtyFiles.filter((filePath) => !allowedAdvisoryGovernanceFiles.has(filePath))
   );
@@ -173,6 +199,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   ]);
   const generatedArtifactFiles = uniqueStrings(buckets.generatedArtifactFiles);
   const advisoryTrackedDirtyFiles = uniqueStrings([
+    ...historicalAdvisoryScopeTrackedFiles,
     ...allowlistedGovernanceTrackedFiles,
     ...regenerableArtifactFiles,
     ...correctPlanningMirrorPreEditFiles,
