@@ -204,6 +204,24 @@ type TeamCommitLaneContract = {
   retryableCodes: readonly ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'];
 };
 
+type TeamBrokerSubagentContract = {
+  schemaId: 'atm.teamBrokerSubagentContract.v1';
+  enabled: true;
+  subagentId: 'team-broker-subagent';
+  lifecycleOwner: 'atm';
+  decisionSurface: 'brokerLane';
+  governs: readonly ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'];
+  stewardId: 'neutral-write-steward';
+  evidenceRequired: readonly ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'];
+  authorityBoundary: {
+    fileWrite: false;
+    gitWrite: false;
+    taskLifecycle: false;
+    selfClose: false;
+  };
+  escalationTarget: 'coordinator';
+};
+
 type TeamRuntimeContract = {
   schemaId: 'atm.teamRuntimeContract.v1';
   runtimeMode: TeamRuntimeMode;
@@ -219,6 +237,7 @@ type TeamRuntimeContract = {
   artifactHandoff: TeamArtifactHandoffContract;
   retryBudget: TeamRetryBudgetContract;
   commitLane: TeamCommitLaneContract;
+  brokerSubagent: TeamBrokerSubagentContract;
   editorSubagentBridge: TeamEditorSubagentBridgeContract;
 };
 
@@ -804,6 +823,7 @@ export function buildTeamRuntimeContract(input: {
     }),
     retryBudget: buildTeamRetryBudgetContract({}),
     commitLane: buildTeamCommitLaneContract(),
+    brokerSubagent: buildTeamBrokerSubagentContract(),
     editorSubagentBridge: buildEditorSubagentBridgeContract({
       enabled: runtimeMode === 'editor-subagent' && !editorBridgeDisabled,
       disabledReason: runtimeMode !== 'editor-subagent'
@@ -816,6 +836,26 @@ export function buildTeamRuntimeContract(input: {
       permissionLeases: input.permissionLeases ?? [],
       evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
     })
+  };
+}
+
+function buildTeamBrokerSubagentContract(): TeamBrokerSubagentContract {
+  return {
+    schemaId: 'atm.teamBrokerSubagentContract.v1',
+    enabled: true,
+    subagentId: 'team-broker-subagent',
+    lifecycleOwner: 'atm',
+    decisionSurface: 'brokerLane',
+    governs: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+    stewardId: 'neutral-write-steward',
+    evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
+    authorityBoundary: {
+      fileWrite: false,
+      gitWrite: false,
+      taskLifecycle: false,
+      selfClose: false
+    },
+    escalationTarget: 'coordinator'
   };
 }
 
