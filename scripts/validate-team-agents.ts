@@ -1307,6 +1307,18 @@ async function main() {
         implementationSummary: 'closure summary fixture',
         validators: ['typecheck'],
         evidence: ['fixture command evidence'],
+        brokerGovernance: {
+          schemaId: 'atm.teamBrokerGovernanceSummary.v1',
+          brokerSubagentEnabled: true,
+          brokerDecisionSurface: 'brokerLane',
+          brokerStewardId: 'neutral-write-steward',
+          brokerGoverns: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+          commitLaneSerializedBy: 'branch-commit-queue',
+          commitLaneOwnerRole: 'coordinator',
+          workerGitWrite: false,
+          workerTaskLifecycle: false,
+          workerSelfClose: false
+        },
         risk: 'low',
         closeReady: true
       }
@@ -1324,6 +1336,16 @@ async function main() {
       assert.equal(packet.teamSummary?.agentReports.length, 1);
       assert.equal(packet.teamSummary?.patrolFindings.length, 1);
       assert.equal((packet.teamSummary?.evidenceCuratorSummary as any)?.summary, 'command-backed evidence remains authoritative');
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.schemaId, 'atm.teamBrokerGovernanceSummary.v1');
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerSubagentEnabled, true);
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerDecisionSurface, 'brokerLane');
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerStewardId, 'neutral-write-steward');
+      assert.deepEqual((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.brokerGoverns, ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane']);
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.commitLaneSerializedBy, 'branch-commit-queue');
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.commitLaneOwnerRole, 'coordinator');
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.workerGitWrite, false);
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.workerTaskLifecycle, false);
+      assert.equal((packet.teamSummary?.teamSummary as any)?.brokerGovernance?.workerSelfClose, false);
 
       const noSummaryPacket = createClosurePacket({
         cwd,

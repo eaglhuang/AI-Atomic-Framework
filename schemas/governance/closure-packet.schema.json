@@ -59,6 +59,85 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
     },
+    "teamSummary": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "capturedAt",
+        "source",
+        "teamRunId",
+        "captainDecision",
+        "agentReports",
+        "patrolFindings",
+        "evidenceCuratorSummary",
+        "teamSummary"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.closurePacketTeamSummary.v1" },
+        "capturedAt": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "teamRunPath"],
+          "properties": {
+            "kind": { "const": "team-run" },
+            "teamRunPath": { "type": "string", "minLength": 1 }
+          }
+        },
+        "teamRunId": { "type": "string", "minLength": 1 },
+        "captainDecision": true,
+        "agentReports": {
+          "type": "array",
+          "items": true
+        },
+        "patrolFindings": {
+          "type": "array",
+          "items": true
+        },
+        "evidenceCuratorSummary": true,
+        "teamSummary": {
+          "type": ["object", "null"],
+          "additionalProperties": true,
+          "not": {
+            "required": ["validationPasses"]
+          },
+          "properties": {
+            "brokerGovernance": {
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "schemaId",
+                "brokerSubagentEnabled",
+                "brokerDecisionSurface",
+                "brokerStewardId",
+                "brokerGoverns",
+                "commitLaneSerializedBy",
+                "commitLaneOwnerRole",
+                "workerGitWrite",
+                "workerTaskLifecycle",
+                "workerSelfClose"
+              ],
+              "properties": {
+                "schemaId": { "const": "atm.teamBrokerGovernanceSummary.v1" },
+                "brokerSubagentEnabled": { "type": "boolean" },
+                "brokerDecisionSurface": { "type": ["string", "null"] },
+                "brokerStewardId": { "type": ["string", "null"] },
+                "brokerGoverns": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "commitLaneSerializedBy": { "type": ["string", "null"] },
+                "commitLaneOwnerRole": { "type": ["string", "null"] },
+                "workerGitWrite": { "type": "boolean" },
+                "workerTaskLifecycle": { "type": "boolean" },
+                "workerSelfClose": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
     "teamArtifactHandoff": {
       "type": "object",
       "additionalProperties": false,
