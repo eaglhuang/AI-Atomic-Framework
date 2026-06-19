@@ -76,7 +76,8 @@ const schemaEntries: Record<string, string> = {
 };
 
 const supportSchemaEntries: Record<string, string> = {
-  'test-report-metrics': 'schemas/test-report/metrics.schema.json'
+  'test-report-metrics': 'schemas/test-report/metrics.schema.json',
+  'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json'
 };
 
 const bannedProtectedSurfaceTerms = [
@@ -296,6 +297,42 @@ if (!brokerMutationRequestSchema) {
   };
   if (!brokerMutationRequestSchema(transactionLinkedRequest)) {
     fail(`broker mutation request must accept transaction linkage fields: ${formatErrors(brokerMutationRequestSchema.errors)}`);
+  }
+}
+
+const teamBrokerWriteTransactionSchema = ajv.getSchema('team-broker-write-transaction');
+if (!teamBrokerWriteTransactionSchema) {
+  fail('team broker write transaction schema must be registered');
+} else {
+  const transactionEvidence = {
+    schemaId: 'atm.teamBrokerWriteTransaction.v1',
+    transactionId: 'txn-schema-write-transaction',
+    taskId: 'TASK-TEAM-SCHEMA-WRITE-TXN',
+    principalId: 'schema-principal',
+    actorId: 'schema-actor',
+    sessionId: 'schema-session',
+    instanceId: 'schema-actor@local',
+    worktreeId: 'C:/workspace/schema',
+    branchRef: 'main',
+    baseHead: 'abc123schemahead',
+    leaseEpoch: 1,
+    allowedFiles: ['src/schema-target.ts'],
+    readSet: ['src/schema-target.ts'],
+    writeSet: ['src/schema-target.ts'],
+    fileHashesBefore: {
+      'src/schema-target.ts': 'sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    },
+    brokerDecision: {
+      verdict: 'parallel-safe',
+      lane: 'direct-brokered',
+      intentId: 'intent-schema-write-transaction'
+    },
+    startedAt: '2026-06-19T00:00:00.000Z',
+    expiresAt: '2026-06-19T00:30:00.000Z',
+    heartbeatAt: '2026-06-19T00:00:00.000Z'
+  };
+  if (!teamBrokerWriteTransactionSchema(transactionEvidence)) {
+    fail(`team broker write transaction schema must accept the milestone-required fields: ${formatErrors(teamBrokerWriteTransactionSchema.errors)}`);
   }
 }
 
