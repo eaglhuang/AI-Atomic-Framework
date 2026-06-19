@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
-import { buildVirtualAtomInUseRegistry, loadRegistry } from './registry.ts';
+import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry } from './registry.ts';
 import { readGitHeadCommit } from './steward.ts';
 import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
 import type { WriteIntent, WriteIntentAtomRef } from './types.ts';
@@ -257,7 +257,7 @@ export function evaluateTeamBrokerLane(input: {
 }): TeamBrokerLaneResult {
   const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
   const writeIntent = buildTeamWriteIntent(input);
-  const registry = loadRegistry(registryPath);
+  const registry = cleanupStale(loadRegistry(registryPath));
   const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
   const decision = calculateBrokerDecision(writeIntent, registry);
   const resolution = resolveTeamBrokerLane(decision);
