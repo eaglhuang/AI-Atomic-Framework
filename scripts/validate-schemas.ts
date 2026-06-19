@@ -367,7 +367,8 @@ if (!teamBrokerWriteTransactionSchema) {
     brokerDecision: {
       verdict: 'parallel-safe',
       lane: 'direct-brokered',
-      intentId: 'intent-schema-write-transaction'
+      intentId: 'intent-schema-write-transaction',
+      parallelSafetyReason: 'no-known-textual-or-resource-conflict'
     },
     startedAt: '2026-06-19T00:00:00.000Z',
     expiresAt: '2026-06-19T00:30:00.000Z',

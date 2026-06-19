@@ -323,6 +323,7 @@ try {
   check(String(overlapResult.evidence.writeTransaction.fileHashesBefore[sharedFile] ?? '').startsWith('sha256:'), 'write transaction must record file hash before write');
   check(overlapResult.evidence.writeTransaction.brokerDecision.verdict === overlapResult.evidence.decision.verdict, 'write transaction broker decision verdict must match lane decision');
   check(overlapResult.evidence.writeTransaction.brokerDecision.lane === overlapResult.evidence.decision.lane, 'write transaction broker decision lane must match lane decision');
+  check(overlapResult.evidence.writeTransaction.brokerDecision.parallelSafetyReason === null, 'non-parallel-safe transaction must not claim parallel-safe reason');
   check(overlapResult.evidence.writeTransaction.leaseEpoch > 0, 'write transaction must carry lease epoch');
   check(Date.parse(overlapResult.evidence.writeTransaction.expiresAt) > Date.parse(overlapResult.evidence.writeTransaction.startedAt), 'write transaction expiresAt must be after startedAt');
   check(
@@ -354,6 +355,11 @@ try {
   });
   check(safeResult.ok === true, 'parallel-safe task must remain safe to start');
   check(safeResult.evidence.chosenLane === 'direct-brokered', 'parallel-safe task must route to direct-brokered');
+  check(safeResult.evidence.writeTransaction.brokerDecision.parallelSafetyReason === 'no-known-textual-or-resource-conflict', 'parallel-safe transaction must record no-known textual/resource conflict reason');
+  check(
+    validateWriteTransaction(safeResult.evidence.writeTransaction),
+    `parallel-safe write transaction must match schema: ${formatAjvErrors(validateWriteTransaction.errors)}`
+  );
 
   const overlapPlan = await runTeam(['plan', '--task', overlapTaskId, '--cwd', tempRoot, '--json']);
   check(overlapPlan.ok === true, `team plan must pass for steward lane: ${JSON.stringify(overlapPlan)}`);

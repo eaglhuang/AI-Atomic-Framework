@@ -61,6 +61,7 @@ export interface TeamBrokerWriteTransactionEvidence {
     readonly verdict: BrokerDecision['verdict'];
     readonly lane: BrokerDecision['lane'];
     readonly intentId: string;
+    readonly parallelSafetyReason: 'no-known-textual-or-resource-conflict' | null;
   };
   readonly startedAt: string;
   readonly expiresAt: string;
@@ -343,7 +344,10 @@ export function buildTeamBrokerWriteTransactionEvidence(input: {
     brokerDecision: {
       verdict: input.decision.verdict,
       lane: input.decision.lane,
-      intentId: input.decision.intentId
+      intentId: input.decision.intentId,
+      parallelSafetyReason: input.decision.verdict === 'parallel-safe'
+        ? 'no-known-textual-or-resource-conflict'
+        : null
     },
     startedAt,
     expiresAt,

@@ -88,7 +88,7 @@
     "brokerDecision": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["verdict", "lane", "intentId"],
+      "required": ["verdict", "lane", "intentId", "parallelSafetyReason"],
       "properties": {
         "verdict": {
           "enum": [
@@ -112,6 +112,10 @@
         "intentId": {
           "type": "string",
           "minLength": 1
+        },
+        "parallelSafetyReason": {
+          "type": ["string", "null"],
+          "enum": ["no-known-textual-or-resource-conflict", null]
         }
       }
     },
