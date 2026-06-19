@@ -223,6 +223,22 @@ try {
   check(overlapResult.evidence.stewardId === DEFAULT_TEAM_STEWARD_ID, 'steward lane must use neutral-write-steward');
   check(overlapResult.evidence.composerPath === 'broker compose -> steward plan/apply', 'steward lane must expose composer path');
   check(overlapResult.evidence.decision.verdict === 'needs-physical-split', 'broker decision must record needs-physical-split');
+  check(overlapResult.evidence.writeTransaction.schemaId === 'atm.teamBrokerWriteTransaction.v1', 'broker lane must include write transaction evidence');
+  check(overlapResult.evidence.writeTransaction.transactionId.startsWith('txn-'), 'write transaction must include stable transaction id prefix');
+  check(overlapResult.evidence.writeTransaction.taskId === overlapTaskId, 'write transaction must carry task id');
+  check(overlapResult.evidence.writeTransaction.principalId === 'team-planner', 'write transaction must carry principal id');
+  check(overlapResult.evidence.writeTransaction.actorId === 'team-planner', 'write transaction must carry actor id');
+  check(overlapResult.evidence.writeTransaction.instanceId === 'team-planner@local', 'write transaction must carry instance id');
+  check(overlapResult.evidence.writeTransaction.worktreeId === tempRoot, 'write transaction must carry worktree id');
+  check(overlapResult.evidence.writeTransaction.baseHead === overlapResult.evidence.writeIntent.baseCommit, 'write transaction baseHead must match write intent base commit');
+  check(overlapResult.evidence.writeTransaction.allowedFiles.includes(sharedFile), 'write transaction must include allowed files');
+  check(overlapResult.evidence.writeTransaction.readSet.includes(sharedFile), 'write transaction must include read set');
+  check(overlapResult.evidence.writeTransaction.writeSet.includes(sharedFile), 'write transaction must include write set');
+  check(String(overlapResult.evidence.writeTransaction.fileHashesBefore[sharedFile] ?? '').startsWith('sha256:'), 'write transaction must record file hash before write');
+  check(overlapResult.evidence.writeTransaction.brokerDecision.verdict === overlapResult.evidence.decision.verdict, 'write transaction broker decision verdict must match lane decision');
+  check(overlapResult.evidence.writeTransaction.brokerDecision.lane === overlapResult.evidence.decision.lane, 'write transaction broker decision lane must match lane decision');
+  check(overlapResult.evidence.writeTransaction.leaseEpoch > 0, 'write transaction must carry lease epoch');
+  check(Date.parse(overlapResult.evidence.writeTransaction.expiresAt) > Date.parse(overlapResult.evidence.writeTransaction.startedAt), 'write transaction expiresAt must be after startedAt');
 
   const blockedResult = evaluateTeamBrokerLane({
     cwd: tempRoot,

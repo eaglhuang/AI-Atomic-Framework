@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
 import { buildVirtualAtomInUseRegistry, loadRegistry } from './registry.ts';
@@ -23,6 +25,7 @@ export interface TeamBrokerLaneEvidence {
   readonly actorId: string;
   readonly registryPath: string;
   readonly writeIntent: WriteIntent;
+  readonly writeTransaction: TeamBrokerWriteTransactionEvidence;
   readonly decision: BrokerDecision;
   readonly virtualAtomInUseRegistry: VirtualAtomInUseRegistryDocument;
   readonly chosenLane: TeamBrokerChosenLane;
@@ -35,6 +38,32 @@ export interface TeamBrokerLaneEvidence {
 export interface TeamBrokerLaneResult {
   readonly ok: boolean;
   readonly evidence: TeamBrokerLaneEvidence;
+}
+
+export interface TeamBrokerWriteTransactionEvidence {
+  readonly schemaId: 'atm.teamBrokerWriteTransaction.v1';
+  readonly transactionId: string;
+  readonly taskId: string;
+  readonly principalId: string;
+  readonly actorId: string;
+  readonly sessionId: string | null;
+  readonly instanceId: string;
+  readonly worktreeId: string;
+  readonly branchRef: string | null;
+  readonly baseHead: string;
+  readonly leaseEpoch: number;
+  readonly allowedFiles: readonly string[];
+  readonly readSet: readonly string[];
+  readonly writeSet: readonly string[];
+  readonly fileHashesBefore: Record<string, string | null>;
+  readonly brokerDecision: {
+    readonly verdict: BrokerDecision['verdict'];
+    readonly lane: BrokerDecision['lane'];
+    readonly intentId: string;
+  };
+  readonly startedAt: string;
+  readonly expiresAt: string;
+  readonly heartbeatAt: string;
 }
 
 export interface TeamBrokerRuntimeActivationHandshakeEvidence {
@@ -227,6 +256,14 @@ export function evaluateTeamBrokerLane(input: {
   const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
   const decision = calculateBrokerDecision(writeIntent, registry);
   const resolution = resolveTeamBrokerLane(decision);
+  const writeTransaction = buildTeamBrokerWriteTransactionEvidence({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    actorId: input.actorId,
+    writeIntent,
+    decision,
+    writePaths: input.writePaths
+  });
 
   const evidence: TeamBrokerLaneEvidence = {
     schemaId: 'atm.teamBrokerLaneEvidence.v1',
@@ -235,6 +272,7 @@ export function evaluateTeamBrokerLane(input: {
     actorId: input.actorId,
     registryPath: DEFAULT_BROKER_REGISTRY_RELATIVE_PATH,
     writeIntent,
+    writeTransaction,
     decision,
     virtualAtomInUseRegistry,
     chosenLane: resolution.chosenLane,
@@ -252,6 +290,77 @@ export function evaluateTeamBrokerLane(input: {
 
 export function buildTeamBrokerEvidence(result: TeamBrokerLaneResult): TeamBrokerLaneEvidence {
   return result.evidence;
+}
+
+export function buildTeamBrokerWriteTransactionEvidence(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly writeIntent: WriteIntent;
+  readonly decision: BrokerDecision;
+  readonly writePaths: readonly string[];
+}): TeamBrokerWriteTransactionEvidence {
+  const cwd = path.resolve(input.cwd);
+  const allowedFiles = normalizePathList(input.writePaths);
+  const readSet = normalizePathList([
+    ...allowedFiles,
+    ...input.writeIntent.atomRefs.map((ref) => ref.sourceRange?.filePath ?? '').filter(Boolean)
+  ]);
+  const writeSet = normalizePathList(input.writeIntent.targetFiles);
+  const startedAt = new Date().toISOString();
+  const leaseEpoch = Date.now();
+  const leaseSeconds = Math.max(1, Math.floor(input.writeIntent.leaseBounds?.requestedSeconds ?? 1800));
+  const expiresAt = new Date(Date.now() + leaseSeconds * 1000).toISOString();
+  const transactionSeed = [
+    input.taskId,
+    input.actorId,
+    input.writeIntent.baseCommit,
+    input.decision.intentId,
+    leaseEpoch,
+    ...writeSet
+  ].join('\n');
+
+  return {
+    schemaId: 'atm.teamBrokerWriteTransaction.v1',
+    transactionId: `txn-${createHash('sha256').update(transactionSeed).digest('hex').slice(0, 16)}`,
+    taskId: input.taskId,
+    principalId: input.actorId,
+    actorId: input.actorId,
+    sessionId: null,
+    instanceId: `${input.actorId}@local`,
+    worktreeId: cwd,
+    branchRef: null,
+    baseHead: input.writeIntent.baseCommit,
+    leaseEpoch,
+    allowedFiles,
+    readSet,
+    writeSet,
+    fileHashesBefore: buildFileHashesBefore(cwd, writeSet),
+    brokerDecision: {
+      verdict: input.decision.verdict,
+      lane: input.decision.lane,
+      intentId: input.decision.intentId
+    },
+    startedAt,
+    expiresAt,
+    heartbeatAt: startedAt
+  };
+}
+
+function normalizePathList(entries: readonly string[]): readonly string[] {
+  return [...new Set(entries.map((entry) => entry.replace(/\\/g, '/').trim()).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function buildFileHashesBefore(cwd: string, relativePaths: readonly string[]): Record<string, string | null> {
+  const output: Record<string, string | null> = {};
+  for (const relativePath of relativePaths) {
+    const absolutePath = path.resolve(cwd, relativePath);
+    output[relativePath] = existsSync(absolutePath)
+      ? `sha256:${createHash('sha256').update(readFileSync(absolutePath)).digest('hex')}`
+      : null;
+  }
+  return output;
 }
 
 export function buildTeamBrokerRuntimeActivationHandshake(input: {
