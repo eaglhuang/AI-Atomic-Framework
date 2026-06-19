@@ -216,6 +216,20 @@ try {
   });
   check(scopeBlocked.ok === false, 'scope-lock mismatch must block steward plan');
   check(scopeBlocked.plan.issues.some((issue) => issue.code === 'scope-lock-mismatch'), 'scope-lock mismatch must be reported');
+  const blockedEvidencePath = path.join(tempRoot, 'steward-blocked-evidence.json');
+  const blockedApply = applyStewardPlan({
+    cwd: tempRoot,
+    stewardId: 'neutral-write-steward',
+    mergePlan: compose.mergePlan,
+    proposals: [proposal],
+    scopeFiles: ['src/other.ts'],
+    evidenceOutPath: blockedEvidencePath
+  });
+  check(blockedApply.ok === false, 'scope-lock mismatch must block steward apply');
+  check(blockedApply.evidence.verdict === 'blocked', 'blocked steward apply must record blocked verdict');
+  check((blockedApply.evidence.blockedReasons ?? []).some((reason) => reason.includes('scope-lock-mismatch')), 'blocked steward evidence must include scope-lock mismatch reason');
+  assertStewardApplyEvidence(blockedApply.evidence, 'blocked steward apply evidence');
+  assertStewardApplyEvidence(JSON.parse(readFileSync(blockedEvidencePath, 'utf8')), 'persisted blocked steward apply evidence');
 
   writeFileSync(targetFile, 'gamma\n', 'utf8');
   const hashDrift = planStewardApply({
