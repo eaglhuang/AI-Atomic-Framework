@@ -2899,6 +2899,25 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       }));
     }
   }
+  const commitLane = teamRun.commitLane ?? teamRun.runtimeContract?.commitLane ?? null;
+  if (commitLane && (
+    commitLane.serializedBy !== 'branch-commit-queue'
+    || commitLane.ownerRole !== 'coordinator'
+    || commitLane.workerGitWrite === true
+  )) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker',
+      code: 'ATM_TEAM_PATROL_COMMIT_LANE_DRIFT',
+      category: 'broker-governance',
+      summary: `Team run ${teamRun.teamRunId} commit lane no longer enforces coordinator-owned serialized commits.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      details: {
+        serializedBy: commitLane.serializedBy ?? null,
+        ownerRole: commitLane.ownerRole ?? null,
+        workerGitWrite: commitLane.workerGitWrite ?? null
+      }
+    }));
+  }
   const artifactFindings = Array.isArray(teamRun.artifactHandoff?.findings)
     ? teamRun.artifactHandoff.findings
     : Array.isArray(teamRun.runtimeContract?.artifactHandoff?.findings)

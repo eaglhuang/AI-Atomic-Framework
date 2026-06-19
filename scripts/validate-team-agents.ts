@@ -1672,6 +1672,14 @@ async function main() {
       agentsSpawned: false,
       retryBudget: { remaining: 0, limit: 2 },
       reworkRoute: { status: 'needs-rework', retryBudget: { remaining: 0, limit: 2 } },
+      runtimeContract: {
+        commitLane: {
+          schemaId: 'atm.teamCommitLaneContract.v1',
+          ownerRole: 'worker',
+          workerGitWrite: true,
+          serializedBy: 'shared-staging'
+        }
+      },
       createdAt: '2026-06-18T00:00:00.000Z',
       updatedAt: '2026-06-18T00:00:00.000Z'
     }, null, 2)}\n`, 'utf8');
@@ -1696,6 +1704,8 @@ async function main() {
       assert.equal(evidence?.severity, 'blocker');
       assert.equal(evidence?.safeToProceed, false);
       assert.ok(evidence?.findings?.some((finding: any) => finding.level === 'blocker' && finding.category === 'broker-governance' && finding.code === 'ATM_TEAM_PATROL_BROKER_SUBAGENT_MISSING'));
+      assert.ok(evidence?.findings?.some((finding: any) => finding.level === 'blocker' && finding.category === 'broker-governance' && finding.code === 'ATM_TEAM_PATROL_COMMIT_LANE_DRIFT'));
+      assert.ok(evidence?.findings?.some((finding: any) => finding.code === 'ATM_TEAM_PATROL_COMMIT_LANE_DRIFT' && finding.details?.serializedBy === 'shared-staging' && finding.details?.ownerRole === 'worker' && finding.details?.workerGitWrite === true));
       assert.ok(evidence?.findings?.some((finding: any) => finding.level === 'blocker' && finding.category === 'retry-budget'));
       assert.ok(evidence?.findings?.some((finding: any) => finding.level === 'warning' && finding.category === 'rework-state'));
       assert.ok(evidence?.findings?.some((finding: any) => finding.category === 'scope'));
