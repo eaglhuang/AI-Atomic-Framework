@@ -296,7 +296,7 @@ type TeamEditorSubagentBridgeContract = {
 type TeamPatrolFinding = {
   level: TeamPatrolFindingLevel;
   code: string;
-  category: 'runtime-mode' | 'artifact-gap' | 'retry-budget' | 'rework-state' | 'scope' | 'evidence';
+  category: 'runtime-mode' | 'artifact-gap' | 'retry-budget' | 'rework-state' | 'scope' | 'evidence' | 'broker-governance';
   summary: string;
   suggestedCommand: string | null;
   details?: Record<string, unknown>;
@@ -2826,6 +2826,42 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       summary: `Team run ${teamRun.teamRunId} reports spawned agents; coordinator should verify advisory role boundaries.`,
       suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`
     }));
+  }
+  const brokerSubagent = teamRun.brokerSubagent ?? teamRun.runtimeContract?.brokerSubagent ?? null;
+  if (!brokerSubagent || brokerSubagent.enabled !== true) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker',
+      code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_MISSING',
+      category: 'broker-governance',
+      summary: `Team run ${teamRun.teamRunId} does not expose an enabled broker subagent contract.`,
+      suggestedCommand: `node atm.mjs team start --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
+      details: { schemaId: brokerSubagent?.schemaId ?? null, enabled: brokerSubagent?.enabled ?? null }
+    }));
+  } else {
+    if (brokerSubagent.decisionSurface !== 'brokerLane' || brokerSubagent.stewardId !== 'neutral-write-steward') {
+      findings.push(teamPatrolFinding({
+        level: 'warning',
+        code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_DRIFT',
+        category: 'broker-governance',
+        summary: `Team run ${teamRun.teamRunId} broker subagent contract does not match the expected broker lane steward.`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        details: {
+          decisionSurface: brokerSubagent.decisionSurface ?? null,
+          stewardId: brokerSubagent.stewardId ?? null
+        }
+      }));
+    }
+    const boundary = brokerSubagent.authorityBoundary ?? {};
+    if (boundary.fileWrite === true || boundary.gitWrite === true || boundary.taskLifecycle === true || boundary.selfClose === true) {
+      findings.push(teamPatrolFinding({
+        level: 'blocker',
+        code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_AUTHORITY_DRIFT',
+        category: 'broker-governance',
+        summary: `Team run ${teamRun.teamRunId} broker subagent authority boundary is too broad.`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        details: { authorityBoundary: boundary }
+      }));
+    }
   }
   const artifactFindings = Array.isArray(teamRun.artifactHandoff?.findings)
     ? teamRun.artifactHandoff.findings
