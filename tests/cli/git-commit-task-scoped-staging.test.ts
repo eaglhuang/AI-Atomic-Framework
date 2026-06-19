@@ -166,6 +166,7 @@ try {
   assert.equal(typeof importCommit.evidence?.commitSha, 'string');
   assert.equal((importCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
   assert.equal((importCommit.evidence as any).branchCommitQueue?.retryableRaceCode, 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE');
+  assert.equal((importCommit.evidence as any).branchCommitQueue?.headShaAtCommitStart, (importCommit.evidence as any).branchCommitQueue?.headShaAtAcquire);
   assertBranchCommitQueueSchema((importCommit.evidence as any).branchCommitQueue, 'import commit branch queue evidence');
 
   const unstagedCommit = expectCliError(
@@ -239,6 +240,7 @@ try {
   assert.equal(typeof autoStageCommit.evidence?.commitSha, 'string');
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.taskId, taskId);
+  assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.headShaAtCommitStart, (autoStageCommit.evidence as any).branchCommitQueue?.headShaAtAcquire);
   assertBranchCommitQueueSchema((autoStageCommit.evidence as any).branchCommitQueue, 'auto-stage commit branch queue evidence');
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
   rmSync(path.join(tempDir, outsideFile), { force: true });

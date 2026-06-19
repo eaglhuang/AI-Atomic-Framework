@@ -293,6 +293,7 @@ if (!branchCommitQueueSchema) {
     branchRef: 'refs/heads/main',
     branchName: 'main',
     headShaAtAcquire: 'abc123schema-before',
+    headShaAtCommitStart: 'abc123schema-before',
     headShaAfterCommit: 'abc123schema-after',
     retryableBusyCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY',
     retryableRaceCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'

@@ -546,6 +546,7 @@ function runGitCommit(options: ParsedGitOptions) {
   const branchRef = readHeadBranchRef(options.cwd);
   const branchName = branchRef ? branchRef.replace(/^refs\/heads\//, '') : 'detached-head';
   const headShaBeforeCommit = readHeadCommitSha(options.cwd);
+  let headShaAtCommitStart = headShaBeforeCommit;
   try {
     withBranchCommitQueueLock({
       cwd: options.cwd,
@@ -555,6 +556,23 @@ function runGitCommit(options: ParsedGitOptions) {
       branchName,
       headShaAtAcquire: headShaBeforeCommit
     }, () => {
+      headShaAtCommitStart = readHeadCommitSha(options.cwd);
+      if (headShaAtCommitStart !== headShaBeforeCommit) {
+        throw new CliError('ATM_GIT_COMMIT_BRANCH_QUEUE_RACE', 'Branch HEAD changed after queue admission and before commit start. Retry through the ATM commit lane.', {
+          exitCode: 1,
+          details: {
+            actorId,
+            taskId: options.taskId,
+            sessionId: session?.sessionId ?? null,
+            branchRef,
+            branchName,
+            headShaAtAcquire: headShaBeforeCommit,
+            headShaAtCommitStart,
+            retryable: true,
+            requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)}${options.taskId ? ` --task ${quoteCliValue(options.taskId)}` : ''} --message ${quoteCliValue(options.message)}${options.noVerify ? ' --no-verify' : ''} --json`
+          }
+        });
+      }
       const commitEnv = {
         ...process.env,
         GIT_AUTHOR_NAME: gitName,
@@ -726,6 +744,7 @@ function runGitCommit(options: ParsedGitOptions) {
     branchRef: branchRef ?? 'detached-head',
     branchName,
     headShaAtAcquire: headShaBeforeCommit,
+    headShaAtCommitStart,
     headShaAfterCommit: commitSha,
     retryableBusyCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY',
     retryableRaceCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'

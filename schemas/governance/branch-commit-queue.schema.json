@@ -18,6 +18,7 @@
         "branchRef",
         "branchName",
         "headShaAtAcquire",
+        "headShaAtCommitStart",
         "headShaAfterCommit",
         "retryableBusyCode",
         "retryableRaceCode"
@@ -46,6 +47,10 @@
           "minLength": 1
         },
         "headShaAtAcquire": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "headShaAtCommitStart": {
           "type": ["string", "null"],
           "minLength": 1
         },
