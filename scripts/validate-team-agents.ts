@@ -750,6 +750,7 @@ async function main() {
     });
     assert.equal(needsRework.schemaId, 'atm.teamReworkRoute.v1');
     assert.equal(needsRework.status, 'needs-rework');
+    assert.equal(needsRework.retryBudget.escalationTarget, null);
     assert.equal(needsRework.transitions[0].from, 'work-in-progress');
     assert.equal(needsRework.transitions[0].to, 'needs-rework');
     assert.deepEqual(needsRework.transitions[0].findingIds, ['reviewer-blocking-finding', 'validator-failure']);
@@ -768,6 +769,7 @@ async function main() {
       retryBudgetUsed: 1
     });
     assert.equal(readyForClose.status, 'ready-for-close');
+    assert.equal(readyForClose.retryBudget.escalationTarget, null);
     assert.ok(
       readyForClose.transitions.some((entry: any) => entry.from === 'needs-rework' && entry.to === 'revalidate-pending'),
       'rework completion must route through revalidate-pending'
@@ -791,6 +793,7 @@ async function main() {
     });
     assert.equal(blocked.status, 'blocked');
     assert.equal(blocked.retryBudget.remaining, 0);
+    assert.equal(blocked.retryBudget.escalationTarget, 'captain');
     assert.ok(
       blocked.transitions.some((entry: any) => entry.to === 'blocked'),
       'retry exhaustion must route to blocked instead of looping'

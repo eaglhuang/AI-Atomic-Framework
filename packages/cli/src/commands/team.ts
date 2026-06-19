@@ -147,6 +147,7 @@ type TeamReworkRoute = {
     maxAttempts: number;
     used: number;
     remaining: number;
+    escalationTarget: string | null;
   };
   requiredChecksPassed: boolean;
   findings: TeamReworkFinding[];
@@ -1011,7 +1012,8 @@ export function buildTeamReworkRouteStateMachine(input: {
     retryBudget: {
       maxAttempts,
       used,
-      remaining
+      remaining,
+      escalationTarget: remaining <= 0 ? 'captain' : null
     },
     requiredChecksPassed,
     findings,
