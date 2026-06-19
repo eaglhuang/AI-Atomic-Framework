@@ -2615,6 +2615,7 @@ export function writeTeamRun(input: {
       implementationSummary: `${input.runtimeContract.selectionReason}; closure remains governed by command-backed evidence.`,
       validators: normalizeStringArray(input.task.validators),
       evidence: [],
+      brokerGovernance: buildTeamBrokerGovernanceSummary(input.runtimeContract),
       risk: input.teamPlan.captainDecision.escalationRequired ? 'medium' : 'low',
       closeReady: false
     },
@@ -2625,6 +2626,21 @@ export function writeTeamRun(input: {
   mkdirSync(directory, { recursive: true });
   writeJsonFile(path.join(directory, `${teamRunId}.json`), teamRun);
   return teamRun;
+}
+
+function buildTeamBrokerGovernanceSummary(runtimeContract: TeamRuntimeContract) {
+  return {
+    schemaId: 'atm.teamBrokerGovernanceSummary.v1',
+    brokerSubagentEnabled: runtimeContract.brokerSubagent.enabled === true,
+    brokerDecisionSurface: runtimeContract.brokerSubagent.decisionSurface,
+    brokerStewardId: runtimeContract.brokerSubagent.stewardId,
+    brokerGoverns: [...runtimeContract.brokerSubagent.governs],
+    commitLaneSerializedBy: runtimeContract.commitLane.serializedBy,
+    commitLaneOwnerRole: runtimeContract.commitLane.ownerRole,
+    workerGitWrite: runtimeContract.workerAdapter.authorityBoundary.gitWrite,
+    workerTaskLifecycle: runtimeContract.workerAdapter.authorityBoundary.taskLifecycle,
+    workerSelfClose: runtimeContract.workerAdapter.authorityBoundary.selfClose
+  };
 }
 
 export function buildTeamStatusResult(input: {

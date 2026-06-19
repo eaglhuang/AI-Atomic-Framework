@@ -546,6 +546,15 @@ async function main() {
     assert.equal(teamRun?.brokerSubagent?.stewardId, 'neutral-write-steward');
     assert.equal(teamRun?.runtimeContract?.brokerSubagent?.schemaId, teamRun?.brokerSubagent?.schemaId);
     assert.equal(teamRun?.runtimeContract?.brokerSubagent?.subagentId, teamRun?.brokerSubagent?.subagentId);
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.schemaId, 'atm.teamBrokerGovernanceSummary.v1');
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.brokerSubagentEnabled, true);
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.brokerDecisionSurface, 'brokerLane');
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.brokerStewardId, 'neutral-write-steward');
+    assert.deepEqual(teamRun?.teamSummary?.brokerGovernance?.brokerGoverns, ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane']);
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.commitLaneSerializedBy, 'branch-commit-queue');
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.workerGitWrite, false);
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.workerTaskLifecycle, false);
+    assert.equal(teamRun?.teamSummary?.brokerGovernance?.workerSelfClose, false);
     assert.ok(Array.isArray(teamRun?.roles) && teamRun.roles.length > 0);
     assert.ok(Array.isArray(teamRun?.leases) && teamRun.leases.length > 0);
     assert.deepEqual(teamRun?.leases, teamRun?.permissionLeases);
