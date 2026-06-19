@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-19T01-18-44-435Z-close-b7dc479d9eb6",
+  "taskId": "TASK-AAO-0110",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260619011641-codex-gpt-5.4-mini-TASK-AAO-0110-858db9b63d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0110.json",
+  "taskSha256": "sha256:fa3e806c60690426fd2c3d1c5bd7ac08578360900b5b963366a1ad0f0475b6c4",
+  "createdAt": "2026-06-19T01:18:44.435Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0110 --actor codex-gpt-5.4-mini --status done --historical-delivery fc318d992d17353dd6c714790167f761561a5297",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260619011641-codex-gpt-5.4-mini-TASK-AAO-0110-858db9b63d",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0110.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:guidance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-19T01:18:44.428Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0110-goal-aligned-legacy-route-selection-for-guided-atomize.task.md",
+        ".atm/history/evidence/TASK-AAO-0110.*",
+        ".atm/history/task-events/TASK-AAO-0110/**",
+        ".atm/history/tasks/TASK-AAO-0110.json",
+        "packages/core/src/guidance/**/*.test.ts",
+        "packages/core/src/guidance/guidance-packet.ts",
+        "packages/core/src/guidance/legacy-route-plan.ts",
+        "packages/core/src/guidance/route-engine.ts",
+        "scripts/validate-guidance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/guidance/**/*.test.ts",
+        "packages/core/src/guidance/guidance-packet.ts",
+        "packages/core/src/guidance/legacy-route-plan.ts",
+        "packages/core/src/guidance/route-engine.ts",
+        "scripts/validate-guidance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
