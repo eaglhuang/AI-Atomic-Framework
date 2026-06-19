@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-19T00-54-46-079Z-close-375b51397ec2",
+  "taskId": "TASK-AAO-0051",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "done",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0051.json",
+  "taskSha256": "sha256:024639be967844bd9779388e4c7b43594c0f9e3cbe7d6168e0217f50a4424c34",
+  "createdAt": "2026-06-19T00:54:46.079Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-AAO-0051 --actor codex-gpt-5.4-mini --delivery-commit 9bed9673c --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0051.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-19T00:54:46.072Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0051-mirror-sync-commit-wrapper-support.task.md",
+        ".atm/history/reports/task-import/*.json",
+        ".atm/history/task-events/<task>/*import*.json",
+        ".atm/history/tasks/<task>.json",
+        "A staged unrelated `.atm/history/**` file is rejected.",
+        "atm.mjs",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "package.json",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "criticalChangedFiles": [
+        "atm.mjs",
+        "package.json",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
