@@ -110,6 +110,61 @@ const referenceRoute = decideGuidanceRoute({
 assert(referenceRoute.nextCommand.includes('--dry-run'), 'legacy route next command must be a dry-run proposal');
 assert(!referenceRoute.nextCommand.includes('processElement'), 'legacy route must not recommend direct processElement mutation');
 
+const goalAlignedPlan = await buildLegacyRoutePlan({
+  sourceText: [
+    'def kinship_pair_binding_supported(value):',
+    '    return spouse_supports_pair_binding(value)',
+    '',
+    'def _required_rule_value(value):',
+    '    return str(value).strip()',
+    '',
+    'def spouse_supports_pair_binding(value):',
+    '    return bool(value)'
+  ].join('\n'),
+  targetFile: 'pipelines/sanguo-rag/relationship_type_refinement.py',
+  releaseBlockerSymbols: ['kinship_pair_binding_supported'],
+  callerDistribution: {
+    _required_rule_value: 1,
+    spouse_supports_pair_binding: 1
+  }
+});
+const explicitSymbolRoute = decideGuidanceRoute({
+  goal: 'guided atomize spouse_supports_pair_binding route selection',
+  orientation,
+  evidence: { legacyRoutePlan: goalAlignedPlan }
+});
+assert(explicitSymbolRoute.routeChoices[0]?.goalAlignment?.symbolName === 'spouse_supports_pair_binding',
+  'explicit symbol goal must rank spouse_supports_pair_binding ahead of generic helper');
+assert(explicitSymbolRoute.routeChoices[0]?.goalAlignment?.score === 100,
+  'explicit symbol goal must expose goalAlignment score');
+assert(String(explicitSymbolRoute.routeChoices[0]?.overrideReason ?? '').includes('matched the guidance goal'),
+  'explicit symbol goal must expose overrideReason');
+assert(explicitSymbolRoute.routeChoices[0]?.goalAlignment?.symbolName !== 'kinship_pair_binding_supported',
+  'explicit symbol route must not select blocked trunk kinship_pair_binding_supported');
+
+const touchedSymbolRoute = decideGuidanceRoute({
+  goal: 'guided atomize route selection',
+  orientation,
+  evidence: {
+    legacyRoutePlan: goalAlignedPlan,
+    touchedSymbols: ['spouse_supports_pair_binding']
+  }
+});
+assert(touchedSymbolRoute.routeChoices[0]?.goalAlignment?.symbolName === 'spouse_supports_pair_binding',
+  'touched symbol evidence must rank touched semantic leaf ahead of generic helper');
+assert(touchedSymbolRoute.routeChoices[0]?.goalAlignment?.score === 75,
+  'touched symbol evidence must expose touched-symbol goalAlignment score');
+
+const helperFallbackRoute = decideGuidanceRoute({
+  goal: 'guided atomize route selection',
+  orientation,
+  evidence: { legacyRoutePlan: goalAlignedPlan }
+});
+assert(helperFallbackRoute.routeChoices[0]?.goalAlignment?.symbolName === '_required_rule_value',
+  'generic helper must remain fallback when no goal-aligned or touched semantic leaf exists');
+assert(String(helperFallbackRoute.routeChoices[0]?.overrideReason ?? '').includes('helper fallback'),
+  'helper fallback route must explain why no semantic override was used');
+
 const newHelperPlan = await buildLegacyRoutePlan({
   sourceText: 'export function normalizeColorName(value) { return String(value || "").trim().toLowerCase(); }',
   targetFile: 'tests/guidance-fixtures/new-helper.js',
