@@ -77,6 +77,7 @@ const schemaEntries: Record<string, string> = {
 
 const supportSchemaEntries: Record<string, string> = {
   'test-report-metrics': 'schemas/test-report/metrics.schema.json',
+  'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
   'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
   'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json'
 };
@@ -302,6 +303,7 @@ if (!brokerMutationRequestSchema) {
 }
 
 const teamBrokerWriteTransactionSchema = ajv.getSchema('team-broker-write-transaction');
+const teamBrokerLaneSchema = ajv.getSchema('team-broker-lane');
 const teamBrokerRuntimeActivationSchema = ajv.getSchema('team-broker-runtime-activation');
 if (!teamBrokerWriteTransactionSchema) {
   fail('team broker write transaction schema must be registered');
@@ -337,29 +339,63 @@ if (!teamBrokerWriteTransactionSchema) {
     fail(`team broker write transaction schema must accept the milestone-required fields: ${formatErrors(teamBrokerWriteTransactionSchema.errors)}`);
   }
 
-  if (!teamBrokerRuntimeActivationSchema) {
+  if (!teamBrokerLaneSchema) {
+    fail('team broker lane schema must be registered');
+  } else if (!teamBrokerRuntimeActivationSchema) {
     fail('team broker runtime activation schema must be registered');
   } else {
+    const brokerLaneEvidence = {
+      schemaId: 'atm.teamBrokerLaneEvidence.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+      actorId: 'schema-actor',
+      registryPath: '.atm/runtime/write-broker.registry.json',
+      writeIntent: {
+        schemaId: 'atm.writeIntent.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'schema broker lane fixture' },
+        taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+        actorId: 'schema-actor',
+        baseCommit: 'abc123schemahead',
+        targetFiles: ['src/schema-target.ts'],
+        atomRefs: [],
+        sharedSurfaces: {
+          generators: [],
+          projections: [],
+          registries: [],
+          validators: [],
+          artifacts: []
+        },
+        requestedLane: 'auto'
+      },
+      writeTransaction: transactionEvidence,
+      decision: {
+        verdict: 'parallel-safe',
+        lane: 'direct-brokered',
+        reason: 'schema broker lane fixture',
+        conflicts: []
+      },
+      virtualAtomInUseRegistry: {
+        schemaId: 'atm.virtualAtomInUseRegistry.v1',
+        specVersion: '0.1.0',
+        activeVirtualAtoms: []
+      },
+      chosenLane: 'direct-brokered',
+      stewardId: null,
+      composerPath: null,
+      safeToStart: true,
+      blockedReasons: []
+    };
+    if (!teamBrokerLaneSchema(brokerLaneEvidence)) {
+      fail(`team broker lane schema must accept broker decision and write transaction evidence: ${formatErrors(teamBrokerLaneSchema.errors)}`);
+    }
     const runtimeActivationEvidence = {
       schemaId: 'atm.teamBrokerRuntimeActivationHandshake.v1',
       specVersion: '0.1.0',
       taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
       actorId: 'schema-actor',
       registryPath: '.atm/runtime/write-broker.registry.json',
-      brokerLane: {
-        schemaId: 'atm.teamBrokerLaneEvidence.v1',
-        taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
-        actorId: 'schema-actor',
-        registryPath: '.atm/runtime/write-broker.registry.json',
-        safeToStart: true,
-        chosenLane: 'direct-brokered',
-        decision: {
-          verdict: 'parallel-safe',
-          lane: 'direct-brokered'
-        },
-        writeTransaction: transactionEvidence,
-        blockedReasons: []
-      },
+      brokerLane: brokerLaneEvidence,
       activationState: 'activated',
       scopedWriteExecution: {
         approved: true,

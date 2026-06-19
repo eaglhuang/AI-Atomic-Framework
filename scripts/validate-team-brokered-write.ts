@@ -35,9 +35,14 @@ function readJson(relativePath: string) {
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const writeTransactionSchema = readJson('schemas/team-agents/team-broker-write-transaction.schema.json');
+const brokerLaneSchema = readJson('schemas/team-agents/team-broker-lane.schema.json');
 ajv.addSchema(writeTransactionSchema);
+ajv.addSchema(brokerLaneSchema);
 const validateWriteTransaction = ajv.compile(writeTransactionSchema);
 const validateRuntimeActivation = ajv.compile(readJson('schemas/team-agents/team-broker-runtime-activation.schema.json'));
+const maybeValidateBrokerLane = ajv.getSchema('https://schemas.ai-atomic-framework.dev/team-agents/team-broker-lane.schema.json');
+check(maybeValidateBrokerLane, 'team broker lane schema must be registered for validator');
+const validateBrokerLane = maybeValidateBrokerLane!;
 
 function formatAjvErrors(errors: typeof validateWriteTransaction.errors) {
   return (errors ?? [])
@@ -314,6 +319,10 @@ try {
     validateWriteTransaction(overlapResult.evidence.writeTransaction),
     `real team broker write transaction must match schema: ${formatAjvErrors(validateWriteTransaction.errors)}`
   );
+  check(
+    validateBrokerLane(overlapResult.evidence),
+    `real team broker lane evidence must match schema: ${formatAjvErrors(validateBrokerLane.errors)}`
+  );
 
   const blockedResult = evaluateTeamBrokerLane({
     cwd: tempRoot,
@@ -342,6 +351,10 @@ try {
   check(Boolean(overlapEvidence?.brokerLane), 'team plan evidence must include brokerLane');
   const overlapBrokerLane = overlapEvidence.brokerLane as Record<string, unknown>;
   check(overlapBrokerLane.chosenLane === 'neutral-steward', 'team plan brokerLane must surface steward lane');
+  check(
+    validateBrokerLane(overlapBrokerLane),
+    `team plan brokerLane evidence must match schema: ${formatAjvErrors(validateBrokerLane.errors)}`
+  );
   const overlapBriefing = (overlapEvidence.teamPlan as Record<string, unknown>)?.briefingContract as Record<string, unknown>;
   check((overlapBriefing?.brokerAdvisory as Record<string, unknown>)?.verdict === 'steward-lane', 'briefing contract must advertise steward lane');
 
@@ -364,6 +377,10 @@ try {
   const overlapTeamRun = overlapRunEvidence.teamRun as Record<string, unknown>;
   check(Boolean(overlapTeamRun?.brokerLane), 'team run record must include brokerLane evidence');
   check((overlapTeamRun.brokerLane as Record<string, unknown>)?.chosenLane === 'neutral-steward', 'team run brokerLane must record steward path');
+  check(
+    validateBrokerLane(overlapTeamRun.brokerLane),
+    `team run brokerLane evidence must match schema: ${formatAjvErrors(validateBrokerLane.errors)}`
+  );
 
   const runtimeHandshake = buildTeamBrokerRuntimeActivationHandshake({
     cwd: tempRoot,

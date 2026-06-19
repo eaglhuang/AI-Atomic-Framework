@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-broker-lane.schema.json",
+  "title": "ATM Team Broker Lane Evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "taskId",
+    "actorId",
+    "registryPath",
+    "writeIntent",
+    "writeTransaction",
+    "decision",
+    "virtualAtomInUseRegistry",
+    "chosenLane",
+    "stewardId",
+    "composerPath",
+    "safeToStart",
+    "blockedReasons"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.teamBrokerLaneEvidence.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "registryPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "writeIntent": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "schemaId",
+        "specVersion",
+        "migration",
+        "taskId",
+        "actorId",
+        "baseCommit",
+        "targetFiles",
+        "atomRefs",
+        "sharedSurfaces",
+        "requestedLane"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.writeIntent.v1"
+        },
+        "specVersion": {
+          "const": "0.1.0"
+        },
+        "migration": {
+          "type": "object"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseCommit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetFiles": {
+          "$ref": "#/$defs/stringList"
+        },
+        "atomRefs": {
+          "type": "array"
+        },
+        "sharedSurfaces": {
+          "type": "object"
+        },
+        "requestedLane": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "writeTransaction": {
+      "$ref": "https://schemas.ai-atomic-framework.dev/team-agents/team-broker-write-transaction.schema.json"
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["verdict", "lane", "reason", "conflicts"],
+      "properties": {
+        "verdict": {
+          "enum": [
+            "parallel-safe",
+            "needs-physical-split",
+            "blocked-cid-conflict",
+            "blocked-shared-surface",
+            "serial",
+            "blocked-active-lease"
+          ]
+        },
+        "lane": {
+          "enum": [
+            "direct-brokered",
+            "deterministic-composer",
+            "neutral-steward",
+            "serial",
+            "blocked"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conflicts": {
+          "type": "array"
+        }
+      }
+    },
+    "virtualAtomInUseRegistry": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaId", "specVersion", "activeVirtualAtoms"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.virtualAtomInUseRegistry.v1"
+        },
+        "specVersion": {
+          "const": "0.1.0"
+        },
+        "activeVirtualAtoms": {
+          "type": "array"
+        }
+      }
+    },
+    "chosenLane": {
+      "enum": [
+        "direct-brokered",
+        "deterministic-composer",
+        "neutral-steward",
+        "serial",
+        "blocked"
+      ]
+    },
+    "stewardId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "composerPath": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "safeToStart": {
+      "type": "boolean"
+    },
+    "blockedReasons": {
+      "$ref": "#/$defs/stringList"
+    }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
