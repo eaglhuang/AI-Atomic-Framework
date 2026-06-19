@@ -80,6 +80,7 @@ export interface BrokerRunRecordInput {
   readonly mergeVerdict: MergeVerdict;
   readonly evidencePath: string;
   readonly appliedFiles?: readonly string[];
+  readonly commitSha?: string | null;
 }
 
 export function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOperationRunRecord {
@@ -102,7 +103,8 @@ export function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOpe
     lane_decision: input.laneDecision,
     merge_verdict: input.mergeVerdict,
     evidence_path: input.evidencePath,
-    ...(taskId ? { task_ids: [taskId] } : {})
+    ...(taskId ? { task_ids: [taskId] } : {}),
+    ...(input.commitSha ? { commit_sha: input.commitSha } : {})
   };
 }
 

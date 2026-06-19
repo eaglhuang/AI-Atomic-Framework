@@ -396,6 +396,7 @@ export interface BrokerOperationRunRecord {
   readonly merge_verdict: MergeVerdict;
   readonly evidence_path: string;
   readonly task_ids?: readonly string[];
+  readonly commit_sha?: string;
 }
 
 export interface BrokerOperationRunRecordEnvelope {

@@ -547,6 +547,8 @@ function buildStewardBrokerOperationRun(input: {
     .sort((left, right) => left.localeCompare(right));
   const taskIds = [...new Set(sortedProposals.map((proposal) => proposal.taskId).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
+  const commitShas = [...new Set(sortedProposals.map((proposal) => proposal.baseCommit).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
   const appliedFiles = [...new Set(input.appliedFiles)].sort((left, right) => left.localeCompare(right));
   const mergeVerdict = mapStewardMergeVerdict(input.mergePlan.verdict);
   const record = {
@@ -563,7 +565,8 @@ function buildStewardBrokerOperationRun(input: {
     lane_decision: 'neutral-steward',
     merge_verdict: mergeVerdict,
     evidence_path: input.evidencePath ?? 'inline:steward-apply-evidence',
-    ...(taskIds.length > 0 ? { task_ids: taskIds } : {})
+    ...(taskIds.length > 0 ? { task_ids: taskIds } : {}),
+    ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {})
   };
 
   return {
