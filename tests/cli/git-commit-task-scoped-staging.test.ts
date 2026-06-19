@@ -327,6 +327,60 @@ try {
   ]);
   assert.equal(deferredCommit.ok, true);
 
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-safe";\n', 'utf8');
+  const gitHeadResiduePath = path.join(tempDir, '.atm/history/evidence/git-head.jsonl');
+  writeFileSync(gitHeadResiduePath, '{"fixture":true}\n', 'utf8');
+  const safeResidueCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: auto clean safe residue',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(safeResidueCommit.ok, true);
+  assert.equal(existsSync(gitHeadResiduePath), false, 'safe generated residue must be auto-cleaned before commit');
+
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-blocked";\n', 'utf8');
+  const foreignResiduePath = path.join(tempDir, '.atm/runtime/snapshots/foreign-staged-TASK-OTHER-9999-1781880000000.json');
+  writeJson(foreignResiduePath, { taskId: 'TASK-OTHER-9999', files: ['src/other.ts'] });
+  const blockedResidueCommit = expectCliError(
+    runAtmGit([
+      'commit',
+      '--cwd', tempDir,
+      '--actor', 'fixture-agent',
+      '--task', taskId,
+      '--session', sessionId,
+      '--message', 'feat: block foreign residue',
+      '--auto-stage',
+      '--json'
+    ]),
+    'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED'
+  );
+  const blockedResidueDetails = ((await blockedResidueCommit).details ?? {}) as any;
+  assert.ok(Array.isArray(blockedResidueDetails.blockedResidue) || Array.isArray(blockedResidueDetails.commitBundle?.blockedResidue), 'foreign generated residue must be reported in blockedResidue details');
+  assert.equal(existsSync(foreignResiduePath), true, 'foreign generated residue must not be auto-cleaned');
+  rmSync(foreignResiduePath, { force: true });
+
+  const userResiduePath = path.join(tempDir, 'notes/manual-user-dirty.txt');
+  writeFileSync(userResiduePath, 'keep me\n', 'utf8');
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "user-dirty";\n', 'utf8');
+  const userDirtyCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: preserve user dirty file',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(userDirtyCommit.ok, true);
+  assert.equal(existsSync(userResiduePath), true, 'user-authored dirty files must never be auto-cleaned');
+  rmSync(userResiduePath, { force: true });
+
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "isolated";\n', 'utf8');
   const unrelatedStagedFile = 'src/unrelated.ts';
   writeFileSync(path.join(tempDir, unrelatedStagedFile), 'export const unrelated = true;\n', 'utf8');

@@ -472,6 +472,23 @@ try {
   assert(stagedScopedCommit.exitCode === 0, 'git commit must succeed once scoped files are staged');
   assert(stagedScopedCommit.parsed.ok === true, 'staged scoped git commit must report ok=true');
 
+  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "safe-residue";\n', 'utf8');
+  writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl'), '{"fixture":true}\n', 'utf8');
+  const residueAutoCleanCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: safe generated residue', '--auto-stage', '--json']);
+  assert(residueAutoCleanCommit.exitCode === 0, 'git commit must auto-clean safe generated residue');
+  assert(residueAutoCleanCommit.parsed.ok === true, 'safe generated residue commit must report ok=true');
+  assert(!existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'safe git-head residue must be removed after governed commit');
+
+  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "blocked-residue";\n', 'utf8');
+  const foreignResidueSnapshot = path.join(repo, '.atm', 'runtime', 'snapshots', 'foreign-staged-TASK-FOREIGN-9999-1781880000000.json');
+  mkdirSync(path.dirname(foreignResidueSnapshot), { recursive: true });
+  writeFileSync(foreignResidueSnapshot, `${JSON.stringify({ taskId: 'TASK-FOREIGN-9999', files: ['src/foreign.ts'] }, null, 2)}\n`, 'utf8');
+  const blockedResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: blocked foreign residue', '--auto-stage', '--json']);
+  assert(blockedResidueCommit.exitCode === 1, 'git commit must block foreign generated residue');
+  assert(blockedResidueCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED', 'foreign generated residue must return the dedicated blocked code');
+  assert(existsSync(foreignResidueSnapshot), 'foreign generated residue must remain on disk for manual recovery');
+  rmSync(foreignResidueSnapshot, { force: true });
+
   const governedFile = path.join(repo, 'notes', 'governance.txt');
   mkdirSync(path.dirname(governedFile), { recursive: true });
   writeFileSync(governedFile, 'governance fixture\n', 'utf8');
@@ -672,7 +689,10 @@ try {
     ATM_COMMIT_ACTOR_ID: 'missing-identity-agent'
   });
   assert(missingIdentityPreCommit.exitCode === 1, 'pre-commit must fail when ATM commit actor has no identity profile');
-  assert((missingIdentityPreCommit.parsed.evidence?.commitAttributionReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_COMMIT_IDENTITY_PROFILE_MISSING' && entry.requiredCommand === expectedIdentitySetCommand), 'pre-commit missing identity finding must return a runnable identity set command from repo-local git config');
+  assert([
+    ...(missingIdentityPreCommit.parsed.evidence?.commitAttributionReport?.findings ?? []),
+    ...(missingIdentityPreCommit.parsed.evidence?.blockingFindings ?? [])
+  ].some((entry: any) => entry.code === 'ATM_COMMIT_IDENTITY_PROFILE_MISSING' && entry.requiredCommand === expectedIdentitySetCommand), 'pre-commit missing identity finding must return a runnable identity set command from repo-local git config');
   const gitPrepareAfterMissingIdentityCheck = runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitPrepareAfterMissingIdentityCheck.exitCode === 0, 'git prepare must restore fixture git identity after missing identity repair command validation');
   assert(gitPrepareAfterMissingIdentityCheck.parsed.ok === true, 'git prepare restore must report ok=true');
@@ -964,7 +984,10 @@ try {
   const staticEvidencePreCommit = runAtm(['hook', 'pre-commit', '--cwd', repo, '--json']);
   assert(staticEvidencePreCommit.exitCode === 1, 'pre-commit must fail for static evidence impersonation without CLI evidence context');
   assert(staticEvidencePreCommit.parsed.ok === false, 'pre-commit must report ok=false for static evidence impersonation');
-  assert((staticEvidencePreCommit.parsed.evidence?.protectedStateReport?.findings ?? []).some((entry: any) => entry.reason === 'static-evidence-artifact-without-cli-context'), 'pre-commit must report the static evidence impersonation finding');
+  assert([
+    ...(staticEvidencePreCommit.parsed.evidence?.protectedStateReport?.findings ?? []),
+    ...(staticEvidencePreCommit.parsed.evidence?.blockingFindings ?? [])
+  ].some((entry: any) => entry.reason === 'static-evidence-artifact-without-cli-context' || entry.code === 'ATM_STATIC_EVIDENCE_ARTIFACT_WITHOUT_CLI_CONTEXT'), 'pre-commit must report the static evidence impersonation finding');
   assert(runGit(repo, ['rm', '--cached', '--force', '--quiet', 'atomic_workbench/evidence/ATM-GOV-IMPERSONATE.json']).exitCode === 0, 'static evidence impersonation fixture must be removable from index');
   rmSync(staticEvidenceArtifactPath, { force: true });
 

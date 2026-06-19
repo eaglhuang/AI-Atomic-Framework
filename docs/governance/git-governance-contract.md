@@ -91,6 +91,27 @@ ATM executes git through `ATM_GIT_EXECUTABLE` when set, otherwise `git.exe` on
 Windows, and always returns `copyableCommitCommand` using `-m` trailers when
 host `--trailer` support is unavailable.
 
+## Auto-Generated Residue Policy
+
+ATM classifies generated residue before governed commit or pre-commit into
+three buckets:
+
+- `auto-clean-safe`: ATM may restore or remove it automatically and emits an
+  audit-friendly warning listing the cleaned files.
+- `block-and-explain`: generated residue belongs to another task/run, so the
+  commit stops with a dedicated error code.
+- `manual-review`: generated-looking residue that ATM cannot prove safe.
+
+Initial safe auto-clean shapes are:
+
+- `.atm/history/evidence/git-head.json`
+- `.atm/history/evidence/git-head.jsonl`
+- current-operation-local `.atm/runtime/snapshots/foreign-staged-*`
+- current-operation-local `.atm/runtime/snapshots/close-window-foreign-staged-*`
+
+ATM never silently deletes user-authored dirty work. Only known reproducible
+byproducts are auto-cleaned.
+
 ## Close Window Staged-Index Lock
 
 `taskflow close --write` acquires an exclusive staged-index lock at
