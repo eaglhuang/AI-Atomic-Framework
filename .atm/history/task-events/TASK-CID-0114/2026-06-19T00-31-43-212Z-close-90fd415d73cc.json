@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-19T00-31-43-212Z-close-90fd415d73cc",
+  "taskId": "TASK-CID-0114",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260618164008-codex-gpt-5.4-mini-TASK-CID-0114-226c6c28b8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0114.json",
+  "taskSha256": "sha256:9573bed863f767d44e2d958c8698b3747ebd9fb55aa09b1dcab25235ea288f2d",
+  "createdAt": "2026-06-19T00:31:43.212Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0114 --actor codex-gpt-5.4-mini --status done --historical-delivery 9f54ec196",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260618164008-codex-gpt-5.4-mini-TASK-CID-0114-226c6c28b8",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0114.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-19T00:31:43.204Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0114-shared-hot-file-broker-rearbitration-and-auto-stage-boundary-hardening.task.md",
+        ".atm/history/evidence/TASK-CID-0114.*",
+        ".atm/history/task-events/TASK-CID-0114/**",
+        ".atm/history/tasks/TASK-CID-0114.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/core/src/broker/**",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/core/src/broker/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
