@@ -36,9 +36,11 @@ const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
 const writeTransactionSchema = readJson('schemas/team-agents/team-broker-write-transaction.schema.json');
 const brokerLaneSchema = readJson('schemas/team-agents/team-broker-lane.schema.json');
+const brokerOperationRunRecordSchema = readJson('schemas/broker/operation-run-record.schema.json');
 ajv.addSchema(writeTransactionSchema);
 ajv.addSchema(brokerLaneSchema);
 const validateWriteTransaction = ajv.compile(writeTransactionSchema);
+const validateBrokerOperationRunRecord = ajv.compile(brokerOperationRunRecordSchema);
 const validateRuntimeActivation = ajv.compile(readJson('schemas/team-agents/team-broker-runtime-activation.schema.json'));
 const maybeValidateBrokerLane = ajv.getSchema('https://schemas.ai-atomic-framework.dev/team-agents/team-broker-lane.schema.json');
 check(maybeValidateBrokerLane, 'team broker lane schema must be registered for validator');
@@ -182,6 +184,10 @@ function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
     planId: 'plan-team-log-1',
     records: [record]
   });
+  check(
+    validateBrokerOperationRunRecord(envelope),
+    `broker run record envelope must match schema: ${formatAjvErrors(validateBrokerOperationRunRecord.errors)}`
+  );
   writeJson(path.join(runDir, 'run-team-log-1.json'), envelope);
 
   const result = spawnSync(
@@ -231,6 +237,10 @@ async function assertBrokerPlanBatchKeepsTransactionLinkage(cwd: string) {
   const runEvidencePath = (result.parsed.evidence as Record<string, unknown>)?.runEvidencePath;
   check(typeof runEvidencePath === 'string' && runEvidencePath.length > 0, 'broker plan-batch must report run evidence path');
   const envelope = JSON.parse(readFileSync(path.join(cwd, runEvidencePath as string), 'utf8')) as Record<string, unknown>;
+  check(
+    validateBrokerOperationRunRecord(envelope),
+    `broker plan-batch persisted run envelope must match schema: ${formatAjvErrors(validateBrokerOperationRunRecord.errors)}`
+  );
   const persistedRecords = envelope.records as Array<Record<string, unknown>>;
   check(
     (persistedRecords?.[0]?.transaction_ids as string[] | undefined)?.includes('txn-team-cli-transaction') === true,
