@@ -185,6 +185,36 @@ function initGitRepo(repo: string) {
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 }
 
+function writeBranchCommitQueueLock(repo: string, input: {
+  actorId: string;
+  taskId?: string | null;
+  branchRef?: string | null;
+  headShaAtAcquire?: string | null;
+}) {
+  const branchRef = input.branchRef ?? 'refs/heads/main';
+  const safeName = branchRef.replace(/[^A-Za-z0-9._-]+/g, '-');
+  const lockDir = path.join(repo, '.atm/runtime/locks', `git-commit-queue-${safeName}.lock`);
+  mkdirSync(lockDir, { recursive: true });
+  writeJson(path.join(lockDir, 'record.json'), {
+    schemaId: 'atm.branchCommitQueueLock.v1',
+    specVersion: '0.1.0',
+    actorId: input.actorId,
+    taskId: input.taskId ?? null,
+    branchRef,
+    branchName: branchRef.replace(/^refs\/heads\//, ''),
+    headShaAtAcquire: input.headShaAtAcquire ?? 'fixture-head',
+    createdAt: '2026-06-19T00:00:00.000Z'
+  });
+}
+
+function readBranchRef(repo: string): string {
+  return execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], {
+    cwd: repo,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore']
+  }).trim();
+}
+
 function writeBrokerRegistry(repo: string, activeIntents: unknown[], options: { currentEpoch?: number } = {}) {
   writeJson(path.join(repo, '.atm/runtime/write-broker.registry.json'), {
     schemaId: 'atm.writeBrokerRegistry.v1',
@@ -657,6 +687,26 @@ assert.equal(
   secondCloseHintDryRun.evidence.closebackPlan.historicalDeliveryGate.required,
   true,
   'post-delivery second close must require historical delivery before write'
+);
+
+const branchQueueBusyFixture = await makeDualRepoCloseFixture('branch-queue-busy', { closePlanningStatus: 'planned' });
+writeBranchCommitQueueLock(branchQueueBusyFixture.targetRepo, {
+  actorId: 'other-writer',
+  taskId: 'TASK-OTHER-FINALIZING',
+  branchRef: readBranchRef(branchQueueBusyFixture.targetRepo)
+});
+const branchQueueBusyDryRun = await runTaskflow([
+  'close',
+  '--cwd', branchQueueBusyFixture.targetRepo,
+  '--profile', branchQueueBusyFixture.profilePath,
+  '--task', branchQueueBusyFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(branchQueueBusyDryRun.evidence.writeReadinessHint.branchCommitQueueGate.status, 'busy');
+assert.ok(
+  branchQueueBusyDryRun.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_CLOSE_BRANCH_COMMIT_QUEUE_BUSY'),
+  'active branch commit queue must block taskflow close --write before commit tail'
 );
 const historicalDeliveryBlocker = secondCloseHintDryRun.evidence.writeReadinessHint.blockers.find(
   (entry: { code: string }) => entry.code === 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED'
