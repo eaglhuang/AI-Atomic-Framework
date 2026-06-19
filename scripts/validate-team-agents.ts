@@ -539,6 +539,12 @@ async function main() {
     assert.equal(teamRun?.executionMode, 'manual-team');
     assert.equal(teamRun?.agentsSpawned, false);
     assert.equal(teamRun?.runtimeWritten, true);
+    assert.equal(teamRun?.brokerSubagent?.schemaId, 'atm.teamBrokerSubagentContract.v1');
+    assert.equal(teamRun?.brokerSubagent?.enabled, true);
+    assert.equal(teamRun?.brokerSubagent?.decisionSurface, 'brokerLane');
+    assert.equal(teamRun?.brokerSubagent?.stewardId, 'neutral-write-steward');
+    assert.equal(teamRun?.runtimeContract?.brokerSubagent?.schemaId, teamRun?.brokerSubagent?.schemaId);
+    assert.equal(teamRun?.runtimeContract?.brokerSubagent?.subagentId, teamRun?.brokerSubagent?.subagentId);
     assert.ok(Array.isArray(teamRun?.roles) && teamRun.roles.length > 0);
     assert.ok(Array.isArray(teamRun?.leases) && teamRun.leases.length > 0);
     assert.deepEqual(teamRun?.leases, teamRun?.permissionLeases);
@@ -559,6 +565,9 @@ async function main() {
     assert.equal(summary?.status, 'active');
     assert.equal(summary?.roleCount, teamRun.roles.length);
     assert.equal(summary?.leaseCount, teamRun.leases.length);
+    assert.equal(summary?.brokerSubagentEnabled, true);
+    assert.equal(summary?.brokerDecisionSurface, 'brokerLane');
+    assert.equal(summary?.brokerStewardId, 'neutral-write-steward');
     assert.equal(summary?.agentsSpawned, false);
 
     const runtimePath = path.join(process.cwd(), '.atm', 'runtime', 'team-runs', `${teamRun.teamRunId}.json`);

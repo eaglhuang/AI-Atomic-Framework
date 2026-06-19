@@ -2564,6 +2564,7 @@ export function writeTeamRun(input: {
     runtimeContract: input.runtimeContract,
     artifactHandoff: input.runtimeContract.artifactHandoff,
     retryBudget: input.runtimeContract.retryBudget,
+    brokerSubagent: input.runtimeContract.brokerSubagent,
     agentsSpawned: input.runtimeContract.agentsSpawned,
     runtimeWritten: true,
     task: summarizeTask(input.taskId, input.task),
@@ -2940,6 +2941,9 @@ function compactTeamRun(run: any) {
     status: run.status,
     roleCount: Array.isArray(run.roles) ? run.roles.length : Array.isArray(run.agents) ? run.agents.length : 0,
     leaseCount: Array.isArray(run.leases) ? run.leases.length : Array.isArray(run.permissionLeases) ? run.permissionLeases.length : 0,
+    brokerSubagentEnabled: run.brokerSubagent?.enabled === true || run.runtimeContract?.brokerSubagent?.enabled === true,
+    brokerDecisionSurface: run.brokerSubagent?.decisionSurface ?? run.runtimeContract?.brokerSubagent?.decisionSurface ?? null,
+    brokerStewardId: run.brokerSubagent?.stewardId ?? run.runtimeContract?.brokerSubagent?.stewardId ?? null,
     agentsSpawned: run.agentsSpawned === true,
     createdAt: run.createdAt ?? null,
     updatedAt: run.updatedAt ?? null
