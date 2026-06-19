@@ -925,6 +925,10 @@ async function main() {
     assert.equal(nodeAdapter.executionSurface, 'agent-runtime');
     assert.equal(nodeAdapter.spawnStrategy, 'spawn-worker');
     assert.equal(nodeAdapter.agentsSpawned, true);
+    assert.equal(nodeAdapter.authorityBoundary.gitWrite, false);
+    assert.equal(nodeAdapter.authorityBoundary.taskLifecycle, false);
+    assert.equal(nodeAdapter.authorityBoundary.selfClose, false);
+    assert.equal(nodeAdapter.authorityBoundary.evidenceWriteOwner, 'coordinator');
     assert.equal(nodeAdapter.vendorNeutral, true);
     assert.equal(nodeAdapter.artifactContractPreserved, true);
     assert.equal(nodeAdapter.retryContractPreserved, true);
@@ -934,6 +938,9 @@ async function main() {
     assert.equal(brokerFallback.executionSurface, 'broker-governance');
     assert.equal(brokerFallback.spawnStrategy, 'disabled');
     assert.equal(brokerFallback.agentsSpawned, false);
+    assert.equal(brokerFallback.authorityBoundary.gitWrite, false);
+    assert.equal(brokerFallback.authorityBoundary.taskLifecycle, false);
+    assert.equal(brokerFallback.authorityBoundary.selfClose, false);
     assert.equal(brokerFallback.brokerFallback.enabled, true);
     for (const preserved of ['broker', 'permission-leases', 'validators', 'police', 'evidence', 'artifact-contract', 'retry-contract']) {
       assert.ok(brokerFallback.brokerFallback.preservesGovernance.includes(preserved), `broker fallback must preserve ${preserved}`);
@@ -945,6 +952,8 @@ async function main() {
     assert.equal(realRuntime.sdkId, 'nodejs');
     assert.equal(realRuntime.modelId, 'provider-selected');
     assert.equal(realRuntime.workerAdapter.adapterId, 'atm.node.reference-worker');
+    assert.equal(realRuntime.workerAdapter.authorityBoundary.gitWrite, false);
+    assert.equal(realRuntime.workerAdapter.authorityBoundary.taskLifecycle, false);
     assert.equal(realRuntime.agentsSpawned, true);
     assert.equal(realRuntime.artifactHandoff.schemaId, 'atm.teamArtifactHandoffContract.v1');
     assert.equal(realRuntime.retryBudget.schemaId, 'atm.teamRetryBudgetContract.v1');
@@ -952,6 +961,7 @@ async function main() {
     const brokerRuntime = buildTeamRuntimeContract({ runtimeMode: 'broker-only' });
     assert.equal(brokerRuntime.runtimeAdapterId, 'atm.node.broker-only-fallback');
     assert.equal(brokerRuntime.workerAdapter.brokerFallback.enabled, true);
+    assert.equal(brokerRuntime.workerAdapter.authorityBoundary.selfClose, false);
     assert.equal(brokerRuntime.agentsSpawned, false);
     assert.equal(brokerRuntime.executionSurface, 'broker-governance');
     assert.equal(brokerRuntime.artifactHandoff.schemaId, realRuntime.artifactHandoff.schemaId);

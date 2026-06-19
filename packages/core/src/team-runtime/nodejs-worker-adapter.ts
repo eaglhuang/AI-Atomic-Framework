@@ -20,6 +20,12 @@ export interface TeamWorkerAdapterContract {
     readonly reason: string | null;
     readonly preservesGovernance: readonly string[];
   };
+  readonly authorityBoundary: {
+    readonly gitWrite: false;
+    readonly taskLifecycle: false;
+    readonly selfClose: false;
+    readonly evidenceWriteOwner: 'coordinator';
+  };
   readonly vendorNeutral: true;
   readonly artifactContractPreserved: true;
   readonly retryContractPreserved: true;
@@ -74,6 +80,12 @@ export function resolveNodejsTeamWorkerAdapter(input: {
         'artifact-contract',
         'retry-contract'
       ]
+    },
+    authorityBoundary: {
+      gitWrite: false,
+      taskLifecycle: false,
+      selfClose: false,
+      evidenceWriteOwner: 'coordinator'
     },
     vendorNeutral: true,
     artifactContractPreserved: true,
