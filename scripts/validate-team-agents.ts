@@ -595,7 +595,14 @@ async function main() {
   }
 
   if (taskCase === 'runtime-mode-contract') {
+    const runtimeContractSchema = JSON.parse(readFileSync(path.join(process.cwd(), 'schemas', 'team-agents', 'team-runtime-contract.schema.json'), 'utf8'));
+    const validateRuntimeContract = new Ajv2020({ allErrors: true }).compile(runtimeContractSchema);
+    const assertRuntimeContractSchema = (contract: unknown, label: string) => {
+      assert.ok(validateRuntimeContract(contract), `${label} runtime contract must match schema: ${JSON.stringify(validateRuntimeContract.errors)}`);
+    };
+
     const defaultContract = buildTeamRuntimeContract({});
+    assertRuntimeContractSchema(defaultContract, 'default');
     assert.equal(defaultContract.runtimeMode, 'broker-only');
     assert.equal(defaultContract.runtimeLanguage, 'node');
     assert.equal(defaultContract.executionSurface, 'broker-governance');
@@ -630,6 +637,7 @@ async function main() {
       sdkId: 'node-sdk',
       modelId: 'model-a'
     });
+    assertRuntimeContractSchema(realAgentContract, 'real-agent');
     assert.equal(realAgentContract.runtimeMode, 'real-agent');
     assert.equal(realAgentContract.runtimeLanguage, 'python');
     assert.equal(realAgentContract.runtimeAdapterId, 'atm.node.reference');
@@ -640,6 +648,7 @@ async function main() {
     assert.equal(realAgentContract.agentsSpawned, true);
 
     const editorContract = buildTeamRuntimeContract({ runtimeMode: 'editor-subagent' });
+    assertRuntimeContractSchema(editorContract, 'editor-subagent');
     assert.equal(editorContract.executionSurface, 'editor-subagent');
     assert.equal(editorContract.runtimeLanguage, 'node');
 

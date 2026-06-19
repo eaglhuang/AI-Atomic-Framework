@@ -79,7 +79,8 @@ const supportSchemaEntries: Record<string, string> = {
   'test-report-metrics': 'schemas/test-report/metrics.schema.json',
   'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
   'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
-  'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json'
+  'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json',
+  'team-runtime-contract': 'schemas/team-agents/team-runtime-contract.schema.json'
 };
 
 const bannedProtectedSurfaceTerms = [
@@ -305,6 +306,7 @@ if (!brokerMutationRequestSchema) {
 const teamBrokerWriteTransactionSchema = ajv.getSchema('team-broker-write-transaction');
 const teamBrokerLaneSchema = ajv.getSchema('team-broker-lane');
 const teamBrokerRuntimeActivationSchema = ajv.getSchema('team-broker-runtime-activation');
+const teamRuntimeContractSchema = ajv.getSchema('team-runtime-contract');
 if (!teamBrokerWriteTransactionSchema) {
   fail('team broker write transaction schema must be registered');
 } else {
@@ -412,6 +414,70 @@ if (!teamBrokerWriteTransactionSchema) {
     };
     if (!teamBrokerRuntimeActivationSchema(runtimeActivationEvidence)) {
       fail(`team broker runtime activation schema must accept broker lane and scoped boundary evidence: ${formatErrors(teamBrokerRuntimeActivationSchema.errors)}`);
+    }
+  }
+
+  if (!teamRuntimeContractSchema) {
+    fail('team runtime contract schema must be registered');
+  } else {
+    const runtimeContractEvidence = {
+      schemaId: 'atm.teamRuntimeContract.v1',
+      runtimeMode: 'broker-only',
+      runtimeLanguage: 'node',
+      runtimeAdapterId: 'atm.node.broker-only-fallback',
+      providerId: 'local',
+      sdkId: 'nodejs',
+      modelId: 'provider-selected',
+      agentsSpawned: false,
+      executionSurface: 'broker-governance',
+      selectionReason: 'broker-only selected by schema fixture',
+      workerAdapter: {
+        schemaId: 'atm.teamWorkerAdapterContract.v1',
+        authorityBoundary: {
+          gitWrite: false,
+          taskLifecycle: false,
+          selfClose: false
+        }
+      },
+      artifactHandoff: {
+        schemaId: 'atm.teamArtifactHandoffContract.v1'
+      },
+      retryBudget: {
+        schemaId: 'atm.teamRetryBudgetContract.v1',
+        status: 'within-budget'
+      },
+      commitLane: {
+        schemaId: 'atm.teamCommitLaneContract.v1',
+        ownerRole: 'coordinator',
+        ownerPermissions: ['task.lifecycle', 'git.write', 'evidence.write'],
+        workerGitWrite: false,
+        serializedBy: 'branch-commit-queue',
+        lockSchemaId: 'atm.branchCommitQueueLock.v1',
+        retryableCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE']
+      },
+      brokerSubagent: {
+        schemaId: 'atm.teamBrokerSubagentContract.v1',
+        enabled: true,
+        subagentId: 'team-broker-subagent',
+        lifecycleOwner: 'atm',
+        decisionSurface: 'brokerLane',
+        governs: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+        stewardId: 'neutral-write-steward',
+        evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
+        authorityBoundary: {
+          fileWrite: false,
+          gitWrite: false,
+          taskLifecycle: false,
+          selfClose: false
+        },
+        escalationTarget: 'coordinator'
+      },
+      editorSubagentBridge: {
+        schemaId: 'atm.teamEditorSubagentBridgeContract.v1'
+      }
+    };
+    if (!teamRuntimeContractSchema(runtimeContractEvidence)) {
+      fail(`team runtime contract schema must accept broker subagent and serialized commit lane evidence: ${formatErrors(teamRuntimeContractSchema.errors)}`);
     }
   }
 }
