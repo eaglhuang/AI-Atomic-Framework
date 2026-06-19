@@ -30,6 +30,7 @@ export function loadRegistry(filePath: string): WriteBrokerRegistryDocument {
       specVersion: '0.1.0',
       repoId: 'local-repo',
       workspaceId: 'main',
+      currentEpoch: Date.now(),
       activeIntents: []
     };
   }
@@ -43,6 +44,7 @@ export function loadRegistry(filePath: string): WriteBrokerRegistryDocument {
       specVersion: '0.1.0',
       repoId: 'local-repo',
       workspaceId: 'main',
+      currentEpoch: Date.now(),
       activeIntents: []
     };
   }
@@ -102,6 +104,7 @@ export function registerIntent(
 
   return {
     ...doc,
+    currentEpoch: Date.now(),
     activeIntents: [...cleanedIntents, newActive]
   };
 }
@@ -123,6 +126,7 @@ export function renewIntentLease(
 
   return {
     ...doc,
+    currentEpoch: Date.now(),
     activeIntents: doc.activeIntents.map((intent) => {
       if (intent.intentId !== target.intentId) return intent;
       return {
@@ -142,6 +146,7 @@ export function releaseTask(
 ): WriteBrokerRegistryDocument {
   return {
     ...doc,
+    currentEpoch: Date.now(),
     activeIntents: doc.activeIntents.filter((entry) => entry.taskId !== taskId)
   };
 }
@@ -158,6 +163,7 @@ export function cleanupStale(
 
   return {
     ...doc,
+    currentEpoch: now,
     activeIntents: validIntents
   };
 }

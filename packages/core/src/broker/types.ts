@@ -192,6 +192,7 @@ export interface WriteBrokerRegistryDocument {
   readonly specVersion: '0.1.0';
   readonly repoId: string;
   readonly workspaceId: string;
+  readonly currentEpoch?: number;
   readonly activeIntents: readonly ActiveWriteIntent[];
 }
 

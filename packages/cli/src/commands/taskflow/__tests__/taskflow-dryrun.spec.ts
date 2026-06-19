@@ -185,12 +185,13 @@ function initGitRepo(repo: string) {
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 }
 
-function writeBrokerRegistry(repo: string, activeIntents: unknown[]) {
+function writeBrokerRegistry(repo: string, activeIntents: unknown[], options: { currentEpoch?: number } = {}) {
   writeJson(path.join(repo, '.atm/runtime/write-broker.registry.json'), {
     schemaId: 'atm.writeBrokerRegistry.v1',
     specVersion: '0.1.0',
     repoId: 'fixture-repo',
     workspaceId: 'main',
+    ...(typeof options.currentEpoch === 'number' ? { currentEpoch: options.currentEpoch } : {}),
     activeIntents
   });
 }
@@ -548,6 +549,43 @@ assert.match(
   String(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''),
   /tasks repair-claim --task TASK-OTHER-STALE-LEASE --actor "?validator"? --json/,
   'stale lease remediation must point to diagnose-first claim repair'
+);
+
+const brokerStaleEpochFixture = await makeBrokerCloseFixture('stale-epoch');
+writeBrokerRegistry(brokerStaleEpochFixture.targetRepo, [
+  makeActiveIntent({
+    taskId: brokerStaleEpochFixture.taskId,
+    actorId: 'validator',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-SELF-EPOCH'],
+    atomCids: ['CID-SELF-EPOCH']
+  }),
+  makeActiveIntent({
+    taskId: 'TASK-OTHER-STALE-EPOCH',
+    actorId: 'other',
+    files: ['src/app.ts'],
+    atomIds: ['ATOM-OTHER-EPOCH'],
+    atomCids: ['CID-OTHER-EPOCH'],
+    expiresAt: '2099-01-01T00:00:00.000Z'
+  })
+], { currentEpoch: 2 });
+const brokerStaleEpochDryRun = await runTaskflow([
+  'close',
+  '--cwd', brokerStaleEpochFixture.targetRepo,
+  '--task', brokerStaleEpochFixture.taskId,
+  '--actor', 'validator',
+  '--json'
+]) as any;
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'blocked-active-lease');
+assert.ok(
+  brokerStaleEpochDryRun.evidence.writeReadinessHint.blockers.some((entry: any) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'),
+  'leaseEpoch behind registry currentEpoch must block taskflow close --write readiness'
+);
+assert.match(
+  String(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''),
+  /tasks repair-claim --task TASK-OTHER-STALE-EPOCH --actor "?validator"? --json/,
+  'stale epoch remediation must point to diagnose-first claim repair'
 );
 
 const brokerCleanFixture = await makeBrokerCloseFixture('clean');

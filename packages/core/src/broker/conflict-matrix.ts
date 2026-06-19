@@ -22,7 +22,10 @@ export interface BrokerConflictMatrix {
 
 export function evaluateConflictMatrix(
   newIntent: WriteIntent,
-  activeIntents: readonly ActiveWriteIntent[]
+  activeIntents: readonly ActiveWriteIntent[],
+  options: {
+    readonly currentEpoch?: number;
+  } = {}
 ): BrokerConflictMatrix {
   const conflicts: BrokerConflictClassResult[] = [];
 
@@ -43,7 +46,7 @@ export function evaluateConflictMatrix(
   const fileConflicts = detectFileRangeConflictClasses(newIntent, activeIntents);
   conflicts.push(...fileConflicts);
 
-  const leaseConflicts = detectLeaseConflicts(activeIntents);
+  const leaseConflicts = detectLeaseConflicts(activeIntents, options.currentEpoch);
   conflicts.push(...leaseConflicts);
 
   const arbitrationVerdict = chooseArbitrationVerdict(conflicts);
@@ -290,11 +293,22 @@ function detectFileRangeConflictClasses(
   return conflicts;
 }
 
-function detectLeaseConflicts(activeIntents: readonly ActiveWriteIntent[]): BrokerConflictClassResult[] {
+function detectLeaseConflicts(
+  activeIntents: readonly ActiveWriteIntent[],
+  currentEpoch?: number
+): BrokerConflictClassResult[] {
   const conflicts: BrokerConflictClassResult[] = [];
   const now = Date.now();
 
   for (const active of activeIntents) {
+    if (typeof currentEpoch === 'number' && Number.isFinite(currentEpoch) && active.leaseEpoch < currentEpoch) {
+      conflicts.push({
+        kind: 'lease',
+        detail: `Active lease epoch stale for '${active.taskId}'; leaseEpoch ${active.leaseEpoch} is behind registry currentEpoch ${currentEpoch}.`,
+        blockingTask: active.taskId
+      });
+      continue;
+    }
     if (!active.expiresAt) continue;
     const expiresAt = Date.parse(active.expiresAt);
     if (Number.isNaN(expiresAt) || expiresAt <= now) {

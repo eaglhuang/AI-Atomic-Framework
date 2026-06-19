@@ -463,7 +463,14 @@ function runPreCommitHook(cwd: string) {
   // opened by tasks close / tasks reconcile). These authorize landing the close
   // artifacts after the regular direction lock has already released.
   const activeCloseCommitWindows = readActiveCloseCommitWindows(root);
-  const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => win.allowedFiles));
+  const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => [
+    ...win.allowedFiles,
+    `.atm/history/tasks/${win.taskId}.json`,
+    `.atm/history/evidence/${win.taskId}.json`,
+    `.atm/history/evidence/${win.taskId}.bundle-manifest.json`,
+    `.atm/history/evidence/${win.taskId}.closure-packet.json`,
+    `.atm/history/task-events/${win.taskId}/**`
+  ]));
   const taskOpenImportBundle = inspectTaskOpenImportBundleStagedArtifacts(root, stagedFiles);
   const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
     ? taskOpenImportBundle.ok
@@ -2754,6 +2761,10 @@ function inspectCloseCommitWindowStagedArtifacts(
   if (stagedFiles.length === 0) {
     return { ok: false, reason: 'no-staged-files' };
   }
+  const activeTaskWindow = readActiveCloseCommitWindows(cwd).find((entry) => entry.taskId === taskId) ?? null;
+  if (activeTaskWindow && stagedFiles.every((filePath) => isAllowedCloseCommitGovernanceArtifactPath(filePath, taskId))) {
+    return { ok: true, reason: 'active-close-commit-window-governance-bundle' };
+  }
   const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
   if (!windowRecord) {
     return { ok: false, reason: 'no-covering-window' };
@@ -2762,6 +2773,17 @@ function inspectCloseCommitWindowStagedArtifacts(
     return { ok: false, reason: `window-task-mismatch:${windowRecord.taskId}` };
   }
   return { ok: true, reason: null };
+}
+
+function isAllowedCloseCommitGovernanceArtifactPath(filePath: string, taskId: string): boolean {
+  const normalized = normalizeRelativePath(filePath);
+  const normalizedTaskId = taskId.toLowerCase();
+  const lower = normalized.toLowerCase();
+  return lower === `.atm/history/tasks/${normalizedTaskId}.json`
+    || lower === `.atm/history/evidence/${normalizedTaskId}.json`
+    || lower === `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`
+    || lower === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`
+    || (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json'));
 }
 
 function isStaticEvidenceArtifactPath(value: string): boolean {

@@ -206,6 +206,30 @@ function testTakeoverForStaleLease() {
   console.log('ok: stale lease maps to takeover');
 }
 
+function testTakeoverForStaleLeaseEpoch() {
+  const active = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      sharedSurfaces: {
+        generators: [],
+        projections: [],
+        registries: [],
+        validators: [],
+        artifacts: []
+      },
+      atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify', sourceRange: { filePath: 'src/lease-epoch.ts', lineStart: 1, lineEnd: 2 } }]
+    }),
+    'TASK-B',
+    { leaseEpoch: 1, expiresAt: '2099-01-01T00:00:00.000Z' }
+  );
+  const matrix = evaluateConflictMatrix(makeIntent({ taskId: 'TASK-C' }), [active], { currentEpoch: 2 });
+  assert.equal(matrix.arbitrationVerdict, 'takeover');
+  assert.equal(matrix.conflicts[0].kind, 'lease');
+  assert.match(matrix.conflicts[0].detail, /currentEpoch 2/);
+  console.log('ok: stale lease epoch maps to takeover');
+}
+
 function testFreezeForSameAtomCidWriteWrite() {
   const active = asActive(
     makeIntent({
@@ -337,6 +361,7 @@ testWatchForDisjointFileRange();
 testReadSetConflict();
 testTakeoverForMalformedIntent();
 testTakeoverForStaleLease();
+testTakeoverForStaleLeaseEpoch();
 testFreezeForSameAtomCidWriteWrite();
 testFreezeForSharedArtifactDrift();
 testFreezeForSharedRegistry();
