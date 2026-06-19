@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-19T13-55-25-463Z-close-e3677bd54c90",
+  "taskId": "TASK-AAO-0136",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260619134854-cursor-gpt-5.2-TASK-AAO-0136-d6b0a491f4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0136.json",
+  "taskSha256": "sha256:2a11476e723de3be3be4f6de2131b545a7abe487388be86059b9eda8004bbbd6",
+  "createdAt": "2026-06-19T13:55:25.463Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0136 --actor cursor-gpt-5.2 --status done --historical-delivery 6d5049ac5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260619134854-cursor-gpt-5.2-TASK-AAO-0136-d6b0a491f4",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0136.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-19T13:55:25.447Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0136-multi-captain-commit-ergonomics.task.md",
+        ".atm/history/evidence/TASK-AAO-0136.*",
+        ".atm/history/task-events/TASK-AAO-0136/**",
+        ".atm/history/tasks/TASK-AAO-0136.json",
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli/hook-audit-scope-classification.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "tests/cli/hook-audit-scope-classification.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
