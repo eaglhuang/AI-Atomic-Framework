@@ -77,6 +77,7 @@ const schemaEntries: Record<string, string> = {
 
 const supportSchemaEntries: Record<string, string> = {
   'test-report-metrics': 'schemas/test-report/metrics.schema.json',
+  'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
   'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json'
 };
 
@@ -301,6 +302,7 @@ if (!brokerMutationRequestSchema) {
 }
 
 const teamBrokerWriteTransactionSchema = ajv.getSchema('team-broker-write-transaction');
+const teamBrokerRuntimeActivationSchema = ajv.getSchema('team-broker-runtime-activation');
 if (!teamBrokerWriteTransactionSchema) {
   fail('team broker write transaction schema must be registered');
 } else {
@@ -333,6 +335,48 @@ if (!teamBrokerWriteTransactionSchema) {
   };
   if (!teamBrokerWriteTransactionSchema(transactionEvidence)) {
     fail(`team broker write transaction schema must accept the milestone-required fields: ${formatErrors(teamBrokerWriteTransactionSchema.errors)}`);
+  }
+
+  if (!teamBrokerRuntimeActivationSchema) {
+    fail('team broker runtime activation schema must be registered');
+  } else {
+    const runtimeActivationEvidence = {
+      schemaId: 'atm.teamBrokerRuntimeActivationHandshake.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+      actorId: 'schema-actor',
+      registryPath: '.atm/runtime/write-broker.registry.json',
+      brokerLane: {
+        schemaId: 'atm.teamBrokerLaneEvidence.v1',
+        taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+        actorId: 'schema-actor',
+        registryPath: '.atm/runtime/write-broker.registry.json',
+        safeToStart: true,
+        chosenLane: 'direct-brokered',
+        decision: {
+          verdict: 'parallel-safe',
+          lane: 'direct-brokered'
+        },
+        writeTransaction: transactionEvidence,
+        blockedReasons: []
+      },
+      activationState: 'activated',
+      scopedWriteExecution: {
+        approved: true,
+        allowedFiles: ['src/schema-target.ts'],
+        evidencePath: null,
+        acceptedInputs: ['PatchProposal', 'MergePlan', 'StewardPlan']
+      },
+      runtimeBoundary: {
+        gitWrite: false,
+        taskLifecycle: false,
+        selfClose: false
+      },
+      blockedReasons: []
+    };
+    if (!teamBrokerRuntimeActivationSchema(runtimeActivationEvidence)) {
+      fail(`team broker runtime activation schema must accept broker lane and scoped boundary evidence: ${formatErrors(teamBrokerRuntimeActivationSchema.errors)}`);
+    }
   }
 }
 

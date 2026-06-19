@@ -34,7 +34,10 @@ function readJson(relativePath: string) {
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 addFormats(ajv);
-const validateWriteTransaction = ajv.compile(readJson('schemas/team-agents/team-broker-write-transaction.schema.json'));
+const writeTransactionSchema = readJson('schemas/team-agents/team-broker-write-transaction.schema.json');
+ajv.addSchema(writeTransactionSchema);
+const validateWriteTransaction = ajv.compile(writeTransactionSchema);
+const validateRuntimeActivation = ajv.compile(readJson('schemas/team-agents/team-broker-runtime-activation.schema.json'));
 
 function formatAjvErrors(errors: typeof validateWriteTransaction.errors) {
   return (errors ?? [])
@@ -376,6 +379,10 @@ try {
   check(runtimeHandshake.evidence.runtimeBoundary.selfClose === false, 'broker runtime activation handshake must deny self-close');
   check(runtimeHandshake.evidence.scopedWriteExecution.approved === true, 'broker runtime activation handshake must approve scoped write execution');
   check(runtimeHandshake.evidence.scopedWriteExecution.allowedFiles.includes(sharedFile), 'broker runtime activation handshake must carry allowed files');
+  check(
+    validateRuntimeActivation(runtimeHandshake.evidence),
+    `real broker runtime activation handshake must match schema: ${formatAjvErrors(validateRuntimeActivation.errors)}`
+  );
 
   const runtimeCliHandshake = await runAtm([
     'broker', 'runtime', 'activate',
@@ -388,6 +395,10 @@ try {
   check((runtimeEvidence.handshake as Record<string, unknown>)?.activationState === 'activated', 'broker runtime activate CLI evidence must include activated handshake');
   check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.gitWrite === false, 'broker runtime activate CLI evidence must keep git.write denied');
   check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.selfClose === false, 'broker runtime activate CLI evidence must keep self-close denied');
+  check(
+    validateRuntimeActivation(runtimeEvidence.handshake),
+    `broker runtime activate CLI handshake must match schema: ${formatAjvErrors(validateRuntimeActivation.errors)}`
+  );
 
   assertBrokerRunLogKeepsTaskLinkage(tempRoot);
   await assertBrokerPlanBatchKeepsTransactionLinkage(tempRoot);

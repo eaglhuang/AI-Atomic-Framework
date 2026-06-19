@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-broker-runtime-activation.schema.json",
+  "title": "ATM Team Broker Runtime Activation Handshake v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "taskId",
+    "actorId",
+    "registryPath",
+    "brokerLane",
+    "activationState",
+    "scopedWriteExecution",
+    "runtimeBoundary",
+    "blockedReasons"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.teamBrokerRuntimeActivationHandshake.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "registryPath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "brokerLane": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "schemaId",
+        "taskId",
+        "actorId",
+        "registryPath",
+        "safeToStart",
+        "chosenLane",
+        "decision",
+        "writeTransaction",
+        "blockedReasons"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamBrokerLaneEvidence.v1"
+        },
+        "taskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registryPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "safeToStart": {
+          "type": "boolean"
+        },
+        "chosenLane": {
+          "enum": [
+            "direct-brokered",
+            "deterministic-composer",
+            "neutral-steward",
+            "serial",
+            "blocked"
+          ]
+        },
+        "decision": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["verdict", "lane"],
+          "properties": {
+            "verdict": {
+              "enum": [
+                "parallel-safe",
+                "needs-physical-split",
+                "blocked-cid-conflict",
+                "blocked-shared-surface",
+                "serial",
+                "blocked-active-lease"
+              ]
+            },
+            "lane": {
+              "enum": [
+                "direct-brokered",
+                "deterministic-composer",
+                "neutral-steward",
+                "serial",
+                "blocked"
+              ]
+            }
+          }
+        },
+        "writeTransaction": {
+          "$ref": "https://schemas.ai-atomic-framework.dev/team-agents/team-broker-write-transaction.schema.json"
+        },
+        "blockedReasons": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "activationState": {
+      "enum": ["activated", "blocked"]
+    },
+    "scopedWriteExecution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "approved",
+        "allowedFiles",
+        "evidencePath",
+        "acceptedInputs"
+      ],
+      "properties": {
+        "approved": {
+          "type": "boolean"
+        },
+        "allowedFiles": {
+          "$ref": "#/$defs/stringList"
+        },
+        "evidencePath": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "acceptedInputs": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "PatchProposal" },
+            { "const": "MergePlan" },
+            { "const": "StewardPlan" }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "runtimeBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gitWrite", "taskLifecycle", "selfClose"],
+      "properties": {
+        "gitWrite": {
+          "const": false
+        },
+        "taskLifecycle": {
+          "const": false
+        },
+        "selfClose": {
+          "const": false
+        }
+      }
+    },
+    "blockedReasons": {
+      "$ref": "#/$defs/stringList"
+    }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
