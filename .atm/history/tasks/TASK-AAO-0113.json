@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0113",
+  "title": "taskflow.profile.v1 contract",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0112"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/taskflow/profile-loader.ts",
+    "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "schemas/taskflow-profile.v1.json",
+    "fixtures/taskflow-profile/valid.profile.json",
+    "fixtures/taskflow-profile/invalid-missing-schema-id.profile.json",
+    "docs/specs/taskflow-profile-v1.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/command-specs/taskflow.spec.ts",
+    "packages/cli/src/commands/taskflow/profile-loader.ts",
+    "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "schemas/taskflow-profile.v1.json",
+    "fixtures/taskflow-profile/valid.profile.json",
+    "fixtures/taskflow-profile/invalid-missing-schema-id.profile.json",
+    "docs/specs/taskflow-profile-v1.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/next.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/batch.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/task-direction.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/lock.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/status.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/review.ts",
+    "C:/Users/User/AI-Atomic-Framework/.atm/**",
+    "C:/Users/User/AI-Atomic-Framework/release/**",
+    "C:/Users/User/AI-Atomic-Framework/docs/ai_atomic_framework/**",
+    "C:/Users/User/AI-Atomic-Framework/examples/**",
+    "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0112-*.task.md"
+  ],
+  "nonGoals": [
+    "Do not mutate AAF source files outside the explicit allowed_files whitelist.",
+    "Do not implement a second lifecycle.",
+    "Do not write task card, ledger, or shard from dry-run mode.",
+    "Do not mirror claim or close status.",
+    "Do not import, require, or spawn the 3KLife opener.",
+    "Do not touch TASK-AAO-0112.",
+    "Do not stage or commit unrelated dirty files."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0113-taskflow-profile-v1-contract.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-24.json"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0113-taskflow-profile-v1-contract.task.md",
+    "sectionTitle": "TASK-AAO-0113",
+    "headingLine": 87,
+    "hash": "c8f473dfc09985da"
+  },
+  "importedAt": "2026-06-19T14:30:06.934Z",
+  "lastTransitionId": "2026-06-19T14-35-51-556Z-close-6ccf49a505a6",
+  "lastTransitionAt": "2026-06-19T14:35:51.556Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-19T14:30:21.097Z",
+  "promotedAt": "2026-06-19T14:30:21.916Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-b7620842648a",
+    "claimedAt": "2026-06-19T14:30:34.360Z",
+    "heartbeatAt": "2026-06-19T14:35:51.552Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0113.json"
+    ],
+    "state": "released",
+    "reason": "Historical close TASK-AAO-0113 delivery 318d40b62; foreign WIP untouched"
+  },
+  "startedAt": "2026-06-19T14:30:34.360Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260619143034-cursor-gpt-5.2-TASK-AAO-0113-0db53dec07",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0113",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0113.*",
+      ".atm/history/task-events/TASK-AAO-0113/**",
+      ".atm/history/tasks/TASK-AAO-0113.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2106a1d52ee4484c404c6bd50441323d9e26f426382227dae3b888aaec18665f",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-19T14:30:38.096Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-19T14:35:51.552Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260619143034-cursor-gpt-5.2-TASK-AAO-0113-0db53dec07",
+  "closeReason": "Historical close TASK-AAO-0113 delivery 318d40b62; foreign WIP untouched",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0113.closure-packet.json"
+}
