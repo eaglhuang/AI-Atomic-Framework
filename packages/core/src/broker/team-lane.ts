@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
@@ -329,7 +330,7 @@ export function buildTeamBrokerWriteTransactionEvidence(input: {
     sessionId: null,
     instanceId: `${input.actorId}@local`,
     worktreeId: cwd,
-    branchRef: null,
+    branchRef: readGitBranchRef(cwd),
     baseHead: input.writeIntent.baseCommit,
     leaseEpoch,
     allowedFiles,
@@ -345,6 +346,13 @@ export function buildTeamBrokerWriteTransactionEvidence(input: {
     expiresAt,
     heartbeatAt: startedAt
   };
+}
+
+function readGitBranchRef(cwd: string): string | null {
+  const result = spawnSync('git', ['-C', cwd, 'symbolic-ref', '--short', 'HEAD'], { encoding: 'utf8' });
+  if (result.status !== 0) return null;
+  const branch = String(result.stdout ?? '').trim();
+  return branch || null;
 }
 
 function normalizePathList(entries: readonly string[]): readonly string[] {

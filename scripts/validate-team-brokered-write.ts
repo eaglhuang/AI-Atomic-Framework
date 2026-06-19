@@ -60,6 +60,12 @@ function commitText(cwd: string, message: string) {
   return String(sha.stdout ?? '').trim();
 }
 
+function readCurrentBranch(cwd: string) {
+  const result = spawnSync('git', ['-C', cwd, 'symbolic-ref', '--short', 'HEAD'], { encoding: 'utf8' });
+  check(result.status === 0, `git symbolic-ref failed: ${result.stderr || result.stdout}`);
+  return String(result.stdout ?? '').trim();
+}
+
 function ensureRequiredFiles() {
   for (const relativePath of [
     'package.json',
@@ -179,6 +185,7 @@ try {
   mkdirSync(sharedDir, { recursive: true });
   writeFileSync(path.join(tempRoot, sharedFile), 'alpha\n', 'utf8');
   commitText(tempRoot, 'base shared target for team broker fixture');
+  const tempBranchRef = readCurrentBranch(tempRoot);
 
   const overlapTaskId = 'TASK-TEAM-BROKER-OVERLAP';
   const blockedTaskId = 'TASK-TEAM-BROKER-BLOCKED';
@@ -230,6 +237,7 @@ try {
   check(overlapResult.evidence.writeTransaction.actorId === 'team-planner', 'write transaction must carry actor id');
   check(overlapResult.evidence.writeTransaction.instanceId === 'team-planner@local', 'write transaction must carry instance id');
   check(overlapResult.evidence.writeTransaction.worktreeId === tempRoot, 'write transaction must carry worktree id');
+  check(overlapResult.evidence.writeTransaction.branchRef === tempBranchRef, 'write transaction must carry current branch ref');
   check(overlapResult.evidence.writeTransaction.baseHead === overlapResult.evidence.writeIntent.baseCommit, 'write transaction baseHead must match write intent base commit');
   check(overlapResult.evidence.writeTransaction.allowedFiles.includes(sharedFile), 'write transaction must include allowed files');
   check(overlapResult.evidence.writeTransaction.readSet.includes(sharedFile), 'write transaction must include read set');
