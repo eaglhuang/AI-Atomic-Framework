@@ -175,6 +175,49 @@ function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
   check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | src/shared-target.ts | TASK-TEAM-BROKER-LOG | abc123teamlogcommit | txn-team-log-1 | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task, commit, and transaction linkage');
 }
 
+async function assertBrokerPlanBatchKeepsTransactionLinkage(cwd: string) {
+  const brokeredTextFile = 'docs/broker-transaction-log.md';
+  const brokeredTextPath = path.join(cwd, brokeredTextFile);
+  mkdirSync(path.dirname(brokeredTextPath), { recursive: true });
+  writeFileSync(brokeredTextPath, 'alpha\n', 'utf8');
+  const requestPath = path.join(cwd, 'broker-request-with-transaction.json');
+  const runEvidenceDir = path.join(cwd, 'broker-plan-runs');
+  writeJson(requestPath, {
+    schemaId: 'atm.mutationRequest.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'team broker transaction fixture' },
+    requestId: 'req-team-cli-transaction',
+    actorId: 'coordinator-1',
+    taskId: 'TASK-TEAM-BROKER-CLI-TXN',
+    transactionId: 'txn-team-cli-transaction',
+    filePath: brokeredTextFile,
+    op: 'append',
+    target: 'EOF',
+    value: 'gamma'
+  });
+
+  const result = await runAtm([
+    'broker', 'plan-batch',
+    '--request-file', requestPath,
+    '--apply',
+    '--run-evidence-dir', runEvidenceDir
+  ], cwd);
+  check(result.exitCode === 0 && result.parsed.ok === true, `broker plan-batch apply must pass: ${JSON.stringify(result.parsed)}`);
+
+  const runRecords = (result.parsed.evidence as Record<string, unknown>)?.runRecords as Array<Record<string, unknown>> | undefined;
+  check(runRecords?.[0]?.transaction_ids instanceof Array, 'broker plan-batch run record must expose transaction_ids');
+  check((runRecords?.[0]?.transaction_ids as string[]).includes('txn-team-cli-transaction'), 'broker plan-batch run record must preserve request transaction id');
+
+  const runEvidencePath = (result.parsed.evidence as Record<string, unknown>)?.runEvidencePath;
+  check(typeof runEvidencePath === 'string' && runEvidencePath.length > 0, 'broker plan-batch must report run evidence path');
+  const envelope = JSON.parse(readFileSync(path.join(cwd, runEvidencePath as string), 'utf8')) as Record<string, unknown>;
+  const persistedRecords = envelope.records as Array<Record<string, unknown>>;
+  check(
+    (persistedRecords?.[0]?.transaction_ids as string[] | undefined)?.includes('txn-team-cli-transaction') === true,
+    'broker plan-batch persisted run envelope must preserve request transaction id'
+  );
+}
+
 ensureRequiredFiles();
 ensureConfigWiring();
 
@@ -331,6 +374,7 @@ try {
   check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.selfClose === false, 'broker runtime activate CLI evidence must keep self-close denied');
 
   assertBrokerRunLogKeepsTaskLinkage(tempRoot);
+  await assertBrokerPlanBatchKeepsTransactionLinkage(tempRoot);
 
   console.log(`[team-brokered-write:${mode}] ok`);
 } finally {

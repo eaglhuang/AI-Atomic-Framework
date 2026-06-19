@@ -784,7 +784,8 @@ export async function runBroker(argv: string[]) {
           laneDecision: entry.verdict,
           mergeVerdict: entry.mergeDecision,
           evidencePath: runEvidencePathRelative ?? 'unknown',
-          appliedFiles: [entry.filePath]
+          appliedFiles: [entry.filePath],
+          transactionIds: extractMutationRequestTransactionIds(request)
         }));
       }
 
@@ -936,6 +937,23 @@ function buildMutationEvidence(
     mergeDecision,
     verdict
   };
+}
+
+function extractMutationRequestTransactionIds(request: MutationRequest): readonly string[] {
+  const source = request as MutationRequest & {
+    transactionId?: unknown;
+    transactionIds?: unknown;
+    transaction_ids?: unknown;
+  };
+  const values = [
+    source.transactionId,
+    ...(Array.isArray(source.transactionIds) ? source.transactionIds : [source.transactionIds]),
+    ...(Array.isArray(source.transaction_ids) ? source.transaction_ids : [source.transaction_ids])
+  ];
+  return [...new Set(values
+    .map((value) => typeof value === 'string' ? value.trim() : '')
+    .filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
 }
 
 interface ParsedBrokerOptions {
