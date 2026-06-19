@@ -67,6 +67,7 @@ const schemaEntries: Record<string, string> = {
   'merge-plan': 'schemas/governance/merge-plan.schema.json',
   'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
   'broker-mutation-request': 'schemas/broker/mutation-request.schema.json',
+  'broker-operation-run-record': 'schemas/broker/operation-run-record.schema.json',
   'broker-conflict-key': 'schemas/broker/conflict-key.schema.json',
   'broker-merge-decision': 'schemas/broker/merge-decision.schema.json',
   'broker-mutation-batch-plan': 'schemas/broker/mutation-batch-plan.schema.json',
@@ -295,6 +296,42 @@ if (!brokerMutationRequestSchema) {
   };
   if (!brokerMutationRequestSchema(transactionLinkedRequest)) {
     fail(`broker mutation request must accept transaction linkage fields: ${formatErrors(brokerMutationRequestSchema.errors)}`);
+  }
+}
+
+const brokerOperationRunRecordSchema = ajv.getSchema('broker-operation-run-record');
+if (!brokerOperationRunRecordSchema) {
+  fail('broker operation run record schema must be registered');
+} else {
+  const operationRunRecordEnvelope = {
+    schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'schema operation run fixture' },
+    runId: 'run-schema-operation-log',
+    planId: 'plan-schema-operation-log',
+    records: [
+      {
+        schemaId: 'atm.brokerOperationRunRecord.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'schema operation run fixture' },
+        runId: 'run-schema-operation-log',
+        planId: 'plan-schema-operation-log',
+        request_identity: ['req-schema-operation-log'],
+        actor_ids: ['schema-validator'],
+        request_files: ['docs/broker-operation-log.md'],
+        adapter_choice: 'text-range',
+        applied_files: ['docs/broker-operation-log.md'],
+        lane_decision: 'neutral-steward',
+        merge_verdict: 'mergeable',
+        evidence_path: '.atm/history/evidence/broker-runs/run-schema-operation-log.json',
+        task_ids: ['TASK-TEAM-SCHEMA-OPLOG'],
+        commit_sha: 'abc123schemaoperation',
+        transaction_ids: ['txn-schema-operation-log']
+      }
+    ]
+  };
+  if (!brokerOperationRunRecordSchema(operationRunRecordEnvelope)) {
+    fail(`broker operation run record schema must accept task/commit/transaction linkage: ${formatErrors(brokerOperationRunRecordSchema.errors)}`);
   }
 }
 
