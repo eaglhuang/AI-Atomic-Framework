@@ -76,6 +76,7 @@ const schemaEntries: Record<string, string> = {
 };
 
 const supportSchemaEntries: Record<string, string> = {
+  'branch-commit-queue': 'schemas/governance/branch-commit-queue.schema.json',
   'test-report-metrics': 'schemas/test-report/metrics.schema.json',
   'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
   'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
@@ -277,6 +278,40 @@ if (!registryV1Schema?.$defs?.registryVersion?.properties?.semanticFingerprint) 
 const policeRegistryCandidateSchema = schemas.get('police-registry-candidate-report');
 if (policeRegistryCandidateSchema?.properties?.candidateStatus?.enum?.join(',') !== 'draft,validated,active,transitioning,deprecated,expired,quarantined') {
   fail('police registry candidate status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
+}
+
+const branchCommitQueueSchema = ajv.getSchema('branch-commit-queue');
+if (!branchCommitQueueSchema) {
+  fail('branch commit queue schema must be registered');
+} else {
+  const queueEvidence = {
+    schemaId: 'atm.branchCommitQueueEvidence.v1',
+    serializedBy: 'branch-commit-queue',
+    actorId: 'schema-actor',
+    taskId: 'TASK-TEAM-SCHEMA-COMMIT',
+    branchRef: 'refs/heads/main',
+    branchName: 'main',
+    headShaAtAcquire: 'abc123schema-before',
+    headShaAfterCommit: 'abc123schema-after',
+    retryableBusyCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY',
+    retryableRaceCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'
+  };
+  if (!branchCommitQueueSchema(queueEvidence)) {
+    fail(`branch commit queue schema must accept commit lane evidence: ${formatErrors(branchCommitQueueSchema.errors)}`);
+  }
+  const queueLock = {
+    schemaId: 'atm.branchCommitQueueLock.v1',
+    specVersion: '0.1.0',
+    actorId: 'schema-actor',
+    taskId: 'TASK-TEAM-SCHEMA-COMMIT',
+    branchRef: 'refs/heads/main',
+    branchName: 'main',
+    headShaAtAcquire: 'abc123schema-before',
+    createdAt: '2026-06-19T00:00:00.000Z'
+  };
+  if (!branchCommitQueueSchema(queueLock)) {
+    fail(`branch commit queue schema must accept lock record evidence: ${formatErrors(branchCommitQueueSchema.errors)}`);
+  }
 }
 
 const brokerMutationRequestSchema = ajv.getSchema('broker-mutation-request');

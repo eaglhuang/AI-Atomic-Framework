@@ -3,10 +3,20 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 import { resolveTaskScopedCommitBundle, runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped-staging');
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+const branchCommitQueueSchema = JSON.parse(readFileSync(path.join(root, 'schemas', 'governance', 'branch-commit-queue.schema.json'), 'utf8'));
+const validateBranchCommitQueue = ajv.compile(branchCommitQueueSchema);
+
+function assertBranchCommitQueueSchema(value: unknown, label: string) {
+  assert.ok(validateBranchCommitQueue(value), `${label} must match branch commit queue schema: ${JSON.stringify(validateBranchCommitQueue.errors)}`);
+}
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -156,6 +166,7 @@ try {
   assert.equal(typeof importCommit.evidence?.commitSha, 'string');
   assert.equal((importCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
   assert.equal((importCommit.evidence as any).branchCommitQueue?.retryableRaceCode, 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE');
+  assertBranchCommitQueueSchema((importCommit.evidence as any).branchCommitQueue, 'import commit branch queue evidence');
 
   const unstagedCommit = expectCliError(
     runAtmGit([
@@ -228,6 +239,7 @@ try {
   assert.equal(typeof autoStageCommit.evidence?.commitSha, 'string');
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.taskId, taskId);
+  assertBranchCommitQueueSchema((autoStageCommit.evidence as any).branchCommitQueue, 'auto-stage commit branch queue evidence');
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
   rmSync(path.join(tempDir, outsideFile), { force: true });
 
@@ -235,7 +247,7 @@ try {
   const branchRef = runGit(tempDir, ['symbolic-ref', '-q', 'HEAD']).trim();
   const branchQueueLockPath = path.join(tempDir, '.atm/runtime/locks', `git-commit-queue-${branchRef.replace(/[^A-Za-z0-9._-]+/g, '-')}.lock`);
   mkdirSync(branchQueueLockPath, { recursive: true });
-  writeJson(path.join(branchQueueLockPath, 'record.json'), {
+  const busyLockRecord = {
     schemaId: 'atm.branchCommitQueueLock.v1',
     specVersion: '0.1.0',
     actorId: 'other-agent',
@@ -244,7 +256,9 @@ try {
     branchName: branchRef.replace(/^refs\/heads\//, ''),
     headShaAtAcquire: runGit(tempDir, ['rev-parse', '--verify', 'HEAD']).trim(),
     createdAt: '2026-06-18T00:00:00.000Z'
-  });
+  };
+  assertBranchCommitQueueSchema(busyLockRecord, 'busy branch queue lock record');
+  writeJson(path.join(branchQueueLockPath, 'record.json'), busyLockRecord);
   const queueBusy = expectCliError(
     runAtmGit([
       'commit',

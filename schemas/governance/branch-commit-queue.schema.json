@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/branch-commit-queue.schema.json",
+  "title": "ATM Branch Commit Queue Evidence v1",
+  "oneOf": [
+    { "$ref": "#/$defs/evidence" },
+    { "$ref": "#/$defs/lockRecord" }
+  ],
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "serializedBy",
+        "actorId",
+        "taskId",
+        "branchRef",
+        "branchName",
+        "headShaAtAcquire",
+        "headShaAfterCommit",
+        "retryableBusyCode",
+        "retryableRaceCode"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.branchCommitQueueEvidence.v1"
+        },
+        "serializedBy": {
+          "const": "branch-commit-queue"
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taskId": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "branchRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branchName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "headShaAtAcquire": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "headShaAfterCommit": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "retryableBusyCode": {
+          "const": "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY"
+        },
+        "retryableRaceCode": {
+          "const": "ATM_GIT_COMMIT_BRANCH_QUEUE_RACE"
+        }
+      }
+    },
+    "lockRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "specVersion",
+        "actorId",
+        "taskId",
+        "branchRef",
+        "branchName",
+        "headShaAtAcquire",
+        "createdAt"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.branchCommitQueueLock.v1"
+        },
+        "specVersion": {
+          "const": "0.1.0"
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "taskId": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "branchRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branchName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "headShaAtAcquire": {
+          "type": ["string", "null"],
+          "minLength": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
