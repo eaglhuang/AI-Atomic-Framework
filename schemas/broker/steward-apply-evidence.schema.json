@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/broker/steward-apply-evidence.schema.json",
+  "title": "ATM Steward Apply Evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "stewardId",
+    "mergePlanId",
+    "proposalIds",
+    "targetFiles",
+    "appliedFiles",
+    "fileBeforeHashes",
+    "fileAfterHashes",
+    "permissions",
+    "applyMethod",
+    "verdict"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.stewardApplyEvidence.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "stewardId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mergePlanId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposalIds": {
+      "$ref": "#/$defs/stringList"
+    },
+    "targetFiles": {
+      "$ref": "#/$defs/stringList"
+    },
+    "appliedFiles": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "fileBeforeHashes": {
+      "$ref": "#/$defs/hashMap"
+    },
+    "fileAfterHashes": {
+      "$ref": "#/$defs/hashMap"
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileWrite", "gitWrite", "taskLifecycle", "selfClose"],
+      "properties": {
+        "fileWrite": {
+          "$ref": "#/$defs/stringList"
+        },
+        "gitWrite": {
+          "const": false
+        },
+        "taskLifecycle": {
+          "const": false
+        },
+        "selfClose": {
+          "const": false
+        }
+      }
+    },
+    "applyMethod": {
+      "enum": [
+        "patch-apply",
+        "ast-rewrite",
+        "git-three-way-fallback",
+        "steward-authored-final-patch"
+      ]
+    },
+    "verdict": {
+      "enum": ["applied", "blocked"]
+    },
+    "blockedReasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "mutationEvidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "brokerOperationRun": {
+      "$ref": "https://schemas.ai-atomic-framework.dev/broker/operation-run-record.schema.json"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "hashMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

@@ -68,6 +68,7 @@ const schemaEntries: Record<string, string> = {
   'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
   'broker-mutation-request': 'schemas/broker/mutation-request.schema.json',
   'broker-operation-run-record': 'schemas/broker/operation-run-record.schema.json',
+  'broker-steward-apply-evidence': 'schemas/broker/steward-apply-evidence.schema.json',
   'broker-conflict-key': 'schemas/broker/conflict-key.schema.json',
   'broker-merge-decision': 'schemas/broker/merge-decision.schema.json',
   'broker-mutation-batch-plan': 'schemas/broker/mutation-batch-plan.schema.json',
@@ -518,6 +519,7 @@ if (!teamBrokerWriteTransactionSchema) {
 }
 
 const brokerOperationRunRecordSchema = ajv.getSchema('broker-operation-run-record');
+const brokerStewardApplyEvidenceSchema = ajv.getSchema('broker-steward-apply-evidence');
 if (!brokerOperationRunRecordSchema) {
   fail('broker operation run record schema must be registered');
 } else {
@@ -550,6 +552,39 @@ if (!brokerOperationRunRecordSchema) {
   };
   if (!brokerOperationRunRecordSchema(operationRunRecordEnvelope)) {
     fail(`broker operation run record schema must accept task/commit/transaction linkage: ${formatErrors(brokerOperationRunRecordSchema.errors)}`);
+  }
+
+  if (!brokerStewardApplyEvidenceSchema) {
+    fail('broker steward apply evidence schema must be registered');
+  } else {
+    const stewardApplyEvidence = {
+      schemaId: 'atm.stewardApplyEvidence.v1',
+      specVersion: '0.1.0',
+      migration: { strategy: 'none', fromVersion: null, notes: 'schema steward apply fixture' },
+      stewardId: 'neutral-write-steward',
+      mergePlanId: 'plan-schema-operation-log',
+      proposalIds: ['proposal-schema-steward'],
+      targetFiles: ['docs/broker-operation-log.md'],
+      appliedFiles: ['docs/broker-operation-log.md'],
+      fileBeforeHashes: {
+        'docs/broker-operation-log.md': 'sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+      },
+      fileAfterHashes: {
+        'docs/broker-operation-log.md': 'sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789'
+      },
+      permissions: {
+        fileWrite: ['docs/broker-operation-log.md'],
+        gitWrite: false,
+        taskLifecycle: false,
+        selfClose: false
+      },
+      applyMethod: 'patch-apply',
+      verdict: 'applied',
+      brokerOperationRun: operationRunRecordEnvelope
+    };
+    if (!brokerStewardApplyEvidenceSchema(stewardApplyEvidence)) {
+      fail(`broker steward apply evidence schema must accept steward boundary and operation linkage: ${formatErrors(brokerStewardApplyEvidenceSchema.errors)}`);
+    }
   }
 }
 

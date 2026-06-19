@@ -4,6 +4,8 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 import { composeBrokerProposals } from '../packages/core/src/broker/compose.ts';
 import { applyStewardPlan, planStewardApply } from '../packages/core/src/broker/steward.ts';
 import { runBroker } from '../packages/cli/src/commands/broker.ts';
@@ -21,6 +23,21 @@ function check(condition: unknown, message: string) {
 
 function readJson(relativePath: string) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
+}
+
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+ajv.addSchema(readJson('schemas/broker/operation-run-record.schema.json'));
+const validateStewardApplyEvidence = ajv.compile(readJson('schemas/broker/steward-apply-evidence.schema.json'));
+
+function formatAjvErrors(errors: any) {
+  return (errors || [])
+    .map((error: any) => `${error.instancePath || '/'} ${error.message}`)
+    .join('; ');
+}
+
+function assertStewardApplyEvidence(value: unknown, label: string) {
+  check(validateStewardApplyEvidence(value), `${label} must match steward apply evidence schema: ${formatAjvErrors(validateStewardApplyEvidence.errors)}`);
 }
 
 function writeJson(filePath: string, value: unknown) {
@@ -187,6 +204,8 @@ try {
   check(apply.evidence.permissions.gitWrite === false, 'steward evidence must deny git.write');
   check(apply.evidence.permissions.taskLifecycle === false, 'steward evidence must deny task.lifecycle');
   check(apply.evidence.verdict === 'applied', 'steward evidence must record applied verdict');
+  assertStewardApplyEvidence(apply.evidence, 'direct steward apply evidence');
+  assertStewardApplyEvidence(JSON.parse(readFileSync(evidencePath, 'utf8')), 'persisted steward apply evidence');
 
   const scopeBlocked = planStewardApply({
     cwd: tempRoot,
@@ -295,6 +314,8 @@ try {
     cliApply.parsed.evidence?.scopedWriteExecution?.virtualAtomInUseRegistry?.activeVirtualAtoms?.length === 1,
     'steward apply CLI must carry the same virtual atom in-use registry'
   );
+  assertStewardApplyEvidence(cliApply.parsed.evidence?.applyEvidence, 'CLI steward apply evidence');
+  assertStewardApplyEvidence(JSON.parse(readFileSync(evidencePath, 'utf8')), 'CLI persisted steward apply evidence');
 
   console.log(`[broker-steward:${mode}] ok`);
 } finally {
