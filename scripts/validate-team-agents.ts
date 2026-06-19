@@ -17,7 +17,7 @@ import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/t
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
-import { teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
+import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
@@ -696,6 +696,11 @@ async function main() {
   }
 
   if (taskCase === 'command-spec-broker-surface') {
+    assert.ok(teamSpecBrokerLane.summary.includes('write transaction identity'));
+    assert.ok(teamSpecBrokerLane.summary.includes('lease epoch'));
+    assert.ok(teamSpecBrokerLane.summary.includes('read/write sets'));
+    assert.ok(teamSpecBrokerLane.summary.includes('file hashes'));
+    assert.ok(teamSpecBrokerLane.summary.includes('broker decision linkage'));
     assert.ok(teamSpecRuntimeStatus.summary.includes('broker subagent status fields'));
     assert.ok(teamSpecRuntimeStatus.summary.includes('serialized commit lane'));
     assert.ok(teamSpecRuntimeStatus.examples.some((entry) => entry.includes('team status --compact')));
