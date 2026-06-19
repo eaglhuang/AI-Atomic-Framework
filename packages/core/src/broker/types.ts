@@ -239,6 +239,9 @@ export interface MutationRequest {
   readonly requestId: string;
   readonly actorId: string;
   readonly taskId?: string;
+  readonly transactionId?: string;
+  readonly transactionIds?: readonly string[];
+  readonly transaction_ids?: readonly string[];
   readonly filePath: string;
   readonly op: string;
   readonly target: string;

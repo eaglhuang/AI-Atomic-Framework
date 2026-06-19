@@ -274,6 +274,30 @@ if (policeRegistryCandidateSchema?.properties?.candidateStatus?.enum?.join(',') 
   fail('police registry candidate status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
 }
 
+const brokerMutationRequestSchema = ajv.getSchema('broker-mutation-request');
+if (!brokerMutationRequestSchema) {
+  fail('broker mutation request schema must be registered');
+} else {
+  const transactionLinkedRequest = {
+    schemaId: 'atm.mutationRequest.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'schema transaction linkage fixture' },
+    requestId: 'req-schema-transaction-link',
+    actorId: 'schema-validator',
+    taskId: 'TASK-TEAM-SCHEMA-TXN',
+    transactionId: 'txn-schema-single',
+    transactionIds: ['txn-schema-camel'],
+    transaction_ids: ['txn-schema-snake'],
+    filePath: 'docs/broker-transaction-link.md',
+    op: 'append',
+    target: 'EOF',
+    value: 'schema transaction linkage'
+  };
+  if (!brokerMutationRequestSchema(transactionLinkedRequest)) {
+    fail(`broker mutation request must accept transaction linkage fields: ${formatErrors(brokerMutationRequestSchema.errors)}`);
+  }
+}
+
 const versionIndexSchema = schemas.get('version-index');
 if (versionIndexSchema?.minProperties !== 1) {
   fail('version-index must require at least one row');
