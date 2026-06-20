@@ -377,6 +377,29 @@ try {
   assert.equal(existsSync(userResiduePath), true, 'user-authored dirty files must never be auto-cleaned');
   rmSync(userResiduePath, { force: true });
 
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "runtime-noise";\n', 'utf8');
+  const runtimeSnapshotPath = path.join(tempDir, '.atm/runtime/snapshots/close-window-foreign-staged-TASK-OTHER-9999-1781880000001.json');
+  writeJson(runtimeSnapshotPath, { taskId: 'TASK-OTHER-9999', files: ['src/other.ts'] });
+  const teamRunPath = path.join(tempDir, '.atm/runtime/team-runs/team-foreign.json');
+  writeJson(teamRunPath, { taskId: 'TASK-OTHER-9999', teamRunId: 'team-foreign', status: 'active' });
+  const transientScratchPath = path.join(tempDir, '.atm/_close-runtime-noise.json');
+  writeJson(transientScratchPath, { fixture: true });
+  const runtimeNoiseCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: ignore runtime residue',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(runtimeNoiseCommit.ok, true);
+  assert.equal(existsSync(runtimeSnapshotPath), true, 'runtime snapshots outside the task bundle should be ignored, not committed');
+  assert.equal(existsSync(teamRunPath), true, 'foreign team-run runtime records must not block the current task commit');
+  assert.equal(existsSync(transientScratchPath), true, 'atm scratch json residue should be ignored by task-scoped commit gating');
+  assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(scopedFile), true);
+
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "isolated";\n', 'utf8');
   const unrelatedStagedFile = 'src/unrelated.ts';
   writeFileSync(path.join(tempDir, unrelatedStagedFile), 'export const unrelated = true;\n', 'utf8');
