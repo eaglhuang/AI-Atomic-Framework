@@ -152,13 +152,14 @@ function seedRegistry(cwd: string, intent: WriteIntent) {
 function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
   const runDir = path.join(cwd, 'broker-runs');
   const logPath = path.join(cwd, 'broker-run-log.md');
+  const reportPath = path.join(cwd, 'broker-run-report.md');
   mkdirSync(runDir, { recursive: true });
 
   const request = {
     schemaId: 'atm.mutationRequest.v1' as const,
     specVersion: '0.1.0' as const,
     migration: { strategy: 'none' as const, fromVersion: null, notes: 'team broker log fixture' },
-    requestId: 'req-team-log-1',
+    requestId: 'bench:B-12:TASK-TEAM-BROKER-LOG:req-team-log-1',
     actorId: 'coordinator-1',
     taskId: 'TASK-TEAM-BROKER-LOG',
     filePath: 'src/shared-target.ts',
@@ -192,13 +193,17 @@ function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
 
   const result = spawnSync(
     process.execPath,
-    ['--strip-types', path.join(root, 'scripts', 'scan-broker-runs.ts'), '--run-dir', runDir, '--log-file', logPath, '--compact'],
+    ['--strip-types', path.join(root, 'scripts', 'scan-broker-runs.ts'), '--run-dir', runDir, '--log-file', logPath, '--report-output', reportPath, '--compact'],
     { encoding: 'utf8' }
   );
   check(result.status === 0, `scan-broker-runs failed: ${result.stderr || result.stdout}`);
   const logText = readFileSync(logPath, 'utf8');
-  check(logText.includes('| runId | planId | requestCount | actorCount | files | tasks | commits | transactions | adapter | lane | verdict | evidence |'), 'broker run log must expose tasks, commits, and transactions columns');
-  check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | src/shared-target.ts | TASK-TEAM-BROKER-LOG | abc123teamlogcommit | txn-team-log-1 | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task, commit, and transaction linkage');
+  check(logText.includes('| runId | planId | requestCount | actorCount | scenarioTags | requestIdentities | actors | taskHints | files | tasks | commits | transactions | adapter | lane | verdict | evidence |'), 'broker run log must expose the expanded broker evidence columns');
+  check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | B-12 | bench:B-12:TASK-TEAM-BROKER-LOG:req-team-log-1 | coordinator-1 | TASK-TEAM-BROKER-LOG | src/shared-target.ts | TASK-TEAM-BROKER-LOG | abc123teamlogcommit | txn-team-log-1 | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task, commit, and transaction linkage');
+
+  const reportText = readFileSync(reportPath, 'utf8');
+  check(reportText.includes('| runId | scenario | task | actor | shared files | lane | verdict |'), 'broker evidence report must expose the report columns');
+  check(reportText.includes('| run-team-log-1 | B-12 | TASK-TEAM-BROKER-LOG | coordinator-1 | src/shared-target.ts | neutral-steward | mergeable |'), 'broker evidence report must preserve the shared file and lane summary');
 }
 
 async function assertBrokerPlanBatchKeepsTransactionLinkage(cwd: string) {

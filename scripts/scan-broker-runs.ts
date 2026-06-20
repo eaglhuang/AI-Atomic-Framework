@@ -24,6 +24,10 @@ interface BrokerRunSummary {
   planId: string;
   requestCount: number;
   actorCount: number;
+  scenarioTags: string;
+  requestIdentities: string;
+  actors: string;
+  taskHints: string;
   files: string;
   tasks: string;
   commits: string;
@@ -85,11 +89,40 @@ function parseLogFile(logFile: string | boolean | undefined): string {
   );
 }
 
+function parseJsonOutputFile(jsonOutputFile: string | boolean | undefined): string | null {
+  if (typeof jsonOutputFile === 'string' && jsonOutputFile.trim()) {
+    return path.resolve(jsonOutputFile);
+  }
+  return null;
+}
+
 function getUniqueSet(values: readonly string[] | undefined | null): readonly string[] {
   if (!values || values.length === 0) {
     return [];
   }
   return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+}
+
+function parseScenarioTag(requestId: string): string | null {
+  const parts = requestId.split(':');
+  if (parts.length >= 2 && parts[0] === 'bench') {
+    return parts[1] ?? null;
+  }
+  return null;
+}
+
+function parseTaskIdHint(requestId: string): string | null {
+  const parts = requestId.split(':');
+  for (const part of parts) {
+    if (part.startsWith('TASK-')) {
+      return part;
+    }
+  }
+  return null;
+}
+
+function escapeMarkdownCell(value: string): string {
+  return value.replace(/\|/g, '\\|');
 }
 
 function readExistingSeenRunIds(logPath: string): Set<string> {
@@ -125,6 +158,8 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
   const actorIds = new Set<string>();
   const files = new Set<string>();
   const taskIds = new Set<string>();
+  const scenarioTags = new Set<string>();
+  const taskHints = new Set<string>();
   const commits = new Set<string>();
   const transactions = new Set<string>();
   const adapters = new Set<string>();
@@ -133,6 +168,14 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
   for (const record of records) {
     for (const requestId of getUniqueSet(record.request_identity)) {
       requestIds.add(requestId);
+      const scenarioTag = parseScenarioTag(requestId);
+      if (scenarioTag) {
+        scenarioTags.add(scenarioTag);
+      }
+      const taskHint = parseTaskIdHint(requestId);
+      if (taskHint) {
+        taskHints.add(taskHint);
+      }
     }
     for (const actorId of getUniqueSet(record.actor_ids)) {
       actorIds.add(actorId);
@@ -168,6 +211,10 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
     planId,
     requestCount: requestIds.size || records.length,
     actorCount: actorIds.size || 1,
+    scenarioTags: [...scenarioTags].join(',') || 'n/a',
+    requestIdentities: [...requestIds].join(',') || 'n/a',
+    actors: [...actorIds].join(',') || 'n/a',
+    taskHints: [...taskHints].join(',') || 'n/a',
     files: [...files].join(',') || path.basename(filePath),
     tasks: [...taskIds].join(',') || 'n/a',
     commits: [...commits].join(',') || 'n/a',
@@ -179,21 +226,57 @@ function summarizeRunEnvelope(filePath: string, envelope: BrokerOperationRunReco
   };
 }
 
-function buildMarkdownSection(runs: BrokerRunSummary[]) {
+function buildMarkdownSection(runs: readonly BrokerRunSummary[]) {
   if (runs.length === 0) {
     return '';
   }
   const rows = runs.map((run) => {
-    return `| ${run.runId} | ${run.planId} | ${run.requestCount} | ${run.actorCount} | ${run.files} | ${run.tasks} | ${run.commits} | ${run.transactions} | ${run.adapter} | ${run.lane} | ${run.verdict} | ${run.evidence} |`;
+    return `| ${escapeMarkdownCell(run.runId)} | ${escapeMarkdownCell(run.planId)} | ${run.requestCount} | ${run.actorCount} | ${escapeMarkdownCell(run.scenarioTags)} | ${escapeMarkdownCell(run.requestIdentities)} | ${escapeMarkdownCell(run.actors)} | ${escapeMarkdownCell(run.taskHints)} | ${escapeMarkdownCell(run.files)} | ${escapeMarkdownCell(run.tasks)} | ${escapeMarkdownCell(run.commits)} | ${escapeMarkdownCell(run.transactions)} | ${escapeMarkdownCell(run.adapter)} | ${escapeMarkdownCell(run.lane)} | ${escapeMarkdownCell(run.verdict)} | ${escapeMarkdownCell(run.evidence)} |`;
   });
   return [
     '',
     '## Scan Result',
     `- Scan time: ${new Date().toISOString()}`,
-    '| runId | planId | requestCount | actorCount | files | tasks | commits | transactions | adapter | lane | verdict | evidence |',
-    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| runId | planId | requestCount | actorCount | scenarioTags | requestIdentities | actors | taskHints | files | tasks | commits | transactions | adapter | lane | verdict | evidence |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
     ...rows
   ].join('\n') + '\n';
+}
+
+function buildEvidenceReport(runs: readonly BrokerRunSummary[]): string {
+  if (runs.length === 0) {
+    return '';
+  }
+  const rows = runs.map((run) => {
+    const scenarios = run.scenarioTags === 'n/a' ? 'field/' : run.scenarioTags;
+    return `| ${escapeMarkdownCell(run.runId)} | ${escapeMarkdownCell(scenarios)} | ${escapeMarkdownCell(run.taskHints || run.tasks)} | ${escapeMarkdownCell(run.actors)} | ${escapeMarkdownCell(run.files)} | ${escapeMarkdownCell(run.lane)} | ${escapeMarkdownCell(run.verdict)} |`;
+  });
+  return [
+    '# Broker Evidence Report',
+    '',
+    `- Generated: ${new Date().toISOString()}`,
+    '',
+    '| runId | scenario | task | actor | shared files | lane | verdict |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
+    ...rows
+  ].join('\n') + '\n';
+}
+
+function writeEvidenceReport(reportOutput: string, runs: readonly BrokerRunSummary[]): void {
+  mkdirSync(path.dirname(reportOutput), { recursive: true });
+  writeFileSync(reportOutput, `${buildEvidenceReport(runs)}\n`, 'utf8');
+}
+
+function writeJsonIndex(jsonOutputFile: string, runDir: string, runs: readonly BrokerRunSummary[]): void {
+  const payload = {
+    schemaId: 'atm.brokerRunScanIndex.v1',
+    specVersion: '0.1.0',
+    scannedAt: new Date().toISOString(),
+    runDir: runDir.replace(/\\/g, '/'),
+    runs
+  };
+  mkdirSync(path.dirname(jsonOutputFile), { recursive: true });
+  writeFileSync(jsonOutputFile, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
 }
 
 function loadEntries(runDir: string): BrokerRunSummary[] {
@@ -223,6 +306,8 @@ function main() {
   const args = getArgs(process.argv.slice(2));
   const runDir = parseRunDir(args['--run-dir'] || args['--run-evidence-dir']);
   const logFile = parseLogFile(args['--log-file']);
+  const jsonOutputFile = parseJsonOutputFile(args['--json-output']);
+  const reportOutput = parseJsonOutputFile(args['--report-output']);
   const compactLog = Boolean(args['--compact']);
 
   mkdirSync(runDir, { recursive: true });
@@ -237,13 +322,21 @@ function main() {
   }
   const sortedEntries = [...dedupedByRun.values()].sort((left, right) => left.runId.localeCompare(right.runId));
 
+  if (jsonOutputFile) {
+    writeJsonIndex(jsonOutputFile, runDir, sortedEntries);
+  }
+
   if (compactLog) {
+    if (reportOutput) {
+      writeEvidenceReport(reportOutput, sortedEntries);
+    }
     const existing = sortedEntries;
     const table = existing.length === 0 ? '' : buildMarkdownSection(existing);
     const content = '# CID Conflict Run Log\n' + table;
     mkdirSync(path.dirname(logFile), { recursive: true });
     writeFileSync(logFile, `${content}\n`, 'utf8');
-    console.log(`[scan-broker-runs] compacted ${existing.length} unique records -> ${logFile}`);
+    const jsonNote = jsonOutputFile ? ` and wrote index -> ${jsonOutputFile}` : '';
+    console.log(`[scan-broker-runs] compacted ${existing.length} unique records -> ${logFile}${jsonNote}`);
     return;
   }
 
@@ -251,7 +344,12 @@ function main() {
   const newRuns = sortedEntries.filter((entry) => !seenRunIds.has(entry.runId));
 
   if (newRuns.length === 0) {
-    console.log(`[scan-broker-runs] no new run records -> ${logFile}`);
+    if (reportOutput) {
+      writeEvidenceReport(reportOutput, sortedEntries);
+    }
+    const jsonNote = jsonOutputFile ? `; wrote index -> ${jsonOutputFile}` : '';
+    const reportNote = reportOutput ? ` and wrote report -> ${reportOutput}` : '';
+    console.log(`[scan-broker-runs] no new run records -> ${logFile}${jsonNote}${reportNote}`);
     return;
   }
 
@@ -268,7 +366,12 @@ function main() {
 
   mkdirSync(path.dirname(logFile), { recursive: true });
   writeFileSync(logFile, `${heading.trimEnd()}\n${section}\n`, 'utf8');
-  console.log(`[scan-broker-runs] appended ${newRuns.length} new run records -> ${logFile}`);
+  if (reportOutput) {
+    writeEvidenceReport(reportOutput, sortedEntries);
+  }
+  const jsonNote = jsonOutputFile ? ` and wrote index -> ${jsonOutputFile}` : '';
+  const reportNote = reportOutput ? ` and wrote report -> ${reportOutput}` : '';
+  console.log(`[scan-broker-runs] appended ${newRuns.length} new run records -> ${logFile}${jsonNote}${reportNote}`);
 }
 
 main();
