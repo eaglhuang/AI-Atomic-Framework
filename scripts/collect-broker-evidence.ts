@@ -87,9 +87,14 @@ function getArgs(argv: string[]): ArgMap {
 
 function parseDefaultRunDir(value: string | boolean | undefined): string {
   if (typeof value === 'string' && value.trim()) {
-    return path.resolve(value);
+    const explicitDir = path.resolve(value);
+    if (!existsSync(explicitDir)) {
+      throw new Error(`run directory does not exist: ${explicitDir}`);
+    }
+    return explicitDir;
   }
-  return path.resolve(
+  const repoFallback = path.join(process.cwd(), '.atm', 'history', 'evidence', 'broker-runs');
+  const externalFallback = path.resolve(
     process.env.USERPROFILE ?? process.env.HOME ?? process.cwd(),
     '3KLife',
     'docs',
@@ -97,6 +102,13 @@ function parseDefaultRunDir(value: string | boolean | undefined): string {
     'broker-collision-evidence',
     'runs'
   );
+  if (existsSync(repoFallback)) {
+    return repoFallback;
+  }
+  if (existsSync(externalFallback)) {
+    return externalFallback;
+  }
+  throw new Error(`Unable to find run directory. Checked: ${repoFallback}, ${externalFallback}`);
 }
 
 function parseOutputDir(value: string | boolean | undefined, runDir: string): string {
@@ -104,6 +116,23 @@ function parseOutputDir(value: string | boolean | undefined, runDir: string): st
     return path.resolve(value);
   }
   return path.join(path.dirname(runDir), 'broker-evidence-bundle');
+}
+
+function printHelp(): void {
+  const lines = [
+    'collect-broker-evidence',
+    '',
+    'Usage:',
+    '  node --strip-types scripts/collect-broker-evidence.ts [--run-dir <dir>] [--output-dir <dir>] [--atm-root <path>] [--run-ids a,b] [--task-ids TASK-...]',
+    '',
+    'Default behavior:',
+    '- run-dir: .atm/history/evidence/broker-runs if exists, otherwise',
+    '  %USERPROFILE%\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs',
+    '- output-dir: <run-dir-parent>/broker-evidence-bundle',
+    '- Output files: broker-evidence-bundle.json and broker-evidence-bundle.md in output-dir',
+    ''
+  ];
+  console.log(lines.join('\n'));
 }
 
 function parseCsvOption(value: string | boolean | undefined): string[] {
@@ -436,6 +465,10 @@ function parseTaskIdsFromRows(rows: readonly BrokerRunSummary[]): string[] {
 
 function main() {
   const args = getArgs(process.argv.slice(2));
+  if (args['--help'] || args['-h']) {
+    printHelp();
+    return;
+  }
   const runDir = parseDefaultRunDir(args['--run-dir'] || args['--run-evidence-dir']);
   const outputDir = parseOutputDir(args['--output-dir'], runDir);
   const jsonOutput = parseOutputFile(args['--json-output'], path.join(outputDir, 'broker-evidence-bundle.json'));
