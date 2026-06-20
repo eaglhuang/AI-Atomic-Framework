@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0043",
   "title": "planning repo root resolver",
-  "status": "running",
+  "status": "done",
   "milestone": "M14",
   "dependencies": [
     "TASK-AAO-0038",
@@ -90,7 +90,7 @@
     "actorId": "antigravity-gemini-3.5-flash",
     "leaseId": "lease-4efa5ca9a8f1",
     "claimedAt": "2026-06-20T12:53:47.483Z",
-    "heartbeatAt": "2026-06-20T12:53:47.483Z",
+    "heartbeatAt": "2026-06-20T13:41:08.596Z",
     "ttlSeconds": 1800,
     "files": [
       "packages/cli/src/commands/tasks/lifecycle-state.ts",
@@ -106,8 +106,8 @@
       "scripts/validate-prompt-scoped-next.ts",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Historical delivery commit 0feeb741c bundles TASK-AAO-0043 deliverables with unrelated framework and skill maintenance; TASK-AAO-0043 scoped files are present and validator evidence is fresh, so closeback must reconcile against the mixed delivery commit instead of inventing a new source commit."
   },
   "owner": "antigravity-gemini-3.5-flash",
   "startedAt": "2026-06-20T12:53:47.483Z",
@@ -145,7 +145,12 @@
     "createdAt": "2026-06-20T12:53:48.050Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-06-20T13-34-25-455Z-import-de9de3c68f54",
-  "lastTransitionAt": "2026-06-20T13:34:25.455Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-20T13-41-08-598Z-close-261a4aefa7de",
+  "lastTransitionAt": "2026-06-20T13:41:08.598Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-06-20T13:41:08.596Z",
+  "closedByActor": "antigravity-gemini-3.5-flash",
+  "closedBySessionId": "session-20260620125347-antigravity-gemini-3.5-flash-TASK-AAO-0043-34294a7168",
+  "closeReason": "Historical delivery commit 0feeb741c bundles TASK-AAO-0043 deliverables with unrelated framework and skill maintenance; TASK-AAO-0043 scoped files are present and validator evidence is fresh, so closeback must reconcile against the mixed delivery commit instead of inventing a new source commit.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0043.closure-packet.json"
 }
