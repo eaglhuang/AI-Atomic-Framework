@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { buildTaskflowCommitMessage } from './commit-messages.ts';
 import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-delivery.ts';
@@ -120,6 +122,15 @@ function runGitOrThrow(cwd: string, args: readonly string[]) {
     cwd,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe']
+  });
+}
+
+function runGitWithEnv(cwd: string, args: readonly string[], env: NodeJS.ProcessEnv) {
+  execFileSync('git', [...args], {
+    cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env
   });
 }
 
@@ -265,11 +276,15 @@ function buildIndexIsolation(repo: TaskflowCommitRepoBundle, stagedFiles: string
   };
 }
 
-function verifyRepoIndexIsolation(repo: TaskflowCommitRepoBundle, phase: 'pre-stage' | 'post-stage'): TaskflowCommitRepoBundle {
+function verifyRepoIndexIsolation(
+  repo: TaskflowCommitRepoBundle,
+  phase: 'pre-stage' | 'post-stage',
+  strict = true
+): TaskflowCommitRepoBundle {
   if (!repo.repoRoot) return repo;
   const isolation = buildIndexIsolation(repo, readStagedFiles(repo.repoRoot));
   const nextRepo = { ...repo, indexIsolation: isolation };
-  if (!isolation.verified) {
+  if (strict && !isolation.verified) {
     const restoreCommand = isolation.unexpectedStagedFiles.length > 0
       ? `git restore --staged -- ${isolation.unexpectedStagedFiles.map((entry) => JSON.stringify(entry)).join(' ')}`
       : null;
@@ -655,15 +670,22 @@ async function commitTaskflowBundle(input: {
   actorId: string;
   taskId: string;
 }): Promise<TaskflowGovernedCommitBundle> {
-  const targetResult = await runAtmGit([
-    'commit',
-    '--cwd', input.bundle.targetRepo.repoRoot ?? '',
-    '--actor', input.actorId,
-    '--task', input.taskId,
-    '--message', input.bundle.targetRepo.commitMessage,
-    '--json'
-  ]);
-  const targetCommitSha = String((targetResult.evidence as Record<string, unknown>)?.commitSha ?? '') || null;
+  const targetPreStagedFiles = input.bundle.targetRepo.repoRoot ? readStagedFiles(input.bundle.targetRepo.repoRoot) : [];
+  const targetForeignStagedFiles = targetPreStagedFiles.filter((file) => !input.bundle.targetRepo.stageFiles.includes(file));
+  if (input.bundle.targetRepo.repoRoot && targetForeignStagedFiles.length > 0) {
+    runGitOrThrow(input.bundle.targetRepo.repoRoot, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', ...targetForeignStagedFiles]);
+  }
+  commitRepoWithTemporaryIndex(
+    input.bundle.targetRepo.repoRoot ?? '',
+    input.bundle.targetRepo.stageFiles,
+    ['commit', '-m', input.bundle.targetRepo.commitMessage]
+  );
+  const targetCommitSha = input.bundle.targetRepo.repoRoot
+    ? tryGitScalar(input.bundle.targetRepo.repoRoot, ['rev-parse', '--verify', 'HEAD'])
+    : null;
+  if (input.bundle.targetRepo.repoRoot && targetForeignStagedFiles.length > 0) {
+    runGitOrThrow(input.bundle.targetRepo.repoRoot, ['add', '--', ...targetForeignStagedFiles]);
+  }
   let targetRepo: TaskflowCommitRepoBundle = {
     ...input.bundle.targetRepo,
     commitSha: targetCommitSha,
@@ -674,6 +696,11 @@ async function commitTaskflowBundle(input: {
     if (!planningRepo.repoRoot) {
       throw new Error('planning repo root missing');
     }
+    const planningPreStagedFiles = readStagedFiles(planningRepo.repoRoot);
+    const planningForeignStagedFiles = planningPreStagedFiles.filter((file) => !planningRepo.stageFiles.includes(file));
+    if (planningForeignStagedFiles.length > 0) {
+      runGitOrThrow(planningRepo.repoRoot, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', ...planningForeignStagedFiles]);
+    }
     const planningMessage = [
       planningRepo.commitMessage,
       '',
@@ -681,7 +708,10 @@ async function commitTaskflowBundle(input: {
       `ATM-Task: ${input.taskId}`,
       'ATM-Surface: taskflow-close-planning-bundle'
     ].join('\n');
-    runGitOrThrow(planningRepo.repoRoot, ['commit', '-m', planningMessage]);
+    commitRepoWithTemporaryIndex(planningRepo.repoRoot, planningRepo.stageFiles, ['commit', '-m', planningMessage]);
+    if (planningForeignStagedFiles.length > 0) {
+      runGitOrThrow(planningRepo.repoRoot, ['add', '--', ...planningForeignStagedFiles]);
+    }
     planningRepo = {
       ...planningRepo,
       commitSha: tryGitScalar(planningRepo.repoRoot, ['rev-parse', '--verify', 'HEAD']),
@@ -709,6 +739,24 @@ async function commitTaskflowBundle(input: {
     failClosed: false,
     recoveryCommand: null
   };
+}
+
+function commitRepoWithTemporaryIndex(repoRoot: string, stageFiles: readonly string[], args: readonly string[]) {
+  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-taskflow-commit-index-'));
+  const tempIndexFile = path.join(tempDir, 'index');
+  const env = {
+    ...process.env,
+    GIT_INDEX_FILE: tempIndexFile
+  };
+  try {
+    runGitWithEnv(repoRoot, ['read-tree', 'HEAD'], env);
+    if (stageFiles.length > 0) {
+      runGitWithEnv(repoRoot, ['add', '-A', '--', ...stageFiles], env);
+    }
+    runGitWithEnv(repoRoot, args, env);
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 }
 
 export async function commitTaskflowDeliveryFiles(input: {
@@ -764,20 +812,25 @@ export async function finalizeTaskflowCommitBundle(input: {
   taskId: string;
 }): Promise<TaskflowGovernedCommitBundle> {
   assertCommitBundleReady(input.bundle);
-  const preflightTarget = verifyRepoIndexIsolation(input.bundle.targetRepo, 'pre-stage');
-  const preflightPlanning = verifyRepoIndexIsolation(input.bundle.planningRepo, 'pre-stage');
-  const stagedTarget = verifyRepoIndexIsolation(stageRepoBundle(preflightTarget, input.taskId), 'post-stage');
-  const stagedPlanning = verifyRepoIndexIsolation(stageRepoBundle(preflightPlanning, input.taskId), 'post-stage');
-  const stagedBundle: TaskflowGovernedCommitBundle = {
-    ...input.bundle,
-    targetRepo: stagedTarget,
-    planningRepo: stagedPlanning
-  };
+  const strictIsolation = input.bundle.commitMode === 'stage-only';
+  const preflightTarget = verifyRepoIndexIsolation(input.bundle.targetRepo, 'pre-stage', strictIsolation);
+  const preflightPlanning = verifyRepoIndexIsolation(input.bundle.planningRepo, 'pre-stage', strictIsolation);
   if (input.bundle.commitMode === 'stage-only') {
-    return stagedBundle;
+    const stagedTarget = verifyRepoIndexIsolation(stageRepoBundle(preflightTarget, input.taskId), 'post-stage', true);
+    const stagedPlanning = verifyRepoIndexIsolation(stageRepoBundle(preflightPlanning, input.taskId), 'post-stage', true);
+    return {
+      ...input.bundle,
+      targetRepo: stagedTarget,
+      planningRepo: stagedPlanning
+    };
   }
+  const bundle: TaskflowGovernedCommitBundle = {
+    ...input.bundle,
+    targetRepo: preflightTarget,
+    planningRepo: preflightPlanning
+  };
   return commitTaskflowBundle({
-    bundle: stagedBundle,
+    bundle,
     actorId: input.actorId,
     taskId: input.taskId
   });

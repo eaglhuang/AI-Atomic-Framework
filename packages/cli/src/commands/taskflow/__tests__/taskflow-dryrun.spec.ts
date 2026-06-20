@@ -467,6 +467,10 @@ async function makeDualRepoCloseFixture(label: string, options: { closePlanningS
       }]
     }]
   });
+  writeJson(path.join(targetRepo, '.atm/history/evidence', `${fixtureTaskId}.closure-packet.json`), {
+    schemaId: 'atm.closurePacket.v1',
+    taskId: fixtureTaskId
+  });
   writeText(planPath, [
     '---',
     `task_id: ${fixtureTaskId}`,
@@ -1020,12 +1024,9 @@ const targetIndexContamination = await runTaskflow([
   '--write',
   '--json'
 ]) as any;
-assert.equal(targetIndexContamination.ok, false, 'target repo unrelated pre-staged files must fail closed before auto-commit');
-assert.equal(
-  targetIndexContamination.evidence.closeWriteTransaction.failureCode,
-  'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED',
-  'index isolation failures must surface through closeWriteTransaction'
-);
+assert.equal(targetIndexContamination.ok, true, 'target repo unrelated pre-staged files must now be preserved during auto-commit');
+assert.equal(targetIndexContamination.evidence.closeWriteTransaction.phase, 'committed');
+assert.ok(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: targetIndexContaminationFixture.targetRepo, encoding: 'utf8' }).includes('pre-staged-target.txt'), 'foreign target staged work must remain staged');
 
 const planningIndexContaminationFixture = await makeDualRepoCloseFixture('planning-index-contamination');
 writeText(path.join(planningIndexContaminationFixture.planningRepo, 'docs/tasks/pre-staged-planning.md'), 'must not commit\n');
@@ -1040,12 +1041,9 @@ const planningIndexContamination = await runTaskflow([
   '--write',
   '--json'
 ]) as any;
-assert.equal(planningIndexContamination.ok, false, 'planning repo unrelated pre-staged files must fail closed before auto-commit');
-assert.equal(
-  planningIndexContamination.evidence.closeWriteTransaction.failureCode,
-  'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED',
-  'planning index isolation failures must surface through closeWriteTransaction'
-);
+assert.equal(planningIndexContamination.ok, true, 'planning repo unrelated pre-staged files must now be preserved during auto-commit');
+assert.equal(planningIndexContamination.evidence.closeWriteTransaction.phase, 'committed');
+assert.ok(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: planningIndexContaminationFixture.planningRepo, encoding: 'utf8' }).includes('docs/tasks/pre-staged-planning.md'), 'foreign planning staged work must remain staged');
 
 const expectedPreStagedFixture = await makeDualRepoCloseFixture('expected-pre-staged');
 execFileSync('git', ['add', `.atm/history/evidence/${expectedPreStagedFixture.taskId}.json`], { cwd: expectedPreStagedFixture.targetRepo, stdio: 'ignore' });
@@ -1083,12 +1081,10 @@ const autoCommit = await runTaskflow([
   '--write',
   '--json'
 ]) as any;
-assert.equal(autoCommit.evidence.governedCommitBundle.commitMode, 'auto-commit');
-assert.equal(autoCommit.evidence.governedCommitBundle.targetRepo.status, 'committed');
-assert.equal(autoCommit.evidence.governedCommitBundle.planningRepo.status, 'committed');
-assert.ok(autoCommit.evidence.governedCommitBundle.targetRepo.commitSha, 'auto-commit target bundle must report commitSha');
-assert.ok(autoCommit.evidence.governedCommitBundle.planningRepo.commitSha, 'auto-commit planning bundle must report commitSha');
-assert.equal(autoCommit.evidence.governedCommitBundle.failClosed, false);
+assert.equal(autoCommit.ok, true);
+assert.equal(autoCommit.evidence.closeWriteTransaction.phase, 'committed');
+assert.equal(autoCommit.evidence.closeWriteTransaction.ok, true);
+assert.equal(autoCommit.evidence.closeWriteTransaction.commitBundleApplied, true);
 assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoCommitFixture.targetRepo, encoding: 'utf8' }).trim(), `chore(taskflow): close ${autoCommitFixture.taskId} target governance bundle`);
 assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoCommitFixture.planningRepo, encoding: 'utf8' }).trim(), `docs(taskflow): close ${autoCommitFixture.taskId} planning bundle`);
 
@@ -1621,8 +1617,12 @@ writeJson(path.join(writeDelFixture.targetRepo, '.atm/history/evidence', `${writ
       exitCode: 0,
       stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
       stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      }]
     }]
-  }]
+  });
+writeJson(path.join(writeDelFixture.targetRepo, '.atm/history/evidence', `${writeDelFixture.taskId}.closure-packet.json`), {
+  schemaId: 'atm.closurePacket.v1',
+  taskId: writeDelFixture.taskId
 });
 const writeDelClose = await runTaskflow([
   'close',
@@ -1730,6 +1730,10 @@ writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${ou
       stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
     }]
   }]
+});
+writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${outOfScopeFixture.taskId}.closure-packet.json`), {
+  schemaId: 'atm.closurePacket.v1',
+  taskId: outOfScopeFixture.taskId
 });
 
 // A. Dry-run close with --write and without waiver should fail-closed because of the committed out-of-scope file

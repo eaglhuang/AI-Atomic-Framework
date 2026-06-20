@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-20T03-38-22-819Z-repair-claim-7c625ee3e2ba",
+  "taskId": "TASK-AAO-0146",
+  "action": "repair-claim",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260620024629-codex-gpt-5.4-mini-TASK-AAO-0146-c2cf65341f",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0146.json",
+  "taskSha256": "sha256:bc8b117c558036c79d45b5c5c16c1060c605d74b8f29f9838e3c60a9ad3902ff",
+  "createdAt": "2026-06-20T03:38:22.819Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-AAO-0146 --actor codex-gpt-5.4-mini --write --reason \"Repair expired self-claim drift and refresh direction-lock ownership before team start and governed close.\" --json"
+}

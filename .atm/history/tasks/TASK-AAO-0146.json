@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0146",
+  "title": "Runner arbitration and close bundle isolation unify touched-set source-first policy",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "This task's touched files are always classified as source-first.",
+    "Non-touched files stay on the frozen runner path.",
+    "`pre-commit`, `pre-close`, `close`, and `validate` share the same runner-arbitration rule.",
+    "Focused regressions cover touched-vs-frozen routing and claim intent behavior.",
+    "Active foreign WIP is not treated as the primary arbitration rule.",
+    "Taskflow close auto-commit preserves foreign staged files instead of failing closed or unstaging another task's WIP."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/validate.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "tests/cli/runner-arbitration-evidence.test.ts",
+    "tests/cli/tasks-claim-auto-intent.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/validate.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "tests/cli/runner-arbitration-evidence.test.ts",
+    "tests/cli/tasks-claim-auto-intent.test.ts",
+    "tests/cli/**",
+    "docs/governance/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not loosen validator severity for touched files.",
+    "Do not special-case foreign active WIP as the primary routing rule."
+  ],
+  "nonGoals": [
+    "Do not redesign unrelated broker arbitration logic.",
+    "Do not convert taskflow close into a blanket source-first mode."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "contextMap": {
+    "primary": [],
+    "secondary": [],
+    "tests": [],
+    "patterns": []
+  },
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-tasks-map",
+    "mapUpdates": [
+      "path_pattern: \"packages/cli/src/commands/taskflow.ts"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/tasks/TASK-AAO-0146-runner-arbitration-touched-set-source-first.task.md",
+    "sectionTitle": "TASK-AAO-0146",
+    "headingLine": 89,
+    "hash": "21d964eb403786e4"
+  },
+  "importedAt": "2026-06-20T04:55:57.143Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-6b380f3cd83a",
+    "claimedAt": "2026-06-20T04:55:30.184Z",
+    "heartbeatAt": "2026-06-20T04:55:30.184Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/validate.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "tests/cli/runner-arbitration-evidence.test.ts",
+      "tests/cli/tasks-claim-auto-intent.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "owner": "codex-gpt-5.4-mini",
+  "startedAt": "2026-06-20T03:38:45.954Z",
+  "startedBySessionId": "session-20260620045530-codex-gpt-5.4-mini-TASK-AAO-0146-76d25b16d6",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0146",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0146.*",
+      ".atm/history/task-events/TASK-AAO-0146/**",
+      ".atm/history/tasks/TASK-AAO-0146.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "packages/cli/src/commands/validate.ts",
+      "tests/cli/runner-arbitration-evidence.test.ts",
+      "tests/cli/tasks-claim-auto-intent.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5a1003b5d0d7d3f2a4d7d4f58ae971e954d2941c8da2ee7a18243188fd9f358e",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-20T04:55:30.216Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-06-20T04-55-57-147Z-import-e80a9d934180",
+  "lastTransitionAt": "2026-06-20T04:55:57.147Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
