@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0115",
+  "title": "taskflow.profile.v1 contract completion / de-hardcode dry-run",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0113"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/profile-loader.ts",
+    "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "schemas/taskflow-profile.v1.json",
+    "fixtures/taskflow-profile/valid.profile.json",
+    "fixtures/taskflow-profile/invalid-missing-schema-id.profile.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/profile-loader.ts",
+    "packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+    "schemas/taskflow-profile.v1.json",
+    "fixtures/taskflow-profile/valid.profile.json",
+    "fixtures/taskflow-profile/invalid-missing-schema-id.profile.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/tasks.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/batch.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/evidence.ts",
+    "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/git-head-evidence.ts",
+    "C:/Users/User/AI-Atomic-Framework/release/**"
+  ],
+  "nonGoals": [
+    "Do not import, require, or spawn the 3KLife opener.",
+    "Do not write task card, ledger, or shard files from the dry-run route.",
+    "Do not implement write mode in taskflow.profile.v1.",
+    "Do not reopen or rewrite TASK-AAO-0113.",
+    "Do not touch TASK-AAO-0114."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {
+    "allowed_files": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0115-taskflow-profile-v1-contract-completion.task.md",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/tasks-atm-part-*.json",
+      "C:/Users/User/3KLife/docs/tasks/tasks-atm/.shardrc.json",
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-evolution-plan-shards/atm-framework-stabilization-milestones.md",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/profile-loader.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/__tests__/profile-loader.spec.ts",
+      "C:/Users/User/AI-Atomic-Framework/packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "C:/Users/User/AI-Atomic-Framework/schemas/taskflow-profile.v1.json",
+      "C:/Users/User/AI-Atomic-Framework/fixtures/taskflow-profile/valid.profile.json",
+      "C:/Users/User/AI-Atomic-Framework/fixtures/taskflow-profile/invalid-missing-schema-id.profile.json",
+      "C:/Users/User/AI-Atomic-Framework/docs/specs/taskflow-profile-v1.md"
+    ],
+    "blocked_by": [],
+    "upstream_repo": "AI-Atomic-Framework"
+  },
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0115-taskflow-profile-v1-contract-completion.task.md",
+    "sectionTitle": "TASK-AAO-0115",
+    "headingLine": 82,
+    "hash": "51bc11f5b139311b"
+  },
+  "importedAt": "2026-06-19T15:22:58.750Z",
+  "lastTransitionId": "2026-06-20T02-11-34-561Z-close-19c5c51f1594",
+  "lastTransitionAt": "2026-06-20T02:11:34.561Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-19T15:22:59.860Z",
+  "promotedAt": "2026-06-19T15:23:00.761Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-25287788fad8",
+    "claimedAt": "2026-06-19T15:23:01.490Z",
+    "heartbeatAt": "2026-06-20T02:11:34.560Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0115.json"
+    ],
+    "state": "released",
+    "reason": "Historical close TASK-AAO-0115 taskflow.profile.v1 contract completion"
+  },
+  "startedAt": "2026-06-19T15:23:01.490Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260619152301-cursor-gpt-5.2-TASK-AAO-0115-d5056bc79b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0115",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0115.*",
+      ".atm/history/task-events/TASK-AAO-0115/**",
+      ".atm/history/tasks/TASK-AAO-0115.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "613614bba81cd4cb0a949aaee52eb911e3c2cf6fcadc9dc727f636cf9a39e52f",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-19T15:23:03.919Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-20T02:11:34.560Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260619152301-cursor-gpt-5.2-TASK-AAO-0115-d5056bc79b",
+  "closeReason": "Historical close TASK-AAO-0115 taskflow.profile.v1 contract completion",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0115.closure-packet.json"
+}
