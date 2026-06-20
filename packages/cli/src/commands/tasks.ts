@@ -1449,7 +1449,8 @@ async function runTasksDeliverAndClose(argv: string[]): Promise<CommandResult> {
         details: {
           taskId: options.taskId,
           batchId: owningBatch.batchId,
-          requiredCommand: `node atm.mjs batch deliver-and-close --actor ${actorId} --batch ${owningBatch.batchId} --json`
+          requiredCommand: `node atm.mjs batch deliver-and-close --actor ${actorId} --batch ${owningBatch.batchId} --json`,
+          skipCommand: `node atm.mjs batch skip --task ${options.taskId} --batch ${owningBatch.batchId} --reason "<blocker>" --actor ${actorId} --json`
         }
       });
     }

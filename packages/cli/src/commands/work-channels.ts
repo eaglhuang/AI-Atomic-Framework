@@ -33,6 +33,7 @@ export interface BatchRunRecord {
   readonly checkpointSize: number;
   readonly status: 'active' | 'paused' | 'completed' | 'abandoned';
   readonly hold?: BatchRunHold | null;
+  readonly skippedTasks?: readonly BatchSkippedTaskRecord[];
   readonly createdByActor: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -45,6 +46,16 @@ export interface BatchRunHold {
   readonly currentTaskId: string | null;
   readonly heldByActor: string;
   readonly heldAt: string;
+  readonly resumeCommand: string;
+}
+
+export interface BatchSkippedTaskRecord {
+  readonly schemaId: 'atm.batchSkippedTask.v1';
+  readonly taskId: string;
+  readonly reason: string;
+  readonly skippedByActor: string;
+  readonly skippedAt: string;
+  readonly batchIndex: number;
   readonly resumeCommand: string;
 }
 
@@ -427,7 +438,51 @@ function normalizeBatchRunRecord(record: BatchRunRecord): BatchRunRecord {
     ...record,
     scopeKey: record.scopeKey || deriveBatchScopeKey([], record.sourcePrompt ?? '', taskIds),
     queueId: record.queueId ?? null,
-    taskIds
+    taskIds,
+    skippedTasks: Array.isArray(record.skippedTasks) ? record.skippedTasks : []
+  };
+}
+
+export function writeBatchTaskAuditEvent(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly action: 'batch-skip' | 'batch-resume';
+  readonly actorId: string;
+  readonly batchId: string;
+  readonly reason?: string | null;
+  readonly batchIndex?: number | null;
+}) {
+  const createdAt = new Date().toISOString();
+  const digest = sha256(JSON.stringify({
+    taskId: input.taskId,
+    action: input.action,
+    actorId: input.actorId,
+    batchId: input.batchId,
+    reason: input.reason ?? null,
+    batchIndex: input.batchIndex ?? null,
+    createdAt
+  })).slice(0, 12);
+  const transitionId = `${createdAt.replace(/[:.]/g, '-')}-${input.action}-${digest}`;
+  const event = {
+    schemaId: 'atm.taskTransition.v1',
+    specVersion: '0.1.0',
+    transitionId,
+    taskId: input.taskId,
+    action: input.action,
+    actorId: input.actorId,
+    batchId: input.batchId,
+    reason: input.reason ?? null,
+    batchIndex: input.batchIndex ?? null,
+    createdAt,
+    command: `node atm.mjs batch ${input.action === 'batch-skip' ? 'skip' : 'resume'} --task ${input.taskId} --batch ${input.batchId} --actor ${input.actorId} --json`
+  };
+  const eventDir = path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId);
+  mkdirSync(eventDir, { recursive: true });
+  const eventPath = path.join(eventDir, `${transitionId}.json`);
+  writeFileSync(eventPath, `${JSON.stringify(event, null, 2)}\n`, 'utf8');
+  return {
+    transitionId,
+    eventPath: normalizeRelativePath(path.relative(input.cwd, eventPath))
   };
 }
 

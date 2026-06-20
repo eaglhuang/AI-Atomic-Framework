@@ -463,9 +463,11 @@ function runPreCommitHook(cwd: string) {
   const checkpointClosedTaskAllowedFiles = collectStagedBatchCheckpointScopeFiles(root, stagedFiles);
   const checkpointCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
     && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles));
+  const directionLockCoversFrameworkCriticalFiles = frameworkStatus.criticalChangedFiles.length > 0
+    && frameworkStatus.criticalChangedFiles.every((entry) => isPathAllowedByTaskDirection(entry, directionLockAllowedFiles));
   const blockingFrameworkIssues = frameworkStatus.blockers.filter((entry) => {
     if (entry === 'git-head-evidence-missing') return false;
-    if (entry === 'active-framework-claim-required' && checkpointCoversFrameworkCriticalFiles) return false;
+    if (entry === 'active-framework-claim-required' && (checkpointCoversFrameworkCriticalFiles || directionLockCoversFrameworkCriticalFiles)) return false;
     if (entry === 'closure-authority-belongs-to-target-repo' && allowAdopterInfrastructureSync) return false;
     return true;
   });
@@ -1381,10 +1383,13 @@ function runCommandForReport(cwd: string, command: string, args: readonly string
 }
 
 function runShellCommandForReport(cwd: string, commandLine: string): CommandRunReport {
+  const env = { ...process.env };
+  delete env.GIT_INDEX_FILE;
   const result = spawnSync(commandLine, {
     cwd,
     encoding: 'utf8',
-    shell: true
+    shell: true,
+    env
   });
   const stdout = String(result.stdout ?? '');
   const stderr = [String(result.stderr ?? ''), result.error?.message ?? ''].filter(Boolean).join('\n');

@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0044",
+  "title": "batch skip / resume",
+  "status": "running",
+  "milestone": "M14",
+  "dependencies": [
+    "TASK-AAO-0042"
+  ],
+  "acceptance": [
+    "`batch skip` advances the batch only when the current task has a recorded blocker reason and no fake done closure.",
+    "`batch resume` puts the skipped task back into a governed queue and requires normal evidence before closure.",
+    "Audit output distinguishes skipped, done, blocked, and open tasks.",
+    "Skip/resume cannot bypass dependency gates or deliverable gates."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "scripts/validate-task-ledger-governance.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-task-ledger-governance.ts --mode validate"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Silently dropping tasks from a batch",
+    "Using skip as done"
+  ],
+  "nonGoals": [
+    "Weakening dependency gates"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert skip/resume state transitions and re-run ledger governance validation.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-governance-map",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "Skip is not success. It is a traceable pause with a reason.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0044-batch-skip-resume.task.md",
+    "sectionTitle": "TASK-AAO-0044",
+    "headingLine": 50,
+    "hash": "8b6d4bb66714c146"
+  },
+  "importedAt": "2026-06-20T05:07:11.414Z",
+  "lastTransitionId": "2026-06-20T05-07-22-241Z-claim-8bc485cc6ed2",
+  "lastTransitionAt": "2026-06-20T05:07:22.241Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "cursor-gpt-5.2",
+  "reservedAt": "2026-06-20T05:07:20.833Z",
+  "promotedAt": "2026-06-20T05:07:21.354Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-ce7ffe187cad",
+    "claimedAt": "2026-06-20T05:07:21.893Z",
+    "heartbeatAt": "2026-06-20T05:07:21.893Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0044.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-20T05:07:21.893Z",
+  "startedByActor": "cursor-gpt-5.2",
+  "startedBySessionId": "session-20260620050721-cursor-gpt-5.2-TASK-AAO-0044-5df6903c4b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0044",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0044.*",
+      ".atm/history/task-events/TASK-AAO-0044/**",
+      ".atm/history/tasks/TASK-AAO-0044.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9b0b940f75ce64a38b1b00ee7e1f29c7f02589211c7ca99e746323ea1c3b1f7a",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-20T05:07:22.241Z",
+    "status": "active"
+  }
+}

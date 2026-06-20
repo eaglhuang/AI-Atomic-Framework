@@ -150,6 +150,10 @@ export function abandonTaskQueue(input: {
 }
 
 export function advanceTaskQueueAfterClose(cwd: string, taskId: string, selector: { readonly batchId?: string | null; readonly queueId?: string | null } = {}): TaskQueueRecord | null {
+  return advanceTaskQueueHead(cwd, taskId, selector);
+}
+
+export function advanceTaskQueueHead(cwd: string, taskId: string, selector: { readonly batchId?: string | null; readonly queueId?: string | null } = {}): TaskQueueRecord | null {
   const queue = findActiveTaskQueue(cwd, null, { ...selector, taskId });
   if (!queue) return null;
   const currentTaskId = queue.taskIds[queue.currentIndex] ?? null;
@@ -160,6 +164,22 @@ export function advanceTaskQueueAfterClose(cwd: string, taskId: string, selector
     ...queue,
     currentIndex: Math.min(nextIndex, Math.max(0, queue.taskIds.length - 1)),
     status: nextIndex >= queue.taskIds.length ? 'completed' : 'active',
+    updatedAt: now
+  };
+  writeTaskQueue(cwd, updated);
+  return updated;
+}
+
+export function restoreTaskQueueHead(cwd: string, taskId: string, selector: { readonly batchId?: string | null; readonly queueId?: string | null } = {}): TaskQueueRecord | null {
+  const queue = findActiveTaskQueue(cwd, null, { ...selector, taskId });
+  if (!queue) return null;
+  const targetIndex = queue.taskIds.indexOf(taskId);
+  if (targetIndex < 0) return null;
+  const now = new Date().toISOString();
+  const updated: TaskQueueRecord = {
+    ...queue,
+    currentIndex: targetIndex,
+    status: 'active',
     updatedAt: now
   };
   writeTaskQueue(cwd, updated);

@@ -1,0 +1,65 @@
+{
+  "taskId": "TASK-AAO-0044",
+  "updatedAt": "2026-06-20T05:08:31.119Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-gpt-5.2",
+      "sessionId": "session-20260620050721-cursor-gpt-5.2-TASK-AAO-0044-5df6903c4b",
+      "createdAt": "2026-06-20T05:08:31.119Z",
+      "details": {
+        "actorId": "cursor-gpt-5.2",
+        "sessionId": "session-20260620050721-cursor-gpt-5.2-TASK-AAO-0044-5df6903c4b",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck",
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e2166101bb3e5c2b29c7c0afda08ec1c36b8a21d33485a48243e835e5f3f577c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck",
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "bcf8f511c1cdb7e19f661623e4f49361d4618ae6",
+            "cacheKey": "sha256:c48160a8722b2d162fdc77b110567bac8db4f1311703c54adb5bb2bcd536f7cc",
+            "cached": false,
+            "generatedAt": "2026-06-20T05:08:31.168Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d48cbb157434734860f0ecb8f7ebf0a1e75d52b06c5bb1823299db66182ba01a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

@@ -530,7 +530,7 @@ const ALLOWED_FLAGS_MAP: Record<string, string[]> = {
   verify: ['--spec', '--self', '--neutrality', '--agents-md', '--guards', '--evidence'],
   'self-host-alpha': ['--verify', '--agent'],
   next: ['--spec', '--claim', '--tasks', '--actor', '--prompt', '--intent', '--task'],
-  batch: ['--batch', '--scope', '--compact', '--hold', '--actor', '--reason'],
+  batch: ['--batch', '--scope', '--compact', '--hold', '--actor', '--reason', '--task'],
   quickfix: ['--actor', '--prompt', '--files', '--reason'],
   init: ['--spec', '--dry-run', '--adopt', '--integration', '--task'],
   bootstrap: ['--spec', '--task'],
@@ -905,7 +905,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--task') {
-      if (!['init', 'bootstrap', 'next', 'tasks'].includes(commandName)) {
+      if (!['init', 'bootstrap', 'next', 'tasks', 'batch'].includes(commandName)) {
         throw createUsageError(commandName, `${commandName} does not support option --task`, { invalidFlags: ['--task'] });
       }
       options.task = requireOptionValue(argv, index, '--task', commandName);
