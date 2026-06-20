@@ -13,4 +13,6 @@ export interface BrokerConflictMatrix {
     readonly arbitrationVerdict: BrokerArbitrationVerdict;
     readonly conflicts: readonly BrokerConflictClassResult[];
 }
-export declare function evaluateConflictMatrix(newIntent: WriteIntent, activeIntents: readonly ActiveWriteIntent[]): BrokerConflictMatrix;
+export declare function evaluateConflictMatrix(newIntent: WriteIntent, activeIntents: readonly ActiveWriteIntent[], options?: {
+    readonly currentEpoch?: number;
+}): BrokerConflictMatrix;

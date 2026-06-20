@@ -3,9 +3,13 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 import {
   DEFAULT_TEAM_STEWARD_ID,
   buildTeamBrokerRuntimeActivationHandshake,
+  buildTeamBrokerRunRecord,
+  buildTeamBrokerRunRecordEnvelope,
   evaluateTeamBrokerLane,
   registerIntent,
   saveRegistry
@@ -26,6 +30,26 @@ function check(condition: unknown, message: string) {
 
 function readJson(relativePath: string) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
+}
+
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+const writeTransactionSchema = readJson('schemas/team-agents/team-broker-write-transaction.schema.json');
+const brokerLaneSchema = readJson('schemas/team-agents/team-broker-lane.schema.json');
+const brokerOperationRunRecordSchema = readJson('schemas/broker/operation-run-record.schema.json');
+ajv.addSchema(writeTransactionSchema);
+ajv.addSchema(brokerLaneSchema);
+const validateWriteTransaction = ajv.compile(writeTransactionSchema);
+const validateBrokerOperationRunRecord = ajv.compile(brokerOperationRunRecordSchema);
+const validateRuntimeActivation = ajv.compile(readJson('schemas/team-agents/team-broker-runtime-activation.schema.json'));
+const maybeValidateBrokerLane = ajv.getSchema('https://schemas.ai-atomic-framework.dev/team-agents/team-broker-lane.schema.json');
+check(maybeValidateBrokerLane, 'team broker lane schema must be registered for validator');
+const validateBrokerLane = maybeValidateBrokerLane!;
+
+function formatAjvErrors(errors: typeof validateWriteTransaction.errors) {
+  return (errors ?? [])
+    .map((error) => `${error.instancePath || '/'} ${error.message}`)
+    .join('; ');
 }
 
 function writeJson(filePath: string, value: unknown) {
@@ -56,6 +80,12 @@ function commitText(cwd: string, message: string) {
   const sha = spawnSync('git', ['-C', cwd, 'rev-parse', 'HEAD'], { encoding: 'utf8' });
   check(sha.status === 0, `git rev-parse HEAD failed: ${sha.stderr || sha.stdout}`);
   return String(sha.stdout ?? '').trim();
+}
+
+function readCurrentBranch(cwd: string) {
+  const result = spawnSync('git', ['-C', cwd, 'symbolic-ref', '--short', 'HEAD'], { encoding: 'utf8' });
+  check(result.status === 0, `git symbolic-ref failed: ${result.stderr || result.stdout}`);
+  return String(result.stdout ?? '').trim();
 }
 
 function ensureRequiredFiles() {
@@ -119,11 +149,117 @@ function seedRegistry(cwd: string, intent: WriteIntent) {
   return registryPath;
 }
 
+function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
+  const runDir = path.join(cwd, 'broker-runs');
+  const logPath = path.join(cwd, 'broker-run-log.md');
+  const reportPath = path.join(cwd, 'broker-run-report.md');
+  mkdirSync(runDir, { recursive: true });
+
+  const request = {
+    schemaId: 'atm.mutationRequest.v1' as const,
+    specVersion: '0.1.0' as const,
+    migration: { strategy: 'none' as const, fromVersion: null, notes: 'team broker log fixture' },
+    requestId: 'bench:B-12:TASK-TEAM-BROKER-LOG:req-team-log-1',
+    actorId: 'coordinator-1',
+    taskId: 'TASK-TEAM-BROKER-LOG',
+    filePath: 'src/shared-target.ts',
+    op: 'append',
+    target: 'EOF',
+    value: 'beta'
+  };
+  const record = buildTeamBrokerRunRecord({
+    runId: 'run-team-log-1',
+    planId: 'plan-team-log-1',
+    request,
+    adapterChoice: 'text-range',
+    laneDecision: 'neutral-steward',
+    mergeVerdict: 'mergeable',
+    evidencePath: '.atm/history/evidence/broker-runs/run-team-log-1.json',
+    appliedFiles: ['src/shared-target.ts'],
+    commitSha: 'abc123teamlogcommit',
+    transactionIds: ['txn-team-log-1']
+  });
+  check(record.transaction_ids?.[0] === 'txn-team-log-1', 'broker run record must preserve transaction id linkage');
+  const envelope = buildTeamBrokerRunRecordEnvelope({
+    runId: 'run-team-log-1',
+    planId: 'plan-team-log-1',
+    records: [record]
+  });
+  check(
+    validateBrokerOperationRunRecord(envelope),
+    `broker run record envelope must match schema: ${formatAjvErrors(validateBrokerOperationRunRecord.errors)}`
+  );
+  writeJson(path.join(runDir, 'run-team-log-1.json'), envelope);
+
+  const result = spawnSync(
+    process.execPath,
+    ['--strip-types', path.join(root, 'scripts', 'scan-broker-runs.ts'), '--run-dir', runDir, '--log-file', logPath, '--report-output', reportPath, '--compact'],
+    { encoding: 'utf8' }
+  );
+  check(result.status === 0, `scan-broker-runs failed: ${result.stderr || result.stdout}`);
+  const logText = readFileSync(logPath, 'utf8');
+  check(logText.includes('| runId | planId | requestCount | actorCount | scenarioTags | requestIdentities | actors | taskHints | files | tasks | commits | transactions | adapter | lane | verdict | evidence |'), 'broker run log must expose the expanded broker evidence columns');
+  check(logText.includes('| run-team-log-1 | plan-team-log-1 | 1 | 1 | B-12 | bench:B-12:TASK-TEAM-BROKER-LOG:req-team-log-1 | coordinator-1 | TASK-TEAM-BROKER-LOG | src/shared-target.ts | TASK-TEAM-BROKER-LOG | abc123teamlogcommit | txn-team-log-1 | text-range | neutral-steward | mergeable | .atm/history/evidence/broker-runs/run-team-log-1.json |'), 'broker run log must preserve task, commit, and transaction linkage');
+
+  const reportText = readFileSync(reportPath, 'utf8');
+  check(reportText.includes('| runId | scenario | task | actor | shared files | lane | verdict |'), 'broker evidence report must expose the report columns');
+  check(reportText.includes('| run-team-log-1 | B-12 | TASK-TEAM-BROKER-LOG | coordinator-1 | src/shared-target.ts | neutral-steward | mergeable |'), 'broker evidence report must preserve the shared file and lane summary');
+}
+
+async function assertBrokerPlanBatchKeepsTransactionLinkage(cwd: string) {
+  const brokeredTextFile = 'docs/broker-transaction-log.md';
+  const brokeredTextPath = path.join(cwd, brokeredTextFile);
+  mkdirSync(path.dirname(brokeredTextPath), { recursive: true });
+  writeFileSync(brokeredTextPath, 'alpha\n', 'utf8');
+  const requestPath = path.join(cwd, 'broker-request-with-transaction.json');
+  const runEvidenceDir = path.join(cwd, 'broker-plan-runs');
+  writeJson(requestPath, {
+    schemaId: 'atm.mutationRequest.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'team broker transaction fixture' },
+    requestId: 'req-team-cli-transaction',
+    actorId: 'coordinator-1',
+    taskId: 'TASK-TEAM-BROKER-CLI-TXN',
+    transactionId: 'txn-team-cli-transaction',
+    filePath: brokeredTextFile,
+    op: 'append',
+    target: 'EOF',
+    value: 'gamma'
+  });
+
+  const result = await runAtm([
+    'broker', 'plan-batch',
+    '--request-file', requestPath,
+    '--apply',
+    '--run-evidence-dir', runEvidenceDir
+  ], cwd);
+  check(result.exitCode === 0 && result.parsed.ok === true, `broker plan-batch apply must pass: ${JSON.stringify(result.parsed)}`);
+
+  const runRecords = (result.parsed.evidence as Record<string, unknown>)?.runRecords as Array<Record<string, unknown>> | undefined;
+  check(runRecords?.[0]?.transaction_ids instanceof Array, 'broker plan-batch run record must expose transaction_ids');
+  check((runRecords?.[0]?.transaction_ids as string[]).includes('txn-team-cli-transaction'), 'broker plan-batch run record must preserve request transaction id');
+
+  const runEvidencePath = (result.parsed.evidence as Record<string, unknown>)?.runEvidencePath;
+  check(typeof runEvidencePath === 'string' && runEvidencePath.length > 0, 'broker plan-batch must report run evidence path');
+  const envelope = JSON.parse(readFileSync(path.join(cwd, runEvidencePath as string), 'utf8')) as Record<string, unknown>;
+  check(
+    validateBrokerOperationRunRecord(envelope),
+    `broker plan-batch persisted run envelope must match schema: ${formatAjvErrors(validateBrokerOperationRunRecord.errors)}`
+  );
+  const persistedRecords = envelope.records as Array<Record<string, unknown>>;
+  check(
+    (persistedRecords?.[0]?.transaction_ids as string[] | undefined)?.includes('txn-team-cli-transaction') === true,
+    'broker plan-batch persisted run envelope must preserve request transaction id'
+  );
+}
+
 ensureRequiredFiles();
 ensureConfigWiring();
 
 const tempRoot = createTempWorkspace('atm-team-brokered-write-');
+const previousAtmSessionId = process.env.ATM_SESSION_ID;
 try {
+  process.env.ATM_SESSION_ID = 'team-broker-session-fixture';
   initializeGitRepository(tempRoot);
   writeFileSync(path.join(tempRoot, 'package.json'), `${JSON.stringify({ name: 'atm-team-brokered-write-temp', private: true, type: 'module' }, null, 2)}\n`, 'utf8');
   const sharedFile = 'src/shared-target.ts';
@@ -131,6 +267,7 @@ try {
   mkdirSync(sharedDir, { recursive: true });
   writeFileSync(path.join(tempRoot, sharedFile), 'alpha\n', 'utf8');
   commitText(tempRoot, 'base shared target for team broker fixture');
+  const tempBranchRef = readCurrentBranch(tempRoot);
 
   const overlapTaskId = 'TASK-TEAM-BROKER-OVERLAP';
   const blockedTaskId = 'TASK-TEAM-BROKER-BLOCKED';
@@ -175,6 +312,33 @@ try {
   check(overlapResult.evidence.stewardId === DEFAULT_TEAM_STEWARD_ID, 'steward lane must use neutral-write-steward');
   check(overlapResult.evidence.composerPath === 'broker compose -> steward plan/apply', 'steward lane must expose composer path');
   check(overlapResult.evidence.decision.verdict === 'needs-physical-split', 'broker decision must record needs-physical-split');
+  check(overlapResult.evidence.writeTransaction.schemaId === 'atm.teamBrokerWriteTransaction.v1', 'broker lane must include write transaction evidence');
+  check(overlapResult.evidence.writeTransaction.transactionId.startsWith('txn-'), 'write transaction must include stable transaction id prefix');
+  check(overlapResult.evidence.writeTransaction.taskId === overlapTaskId, 'write transaction must carry task id');
+  check(overlapResult.evidence.writeTransaction.principalId === 'team-planner', 'write transaction must carry principal id');
+  check(overlapResult.evidence.writeTransaction.actorId === 'team-planner', 'write transaction must carry actor id');
+  check(overlapResult.evidence.writeTransaction.sessionId === 'team-broker-session-fixture', 'write transaction must carry session id when available');
+  check(overlapResult.evidence.writeTransaction.instanceId === 'team-planner@local', 'write transaction must carry instance id');
+  check(overlapResult.evidence.writeTransaction.worktreeId === tempRoot, 'write transaction must carry worktree id');
+  check(overlapResult.evidence.writeTransaction.branchRef === tempBranchRef, 'write transaction must carry current branch ref');
+  check(overlapResult.evidence.writeTransaction.baseHead === overlapResult.evidence.writeIntent.baseCommit, 'write transaction baseHead must match write intent base commit');
+  check(overlapResult.evidence.writeTransaction.allowedFiles.includes(sharedFile), 'write transaction must include allowed files');
+  check(overlapResult.evidence.writeTransaction.readSet.includes(sharedFile), 'write transaction must include read set');
+  check(overlapResult.evidence.writeTransaction.writeSet.includes(sharedFile), 'write transaction must include write set');
+  check(String(overlapResult.evidence.writeTransaction.fileHashesBefore[sharedFile] ?? '').startsWith('sha256:'), 'write transaction must record file hash before write');
+  check(overlapResult.evidence.writeTransaction.brokerDecision.verdict === overlapResult.evidence.decision.verdict, 'write transaction broker decision verdict must match lane decision');
+  check(overlapResult.evidence.writeTransaction.brokerDecision.lane === overlapResult.evidence.decision.lane, 'write transaction broker decision lane must match lane decision');
+  check(overlapResult.evidence.writeTransaction.brokerDecision.parallelSafetyReason === null, 'non-parallel-safe transaction must not claim parallel-safe reason');
+  check(overlapResult.evidence.writeTransaction.leaseEpoch > 0, 'write transaction must carry lease epoch');
+  check(Date.parse(overlapResult.evidence.writeTransaction.expiresAt) > Date.parse(overlapResult.evidence.writeTransaction.startedAt), 'write transaction expiresAt must be after startedAt');
+  check(
+    validateWriteTransaction(overlapResult.evidence.writeTransaction),
+    `real team broker write transaction must match schema: ${formatAjvErrors(validateWriteTransaction.errors)}`
+  );
+  check(
+    validateBrokerLane(overlapResult.evidence),
+    `real team broker lane evidence must match schema: ${formatAjvErrors(validateBrokerLane.errors)}`
+  );
 
   const blockedResult = evaluateTeamBrokerLane({
     cwd: tempRoot,
@@ -196,6 +360,11 @@ try {
   });
   check(safeResult.ok === true, 'parallel-safe task must remain safe to start');
   check(safeResult.evidence.chosenLane === 'direct-brokered', 'parallel-safe task must route to direct-brokered');
+  check(safeResult.evidence.writeTransaction.brokerDecision.parallelSafetyReason === 'no-known-textual-or-resource-conflict', 'parallel-safe transaction must record no-known textual/resource conflict reason');
+  check(
+    validateWriteTransaction(safeResult.evidence.writeTransaction),
+    `parallel-safe write transaction must match schema: ${formatAjvErrors(validateWriteTransaction.errors)}`
+  );
 
   const overlapPlan = await runTeam(['plan', '--task', overlapTaskId, '--cwd', tempRoot, '--json']);
   check(overlapPlan.ok === true, `team plan must pass for steward lane: ${JSON.stringify(overlapPlan)}`);
@@ -203,6 +372,10 @@ try {
   check(Boolean(overlapEvidence?.brokerLane), 'team plan evidence must include brokerLane');
   const overlapBrokerLane = overlapEvidence.brokerLane as Record<string, unknown>;
   check(overlapBrokerLane.chosenLane === 'neutral-steward', 'team plan brokerLane must surface steward lane');
+  check(
+    validateBrokerLane(overlapBrokerLane),
+    `team plan brokerLane evidence must match schema: ${formatAjvErrors(validateBrokerLane.errors)}`
+  );
   const overlapBriefing = (overlapEvidence.teamPlan as Record<string, unknown>)?.briefingContract as Record<string, unknown>;
   check((overlapBriefing?.brokerAdvisory as Record<string, unknown>)?.verdict === 'steward-lane', 'briefing contract must advertise steward lane');
 
@@ -225,6 +398,10 @@ try {
   const overlapTeamRun = overlapRunEvidence.teamRun as Record<string, unknown>;
   check(Boolean(overlapTeamRun?.brokerLane), 'team run record must include brokerLane evidence');
   check((overlapTeamRun.brokerLane as Record<string, unknown>)?.chosenLane === 'neutral-steward', 'team run brokerLane must record steward path');
+  check(
+    validateBrokerLane(overlapTeamRun.brokerLane),
+    `team run brokerLane evidence must match schema: ${formatAjvErrors(validateBrokerLane.errors)}`
+  );
 
   const runtimeHandshake = buildTeamBrokerRuntimeActivationHandshake({
     cwd: tempRoot,
@@ -237,8 +414,13 @@ try {
   check(runtimeHandshake.evidence.activationState === 'activated', 'broker runtime activation handshake must report activated state');
   check(runtimeHandshake.evidence.runtimeBoundary.gitWrite === false, 'broker runtime activation handshake must deny git.write');
   check(runtimeHandshake.evidence.runtimeBoundary.taskLifecycle === false, 'broker runtime activation handshake must deny task.lifecycle');
+  check(runtimeHandshake.evidence.runtimeBoundary.selfClose === false, 'broker runtime activation handshake must deny self-close');
   check(runtimeHandshake.evidence.scopedWriteExecution.approved === true, 'broker runtime activation handshake must approve scoped write execution');
   check(runtimeHandshake.evidence.scopedWriteExecution.allowedFiles.includes(sharedFile), 'broker runtime activation handshake must carry allowed files');
+  check(
+    validateRuntimeActivation(runtimeHandshake.evidence),
+    `real broker runtime activation handshake must match schema: ${formatAjvErrors(validateRuntimeActivation.errors)}`
+  );
 
   const runtimeCliHandshake = await runAtm([
     'broker', 'runtime', 'activate',
@@ -250,8 +432,21 @@ try {
   const runtimeEvidence = runtimeCliHandshake.parsed.evidence as Record<string, unknown>;
   check((runtimeEvidence.handshake as Record<string, unknown>)?.activationState === 'activated', 'broker runtime activate CLI evidence must include activated handshake');
   check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.gitWrite === false, 'broker runtime activate CLI evidence must keep git.write denied');
+  check(((runtimeEvidence.handshake as Record<string, unknown>)?.runtimeBoundary as Record<string, unknown> | undefined)?.selfClose === false, 'broker runtime activate CLI evidence must keep self-close denied');
+  check(
+    validateRuntimeActivation(runtimeEvidence.handshake),
+    `broker runtime activate CLI handshake must match schema: ${formatAjvErrors(validateRuntimeActivation.errors)}`
+  );
+
+  assertBrokerRunLogKeepsTaskLinkage(tempRoot);
+  await assertBrokerPlanBatchKeepsTransactionLinkage(tempRoot);
 
   console.log(`[team-brokered-write:${mode}] ok`);
 } finally {
+  if (previousAtmSessionId === undefined) {
+    delete process.env.ATM_SESSION_ID;
+  } else {
+    process.env.ATM_SESSION_ID = previousAtmSessionId;
+  }
   rmSync(tempRoot, { recursive: true, force: true });
 }

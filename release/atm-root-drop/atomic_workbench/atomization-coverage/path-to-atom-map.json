@@ -48,6 +48,20 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "docs/governance/team-agents/knowledge-index-contract.md",
+      "atom_id": "atm.team-agents-knowledge-map",
+      "capability": "Team Agents advisory knowledge storage boundary, separating canonical .atm/knowledge shards from generated .atm/runtime/knowledge caches and forbidding second-registry authority",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0020"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/templates/README.md",
+      "atom_id": "atm.team-agents-knowledge-map",
+      "capability": "Template-level Team knowledge guidance for Markdown-first advisory shards, canonical roots, generated cache roots, and non-authoritative usage",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0020"
+    },
+    {
       "path_pattern": "docs/governance/team-agents/templates/agent-report-template.md",
       "atom_id": "atm.team-agents-template-map",
       "capability": "Canonical agent report template for role, status, files read/changed, commands, findings, blockers, and recommendation",
@@ -77,10 +91,10 @@
     },
     {
       "path_pattern": "docs/governance/team-agents/templates/team-memory-shard-template.md",
-      "atom_id": "atm.team-agents-template-map",
-      "capability": "Canonical team memory shard template for retained operational memory, validation, and retention rules",
+      "atom_id": "atm.team-agents-knowledge-map",
+      "capability": "Canonical team memory shard template for retained advisory knowledge, canonical/runtime storage boundaries, validation, and retention rules",
       "coverage_status": "active",
-      "source_task": "TASK-TEAM-0005"
+      "source_task": "TASK-TEAM-0020"
     },
     {
       "path_pattern": "docs/governance/team-agents/templates/team-summary-template.md",
@@ -214,7 +228,7 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/git.spec.ts",
       "atom_id": "atm.git-governance-map",
-      "capability": "git command surface specification for identity, check, and commit wrapper flows",
+      "capability": "git command surface specification for per-actor identity, check, and commit wrapper flows",
       "coverage_status": "active"
     },
     {
@@ -226,7 +240,7 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "atom_id": "atm.task-direction-map",
-      "capability": "tasks command surface specification including scope add sub-command with --add csv option (TASK-AAO-0010).",
+      "capability": "tasks command surface specification including scope add sub-command with --add csv option and claim auto-intent surface documentation (TASK-AAO-0010, TASK-MAO-0055).",
       "coverage_status": "active"
     },
     {
@@ -234,6 +248,20 @@
       "atom_id": "atm.task-closure-map",
       "capability": "tasks close backend surface specification including --historical-delivery and --historical-batch examples so operator documentation reflects the protected close lane inputs for historical delivery reconstruction and historical-batch slices.",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamPlan",
+      "atom_id": "team.knowledge-preflight-brief",
+      "capability": "Team plan exposes compact advisory knowledgeSummary hits for Captain/Planner preflight without sending full corpus to implementers.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0022"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-knowledge.ts#buildTeamKnowledgeSummary",
+      "atom_id": "team.knowledge-preflight-brief",
+      "capability": "Builds compact advisory-only Team knowledge summaries with top hits, reasons, snippets, follow-up query command, and missing-index build guidance.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0022"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecAtomizationPlanner",
@@ -271,6 +299,13 @@
       "source_task": "TASK-TEAM-0027"
     },
     {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecLeaseFencing",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Command-spec examples for Team lease fencing and deadlock diagnostics validators.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecRuntimeStatus",
       "atom_id": "team.spec.runtime-status",
       "capability": "Command-spec examples for read-only team run status.",
@@ -286,7 +321,7 @@
     {
       "path_pattern": "packages/cli/src/commands/evidence.ts",
       "atom_id": "atm.evidence-command-map",
-      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing, and historical-batch; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; generic evidence records emit atomHealthClaims from task atomizationImpact; close verify requires atom-or-map-health-evidence for governed atom/map tasks; historical-batch slices record per-task deliverable coverage, validatorClaims (taskSpecific/batchWide/advisory), atomHealthClaims, okToRecordEvidence, okToCloseTask, and diagnostic-only approval metadata; supports quoteForShell for cross-shell safe requiredCommand quoting and detectAutoLinkedValidator for auto-linking known validators during evidence add when no explicit validators are specified (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017, TASK-AAO-0063, TASK-CID-0099, TASK-CID-0100 to TASK-CID-0103).",
+      "capability": "evidence CLI command: add, run, git-head-backfill, verify, diff, validators --list, missing, and historical-batch; run command auto-spawns, captures stdout/stderr hashes, and adds evidence; generic evidence records emit atomHealthClaims from task atomizationImpact; close verify requires atom-or-map-health-evidence for governed atom/map tasks; historical-batch slices record per-task deliverable coverage, validatorClaims (taskSpecific/batchWide/advisory), atomHealthClaims, okToRecordEvidence, okToCloseTask, and diagnostic-only approval metadata; supports quoteForShell for cross-shell safe requiredCommand quoting and detectAutoLinkedValidator for auto-linking known validators during evidence add when no explicit validators are specified; buildAutoEvidencePlan and executeAutoEvidencePlan discover missing closure-required validators and drive taskflow pre-close/close --auto-evidence without manual --validators (TASK-AAO-0015, TASK-AAO-0016, TASK-AAO-0017, TASK-AAO-0063, TASK-AAO-0142, TASK-CID-0099, TASK-CID-0100 to TASK-CID-0103).",
       "coverage_status": "active"
     },
     {
@@ -298,7 +333,7 @@
     {
       "path_pattern": "packages/cli/src/commands/git-governance.ts",
       "atom_id": "atm.git-governance-map",
-      "capability": "git identity preparation, commit wrapper trailers, task/session attribution, mirror-sync-only commit handling, and narrow closed-task historical ledger restore packet commits",
+      "capability": "per-actor git identity resolution, actor-scoped commit author env injection, commit wrapper trailers, task/session attribution, mirror-sync-only commit handling, and narrow closed-task historical ledger restore packet commits",
       "coverage_status": "active"
     },
     {
@@ -328,13 +363,27 @@
     {
       "path_pattern": "packages/cli/src/commands/next.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
+      "capability": "next-action routing, task scope resolution, public decisionTrail contract, and default --auto-intent claim guidance for task routes.",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/planning-repo-root.ts",
+      "atom_id": "atm.next-router-map",
+      "capability": "Resolve cross-repo planning roots from ATM_PLANNING_REPO_ROOT or taskLedger.planningRoots, store planning paths planning-root-relative, and emit fail-closed planning-root diagnostics when external planning is unreachable.",
+      "coverage_status": "active",
+      "source_task": "TASK-AAO-0043"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts#embedTeamRecommendation",
+      "atom_id": "atm.next-guidance-map",
+      "capability": "Captain-facing next guidance embeds advisory Team knowledge summaries in teamRecommendation without changing task routing or close gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0022"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs/next.spec.ts",
       "atom_id": "atm.next-router-map",
-      "capability": "next command CLI surface specification: summary, options (--claim, --actor, --prompt, --task, --tasks, --intent, --output), and canonical usage examples covering prompt-scoped, explicit-task, quickfix, batch, and claim flows (TASK-MAO-0004).",
+      "capability": "next command CLI surface specification: summary, options (--claim, --actor, --auto-intent, --claim-intent, --prompt, --task, --tasks, --intent, --output), and canonical usage examples covering prompt-scoped, explicit-task, quickfix, batch, and claim flows (TASK-MAO-0004, TASK-MAO-0055).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0004"
     },
@@ -438,13 +487,13 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-ledger-governance-map",
-      "capability": "tasks import/reconcile; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
+      "capability": "tasks import/reconcile and claim lifecycle governance; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; claim auto-intent resolves write vs closeout-only from in-scope dirty files and deliverables already in HEAD; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
       "coverage_status": "active"
     },
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-direction-map",
-      "capability": "tasks scope add: formal scope amendment CLI; appends paths to active taskDirectionLock.allowedFiles via CLI, records scope-amendment transition event, returns ATM_SCOPE_AMENDMENT_APPLIED. Agents must not edit .atm/runtime/locks/** directly; all scope widening goes through this command (TASK-AAO-0010).",
+      "capability": "tasks scope add: formal scope amendment CLI; appends paths to active taskDirectionLock.allowedFiles via CLI, records scope-amendment transition events, returns ATM_SCOPE_AMENDMENT_APPLIED, rewrites ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK with explicit active-claim guidance, and supports --claim-first auto-claim precondition resolution with scope-amendment.claim-first-resolved audit events. Agents must not edit .atm/runtime/locks/** directly; all scope widening goes through this command (TASK-AAO-0010, TASK-MAO-0056).",
       "coverage_status": "active"
     },
     {
@@ -545,7 +594,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks/task-option-parsers.ts",
       "atom_id": "atm.task-option-parsers-map",
-      "capability": "Pure option parsing and CLI flags validators for task sub-commands (reconcile, deliver-and-close, scope add, create, mirror, close, reset, audit, queue, lock cleanup, legacy ledger migration, and claim lifecycle)",
+      "capability": "Pure option parsing and CLI flags validators for task sub-commands (reconcile, deliver-and-close, scope add including --claim-first, create, mirror, close, reset, audit, queue, lock cleanup, legacy ledger migration, and claim lifecycle)",
       "coverage_status": "active"
     },
     {
@@ -605,6 +654,20 @@
       "source_task": "TASK-TEAM-0027"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamPatrolReport",
+      "atom_id": "team.patrol-report",
+      "capability": "Read-only Team patrol report for runtime mode, rework readiness, missing artifacts, retry-budget risk, and claim/close preflight guidance without runtime or history mutation.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0014"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/team.spec.ts#teamSpecPatrolReport",
+      "atom_id": "team.patrol-report",
+      "capability": "CLI help surface documents team patrol modes and read-only preflight usage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0014"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
       "atom_id": "team.plan-broker-lane",
       "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
@@ -614,9 +677,44 @@
     {
       "path_pattern": "packages/cli/src/commands/team.ts#runTeam",
       "atom_id": "team.cli-entry",
-      "capability": "Team CLI entry router for plan, start, status, and validate actions.",
+      "capability": "Team CLI entry router for plan, start, status, validate, wave, and knowledge actions.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-knowledge.ts",
+      "atom_id": "team.knowledge-build-query",
+      "capability": "Advisory Team Agents knowledge build/query dry-run surface with metadata filtering, lexical ranking, compact hits, and missing-index build guidance.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0021"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-knowledge.ts#knowledgeRetentionBudget",
+      "atom_id": "team.knowledge-retention-budget",
+      "capability": "Team knowledge stats and compact dry-run report canonical shard counts, runtime cache footprint, stale/superseded archive candidates, and runtime disk budget diagnostics without mutating canonical shards.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0023"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/stores.ts#knowledge-root-guards",
+      "atom_id": "team.knowledge-retention-budget",
+      "capability": "Local governance shard store keeps canonical .atm/knowledge shards separate from generated disposable .atm/runtime/knowledge cache outputs.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0023"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-knowledge.ts#hybridRetrievalOptIn",
+      "atom_id": "team.knowledge-hybrid-rerank",
+      "capability": "Optional vector rerank runs only over the lexical shortlist, reads runtime-only embedding cache, reports fallback evidence, and degrades to lexical-only when disabled or missing.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0024"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/knowledge-index-contract.md#hybrid-retrieval",
+      "atom_id": "team.knowledge-hybrid-rerank",
+      "capability": "Hybrid retrieval contract keeps lexical filtering as the baseline, generated embeddings runtime-only, opt-in explicit, and missing embeddings fail-soft to lexical results.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0024"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
@@ -631,6 +729,69 @@
       "capability": "Team run runtime record writer under .atm/runtime/team-runs.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamRuntimeContract",
+      "atom_id": "team.runtime-mode-contract",
+      "capability": "Neutral Team runtime contract records runtimeMode, runtimeLanguage, adapter metadata, provider, SDK, model, and selected execution surface across real-agent, editor-subagent, and broker-only modes.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildEditorSubagentBridgeContract",
+      "atom_id": "team.editor-subagent-bridge-contract",
+      "capability": "Editor-neutral subagent bridge role envelopes preserve role, scope, lease, artifact, and retry metadata while ATM remains lifecycle owner.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0032"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamReworkRouteStateMachine",
+      "atom_id": "team.rework-route-state-machine",
+      "capability": "Reviewer and validator findings route Team runtime state through needs-rework, revalidate-pending, ready-for-close, blocked, or escalated transitions with bounded retry semantics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0033"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamArtifactHandoffContract",
+      "atom_id": "team.artifact-handoff-retry-contract",
+      "capability": "Role artifact handoff contracts declare consumed, produced, and required artifacts for implementer, reviewer, validator, and evidence collector roles, with fail-closed missing artifact findings and explicit retry-budget escalation metadata.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0034"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/nodejs-worker-adapter.ts",
+      "atom_id": "team.nodejs-worker-adapter",
+      "capability": "Node.js reference Team worker adapter resolves real-agent runtime metadata and broker-only fallback while preserving broker, lease, validator, police, evidence, artifact, and retry governance contracts.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0035"
+    },
+    {
+      "path_pattern": "examples/team-runtime/README.md",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "Polyglot Team runtime example guide states Node.js remains the default runtime while Python and C# reference adapters preserve broker, lease, validator, police, evidence, artifact, retry, and closure authority requirements.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
+      "path_pattern": "examples/team-runtime/python-reference-worker-adapter.py",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "Python reference Team worker adapter metadata expresses atm.teamWorkerAdapterContract.v1 without weakening broker, permission lease, evidence, validator, artifact, retry, or closure authority gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
+      "path_pattern": "examples/team-runtime/csharp-reference-worker-adapter.cs",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "C# reference Team worker adapter metadata expresses atm.teamWorkerAdapterContract.v1 without weakening broker, permission lease, evidence, validator, artifact, retry, or closure authority gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamClosureAttestation",
+      "atom_id": "team.sandbox-attestation-closure-contract",
+      "capability": "Team closure attestation metadata records runtime mode, language, adapter, provider, SDK, model, runner kind, runtime version, sandbox policy hash, signer, reviewer independence, and explicit command-backed evidence requirements without treating local runtime wrappers as secure sandbox proof.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0019"
     },
     {
       "path_pattern": "packages/cli/src/commands/work-channels.ts",
@@ -1364,6 +1525,55 @@
       "source_task": "TASK-MAO-0026"
     },
     {
+      "path_pattern": "packages/core/src/governance/scope-lock.ts#validateScopeLeaseFencing",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Pure Team lease fencing diagnostics for duplicate exclusive owners, tombstone stale reacquire attempts, allowedFiles write violations, and wait-for graph cycles.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "packages/core/src/governance/scope-lock.ts#validateScopeLeaseEpoch",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Stale epoch release or transfer guard returning expected and actual epoch diagnostics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/stores.ts#acquireLock",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Local governance scope lock acquisition stamps leaseEpoch for Team fencing diagnostics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "packages/plugin-governance-local/src/stores.ts#releaseLock",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Local governance scope lock release records tombstone status and releaseEpoch so stale runs cannot silently reacquire ownership.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#fencing-deadlock",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Validator case proving duplicate owners, stale epochs, wait-for cycles, tombstone reacquire prevention, allowedFiles violations, and real-agent/editor-subagent/broker-only diagnostics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#active-resource-index-readonly",
+      "atom_id": "team.lease-fencing-deadlock-contract",
+      "capability": "Validator case proving Team plan/validate consume Active Resource Index and Scope Lease Registry read-only without promoting, claiming, closing, or rewriting ledger/runtime state.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0018"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#polyglot-worker-examples",
+      "atom_id": "team.polyglot-worker-adapter-examples",
+      "capability": "Validator case proving Python and C# Team worker adapter examples use the same adapter schema as Node.js, keep Node.js as default, and preserve broker, lease, validator, police, evidence, artifact, retry, and closure authority gates.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0036"
+    },
+    {
       "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",
       "atom_id": "atm.team-wave-runtime-map",
       "capability": "Wave Mode runtime record + dispatch surface (team wave dispatch writes a coordinator-owned wave envelope to .atm/runtime/team-waves) plus the safe/unsafe/mixed/envelope self-check run on every validate-team-agents invocation (TASK-MAO-0027).",
@@ -1523,13 +1733,202 @@
       "capability": "External core contributor pipeline CI gate: validates contributor patch envelopes against upstream in-dev/HEAD, rejects release-only direct modifications, and admits well-formed patch-only submits before the steward rebuild lane (TASK-MAO-0022).",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0022"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Diagnose-first claim repair for stale, dangling, expired, and conflicting claim drift; apply auditable repair only when no valid active lease blocks.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "tests/cli/tasks-repair-claim.test.ts",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Regression coverage for tasks repair-claim diagnose/write and lifecycle-owner blocking rules.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "docs/governance/git-governance-contract.md",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Document lifecycle owner rules and tasks repair-claim diagnose/write operator path.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "docs/ATM_NEW_USER_WORKFLOW.md",
+      "atom_id": "atm.claim-repair-lifecycle-owner-map",
+      "capability": "Operator guidance: closeout has one lifecycle owner; next --claim defaults to auto-intent for write vs closeout-only routing; tasks repair-claim is diagnose-first recovery, not a close shortcut.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0043"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/task-view.ts",
+      "atom_id": "atm.task-view-dashboard-map",
+      "capability": "Read-only task dashboard over status triangulation, evidence blockers, close completion checklist, and next safe operator command.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0044"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "atom_id": "atm.task-view-dashboard-map",
+      "capability": "Close completion checklist builder for ledger, governance, planning mirror, lifecycle events, delivery SHA, and waiver reason.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0044"
+    },
+    {
+      "path_pattern": "tests/cli/task-view-dashboard.test.ts",
+      "atom_id": "atm.task-view-dashboard-map",
+      "capability": "Regression coverage for task-view dashboard and close completion checklist.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0044"
+    },
+    {
+      "path_pattern": "docs/ATM_NEW_USER_WORKFLOW.md",
+      "atom_id": "atm.closeback-operator-runbook-map",
+      "capability": "Closeback operator runbook: pre-close, dry-run, scoped remediation, foreign staged restore, banned patterns, and close completion checklist.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0045"
+    },
+    {
+      "path_pattern": "docs/governance/historical-batch-evidence.md",
+      "atom_id": "atm.closeback-operator-runbook-map",
+      "capability": "Historical batch envelope vs per-task close approval boundaries for closeback operators.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0045"
+    },
+    {
+      "path_pattern": "docs/governance/git-governance-contract.md",
+      "atom_id": "atm.closeback-operator-runbook-map",
+      "capability": "Foreign staged restore protocol and defer-foreign-staged governance contract.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0045"
+    },
+    {
+      "path_pattern": "docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "atom_id": "atm.closeback-operator-runbook-map",
+      "capability": "Host adaptor integration points for closeback operator lane and verification.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0045"
+    },
+    {
+      "path_pattern": "packages/cli/README.md",
+      "atom_id": "atm.closeback-operator-runbook-map",
+      "capability": "CLI README operator lane table for taskflow, pre-close, task-view, and governed git commit.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/route.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "Route pause/resume runtime integration with broker freeze protocol and freeze sidecar persistence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/freeze.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "Freeze signal, acknowledgement, decision, and resume helpers consumed by route pause/resume.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/types.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "RouteFreezeRuntimeRecord sidecar contract for freeze protocol state outside route context schema.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "tests/cli/route-freeze-runtime.test.ts",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "CLI regression proving route pause/resume exercises freeze.ts and emits freezeProtocol evidence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "docs/specs/mao-logical-routing-v1.md",
+      "atom_id": "atm.route-freeze-runtime-map",
+      "capability": "Document route pause/resume freeze protocol runtime and reserved deferred features.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0046"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/index.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Broker public surface exporting patch envelope and freeze helpers for runtime handoff consumers.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/route.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Route pause/handoff runtime integration creating and comparing metadata-only patch envelopes.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "tests/cli/route-patch-envelope-handoff.test.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "CLI regression proving route pause/handoff emits valid patch envelope handoff evidence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Core regression for createHandoffPatchEnvelope via broker index export.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/command-specs/route.spec.ts",
+      "atom_id": "atm.patch-envelope-handoff-map",
+      "capability": "Route command spec documenting handoff action and apply-out-of-scope boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0047"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-parallel-routing/event-replay.manifest.json",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Event replay manifest listing sanitized task-event and broker-evidence replay fixtures.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-parallel-routing/event-replay/**",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Sanitized deterministic replay fixtures sourced from ATM task events and broker evidence.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Event replay benchmark runner evaluating freeze, patch envelope, and broker conflict replays.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/validate-mao-parallel-routing.ts",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Combined static and event-replay MAO benchmark validator with separate catch-rate reporting.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "docs/reports/mao-parallel-routing-benchmark.md",
+      "atom_id": "atm.mao-event-replay-benchmark-map",
+      "capability": "Benchmark report distinguishing hand-authored static coverage from sanitized event replay coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0048"
     }
   ],
   "summary": {
-    "total_production_paths": 183,
-    "mapped_paths": 183,
+    "total_production_paths": 200,
+    "mapped_paths": 200,
     "coverage_percentage": 100,
-    "atoms_defined": 111,
+    "atoms_defined": 113,
     "atoms_with_evidence": 0,
     "debt_items": 0,
     "core_wave1_completed": true

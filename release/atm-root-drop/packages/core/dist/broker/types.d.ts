@@ -1,3 +1,4 @@
+import type { FreezeAck, FreezeResolution, FreezeSignal } from './freeze.ts';
 export interface MigrationRecord {
     readonly strategy: 'none' | 'additive' | 'breaking';
     readonly fromVersion: string | null;
@@ -69,6 +70,9 @@ export interface PatchProposal {
     readonly proposalId: string;
     readonly taskId: string;
     readonly actorId: string;
+    readonly transactionId?: string;
+    readonly transactionIds?: readonly string[];
+    readonly transaction_ids?: readonly string[];
     readonly baseCommit: string;
     readonly fileBeforeHash: string;
     readonly targetFile: string;
@@ -169,6 +173,7 @@ export interface WriteBrokerRegistryDocument {
     readonly specVersion: '0.1.0';
     readonly repoId: string;
     readonly workspaceId: string;
+    readonly currentEpoch?: number;
     readonly activeIntents: readonly ActiveWriteIntent[];
 }
 export type BrokerArbitrationVerdict = 'allow' | 'watch' | 'freeze' | 'takeover';
@@ -206,10 +211,28 @@ export interface MutationRequest {
     readonly requestId: string;
     readonly actorId: string;
     readonly taskId?: string;
+    readonly transactionId?: string;
+    readonly transactionIds?: readonly string[];
+    readonly transaction_ids?: readonly string[];
     readonly filePath: string;
     readonly op: string;
     readonly target: string;
     readonly value?: unknown;
+}
+export type ExplicitMutationIntentKind = 'mutation-request' | 'patch-proposal' | 'owner-shard-row-target' | 'json-pointer' | 'text-range' | 'scalar-operation';
+export interface MutationIntentMissingInput {
+    readonly requestId: string;
+    readonly filePath: string;
+    readonly kind: ExplicitMutationIntentKind | 'unknown';
+    readonly field: 'filePath' | 'op' | 'target' | 'value';
+    readonly reason: string;
+}
+export interface ExplicitMutationIntentInputSummary {
+    readonly requestId: string;
+    readonly filePath: string;
+    readonly kind: ExplicitMutationIntentKind;
+    readonly op: string;
+    readonly target: string;
 }
 /**
  * An adapter-normalized mutation: the registry-neutral request after the
@@ -324,6 +347,8 @@ export interface BrokerOperationRunRecord {
     readonly merge_verdict: MergeVerdict;
     readonly evidence_path: string;
     readonly task_ids?: readonly string[];
+    readonly commit_sha?: string;
+    readonly transaction_ids?: readonly string[];
 }
 export interface BrokerOperationRunRecordEnvelope {
     readonly schemaId: 'atm.brokerOperationRunRecordEnvelope.v1';
@@ -352,3 +377,22 @@ export interface BrokerMutationEvidenceEntry {
 }
 /** Shared default migration record for adapter-emitted envelopes. */
 export declare function brokerAdapterMigration(): MigrationRecord;
+export interface RouteFreezeRuntimeRecord {
+    readonly schemaId: 'atm.routeFreezeRuntime.v1';
+    readonly specVersion: '0.1.0';
+    readonly migration: MigrationRecord;
+    readonly routeId: string;
+    readonly signal: FreezeSignal;
+    readonly ack: FreezeAck;
+    readonly resolution: FreezeResolution;
+    readonly pauseReason: string;
+    readonly updatedAt: string;
+}
+export declare function createRouteFreezeRuntimeRecord(input: {
+    readonly routeId: string;
+    readonly signal: FreezeSignal;
+    readonly ack: FreezeAck;
+    readonly resolution: FreezeResolution;
+    readonly pauseReason: string;
+    readonly updatedAt: string;
+}): RouteFreezeRuntimeRecord;

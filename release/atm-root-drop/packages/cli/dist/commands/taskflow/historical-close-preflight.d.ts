@@ -8,7 +8,7 @@ interface PreflightCommitBundle {
     readonly targetRepo: PreflightCommitRepoBundle;
     readonly planningRepo: PreflightCommitRepoBundle;
 }
-export type HistoricalClosePreflightBlockerId = 'scopeTrackedDirtyFiles' | 'unexpectedStagedTasks' | 'unexpectedStagedNonBundleFiles' | 'mixedDeliveryCommit' | 'staleEvidence' | 'missingApprovalLease';
+export type HistoricalClosePreflightBlockerId = 'scopeTrackedDirtyFiles' | 'incorrectPlanningMirrorPreEdit' | 'unexpectedStagedTasks' | 'unexpectedStagedNonBundleFiles' | 'mixedDeliveryCommit' | 'staleEvidence' | 'missingApprovalLease';
 export interface HistoricalClosePreflightRemediationChoice {
     readonly id: 'restore-accidental-drift' | 'commit-scoped-delivery' | 'defer-foreign-staged' | 'request-waiver' | 'refresh-evidence' | 'restore-accidental-staged';
     readonly summary: string;
@@ -34,6 +34,7 @@ export interface UnexpectedNonBundleStagedRepoReport {
     readonly repoKind: 'target' | 'planning';
     readonly stagedFiles: readonly string[];
     readonly restoreCommand: string;
+    readonly deferredForeignFiles: readonly string[];
 }
 export interface HistoricalCloseWriteRollbackSummary {
     readonly schemaId: 'atm.historicalCloseWriteRollbackSummary.v1';

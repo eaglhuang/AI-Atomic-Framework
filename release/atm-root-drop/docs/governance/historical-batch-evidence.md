@@ -121,6 +121,21 @@ When using `taskflow close --write`, inspect `closeWriteTransaction` in the
 JSON result. A commit-bundle failure rolls back the close transition and leaves
 the task not-done instead of reporting success with a stranded done ledger.
 
+## One envelope vs per-task close approvals
+
+Historical batch evidence separates **validator attestation** from **lifecycle
+close**:
+
+| Step | Approvals |
+|---|---|
+| `evidence historical-batch --write` | One shared envelope for the delivery commit range and validator set. Requires explicit `--allow-unmatched` + human approval when tasks do not all match the commit set. |
+| `taskflow close --historical-batch --write` (per task) | One governed close bundle **per task**, even when they share the batch envelope. Each close still records its own transition, closure packet, and planning mirror update. |
+| Out-of-scope delivery waiver | Separate from the batch envelope. Pre-close must show the waiver lease or reason before `--write`. |
+
+Do not treat one batch envelope as permission to skip per-task pre-close,
+dry-run, or checklist verification. See `docs/ATM_NEW_USER_WORKFLOW.md`
+(Closeback operator runbook) for the full sequence and banned patterns.
+
 ## Relationship to ordinary evidence
 
 Historical batch does not replace normal evidence capture. It fills the gap

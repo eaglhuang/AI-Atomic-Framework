@@ -22,7 +22,10 @@ export interface BrokerConflictMatrix {
 
 export function evaluateConflictMatrix(
   newIntent: WriteIntent,
-  activeIntents: readonly ActiveWriteIntent[]
+  activeIntents: readonly ActiveWriteIntent[],
+  options: {
+    readonly currentEpoch?: number;
+  } = {}
 ): BrokerConflictMatrix {
   const conflicts: BrokerConflictClassResult[] = [];
 
@@ -43,7 +46,7 @@ export function evaluateConflictMatrix(
   const fileConflicts = detectFileRangeConflictClasses(newIntent, activeIntents);
   conflicts.push(...fileConflicts);
 
-  const leaseConflicts = detectLeaseConflicts(activeIntents);
+  const leaseConflicts = detectLeaseConflicts(newIntent, activeIntents, options.currentEpoch);
   conflicts.push(...leaseConflicts);
 
   const arbitrationVerdict = chooseArbitrationVerdict(conflicts);
@@ -290,11 +293,55 @@ function detectFileRangeConflictClasses(
   return conflicts;
 }
 
-function detectLeaseConflicts(activeIntents: readonly ActiveWriteIntent[]): BrokerConflictClassResult[] {
+function hasResourceOverlap(newIntent: WriteIntent, active: ActiveWriteIntent): boolean {
+  if (active.taskId === newIntent.taskId) return true;
+
+  const activeFiles = new Set(active.resourceKeys.files);
+  if (newIntent.targetFiles.some(file => activeFiles.has(file))) return true;
+
+  const activeAtomIds = new Set(active.resourceKeys.atomIds);
+  if (newIntent.atomRefs.some(ref => activeAtomIds.has(ref.atomId))) return true;
+
+  const activeAtomCids = new Set(active.resourceKeys.atomCids);
+  if (newIntent.atomRefs.some(ref => activeAtomCids.has(ref.atomCid))) return true;
+
+  const activeGenerators = new Set(active.resourceKeys.generators);
+  if (newIntent.sharedSurfaces.generators.some(gen => activeGenerators.has(gen))) return true;
+
+  const activeProjections = new Set(active.resourceKeys.projections);
+  if (newIntent.sharedSurfaces.projections.some(proj => activeProjections.has(proj))) return true;
+
+  const activeRegistries = new Set(active.resourceKeys.registries);
+  if (newIntent.sharedSurfaces.registries.some(reg => activeRegistries.has(reg))) return true;
+
+  const activeValidators = new Set(active.resourceKeys.validators);
+  if (newIntent.sharedSurfaces.validators.some(val => activeValidators.has(val))) return true;
+
+  const activeArtifacts = new Set(active.resourceKeys.artifacts);
+  if (newIntent.sharedSurfaces.artifacts.some(art => activeArtifacts.has(art))) return true;
+
+  return false;
+}
+
+function detectLeaseConflicts(
+  newIntent: WriteIntent,
+  activeIntents: readonly ActiveWriteIntent[],
+  currentEpoch?: number
+): BrokerConflictClassResult[] {
   const conflicts: BrokerConflictClassResult[] = [];
   const now = Date.now();
 
   for (const active of activeIntents) {
+    if (!hasResourceOverlap(newIntent, active)) continue;
+
+    if (active.taskId !== newIntent.taskId && typeof currentEpoch === 'number' && Number.isFinite(currentEpoch) && active.leaseEpoch < currentEpoch) {
+      conflicts.push({
+        kind: 'lease',
+        detail: `Active lease epoch stale for '${active.taskId}'; leaseEpoch ${active.leaseEpoch} is behind registry currentEpoch ${currentEpoch}.`,
+        blockingTask: active.taskId
+      });
+      continue;
+    }
     if (!active.expiresAt) continue;
     const expiresAt = Date.parse(active.expiresAt);
     if (Number.isNaN(expiresAt) || expiresAt <= now) {

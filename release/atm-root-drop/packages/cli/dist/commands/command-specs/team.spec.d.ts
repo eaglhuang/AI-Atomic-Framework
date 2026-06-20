@@ -34,6 +34,10 @@ export declare const teamSpecPermissionValidation: {
     summary: string;
     examples: string[];
 };
+export declare const teamSpecLeaseFencing: {
+    summary: string;
+    examples: string[];
+};
 export declare const teamSpecBrokerLane: {
     summary: string;
     examples: string[];
@@ -54,7 +58,15 @@ export declare const teamSpecRuntimeStatus: {
     summary: string;
     examples: string[];
 };
+export declare const teamSpecPatrolReport: {
+    summary: string;
+    examples: string[];
+};
 export declare const teamSpecNextRecommendation: {
+    summary: string;
+    examples: string[];
+};
+export declare const teamSpecKnowledgeBuildQuery: {
     summary: string;
     examples: string[];
 };

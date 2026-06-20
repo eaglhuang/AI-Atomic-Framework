@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { TaskDirectionTask, TaskQueueRecord } from './task-direction.ts';
+import { normalizeStoredPlanningPathForIdentity } from './planning-repo-root.ts';
 
 export interface QuickfixLock {
   readonly schemaId: 'atm.quickfixLock.v1';
@@ -33,6 +34,7 @@ export interface BatchRunRecord {
   readonly checkpointSize: number;
   readonly status: 'active' | 'paused' | 'completed' | 'abandoned';
   readonly hold?: BatchRunHold | null;
+  readonly skippedTasks?: readonly BatchSkippedTaskRecord[];
   readonly createdByActor: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -45,6 +47,16 @@ export interface BatchRunHold {
   readonly currentTaskId: string | null;
   readonly heldByActor: string;
   readonly heldAt: string;
+  readonly resumeCommand: string;
+}
+
+export interface BatchSkippedTaskRecord {
+  readonly schemaId: 'atm.batchSkippedTask.v1';
+  readonly taskId: string;
+  readonly reason: string;
+  readonly skippedByActor: string;
+  readonly skippedAt: string;
+  readonly batchIndex: number;
   readonly resumeCommand: string;
 }
 
@@ -219,7 +231,7 @@ export function writeBatchRun(input: {
     schemaId: 'atm.batchRun.v1',
     specVersion: '0.1.0',
     batchId,
-    scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds),
+    scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds, input.cwd),
     queueId: input.queue?.queueId ?? null,
     sourcePrompt: prompt,
     sourcePromptHash: sha256(prompt),
@@ -427,7 +439,51 @@ function normalizeBatchRunRecord(record: BatchRunRecord): BatchRunRecord {
     ...record,
     scopeKey: record.scopeKey || deriveBatchScopeKey([], record.sourcePrompt ?? '', taskIds),
     queueId: record.queueId ?? null,
-    taskIds
+    taskIds,
+    skippedTasks: Array.isArray(record.skippedTasks) ? record.skippedTasks : []
+  };
+}
+
+export function writeBatchTaskAuditEvent(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly action: 'batch-skip' | 'batch-resume';
+  readonly actorId: string;
+  readonly batchId: string;
+  readonly reason?: string | null;
+  readonly batchIndex?: number | null;
+}) {
+  const createdAt = new Date().toISOString();
+  const digest = sha256(JSON.stringify({
+    taskId: input.taskId,
+    action: input.action,
+    actorId: input.actorId,
+    batchId: input.batchId,
+    reason: input.reason ?? null,
+    batchIndex: input.batchIndex ?? null,
+    createdAt
+  })).slice(0, 12);
+  const transitionId = `${createdAt.replace(/[:.]/g, '-')}-${input.action}-${digest}`;
+  const event = {
+    schemaId: 'atm.taskTransition.v1',
+    specVersion: '0.1.0',
+    transitionId,
+    taskId: input.taskId,
+    action: input.action,
+    actorId: input.actorId,
+    batchId: input.batchId,
+    reason: input.reason ?? null,
+    batchIndex: input.batchIndex ?? null,
+    createdAt,
+    command: `node atm.mjs batch ${input.action === 'batch-skip' ? 'skip' : 'resume'} --task ${input.taskId} --batch ${input.batchId} --actor ${input.actorId} --json`
+  };
+  const eventDir = path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId);
+  mkdirSync(eventDir, { recursive: true });
+  const eventPath = path.join(eventDir, `${transitionId}.json`);
+  writeFileSync(eventPath, `${JSON.stringify(event, null, 2)}\n`, 'utf8');
+  return {
+    transitionId,
+    eventPath: normalizeRelativePath(path.relative(input.cwd, eventPath))
   };
 }
 
@@ -442,13 +498,16 @@ function dedupeBatchRuns(records: readonly BatchRunRecord[]) {
   return output.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
 }
 
-function deriveBatchScopeKey(tasks: readonly TaskDirectionTask[], prompt: string, taskIds: readonly string[]) {
+function deriveBatchScopeKey(tasks: readonly TaskDirectionTask[], prompt: string, taskIds: readonly string[], cwd?: string) {
   const idRoots = uniqueStrings(taskIds.map((taskId) => {
     const match = taskId.match(/^(.+?)-\d{2,}(?:-.+)?$/);
     return match?.[1] ?? '';
   }).filter(Boolean));
   if (idRoots.length === 1) return idRoots[0] ?? 'custom';
-  const planPaths = uniqueStrings(tasks.map((task) => task.sourcePlanPath).filter((entry): entry is string => Boolean(entry)));
+  const planPaths = uniqueStrings(tasks
+    .map((task) => task.sourcePlanPath)
+    .filter((entry): entry is string => Boolean(entry))
+    .map((entry) => cwd ? normalizeStoredPlanningPathForIdentity(cwd, entry) : entry));
   if (planPaths.length === 1) return `plan-${sha256(planPaths[0] ?? '').slice(0, 12)}`;
   if (taskIds.length > 0) return `tasks-${sha256(taskIds.join('\n')).slice(0, 12)}`;
   return `prompt-${sha256(prompt).slice(0, 12)}`;

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-20T11-46-22-022Z-scope-amendment-6a40edde1b8c",
+  "taskId": "TASK-AAO-0043",
+  "action": "scope-amendment",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0043.json",
+  "taskSha256": "sha256:0170fa60663de286c3a2d5f0cb4357d91790c087edac4c0ce17ac972577df5a7",
+  "createdAt": "2026-06-20T11:46:22.022Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0043 --actor cursor-gpt-5.2 --add packages/cli/src/commands/command-specs/next.spec.ts --reason \"0043 command spec touch-up if needed\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "0043 command spec touch-up if needed"
+  }
+}

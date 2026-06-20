@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
@@ -204,6 +205,32 @@ async function main() {
     assert(!((familyQueue.evidence.nextAction as any).selectedTasks ?? []).some((task: any) => task.workItemId.includes('APO')), 'task family prompt must not fall back to unrelated root task cards');
     const familyTrail = assertDecisionTrail(familyQueue.evidence.nextAction as any, 'task family queue');
     assert(familyTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-AAO-0001')), 'task family decisionTrail must record the matching queue head');
+
+    const isolatedRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-planning-root-missing-'));
+    mkdirSync(path.join(isolatedRoot, '.atm'), { recursive: true });
+    writeFileSync(path.join(isolatedRoot, '.atm', 'config.json'), `${JSON.stringify({
+      schemaVersion: 'atm.config.v0.1',
+      taskLedger: { enabled: true }
+    }, null, 2)}\n`, 'utf8');
+    const missingRootRoute = await runNext(['--cwd', isolatedRoot, '--prompt', '請依照 3KLife docs/ai_atomic_framework 規劃完成 TASK-AAO-0043']);
+    assert(missingRootRoute.ok === false, 'missing configured planning root must fail closed');
+    assert(missingRootRoute.messages.some((entry) => entry.code === 'ATM_PLANNING_ROOT_MISSING'), 'missing configured planning root must emit ATM_PLANNING_ROOT_MISSING');
+    assert((missingRootRoute.evidence.nextAction as any)?.planningRootMissing?.suggestedConfig?.taskLedger?.planningRoots, 'missing planning root diagnostic must suggest config action');
+    rmSync(isolatedRoot, { recursive: true, force: true });
+
+    const importedRelative = await runTasks([
+      'import',
+      '--cwd',
+      tempRoot,
+      '--from',
+      path.join(externalTaskDir, 'TASK-AAO-0001-report-overlap-matrix-routing.task.md'),
+      '--dry-run',
+      '--json'
+    ]);
+    assert(importedRelative.ok === true, 'tasks import dry-run must succeed for external planning card');
+    const importedPlanPath = (importedRelative.evidence as any)?.manifest?.tasks?.[0]?.source?.planPath ?? '';
+    assert(!importedPlanPath.startsWith('../'), 'imported planning paths must be stored relative to planning root');
+    assert(importedPlanPath.includes('atm-agent-first-operability/tasks/TASK-AAO-0001-report-overlap-matrix-routing.task.md'), 'imported planning path must stay planning-root-relative');
 
     writeTaskCard(path.join(taskDir, 'TASK-EMPTY-0001.task.md'), 'TASK-EMPTY-0001', 'Empty scope fixture', { status: 'done' });
     const emptyScope = await runNext(['--cwd', tempRoot, '--prompt', 'Please continue remaining TASK-EMPTY task cards one by one']);
@@ -467,7 +494,7 @@ target_repo: AI-Atomic-Framework
     const crossClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-CROSS-0001']);
     assert(crossClaim.ok === true, 'cross-repo ledger task claim must succeed');
     const crossLock = (crossClaim.evidence.taskDirectionLock as any) ?? {};
-    assert((crossClaim.evidence.nextAction as any).planningContext?.readOnlyPaths?.some((entry: string) => entry.includes('../3KLife/docs/ai_atomic_framework/atm-agent-first-operability')), 'next --claim must surface planningContext.readOnlyPaths');
+    assert((crossClaim.evidence.nextAction as any).planningContext?.readOnlyPaths?.some((entry: string) => entry.includes('3KLife/docs/ai_atomic_framework/atm-agent-first-operability')), 'next --claim must surface planningContext.readOnlyPaths');
     assert((crossClaim.evidence.nextAction as any).targetWork?.allowedFiles?.includes('packages/cli/src/commands/next.ts'), 'next --claim must surface targetWork.allowedFiles');
     assert(!((crossClaim.evidence.nextAction as any).targetWork?.allowedFiles ?? []).some((entry: string) => entry.startsWith('docs/ai_atomic_framework/atm-agent-first-operability/')), 'targetWork.allowedFiles must exclude planning mirror files');
     assert((crossLock.allowedFiles ?? []).includes('packages/cli/src/commands/next.ts'), 'direction lock must keep real target files');
@@ -610,7 +637,14 @@ scopePaths:
     assert(claimEvidence?.nextAction?.teamRecommendation?.parallelAdvisory?.verdict === 'insufficient-mutation-intent', 'claim advisory must report insufficient mutation intent');
     assert(claimEvidence?.nextAction?.teamRecommendation?.parallelAdvisory?.brokerAdmission?.confirmedConflict === false, 'claim advisory must not report a confirmed Broker conflict');
 
-    const teamPlanResult = await runTeam(['plan', '--task', 'TASK-CONFLICT-0002', '--cwd', tempRoot, '--json']);
+    let teamPlanResult: any;
+    try {
+      teamPlanResult = await runTeam(['plan', '--task', 'TASK-CONFLICT-0002', '--cwd', tempRoot, '--json']);
+    } catch (err: any) {
+      console.log('runTeam failed with error:', err.message, err.stack, JSON.stringify(err.details ?? {}, null, 2));
+      throw err;
+    }
+    console.log('teamPlanResult is:', JSON.stringify(teamPlanResult, null, 2));
     assert(teamPlanResult.ok === true, 'team plan must not fail validation on unconfirmed same-atom metadata overlap');
     const teamEvidence = teamPlanResult.evidence as any;
     assert(teamEvidence?.validation?.ok === true, 'validation ok must stay true for unconfirmed same-atom metadata overlap');

@@ -376,7 +376,20 @@ export declare const commandSpecs: Readonly<{
         options: any[];
         examples: any[];
     }>;
-    taskflow: any;
+    taskflow: Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+    }>;
+    'task-view': Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+    }>;
     broker: Readonly<{
         name: string;
         summary: string;

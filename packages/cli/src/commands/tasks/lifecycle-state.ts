@@ -73,10 +73,17 @@ export function evaluateTaskClaimAdmission(input: {
   readonly actorId: string;
   readonly status: unknown;
   readonly claimIntent: TaskClaimIntent;
+  readonly currentClaimActorId?: string | null;
+  readonly currentClaimState?: string | null;
 }): TaskLifecycleAdmission {
   const status = normalizeTaskLifecycleStatus(input.status);
   if (status === 'ready') {
     return { ok: true, reason: 'ready-claim' };
+  }
+  if (status === 'running'
+    && input.currentClaimState === 'active'
+    && input.currentClaimActorId === input.actorId) {
+    return { ok: true, reason: 'running-same-actor-reclaim' };
   }
   if (status === 'review' && input.claimIntent === 'closeout-only') {
     return { ok: true, reason: 'review-closeout-only-reclaim' };

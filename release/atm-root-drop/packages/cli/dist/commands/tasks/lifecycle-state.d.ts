@@ -25,6 +25,8 @@ export declare function evaluateTaskClaimAdmission(input: {
     readonly actorId: string;
     readonly status: unknown;
     readonly claimIntent: TaskClaimIntent;
+    readonly currentClaimActorId?: string | null;
+    readonly currentClaimState?: string | null;
 }): TaskLifecycleAdmission;
 export declare function evaluateTaskDoneCloseAdmission(input: {
     readonly taskId: string;

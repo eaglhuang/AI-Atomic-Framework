@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, relativePathFrom } from './shared.js';
+import { isExternalPlanningStoredPath, isPlanningRootDocStoredPath, looksLikePlanningRootRelativePath, normalizeStoredPlanningPathForIdentity, resolveStoredPlanningPath } from './planning-repo-root.js';
 import { isPathAllowedByScope } from './work-channels.js';
 export function createOrRefreshTaskQueue(input) {
     const sourcePrompt = input.sourcePrompt.trim();
@@ -74,6 +75,9 @@ export function abandonTaskQueue(input) {
     return abandoned;
 }
 export function advanceTaskQueueAfterClose(cwd, taskId, selector = {}) {
+    return advanceTaskQueueHead(cwd, taskId, selector);
+}
+export function advanceTaskQueueHead(cwd, taskId, selector = {}) {
     const queue = findActiveTaskQueue(cwd, null, { ...selector, taskId });
     if (!queue)
         return null;
@@ -86,6 +90,23 @@ export function advanceTaskQueueAfterClose(cwd, taskId, selector = {}) {
         ...queue,
         currentIndex: Math.min(nextIndex, Math.max(0, queue.taskIds.length - 1)),
         status: nextIndex >= queue.taskIds.length ? 'completed' : 'active',
+        updatedAt: now
+    };
+    writeTaskQueue(cwd, updated);
+    return updated;
+}
+export function restoreTaskQueueHead(cwd, taskId, selector = {}) {
+    const queue = findActiveTaskQueue(cwd, null, { ...selector, taskId });
+    if (!queue)
+        return null;
+    const targetIndex = queue.taskIds.indexOf(taskId);
+    if (targetIndex < 0)
+        return null;
+    const now = new Date().toISOString();
+    const updated = {
+        ...queue,
+        currentIndex: targetIndex,
+        status: 'active',
         updatedAt: now
     };
     writeTaskQueue(cwd, updated);
@@ -329,14 +350,35 @@ export function buildTaskSelfAllowPaths(taskId) {
         `.atm/history/task-events/${taskId}/**`
     ];
 }
-export function partitionTaskScope(task) {
+export function partitionTaskScope(task, options) {
+    const cwd = options?.cwd ?? null;
+    const normalizeScopePath = (value) => {
+        if (!value)
+            return value;
+        return cwd ? normalizeStoredPlanningPathForIdentity(cwd, value) : normalizeRelativePath(value);
+    };
+    const normalizedScopePaths = task.scopePaths.map(normalizeScopePath);
+    const normalizedSourcePlanPath = task.sourcePlanPath ? normalizeScopePath(task.sourcePlanPath) : null;
+    const normalizedNearbyPlanPaths = task.nearbyPlanPaths.map(normalizeScopePath);
+    const classifyPlanningPath = (value) => {
+        if (!value)
+            return false;
+        if (cwd)
+            return isExternalPlanningStoredPath(cwd, value);
+        return isExternalPlanningPath(value);
+    };
+    const resolveToAbsolute = (value) => {
+        if (!value)
+            return '';
+        return cwd ? resolveStoredPlanningPath(cwd, value).absolutePath : path.resolve(value);
+    };
     const planningReadOnlyPaths = sanitizeTaskDirectionAllowedFiles([
         task.sourcePlanPath ?? '',
         ...task.nearbyPlanPaths,
-        ...task.scopePaths.filter(isExternalPlanningPath)
-    ]);
+        ...task.scopePaths.filter(classifyPlanningPath)
+    ].map(resolveToAbsolute));
     const planningMirrorPaths = uniqueSorted(planningReadOnlyPaths.flatMap(derivePlanningMirrorGuardPaths));
-    const targetCandidates = sanitizeTaskDirectionAllowedFiles(task.scopePaths);
+    const targetCandidates = sanitizeTaskDirectionAllowedFiles(normalizedScopePaths);
     const allowedFiles = targetCandidates.filter((entry) => {
         if (planningReadOnlyPaths.includes(entry))
             return false;
@@ -512,7 +554,9 @@ function writeJson(filePath, value) {
 }
 function isExternalPlanningPath(value) {
     const normalized = normalizeRelativePath(value);
-    return normalized.startsWith('../');
+    return normalized.startsWith('../')
+        || isPlanningRootDocStoredPath(normalized)
+        || looksLikePlanningRootRelativePath(normalized);
 }
 function derivePlanningMirrorGuardPaths(value) {
     const normalized = normalizeRelativePath(value);

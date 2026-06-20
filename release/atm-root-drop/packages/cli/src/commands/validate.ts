@@ -1,9 +1,11 @@
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { validateAtomRefReadability } from '../../../core/src/registry/atom-ref-readability.ts';
 import { runFrameworkDevelopmentValidation } from './framework-development.ts';
+import { readActiveTaskDirectionLocks } from './task-direction.ts';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.ts';
+import { isPathAllowedByScope } from './work-channels.ts';
 
 const requiredAtomicSpecFields = [
   'schemaId',
@@ -17,6 +19,16 @@ const requiredAtomicSpecFields = [
   'compatibility',
   'hashLock'
 ];
+
+export interface TaskRunnerArbitration {
+  readonly schemaId: 'atm.taskRunnerArbitration.v1';
+  readonly taskId: string;
+  readonly dirtyInScopeFiles: readonly string[];
+  readonly sourceFirstFiles: readonly string[];
+  readonly foreignActiveFiles: readonly string[];
+  readonly frozenFiles: readonly string[];
+  readonly preferredRunnerKind: 'dev-source' | 'frozen-runner';
+}
 
 export function runValidate(argv: any) {
   if (argv.includes('taxonomy')) {
@@ -64,6 +76,73 @@ function valueAfter(argv: any, flag: string): string | null {
   }
   const value = argv[index + 1];
   return typeof value === 'string' && !value.startsWith('--') ? value : null;
+}
+
+function readGitNameOnly(cwd: string, args: readonly string[]) {
+  try {
+    const output = execFileSync('git', [...args], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    }).trim();
+    return output.split(/\r?\n/).map((entry) => entry.trim().replace(/\\/g, '/')).filter(Boolean);
+  } catch {
+    return [] as string[];
+  }
+}
+
+function uniqueStrings(values: readonly string[]) {
+  return [...new Set(values.map((entry) => entry.trim().replace(/\\/g, '/')).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function readTaskArbitrationAllowedFiles(taskDocument: Record<string, unknown>) {
+  const readList = (key: string) => {
+    const value = taskDocument[key];
+    return Array.isArray(value)
+      ? value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim().replace(/\\/g, '/'))
+      : [] as string[];
+  };
+  return uniqueStrings([
+    ...readList('deliverables'),
+    ...readList('scopePaths'),
+    ...readList('targetAllowedFiles')
+  ]);
+}
+
+export function resolveTaskRunnerArbitration(cwd: string, taskId: string, candidateFiles: readonly string[] = []): TaskRunnerArbitration {
+  const resolvedCwd = path.resolve(cwd);
+  const taskPath = path.resolve(resolvedCwd, '.atm', 'history', 'tasks', `${taskId.trim()}.json`);
+  let taskDocument: Record<string, unknown> = {};
+  if (existsSync(taskPath)) {
+    try {
+      taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    } catch {
+      taskDocument = {};
+    }
+  }
+  const allowedFiles = readTaskArbitrationAllowedFiles(taskDocument);
+  const dirtyFiles = uniqueStrings([
+    ...readGitNameOnly(resolvedCwd, ['diff', '--name-only', '--cached']),
+    ...readGitNameOnly(resolvedCwd, ['diff', '--name-only']),
+    ...readGitNameOnly(resolvedCwd, ['ls-files', '-o', '--exclude-standard'])
+  ]);
+  const dirtyInScopeFiles = dirtyFiles.filter((filePath) => allowedFiles.some((allowed) => isPathAllowedByScope(filePath, [allowed])));
+  const foreignLocks = readActiveTaskDirectionLocks(resolvedCwd).filter((lock) => lock.taskId !== taskId && lock.status === 'active');
+  const candidateUniverse = uniqueStrings(candidateFiles.length > 0 ? candidateFiles : dirtyInScopeFiles);
+  const foreignActiveFiles = candidateUniverse.filter((filePath) =>
+    foreignLocks.some((lock) => isPathAllowedByScope(filePath, lock.allowedFiles))
+  );
+  const sourceFirstFiles = dirtyInScopeFiles.filter((filePath) => !foreignActiveFiles.includes(filePath));
+  const frozenFiles = uniqueStrings(candidateUniverse.filter((filePath) => foreignActiveFiles.includes(filePath)));
+  return {
+    schemaId: 'atm.taskRunnerArbitration.v1',
+    taskId: taskId.trim(),
+    dirtyInScopeFiles,
+    sourceFirstFiles,
+    foreignActiveFiles,
+    frozenFiles,
+    preferredRunnerKind: sourceFirstFiles.length > 0 ? 'dev-source' : 'frozen-runner'
+  };
 }
 
 function validateAtomizationCoverage(cwd: string) {

@@ -34,6 +34,9 @@ import type { LocalGovernanceConfig } from './index';
 import { resolveLocalGovernanceLayout } from './layout.ts';
 import { isArtifactVersionKind, resolveDataAndArtifactVersions, isValidSemverVersionString } from './versioning.ts';
 
+const CANONICAL_KNOWLEDGE_ROOT = '.atm/knowledge';
+const GENERATED_KNOWLEDGE_CACHE_ROOT = '.atm/runtime/knowledge';
+
 export function createLocalGovernanceStores(config: LocalGovernanceConfig): GovernanceStores {
   const repositoryRoot = path.resolve(config.repositoryRoot);
   const layout = resolveLocalGovernanceLayout(config.layout);
@@ -102,6 +105,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       ensureAllDirectories();
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItem.workItemId}.lock.json`);
       const timestamp = now();
+      const leaseEpoch = Date.parse(timestamp);
       const record: ScopeLockRecord = {
         schemaId: 'atm.governanceScopeLock',
         specVersion: '0.1.0',
@@ -115,13 +119,14 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
         lockedAt: timestamp,
         actorId: actor,
         leaseId: `lease-${timestamp.replace(/[:.]/g, '-')}`,
+        leaseEpoch,
         heartbeatAt: timestamp,
         ttlSeconds: 1800,
         files: Array.from(new Set(files.map((filePath) => normalizeRelativePath(filePath)).filter(Boolean)))
-      };
+      } as ScopeLockRecord;
       if (existsSync(filePath)) {
         const existing = readJsonFile(filePath) as Record<string, unknown>;
-        if (isReleasedLockRecord(existing)) {
+        if (isReleasedLockRecord(existing) || existing.lockedBy === actor || existing.actorId === actor) {
           writeJsonFile(filePath, record);
           return record;
         }
@@ -169,7 +174,8 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
         released: true,
         status: 'released',
         releasedAt: timestamp,
-        releasedBy: actor
+        releasedBy: actor,
+        releaseEpoch: Date.parse(timestamp)
       });
       return capabilityResult(`Released scope lock for ${workItemId}.`);
     }
@@ -209,15 +215,18 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     initialize: () => initializeStore('shard store'),
     healthCheck: () => capabilityResult(`Shard store is ready at ${layout.shardStorePath}.`),
     readShard(shardPath) {
+      assertCanonicalShardInput(shardPath);
       const absolutePath = resolveRepoPath(repositoryRoot, shardPath);
       return existsSync(absolutePath) ? readUnknownFile(absolutePath) : null;
     },
     writeShard(shardPath, value) {
+      assertCanonicalShardInput(shardPath);
       ensureAllDirectories();
       writeUnknownFile(resolveRepoPath(repositoryRoot, shardPath), value);
       return capabilityResult(`Wrote shard ${normalizeRelativePath(shardPath)}.`);
     },
     rebuildIndex(indexPath) {
+      assertGeneratedKnowledgeCacheOutput(indexPath);
       ensureAllDirectories();
       const entries = listFilesRecursive(absoluteLayout.shardStorePath).map((filePath) => relativePathFrom(repositoryRoot, filePath));
       writeJsonFile(resolveRepoPath(repositoryRoot, indexPath), {
@@ -486,6 +495,24 @@ function relativePathFrom(repositoryRoot: string, filePath: string): string {
 
 function normalizeRelativePath(filePath: string): string {
   return filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function assertCanonicalShardInput(filePath: string): void {
+  const normalized = normalizeRelativePath(filePath);
+  if (isInsideRelativeRoot(normalized, GENERATED_KNOWLEDGE_CACHE_ROOT)) {
+    throw new Error(`Generated knowledge cache paths under ${GENERATED_KNOWLEDGE_CACHE_ROOT}/** cannot be used as canonical shard input. Use ${CANONICAL_KNOWLEDGE_ROOT}/** for canonical Team knowledge shards.`);
+  }
+}
+
+function assertGeneratedKnowledgeCacheOutput(filePath: string): void {
+  const normalized = normalizeRelativePath(filePath);
+  if (isInsideRelativeRoot(normalized, CANONICAL_KNOWLEDGE_ROOT)) {
+    throw new Error(`Shard indexes are generated artifacts. Write Team knowledge indexes under ${GENERATED_KNOWLEDGE_CACHE_ROOT}/**, not canonical ${CANONICAL_KNOWLEDGE_ROOT}/**.`);
+  }
+}
+
+function isInsideRelativeRoot(filePath: string, root: string): boolean {
+  return filePath === root || filePath.startsWith(`${root}/`);
 }
 
 function writeJsonFile(filePath: string, value: unknown) {

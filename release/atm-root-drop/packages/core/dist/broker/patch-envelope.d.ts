@@ -57,3 +57,12 @@ export declare function validatePatchEnvelope(envelope: PatchEnvelope): {
     readonly ok: boolean;
     readonly reason: string;
 };
+export declare function createHandoffPatchEnvelope(input: {
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly freezeId: string;
+    readonly targetFiles?: readonly string[];
+    readonly snapshotDir?: string;
+    readonly partialReason?: string;
+    readonly capturedAt?: string;
+}): PatchEnvelope;

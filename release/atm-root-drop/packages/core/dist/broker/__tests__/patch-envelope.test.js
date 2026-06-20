@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { createPatchEnvelope, isMetadataOnlyEnvelope, validatePatchEnvelope, summarizePatchEnvelope, comparePatchEnvelopes } from '../patch-envelope.js';
+import { createPatchEnvelope, createHandoffPatchEnvelope, isMetadataOnlyEnvelope, validatePatchEnvelope, summarizePatchEnvelope, comparePatchEnvelopes } from '../index.js';
 function testValidTextualDiffEnvelopePasses() {
     const envelope = createPatchEnvelope({
         taskId: 'TASK-A',
@@ -117,6 +117,19 @@ function testSummarizeProducesStableDigest() {
     assert.equal(emptySummary.fileCount, 0);
     assert.equal(emptySummary.hasPatchText, false);
 }
+function testHandoffEnvelopeUsesBrokerDefaults() {
+    const envelope = createHandoffPatchEnvelope({
+        taskId: 'TASK-HANDOFF',
+        actorId: 'agent-handoff',
+        freezeId: 'freeze-handoff',
+        targetFiles: ['packages/cli/src/commands/route.ts']
+    });
+    assert.equal(envelope.mode, 'metadata-only');
+    assert.equal(isMetadataOnlyEnvelope(envelope), true);
+    assert.equal(validatePatchEnvelope(envelope).ok, true);
+    assert.ok(envelope.metadata.partialReason?.includes('worktree apply'));
+    assert.equal(envelope.snapshotDir, '.atm/runtime/wip-snapshot');
+}
 function testCompareIdentifiesDivergences() {
     const base = createPatchEnvelope({
         taskId: 'TASK-CMP',
@@ -167,5 +180,6 @@ testMissingActorIdFails();
 testMissingFreezeIdFails();
 testTextualDiffEnvelopeRequiresPatchText();
 testSummarizeProducesStableDigest();
+testHandoffEnvelopeUsesBrokerDefaults();
 testCompareIdentifiesDivergences();
 console.log('patch envelope tests: ok');

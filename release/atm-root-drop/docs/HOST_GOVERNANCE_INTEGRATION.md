@@ -248,6 +248,24 @@ See [ADAPTER_GUIDE.md](./ADAPTER_GUIDE.md) for the stable adapter contract and
 [ARCHITECTURE.md](./ARCHITECTURE.md) for the layer boundary that keeps host
 policy out of core semantics.
 
+## Closeback operator integration
+
+Host wrappers and editor adaptors should route closeout through the governed
+operator lane, not through raw Git or backend repair commands.
+
+| Concern | Host integration point |
+|---|---|
+| Pre-close visibility | Call `taskflow pre-close` before any close `--write`; surface `scopeTrackedDirtyFiles`, `unexpectedStagedTasks`, and `staleEvidence` to the operator. |
+| Foreign staged bundles | When parallel agents share one worktree, expose `--defer-foreign-staged` on delivery and close wrappers; never silently unstage another task's governance bundle. |
+| Close verification | After close, call `task-view` and check `closeCompletionChecklist.partialClose === false`. |
+| Historical delivery | When delivery predates governance, route to `evidence historical-batch` plus per-task `taskflow close --historical-batch`; one batch envelope does not replace per-task close. |
+| Banned shortcuts | Do not document `tasks repair-closure` as close; do not hand-edit `.atm/history/**`; do not use bare `git commit` for ledger mutations. |
+
+Full runbook: `docs/ATM_NEW_USER_WORKFLOW.md` (Closeback operator runbook).
+Git defer and snapshot contract: `docs/governance/git-governance-contract.md`
+(Foreign staged restore protocol). Batch envelope rules:
+`docs/governance/historical-batch-evidence.md`.
+
 ## Related Documentation
 
 - [ADAPTER_GUIDE.md](./ADAPTER_GUIDE.md)

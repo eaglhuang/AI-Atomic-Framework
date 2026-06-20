@@ -1,0 +1,1416 @@
+{
+  "schemaId": "atm.teamRun.v1",
+  "teamRunId": "team-02af6aa8867f",
+  "channel": "normal",
+  "taskId": "TASK-AAO-0043",
+  "batchId": null,
+  "actorId": "cursor-gpt-5.2",
+  "recipeId": "atm.default.normal.typescript",
+  "status": "active",
+  "executionMode": "manual-team",
+  "executionSurface": "broker-governance",
+  "runtimeMode": "broker-only",
+  "runtimeLanguage": "node",
+  "runtimeAdapterId": "atm.node.broker-only-fallback",
+  "providerId": "local",
+  "sdkId": "none",
+  "modelId": "none",
+  "runtimeContract": {
+    "schemaId": "atm.teamRuntimeContract.v1",
+    "runtimeMode": "broker-only",
+    "runtimeLanguage": "node",
+    "runtimeAdapterId": "atm.node.broker-only-fallback",
+    "providerId": "local",
+    "sdkId": "none",
+    "modelId": "none",
+    "agentsSpawned": false,
+    "executionSurface": "broker-governance",
+    "selectionReason": "broker-only selected; no agents are spawned, language=node, atm.node.broker-only-fallback",
+    "workerAdapter": {
+      "schemaId": "atm.teamWorkerAdapterContract.v1",
+      "adapterId": "atm.node.broker-only-fallback",
+      "runtimeMode": "broker-only",
+      "runtimeLanguage": "node",
+      "executionSurface": "broker-governance",
+      "providerId": "local",
+      "sdkId": "none",
+      "modelId": "none",
+      "spawnStrategy": "disabled",
+      "agentsSpawned": false,
+      "brokerFallback": {
+        "enabled": true,
+        "reason": "agent spawning disabled; broker governance remains authoritative",
+        "preservesGovernance": [
+          "broker",
+          "permission-leases",
+          "validators",
+          "police",
+          "evidence",
+          "artifact-contract",
+          "retry-contract"
+        ]
+      },
+      "authorityBoundary": {
+        "gitWrite": false,
+        "taskLifecycle": false,
+        "selfClose": false,
+        "evidenceWriteOwner": "coordinator"
+      },
+      "vendorNeutral": true,
+      "artifactContractPreserved": true,
+      "retryContractPreserved": true
+    },
+    "artifactHandoff": {
+      "schemaId": "atm.teamArtifactHandoffContract.v1",
+      "requiredRoles": [
+        "evidence-collector",
+        "implementer",
+        "reviewer",
+        "validator"
+      ],
+      "roleContracts": [
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "evidence-collector",
+          "role": "evidence-collector",
+          "consumesFrom": [
+            "review-findings",
+            "validator-results"
+          ],
+          "producesTo": [
+            "closure-packet"
+          ],
+          "requiredArtifacts": [
+            "command-backed-evidence",
+            "closure-packet"
+          ]
+        },
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "consumesFrom": [
+            "task-card",
+            "team-plan",
+            "scope-locks"
+          ],
+          "producesTo": [
+            "reviewer",
+            "validator",
+            "evidence-collector"
+          ],
+          "requiredArtifacts": [
+            "implementation-diff",
+            "implementation-notes"
+          ]
+        },
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "reviewer",
+          "role": "reviewer",
+          "consumesFrom": [
+            "implementation-diff",
+            "implementation-notes"
+          ],
+          "producesTo": [
+            "implementer",
+            "evidence-collector"
+          ],
+          "requiredArtifacts": [
+            "review-findings"
+          ]
+        },
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "validator",
+          "role": "validator",
+          "consumesFrom": [
+            "implementation-diff",
+            "validator-commands"
+          ],
+          "producesTo": [
+            "evidence-collector"
+          ],
+          "requiredArtifacts": [
+            "validator-results"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "evidence-collector",
+          "agentId": "evidence-collector",
+          "artifact": "command-backed-evidence",
+          "blocking": true,
+          "summary": "evidence-collector requires artifact 'command-backed-evidence' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "evidence-collector",
+          "agentId": "evidence-collector",
+          "artifact": "closure-packet",
+          "blocking": true,
+          "summary": "evidence-collector requires artifact 'closure-packet' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "implementer",
+          "agentId": "implementer-typescript",
+          "artifact": "implementation-diff",
+          "blocking": true,
+          "summary": "implementer requires artifact 'implementation-diff' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "implementer",
+          "agentId": "implementer-typescript",
+          "artifact": "implementation-notes",
+          "blocking": true,
+          "summary": "implementer requires artifact 'implementation-notes' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "reviewer",
+          "agentId": "reviewer",
+          "artifact": "review-findings",
+          "blocking": true,
+          "summary": "reviewer requires artifact 'review-findings' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "validator",
+          "agentId": "validator",
+          "artifact": "validator-results",
+          "blocking": true,
+          "summary": "validator requires artifact 'validator-results' before close."
+        }
+      ],
+      "closeAllowed": false
+    },
+    "retryBudget": {
+      "schemaId": "atm.teamRetryBudgetContract.v1",
+      "maxReworkCycles": 1,
+      "maxValidatorReruns": 1,
+      "maxReviewerReturns": 1,
+      "usedReworkCycles": 0,
+      "usedValidatorReruns": 0,
+      "usedReviewerReturns": 0,
+      "exhausted": false,
+      "escalationTarget": null,
+      "status": "within-budget"
+    },
+    "commitLane": {
+      "schemaId": "atm.teamCommitLaneContract.v1",
+      "ownerRole": "coordinator",
+      "ownerPermissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ],
+      "workerGitWrite": false,
+      "serializedBy": "branch-commit-queue",
+      "lockSchemaId": "atm.branchCommitQueueLock.v1",
+      "retryableCodes": [
+        "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
+        "ATM_GIT_COMMIT_BRANCH_QUEUE_RACE"
+      ]
+    },
+    "brokerSubagent": {
+      "schemaId": "atm.teamBrokerSubagentContract.v1",
+      "enabled": true,
+      "subagentId": "team-broker-subagent",
+      "lifecycleOwner": "atm",
+      "decisionSurface": "brokerLane",
+      "governs": [
+        "write-intents",
+        "scope-conflicts",
+        "steward-apply",
+        "commit-lane"
+      ],
+      "stewardId": "neutral-write-steward",
+      "evidenceRequired": [
+        "atm.teamBrokerLaneEvidence.v1",
+        "atm.stewardApplyEvidence.v1",
+        "atm.brokerOperationRunRecordEnvelope.v1"
+      ],
+      "authorityBoundary": {
+        "fileWrite": false,
+        "gitWrite": false,
+        "taskLifecycle": false,
+        "selfClose": false
+      },
+      "escalationTarget": "coordinator"
+    },
+    "editorSubagentBridge": {
+      "schemaId": "atm.teamEditorSubagentBridgeContract.v1",
+      "enabled": false,
+      "lifecycleOwner": "atm",
+      "disabledReason": "runtime-mode-is-not-editor-subagent",
+      "editorNeutral": true,
+      "allowedFiles": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "roleEnvelopes": [
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "coordinator",
+          "role": "coordinator",
+          "profile": "atm.coordinator.v1",
+          "language": "typescript",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [
+              {
+                "permission": "task.lifecycle",
+                "agentId": "coordinator"
+              },
+              {
+                "permission": "git.write",
+                "agentId": "coordinator"
+              },
+              {
+                "permission": "evidence.write",
+                "agentId": "coordinator"
+              }
+            ],
+            "leaseOwner": "coordinator"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "atomization-planner",
+          "role": "atomizationPlanner",
+          "profile": "atm.atomizationPlanner.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "atomization-planner"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "reader",
+          "role": "reader",
+          "profile": "atm.reader.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "reader"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "scope-guardian",
+          "role": "scopeGuardian",
+          "profile": "atm.scopeGuardian.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "scope-guardian"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.write"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [
+              {
+                "permission": "file.write",
+                "agentId": "implementer-typescript",
+                "paths": [
+                  "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+                  "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+                  "packages/cli/src/commands/command-specs/next.spec.ts",
+                  "packages/cli/src/commands/command-specs/tasks.spec.ts",
+                  "packages/cli/src/commands/next.ts",
+                  "packages/cli/src/commands/next/route-predicates.ts",
+                  "packages/cli/src/commands/planning-repo-root.ts",
+                  "packages/cli/src/commands/task-direction.ts",
+                  "packages/cli/src/commands/tasks.ts",
+                  "packages/cli/src/commands/tasks/lifecycle-state.ts",
+                  "packages/cli/src/commands/work-channels.ts",
+                  "scripts/validate-prompt-scoped-next.ts"
+                ]
+              }
+            ],
+            "leaseOwner": "implementer-typescript"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "task-card",
+              "team-plan",
+              "scope-locks"
+            ],
+            "producesTo": [
+              "reviewer",
+              "validator",
+              "evidence-collector"
+            ],
+            "requiredArtifacts": [
+              "implementation-diff",
+              "implementation-notes"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "validator",
+          "role": "validator",
+          "profile": "atm.validator.v1",
+          "language": "typescript",
+          "permissions": [
+            "exec.validator"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "validator"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "implementation-diff",
+              "validator-commands"
+            ],
+            "producesTo": [
+              "evidence-collector"
+            ],
+            "requiredArtifacts": [
+              "validator-results"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "evidence-collector",
+          "role": "evidenceCollector",
+          "profile": "atm.evidenceCollector.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+            "packages/cli/src/commands/command-specs/next.spec.ts",
+            "packages/cli/src/commands/command-specs/tasks.spec.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/route-predicates.ts",
+            "packages/cli/src/commands/planning-repo-root.ts",
+            "packages/cli/src/commands/task-direction.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/cli/src/commands/tasks/lifecycle-state.ts",
+            "packages/cli/src/commands/work-channels.ts",
+            "scripts/validate-prompt-scoped-next.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "evidence-collector"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        }
+      ]
+    }
+  },
+  "artifactHandoff": {
+    "schemaId": "atm.teamArtifactHandoffContract.v1",
+    "requiredRoles": [
+      "evidence-collector",
+      "implementer",
+      "reviewer",
+      "validator"
+    ],
+    "roleContracts": [
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "evidence-collector",
+        "role": "evidence-collector",
+        "consumesFrom": [
+          "review-findings",
+          "validator-results"
+        ],
+        "producesTo": [
+          "closure-packet"
+        ],
+        "requiredArtifacts": [
+          "command-backed-evidence",
+          "closure-packet"
+        ]
+      },
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "implementer-typescript",
+        "role": "implementer",
+        "consumesFrom": [
+          "task-card",
+          "team-plan",
+          "scope-locks"
+        ],
+        "producesTo": [
+          "reviewer",
+          "validator",
+          "evidence-collector"
+        ],
+        "requiredArtifacts": [
+          "implementation-diff",
+          "implementation-notes"
+        ]
+      },
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "reviewer",
+        "role": "reviewer",
+        "consumesFrom": [
+          "implementation-diff",
+          "implementation-notes"
+        ],
+        "producesTo": [
+          "implementer",
+          "evidence-collector"
+        ],
+        "requiredArtifacts": [
+          "review-findings"
+        ]
+      },
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "validator",
+        "role": "validator",
+        "consumesFrom": [
+          "implementation-diff",
+          "validator-commands"
+        ],
+        "producesTo": [
+          "evidence-collector"
+        ],
+        "requiredArtifacts": [
+          "validator-results"
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "evidence-collector",
+        "agentId": "evidence-collector",
+        "artifact": "command-backed-evidence",
+        "blocking": true,
+        "summary": "evidence-collector requires artifact 'command-backed-evidence' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "evidence-collector",
+        "agentId": "evidence-collector",
+        "artifact": "closure-packet",
+        "blocking": true,
+        "summary": "evidence-collector requires artifact 'closure-packet' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "implementer",
+        "agentId": "implementer-typescript",
+        "artifact": "implementation-diff",
+        "blocking": true,
+        "summary": "implementer requires artifact 'implementation-diff' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "implementer",
+        "agentId": "implementer-typescript",
+        "artifact": "implementation-notes",
+        "blocking": true,
+        "summary": "implementer requires artifact 'implementation-notes' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "reviewer",
+        "agentId": "reviewer",
+        "artifact": "review-findings",
+        "blocking": true,
+        "summary": "reviewer requires artifact 'review-findings' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "validator",
+        "agentId": "validator",
+        "artifact": "validator-results",
+        "blocking": true,
+        "summary": "validator requires artifact 'validator-results' before close."
+      }
+    ],
+    "closeAllowed": false
+  },
+  "retryBudget": {
+    "schemaId": "atm.teamRetryBudgetContract.v1",
+    "maxReworkCycles": 1,
+    "maxValidatorReruns": 1,
+    "maxReviewerReturns": 1,
+    "usedReworkCycles": 0,
+    "usedValidatorReruns": 0,
+    "usedReviewerReturns": 0,
+    "exhausted": false,
+    "escalationTarget": null,
+    "status": "within-budget"
+  },
+  "brokerSubagent": {
+    "schemaId": "atm.teamBrokerSubagentContract.v1",
+    "enabled": true,
+    "subagentId": "team-broker-subagent",
+    "lifecycleOwner": "atm",
+    "decisionSurface": "brokerLane",
+    "governs": [
+      "write-intents",
+      "scope-conflicts",
+      "steward-apply",
+      "commit-lane"
+    ],
+    "stewardId": "neutral-write-steward",
+    "evidenceRequired": [
+      "atm.teamBrokerLaneEvidence.v1",
+      "atm.stewardApplyEvidence.v1",
+      "atm.brokerOperationRunRecordEnvelope.v1"
+    ],
+    "authorityBoundary": {
+      "fileWrite": false,
+      "gitWrite": false,
+      "taskLifecycle": false,
+      "selfClose": false
+    },
+    "escalationTarget": "coordinator"
+  },
+  "agentsSpawned": false,
+  "runtimeWritten": true,
+  "task": {
+    "taskId": "TASK-AAO-0043",
+    "title": "planning repo root resolver",
+    "status": "running",
+    "targetRepo": "AI-Atomic-Framework",
+    "sourcePlanPath": "atm-agent-first-operability/tasks/TASK-AAO-0043-planning-repo-root-resolver.task.md"
+  },
+  "roles": [
+    {
+      "agentId": "coordinator",
+      "role": "coordinator",
+      "profile": "atm.coordinator.v1",
+      "language": null,
+      "permissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ]
+    },
+    {
+      "agentId": "atomization-planner",
+      "role": "atomizationPlanner",
+      "profile": "atm.atomizationPlanner.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "reader",
+      "role": "reader",
+      "profile": "atm.reader.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "scope-guardian",
+      "role": "scopeGuardian",
+      "profile": "atm.scopeGuardian.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "implementer-typescript",
+      "role": "implementer",
+      "profile": "atm.implementer.typescript.v1",
+      "language": "typescript",
+      "permissions": [
+        "file.write"
+      ]
+    },
+    {
+      "agentId": "validator",
+      "role": "validator",
+      "profile": "atm.validator.v1",
+      "language": null,
+      "permissions": [
+        "exec.validator"
+      ]
+    },
+    {
+      "agentId": "evidence-collector",
+      "role": "evidenceCollector",
+      "profile": "atm.evidenceCollector.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "agentId": "coordinator",
+      "role": "coordinator",
+      "profile": "atm.coordinator.v1",
+      "permissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ]
+    },
+    {
+      "agentId": "atomization-planner",
+      "role": "atomizationPlanner",
+      "profile": "atm.atomizationPlanner.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "reader",
+      "role": "reader",
+      "profile": "atm.reader.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "scope-guardian",
+      "role": "scopeGuardian",
+      "profile": "atm.scopeGuardian.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "implementer-typescript",
+      "role": "implementer",
+      "profile": "atm.implementer.typescript.v1",
+      "language": "typescript",
+      "permissions": [
+        "file.write"
+      ]
+    },
+    {
+      "agentId": "validator",
+      "role": "validator",
+      "profile": "atm.validator.v1",
+      "permissions": [
+        "exec.validator"
+      ]
+    },
+    {
+      "agentId": "evidence-collector",
+      "role": "evidenceCollector",
+      "profile": "atm.evidenceCollector.v1",
+      "permissions": [
+        "file.read"
+      ]
+    }
+  ],
+  "leases": [
+    {
+      "permission": "task.lifecycle",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "git.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "evidence.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "file.write",
+      "agentId": "implementer-typescript",
+      "paths": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ]
+    }
+  ],
+  "permissionLeases": [
+    {
+      "permission": "task.lifecycle",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "git.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "evidence.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "file.write",
+      "agentId": "implementer-typescript",
+      "paths": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ]
+    }
+  ],
+  "validation": {
+    "ok": true,
+    "findings": []
+  },
+  "brokerLane": {
+    "schemaId": "atm.teamBrokerLaneEvidence.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0043",
+    "actorId": "cursor-gpt-5.2",
+    "registryPath": ".atm/runtime/write-broker.registry.json",
+    "writeIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "team plan/start broker lane"
+      },
+      "taskId": "TASK-AAO-0043",
+      "actorId": "cursor-gpt-5.2",
+      "baseCommit": "75bf2eab088172d22a7e133de89c0ec1a258f18a",
+      "targetFiles": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "atomRefs": [
+        {
+          "atomId": "atm.next-router-map",
+          "atomCid": "task-aao-0043",
+          "operation": "modify"
+        }
+      ],
+      "sharedSurfaces": {
+        "generators": [],
+        "projections": [],
+        "registries": [],
+        "validators": [],
+        "artifacts": []
+      },
+      "requestedLane": "auto"
+    },
+    "writeTransaction": {
+      "schemaId": "atm.teamBrokerWriteTransaction.v1",
+      "transactionId": "txn-ff3b040d7fe99906",
+      "taskId": "TASK-AAO-0043",
+      "principalId": "cursor-gpt-5.2",
+      "actorId": "cursor-gpt-5.2",
+      "sessionId": null,
+      "instanceId": "cursor-gpt-5.2@local",
+      "worktreeId": "C:\\Users\\User\\AI-Atomic-Framework",
+      "branchRef": "main",
+      "baseHead": "75bf2eab088172d22a7e133de89c0ec1a258f18a",
+      "leaseEpoch": 1781958358096,
+      "allowedFiles": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "readSet": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "writeSet": [
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "packages/cli/src/commands/planning-repo-root.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "fileHashesBefore": {
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json": "sha256:084870f74aa3b3d88ee5f725ea646791c20a497311064d9146f390850d30cbbe",
+        "packages/cli/src/commands/__tests__/planning-repo-root.test.ts": "sha256:9abfe39e084c58f1c7276d267bb7a9996ac77ce3d5f64e08122e77207f102f8c",
+        "packages/cli/src/commands/command-specs/next.spec.ts": "sha256:95f6f5d9f51417d41aac41790d4ab3698a2adf5fd6732206981d22335566f503",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts": "sha256:da2e3e90c4531408751acd9da759757f53744143297b3f67b28701eaac21a19d",
+        "packages/cli/src/commands/next.ts": "sha256:34e8798f2bfe8db6cae761bf6e99de1cec5485ef6d73440d255584416e9127ad",
+        "packages/cli/src/commands/next/route-predicates.ts": "sha256:fa10dc83a13122078019bac66d5b7368cb297800c7992ac6cf576cd5eda8ecfb",
+        "packages/cli/src/commands/planning-repo-root.ts": "sha256:80bf1d3d0950203e145531f9818c2e34381cd3075042aacbcfff8730d6fe4169",
+        "packages/cli/src/commands/task-direction.ts": "sha256:3932b21e6721e3e255a8f97226783a4f3e235636e781628c5f1443022d02a651",
+        "packages/cli/src/commands/tasks.ts": "sha256:ca4d7170ea3ca8b2c82beecf213a9949a9339ac3aa0fcf1404b7fcf171ae6232",
+        "packages/cli/src/commands/tasks/lifecycle-state.ts": "sha256:5d29ef50f7b5d0899b28f8fb49b60301a3ce338645afb6ea94fb892f0bd1e1c8",
+        "packages/cli/src/commands/work-channels.ts": "sha256:b5e20559ed92afd3b3b88922404c2e20c15fa934ed14c8d0bf451261530703fd",
+        "scripts/validate-prompt-scoped-next.ts": "sha256:8f8bb9ae1e247ce98103e65d3781a51aa68e28cd61c19a76560ead2532c07737"
+      },
+      "brokerDecision": {
+        "verdict": "parallel-safe",
+        "lane": "direct-brokered",
+        "intentId": "decision-1781958358096",
+        "parallelSafetyReason": "no-known-textual-or-resource-conflict"
+      },
+      "startedAt": "2026-06-20T12:25:58.096Z",
+      "expiresAt": "2026-06-20T12:55:58.096Z",
+      "heartbeatAt": "2026-06-20T12:25:58.096Z"
+    },
+    "decision": {
+      "schemaId": "atm.brokerDecision.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "generated"
+      },
+      "intentId": "decision-1781958358096",
+      "taskId": "TASK-AAO-0043",
+      "verdict": "parallel-safe",
+      "lane": "direct-brokered",
+      "conflicts": [],
+      "applyMethod": "none",
+      "reason": "Parallel safe",
+      "conflictMatrix": {
+        "schemaId": "atm.brokerConflictMatrix.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "generated"
+        },
+        "taskId": "TASK-AAO-0043",
+        "arbitrationVerdict": "allow",
+        "conflicts": []
+      }
+    },
+    "virtualAtomInUseRegistry": {
+      "schemaId": "atm.virtualAtomInUseRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "local-repo",
+      "workspaceId": "main",
+      "activeVirtualAtoms": [],
+      "activeIntents": []
+    },
+    "chosenLane": "direct-brokered",
+    "stewardId": null,
+    "composerPath": null,
+    "safeToStart": true,
+    "blockedReasons": []
+  },
+  "captainDecision": {
+    "schemaId": "atm.teamCaptainDecision.v1",
+    "captain": {
+      "role": "Task Captain",
+      "agentId": "coordinator"
+    },
+    "taskId": "TASK-AAO-0043",
+    "authorityChain": {
+      "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+      "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+    },
+    "conflictRules": [
+      "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+      "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+      "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+    ],
+    "teamSize": "medium",
+    "requiredRoles": [
+      "Task Captain",
+      "Atomization Planner",
+      "Code Builder",
+      "Check Runner"
+    ],
+    "optionalRoles": [
+      "Reader",
+      "Evidence Collector",
+      "Scope Guardian"
+    ],
+    "reason": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+    "confidence": "medium",
+    "implementerSelector": {
+      "schemaId": "atm.teamImplementerSelector.v1",
+      "selectedImplementer": {
+        "agentId": "implementer-typescript",
+        "role": "implementer",
+        "profile": "atm.implementer.typescript.v1",
+        "language": "typescript",
+        "recipeId": "atm.default.normal.typescript"
+      },
+      "languageMatch": "typescript",
+      "roleMatch": "typescript-implementer",
+      "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+      "confidence": "high",
+      "deterministicHints": {
+        "scopePaths": [
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+          "packages/cli/src/commands/command-specs/next.spec.ts",
+          "packages/cli/src/commands/command-specs/tasks.spec.ts",
+          "packages/cli/src/commands/next.ts",
+          "packages/cli/src/commands/next/route-predicates.ts",
+          "packages/cli/src/commands/planning-repo-root.ts",
+          "packages/cli/src/commands/task-direction.ts",
+          "packages/cli/src/commands/tasks.ts",
+          "packages/cli/src/commands/tasks/lifecycle-state.ts",
+          "packages/cli/src/commands/work-channels.ts",
+          "scripts/validate-prompt-scoped-next.ts"
+        ],
+        "deliverables": [
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+          "packages/cli/src/commands/__tests__/planning-repo-root.test.ts",
+          "packages/cli/src/commands/command-specs/next.spec.ts",
+          "packages/cli/src/commands/command-specs/tasks.spec.ts",
+          "packages/cli/src/commands/next.ts",
+          "packages/cli/src/commands/next/route-predicates.ts",
+          "packages/cli/src/commands/planning-repo-root.ts",
+          "packages/cli/src/commands/task-direction.ts",
+          "packages/cli/src/commands/tasks.ts",
+          "packages/cli/src/commands/tasks/lifecycle-state.ts",
+          "packages/cli/src/commands/work-channels.ts",
+          "scripts/validate-prompt-scoped-next.ts"
+        ],
+        "fileExtensions": [
+          ".json",
+          ".ts"
+        ],
+        "pathHints": [
+          "typescript-file",
+          "typescript-heavy"
+        ],
+        "pythonHeavy": false,
+        "typescriptHeavy": true,
+        "uiPaths": false
+      }
+    },
+    "stopConditions": [
+      "scope must stay within declared allowed files",
+      "required roles must each be uniquely represented",
+      "validators must not report blocking permission conflicts",
+      "a broader or stronger lane must stop the plan"
+    ],
+    "escalationRequired": true,
+    "escalationReason": "Scope spans 12 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Large script risk indicates the captain should not keep all coordination signals inline. Validator fan-out is 7, which merits lieutenant tracking.",
+    "needLieutenant": true,
+    "nextTeamShape": {
+      "schemaId": "atm.teamLieutenantEscalationShape.v1",
+      "captain": {
+        "role": "Task Captain",
+        "permissions": [
+          "task.lifecycle",
+          "git.write",
+          "evidence.write"
+        ]
+      },
+      "lieutenant": {
+        "role": "Task Lieutenant",
+        "recommended": true,
+        "permissions": [
+          "file.read",
+          "exec.validator"
+        ],
+        "forbiddenPermissions": [
+          "task.lifecycle",
+          "git.write",
+          "evidence.write"
+        ],
+        "coordinationFocus": [
+          "phase coordination",
+          "blocker tracking",
+          "handoff summarization"
+        ]
+      },
+      "teamSizeHint": "medium",
+      "coordinationBoundary": "captain+lieutenant",
+      "signals": {
+        "scopeCount": 12,
+        "crossRepoScope": true,
+        "validatorCount": 7,
+        "largeScriptRisk": true,
+        "closureSignals": false,
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe"
+      },
+      "suggestedPermissions": {
+        "captain": [
+          "task.lifecycle",
+          "git.write",
+          "evidence.write"
+        ],
+        "lieutenant": [
+          "file.read",
+          "exec.validator"
+        ]
+      }
+    },
+    "decisionSurface": {
+      "validationOk": true,
+      "brokerVerdict": "parallel-safe",
+      "largeScriptRisk": {
+        "level": "high",
+        "threshold": 3,
+        "reasons": [
+          "hot file touched: packages/cli/src/commands/next.ts, packages/cli/src/commands/tasks.ts",
+          "touched files 12 exceed planning threshold 3"
+        ]
+      },
+      "mapUpdateNeed": true,
+      "escalationRequired": true,
+      "needLieutenant": true,
+      "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+    }
+  },
+  "reworkRoute": {
+    "schemaId": "atm.teamReworkRoute.v1",
+    "status": "work-in-progress",
+    "retryBudget": {
+      "maxAttempts": 1,
+      "used": 0,
+      "remaining": 1,
+      "escalationTarget": null
+    },
+    "requiredChecksPassed": false,
+    "findings": [],
+    "transitions": []
+  },
+  "agentReports": [],
+  "patrolFindings": [],
+  "evidenceCuratorSummary": null,
+  "teamSummary": {
+    "decision": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+    "implementationSummary": "broker-only selected; no agents are spawned, language=node, atm.node.broker-only-fallback; closure remains governed by command-backed evidence.",
+    "validators": [
+      "npm run typecheck",
+      "npm run validate:cli",
+      "node --strip-types scripts/validate-prompt-scoped-next.ts"
+    ],
+    "evidence": [],
+    "brokerGovernance": {
+      "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+      "brokerSubagentEnabled": true,
+      "brokerDecisionSurface": "brokerLane",
+      "brokerStewardId": "neutral-write-steward",
+      "brokerGoverns": [
+        "write-intents",
+        "scope-conflicts",
+        "steward-apply",
+        "commit-lane"
+      ],
+      "brokerEvidenceRequired": [
+        "atm.teamBrokerLaneEvidence.v1",
+        "atm.stewardApplyEvidence.v1",
+        "atm.brokerOperationRunRecordEnvelope.v1"
+      ],
+      "commitLaneSerializedBy": "branch-commit-queue",
+      "commitLaneOwnerRole": "coordinator",
+      "workerGitWrite": false,
+      "workerTaskLifecycle": false,
+      "workerSelfClose": false
+    },
+    "risk": "medium",
+    "closeReady": false
+  },
+  "createdAt": "2026-06-20T12:25:58.129Z",
+  "updatedAt": "2026-06-20T12:25:58.129Z"
+}

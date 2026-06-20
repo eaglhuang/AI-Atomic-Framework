@@ -77,5 +77,5 @@ function isActiveLedgerStatus(status) {
 function isOpenPlanningStatus(status) {
     if (!status)
         return true;
-    return ['planned', 'open', 'ready', 'running', 'in_progress', 'review'].includes(status);
+    return ['draft', 'planned', 'open', 'ready', 'running', 'in_progress', 'review'].includes(status);
 }

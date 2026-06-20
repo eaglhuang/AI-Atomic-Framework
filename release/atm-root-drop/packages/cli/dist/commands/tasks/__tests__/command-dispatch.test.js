@@ -30,6 +30,7 @@ const handlers = {
     claimLifecycle: (action, argv) => handler(action)(argv),
     reconcile: handler('reconcile'),
     repairClosure: handler('repair-closure'),
+    repairClaim: handler('repair-claim'),
     show: handler('show'),
     status: handler('status'),
     finalize: handler('finalize'),

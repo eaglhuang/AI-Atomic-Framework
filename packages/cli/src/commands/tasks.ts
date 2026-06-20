@@ -29,6 +29,7 @@ import {
   writeClosurePacket
 } from './framework-development.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, parseArgsForCommand, relativePathFrom, resolveValue, type CommandResult } from './shared.ts';
+import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from './planning-repo-root.ts';
 import {
   appendTaskTransitionEvent,
   createTaskTransitionId,
@@ -1688,7 +1689,7 @@ async function runTasksImport(argv: string[]) {
     }
   }
 
-  const planAbsolute = path.resolve(options.cwd, options.from);
+  const planAbsolute = resolvePlanAbsoluteFromStored(options.cwd, options.from);
   if (!existsSync(planAbsolute) || !statSync(planAbsolute).isFile()) {
     throw new CliError('ATM_TASKS_PLAN_NOT_FOUND', `Plan markdown file not found: ${options.from}`, {
       exitCode: 2,
@@ -1708,7 +1709,7 @@ async function runTasksImport(argv: string[]) {
     try {
       const input = {
         cwd: options.cwd,
-        sourcePath: relativePathFrom(options.cwd, planAbsolute),
+        sourcePath: toStoredPlanningPath(options.cwd, planAbsolute),
         raw: planText
       };
       if (typeof plugin.parse === 'function') {
@@ -1733,7 +1734,7 @@ async function runTasksImport(argv: string[]) {
   if (!parsed) {
     parsed = parsePlanMarkdown({
       planText,
-      planRelativePath: relativePathFrom(options.cwd, planAbsolute),
+      planRelativePath: toStoredPlanningPath(options.cwd, planAbsolute),
       importedAt: generatedAt
     });
   }
@@ -1833,7 +1834,7 @@ async function runTasksImport(argv: string[]) {
     evidencePath = writeImportEvidence({
       cwd: options.cwd,
       tasks: parsed.tasks,
-      planPath: relativePathFrom(options.cwd, planAbsolute),
+      planPath: toStoredPlanningPath(options.cwd, planAbsolute),
       generatedAt,
       writtenPaths
     });
@@ -1851,7 +1852,7 @@ async function runTasksImport(argv: string[]) {
     schemaId: 'atm.taskImportManifest',
     specVersion: '0.1.0',
     generatedAt,
-    planPath: relativePathFrom(options.cwd, planAbsolute),
+    planPath: toStoredPlanningPath(options.cwd, planAbsolute),
     mode: options.dryRun ? 'dry-run' : 'write',
     tasks: parsed.tasks,
     diagnostics: parsed.diagnostics,
@@ -2295,7 +2296,7 @@ function importPlanningTaskForReservation(input: {
   const planText = readFileSync(planAbsolute, 'utf8');
   const task = parseSingleCard({
     planText,
-    planRelativePath: relativePathFrom(input.cwd, planAbsolute),
+    planRelativePath: toStoredPlanningPath(input.cwd, planAbsolute),
     importedAt: input.importedAt
   });
   if (!task || task.workItemId !== input.taskId) {
@@ -2303,7 +2304,7 @@ function importPlanningTaskForReservation(input: {
       exitCode: 1,
       details: {
         taskId: input.taskId,
-        planPath: relativePathFrom(input.cwd, planAbsolute)
+        planPath: toStoredPlanningPath(input.cwd, planAbsolute)
       }
     });
   }
@@ -2321,7 +2322,7 @@ function importPlanningTaskForReservation(input: {
       exitCode: 1,
       details: {
         taskId: input.taskId,
-        planPath: relativePathFrom(input.cwd, planAbsolute),
+        planPath: toStoredPlanningPath(input.cwd, planAbsolute),
         diagnostics: blockingDiagnostics
       }
     });
@@ -2329,7 +2330,7 @@ function importPlanningTaskForReservation(input: {
   const evidencePath = writeImportEvidence({
     cwd: input.cwd,
     tasks: [task],
-    planPath: relativePathFrom(input.cwd, planAbsolute),
+    planPath: toStoredPlanningPath(input.cwd, planAbsolute),
     generatedAt: input.importedAt,
     writtenPaths: writeResult.writtenPaths
   });
@@ -4360,7 +4361,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       taskId: options.taskId,
       actorId,
       status: String(taskDocument.status ?? ''),
-      claimIntent: claimIntentResolution.resolvedClaimIntent
+      claimIntent: claimIntentResolution.resolvedClaimIntent,
+      currentClaimActorId: currentClaim?.actorId ?? null,
+      currentClaimState: currentClaim?.state ?? null
     });
     if (!claimAdmission.ok) {
       throw new CliError(claimAdmission.code, claimAdmission.message, {
@@ -6396,7 +6399,7 @@ function enrichParsedTasksFromSiblingTaskCards(input: {
     const cardText = readFileSync(cardPath, 'utf8');
     const card = parseSingleCard({
       planText: cardText,
-      planRelativePath: relativePathFrom(input.cwd, cardPath),
+      planRelativePath: toStoredPlanningPath(input.cwd, cardPath),
       importedAt: input.importedAt
     });
     if (card) cardByTaskId.set(card.workItemId, card);

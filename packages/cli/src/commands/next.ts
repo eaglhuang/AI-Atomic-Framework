@@ -104,6 +104,10 @@ import {
   uniqueSorted
 } from './next/view-projections.ts';
 import {
+  readConfiguredPlanningRoots,
+  shouldReportPlanningRootMissing
+} from './planning-repo-root.ts';
+import {
   resolveCandidatePlanningRoots,
   type PlanningRootWarning
 } from './next/planning-root-preference.ts';
@@ -888,7 +892,10 @@ async function claimNextImportedTask(input: {
     });
   }
   const alreadyClaimedByActor = existingClaimActorId === resolvedActor.actorId;
-  const claimPreparation = alreadyClaimedByActor
+  const activeClaimIntent = claimableTask.activeClaimIntent ?? 'write';
+  const shouldReuseActiveClaim = alreadyClaimedByActor
+    && (autoIntent || activeClaimIntent === claimIntent);
+  const claimPreparation = shouldReuseActiveClaim
     ? {
       taskId: claimableTask.workItemId,
       originalStatus: normalizeTaskRouteStatus(claimableTask.status),
@@ -900,15 +907,17 @@ async function claimNextImportedTask(input: {
       task: claimableTask,
       actorId: resolvedActor.actorId
     });
-  const claimResult = alreadyClaimedByActor
-    ? {
-      evidence: {
-        action: 'claim',
-        taskId: claimableTask.workItemId,
-        actorId: resolvedActor.actorId,
-        reusedActiveClaim: true
-      }
-    }
+  const claimResult = shouldReuseActiveClaim
+    ? await runTasks([
+      'renew',
+      '--cwd',
+      input.cwd,
+      '--task',
+      claimableTask.workItemId,
+      '--actor',
+      resolvedActor.actorId,
+      '--json'
+    ])
     : await runTasks([
       'claim',
       '--cwd',
@@ -925,6 +934,10 @@ async function claimNextImportedTask(input: {
       ])).join(','),
       '--json'
     ]);
+  if (shouldReuseActiveClaim && claimResult.ok && claimResult.evidence) {
+    (claimResult.evidence as any).reusedActiveClaim = true;
+    (claimResult.evidence as any).claimIntent = activeClaimIntent;
+  }
   const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
     ? findActiveTaskQueueForIntent(input.cwd, input.taskIntent, { taskId: claimableTask.workItemId }) ?? createOrRefreshTaskQueue({
       cwd: input.cwd,
@@ -1203,12 +1216,14 @@ function buildPromptScopedNextResult(input: {
     });
   }
   if (promptScope.status === 'not-found') {
+    const planningRootMissing = input.importedTaskQueue.planningRootMissing ?? null;
     const nextAction = {
-      status: 'task-scope-not-found',
-      command: 'node atm.mjs next --prompt "<current user prompt>" --json',
-      reason: 'the prompt mentions task scope, but no matching ATM task card or ledger task was found',
+      status: planningRootMissing ? 'planning-root-missing' : 'task-scope-not-found',
+      command: planningRootMissing?.requiredCommand ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
+      reason: planningRootMissing?.detail ?? 'the prompt mentions task scope, but no matching ATM task card or ledger task was found',
       taskIntent: input.taskIntent,
       candidates: [],
+      planningRootMissing,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
     };
@@ -1221,9 +1236,11 @@ function buildPromptScopedNextResult(input: {
         null,
         input.integrationBootstrap as any,
         input.runtimeAdapterReadiness as any,
-        message('error', 'ATM_NEXT_TASK_SCOPE_NOT_FOUND', 'The prompt looks task-scoped, but ATM could not find a matching task.', {
-          taskIntent: input.taskIntent
-        })
+        planningRootMissing
+          ? message('error', 'ATM_PLANNING_ROOT_MISSING', planningRootMissing.detail, planningRootMissing)
+          : message('error', 'ATM_NEXT_TASK_SCOPE_NOT_FOUND', 'The prompt looks task-scoped, but ATM could not find a matching task.', {
+            taskIntent: input.taskIntent
+          })
       ),
       evidence: {
         nextAction,
@@ -2067,8 +2084,11 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
           closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
           activeClaimActorId: claimRecord.state === 'active' && typeof claimRecord.actorId === 'string'
             ? claimRecord.actorId
-            : null
-        })];
+            : null,
+          activeClaimIntent: claimRecord.state === 'active' && typeof claimRecord.intent === 'string'
+            ? claimRecord.intent
+            : (claimRecord.state === 'active' ? 'write' : null)
+        }, cwd)];
       } catch {
         return [];
       }
@@ -2132,8 +2152,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
         planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
         allowPlanningMirror: allowsPlanningMirror(parsed),
         closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
-        activeClaimActorId: null
-      });
+        activeClaimActorId: null,
+        activeClaimIntent: null
+      }, cwd);
     })
     .filter((entry): entry is ImportedTaskSummaryWithOutOfScope => entry !== null);
   const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
@@ -2159,7 +2180,16 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
       targetRepo: activeQueue.targetRepo,
       diagnostics: [`active-queue:${activeQueue.queueId}`, `queue-index:${activeQueue.currentIndex}`]
     }
-    : resolvePromptScopedTaskRoute(cwd, tasks, taskIntent);
+    : resolvePromptScopedTaskRoute(cwd, tasks, taskIntent, planningRootResolution);
+  const planningRootMissing = promptScope?.status === 'not-found' && taskIntent
+    ? shouldReportPlanningRootMissing({
+      cwd,
+      taskScopeMentioned: taskIntent.taskScopeMentioned,
+      mentionedPlanPaths: taskIntent.mentionedPlanPaths,
+      userPrompt: taskIntent.userPrompt,
+      matchedTaskCount: tasks.filter((task) => (task.matchScore ?? 0) > 0).length
+    })
+    : null;
   const selectedTaskPool = promptScope?.selectedTasks ?? [];
   const explicitSingleTaskRoute = isExplicitSingleTaskRoute(promptScope, taskIntent);
   const selectedTask = selectImportedTaskForPromptScope(
@@ -2183,7 +2213,8 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
     claimableTask,
     tasks,
     promptScope,
-    planningRootWarnings: planningRootResolution.warnings
+    planningRootWarnings: planningRootResolution.warnings,
+    planningRootMissing
   };
 }
 
@@ -2423,7 +2454,12 @@ function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly
 }
 
 
-function resolvePromptScopedTaskRoute(cwd: string, tasks: readonly ImportedTaskSummary[], taskIntent: TaskIntent | null): PromptScopedTaskRoute | null {
+function resolvePromptScopedTaskRoute(
+  cwd: string,
+  tasks: readonly ImportedTaskSummary[],
+  taskIntent: TaskIntent | null,
+  planningRootResolution?: ReturnType<typeof resolveCandidatePlanningRoots>
+): PromptScopedTaskRoute | null {
   if (!taskIntent || !taskIntent.taskScopeMentioned) return null;
   if (taskIntent.explicitTaskIds.length > 0) {
     const selectedTasks = taskIntent.explicitTaskIds
@@ -2744,8 +2780,8 @@ interface ImportedTaskSummaryWithOutOfScope extends ImportedTaskSummary {
   readonly outOfScope?: readonly string[];
 }
 
-function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningReadOnlyPaths' | 'planningMirrorPaths' | 'targetAllowedFiles'> & { readonly outOfScope?: readonly string[] }): ImportedTaskSummaryWithOutOfScope {
-  const partition = partitionTaskScope(task);
+function finalizeImportedTaskSummary(task: Omit<ImportedTaskSummary, 'planningReadOnlyPaths' | 'planningMirrorPaths' | 'targetAllowedFiles'> & { readonly outOfScope?: readonly string[] }, cwd?: string): ImportedTaskSummaryWithOutOfScope {
+  const partition = partitionTaskScope(task, cwd ? { cwd } : undefined);
   return {
     ...task,
     planningReadOnlyPaths: partition.planningContext.readOnlyPaths,
@@ -3144,20 +3180,6 @@ function isTaskPathUnderPreferredPlanningRoots(cwd: string, taskPath: string): b
     configuredRoots: readConfiguredPlanningRoots(cwd)
   });
   return resolution.roots.some((root) => absoluteTaskPath.startsWith(`${root}${path.sep}`));
-}
-
-function readConfiguredPlanningRoots(cwd: string): readonly string[] {
-  const configPath = path.join(cwd, '.atm', 'config.json');
-  if (!existsSync(configPath)) return [];
-  try {
-    const parsed = parseJsonText(readFileSync(configPath, 'utf8')) as Record<string, unknown>;
-    const taskLedger = parsed.taskLedger && typeof parsed.taskLedger === 'object' && !Array.isArray(parsed.taskLedger)
-      ? parsed.taskLedger as Record<string, unknown>
-      : {};
-    return readStringArray(taskLedger.planningRoots ?? taskLedger.externalPlanningRoots);
-  } catch {
-    return [];
-  }
 }
 
 function planFileMatchesPrompt(cwd: string, planPath: string, intent: TaskIntent): boolean {

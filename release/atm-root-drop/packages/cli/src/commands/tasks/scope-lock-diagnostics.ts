@@ -32,7 +32,11 @@ export interface FrameworkCloseDirtyGuardReport {
   readonly blockingTrackedDirtyFiles: readonly string[];
   readonly scopeTrackedDirtyFiles: readonly string[];
   readonly governanceTrackedDirtyFiles: readonly string[];
+  readonly regenerableArtifactFiles: readonly string[];
+  readonly correctPlanningMirrorPreEditFiles: readonly string[];
+  readonly incorrectPlanningMirrorPreEditFiles: readonly string[];
   readonly advisoryTrackedDirtyFiles: readonly string[];
+  readonly foreignActiveDirtyFiles: readonly string[];
   readonly generatedArtifactFiles: readonly string[];
   readonly remediation: TaskScopeDiagnosticRemediation;
 }
@@ -51,6 +55,7 @@ type TaskScopeIsolationSummary =
 type DirtyBucketId =
   | 'scopeTrackedDirtyFiles'
   | 'governanceTrackedDirtyFiles'
+  | 'regenerableArtifactFiles'
   | 'generatedArtifactFiles'
   | 'advisoryTrackedDirtyFiles';
 
@@ -64,7 +69,22 @@ interface DirtyBucketInput {
   readonly declaredFiles: readonly string[];
 }
 
+function isHistoricalDeliveredFile(
+  filePath: string,
+  deliverableFiles: readonly string[],
+  historicalDeliveredFiles: readonly string[]
+): boolean {
+  return deliverableFiles.some((declared) =>
+    pathMatchesTaskScope(filePath, declared)
+    && historicalDeliveredFiles.some((historical) => pathMatchesTaskScope(historical, declared))
+  );
+}
+
 const dirtyBucketStrategies: readonly DirtyBucketStrategy[] = [
+  {
+    id: 'regenerableArtifactFiles',
+    includes: (filePath, input) => isSameTaskRegenerableArtifact(filePath, input.taskId)
+  },
   {
     id: 'governanceTrackedDirtyFiles',
     includes: (filePath, input) => isTaskCloseGovernanceCriticalPath(filePath, input.taskId)
@@ -122,17 +142,28 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   readonly cwd: string;
   readonly taskId: string;
   readonly taskDeclaredFiles: readonly string[];
+  readonly taskDeliverableFiles?: readonly string[];
   readonly trackedDirtyFiles: readonly string[];
+  readonly historicalDeliveredFiles?: readonly string[];
   readonly allowedAdvisoryGovernanceFiles?: readonly string[];
+  readonly allowedAdvisoryDirtyFiles?: readonly string[];
+  readonly correctPlanningMirrorPreEditFiles?: readonly string[];
+  readonly incorrectPlanningMirrorPreEditFiles?: readonly string[];
 }): FrameworkCloseDirtyGuardReport {
   const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
+  const deliverableFiles = normalizeTaskScopePaths(input.cwd, input.taskDeliverableFiles ?? []);
   const trackedDirtyFiles = uniqueStrings(input.trackedDirtyFiles.map(normalizeRelativePath).filter(Boolean));
+  const historicalDeliveredFiles = uniqueStrings((input.historicalDeliveredFiles ?? []).map(normalizeRelativePath).filter(Boolean));
   const allowedAdvisoryGovernanceFiles = new Set(
     uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean))
+  );
+  const allowedAdvisoryDirtyFiles = new Set(
+    uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean))
   );
   const buckets: Record<DirtyBucketId, string[]> = {
     scopeTrackedDirtyFiles: [],
     governanceTrackedDirtyFiles: [],
+    regenerableArtifactFiles: [],
     generatedArtifactFiles: [],
     advisoryTrackedDirtyFiles: []
   };
@@ -145,20 +176,45 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     buckets[strategy?.id ?? 'advisoryTrackedDirtyFiles'].push(filePath);
   }
 
-  const scopeTrackedDirtyFiles = uniqueStrings(buckets.scopeTrackedDirtyFiles);
+  const historicalCloseback = historicalDeliveredFiles.length > 0;
+  const scopeTrackedDirtyFiles = uniqueStrings(buckets.scopeTrackedDirtyFiles.filter((filePath) => {
+    if (allowedAdvisoryDirtyFiles.has(filePath)) {
+      return false;
+    }
+    if (!historicalCloseback) return true;
+    const matchesDeliverable = deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared));
+    if (!matchesDeliverable) {
+      return false;
+    }
+    return !isHistoricalDeliveredFile(filePath, deliverableFiles, historicalDeliveredFiles);
+  }));
+  const historicalAdvisoryScopeTrackedFiles = historicalCloseback
+    ? uniqueStrings(buckets.scopeTrackedDirtyFiles.filter((filePath) => !scopeTrackedDirtyFiles.includes(filePath)))
+    : [];
   const governanceTrackedDirtyFiles = uniqueStrings(
-    buckets.governanceTrackedDirtyFiles.filter((filePath) => !allowedAdvisoryGovernanceFiles.has(filePath))
+    buckets.governanceTrackedDirtyFiles.filter((filePath) => !allowedAdvisoryGovernanceFiles.has(filePath) && !allowedAdvisoryDirtyFiles.has(filePath))
   );
   const allowlistedGovernanceTrackedFiles = uniqueStrings(
-    buckets.governanceTrackedDirtyFiles.filter((filePath) => allowedAdvisoryGovernanceFiles.has(filePath))
+    buckets.governanceTrackedDirtyFiles.filter((filePath) => allowedAdvisoryGovernanceFiles.has(filePath) || allowedAdvisoryDirtyFiles.has(filePath))
   );
+  const foreignActiveDirtyFiles = uniqueStrings(
+    trackedDirtyFiles.filter((filePath) => allowedAdvisoryDirtyFiles.has(filePath))
+  );
+  const correctPlanningMirrorPreEditFiles = uniqueStrings(input.correctPlanningMirrorPreEditFiles ?? []);
+  const incorrectPlanningMirrorPreEditFiles = uniqueStrings(input.incorrectPlanningMirrorPreEditFiles ?? []);
+  const regenerableArtifactFiles = uniqueStrings(buckets.regenerableArtifactFiles);
   const blockingTrackedDirtyFiles = uniqueStrings([
     ...scopeTrackedDirtyFiles,
-    ...governanceTrackedDirtyFiles
+    ...governanceTrackedDirtyFiles,
+    ...incorrectPlanningMirrorPreEditFiles
   ]);
   const generatedArtifactFiles = uniqueStrings(buckets.generatedArtifactFiles);
   const advisoryTrackedDirtyFiles = uniqueStrings([
+    ...historicalAdvisoryScopeTrackedFiles,
     ...allowlistedGovernanceTrackedFiles,
+    ...foreignActiveDirtyFiles,
+    ...regenerableArtifactFiles,
+    ...correctPlanningMirrorPreEditFiles,
     ...generatedArtifactFiles,
     ...buckets.advisoryTrackedDirtyFiles
   ]);
@@ -171,14 +227,20 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     blockingTrackedDirtyFiles,
     scopeTrackedDirtyFiles,
     governanceTrackedDirtyFiles,
+    regenerableArtifactFiles,
+    correctPlanningMirrorPreEditFiles,
+    incorrectPlanningMirrorPreEditFiles,
     advisoryTrackedDirtyFiles,
+    foreignActiveDirtyFiles,
     generatedArtifactFiles,
     remediation: {
       requiredCommand: ok ? null : `node atm.mjs git commit --actor <actor> --task ${input.taskId} --message "<delivery message>" --json`,
       safeToAutoStage: false,
       operatorSummary: ok
-        ? 'No in-scope or closure-governance tracked dirty files block close.'
-        : 'Commit the task-scoped delivery or closure-governance files through the governed delivery lane before closing done. Run taskflow pre-close to classify scope drift versus foreign staged bundles. During taskflow close --write, only the active close task may stage governed bundles while the close-window staged-index lock is held; defer foreign staged files explicitly with --defer-foreign-staged when the other agent can restage afterward.'
+        ? 'No in-scope or closure-governance tracked dirty files block close. Same-task regenerable artifacts (bundle manifests, closure packets) and correct planning-mirror pre-edits are close-owned transient state until the final governed bundle lands.'
+        : incorrectPlanningMirrorPreEditFiles.length > 0
+          ? 'Planning mirror edits do not match the governed closeback result. Restore the card or align frontmatter with taskflow close --dry-run before closing done.'
+          : 'Commit the task-scoped delivery or closure-governance files through the governed delivery lane before closing done. Same-task regenerable artifacts are advisory because taskflow close regenerates them; protected evidence and task ledgers still block close. Run taskflow pre-close to classify scope drift versus foreign staged bundles. During taskflow close --write, only the active close task may stage governed bundles while the close-window staged-index lock is held; defer foreign staged files explicitly with --defer-foreign-staged when the other agent can restage afterward.'
     }
   };
 }
@@ -254,6 +316,13 @@ function isGeneratedArtifactPath(filePath: string): boolean {
     || normalized.startsWith('release/atm-root-drop/')
     || normalized.startsWith('packages/cli/dist/')
     || normalized.startsWith('packages/integrations-core/dist/');
+}
+
+function isSameTaskRegenerableArtifact(filePath: string, taskId: string): boolean {
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  const bundleManifest = `.atm/history/evidence/${taskId}.bundle-manifest.json`.toLowerCase();
+  const closurePacket = `.atm/history/evidence/${taskId}.closure-packet.json`.toLowerCase();
+  return normalized === bundleManifest || normalized === closurePacket;
 }
 
 function uniqueStrings(values: readonly string[]): readonly string[] {

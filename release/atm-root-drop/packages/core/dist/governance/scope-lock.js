@@ -25,6 +25,152 @@ export function parseScopeLockRecord(document) {
 export function hasMapSelectors(scopeLock) {
     return Boolean(scopeLock.selectors && Object.keys(scopeLock.selectors).length > 0);
 }
+export function validateScopeLeaseFencing(entries) {
+    const findings = [];
+    findings.push(...findDuplicateExclusiveOwners(entries));
+    findings.push(...findReleasedTombstoneReacquires(entries));
+    findings.push(...findAllowedFilesViolations(entries));
+    findings.push(...findWaitForCycles(entries));
+    return {
+        ok: findings.length === 0,
+        findings
+    };
+}
+export function validateScopeLeaseEpoch(input) {
+    if (input.actualEpoch === input.expectedEpoch) {
+        return { ok: true, findings: [] };
+    }
+    return {
+        ok: false,
+        findings: [{
+                code: 'ATM_SCOPE_LEASE_STALE_EPOCH',
+                detail: `Stale lease epoch for ${input.leaseId}: expected ${input.expectedEpoch}, received ${input.actualEpoch}.`,
+                leaseIds: [input.leaseId],
+                expectedEpoch: input.expectedEpoch,
+                actualEpoch: input.actualEpoch,
+                runModes: [input.runMode]
+            }]
+    };
+}
+function findDuplicateExclusiveOwners(entries) {
+    const findings = [];
+    const activeByResource = new Map();
+    for (const entry of entries.filter((candidate) => candidate.status === 'active')) {
+        activeByResource.set(entry.resourceKey, [...(activeByResource.get(entry.resourceKey) ?? []), entry]);
+    }
+    for (const [resourceKey, active] of activeByResource.entries()) {
+        const ownerKeys = new Set(active.map((entry) => writerKey(entry.owner)));
+        if (ownerKeys.size > 1) {
+            findings.push({
+                code: 'ATM_SCOPE_LEASE_DUPLICATE_EXCLUSIVE_OWNER',
+                detail: `Resource ${resourceKey} has ${ownerKeys.size} active exclusive owners.`,
+                leaseIds: active.map((entry) => entry.leaseId),
+                runModes: uniqueRunModes(active)
+            });
+        }
+    }
+    return findings;
+}
+function findReleasedTombstoneReacquires(entries) {
+    const findings = [];
+    const released = entries.filter((entry) => entry.status === 'released');
+    const active = entries.filter((entry) => entry.status === 'active');
+    for (const tombstone of released) {
+        for (const candidate of active) {
+            const sameOwner = writerKey(candidate.owner) === writerKey(tombstone.owner);
+            const staleEpoch = candidate.leaseEpoch <= tombstone.leaseEpoch;
+            if (candidate.resourceKey === tombstone.resourceKey && sameOwner && staleEpoch) {
+                findings.push({
+                    code: 'ATM_SCOPE_LEASE_TOMBSTONE_REACQUIRE',
+                    detail: `Released tombstone ${tombstone.leaseId} blocks stale reacquire ${candidate.leaseId}.`,
+                    leaseIds: [tombstone.leaseId, candidate.leaseId],
+                    expectedEpoch: tombstone.leaseEpoch + 1,
+                    actualEpoch: candidate.leaseEpoch,
+                    runModes: uniqueRunModes([tombstone, candidate])
+                });
+            }
+        }
+    }
+    return findings;
+}
+function findAllowedFilesViolations(entries) {
+    const findings = [];
+    for (const entry of entries.filter((candidate) => candidate.status === 'active')) {
+        const allowed = entry.allowedFiles.map(normalizePathForLease);
+        const violations = entry.writeSet
+            .map(normalizePathForLease)
+            .filter((writePath) => !allowed.some((allowedPath) => pathMatchesLeasePattern(writePath, allowedPath)));
+        if (violations.length > 0) {
+            findings.push({
+                code: 'ATM_SCOPE_LEASE_ALLOWED_FILES_VIOLATION',
+                detail: `Lease ${entry.leaseId} writes outside allowedFiles: ${violations.join(', ')}.`,
+                leaseIds: [entry.leaseId],
+                runModes: [entry.runMode]
+            });
+        }
+    }
+    return findings;
+}
+function findWaitForCycles(entries) {
+    const active = entries.filter((entry) => entry.status === 'active');
+    const byId = new Map(active.map((entry) => [entry.leaseId, entry]));
+    const findings = [];
+    const visited = new Set();
+    const visiting = new Set();
+    const visit = (leaseId, stack) => {
+        if (visiting.has(leaseId)) {
+            const cycle = stack.slice(stack.indexOf(leaseId)).concat(leaseId);
+            const cycleEntries = cycle.map((id) => byId.get(id)).filter((entry) => Boolean(entry));
+            findings.push({
+                code: 'ATM_SCOPE_LEASE_WAIT_FOR_CYCLE',
+                detail: `Wait-for graph cycle detected: ${cycle.join(' -> ')}.`,
+                leaseIds: cycle,
+                runModes: uniqueRunModes(cycleEntries)
+            });
+            return;
+        }
+        if (visited.has(leaseId))
+            return;
+        const entry = byId.get(leaseId);
+        if (!entry)
+            return;
+        visiting.add(leaseId);
+        for (const next of entry.waitsFor ?? []) {
+            visit(next, [...stack, leaseId]);
+        }
+        visiting.delete(leaseId);
+        visited.add(leaseId);
+    };
+    for (const entry of active) {
+        visit(entry.leaseId, []);
+    }
+    return dedupeFindings(findings);
+}
+function writerKey(owner) {
+    return `${owner.instanceId}::${owner.worktreeId}`;
+}
+function uniqueRunModes(entries) {
+    return [...new Set(entries.map((entry) => entry.runMode))].sort();
+}
+function normalizePathForLease(value) {
+    return value.replace(/\\/g, '/').replace(/^\.\//, '');
+}
+function pathMatchesLeasePattern(filePath, pattern) {
+    if (pattern.endsWith('/**')) {
+        return filePath === pattern.slice(0, -3) || filePath.startsWith(pattern.slice(0, -2));
+    }
+    return filePath === pattern;
+}
+function dedupeFindings(findings) {
+    const seen = new Set();
+    return findings.filter((finding) => {
+        const key = `${finding.code}:${finding.leaseIds.join('|')}`;
+        if (seen.has(key))
+            return false;
+        seen.add(key);
+        return true;
+    });
+}
 function normalizeSpecVersion(value, hasSelectors) {
     const specVersion = typeof value === 'string' ? value.trim() : '';
     if (specVersion !== '0.1.0' && specVersion !== '0.2.0') {

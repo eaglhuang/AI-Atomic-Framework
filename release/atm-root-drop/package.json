@@ -13,6 +13,8 @@
     "packages:list": "node --strip-types scripts/list-packages.ts",
     "sync:registry-artifacts": "node --strip-types scripts/sync-registry-artifacts.ts",
     "build": "tsc -p tsconfig.build.json && node --strip-types scripts/build-package-dist.ts && node --strip-types scripts/build-root-drop-release.ts && node --strip-types scripts/build-onefile-release.ts",
+    "build:packages": "tsc -p tsconfig.build.json && node --strip-types scripts/build-package-dist.ts",
+    "build:release-hygiene:cleanup": "node --strip-types scripts/build-release-hygiene.ts --mode cleanup",
     "build:root-drop-release": "node --strip-types scripts/build-root-drop-release.ts",
     "build:onefile-release": "node --strip-types scripts/build-onefile-release.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -124,9 +126,15 @@
     "sync:registry-versions": "node --strip-types scripts/backfill-registry-versions.ts",
     "health:post-merge": "node --strip-types scripts/check-main-health.ts",
     "scan:broker-runs": "node --strip-types scripts/scan-broker-runs.ts",
-    "scan:broker-runs:3klife-log": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID衝突解決紀錄log.md",
-    "scan:broker-runs:3klife-log:auto": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID衝突解決紀錄log.md --compact",
-    "automation:broker-run-log-scan": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID衝突解決紀錄log.md"
+    "scan:broker-runs:3klife-log": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID-Conflict-Run-Log.md",
+    "scan:broker-runs:3klife-log:auto": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID-Conflict-Run-Log.md --compact",
+    "scan:broker-runs:3klife-index": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID-Conflict-Run-Log.md --json-output C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\broker-run-index.json --compact",
+    "scan:broker-runs:3klife-evidence": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID-Conflict-Run-Log.md --json-output C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\broker-run-index.json --report-output C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\broker-run-report.md --compact",
+    "automation:broker-run-log-scan": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs --log-file C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\CID-Conflict-Run-Log.md --json-output C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\broker-run-index.json --report-output C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\broker-run-report.md --compact",
+    "scan:broker-runs:paper-evidence": "node --strip-types scripts/scan-broker-runs.ts --run-dir C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/runs --log-file C:/Users/User/3KLife/docs/ai_atomic_framework/CID-Conflict-Run-Log.md --json-output C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/broker-run-index.json --report-output C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/broker-run-report.md --compact",
+    "collect:broker-evidence": "node --strip-types scripts/collect-broker-evidence.ts",
+    "collect:broker-evidence:paper": "node --strip-types scripts/collect-broker-evidence.ts --output-dir C:/Users/User/3KLife/docs/ai_atomic_framework/broker-evidence-bundle",
+    "capture:broker-evidence": "node --strip-types scripts/capture-broker-evidence.ts"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

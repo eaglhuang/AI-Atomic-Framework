@@ -2,11 +2,14 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, readJsonFile, writeJsonFile } from './shared.js';
+import { TEAM_CLOSURE_ATTESTATION_SCHEMA_ID } from './evidence.js';
 import { getCommandSpec } from './command-specs.js';
 import { runTasks } from './tasks.js';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
+import { buildTeamKnowledgeSummary, runTeamKnowledge } from './team-knowledge.js';
 import { runTeamWave } from './team-wave.js';
 import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../core/dist/broker/team-lane.js';
+import { resolveNodejsTeamWorkerAdapter } from '../../../core/dist/team-runtime/nodejs-worker-adapter.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive' },
     { id: 'git.write', mode: 'exclusive' },
@@ -106,6 +109,16 @@ export const TEAM_ATOM_BOUNDARIES = {
         capability: 'Read-only team run status surface.',
         downstreamTasks: ['TASK-TEAM-0011']
     },
+    'team.runtime-mode-contract': {
+        anchor: 'packages/cli/src/commands/team.ts#buildTeamRuntimeContract',
+        capability: 'Neutral Team runtime mode and adapter metadata contract for real-agent, editor-subagent, and broker-only execution surfaces.',
+        downstreamTasks: ['TASK-TEAM-0031']
+    },
+    'team.patrol-report': {
+        anchor: 'packages/cli/src/commands/team.ts#buildTeamPatrolReport',
+        capability: 'Read-only patrol report for runtime mode, broker-governance evidence gates, rework readiness, missing artifacts, and retry-budget risk.',
+        downstreamTasks: ['TASK-TEAM-0014']
+    },
     'team.permission-lease-validator': {
         anchor: 'packages/cli/src/commands/team.ts#validateTeamPermissionModel',
         capability: 'Deterministic permission lease validation before team runtime start.',
@@ -116,10 +129,20 @@ export const TEAM_ATOM_BOUNDARIES = {
         capability: 'Deterministic file.write lease scope validation against task allowed files before team runtime start.',
         downstreamTasks: ['TASK-TEAM-0013']
     },
+    'team.lease-fencing-deadlock-contract': {
+        anchor: 'packages/core/src/governance/scope-lock.ts#validateScopeLeaseFencing',
+        capability: 'Team lease fencing diagnostics for duplicate exclusive owners, stale lease epochs, wait-for cycles, released tombstones, and allowedFiles write boundaries across real-agent, editor-subagent, and broker-only runs.',
+        downstreamTasks: ['TASK-TEAM-0018']
+    },
     'team.next-recommendation': {
         anchor: 'packages/cli/src/commands/team.ts#buildTeamRecommendation',
         capability: 'Advisory next/playbook teamRecommendation surface with plan/start/status/reason command hints without auto-running team commands.',
         downstreamTasks: ['TASK-TEAM-0015']
+    },
+    'team.knowledge-build-query': {
+        anchor: 'packages/cli/src/commands/team-knowledge.ts#runTeamKnowledge',
+        capability: 'Advisory Team Agents knowledge build/query dry-run surface with metadata filtering and lexical ranking.',
+        downstreamTasks: ['TASK-TEAM-0021']
     }
 };
 export function resolveTeamRecipeIdForChannel(channel) {
@@ -161,6 +184,7 @@ export function buildTeamRecommendation(input) {
         validate: `node atm.mjs team validate --task ${quotedTask} --recipe ${recipeId} --json`,
         start: `node atm.mjs team start --task ${quotedTask} --actor ${actorId} --recipe ${recipeId} --json`,
         status: 'node atm.mjs team status --compact --json',
+        ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
         ...(input.parallelAdvisory ? { parallelAdvisory: input.parallelAdvisory } : {}),
         constraints: [
             'Team start writes only .atm/runtime/team-runs/<teamRunId>.json.',
@@ -212,6 +236,10 @@ const builtInRecipes = [
     }
 ];
 export async function runTeam(argv) {
+    if (String(argv[0] ?? '').toLowerCase() === 'knowledge') {
+        const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
+        return runTeamKnowledge(argv.slice(1), cwd);
+    }
     const spec = getCommandSpec('team');
     const parsed = parseArgsForCommand(spec, argv);
     const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
@@ -220,8 +248,12 @@ export async function runTeam(argv) {
         // TASK-MAO-0024: Team Agents Wave Mode planning surface.
         return runTeamWave(parsed.positional.slice(1).map(String), cwd);
     }
-    if (!['plan', 'start', 'status', 'validate'].includes(action)) {
-        throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, wave', { exitCode: 2 });
+    if (action === 'knowledge') {
+        const knowledgeArgv = argv[0]?.toLowerCase() === 'knowledge' ? argv.slice(1) : parsed.positional.slice(1).map(String);
+        return runTeamKnowledge(knowledgeArgv, cwd);
+    }
+    if (!['plan', 'start', 'status', 'validate', 'patrol'].includes(action)) {
+        throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge', { exitCode: 2 });
     }
     if (action === 'status') {
         return buildTeamStatusResult({
@@ -234,6 +266,14 @@ export async function runTeam(argv) {
     if (!taskId) {
         throw new CliError('ATM_TEAM_TASK_REQUIRED', `team ${action} requires --task <id>.`, { exitCode: 2 });
     }
+    if (action === 'patrol') {
+        return buildTeamPatrolResult({
+            cwd,
+            taskId,
+            mode: normalizeTeamPatrolMode(parsed.options.mode),
+            requestedTeamRunId: String(parsed.options.team ?? '').trim()
+        });
+    }
     const context = await buildTeamPlanningContext({
         cwd,
         taskId,
@@ -242,6 +282,19 @@ export async function runTeam(argv) {
     });
     const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
     const ok = validation.findings.every((finding) => finding.level !== 'error');
+    const runtimeContract = buildTeamRuntimeContract({
+        runtimeMode: parsed.options.runtimeMode,
+        runtimeLanguage: parsed.options.runtimeLanguage,
+        runtimeAdapterId: parsed.options.runtimeAdapter,
+        providerId: parsed.options.provider,
+        sdkId: parsed.options.sdk,
+        modelId: parsed.options.model,
+        editorBridgeDisabled: parsed.options.disableEditorBridge,
+        recipe,
+        allowedFiles: deriveWritePaths(task, cwd),
+        permissionLeases: teamPlan.suggestedPermissionLeases,
+        evidenceRequired: String(task.evidenceRequired ?? 'command-backed')
+    });
     if (action === 'validate') {
         const permissionOk = permissionValidation.ok;
         const nonPermissionFindings = validation.findings.filter((finding) => !permissionValidation.findings.includes(finding));
@@ -272,7 +325,8 @@ export async function runTeam(argv) {
                 safeToStart,
                 relatedFindings: nonPermissionFindings,
                 suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
-                brokerLane: teamPlan.brokerLane
+                brokerLane: teamPlan.brokerLane,
+                runtimeContract
             }
         });
     }
@@ -301,7 +355,8 @@ export async function runTeam(argv) {
                     recipe,
                     validation,
                     teamPlan,
-                    brokerLane: teamPlan.brokerLane
+                    brokerLane: teamPlan.brokerLane,
+                    runtimeContract
                 }
             });
         }
@@ -312,7 +367,8 @@ export async function runTeam(argv) {
             task,
             recipe,
             teamPlan,
-            validation
+            validation,
+            runtimeContract
         });
         return makeResult({
             ok: true,
@@ -328,10 +384,11 @@ export async function runTeam(argv) {
             evidence: {
                 action: 'start',
                 runtimeWritten: true,
-                agentsSpawned: false,
+                agentsSpawned: runtimeContract.agentsSpawned,
                 teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
                 teamRun,
-                brokerLane: teamPlan.brokerLane
+                brokerLane: teamPlan.brokerLane,
+                runtimeContract
             }
         });
     }
@@ -359,9 +416,504 @@ export async function runTeam(argv) {
             permissionCatalog: teamPermissionCatalog,
             validation,
             teamPlan,
+            runtimeContract,
             brokerLane: teamPlan.brokerLane
         }
     });
+}
+function readOptionValue(argv, flag) {
+    const index = argv.indexOf(flag);
+    if (index < 0) {
+        return undefined;
+    }
+    return argv[index + 1];
+}
+export function buildTeamRuntimeContract(input) {
+    const runtimeMode = normalizeTeamRuntimeMode(input.runtimeMode);
+    const runtimeLanguage = normalizeOptionalRuntimeString(input.runtimeLanguage) ?? 'node';
+    const runtimeAdapterId = normalizeOptionalRuntimeString(input.runtimeAdapterId);
+    const providerId = normalizeOptionalRuntimeString(input.providerId);
+    const sdkId = normalizeOptionalRuntimeString(input.sdkId);
+    const modelId = normalizeOptionalRuntimeString(input.modelId);
+    const editorBridgeDisabled = Boolean(input.editorBridgeDisabled);
+    const workerAdapter = resolveNodejsTeamWorkerAdapter({
+        runtimeMode,
+        runtimeLanguage,
+        runtimeAdapterId,
+        providerId,
+        sdkId,
+        modelId
+    });
+    const agentsSpawned = workerAdapter.agentsSpawned;
+    const executionSurface = workerAdapter.executionSurface;
+    return {
+        schemaId: 'atm.teamRuntimeContract.v1',
+        runtimeMode,
+        runtimeLanguage,
+        runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId,
+        providerId: providerId ?? workerAdapter.providerId,
+        sdkId: sdkId ?? workerAdapter.sdkId,
+        modelId: modelId ?? workerAdapter.modelId,
+        agentsSpawned,
+        executionSurface,
+        selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId }),
+        workerAdapter,
+        artifactHandoff: buildTeamArtifactHandoffContract({
+            recipe: input.recipe,
+            requiredRoles: ['implementer', 'reviewer', 'validator', 'evidence-collector'],
+            producedArtifacts: []
+        }),
+        retryBudget: buildTeamRetryBudgetContract({}),
+        commitLane: buildTeamCommitLaneContract(),
+        brokerSubagent: buildTeamBrokerSubagentContract(),
+        editorSubagentBridge: buildEditorSubagentBridgeContract({
+            enabled: runtimeMode === 'editor-subagent' && !editorBridgeDisabled,
+            disabledReason: runtimeMode !== 'editor-subagent'
+                ? 'runtime-mode-is-not-editor-subagent'
+                : editorBridgeDisabled
+                    ? 'disabled-by-run-option'
+                    : null,
+            recipe: input.recipe,
+            allowedFiles: input.allowedFiles ?? [],
+            permissionLeases: input.permissionLeases ?? [],
+            evidenceRequired: String(input.evidenceRequired ?? 'command-backed')
+        })
+    };
+}
+function buildTeamBrokerSubagentContract() {
+    return {
+        schemaId: 'atm.teamBrokerSubagentContract.v1',
+        enabled: true,
+        subagentId: 'team-broker-subagent',
+        lifecycleOwner: 'atm',
+        decisionSurface: 'brokerLane',
+        governs: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+        stewardId: 'neutral-write-steward',
+        evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
+        authorityBoundary: {
+            fileWrite: false,
+            gitWrite: false,
+            taskLifecycle: false,
+            selfClose: false
+        },
+        escalationTarget: 'coordinator'
+    };
+}
+function buildTeamCommitLaneContract() {
+    return {
+        schemaId: 'atm.teamCommitLaneContract.v1',
+        ownerRole: 'coordinator',
+        ownerPermissions: ['task.lifecycle', 'git.write', 'evidence.write'],
+        workerGitWrite: false,
+        serializedBy: 'branch-commit-queue',
+        lockSchemaId: 'atm.branchCommitQueueLock.v1',
+        retryableCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE']
+    };
+}
+export function buildTeamClosureAttestation(input) {
+    const runtime = input.runtimeContract ?? null;
+    const runtimeMode = normalizeTeamRuntimeMode(input.runtimeMode ?? runtime?.runtimeMode);
+    const runtimeLanguage = normalizeOptionalRuntimeString(input.runtimeLanguage ?? runtime?.runtimeLanguage) ?? 'node';
+    const runtimeAdapterId = normalizeOptionalRuntimeString(input.runtimeAdapterId ?? runtime?.runtimeAdapterId);
+    const providerId = normalizeOptionalRuntimeString(input.providerId ?? runtime?.providerId);
+    const sdkId = normalizeOptionalRuntimeString(input.sdkId ?? runtime?.sdkId);
+    const modelId = normalizeOptionalRuntimeString(input.modelId ?? runtime?.modelId);
+    const runnerKind = normalizeOptionalRuntimeString(input.runnerKind) ?? (runtime?.agentsSpawned ? 'team-agent-runtime' : 'broker-governance');
+    const sandboxPolicyHash = normalizeOptionalRuntimeString(input.sandboxPolicyHash)
+        ?? createHash('sha256')
+            .update([
+            'local-runtime-wrapper-is-not-secure-sandbox-proof',
+            runtimeMode,
+            runtimeLanguage,
+            runtimeAdapterId ?? '',
+            providerId ?? '',
+            sdkId ?? '',
+            modelId ?? ''
+        ].join('\n'))
+            .digest('hex');
+    return {
+        schemaId: TEAM_CLOSURE_ATTESTATION_SCHEMA_ID,
+        teamRunId: normalizeOptionalRuntimeString(input.teamRunId) ?? 'manual-team-run',
+        runtimeMode,
+        runtimeLanguage,
+        runtimeAdapterId,
+        providerId,
+        sdkId,
+        modelId,
+        runnerKind,
+        runtimeVersion: normalizeOptionalRuntimeString(input.runtimeVersion),
+        sandboxPolicyHash: `sha256:${sandboxPolicyHash.replace(/^sha256:/, '')}`,
+        attestationSigner: normalizeOptionalRuntimeString(input.attestationSigner) ?? 'coordinator',
+        brokerSubagent: buildBrokerSubagentAttestation(runtime?.brokerSubagent),
+        commitLane: buildCommitLaneAttestation(runtime?.commitLane),
+        workerAuthorityBoundary: buildWorkerAuthorityBoundaryAttestation(runtime?.workerAdapter),
+        reviewerIndependence: buildReviewerIndependenceAttestation(input.reviewerIndependence),
+        attestedAt: normalizeOptionalRuntimeString(input.attestedAt) ?? new Date().toISOString(),
+        localRuntimeWrapperIsSecureSandboxProof: false,
+        commandBackedEvidenceRequired: true
+    };
+}
+function buildBrokerSubagentAttestation(input) {
+    const boundary = (input?.authorityBoundary ?? {});
+    return {
+        schemaId: normalizeOptionalRuntimeString(input?.schemaId),
+        enabled: input?.enabled === true,
+        subagentId: normalizeOptionalRuntimeString(input?.subagentId),
+        decisionSurface: normalizeOptionalRuntimeString(input?.decisionSurface),
+        stewardId: normalizeOptionalRuntimeString(input?.stewardId),
+        governs: normalizeStringArray(input?.governs),
+        evidenceRequired: normalizeStringArray(input?.evidenceRequired),
+        authorityBoundary: {
+            fileWrite: boundary?.fileWrite === true,
+            gitWrite: boundary?.gitWrite === true,
+            taskLifecycle: boundary?.taskLifecycle === true,
+            selfClose: boundary?.selfClose === true
+        }
+    };
+}
+function buildCommitLaneAttestation(input) {
+    const lane = (input ?? {});
+    return {
+        schemaId: normalizeOptionalRuntimeString(input?.schemaId),
+        serializedBy: normalizeOptionalRuntimeString(input?.serializedBy),
+        ownerRole: normalizeOptionalRuntimeString(input?.ownerRole),
+        workerGitWrite: lane.workerGitWrite === true
+    };
+}
+function buildWorkerAuthorityBoundaryAttestation(input) {
+    const boundary = (input?.authorityBoundary ?? {});
+    return {
+        gitWrite: boundary.gitWrite === true,
+        taskLifecycle: boundary.taskLifecycle === true,
+        selfClose: boundary.selfClose === true,
+        evidenceWriteOwner: normalizeOptionalRuntimeString(boundary?.evidenceWriteOwner)
+    };
+}
+function buildReviewerIndependenceAttestation(input) {
+    const required = input?.required !== false;
+    const satisfied = input?.satisfied === true;
+    return {
+        required,
+        satisfied,
+        policy: normalizeOptionalRuntimeString(input?.policy) ?? 'reviewer-runtime-and-model-independent-from-implementer-when-required',
+        reviewerProviderId: normalizeOptionalRuntimeString(input?.reviewerProviderId),
+        reviewerModelId: normalizeOptionalRuntimeString(input?.reviewerModelId),
+        reviewerRuntimeAdapterId: normalizeOptionalRuntimeString(input?.reviewerRuntimeAdapterId),
+        reason: normalizeOptionalRuntimeString(input?.reason) ?? (satisfied ? 'reviewer independence policy satisfied' : 'reviewer independence policy unsatisfied')
+    };
+}
+export function buildTeamArtifactHandoffContract(input) {
+    const requiredRoles = uniqueStrings((input.requiredRoles ?? ['implementer', 'reviewer', 'validator', 'evidence-collector'])
+        .map((entry) => String(entry).trim())
+        .filter(Boolean));
+    const recipeAgents = input.recipe?.agents ?? [];
+    const roleContracts = requiredRoles.map((role) => {
+        const agent = recipeAgents.find((entry) => entry.role === role);
+        return buildTeamRoleArtifactContract({
+            agentId: agent?.agentId ?? role,
+            role
+        });
+    });
+    const findings = validateTeamArtifactHandoff({
+        roleContracts,
+        producedArtifacts: input.producedArtifacts ?? []
+    });
+    return {
+        schemaId: 'atm.teamArtifactHandoffContract.v1',
+        requiredRoles,
+        roleContracts,
+        findings,
+        closeAllowed: findings.every((finding) => !finding.blocking)
+    };
+}
+export function validateTeamArtifactHandoff(input) {
+    const producedArtifacts = new Set((input.producedArtifacts ?? []).map((entry) => normalizeArtifactName(entry)).filter(Boolean));
+    const findings = [];
+    for (const contract of input.roleContracts) {
+        for (const artifact of contract.requiredArtifacts) {
+            const normalizedArtifact = normalizeArtifactName(artifact);
+            if (!producedArtifacts.has(normalizedArtifact)) {
+                findings.push({
+                    level: 'error',
+                    code: 'missing-required-artifact',
+                    role: contract.role,
+                    agentId: contract.agentId,
+                    artifact,
+                    blocking: true,
+                    summary: `${contract.role} requires artifact '${artifact}' before close.`
+                });
+            }
+        }
+    }
+    return findings;
+}
+export function buildTeamRetryBudgetContract(input) {
+    const maxReworkCycles = normalizeRetryBudget(input.maxReworkCycles, 1);
+    const maxValidatorReruns = normalizeRetryBudget(input.maxValidatorReruns, 1);
+    const maxReviewerReturns = normalizeRetryBudget(input.maxReviewerReturns, 1);
+    const usedReworkCycles = normalizeRetryBudget(input.usedReworkCycles, 0);
+    const usedValidatorReruns = normalizeRetryBudget(input.usedValidatorReruns, 0);
+    const usedReviewerReturns = normalizeRetryBudget(input.usedReviewerReturns, 0);
+    const exhausted = usedReworkCycles >= maxReworkCycles
+        || usedValidatorReruns >= maxValidatorReruns
+        || usedReviewerReturns >= maxReviewerReturns;
+    const escalationTarget = normalizeOptionalRuntimeString(input.escalationTarget) ?? 'captain';
+    return {
+        schemaId: 'atm.teamRetryBudgetContract.v1',
+        maxReworkCycles,
+        maxValidatorReruns,
+        maxReviewerReturns,
+        usedReworkCycles,
+        usedValidatorReruns,
+        usedReviewerReturns,
+        exhausted,
+        escalationTarget: exhausted ? escalationTarget : null,
+        status: exhausted ? 'escalation-required' : 'within-budget'
+    };
+}
+export function buildTeamReworkRouteStateMachine(input) {
+    const maxAttempts = normalizeRetryBudget(input.retryBudgetMax, 1);
+    const used = normalizeRetryBudget(input.retryBudgetUsed, 0);
+    const remaining = Math.max(0, maxAttempts - used);
+    const findings = normalizeTeamReworkFindings(input.findings ?? []);
+    const requiredChecksPassed = input.requiredChecksPassed === true;
+    const startingStatus = input.previousStatus ?? 'work-in-progress';
+    const blockingReviewerFindings = findings.filter((finding) => finding.source === 'reviewer' && isBlockingReworkFinding(finding));
+    const failedValidatorFindings = findings.filter((finding) => finding.source === 'validator' && finding.passed === false);
+    const blockingFindings = [...blockingReviewerFindings, ...failedValidatorFindings];
+    const transitions = [];
+    let status = startingStatus;
+    if (blockingFindings.length > 0) {
+        status = pushTeamReworkTransition({
+            transitions,
+            from: status,
+            to: remaining <= 0 ? 'blocked' : 'needs-rework',
+            reason: remaining <= 0
+                ? 'retry budget exhausted while blocking reviewer or validator findings remain'
+                : 'blocking reviewer or validator findings require implementation rework',
+            findingIds: blockingFindings.map((finding) => finding.id)
+        });
+    }
+    else if (status === 'needs-rework') {
+        status = pushTeamReworkTransition({
+            transitions,
+            from: status,
+            to: 'revalidate-pending',
+            reason: 'rework completed; validation must rerun before close readiness',
+            findingIds: []
+        });
+    }
+    if ((status === 'work-in-progress' || status === 'revalidate-pending') && requiredChecksPassed) {
+        status = pushTeamReworkTransition({
+            transitions,
+            from: status,
+            to: 'ready-for-close',
+            reason: 'required reviewer and validator checks passed',
+            findingIds: []
+        });
+    }
+    else if (status === 'revalidate-pending' && remaining <= 0) {
+        status = pushTeamReworkTransition({
+            transitions,
+            from: status,
+            to: 'escalated',
+            reason: 'revalidation is pending but retry budget is exhausted',
+            findingIds: []
+        });
+    }
+    return {
+        schemaId: 'atm.teamReworkRoute.v1',
+        status,
+        retryBudget: {
+            maxAttempts,
+            used,
+            remaining,
+            escalationTarget: remaining <= 0 ? 'captain' : null
+        },
+        requiredChecksPassed,
+        findings,
+        transitions
+    };
+}
+function buildTeamRoleArtifactContract(input) {
+    const role = input.role;
+    if (role === 'implementer') {
+        return {
+            schemaId: 'atm.teamRoleArtifactContract.v1',
+            agentId: input.agentId,
+            role,
+            consumesFrom: ['task-card', 'team-plan', 'scope-locks'],
+            producesTo: ['reviewer', 'validator', 'evidence-collector'],
+            requiredArtifacts: ['implementation-diff', 'implementation-notes']
+        };
+    }
+    if (role === 'reviewer') {
+        return {
+            schemaId: 'atm.teamRoleArtifactContract.v1',
+            agentId: input.agentId,
+            role,
+            consumesFrom: ['implementation-diff', 'implementation-notes'],
+            producesTo: ['implementer', 'evidence-collector'],
+            requiredArtifacts: ['review-findings']
+        };
+    }
+    if (role === 'validator') {
+        return {
+            schemaId: 'atm.teamRoleArtifactContract.v1',
+            agentId: input.agentId,
+            role,
+            consumesFrom: ['implementation-diff', 'validator-commands'],
+            producesTo: ['evidence-collector'],
+            requiredArtifacts: ['validator-results']
+        };
+    }
+    if (role === 'evidence-collector') {
+        return {
+            schemaId: 'atm.teamRoleArtifactContract.v1',
+            agentId: input.agentId,
+            role,
+            consumesFrom: ['review-findings', 'validator-results'],
+            producesTo: ['closure-packet'],
+            requiredArtifacts: ['command-backed-evidence', 'closure-packet']
+        };
+    }
+    return {
+        schemaId: 'atm.teamRoleArtifactContract.v1',
+        agentId: input.agentId,
+        role,
+        consumesFrom: ['team-plan'],
+        producesTo: ['team-summary'],
+        requiredArtifacts: ['role-report']
+    };
+}
+function normalizeArtifactName(value) {
+    return String(value ?? '').trim().toLowerCase();
+}
+export function transitionTeamReworkRoute(current, input) {
+    const next = buildTeamReworkRouteStateMachine({
+        findings: input.findings ?? current.findings,
+        requiredChecksPassed: input.requiredChecksPassed ?? current.requiredChecksPassed,
+        retryBudgetMax: current.retryBudget.maxAttempts,
+        retryBudgetUsed: input.retryBudgetUsed ?? current.retryBudget.used,
+        previousStatus: current.status
+    });
+    return {
+        ...next,
+        transitions: [...current.transitions, ...next.transitions]
+    };
+}
+function normalizeTeamReworkFindings(findings) {
+    return findings.map((finding, index) => ({
+        source: finding.source === 'validator' ? 'validator' : 'reviewer',
+        id: String(finding.id || `${finding.source || 'finding'}-${index + 1}`),
+        blocking: finding.blocking === true,
+        passed: typeof finding.passed === 'boolean' ? finding.passed : undefined,
+        severity: normalizeFindingSeverity(finding.severity),
+        summary: typeof finding.summary === 'string' ? finding.summary : undefined
+    }));
+}
+function normalizeFindingSeverity(value) {
+    return value === 'info' || value === 'warning' || value === 'error' || value === 'blocker'
+        ? value
+        : undefined;
+}
+function isBlockingReworkFinding(finding) {
+    return finding.blocking === true || finding.severity === 'error' || finding.severity === 'blocker';
+}
+function normalizeRetryBudget(value, fallback) {
+    return typeof value === 'number' && Number.isFinite(value) && value >= 0
+        ? Math.floor(value)
+        : fallback;
+}
+function pushTeamReworkTransition(input) {
+    if (input.from !== input.to) {
+        input.transitions.push({
+            from: input.from,
+            to: input.to,
+            reason: input.reason,
+            findingIds: input.findingIds
+        });
+    }
+    return input.to;
+}
+function buildEditorSubagentBridgeContract(input) {
+    const allowedFiles = uniqueStrings(input.allowedFiles.map((entry) => String(entry).trim()).filter(Boolean));
+    const leasesByAgent = new Map();
+    for (const lease of input.permissionLeases) {
+        leasesByAgent.set(lease.agentId, [...(leasesByAgent.get(lease.agentId) ?? []), {
+                permission: lease.permission,
+                agentId: lease.agentId,
+                paths: lease.paths ? [...lease.paths] : undefined
+            }]);
+    }
+    const roleEnvelopes = (input.recipe?.agents ?? []).map((agent) => {
+        const permissionLeases = leasesByAgent.get(agent.agentId) ?? [];
+        const artifactContract = buildTeamRoleArtifactContract({
+            agentId: agent.agentId,
+            role: agent.role
+        });
+        return {
+            schemaId: 'atm.teamEditorSubagentRoleEnvelope.v1',
+            agentId: agent.agentId,
+            role: agent.role,
+            profile: agent.profile ?? null,
+            language: agent.language ?? input.recipe?.language ?? null,
+            permissions: [...agent.permissions],
+            allowedFiles,
+            leaseMetadata: {
+                permissionLeases,
+                leaseOwner: agent.agentId
+            },
+            artifactMetadata: {
+                expectedReports: [
+                    'agent report',
+                    'validator evidence',
+                    'team summary'
+                ],
+                evidenceRequired: input.evidenceRequired,
+                consumesFrom: artifactContract.consumesFrom,
+                producesTo: artifactContract.producesTo,
+                requiredArtifacts: artifactContract.requiredArtifacts
+            },
+            retryMetadata: {
+                retryPolicy: 'atm-governed',
+                maxAttempts: 1
+            }
+        };
+    });
+    return {
+        schemaId: 'atm.teamEditorSubagentBridgeContract.v1',
+        enabled: input.enabled,
+        lifecycleOwner: 'atm',
+        disabledReason: input.disabledReason,
+        editorNeutral: true,
+        allowedFiles,
+        roleEnvelopes
+    };
+}
+function normalizeTeamRuntimeMode(value) {
+    const normalized = String(value ?? 'broker-only').trim();
+    if (normalized === 'real-agent' || normalized === 'editor-subagent' || normalized === 'broker-only') {
+        return normalized;
+    }
+    throw new CliError('ATM_TEAM_RUNTIME_MODE_INVALID', `Unsupported team runtime mode: ${normalized}`, {
+        exitCode: 2,
+        details: { supportedModes: ['real-agent', 'editor-subagent', 'broker-only'] }
+    });
+}
+function normalizeOptionalRuntimeString(value) {
+    const normalized = String(value ?? '').trim();
+    return normalized.length > 0 ? normalized : null;
+}
+function describeRuntimeSelection(input) {
+    const adapter = input.runtimeAdapterId ?? 'no adapter override';
+    if (input.runtimeMode === 'broker-only') {
+        return `broker-only selected; no agents are spawned, language=${input.runtimeLanguage}, ${adapter}`;
+    }
+    if (input.runtimeMode === 'editor-subagent') {
+        return `editor-subagent selected; adapter metadata is advisory, language=${input.runtimeLanguage}, ${adapter}`;
+    }
+    return `real-agent selected; adapter metadata is advisory until a worker bridge consumes it, language=${input.runtimeLanguage}, ${adapter}`;
 }
 async function buildTeamPlanningContext(input) {
     const task = readTask(input.cwd, input.taskId);
@@ -390,8 +942,7 @@ async function buildTeamPlanningContext(input) {
         if (parallelResult && parallelResult.ok && parallelResult.evidence && Array.isArray(parallelResult.evidence.candidates)) {
             for (const candidate of parallelResult.evidence.candidates) {
                 const finding = candidate.finding;
-                if (finding && Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0) {
-                    // Consumer-side compensation: override verdict to 'blocked-cid-conflict'
+                if (finding && finding.verdict === 'blocked-cid-conflict') {
                     parallelFindings.push(buildPermissionFinding({
                         level: 'error',
                         code: 'blocked-cid-conflict',
@@ -420,7 +971,12 @@ async function buildTeamPlanningContext(input) {
         recipe,
         writePaths,
         validation,
-        brokerLane
+        brokerLane,
+        knowledgeSummary: buildTeamKnowledgeSummary({
+            cwd: input.cwd,
+            taskId: String(task.workItemId ?? task.taskId ?? input.taskId),
+            top: 3
+        })
     });
     return {
         task,
@@ -895,6 +1451,7 @@ function buildTeamPlan(input) {
         agents: input.recipe.agents,
         captainDecision,
         implementerSelector,
+        ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
         requiredRoles: crewBriefingContract.requiredRoles,
         optionalRoles: crewBriefingContract.optionalRoles,
         briefingContract: crewBriefingContract,
@@ -1435,7 +1992,18 @@ export function writeTeamRun(input) {
         recipeId: input.recipe.recipeId,
         status: 'active',
         executionMode: 'manual-team',
-        agentsSpawned: false,
+        executionSurface: input.runtimeContract.executionSurface,
+        runtimeMode: input.runtimeContract.runtimeMode,
+        runtimeLanguage: input.runtimeContract.runtimeLanguage,
+        runtimeAdapterId: input.runtimeContract.runtimeAdapterId,
+        providerId: input.runtimeContract.providerId,
+        sdkId: input.runtimeContract.sdkId,
+        modelId: input.runtimeContract.modelId,
+        runtimeContract: input.runtimeContract,
+        artifactHandoff: input.runtimeContract.artifactHandoff,
+        retryBudget: input.runtimeContract.retryBudget,
+        brokerSubagent: input.runtimeContract.brokerSubagent,
+        agentsSpawned: input.runtimeContract.agentsSpawned,
         runtimeWritten: true,
         task: summarizeTask(input.taskId, input.task),
         roles: input.recipe.agents.map((agent) => ({
@@ -1451,14 +2019,21 @@ export function writeTeamRun(input) {
         validation: input.validation,
         brokerLane: input.teamPlan.brokerLane,
         captainDecision: input.teamPlan.captainDecision,
+        reworkRoute: buildTeamReworkRouteStateMachine({
+            findings: [],
+            requiredChecksPassed: false,
+            retryBudgetMax: input.runtimeContract.retryBudget.maxReworkCycles,
+            retryBudgetUsed: 0
+        }),
         agentReports: [],
         patrolFindings: [],
         evidenceCuratorSummary: null,
         teamSummary: {
             decision: input.teamPlan.captainDecision.reason,
-            implementationSummary: 'Team runtime started; closure remains governed by command-backed evidence.',
+            implementationSummary: `${input.runtimeContract.selectionReason}; closure remains governed by command-backed evidence.`,
             validators: normalizeStringArray(input.task.validators),
             evidence: [],
+            brokerGovernance: buildTeamBrokerGovernanceSummary(input.runtimeContract),
             risk: input.teamPlan.captainDecision.escalationRequired ? 'medium' : 'low',
             closeReady: false
         },
@@ -1469,6 +2044,21 @@ export function writeTeamRun(input) {
     mkdirSync(directory, { recursive: true });
     writeJsonFile(path.join(directory, `${teamRunId}.json`), teamRun);
     return teamRun;
+}
+function buildTeamBrokerGovernanceSummary(runtimeContract) {
+    return {
+        schemaId: 'atm.teamBrokerGovernanceSummary.v1',
+        brokerSubagentEnabled: runtimeContract.brokerSubagent.enabled === true,
+        brokerDecisionSurface: runtimeContract.brokerSubagent.decisionSurface,
+        brokerStewardId: runtimeContract.brokerSubagent.stewardId,
+        brokerGoverns: [...runtimeContract.brokerSubagent.governs],
+        brokerEvidenceRequired: [...runtimeContract.brokerSubagent.evidenceRequired],
+        commitLaneSerializedBy: runtimeContract.commitLane.serializedBy,
+        commitLaneOwnerRole: runtimeContract.commitLane.ownerRole,
+        workerGitWrite: runtimeContract.workerAdapter.authorityBoundary.gitWrite,
+        workerTaskLifecycle: runtimeContract.workerAdapter.authorityBoundary.taskLifecycle,
+        workerSelfClose: runtimeContract.workerAdapter.authorityBoundary.selfClose
+    };
 }
 export function buildTeamStatusResult(input) {
     const runs = input.requestedTeamRunId
@@ -1491,6 +2081,135 @@ export function buildTeamStatusResult(input) {
         }
     });
 }
+export function buildTeamPatrolResult(input) {
+    const report = buildTeamPatrolReport(input);
+    return makeResult({
+        ok: true,
+        command: 'team',
+        cwd: input.cwd,
+        messages: [
+            message(report.safeToProceed ? 'info' : 'warning', report.safeToProceed ? 'ATM_TEAM_PATROL_READY' : 'ATM_TEAM_PATROL_FINDINGS', report.safeToProceed
+                ? 'Team patrol completed with no blocking findings. No runtime or history state was written.'
+                : 'Team patrol found follow-up items. No runtime or history state was written.', {
+                taskId: input.taskId,
+                mode: input.mode,
+                severity: report.severity,
+                findingCount: report.findings.length
+            })
+        ],
+        evidence: report
+    });
+}
+export function buildTeamPatrolReport(input) {
+    const findings = [];
+    const taskPath = path.join(input.cwd, '.atm', 'history', 'tasks', `${input.taskId}.json`);
+    const evidencePath = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.json`);
+    const closurePacketPath = path.join(input.cwd, '.atm', 'history', 'closure-packets', `${input.taskId}.json`);
+    const taskExists = existsSync(taskPath);
+    const evidenceExists = existsSync(evidencePath);
+    const closurePacketExists = existsSync(closurePacketPath);
+    const task = taskExists ? readJsonFile(taskPath, 'ATM_TEAM_TASK_INVALID') : null;
+    const taskSummary = task ? summarizeTask(input.taskId, task) : { taskId: input.taskId, title: input.taskId, status: null, targetRepo: null, sourcePlanPath: null };
+    const writePaths = task ? deriveWritePaths(task, input.cwd) : [];
+    const largeScriptRisk = evaluateLargeScriptRisk(writePaths);
+    const teamRun = input.requestedTeamRunId ? readTeamRun(input.cwd, input.requestedTeamRunId) : findLatestTeamRunForTask(input.cwd, input.taskId);
+    if (!taskExists) {
+        findings.push(teamPatrolFinding({
+            level: 'blocker',
+            code: 'ATM_TEAM_PATROL_TASK_MISSING',
+            category: 'artifact-gap',
+            summary: `Task ledger is missing for ${input.taskId}.`,
+            suggestedCommand: `node atm.mjs next --task ${quoteCliValue(input.taskId)} --json`,
+            details: { path: path.relative(input.cwd, taskPath).replace(/\\/g, '/') }
+        }));
+    }
+    if (!evidenceExists) {
+        findings.push(teamPatrolFinding({
+            level: input.mode === 'close-preflight' ? 'blocker' : 'warning',
+            code: 'ATM_TEAM_PATROL_EVIDENCE_MISSING',
+            category: 'evidence',
+            summary: `Command-backed evidence file is not present for ${input.taskId}.`,
+            suggestedCommand: `node atm.mjs evidence run --task ${quoteCliValue(input.taskId)} --actor <actor> -- <validator-command>`,
+            details: { path: path.relative(input.cwd, evidencePath).replace(/\\/g, '/') }
+        }));
+    }
+    if (input.mode === 'close-preflight' && !closurePacketExists) {
+        findings.push(teamPatrolFinding({
+            level: 'warning',
+            code: 'ATM_TEAM_PATROL_CLOSURE_PACKET_MISSING',
+            category: 'artifact-gap',
+            summary: `Closure packet has not been materialized for ${input.taskId}.`,
+            suggestedCommand: `node atm.mjs taskflow pre-close --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
+            details: { path: path.relative(input.cwd, closurePacketPath).replace(/\\/g, '/') }
+        }));
+    }
+    if (!teamRun) {
+        findings.push(teamPatrolFinding({
+            level: 'info',
+            code: 'ATM_TEAM_PATROL_NO_TEAM_RUN',
+            category: 'runtime-mode',
+            summary: 'No matching active team runtime record was found; patrol continues from ledger artifacts only.',
+            suggestedCommand: `node atm.mjs team start --task ${quoteCliValue(input.taskId)} --actor <actor> --json`
+        }));
+    }
+    else {
+        const taskStatus = normalizeOptionalRuntimeString(taskSummary.status);
+        if (taskStatus && ['done', 'abandoned', 'blocked'].includes(taskStatus) && String(teamRun.status ?? '').trim() === 'active') {
+            findings.push(teamPatrolFinding({
+                level: 'warning',
+                code: 'ATM_TEAM_PATROL_STALE_TERMINAL_TEAM_RUN',
+                category: 'runtime-mode',
+                summary: `Team run ${teamRun.teamRunId} is still active even though task ${input.taskId} is already ${taskStatus}.`,
+                suggestedCommand: `node atm.mjs tasks close --task ${quoteCliValue(input.taskId)} --actor <actor> --status ${taskStatus} --json`,
+                details: { teamRunId: teamRun.teamRunId, taskStatus }
+            }));
+        }
+        findings.push(...buildTeamRunPatrolFindings(teamRun, input));
+    }
+    if (input.mode === 'big-script' || largeScriptRisk.level === 'high') {
+        findings.push(teamPatrolFinding({
+            level: largeScriptRisk.level === 'high' ? 'warning' : 'info',
+            code: largeScriptRisk.level === 'high' ? 'ATM_TEAM_PATROL_LARGE_SCRIPT_RISK' : 'ATM_TEAM_PATROL_SCOPE_LOW_RISK',
+            category: 'scope',
+            summary: largeScriptRisk.level === 'high'
+                ? 'Task write scope has large-script or hot-file risk and should receive extra review.'
+                : 'Task write scope does not exceed the large-script threshold.',
+            suggestedCommand: largeScriptRisk.level === 'high'
+                ? `node atm.mjs team plan --task ${quoteCliValue(input.taskId)} --json`
+                : null,
+            details: { writePaths, largeScriptRisk }
+        }));
+    }
+    const severity = summarizePatrolSeverity(findings);
+    return {
+        schemaId: 'atm.teamPatrolReport.v1',
+        action: 'patrol',
+        readOnly: true,
+        runtimeWritten: false,
+        historyWritten: false,
+        agentsSpawned: false,
+        mutations: [],
+        taskId: input.taskId,
+        runId: `patrol-${input.taskId}-${input.mode}`,
+        patrolTeam: ['atomic-police', 'scope-guardian', 'evidence-auditor', 'runtime-sentinel'],
+        mode: input.mode,
+        severity,
+        safeToProceed: severity !== 'blocker',
+        findings,
+        suggestedCommand: suggestedPatrolCommand(input.taskId, input.mode, severity),
+        followUp: buildTeamPatrolFollowUp(input.taskId, input.mode, findings),
+        task: taskSummary,
+        inspected: {
+            taskPath: path.relative(input.cwd, taskPath).replace(/\\/g, '/'),
+            evidencePath: path.relative(input.cwd, evidencePath).replace(/\\/g, '/'),
+            closurePacketPath: path.relative(input.cwd, closurePacketPath).replace(/\\/g, '/'),
+            teamRunId: teamRun?.teamRunId ?? null,
+            teamRunPath: teamRun?.teamRunId ? `.atm/runtime/team-runs/${teamRun.teamRunId}.json` : null,
+            runtimeRoot: '.atm/runtime',
+            historyRoot: '.atm/history'
+        }
+    };
+}
 function listTeamRuns(cwd) {
     const directory = teamRunsDirectory(cwd);
     if (!existsSync(directory))
@@ -1499,6 +2218,12 @@ function listTeamRuns(cwd) {
         .filter((entry) => entry.endsWith('.json'))
         .sort((left, right) => left.localeCompare(right))
         .map((entry) => readJsonFile(path.join(directory, entry), 'ATM_TEAM_RUN_INVALID'));
+}
+function findLatestTeamRunForTask(cwd, taskId) {
+    const runs = listTeamRuns(cwd)
+        .filter((run) => run.taskId === taskId)
+        .sort((left, right) => String(right.updatedAt ?? right.createdAt ?? '').localeCompare(String(left.updatedAt ?? left.createdAt ?? '')));
+    return runs[0] ?? null;
 }
 function readTeamRun(cwd, teamRunId) {
     const filePath = path.join(teamRunsDirectory(cwd), `${teamRunId}.json`);
@@ -1510,7 +2235,216 @@ function readTeamRun(cwd, teamRunId) {
     }
     return readJsonFile(filePath, 'ATM_TEAM_RUN_INVALID');
 }
+function normalizeTeamPatrolMode(value) {
+    const mode = String(value ?? 'claim-preflight').trim();
+    if (['claim-preflight', 'close-preflight', 'big-script', 'daily-noon'].includes(mode)) {
+        return mode;
+    }
+    throw new CliError('ATM_TEAM_PATROL_MODE_INVALID', `Unsupported team patrol mode: ${mode}`, {
+        exitCode: 2,
+        details: { supportedModes: ['claim-preflight', 'close-preflight', 'big-script', 'daily-noon'] }
+    });
+}
+function buildTeamRunPatrolFindings(teamRun, input) {
+    const findings = [];
+    if (teamRun.executionMode !== 'manual-team') {
+        findings.push(teamPatrolFinding({
+            level: 'warning',
+            code: 'ATM_TEAM_PATROL_RUNTIME_MODE_UNEXPECTED',
+            category: 'runtime-mode',
+            summary: `Team run ${teamRun.teamRunId} is not in manual-team execution mode.`,
+            suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+            details: { executionMode: teamRun.executionMode ?? null }
+        }));
+    }
+    if (teamRun.agentsSpawned === true) {
+        findings.push(teamPatrolFinding({
+            level: 'warning',
+            code: 'ATM_TEAM_PATROL_AGENTS_SPAWNED',
+            category: 'runtime-mode',
+            summary: `Team run ${teamRun.teamRunId} reports spawned agents; coordinator should verify advisory role boundaries.`,
+            suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`
+        }));
+    }
+    const brokerSubagent = teamRun.brokerSubagent ?? teamRun.runtimeContract?.brokerSubagent ?? null;
+    if (!brokerSubagent || brokerSubagent.enabled !== true) {
+        findings.push(teamPatrolFinding({
+            level: 'blocker',
+            code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_MISSING',
+            category: 'broker-governance',
+            summary: `Team run ${teamRun.teamRunId} does not expose an enabled broker subagent contract.`,
+            suggestedCommand: `node atm.mjs team start --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
+            details: { schemaId: brokerSubagent?.schemaId ?? null, enabled: brokerSubagent?.enabled ?? null }
+        }));
+    }
+    else {
+        if (brokerSubagent.decisionSurface !== 'brokerLane' || brokerSubagent.stewardId !== 'neutral-write-steward') {
+            findings.push(teamPatrolFinding({
+                level: 'warning',
+                code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_DRIFT',
+                category: 'broker-governance',
+                summary: `Team run ${teamRun.teamRunId} broker subagent contract does not match the expected broker lane steward.`,
+                suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+                details: {
+                    decisionSurface: brokerSubagent.decisionSurface ?? null,
+                    stewardId: brokerSubagent.stewardId ?? null
+                }
+            }));
+        }
+        const expectedEvidenceRequired = [
+            'atm.teamBrokerLaneEvidence.v1',
+            'atm.stewardApplyEvidence.v1',
+            'atm.brokerOperationRunRecordEnvelope.v1'
+        ];
+        const evidenceRequired = normalizeStringArray(brokerSubagent.evidenceRequired);
+        const missingEvidence = expectedEvidenceRequired.filter((entry) => !evidenceRequired.includes(entry));
+        if (missingEvidence.length > 0) {
+            findings.push(teamPatrolFinding({
+                level: 'blocker',
+                code: 'ATM_TEAM_PATROL_BROKER_EVIDENCE_GATE_DRIFT',
+                category: 'broker-governance',
+                summary: `Team run ${teamRun.teamRunId} broker subagent evidence gates are incomplete.`,
+                suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+                details: {
+                    evidenceRequired,
+                    expectedEvidenceRequired,
+                    missingEvidence
+                }
+            }));
+        }
+        const boundary = brokerSubagent.authorityBoundary ?? {};
+        if (boundary.fileWrite === true || boundary.gitWrite === true || boundary.taskLifecycle === true || boundary.selfClose === true) {
+            findings.push(teamPatrolFinding({
+                level: 'blocker',
+                code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_AUTHORITY_DRIFT',
+                category: 'broker-governance',
+                summary: `Team run ${teamRun.teamRunId} broker subagent authority boundary is too broad.`,
+                suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+                details: { authorityBoundary: boundary }
+            }));
+        }
+    }
+    const commitLane = teamRun.commitLane ?? teamRun.runtimeContract?.commitLane ?? null;
+    if (commitLane && (commitLane.serializedBy !== 'branch-commit-queue'
+        || commitLane.ownerRole !== 'coordinator'
+        || commitLane.workerGitWrite === true)) {
+        findings.push(teamPatrolFinding({
+            level: 'blocker',
+            code: 'ATM_TEAM_PATROL_COMMIT_LANE_DRIFT',
+            category: 'broker-governance',
+            summary: `Team run ${teamRun.teamRunId} commit lane no longer enforces coordinator-owned serialized commits.`,
+            suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+            details: {
+                serializedBy: commitLane.serializedBy ?? null,
+                ownerRole: commitLane.ownerRole ?? null,
+                workerGitWrite: commitLane.workerGitWrite ?? null
+            }
+        }));
+    }
+    const artifactFindings = Array.isArray(teamRun.artifactHandoff?.findings)
+        ? teamRun.artifactHandoff.findings
+        : Array.isArray(teamRun.runtimeContract?.artifactHandoff?.findings)
+            ? teamRun.runtimeContract.artifactHandoff.findings
+            : [];
+    for (const artifactFinding of artifactFindings) {
+        if (artifactFinding?.blocking === true) {
+            findings.push(teamPatrolFinding({
+                level: input.mode === 'close-preflight' ? 'blocker' : 'warning',
+                code: 'ATM_TEAM_PATROL_ARTIFACT_HANDOFF_BLOCKED',
+                category: 'artifact-gap',
+                summary: String(artifactFinding.summary ?? 'Team role artifact handoff has a missing required artifact.'),
+                suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+                details: {
+                    role: artifactFinding.role ?? null,
+                    agentId: artifactFinding.agentId ?? null,
+                    artifact: artifactFinding.artifact ?? null
+                }
+            }));
+        }
+    }
+    const remaining = extractRetryBudgetRemaining(teamRun);
+    if (remaining !== null && remaining <= 0) {
+        findings.push(teamPatrolFinding({
+            level: 'blocker',
+            code: 'ATM_TEAM_PATROL_RETRY_BUDGET_EXHAUSTED',
+            category: 'retry-budget',
+            summary: `Team run ${teamRun.teamRunId} has no retry budget remaining.`,
+            suggestedCommand: `node atm.mjs team patrol --task ${quoteCliValue(input.taskId)} --mode close-preflight --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+            details: { retryBudgetRemaining: remaining }
+        }));
+    }
+    const reworkStatus = String(teamRun.reworkRoute?.status ?? teamRun.reworkStatus ?? '').trim();
+    if (['needs-rework', 'blocked', 'stale'].includes(reworkStatus)) {
+        findings.push(teamPatrolFinding({
+            level: reworkStatus === 'blocked' ? 'blocker' : 'warning',
+            code: 'ATM_TEAM_PATROL_REWORK_ROUTE_ATTENTION',
+            category: 'rework-state',
+            summary: `Team run ${teamRun.teamRunId} rework route is ${reworkStatus}.`,
+            suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+            details: { reworkStatus }
+        }));
+    }
+    if (reworkStatus === 'ready-for-close' && input.mode === 'close-preflight') {
+        findings.push(teamPatrolFinding({
+            level: 'info',
+            code: 'ATM_TEAM_PATROL_REWORK_ROUTE_READY_FOR_CLOSE',
+            category: 'rework-state',
+            summary: `Team run ${teamRun.teamRunId} rework route is ready-for-close.`,
+            suggestedCommand: `node atm.mjs taskflow pre-close --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
+            details: { reworkStatus }
+        }));
+    }
+    return findings;
+}
+function extractRetryBudgetRemaining(teamRun) {
+    const retryBudget = teamRun.retryBudget ?? teamRun.runtimeContract?.retryBudget;
+    if (retryBudget?.status === 'escalation-required' || retryBudget?.exhausted === true) {
+        return 0;
+    }
+    const candidates = [
+        teamRun.reworkRoute?.retryBudgetRemaining,
+        teamRun.reworkRoute?.retryBudget?.remaining
+    ];
+    for (const candidate of candidates) {
+        if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+            return candidate;
+        }
+    }
+    return null;
+}
+function teamPatrolFinding(input) {
+    return input;
+}
+function summarizePatrolSeverity(findings) {
+    if (findings.some((finding) => finding.level === 'blocker'))
+        return 'blocker';
+    if (findings.some((finding) => finding.level === 'warning'))
+        return 'warning';
+    return 'info';
+}
+function suggestedPatrolCommand(taskId, mode, severity) {
+    if (severity === 'blocker') {
+        return `node atm.mjs taskflow pre-close --task ${quoteCliValue(taskId)} --actor <actor> --json`;
+    }
+    if (mode === 'claim-preflight') {
+        return `node atm.mjs next --claim --task ${quoteCliValue(taskId)} --actor <actor> --json`;
+    }
+    if (mode === 'close-preflight') {
+        return `node atm.mjs taskflow pre-close --task ${quoteCliValue(taskId)} --actor <actor> --json`;
+    }
+    return `node atm.mjs team patrol --task ${quoteCliValue(taskId)} --mode ${mode} --json`;
+}
+function buildTeamPatrolFollowUp(taskId, mode, findings) {
+    const commands = uniqueStrings(findings.map((finding) => finding.suggestedCommand).filter((entry) => Boolean(entry)));
+    if (commands.length > 0)
+        return commands;
+    if (mode === 'close-preflight') {
+        return [`node atm.mjs taskflow pre-close --task ${quoteCliValue(taskId)} --actor <actor> --json`];
+    }
+    return [`node atm.mjs team plan --task ${quoteCliValue(taskId)} --json`];
+}
 function compactTeamRun(run) {
+    const brokerGovernance = run.teamSummary?.brokerGovernance ?? null;
     return {
         teamRunId: run.teamRunId,
         taskId: run.taskId,
@@ -1519,6 +2453,16 @@ function compactTeamRun(run) {
         status: run.status,
         roleCount: Array.isArray(run.roles) ? run.roles.length : Array.isArray(run.agents) ? run.agents.length : 0,
         leaseCount: Array.isArray(run.leases) ? run.leases.length : Array.isArray(run.permissionLeases) ? run.permissionLeases.length : 0,
+        brokerSubagentEnabled: run.brokerSubagent?.enabled === true || run.runtimeContract?.brokerSubagent?.enabled === true,
+        brokerDecisionSurface: run.brokerSubagent?.decisionSurface ?? run.runtimeContract?.brokerSubagent?.decisionSurface ?? null,
+        brokerStewardId: run.brokerSubagent?.stewardId ?? run.runtimeContract?.brokerSubagent?.stewardId ?? null,
+        brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
+        brokerEvidenceRequired: normalizeStringArray(brokerGovernance?.brokerEvidenceRequired ?? run.brokerSubagent?.evidenceRequired ?? run.runtimeContract?.brokerSubagent?.evidenceRequired),
+        commitLaneSerializedBy: brokerGovernance?.commitLaneSerializedBy ?? run.runtimeContract?.commitLane?.serializedBy ?? null,
+        commitLaneOwnerRole: brokerGovernance?.commitLaneOwnerRole ?? run.runtimeContract?.commitLane?.ownerRole ?? null,
+        workerGitWrite: brokerGovernance?.workerGitWrite ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.gitWrite ?? null,
+        workerTaskLifecycle: brokerGovernance?.workerTaskLifecycle ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.taskLifecycle ?? null,
+        workerSelfClose: brokerGovernance?.workerSelfClose ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.selfClose ?? null,
         agentsSpawned: run.agentsSpawned === true,
         createdAt: run.createdAt ?? null,
         updatedAt: run.updatedAt ?? null

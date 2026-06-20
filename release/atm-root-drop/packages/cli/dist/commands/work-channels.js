@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { normalizeStoredPlanningPathForIdentity } from './planning-repo-root.js';
 const quickfixLockPath = ['.atm', 'runtime', 'quickfix-lock.json'];
 const batchRunPath = ['.atm', 'runtime', 'batch-run.json'];
 const batchRunsPath = ['.atm', 'runtime', 'batch-runs'];
@@ -156,7 +157,7 @@ export function writeBatchRun(input) {
         schemaId: 'atm.batchRun.v1',
         specVersion: '0.1.0',
         batchId,
-        scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds),
+        scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds, input.cwd),
         queueId: input.queue?.queueId ?? null,
         sourcePrompt: prompt,
         sourcePromptHash: sha256(prompt),
@@ -355,7 +356,42 @@ function normalizeBatchRunRecord(record) {
         ...record,
         scopeKey: record.scopeKey || deriveBatchScopeKey([], record.sourcePrompt ?? '', taskIds),
         queueId: record.queueId ?? null,
-        taskIds
+        taskIds,
+        skippedTasks: Array.isArray(record.skippedTasks) ? record.skippedTasks : []
+    };
+}
+export function writeBatchTaskAuditEvent(input) {
+    const createdAt = new Date().toISOString();
+    const digest = sha256(JSON.stringify({
+        taskId: input.taskId,
+        action: input.action,
+        actorId: input.actorId,
+        batchId: input.batchId,
+        reason: input.reason ?? null,
+        batchIndex: input.batchIndex ?? null,
+        createdAt
+    })).slice(0, 12);
+    const transitionId = `${createdAt.replace(/[:.]/g, '-')}-${input.action}-${digest}`;
+    const event = {
+        schemaId: 'atm.taskTransition.v1',
+        specVersion: '0.1.0',
+        transitionId,
+        taskId: input.taskId,
+        action: input.action,
+        actorId: input.actorId,
+        batchId: input.batchId,
+        reason: input.reason ?? null,
+        batchIndex: input.batchIndex ?? null,
+        createdAt,
+        command: `node atm.mjs batch ${input.action === 'batch-skip' ? 'skip' : 'resume'} --task ${input.taskId} --batch ${input.batchId} --actor ${input.actorId} --json`
+    };
+    const eventDir = path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId);
+    mkdirSync(eventDir, { recursive: true });
+    const eventPath = path.join(eventDir, `${transitionId}.json`);
+    writeFileSync(eventPath, `${JSON.stringify(event, null, 2)}\n`, 'utf8');
+    return {
+        transitionId,
+        eventPath: normalizeRelativePath(path.relative(input.cwd, eventPath))
     };
 }
 function dedupeBatchRuns(records) {
@@ -369,14 +405,17 @@ function dedupeBatchRuns(records) {
     }
     return output.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
 }
-function deriveBatchScopeKey(tasks, prompt, taskIds) {
+function deriveBatchScopeKey(tasks, prompt, taskIds, cwd) {
     const idRoots = uniqueStrings(taskIds.map((taskId) => {
         const match = taskId.match(/^(.+?)-\d{2,}(?:-.+)?$/);
         return match?.[1] ?? '';
     }).filter(Boolean));
     if (idRoots.length === 1)
         return idRoots[0] ?? 'custom';
-    const planPaths = uniqueStrings(tasks.map((task) => task.sourcePlanPath).filter((entry) => Boolean(entry)));
+    const planPaths = uniqueStrings(tasks
+        .map((task) => task.sourcePlanPath)
+        .filter((entry) => Boolean(entry))
+        .map((entry) => cwd ? normalizeStoredPlanningPathForIdentity(cwd, entry) : entry));
     if (planPaths.length === 1)
         return `plan-${sha256(planPaths[0] ?? '').slice(0, 12)}`;
     if (taskIds.length > 0)

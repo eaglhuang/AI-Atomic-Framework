@@ -1,3 +1,5 @@
+import type { FreezeAck, FreezeResolution, FreezeSignal } from './freeze.ts';
+
 export interface MigrationRecord {
   readonly strategy: 'none' | 'additive' | 'breaking';
   readonly fromVersion: string | null;
@@ -79,6 +81,9 @@ export interface PatchProposal {
   readonly proposalId: string;
   readonly taskId: string;
   readonly actorId: string;
+  readonly transactionId?: string;
+  readonly transactionIds?: readonly string[];
+  readonly transaction_ids?: readonly string[];
   readonly baseCommit: string;
   readonly fileBeforeHash: string;
   readonly targetFile: string;
@@ -187,6 +192,7 @@ export interface WriteBrokerRegistryDocument {
   readonly specVersion: '0.1.0';
   readonly repoId: string;
   readonly workspaceId: string;
+  readonly currentEpoch?: number;
   readonly activeIntents: readonly ActiveWriteIntent[];
 }
 
@@ -237,10 +243,37 @@ export interface MutationRequest {
   readonly requestId: string;
   readonly actorId: string;
   readonly taskId?: string;
+  readonly transactionId?: string;
+  readonly transactionIds?: readonly string[];
+  readonly transaction_ids?: readonly string[];
   readonly filePath: string;
   readonly op: string;
   readonly target: string;
   readonly value?: unknown;
+}
+
+export type ExplicitMutationIntentKind =
+  | 'mutation-request'
+  | 'patch-proposal'
+  | 'owner-shard-row-target'
+  | 'json-pointer'
+  | 'text-range'
+  | 'scalar-operation';
+
+export interface MutationIntentMissingInput {
+  readonly requestId: string;
+  readonly filePath: string;
+  readonly kind: ExplicitMutationIntentKind | 'unknown';
+  readonly field: 'filePath' | 'op' | 'target' | 'value';
+  readonly reason: string;
+}
+
+export interface ExplicitMutationIntentInputSummary {
+  readonly requestId: string;
+  readonly filePath: string;
+  readonly kind: ExplicitMutationIntentKind;
+  readonly op: string;
+  readonly target: string;
 }
 
 /**
@@ -370,6 +403,8 @@ export interface BrokerOperationRunRecord {
   readonly merge_verdict: MergeVerdict;
   readonly evidence_path: string;
   readonly task_ids?: readonly string[];
+  readonly commit_sha?: string;
+  readonly transaction_ids?: readonly string[];
 }
 
 export interface BrokerOperationRunRecordEnvelope {
@@ -408,4 +443,43 @@ const FROZEN_MIGRATION: MigrationRecord = Object.freeze({
 /** Shared default migration record for adapter-emitted envelopes. */
 export function brokerAdapterMigration(): MigrationRecord {
   return FROZEN_MIGRATION;
+}
+
+export interface RouteFreezeRuntimeRecord {
+  readonly schemaId: 'atm.routeFreezeRuntime.v1';
+  readonly specVersion: '0.1.0';
+  readonly migration: MigrationRecord;
+  readonly routeId: string;
+  readonly signal: FreezeSignal;
+  readonly ack: FreezeAck;
+  readonly resolution: FreezeResolution;
+  readonly pauseReason: string;
+  readonly updatedAt: string;
+}
+
+const ROUTE_FREEZE_RUNTIME_MIGRATION: MigrationRecord = Object.freeze({
+  strategy: 'none',
+  fromVersion: null,
+  notes: 'Route pause/freeze runtime sidecar bound to broker freeze protocol.'
+});
+
+export function createRouteFreezeRuntimeRecord(input: {
+  readonly routeId: string;
+  readonly signal: FreezeSignal;
+  readonly ack: FreezeAck;
+  readonly resolution: FreezeResolution;
+  readonly pauseReason: string;
+  readonly updatedAt: string;
+}): RouteFreezeRuntimeRecord {
+  return {
+    schemaId: 'atm.routeFreezeRuntime.v1',
+    specVersion: '0.1.0',
+    migration: ROUTE_FREEZE_RUNTIME_MIGRATION,
+    routeId: input.routeId,
+    signal: input.signal,
+    ack: input.ack,
+    resolution: input.resolution,
+    pauseReason: input.pauseReason,
+    updatedAt: input.updatedAt
+  };
 }

@@ -1,0 +1,45 @@
+{
+  "taskId": "TASK-AAO-0039",
+  "updatedAt": "2026-06-20T12:22:13.436Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-AAO-0039 against commit 01ff40aa00850c840725a0ae04a7ff61767fa2dd.",
+      "artifactPaths": [
+        ".atm/history/evidence/TASK-AAO-0039.*",
+        ".atm/history/task-events/TASK-AAO-0039/**",
+        ".atm/history/tasks/TASK-AAO-0039.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "package.json",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-task-ledger-governance.ts",
+        "atm-agent-first-operability/tasks/TASK-AAO-0039-planning-only-ledger-audit-boundary.task.md"
+      ],
+      "producedBy": "cursor-gpt-5.2",
+      "createdAt": "2026-06-20T12:22:13.436Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 01ff40aa00850c840725a0ae04a7ff61767fa2dd",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:78d0fc43cc046a166237e4544094c7bd29f4e00edb866446f596f77b2894677f",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "01ff40aa00850c840725a0ae04a7ff61767fa2dd"
+      }
+    }
+  ]
+}

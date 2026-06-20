@@ -542,13 +542,36 @@ export async function runBroker(argv) {
             throw new CliError('ATM_CLI_USAGE', 'broker plan-batch requires --request-file <path> and/or --requests-dir <dir>.', { exitCode: 2 });
         }
         const requests = [];
+        const explicitInputs = [];
+        const missingInputs = [];
         const requestConflictKeys = new Map();
         for (const requestPath of requestPaths) {
             if (!existsSync(requestPath)) {
                 throw new CliError('ATM_FILE_NOT_FOUND', `Mutation request file not found: ${requestPath}`, { exitCode: 1 });
             }
             const request = JSON.parse(readFileSync(requestPath, 'utf8'));
+            const classification = classifyExplicitMutationRequest(request);
+            explicitInputs.push(...classification.explicitInputs);
+            missingInputs.push(...classification.missingInputs);
             requests.push(request);
+        }
+        if (missingInputs.length > 0) {
+            return makeResult({
+                ok: false,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('warn', 'ATM_BROKER_MUTATION_INTENT_MISSING_INPUTS', `Structured mutation intent is incomplete for ${missingInputs.length} input field(s); broker will not guess missing targets or operations.`, {
+                        missingInputCount: missingInputs.length,
+                        requestCount: requests.length
+                    })
+                ],
+                evidence: {
+                    action: 'plan-batch',
+                    explicitInputs,
+                    missingInputs
+                }
+            });
         }
         const registry = defaultAdapterRegistry();
         // Load the current on-disk contents of each target file (when present) so the
@@ -630,7 +653,8 @@ export async function runBroker(argv) {
                     laneDecision: entry.verdict,
                     mergeVerdict: entry.mergeDecision,
                     evidencePath: runEvidencePathRelative ?? 'unknown',
-                    appliedFiles: [entry.filePath]
+                    appliedFiles: [entry.filePath],
+                    transactionIds: extractMutationRequestTransactionIds(request)
                 }));
             }
             if (runEvidenceRecords.length > 0) {
@@ -653,6 +677,8 @@ export async function runBroker(argv) {
             ],
             evidence: {
                 action: 'plan-batch',
+                explicitInputs,
+                missingInputs,
                 plan,
                 applied: options.apply ? applied : false,
                 casMismatches,
@@ -664,6 +690,79 @@ export async function runBroker(argv) {
         });
     }
     throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+function classifyExplicitMutationRequest(request) {
+    const missingInputs = [];
+    const requestId = request.requestId || 'unknown-request';
+    const filePath = typeof request.filePath === 'string' ? request.filePath : '';
+    const op = typeof request.op === 'string' ? request.op.trim() : '';
+    const target = typeof request.target === 'string' ? request.target.trim() : '';
+    const kind = resolveExplicitMutationIntentKind(request, filePath, op, target);
+    if (!filePath.trim()) {
+        missingInputs.push({
+            requestId,
+            filePath,
+            kind: kind ?? 'unknown',
+            field: 'filePath',
+            reason: 'filePath is required for broker mutation intent.'
+        });
+    }
+    if (!op) {
+        missingInputs.push({
+            requestId,
+            filePath,
+            kind: kind ?? 'unknown',
+            field: 'op',
+            reason: 'operation is required; broker does not infer operations from prose.'
+        });
+    }
+    if (!target) {
+        missingInputs.push({
+            requestId,
+            filePath,
+            kind: kind ?? 'unknown',
+            field: 'target',
+            reason: 'target/region is required; broker does not guess write regions.'
+        });
+    }
+    if (missingInputs.length > 0 || !kind) {
+        return { explicitInputs: [], missingInputs };
+    }
+    return {
+        explicitInputs: [
+            {
+                requestId,
+                filePath,
+                kind,
+                op,
+                target
+            }
+        ],
+        missingInputs
+    };
+}
+function resolveExplicitMutationIntentKind(request, filePath, op, target) {
+    const explicitKind = request.intentKind;
+    if (explicitKind) {
+        return explicitKind;
+    }
+    const normalizedPath = filePath.replace(/\\/g, '/').toLowerCase();
+    if (normalizedPath.includes('/path-to-atom-map-shards/owner-shard-') && target) {
+        return 'owner-shard-row-target';
+    }
+    if ((normalizedPath.endsWith('.scalars.json') || normalizedPath.endsWith('.counter.json')) && target) {
+        return 'scalar-operation';
+    }
+    if ((normalizedPath.endsWith('.md') || normalizedPath.endsWith('.txt')) && target) {
+        return 'text-range';
+    }
+    if (normalizedPath.endsWith('.json') && target.startsWith('/')) {
+        return 'json-pointer';
+    }
+    if (op && target) {
+        return 'mutation-request';
+    }
+    return null;
 }
 function buildMutationEvidence(adapterId, request, baseHash, resultHash, mergeDecision, verdict, conflictKeys) {
     return {
@@ -677,6 +776,18 @@ function buildMutationEvidence(adapterId, request, baseHash, resultHash, mergeDe
         mergeDecision,
         verdict
     };
+}
+function extractMutationRequestTransactionIds(request) {
+    const source = request;
+    const values = [
+        source.transactionId,
+        ...(Array.isArray(source.transactionIds) ? source.transactionIds : [source.transactionIds]),
+        ...(Array.isArray(source.transaction_ids) ? source.transaction_ids : [source.transaction_ids])
+    ];
+    return [...new Set(values
+            .map((value) => typeof value === 'string' ? value.trim() : '')
+            .filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
 }
 function parseBrokerArgs(argv) {
     const state = {

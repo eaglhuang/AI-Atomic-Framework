@@ -4,6 +4,15 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { evaluateConflictMatrix } from '../../packages/core/src/broker/conflict-matrix.ts';
+import {
+  acknowledgeFreeze,
+  createFreezeSignal,
+  resolveFreezeDecision
+} from '../../packages/core/src/broker/freeze.ts';
+import {
+  createHandoffPatchEnvelope,
+  validatePatchEnvelope
+} from '../../packages/core/src/broker/patch-envelope.ts';
 import { planStewardApply } from '../../packages/core/src/broker/steward.ts';
 import type { BrokerArbitrationVerdict } from '../../packages/core/src/broker/types.ts';
 import type { MergePlan, PatchProposal, WriteBrokerRegistryDocument, WriteIntent } from '../../packages/core/src/broker/types.ts';
@@ -18,7 +27,15 @@ export type MaoCapabilityTask =
   | 'TASK-MAO-0007'
   | 'TASK-MAO-0009'
   | 'TASK-MAO-0015'
+  | 'TASK-MAO-0046'
+  | 'TASK-MAO-0047'
   | 'CID-AGR-INCIDENT';
+
+export type MaoEventReplayKind =
+  | 'broker-conflict'
+  | 'task-event-claim'
+  | 'freeze-protocol'
+  | 'patch-envelope-handoff';
 
 export type MaoCoverageTier = 'generic-mao' | 'm5-runner-extension';
 
@@ -76,6 +93,50 @@ export interface MaoParallelRoutingScenario {
   readonly registryCapsuleCid?: string;
   readonly groundTruth: MaoParallelGroundTruth;
   readonly expected: MaoParallelExpectation;
+}
+
+export interface MaoEventReplayProvenance {
+  readonly origin: 'broker-evidence' | 'task-events';
+  readonly sanitizedFrom: string;
+  readonly notes: string;
+}
+
+export interface MaoFreezeReplayCase {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly routeId: string;
+  readonly fixedNow: number;
+  readonly reason: string;
+}
+
+export interface MaoPatchEnvelopeReplayCase {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly freezeId: string;
+  readonly targetFiles: readonly string[];
+  readonly capturedAt: string;
+  readonly partialReason: string;
+}
+
+export interface MaoEventReplayScenario {
+  readonly id: string;
+  readonly description: string;
+  readonly layer: 'event-replay';
+  readonly replayKind: MaoEventReplayKind;
+  readonly capabilityIntroducedBy: MaoCapabilityTask;
+  readonly coverageTier: MaoCoverageTier;
+  readonly replayProvenance: MaoEventReplayProvenance;
+  readonly registryCase?: MaoConflictRegistryCase;
+  readonly freezeReplayCase?: MaoFreezeReplayCase;
+  readonly patchEnvelopeReplayCase?: MaoPatchEnvelopeReplayCase;
+  readonly groundTruth: MaoParallelGroundTruth;
+  readonly expected: MaoParallelExpectation;
+}
+
+export interface MaoCombinedBenchmarkReport {
+  readonly staticReport: MaoParallelBenchmarkReport;
+  readonly eventReplayReport: MaoParallelBenchmarkReport;
+  readonly combinedShipSafe: boolean;
 }
 
 export interface MaoParallelScenarioResult {
@@ -163,22 +224,116 @@ export function transitionMaoRoute(
   return next;
 }
 
-function evaluateConflictMatrixScenario(scenario: MaoParallelRoutingScenario): MaoRoutingVerdict {
-  if (!scenario.registryCase) {
-    return 'blocked';
-  }
-
+function evaluateConflictRegistryCase(
+  registryCase: MaoConflictRegistryCase,
+  options: { readonly kind?: MaoParallelScenarioKind; readonly sourceCapsuleCid?: string; readonly registryCapsuleCid?: string } = {}
+): MaoRoutingVerdict {
   let routingVerdict = mapArbitrationVerdictToMaoRouting(
-    evaluateConflictMatrix(scenario.registryCase.newIntent, scenario.registryCase.registry.activeIntents).arbitrationVerdict
+    evaluateConflictMatrix(registryCase.newIntent, registryCase.registry.activeIntents).arbitrationVerdict
   );
 
-  if (scenario.kind === 'capsule-drift' && scenario.sourceCapsuleCid && scenario.registryCapsuleCid) {
-    if (detectCapsuleCidDrift(scenario.registryCapsuleCid, scenario.sourceCapsuleCid)) {
+  if (options.kind === 'capsule-drift' && options.sourceCapsuleCid && options.registryCapsuleCid) {
+    if (detectCapsuleCidDrift(options.registryCapsuleCid, options.sourceCapsuleCid)) {
       routingVerdict = 'freeze';
     }
   }
 
   return routingVerdict;
+}
+
+function evaluateConflictMatrixScenario(scenario: MaoParallelRoutingScenario): MaoRoutingVerdict {
+  if (!scenario.registryCase) {
+    return 'blocked';
+  }
+
+  return evaluateConflictRegistryCase(scenario.registryCase, {
+    kind: scenario.kind,
+    sourceCapsuleCid: scenario.sourceCapsuleCid,
+    registryCapsuleCid: scenario.registryCapsuleCid
+  });
+}
+
+function evaluateFreezeProtocolReplay(scenario: MaoEventReplayScenario): MaoRoutingVerdict {
+  if (!scenario.freezeReplayCase) {
+    return 'blocked';
+  }
+
+  const replay = scenario.freezeReplayCase;
+  const signal = createFreezeSignal({
+    taskId: replay.taskId,
+    actorId: replay.actorId,
+    now: replay.fixedNow,
+    blockingRoute: replay.routeId,
+    conflictingResource: replay.reason
+  });
+  const ack = acknowledgeFreeze(signal, { now: replay.fixedNow + 1 });
+  const resolution = resolveFreezeDecision({
+    signal,
+    acknowledgedAt: ack.acknowledgedAt,
+    now: replay.fixedNow + 2
+  });
+  return resolution.decision.state === 'acknowledged' ? 'route-frozen' : 'blocked';
+}
+
+function evaluatePatchEnvelopeHandoffReplay(scenario: MaoEventReplayScenario): MaoRoutingVerdict {
+  if (!scenario.patchEnvelopeReplayCase) {
+    return 'blocked';
+  }
+
+  const replay = scenario.patchEnvelopeReplayCase;
+  const envelope = createHandoffPatchEnvelope({
+    taskId: replay.taskId,
+    actorId: replay.actorId,
+    freezeId: replay.freezeId,
+    targetFiles: replay.targetFiles,
+    partialReason: replay.partialReason,
+    capturedAt: replay.capturedAt
+  });
+  return validatePatchEnvelope(envelope).ok ? 'freeze' : 'blocked';
+}
+
+export function evaluateEventReplayScenario(scenario: MaoEventReplayScenario): MaoParallelScenarioResult {
+  const started = process.hrtime.bigint();
+  let routingVerdict: MaoRoutingVerdict = 'blocked';
+
+  switch (scenario.replayKind) {
+    case 'broker-conflict':
+    case 'task-event-claim':
+      routingVerdict = scenario.registryCase
+        ? evaluateConflictRegistryCase(scenario.registryCase)
+        : 'blocked';
+      break;
+    case 'freeze-protocol':
+      routingVerdict = evaluateFreezeProtocolReplay(scenario);
+      break;
+    case 'patch-envelope-handoff':
+      routingVerdict = evaluatePatchEnvelopeHandoffReplay(scenario);
+      break;
+    default:
+      routingVerdict = 'blocked';
+  }
+
+  const validatorOutcome = deriveValidatorOutcomeFromGroundTruth(scenario.groundTruth, routingVerdict);
+  const falseSafeRegression =
+    !scenario.groundTruth.safeToParallelize
+    && PERMISSIVE_VERDICTS.has(routingVerdict)
+    && scenario.expected.validatorOutcome === 'fail'
+    && validatorOutcome === 'pass';
+  const matchedExpectation =
+    scenario.expected.routingVerdict === routingVerdict
+    && scenario.expected.validatorOutcome === validatorOutcome;
+
+  return {
+    scenarioId: scenario.id,
+    kind: 'conflict-matrix',
+    capabilityIntroducedBy: scenario.capabilityIntroducedBy,
+    coverageTier: scenario.coverageTier,
+    routingVerdict,
+    validatorOutcome,
+    falseSafeRegression,
+    matchedExpectation,
+    latencyNs: Number(process.hrtime.bigint() - started)
+  };
 }
 
 function evaluateRouteLifecycleScenario(scenario: MaoParallelRoutingScenario): MaoRoutingVerdict {
@@ -257,18 +412,25 @@ function evaluateStewardPlanScenario(scenario: MaoParallelRoutingScenario): MaoR
   }
 }
 
+function deriveValidatorOutcomeFromGroundTruth(
+  groundTruth: MaoParallelGroundTruth,
+  routingVerdict: MaoRoutingVerdict
+): 'pass' | 'fail' {
+  const permissive = PERMISSIVE_VERDICTS.has(routingVerdict);
+  if (!groundTruth.safeToParallelize && permissive) {
+    return groundTruth.validatorShouldCatch ? 'fail' : 'pass';
+  }
+  if (groundTruth.validatorShouldCatch && permissive) {
+    return 'fail';
+  }
+  return 'pass';
+}
+
 function deriveValidatorOutcome(
   scenario: MaoParallelRoutingScenario,
   routingVerdict: MaoRoutingVerdict
 ): 'pass' | 'fail' {
-  const permissive = PERMISSIVE_VERDICTS.has(routingVerdict);
-  if (!scenario.groundTruth.safeToParallelize && permissive) {
-    return scenario.groundTruth.validatorShouldCatch ? 'fail' : 'pass';
-  }
-  if (scenario.groundTruth.validatorShouldCatch && permissive) {
-    return 'fail';
-  }
-  return 'pass';
+  return deriveValidatorOutcomeFromGroundTruth(scenario.groundTruth, routingVerdict);
 }
 
 export function evaluateMaoParallelScenario(scenario: MaoParallelRoutingScenario): MaoParallelScenarioResult {
@@ -335,6 +497,27 @@ export function loadAllMaoParallelRoutingScenarios(root: string): MaoParallelRou
   return manifest.scenarios.map((scenarioFile) => loadMaoParallelRoutingScenario(root, scenarioFile));
 }
 
+export function loadMaoEventReplayManifest(root: string): { readonly replays: readonly string[] } {
+  const manifestPath = path.join(root, 'scripts/fixtures/mao-parallel-routing/event-replay.manifest.json');
+  if (!existsSync(manifestPath)) {
+    throw new Error(`missing mao event replay benchmark manifest: ${manifestPath}`);
+  }
+  return JSON.parse(readFileSync(manifestPath, 'utf8')) as { readonly replays: readonly string[] };
+}
+
+export function loadMaoEventReplayScenario(root: string, replayFile: string): MaoEventReplayScenario {
+  const replayPath = path.join(root, 'scripts/fixtures/mao-parallel-routing', replayFile);
+  if (!existsSync(replayPath)) {
+    throw new Error(`missing mao event replay scenario: ${replayPath}`);
+  }
+  return JSON.parse(readFileSync(replayPath, 'utf8')) as MaoEventReplayScenario;
+}
+
+export function loadAllMaoEventReplayScenarios(root: string): MaoEventReplayScenario[] {
+  const manifest = loadMaoEventReplayManifest(root);
+  return manifest.replays.map((replayFile) => loadMaoEventReplayScenario(root, replayFile));
+}
+
 export function listMaoParallelRoutingScenarioFiles(root: string): string[] {
   const fixtureDir = path.join(root, 'scripts/fixtures/mao-parallel-routing');
   return readdirSync(fixtureDir)
@@ -345,6 +528,30 @@ export function listMaoParallelRoutingScenarioFiles(root: string): string[] {
 export function runMaoParallelRoutingBenchmarkSuite(root: string): MaoParallelBenchmarkReport {
   const scenarios = loadAllMaoParallelRoutingScenarios(root);
   const results = scenarios.map((scenario) => evaluateMaoParallelScenario(scenario));
+  return buildMaoParallelBenchmarkReport(scenarios.map((scenario) => scenario.id), results, scenarios);
+}
+
+export function runMaoEventReplayBenchmarkSuite(root: string): MaoParallelBenchmarkReport {
+  const scenarios = loadAllMaoEventReplayScenarios(root);
+  const results = scenarios.map((scenario) => evaluateEventReplayScenario(scenario));
+  return buildMaoParallelBenchmarkReport(scenarios.map((scenario) => scenario.id), results, scenarios);
+}
+
+export function runCombinedMaoBenchmarkSuite(root: string): MaoCombinedBenchmarkReport {
+  const staticReport = runMaoParallelRoutingBenchmarkSuite(root);
+  const eventReplayReport = runMaoEventReplayBenchmarkSuite(root);
+  return {
+    staticReport,
+    eventReplayReport,
+    combinedShipSafe: staticReport.shipSafe && eventReplayReport.shipSafe
+  };
+}
+
+function buildMaoParallelBenchmarkReport(
+  scenarioIds: readonly string[],
+  results: readonly MaoParallelScenarioResult[],
+  scenarios: readonly Pick<MaoParallelRoutingScenario | MaoEventReplayScenario, 'id' | 'groundTruth'>[]
+): MaoParallelBenchmarkReport {
   const falseSafeRegressions: string[] = [];
   const expectationFailures: string[] = [];
   const perScenarioNs: Record<string, number> = {};
@@ -354,6 +561,8 @@ export function runMaoParallelRoutingBenchmarkSuite(root: string): MaoParallelBe
     'TASK-MAO-0007': 0,
     'TASK-MAO-0009': 0,
     'TASK-MAO-0015': 0,
+    'TASK-MAO-0046': 0,
+    'TASK-MAO-0047': 0,
     'CID-AGR-INCIDENT': 0
   };
   const tierCoverage: Record<MaoCoverageTier, number> = {
@@ -394,7 +603,7 @@ export function runMaoParallelRoutingBenchmarkSuite(root: string): MaoParallelBe
     : Math.round((caughtCount / unsafeScenarioCount) * 1000) / 10;
 
   return {
-    scenarioCount: scenarios.length,
+    scenarioCount: scenarioIds.length,
     falseSafeRegressions,
     expectationFailures,
     catchRate: {
@@ -405,7 +614,7 @@ export function runMaoParallelRoutingBenchmarkSuite(root: string): MaoParallelBe
     },
     latency: {
       totalNs,
-      averageNs: scenarios.length === 0 ? 0 : Math.round(totalNs / scenarios.length),
+      averageNs: scenarioIds.length === 0 ? 0 : Math.round(totalNs / scenarioIds.length),
       perScenarioNs
     },
     capabilityCoverage,
@@ -415,38 +624,62 @@ export function runMaoParallelRoutingBenchmarkSuite(root: string): MaoParallelBe
 }
 
 export function renderMaoParallelRoutingBenchmarkMarkdown(
-  report: MaoParallelBenchmarkReport,
-  scenarios: readonly MaoParallelRoutingScenario[]
+  combined: MaoCombinedBenchmarkReport,
+  staticScenarios: readonly MaoParallelRoutingScenario[],
+  replayScenarios: readonly MaoEventReplayScenario[]
 ): string {
-  const scenarioRows = scenarios.map((scenario) => {
+  const staticRows = staticScenarios.map((scenario) => {
     const result = evaluateMaoParallelScenario(scenario);
     return `| ${scenario.id} | ${scenario.kind} | ${scenario.capabilityIntroducedBy} | ${scenario.coverageTier} | ${result.routingVerdict} | ${result.matchedExpectation ? 'pass' : 'fail'} |`;
   });
+  const replayRows = replayScenarios.map((scenario) => {
+    const result = evaluateEventReplayScenario(scenario);
+    return `| ${scenario.id} | ${scenario.replayKind} | ${scenario.capabilityIntroducedBy} | ${scenario.replayProvenance.origin} | ${result.routingVerdict} | ${result.matchedExpectation ? 'pass' : 'fail'} |`;
+  });
+
+  const renderCatchSection = (label: string, report: MaoParallelBenchmarkReport) => [
+    `### ${label}`,
+    '',
+    `- Scenario count: ${report.scenarioCount}`,
+    `- Catch rate: ${report.catchRate.catchRatePercent}% (${report.catchRate.caughtCount}/${report.catchRate.unsafeScenarioCount} unsafe scenarios caught)`,
+    `- Average latency: ${report.latency.averageNs} ns per scenario`,
+    `- Ship-safe: ${report.shipSafe ? 'yes' : 'no'}`
+  ].join('\n');
 
   return [
     '# MAO Parallel Routing Benchmark',
     '',
-    '> Generated by `scripts/validate-mao-parallel-routing.ts` for `TASK-MAO-0010`.',
+    '> Generated by `scripts/validate-mao-parallel-routing.ts` for `TASK-MAO-0010` and extended by `TASK-MAO-0048` event replay.',
     '> Deterministic offline simulator. Out of scope: real multi-process load testing and distributed broker consensus (see task card `outOfScope`).',
     '',
     '## Summary',
     '',
-    `- Scenario count: ${report.scenarioCount}`,
-    `- Catch rate: ${report.catchRate.catchRatePercent}% (${report.catchRate.caughtCount}/${report.catchRate.unsafeScenarioCount} unsafe scenarios caught)`,
-    `- Average latency: ${report.latency.averageNs} ns per scenario (deterministic local simulator)`,
-    `- Ship-safe: ${report.shipSafe ? 'yes' : 'no'}`,
+    `- Combined ship-safe: ${combined.combinedShipSafe ? 'yes' : 'no'}`,
+    renderCatchSection('Static hand-authored scenarios (TASK-MAO-0010)', combined.staticReport),
+    renderCatchSection('Event replay scenarios (TASK-MAO-0048)', combined.eventReplayReport),
     '',
-    '## Capability coverage (which MAO task introduced each behavior)',
+    '## How to read event replay coverage',
     '',
-    ...Object.entries(report.capabilityCoverage)
+    '- Static scenarios prove deterministic logic paths with hand-authored fixtures.',
+    '- Event replay scenarios are sanitized snapshots derived from `.atm/history/task-events/` and broker evidence; they do not import private chat transcripts.',
+    '- Replay coverage complements static coverage but does not prove all live concurrency cases.',
+    '- Freeze and patch-envelope replay cases use fixed timestamps so results stay deterministic in CI.',
+    '',
+    '## Capability coverage (static scenarios)',
+    '',
+    ...Object.entries(combined.staticReport.capabilityCoverage)
       .filter(([, count]) => count > 0)
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([taskId, count]) => `- ${taskId}: ${count} scenario(s)`),
     '',
-    '## Coverage tiers',
+    '## Event replay provenance',
     '',
-    `- generic-mao: ${report.tierCoverage['generic-mao']} scenario(s)`,
-    `- m5-runner-extension: ${report.tierCoverage['m5-runner-extension']} scenario(s) — expected to grow with MAO-0011+ runner Broker cards`,
+    ...replayScenarios.map((scenario) => `- ${scenario.id}: ${scenario.replayProvenance.origin} ← ${scenario.replayProvenance.sanitizedFrom}`),
+    '',
+    '## Coverage tiers (static)',
+    '',
+    `- generic-mao: ${combined.staticReport.tierCoverage['generic-mao']} scenario(s)`,
+    `- m5-runner-extension: ${combined.staticReport.tierCoverage['m5-runner-extension']} scenario(s) — expected to grow with MAO-0011+ runner Broker cards`,
     '',
     '## CID / AGR incident lessons retained',
     '',
@@ -456,31 +689,52 @@ export function renderMaoParallelRoutingBenchmarkMarkdown(
     '',
     '## False-safe regressions',
     '',
-    report.falseSafeRegressions.length === 0
-      ? '- none'
-      : report.falseSafeRegressions.map((entry) => `- ${entry}`).join('\n'),
+    ...(combined.staticReport.falseSafeRegressions.length === 0 && combined.eventReplayReport.falseSafeRegressions.length === 0
+      ? ['- none']
+      : [
+        ...combined.staticReport.falseSafeRegressions.map((entry) => `- static:${entry}`),
+        ...combined.eventReplayReport.falseSafeRegressions.map((entry) => `- replay:${entry}`)
+      ]),
     '',
     '## Expectation failures',
     '',
-    report.expectationFailures.length === 0
-      ? '- none'
-      : report.expectationFailures.map((entry) => `- ${entry}`).join('\n'),
+    ...(combined.staticReport.expectationFailures.length === 0 && combined.eventReplayReport.expectationFailures.length === 0
+      ? ['- none']
+      : [
+        ...combined.staticReport.expectationFailures.map((entry) => `- static:${entry}`),
+        ...combined.eventReplayReport.expectationFailures.map((entry) => `- replay:${entry}`)
+      ]),
     '',
-    '## Scenario matrix',
+    '## Static scenario matrix',
     '',
     '| scenario | kind | capability | tier | verdict | matched |',
     '| --- | --- | --- | --- | --- | --- |',
-    ...scenarioRows,
+    ...staticRows,
+    '',
+    '## Event replay matrix',
+    '',
+    '| scenario | replay kind | capability | source | verdict | matched |',
+    '| --- | --- | --- | --- | --- | --- |',
+    ...replayRows,
     '',
     '## Per-scenario latency (ns)',
     '',
-    ...Object.entries(report.latency.perScenarioNs)
+    '### Static',
+    '',
+    ...Object.entries(combined.staticReport.latency.perScenarioNs)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([scenarioId, latencyNs]) => `- ${scenarioId}: ${latencyNs}`),
+    '',
+    '### Event replay',
+    '',
+    ...Object.entries(combined.eventReplayReport.latency.perScenarioNs)
       .sort(([left], [right]) => left.localeCompare(right))
       .map(([scenarioId, latencyNs]) => `- ${scenarioId}: ${latencyNs}`),
     '',
     '## Remaining risks',
     '',
     '- Harness still simulates route/steward paths locally; live `route` CLI and broker admission integration remain for later waves.',
+    '- Event replay fixtures are sanitized snapshots; they do not continuously ingest live `.atm/history` during CI.',
     '- Runner-derived artifact scenarios are placeholders until M5 fixtures land (`TASK-MAO-0011` … `TASK-MAO-0016`).',
     '- Live `route` CLI integration, real-broker admission, and distributed consensus are out of MAO-0010 scope; deferred to MAO-0011+ runner Broker cards and the December 2026 full-paper evaluation.'
   ].join('\n');

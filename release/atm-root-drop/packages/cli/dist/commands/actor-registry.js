@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 export const actorRegistryRelativePath = '.atm/catalog/registry/actors.json';
 export const runtimeIdentityRelativePath = '.atm/runtime/identity/default.json';
+export const runtimeActorIdentityDirectoryRelativePath = '.atm/runtime/identity/actors';
 export const actorIdEnvVar = 'ATM_ACTOR_ID';
 export const legacyActorIdEnvVar = 'AGENT_IDENTITY';
 export function readActorRegistry(cwd) {
@@ -97,6 +98,40 @@ export function writeRuntimeIdentityDefault(cwd, document) {
     mkdirSync(path.dirname(absolutePath), { recursive: true });
     writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
     return runtimeIdentityRelativePath;
+}
+export function runtimeIdentityActorRelativePath(actorId) {
+    return `${runtimeActorIdentityDirectoryRelativePath}/${actorId}.json`;
+}
+export function readRuntimeIdentityForActor(cwd, actorId) {
+    const absolutePath = path.join(path.resolve(cwd), runtimeIdentityActorRelativePath(actorId));
+    if (!existsSync(absolutePath))
+        return null;
+    try {
+        const parsed = JSON.parse(readFileSync(absolutePath, 'utf8'));
+        const parsedActorId = sanitizeOptional(parsed.actorId);
+        if (!parsedActorId)
+            return null;
+        return {
+            schemaId: 'atm.identityDefault.v1',
+            specVersion: '0.1.0',
+            actorId: parsedActorId,
+            gitName: sanitizeOptional(parsed.gitName) ?? null,
+            gitEmail: sanitizeOptional(parsed.gitEmail) ?? null,
+            editor: sanitizeOptional(parsed.editor) ?? null,
+            provider: sanitizeOptional(parsed.provider) ?? null,
+            activeSessionId: sanitizeOptional(parsed.activeSessionId) ?? null,
+            updatedAt: sanitizeOptional(parsed.updatedAt) ?? new Date().toISOString()
+        };
+    }
+    catch {
+        return null;
+    }
+}
+export function writeRuntimeIdentityForActor(cwd, actorId, document) {
+    const absolutePath = path.join(path.resolve(cwd), runtimeIdentityActorRelativePath(actorId));
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+    return runtimeIdentityActorRelativePath(actorId);
 }
 export function resolveActorId(inputActorId, cwd) {
     const explicit = sanitizeOptional(inputActorId);

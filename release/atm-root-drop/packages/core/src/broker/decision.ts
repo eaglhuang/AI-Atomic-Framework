@@ -19,7 +19,9 @@ export function calculateBrokerDecision(
 ): BrokerDecision {
   const conflicts: ConflictDetail[] = [];
   const taskId = newIntent.taskId;
-  const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents);
+  const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents, {
+    currentEpoch: registry.currentEpoch
+  });
 
   if (conflictMatrix.arbitrationVerdict === 'takeover') {
     return {

@@ -59,6 +59,243 @@
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
     },
+    "teamSummary": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "capturedAt",
+        "source",
+        "teamRunId",
+        "captainDecision",
+        "agentReports",
+        "patrolFindings",
+        "evidenceCuratorSummary",
+        "teamSummary"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.closurePacketTeamSummary.v1" },
+        "capturedAt": { "type": "string", "minLength": 1 },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "teamRunPath"],
+          "properties": {
+            "kind": { "const": "team-run" },
+            "teamRunPath": { "type": "string", "minLength": 1 }
+          }
+        },
+        "teamRunId": { "type": "string", "minLength": 1 },
+        "captainDecision": true,
+        "agentReports": {
+          "type": "array",
+          "items": true
+        },
+        "patrolFindings": {
+          "type": "array",
+          "items": true
+        },
+        "evidenceCuratorSummary": true,
+        "teamSummary": {
+          "type": ["object", "null"],
+          "additionalProperties": true,
+          "not": {
+            "required": ["validationPasses"]
+          },
+          "properties": {
+            "brokerGovernance": {
+              "type": "object",
+              "additionalProperties": true,
+              "required": [
+                "schemaId",
+                "brokerSubagentEnabled",
+                "brokerDecisionSurface",
+                "brokerStewardId",
+                "brokerGoverns",
+                "brokerEvidenceRequired",
+                "commitLaneSerializedBy",
+                "commitLaneOwnerRole",
+                "workerGitWrite",
+                "workerTaskLifecycle",
+                "workerSelfClose"
+              ],
+              "properties": {
+                "schemaId": { "const": "atm.teamBrokerGovernanceSummary.v1" },
+                "brokerSubagentEnabled": { "type": "boolean" },
+                "brokerDecisionSurface": { "type": ["string", "null"] },
+                "brokerStewardId": { "type": ["string", "null"] },
+                "brokerGoverns": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "brokerEvidenceRequired": {
+                  "type": "array",
+                  "items": { "type": "string", "minLength": 1 }
+                },
+                "commitLaneSerializedBy": { "type": ["string", "null"] },
+                "commitLaneOwnerRole": { "type": ["string", "null"] },
+                "workerGitWrite": { "type": "boolean" },
+                "workerTaskLifecycle": { "type": "boolean" },
+                "workerSelfClose": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "teamArtifactHandoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "producedArtifacts",
+        "missingArtifacts",
+        "retryBudgetStatus",
+        "escalationTarget",
+        "closeAllowed"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.teamArtifactHandoffEvidence.v1" },
+        "producedArtifacts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "missingArtifacts": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "retryBudgetStatus": { "enum": ["within-budget", "escalation-required", "unknown"] },
+        "escalationTarget": { "type": ["string", "null"] },
+        "closeAllowed": { "type": "boolean" }
+      }
+    },
+    "teamClosureAttestation": {
+      "description": "Optional Team Agents runtime attestation for closure review. This metadata enriches review context only; local runtime wrappers are not secure sandbox proof by themselves and command-backed evidence remains required.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "teamRunId",
+        "runtimeMode",
+        "runtimeLanguage",
+        "runtimeAdapterId",
+        "providerId",
+        "sdkId",
+        "modelId",
+        "runnerKind",
+        "runtimeVersion",
+        "sandboxPolicyHash",
+        "attestationSigner",
+        "brokerSubagent",
+        "commitLane",
+        "workerAuthorityBoundary",
+        "reviewerIndependence",
+        "attestedAt",
+        "localRuntimeWrapperIsSecureSandboxProof",
+        "commandBackedEvidenceRequired"
+      ],
+      "properties": {
+        "schemaId": { "const": "atm.teamClosureAttestation.v1" },
+        "teamRunId": { "type": "string", "minLength": 1 },
+        "runtimeMode": { "enum": ["real-agent", "editor-subagent", "broker-only"] },
+        "runtimeLanguage": { "type": "string", "minLength": 1 },
+        "runtimeAdapterId": { "type": ["string", "null"] },
+        "providerId": { "type": ["string", "null"] },
+        "sdkId": { "type": ["string", "null"] },
+        "modelId": { "type": ["string", "null"] },
+        "runnerKind": { "type": "string", "minLength": 1 },
+        "runtimeVersion": { "type": ["string", "null"] },
+        "sandboxPolicyHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "attestationSigner": { "type": "string", "minLength": 1 },
+        "brokerSubagent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaId",
+            "enabled",
+            "subagentId",
+            "decisionSurface",
+            "stewardId",
+            "governs",
+            "evidenceRequired",
+            "authorityBoundary"
+          ],
+          "properties": {
+            "schemaId": { "type": ["string", "null"] },
+            "enabled": { "type": "boolean" },
+            "subagentId": { "type": ["string", "null"] },
+            "decisionSurface": { "type": ["string", "null"] },
+            "stewardId": { "type": ["string", "null"] },
+            "governs": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "evidenceRequired": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "authorityBoundary": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fileWrite", "gitWrite", "taskLifecycle", "selfClose"],
+              "properties": {
+                "fileWrite": { "type": "boolean" },
+                "gitWrite": { "type": "boolean" },
+                "taskLifecycle": { "type": "boolean" },
+                "selfClose": { "type": "boolean" }
+              }
+            }
+          }
+        },
+        "commitLane": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schemaId", "serializedBy", "ownerRole", "workerGitWrite"],
+          "properties": {
+            "schemaId": { "type": ["string", "null"] },
+            "serializedBy": { "type": ["string", "null"] },
+            "ownerRole": { "type": ["string", "null"] },
+            "workerGitWrite": { "type": "boolean" }
+          }
+        },
+        "workerAuthorityBoundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gitWrite", "taskLifecycle", "selfClose", "evidenceWriteOwner"],
+          "properties": {
+            "gitWrite": { "type": "boolean" },
+            "taskLifecycle": { "type": "boolean" },
+            "selfClose": { "type": "boolean" },
+            "evidenceWriteOwner": { "type": ["string", "null"] }
+          }
+        },
+        "reviewerIndependence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required",
+            "satisfied",
+            "policy",
+            "reviewerProviderId",
+            "reviewerModelId",
+            "reviewerRuntimeAdapterId",
+            "reason"
+          ],
+          "properties": {
+            "required": { "type": "boolean" },
+            "satisfied": { "type": "boolean" },
+            "policy": { "type": "string", "minLength": 1 },
+            "reviewerProviderId": { "type": ["string", "null"] },
+            "reviewerModelId": { "type": ["string", "null"] },
+            "reviewerRuntimeAdapterId": { "type": ["string", "null"] },
+            "reason": { "type": "string", "minLength": 1 }
+          }
+        },
+        "attestedAt": { "type": "string", "minLength": 1 },
+        "localRuntimeWrapperIsSecureSandboxProof": { "const": false },
+        "commandBackedEvidenceRequired": { "const": true }
+      }
+    },
     "evidencePath": { "type": "string", "minLength": 1 },
     "closedAt": { "type": "string", "minLength": 1 },
     "closedByActor": { "type": "string", "minLength": 1 }

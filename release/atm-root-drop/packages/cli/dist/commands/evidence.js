@@ -8,9 +8,26 @@ import { resolveActorWorkSession } from './actor-session.js';
 import { createFrameworkModeStatus } from './framework-development.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
 import { gitHeadEvidencePath } from './git-head-evidence.js';
+import { resolveTaskRunnerArbitration } from './validate.js';
 import { generateDiffEvidence, mergeDiffEvidenceWithExisting, validateDiffEvidence } from '../../../core/dist/evidence/diff-evidence.js';
 import { inspectHistoricalDelivery, pathMatchesTaskScope } from './tasks/historical-delivery.js';
 export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';
+export const TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID = 'atm.teamArtifactHandoffEvidence.v1';
+export const TEAM_CLOSURE_ATTESTATION_SCHEMA_ID = 'atm.teamClosureAttestation.v1';
+export function buildTeamArtifactHandoffEvidence(input) {
+    return {
+        schemaId: TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID,
+        producedArtifacts: readStringArray(input.producedArtifacts),
+        missingArtifacts: readStringArray(input.missingArtifacts),
+        retryBudgetStatus: typeof input.retryBudgetStatus === 'string' && input.retryBudgetStatus.trim().length > 0
+            ? input.retryBudgetStatus.trim()
+            : 'unknown',
+        escalationTarget: typeof input.escalationTarget === 'string' && input.escalationTarget.trim().length > 0
+            ? input.escalationTarget.trim()
+            : null,
+        closeAllowed: input.closeAllowed === true
+    };
+}
 export function evidenceBundleManifestRelativePath(taskId) {
     return `.atm/history/evidence/${taskId}.bundle-manifest.json`;
 }
@@ -169,6 +186,8 @@ function isClosureRequiredValidator(gate, taskDeclaredValidators) {
 }
 /** 依 gate 名稱回傳對應的執行指令（human-readable 提示用） */
 function resolveValidatorExpectedCommand(gate) {
+    if (looksLikeLiteralValidatorCommand(gate))
+        return gate;
     if (gate === 'typecheck')
         return 'npm run typecheck';
     if (gate === 'git diff --check')
@@ -184,6 +203,12 @@ function resolveValidatorExpectedCommand(gate) {
     if (gate === 'git-head-evidence')
         return 'node atm.mjs evidence git-head-backfill --actor <actor> --json';
     return `node atm.mjs ${gate} --json`;
+}
+function looksLikeLiteralValidatorCommand(value) {
+    const normalized = normalizeValidatorToken(value);
+    return /^(?:node|npm|git|npx|pnpm|yarn|powershell(?:\.exe)?|pwsh(?:\.exe)?)\s+/i.test(normalized)
+        || normalized.startsWith('./')
+        || normalized.startsWith('.\\');
 }
 /** evidence validators --list --task <id> 的執行邏輯 */
 function runEvidenceValidators(argv) {
@@ -365,11 +390,9 @@ function classifyValidatorEvidenceState(bundle, gate) {
         return 'failed-run';
     return bestPositive ?? 'absent';
 }
-function buildMissingValidatorFinding(gate, state, taskId, actor) {
+function buildMissingValidatorFinding(gate, state, taskId, actor, runnerKind) {
     const expectedCommand = resolveValidatorExpectedCommand(gate);
-    const escapedExpected = quoteForShell(expectedCommand);
-    const escapedGate = quoteForShell(gate);
-    const requiredCommand = `node atm.mjs evidence run --task ${taskId} --actor ${actor} --command ${escapedExpected} --validators ${escapedGate} --json`;
+    const requiredCommand = buildAutoEvidenceRequiredCommand(taskId, actor, expectedCommand, gate, runnerKind);
     if (state === 'absent') {
         return {
             code: 'ATM_EVIDENCE_VALIDATOR_ABSENT',
@@ -408,6 +431,7 @@ function buildMissingValidatorFinding(gate, state, taskId, actor) {
 export function computeMissingValidatorReport(cwd, taskId, actorId) {
     const resolvedCwd = path.resolve(cwd);
     const resolvedTaskId = taskId.trim();
+    const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, resolvedTaskId);
     // 1. 取得 framework 必要 gates
     const frameworkStatus = createFrameworkModeStatus({ cwd: resolvedCwd });
     const frameworkGates = frameworkStatus.requiredGates;
@@ -446,7 +470,7 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
             evidenceState: state
         });
         if (state !== 'pass') {
-            const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId);
+            const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId, runnerArbitration.preferredRunnerKind);
             if (closureRequired) {
                 requiredFindings.push(finding);
                 if (state === 'absent')
@@ -503,6 +527,158 @@ export function computeMissingValidatorReport(cwd, taskId, actorId) {
         blockingFindings,
         advisoryFindings,
         validators: catalogEntries
+    };
+}
+function validatorRequiresOperatorApproval(gate, command) {
+    if (gate === 'git-head-evidence')
+        return true;
+    return /<[^>]+>/.test(command);
+}
+function readTaskDeclaredValidatorGates(cwd, taskId) {
+    const taskDocument = readTaskDocument(cwd, taskId);
+    if (!taskDocument || !Array.isArray(taskDocument.validators))
+        return [];
+    return taskDocument.validators
+        .filter((entry) => typeof entry === 'string' && entry.trim().length > 0)
+        .map((entry) => canonicalizeValidatorIdentity(entry.trim()))
+        .filter(Boolean);
+}
+function isTaskDeclaredValidatorGate(gate, taskDeclared) {
+    return taskDeclared.includes(gate);
+}
+function canAutoRunDeclaredValidator(gate, command, taskDeclared) {
+    if (validatorRequiresOperatorApproval(gate, command))
+        return false;
+    if (detectAutoLinkedValidator(command))
+        return true;
+    if (isTaskDeclaredValidatorGate(gate, taskDeclared))
+        return true;
+    if (looksLikeLiteralValidatorCommand(gate))
+        return true;
+    return false;
+}
+function buildAutoEvidenceRequiredCommand(taskId, actorId, command, validator, runnerKind) {
+    const escapedCommand = quoteForShell(command);
+    if (detectAutoLinkedValidator(command)) {
+        return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --runner-kind ${runnerKind} --json`;
+    }
+    const escapedGate = quoteForShell(validator);
+    return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --validators ${escapedGate} --runner-kind ${runnerKind} --json`;
+}
+export function buildAutoEvidencePlan(input) {
+    const resolvedCwd = path.resolve(input.cwd);
+    const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
+    const report = computeMissingValidatorReport(resolvedCwd, input.taskId, input.actorId);
+    const taskDeclared = readTaskDeclaredValidatorGates(resolvedCwd, input.taskId);
+    const toRun = [];
+    const alreadySatisfied = [];
+    const skippedOutOfScope = [];
+    const requiresApproval = [];
+    for (const entry of report.validators) {
+        const command = entry.expectedCommand;
+        const requiredCommand = entry.evidenceState === 'pass'
+            ? null
+            : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name, runnerArbitration.preferredRunnerKind);
+        const base = {
+            validator: entry.name,
+            command,
+            evidenceState: entry.evidenceState,
+            requiredCommand
+        };
+        if (entry.evidenceState === 'pass') {
+            alreadySatisfied.push({
+                ...base,
+                disposition: 'already-satisfied',
+                reason: 'Validator evidence is fresh and command-backed.'
+            });
+            continue;
+        }
+        if (!entry.closureRequired) {
+            skippedOutOfScope.push({
+                ...base,
+                disposition: 'skipped-out-of-scope',
+                reason: 'Advisory validator outside task-card closure baseline; auto-evidence does not run it without explicit operator opt-in.'
+            });
+            continue;
+        }
+        if (!canAutoRunDeclaredValidator(entry.name, command, taskDeclared)) {
+            requiresApproval.push({
+                ...base,
+                disposition: 'requires-approval',
+                reason: 'Validator requires explicit operator approval or cannot be mapped to a safe auto-run command.'
+            });
+            continue;
+        }
+        toRun.push({
+            ...base,
+            disposition: 'to-run',
+            reason: 'Declared closure-required validator is missing fresh command-backed evidence and can be auto-run.'
+        });
+    }
+    const remediationCommand = toRun[0]?.requiredCommand
+        ?? requiresApproval[0]?.requiredCommand
+        ?? report.blockingFindings[0]?.requiredCommand
+        ?? null;
+    return {
+        schemaId: 'atm.autoEvidencePlan.v1',
+        taskId: input.taskId,
+        mode: input.mode ?? 'dry-run',
+        ok: toRun.length === 0 && requiresApproval.length === 0 && report.ok,
+        toRun,
+        alreadySatisfied,
+        skippedOutOfScope,
+        requiresApproval,
+        remediationCommand
+    };
+}
+export function executeAutoEvidencePlan(input) {
+    const resolvedCwd = path.resolve(input.cwd);
+    const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
+    const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+    const runs = [];
+    for (const entry of plan.toRun) {
+        if (!entry.command)
+            continue;
+        try {
+            runEvidenceRun([
+                '--cwd', resolvedCwd,
+                '--task', input.taskId,
+                '--actor', input.actorId,
+                '--command', entry.command,
+                '--runner-kind', runnerArbitration.preferredRunnerKind,
+                '--json'
+            ]);
+            runs.push({ validator: entry.validator, command: entry.command, ok: true });
+        }
+        catch (error) {
+            const errorCode = error instanceof CliError ? error.code : 'ATM_AUTO_EVIDENCE_RUN_FAILED';
+            const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, entry.command, entry.validator, runnerArbitration.preferredRunnerKind);
+            return {
+                schemaId: 'atm.autoEvidenceExecution.v1',
+                taskId: input.taskId,
+                ok: false,
+                plan,
+                runs: [...runs, { validator: entry.validator, command: entry.command, ok: false, errorCode }],
+                failedValidator: entry.validator,
+                remediationCommand
+            };
+        }
+    }
+    const refreshedPlan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+    const executedValidators = new Set(runs.filter((run) => run.ok).map((run) => run.validator));
+    const pendingAutoRun = refreshedPlan.toRun.filter((entry) => !executedValidators.has(entry.validator));
+    const ok = runs.every((run) => run.ok)
+        && runs.length === plan.toRun.length
+        && pendingAutoRun.length === 0
+        && refreshedPlan.requiresApproval.length === 0;
+    return {
+        schemaId: 'atm.autoEvidenceExecution.v1',
+        taskId: input.taskId,
+        ok,
+        plan: refreshedPlan,
+        runs,
+        failedValidator: null,
+        remediationCommand: ok ? null : refreshedPlan.remediationCommand
     };
 }
 /** evidence missing --task <id> --actor <actor> 的執行邏輯 */
@@ -571,18 +747,29 @@ function runEvidenceRun(argv) {
     const actorId = resolvedActor.actorId;
     const resolvedCwd = path.resolve(options.cwd);
     const resolvedTaskId = options.taskId.trim();
+    const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, resolvedTaskId);
+    const requestedRunnerKind = normalizeRunnerKind(options.runnerKind ?? inferRunnerKindFromCommand(options.command));
+    const effectiveRunnerKind = requestedRunnerKind === 'unknown'
+        ? runnerArbitration.preferredRunnerKind
+        : requestedRunnerKind;
+    if (options.validators.length === 0) {
+        options.validators = resolveEvidenceAutoValidators({
+            cwd: resolvedCwd,
+            taskId: resolvedTaskId,
+            command: options.command
+        });
+    }
     // 1. 檢查是否要重用最近一次的執行結果
     let reusedRun = null;
     if (options.recentRun) {
         const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
-        const runnerKind = normalizeRunnerKind(options.runnerKind ?? inferRunnerKindFromCommand(options.command));
         // 從最新的 evidence 開始往回找匹配的 command run
         for (let i = bundle.evidence.length - 1; i >= 0; i--) {
             const record = bundle.evidence[i];
             const runs = (isRecord(record.details) && Array.isArray(record.details.commandRuns))
                 ? record.details.commandRuns.map(r => normalizeCommandRunInput(r, `evidence[${i}]/commandRuns`))
                 : [];
-            const match = runs.find(r => r.command === options.command && (r.runnerKind ?? 'unknown') === runnerKind);
+            const match = runs.find(r => r.command === options.command && (r.runnerKind ?? 'unknown') === effectiveRunnerKind);
             if (match) {
                 reusedRun = {
                     ...match,
@@ -611,7 +798,8 @@ function runEvidenceRun(argv) {
             stdoutSha256: hashString(result.stdout ?? ''),
             stderrSha256: hashString(result.stderr ?? ''),
             generatedAt: new Date().toISOString(),
-            validators: options.validators
+            validators: options.validators,
+            runnerKind: effectiveRunnerKind
         };
         if (result.error) {
             // 執行發生系統錯誤 (例如找不到指令)
@@ -624,6 +812,7 @@ function runEvidenceRun(argv) {
     // 3. 呼叫 evidence add 邏輯 (透過建構 argv 再呼叫 runEvidenceAdd)
     // 這樣可以確保寫入格式、sessionId、git commit 等邏輯一致
     const addArgv = [
+        '--cwd', resolvedCwd,
         '--task', resolvedTaskId,
         '--actor', actorId,
         '--kind', options.kind,
@@ -639,9 +828,7 @@ function runEvidenceRun(argv) {
     if (options.artifacts.length > 0) {
         addArgv.push('--artifacts', options.artifacts.join(','));
     }
-    if (options.runnerKind) {
-        addArgv.push('--runner-kind', options.runnerKind);
-    }
+    addArgv.push('--runner-kind', effectiveRunnerKind);
     if (reusedRun) {
         addArgv.push('--freshness', 'historical-reference');
     }
@@ -801,6 +988,7 @@ export function verifyTaskEvidence(input) {
     const reopenedRedteamTask = detectReopenedOrRedteamTask(input.taskDocument);
     const codeOrFrameworkTask = Boolean(input.frameworkTask) || detectCodeOrFrameworkTask(input.taskDocument, input.taskDeclaredFiles ?? []);
     const healthyAtomEvidence = hasHealthyAtomEvidence(input.taskDocument ?? null, bundle.evidence);
+    const hasTeamClosureAttestationRecord = bundle.evidence.some(hasTeamClosureAttestation);
     const missing = [];
     if (input.gate === 'close') {
         if (nonWaiver <= 0) {
@@ -813,6 +1001,9 @@ export function verifyTaskEvidence(input) {
             missing.push('artifact-only-evidence-not-allowed');
         }
         if (codeOrFrameworkTask && (counts.test + counts.commit + counts.attestation + commandRunEvidenceCount) <= 0) {
+            missing.push('code-or-framework-runnable-evidence');
+        }
+        if (codeOrFrameworkTask && hasTeamClosureAttestationRecord && commandRunEvidenceCount <= 0) {
             missing.push('code-or-framework-runnable-evidence');
         }
         if (!healthyAtomEvidence) {
@@ -864,10 +1055,11 @@ function runEvidenceAdd(argv) {
     });
     // Auto-link logic for evidence add
     if (options.validators.length === 0 && options.commandRun) {
-        const autoVal = detectAutoLinkedValidator(options.commandRun.command);
-        if (autoVal) {
-            options.validators = [autoVal];
-        }
+        options.validators = resolveEvidenceAutoValidators({
+            cwd: options.cwd,
+            taskId: options.taskId,
+            command: options.commandRun.command
+        });
     }
     const commandRuns = normalizeEvidenceCommandRuns({
         cwd: options.cwd,
@@ -2329,8 +2521,22 @@ function isCommandRunProof(value) {
     const candidate = value;
     return typeof candidate.command === 'string'
         && typeof candidate.exitCode === 'number'
+        && candidate.exitCode === 0
         && isSha256(candidate.stdoutSha256)
         && isSha256(candidate.stderrSha256);
+}
+function hasTeamClosureAttestation(value) {
+    if (!isRecord(value))
+        return false;
+    if (isRecord(value.details)) {
+        if (value.details.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID)
+            return true;
+        if (isRecord(value.details.teamClosureAttestation) && value.details.teamClosureAttestation.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID)
+            return true;
+    }
+    if (isRecord(value.teamClosureAttestation) && value.teamClosureAttestation.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID)
+        return true;
+    return false;
 }
 function isSha256(value) {
     return typeof value === 'string' && /^sha256:[a-f0-9]{64}$/i.test(value.trim());
@@ -2378,4 +2584,24 @@ export function detectAutoLinkedValidator(command) {
         return gate;
     }
     return null;
+}
+function resolveEvidenceAutoValidators(input) {
+    const autoLinked = detectAutoLinkedValidator(input.command);
+    if (autoLinked)
+        return [autoLinked];
+    const taskDocument = readTaskDocument(input.cwd, input.taskId);
+    if (!taskDocument || !Array.isArray(taskDocument.validators))
+        return [];
+    const commandCanonical = canonicalizeValidatorIdentity(input.command);
+    const commandNormalized = normalizeValidatorToken(input.command);
+    for (const entry of taskDocument.validators) {
+        if (typeof entry !== 'string' || !entry.trim())
+            continue;
+        const declaredCanonical = canonicalizeValidatorIdentity(entry);
+        if (declaredCanonical && declaredCanonical === commandCanonical)
+            return [declaredCanonical];
+        if (normalizeValidatorToken(entry) === commandNormalized)
+            return [declaredCanonical || entry.trim()];
+    }
+    return [];
 }

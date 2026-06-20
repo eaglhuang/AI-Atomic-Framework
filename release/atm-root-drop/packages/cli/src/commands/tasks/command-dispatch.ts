@@ -16,6 +16,7 @@ export interface TaskCommandDispatchTable {
   readonly claimLifecycle: (action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) => CommandResult | Promise<CommandResult>;
   readonly reconcile: TaskCommandHandler;
   readonly repairClosure: TaskCommandHandler;
+  readonly repairClaim: TaskCommandHandler;
   readonly show: TaskCommandHandler;
   readonly status: TaskCommandHandler;
   readonly finalize: TaskCommandHandler;
@@ -27,7 +28,7 @@ export interface TaskCommandDispatchTable {
   readonly scope: TaskCommandHandler;
 }
 
-export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
+export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
 
 export function normalizeTasksArgv(argv: readonly string[]): string[] {
   const cleanArgv: string[] = [];
@@ -82,6 +83,8 @@ export async function dispatchTasksAction(argv: readonly string[], handlers: Tas
       return await handlers.reconcile(rest);
     case 'repair-closure':
       return await handlers.repairClosure(rest);
+    case 'repair-claim':
+      return await handlers.repairClaim(rest);
     case 'show':
       return await handlers.show(rest);
     case 'status':

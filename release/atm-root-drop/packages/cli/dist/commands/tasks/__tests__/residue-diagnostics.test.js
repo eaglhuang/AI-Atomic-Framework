@@ -88,6 +88,38 @@ const ambiguous = buildResidueClassification({
 });
 assert(ambiguous.bucket === 'ambiguous-manual-review', 'divergence must fail closed as ambiguous-manual-review');
 assert(ambiguous.nextCommand === 'node atm.mjs tasks status --task TASK-RES --json', 'ambiguous command must stay diagnostic-only');
+const activeClaimDraftParity = buildResidueClassification({
+    cwd: process.cwd(),
+    taskId: 'TASK-RES',
+    taskDocument: taskDocument({ status: 'running' }),
+    liveLedger: {
+        status: 'running',
+        claimState: 'active',
+        lastTransitionId: 'claim-1',
+        lastTransitionAt: '2026-06-13T00:00:00.000Z'
+    },
+    planningFrontmatter: {
+        status: 'draft',
+        source: '../planning/tasks/TASK-RES.task.md'
+    },
+    lastTransitionEvent: {
+        action: 'claim',
+        actorId: 'captain',
+        createdAt: '2026-06-13T00:00:00.000Z',
+        fromStatus: 'ready',
+        toStatus: 'running'
+    },
+    divergence: [
+        {
+            field: 'status',
+            liveLedger: 'running',
+            planningFrontmatter: 'draft',
+            lastTransitionEvent: 'running'
+        }
+    ]
+});
+assert(activeClaimDraftParity.bucket === 'no-residue', 'active claim with draft planning parity must not block close as ambiguous');
+assert(activeClaimDraftParity.nextCommand === 'node atm.mjs tasks status --task TASK-RES --json', 'active claim draft parity command must stay diagnostic-only');
 const incomplete = buildResidueClassification({
     cwd: process.cwd(),
     taskId: 'TASK-RES',

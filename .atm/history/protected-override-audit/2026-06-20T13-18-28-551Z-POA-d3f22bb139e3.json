@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-d3f22bb139e3",
+  "recordedAt": "2026-06-20T13:18:28.551Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"feat(skill): add chinese mojibake cleaner training workflow\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-776491b07f",
+  "reason": "Commit only self-authored chinese-mojibake-cleaner skill files while active task direction lock belongs to unrelated work",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-06-20T13-18-28-549Z-EMG-GLOBAL-776491b07f.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

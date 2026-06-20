@@ -23,7 +23,11 @@ export interface FrameworkCloseDirtyGuardReport {
     readonly blockingTrackedDirtyFiles: readonly string[];
     readonly scopeTrackedDirtyFiles: readonly string[];
     readonly governanceTrackedDirtyFiles: readonly string[];
+    readonly regenerableArtifactFiles: readonly string[];
+    readonly correctPlanningMirrorPreEditFiles: readonly string[];
+    readonly incorrectPlanningMirrorPreEditFiles: readonly string[];
     readonly advisoryTrackedDirtyFiles: readonly string[];
+    readonly foreignActiveDirtyFiles: readonly string[];
     readonly generatedArtifactFiles: readonly string[];
     readonly remediation: TaskScopeDiagnosticRemediation;
 }
@@ -48,8 +52,13 @@ export declare function evaluateFrameworkCloseDirtyGuard(input: {
     readonly cwd: string;
     readonly taskId: string;
     readonly taskDeclaredFiles: readonly string[];
+    readonly taskDeliverableFiles?: readonly string[];
     readonly trackedDirtyFiles: readonly string[];
+    readonly historicalDeliveredFiles?: readonly string[];
     readonly allowedAdvisoryGovernanceFiles?: readonly string[];
+    readonly allowedAdvisoryDirtyFiles?: readonly string[];
+    readonly correctPlanningMirrorPreEditFiles?: readonly string[];
+    readonly incorrectPlanningMirrorPreEditFiles?: readonly string[];
 }): FrameworkCloseDirtyGuardReport;
 export declare function summarizeCloseWindowLockRemediation(input: {
     cwd: string;

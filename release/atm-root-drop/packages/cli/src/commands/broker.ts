@@ -35,7 +35,18 @@ import {
 import { defaultAdapterRegistry, resolveAdapter } from '../../../core/src/broker/adapters/registry.ts';
 import { planMutationBatch } from '../../../core/src/broker/adapters/batch-planner.ts';
 import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
-import type { BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord } from '../../../core/src/broker/types.ts';
+import type {
+  BrokerMutationEvidenceEntry,
+  MergePlan,
+  MutationRequest,
+  PatchProposal,
+  WriteIntent,
+  ConflictKey,
+  BrokerOperationRunRecord,
+  ExplicitMutationIntentInputSummary,
+  ExplicitMutationIntentKind,
+  MutationIntentMissingInput
+} from '../../../core/src/broker/types.ts';
 
 const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
   '.atm',
@@ -646,13 +657,42 @@ export async function runBroker(argv: string[]) {
     }
 
     const requests: MutationRequest[] = [];
+    const explicitInputs: ExplicitMutationIntentInputSummary[] = [];
+    const missingInputs: MutationIntentMissingInput[] = [];
     const requestConflictKeys = new Map<string, readonly ConflictKey[]>();
     for (const requestPath of requestPaths) {
       if (!existsSync(requestPath)) {
         throw new CliError('ATM_FILE_NOT_FOUND', `Mutation request file not found: ${requestPath}`, { exitCode: 1 });
       }
       const request = JSON.parse(readFileSync(requestPath, 'utf8')) as MutationRequest;
+      const classification = classifyExplicitMutationRequest(request);
+      explicitInputs.push(...classification.explicitInputs);
+      missingInputs.push(...classification.missingInputs);
       requests.push(request);
+    }
+
+    if (missingInputs.length > 0) {
+      return makeResult({
+        ok: false,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message(
+            'warn',
+            'ATM_BROKER_MUTATION_INTENT_MISSING_INPUTS',
+            `Structured mutation intent is incomplete for ${missingInputs.length} input field(s); broker will not guess missing targets or operations.`,
+            {
+              missingInputCount: missingInputs.length,
+              requestCount: requests.length
+            }
+          )
+        ],
+        evidence: {
+          action: 'plan-batch',
+          explicitInputs,
+          missingInputs
+        }
+      });
     }
 
     const registry = defaultAdapterRegistry();
@@ -744,7 +784,8 @@ export async function runBroker(argv: string[]) {
           laneDecision: entry.verdict,
           mergeVerdict: entry.mergeDecision,
           evidencePath: runEvidencePathRelative ?? 'unknown',
-          appliedFiles: [entry.filePath]
+          appliedFiles: [entry.filePath],
+          transactionIds: extractMutationRequestTransactionIds(request)
         }));
       }
 
@@ -774,6 +815,8 @@ export async function runBroker(argv: string[]) {
       ],
       evidence: {
         action: 'plan-batch',
+        explicitInputs,
+        missingInputs,
         plan,
         applied: options.apply ? applied : false,
         casMismatches,
@@ -786,6 +829,92 @@ export async function runBroker(argv: string[]) {
   }
 
   throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+
+function classifyExplicitMutationRequest(request: MutationRequest): {
+  readonly explicitInputs: readonly ExplicitMutationIntentInputSummary[];
+  readonly missingInputs: readonly MutationIntentMissingInput[];
+} {
+  const missingInputs: MutationIntentMissingInput[] = [];
+  const requestId = request.requestId || 'unknown-request';
+  const filePath = typeof request.filePath === 'string' ? request.filePath : '';
+  const op = typeof request.op === 'string' ? request.op.trim() : '';
+  const target = typeof request.target === 'string' ? request.target.trim() : '';
+  const kind = resolveExplicitMutationIntentKind(request, filePath, op, target);
+
+  if (!filePath.trim()) {
+    missingInputs.push({
+      requestId,
+      filePath,
+      kind: kind ?? 'unknown',
+      field: 'filePath',
+      reason: 'filePath is required for broker mutation intent.'
+    });
+  }
+  if (!op) {
+    missingInputs.push({
+      requestId,
+      filePath,
+      kind: kind ?? 'unknown',
+      field: 'op',
+      reason: 'operation is required; broker does not infer operations from prose.'
+    });
+  }
+  if (!target) {
+    missingInputs.push({
+      requestId,
+      filePath,
+      kind: kind ?? 'unknown',
+      field: 'target',
+      reason: 'target/region is required; broker does not guess write regions.'
+    });
+  }
+
+  if (missingInputs.length > 0 || !kind) {
+    return { explicitInputs: [], missingInputs };
+  }
+
+  return {
+    explicitInputs: [
+      {
+        requestId,
+        filePath,
+        kind,
+        op,
+        target
+      }
+    ],
+    missingInputs
+  };
+}
+
+function resolveExplicitMutationIntentKind(
+  request: MutationRequest,
+  filePath: string,
+  op: string,
+  target: string
+): ExplicitMutationIntentKind | null {
+  const explicitKind = (request as MutationRequest & { intentKind?: ExplicitMutationIntentKind }).intentKind;
+  if (explicitKind) {
+    return explicitKind;
+  }
+  const normalizedPath = filePath.replace(/\\/g, '/').toLowerCase();
+  if (normalizedPath.includes('/path-to-atom-map-shards/owner-shard-') && target) {
+    return 'owner-shard-row-target';
+  }
+  if ((normalizedPath.endsWith('.scalars.json') || normalizedPath.endsWith('.counter.json')) && target) {
+    return 'scalar-operation';
+  }
+  if ((normalizedPath.endsWith('.md') || normalizedPath.endsWith('.txt')) && target) {
+    return 'text-range';
+  }
+  if (normalizedPath.endsWith('.json') && target.startsWith('/')) {
+    return 'json-pointer';
+  }
+  if (op && target) {
+    return 'mutation-request';
+  }
+  return null;
 }
 
 function buildMutationEvidence(
@@ -808,6 +937,23 @@ function buildMutationEvidence(
     mergeDecision,
     verdict
   };
+}
+
+function extractMutationRequestTransactionIds(request: MutationRequest): readonly string[] {
+  const source = request as MutationRequest & {
+    transactionId?: unknown;
+    transactionIds?: unknown;
+    transaction_ids?: unknown;
+  };
+  const values = [
+    source.transactionId,
+    ...(Array.isArray(source.transactionIds) ? source.transactionIds : [source.transactionIds]),
+    ...(Array.isArray(source.transaction_ids) ? source.transaction_ids : [source.transaction_ids])
+  ];
+  return [...new Set(values
+    .map((value) => typeof value === 'string' ? value.trim() : '')
+    .filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
 }
 
 interface ParsedBrokerOptions {

@@ -49,6 +49,12 @@ export function planStewardApply(input) {
 export function applyStewardPlan(input) {
     const planResult = planStewardApply(input);
     if (!planResult.ok) {
+        const brokerOperationRun = buildStewardBrokerOperationRun({
+            mergePlan: input.mergePlan,
+            proposals: input.proposals,
+            appliedFiles: [],
+            evidencePath: input.evidenceOutPath ?? null
+        });
         const evidence = buildStewardApplyEvidence({
             stewardId: input.stewardId,
             mergePlan: input.mergePlan,
@@ -58,7 +64,8 @@ export function applyStewardPlan(input) {
             fileBeforeHashes: {},
             fileAfterHashes: {},
             verdict: 'blocked',
-            blockedReasons: planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`)
+            blockedReasons: planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`),
+            brokerOperationRun
         });
         if (input.evidenceOutPath)
             writeEvidenceFile(input.evidenceOutPath, evidence);
@@ -80,6 +87,12 @@ export function applyStewardPlan(input) {
             appliedFiles.push(proposal.targetFile);
     }
     appliedFiles.sort((left, right) => left.localeCompare(right));
+    const brokerOperationRun = buildStewardBrokerOperationRun({
+        mergePlan: input.mergePlan,
+        proposals: input.proposals,
+        appliedFiles,
+        evidencePath: input.evidenceOutPath ?? null
+    });
     const evidence = buildStewardApplyEvidence({
         stewardId: input.stewardId,
         mergePlan: input.mergePlan,
@@ -88,7 +101,8 @@ export function applyStewardPlan(input) {
         appliedFiles,
         fileBeforeHashes,
         fileAfterHashes,
-        verdict: 'applied'
+        verdict: 'applied',
+        brokerOperationRun
     });
     if (input.evidenceOutPath)
         writeEvidenceFile(input.evidenceOutPath, evidence);
@@ -343,6 +357,64 @@ export function applyUnifiedPatch(content, patch) {
 function writeEvidenceFile(filePath, evidence) {
     mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
     writeFileSync(filePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
+}
+function buildStewardBrokerOperationRun(input) {
+    const sortedProposals = sortProposalsForCompose(input.proposals);
+    const proposalIds = [...new Set(sortedProposals.map((proposal) => proposal.proposalId).concat(input.mergePlan.inputProposals))]
+        .sort((left, right) => left.localeCompare(right));
+    const actorIds = [...new Set(sortedProposals.map((proposal) => proposal.actorId).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const requestFiles = [...new Set(sortedProposals.map((proposal) => proposal.targetFile).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const taskIds = [...new Set(sortedProposals.map((proposal) => proposal.taskId).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const commitShas = [...new Set(sortedProposals.map((proposal) => proposal.baseCommit).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+    const transactionIds = [...new Set(sortedProposals.flatMap((proposal) => extractProposalTransactionIds(proposal)))]
+        .sort((left, right) => left.localeCompare(right));
+    const appliedFiles = [...new Set(input.appliedFiles)].sort((left, right) => left.localeCompare(right));
+    const mergeVerdict = mapStewardMergeVerdict(input.mergePlan.verdict);
+    const record = {
+        schemaId: 'atm.brokerOperationRunRecord.v1',
+        specVersion: '0.1.0',
+        migration: input.mergePlan.migration,
+        runId: `steward-${input.mergePlan.mergePlanId}`,
+        planId: input.mergePlan.mergePlanId,
+        request_identity: proposalIds,
+        actor_ids: actorIds,
+        request_files: requestFiles,
+        adapter_choice: `steward.${input.mergePlan.applyMethod}`,
+        applied_files: appliedFiles,
+        lane_decision: 'neutral-steward',
+        merge_verdict: mergeVerdict,
+        evidence_path: input.evidencePath ?? 'inline:steward-apply-evidence',
+        ...(taskIds.length > 0 ? { task_ids: taskIds } : {}),
+        ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {}),
+        ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
+    };
+    return {
+        schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+        specVersion: '0.1.0',
+        migration: input.mergePlan.migration,
+        runId: record.runId,
+        planId: input.mergePlan.mergePlanId,
+        records: [record]
+    };
+}
+function extractProposalTransactionIds(proposal) {
+    const values = [
+        proposal.transactionId,
+        ...(proposal.transactionIds ?? []),
+        ...(proposal.transaction_ids ?? [])
+    ];
+    return values
+        .map((value) => typeof value === 'string' ? value.trim() : '')
+        .filter(Boolean);
+}
+function mapStewardMergeVerdict(verdict) {
+    if (verdict === 'parallel-safe' || verdict === 'needs-steward')
+        return 'mergeable';
+    return 'conflict';
 }
 function hashText(value) {
     return crypto.createHash('sha256').update(value).digest('hex');

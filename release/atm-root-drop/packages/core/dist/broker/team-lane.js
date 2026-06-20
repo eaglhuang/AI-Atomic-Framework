@@ -1,11 +1,15 @@
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.js';
-import { buildVirtualAtomInUseRegistry, loadRegistry } from './registry.js';
+import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry } from './registry.js';
 import { readGitHeadCommit } from './steward.js';
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
 export const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = '.atm/runtime/write-broker.registry.json';
 export function buildTeamBrokerRunRecord(input) {
     const taskId = input.request.taskId?.trim();
+    const transactionIds = normalizeStringList(input.transactionIds ?? []);
     return {
         schemaId: 'atm.brokerOperationRunRecord.v1',
         specVersion: '0.1.0',
@@ -24,7 +28,9 @@ export function buildTeamBrokerRunRecord(input) {
         lane_decision: input.laneDecision,
         merge_verdict: input.mergeVerdict,
         evidence_path: input.evidencePath,
-        ...(taskId ? { task_ids: [taskId] } : {})
+        ...(taskId ? { task_ids: [taskId] } : {}),
+        ...(input.commitSha ? { commit_sha: input.commitSha } : {}),
+        ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
     };
 }
 export function buildTeamBrokerRunRecordEnvelope(input) {
@@ -110,10 +116,18 @@ export function resolveTeamBrokerLane(decision) {
 export function evaluateTeamBrokerLane(input) {
     const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
     const writeIntent = buildTeamWriteIntent(input);
-    const registry = loadRegistry(registryPath);
+    const registry = cleanupStale(loadRegistry(registryPath));
     const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
     const decision = calculateBrokerDecision(writeIntent, registry);
     const resolution = resolveTeamBrokerLane(decision);
+    const writeTransaction = buildTeamBrokerWriteTransactionEvidence({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        writeIntent,
+        decision,
+        writePaths: input.writePaths
+    });
     const evidence = {
         schemaId: 'atm.teamBrokerLaneEvidence.v1',
         specVersion: '0.1.0',
@@ -121,6 +135,7 @@ export function evaluateTeamBrokerLane(input) {
         actorId: input.actorId,
         registryPath: DEFAULT_BROKER_REGISTRY_RELATIVE_PATH,
         writeIntent,
+        writeTransaction,
         decision,
         virtualAtomInUseRegistry,
         chosenLane: resolution.chosenLane,
@@ -136,6 +151,87 @@ export function evaluateTeamBrokerLane(input) {
 }
 export function buildTeamBrokerEvidence(result) {
     return result.evidence;
+}
+export function buildTeamBrokerWriteTransactionEvidence(input) {
+    const cwd = path.resolve(input.cwd);
+    const allowedFiles = normalizePathList(input.writePaths);
+    const readSet = normalizePathList([
+        ...allowedFiles,
+        ...input.writeIntent.atomRefs.map((ref) => ref.sourceRange?.filePath ?? '').filter(Boolean)
+    ]);
+    const writeSet = normalizePathList(input.writeIntent.targetFiles);
+    const startedAt = new Date().toISOString();
+    const leaseEpoch = Date.now();
+    const leaseSeconds = Math.max(1, Math.floor(input.writeIntent.leaseBounds?.requestedSeconds ?? 1800));
+    const expiresAt = new Date(Date.now() + leaseSeconds * 1000).toISOString();
+    const transactionSeed = [
+        input.taskId,
+        input.actorId,
+        input.writeIntent.baseCommit,
+        input.decision.intentId,
+        leaseEpoch,
+        ...writeSet
+    ].join('\n');
+    return {
+        schemaId: 'atm.teamBrokerWriteTransaction.v1',
+        transactionId: `txn-${createHash('sha256').update(transactionSeed).digest('hex').slice(0, 16)}`,
+        taskId: input.taskId,
+        principalId: input.actorId,
+        actorId: input.actorId,
+        sessionId: readSessionId(),
+        instanceId: `${input.actorId}@local`,
+        worktreeId: cwd,
+        branchRef: readGitBranchRef(cwd),
+        baseHead: input.writeIntent.baseCommit,
+        leaseEpoch,
+        allowedFiles,
+        readSet,
+        writeSet,
+        fileHashesBefore: buildFileHashesBefore(cwd, writeSet),
+        brokerDecision: {
+            verdict: input.decision.verdict,
+            lane: input.decision.lane,
+            intentId: input.decision.intentId,
+            parallelSafetyReason: input.decision.verdict === 'parallel-safe'
+                ? 'no-known-textual-or-resource-conflict'
+                : null
+        },
+        startedAt,
+        expiresAt,
+        heartbeatAt: startedAt
+    };
+}
+function readSessionId() {
+    for (const key of ['ATM_SESSION_ID', 'CODEX_SESSION_ID', 'GITHUB_RUN_ID']) {
+        const value = process.env[key]?.trim();
+        if (value)
+            return value;
+    }
+    return null;
+}
+function readGitBranchRef(cwd) {
+    const result = spawnSync('git', ['-C', cwd, 'symbolic-ref', '--short', 'HEAD'], { encoding: 'utf8' });
+    if (result.status !== 0)
+        return null;
+    const branch = String(result.stdout ?? '').trim();
+    return branch || null;
+}
+function normalizePathList(entries) {
+    return normalizeStringList(entries.map((entry) => entry.replace(/\\/g, '/')));
+}
+function normalizeStringList(entries) {
+    return [...new Set(entries.map((entry) => entry.replace(/\\/g, '/').trim()).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+}
+function buildFileHashesBefore(cwd, relativePaths) {
+    const output = {};
+    for (const relativePath of relativePaths) {
+        const absolutePath = path.resolve(cwd, relativePath);
+        output[relativePath] = existsSync(absolutePath)
+            ? `sha256:${createHash('sha256').update(readFileSync(absolutePath)).digest('hex')}`
+            : null;
+    }
+    return output;
 }
 export function buildTeamBrokerRuntimeActivationHandshake(input) {
     const laneResult = evaluateTeamBrokerLane(input);

@@ -168,6 +168,8 @@ export function buildClosebackPlan(input) {
             matchedFiles: [],
             reason: null
         },
+        waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
+        waiverReason: input.waiverReason ?? null,
         evidenceValidators,
         residue: {
             bucket: input.diagnosis.bucket,
@@ -484,11 +486,41 @@ export function buildCloseWriteRollbackSnapshot(input) {
         closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null,
         closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
         planningCard: input.planningCard,
-        stagedArtifacts
+        stagedArtifacts,
+        preCloseStagedFiles: uniqueRelativePaths(input.preCloseStagedFiles ?? [])
     };
 }
 function uniqueRelativePaths(values) {
     return [...new Set(values.map((entry) => (typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '')).filter(Boolean))];
+}
+function readRollbackStagedFiles(cwd) {
+    try {
+        const output = execFileSync(resolveGitExecutableForRollback(), ['diff', '--cached', '--name-only'], {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+        return uniqueRelativePaths(output.split(/\r?\n/));
+    }
+    catch {
+        return [];
+    }
+}
+function restoreRollbackIndexBaseline(input) {
+    const baseline = new Set(uniqueRelativePaths(input.preCloseStagedFiles));
+    const unexpected = readRollbackStagedFiles(input.cwd).filter((entry) => !baseline.has(entry));
+    if (unexpected.length === 0)
+        return;
+    try {
+        execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...unexpected], {
+            cwd: input.cwd,
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+        input.rolledBackArtifacts.push(...unexpected.map((entry) => `${entry} (unstaged rollback-baseline)`));
+    }
+    catch {
+        // preserve rollback report even if index cleanup fails
+    }
 }
 export function rollbackCloseWriteTransaction(input) {
     const rolledBackArtifacts = [];
@@ -515,7 +547,8 @@ export function rollbackCloseWriteTransaction(input) {
         writeFileSync(input.snapshot.planningCard.absolutePath, input.snapshot.planningCard.previousContent, 'utf8');
         rolledBackArtifacts.push(input.snapshot.planningCard.absolutePath);
     }
-    const staged = uniqueRelativePaths(input.snapshot.stagedArtifacts);
+    const preCloseStaged = new Set(input.snapshot.preCloseStagedFiles);
+    const staged = uniqueRelativePaths(input.snapshot.stagedArtifacts).filter((entry) => !preCloseStaged.has(entry));
     if (staged.length > 0) {
         try {
             execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...staged], {
@@ -528,6 +561,11 @@ export function rollbackCloseWriteTransaction(input) {
             // preserve rollback report even if index cleanup fails
         }
     }
+    restoreRollbackIndexBaseline({
+        cwd: input.cwd,
+        preCloseStagedFiles: input.snapshot.preCloseStagedFiles,
+        rolledBackArtifacts
+    });
     if (input.snapshot.closeWindowStagedIndexLockActive) {
         const released = releaseCloseWindowStagedIndexLock({
             cwd: input.cwd,
@@ -601,6 +639,124 @@ export async function executeCloseWriteCommitPhase(input) {
             })
         };
     }
+}
+export const TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID = 'atm.taskCloseCompletionChecklist.v1';
+function normalizeLifecycleStatus(value) {
+    const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
+    return normalized || null;
+}
+function readClosurePacketRecord(cwd, relativePath) {
+    if (!relativePath)
+        return null;
+    const absolutePath = path.isAbsolute(relativePath) ? relativePath : path.join(cwd, relativePath);
+    if (!existsSync(absolutePath))
+        return null;
+    try {
+        return JSON.parse(readFileSync(absolutePath, 'utf8'));
+    }
+    catch {
+        return null;
+    }
+}
+function readCloseTransitionCommand(cwd, taskId, transitionId) {
+    if (!transitionId)
+        return null;
+    const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${transitionId}.json`);
+    if (!existsSync(eventPath))
+        return null;
+    try {
+        const event = JSON.parse(readFileSync(eventPath, 'utf8'));
+        return typeof event.command === 'string' ? event.command : null;
+    }
+    catch {
+        return null;
+    }
+}
+function closeCommandUsedWaiver(command) {
+    return Boolean(command && /--waiver-out-of-scope-delivery\b/.test(command));
+}
+export function buildCloseCompletionChecklist(input) {
+    const ledgerStatus = normalizeLifecycleStatus(typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null);
+    const planningStatus = normalizeLifecycleStatus(input.triangulation.planningFrontmatter.status);
+    const ledgerDone = ledgerStatus === 'done';
+    const closurePacketPath = typeof input.taskDocument.closurePacket === 'string'
+        ? input.taskDocument.closurePacket
+        : null;
+    const closurePacket = readClosurePacketRecord(input.cwd, closurePacketPath);
+    const targetCommit = typeof closurePacket?.targetCommit === 'string'
+        ? closurePacket.targetCommit
+        : (typeof input.taskDocument.delivery_commit === 'string' ? input.taskDocument.delivery_commit : null);
+    const closeReason = typeof input.taskDocument.closeReason === 'string' ? input.taskDocument.closeReason.trim() : '';
+    const lastTransitionId = typeof input.taskDocument.lastTransitionId === 'string' ? input.taskDocument.lastTransitionId : null;
+    const closeCommand = readCloseTransitionCommand(input.cwd, input.taskId, lastTransitionId);
+    const waiverRequired = closeCommandUsedWaiver(closeCommand);
+    const closeEventRecorded = input.triangulation.lastTransitionEvent?.action === 'close'
+        && Boolean(lastTransitionId)
+        && existsSync(path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId, `${lastTransitionId}.json`));
+    const targetGovernanceCommitted = Boolean(closurePacketPath && existsSync(path.isAbsolute(closurePacketPath) ? closurePacketPath : path.join(input.cwd, closurePacketPath)));
+    const planningMirrorCommitted = !ledgerDone || planningStatus === 'done';
+    const fields = [
+        {
+            id: 'ledger-done',
+            ok: ledgerDone,
+            value: ledgerStatus,
+            detail: ledgerDone ? 'Live ledger records done.' : 'Live ledger is not done yet.'
+        },
+        {
+            id: 'target-governance-committed',
+            ok: targetGovernanceCommitted,
+            value: closurePacketPath,
+            detail: targetGovernanceCommitted
+                ? 'Closure packet is present in the target repo.'
+                : 'Closure packet is missing; target governance close may be incomplete.'
+        },
+        {
+            id: 'planning-mirror-committed',
+            ok: planningMirrorCommitted,
+            value: input.triangulation.planningFrontmatter.status,
+            detail: planningMirrorCommitted
+                ? 'Planning mirror agrees with governed close state.'
+                : 'Planning mirror is not done while the live ledger is done.'
+        },
+        {
+            id: 'lifecycle-events-recorded',
+            ok: closeEventRecorded,
+            value: lastTransitionId,
+            detail: closeEventRecorded
+                ? 'Close transition event is recorded under .atm/history/task-events.'
+                : 'No close transition event is recorded for this task.'
+        },
+        {
+            id: 'delivery-sha',
+            ok: Boolean(targetCommit),
+            value: targetCommit,
+            detail: targetCommit
+                ? 'Delivery commit SHA is recorded in closure provenance.'
+                : 'Delivery SHA is missing from closure provenance.'
+        },
+        {
+            id: 'waiver-reason',
+            ok: !waiverRequired || Boolean(closeReason),
+            value: closeReason || null,
+            detail: waiverRequired
+                ? (closeReason ? 'Waiver reason is recorded for out-of-scope delivery.' : 'Waiver was used but no durable reason is recorded.')
+                : 'No out-of-scope delivery waiver was required.'
+        }
+    ];
+    const requiredFields = fields.filter((entry) => entry.id !== 'waiver-reason' || waiverRequired);
+    const partialClose = ledgerDone && requiredFields.some((entry) => !entry.ok);
+    const summary = partialClose
+        ? 'Task ledger is done, but close completion checklist shows a partial close.'
+        : ledgerDone
+            ? 'Task close completion checklist is satisfied.'
+            : 'Task is not done; close completion checklist is informational only.';
+    return {
+        schemaId: TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID,
+        taskId: input.taskId,
+        partialClose,
+        summary,
+        fields
+    };
 }
 // === TASK-MAO-0041 evidence-bundle-manifest (cursor-composer-2.5) START ===
 // 0041 close-orchestration hooks live in this region only.

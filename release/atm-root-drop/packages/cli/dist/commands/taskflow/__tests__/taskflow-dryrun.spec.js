@@ -161,6 +161,131 @@ function initGitRepo(repo) {
     execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
 }
+function writeBranchCommitQueueLock(repo, input) {
+    const branchRef = input.branchRef ?? 'refs/heads/main';
+    const safeName = branchRef.replace(/[^A-Za-z0-9._-]+/g, '-');
+    const lockDir = path.join(repo, '.atm/runtime/locks', `git-commit-queue-${safeName}.lock`);
+    mkdirSync(lockDir, { recursive: true });
+    writeJson(path.join(lockDir, 'record.json'), {
+        schemaId: 'atm.branchCommitQueueLock.v1',
+        specVersion: '0.1.0',
+        actorId: input.actorId,
+        taskId: input.taskId ?? null,
+        branchRef,
+        branchName: branchRef.replace(/^refs\/heads\//, ''),
+        headShaAtAcquire: input.headShaAtAcquire ?? 'fixture-head',
+        createdAt: '2026-06-19T00:00:00.000Z'
+    });
+}
+function readBranchRef(repo) {
+    return execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], {
+        cwd: repo,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+}
+function writeBrokerRegistry(repo, activeIntents, options = {}) {
+    writeJson(path.join(repo, '.atm/runtime/write-broker.registry.json'), {
+        schemaId: 'atm.writeBrokerRegistry.v1',
+        specVersion: '0.1.0',
+        repoId: 'fixture-repo',
+        workspaceId: 'main',
+        ...(typeof options.currentEpoch === 'number' ? { currentEpoch: options.currentEpoch } : {}),
+        activeIntents
+    });
+}
+function makeActiveIntent(input) {
+    return {
+        intentId: `intent-${input.taskId}`,
+        taskId: input.taskId,
+        teamRunId: null,
+        actorId: input.actorId,
+        baseCommit: 'base-fixture',
+        resourceKeys: {
+            files: input.files,
+            atomIds: input.atomIds ?? [],
+            atomCids: input.atomCids ?? [],
+            generators: [],
+            projections: [],
+            registries: [],
+            validators: [],
+            artifacts: []
+        },
+        leaseEpoch: 1,
+        leaseSeconds: 1800,
+        leaseMaxSeconds: 1800,
+        heartbeatAt: '2026-06-18T00:00:00.000Z',
+        lane: 'direct-brokered',
+        expiresAt: input.expiresAt ?? '2099-01-01T00:00:00.000Z'
+    };
+}
+async function makeBrokerCloseFixture(label) {
+    const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-broker-close-${label}-`));
+    const targetRepo = path.join(tempRoot, 'target');
+    const planningRepo = path.join(tempRoot, 'planning');
+    initGitRepo(targetRepo);
+    initGitRepo(planningRepo);
+    writeJson(path.join(targetRepo, 'package.json'), { name: `broker-close-${label}`, type: 'module' });
+    writeJson(path.join(targetRepo, '.atm/config.json'), {
+        schemaVersion: 'atm.config.v0.1',
+        layoutVersion: 2,
+        paths: {
+            tasks: '.atm/history/tasks',
+            taskEvents: '.atm/history/task-events'
+        },
+        taskLedger: {
+            enabled: true,
+            mode: 'auto',
+            mirrorExternalTasks: true,
+            requireCliTransitions: true,
+            provider: 'atm-local'
+        }
+    });
+    writeJson(path.join(targetRepo, '.atm/runtime/identity/default.json'), {
+        actorId: 'validator',
+        gitName: 'ATM Validator',
+        gitEmail: 'validator@example.invalid',
+        updatedAt: new Date().toISOString()
+    });
+    const taskId = `TASK-BROKER-${label.toUpperCase()}`;
+    const taskPath = path.join(targetRepo, '.atm/history/tasks', `${taskId}.json`);
+    writeJson(taskPath, {
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: taskId,
+        title: `${label} broker close fixture`,
+        status: 'running',
+        deliverables: ['src/app.ts'],
+        scopePaths: ['src/app.ts'],
+        targetAllowedFiles: ['src/app.ts'],
+        validators: [],
+        planningRepo: 'planning',
+        targetRepo: 'target',
+        closureAuthority: 'target_repo',
+        source: {
+            planPath: `../planning/docs/tasks/${taskId}.task.md`,
+            sectionTitle: taskId,
+            headingLine: 1,
+            hash: 'fixture'
+        },
+        claim: {
+            actorId: 'validator',
+            leaseId: `lease-${taskId}`,
+            claimedAt: '2026-06-18T00:00:00.000Z',
+            heartbeatAt: '2026-06-18T00:00:00.000Z',
+            ttlSeconds: 1800,
+            files: ['src/app.ts'],
+            state: 'active',
+            intent: 'write'
+        }
+    });
+    writeText(path.join(targetRepo, 'src/app.ts'), 'export const app = 1;\n');
+    writeText(path.join(planningRepo, 'docs/tasks', `${taskId}.task.md`), `---\ntask_id: ${taskId}\nstatus: planned\n---\n`);
+    execFileSync('git', ['add', '.'], { cwd: targetRepo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'base broker close fixture'], { cwd: targetRepo, stdio: 'ignore' });
+    execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'base broker close planning fixture'], { cwd: planningRepo, stdio: 'ignore' });
+    return { targetRepo, planningRepo, taskId };
+}
 async function makeDualRepoCloseFixture(label, options = {}) {
     const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-close-${label}-`));
     const targetRepo = path.join(tempRoot, 'target');
@@ -299,6 +424,10 @@ async function makeDualRepoCloseFixture(label, options = {}) {
                     }]
             }]
     });
+    writeJson(path.join(targetRepo, '.atm/history/evidence', `${fixtureTaskId}.closure-packet.json`), {
+        schemaId: 'atm.closurePacket.v1',
+        taskId: fixtureTaskId
+    });
     writeText(planPath, [
         '---',
         `task_id: ${fixtureTaskId}`,
@@ -311,6 +440,145 @@ async function makeDualRepoCloseFixture(label, options = {}) {
     writeText(path.join(targetRepo, 'scratch.txt'), 'unrelated noise\n');
     return { targetRepo, planningRepo, taskId: fixtureTaskId, planPath, deliveryCommit, profilePath: path.join(planningRepo, 'taskflow.profile.json') };
 }
+const brokerConfirmedFixture = await makeBrokerCloseFixture('confirmed');
+writeBrokerRegistry(brokerConfirmedFixture.targetRepo, [
+    makeActiveIntent({
+        taskId: brokerConfirmedFixture.taskId,
+        actorId: 'validator',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-A'],
+        atomCids: ['CID-SHARED']
+    }),
+    makeActiveIntent({
+        taskId: 'TASK-OTHER-CONFIRMED',
+        actorId: 'other',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-B'],
+        atomCids: ['CID-SHARED']
+    })
+]);
+const brokerConfirmedPreClose = await runTaskflow([
+    'pre-close',
+    '--cwd', brokerConfirmedFixture.targetRepo,
+    '--task', brokerConfirmedFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(brokerConfirmedPreClose.evidence.writeReadinessHint.brokerConflictGate.verdict, 'confirmedConflict');
+const brokerConfirmedDryRun = await runTaskflow([
+    'close',
+    '--cwd', brokerConfirmedFixture.targetRepo,
+    '--task', brokerConfirmedFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(brokerConfirmedDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'confirmedConflict');
+assert.ok(brokerConfirmedDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT'), 'confirmed broker conflict must block taskflow close --write readiness');
+const brokerInsufficientFixture = await makeBrokerCloseFixture('insufficient');
+writeBrokerRegistry(brokerInsufficientFixture.targetRepo, [
+    makeActiveIntent({
+        taskId: brokerInsufficientFixture.taskId,
+        actorId: 'validator',
+        files: ['src/app.ts']
+    }),
+    makeActiveIntent({
+        taskId: 'TASK-OTHER-INSUFFICIENT',
+        actorId: 'other',
+        files: ['src/app.ts']
+    })
+]);
+const brokerInsufficientDryRun = await runTaskflow([
+    'close',
+    '--cwd', brokerInsufficientFixture.targetRepo,
+    '--task', brokerInsufficientFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(brokerInsufficientDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'insufficientMutationIntent');
+assert.ok(brokerInsufficientDryRun.evidence.writeReadinessHint.blockers.every((entry) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_CONFIRMED_CONFLICT'), 'insufficient mutation intent must remain advisory');
+const brokerStaleLeaseFixture = await makeBrokerCloseFixture('stale-lease');
+writeBrokerRegistry(brokerStaleLeaseFixture.targetRepo, [
+    makeActiveIntent({
+        taskId: brokerStaleLeaseFixture.taskId,
+        actorId: 'validator',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-SELF'],
+        atomCids: ['CID-SELF']
+    }),
+    makeActiveIntent({
+        taskId: 'TASK-OTHER-STALE-LEASE',
+        actorId: 'other',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-OTHER'],
+        atomCids: ['CID-OTHER'],
+        expiresAt: '2000-01-01T00:00:00.000Z'
+    })
+]);
+const brokerStaleLeaseDryRun = await runTaskflow([
+    'close',
+    '--cwd', brokerStaleLeaseFixture.targetRepo,
+    '--task', brokerStaleLeaseFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'blocked-active-lease');
+assert.ok(brokerStaleLeaseDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'stale lease takeover must block taskflow close --write readiness before hook-time drift');
+assert.match(String(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''), /tasks repair-claim --task TASK-OTHER-STALE-LEASE --actor "?validator"? --json/, 'stale lease remediation must point to diagnose-first claim repair');
+const brokerStaleEpochFixture = await makeBrokerCloseFixture('stale-epoch');
+writeBrokerRegistry(brokerStaleEpochFixture.targetRepo, [
+    makeActiveIntent({
+        taskId: brokerStaleEpochFixture.taskId,
+        actorId: 'validator',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-SELF-EPOCH'],
+        atomCids: ['CID-SELF-EPOCH']
+    }),
+    makeActiveIntent({
+        taskId: 'TASK-OTHER-STALE-EPOCH',
+        actorId: 'other',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-OTHER-EPOCH'],
+        atomCids: ['CID-OTHER-EPOCH'],
+        expiresAt: '2099-01-01T00:00:00.000Z'
+    })
+], { currentEpoch: 2 });
+const brokerStaleEpochDryRun = await runTaskflow([
+    'close',
+    '--cwd', brokerStaleEpochFixture.targetRepo,
+    '--task', brokerStaleEpochFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'blocked-active-lease');
+assert.ok(brokerStaleEpochDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'leaseEpoch behind registry currentEpoch must block taskflow close --write readiness');
+assert.match(String(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''), /tasks repair-claim --task TASK-OTHER-STALE-EPOCH --actor "?validator"? --json/, 'stale epoch remediation must point to diagnose-first claim repair');
+const brokerCleanFixture = await makeBrokerCloseFixture('clean');
+writeBrokerRegistry(brokerCleanFixture.targetRepo, [
+    makeActiveIntent({
+        taskId: brokerCleanFixture.taskId,
+        actorId: 'validator',
+        files: ['src/app.ts'],
+        atomIds: ['ATOM-A'],
+        atomCids: ['CID-A']
+    }),
+    makeActiveIntent({
+        taskId: 'TASK-OTHER-CLEAN',
+        actorId: 'other',
+        files: ['src/other.ts'],
+        atomIds: ['ATOM-Z'],
+        atomCids: ['CID-Z']
+    })
+]);
+const brokerCleanDryRun = await runTaskflow([
+    'close',
+    '--cwd', brokerCleanFixture.targetRepo,
+    '--task', brokerCleanFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(brokerCleanDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'noConflict');
 const dryRunFixture = await makeDualRepoCloseFixture('dryrun');
 const dryRunClose = await runTaskflow([
     'close',
@@ -342,6 +610,22 @@ const secondCloseHintDryRun = await runTaskflow([
 ]);
 assert.equal(secondCloseHintDryRun.ok, true, 'post-delivery second close dry-run must succeed');
 assert.equal(secondCloseHintDryRun.evidence.closebackPlan.historicalDeliveryGate.required, true, 'post-delivery second close must require historical delivery before write');
+const branchQueueBusyFixture = await makeDualRepoCloseFixture('branch-queue-busy', { closePlanningStatus: 'planned' });
+writeBranchCommitQueueLock(branchQueueBusyFixture.targetRepo, {
+    actorId: 'other-writer',
+    taskId: 'TASK-OTHER-FINALIZING',
+    branchRef: readBranchRef(branchQueueBusyFixture.targetRepo)
+});
+const branchQueueBusyDryRun = await runTaskflow([
+    'close',
+    '--cwd', branchQueueBusyFixture.targetRepo,
+    '--profile', branchQueueBusyFixture.profilePath,
+    '--task', branchQueueBusyFixture.taskId,
+    '--actor', 'validator',
+    '--json'
+]);
+assert.equal(branchQueueBusyDryRun.evidence.writeReadinessHint.branchCommitQueueGate.status, 'busy');
+assert.ok(branchQueueBusyDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BRANCH_COMMIT_QUEUE_BUSY'), 'active branch commit queue must block taskflow close --write before commit tail');
 const historicalDeliveryBlocker = secondCloseHintDryRun.evidence.writeReadinessHint.blockers.find((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED');
 assert.ok(historicalDeliveryBlocker, 'post-delivery second close must surface historical-delivery blocker');
 assert.ok(historicalDeliveryBlocker.requiredCommand.includes(secondCloseHintFixture.deliveryCommit), 'historical-delivery blocker must promote the detected delivery SHA in requiredCommand');
@@ -625,8 +909,9 @@ const targetIndexContamination = await runTaskflow([
     '--write',
     '--json'
 ]);
-assert.equal(targetIndexContamination.ok, false, 'target repo unrelated pre-staged files must fail closed before auto-commit');
-assert.equal(targetIndexContamination.evidence.closeWriteTransaction.failureCode, 'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED', 'index isolation failures must surface through closeWriteTransaction');
+assert.equal(targetIndexContamination.ok, true, 'target repo unrelated pre-staged files must now be preserved during auto-commit');
+assert.equal(targetIndexContamination.evidence.closeWriteTransaction.phase, 'committed');
+assert.ok(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: targetIndexContaminationFixture.targetRepo, encoding: 'utf8' }).includes('pre-staged-target.txt'), 'foreign target staged work must remain staged');
 const planningIndexContaminationFixture = await makeDualRepoCloseFixture('planning-index-contamination');
 writeText(path.join(planningIndexContaminationFixture.planningRepo, 'docs/tasks/pre-staged-planning.md'), 'must not commit\n');
 execFileSync('git', ['add', 'docs/tasks/pre-staged-planning.md'], { cwd: planningIndexContaminationFixture.planningRepo, stdio: 'ignore' });
@@ -640,8 +925,9 @@ const planningIndexContamination = await runTaskflow([
     '--write',
     '--json'
 ]);
-assert.equal(planningIndexContamination.ok, false, 'planning repo unrelated pre-staged files must fail closed before auto-commit');
-assert.equal(planningIndexContamination.evidence.closeWriteTransaction.failureCode, 'ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED', 'planning index isolation failures must surface through closeWriteTransaction');
+assert.equal(planningIndexContamination.ok, true, 'planning repo unrelated pre-staged files must now be preserved during auto-commit');
+assert.equal(planningIndexContamination.evidence.closeWriteTransaction.phase, 'committed');
+assert.ok(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: planningIndexContaminationFixture.planningRepo, encoding: 'utf8' }).includes('docs/tasks/pre-staged-planning.md'), 'foreign planning staged work must remain staged');
 const expectedPreStagedFixture = await makeDualRepoCloseFixture('expected-pre-staged');
 execFileSync('git', ['add', `.atm/history/evidence/${expectedPreStagedFixture.taskId}.json`], { cwd: expectedPreStagedFixture.targetRepo, stdio: 'ignore' });
 execFileSync('git', ['add', `docs/tasks/${expectedPreStagedFixture.taskId}.task.md`], { cwd: expectedPreStagedFixture.planningRepo, stdio: 'ignore' });
@@ -671,12 +957,10 @@ const autoCommit = await runTaskflow([
     '--write',
     '--json'
 ]);
-assert.equal(autoCommit.evidence.governedCommitBundle.commitMode, 'auto-commit');
-assert.equal(autoCommit.evidence.governedCommitBundle.targetRepo.status, 'committed');
-assert.equal(autoCommit.evidence.governedCommitBundle.planningRepo.status, 'committed');
-assert.ok(autoCommit.evidence.governedCommitBundle.targetRepo.commitSha, 'auto-commit target bundle must report commitSha');
-assert.ok(autoCommit.evidence.governedCommitBundle.planningRepo.commitSha, 'auto-commit planning bundle must report commitSha');
-assert.equal(autoCommit.evidence.governedCommitBundle.failClosed, false);
+assert.equal(autoCommit.ok, true);
+assert.equal(autoCommit.evidence.closeWriteTransaction.phase, 'committed');
+assert.equal(autoCommit.evidence.closeWriteTransaction.ok, true);
+assert.equal(autoCommit.evidence.closeWriteTransaction.commitBundleApplied, true);
 assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoCommitFixture.targetRepo, encoding: 'utf8' }).trim(), `chore(taskflow): close ${autoCommitFixture.taskId} target governance bundle`);
 assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoCommitFixture.planningRepo, encoding: 'utf8' }).trim(), `docs(taskflow): close ${autoCommitFixture.taskId} planning bundle`);
 const missingPlanningFixture = await makeDualRepoCloseFixture('missingplan');
@@ -791,8 +1075,8 @@ async function makePlanningAuthorityCloseFixture(label) {
         workItemId: fixtureTaskId,
         title: 'Planning authority close fixture',
         status: 'ready',
-        scopePaths: [reportPath],
-        deliverables: [reportPath],
+        scopePaths: [reportPath, `docs/tasks/${fixtureTaskId}.task.md`],
+        deliverables: [reportPath, `docs/tasks/${fixtureTaskId}.task.md`],
         planningRepo: 'planning',
         targetRepo: 'target',
         closureAuthority: 'planning_repo',
@@ -1176,6 +1460,10 @@ writeJson(path.join(writeDelFixture.targetRepo, '.atm/history/evidence', `${writ
                 }]
         }]
 });
+writeJson(path.join(writeDelFixture.targetRepo, '.atm/history/evidence', `${writeDelFixture.taskId}.closure-packet.json`), {
+    schemaId: 'atm.closurePacket.v1',
+    taskId: writeDelFixture.taskId
+});
 const writeDelClose = await runTaskflow([
     'close',
     '--cwd', writeDelFixture.targetRepo,
@@ -1270,6 +1558,10 @@ writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${ou
                     stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
                 }]
         }]
+});
+writeJson(path.join(outOfScopeFixture.targetRepo, '.atm/history/evidence', `${outOfScopeFixture.taskId}.closure-packet.json`), {
+    schemaId: 'atm.closurePacket.v1',
+    taskId: outOfScopeFixture.taskId
 });
 // A. Dry-run close with --write and without waiver should fail-closed because of the committed out-of-scope file
 let outOfScopeError = null;
@@ -1378,4 +1670,17 @@ const closeDryRunMixed = await runTaskflow([
 ]);
 assert.equal(closeDryRunMixed.evidence.historicalClosePreflight.schemaId, 'atm.historicalClosePreflight.v1');
 assert.ok(closeDryRunMixed.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT'));
+const closeDryRunMixedWithWaiverAlias = await runTaskflow([
+    'close',
+    '--cwd', outOfScopeFixture.targetRepo,
+    '--profile', outOfScopeFixture.profilePath,
+    '--task', outOfScopeFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', deliveryCommitSha,
+    '--waive-out-of-scope',
+    '--reason', 'approved alias waiver for testing',
+    '--json'
+]);
+assert.equal(closeDryRunMixedWithWaiverAlias.ok, true, 'taskflow close must accept --waive-out-of-scope as a waiver alias');
+assert.equal(closeDryRunMixedWithWaiverAlias.evidence.closebackPlan.waiverOutOfScopeDelivery, true);
 console.log('[taskflow-dryrun:test] ok');

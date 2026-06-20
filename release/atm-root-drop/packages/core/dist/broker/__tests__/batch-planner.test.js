@@ -1,4 +1,8 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { runBroker } from '../../../../cli/dist/commands/broker.js';
 import { planMutationBatch, buildDeterministicPlanId } from '../adapters/batch-planner.js';
 import { computeCasResult, hashContent } from '../adapters/cas.js';
 import { defaultAdapterRegistry } from '../adapters/registry.js';
@@ -12,6 +16,10 @@ function makeRequest(overrides) {
         value: undefined,
         ...overrides
     };
+}
+function writeJson(filePath, value) {
+    mkdirSync(path.dirname(filePath), { recursive: true });
+    writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 function testDeterministicPlan() {
     const registry = defaultAdapterRegistry();
@@ -87,9 +95,58 @@ function testUnknownFormatFailsClosed() {
     assert.equal(plan.queued.length, 1);
     console.log('ok: unknown format => fallback fail-closed (only one batched, rest queued)');
 }
+async function testBrokerPlanBatchReturnsMissingInputs() {
+    const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-broker-intent-'));
+    try {
+        const validRequestPath = path.join(tempDir, 'valid-request.json');
+        writeJson(validRequestPath, makeRequest({
+            requestId: 'req-valid',
+            filePath: 'data.json',
+            op: 'upsert',
+            target: '/owner/name',
+            value: 'atm'
+        }));
+        const validResult = await runBroker([
+            'plan-batch',
+            '--cwd', tempDir,
+            '--request-file', validRequestPath
+        ]);
+        const validEvidence = validResult.evidence;
+        assert.equal(validResult.ok, true);
+        assert.deepEqual(validEvidence.missingInputs, []);
+        assert.equal(validEvidence.explicitInputs?.[0]?.kind, 'json-pointer');
+        const missingTargetPath = path.join(tempDir, 'missing-target.json');
+        writeJson(missingTargetPath, {
+            ...makeRequest({
+                requestId: 'req-missing-target',
+                filePath: 'notes.md',
+                op: 'replaceRange',
+                target: '',
+                value: 'replacement'
+            }),
+            target: ''
+        });
+        const missingTargetResult = await runBroker([
+            'plan-batch',
+            '--cwd', tempDir,
+            '--request-file', missingTargetPath
+        ]);
+        const missingTargetEvidence = missingTargetResult.evidence;
+        assert.equal(missingTargetResult.ok, false);
+        assert.equal(missingTargetResult.messages[0]?.code, 'ATM_BROKER_MUTATION_INTENT_MISSING_INPUTS');
+        assert.equal(missingTargetEvidence.missingInputs?.length, 1);
+        assert.equal(missingTargetEvidence.missingInputs?.[0]?.field, 'target');
+        assert.deepEqual(missingTargetEvidence.explicitInputs, []);
+        console.log('ok: incomplete structured mutation intent returns missingInputs without guessing');
+    }
+    finally {
+        rmSync(tempDir, { recursive: true, force: true });
+    }
+}
 testDeterministicPlan();
 testSameRowQueued();
 testRequestConflictKeysPreserved();
 testCasPreventsLostUpdate();
 testUnknownFormatFailsClosed();
+await testBrokerPlanBatchReturnsMissingInputs();
 console.log('all batch-planner tests passed');

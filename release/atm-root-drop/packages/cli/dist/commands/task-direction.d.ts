@@ -82,6 +82,14 @@ export declare function advanceTaskQueueAfterClose(cwd: string, taskId: string, 
     readonly batchId?: string | null;
     readonly queueId?: string | null;
 }): TaskQueueRecord | null;
+export declare function advanceTaskQueueHead(cwd: string, taskId: string, selector?: {
+    readonly batchId?: string | null;
+    readonly queueId?: string | null;
+}): TaskQueueRecord | null;
+export declare function restoreTaskQueueHead(cwd: string, taskId: string, selector?: {
+    readonly batchId?: string | null;
+    readonly queueId?: string | null;
+}): TaskQueueRecord | null;
 export declare function buildTaskQueueStatus(cwd: string): {
     activeQueue: TaskQueueRecord | null;
     queueHeadTaskId: string | null;
@@ -132,7 +140,9 @@ export declare function buildAllowedFilesForTask(task: TaskDirectionTask): reado
  * 不含整個 .atm/history/**，以保持精確邊界。
  */
 export declare function buildTaskSelfAllowPaths(taskId: string): readonly string[];
-export declare function partitionTaskScope(task: TaskDirectionTask): TaskScopePartition;
+export declare function partitionTaskScope(task: TaskDirectionTask, options?: {
+    readonly cwd?: string;
+}): TaskScopePartition;
 export declare function sanitizeTaskDirectionAllowedFiles(values: readonly string[]): readonly string[];
 export declare function isTaskDirectionPathCandidate(value: string): boolean;
 export declare function isPlanningMirrorPath(filePath: string, planningMirrorPaths: readonly string[]): boolean;

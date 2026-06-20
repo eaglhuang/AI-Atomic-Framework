@@ -93,6 +93,30 @@ try {
   assert(stableStringify(stores.shardStore.readShard(fixture.shard.path)) === stableStringify(fixture.shard.value), 'shard store must round-trip JSON shard values');
   stores.shardStore.rebuildIndex(fixture.shard.indexPath);
   assert(existsSync(path.join(hostRepo, fixture.shard.indexPath)), 'shard store must rebuild an index file');
+  stores.shardStore.writeShard('.atm/knowledge/team/example.json', { lesson: 'canonical knowledge shard' });
+  assert(stableStringify(stores.shardStore.readShard('.atm/knowledge/team/example.json')) === stableStringify({ lesson: 'canonical knowledge shard' }), 'shard store must allow canonical Team knowledge shards');
+  stores.shardStore.rebuildIndex('.atm/runtime/knowledge/index.json');
+  assert(existsSync(path.join(hostRepo, '.atm/runtime/knowledge/index.json')), 'shard store must allow generated Team knowledge indexes under runtime cache');
+  stores.shardStore.rebuildIndex('.atm/runtime/knowledge/embeddings/cache-index.json');
+  assert(existsSync(path.join(hostRepo, '.atm/runtime/knowledge/embeddings/cache-index.json')), 'shard store must allow disposable generated Team knowledge cache indexes under runtime cache');
+  try {
+    stores.shardStore.readShard('.atm/runtime/knowledge/index.json');
+    fail('shard store must reject generated Team knowledge cache as canonical shard input');
+  } catch (error) {
+    assert(String((error as Error).message).includes('.atm/runtime/knowledge'), 'runtime knowledge cache rejection must name the generated cache root');
+  }
+  try {
+    stores.shardStore.readShard('.atm/runtime/knowledge/embeddings/cache-index.json');
+    fail('shard store must reject nested generated Team knowledge cache as canonical shard input');
+  } catch (error) {
+    assert(String((error as Error).message).includes('.atm/runtime/knowledge'), 'nested runtime knowledge cache rejection must name the generated cache root');
+  }
+  try {
+    stores.shardStore.rebuildIndex('.atm/knowledge/index.json');
+    fail('shard store must reject canonical Team knowledge roots as generated index output');
+  } catch (error) {
+    assert(String((error as Error).message).includes('.atm/knowledge'), 'canonical knowledge index-output rejection must name the canonical root');
+  }
 
   const artifactRecord = stores.artifactStore.writeArtifact(fixture.artifact, `${JSON.stringify({ ok: true }, null, 2)}\n`);
   assert(artifactRecord.artifactPath === fixture.artifact.artifactPath, 'artifact store must return the original record');

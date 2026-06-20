@@ -147,6 +147,7 @@ export function recoverBrokerRuntime(input) {
                 specVersion: '0.1.0',
                 repoId: 'local-repo',
                 workspaceId: 'main',
+                currentEpoch: Date.now(),
                 activeIntents: []
             },
             suspectIntents: [],

@@ -126,7 +126,7 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
       } as ScopeLockRecord;
       if (existsSync(filePath)) {
         const existing = readJsonFile(filePath) as Record<string, unknown>;
-        if (isReleasedLockRecord(existing)) {
+        if (isReleasedLockRecord(existing) || existing.lockedBy === actor || existing.actorId === actor) {
           writeJsonFile(filePath, record);
           return record;
         }

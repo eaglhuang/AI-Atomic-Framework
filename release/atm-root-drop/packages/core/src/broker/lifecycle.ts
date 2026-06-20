@@ -72,6 +72,7 @@ export function recordBrokerClaimIntent(input: {
   const now = new Date().toISOString();
   const nextRegistry: WriteBrokerRegistryDocument = {
     ...registry,
+    currentEpoch: Date.now(),
     activeIntents: [
       ...registry.activeIntents.filter((intent) => intent.taskId !== input.taskId),
       {

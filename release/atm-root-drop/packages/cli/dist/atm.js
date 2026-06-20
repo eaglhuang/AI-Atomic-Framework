@@ -59,6 +59,7 @@ import { runDaemon } from './commands/daemon.js';
 import { runCache } from './commands/cache.js';
 import { runHealthReport } from './commands/health-report.js';
 import { runTaskflow } from './commands/taskflow.js';
+import { runTaskView } from './commands/task-view.js';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.js';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.js';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.js';
@@ -127,6 +128,7 @@ export const cliCommandRunners = {
     'health-report': runHealthReport,
     identity: runIdentity,
     taskflow: runTaskflow,
+    'task-view': runTaskView,
     broker: runBroker,
     route: runRoute
 };

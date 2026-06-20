@@ -8,7 +8,7 @@ import { sortProposalsForCompose } from './merge-plan.ts';
 import { validateBrokerProposal } from './proposal.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
-import type { DecompositionRequest, MergePlan, PatchProposal } from './types.ts';
+import type { BrokerOperationRunRecordEnvelope, DecompositionRequest, MergePlan, MergeVerdict, PatchProposal } from './types.ts';
 
 // ---------------------------------------------------------------------------
 // Steward arbitration verdict — the four possible outcomes per implementation
@@ -179,6 +179,12 @@ export function applyStewardPlan(input: {
 }): StewardApplyResult {
   const planResult = planStewardApply(input);
   if (!planResult.ok) {
+    const brokerOperationRun = buildStewardBrokerOperationRun({
+      mergePlan: input.mergePlan,
+      proposals: input.proposals,
+      appliedFiles: [],
+      evidencePath: input.evidenceOutPath ?? null
+    });
     const evidence = buildStewardApplyEvidence({
       stewardId: input.stewardId,
       mergePlan: input.mergePlan,
@@ -188,7 +194,8 @@ export function applyStewardPlan(input: {
       fileBeforeHashes: {},
       fileAfterHashes: {},
       verdict: 'blocked',
-      blockedReasons: planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`)
+      blockedReasons: planResult.plan.issues.map((issue) => `${issue.code}: ${issue.detail}`),
+      brokerOperationRun
     });
     if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
     return { ok: false, evidence };
@@ -211,6 +218,12 @@ export function applyStewardPlan(input: {
   }
 
   appliedFiles.sort((left, right) => left.localeCompare(right));
+  const brokerOperationRun = buildStewardBrokerOperationRun({
+    mergePlan: input.mergePlan,
+    proposals: input.proposals,
+    appliedFiles,
+    evidencePath: input.evidenceOutPath ?? null
+  });
   const evidence = buildStewardApplyEvidence({
     stewardId: input.stewardId,
     mergePlan: input.mergePlan,
@@ -219,7 +232,8 @@ export function applyStewardPlan(input: {
     appliedFiles,
     fileBeforeHashes,
     fileAfterHashes,
-    verdict: 'applied'
+    verdict: 'applied',
+    brokerOperationRun
   });
   if (input.evidenceOutPath) writeEvidenceFile(input.evidenceOutPath, evidence);
   return { ok: true, evidence };
@@ -516,6 +530,72 @@ export function applyUnifiedPatch(content: string, patch: string): string {
 function writeEvidenceFile(filePath: string, evidence: StewardApplyEvidence): void {
   mkdirSync(path.dirname(path.resolve(filePath)), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(evidence, null, 2)}\n`, 'utf8');
+}
+
+function buildStewardBrokerOperationRun(input: {
+  readonly mergePlan: MergePlan;
+  readonly proposals: readonly PatchProposal[];
+  readonly appliedFiles: readonly string[];
+  readonly evidencePath: string | null;
+}): BrokerOperationRunRecordEnvelope {
+  const sortedProposals = sortProposalsForCompose(input.proposals);
+  const proposalIds = [...new Set(sortedProposals.map((proposal) => proposal.proposalId).concat(input.mergePlan.inputProposals))]
+    .sort((left, right) => left.localeCompare(right));
+  const actorIds = [...new Set(sortedProposals.map((proposal) => proposal.actorId).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+  const requestFiles = [...new Set(sortedProposals.map((proposal) => proposal.targetFile).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+  const taskIds = [...new Set(sortedProposals.map((proposal) => proposal.taskId).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+  const commitShas = [...new Set(sortedProposals.map((proposal) => proposal.baseCommit).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+  const transactionIds = [...new Set(sortedProposals.flatMap((proposal) => extractProposalTransactionIds(proposal)))]
+    .sort((left, right) => left.localeCompare(right));
+  const appliedFiles = [...new Set(input.appliedFiles)].sort((left, right) => left.localeCompare(right));
+  const mergeVerdict = mapStewardMergeVerdict(input.mergePlan.verdict);
+  const record = {
+    schemaId: 'atm.brokerOperationRunRecord.v1' as const,
+    specVersion: '0.1.0' as const,
+    migration: input.mergePlan.migration,
+    runId: `steward-${input.mergePlan.mergePlanId}`,
+    planId: input.mergePlan.mergePlanId,
+    request_identity: proposalIds,
+    actor_ids: actorIds,
+    request_files: requestFiles,
+    adapter_choice: `steward.${input.mergePlan.applyMethod}`,
+    applied_files: appliedFiles,
+    lane_decision: 'neutral-steward',
+    merge_verdict: mergeVerdict,
+    evidence_path: input.evidencePath ?? 'inline:steward-apply-evidence',
+    ...(taskIds.length > 0 ? { task_ids: taskIds } : {}),
+    ...(commitShas.length === 1 ? { commit_sha: commitShas[0] } : {}),
+    ...(transactionIds.length > 0 ? { transaction_ids: transactionIds } : {})
+  };
+
+  return {
+    schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+    specVersion: '0.1.0',
+    migration: input.mergePlan.migration,
+    runId: record.runId,
+    planId: input.mergePlan.mergePlanId,
+    records: [record]
+  };
+}
+
+function extractProposalTransactionIds(proposal: PatchProposal): readonly string[] {
+  const values = [
+    proposal.transactionId,
+    ...(proposal.transactionIds ?? []),
+    ...(proposal.transaction_ids ?? [])
+  ];
+  return values
+    .map((value) => typeof value === 'string' ? value.trim() : '')
+    .filter(Boolean);
+}
+
+function mapStewardMergeVerdict(verdict: MergePlan['verdict']): MergeVerdict {
+  if (verdict === 'parallel-safe' || verdict === 'needs-steward') return 'mergeable';
+  return 'conflict';
 }
 
 function hashText(value: string): string {

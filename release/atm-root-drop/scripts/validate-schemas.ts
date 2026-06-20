@@ -67,6 +67,8 @@ const schemaEntries: Record<string, string> = {
   'merge-plan': 'schemas/governance/merge-plan.schema.json',
   'break-glass-handoff': 'schemas/governance/break-glass-handoff.schema.json',
   'broker-mutation-request': 'schemas/broker/mutation-request.schema.json',
+  'broker-operation-run-record': 'schemas/broker/operation-run-record.schema.json',
+  'broker-steward-apply-evidence': 'schemas/broker/steward-apply-evidence.schema.json',
   'broker-conflict-key': 'schemas/broker/conflict-key.schema.json',
   'broker-merge-decision': 'schemas/broker/merge-decision.schema.json',
   'broker-mutation-batch-plan': 'schemas/broker/mutation-batch-plan.schema.json',
@@ -75,7 +77,12 @@ const schemaEntries: Record<string, string> = {
 };
 
 const supportSchemaEntries: Record<string, string> = {
-  'test-report-metrics': 'schemas/test-report/metrics.schema.json'
+  'branch-commit-queue': 'schemas/governance/branch-commit-queue.schema.json',
+  'test-report-metrics': 'schemas/test-report/metrics.schema.json',
+  'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
+  'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
+  'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json',
+  'team-runtime-contract': 'schemas/team-agents/team-runtime-contract.schema.json'
 };
 
 const bannedProtectedSurfaceTerms = [
@@ -272,6 +279,344 @@ if (!registryV1Schema?.$defs?.registryVersion?.properties?.semanticFingerprint) 
 const policeRegistryCandidateSchema = schemas.get('police-registry-candidate-report');
 if (policeRegistryCandidateSchema?.properties?.candidateStatus?.enum?.join(',') !== 'draft,validated,active,transitioning,deprecated,expired,quarantined') {
   fail('police registry candidate status enum must be draft/validated/active/transitioning/deprecated/expired/quarantined');
+}
+
+const branchCommitQueueSchema = ajv.getSchema('branch-commit-queue');
+if (!branchCommitQueueSchema) {
+  fail('branch commit queue schema must be registered');
+} else {
+  const queueEvidence = {
+    schemaId: 'atm.branchCommitQueueEvidence.v1',
+    serializedBy: 'branch-commit-queue',
+    actorId: 'schema-actor',
+    taskId: 'TASK-TEAM-SCHEMA-COMMIT',
+    branchRef: 'refs/heads/main',
+    branchName: 'main',
+    headShaAtAcquire: 'abc123schema-before',
+    headShaAtCommitStart: 'abc123schema-before',
+    headShaAfterCommit: 'abc123schema-after',
+    retryableBusyCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY',
+    retryableRaceCode: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'
+  };
+  if (!branchCommitQueueSchema(queueEvidence)) {
+    fail(`branch commit queue schema must accept commit lane evidence: ${formatErrors(branchCommitQueueSchema.errors)}`);
+  }
+  const queueLock = {
+    schemaId: 'atm.branchCommitQueueLock.v1',
+    specVersion: '0.1.0',
+    actorId: 'schema-actor',
+    taskId: 'TASK-TEAM-SCHEMA-COMMIT',
+    branchRef: 'refs/heads/main',
+    branchName: 'main',
+    headShaAtAcquire: 'abc123schema-before',
+    createdAt: '2026-06-19T00:00:00.000Z'
+  };
+  if (!branchCommitQueueSchema(queueLock)) {
+    fail(`branch commit queue schema must accept lock record evidence: ${formatErrors(branchCommitQueueSchema.errors)}`);
+  }
+}
+
+const brokerMutationRequestSchema = ajv.getSchema('broker-mutation-request');
+if (!brokerMutationRequestSchema) {
+  fail('broker mutation request schema must be registered');
+} else {
+  const transactionLinkedRequest = {
+    schemaId: 'atm.mutationRequest.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'schema transaction linkage fixture' },
+    requestId: 'req-schema-transaction-link',
+    actorId: 'schema-validator',
+    taskId: 'TASK-TEAM-SCHEMA-TXN',
+    transactionId: 'txn-schema-single',
+    transactionIds: ['txn-schema-camel'],
+    transaction_ids: ['txn-schema-snake'],
+    filePath: 'docs/broker-transaction-link.md',
+    op: 'append',
+    target: 'EOF',
+    value: 'schema transaction linkage'
+  };
+  if (!brokerMutationRequestSchema(transactionLinkedRequest)) {
+    fail(`broker mutation request must accept transaction linkage fields: ${formatErrors(brokerMutationRequestSchema.errors)}`);
+  }
+}
+
+const teamBrokerWriteTransactionSchema = ajv.getSchema('team-broker-write-transaction');
+const teamBrokerLaneSchema = ajv.getSchema('team-broker-lane');
+const teamBrokerRuntimeActivationSchema = ajv.getSchema('team-broker-runtime-activation');
+const teamRuntimeContractSchema = ajv.getSchema('team-runtime-contract');
+if (!teamBrokerWriteTransactionSchema) {
+  fail('team broker write transaction schema must be registered');
+} else {
+  const transactionEvidence = {
+    schemaId: 'atm.teamBrokerWriteTransaction.v1',
+    transactionId: 'txn-schema-write-transaction',
+    taskId: 'TASK-TEAM-SCHEMA-WRITE-TXN',
+    principalId: 'schema-principal',
+    actorId: 'schema-actor',
+    sessionId: 'schema-session',
+    instanceId: 'schema-actor@local',
+    worktreeId: 'C:/workspace/schema',
+    branchRef: 'main',
+    baseHead: 'abc123schemahead',
+    leaseEpoch: 1,
+    allowedFiles: ['src/schema-target.ts'],
+    readSet: ['src/schema-target.ts'],
+    writeSet: ['src/schema-target.ts'],
+    fileHashesBefore: {
+      'src/schema-target.ts': 'sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    },
+    brokerDecision: {
+      verdict: 'parallel-safe',
+      lane: 'direct-brokered',
+      intentId: 'intent-schema-write-transaction',
+      parallelSafetyReason: 'no-known-textual-or-resource-conflict'
+    },
+    startedAt: '2026-06-19T00:00:00.000Z',
+    expiresAt: '2026-06-19T00:30:00.000Z',
+    heartbeatAt: '2026-06-19T00:00:00.000Z'
+  };
+  if (!teamBrokerWriteTransactionSchema(transactionEvidence)) {
+    fail(`team broker write transaction schema must accept the milestone-required fields: ${formatErrors(teamBrokerWriteTransactionSchema.errors)}`);
+  }
+
+  if (!teamBrokerLaneSchema) {
+    fail('team broker lane schema must be registered');
+  } else if (!teamBrokerRuntimeActivationSchema) {
+    fail('team broker runtime activation schema must be registered');
+  } else {
+    const brokerLaneEvidence = {
+      schemaId: 'atm.teamBrokerLaneEvidence.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+      actorId: 'schema-actor',
+      registryPath: '.atm/runtime/write-broker.registry.json',
+      writeIntent: {
+        schemaId: 'atm.writeIntent.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'schema broker lane fixture' },
+        taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+        actorId: 'schema-actor',
+        baseCommit: 'abc123schemahead',
+        targetFiles: ['src/schema-target.ts'],
+        atomRefs: [],
+        sharedSurfaces: {
+          generators: [],
+          projections: [],
+          registries: [],
+          validators: [],
+          artifacts: []
+        },
+        requestedLane: 'auto'
+      },
+      writeTransaction: transactionEvidence,
+      decision: {
+        verdict: 'parallel-safe',
+        lane: 'direct-brokered',
+        reason: 'schema broker lane fixture',
+        conflicts: []
+      },
+      virtualAtomInUseRegistry: {
+        schemaId: 'atm.virtualAtomInUseRegistry.v1',
+        specVersion: '0.1.0',
+        activeVirtualAtoms: []
+      },
+      chosenLane: 'direct-brokered',
+      stewardId: null,
+      composerPath: null,
+      safeToStart: true,
+      blockedReasons: []
+    };
+    if (!teamBrokerLaneSchema(brokerLaneEvidence)) {
+      fail(`team broker lane schema must accept broker decision and write transaction evidence: ${formatErrors(teamBrokerLaneSchema.errors)}`);
+    }
+    const runtimeActivationEvidence = {
+      schemaId: 'atm.teamBrokerRuntimeActivationHandshake.v1',
+      specVersion: '0.1.0',
+      taskId: 'TASK-TEAM-SCHEMA-RUNTIME',
+      actorId: 'schema-actor',
+      registryPath: '.atm/runtime/write-broker.registry.json',
+      brokerLane: brokerLaneEvidence,
+      activationState: 'activated',
+      scopedWriteExecution: {
+        approved: true,
+        allowedFiles: ['src/schema-target.ts'],
+        evidencePath: null,
+        acceptedInputs: ['PatchProposal', 'MergePlan', 'StewardPlan']
+      },
+      runtimeBoundary: {
+        gitWrite: false,
+        taskLifecycle: false,
+        selfClose: false
+      },
+      blockedReasons: []
+    };
+    if (!teamBrokerRuntimeActivationSchema(runtimeActivationEvidence)) {
+      fail(`team broker runtime activation schema must accept broker lane and scoped boundary evidence: ${formatErrors(teamBrokerRuntimeActivationSchema.errors)}`);
+    }
+  }
+
+  if (!teamRuntimeContractSchema) {
+    fail('team runtime contract schema must be registered');
+  } else {
+    const runtimeContractEvidence = {
+      schemaId: 'atm.teamRuntimeContract.v1',
+      runtimeMode: 'broker-only',
+      runtimeLanguage: 'node',
+      runtimeAdapterId: 'atm.node.broker-only-fallback',
+      providerId: 'local',
+      sdkId: 'nodejs',
+      modelId: 'provider-selected',
+      agentsSpawned: false,
+      executionSurface: 'broker-governance',
+      selectionReason: 'broker-only selected by schema fixture',
+      workerAdapter: {
+        schemaId: 'atm.teamWorkerAdapterContract.v1',
+        authorityBoundary: {
+          gitWrite: false,
+          taskLifecycle: false,
+          selfClose: false
+        }
+      },
+      artifactHandoff: {
+        schemaId: 'atm.teamArtifactHandoffContract.v1'
+      },
+      retryBudget: {
+        schemaId: 'atm.teamRetryBudgetContract.v1',
+        status: 'within-budget'
+      },
+      commitLane: {
+        schemaId: 'atm.teamCommitLaneContract.v1',
+        ownerRole: 'coordinator',
+        ownerPermissions: ['task.lifecycle', 'git.write', 'evidence.write'],
+        workerGitWrite: false,
+        serializedBy: 'branch-commit-queue',
+        lockSchemaId: 'atm.branchCommitQueueLock.v1',
+        retryableCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE']
+      },
+      brokerSubagent: {
+        schemaId: 'atm.teamBrokerSubagentContract.v1',
+        enabled: true,
+        subagentId: 'team-broker-subagent',
+        lifecycleOwner: 'atm',
+        decisionSurface: 'brokerLane',
+        governs: ['write-intents', 'scope-conflicts', 'steward-apply', 'commit-lane'],
+        stewardId: 'neutral-write-steward',
+        evidenceRequired: ['atm.teamBrokerLaneEvidence.v1', 'atm.stewardApplyEvidence.v1', 'atm.brokerOperationRunRecordEnvelope.v1'],
+        authorityBoundary: {
+          fileWrite: false,
+          gitWrite: false,
+          taskLifecycle: false,
+          selfClose: false
+        },
+        escalationTarget: 'coordinator'
+      },
+      editorSubagentBridge: {
+        schemaId: 'atm.teamEditorSubagentBridgeContract.v1'
+      }
+    };
+    if (!teamRuntimeContractSchema(runtimeContractEvidence)) {
+      fail(`team runtime contract schema must accept broker subagent and serialized commit lane evidence: ${formatErrors(teamRuntimeContractSchema.errors)}`);
+    }
+  }
+}
+
+const brokerOperationRunRecordSchema = ajv.getSchema('broker-operation-run-record');
+const brokerStewardApplyEvidenceSchema = ajv.getSchema('broker-steward-apply-evidence');
+if (!brokerOperationRunRecordSchema) {
+  fail('broker operation run record schema must be registered');
+} else {
+  const operationRunRecordEnvelope = {
+    schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'schema operation run fixture' },
+    runId: 'run-schema-operation-log',
+    planId: 'plan-schema-operation-log',
+    records: [
+      {
+        schemaId: 'atm.brokerOperationRunRecord.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'schema operation run fixture' },
+        runId: 'run-schema-operation-log',
+        planId: 'plan-schema-operation-log',
+        request_identity: ['req-schema-operation-log'],
+        actor_ids: ['schema-validator'],
+        request_files: ['docs/broker-operation-log.md'],
+        adapter_choice: 'text-range',
+        applied_files: ['docs/broker-operation-log.md'],
+        lane_decision: 'neutral-steward',
+        merge_verdict: 'mergeable',
+        evidence_path: '.atm/history/evidence/broker-runs/run-schema-operation-log.json',
+        task_ids: ['TASK-TEAM-SCHEMA-OPLOG'],
+        commit_sha: 'abc123schemaoperation',
+        transaction_ids: ['txn-schema-operation-log']
+      }
+    ]
+  };
+  if (!brokerOperationRunRecordSchema(operationRunRecordEnvelope)) {
+    fail(`broker operation run record schema must accept task/commit/transaction linkage: ${formatErrors(brokerOperationRunRecordSchema.errors)}`);
+  }
+
+  if (!brokerStewardApplyEvidenceSchema) {
+    fail('broker steward apply evidence schema must be registered');
+  } else {
+    const stewardApplyEvidence = {
+      schemaId: 'atm.stewardApplyEvidence.v1',
+      specVersion: '0.1.0',
+      migration: { strategy: 'none', fromVersion: null, notes: 'schema steward apply fixture' },
+      stewardId: 'neutral-write-steward',
+      mergePlanId: 'plan-schema-operation-log',
+      proposalIds: ['proposal-schema-steward'],
+      targetFiles: ['docs/broker-operation-log.md'],
+      appliedFiles: ['docs/broker-operation-log.md'],
+      fileBeforeHashes: {
+        'docs/broker-operation-log.md': 'sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+      },
+      fileAfterHashes: {
+        'docs/broker-operation-log.md': 'sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789'
+      },
+      permissions: {
+        fileWrite: ['docs/broker-operation-log.md'],
+        gitWrite: false,
+        taskLifecycle: false,
+        selfClose: false
+      },
+      applyMethod: 'patch-apply',
+      verdict: 'applied',
+      brokerOperationRun: operationRunRecordEnvelope
+    };
+    if (!brokerStewardApplyEvidenceSchema(stewardApplyEvidence)) {
+      fail(`broker steward apply evidence schema must accept steward boundary and operation linkage: ${formatErrors(brokerStewardApplyEvidenceSchema.errors)}`);
+    }
+  }
+}
+
+const patchProposalSchema = ajv.getSchema('patch-proposal');
+if (!patchProposalSchema) {
+  fail('patch proposal schema must be registered');
+} else {
+  const transactionLinkedProposal = {
+    schemaId: 'atm.patchProposal.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'schema transaction proposal fixture' },
+    proposalId: 'prop-schema-transaction-link',
+    taskId: 'TASK-TEAM-SCHEMA-PROP-TXN',
+    actorId: 'schema-validator',
+    transactionId: 'txn-proposal-single',
+    transactionIds: ['txn-proposal-camel'],
+    transaction_ids: ['txn-proposal-snake'],
+    baseCommit: 'abc123schema',
+    fileBeforeHash: 'sha256:abc123schema',
+    targetFile: 'docs/broker-proposal-transaction-link.md',
+    atomRefs: [{ atomId: 'atom-schema', atomCid: 'cid-schema' }],
+    anchors: [{ kind: 'line', hint: 'EOF' }],
+    intent: 'schema proposal transaction linkage',
+    patch: '@@ -0,0 +1 @@\n+schema proposal transaction linkage',
+    validators: ['node --strip-types scripts/validate-schemas.ts --mode validate'],
+    rollback: 'revert proposal transaction linkage fixture'
+  };
+  if (!patchProposalSchema(transactionLinkedProposal)) {
+    fail(`patch proposal schema must accept transaction linkage fields: ${formatErrors(patchProposalSchema.errors)}`);
+  }
 }
 
 const versionIndexSchema = schemas.get('version-index');

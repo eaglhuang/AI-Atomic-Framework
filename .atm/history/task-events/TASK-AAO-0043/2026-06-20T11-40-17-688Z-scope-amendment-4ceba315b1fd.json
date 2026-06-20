@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-20T11-40-17-688Z-scope-amendment-4ceba315b1fd",
+  "taskId": "TASK-AAO-0043",
+  "action": "scope-amendment",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0043.json",
+  "taskSha256": "sha256:039a8a3f44aa3af3e6220080cc5621b71fb0f7c5fd4292d403d2804848340446",
+  "createdAt": "2026-06-20T11:40:17.688Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0043 --actor cursor-gpt-5.2 --add \"packages/cli/src/commands/planning-repo-root.ts,packages/cli/src/commands/__tests__/planning-repo-root.test.ts,packages/cli/src/commands/next/route-predicates.ts,packages/cli/src/commands/tasks/lifecycle-state.ts\" --reason \"0043 resolver module and lifecycle reclaim collateral\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "0043 resolver module and lifecycle reclaim collateral"
+  }
+}

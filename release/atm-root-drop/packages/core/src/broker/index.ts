@@ -11,4 +11,6 @@ export * from './team-lane.ts';
 export * from './lifecycle.ts';
 export * from './orphan-cleanup.ts';
 export * from './recovery.ts';
+export * from './freeze.ts';
+export * from './patch-envelope.ts';
 export * from './adapters/index.ts';

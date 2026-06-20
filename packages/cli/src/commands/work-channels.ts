@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { TaskDirectionTask, TaskQueueRecord } from './task-direction.ts';
+import { normalizeStoredPlanningPathForIdentity } from './planning-repo-root.ts';
 
 export interface QuickfixLock {
   readonly schemaId: 'atm.quickfixLock.v1';
@@ -230,7 +231,7 @@ export function writeBatchRun(input: {
     schemaId: 'atm.batchRun.v1',
     specVersion: '0.1.0',
     batchId,
-    scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds),
+    scopeKey: deriveBatchScopeKey(sourceTasks, prompt, taskIds, input.cwd),
     queueId: input.queue?.queueId ?? null,
     sourcePrompt: prompt,
     sourcePromptHash: sha256(prompt),
@@ -497,13 +498,16 @@ function dedupeBatchRuns(records: readonly BatchRunRecord[]) {
   return output.sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
 }
 
-function deriveBatchScopeKey(tasks: readonly TaskDirectionTask[], prompt: string, taskIds: readonly string[]) {
+function deriveBatchScopeKey(tasks: readonly TaskDirectionTask[], prompt: string, taskIds: readonly string[], cwd?: string) {
   const idRoots = uniqueStrings(taskIds.map((taskId) => {
     const match = taskId.match(/^(.+?)-\d{2,}(?:-.+)?$/);
     return match?.[1] ?? '';
   }).filter(Boolean));
   if (idRoots.length === 1) return idRoots[0] ?? 'custom';
-  const planPaths = uniqueStrings(tasks.map((task) => task.sourcePlanPath).filter((entry): entry is string => Boolean(entry)));
+  const planPaths = uniqueStrings(tasks
+    .map((task) => task.sourcePlanPath)
+    .filter((entry): entry is string => Boolean(entry))
+    .map((entry) => cwd ? normalizeStoredPlanningPathForIdentity(cwd, entry) : entry));
   if (planPaths.length === 1) return `plan-${sha256(planPaths[0] ?? '').slice(0, 12)}`;
   if (taskIds.length > 0) return `tasks-${sha256(taskIds.join('\n')).slice(0, 12)}`;
   return `prompt-${sha256(prompt).slice(0, 12)}`;

@@ -5,8 +5,8 @@ import { CliError, makeResult, message, parseOptions } from './shared.js';
 import { resolveActorId } from './actor-registry.js';
 import { runNext } from './next.js';
 import { runTasks } from './tasks.js';
-import { abandonTaskQueue, findActiveTaskQueue, partitionTaskScope } from './task-direction.js';
-import { activeBatchSelectionStatus, inspectBatchRunConsistency, isPathAllowedByScope, listActiveBatchRuns, releaseBatchRun, repairBatchRunFromQueue, updateBatchRun } from './work-channels.js';
+import { abandonTaskQueue, advanceTaskQueueHead, findActiveTaskQueue, partitionTaskScope, restoreTaskQueueHead } from './task-direction.js';
+import { activeBatchSelectionStatus, inspectBatchRunConsistency, isPathAllowedByScope, listActiveBatchRuns, releaseBatchRun, repairBatchRunFromQueue, updateBatchRun, writeBatchTaskAuditEvent } from './work-channels.js';
 export async function runBatch(argv) {
     const action = String(argv[0] ?? 'status').toLowerCase();
     const batchHistoricalDeliveryRefs = action === 'checkpoint'
@@ -502,10 +502,172 @@ export async function runBatch(argv) {
             }
         });
     }
+    if (action === 'skip') {
+        const taskId = typeof options.task === 'string' ? options.task.trim() : '';
+        const reason = typeof options.reason === 'string' ? options.reason.trim() : '';
+        if (!taskId) {
+            throw new CliError('ATM_CLI_USAGE', 'batch skip requires --task <task-id>.', { exitCode: 2 });
+        }
+        if (!reason) {
+            throw new CliError('ATM_BATCH_SKIP_REASON_REQUIRED', 'batch skip requires --reason <reason>; skip is a traceable pause, not success.', { exitCode: 2 });
+        }
+        const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
+        if (!active) {
+            throw new CliError('ATM_BATCH_RUN_MISSING', 'batch skip requires an active batch run.', { exitCode: 2 });
+        }
+        const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
+        const consistency = inspectBatchRunConsistency(active, queue);
+        if (!consistency.ok || !queue) {
+            throw new CliError('ATM_BATCH_STATE_REPAIR_REQUIRED', 'batch skip cannot continue because batch-run and task-queue runtime disagree.', {
+                exitCode: 1,
+                details: {
+                    batchId: active.batchId,
+                    reason: consistency.reason,
+                    requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
+                }
+            });
+        }
+        if (active.currentTaskId !== taskId) {
+            throw new CliError('ATM_BATCH_SKIP_NOT_QUEUE_HEAD', `batch skip only applies to the current queue head (${active.currentTaskId ?? 'none'}).`, {
+                exitCode: 2,
+                details: {
+                    batchId: active.batchId,
+                    requestedTaskId: taskId,
+                    currentTaskId: active.currentTaskId,
+                    requiredCommand: `node atm.mjs batch current --batch ${active.batchId} --compact --json`
+                }
+            });
+        }
+        if ((active.skippedTasks ?? []).some((entry) => entry.taskId === taskId)) {
+            throw new CliError('ATM_BATCH_SKIP_ALREADY_RECORDED', `Task ${taskId} is already recorded as skipped in this batch run.`, {
+                exitCode: 2,
+                details: {
+                    batchId: active.batchId,
+                    resumeCommand: `node atm.mjs batch resume --task ${taskId} --batch ${active.batchId} --actor ${resolvedActor.actorId} --json`
+                }
+            });
+        }
+        const skippedEntry = {
+            schemaId: 'atm.batchSkippedTask.v1',
+            taskId,
+            reason,
+            skippedByActor: resolvedActor.actorId,
+            skippedAt: new Date().toISOString(),
+            batchIndex: active.currentIndex,
+            resumeCommand: `node atm.mjs batch resume --task ${taskId} --batch ${active.batchId} --actor ${resolvedActor.actorId} --json`
+        };
+        const advancedQueue = advanceTaskQueueHead(options.cwd, taskId, { batchId: active.batchId, queueId: queue.queueId });
+        const nextTaskId = advancedQueue?.taskIds[advancedQueue.currentIndex] ?? null;
+        const updated = updateBatchRun(options.cwd, active, {
+            currentIndex: advancedQueue?.currentIndex ?? active.currentIndex,
+            currentTaskId: nextTaskId,
+            status: advancedQueue?.status === 'completed' || !nextTaskId ? 'completed' : 'active',
+            skippedTasks: [...(active.skippedTasks ?? []), skippedEntry],
+            hold: null
+        });
+        const auditEvent = writeBatchTaskAuditEvent({
+            cwd: options.cwd,
+            taskId,
+            action: 'batch-skip',
+            actorId: resolvedActor.actorId,
+            batchId: active.batchId,
+            reason,
+            batchIndex: skippedEntry.batchIndex
+        });
+        const finalized = updated.status === 'completed'
+            ? releaseBatchRun(options.cwd, updated, 'completed')
+            : updated;
+        return makeResult({
+            ok: true,
+            command: 'batch',
+            cwd: options.cwd,
+            messages: [message('info', 'ATM_BATCH_TASK_SKIPPED', `Batch skipped ${taskId} with a recorded reason; the task was not closed as done.`, {
+                    batchId: finalized.batchId,
+                    skippedTaskId: taskId,
+                    nextTaskId: finalized.currentTaskId,
+                    reason,
+                    resumeCommand: skippedEntry.resumeCommand,
+                    auditEventPath: auditEvent.eventPath
+                })],
+            evidence: {
+                action: 'skip',
+                actorId: resolvedActor.actorId,
+                skippedTask: skippedEntry,
+                batchRun: finalized,
+                taskQueue: advancedQueue,
+                auditEvent,
+                auditSummary: buildBatchAuditSummary(finalized)
+            }
+        });
+    }
     if (action === 'repair' || action === 'resume') {
         const active = selectRequiredBatch(options.cwd, buildBatchSelector(options), resolvedActor.actorId, action);
         if (!active) {
             throw new CliError('ATM_BATCH_RUN_MISSING', `batch ${action} requires an active batch run.`, { exitCode: 2 });
+        }
+        const resumeTaskId = typeof options.task === 'string' ? options.task.trim() : '';
+        if (action === 'resume' && resumeTaskId) {
+            const skippedEntry = (active.skippedTasks ?? []).find((entry) => entry.taskId === resumeTaskId) ?? null;
+            if (!skippedEntry) {
+                throw new CliError('ATM_BATCH_RESUME_TASK_NOT_SKIPPED', `Task ${resumeTaskId} is not recorded as skipped in batch ${active.batchId}.`, {
+                    exitCode: 2,
+                    details: {
+                        batchId: active.batchId,
+                        skippedTaskIds: (active.skippedTasks ?? []).map((entry) => entry.taskId),
+                        requiredCommand: `node atm.mjs batch status --batch ${active.batchId} --compact --json`
+                    }
+                });
+            }
+            const restoredQueue = restoreTaskQueueHead(options.cwd, resumeTaskId, { batchId: active.batchId, queueId: active.queueId });
+            if (!restoredQueue) {
+                throw new CliError('ATM_BATCH_RESUME_QUEUE_RESTORE_FAILED', `Could not restore queue head for skipped task ${resumeTaskId}.`, {
+                    exitCode: 1,
+                    details: {
+                        batchId: active.batchId,
+                        requiredCommand: `node atm.mjs batch repair --actor ${resolvedActor.actorId} --batch ${active.batchId} --json`
+                    }
+                });
+            }
+            const resumed = updateBatchRun(options.cwd, active, {
+                queueId: restoredQueue.queueId,
+                currentIndex: restoredQueue.currentIndex,
+                currentTaskId: resumeTaskId,
+                status: 'active',
+                skippedTasks: (active.skippedTasks ?? []).filter((entry) => entry.taskId !== resumeTaskId),
+                hold: null
+            });
+            const auditEvent = writeBatchTaskAuditEvent({
+                cwd: options.cwd,
+                taskId: resumeTaskId,
+                action: 'batch-resume',
+                actorId: resolvedActor.actorId,
+                batchId: active.batchId,
+                reason: skippedEntry.reason,
+                batchIndex: skippedEntry.batchIndex
+            });
+            const nextClaim = await runNext(['--cwd', options.cwd, '--claim', '--actor', resolvedActor.actorId, '--prompt', resumed.sourcePrompt, '--json']);
+            return makeResult({
+                ok: true,
+                command: 'batch',
+                cwd: options.cwd,
+                messages: [message('info', 'ATM_BATCH_TASK_RESUMED', `Batch restored skipped task ${resumeTaskId} to the queue head.`, {
+                        batchId: resumed.batchId,
+                        resumedTaskId: resumeTaskId,
+                        nextClaimed: Boolean(nextClaim?.ok),
+                        auditEventPath: auditEvent.eventPath
+                    })],
+                evidence: {
+                    action: 'resume',
+                    actorId: resolvedActor.actorId,
+                    resumedTaskId: resumeTaskId,
+                    before: active,
+                    after: resumed,
+                    taskQueue: restoredQueue,
+                    auditEvent,
+                    auditSummary: buildBatchAuditSummary(resumed),
+                    nextClaim: nextClaim?.evidence ?? null
+                }
+            });
         }
         const queue = findActiveTaskQueue(options.cwd, active.sourcePrompt, { batchId: active.batchId });
         const consistency = inspectBatchRunConsistency(active, queue);
@@ -598,7 +760,7 @@ export async function runBatch(argv) {
             }
         });
     }
-    throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, abandon', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 });
 }
 function buildBatchSelector(options) {
     const selector = {};
@@ -736,6 +898,8 @@ function buildCompactBatchStatus(cwd, batchRun, taskQueue, consistency, activeBa
         progress: buildCompactProgress(batchRun, taskQueue),
         held,
         hold: batchRun?.hold ?? null,
+        skippedTasks: batchRun?.skippedTasks ?? [],
+        auditSummary: buildBatchAuditSummary(batchRun),
         currentTaskId,
         currentTask: queueHead
             ? {
@@ -993,7 +1157,26 @@ function buildCompactProgress(batchRun, taskQueue) {
         totalTasks,
         remainingTasks: typeof currentIndex === 'number'
             ? Math.max(0, totalTasks - currentIndex)
-            : totalTasks
+            : totalTasks,
+        skippedTaskCount: Array.isArray(batchRun?.skippedTasks) ? batchRun.skippedTasks.length : 0
+    };
+}
+function buildBatchAuditSummary(batchRun) {
+    const skippedTasks = Array.isArray(batchRun?.skippedTasks) ? batchRun.skippedTasks : [];
+    return {
+        schemaId: 'atm.batchAuditSummary.v1',
+        currentTaskId: batchRun?.currentTaskId ?? null,
+        held: Boolean(batchRun?.hold),
+        batchStatus: batchRun?.status ?? null,
+        openTaskId: batchRun?.currentTaskId ?? null,
+        skippedTaskIds: skippedTasks.map((entry) => entry.taskId),
+        skippedTasks: skippedTasks.map((entry) => ({
+            taskId: entry.taskId,
+            reason: entry.reason,
+            state: 'skipped'
+        })),
+        blockedTaskIds: skippedTasks.map((entry) => entry.taskId),
+        doneTaskIds: []
     };
 }
 function readTaskValidators(cwd, taskPath) {

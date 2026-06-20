@@ -33,6 +33,7 @@ function expectCliError(fn: () => unknown, expectedCode: string, label: string) 
   const options = parseScopeAddOptions([
     '--task', 'TASK-MAO-0049',
     '--actor', 'augment-code',
+    '--claim-first',
     '--add', 'docs/a.md,docs/b.md',
     '--class', 'doc-sync',
     '--phase', 'closeout',
@@ -40,6 +41,7 @@ function expectCliError(fn: () => unknown, expectedCode: string, label: string) 
   ]);
   assert.equal(options.taskId, 'TASK-MAO-0049');
   assert.equal(options.actorId, 'augment-code');
+  assert.equal(options.claimFirst, true);
   assert.deepEqual(options.addPaths, ['docs/a.md', 'docs/b.md']);
   assert.equal(options.amendmentClass, 'doc-sync');
   assert.equal(options.amendmentPhase, 'closeout');

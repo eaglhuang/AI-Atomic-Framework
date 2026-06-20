@@ -8,13 +8,13 @@ import {
 
 export default defineCommandSpec({
   name: 'identity',
-  summary: 'Manage repo-local default actor identity and inspect the current runtime session hint.',
+  summary: 'Manage per-actor runtime git identity profiles and inspect the current repo-default/session hint.',
   positional: [
     { name: 'action', summary: 'set | show', required: true }
   ],
   options: [
     commonCwdOption,
-    { flag: '--actor', value: 'id', summary: 'Default actor id for this repository runtime.' },
+    { flag: '--actor', value: 'id', summary: 'Actor id for the per-actor identity profile; omit on set to update repo default.json.' },
     { flag: '--name', value: 'text', summary: 'Optional display name; when combined with --kind, also updates actor registry.' },
     { flag: '--kind', value: 'kind', summary: 'Optional actor kind: human | ai-agent | automation.' },
     { flag: '--provider', value: 'text', summary: 'Optional provider label for registry/default identity.' },
@@ -30,6 +30,8 @@ export default defineCommandSpec({
   ],
   examples: [
     'node atm.mjs identity set --actor codex-main --git-name "codex-main" --git-email codex-main@atm.local --editor codex --json',
+    'node atm.mjs identity set --git-name "solo-user" --git-email solo-user@example.local --json',
+    'node atm.mjs identity show --actor codex-main --json',
     'node atm.mjs identity show --json'
   ]
 });

@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
+import { finalizeBuildReleaseHygiene } from './build-release-hygiene.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -280,4 +281,5 @@ run();
 if (path.resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
   const result = buildOnefileRelease();
   console.log(`[build-onefile-release] built ${result.fileCount} files at ${path.relative(repoRoot, result.outputRoot)}`);
+  finalizeBuildReleaseHygiene(repoRoot);
 }

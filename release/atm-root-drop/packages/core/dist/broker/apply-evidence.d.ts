@@ -1,8 +1,9 @@
-import type { BrokerMutationEvidenceEntry, MergePlan, MigrationRecord } from './types.ts';
+import type { BrokerMutationEvidenceEntry, BrokerOperationRunRecordEnvelope, MergePlan, MigrationRecord } from './types.ts';
 export interface StewardPermissionBoundary {
     readonly fileWrite: readonly string[];
     readonly gitWrite: false;
     readonly taskLifecycle: false;
+    readonly selfClose: false;
 }
 export interface StewardApplyEvidence {
     readonly schemaId: 'atm.stewardApplyEvidence.v1';
@@ -20,6 +21,7 @@ export interface StewardApplyEvidence {
     readonly verdict: 'applied' | 'blocked';
     readonly blockedReasons?: readonly string[];
     readonly mutationEvidence?: readonly BrokerMutationEvidenceEntry[];
+    readonly brokerOperationRun?: BrokerOperationRunRecordEnvelope;
 }
 export declare const defaultStewardApplyMigration: MigrationRecord;
 export declare function buildStewardApplyEvidence(input: {
@@ -33,4 +35,5 @@ export declare function buildStewardApplyEvidence(input: {
     readonly verdict: StewardApplyEvidence['verdict'];
     readonly blockedReasons?: readonly string[];
     readonly mutationEvidence?: readonly BrokerMutationEvidenceEntry[];
+    readonly brokerOperationRun?: BrokerOperationRunRecordEnvelope;
 }): StewardApplyEvidence;

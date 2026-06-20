@@ -7,6 +7,9 @@ completed_by_agent: "codex-gpt-5.4-mini"
 delivery_commit: "dbde2ae05fc1bdd573235c5e378f1ef5a55887a4"
 priority: P1
 closure_authority: target_repo
+lastTransitionId: 2026-06-20T13-01-17-614Z-close-ba1d31491d31
+closedByActor: antigravity-gemini-3.5-flash
+closurePacket: .atm/history/evidence/TASK-AAO-0146.closure-packet.json
 depends_on:
 []
 scopePaths:

@@ -20,7 +20,7 @@ export default defineCommandSpec({
     { flag: '--summary', value: 'text', summary: 'Optional short evidence summary.' },
     { flag: '--artifacts', value: 'csv', summary: 'Optional artifact path list recorded with the evidence.' },
     { flag: '--freshness', value: 'type', summary: 'Raw evidence add freshness: fresh|historical-reference|draft (default: fresh).' },
-    { flag: '--validators', value: 'csv', summary: 'Validator pass list; normal validator capture should use evidence run with this flag.' },
+    { flag: '--validators', value: 'csv', summary: 'Optional validator override. Omit when the command matches a known gate or a task-card declared validator; evidence run will auto-link it.' },
     { flag: '--command', value: 'text', summary: 'Command to run/capture. With evidence add this is raw metadata and also requires exit code plus sha256 outputs.' },
     { flag: '--command-runs', value: 'json-file', summary: 'Raw evidence add only: append commandRuns from a JSON array or {commandRuns:[]} cache file.' },
     { flag: '--exit-code', value: 'number', summary: 'Raw evidence add only: exit code paired with --command evidence.' },
@@ -46,8 +46,9 @@ export default defineCommandSpec({
     commonHelpOption
   ],
   examples: [
-    'node atm.mjs evidence run --task ATM-GOV-0104 --actor codex-main --command "npm run typecheck" --validators typecheck --json',
+    'node atm.mjs evidence run --task ATM-GOV-0104 --actor codex-main --command "npm run typecheck" --json',
     'node atm.mjs evidence run --task ATM-GOV-0104 --actor codex-main --command "npm run validate:cli" --validators validate:cli --recent-run --json',
+    'node atm.mjs evidence run --task TASK-TEAM-0014 --actor codex-main --command "node atm.mjs team patrol --task TASK-TEAM-0014 --json" --json',
     'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --summary "raw artifact evidence" --artifacts reports/governance.json --json',
     'node atm.mjs evidence add --task ATM-GOV-0104 --actor codex-main --kind test --freshness fresh --command "npm run typecheck" --exit-code 0 --stdout-sha256 sha256:1111111111111111111111111111111111111111111111111111111111111111 --stderr-sha256 sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 --validators typecheck --json',
     'node atm.mjs evidence git-head-backfill --actor codex-main --reason "Backfill evidence for a pre-ATM HEAD commit" --json',

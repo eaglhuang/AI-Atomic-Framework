@@ -5,6 +5,7 @@ export interface RouteEngineEvidence {
     readonly demandPoliceFindings?: readonly string[];
     readonly legacyRoutePlan?: LegacyRoutePlan;
     readonly legacyTargetFile?: string | null;
+    readonly touchedSymbols?: readonly string[];
 }
 export interface RouteEngineInput {
     readonly goal: string;

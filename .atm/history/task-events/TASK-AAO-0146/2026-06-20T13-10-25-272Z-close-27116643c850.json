@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-20T13-10-25-272Z-close-27116643c850",
+  "taskId": "TASK-AAO-0146",
+  "action": "close",
+  "actorId": "antigravity-gemini-3.5-flash",
+  "sessionId": null,
+  "fromStatus": "done",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0146.json",
+  "taskSha256": "sha256:8c850edc28780da14d97d06ba18889223671879a648245cb2a133507b285faed",
+  "createdAt": "2026-06-20T13:10:25.272Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-AAO-0146 --actor antigravity-gemini-3.5-flash --delivery-commit dbde2ae05fc1bdd573235c5e378f1ef5a55887a4 --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0146.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "runner-arbitration-evidence",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-20T13:10:25.268Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0146.*",
+        ".atm/history/task-events/TASK-AAO-0146/**",
+        ".atm/history/tasks/TASK-AAO-0146.json",
+        "docs/governance/**",
+        "docs/tasks/TASK-AAO-0146-runner-arbitration-touched-set-source-first.task.md",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "packages/cli/src/commands/validate.ts",
+        "tests/cli/**",
+        "tests/cli/runner-arbitration-evidence.test.ts",
+        "tests/cli/tasks-claim-auto-intent.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "packages/cli/src/commands/validate.ts",
+        "tests/cli/**",
+        "tests/cli/runner-arbitration-evidence.test.ts",
+        "tests/cli/tasks-claim-auto-intent.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

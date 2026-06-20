@@ -28,6 +28,7 @@ export interface BatchRunRecord {
     readonly checkpointSize: number;
     readonly status: 'active' | 'paused' | 'completed' | 'abandoned';
     readonly hold?: BatchRunHold | null;
+    readonly skippedTasks?: readonly BatchSkippedTaskRecord[];
     readonly createdByActor: string | null;
     readonly createdAt: string;
     readonly updatedAt: string;
@@ -39,6 +40,15 @@ export interface BatchRunHold {
     readonly currentTaskId: string | null;
     readonly heldByActor: string;
     readonly heldAt: string;
+    readonly resumeCommand: string;
+}
+export interface BatchSkippedTaskRecord {
+    readonly schemaId: 'atm.batchSkippedTask.v1';
+    readonly taskId: string;
+    readonly reason: string;
+    readonly skippedByActor: string;
+    readonly skippedAt: string;
+    readonly batchIndex: number;
     readonly resumeCommand: string;
 }
 export interface BatchRunSelector {
@@ -124,3 +134,15 @@ export declare function isBatchPrompt(prompt: string): boolean;
  * `diagnoseTaskDirectionLockAllowedFiles` in `task-direction.ts` (TASK-AAO-0012).
  */
 export declare function isPathAllowedByScope(filePath: string, allowedFiles: readonly string[]): boolean;
+export declare function writeBatchTaskAuditEvent(input: {
+    readonly cwd: string;
+    readonly taskId: string;
+    readonly action: 'batch-skip' | 'batch-resume';
+    readonly actorId: string;
+    readonly batchId: string;
+    readonly reason?: string | null;
+    readonly batchIndex?: number | null;
+}): {
+    transitionId: string;
+    eventPath: string;
+};

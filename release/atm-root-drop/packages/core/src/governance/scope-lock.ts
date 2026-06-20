@@ -5,6 +5,47 @@ const mapIdPattern = /^ATM-MAP-\d{4}$/;
 const legacyUriPattern = /^[a-z][a-z0-9+.-]*:\/\/.+/;
 const validEdgeKinds = new Set(['data-flow', 'control-flow', 'event-flow', 'validation', 'fallback', 'side-effect', 'rollback']);
 
+export type ScopeLeaseRunMode = 'real-agent' | 'editor-subagent' | 'broker-only';
+export type ScopeLeaseStatus = 'active' | 'released';
+
+export interface ScopeLeaseOwnerKey {
+  readonly instanceId: string;
+  readonly worktreeId: string;
+}
+
+export interface ScopeLeaseRegistryEntry {
+  readonly leaseId: string;
+  readonly taskId: string;
+  readonly resourceKey: string;
+  readonly owner: ScopeLeaseOwnerKey;
+  readonly runMode: ScopeLeaseRunMode;
+  readonly leaseEpoch: number;
+  readonly status: ScopeLeaseStatus;
+  readonly allowedFiles: readonly string[];
+  readonly writeSet: readonly string[];
+  readonly waitsFor?: readonly string[];
+  readonly releasedAt?: string;
+}
+
+export interface ScopeLeaseFencingFinding {
+  readonly code:
+    | 'ATM_SCOPE_LEASE_DUPLICATE_EXCLUSIVE_OWNER'
+    | 'ATM_SCOPE_LEASE_STALE_EPOCH'
+    | 'ATM_SCOPE_LEASE_WAIT_FOR_CYCLE'
+    | 'ATM_SCOPE_LEASE_TOMBSTONE_REACQUIRE'
+    | 'ATM_SCOPE_LEASE_ALLOWED_FILES_VIOLATION';
+  readonly detail: string;
+  readonly leaseIds: readonly string[];
+  readonly expectedEpoch?: number;
+  readonly actualEpoch?: number;
+  readonly runModes: readonly ScopeLeaseRunMode[];
+}
+
+export interface ScopeLeaseFencingResult {
+  readonly ok: boolean;
+  readonly findings: readonly ScopeLeaseFencingFinding[];
+}
+
 export function createScopeLockRecord(input: any): ScopeLockRecord {
   const files = normalizeStringArray(input?.files, 'files');
   const selectors = normalizeSelectors(input?.selectors);
@@ -30,6 +71,167 @@ export function parseScopeLockRecord(document: any) {
 
 export function hasMapSelectors(scopeLock: ScopeLockRecord) {
   return Boolean(scopeLock.selectors && Object.keys(scopeLock.selectors).length > 0);
+}
+
+export function validateScopeLeaseFencing(entries: readonly ScopeLeaseRegistryEntry[]): ScopeLeaseFencingResult {
+  const findings: ScopeLeaseFencingFinding[] = [];
+  findings.push(...findDuplicateExclusiveOwners(entries));
+  findings.push(...findReleasedTombstoneReacquires(entries));
+  findings.push(...findAllowedFilesViolations(entries));
+  findings.push(...findWaitForCycles(entries));
+  return {
+    ok: findings.length === 0,
+    findings
+  };
+}
+
+export function validateScopeLeaseEpoch(input: {
+  readonly leaseId: string;
+  readonly runMode: ScopeLeaseRunMode;
+  readonly expectedEpoch: number;
+  readonly actualEpoch: number;
+}): ScopeLeaseFencingResult {
+  if (input.actualEpoch === input.expectedEpoch) {
+    return { ok: true, findings: [] };
+  }
+  return {
+    ok: false,
+    findings: [{
+      code: 'ATM_SCOPE_LEASE_STALE_EPOCH',
+      detail: `Stale lease epoch for ${input.leaseId}: expected ${input.expectedEpoch}, received ${input.actualEpoch}.`,
+      leaseIds: [input.leaseId],
+      expectedEpoch: input.expectedEpoch,
+      actualEpoch: input.actualEpoch,
+      runModes: [input.runMode]
+    }]
+  };
+}
+
+function findDuplicateExclusiveOwners(entries: readonly ScopeLeaseRegistryEntry[]): ScopeLeaseFencingFinding[] {
+  const findings: ScopeLeaseFencingFinding[] = [];
+  const activeByResource = new Map<string, ScopeLeaseRegistryEntry[]>();
+  for (const entry of entries.filter((candidate) => candidate.status === 'active')) {
+    activeByResource.set(entry.resourceKey, [...(activeByResource.get(entry.resourceKey) ?? []), entry]);
+  }
+  for (const [resourceKey, active] of activeByResource.entries()) {
+    const ownerKeys = new Set(active.map((entry) => writerKey(entry.owner)));
+    if (ownerKeys.size > 1) {
+      findings.push({
+        code: 'ATM_SCOPE_LEASE_DUPLICATE_EXCLUSIVE_OWNER',
+        detail: `Resource ${resourceKey} has ${ownerKeys.size} active exclusive owners.`,
+        leaseIds: active.map((entry) => entry.leaseId),
+        runModes: uniqueRunModes(active)
+      });
+    }
+  }
+  return findings;
+}
+
+function findReleasedTombstoneReacquires(entries: readonly ScopeLeaseRegistryEntry[]): ScopeLeaseFencingFinding[] {
+  const findings: ScopeLeaseFencingFinding[] = [];
+  const released = entries.filter((entry) => entry.status === 'released');
+  const active = entries.filter((entry) => entry.status === 'active');
+  for (const tombstone of released) {
+    for (const candidate of active) {
+      const sameOwner = writerKey(candidate.owner) === writerKey(tombstone.owner);
+      const staleEpoch = candidate.leaseEpoch <= tombstone.leaseEpoch;
+      if (candidate.resourceKey === tombstone.resourceKey && sameOwner && staleEpoch) {
+        findings.push({
+          code: 'ATM_SCOPE_LEASE_TOMBSTONE_REACQUIRE',
+          detail: `Released tombstone ${tombstone.leaseId} blocks stale reacquire ${candidate.leaseId}.`,
+          leaseIds: [tombstone.leaseId, candidate.leaseId],
+          expectedEpoch: tombstone.leaseEpoch + 1,
+          actualEpoch: candidate.leaseEpoch,
+          runModes: uniqueRunModes([tombstone, candidate])
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function findAllowedFilesViolations(entries: readonly ScopeLeaseRegistryEntry[]): ScopeLeaseFencingFinding[] {
+  const findings: ScopeLeaseFencingFinding[] = [];
+  for (const entry of entries.filter((candidate) => candidate.status === 'active')) {
+    const allowed = entry.allowedFiles.map(normalizePathForLease);
+    const violations = entry.writeSet
+      .map(normalizePathForLease)
+      .filter((writePath) => !allowed.some((allowedPath) => pathMatchesLeasePattern(writePath, allowedPath)));
+    if (violations.length > 0) {
+      findings.push({
+        code: 'ATM_SCOPE_LEASE_ALLOWED_FILES_VIOLATION',
+        detail: `Lease ${entry.leaseId} writes outside allowedFiles: ${violations.join(', ')}.`,
+        leaseIds: [entry.leaseId],
+        runModes: [entry.runMode]
+      });
+    }
+  }
+  return findings;
+}
+
+function findWaitForCycles(entries: readonly ScopeLeaseRegistryEntry[]): ScopeLeaseFencingFinding[] {
+  const active = entries.filter((entry) => entry.status === 'active');
+  const byId = new Map(active.map((entry) => [entry.leaseId, entry]));
+  const findings: ScopeLeaseFencingFinding[] = [];
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+
+  const visit = (leaseId: string, stack: string[]): void => {
+    if (visiting.has(leaseId)) {
+      const cycle = stack.slice(stack.indexOf(leaseId)).concat(leaseId);
+      const cycleEntries = cycle.map((id) => byId.get(id)).filter((entry): entry is ScopeLeaseRegistryEntry => Boolean(entry));
+      findings.push({
+        code: 'ATM_SCOPE_LEASE_WAIT_FOR_CYCLE',
+        detail: `Wait-for graph cycle detected: ${cycle.join(' -> ')}.`,
+        leaseIds: cycle,
+        runModes: uniqueRunModes(cycleEntries)
+      });
+      return;
+    }
+    if (visited.has(leaseId)) return;
+    const entry = byId.get(leaseId);
+    if (!entry) return;
+    visiting.add(leaseId);
+    for (const next of entry.waitsFor ?? []) {
+      visit(next, [...stack, leaseId]);
+    }
+    visiting.delete(leaseId);
+    visited.add(leaseId);
+  };
+
+  for (const entry of active) {
+    visit(entry.leaseId, []);
+  }
+  return dedupeFindings(findings);
+}
+
+function writerKey(owner: ScopeLeaseOwnerKey): string {
+  return `${owner.instanceId}::${owner.worktreeId}`;
+}
+
+function uniqueRunModes(entries: readonly ScopeLeaseRegistryEntry[]): readonly ScopeLeaseRunMode[] {
+  return [...new Set(entries.map((entry) => entry.runMode))].sort();
+}
+
+function normalizePathForLease(value: string): string {
+  return value.replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function pathMatchesLeasePattern(filePath: string, pattern: string): boolean {
+  if (pattern.endsWith('/**')) {
+    return filePath === pattern.slice(0, -3) || filePath.startsWith(pattern.slice(0, -2));
+  }
+  return filePath === pattern;
+}
+
+function dedupeFindings(findings: readonly ScopeLeaseFencingFinding[]): ScopeLeaseFencingFinding[] {
+  const seen = new Set<string>();
+  return findings.filter((finding) => {
+    const key = `${finding.code}:${finding.leaseIds.join('|')}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function normalizeSpecVersion(value: unknown, hasSelectors: boolean) {

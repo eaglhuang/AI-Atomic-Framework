@@ -2,13 +2,16 @@ import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { computeMissingValidatorReport } from '../evidence.ts';
+import { readActiveTaskDirectionLocks } from '../task-direction.ts';
 import { normalizeTaskId } from '../tasks/task-import-validators.ts';
 import { normalizeRelativePath } from '../tasks/task-file-io-helpers.ts';
 import {
   evaluateFrameworkCloseDirtyGuard,
   type FrameworkCloseDirtyGuardReport
 } from '../tasks/scope-lock-diagnostics.ts';
+import { evaluatePlanningMirrorDirtyFiles } from '../tasks/planning-mirror-close-diagnostics.ts';
 import { inspectHistoricalDelivery, type TaskHistoricalDeliveryReport } from '../tasks/historical-delivery.ts';
+import { isPathAllowedByScope } from '../work-channels.ts';
 
 interface PreflightCommitRepoBundle {
   readonly repoRoot: string | null;
@@ -22,6 +25,7 @@ interface PreflightCommitBundle {
 
 export type HistoricalClosePreflightBlockerId =
   | 'scopeTrackedDirtyFiles'
+  | 'incorrectPlanningMirrorPreEdit'
   | 'unexpectedStagedTasks'
   | 'unexpectedStagedNonBundleFiles'
   | 'mixedDeliveryCommit'
@@ -56,6 +60,7 @@ export interface UnexpectedNonBundleStagedRepoReport {
   readonly repoKind: 'target' | 'planning';
   readonly stagedFiles: readonly string[];
   readonly restoreCommand: string;
+  readonly deferredForeignFiles: readonly string[];
 }
 
 export interface HistoricalCloseWriteRollbackSummary {
@@ -97,6 +102,22 @@ function extractGovernanceTaskId(filePath: string): string | null {
   return null;
 }
 
+function isSameTaskAdvisoryStagedFile(taskId: string, filePath: string): boolean {
+  const normalizedTaskId = normalizeTaskId(taskId);
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  const bundleManifest = `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`.toLowerCase();
+  const closurePacket = `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`.toLowerCase();
+  if (normalized === bundleManifest || normalized === closurePacket) {
+    return true;
+  }
+  const foreignSnapshotPattern = new RegExp(`^\\.atm/runtime/snapshots/(?:close-window-)?foreign-staged-${normalizedTaskId.toLowerCase()}-\\d+\\.json$`);
+  if (foreignSnapshotPattern.test(normalized)) {
+    return true;
+  }
+  const governanceDirtyPattern = new RegExp(`^\\.atm/runtime/snapshots/close-window-governance-dirty-[^.]+-\\.atm__history__evidence__${normalizedTaskId.toLowerCase()}(?:\\.[^.]+)?\\.json\\.json$`);
+  return governanceDirtyPattern.test(normalized);
+}
+
 function readTrackedDirtyFiles(repoRoot: string): string[] {
   try {
     const output = execFileSync('git', ['diff', '--name-only', 'HEAD'], {
@@ -121,6 +142,14 @@ function readStagedFiles(repoRoot: string): string[] {
   } catch {
     return [];
   }
+}
+
+function listForeignActiveFiles(cwd: string, taskId: string, files: readonly string[]): string[] {
+  const normalizedTaskId = normalizeTaskId(taskId);
+  const foreignLocks = readActiveTaskDirectionLocks(cwd).filter((lock) => lock.taskId !== normalizedTaskId && lock.status === 'active');
+  return uniqueStrings(files.filter((filePath) =>
+    foreignLocks.some((lock) => isPathAllowedByScope(filePath, lock.allowedFiles))
+  ));
 }
 
 function existingBundleFiles(repoRoot: string | null, stageFiles: readonly string[]): string[] {
@@ -182,8 +211,12 @@ function buildUnexpectedNonBundleStagedFiles(input: {
   const reports: UnexpectedNonBundleStagedRepoReport[] = [];
   for (const repo of repos) {
     const expected = new Set(existingBundleFiles(repo.repoRoot, repo.stageFiles));
-    const unexpected = readStagedFiles(repo.repoRoot).filter((file) => {
+    const stagedFiles = readStagedFiles(repo.repoRoot);
+    const deferredForeignFiles = listForeignActiveFiles(input.targetRepoRoot, input.taskId, stagedFiles);
+    const unexpected = stagedFiles.filter((file) => {
       if (expected.has(file)) return false;
+      if (isSameTaskAdvisoryStagedFile(input.taskId, file)) return false;
+      if (deferredForeignFiles.includes(file)) return false;
       const foreignTaskId = extractGovernanceTaskId(file);
       return !foreignTaskId || foreignTaskId === normalizeTaskId(input.taskId);
     });
@@ -192,7 +225,8 @@ function buildUnexpectedNonBundleStagedFiles(input: {
       repoRoot: repo.repoRoot,
       repoKind: repo.repoKind,
       stagedFiles: uniqueStrings(unexpected),
-      restoreCommand: `git -C ${JSON.stringify(repo.repoRoot)} restore --staged -- ${unexpected.map((entry) => JSON.stringify(entry)).join(' ')}`
+      restoreCommand: `git -C ${JSON.stringify(repo.repoRoot)} restore --staged -- ${unexpected.map((entry) => JSON.stringify(entry)).join(' ')}`,
+      deferredForeignFiles
     });
   }
   return reports;
@@ -214,6 +248,28 @@ function buildUnexpectedNonBundleStagedBlocker(
       requiredCommand: entry.restoreCommand
     })),
     requiredCommand: reports[0]?.restoreCommand ?? null
+  };
+}
+
+function buildIncorrectPlanningMirrorBlocker(input: {
+  taskId: string;
+  actorId: string;
+  dirtyGuard: FrameworkCloseDirtyGuardReport;
+}): HistoricalClosePreflightBlocker | null {
+  if (input.dirtyGuard.incorrectPlanningMirrorPreEditFiles.length === 0) return null;
+  return {
+    id: 'incorrectPlanningMirrorPreEdit',
+    code: 'ATM_TASKFLOW_PRECLOSE_PLANNING_MIRROR_PREEDIT_INVALID',
+    summary: 'Planning mirror edits do not match the governed closeback result; incorrect pre-edits remain blockers.',
+    files: input.dirtyGuard.incorrectPlanningMirrorPreEditFiles,
+    remediationChoices: [
+      {
+        id: 'restore-accidental-drift',
+        summary: 'Restore the planning card frontmatter to the active claim state, then rerun taskflow close --dry-run.',
+        requiredCommand: input.dirtyGuard.remediation.requiredCommand
+      }
+    ],
+    requiredCommand: input.dirtyGuard.remediation.requiredCommand
   };
 }
 
@@ -297,22 +353,23 @@ function buildMixedDeliveryBlocker(input: {
 }
 
 function buildStaleEvidenceBlocker(input: {
-  taskId: string;
-  staleEvidence: readonly string[];
-  requiredCommand: string | null;
+  findings: ReadonlyArray<{
+    readonly validator: string;
+    readonly requiredCommand: string | null;
+  }>;
 }): HistoricalClosePreflightBlocker | null {
-  if (input.staleEvidence.length === 0) return null;
+  if (input.findings.length === 0) return null;
   return {
     id: 'staleEvidence',
     code: 'ATM_TASKFLOW_PRECLOSE_STALE_EVIDENCE',
     summary: 'Required validators are absent, stale, or not command-backed in task evidence.',
     files: [],
-    remediationChoices: input.staleEvidence.map((validator) => ({
+    remediationChoices: input.findings.map((finding) => ({
       id: 'refresh-evidence' as const,
-      summary: `Refresh command-backed evidence for ${validator}.`,
-      requiredCommand: input.requiredCommand
+      summary: `Refresh command-backed evidence for ${finding.validator}.`,
+      requiredCommand: finding.requiredCommand
     })),
-    requiredCommand: input.requiredCommand
+    requiredCommand: input.findings[0]?.requiredCommand ?? null
   };
 }
 
@@ -348,6 +405,12 @@ export function extractTaskflowDeclaredFiles(taskDocument: Record<string, unknow
   ]);
 }
 
+function extractTaskflowDeliverableFiles(taskDocument: Record<string, unknown>): string[] {
+  const value = taskDocument.deliverables;
+  if (!Array.isArray(value)) return [];
+  return uniqueStrings(value.filter((entry): entry is string => typeof entry === 'string'));
+}
+
 export function buildHistoricalClosePreflight(input: {
   cwd: string;
   taskId: string;
@@ -359,22 +422,50 @@ export function buildHistoricalClosePreflight(input: {
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
   const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
+  const deliverableFiles = extractTaskflowDeliverableFiles(input.taskDocument);
   const expectedCloseBundleFiles = uniqueStrings([
     ...input.previewCommitBundle.targetRepo.stageFiles,
     ...(input.previewCommitBundle.planningRepo.repoRoot ? input.previewCommitBundle.planningRepo.stageFiles : [])
   ]);
   const trackedDirtyFiles = readTrackedDirtyFiles(input.cwd);
+  const foreignActiveDirtyFiles = listForeignActiveFiles(input.cwd, input.taskId, trackedDirtyFiles);
+  const planningMirrorRelativePath = input.previewCommitBundle.planningRepo.stageFiles[0] ?? null;
+  const planningMirrorDirty = evaluatePlanningMirrorDirtyFiles({
+    planningRepoRoot: input.previewCommitBundle.planningRepo.repoRoot,
+    planningMirrorRelativePath,
+    trackedDirtyFiles: input.previewCommitBundle.planningRepo.repoRoot
+      ? readTrackedDirtyFiles(input.previewCommitBundle.planningRepo.repoRoot)
+      : [],
+    actorId: input.actorId,
+    historicalDeliveryRef: input.historicalDeliveryRefs[0] ?? null
+  });
+  const historicalDeliveredFiles = uniqueStrings(
+    input.historicalDeliveryRefs.flatMap((ref) => inspectHistoricalDelivery({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      requestedRef: ref,
+      declaredFiles,
+      enforceDeclaredScope: true,
+      waiverOutOfScopeDelivery: false,
+      waiverReason: null
+    }).deliverableFiles)
+  );
   const dirtyGuard = evaluateFrameworkCloseDirtyGuard({
     cwd: input.cwd,
     taskId: input.taskId,
     taskDeclaredFiles: declaredFiles,
+    taskDeliverableFiles: deliverableFiles,
     trackedDirtyFiles,
+    historicalDeliveredFiles,
     allowedAdvisoryGovernanceFiles: uniqueStrings([
       ...expectedCloseBundleFiles.filter((filePath) => filePath.startsWith('.atm/')),
       ...(input.historicalDeliveryRefs.length > 0
         ? [`.atm/history/evidence/${input.taskId}.json`]
         : [])
-    ])
+    ]),
+    allowedAdvisoryDirtyFiles: foreignActiveDirtyFiles,
+    correctPlanningMirrorPreEditFiles: planningMirrorDirty.correctPlanningMirrorPreEditFiles,
+    incorrectPlanningMirrorPreEditFiles: planningMirrorDirty.incorrectPlanningMirrorPreEditFiles
   });
   const unexpectedStagedTasks = buildUnexpectedStagedTasks({
     taskId: input.taskId,
@@ -409,11 +500,10 @@ export function buildHistoricalClosePreflight(input: {
       .filter((entry) => entry.category === 'stale' || entry.category === 'absent' || entry.category === 'failed-run' || entry.category === 'diagnostic-only')
       .map((entry) => entry.validator)
     : [];
-  const staleRequiredCommand = missingReport?.blockingFindings[0]?.requiredCommand ?? null;
 
   const operationalBlockers = [
     buildScopeDirtyBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
-    buildUnexpectedStagedBlocker(unexpectedStagedTasks),
+    buildIncorrectPlanningMirrorBlocker({ taskId: input.taskId, actorId: input.actorId, dirtyGuard }),
     buildUnexpectedNonBundleStagedBlocker(unexpectedNonBundleStaged),
     buildMixedDeliveryBlocker({
       taskId: input.taskId,
@@ -425,16 +515,16 @@ export function buildHistoricalClosePreflight(input: {
     })
   ].filter((entry): entry is HistoricalClosePreflightBlocker => entry !== null);
   const staleBlocker = buildStaleEvidenceBlocker({
-    taskId: input.taskId,
-    staleEvidence,
-    requiredCommand: staleRequiredCommand
+    findings: missingReport?.blockingFindings.filter((entry) =>
+      entry.category === 'stale' || entry.category === 'absent' || entry.category === 'failed-run' || entry.category === 'diagnostic-only'
+    ) ?? []
   });
   const blockers = staleBlocker ? [...operationalBlockers, staleBlocker] : operationalBlockers;
 
   return {
     schemaId: 'atm.historicalClosePreflight.v1',
     taskId: input.taskId,
-    ok: blockers.length === 0,
+    ok: blockers.length === 0 && dirtyGuard.ok,
     blockers,
     operationalBlockers,
     scopeTrackedDirtyFiles: dirtyGuard.scopeTrackedDirtyFiles,

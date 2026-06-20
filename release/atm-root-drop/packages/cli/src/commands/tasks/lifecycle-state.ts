@@ -73,10 +73,17 @@ export function evaluateTaskClaimAdmission(input: {
   readonly actorId: string;
   readonly status: unknown;
   readonly claimIntent: TaskClaimIntent;
+  readonly currentClaimActorId?: string | null;
+  readonly currentClaimState?: string | null;
 }): TaskLifecycleAdmission {
   const status = normalizeTaskLifecycleStatus(input.status);
   if (status === 'ready') {
     return { ok: true, reason: 'ready-claim' };
+  }
+  if (status === 'running'
+    && input.currentClaimState === 'active'
+    && input.currentClaimActorId === input.actorId) {
+    return { ok: true, reason: 'running-same-actor-reclaim' };
   }
   if (status === 'review' && input.claimIntent === 'closeout-only') {
     return { ok: true, reason: 'review-closeout-only-reclaim' };
@@ -129,7 +136,22 @@ export function evaluateTaskDoneCloseAdmission(input: {
       'blocked'
     ]);
     if (allowedHistoricalStatuses.has(status)) {
-      return { ok: true, reason: `${status}-to-done-historical-closeback` };
+      if (input.claimState === 'active' && input.claimActorId === input.actorId) {
+        return { ok: true, reason: `${status}-to-done-historical-closeback` };
+      }
+      if (input.claimState !== 'active') {
+        return { ok: true, reason: `${status}-to-done-historical-closeback-unclaimed` };
+      }
+      return {
+        ok: false,
+        code: 'ATM_TASK_CLOSE_ACTIVE_CLAIM_REQUIRED',
+        message: `Task ${input.taskId} cannot be closed as done while active claim is owned by ${input.claimActorId ?? 'another actor'}, even when historical delivery is supplied.`,
+        details: {
+          taskId: input.taskId,
+          actorId: input.actorId,
+          requiredCommand: `node atm.mjs next --claim --actor ${input.actorId} --prompt "${input.taskId}" --json`
+        }
+      };
     }
   }
   if (status === 'planned') {

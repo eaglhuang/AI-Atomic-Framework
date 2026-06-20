@@ -1,49 +1,67 @@
 import path from 'node:path';
-import { findActorByResolvedId, readRuntimeIdentityDefault, sanitizeActorKind, upsertActorRecord, writeRuntimeIdentityDefault } from './actor-registry.js';
+import { findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.js';
 import { listActorWorkSessions, resolveActorWorkSession } from './actor-session.js';
 import { CliError, makeResult, message } from './shared.js';
 export async function runIdentity(argv) {
     const options = parseIdentityOptions(argv);
     if (options.action === 'show') {
-        const current = readRuntimeIdentityDefault(options.cwd);
+        const current = options.actorId
+            ? readRuntimeIdentityForActor(options.cwd, options.actorId)
+            : readRuntimeIdentityDefault(options.cwd);
         const session = current?.activeSessionId ? resolveActorWorkSession(options.cwd, { sessionId: current.activeSessionId, includeNonActive: true }) : null;
         return makeResult({
             ok: true,
             command: 'identity',
             cwd: options.cwd,
             messages: [message('info', 'ATM_IDENTITY_SHOW', current
-                    ? `Loaded repo default identity for ${current.actorId}.`
-                    : 'No repo default identity is configured yet.')],
+                    ? options.actorId
+                        ? `Loaded actor identity for ${current.actorId}.`
+                        : `Loaded repo default identity for ${current.actorId}.`
+                    : options.actorId
+                        ? `No actor identity is configured yet for ${options.actorId}.`
+                        : 'No repo default identity is configured yet.')],
             evidence: {
                 identity: current,
+                identityPath: current
+                    ? options.actorId
+                        ? runtimeIdentityActorRelativePath(options.actorId)
+                        : runtimeIdentityRelativePath
+                    : null,
                 activeSession: session,
                 recentSessions: listActorWorkSessions(options.cwd).slice(0, 5)
             }
         });
     }
-    if (!options.actorId) {
-        throw new CliError('ATM_CLI_USAGE', 'identity set requires --actor <actor-id>.', { exitCode: 2 });
+    const existingDefault = readRuntimeIdentityDefault(options.cwd);
+    const effectiveActorId = options.actorId ?? existingDefault?.actorId ?? null;
+    if (!effectiveActorId) {
+        throw new CliError('ATM_CLI_USAGE', 'identity set requires --actor <actor-id> or an existing repo default identity.', { exitCode: 2 });
     }
-    const existingActor = findActorByResolvedId(options.cwd, { actorId: options.actorId, source: 'option' });
+    const existingActor = findActorByResolvedId(options.cwd, { actorId: effectiveActorId, source: 'option' });
     const nowIso = new Date().toISOString();
+    const existingIdentity = options.actorId
+        ? readRuntimeIdentityForActor(options.cwd, effectiveActorId)
+        : existingDefault;
     const document = {
         schemaId: 'atm.identityDefault.v1',
         specVersion: '0.1.0',
-        actorId: options.actorId,
-        gitName: options.gitName ?? existingActor?.gitName ?? null,
-        gitEmail: options.gitEmail ?? existingActor?.gitEmail ?? null,
-        editor: options.editor ?? existingActor?.editor ?? null,
-        provider: options.provider ?? existingActor?.provider ?? null,
-        activeSessionId: options.activeSessionId ?? readRuntimeIdentityDefault(options.cwd)?.activeSessionId ?? null,
+        actorId: effectiveActorId,
+        gitName: options.gitName ?? existingIdentity?.gitName ?? existingActor?.gitName ?? null,
+        gitEmail: options.gitEmail ?? existingIdentity?.gitEmail ?? existingActor?.gitEmail ?? null,
+        editor: options.editor ?? existingIdentity?.editor ?? existingActor?.editor ?? null,
+        provider: options.provider ?? existingIdentity?.provider ?? existingActor?.provider ?? null,
+        activeSessionId: options.activeSessionId ?? existingIdentity?.activeSessionId ?? null,
         updatedAt: nowIso
     };
-    const identityPath = writeRuntimeIdentityDefault(options.cwd, document);
+    const identityPath = options.actorId
+        ? writeRuntimeIdentityForActor(options.cwd, effectiveActorId, document)
+        : writeRuntimeIdentityDefault(options.cwd, document);
     let registryPath = null;
     const actorKind = sanitizeActorKind(options.actorKind) ?? existingActor?.actorKind ?? null;
     const displayName = options.displayName ?? existingActor?.displayName ?? null;
     if (actorKind && displayName) {
         registryPath = upsertActorRecord(options.cwd, {
-            actorId: options.actorId,
+            actorId: effectiveActorId,
             actorKind,
             displayName,
             provider: options.provider ?? existingActor?.provider ?? undefined,
@@ -58,8 +76,11 @@ export async function runIdentity(argv) {
         ok: true,
         command: 'identity',
         cwd: options.cwd,
-        messages: [message('info', 'ATM_IDENTITY_SET', `Repo default identity set to ${options.actorId}.`, {
-                actorId: options.actorId,
+        messages: [message('info', 'ATM_IDENTITY_SET', options.actorId
+                ? `Actor identity set to ${effectiveActorId}.`
+                : `Repo default identity set to ${effectiveActorId}.`, {
+                actorId: effectiveActorId,
+                actorScoped: Boolean(options.actorId),
                 registryUpdated: Boolean(registryPath)
             })],
         evidence: {

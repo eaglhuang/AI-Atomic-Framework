@@ -7,6 +7,7 @@ export function loadRegistry(filePath) {
             specVersion: '0.1.0',
             repoId: 'local-repo',
             workspaceId: 'main',
+            currentEpoch: Date.now(),
             activeIntents: []
         };
     }
@@ -20,6 +21,7 @@ export function loadRegistry(filePath) {
             specVersion: '0.1.0',
             repoId: 'local-repo',
             workspaceId: 'main',
+            currentEpoch: Date.now(),
             activeIntents: []
         };
     }
@@ -70,6 +72,7 @@ export function registerIntent(doc, intent, lane, ttlSeconds = 1800) {
     };
     return {
         ...doc,
+        currentEpoch: Date.now(),
         activeIntents: [...cleanedIntents, newActive]
     };
 }
@@ -83,6 +86,7 @@ export function renewIntentLease(doc, taskId, actorId, ttlSeconds = 1800) {
     const expiresAt = new Date(Date.now() + leaseSeconds * 1000).toISOString();
     return {
         ...doc,
+        currentEpoch: Date.now(),
         activeIntents: doc.activeIntents.map((intent) => {
             if (intent.intentId !== target.intentId)
                 return intent;
@@ -99,6 +103,7 @@ export function renewIntentLease(doc, taskId, actorId, ttlSeconds = 1800) {
 export function releaseTask(doc, taskId) {
     return {
         ...doc,
+        currentEpoch: Date.now(),
         activeIntents: doc.activeIntents.filter((entry) => entry.taskId !== taskId)
     };
 }
@@ -112,6 +117,7 @@ export function cleanupStale(doc) {
     });
     return {
         ...doc,
+        currentEpoch: now,
         activeIntents: validIntents
     };
 }

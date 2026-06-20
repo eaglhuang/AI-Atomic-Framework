@@ -58,6 +58,7 @@ import reviewSpec from './command-specs/review.spec.js';
 import agentPackSpec from './command-specs/agent-pack.spec.js';
 import reviewAdvisorySpec from './command-specs/review-advisory.spec.js';
 import taskflowSpec from './command-specs/taskflow.spec.js';
+import taskViewSpec from './command-specs/task-view.spec.js';
 import brokerSpec from './command-specs/broker.spec.js';
 import routeSpec from './command-specs/route.spec.js';
 function withVisibility(spec, visibility = 'public') {
@@ -126,7 +127,8 @@ export const commandSpecs = Object.freeze({
     validate: validateSpec,
     welcome: welcomeSpec,
     verify: verifySpec,
-    taskflow: withVisibility(taskflowSpec, 'internal'),
+    taskflow: taskflowSpec,
+    'task-view': taskViewSpec,
     broker: brokerSpec,
     route: routeSpec,
 });

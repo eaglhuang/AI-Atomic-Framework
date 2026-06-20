@@ -44,7 +44,7 @@ export function decideGuidanceRoute(input) {
         });
     }
     if (evidence.legacyRoutePlan) {
-        return decideLegacyRoute(input.orientation, evidence.legacyRoutePlan);
+        return decideLegacyRoute(input.orientation, evidence.legacyRoutePlan, goal, evidence.touchedSymbols ?? []);
     }
     if ((evidence.demandPoliceFindings?.length ?? 0) > 0 || /split|decompos|拆|拆分/.test(lowerGoal)) {
         return buildDecision({
@@ -99,14 +99,14 @@ export function decideGuidanceRoute(input) {
         ]
     });
 }
-function decideLegacyRoute(orientation, plan) {
+function decideLegacyRoute(orientation, plan, goal = '', touchedSymbols = []) {
     const safeSegments = plan.segments.filter((segment) => plan.safeFirstAtoms.includes(segment.symbolName));
-    const preferredSegment = choosePreferredSafeSegment(safeSegments);
+    const preferred = choosePreferredSafeSegment(safeSegments, { goal, touchedSymbols });
     const trunkBlockers = plan.trunkFunctions.filter((symbolName) => plan.releaseBlockers.includes(symbolName));
     const reasons = trunkBlockers.length > 0
         ? [`Legacy route plan marks trunk release blocker(s): ${trunkBlockers.join(', ')}. Direct trunk mutation is blocked; proceed leaf-first.`]
         : ['Legacy route plan is available; proceed with dry-run proposal evidence before mutation.'];
-    if (!preferredSegment) {
+    if (!preferred) {
         return buildDecision({
             route: 'split',
             confidence: 0.78,
@@ -116,22 +116,87 @@ function decideLegacyRoute(orientation, plan) {
             nextCommand: 'node atm.mjs upgrade --propose --behavior behavior.split --dry-run --json'
         });
     }
+    const preferredSegment = preferred.segment;
     const route = behaviorToRoute(preferredSegment.recommendedBehavior);
+    const routeChoice = buildRouteChoice(route, preferred);
     return buildDecision({
         route,
         confidence: route === 'split' ? 0.9 : 0.86,
-        reasons: [...reasons, `Selected safe leaf ${preferredSegment.symbolName} for ${preferredSegment.recommendedBehavior} dry-run proposal.`],
+        reasons: [...reasons, routeChoice.reason],
         requiredEvidence: ['LegacyRoutePlan', `${preferredSegment.recommendedBehavior} dry-run proposal`, 'human review before apply'],
         blockedBy: orientation.releaseBlockers,
         nextCommand: `node atm.mjs upgrade --propose --behavior behavior.${preferredSegment.recommendedBehavior} --dry-run --json`,
-        routeChoices: [{ route, reason: `safe leaf ${preferredSegment.symbolName}` }]
+        routeChoices: [routeChoice]
     });
 }
-function choosePreferredSafeSegment(segments) {
-    return segments.find((segment) => segment.recommendedBehavior === 'split')
-        ?? segments.find((segment) => segment.recommendedBehavior === 'infect')
-        ?? segments.find((segment) => segment.recommendedBehavior === 'atomize')
-        ?? null;
+function choosePreferredSafeSegment(segments, context) {
+    const ranked = segments.map((segment, index) => rankSegment(segment, context, index));
+    ranked.sort((left, right) => right.goalAlignment.score - left.goalAlignment.score
+        || behaviorPriority(right.segment.recommendedBehavior) - behaviorPriority(left.segment.recommendedBehavior)
+        || left.index - right.index);
+    const selected = ranked[0];
+    if (!selected) {
+        return null;
+    }
+    return {
+        segment: selected.segment,
+        goalAlignment: selected.goalAlignment,
+        overrideReason: selected.overrideReason
+    };
+}
+function rankSegment(segment, context, index) {
+    const matchedTerms = matchSymbolTerms(context.goal, segment.symbolName);
+    const touched = context.touchedSymbols.some((symbolName) => symbolName === segment.symbolName);
+    const score = matchedTerms.length > 0 ? 100 : touched ? 75 : 0;
+    return {
+        segment,
+        index,
+        goalAlignment: {
+            symbolName: segment.symbolName,
+            matchedTerms,
+            score
+        },
+        overrideReason: score > 0
+            ? `Selected ${segment.symbolName} because it matched the guidance goal or touched-symbol evidence before generic helper fallback.`
+            : undefined
+    };
+}
+function matchSymbolTerms(goal, symbolName) {
+    if (!goal.trim()) {
+        return [];
+    }
+    const normalizedGoal = goal.toLowerCase();
+    const symbolTerms = Array.from(new Set([
+        symbolName,
+        symbolName.replace(/_/g, ' '),
+        symbolName.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    ].map((term) => term.toLowerCase()).filter(Boolean)));
+    return symbolTerms.filter((term) => normalizedGoal.includes(term));
+}
+function behaviorPriority(behavior) {
+    switch (behavior) {
+        case 'split': return 3;
+        case 'infect': return 2;
+        case 'atomize': return 1;
+        default: return 0;
+    }
+}
+function buildRouteChoice(route, ranked) {
+    const baseReason = `Selected safe leaf ${ranked.segment.symbolName} for ${ranked.segment.recommendedBehavior} dry-run proposal.`;
+    if (ranked.goalAlignment.score > 0) {
+        return {
+            route,
+            reason: `${baseReason} ${ranked.overrideReason}`,
+            goalAlignment: ranked.goalAlignment,
+            overrideReason: ranked.overrideReason
+        };
+    }
+    return {
+        route,
+        reason: `${baseReason} No explicit semantic symbol matched, so ATM used the safe helper fallback order.`,
+        goalAlignment: ranked.goalAlignment,
+        overrideReason: 'No explicit goal-aligned or touched semantic leaf was available; helper fallback order applied.'
+    };
 }
 function behaviorToRoute(behavior) {
     switch (behavior) {

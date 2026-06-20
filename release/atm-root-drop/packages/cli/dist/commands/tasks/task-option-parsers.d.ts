@@ -36,6 +36,7 @@ export declare function parseScopeAddOptions(argv: string[]): {
     taskId: string;
     reason: string | null;
     actorId: string | null;
+    claimFirst: boolean;
     emergencyApproval: string | null;
     addPaths: string[];
     /** 修改類型：doc-sync | help-snapshot-sync | test-alignment | generated-artifact | linked-surface */
@@ -132,4 +133,6 @@ export declare function parseClaimLifecycleOptions(action: 'claim' | 'renew' | '
     reason: string | null;
     reservedOk: boolean;
     claimIntent: "write" | "closeout-only";
+    autoIntent: boolean;
+    claimIntentExplicit: boolean;
 };

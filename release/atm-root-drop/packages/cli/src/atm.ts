@@ -59,6 +59,7 @@ import { runDaemon } from './commands/daemon.ts';
 import { runCache } from './commands/cache.ts';
 import { runHealthReport } from './commands/health-report.ts';
 import { runTaskflow } from './commands/taskflow.ts';
+import { runTaskView } from './commands/task-view.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
@@ -128,6 +129,7 @@ export const cliCommandRunners: Record<string, (argv: any) => any> = {
   'health-report': runHealthReport,
   identity: runIdentity,
   taskflow: runTaskflow,
+  'task-view': runTaskView,
   broker: runBroker,
   route: runRoute
 };

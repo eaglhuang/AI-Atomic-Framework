@@ -30,6 +30,7 @@ interface ImportedTaskSummary {
     readonly targetAllowedFiles: readonly string[];
     readonly closureAuthority: string | null;
     readonly activeClaimActorId: string | null;
+    readonly activeClaimIntent: string | null;
     readonly matchScore?: number;
     readonly matchReasons?: readonly string[];
 }
@@ -45,6 +46,13 @@ interface ImportedTaskQueue {
         readonly detail: string;
         readonly siblingRepoDirs: readonly string[];
     }[];
+    readonly planningRootMissing?: {
+        readonly code: 'ATM_PLANNING_ROOT_MISSING';
+        readonly detail: string;
+        readonly suggestedEnv: string;
+        readonly suggestedConfig: Record<string, unknown>;
+        readonly requiredCommand: string;
+    } | null;
 }
 declare function isFrameworkMaintenancePrompt(prompt: string): boolean;
 declare function isExplicitSingleTaskRoute(promptScope: PromptScopedTaskRoute | null, taskIntent: TaskIntent | null): boolean;

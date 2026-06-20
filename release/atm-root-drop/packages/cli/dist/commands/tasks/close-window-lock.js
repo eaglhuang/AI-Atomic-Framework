@@ -110,6 +110,19 @@ function deferForeignStagedFiles(cwd, unexpectedStagedTasks) {
     });
     return snapshotPath;
 }
+function cleanupForeignStagedSnapshot(cwd, snapshotPath) {
+    if (!snapshotPath)
+        return;
+    const absolutePath = path.join(cwd, snapshotPath);
+    if (!existsSync(absolutePath))
+        return;
+    try {
+        unlinkSync(absolutePath);
+    }
+    catch {
+        // best-effort runtime residue cleanup
+    }
+}
 export function acquireCloseWindowStagedIndexLock(input) {
     const lockPath = closeWindowStagedIndexLockPath(input.cwd);
     const existing = readCloseWindowStagedIndexLock(input.cwd);
@@ -195,6 +208,7 @@ export function releaseCloseWindowStagedIndexLock(input) {
         return null;
     if (existing.taskId !== normalizeTaskId(input.taskId))
         return existing;
+    cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
     const released = {
         ...existing,
         status: 'released',

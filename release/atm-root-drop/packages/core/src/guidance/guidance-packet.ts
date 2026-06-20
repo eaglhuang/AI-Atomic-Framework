@@ -89,6 +89,12 @@ export interface LegacyHotspotConfig {
 export interface RouteChoice {
   readonly route: GuidanceRoute;
   readonly reason: string;
+  readonly goalAlignment?: {
+    readonly symbolName: string;
+    readonly matchedTerms: readonly string[];
+    readonly score: number;
+  };
+  readonly overrideReason?: string;
 }
 
 export interface RouteDecision {

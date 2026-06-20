@@ -84,6 +84,18 @@ function sandboxEpermHint(args: any, cwd: any) {
   ].join(' ');
 }
 
+function safeRmSync(targetPath: string) {
+  try {
+    rmSync(targetPath, { recursive: true, force: true });
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException | undefined)?.code;
+    if (code !== 'EPERM' && code !== 'EBUSY') {
+      throw error;
+    }
+    console.warn(`[cli:${mode}] warning: cleanup skipped for ${targetPath} (${code})`);
+  }
+}
+
 async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
   return runAtmInProcess(args, cwd, env);
 }
@@ -302,6 +314,13 @@ assert(taskflowUsageText.includes('Official operator lane'), 'taskflow --help mu
 assert(taskflowUsageText.includes('writeReadinessHint'), 'taskflow --help must reference the writeReadinessHint surface for dry-run --write readiness');
 assert(taskflowUsageText.includes('low-level template generator surface'), 'taskflow --help must label tasks new as a low-level template generator surface');
 assert(taskflowUsageText.includes('runtime synchronization surface'), 'taskflow --help must label tasks import as a runtime synchronization (backend) surface');
+
+const teamHelp = await runAtm(['team', '--help'], root);
+const teamUsageText = JSON.stringify(teamHelp.parsed.evidence?.usage ?? {});
+assert(teamUsageText.includes('knowledge'), 'team --help must list the team knowledge action');
+assert(teamUsageText.includes('team knowledge build'), 'team --help examples must show team knowledge build usage');
+assert(teamUsageText.includes('team knowledge query'), 'team --help examples must show team knowledge query usage');
+assert(teamUsageText.includes('--dry-run'), 'team --help must document advisory knowledge dry-run');
 
 const lifecycleStateTest = spawnSync(
   process.execPath,
@@ -1376,6 +1395,23 @@ try {
     assert(secondRecord.details.validationPasses.includes('typecheck'), 'must include typecheck');
     assert(!secondRecord.details.validationPasses.includes('validate:cli'), 'must not include validate:cli if custom validators provided');
 
+    const importedTaskPath = path.join(autoLinkTempWorkspace, '.atm/history/tasks/TASK-AAO-0063.json');
+    const importedTask = JSON.parse(readFileSync(importedTaskPath, 'utf8'));
+    importedTask.validators = [...(Array.isArray(importedTask.validators) ? importedTask.validators : []), 'node --version'];
+    writeJson(importedTaskPath, importedTask);
+
+    const runRes = await runAtm([
+      'evidence', 'run',
+      '--task', 'TASK-AAO-0063',
+      '--actor', 'Antigravity',
+      '--command', 'node --version'
+    ], autoLinkTempWorkspace);
+    assert(runRes.parsed.ok === true, 'evidence run without --validators must auto-link task-declared command validators');
+
+    const evidenceContentAfterRun = JSON.parse(readFileSync(evidenceJsonPath, 'utf8'));
+    const thirdRecord = evidenceContentAfterRun.evidence[2];
+    assert(thirdRecord.details.validationPasses.includes('node --version'), 'task-declared literal command validator must auto-link');
+
     // 2.3: --output-json file writer flag tests
     const outputJsonTestPath = path.join(autoLinkTempWorkspace, 'output-test.json');
     const statusRes = await runAtmSpawned(['tasks', 'queue', 'status', '--output-json', outputJsonTestPath], autoLinkTempWorkspace);
@@ -1915,10 +1951,10 @@ try {
     assert(closeSuccessRes.exitCode === 0, 'closing task with valid evidence and session must succeed');
     assert(closeSuccessRes.parsed.ok === true, 'must report ok = true');
   } finally {
-    rmSync(closeGateWorkspace, { recursive: true, force: true });
+    safeRmSync(closeGateWorkspace);
   }
 } finally {
-  rmSync(tempRoot, { recursive: true, force: true });
+  safeRmSync(tempRoot);
 }
 
 if (!process.exitCode) {

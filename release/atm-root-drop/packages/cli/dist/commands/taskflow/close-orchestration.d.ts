@@ -53,6 +53,8 @@ export interface TaskflowClosebackPlan {
         matchedFiles: string[];
         reason: string | null;
     };
+    waiverOutOfScopeDelivery: boolean;
+    waiverReason: string | null;
     evidenceValidators: string[];
     residue: Pick<TaskResidueClassification, 'bucket' | 'truth' | 'residue' | 'reason' | 'nextCommand'>;
     /** 該任務已記錄的範圍增修歷史（依時間順序），收口摘要中可見。 */
@@ -156,6 +158,7 @@ export interface CloseWriteRollbackSnapshot {
         readonly previousContent: string;
     } | null;
     readonly stagedArtifacts: readonly string[];
+    readonly preCloseStagedFiles: readonly string[];
 }
 export interface CloseWriteTransactionReport {
     readonly schemaId: 'atm.closeWriteTransaction.v1';
@@ -177,6 +180,7 @@ export declare function buildCloseWriteRollbackSnapshot(input: {
     planningCard: CloseWriteRollbackSnapshot['planningCard'];
     extraStagedArtifacts?: readonly string[];
     closeWindowStagedIndexLockActive?: boolean;
+    preCloseStagedFiles?: readonly string[];
 }): CloseWriteRollbackSnapshot;
 export declare function rollbackCloseWriteTransaction(input: {
     cwd: string;
@@ -199,6 +203,39 @@ export declare function executeCloseWriteCommitPhase<TBundle extends {
     bundle: TBundle;
     transaction: CloseWriteTransactionReport;
 }>;
+export declare const TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID = "atm.taskCloseCompletionChecklist.v1";
+export type TaskCloseCompletionChecklistFieldId = 'ledger-done' | 'target-governance-committed' | 'planning-mirror-committed' | 'lifecycle-events-recorded' | 'delivery-sha' | 'waiver-reason';
+export interface TaskCloseCompletionChecklistField {
+    readonly id: TaskCloseCompletionChecklistFieldId;
+    readonly ok: boolean;
+    readonly value: string | null;
+    readonly detail: string | null;
+}
+export interface TaskCloseCompletionChecklist {
+    readonly schemaId: typeof TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID;
+    readonly taskId: string;
+    readonly partialClose: boolean;
+    readonly summary: string;
+    readonly fields: readonly TaskCloseCompletionChecklistField[];
+}
+export declare function buildCloseCompletionChecklist(input: {
+    cwd: string;
+    taskId: string;
+    taskDocument: Record<string, unknown>;
+    triangulation: {
+        liveLedger: {
+            status: string | null;
+        };
+        planningFrontmatter: {
+            status: string | null;
+            source: string | null;
+        };
+        lastTransitionEvent: {
+            action: string | null;
+            createdAt: string | null;
+        } | null;
+    };
+}): TaskCloseCompletionChecklist;
 export { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestRelativePath, evidenceBundleManifestPathForTask, readEvidenceBundleManifest, type EvidenceBundleManifest };
 export { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory, type DirectoryDeliverableExpansion, type DirectoryDeliverableManifestEntry };
 export declare function listOptionalEvidenceBundleGovernanceArtifacts(cwd: string, taskId: string): readonly string[];

@@ -11,6 +11,7 @@ export interface TeamBrokerLaneEvidence {
     readonly actorId: string;
     readonly registryPath: string;
     readonly writeIntent: WriteIntent;
+    readonly writeTransaction: TeamBrokerWriteTransactionEvidence;
     readonly decision: BrokerDecision;
     readonly virtualAtomInUseRegistry: VirtualAtomInUseRegistryDocument;
     readonly chosenLane: TeamBrokerChosenLane;
@@ -22,6 +23,32 @@ export interface TeamBrokerLaneEvidence {
 export interface TeamBrokerLaneResult {
     readonly ok: boolean;
     readonly evidence: TeamBrokerLaneEvidence;
+}
+export interface TeamBrokerWriteTransactionEvidence {
+    readonly schemaId: 'atm.teamBrokerWriteTransaction.v1';
+    readonly transactionId: string;
+    readonly taskId: string;
+    readonly principalId: string;
+    readonly actorId: string;
+    readonly sessionId: string | null;
+    readonly instanceId: string;
+    readonly worktreeId: string;
+    readonly branchRef: string | null;
+    readonly baseHead: string;
+    readonly leaseEpoch: number;
+    readonly allowedFiles: readonly string[];
+    readonly readSet: readonly string[];
+    readonly writeSet: readonly string[];
+    readonly fileHashesBefore: Record<string, string | null>;
+    readonly brokerDecision: {
+        readonly verdict: BrokerDecision['verdict'];
+        readonly lane: BrokerDecision['lane'];
+        readonly intentId: string;
+        readonly parallelSafetyReason: 'no-known-textual-or-resource-conflict' | null;
+    };
+    readonly startedAt: string;
+    readonly expiresAt: string;
+    readonly heartbeatAt: string;
 }
 export interface TeamBrokerRuntimeActivationHandshakeEvidence {
     readonly schemaId: 'atm.teamBrokerRuntimeActivationHandshake.v1';
@@ -63,6 +90,8 @@ export interface BrokerRunRecordInput {
     readonly mergeVerdict: MergeVerdict;
     readonly evidencePath: string;
     readonly appliedFiles?: readonly string[];
+    readonly commitSha?: string | null;
+    readonly transactionIds?: readonly string[];
 }
 export declare function buildTeamBrokerRunRecord(input: BrokerRunRecordInput): BrokerOperationRunRecord;
 export declare function buildTeamBrokerRunRecordEnvelope(input: {
@@ -93,6 +122,14 @@ export declare function evaluateTeamBrokerLane(input: {
     readonly registryPath?: string;
 }): TeamBrokerLaneResult;
 export declare function buildTeamBrokerEvidence(result: TeamBrokerLaneResult): TeamBrokerLaneEvidence;
+export declare function buildTeamBrokerWriteTransactionEvidence(input: {
+    readonly cwd: string;
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly writeIntent: WriteIntent;
+    readonly decision: BrokerDecision;
+    readonly writePaths: readonly string[];
+}): TeamBrokerWriteTransactionEvidence;
 export declare function buildTeamBrokerRuntimeActivationHandshake(input: {
     readonly cwd: string;
     readonly taskId: string;

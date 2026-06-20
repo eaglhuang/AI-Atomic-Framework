@@ -11,4 +11,6 @@ export * from './team-lane.js';
 export * from './lifecycle.js';
 export * from './orphan-cleanup.js';
 export * from './recovery.js';
+export * from './freeze.js';
+export * from './patch-envelope.js';
 export * from './adapters/index.js';

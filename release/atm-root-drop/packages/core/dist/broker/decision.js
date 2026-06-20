@@ -4,7 +4,9 @@ import { intersectRanges, normalizeLineRange, rangesOverlap } from './agr.js';
 export function calculateBrokerDecision(newIntent, registry) {
     const conflicts = [];
     const taskId = newIntent.taskId;
-    const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents);
+    const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents, {
+        currentEpoch: registry.currentEpoch
+    });
     if (conflictMatrix.arbitrationVerdict === 'takeover') {
         return {
             schemaId: 'atm.brokerDecision.v1',
