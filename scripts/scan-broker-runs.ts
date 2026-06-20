@@ -80,12 +80,13 @@ function parseLogFile(logFile: string | boolean | undefined): string {
   if (envLogFile) {
     return path.resolve(envLogFile);
   }
+  // Fallback to a UTF-8-friendly default path that is stable across shells.
   return path.resolve(
     process.env.USERPROFILE ?? process.env.HOME ?? process.cwd(),
     '3KLife',
     'docs',
     'ai_atomic_framework',
-    'CID衝突解決紀錄log.md'
+    'CID-Conflict-Run-Log.md'
   );
 }
 
