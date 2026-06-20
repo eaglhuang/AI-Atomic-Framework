@@ -1,0 +1,114 @@
+{
+  "schema": "chinese-mojibake-cleaner.repo-training-material-plan.v1",
+  "goal": "Train fastest on this repo's Chinese Markdown, task cards, governance notes, and Chinese code comments.",
+  "batchDesign": {
+    "recommendedBatchSize": 24,
+    "caseMix": [
+      {
+        "sourceType": "markdown-task-card",
+        "count": 6,
+        "why": "Highest human-facing value; contains task IDs, status words, validation notes, and mixed inline code."
+      },
+      {
+        "sourceType": "markdown-governance-note",
+        "count": 5,
+        "why": "Covers ATM policy language and repo-specific Traditional Chinese terms."
+      },
+      {
+        "sourceType": "typescript-comment",
+        "count": 5,
+        "why": "Protects syntax, string literals, template strings, and nearby Chinese diagnostics."
+      },
+      {
+        "sourceType": "json-note",
+        "count": 4,
+        "why": "Covers structured artifacts where keys and punctuation must survive."
+      },
+      {
+        "sourceType": "handoff-or-learning-log",
+        "count": 4,
+        "why": "Covers the exact documents most likely to be generated, corrupted, and reread by agents."
+      }
+    ],
+    "corruptionModesPerCase": ["latin1", "cp1252", "cp1252_double", "mixed-code-prose"],
+    "labelsPerCase": [
+      "exactExpected",
+      "readableExpected",
+      "protectedTokens",
+      "repoTermsExpected",
+      "unrecoverableSpans"
+    ]
+  },
+  "sourceSelectors": [
+    {
+      "id": "task-card-lifecycle",
+      "includePatterns": ["TASK-RFT-", "TASK-AAO-", "preflight", "close", "開工", "收尾", "綠燈"],
+      "targetFiles": ["docs/**/*.md", ".agents/**/*.md"],
+      "minimumProtectedTokens": 2
+    },
+    {
+      "id": "taskflow-governance",
+      "includePatterns": ["taskflow", "close-gate", "foreign-staged", "owner", "fallback-owner"],
+      "targetFiles": ["docs/**/*.md", "packages/**/*.ts", "scripts/**/*.ts"],
+      "minimumProtectedTokens": 3
+    },
+    {
+      "id": "atom-map-refactor",
+      "includePatterns": ["atom", "map", "拆分", "fixtures", "inject", "assertions"],
+      "targetFiles": ["docs/**/*.md", "packages/**/*.ts", ".agents/**/*.md"],
+      "minimumProtectedTokens": 2
+    },
+    {
+      "id": "structured-governance-json",
+      "includePatterns": ["owner", "status", "evidence", "task", "trace", "severity"],
+      "targetFiles": [".atm/**/*.json", "docs/**/*.json", "atomic_workbench/**/*.json"],
+      "minimumProtectedTokens": 4
+    }
+  ],
+  "goldenCaseShape": {
+    "id": "repo-case-YYYYMMDD-NNN",
+    "sourcePath": "relative/path/from/repo/root",
+    "sourceType": "markdown-task-card",
+    "cleanText": "",
+    "corruptions": {
+      "latin1": "",
+      "cp1252": "",
+      "cp1252_double": "",
+      "mixed-code-prose": ""
+    },
+    "exactExpected": "",
+    "readableExpected": "",
+    "protectedTokens": [],
+    "repoTermsExpected": [],
+    "unrecoverableSpans": [],
+    "reviewNotes": []
+  },
+  "fastFeedbackMetrics": [
+    {
+      "metric": "tokenPreservationRate",
+      "definition": "Percent of protected tokens preserved exactly."
+    },
+    {
+      "metric": "repoTermRecoveryRate",
+      "definition": "Percent of expected repo vocabulary recovered."
+    },
+    {
+      "metric": "fffdReduction",
+      "definition": "Reduction of U+FFFD count without inventing task IDs or paths."
+    },
+    {
+      "metric": "readabilityDecision",
+      "definition": "Human or rule-based label: exact, readable, partial, unsafe."
+    },
+    {
+      "metric": "syntaxSurvival",
+      "definition": "Markdown/code/JSON structure still looks parseable after repair."
+    }
+  ],
+  "promotionRules": [
+    "Promote a replacement to high-confidence only after it appears in at least 3 contexts or 2 source types.",
+    "Do not promote replacements that change identifiers, task IDs, file paths, command flags, JSON keys, or code spans.",
+    "Allow readableExpected recovery for cp1252-lossy and cp1252-double; require exactExpected for latin1-reversible.",
+    "When unsure, record the fragment as unrecoverable rather than guessing."
+  ]
+}
