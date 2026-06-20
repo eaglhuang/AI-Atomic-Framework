@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0038",
+  "title": "Permission broker and configurable policy layer",
+  "status": "done",
+  "milestone": "M8I",
+  "dependencies": [
+    "TASK-TEAM-0037"
+  ],
+  "acceptance": [
+    "File, tool, network, and vendor permissions are checked through one broker contract.",
+    "Policy can be configured per adopter repo without changing the framework runtime code.",
+    "Provider bridges cannot grant themselves elevated rights."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "schemas/governance/team-agent-permission-policy.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "schemas/governance/team-agent-permission-policy.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case provider-permission-broker",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Provider-specific credential storage",
+    "Giving workers direct lifecycle authority"
+  ],
+  "nonGoals": [
+    "Do not couple policy decisions to one SDK implementation",
+    "Do not let provider bridges self-authorize writes"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert permission broker logic, schema additions, and validator coverage together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "2026-06-19 | planned | policy lane opened alongside the vendor-neutral runtime kernel.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0038-permission-broker-and-configurable-policy-layer.task.md",
+    "sectionTitle": "TASK-TEAM-0038",
+    "headingLine": 48,
+    "hash": "d73c9b938b9de554"
+  },
+  "importedAt": "2026-06-20T14:47:38.356Z",
+  "lastTransitionId": "2026-06-20T15-53-21-427Z-close-79bd05052548",
+  "lastTransitionAt": "2026-06-20T15:53:21.427Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-20T15:47:02.022Z",
+  "promotedAt": "2026-06-20T15:49:01.902Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-cac1b216e407",
+    "claimedAt": "2026-06-20T15:50:21.944Z",
+    "heartbeatAt": "2026-06-20T15:53:21.425Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "schemas/governance/team-agent-permission-policy.schema.json",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "state": "released",
+    "reason": "Emergency shared delivery bundle spans TEAM-0037/0038/0039/0041; scoped acceptance for TASK-TEAM-0038 is fully contained in commit 86b51db32d9078b3d941d450d617096b2d088961."
+  },
+  "startedAt": "2026-06-20T15:50:21.944Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260620155021-codex-gpt-5.4-mini-TASK-TEAM-0038-d619a37827",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0038",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0038.*",
+      ".atm/history/task-events/TASK-TEAM-0038/**",
+      ".atm/history/tasks/TASK-TEAM-0038.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "schemas/governance/team-agent-permission-policy.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "994d65f73f5a7bc4c557fa761e61fa8d2e4d72c877f153b3c829f20697fc0b24",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-20T15:50:22.103Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-20T15:53:21.425Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260620155021-codex-gpt-5.4-mini-TASK-TEAM-0038-d619a37827",
+  "closeReason": "Emergency shared delivery bundle spans TEAM-0037/0038/0039/0041; scoped acceptance for TASK-TEAM-0038 is fully contained in commit 86b51db32d9078b3d941d450d617096b2d088961.",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0038.closure-packet.json"
+}
