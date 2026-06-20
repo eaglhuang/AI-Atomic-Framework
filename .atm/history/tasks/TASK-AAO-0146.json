@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0146",
   "title": "Runner arbitration and close bundle isolation unify touched-set source-first policy",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -94,7 +94,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-6b380f3cd83a",
     "claimedAt": "2026-06-20T04:55:30.184Z",
-    "heartbeatAt": "2026-06-20T04:55:30.184Z",
+    "heartbeatAt": "2026-06-20T05:04:23.740Z",
     "ttlSeconds": 1800,
     "files": [
       "packages/cli/src/commands/hook.ts",
@@ -110,8 +110,8 @@
       "tests/cli/runner-arbitration-evidence.test.ts",
       "tests/cli/tasks-claim-auto-intent.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "TASK-AAO-0149 was intentionally folded into TASK-AAO-0146, so the governed delivery commit includes the TASK-AAO-0146 planning card alongside the source changes."
   },
   "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-06-20T03:38:45.954Z",
@@ -149,7 +149,12 @@
     "createdAt": "2026-06-20T04:55:30.216Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-06-20T04-55-57-147Z-import-e80a9d934180",
-  "lastTransitionAt": "2026-06-20T04:55:57.147Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-20T05-04-23-742Z-close-8b8bd40fc28e",
+  "lastTransitionAt": "2026-06-20T05:04:23.742Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-06-20T05:04:23.741Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260620045530-codex-gpt-5.4-mini-TASK-AAO-0146-76d25b16d6",
+  "closeReason": "TASK-AAO-0149 was intentionally folded into TASK-AAO-0146, so the governed delivery commit includes the TASK-AAO-0146 planning card alongside the source changes.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0146.closure-packet.json"
 }

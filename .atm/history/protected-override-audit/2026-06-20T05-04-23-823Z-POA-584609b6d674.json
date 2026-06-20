@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-584609b6d674",
+  "recordedAt": "2026-06-20T05:04:23.823Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-AAO-0146",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0146 --actor codex-gpt-5.4-mini --status done --json",
+  "flags": [
+    "--historical-delivery",
+    "--waiver-out-of-scope-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-AAO-0146-1dc6845b5e",
+  "reason": "TASK-AAO-0149 was intentionally folded into TASK-AAO-0146, so the governed delivery commit includes the TASK-AAO-0146 planning card alongside the source changes.",
+  "skippedChecks": [
+    "taskflow-operator-lane",
+    "protected-backend-surface"
+  ],
+  "touchedFiles": [
+    ".atm/history/evidence/TASK-AAO-0146.closure-packet.json",
+    ".atm/history/evidence/TASK-AAO-0146.json",
+    ".atm/history/task-events/TASK-AAO-0146/2026-06-20T05-04-23-742Z-close-8b8bd40fc28e.json",
+    ".atm/history/tasks/TASK-AAO-0146.json"
+  ],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-06-20T05-04-23-739Z-EMG-TASK-AAO-0146-1dc6845b5e.json",
+  "parentEventId": "POA-a7ebc40fba28",
+  "repairCandidate": null
+}

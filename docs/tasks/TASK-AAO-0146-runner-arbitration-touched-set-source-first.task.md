@@ -1,7 +1,10 @@
 ---
 task_id: TASK-AAO-0146
 title: "Runner arbitration and close bundle isolation unify touched-set source-first policy"
-status: planned
+status: done
+completed_at: 2026-06-20T05:04:23.741Z
+completed_by_agent: "codex-gpt-5.4-mini"
+delivery_commit: "dbde2ae05fc1bdd573235c5e378f1ef5a55887a4"
 priority: P1
 closure_authority: target_repo
 depends_on:
