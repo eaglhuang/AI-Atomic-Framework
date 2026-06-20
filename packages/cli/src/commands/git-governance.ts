@@ -1471,6 +1471,7 @@ function inspectTaskScopedStagedGovernanceBundle(
   const mismatchedTaskIds: string[] = [];
   if (claim?.state === 'active') {
     for (const filePath of stagedFiles) {
+      if (isIgnorableCommitStagingSideEffect(filePath, taskId)) continue;
       if (!isAllowedGovernanceArtifactPath(filePath, taskId)) continue;
       const stagedTaskId = extractGovernanceTaskIdFromPath(filePath);
       if (stagedTaskId && stagedTaskId !== taskId.toUpperCase()) {
@@ -1485,7 +1486,10 @@ function inspectTaskScopedStagedGovernanceBundle(
       }
     }
     const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
-    const outOfScopeStaged = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
+    const outOfScopeStaged = stagedFiles.filter((filePath) =>
+      !isIgnorableCommitStagingSideEffect(filePath, taskId)
+      && !isFileAllowedInTaskBundle(filePath, taskId, declaredScope)
+    );
     if (outOfScopeStaged.length > 0) {
       warnings.push(`Pre-commit warning: staged files outside allowedFiles for ${taskId}: ${outOfScopeStaged.join(', ')}`);
     }
@@ -1532,7 +1536,10 @@ function inspectTaskScopedUnstagedCommit(
     !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
     && !isIgnorableCommitStagingSideEffect(filePath, taskId)
   );
-  const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
+  const outOfScopeStagedFiles = stagedFiles.filter((filePath) =>
+    !isIgnorableCommitStagingSideEffect(filePath, taskId)
+    && !isFileAllowedInTaskBundle(filePath, taskId, declaredScope)
+  );
   const unstagedInScopeDirty = deliverableDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
   const unstagedDeliverableDirty = unstagedInScopeDirty.filter((filePath) =>
     !isAllowedGovernanceArtifactPath(filePath, taskId)

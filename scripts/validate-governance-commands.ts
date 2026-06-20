@@ -479,15 +479,37 @@ try {
   assert(residueAutoCleanCommit.parsed.ok === true, 'safe generated residue commit must report ok=true');
   assert(!existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'safe git-head residue must be removed after governed commit');
 
-  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "blocked-residue";\n', 'utf8');
-  const foreignResidueSnapshot = path.join(repo, '.atm', 'runtime', 'snapshots', 'foreign-staged-TASK-FOREIGN-9999-1781880000000.json');
-  mkdirSync(path.dirname(foreignResidueSnapshot), { recursive: true });
-  writeFileSync(foreignResidueSnapshot, `${JSON.stringify({ taskId: 'TASK-FOREIGN-9999', files: ['src/foreign.ts'] }, null, 2)}\n`, 'utf8');
-  const blockedResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: blocked foreign residue', '--auto-stage', '--json']);
-  assert(blockedResidueCommit.exitCode === 1, 'git commit must block foreign generated residue');
-  assert(blockedResidueCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED', 'foreign generated residue must return the dedicated blocked code');
-  assert(existsSync(foreignResidueSnapshot), 'foreign generated residue must remain on disk for manual recovery');
-  rmSync(foreignResidueSnapshot, { force: true });
+  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "runtime-side-effects";\n', 'utf8');
+  const teamRunResidue = path.join(repo, '.atm', 'runtime', 'team-runs', 'team-fixture.json');
+  mkdirSync(path.dirname(teamRunResidue), { recursive: true });
+  writeFileSync(teamRunResidue, `${JSON.stringify({
+    schemaId: 'atm.teamRun.v1',
+    teamRunId: 'team-fixture',
+    taskId: 'TASK-FOREIGN-9999'
+  }, null, 2)}\n`, 'utf8');
+  const closeWindowResidue = path.join(repo, '.atm', 'runtime', 'snapshots', 'close-window-foreign-staged-TASK-FOREIGN-9999-1781880000001.json');
+  mkdirSync(path.dirname(closeWindowResidue), { recursive: true });
+  writeFileSync(closeWindowResidue, `${JSON.stringify({
+    schemaId: 'atm.closeWindowForeignStagedSnapshot.v1',
+    taskId: 'TASK-FOREIGN-9999',
+    files: ['src/foreign.ts']
+  }, null, 2)}\n`, 'utf8');
+  assert(runGit(repo, ['add', '.atm/runtime/team-runs/team-fixture.json', '.atm/runtime/snapshots/close-window-foreign-staged-TASK-FOREIGN-9999-1781880000001.json']).exitCode === 0, 'runtime residue fixture must stage');
+  const runtimeResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: runtime residue must not block scoped commit', '--auto-stage', '--json']);
+  assert(runtimeResidueCommit.exitCode === 0, 'git commit must ignore staged runtime residue when building the scoped commit bundle');
+  assert(runtimeResidueCommit.parsed.ok === true, 'staged runtime residue commit must report ok=true');
+  assert(existsSync(teamRunResidue), 'runtime team-run residue should remain on disk after scoped commit');
+  assert(existsSync(closeWindowResidue), 'runtime snapshot residue should remain on disk after scoped commit');
+
+  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "manual-review-residue";\n', 'utf8');
+  const unknownResidueSnapshot = path.join(repo, '.atm', 'runtime', 'snapshots', 'opaque-generated-residue.json');
+  mkdirSync(path.dirname(unknownResidueSnapshot), { recursive: true });
+  writeFileSync(unknownResidueSnapshot, `${JSON.stringify({ createdBy: 'unknown-fixture' }, null, 2)}\n`, 'utf8');
+  const manualReviewResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: manual review residue', '--auto-stage', '--json']);
+  assert(manualReviewResidueCommit.exitCode === 1, 'git commit must stop on unclassified generated residue');
+  assert(manualReviewResidueCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_GENERATED_RESIDUE_MANUAL_REVIEW', 'unknown generated residue must return the dedicated manual-review code');
+  assert(existsSync(unknownResidueSnapshot), 'manual-review residue must remain on disk for operator inspection');
+  rmSync(unknownResidueSnapshot, { force: true });
 
   const governedFile = path.join(repo, 'notes', 'governance.txt');
   mkdirSync(path.dirname(governedFile), { recursive: true });
