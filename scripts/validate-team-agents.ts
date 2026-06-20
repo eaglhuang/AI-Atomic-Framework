@@ -7,7 +7,13 @@ import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
 import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { discoverGovernedVendorConfigSurface } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
+import { TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
+import { TeamProviderRegistry } from '../packages/core/src/team-runtime/provider-registry.ts';
+import { runProviderOrchestration } from '../packages/core/src/team-runtime/execution-orchestrator.ts';
+import { createDefaultTeamPermissionPolicy, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
+import { resolveTeamProviderSelection } from '../packages/core/src/team-runtime/provider-selection.ts';
 import {
   validateScopeLeaseEpoch,
   validateScopeLeaseFencing,
@@ -340,6 +346,99 @@ async function main() {
     );
 
     console.log('[validate-team-agents] ok (permission-lease)');
+    return;
+  }
+
+  if (taskCase === 'vendor-neutral-runtime-contract') {
+    const metadata = TEAM_PROVIDER_IDS.map((providerId) => createTeamProviderMetadata(providerId));
+    assert.equal(supportsVendorNeutralProviders(metadata), true);
+    const registry = new TeamProviderRegistry();
+    registry.registerDefaults(TEAM_PROVIDER_IDS);
+    assert.equal(registry.list().length, TEAM_PROVIDER_IDS.length);
+    const provider = registry.get('claude-code');
+    assert.ok(provider);
+    const orchestration = runProviderOrchestration(provider!, {
+      taskId: 'TASK-TEAM-0037',
+      role: 'implementer',
+      runtimeMode: 'broker-only',
+      providerId: 'claude-code',
+      sdkId: 'claude-code',
+      modelId: 'claude-opus',
+      retries: 2
+    });
+    assert.equal(orchestration.ok, true);
+    assert.equal(orchestration.coordinatorOwnedAuthority, true);
+    console.log('[validate-team-agents] ok (vendor-neutral-runtime-contract)');
+    return;
+  }
+
+  if (taskCase === 'provider-permission-broker') {
+    const policy = createDefaultTeamPermissionPolicy();
+    const allow = decideTeamPermission(policy, {
+      permission: 'exec.validator',
+      providerId: 'openai',
+      scopedPaths: ['packages/cli/src/commands/team.ts']
+    });
+    assert.equal(allow.ok, true);
+    const deny = decideTeamPermission(policy, {
+      permission: 'git.write',
+      providerId: 'gemini',
+      scopedPaths: []
+    });
+    assert.equal(deny.ok, false);
+    console.log('[validate-team-agents] ok (provider-permission-broker)');
+    return;
+  }
+
+  if (taskCase === 'governed-repo-vendor-config') {
+    const surface = discoverGovernedVendorConfigSurface(process.cwd());
+    assert.equal(existsSync(surface.templateReadme), true);
+    const selfHosting = readFileSync(path.join(process.cwd(), 'docs', 'SELF_HOSTING_ALPHA.md'), 'utf8');
+    assert.ok(selfHosting.includes('agent-integrations/vendors'));
+    console.log('[validate-team-agents] ok (governed-repo-vendor-config)');
+    return;
+  }
+
+  if (taskCase === 'provider-selection-overrides') {
+    const selection = resolveTeamProviderSelection('validator', {
+      repoDefault: {
+        providerId: 'openai',
+        sdkId: 'responses',
+        modelId: 'gpt-5-mini',
+        runtimeMode: 'broker-only'
+      },
+      roleOverrides: {
+        validator: {
+          providerId: 'gemini',
+          sdkId: 'gemini-cli',
+          modelId: 'gemini-2.5-pro',
+          runtimeMode: 'editor-subagent'
+        }
+      }
+    });
+    assert.equal(selection.source, 'role-override');
+    const runtime = buildTeamRuntimeContract({
+      roleName: 'validator',
+      selectionConfig: {
+        repoDefault: {
+          providerId: 'openai',
+          sdkId: 'responses',
+          modelId: 'gpt-5-mini',
+          runtimeMode: 'broker-only'
+        },
+        roleOverrides: {
+          validator: {
+            providerId: 'gemini',
+            sdkId: 'gemini-cli',
+            modelId: 'gemini-2.5-pro',
+            runtimeMode: 'editor-subagent'
+          }
+        }
+      }
+    });
+    assert.equal(runtime.providerId, 'gemini');
+    assert.ok(runtime.selectionReason.includes('selection=role-override'));
+    console.log('[validate-team-agents] ok (provider-selection-overrides)');
     return;
   }
 

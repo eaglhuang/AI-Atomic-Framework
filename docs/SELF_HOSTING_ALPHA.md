@@ -40,6 +40,14 @@ Phase B may proceed only when all of the following are true:
 4. `atm verify --neutrality --json` exits 0 on protected framework surfaces.
 5. The proof does not rely on any downstream-specific script, engine, or local governance tool.
 
+## Team Vendor Config Surface
+
+Adopter repositories may keep Team vendor settings under `agent-integrations/vendors/**`.
+
+- ATM may discover and validate this governed config surface.
+- The root-drop template documents the layout in `release/atm-root-drop/templates/root-drop/agent-integrations/vendors/README.md`.
+- Real secrets stay in the governed adopter repository, not in the framework repository.
+
 ## Advisory Multi-Agent Confidence
 
 The advisory confidence layer uses the same deterministic alpha0 proof, but records the result under a named agent profile.

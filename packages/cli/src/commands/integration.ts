@@ -10,6 +10,21 @@ import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand,
 import { getCommandSpec } from './command-specs.ts';
 type IntegrationHooksModule = typeof import('./integration-hooks.ts');
 
+export type GovernedVendorConfigSurface = {
+  rootDir: string;
+  templateReadme: string;
+  exists: boolean;
+};
+
+export function discoverGovernedVendorConfigSurface(repositoryRoot: string): GovernedVendorConfigSurface {
+  const rootDir = path.join(repositoryRoot, 'agent-integrations', 'vendors');
+  return {
+    rootDir,
+    templateReadme: path.join(repositoryRoot, 'release', 'atm-root-drop', 'templates', 'root-drop', 'agent-integrations', 'vendors', 'README.md'),
+    exists: existsSync(rootDir)
+  };
+}
+
 async function loadIntegrationHooks(): Promise<IntegrationHooksModule> {
   return import('./integration-hooks.ts');
 }

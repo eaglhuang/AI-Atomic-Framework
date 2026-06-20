@@ -738,6 +738,62 @@
       "source_task": "TASK-TEAM-0031"
     },
     {
+      "path_pattern": "packages/core/src/team-runtime/provider-contract.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Vendor-neutral Team provider contract covering provider metadata, session lifecycle, and step-result shape for multi-vendor bridges.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0037"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/provider-registry.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Provider registry for vendor-neutral Team provider contracts without vendor-specific orchestration branching.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0037"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Vendor-neutral execution orchestrator for Team provider sessions, retries, cancellation, and coordinator-owned authority boundaries.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0037"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/permission-broker.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Governed Team permission broker and policy decision surface for provider-neutral permission checks.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0038"
+    },
+    {
+      "path_pattern": "schemas/governance/team-agent-permission-policy.schema.json",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Schema contract for adopter-governed Team agent permission policy configuration.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0038"
+    },
+    {
+      "path_pattern": "release/atm-root-drop/templates/root-drop/agent-integrations/vendors/README.md",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Root-drop template documentation for governed repo vendor integration config layout under agent-integrations/vendors.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0039"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Canonical Team vendor runtime governance document covering provider contract, permission broker, vendor config surface, and provider selection rules.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0039"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/provider-selection.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Repo default and role override provider selection contract for Team runtime metadata and observability.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0041"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#buildEditorSubagentBridgeContract",
       "atom_id": "team.editor-subagent-bridge-contract",
       "capability": "Editor-neutral subagent bridge role envelopes preserve role, scope, lease, artifact, and retry metadata while ATM remains lifecycle owner.",
