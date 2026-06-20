@@ -1,51 +1,46 @@
-# ATM Broker Evidence Plan (v2 - 快速執行版)
+# ATM Broker Evidence Plan
 
-## 目標
+## Purpose
 
-把論文證據分成兩層：
+This document defines a reproducible Hybrid evidence pipeline for the paper without changing `atm.brokerOperationRunRecordEnvelope.v1`.
 
-1. **Synthetic evidence（B-02 / B-08 / B-13）**：靠本地腳本保證機制可重放。
-2. **Field evidence（B-07 / B-12）**：兩位不同編輯器同時開同一範圍，刻意提高實際撞車。
+## Evidence Strategy
 
-## 目前實作進度
+1. Synthetic bench runs cover deterministic mechanism scenarios: B-02, B-08, and B-13.
+2. Field runs cover controlled real-task collisions: B-07 baseline and B-12 controlled 4-vendor field capture.
+3. Scenario tags stay in `request_identity` or `planId` using `bench:<scenario>:<taskId>:<slug>`.
+4. Field capture is post-run capture. The tools read broker envelopes and `atm.teamRun.v1` brokerLane records after execution; they do not live-intercept or mutate broker behavior.
 
-- `TASK-TEAM-0042` / `TASK-TEAM-0043` 已列為下一段 B-12 真實碰撞對。
-- 現有掃描能力加上新腳本可把 run / task / actor / file / lane / verdict、以及 closure + team-run 一起輸出。
+## Reference Commands
 
-## 快速跑法
-
-### 1) 同步兩個實體編輯器
-
-- `TASK-TEAM-0042`：由 Codex 打開、主動進行 brokered 寫入。
-- `TASK-TEAM-0043`：由 Cursor 打開、主動進行 brokered 寫入。
-- 兩邊只走既有 ATM broker 流程，不要繞過任一 write intent。
-
-### 2) 產出證據 bundle
-
-在 ATM repo 執行：
+Synthetic MVP:
 
 ```powershell
-node --strip-types scripts/scan-broker-runs.ts --run-dir C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/runs --log-file C:/Users/User/3KLife/docs/ai_atomic_framework/CID-Conflict-Run-Log.md --json-output C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/broker-run-index.json --report-output C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/broker-run-report.md --compact
+node --strip-types tools/multi-vendor-broker-bench/index.ts run --scenario B-02 --output-dir .atm-temp/bench-b02
+node --strip-types tools/multi-vendor-broker-bench/index.ts run --scenario B-08 --output-dir .atm-temp/bench-b08
+node --strip-types tools/multi-vendor-broker-bench/index.ts run --scenario B-13 --output-dir .atm-temp/bench-b13
 ```
 
-這是論文摘要層（scenario/task/actor/lane/verdict）快速核對。
-
-### 3) 產出 paper bundle（含 closure + team-runs）
+Capture and bundle broker evidence:
 
 ```powershell
-node --strip-types scripts/collect-broker-evidence.ts --run-dir C:/Users/User/3KLife/docs/ai_atomic_framework/broker-collision-evidence/runs --atm-root C:/Users/User/AI-Atomic-Framework --output-dir C:/Users/User/3KLife/docs/ai_atomic_framework/broker-evidence-bundle
+node --strip-types scripts/capture-broker-evidence.ts --run-dir <broker-run-dir> --team-run-dir <repo-root>/.atm/runtime/team-runs --output-dir <capture-output>
 ```
 
-輸出：
+```powershell
+node --strip-types scripts/collect-broker-evidence.ts --run-dir <broker-run-dir> --team-run-dir <repo-root>/.atm/runtime/team-runs --output-dir <bundle-output>
+```
 
-- `broker-evidence-bundle.json`
-- `broker-evidence-bundle.md`
+Controlled B-12 field capture after real team runs:
 
-### 4) 結果對照欄位
+```powershell
+node --strip-types tools/multi-vendor-broker-bench/index.ts capture-field --scenario B-12 --task TASK-TEAM-0042 --task TASK-TEAM-0043 --team-run-dir .atm/runtime/team-runs --output-dir .atm-temp/field-b12
+```
 
-每筆 run 至少要保留：
+## Captured Fields
 
 - `runId`
+- `planId`
 - `scenario`
 - `task`
 - `actors`
@@ -53,16 +48,8 @@ node --strip-types scripts/collect-broker-evidence.ts --run-dir C:/Users/User/3K
 - `shared files`
 - `lane`
 - `verdict`
+- `transactions`
 - `closurePacket`
 - `teamRuns`
 
-若是 `blocked` 或 `queued`，同樣可作為 field evidence，只要 broker verdict 可核對。
-
-## 目前最常見「為什麼很難撞到」
-
-- 兩位編輯器未同時落在同一組共享檔。
-- 其中一邊在衝突前就先提交。
-- 實際 scope 不對，僅在各自非共享路徑操作。
-
-建議：至少固定 2~3 次同起同進同檔，保證 shared-file 競爭條件形成。
-
+Blocked, queued, applied, conflict, and validator-rejected outcomes are valid evidence when the broker decision is reproducible and traceable.

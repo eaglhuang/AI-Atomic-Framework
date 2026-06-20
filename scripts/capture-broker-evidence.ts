@@ -50,6 +50,15 @@ interface BrokerExperimentRun {
   readonly runEvidencePath?: string | null;
 }
 
+interface TeamRun {
+  readonly schemaId?: string | null;
+  readonly teamRunId?: string | null;
+  readonly taskId?: string | null;
+  readonly actorId?: string | null;
+  readonly planId?: string | null;
+  readonly brokerLane?: unknown;
+}
+
 interface BrokerRunSummary {
   runId: string;
   planId: string;
@@ -96,6 +105,7 @@ interface CapturePayload {
   specVersion: string;
   generatedAt: string;
   sourceRunDirs: string[];
+  sourceTeamRunDirs: string[];
   sourceAtmRoot: string;
   commandLog?: CommandResult[];
   capturedFor: {
@@ -105,6 +115,7 @@ interface CapturePayload {
     settleMs: number;
     runFilters: string[];
     taskFilters: string[];
+    teamRunDirs: string[];
   };
   runs: BrokerRunSummary[];
   taskArtifacts: TaskArtifactSummary[];
@@ -232,6 +243,33 @@ function parseDefaultRunDirs(value: ArgValue | undefined): string[] {
   return runDirs;
 }
 
+function parseTeamRunDirs(value: ArgValue | undefined): string[] {
+  const values = asStringList(value);
+  if (values.length === 0) {
+    return [];
+  }
+  const dirs: string[] = [];
+  const missing: string[] = [];
+  for (const entry of values) {
+    for (const part of entry.split(',')) {
+      const trimmed = part.trim();
+      if (!trimmed) {
+        continue;
+      }
+      const resolved = path.resolve(trimmed);
+      if (existsSync(resolved)) {
+        dirs.push(resolved);
+      } else {
+        missing.push(trimmed);
+      }
+    }
+  }
+  if (missing.length > 0) {
+    throw new Error(`Specified team-run directory not found: ${missing.join(', ')}`);
+  }
+  return [...new Set(dirs)];
+}
+
 function parseOutputDir(value: ArgValue | undefined, outputHint: string): string {
   if (typeof value === 'string' && value.trim()) {
     return path.resolve(value);
@@ -287,6 +325,42 @@ function parseTaskIdHint(requestId: string): string | null {
 
 function toCsv(values: StringSet): string {
   return [...values].sort((left, right) => left.localeCompare(right)).join(',') || 'n/a';
+}
+
+function addStringValue(target: Set<string>, value: unknown): void {
+  if (typeof value === 'string' && value.trim()) {
+    target.add(value.trim());
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      addStringValue(target, item);
+    }
+  }
+}
+
+function collectObjectStringsByKey(value: unknown, keys: ReadonlySet<string>, target: Set<string>): void {
+  if (!value || typeof value !== 'object') {
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectObjectStringsByKey(item, keys, target);
+    }
+    return;
+  }
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (keys.has(key)) {
+      addStringValue(target, entry);
+    }
+    collectObjectStringsByKey(entry, keys, target);
+  }
+}
+
+function firstStringByKey(value: unknown, keys: ReadonlySet<string>): string | null {
+  const values = new Set<string>();
+  collectObjectStringsByKey(value, keys, values);
+  return [...values][0] ?? null;
 }
 
 function collectTagsFromExperiment(requestId: string): { scenarios: string[]; tasks: string[] } {
@@ -528,6 +602,78 @@ function parseRunFile(filePath: string, runSource: RunSource): BrokerRunSummary 
   return null;
 }
 
+function isTeamRun(value: unknown): value is TeamRun {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const maybe = value as TeamRun;
+  return maybe.schemaId === 'atm.teamRun.v1' && typeof maybe.teamRunId === 'string';
+}
+
+function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | null {
+  if (typeof run.teamRunId !== 'string' || !run.teamRunId) {
+    return null;
+  }
+
+  const brokerLane = run.brokerLane;
+  const identities = new Set<string>();
+  const actors = new Set<string>();
+  const files = new Set<string>();
+  const tasks = new Set<string>();
+  const commits = new Set<string>();
+  const tx = new Set<string>();
+  const scenarios = new Set<string>();
+
+  addStringValue(tasks, run.taskId);
+  addStringValue(actors, run.actorId);
+  addStringValue(identities, run.planId);
+
+  collectObjectStringsByKey(brokerLane, new Set(['request_identity', 'requestIdentity', 'requestId', 'planId']), identities);
+  collectObjectStringsByKey(brokerLane, new Set(['taskId', 'task_ids', 'taskIds']), tasks);
+  collectObjectStringsByKey(brokerLane, new Set(['actorId', 'actor_ids', 'actorIds']), actors);
+  collectObjectStringsByKey(brokerLane, new Set([
+    'file',
+    'filePath',
+    'files',
+    'request_files',
+    'requestFiles',
+    'applied_files',
+    'appliedFiles',
+    'readSet',
+    'writeSet',
+    'scopePaths',
+    'sharedFiles'
+  ]), files);
+  collectObjectStringsByKey(brokerLane, new Set(['baseCommit', 'baseHead', 'baseHash', 'commit', 'commit_sha']), commits);
+  collectObjectStringsByKey(brokerLane, new Set(['transactionId', 'transaction_ids', 'transactionIds', 'writeTransactionId']), tx);
+
+  for (const identity of identities) {
+    const split = collectTags(identity);
+    split.scenarios.forEach((value) => scenarios.add(value));
+    split.tasks.forEach((value) => tasks.add(value));
+  }
+
+  const lane = firstStringByKey(brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
+  const verdict = firstStringByKey(brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+
+  return {
+    runId: run.teamRunId,
+    planId: run.taskId ?? run.planId ?? 'unknown',
+    scenario: [...scenarios].sort().join(',') || 'field',
+    tasks: toCsv(tasks),
+    actors: toCsv(actors),
+    files: toCsv(files),
+    vendor: 'team-broker-lane',
+    lane,
+    verdict,
+    commits: toCsv(commits),
+    transactions: toCsv(tx),
+    identities: toCsv(identities),
+    evidence: runSource.replace(/\\/g, '/'),
+    requiredFields: []
+  };
+}
+
 function readRunSummaries(runDir: string): BrokerRunSummary[] {
   if (!existsSync(runDir)) {
     return [];
@@ -556,7 +702,38 @@ function readRunSummaries(runDir: string): BrokerRunSummary[] {
   return rows;
 }
 
-function collectTaskArtifacts(atmRoot: string, taskIds: string[]): TaskArtifactSummary[] {
+function readTeamRunSummaries(teamRunDirs: readonly string[]): BrokerRunSummary[] {
+  const rows: BrokerRunSummary[] = [];
+  const seen = new Set<string>();
+  for (const teamRunDir of teamRunDirs) {
+    if (!existsSync(teamRunDir)) {
+      continue;
+    }
+    const entries = readdirSync(teamRunDir, { withFileTypes: true })
+      .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+      .map((entry) => path.join(teamRunDir, entry.name))
+      .sort();
+    for (const filePath of entries) {
+      try {
+        const raw = JSON.parse(readFileSync(filePath, 'utf8')) as unknown;
+        if (!isTeamRun(raw)) {
+          continue;
+        }
+        const summary = summarizeTeamRun(raw, filePath);
+        if (!summary || seen.has(summary.runId)) {
+          continue;
+        }
+        seen.add(summary.runId);
+        rows.push(summary);
+      } catch {
+        // skip invalid team run file
+      }
+    }
+  }
+  return rows;
+}
+
+function collectTaskArtifacts(atmRoot: string, taskIds: string[], teamRunDirs: readonly string[]): TaskArtifactSummary[] {
   const closureSet = new Set<string>();
   const normalizedTaskIds = taskIds
     .filter((taskId) => taskId.startsWith('TASK-'))
@@ -579,9 +756,12 @@ function collectTaskArtifacts(atmRoot: string, taskIds: string[]): TaskArtifactS
     }
   }
 
-  const teamRunDir = path.join(atmRoot, '.atm', 'runtime', 'team-runs');
   const teamRunsByTask: Record<string, string[]> = {};
-  if (existsSync(teamRunDir)) {
+  const candidateTeamRunDirs = teamRunDirs.length > 0 ? teamRunDirs : [path.join(atmRoot, '.atm', 'runtime', 'team-runs')];
+  for (const teamRunDir of candidateTeamRunDirs) {
+    if (!existsSync(teamRunDir)) {
+      continue;
+    }
     for (const fileName of readdirSync(teamRunDir)) {
       if (!fileName.endsWith('.json')) {
         continue;
@@ -593,7 +773,7 @@ function collectTaskArtifacts(atmRoot: string, taskIds: string[]): TaskArtifactS
           continue;
         }
         teamRunsByTask[taskId] ??= [];
-        teamRunsByTask[taskId].push(`.atm/runtime/team-runs/${fileName}`);
+        teamRunsByTask[taskId].push(path.join(teamRunDir, fileName).replace(/\\/g, '/'));
       } catch {
         // ignore malformed team run file
       }
@@ -663,13 +843,18 @@ function parseFilters(runFilters: string[], taskFilters: string[]): (row: Broker
   };
 }
 
-function readRunSummariesByDirs(runDirs: string[]): Map<string, BrokerRunSummary> {
+function readRunSummariesByDirs(runDirs: string[], teamRunDirs: readonly string[] = []): Map<string, BrokerRunSummary> {
   const all = new Map<string, BrokerRunSummary>();
   for (const runDir of runDirs) {
     for (const row of readRunSummaries(runDir)) {
       if (!all.has(row.runId)) {
         all.set(row.runId, row);
       }
+    }
+  }
+  for (const row of readTeamRunSummaries(teamRunDirs)) {
+    if (!all.has(row.runId)) {
+      all.set(row.runId, row);
     }
   }
   return all;
@@ -690,7 +875,7 @@ function printHelp(): void {
     'capture-broker-evidence',
     '',
     'Usage:',
-    '  node --strip-types scripts/capture-broker-evidence.ts [--run-dir <dir> ...] [--command <cmd> ...] [--await-new N] [--timeout-ms N] [--poll-ms N] [--settle-ms N] [--output-dir <dir>] [--run-ids a,b] [--task-ids TASK-...] [--atm-root <path>] [--strict]',
+    '  node --strip-types scripts/capture-broker-evidence.ts [--run-dir <dir> ...] [--team-run-dir <dir> ...] [--command <cmd> ...] [--await-new N] [--timeout-ms N] [--poll-ms N] [--settle-ms N] [--output-dir <dir>] [--run-ids a,b] [--task-ids TASK-...] [--atm-root <path>] [--strict]',
     '',
     'Examples:',
     '  # wait for 1 new run in default locations and emit a filtered evidence bundle',
@@ -704,6 +889,7 @@ function printHelp(): void {
     '- output-dir: <first-run-dir>/broker-capture',
     '- json output: <output-dir>/broker-capture.json',
     '- md output: <output-dir>/broker-capture.md',
+    '- team-run-dir: optional atm.teamRun.v1 runtime directory; brokerLane is summarized as run rows',
     '- strict: true',
     ''
   ];
@@ -794,6 +980,7 @@ async function main() {
   }
 
   const runDirs = parseDefaultRunDirs(args['--run-dir']);
+  const teamRunDirs = parseTeamRunDirs(args['--team-run-dir']);
   const outputDir = parseOutputDir(args['--output-dir'], path.join(runDirs[0] ?? process.cwd(), 'broker-capture'));
   const jsonOutput = parseOutputFile(args['--json-output'], path.join(outputDir, 'broker-capture.json'));
   const reportOutput = parseOutputFile(args['--report-output'], path.join(outputDir, 'broker-capture.md'));
@@ -811,7 +998,7 @@ async function main() {
   const filter = parseFilters(runFilter, taskFilter);
   const captureOnlyNew = commandList.length > 0 || awaitNew > 0;
 
-  const baselineRuns = readRunSummariesByDirs(runDirs);
+  const baselineRuns = readRunSummariesByDirs(runDirs, teamRunDirs);
   const baseline = new Set(baselineRuns.keys());
   const commandLog: CommandResult[] = [];
   const commandStartAt = Date.now();
@@ -834,7 +1021,7 @@ async function main() {
 
   while (Date.now() - captureStart < timeoutMs && (awaitNew === 0 || candidates.size < awaitNew)) {
     iteration += 1;
-    const allRuns = readRunSummariesByDirs(runDirs);
+    const allRuns = readRunSummariesByDirs(runDirs, teamRunDirs);
     const rows = applyFilters(Array.from(allRuns.values()), filter);
     const newRows = rows.filter((row) => !baseline.has(row.runId));
     candidates = new Map(newRows.map((row) => [row.runId, row]));
@@ -854,7 +1041,7 @@ async function main() {
 
   await commandPromise;
 
-  const finalRuns = readRunSummariesByDirs(runDirs);
+  const finalRuns = readRunSummariesByDirs(runDirs, teamRunDirs);
   const filteredRuns = applyFilters(Array.from(finalRuns.values()), filter);
   const selected = filteredRuns.filter((row) => (captureOnlyNew ? !baseline.has(row.runId) : true));
 
@@ -880,7 +1067,7 @@ async function main() {
   }
 
   const taskIds = parseTaskIdsFromRows(finalRows);
-  const taskArtifacts = collectTaskArtifacts(atmRoot, taskIds);
+  const taskArtifacts = collectTaskArtifacts(atmRoot, taskIds, teamRunDirs);
 
   mkdirSync(outputDir, { recursive: true });
 
@@ -888,7 +1075,8 @@ async function main() {
     schemaId: 'atm.brokerCaptureBundle.v1',
     specVersion: '0.1.0',
     generatedAt: new Date().toISOString(),
-    sourceRunDirs: runDirs,
+    sourceRunDirs: runDirs.map((runDir) => runDir.replace(/\\/g, '/')),
+    sourceTeamRunDirs: teamRunDirs.map((teamRunDir) => teamRunDir.replace(/\\/g, '/')),
     sourceAtmRoot: atmRoot.replace(/\\/g, '/'),
     commandLog,
     capturedFor: {
@@ -897,7 +1085,8 @@ async function main() {
       pollMs,
       settleMs,
       runFilters: runFilter,
-      taskFilters: taskFilter
+      taskFilters: taskFilter,
+      teamRunDirs: teamRunDirs.map((teamRunDir) => teamRunDir.replace(/\\/g, '/'))
     },
     runs: finalRows,
     taskArtifacts

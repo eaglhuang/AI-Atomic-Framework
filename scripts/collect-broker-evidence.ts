@@ -41,6 +41,15 @@ interface BrokerExperimentRun {
   readonly runEvidencePath?: string | null;
 }
 
+interface TeamRun {
+  readonly schemaId?: string | null;
+  readonly teamRunId?: string | null;
+  readonly taskId?: string | null;
+  readonly actorId?: string | null;
+  readonly planId?: string | null;
+  readonly brokerLane?: unknown;
+}
+
 interface BrokerRunSummary {
   runId: string;
   planId: string;
@@ -111,6 +120,17 @@ function parseDefaultRunDir(value: string | boolean | undefined): string {
   throw new Error(`Unable to find run directory. Checked: ${repoFallback}, ${externalFallback}`);
 }
 
+function parseTeamRunDir(value: string | boolean | undefined): string | null {
+  if (typeof value !== 'string' || !value.trim()) {
+    return null;
+  }
+  const dir = path.resolve(value);
+  if (!existsSync(dir)) {
+    throw new Error(`team-run directory does not exist: ${dir}`);
+  }
+  return dir;
+}
+
 function parseOutputDir(value: string | boolean | undefined, runDir: string): string {
   if (typeof value === 'string' && value.trim()) {
     return path.resolve(value);
@@ -123,13 +143,14 @@ function printHelp(): void {
     'collect-broker-evidence',
     '',
     'Usage:',
-    '  node --strip-types scripts/collect-broker-evidence.ts [--run-dir <dir>] [--output-dir <dir>] [--atm-root <path>] [--run-ids a,b] [--task-ids TASK-...]',
+    '  node --strip-types scripts/collect-broker-evidence.ts [--run-dir <dir>] [--team-run-dir <dir>] [--output-dir <dir>] [--atm-root <path>] [--run-ids a,b] [--task-ids TASK-...]',
     '',
     'Default behavior:',
     '- run-dir: .atm/history/evidence/broker-runs if exists, otherwise',
     '  %USERPROFILE%\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs',
     '- output-dir: <run-dir-parent>/broker-evidence-bundle',
     '- Output files: broker-evidence-bundle.json and broker-evidence-bundle.md in output-dir',
+    '- team-run-dir: optional atm.teamRun.v1 runtime directory; brokerLane is summarized as run rows',
     ''
   ];
   console.log(lines.join('\n'));
@@ -172,6 +193,42 @@ function collectTags(requestId: string): { scenarios: string[]; tasks: string[] 
 
 function toCsv(values: StringSet): string {
   return [...values].sort((left, right) => left.localeCompare(right)).join(',') || 'n/a';
+}
+
+function addStringValue(target: Set<string>, value: unknown): void {
+  if (typeof value === 'string' && value.trim()) {
+    target.add(value.trim());
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      addStringValue(target, item);
+    }
+  }
+}
+
+function collectObjectStringsByKey(value: unknown, keys: ReadonlySet<string>, target: Set<string>): void {
+  if (!value || typeof value !== 'object') {
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      collectObjectStringsByKey(item, keys, target);
+    }
+    return;
+  }
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (keys.has(key)) {
+      addStringValue(target, entry);
+    }
+    collectObjectStringsByKey(entry, keys, target);
+  }
+}
+
+function firstStringByKey(value: unknown, keys: ReadonlySet<string>): string | null {
+  const values = new Set<string>();
+  collectObjectStringsByKey(value, keys, values);
+  return [...values][0] ?? null;
 }
 
 function summarizeEnvelopeRecord(run: BrokerEnvelope, runSource: string): BrokerRunSummary | null {
@@ -342,6 +399,77 @@ function isBrokerExperimentRun(value: unknown): value is BrokerExperimentRun {
     || (typeof maybe.runId === 'string' && Array.isArray(maybe.mutationEvidence));
 }
 
+function isTeamRun(value: unknown): value is TeamRun {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const maybe = value as TeamRun;
+  return maybe.schemaId === 'atm.teamRun.v1' && typeof maybe.teamRunId === 'string';
+}
+
+function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | null {
+  if (typeof run.teamRunId !== 'string' || !run.teamRunId) {
+    return null;
+  }
+
+  const brokerLane = run.brokerLane;
+  const identities = new Set<string>();
+  const actors = new Set<string>();
+  const files = new Set<string>();
+  const tasks = new Set<string>();
+  const commits = new Set<string>();
+  const tx = new Set<string>();
+  const scenarios = new Set<string>();
+
+  addStringValue(tasks, run.taskId);
+  addStringValue(actors, run.actorId);
+  addStringValue(identities, run.planId);
+
+  collectObjectStringsByKey(brokerLane, new Set(['request_identity', 'requestIdentity', 'requestId', 'planId']), identities);
+  collectObjectStringsByKey(brokerLane, new Set(['taskId', 'task_ids', 'taskIds']), tasks);
+  collectObjectStringsByKey(brokerLane, new Set(['actorId', 'actor_ids', 'actorIds']), actors);
+  collectObjectStringsByKey(brokerLane, new Set([
+    'file',
+    'filePath',
+    'files',
+    'request_files',
+    'requestFiles',
+    'applied_files',
+    'appliedFiles',
+    'readSet',
+    'writeSet',
+    'scopePaths',
+    'sharedFiles'
+  ]), files);
+  collectObjectStringsByKey(brokerLane, new Set(['baseCommit', 'baseHead', 'baseHash', 'commit', 'commit_sha']), commits);
+  collectObjectStringsByKey(brokerLane, new Set(['transactionId', 'transaction_ids', 'transactionIds', 'writeTransactionId']), tx);
+
+  for (const identity of identities) {
+    const split = collectTags(identity);
+    split.scenarios.forEach((value) => scenarios.add(value));
+    split.tasks.forEach((value) => tasks.add(value));
+  }
+
+  const lane = firstStringByKey(brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
+  const verdict = firstStringByKey(brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+
+  return {
+    runId: run.teamRunId,
+    planId: run.taskId ?? run.planId ?? 'unknown',
+    scenario: [...scenarios].sort().join(',') || 'field',
+    tasks: toCsv(tasks),
+    actors: toCsv(actors),
+    files: toCsv(files),
+    vendor: 'team-broker-lane',
+    lane,
+    verdict,
+    commits: toCsv(commits),
+    transactions: toCsv(tx),
+    identities: toCsv(identities),
+    evidence: runSource.replace(/\\/g, '/')
+  };
+}
+
 function loadRunSummaries(runDir: string): BrokerRunSummary[] {
   const rows: BrokerRunSummary[] = [];
   const entries = readdirSync(runDir, { withFileTypes: true })
@@ -370,7 +498,35 @@ function loadRunSummaries(runDir: string): BrokerRunSummary[] {
   return rows;
 }
 
-function collectTaskArtifacts(atmRoot: string, taskIds: string[]): TaskArtifactSummary[] {
+function loadTeamRunSummaries(teamRunDir: string | null): BrokerRunSummary[] {
+  if (!teamRunDir || !existsSync(teamRunDir)) {
+    return [];
+  }
+  const rows: BrokerRunSummary[] = [];
+  const entries = readdirSync(teamRunDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.join(teamRunDir, entry.name))
+    .sort();
+
+  for (const fullPath of entries) {
+    try {
+      const raw = JSON.parse(readFileSync(fullPath, 'utf8')) as unknown;
+      if (!isTeamRun(raw)) {
+        continue;
+      }
+      const row = summarizeTeamRun(raw, fullPath);
+      if (row) {
+        rows.push(row);
+      }
+    } catch {
+      // ignore invalid or malformed team run files
+    }
+  }
+
+  return rows;
+}
+
+function collectTaskArtifacts(atmRoot: string, taskIds: string[], teamRunDir: string | null): TaskArtifactSummary[] {
   const closureSet = new Set<string>();
   const normalizedTaskIds = taskIds
     .filter((taskId) => taskId.startsWith('TASK-'))
@@ -393,21 +549,21 @@ function collectTaskArtifacts(atmRoot: string, taskIds: string[]): TaskArtifactS
     }
   }
 
-  const teamRunDir = path.join(atmRoot, '.atm', 'runtime', 'team-runs');
+  const resolvedTeamRunDir = teamRunDir ?? path.join(atmRoot, '.atm', 'runtime', 'team-runs');
   const teamRunsByTask: Record<string, string[]> = {};
-  if (existsSync(teamRunDir)) {
-    for (const fileName of readdirSync(teamRunDir)) {
+  if (existsSync(resolvedTeamRunDir)) {
+    for (const fileName of readdirSync(resolvedTeamRunDir)) {
       if (!fileName.endsWith('.json')) {
         continue;
       }
       try {
-        const run = JSON.parse(readFileSync(path.join(teamRunDir, fileName), 'utf8')) as { taskId?: unknown };
+        const run = JSON.parse(readFileSync(path.join(resolvedTeamRunDir, fileName), 'utf8')) as { taskId?: unknown };
         const taskId = typeof run.taskId === 'string' ? run.taskId : null;
         if (!taskId || !taskId.startsWith('TASK-')) {
           continue;
         }
         teamRunsByTask[taskId] ??= [];
-        teamRunsByTask[taskId].push(`.atm/runtime/team-runs/${fileName}`);
+        teamRunsByTask[taskId].push(path.join(resolvedTeamRunDir, fileName).replace(/\\/g, '/'));
       } catch {
         // ignore malformed team run file
       }
@@ -470,6 +626,7 @@ function main() {
     return;
   }
   const runDir = parseDefaultRunDir(args['--run-dir'] || args['--run-evidence-dir']);
+  const teamRunDir = parseTeamRunDir(args['--team-run-dir']);
   const outputDir = parseOutputDir(args['--output-dir'], runDir);
   const jsonOutput = parseOutputFile(args['--json-output'], path.join(outputDir, 'broker-evidence-bundle.json'));
   const reportOutput = parseOutputFile(args['--report-output'], path.join(outputDir, 'broker-evidence-bundle.md'));
@@ -477,7 +634,10 @@ function main() {
   const taskFilter = new Set(parseCsvOption(args['--task-ids']));
   const atmRoot = path.resolve(typeof args['--atm-root'] === 'string' ? args['--atm-root'] : process.cwd());
 
-  const rows = loadRunSummaries(runDir)
+  const rows = [
+    ...loadRunSummaries(runDir),
+    ...loadTeamRunSummaries(teamRunDir)
+  ]
     .filter((row) => {
       if (runFilter.size > 0 && !runFilter.has(row.runId)) {
         return false;
@@ -499,7 +659,7 @@ function main() {
   const uniqRows = [...dedupedRows.values()];
 
   const taskIds = parseTaskIdsFromRows(uniqRows);
-  const taskArtifacts = collectTaskArtifacts(atmRoot, taskIds);
+  const taskArtifacts = collectTaskArtifacts(atmRoot, taskIds, teamRunDir);
 
   mkdirSync(outputDir, { recursive: true });
   writeFileSync(jsonOutput, `${JSON.stringify({
@@ -507,6 +667,7 @@ function main() {
     specVersion: '0.1.0',
     generatedAt: new Date().toISOString(),
     sourceRunDir: runDir.replace(/\\/g, '/'),
+    sourceTeamRunDir: teamRunDir ? teamRunDir.replace(/\\/g, '/') : null,
     sourceAtmRoot: atmRoot.replace(/\\/g, '/'),
     runs: uniqRows,
     taskArtifacts

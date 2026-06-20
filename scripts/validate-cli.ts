@@ -84,6 +84,18 @@ function sandboxEpermHint(args: any, cwd: any) {
   ].join(' ');
 }
 
+function safeRmSync(targetPath: string) {
+  try {
+    rmSync(targetPath, { recursive: true, force: true });
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException | undefined)?.code;
+    if (code !== 'EPERM' && code !== 'EBUSY') {
+      throw error;
+    }
+    console.warn(`[cli:${mode}] warning: cleanup skipped for ${targetPath} (${code})`);
+  }
+}
+
 async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
   return runAtmInProcess(args, cwd, env);
 }
@@ -1939,10 +1951,10 @@ try {
     assert(closeSuccessRes.exitCode === 0, 'closing task with valid evidence and session must succeed');
     assert(closeSuccessRes.parsed.ok === true, 'must report ok = true');
   } finally {
-    rmSync(closeGateWorkspace, { recursive: true, force: true });
+    safeRmSync(closeGateWorkspace);
   }
 } finally {
-  rmSync(tempRoot, { recursive: true, force: true });
+  safeRmSync(tempRoot);
 }
 
 if (!process.exitCode) {

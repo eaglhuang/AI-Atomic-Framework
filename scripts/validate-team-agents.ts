@@ -1846,10 +1846,12 @@ async function main() {
     mkdirSync(cwd, { recursive: true });
 
     const runDir = path.join(cwd, '.atm', 'history', 'evidence', 'broker-runs');
+    const teamRunDir = path.join(cwd, '.atm', 'runtime', 'team-runs');
     const outputDir = path.join(cwd, 'capture-output');
     const commandOutput = path.join(cwd, 'command-output');
 
     mkdirSync(runDir, { recursive: true });
+    mkdirSync(teamRunDir, { recursive: true });
     mkdirSync(outputDir, { recursive: true });
 
     const baselineRun = path.join(runDir, 'baseline.json');
@@ -1906,6 +1908,95 @@ async function main() {
       Array.isArray(filtered.runs?.[0]?.requiredFields),
       'requiredFields should be collected for schema audit'
     );
+
+    const teamRunPath = path.join(teamRunDir, 'team-capture-1.json');
+    writeFileSync(teamRunPath, `${JSON.stringify({
+      schemaId: 'atm.teamRun.v1',
+      specVersion: '0.1.0',
+      teamRunId: 'team-capture-1',
+      taskId: 'TASK-TEAM-0042',
+      actorId: 'codex',
+      planId: 'bench:B-12:TASK-TEAM-0042:team-run',
+      brokerLane: {
+        chosenLane: 'queued',
+        decision: {
+          lane: 'queued',
+          verdict: 'blocked'
+        },
+        writeIntent: {
+          requestIdentity: 'bench:B-12:TASK-TEAM-0042:team-run',
+          actorId: 'codex',
+          requestFiles: ['packages/cli/src/commands/team.ts'],
+          baseCommit: 'teamrunbase'
+        },
+        writeTransaction: {
+          transactionId: 'txn-team-run-1',
+          writeSet: ['packages/cli/src/commands/team.ts']
+        }
+      }
+    }, null, 2)}\n`, 'utf8');
+
+    const teamCaptureResult = spawnSync(
+      process.execPath,
+      [
+        '--strip-types',
+        path.join(process.cwd(), 'scripts', 'capture-broker-evidence.ts'),
+        '--run-dir',
+        runDir,
+        '--team-run-dir',
+        teamRunDir,
+        '--task-ids',
+        'TASK-TEAM-0042',
+        '--output-dir',
+        path.join(cwd, 'capture-output-team-run'),
+        '--json-output',
+        path.join(cwd, 'capture-output-team-run', 'team-broker-capture.json'),
+        '--report-output',
+        path.join(cwd, 'capture-output-team-run', 'team-broker-capture.md')
+      ],
+      { encoding: 'utf8' }
+    );
+    assert.equal(teamCaptureResult.status, 0, teamCaptureResult.stderr || teamCaptureResult.stdout);
+    const teamCaptured = JSON.parse(readFileSync(path.join(cwd, 'capture-output-team-run', 'team-broker-capture.json'), 'utf8')) as {
+      runs?: Array<{ runId: string; scenario: string; lane: string; verdict: string; transactions: string; files: string }>;
+      sourceTeamRunDirs?: string[];
+    };
+    const teamCapturedRow = teamCaptured.runs?.find((row) => row.runId === 'team-capture-1');
+    assert.ok(teamCapturedRow, 'team-run brokerLane should be captured as a run row');
+    assert.equal(teamCapturedRow?.scenario, 'B-12');
+    assert.equal(teamCapturedRow?.lane, 'queued');
+    assert.equal(teamCapturedRow?.verdict, 'blocked');
+    assert.ok(teamCapturedRow?.transactions.includes('txn-team-run-1'));
+    assert.ok(teamCapturedRow?.files.includes('packages/cli/src/commands/team.ts'));
+    assert.ok(teamCaptured.sourceTeamRunDirs?.[0]?.includes('team-runs'));
+
+    const teamCollectResult = spawnSync(
+      process.execPath,
+      [
+        '--strip-types',
+        path.join(process.cwd(), 'scripts', 'collect-broker-evidence.ts'),
+        '--run-dir',
+        runDir,
+        '--team-run-dir',
+        teamRunDir,
+        '--task-ids',
+        'TASK-TEAM-0042',
+        '--output-dir',
+        path.join(cwd, 'collect-output-team-run')
+      ],
+      { encoding: 'utf8' }
+    );
+    assert.equal(teamCollectResult.status, 0, teamCollectResult.stderr || teamCollectResult.stdout);
+    const teamCollected = JSON.parse(readFileSync(path.join(cwd, 'collect-output-team-run', 'broker-evidence-bundle.json'), 'utf8')) as {
+      runs?: Array<{ runId: string; scenario: string; lane: string; verdict: string }>;
+      sourceTeamRunDir?: string;
+    };
+    const teamCollectedRow = teamCollected.runs?.find((row) => row.runId === 'team-capture-1');
+    assert.ok(teamCollectedRow, 'collect-broker-evidence should include team-run brokerLane row');
+    assert.equal(teamCollectedRow?.scenario, 'B-12');
+    assert.equal(teamCollectedRow?.lane, 'queued');
+    assert.equal(teamCollectedRow?.verdict, 'blocked');
+    assert.ok(teamCollected.sourceTeamRunDir?.includes('team-runs'));
 
     const writerPath = path.join(commandOutput, 'write-run.cjs');
     mkdirSync(commandOutput, { recursive: true });
