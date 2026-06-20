@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-20T05-55-07-548Z-close-8eb6fa8c8c80",
+  "taskId": "TASK-AAO-0044",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260620050721-cursor-gpt-5.2-TASK-AAO-0044-5df6903c4b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0044.json",
+  "taskSha256": "sha256:13cc002c3b70205abcf3cb9b712fbbe892cdb16d4619237899bef5d7816f0af2",
+  "createdAt": "2026-06-20T05:55:07.548Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0044 --actor cursor-gpt-5.2 --status done --historical-delivery 8c2fa16d3fc655c31d1974112edd767685415eaa",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260620050721-cursor-gpt-5.2-TASK-AAO-0044-5df6903c4b",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0044.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-20T05:55:07.543Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0044-batch-skip-resume.task.md",
+        ".atm/history/evidence/TASK-AAO-0044.*",
+        ".atm/history/task-events/TASK-AAO-0044/**",
+        ".atm/history/tasks/TASK-AAO-0044.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/validate-task-ledger-governance.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
