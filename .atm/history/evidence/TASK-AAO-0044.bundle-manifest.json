@@ -1,0 +1,84 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0044",
+  "updatedAt": "2026-06-20T05:51:11.582Z",
+  "updatedBy": "cursor-gpt-5.2",
+  "freshValidationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release",
+    "validate:task-ledger-governance"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/__tests__/batch-skip-resume.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e2166101bb3e5c2b29c7c0afda08ec1c36b8a21d33485a48243e835e5f3f577c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck",
+        "validate:cli"
+      ],
+      "generatedAt": "2026-06-20T05:08:31.168Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "bcf8f511c1cdb7e19f661623e4f49361d4618ae6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-06-20T05:50:04.712Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:01cbceef86029c9bbc1907fd6d28377066d0d7be65540b2e86f25378cf58364d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:onefile-release"
+      ],
+      "generatedAt": "2026-06-20T05:50:20.740Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:root-drop-release"
+      ],
+      "generatedAt": "2026-06-20T05:50:38.088Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:task-ledger-governance",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a8f3831d565560e23b2ccb26632f5ae4fb312d47b51ee51c6c4d3760a81fc81d",
+      "stderrSha256": "sha256:4a5eaa6aeb350e1e29635437a1c6710aa366b85cb6827a44c95dd7b65fd6d4d0",
+      "validators": [
+        "validate:task-ledger-governance"
+      ],
+      "generatedAt": "2026-06-20T05:51:11.647Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
