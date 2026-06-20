@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0037",
+  "title": "Vendor-neutral Team agent provider contract and orchestration kernel",
+  "status": "done",
+  "milestone": "M8I",
+  "dependencies": [
+    "TASK-TEAM-0031",
+    "TASK-TEAM-0032",
+    "TASK-TEAM-0033",
+    "TASK-TEAM-0034",
+    "TASK-TEAM-0035",
+    "TASK-TEAM-0036"
+  ],
+  "acceptance": [
+    "Team runtime core can register multiple providers without vendor-specific conditionals leaking into role orchestration.",
+    "Provider metadata is sufficient to support OpenAI, Azure OpenAI, Claude Code, Gemini, and Microsoft Foundry without changing the core interface shape.",
+    "Worker authority boundaries remain coordinator-owned."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/provider-contract.ts",
+    "packages/core/src/team-runtime/provider-registry.ts",
+    "packages/core/src/team-runtime/execution-orchestrator.ts",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/provider-contract.ts",
+    "packages/core/src/team-runtime/provider-registry.ts",
+    "packages/core/src/team-runtime/execution-orchestrator.ts",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case vendor-neutral-runtime-contract",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Vendor-specific SDK bridge implementation",
+    "Adopter repo secret values",
+    "Direct worker git write or self-close authority"
+  ],
+  "nonGoals": [
+    "Do not hard-code any one vendor into the Team runtime core",
+    "Do not bypass broker or permission lease enforcement"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the provider contract, registry, orchestration kernel, and validator coverage together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "2026-06-19 | planned | foundation card for the multi-vendor Team runtime lane opened from the integration blueprint.",
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0037-vendor-neutral-team-agent-provider-contract-and-orchestration-kernel.task.md",
+    "sectionTitle": "TASK-TEAM-0037",
+    "headingLine": 56,
+    "hash": "4fd5f2d915494c70"
+  },
+  "importedAt": "2026-06-20T14:47:38.361Z",
+  "lastTransitionId": "2026-06-20T15-50-06-647Z-close-d5e5bbf1d25d",
+  "lastTransitionAt": "2026-06-20T15:50:06.647Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-20T15:46:52.649Z",
+  "promotedAt": "2026-06-20T15:47:01.980Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-25249d66885a",
+    "claimedAt": "2026-06-20T15:49:14.246Z",
+    "heartbeatAt": "2026-06-20T15:50:06.645Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/provider-registry.ts",
+      "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "state": "released",
+    "reason": "Emergency shared delivery bundle spans TEAM-0037/0038/0039/0041; scoped acceptance for TASK-TEAM-0037 is fully contained in commit 86b51db32d9078b3d941d450d617096b2d088961."
+  },
+  "startedAt": "2026-06-20T15:49:14.246Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260620154914-codex-gpt-5.4-mini-TASK-TEAM-0037-acfe9bbf1d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0037",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0037.*",
+      ".atm/history/task-events/TASK-TEAM-0037/**",
+      ".atm/history/tasks/TASK-TEAM-0037.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/provider-registry.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "38bfc1d0b4e6660e29124e29374de8e26ad9b566d0f0dbe6606a2107f6ae6bbb",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-20T15:49:14.422Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-20T15:50:06.645Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260620154914-codex-gpt-5.4-mini-TASK-TEAM-0037-acfe9bbf1d",
+  "closeReason": "Emergency shared delivery bundle spans TEAM-0037/0038/0039/0041; scoped acceptance for TASK-TEAM-0037 is fully contained in commit 86b51db32d9078b3d941d450d617096b2d088961.",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0037.closure-packet.json"
+}
