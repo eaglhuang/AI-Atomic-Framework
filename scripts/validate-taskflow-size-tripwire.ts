@@ -6,7 +6,7 @@ const taskflowPath = path.resolve('packages/cli/src/commands/taskflow.ts');
 const lineCount = readFileSync(taskflowPath, 'utf8').split(/\r?\n/).length;
 
 if (lineCount > LIMIT) {
-  console.error(`ATM_TASKFLOW_SIZE_TRIPWIRE_FIRED taskflow.ts has ${lineCount}/${LIMIT} lines. Revisit TASK-RFT-0008 and open the next taskflow refactor card.`);
+  console.error(`ATM_TASKFLOW_SIZE_TRIPWIRE_FIRED taskflow.ts has ${lineCount}/${LIMIT} lines. Revisit TASK-RFT-0009 and continue atom extraction.`);
   process.exit(1);
 }
 
