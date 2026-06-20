@@ -8,6 +8,7 @@ import { resolveActorWorkSession } from './actor-session.ts';
 import { createFrameworkModeStatus } from './framework-development.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 import { gitHeadEvidencePath } from './git-head-evidence.ts';
+import { resolveTaskRunnerArbitration } from './validate.ts';
 import {
   generateDiffEvidence,
   mergeDiffEvidenceWithExisting,
@@ -583,12 +584,11 @@ function buildMissingValidatorFinding(
   gate: string,
   state: Exclude<ValidatorEvidenceState, 'pass'>,
   taskId: string,
-  actor: string
+  actor: string,
+  runnerKind: 'dev-source' | 'frozen-runner'
 ): MissingValidatorFinding {
   const expectedCommand = resolveValidatorExpectedCommand(gate);
-  const escapedExpected = quoteForShell(expectedCommand);
-  const escapedGate = quoteForShell(gate);
-  const requiredCommand = `node atm.mjs evidence run --task ${taskId} --actor ${actor} --command ${escapedExpected} --validators ${escapedGate} --json`;
+  const requiredCommand = buildAutoEvidenceRequiredCommand(taskId, actor, expectedCommand, gate, runnerKind);
   if (state === 'absent') {
     return {
       code: 'ATM_EVIDENCE_VALIDATOR_ABSENT',
@@ -633,6 +633,7 @@ export function computeMissingValidatorReport(
 ): MissingValidatorReport {
   const resolvedCwd = path.resolve(cwd);
   const resolvedTaskId = taskId.trim();
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, resolvedTaskId);
 
   // 1. 取得 framework 必要 gates
   const frameworkStatus = createFrameworkModeStatus({ cwd: resolvedCwd });
@@ -680,7 +681,7 @@ export function computeMissingValidatorReport(
       evidenceState: state
     });
     if (state !== 'pass') {
-      const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId);
+      const finding = buildMissingValidatorFinding(gate, state, resolvedTaskId, actorId, runnerArbitration.preferredRunnerKind);
       if (closureRequired) {
         requiredFindings.push(finding);
         if (state === 'absent') absent.push(gate);
@@ -804,13 +805,19 @@ function canAutoRunDeclaredValidator(gate: string, command: string, taskDeclared
   return false;
 }
 
-function buildAutoEvidenceRequiredCommand(taskId: string, actorId: string, command: string, validator: string): string {
+function buildAutoEvidenceRequiredCommand(
+  taskId: string,
+  actorId: string,
+  command: string,
+  validator: string,
+  runnerKind: 'dev-source' | 'frozen-runner'
+): string {
   const escapedCommand = quoteForShell(command);
   if (detectAutoLinkedValidator(command)) {
-    return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --json`;
+    return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --runner-kind ${runnerKind} --json`;
   }
   const escapedGate = quoteForShell(validator);
-  return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --validators ${escapedGate} --json`;
+  return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --validators ${escapedGate} --runner-kind ${runnerKind} --json`;
 }
 
 export function buildAutoEvidencePlan(input: {
@@ -820,6 +827,7 @@ export function buildAutoEvidencePlan(input: {
   mode?: 'dry-run' | 'execute';
 }): AutoEvidencePlan {
   const resolvedCwd = path.resolve(input.cwd);
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
   const report = computeMissingValidatorReport(resolvedCwd, input.taskId, input.actorId);
   const taskDeclared = readTaskDeclaredValidatorGates(resolvedCwd, input.taskId);
   const toRun: AutoEvidencePlanEntry[] = [];
@@ -831,7 +839,7 @@ export function buildAutoEvidencePlan(input: {
     const command = entry.expectedCommand;
     const requiredCommand = entry.evidenceState === 'pass'
       ? null
-      : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name);
+      : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name, runnerArbitration.preferredRunnerKind);
     const base = {
       validator: entry.name,
       command,
@@ -897,6 +905,7 @@ export function executeAutoEvidencePlan(input: {
   actorId: string;
 }): AutoEvidenceExecutionResult {
   const resolvedCwd = path.resolve(input.cwd);
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
   const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
   const runs: AutoEvidenceExecutionResult['runs'][number][] = [];
 
@@ -908,12 +917,13 @@ export function executeAutoEvidencePlan(input: {
         '--task', input.taskId,
         '--actor', input.actorId,
         '--command', entry.command,
+        '--runner-kind', runnerArbitration.preferredRunnerKind,
         '--json'
       ]);
       runs.push({ validator: entry.validator, command: entry.command, ok: true });
     } catch (error) {
       const errorCode = error instanceof CliError ? error.code : 'ATM_AUTO_EVIDENCE_RUN_FAILED';
-      const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, entry.command, entry.validator);
+      const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, entry.command, entry.validator, runnerArbitration.preferredRunnerKind);
       return {
         schemaId: 'atm.autoEvidenceExecution.v1',
         taskId: input.taskId,
@@ -999,6 +1009,11 @@ function runEvidenceRun(argv: string[]) {
   const actorId = resolvedActor.actorId;
   const resolvedCwd = path.resolve(options.cwd);
   const resolvedTaskId = options.taskId.trim();
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, resolvedTaskId);
+  const requestedRunnerKind = normalizeRunnerKind(options.runnerKind ?? inferRunnerKindFromCommand(options.command));
+  const effectiveRunnerKind = requestedRunnerKind === 'unknown'
+    ? runnerArbitration.preferredRunnerKind
+    : requestedRunnerKind;
   if (options.validators.length === 0) {
     options.validators = resolveEvidenceAutoValidators({
       cwd: resolvedCwd,
@@ -1011,7 +1026,6 @@ function runEvidenceRun(argv: string[]) {
   let reusedRun: CommandRunEvidenceInput | null = null;
   if (options.recentRun) {
     const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
-    const runnerKind = normalizeRunnerKind(options.runnerKind ?? inferRunnerKindFromCommand(options.command));
 
     // 從最新的 evidence 開始往回找匹配的 command run
     for (let i = bundle.evidence.length - 1; i >= 0; i--) {
@@ -1020,7 +1034,7 @@ function runEvidenceRun(argv: string[]) {
         ? (record.details.commandRuns as unknown[]).map(r => normalizeCommandRunInput(r, `evidence[${i}]/commandRuns`))
         : [];
 
-      const match = runs.find(r => r.command === options.command && (r.runnerKind ?? 'unknown') === runnerKind);
+      const match = runs.find(r => r.command === options.command && (r.runnerKind ?? 'unknown') === effectiveRunnerKind);
       if (match) {
         reusedRun = {
           ...match,
@@ -1051,7 +1065,8 @@ function runEvidenceRun(argv: string[]) {
       stdoutSha256: hashString(result.stdout ?? ''),
       stderrSha256: hashString(result.stderr ?? ''),
       generatedAt: new Date().toISOString(),
-      validators: options.validators
+      validators: options.validators,
+      runnerKind: effectiveRunnerKind
     };
 
     if (result.error) {
@@ -1083,9 +1098,7 @@ function runEvidenceRun(argv: string[]) {
   if (options.artifacts.length > 0) {
     addArgv.push('--artifacts', options.artifacts.join(','));
   }
-  if (options.runnerKind) {
-    addArgv.push('--runner-kind', options.runnerKind);
-  }
+  addArgv.push('--runner-kind', effectiveRunnerKind);
   if (reusedRun) {
     addArgv.push('--freshness', 'historical-reference');
   }

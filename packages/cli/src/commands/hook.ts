@@ -103,6 +103,11 @@ interface CommandRunReport {
   readonly stderrPreview: string;
 }
 
+interface ValidatorRunTriage {
+  readonly blockingRuns: readonly CommandRunReport[];
+  readonly advisoryFindings: readonly PreCommitAdvisoryFinding[];
+}
+
 interface CommitEvidenceMatch {
   readonly commitSha: string;
   readonly criticalChangedFiles: readonly string[];
@@ -199,6 +204,7 @@ interface PreCommitAdvisoryFinding {
   readonly files?: readonly string[];
   readonly scope: 'tree-wide';
   readonly taskId?: string;
+  readonly classification?: 'tree-wide-advisory';
   readonly data?: unknown;
 }
 
@@ -533,7 +539,13 @@ function runPreCommitHook(cwd: string) {
   const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
     ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
     : [];
-  const failedValidatorRuns = commandRuns.filter((entry) => entry.exitCode !== 0);
+  const validatorRunTriage = triageForeignTaskflowValidatorRuns({
+    cwd: root,
+    stagedFiles,
+    activeDirectionLocks,
+    failedRuns: commandRuns.filter((entry) => entry.exitCode !== 0)
+  });
+  const failedValidatorRuns = validatorRunTriage.blockingRuns;
   const staleLocks = frameworkStatus.staleLocks;
   const releasableStaleLock = staleLocks.find(isFrameworkStaleLockReleasable) ?? null;
   const baseClaimCommand = buildFrameworkTempClaimCommand(frameworkStatus.criticalChangedFiles, 'temporary framework maintenance before commit', releasableStaleLock?.actorId ?? null);
@@ -573,7 +585,7 @@ function runPreCommitHook(cwd: string) {
     ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
     : null;
   // TASK-AAO-0136: collect tree-wide advisory findings (warnings only, not blockers).
-  const advisoryFindings: PreCommitAdvisoryFinding[] = [];
+  const advisoryFindings: PreCommitAdvisoryFinding[] = [...validatorRunTriage.advisoryFindings];
   const blockingFindings = buildPreCommitBlockingFindings({
     encodingReport,
     gitIndexDiagnostic,
@@ -1301,6 +1313,56 @@ function runRequiredFrameworkValidators(cwd: string, requiredGates: readonly str
   if (validationPasses.length === 0) return [];
   const commands = uniqueSorted(validationPasses.map((gate) => gate === 'typecheck' ? 'npm run typecheck' : `npm run ${gate}`));
   return commands.map((command) => runShellCommandForReport(cwd, command));
+}
+
+function triageForeignTaskflowValidatorRuns(input: {
+  cwd: string;
+  stagedFiles: readonly string[];
+  activeDirectionLocks: ReturnType<typeof readActiveTaskDirectionLocks>;
+  failedRuns: readonly CommandRunReport[];
+}): ValidatorRunTriage {
+  const taskflowPath = 'packages/cli/src/commands/taskflow.ts';
+  if (input.failedRuns.length === 0) {
+    return { blockingRuns: input.failedRuns, advisoryFindings: [] };
+  }
+  if (input.stagedFiles.includes(taskflowPath)) {
+    return { blockingRuns: input.failedRuns, advisoryFindings: [] };
+  }
+  const owningLocks = input.activeDirectionLocks.filter((lock) => isPathAllowedByTaskDirection(taskflowPath, lock.allowedFiles));
+  if (owningLocks.length === 0) {
+    return { blockingRuns: input.failedRuns, advisoryFindings: [] };
+  }
+
+  const blockingRuns: CommandRunReport[] = [];
+  const advisoryFindings: PreCommitAdvisoryFinding[] = [];
+  for (const run of input.failedRuns) {
+    const preview = `${run.stdoutPreview}\n${run.stderrPreview}`;
+    const mentionsForeignTaskflow = preview.includes(taskflowPath)
+      || preview.includes('buildTaskflowCloseWriteReadinessHint')
+      || preview.includes('Identifier \'buildTaskflowCloseWriteReadinessHint\' has already been declared')
+      || preview.includes('Cannot find name \'Taskflow')
+      || preview.includes('Cannot find name \'buildHistoricalClosePreflight\'');
+    const isFrameworkSurface = run.command === 'npm run typecheck' || run.command === 'npm run validate:cli';
+    if (isFrameworkSurface && mentionsForeignTaskflow) {
+      advisoryFindings.push({
+        code: 'ATM_HOOK_FOREIGN_TASKFLOW_WIP_ADVISORY',
+        source: 'framework-validator',
+        detail: `${run.command} failed against foreign in-flight taskflow.ts source owned by active direction lock(s): ${owningLocks.map((lock) => lock.taskId).join(', ')}. This commit does not stage taskflow.ts, so the failure is advisory for this lane.`,
+        scope: 'tree-wide',
+        classification: 'tree-wide-advisory',
+        data: {
+          command: run.command,
+          foreignTaskflowPath: taskflowPath,
+          owningTaskIds: owningLocks.map((lock) => lock.taskId),
+          stdoutSha256: run.stdoutSha256,
+          stderrSha256: run.stderrSha256
+        }
+      });
+      continue;
+    }
+    blockingRuns.push(run);
+  }
+  return { blockingRuns, advisoryFindings };
 }
 
 function runCommandForReport(cwd: string, command: string, args: readonly string[]): CommandRunReport {

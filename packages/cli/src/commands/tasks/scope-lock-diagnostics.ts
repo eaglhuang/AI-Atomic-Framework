@@ -36,6 +36,7 @@ export interface FrameworkCloseDirtyGuardReport {
   readonly correctPlanningMirrorPreEditFiles: readonly string[];
   readonly incorrectPlanningMirrorPreEditFiles: readonly string[];
   readonly advisoryTrackedDirtyFiles: readonly string[];
+  readonly foreignActiveDirtyFiles: readonly string[];
   readonly generatedArtifactFiles: readonly string[];
   readonly remediation: TaskScopeDiagnosticRemediation;
 }
@@ -145,6 +146,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   readonly trackedDirtyFiles: readonly string[];
   readonly historicalDeliveredFiles?: readonly string[];
   readonly allowedAdvisoryGovernanceFiles?: readonly string[];
+  readonly allowedAdvisoryDirtyFiles?: readonly string[];
   readonly correctPlanningMirrorPreEditFiles?: readonly string[];
   readonly incorrectPlanningMirrorPreEditFiles?: readonly string[];
 }): FrameworkCloseDirtyGuardReport {
@@ -154,6 +156,9 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   const historicalDeliveredFiles = uniqueStrings((input.historicalDeliveredFiles ?? []).map(normalizeRelativePath).filter(Boolean));
   const allowedAdvisoryGovernanceFiles = new Set(
     uniqueStrings((input.allowedAdvisoryGovernanceFiles ?? []).map(normalizeRelativePath).filter(Boolean))
+  );
+  const allowedAdvisoryDirtyFiles = new Set(
+    uniqueStrings((input.allowedAdvisoryDirtyFiles ?? []).map(normalizeRelativePath).filter(Boolean))
   );
   const buckets: Record<DirtyBucketId, string[]> = {
     scopeTrackedDirtyFiles: [],
@@ -173,6 +178,9 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
 
   const historicalCloseback = historicalDeliveredFiles.length > 0;
   const scopeTrackedDirtyFiles = uniqueStrings(buckets.scopeTrackedDirtyFiles.filter((filePath) => {
+    if (allowedAdvisoryDirtyFiles.has(filePath)) {
+      return false;
+    }
     if (!historicalCloseback) return true;
     const matchesDeliverable = deliverableFiles.some((declared) => pathMatchesTaskScope(filePath, declared));
     if (!matchesDeliverable) {
@@ -184,10 +192,13 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     ? uniqueStrings(buckets.scopeTrackedDirtyFiles.filter((filePath) => !scopeTrackedDirtyFiles.includes(filePath)))
     : [];
   const governanceTrackedDirtyFiles = uniqueStrings(
-    buckets.governanceTrackedDirtyFiles.filter((filePath) => !allowedAdvisoryGovernanceFiles.has(filePath))
+    buckets.governanceTrackedDirtyFiles.filter((filePath) => !allowedAdvisoryGovernanceFiles.has(filePath) && !allowedAdvisoryDirtyFiles.has(filePath))
   );
   const allowlistedGovernanceTrackedFiles = uniqueStrings(
-    buckets.governanceTrackedDirtyFiles.filter((filePath) => allowedAdvisoryGovernanceFiles.has(filePath))
+    buckets.governanceTrackedDirtyFiles.filter((filePath) => allowedAdvisoryGovernanceFiles.has(filePath) || allowedAdvisoryDirtyFiles.has(filePath))
+  );
+  const foreignActiveDirtyFiles = uniqueStrings(
+    trackedDirtyFiles.filter((filePath) => allowedAdvisoryDirtyFiles.has(filePath))
   );
   const correctPlanningMirrorPreEditFiles = uniqueStrings(input.correctPlanningMirrorPreEditFiles ?? []);
   const incorrectPlanningMirrorPreEditFiles = uniqueStrings(input.incorrectPlanningMirrorPreEditFiles ?? []);
@@ -201,6 +212,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
   const advisoryTrackedDirtyFiles = uniqueStrings([
     ...historicalAdvisoryScopeTrackedFiles,
     ...allowlistedGovernanceTrackedFiles,
+    ...foreignActiveDirtyFiles,
     ...regenerableArtifactFiles,
     ...correctPlanningMirrorPreEditFiles,
     ...generatedArtifactFiles,
@@ -219,6 +231,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     correctPlanningMirrorPreEditFiles,
     incorrectPlanningMirrorPreEditFiles,
     advisoryTrackedDirtyFiles,
+    foreignActiveDirtyFiles,
     generatedArtifactFiles,
     remediation: {
       requiredCommand: ok ? null : `node atm.mjs git commit --actor <actor> --task ${input.taskId} --message "<delivery message>" --json`,

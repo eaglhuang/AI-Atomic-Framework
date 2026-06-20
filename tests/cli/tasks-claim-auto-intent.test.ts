@@ -58,6 +58,18 @@ try {
   assert.equal(landedClaim.parsed.evidence.claimIntent, 'closeout-only');
   assert.equal(landedClaim.parsed.evidence.claimIntentResolution.reason, 'deliverables-already-in-head');
   assert.deepEqual(landedClaim.parsed.evidence.claimIntentResolution.deliverablesTrackedInHead, ['src/already-landed.ts']);
+  runAtm(['tasks', 'release', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--reason', 'fixture reset', '--json']);
+
+  writeFileSync(path.join(workspace, 'src', 'already-landed.ts'), 'export const alreadyLanded = false;\n');
+  const reclaimedTaskPath = path.join(workspace, '.atm', 'history', 'tasks', 'TASK-MAO-AUTO-0002.json');
+  const reclaimedTaskBefore = JSON.parse(readFileSync(reclaimedTaskPath, 'utf8'));
+  reclaimedTaskBefore.status = 'ready';
+  writeFileSync(reclaimedTaskPath, `${JSON.stringify(reclaimedTaskBefore, null, 2)}\n`);
+  const reclaimedWrite = runAtm(['next', '--cwd', workspace, '--claim', '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--claim-intent', 'write', '--json']);
+  assert.equal(reclaimedWrite.exitCode, 0, reclaimedWrite.stderr || reclaimedWrite.stdout);
+  assert.equal(reclaimedWrite.parsed.evidence.nextAction.claimIntent, 'write');
+  const reclaimedTask = JSON.parse(readFileSync(reclaimedTaskPath, 'utf8'));
+  assert.equal(reclaimedTask.claim?.intent, 'write');
 
   const nextRoute = runAtm(['next', '--cwd', workspace, '--prompt', 'Continue TASK-MAO-AUTO-0002', '--json']);
   assert.equal(nextRoute.exitCode, 0, nextRoute.stderr || nextRoute.stdout);
