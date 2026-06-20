@@ -1,0 +1,576 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0078",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8b4329f0815350b89c1470c9059968d2e8391118",
+  "governedTreeSha": "30f6c10a402f4ad355c9c56d486448232b48e8af",
+  "targetCommitDelta": {
+    "currentCommitSha": "8b4329f0815350b89c1470c9059968d2e8391118",
+    "parentCommitShas": [
+      "8b4329f0815350b89c1470c9059968d2e8391118"
+    ],
+    "governedTreeSha": "30f6c10a402f4ad355c9c56d486448232b48e8af",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0078.json",
+      ".atm/history/task-events/TASK-AAO-0078/2026-06-20T02-20-27-477Z-import-747aa6619ff5.json",
+      ".atm/history/task-events/TASK-AAO-0078/2026-06-20T02-20-55-985Z-reserve-71d5ebd4730f.json",
+      ".atm/history/task-events/TASK-AAO-0078/2026-06-20T02-20-56-451Z-promote-ea93e81c57da.json",
+      ".atm/history/task-events/TASK-AAO-0078/2026-06-20T02-20-57-372Z-claim-32dffb2dfb51.json",
+      ".atm/history/tasks/TASK-AAO-0078.json",
+      ".atm/history/tasks/TASK-CID-0112.json",
+      ".atm/history/tasks/TASK-MAO-0021.json",
+      ".atm/history/tasks/TASK-RFT-0008.json",
+      ".atm/runtime/snapshots/close-window-foreign-staged-git-head-1781713626705.json",
+      ".atm/runtime/snapshots/foreign-staged-TASK-MAO-0044-1781715809617.json",
+      ".atm/runtime/team-runs/team-20a567ff700e.json",
+      ".atm/runtime/team-runs/team-48495f14cfa8.json",
+      ".atm/runtime/team-runs/team-4d7bc0109ef7.json",
+      ".atm/runtime/team-runs/team-58b90b56f1a5.json",
+      ".atm/runtime/team-runs/team-829439bfad9a.json",
+      ".atm/runtime/team-runs/team-92f37ff86535.json",
+      ".gitattributes",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/route-predicates.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "packages/cli/src/commands/tasks/lifecycle-state.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/decision.test.ts",
+      "packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/ATM_NEW_USER_WORKFLOW.md",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/docs/governance/command-surface.md",
+      "release/atm-root-drop/docs/governance/git-governance-contract.md",
+      "release/atm-root-drop/docs/governance/historical-batch-evidence.md",
+      "release/atm-root-drop/docs/governance/task-close-ready-task-cid-0111.md",
+      "release/atm-root-drop/docs/governance/team-agents/templates/team-memory-shard-template.md",
+      "release/atm-root-drop/docs/HOST_GOVERNANCE_INTEGRATION.md",
+      "release/atm-root-drop/docs/reports/mao-parallel-routing-benchmark.md",
+      "release/atm-root-drop/docs/specs/mao-logical-routing-v1.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/atm.js",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/evidence.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/git.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/identity.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/next.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/route.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/taskflow.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/tasks.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/team.spec.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/team.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/hook.js",
+      "release/atm-root-drop/packages/cli/dist/commands/identity.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-predicates.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/route.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-orchestration.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-orchestration.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/command-dispatch.test.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lifecycle-state.test.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/residue-diagnostics.test.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/scope-lock-diagnostics.test.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/command-dispatch.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/command-dispatch.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/lifecycle-state.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/lifecycle-state.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/residue-diagnostics.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/scope-lock-diagnostics.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/scope-lock-diagnostics.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/surface-invariants.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/README.md",
+      "release/atm-root-drop/packages/cli/src/atm.ts",
+      "release/atm-root-drop/packages/cli/src/commands/actor-registry.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/git.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/identity.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/next.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/route.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/taskflow.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/team.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook.ts",
+      "release/atm-root-drop/packages/cli/src/commands/identity.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-predicates.ts",
+      "release/atm-root-drop/packages/cli/src/commands/route.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/command-dispatch.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/lifecycle-state.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/residue-diagnostics.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/surface-invariants.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/batch-planner.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/conflict-matrix.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/decision.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/patch-envelope.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/steward-arbitration.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/apply-evidence.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/apply-evidence.js",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/broker/patch-envelope.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/patch-envelope.js",
+      "release/atm-root-drop/packages/core/dist/broker/recovery.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/broker/steward.js",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.js",
+      "release/atm-root-drop/packages/core/dist/broker/types.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/types.js",
+      "release/atm-root-drop/packages/core/dist/governance/scope-lock.d.ts",
+      "release/atm-root-drop/packages/core/dist/governance/scope-lock.js",
+      "release/atm-root-drop/packages/core/dist/guidance/guidance-packet.d.ts",
+      "release/atm-root-drop/packages/core/dist/guidance/route-engine.d.ts",
+      "release/atm-root-drop/packages/core/dist/guidance/route-engine.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/decision.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/patch-envelope.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/steward-arbitration.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/apply-evidence.ts",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/broker/patch-envelope.ts",
+      "release/atm-root-drop/packages/core/src/broker/recovery.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/broker/steward.ts",
+      "release/atm-root-drop/packages/core/src/broker/team-lane.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/packages/core/src/governance/scope-lock.ts",
+      "release/atm-root-drop/packages/core/src/guidance/guidance-packet.ts",
+      "release/atm-root-drop/packages/core/src/guidance/route-engine.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/stores.js",
+      "release/atm-root-drop/packages/plugin-governance-local/src/stores.ts",
+      "release/atm-root-drop/schemas/broker/mutation-request.schema.json",
+      "release/atm-root-drop/schemas/governance/closure-packet.schema.json",
+      "release/atm-root-drop/schemas/governance/patch-proposal.schema.json",
+      "release/atm-root-drop/scripts/build-onefile-release.ts",
+      "release/atm-root-drop/scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "release/atm-root-drop/scripts/scan-broker-runs.ts",
+      "release/atm-root-drop/scripts/validate-broker-steward.ts",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-governance-local.ts",
+      "release/atm-root-drop/scripts/validate-guidance.ts",
+      "release/atm-root-drop/scripts/validate-mao-parallel-routing.ts",
+      "release/atm-root-drop/scripts/validate-prompt-scoped-next.ts",
+      "release/atm-root-drop/scripts/validate-schemas.ts",
+      "release/atm-root-drop/scripts/validate-task-import.ts",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "release/atm-root-drop/scripts/validate-task-parallel-advisor.ts",
+      "release/atm-root-drop/scripts/validate-team-agents.ts",
+      "release/atm-root-drop/scripts/validate-team-brokered-write.ts",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/command-list.json",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/next.json",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging.test.ts",
+      "release/atm-root-drop/tests/cli/route-lifecycle.test.ts",
+      "release/atm-root-drop/tests/cli/task-scope-amendment.test.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-root-drop-release.ts",
+      "tests/cli-fixtures/help-snapshots/next.json",
+      "tests/cli/tasks-claim-auto-intent.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:86498c730e00c3dd614a0b0ae2b99b1c7d409b680278f1c763ab0ae357e4e583",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:typecheck"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-20T02:24:10.191Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0078-git-head-evidence-jsonl-migration.task.md",
+      ".atm/history/evidence/git-head.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/evidence/TASK-AAO-0078.*",
+      ".atm/history/task-events/TASK-AAO-0078/**",
+      ".atm/history/tasks/TASK-AAO-0078.json",
+      ".gitattributes",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-root-drop-release.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-root-drop-release.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0078.json",
+  "closedAt": "2026-06-20T02:24:10.191Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "sessionId": "session-20260620022056-cursor-gpt-5.2-TASK-AAO-0078-2685a719d7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "138adbef808343274436058604981eb7cc550db7",
+    "taskMatchedFiles": [
+      ".gitattributes",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/framework-development.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-root-drop-release.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/cli/src/commands/task-direction.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/cli/src/commands/task-direction.ts"
+    ],
+    "waiverReason": "Historical close TASK-AAO-0078 git-head JSONL migration"
+  },
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-06-20T02:24:10.192Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-55943e9668dd.json"
+    },
+    "teamRunId": "team-55943e9668dd",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "TASK-AAO-0078",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamSize": "medium",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "confidence": "medium",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "recipeId": "atm.default.normal.typescript"
+        },
+        "languageMatch": "typescript",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+        "confidence": "high",
+        "deterministicHints": {
+          "scopePaths": [
+            ".atm/history/evidence/git-head.json",
+            ".atm/history/evidence/git-head.jsonl",
+            ".gitattributes",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/evidence.ts",
+            "packages/cli/src/commands/framework-development.ts",
+            "packages/cli/src/commands/git-head-evidence.ts",
+            "packages/cli/src/commands/hook.ts",
+            "scripts/validate-git-head-evidence.ts",
+            "scripts/validate-git-hooks-enforcement.ts",
+            "scripts/validate-onefile-release.ts",
+            "scripts/validate-root-drop-release.ts"
+          ],
+          "deliverables": [
+            ".atm/history/evidence/git-head.json",
+            ".atm/history/evidence/git-head.jsonl",
+            ".gitattributes",
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/evidence.ts",
+            "packages/cli/src/commands/framework-development.ts",
+            "packages/cli/src/commands/git-head-evidence.ts",
+            "packages/cli/src/commands/hook.ts",
+            "scripts/validate-git-head-evidence.ts",
+            "scripts/validate-git-hooks-enforcement.ts",
+            "scripts/validate-onefile-release.ts",
+            "scripts/validate-root-drop-release.ts"
+          ],
+          "fileExtensions": [
+            ".json",
+            ".jsonl",
+            ".ts"
+          ],
+          "pathHints": [
+            "typescript-file",
+            "typescript-heavy"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": true,
+      "escalationReason": "Scope spans 12 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Large script risk indicates the captain should not keep all coordination signals inline. Closure, evidence, or git signals are present and should be tracked by a lieutenant boundary. Validator fan-out is 10, which merits lieutenant tracking.",
+      "needLieutenant": true,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": true,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "medium",
+        "coordinationBoundary": "captain+lieutenant",
+        "signals": {
+          "scopeCount": 12,
+          "crossRepoScope": true,
+          "validatorCount": 10,
+          "largeScriptRisk": true,
+          "closureSignals": true,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "high",
+          "threshold": 3,
+          "reasons": [
+            "hot file touched: packages/cli/src/commands/evidence.ts, packages/cli/src/commands/hook.ts",
+            "touched files 10 exceed planning threshold 3"
+          ]
+        },
+        "mapUpdateNeed": true,
+        "escalationRequired": true,
+        "needLieutenant": true,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "implementationSummary": "editor-subagent selected; adapter metadata is advisory, language=node, atm.editor.subagent-bridge; closure remains governed by command-backed evidence.",
+      "validators": [
+        "npm run typecheck",
+        "npm run validate:cli",
+        "npm run validate:git-head-evidence",
+        "git diff --check"
+      ],
+      "evidence": [],
+      "brokerGovernance": {
+        "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+        "brokerSubagentEnabled": true,
+        "brokerDecisionSurface": "brokerLane",
+        "brokerStewardId": "neutral-write-steward",
+        "brokerGoverns": [
+          "write-intents",
+          "scope-conflicts",
+          "steward-apply",
+          "commit-lane"
+        ],
+        "brokerEvidenceRequired": [
+          "atm.teamBrokerLaneEvidence.v1",
+          "atm.stewardApplyEvidence.v1",
+          "atm.brokerOperationRunRecordEnvelope.v1"
+        ],
+        "commitLaneSerializedBy": "branch-commit-queue",
+        "commitLaneOwnerRole": "coordinator",
+        "workerGitWrite": false,
+        "workerTaskLifecycle": false,
+        "workerSelfClose": false
+      },
+      "risk": "medium",
+      "closeReady": false
+    }
+  }
+}
