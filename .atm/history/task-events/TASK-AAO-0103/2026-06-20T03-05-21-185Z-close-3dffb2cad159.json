@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-20T03-05-21-185Z-close-3dffb2cad159",
+  "taskId": "TASK-AAO-0103",
+  "action": "close",
+  "actorId": "cursor-gpt-5.2",
+  "sessionId": "session-20260620025911-cursor-gpt-5.2-TASK-AAO-0103-01f46f47dc",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0103.json",
+  "taskSha256": "sha256:e638cb751f230509bc4d6c101ea315de781bc679b750a37a1517690765d918ca",
+  "createdAt": "2026-06-20T03:05:21.185Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0103 --actor cursor-gpt-5.2 --status done --historical-delivery 6f28a1c1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260620025911-cursor-gpt-5.2-TASK-AAO-0103-01f46f47dc",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0103.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-20T03:05:21.179Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0103-environment-workspace-hygiene-preflight.task.md",
+        ".atm/history/evidence/TASK-AAO-0103.*",
+        ".atm/history/task-events/TASK-AAO-0103/**",
+        ".atm/history/tasks/TASK-AAO-0103.json",
+        "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0103-environment-workspace-hygiene-preflight.task.md",
+        "docs/tasks/tasks-aao.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

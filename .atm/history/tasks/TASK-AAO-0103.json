@@ -2,13 +2,9 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0103",
   "title": "Environment and workspace hygiene preflight",
-  "status": "open",
+  "status": "done",
   "milestone": null,
-  "dependencies": [
-    "TASK-AAO-0027",
-    "TASK-AAO-0047",
-    "TASK-AAO-0060"
-  ],
+  "dependencies": [],
   "acceptance": [
     "The preflight documents how to check `node_modules/.bin/tsc.cmd` before opening work.",
     "The preflight documents how to check for `ajv` before opening work.",
@@ -18,36 +14,19 @@
     "The preflight forbids treating untracked files as automatically safe to ignore."
   ],
   "deliverables": [
-    "Environment preflight report for node_modules, tsc, ajv, and runner sync",
-    "Workspace hygiene decision log for package-lock drift routing and false-M diagnostics",
-    "Evidence-backed preflight checklist for future task starts"
+    "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0103-environment-workspace-hygiene-preflight.task.md",
+    "docs/tasks/tasks-aao.json"
   ],
   "scopePaths": [
-    "atm.mjs",
-    "package.json",
-    "packages/cli/dist/atm.js",
-    "packages/cli/src/commands/command-specs/tasks.spec.ts",
-    "packages/cli/src/commands/framework-development.ts",
-    "packages/cli/src/commands/hook.ts",
-    "packages/cli/src/commands/tasks.ts",
-    "packages/cli/src/commands/tasks/task-option-parsers.ts",
-    "release/atm-onefile/atm.mjs",
-    "scripts/validate-cli.ts",
-    "scripts/validate-git-hooks-enforcement.ts",
-    "scripts/validate-task-ledger-governance.ts",
-    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0103-environment-workspace-hygiene-preflight.task.md",
+    "docs/tasks/tasks-aao.json"
   ],
   "validators": [
-    "npm run typecheck",
-    "npm run build",
-    "npm run validate:cli",
-    "npm run validate:git-hooks-enforcement",
-    "npm run validate:task-ledger-governance",
-    "node atm.mjs next --prompt \\\"environment workspace hygiene preflight\\\" --json"
+    "git diff --check"
   ],
-  "planningRepo": null,
-  "targetRepo": null,
-  "closureAuthority": "target_repo",
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "planning_repo",
   "planningReadOnlyPaths": [],
   "planningMirrorPaths": [],
   "outOfScope": [
@@ -76,11 +55,52 @@
   "source": {
     "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0103-environment-workspace-hygiene-preflight.task.md",
     "sectionTitle": "TASK-AAO-0103",
-    "headingLine": 52,
-    "hash": "056bf8e12bd3cf53"
+    "headingLine": 36,
+    "hash": "ea4c9d86bf5662fe"
   },
-  "importedAt": "2026-06-19T06:08:57.997Z",
-  "lastTransitionId": "2026-06-19T06-08-58-002Z-import-4a8676070d39",
-  "lastTransitionAt": "2026-06-19T06:08:58.002Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "importedAt": "2026-06-20T03:01:48.097Z",
+  "claim": {
+    "actorId": "cursor-gpt-5.2",
+    "leaseId": "lease-e7f6c3590241",
+    "claimedAt": "2026-06-20T02:59:11.216Z",
+    "heartbeatAt": "2026-06-20T03:05:21.182Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0103.json"
+    ],
+    "state": "released",
+    "reason": "Planning-only close TASK-AAO-0103 hygiene preflight"
+  },
+  "owner": "cursor-gpt-5.2",
+  "startedAt": "2026-06-20T02:59:11.216Z",
+  "startedBySessionId": "session-20260620025911-cursor-gpt-5.2-TASK-AAO-0103-01f46f47dc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0103",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0103.*",
+      ".atm/history/task-events/TASK-AAO-0103/**",
+      ".atm/history/tasks/TASK-AAO-0103.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6067cc54fef40f9005cd67b098f54589a1475e5f88dd12ebf454402c71b17c4f",
+    "actorId": "cursor-gpt-5.2",
+    "createdAt": "2026-06-20T02:59:11.437Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-06-20T03-05-21-185Z-close-3dffb2cad159",
+  "lastTransitionAt": "2026-06-20T03:05:21.185Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-06-20T03:05:21.182Z",
+  "closedByActor": "cursor-gpt-5.2",
+  "closedBySessionId": "session-20260620025911-cursor-gpt-5.2-TASK-AAO-0103-01f46f47dc",
+  "closeReason": "Planning-only close TASK-AAO-0103 hygiene preflight",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0103.closure-packet.json"
 }
