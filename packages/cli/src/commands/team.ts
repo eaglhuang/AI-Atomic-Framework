@@ -2778,6 +2778,17 @@ export function buildTeamPatrolReport(input: {
       suggestedCommand: `node atm.mjs team start --task ${quoteCliValue(input.taskId)} --actor <actor> --json`
     }));
   } else {
+    const taskStatus = normalizeOptionalRuntimeString(taskSummary.status);
+    if (taskStatus && ['done', 'abandoned', 'blocked'].includes(taskStatus) && String(teamRun.status ?? '').trim() === 'active') {
+      findings.push(teamPatrolFinding({
+        level: 'warning',
+        code: 'ATM_TEAM_PATROL_STALE_TERMINAL_TEAM_RUN',
+        category: 'runtime-mode',
+        summary: `Team run ${teamRun.teamRunId} is still active even though task ${input.taskId} is already ${taskStatus}.`,
+        suggestedCommand: `node atm.mjs tasks close --task ${quoteCliValue(input.taskId)} --actor <actor> --status ${taskStatus} --json`,
+        details: { teamRunId: teamRun.teamRunId, taskStatus }
+      }));
+    }
     findings.push(...buildTeamRunPatrolFindings(teamRun, input));
   }
 

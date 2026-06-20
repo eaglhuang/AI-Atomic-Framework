@@ -140,6 +140,7 @@ try {
     actorId: 'fixture-agent',
     outcome: 'aborted'
   });
+  assert.equal(existsSync(path.join(repoRoot, deferred.foreignStagedSnapshotPath!)), false, 'close-window deferred snapshot must be auto-cleaned when the lock releases');
 
   const previousTaskContent = readFileSync(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), 'utf8');
   writeJson(path.join(repoRoot, `.atm/history/tasks/${taskId}.json`), {

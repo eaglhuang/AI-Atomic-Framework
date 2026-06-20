@@ -416,6 +416,7 @@ function runGitCommit(options: ParsedGitOptions) {
     claimLeaseId: claimForTrailers?.leaseId ?? null,
     allowImplicitSession: Boolean(options.taskId && !bypassesActiveSession)
   });
+  let deferredForeignStagedSnapshotPath: string | null = null;
   if (options.taskId && !session && !bypassesActiveSession) {
     throw new CliError('ATM_GIT_COMMIT_SESSION_REQUIRED', `git commit requires an active or recent ATM work session for ${options.taskId}.`, {
       exitCode: 1,
@@ -443,6 +444,7 @@ function runGitCommit(options: ParsedGitOptions) {
         ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : [])
       ]
     });
+    deferredForeignStagedSnapshotPath = bundleReport.deferredForeignStagedSnapshot;
     const copyableCommitCommand = bundleReport.copyableCommitCommand;
     if (options.dryRun) {
       return makeResult({
@@ -470,6 +472,7 @@ function runGitCommit(options: ParsedGitOptions) {
       });
     }
     if (!bundleReport.ok) {
+      cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
       throw new CliError(bundleReport.blockedCode ?? 'ATM_GIT_COMMIT_BUNDLE_BLOCKED', bundleReport.blockedSummary ?? 'Task-scoped commit bundle resolver blocked the commit.', {
         exitCode: 1,
         details: {
@@ -485,6 +488,7 @@ function runGitCommit(options: ParsedGitOptions) {
     }
     const stagedBundleInspection = inspectTaskScopedStagedGovernanceBundle(options.cwd, options.taskId, taskDocument);
     if (!stagedBundleInspection.ok) {
+      cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
       throw new CliError(stagedBundleInspection.code, stagedBundleInspection.summary, {
         exitCode: 1,
         details: {
@@ -499,6 +503,7 @@ function runGitCommit(options: ParsedGitOptions) {
     }
     const stagingInspection = inspectTaskScopedUnstagedCommit(options.cwd, options.taskId, taskDocument);
     if (stagingInspection?.kind === 'staging-required') {
+      cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
       throw new CliError(
         'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED',
         `git commit for ${options.taskId} requires staged task-scoped files before the wrapper can create a governed commit.`,
@@ -518,6 +523,7 @@ function runGitCommit(options: ParsedGitOptions) {
       );
     }
     if (stagingInspection?.kind === 'mixed-scope') {
+      cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
       throw new CliError(
         'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS',
         `git commit for ${options.taskId} found out-of-scope files already staged with task-scoped work; defer foreign staged files or stage only in-scope files manually before retrying.`,
@@ -624,6 +630,7 @@ function runGitCommit(options: ParsedGitOptions) {
       }
     });
   } catch (error) {
+    cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
     if (error instanceof CliError && (error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY' || error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE')) {
       throw error;
     }
@@ -744,6 +751,7 @@ function runGitCommit(options: ParsedGitOptions) {
     });
   }
   const commitSha = readHeadCommitSha(options.cwd);
+  cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
   const branchCommitQueue = {
     schemaId: 'atm.branchCommitQueueEvidence.v1',
     serializedBy: 'branch-commit-queue',
@@ -1318,6 +1326,17 @@ function deferForeignStagedFiles(
   }, null, 2)}\n`, 'utf8');
   runGitCommand(cwd, ['restore', '--staged', '--', ...files], ['ignore', 'pipe', 'pipe']);
   return snapshotPath;
+}
+
+function cleanupDeferredForeignStagedSnapshot(cwd: string, snapshotPath: string | null) {
+  if (!snapshotPath) return;
+  const absolutePath = path.join(cwd, snapshotPath);
+  if (!existsSync(absolutePath)) return;
+  try {
+    rmSync(absolutePath, { force: true });
+  } catch {
+    // best-effort runtime residue cleanup
+  }
 }
 
 function withTaskScopedCommitIndex<T>(

@@ -326,6 +326,7 @@ try {
     '--json'
   ]);
   assert.equal(deferredCommit.ok, true);
+  assert.equal(existsSync(path.join(tempDir, bundle.deferredForeignStagedSnapshot!)), false, 'git commit must auto-clean deferred foreign staged snapshots after use');
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-safe";\n', 'utf8');
   const gitHeadResiduePath = path.join(tempDir, '.atm/history/evidence/git-head.jsonl');
@@ -346,23 +347,18 @@ try {
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-blocked";\n', 'utf8');
   const foreignResiduePath = path.join(tempDir, '.atm/runtime/snapshots/foreign-staged-TASK-OTHER-9999-1781880000000.json');
   writeJson(foreignResiduePath, { taskId: 'TASK-OTHER-9999', files: ['src/other.ts'] });
-  const blockedResidueCommit = expectCliError(
-    runAtmGit([
-      'commit',
-      '--cwd', tempDir,
-      '--actor', 'fixture-agent',
-      '--task', taskId,
-      '--session', sessionId,
-      '--message', 'feat: block foreign residue',
-      '--auto-stage',
-      '--json'
-    ]),
-    'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED'
-  );
-  const blockedResidueDetails = ((await blockedResidueCommit).details ?? {}) as any;
-  assert.ok(Array.isArray(blockedResidueDetails.blockedResidue) || Array.isArray(blockedResidueDetails.commitBundle?.blockedResidue), 'foreign generated residue must be reported in blockedResidue details');
-  assert.equal(existsSync(foreignResiduePath), true, 'foreign generated residue must not be auto-cleaned');
-  rmSync(foreignResiduePath, { force: true });
+  const foreignResidueCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: auto clean foreign residue snapshot',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert.equal(foreignResidueCommit.ok, true);
+  assert.equal(existsSync(foreignResiduePath), false, 'machine-generated foreign staged snapshots must be auto-cleaned');
 
   const userResiduePath = path.join(tempDir, 'notes/manual-user-dirty.txt');
   writeFileSync(userResiduePath, 'keep me\n', 'utf8');

@@ -149,6 +149,17 @@ function deferForeignStagedFiles(cwd: string, unexpectedStagedTasks: readonly Cl
   return snapshotPath;
 }
 
+function cleanupForeignStagedSnapshot(cwd: string, snapshotPath: string | null) {
+  if (!snapshotPath) return;
+  const absolutePath = path.join(cwd, snapshotPath);
+  if (!existsSync(absolutePath)) return;
+  try {
+    unlinkSync(absolutePath);
+  } catch {
+    // best-effort runtime residue cleanup
+  }
+}
+
 export function acquireCloseWindowStagedIndexLock(input: {
   cwd: string;
   taskId: string;
@@ -249,6 +260,7 @@ export function releaseCloseWindowStagedIndexLock(input: {
   const existing = readCloseWindowStagedIndexLock(input.cwd);
   if (!existing || existing.status !== 'active') return null;
   if (existing.taskId !== normalizeTaskId(input.taskId)) return existing;
+  cleanupForeignStagedSnapshot(input.cwd, existing.foreignStagedSnapshotPath);
   const released: CloseWindowStagedIndexLockRecord = {
     ...existing,
     status: 'released',

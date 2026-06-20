@@ -8,6 +8,7 @@ import { clearBrokerRuntimeStateForTask, removeBrokerRegistryIfEmpty } from '../
 import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, updateActorWorkSessionState, upsertActorWorkSession } from './actor-session.ts';
 import { computeMissingValidatorReport, verifyTaskEvidence } from './evidence.ts';
+import { cleanupStaleTeamRunsForTerminalTasks } from './team-runtime-cleanup.ts';
 import {
   assertRunnerFreshForWriteAction,
   auditTasks,
@@ -3050,6 +3051,11 @@ async function runTasksClose(argv: string[]) {
       reason: options.reason ?? (typeof taskDocument.closeReason === 'string' ? taskDocument.closeReason : null)
     });
   }
+  const cleanedTeamRuns = cleanupStaleTeamRunsForTerminalTasks({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    terminalTaskStatus: options.status
+  });
   // TASK-AAO-0136: register close-commit-window for done closes so the captain's
   // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
   // even though the direction lock has now released.
@@ -3106,6 +3112,7 @@ async function runTasksClose(argv: string[]) {
       transitionPath,
       closeCommitWindowPath: closeCommitWindowPathFromClose,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null,
+      cleanedTeamRuns,
       // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
       // critical changes were in-scope vs isolated as advisory unrelated changes.
       closeScopedDiffIsolation,
