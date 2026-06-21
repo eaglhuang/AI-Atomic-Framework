@@ -13,6 +13,7 @@
     "writeIntent",
     "writeTransaction",
     "decision",
+    "admission",
     "virtualAtomInUseRegistry",
     "chosenLane",
     "stewardId",
@@ -124,6 +125,81 @@
         },
         "conflicts": {
           "type": "array"
+        }
+      }
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trigger",
+        "state",
+        "requiresProposal",
+        "summarySubmitted",
+        "hotFiles",
+        "boundedRegions",
+        "rearbitrationRequired",
+        "reason"
+      ],
+      "properties": {
+        "trigger": {
+          "enum": [
+            "not-required",
+            "hot-file",
+            "same-file-overlap-risk",
+            "shared-surface-risk",
+            "manual-review-surface"
+          ]
+        },
+        "state": {
+          "enum": [
+            "not-required",
+            "proposal-submitted",
+            "provisional-write-lease",
+            "write-admitted",
+            "composer-routed",
+            "blocked-before-write",
+            "parked-for-rearbitration",
+            "applied"
+          ]
+        },
+        "requiresProposal": {
+          "type": "boolean"
+        },
+        "summarySubmitted": {
+          "type": "boolean"
+        },
+        "hotFiles": {
+          "$ref": "#/$defs/stringList"
+        },
+        "boundedRegions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["filePath", "lineStart", "lineEnd"],
+            "properties": {
+              "filePath": {
+                "type": "string",
+                "minLength": 1
+              },
+              "lineStart": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "lineEnd": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "rearbitrationRequired": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },

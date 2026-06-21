@@ -21,6 +21,7 @@
     "writeSet",
     "fileHashesBefore",
     "brokerDecision",
+    "admissionState",
     "startedAt",
     "expiresAt",
     "heartbeatAt"
@@ -118,6 +119,18 @@
           "enum": ["no-known-textual-or-resource-conflict", null]
         }
       }
+    },
+    "admissionState": {
+      "enum": [
+        "not-required",
+        "proposal-submitted",
+        "provisional-write-lease",
+        "write-admitted",
+        "composer-routed",
+        "blocked-before-write",
+        "parked-for-rearbitration",
+        "applied"
+      ]
     },
     "startedAt": {
       "type": "string",
