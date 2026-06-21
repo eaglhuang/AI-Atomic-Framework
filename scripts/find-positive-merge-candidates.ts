@@ -357,6 +357,9 @@ function scoreFile(relativePath: string, sourceText: string, segments: Candidate
   const pair = chooseSuggestedPair(segments);
   if (!pair) return null;
   const brokerPreview = simulateBrokerPreview(relativePath, pair[0], pair[1]);
+  if (!brokerPreview) {
+    return null;
+  }
   if (brokerPreview.positiveDecision.verdict !== 'parallel-safe') {
     return null;
   }

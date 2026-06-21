@@ -413,6 +413,12 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
   }
 
   const brokerLane = run.brokerLane;
+  const brokerLaneObject = brokerLane && typeof brokerLane === 'object'
+    ? brokerLane as Record<string, unknown>
+    : null;
+  const writeIntent = brokerLaneObject?.writeIntent;
+  const writeTransaction = brokerLaneObject?.writeTransaction;
+  const decision = brokerLaneObject?.decision;
   const identities = new Set<string>();
   const actors = new Set<string>();
   const files = new Set<string>();
@@ -425,10 +431,10 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
   addStringValue(actors, run.actorId);
   addStringValue(identities, run.planId);
 
-  collectObjectStringsByKey(brokerLane, new Set(['request_identity', 'requestIdentity', 'requestId', 'planId']), identities);
-  collectObjectStringsByKey(brokerLane, new Set(['taskId', 'task_ids', 'taskIds']), tasks);
-  collectObjectStringsByKey(brokerLane, new Set(['actorId', 'actor_ids', 'actorIds']), actors);
-  collectObjectStringsByKey(brokerLane, new Set([
+  collectObjectStringsByKey(writeIntent, new Set(['request_identity', 'requestIdentity', 'requestId', 'planId']), identities);
+  collectObjectStringsByKey(writeIntent, new Set(['taskId', 'task_ids', 'taskIds']), tasks);
+  collectObjectStringsByKey(writeIntent, new Set(['actorId', 'actor_ids', 'actorIds']), actors);
+  collectObjectStringsByKey(writeIntent, new Set([
     'file',
     'filePath',
     'files',
@@ -439,10 +445,12 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
     'readSet',
     'writeSet',
     'scopePaths',
-    'sharedFiles'
+    'sharedFiles',
+    'targetFiles'
   ]), files);
-  collectObjectStringsByKey(brokerLane, new Set(['baseCommit', 'baseHead', 'baseHash', 'commit', 'commit_sha']), commits);
-  collectObjectStringsByKey(brokerLane, new Set(['transactionId', 'transaction_ids', 'transactionIds', 'writeTransactionId']), tx);
+  collectObjectStringsByKey(writeIntent, new Set(['baseCommit', 'baseHead', 'baseHash', 'commit', 'commit_sha']), commits);
+  collectObjectStringsByKey(decision, new Set(['intentId', 'transactionId', 'transaction_ids', 'transactionIds', 'writeTransactionId']), tx);
+  collectObjectStringsByKey(writeTransaction, new Set(['intentId', 'transactionId', 'transaction_ids', 'transactionIds', 'writeTransactionId']), tx);
 
   for (const identity of identities) {
     const split = collectTags(identity);
@@ -450,8 +458,8 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
     split.tasks.forEach((value) => tasks.add(value));
   }
 
-  const lane = firstStringByKey(brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
-  const verdict = firstStringByKey(brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+  const lane = firstStringByKey(decision ?? brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
+  const verdict = firstStringByKey(decision ?? brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
 
   return {
     runId: run.teamRunId,
@@ -503,10 +511,7 @@ function loadTeamRunSummaries(teamRunDir: string | null): BrokerRunSummary[] {
     return [];
   }
   const rows: BrokerRunSummary[] = [];
-  const entries = readdirSync(teamRunDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
-    .map((entry) => path.join(teamRunDir, entry.name))
-    .sort();
+  const entries = listActiveTeamRunFiles(teamRunDir);
 
   for (const fullPath of entries) {
     try {
@@ -524,6 +529,16 @@ function loadTeamRunSummaries(teamRunDir: string | null): BrokerRunSummary[] {
   }
 
   return rows;
+}
+
+function listActiveTeamRunFiles(teamRunDir: string): string[] {
+  if (!existsSync(teamRunDir)) {
+    return [];
+  }
+  return readdirSync(teamRunDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.join(teamRunDir, entry.name))
+    .sort();
 }
 
 function collectTaskArtifacts(atmRoot: string, taskIds: string[], teamRunDir: string | null): TaskArtifactSummary[] {
@@ -552,18 +567,15 @@ function collectTaskArtifacts(atmRoot: string, taskIds: string[], teamRunDir: st
   const resolvedTeamRunDir = teamRunDir ?? path.join(atmRoot, '.atm', 'runtime', 'team-runs');
   const teamRunsByTask: Record<string, string[]> = {};
   if (existsSync(resolvedTeamRunDir)) {
-    for (const fileName of readdirSync(resolvedTeamRunDir)) {
-      if (!fileName.endsWith('.json')) {
-        continue;
-      }
+    for (const fullPath of listActiveTeamRunFiles(resolvedTeamRunDir)) {
       try {
-        const run = JSON.parse(readFileSync(path.join(resolvedTeamRunDir, fileName), 'utf8')) as { taskId?: unknown };
+        const run = JSON.parse(readFileSync(fullPath, 'utf8')) as { taskId?: unknown };
         const taskId = typeof run.taskId === 'string' ? run.taskId : null;
         if (!taskId || !taskId.startsWith('TASK-')) {
           continue;
         }
         teamRunsByTask[taskId] ??= [];
-        teamRunsByTask[taskId].push(path.join(resolvedTeamRunDir, fileName).replace(/\\/g, '/'));
+        teamRunsByTask[taskId].push(fullPath.replace(/\\/g, '/'));
       } catch {
         // ignore malformed team run file
       }
