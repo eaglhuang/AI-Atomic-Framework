@@ -2,6 +2,7 @@ import { type TeamClosureAttestationEvidence, type TeamClosureReviewerIndependen
 import { type TeamKnowledgeSummary } from './team-knowledge.ts';
 import type { TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import { type TeamWorkerAdapterContract } from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
+import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 type TeamRecipeAgent = {
     agentId: string;
     role: string;
@@ -362,6 +363,8 @@ export declare function buildTeamRuntimeContract(input: {
     providerId?: unknown;
     sdkId?: unknown;
     modelId?: unknown;
+    roleName?: unknown;
+    selectionConfig?: TeamProviderSelectionConfig | null;
     editorBridgeDisabled?: unknown;
     recipe?: TeamRecipe;
     allowedFiles?: readonly string[];

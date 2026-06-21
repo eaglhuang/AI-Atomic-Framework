@@ -4,6 +4,12 @@ import { createCodexIntegrationAdapter } from '../../../integration-codex/src/in
 import { createCursorIntegrationAdapter } from '../../../integration-cursor/src/index.ts';
 import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } from '../../../integration-gemini/src/index.ts';
 import type { InstallManifest } from '../../../integrations-core/src/index.ts';
+export type GovernedVendorConfigSurface = {
+    rootDir: string;
+    templateReadme: string;
+    exists: boolean;
+};
+export declare function discoverGovernedVendorConfigSurface(repositoryRoot: string): GovernedVendorConfigSurface;
 declare const integrationAdapterFactories: Readonly<{
     'claude-code': typeof createClaudeCodeIntegrationAdapter;
     codex: typeof createCodexIntegrationAdapter;

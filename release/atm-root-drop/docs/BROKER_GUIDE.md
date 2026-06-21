@@ -1,6 +1,6 @@
 # Broker Guide
 
-This guide documents the write-broker surface that coordinates concurrent agent writes: `WriteIntent`, `calculateBrokerDecision()`, and the candidate bridge.
+This guide documents the write-broker surface that coordinates concurrent agent writes: `WriteIntent`, `calculateBrokerDecision()`, the proposal-gated admission contract, and the candidate bridge.
 
 CID terminology used by this guide:
 
@@ -18,6 +18,38 @@ CID terminology used by this guide:
 | `needs-physical-split` | `deterministic-composer` | Same physical file but CID-disjoint; routed to the composer |
 | `blocked-cid-conflict` | `blocked` | Atom ID or semantic CID collision with an active intent |
 | `blocked-shared-surface` | `blocked` | Generator / projection / registry / validator / artifact collision |
+
+## Proposal-Gated Admission v1
+
+The broker contract now has a separate admission vocabulary in `BrokerDecision.admission` and `TeamBrokerLaneEvidence.admission`. This vocabulary is additive: it does not replace the existing conflict verdicts or lanes.
+
+Admission triggers:
+
+| Trigger | Meaning |
+|---|---|
+| `not-required` | Normal fast path; no proposal-first gate is active |
+| `hot-file` | Same-file surface is governance-hot and should submit a proposal summary first |
+| `same-file-overlap-risk` | Broker sees a pre-write overlap risk on the same file |
+| `shared-surface-risk` | Shared projection / registry style surfaces need proposal-aware admission |
+| `manual-review-surface` | Caller explicitly requests proposal-aware admission |
+
+Admission states:
+
+| State | Meaning |
+|---|---|
+| `proposal-submitted` | Proposal-first trigger is active, but only a summary/proposal has been admitted so far |
+| `provisional-write-lease` | First writer has a bounded provisional lease, not a full free-write admission |
+| `write-admitted` | Direct broker path is fully admitted |
+| `composer-routed` | Same-file work is routed to the deterministic composer before live write |
+| `blocked-before-write` | Broker blocked the lane before apply-time mutation |
+| `parked-for-rearbitration` | Existing writer must pause so broker can rearbitrate |
+| `applied` | Governed write reached the final applied state |
+
+Current v1 rule boundary:
+
+- Proposal gating is conditional escalation, not the default for every file.
+- Existing direct broker flows stay valid when `trigger = not-required`.
+- Hot-file and overlap-risk lanes can carry proposal-first evidence without changing the envelope shape used by downstream evidence capture.
 
 ## Candidate Bridge (TASK-ASP-0004)
 

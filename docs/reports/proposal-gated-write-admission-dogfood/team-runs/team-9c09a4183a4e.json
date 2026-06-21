@@ -1,6 +1,6 @@
 {
   "schemaId": "atm.teamRun.v1",
-  "teamRunId": "team-f5f32e2ee5c7",
+  "teamRunId": "team-9c09a4183a4e",
   "channel": "normal",
   "taskId": "TASK-TEAM-BROKER-OVERLAP",
   "batchId": null,
@@ -927,7 +927,7 @@
       },
       "taskId": "TASK-TEAM-BROKER-OVERLAP",
       "actorId": "coordinator-1",
-      "baseCommit": "f157711da0b42bef4665d554949190a622f39bdd",
+      "baseCommit": "9667c7154054bbef99f8d6e87b519920126f6a2d",
       "targetFiles": [
         "src/shared-target.ts"
       ],
@@ -949,16 +949,16 @@
     },
     "writeTransaction": {
       "schemaId": "atm.teamBrokerWriteTransaction.v1",
-      "transactionId": "txn-7d0e6b2fa5c7f0da",
+      "transactionId": "txn-166558780fe9aae2",
       "taskId": "TASK-TEAM-BROKER-OVERLAP",
       "principalId": "coordinator-1",
       "actorId": "coordinator-1",
       "sessionId": "team-broker-session-fixture",
       "instanceId": "coordinator-1@local",
-      "worktreeId": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp\\atm-team-brokered-write-mqnyjzb3-tr63kf5g",
+      "worktreeId": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp\\atm-team-brokered-write-mqnzfta6-u2c1ogqg",
       "branchRef": "master",
-      "baseHead": "f157711da0b42bef4665d554949190a622f39bdd",
-      "leaseEpoch": 1782056713270,
+      "baseHead": "9667c7154054bbef99f8d6e87b519920126f6a2d",
+      "leaseEpoch": 1782058198086,
       "allowedFiles": [
         "src/shared-target.ts"
       ],
@@ -974,13 +974,13 @@
       "brokerDecision": {
         "verdict": "needs-physical-split",
         "lane": "deterministic-composer",
-        "intentId": "decision-1782056713270",
+        "intentId": "decision-1782058198086",
         "parallelSafetyReason": null
       },
       "admissionState": "composer-routed",
-      "startedAt": "2026-06-21T15:45:13.270Z",
-      "expiresAt": "2026-06-21T16:15:13.270Z",
-      "heartbeatAt": "2026-06-21T15:45:13.270Z"
+      "startedAt": "2026-06-21T16:09:58.086Z",
+      "expiresAt": "2026-06-21T16:39:58.086Z",
+      "heartbeatAt": "2026-06-21T16:09:58.086Z"
     },
     "decision": {
       "schemaId": "atm.brokerDecision.v1",
@@ -990,7 +990,7 @@
         "fromVersion": null,
         "notes": "generated"
       },
-      "intentId": "decision-1782056713270",
+      "intentId": "decision-1782058198086",
       "taskId": "TASK-TEAM-BROKER-OVERLAP",
       "verdict": "needs-physical-split",
       "lane": "deterministic-composer",
@@ -1046,10 +1046,10 @@
           "virtualAtomCid": "cid-donor",
           "taskId": "TASK-TEAM-BROKER-DONOR",
           "actorId": "donor-actor",
-          "intentId": "intent-1782056712422",
+          "intentId": "intent-1782058197567",
           "lane": "direct-brokered",
-          "leaseEpoch": 1782056712422,
-          "expiresAt": "2026-06-21T16:15:12.422Z",
+          "leaseEpoch": 1782058197567,
+          "expiresAt": "2026-06-21T16:39:57.567Z",
           "sourceAtomIds": [
             "atom-overlap-donor"
           ]
@@ -1057,7 +1057,7 @@
       ],
       "activeIntents": [
         {
-          "intentId": "intent-1782056712422",
+          "intentId": "intent-1782058197567",
           "taskId": "TASK-TEAM-BROKER-DONOR",
           "teamRunId": null,
           "actorId": "donor-actor",
@@ -1079,12 +1079,12 @@
             "validators": [],
             "artifacts": []
           },
-          "leaseEpoch": 1782056712422,
+          "leaseEpoch": 1782058197567,
           "leaseSeconds": 1800,
           "leaseMaxSeconds": 1800,
-          "heartbeatAt": "2026-06-21T15:45:12.422Z",
+          "heartbeatAt": "2026-06-21T16:09:57.567Z",
           "lane": "direct-brokered",
-          "expiresAt": "2026-06-21T16:15:12.422Z"
+          "expiresAt": "2026-06-21T16:39:57.567Z"
         }
       ]
     },
@@ -1276,6 +1276,6 @@
     "risk": "low",
     "closeReady": false
   },
-  "createdAt": "2026-06-21T15:45:13.636Z",
-  "updatedAt": "2026-06-21T15:45:13.636Z"
+  "createdAt": "2026-06-21T16:09:58.113Z",
+  "updatedAt": "2026-06-21T16:09:58.113Z"
 }

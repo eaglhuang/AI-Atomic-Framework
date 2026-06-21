@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -7,13 +8,16 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import {
   DEFAULT_TEAM_STEWARD_ID,
+  buildTeamWriteIntent,
   buildTeamBrokerRuntimeActivationHandshake,
   buildTeamBrokerRunRecord,
   buildTeamBrokerRunRecordEnvelope,
   evaluateTeamBrokerLane,
+  loadRegistry,
   registerIntent,
   saveRegistry
 } from '../packages/core/src/broker/index.ts';
+import { calculateBrokerDecision, composeBrokerProposals } from '../packages/core/src/broker/index.ts';
 import type { WriteBrokerRegistryDocument, WriteIntent } from '../packages/core/src/broker/types.ts';
 import { runBroker } from '../packages/cli/src/commands/broker.ts';
 import { runTeam } from '../packages/cli/src/commands/team.ts';
@@ -23,6 +27,9 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+const retainArtifactsDir = process.argv.includes('--retain-artifacts-dir')
+  ? process.argv[process.argv.indexOf('--retain-artifacts-dir') + 1]
+  : null;
 
 function check(condition: unknown, message: string) {
   assert.ok(condition, `[team-brokered-write:${mode}] ${message}`);
@@ -55,6 +62,13 @@ function formatAjvErrors(errors: typeof validateWriteTransaction.errors) {
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function resolveRetainArtifactsDir(): string | null {
+  if (!retainArtifactsDir || retainArtifactsDir.startsWith('--')) {
+    return null;
+  }
+  return path.resolve(root, retainArtifactsDir);
 }
 
 async function runAtm(args: string[], cwd = root) {
@@ -119,7 +133,7 @@ function ensureConfigWiring() {
   );
 }
 
-function writeTaskCard(cwd: string, taskId: string, scopePaths: string[], atomId: string) {
+function writeTaskCard(cwd: string, taskId: string, scopePaths: string[], atomId: string, extras: Record<string, unknown> = {}) {
   const taskDir = path.join(cwd, '.atm', 'history', 'tasks');
   mkdirSync(taskDir, { recursive: true });
   writeJson(path.join(taskDir, `${taskId}.json`), {
@@ -131,7 +145,8 @@ function writeTaskCard(cwd: string, taskId: string, scopePaths: string[], atomId
     deliverables: scopePaths,
     atomizationImpact: {
       ownerAtomOrMap: atomId
-    }
+    },
+    ...extras
   });
 }
 
@@ -147,6 +162,18 @@ function seedRegistry(cwd: string, intent: WriteIntent) {
   const registry = registerIntent(emptyRegistry, intent, 'direct-brokered');
   saveRegistry(registryPath, registry);
   return registryPath;
+}
+
+function writeIntentFile(cwd: string, filename: string, intent: WriteIntent) {
+  const filePath = path.join(cwd, filename);
+  writeJson(filePath, intent);
+  return filePath;
+}
+
+function writeProposalFile(cwd: string, filename: string, proposal: Record<string, unknown>) {
+  const filePath = path.join(cwd, filename);
+  writeJson(filePath, proposal);
+  return filePath;
 }
 
 function assertBrokerRunLogKeepsTaskLinkage(cwd: string) {
@@ -257,6 +284,7 @@ ensureRequiredFiles();
 ensureConfigWiring();
 
 const tempRoot = createTempWorkspace('atm-team-brokered-write-');
+const retainedArtifactsDir = resolveRetainArtifactsDir();
 const previousAtmSessionId = process.env.ATM_SESSION_ID;
 try {
   process.env.ATM_SESSION_ID = 'team-broker-session-fixture';
@@ -264,18 +292,100 @@ try {
   writeFileSync(path.join(tempRoot, 'package.json'), `${JSON.stringify({ name: 'atm-team-brokered-write-temp', private: true, type: 'module' }, null, 2)}\n`, 'utf8');
   const sharedFile = 'src/shared-target.ts';
   const sharedDir = path.join(tempRoot, 'src');
+  const hotSharedFile = 'packages/cli/src/commands/broker.ts';
   mkdirSync(sharedDir, { recursive: true });
+  mkdirSync(path.join(tempRoot, 'packages', 'cli', 'src', 'commands'), { recursive: true });
   writeFileSync(path.join(tempRoot, sharedFile), 'alpha\n', 'utf8');
+  writeFileSync(
+    path.join(tempRoot, hotSharedFile),
+    [
+      'export function brokerHotFixture() {',
+      '  const lines = [',
+      "    'line-01',",
+      "    'line-02',",
+      "    'line-03',",
+      "    'line-04',",
+      "    'line-05',",
+      "    'line-06',",
+      "    'line-07',",
+      "    'line-08',",
+      "    'line-09',",
+      "    'line-10',",
+      "    'line-11',",
+      "    'line-12',",
+      "    'line-13',",
+      "    'line-14',",
+      "    'line-15',",
+      "    'line-16',",
+      "    'line-17',",
+      "    'line-18',",
+      "    'line-19',",
+      "    'line-20',",
+      "    'line-21',",
+      "    'line-22',",
+      "    'line-23',",
+      "    'line-24',",
+      "    'line-25',",
+      "    'line-26',",
+      "    'line-27',",
+      "    'line-28',",
+      "    'line-29',",
+      "    'line-30'",
+      '  ];',
+      "  return lines.join('\\n');",
+      '}',
+      ''
+    ].join('\n'),
+    'utf8'
+  );
   commitText(tempRoot, 'base shared target for team broker fixture');
   const tempBranchRef = readCurrentBranch(tempRoot);
 
   const overlapTaskId = 'TASK-TEAM-BROKER-OVERLAP';
   const blockedTaskId = 'TASK-TEAM-BROKER-BLOCKED';
   const safeTaskId = 'TASK-TEAM-BROKER-SAFE';
+  const hotFirstTaskId = 'TASK-TEAM-BROKER-HOT-FIRST';
+  const hotDisjointTaskId = 'TASK-TEAM-BROKER-HOT-DISJOINT';
+  const hotOverlapTaskId = 'TASK-TEAM-BROKER-HOT-OVERLAP';
+  const hotParkSeedTaskId = 'TASK-TEAM-BROKER-HOT-PARK-SEED';
+  const hotParkJoinTaskId = 'TASK-TEAM-BROKER-HOT-PARK-JOIN';
 
   writeTaskCard(tempRoot, overlapTaskId, [sharedFile], 'atom-overlap-recipient');
   writeTaskCard(tempRoot, blockedTaskId, [sharedFile], 'atom-overlap-donor');
   writeTaskCard(tempRoot, safeTaskId, ['src/unique-target.ts'], 'atom-safe');
+  writeTaskCard(tempRoot, hotFirstTaskId, [hotSharedFile], 'atom-hot-first', {
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: false,
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 1, lineEnd: 12 }],
+      notes: 'First writer must submit proposal before hot-file write.'
+    }
+  });
+  writeTaskCard(tempRoot, hotDisjointTaskId, [hotSharedFile], 'atom-hot-disjoint', {
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 18, lineEnd: 24 }],
+      notes: 'Second writer proposes a disjoint bounded region.'
+    }
+  });
+  writeTaskCard(tempRoot, hotOverlapTaskId, [hotSharedFile], 'atom-hot-overlap', {
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 8, lineEnd: 12 }],
+      notes: 'Second writer overlaps the same bounded region.'
+    }
+  });
+  writeTaskCard(tempRoot, hotParkSeedTaskId, [hotSharedFile], 'atom-hot-park-seed');
+  writeTaskCard(tempRoot, hotParkJoinTaskId, [hotSharedFile], 'atom-hot-park-join', {
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 14, lineEnd: 16 }],
+      notes: 'Second writer joins while the first writer has not yet submitted bounded-region detail.'
+    }
+  });
 
   seedRegistry(tempRoot, {
     schemaId: 'atm.writeIntent.v1',
@@ -299,6 +409,10 @@ try {
   const overlapTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${overlapTaskId}.json`), 'utf8'));
   const blockedTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${blockedTaskId}.json`), 'utf8'));
   const safeTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${safeTaskId}.json`), 'utf8'));
+  const hotFirstTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotFirstTaskId}.json`), 'utf8'));
+  const hotDisjointTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotDisjointTaskId}.json`), 'utf8'));
+  const hotOverlapTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotOverlapTaskId}.json`), 'utf8'));
+  const hotParkJoinTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotParkJoinTaskId}.json`), 'utf8'));
 
   const overlapResult = evaluateTeamBrokerLane({
     cwd: tempRoot,
@@ -437,6 +551,248 @@ try {
     validateRuntimeActivation(runtimeEvidence.handshake),
     `broker runtime activate CLI handshake must match schema: ${formatAjvErrors(validateRuntimeActivation.errors)}`
   );
+
+  const firstWriterPlan = await runTeam(['plan', '--task', hotFirstTaskId, '--cwd', tempRoot, '--json']);
+  check(firstWriterPlan.ok === false, 'hot-file first writer must enter proposal-first mode before a second writer exists');
+  const firstWriterPlanBrokerLane = (firstWriterPlan.evidence as Record<string, unknown>)?.brokerLane as Record<string, unknown>;
+  check(firstWriterPlanBrokerLane?.safeToStart === false, 'hot-file first writer must not be marked safeToStart');
+  check((firstWriterPlanBrokerLane?.admission as Record<string, unknown>)?.state === 'proposal-submitted', 'hot-file first writer must emit proposal-submitted admission state');
+
+  const hotFirstIntent = buildTeamWriteIntent({
+    cwd: tempRoot,
+    taskId: hotFirstTaskId,
+    actorId: 'coordinator-1',
+    task: hotFirstTask,
+    writePaths: [hotSharedFile]
+  });
+  const hotFirstDecision = calculateBrokerDecision(hotFirstIntent, loadRegistry(path.join(tempRoot, '.atm', 'runtime', 'write-broker.registry.json')));
+  const hotFirstIntentFile = writeIntentFile(tempRoot, 'hot-first.intent.json', hotFirstIntent);
+  const registerHotFirst = await runAtm([
+    'broker', 'register',
+    '--task', hotFirstTaskId,
+    '--intent-file', hotFirstIntentFile
+  ], tempRoot);
+  check(registerHotFirst.exitCode === 0 && registerHotFirst.parsed.ok === true, `first hot writer register must succeed: ${JSON.stringify(registerHotFirst.parsed)}`);
+  check((registerHotFirst.parsed.evidence as Record<string, unknown>)?.decision, 'broker register must report decision evidence for first hot writer');
+
+  const brokerStatusAfterFirst = await runAtm(['broker', 'status'], tempRoot);
+  check(brokerStatusAfterFirst.exitCode === 0 && brokerStatusAfterFirst.parsed.ok === true, 'broker status must succeed after first hot writer registers');
+  const admissionStates = ((brokerStatusAfterFirst.parsed.evidence as Record<string, unknown>)?.admissionStates ?? []) as Array<Record<string, unknown>>;
+  const firstWriterAdmission = admissionStates.find((entry) => entry.taskId === hotFirstTaskId);
+  check(firstWriterAdmission?.admissionState === 'proposal-submitted', 'registry status must preserve proposal-submitted state for the first hot writer');
+  check(firstWriterAdmission?.admissionTrigger === 'hot-file', 'registry status must preserve hot-file trigger for the first writer');
+
+  const hotDisjointLane = evaluateTeamBrokerLane({
+    cwd: tempRoot,
+    taskId: hotDisjointTaskId,
+    actorId: 'coordinator-2',
+    task: hotDisjointTask,
+    writePaths: [hotSharedFile]
+  });
+  check(hotDisjointLane.ok === true, 'disjoint second writer must be admitted into governed composer/steward path');
+  check(hotDisjointLane.evidence.decision.verdict === 'needs-physical-split', 'disjoint second writer must be resolved before apply as needs-physical-split');
+  check(hotDisjointLane.evidence.admission.state === 'composer-routed', 'disjoint second writer must emit composer-routed admission state');
+  check(hotDisjointLane.evidence.admission.rearbitrationRequired === true, 'disjoint second writer must record rearbitration requirement');
+
+  const hotDisjointStart = await runTeam(['start', '--task', hotDisjointTaskId, '--actor', 'coordinator-2', '--cwd', tempRoot, '--json']);
+  check(hotDisjointStart.ok === true, `disjoint second writer team start must enter governed path: ${JSON.stringify(hotDisjointStart)}`);
+  const hotDisjointRun = (hotDisjointStart.evidence as Record<string, unknown>)?.teamRun as Record<string, unknown>;
+  const hotDisjointBrokerLane = hotDisjointRun?.brokerLane as Record<string, unknown>;
+  check(hotDisjointBrokerLane?.chosenLane === 'neutral-steward', 'disjoint second writer must be routed to neutral-steward');
+  check((hotDisjointBrokerLane?.admission as Record<string, unknown>)?.state === 'composer-routed', 'team run must keep composer-routed admission state');
+
+  const hotOverlapLane = evaluateTeamBrokerLane({
+    cwd: tempRoot,
+    taskId: hotOverlapTaskId,
+    actorId: 'coordinator-3',
+    task: hotOverlapTask,
+    writePaths: [hotSharedFile]
+  });
+  check(hotOverlapLane.ok === false, 'overlapping second writer must be blocked before write');
+  check(hotOverlapLane.evidence.decision.verdict === 'blocked-active-lease', 'overlap conflict must block at active lease admission stage');
+  check(hotOverlapLane.evidence.admission.state === 'blocked-before-write', 'overlapping second writer must emit blocked-before-write state');
+
+  const parkSeedIntent = buildTeamWriteIntent({
+    cwd: tempRoot,
+    taskId: hotParkSeedTaskId,
+    actorId: 'coordinator-4',
+    task: JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotParkSeedTaskId}.json`), 'utf8')),
+    writePaths: [hotSharedFile]
+  });
+  const parkSeedDecision = calculateBrokerDecision(parkSeedIntent, {
+    schemaId: 'atm.writeBrokerRegistry.v1',
+    specVersion: '0.1.0',
+    repoId: 'team-broker-fixture',
+    workspaceId: 'main',
+    currentEpoch: Date.now(),
+    activeIntents: []
+  });
+  const parkRegistryPath = path.join(tempRoot, '.atm', 'runtime', 'write-broker-park.registry.json');
+  saveRegistry(
+    parkRegistryPath,
+    registerIntent(
+      {
+        schemaId: 'atm.writeBrokerRegistry.v1',
+        specVersion: '0.1.0',
+        repoId: 'team-broker-fixture',
+        workspaceId: 'main',
+        activeIntents: []
+      },
+      parkSeedIntent,
+      'direct-brokered',
+      1800,
+      parkSeedDecision.admission
+    )
+  );
+  const parkJoinLane = evaluateTeamBrokerLane({
+    cwd: tempRoot,
+    taskId: hotParkJoinTaskId,
+    actorId: 'coordinator-5',
+    task: hotParkJoinTask,
+    writePaths: [hotSharedFile],
+    registryPath: parkRegistryPath
+  });
+  check(parkJoinLane.ok === true, 'park-first-writer rearbitration must hand the second writer into governed path instead of direct write');
+  check(parkJoinLane.evidence.admission.state === 'parked-for-rearbitration', 'rearbitration case must emit parked-for-rearbitration state');
+  check(parkJoinLane.evidence.admission.rearbitrationRequired === true, 'rearbitration case must flag rearbitrationRequired');
+
+  const baseHotFile = readFileSync(path.join(tempRoot, hotSharedFile), 'utf8');
+  const hotBaseHash = `sha256:${createHash('sha256').update(baseHotFile).digest('hex')}`;
+  const hotBaseCommit = spawnSync('git', ['-C', tempRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8' });
+  check(hotBaseCommit.status === 0, `git rev-parse HEAD failed for proposal-gated hot flow: ${hotBaseCommit.stderr || hotBaseCommit.stdout}`);
+  const hotBaseCommitSha = String(hotBaseCommit.stdout ?? '').trim();
+  const firstProposalPath = writeProposalFile(tempRoot, 'proposal-first-hot.json', {
+    schemaId: 'atm.patchProposal.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'proposal-gated hot writer first region' },
+    proposalId: 'proposal-hot-first',
+    taskId: hotFirstTaskId,
+    actorId: 'coordinator-1',
+    targetFile: hotSharedFile,
+    baseCommit: hotBaseCommitSha,
+    fileBeforeHash: hotBaseHash,
+    atomRefs: [{ atomId: 'atom-hot-first', atomCid: 'cid-hot-first', operation: 'modify' }],
+    anchors: [{ kind: 'line-range', hint: 'first-region' }],
+    intent: 'Replace the first writer bounded region after proposal-first admission.',
+    patch: '@@ -4,3 +4,3 @@\n-    \'line-02\',\n-    \'line-03\',\n-    \'line-04\',\n+    \'line-02-first\',\n+    \'line-03-first\',\n+    \'line-04-first\',\n',
+    validators: ['node --strip-types scripts/validate-team-brokered-write.ts --mode validate'],
+    rollback: 'Restore the original broker hot fixture lines 2-4.'
+  });
+  const secondProposalPath = writeProposalFile(tempRoot, 'proposal-second-hot.json', {
+    schemaId: 'atm.patchProposal.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'proposal-gated hot writer disjoint region' },
+    proposalId: 'proposal-hot-second',
+    taskId: hotDisjointTaskId,
+    actorId: 'coordinator-2',
+    targetFile: hotSharedFile,
+    baseCommit: hotBaseCommitSha,
+    fileBeforeHash: hotBaseHash,
+    atomRefs: [{ atomId: 'atom-hot-disjoint', atomCid: 'cid-hot-disjoint', operation: 'modify' }],
+    anchors: [{ kind: 'line-range', hint: 'second-region' }],
+    intent: 'Replace the disjoint late-joiner bounded region through composer/steward.',
+    patch: '@@ -20,3 +20,3 @@\n-    \'line-18\',\n-    \'line-19\',\n-    \'line-20\',\n+    \'line-18-second\',\n+    \'line-19-second\',\n+    \'line-20-second\',\n',
+    validators: ['node --strip-types scripts/validate-team-brokered-write.ts --mode validate'],
+    rollback: 'Restore the original broker hot fixture lines 18-20.'
+  });
+
+  const hotCompose = await runAtm([
+    'broker', 'compose',
+    '--proposal-file', firstProposalPath,
+    '--proposal-file', secondProposalPath
+  ], tempRoot);
+  check(hotCompose.exitCode === 0 && hotCompose.parsed.ok === true, `proposal-gated compose must succeed for disjoint hot regions: ${JSON.stringify(hotCompose.parsed)}`);
+  const hotMergePlan = (hotCompose.parsed.evidence as Record<string, unknown>)?.mergePlan as Record<string, unknown>;
+  check(hotMergePlan?.verdict === 'parallel-safe', 'disjoint patch proposals must remain compose-mergeable');
+  const hotMergePlanPath = path.join(tempRoot, 'hot-merge-plan.json');
+  writeJson(hotMergePlanPath, hotMergePlan);
+
+  const stewardEvidenceRelative = path.join('.atm', 'runtime', 'proposal-gated-hot-apply.json');
+  const stewardApply = await runAtm([
+    'broker', 'steward', 'apply',
+    '--merge-plan-file', hotMergePlanPath,
+    '--proposal-file', firstProposalPath,
+    '--proposal-file', secondProposalPath,
+    '--task', hotDisjointTaskId,
+    '--actor', 'coordinator-2',
+    '--scope-file', hotSharedFile,
+    '--evidence-out', stewardEvidenceRelative
+  ], tempRoot);
+  check(stewardApply.exitCode === 0 && stewardApply.parsed.ok === true, `governed steward apply must succeed after proposal gating: ${JSON.stringify(stewardApply.parsed)}`);
+  const stewardEvidence = (stewardApply.parsed.evidence as Record<string, unknown>)?.applyEvidence as Record<string, unknown>;
+  const scopedWriteExecution = (stewardApply.parsed.evidence as Record<string, unknown>)?.scopedWriteExecution as Record<string, unknown>;
+  check(scopedWriteExecution?.verdict === 'applied', 'scoped governed write execution must end in applied state');
+  check((scopedWriteExecution?.handshake as Record<string, unknown>)?.brokerLane, 'scoped execution must keep broker lane handshake evidence');
+  check(Array.isArray((stewardEvidence?.appliedFiles as unknown[])) && (stewardEvidence.appliedFiles as string[]).includes(hotSharedFile), 'steward apply evidence must record applied hot file');
+  check(readFileSync(path.join(tempRoot, hotSharedFile), 'utf8').includes('line-19-second'), 'governed steward apply must mutate the disjoint second region');
+  check(readFileSync(path.join(tempRoot, hotSharedFile), 'utf8').includes('line-03-first'), 'governed steward apply must preserve the first writer region update');
+
+  const composeDirect = composeBrokerProposals([
+    JSON.parse(readFileSync(firstProposalPath, 'utf8')),
+    JSON.parse(readFileSync(secondProposalPath, 'utf8'))
+  ]);
+  check(composeDirect.ok === true && composeDirect.mergePlan.verdict === 'parallel-safe', 'direct compose helper must agree with CLI compose for disjoint hot regions');
+
+  const applyEvidencePath = path.join(tempRoot, stewardEvidenceRelative);
+  const applyEvidenceJson = JSON.parse(readFileSync(applyEvidencePath, 'utf8')) as Record<string, unknown>;
+  const brokerOperationRun = applyEvidenceJson.brokerOperationRun as Record<string, unknown>;
+  const proposalRunDir = path.join(tempRoot, 'proposal-gated-runs');
+  mkdirSync(proposalRunDir, { recursive: true });
+  writeJson(path.join(proposalRunDir, 'proposal-gated-hot-run.json'), brokerOperationRun);
+
+  const collectOutputDir = path.join(tempRoot, 'proposal-gated-evidence-bundle');
+  const collectResult = spawnSync(
+    process.execPath,
+    [
+      '--strip-types',
+      path.join(root, 'scripts', 'collect-broker-evidence.ts'),
+      '--run-dir', proposalRunDir,
+      '--team-run-dir', path.join(tempRoot, '.atm', 'runtime', 'team-runs'),
+      '--output-dir', collectOutputDir,
+      '--atm-root', tempRoot,
+      '--task-ids', `${hotFirstTaskId},${hotDisjointTaskId}`
+    ],
+    { encoding: 'utf8' }
+  );
+  check(collectResult.status === 0, `collect-broker-evidence must succeed for proposal-gated flow: ${collectResult.stderr || collectResult.stdout}`);
+  const collectedJson = JSON.parse(readFileSync(path.join(collectOutputDir, 'broker-evidence-bundle.json'), 'utf8')) as { runs?: Array<Record<string, unknown>> };
+  const collectedRows = collectedJson.runs ?? [];
+  check(collectedRows.some((row) => String(row.tasks ?? '').includes(hotDisjointTaskId) && String(row.lane ?? '').includes('composer-routed')), 'collect-broker-evidence must report composer-routed state for the governed second writer');
+  check(collectedRows.some((row) => String(row.tasks ?? '').includes(hotFirstTaskId) && String(row.lane ?? '').includes('proposal-submitted')), 'collect-broker-evidence must report proposal-submitted state for the first hot writer');
+
+  if (retainedArtifactsDir) {
+    rmSync(retainedArtifactsDir, { recursive: true, force: true });
+    mkdirSync(retainedArtifactsDir, { recursive: true });
+    cpSync(collectOutputDir, path.join(retainedArtifactsDir, 'broker-evidence-bundle'), { recursive: true });
+    cpSync(proposalRunDir, path.join(retainedArtifactsDir, 'broker-runs'), { recursive: true });
+    cpSync(path.join(tempRoot, '.atm', 'runtime', 'team-runs'), path.join(retainedArtifactsDir, 'team-runs'), { recursive: true });
+    cpSync(applyEvidencePath, path.join(retainedArtifactsDir, 'proposal-gated-hot-apply.json'));
+    writeJson(path.join(retainedArtifactsDir, 'proposal-gated-summary.json'), {
+      schemaId: 'atm.proposalGatedWriteAdmissionDogfood.v1',
+      generatedAt: new Date().toISOString(),
+      mode,
+      hotFile: hotSharedFile,
+      traces: {
+        firstWriterAdmission: firstWriterAdmission ?? null,
+        disjointLane: hotDisjointLane.evidence.admission,
+        blockedLane: hotOverlapLane.evidence.admission,
+        parkedLane: parkJoinLane.evidence.admission,
+        scopedWriteVerdict: scopedWriteExecution?.verdict ?? null
+      },
+      commands: [
+        'node --strip-types scripts/validate-team-brokered-write.ts --mode validate',
+        'npm run validate:team-agents -- --case capture-broker-evidence',
+        'node --strip-types scripts/collect-broker-evidence.ts --run-dir <bundle>/broker-runs --team-run-dir <bundle>/team-runs --output-dir <dir> --atm-root <fixture-root>'
+      ],
+      artifactPaths: {
+        brokerEvidenceBundle: 'broker-evidence-bundle/broker-evidence-bundle.json',
+        brokerEvidenceReport: 'broker-evidence-bundle/broker-evidence-bundle.md',
+        brokerRunsDir: 'broker-runs',
+        teamRunsDir: 'team-runs',
+        applyEvidence: 'proposal-gated-hot-apply.json'
+      }
+    });
+  }
 
   assertBrokerRunLogKeepsTaskLinkage(tempRoot);
   await assertBrokerPlanBatchKeepsTransactionLinkage(tempRoot);

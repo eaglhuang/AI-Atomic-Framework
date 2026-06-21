@@ -50,10 +50,35 @@ export interface WriteIntent {
     readonly sharedSurfaces: SharedSurfacesRecord;
     readonly requestedLane: 'auto' | 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
     readonly leaseBounds?: LeaseBounds;
+    readonly proposalAdmission?: ProposalAdmissionRequest;
 }
 export interface LeaseBounds {
     readonly requestedSeconds: number;
     readonly maxSeconds: number;
+}
+export type ProposalAdmissionTrigger = 'not-required' | 'hot-file' | 'same-file-overlap-risk' | 'shared-surface-risk' | 'manual-review-surface';
+export type ProposalAdmissionState = 'not-required' | 'proposal-submitted' | 'provisional-write-lease' | 'write-admitted' | 'composer-routed' | 'blocked-before-write' | 'parked-for-rearbitration' | 'applied';
+export interface ProposalAdmissionBoundedRegion {
+    readonly filePath: string;
+    readonly lineStart: number;
+    readonly lineEnd: number;
+}
+export interface ProposalAdmissionRequest {
+    readonly trigger: ProposalAdmissionTrigger;
+    readonly summarySubmitted: boolean;
+    readonly boundedRegions?: readonly ProposalAdmissionBoundedRegion[];
+    readonly hotFiles?: readonly string[];
+    readonly notes?: string;
+}
+export interface ProposalAdmissionEvidence {
+    readonly trigger: ProposalAdmissionTrigger;
+    readonly state: ProposalAdmissionState;
+    readonly requiresProposal: boolean;
+    readonly summarySubmitted: boolean;
+    readonly hotFiles: readonly string[];
+    readonly boundedRegions: readonly ProposalAdmissionBoundedRegion[];
+    readonly rearbitrationRequired: boolean;
+    readonly reason: string;
 }
 export interface ProposalAtomRef {
     readonly atomId: string;
@@ -101,6 +126,7 @@ export interface BrokerDecision {
     readonly stewardId?: string | null;
     readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch' | 'none';
     readonly reason: string;
+    readonly admission?: ProposalAdmissionEvidence;
 }
 export interface MergePlan {
     readonly schemaId: 'atm.mergePlan.v1';
@@ -167,6 +193,7 @@ export interface ActiveWriteIntent {
     readonly heartbeatAt: string;
     readonly lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';
     readonly expiresAt?: string;
+    readonly admission?: ProposalAdmissionEvidence;
 }
 export interface WriteBrokerRegistryDocument {
     readonly schemaId: 'atm.writeBrokerRegistry.v1';

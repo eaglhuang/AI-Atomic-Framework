@@ -34,14 +34,14 @@ export async function runBroker(argv) {
             && decision.verdict !== 'blocked-shared-surface'
             && decision.verdict !== 'blocked-active-lease';
         // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
-        registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds);
+        registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds, decision.admission);
         saveRegistry(registryPath, registry);
         return makeResult({
             ok: isBrokerSafe,
             command: 'broker',
             cwd: options.cwd,
             messages: [
-                message(isBrokerSafe ? 'info' : 'error', 'ATM_BROKER_REGISTERED', `Write intent registered with verdict '${decision.verdict}' and lane '${decision.lane}'. Arbitration matrix verdict: '${conflictMatrix?.arbitrationVerdict ?? 'n/a'}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`, { decision })
+                message(isBrokerSafe ? 'info' : 'error', 'ATM_BROKER_REGISTERED', `Write intent registered with verdict '${decision.verdict}', lane '${decision.lane}', and admission '${decision.admission?.state ?? 'not-required'}'. Arbitration matrix verdict: '${conflictMatrix?.arbitrationVerdict ?? 'n/a'}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`, { decision })
             ],
             evidence: {
                 decision,
@@ -89,7 +89,7 @@ export async function runBroker(argv) {
             command: 'broker',
             cwd: options.cwd,
             messages: [
-                message('info', 'ATM_BROKER_DECISION', `Calculated broker decision: verdict '${decision.verdict}', lane '${decision.lane}'`)
+                message('info', 'ATM_BROKER_DECISION', `Calculated broker decision: verdict '${decision.verdict}', lane '${decision.lane}', admission '${decision.admission?.state ?? 'not-required'}'`)
             ],
             evidence: {
                 decision
@@ -107,7 +107,14 @@ export async function runBroker(argv) {
             ],
             evidence: {
                 registryPath: '.atm/runtime/write-broker.registry.json',
-                activeIntents: registry.activeIntents
+                activeIntents: registry.activeIntents,
+                admissionStates: registry.activeIntents.map((intent) => ({
+                    taskId: intent.taskId,
+                    actorId: intent.actorId,
+                    lane: intent.lane,
+                    admissionState: intent.admission?.state ?? 'not-required',
+                    admissionTrigger: intent.admission?.trigger ?? 'not-required'
+                }))
             }
         });
     }

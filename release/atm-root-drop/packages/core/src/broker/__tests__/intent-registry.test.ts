@@ -45,7 +45,13 @@ function makeIntent(overrides: Partial<WriteIntent> = {}): WriteIntent {
 }
 
 function testRegisterIntentEncodesLeaseBounds() {
-  const registry = registerIntent(emptyRegistry(), makeIntent(), 'direct-brokered', 300);
+  const registry = registerIntent(emptyRegistry(), makeIntent({
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: true,
+      hotFiles: ['src/lease.ts']
+    }
+  }), 'direct-brokered', 300);
   assert.equal(registry.activeIntents.length, 1);
   const [active] = registry.activeIntents;
   assert.equal(active.taskId, 'TASK-LEASE-001');
@@ -53,6 +59,7 @@ function testRegisterIntentEncodesLeaseBounds() {
   assert.equal(active.leaseMaxSeconds, 600);
   assert.equal(typeof active.heartbeatAt, 'string');
   assert.ok(active.expiresAt);
+  assert.equal(active.admission?.state, 'proposal-submitted');
   console.log('ok: registerIntent encodes lease bounds and heartbeat');
 }
 

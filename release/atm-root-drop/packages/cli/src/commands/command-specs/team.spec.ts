@@ -126,6 +126,7 @@ export const teamSpecRuntimeStatus = {
     'node atm.mjs team start --task TASK-TEAM-0011 --actor codex-main --json',
     'node atm.mjs team start --task TASK-TEAM-0031 --actor codex-main --runtime-mode broker-only --runtime-adapter atm.node.broker --json',
     'node atm.mjs team start --task TASK-TEAM-0032 --actor codex-main --runtime-mode editor-subagent --runtime-adapter codex.desktop.subagent --json',
+    'node atm.mjs team start --task TASK-TEAM-0041 --actor codex-main --provider openai --sdk responses --model gpt-5-mini --json',
     'node atm.mjs team status --compact --json'
   ]
 };

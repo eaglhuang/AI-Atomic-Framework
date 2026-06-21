@@ -7,6 +7,14 @@ import { createCursorIntegrationAdapter } from '../../../integration-cursor/dist
 import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } from '../../../integration-gemini/dist/index.js';
 import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand, readJsonFile, resolveValue } from './shared.js';
 import { getCommandSpec } from './command-specs.js';
+export function discoverGovernedVendorConfigSurface(repositoryRoot) {
+    const rootDir = path.join(repositoryRoot, 'agent-integrations', 'vendors');
+    return {
+        rootDir,
+        templateReadme: path.join(repositoryRoot, 'release', 'atm-root-drop', 'templates', 'root-drop', 'agent-integrations', 'vendors', 'README.md'),
+        exists: existsSync(rootDir)
+    };
+}
 async function loadIntegrationHooks() {
     return import('./integration-hooks.js');
 }

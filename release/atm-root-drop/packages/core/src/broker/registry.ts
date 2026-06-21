@@ -62,16 +62,18 @@ export function registerIntent(
   doc: WriteBrokerRegistryDocument,
   intent: WriteIntent,
   lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked',
-  ttlSeconds = 1800
+  ttlSeconds = 1800,
+  admissionOverride?: ActiveWriteIntent['admission']
 ): WriteBrokerRegistryDocument {
   const leaseSeconds = resolveLeaseSeconds(intent, ttlSeconds);
   const leaseMaxSeconds = resolveLeaseMaxSeconds(intent, ttlSeconds);
   const cleanedIntents = doc.activeIntents.filter((entry) => entry.taskId !== intent.taskId);
+  const epoch = Date.now();
   const now = new Date().toISOString();
-  const expiresAt = new Date(Date.now() + leaseSeconds * 1000).toISOString();
+  const expiresAt = new Date(epoch + leaseSeconds * 1000).toISOString();
 
   const newActive: ActiveWriteIntent = {
-    intentId: `intent-${Date.now()}`,
+    intentId: `intent-${epoch}`,
     taskId: intent.taskId,
     teamRunId: null,
     actorId: intent.actorId,
@@ -94,17 +96,35 @@ export function registerIntent(
       validators: intent.sharedSurfaces.validators,
       artifacts: intent.sharedSurfaces.artifacts
     },
-    leaseEpoch: Date.now(),
+    leaseEpoch: epoch,
     leaseSeconds,
     leaseMaxSeconds,
     heartbeatAt: now,
     lane,
-    expiresAt
+    expiresAt,
+    admission: admissionOverride
+      ? {
+          ...admissionOverride,
+          hotFiles: [...(admissionOverride.hotFiles ?? [])],
+          boundedRegions: [...(admissionOverride.boundedRegions ?? [])]
+        }
+      : intent.proposalAdmission
+        ? {
+            trigger: intent.proposalAdmission.trigger,
+            state: intent.proposalAdmission.summarySubmitted ? 'proposal-submitted' : 'proposal-submitted',
+            requiresProposal: intent.proposalAdmission.trigger !== 'not-required',
+            summarySubmitted: intent.proposalAdmission.summarySubmitted,
+            hotFiles: [...(intent.proposalAdmission.hotFiles ?? [])],
+            boundedRegions: [...(intent.proposalAdmission.boundedRegions ?? [])],
+            rearbitrationRequired: false,
+            reason: intent.proposalAdmission.notes?.trim() || 'Registered proposal admission request.'
+          }
+        : undefined
   };
 
   return {
     ...doc,
-    currentEpoch: Date.now(),
+    currentEpoch: epoch,
     activeIntents: [...cleanedIntents, newActive]
   };
 }
@@ -160,10 +180,16 @@ export function cleanupStale(
     const exp = Date.parse(entry.expiresAt);
     return exp > now;
   });
+  const validEpochs = validIntents
+    .map((entry) => entry.leaseEpoch)
+    .filter((epoch) => Number.isFinite(epoch));
+  const preservedEpoch = validEpochs.length > 0
+    ? Math.max(...validEpochs)
+    : (typeof doc.currentEpoch === 'number' && Number.isFinite(doc.currentEpoch) ? doc.currentEpoch : now);
 
   return {
     ...doc,
-    currentEpoch: now,
+    currentEpoch: preservedEpoch,
     activeIntents: validIntents
   };
 }

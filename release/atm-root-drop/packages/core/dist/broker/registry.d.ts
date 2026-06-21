@@ -20,7 +20,7 @@ export interface VirtualAtomInUseRegistryDocument {
 }
 export declare function loadRegistry(filePath: string): WriteBrokerRegistryDocument;
 export declare function saveRegistry(filePath: string, doc: WriteBrokerRegistryDocument): void;
-export declare function registerIntent(doc: WriteBrokerRegistryDocument, intent: WriteIntent, lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked', ttlSeconds?: number): WriteBrokerRegistryDocument;
+export declare function registerIntent(doc: WriteBrokerRegistryDocument, intent: WriteIntent, lane: 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked', ttlSeconds?: number, admissionOverride?: ActiveWriteIntent['admission']): WriteBrokerRegistryDocument;
 export declare function renewIntentLease(doc: WriteBrokerRegistryDocument, taskId: string, actorId: string, ttlSeconds?: number): WriteBrokerRegistryDocument;
 export declare function releaseTask(doc: WriteBrokerRegistryDocument, taskId: string): WriteBrokerRegistryDocument;
 export declare function cleanupStale(doc: WriteBrokerRegistryDocument): WriteBrokerRegistryDocument;

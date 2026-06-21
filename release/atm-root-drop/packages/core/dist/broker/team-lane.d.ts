@@ -1,5 +1,5 @@
 import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
-import type { WriteIntent } from './types.ts';
+import type { ProposalAdmissionEvidence, WriteIntent } from './types.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 export declare const DEFAULT_TEAM_STEWARD_ID = "neutral-write-steward";
 export declare const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = ".atm/runtime/write-broker.registry.json";
@@ -13,6 +13,7 @@ export interface TeamBrokerLaneEvidence {
     readonly writeIntent: WriteIntent;
     readonly writeTransaction: TeamBrokerWriteTransactionEvidence;
     readonly decision: BrokerDecision;
+    readonly admission: ProposalAdmissionEvidence;
     readonly virtualAtomInUseRegistry: VirtualAtomInUseRegistryDocument;
     readonly chosenLane: TeamBrokerChosenLane;
     readonly stewardId: string | null;
@@ -46,6 +47,7 @@ export interface TeamBrokerWriteTransactionEvidence {
         readonly intentId: string;
         readonly parallelSafetyReason: 'no-known-textual-or-resource-conflict' | null;
     };
+    readonly admissionState: ProposalAdmissionEvidence['state'];
     readonly startedAt: string;
     readonly expiresAt: string;
     readonly heartbeatAt: string;

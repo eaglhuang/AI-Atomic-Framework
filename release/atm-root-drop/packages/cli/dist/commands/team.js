@@ -10,6 +10,7 @@ import { buildTeamKnowledgeSummary, runTeamKnowledge } from './team-knowledge.js
 import { runTeamWave } from './team-wave.js';
 import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../core/dist/broker/team-lane.js';
 import { resolveNodejsTeamWorkerAdapter } from '../../../core/dist/team-runtime/nodejs-worker-adapter.js';
+import { resolveTeamProviderSelection } from '../../../core/dist/team-runtime/provider-selection.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive' },
     { id: 'git.write', mode: 'exclusive' },
@@ -435,28 +436,38 @@ export function buildTeamRuntimeContract(input) {
     const providerId = normalizeOptionalRuntimeString(input.providerId);
     const sdkId = normalizeOptionalRuntimeString(input.sdkId);
     const modelId = normalizeOptionalRuntimeString(input.modelId);
+    const roleName = normalizeOptionalRuntimeString(input.roleName) ?? 'coordinator';
+    const selectionDecision = input.selectionConfig
+        ? resolveTeamProviderSelection(roleName, input.selectionConfig)
+        : null;
     const editorBridgeDisabled = Boolean(input.editorBridgeDisabled);
     const workerAdapter = resolveNodejsTeamWorkerAdapter({
-        runtimeMode,
+        runtimeMode: selectionDecision?.runtimeMode ?? runtimeMode,
         runtimeLanguage,
         runtimeAdapterId,
-        providerId,
-        sdkId,
-        modelId
+        providerId: providerId ?? selectionDecision?.providerId,
+        sdkId: sdkId ?? selectionDecision?.sdkId,
+        modelId: modelId ?? selectionDecision?.modelId
     });
     const agentsSpawned = workerAdapter.agentsSpawned;
     const executionSurface = workerAdapter.executionSurface;
     return {
         schemaId: 'atm.teamRuntimeContract.v1',
-        runtimeMode,
+        runtimeMode: selectionDecision?.runtimeMode ?? runtimeMode,
         runtimeLanguage,
         runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId,
-        providerId: providerId ?? workerAdapter.providerId,
-        sdkId: sdkId ?? workerAdapter.sdkId,
-        modelId: modelId ?? workerAdapter.modelId,
+        providerId: providerId ?? selectionDecision?.providerId ?? workerAdapter.providerId,
+        sdkId: sdkId ?? selectionDecision?.sdkId ?? workerAdapter.sdkId,
+        modelId: modelId ?? selectionDecision?.modelId ?? workerAdapter.modelId,
         agentsSpawned,
         executionSurface,
-        selectionReason: describeRuntimeSelection({ runtimeMode, runtimeLanguage, runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId }),
+        selectionReason: describeRuntimeSelection({
+            runtimeMode: selectionDecision?.runtimeMode ?? runtimeMode,
+            runtimeLanguage,
+            runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId,
+            selectionSource: selectionDecision?.source ?? null,
+            roleName
+        }),
         workerAdapter,
         artifactHandoff: buildTeamArtifactHandoffContract({
             recipe: input.recipe,
@@ -907,13 +918,16 @@ function normalizeOptionalRuntimeString(value) {
 }
 function describeRuntimeSelection(input) {
     const adapter = input.runtimeAdapterId ?? 'no adapter override';
+    const selectionSource = input.selectionSource
+        ? `selection=${input.selectionSource}${input.roleName ? ` role=${input.roleName}` : ''}`
+        : 'selection=explicit-runtime';
     if (input.runtimeMode === 'broker-only') {
-        return `broker-only selected; no agents are spawned, language=${input.runtimeLanguage}, ${adapter}`;
+        return `broker-only selected; no agents are spawned, language=${input.runtimeLanguage}, ${adapter}, ${selectionSource}`;
     }
     if (input.runtimeMode === 'editor-subagent') {
-        return `editor-subagent selected; adapter metadata is advisory, language=${input.runtimeLanguage}, ${adapter}`;
+        return `editor-subagent selected; adapter metadata is advisory, language=${input.runtimeLanguage}, ${adapter}, ${selectionSource}`;
     }
-    return `real-agent selected; adapter metadata is advisory until a worker bridge consumes it, language=${input.runtimeLanguage}, ${adapter}`;
+    return `real-agent selected; adapter metadata is advisory until a worker bridge consumes it, language=${input.runtimeLanguage}, ${adapter}, ${selectionSource}`;
 }
 async function buildTeamPlanningContext(input) {
     const task = readTask(input.cwd, input.taskId);
