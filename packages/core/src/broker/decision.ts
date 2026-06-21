@@ -6,6 +6,10 @@ import type {
   DecompositionRequest,
   DecompositionTargetFunction,
   LineRange,
+  ProposalAdmissionBoundedRegion,
+  ProposalAdmissionEvidence,
+  ProposalAdmissionRequest,
+  ProposalAdmissionState,
   WriteBrokerRegistryDocument,
   WriteIntent
 } from './types.ts';
@@ -22,6 +26,7 @@ export function calculateBrokerDecision(
   const conflictMatrix = evaluateConflictMatrix(newIntent, registry.activeIntents, {
     currentEpoch: registry.currentEpoch
   });
+  const baseAdmission = buildProposalAdmissionBase(newIntent);
 
   if (conflictMatrix.arbitrationVerdict === 'takeover') {
     return {
@@ -37,7 +42,11 @@ export function calculateBrokerDecision(
       ],
       applyMethod: 'none',
       reason: 'Takeover required before conflict arbitration',
-      conflictMatrix
+      conflictMatrix,
+      admission: finalizeProposalAdmission(baseAdmission, 'blocked-before-write', {
+        reason: 'Takeover required before conflict arbitration.',
+        rearbitrationRequired: true
+      })
     };
   }
 
@@ -92,7 +101,11 @@ export function calculateBrokerDecision(
       conflicts,
       applyMethod: 'none',
       reason: 'Blocked by shared surface conflict',
-        conflictMatrix
+      conflictMatrix,
+      admission: finalizeProposalAdmission(baseAdmission, 'blocked-before-write', {
+        reason: 'Blocked by shared surface conflict before write.',
+        rearbitrationRequired: baseAdmission.requiresProposal
+      })
     };
   }
 
@@ -158,8 +171,17 @@ export function calculateBrokerDecision(
       conflicts,
       applyMethod: 'none',
       reason: 'Blocked by Atom ID, CID, or read-set semantic conflict',
-      conflictMatrix
+      conflictMatrix,
+      admission: finalizeProposalAdmission(baseAdmission, 'blocked-before-write', {
+        reason: 'Blocked by Atom ID, CID, or read-set semantic conflict before write.',
+        rearbitrationRequired: baseAdmission.requiresProposal
+      })
     };
+  }
+
+  const proposalOverlapDecision = evaluateProposalOverlap(newIntent, registry.activeIntents, baseAdmission, conflictMatrix);
+  if (proposalOverlapDecision) {
+    return proposalOverlapDecision;
   }
 
   // 3. Physical file overlap checks
@@ -176,7 +198,11 @@ export function calculateBrokerDecision(
       conflicts: fileOverlapResult.conflicts,
       applyMethod: 'patch-apply',
       reason: fileOverlapResult.reason,
-      conflictMatrix
+      conflictMatrix,
+      admission: finalizeProposalAdmission(baseAdmission, 'composer-routed', {
+        reason: 'Same-file work requires proposal-aware composer routing before write.',
+        rearbitrationRequired: true
+      })
     };
 
     if (fileOverlapResult.decompositionRequest) {
@@ -201,8 +227,85 @@ export function calculateBrokerDecision(
     conflicts: [],
     applyMethod: 'none',
     reason: 'Parallel safe',
-    conflictMatrix
+    conflictMatrix,
+    admission: finalizeProposalAdmission(
+      baseAdmission,
+      baseAdmission.requiresProposal ? 'provisional-write-lease' : 'write-admitted',
+      {
+        reason: baseAdmission.requiresProposal
+          ? 'Proposal-first lane is active; broker recorded a provisional write lease before final admission.'
+          : 'No proposal-first trigger is active; direct brokered write is admitted.'
+      }
+    )
   };
+}
+
+function buildProposalAdmissionBase(intent: WriteIntent): ProposalAdmissionEvidence {
+  const request = intent.proposalAdmission ?? defaultProposalAdmissionRequest();
+  return {
+    trigger: request.trigger,
+    state: 'not-required',
+    requiresProposal: request.trigger !== 'not-required',
+    summarySubmitted: request.summarySubmitted,
+    hotFiles: normalizeStringList(request.hotFiles ?? []),
+    boundedRegions: normalizeBoundedRegions(request.boundedRegions ?? []),
+    rearbitrationRequired: false,
+    reason: request.notes?.trim() || 'No proposal admission trigger is active.'
+  };
+}
+
+function finalizeProposalAdmission(
+  base: ProposalAdmissionEvidence,
+  preferredState: ProposalAdmissionState,
+  overrides: {
+    readonly reason: string;
+    readonly rearbitrationRequired?: boolean;
+  }
+): ProposalAdmissionEvidence {
+  const state = !base.requiresProposal
+    ? preferredState === 'blocked-before-write' || preferredState === 'composer-routed'
+      ? preferredState
+      : 'not-required'
+    : base.summarySubmitted
+      ? preferredState
+      : preferredState === 'blocked-before-write'
+        ? 'blocked-before-write'
+        : 'proposal-submitted';
+  return {
+    ...base,
+    state,
+    rearbitrationRequired: overrides.rearbitrationRequired ?? false,
+    reason: overrides.reason
+  };
+}
+
+function defaultProposalAdmissionRequest(): ProposalAdmissionRequest {
+  return {
+    trigger: 'not-required',
+    summarySubmitted: false
+  };
+}
+
+function normalizeStringList(values: readonly string[]): readonly string[] {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right));
+}
+
+function normalizeBoundedRegions(values: readonly ProposalAdmissionBoundedRegion[]): readonly ProposalAdmissionBoundedRegion[] {
+  return values
+    .filter((value) => value.filePath && value.lineStart > 0 && value.lineEnd >= value.lineStart)
+    .map((value) => ({
+      filePath: value.filePath,
+      lineStart: value.lineStart,
+      lineEnd: value.lineEnd
+    }))
+    .sort((left, right) => {
+      const fileOrder = left.filePath.localeCompare(right.filePath);
+      if (fileOrder !== 0) return fileOrder;
+      const startOrder = left.lineStart - right.lineStart;
+      if (startOrder !== 0) return startOrder;
+      return left.lineEnd - right.lineEnd;
+    });
 }
 
 interface PhysicalOverlapResult {
@@ -288,6 +391,162 @@ function evaluatePhysicalOverlap(
     };
   }
 
+  return null;
+}
+
+function evaluateProposalOverlap(
+  newIntent: WriteIntent,
+  activeIntents: readonly ActiveWriteIntent[],
+  baseAdmission: ProposalAdmissionEvidence,
+  conflictMatrix: BrokerConflictMatrix
+): BrokerDecision | null {
+  if (!baseAdmission.requiresProposal) {
+    return null;
+  }
+
+  for (const activeIntent of activeIntents) {
+    if (activeIntent.taskId === newIntent.taskId) {
+      continue;
+    }
+
+    const sharedFiles = newIntent.targetFiles.filter((filePath) => activeIntent.resourceKeys.files.includes(filePath));
+    if (sharedFiles.length === 0) {
+      continue;
+    }
+
+    const activeAdmission = activeIntent.admission;
+    const activeRequiresProposal = activeAdmission?.requiresProposal ?? false;
+    if (!activeRequiresProposal) {
+      continue;
+    }
+
+    for (const filePath of sharedFiles) {
+      const newRegions = resolveProposalRegionsForFile(newIntent, filePath);
+      const activeRegions = resolveActiveProposalRegionsForFile(activeIntent, filePath);
+      const overlapping = findOverlappingProposalRegion(newRegions, activeRegions);
+
+      if (overlapping) {
+        return {
+          schemaId: 'atm.brokerDecision.v1',
+          specVersion: '0.1.0',
+          migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
+          intentId: `decision-${Date.now()}`,
+          taskId: newIntent.taskId,
+          verdict: 'blocked-active-lease',
+          lane: 'blocked',
+          conflicts: [{
+            kind: 'file-range',
+            detail: `Proposal overlap detected on '${filePath}' lines [${overlapping.lineStart}-${overlapping.lineEnd}] with active task '${activeIntent.taskId}'.`
+          }],
+          applyMethod: 'none',
+          reason: `Second writer must wait; active writer '${activeIntent.taskId}' should be parked for rearbitration before same-region write.`,
+          conflictMatrix,
+          admission: finalizeProposalAdmission(baseAdmission, 'blocked-before-write', {
+            reason: `Proposal overlap detected on the same bounded region for '${filePath}'; rearbitration is required before any write is admitted.`,
+            rearbitrationRequired: true
+          })
+        };
+      }
+
+      if (newRegions.length > 0 && activeRegions.length > 0) {
+        return {
+          schemaId: 'atm.brokerDecision.v1',
+          specVersion: '0.1.0',
+          migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
+          intentId: `decision-${Date.now()}`,
+          taskId: newIntent.taskId,
+          verdict: 'needs-physical-split',
+          lane: 'deterministic-composer',
+          conflicts: [{
+            kind: 'file-range',
+            detail: `Proposal regions on '${filePath}' are disjoint between '${newIntent.taskId}' and '${activeIntent.taskId}'.`
+          }],
+          applyMethod: 'patch-apply',
+          reason: `Same-file proposal compare succeeded; route '${filePath}' through deterministic-composer before the second writer mutates the working tree.`,
+          conflictMatrix,
+          admission: finalizeProposalAdmission(baseAdmission, 'composer-routed', {
+            reason: `Disjoint bounded proposal regions on '${filePath}' require deterministic-composer routing before write.`,
+            rearbitrationRequired: true
+          })
+        };
+      }
+
+      return {
+        schemaId: 'atm.brokerDecision.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
+        intentId: `decision-${Date.now()}`,
+        taskId: newIntent.taskId,
+        verdict: 'needs-physical-split',
+        lane: 'deterministic-composer',
+        conflicts: [{
+          kind: 'file-range',
+          detail: `Proposal-first same-file rearbitration required on '${filePath}' before writer admission.`
+        }],
+        applyMethod: 'patch-apply',
+        reason: `Active proposal-first writer '${activeIntent.taskId}' should be parked while broker rearbitrates same-file work on '${filePath}'.`,
+        conflictMatrix,
+        admission: finalizeProposalAdmission(baseAdmission, 'parked-for-rearbitration', {
+          reason: `An active proposal-first writer already holds '${filePath}'; park and rearbitrate before granting second-writer authority.`,
+          rearbitrationRequired: true
+        })
+      };
+    }
+  }
+
+  return null;
+}
+
+function resolveProposalRegionsForFile(intent: WriteIntent, filePath: string): readonly ProposalAdmissionBoundedRegion[] {
+  const fromAdmission = (intent.proposalAdmission?.boundedRegions ?? []).filter((region) => region.filePath === filePath);
+  if (fromAdmission.length > 0) {
+    return normalizeBoundedRegions(fromAdmission);
+  }
+  return normalizeBoundedRegions(
+    intent.atomRefs
+      .filter((ref) => ref.sourceRange?.filePath === filePath)
+      .map((ref) => ({
+        filePath,
+        lineStart: ref.sourceRange!.lineStart,
+        lineEnd: ref.sourceRange!.lineEnd
+      }))
+  );
+}
+
+function resolveActiveProposalRegionsForFile(intent: ActiveWriteIntent, filePath: string): readonly ProposalAdmissionBoundedRegion[] {
+  const fromAdmission = (intent.admission?.boundedRegions ?? []).filter((region) => region.filePath === filePath);
+  if (fromAdmission.length > 0) {
+    return normalizeBoundedRegions(fromAdmission);
+  }
+  return normalizeBoundedRegions(
+    (intent.resourceKeys.atomRanges ?? [])
+      .filter((range) => range.filePath === filePath)
+      .map((range) => ({
+        filePath,
+        lineStart: range.lineStart,
+        lineEnd: range.lineEnd
+      }))
+  );
+}
+
+function findOverlappingProposalRegion(
+  left: readonly ProposalAdmissionBoundedRegion[],
+  right: readonly ProposalAdmissionBoundedRegion[]
+): ProposalAdmissionBoundedRegion | null {
+  for (const leftRegion of left) {
+    for (const rightRegion of right) {
+      if (leftRegion.filePath !== rightRegion.filePath) {
+        continue;
+      }
+      if (leftRegion.lineStart <= rightRegion.lineEnd && rightRegion.lineStart <= leftRegion.lineEnd) {
+        return {
+          filePath: leftRegion.filePath,
+          lineStart: Math.max(leftRegion.lineStart, rightRegion.lineStart),
+          lineEnd: Math.min(leftRegion.lineEnd, rightRegion.lineEnd)
+        };
+      }
+    }
+  }
   return null;
 }
 
