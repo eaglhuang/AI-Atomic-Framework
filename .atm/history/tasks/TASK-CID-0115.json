@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0115",
   "title": "Proposal-gated write admission contract and runtime states",
-  "status": "running",
+  "status": "done",
   "milestone": "M21",
   "dependencies": [
     "TASK-CID-0114"
@@ -66,8 +66,8 @@
     "hash": "6eea465af09189d4"
   },
   "importedAt": "2026-06-21T15:11:07.143Z",
-  "lastTransitionId": "2026-06-21T15-11-19-855Z-claim-048b000322a2",
-  "lastTransitionAt": "2026-06-21T15:11:19.855Z",
+  "lastTransitionId": "2026-06-21T15-54-21-773Z-close-498259939bd2",
+  "lastTransitionAt": "2026-06-21T15:54:21.773Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "captain",
   "reservedAt": "2026-06-21T15:11:19.700Z",
@@ -76,7 +76,7 @@
     "actorId": "captain",
     "leaseId": "lease-37a378f05877",
     "claimedAt": "2026-06-21T15:11:19.706Z",
-    "heartbeatAt": "2026-06-21T15:11:19.706Z",
+    "heartbeatAt": "2026-06-21T15:54:21.772Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0115.json",
@@ -86,8 +86,8 @@
       "packages/core/src/broker/**",
       "tests/cli/**"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-06-21T15:11:19.706Z",
   "startedByActor": "captain",
@@ -117,5 +117,9 @@
     "actorId": "captain",
     "createdAt": "2026-06-21T15:11:19.854Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-06-21T15:54:21.772Z",
+  "closedByActor": "captain",
+  "closedBySessionId": "session-20260621151119-captain-TASK-CID-0115-12295c08d3",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0115.closure-packet.json"
 }
