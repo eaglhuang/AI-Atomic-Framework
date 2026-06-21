@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.brokerEvidenceBundle.v1",
+  "specVersion": "0.1.0",
+  "generatedAt": "2026-06-21T15:45:15.279Z",
+  "sourceRunDir": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g/proposal-gated-runs",
+  "sourceTeamRunDir": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g/.atm/runtime/team-runs",
+  "sourceAtmRoot": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g",
+  "runs": [
+    {
+      "runId": "registry-TASK-TEAM-BROKER-HOT-FIRST",
+      "planId": "TASK-TEAM-BROKER-HOT-FIRST",
+      "scenario": "field",
+      "tasks": "TASK-TEAM-BROKER-HOT-FIRST",
+      "actors": "coordinator-1",
+      "files": "packages/cli/src/commands/broker.ts",
+      "vendor": "broker-registry",
+      "lane": "direct-brokered:proposal-submitted",
+      "verdict": "recorded:proposal-submitted",
+      "commits": "f157711da0b42bef4665d554949190a622f39bdd",
+      "transactions": "intent-1782056714002",
+      "identities": "intent-1782056714002",
+      "evidence": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g/.atm/runtime/write-broker.registry.json"
+    },
+    {
+      "runId": "steward-merge-37e2c6d6dab54d12",
+      "planId": "merge-37e2c6d6dab54d12",
+      "scenario": "field",
+      "tasks": "TASK-TEAM-BROKER-HOT-DISJOINT,TASK-TEAM-BROKER-HOT-FIRST",
+      "actors": "coordinator-1,coordinator-2",
+      "files": "packages/cli/src/commands/broker.ts",
+      "vendor": "steward.patch-apply",
+      "lane": "neutral-steward",
+      "verdict": "mergeable",
+      "commits": "f157711da0b42bef4665d554949190a622f39bdd",
+      "transactions": "n/a",
+      "identities": "proposal-hot-first,proposal-hot-second",
+      "evidence": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g/.atm/runtime/proposal-gated-hot-apply.json"
+    },
+    {
+      "runId": "team-aa48783f592c",
+      "planId": "TASK-TEAM-BROKER-HOT-DISJOINT",
+      "scenario": "field",
+      "tasks": "TASK-TEAM-BROKER-HOT-DISJOINT",
+      "actors": "coordinator-2",
+      "files": "packages/cli/src/commands/broker.ts",
+      "vendor": "team-broker-lane",
+      "lane": "deterministic-composer:composer-routed",
+      "verdict": "needs-physical-split:composer-routed",
+      "commits": "f157711da0b42bef4665d554949190a622f39bdd",
+      "transactions": "decision-1782056714210,txn-4bdf8f70d6eee701",
+      "identities": "n/a",
+      "evidence": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g/.atm/runtime/team-runs/team-aa48783f592c.json"
+    }
+  ],
+  "taskArtifacts": [
+    {
+      "taskId": "TASK-TEAM-BROKER-HOT-DISJOINT",
+      "closurePacket": "n/a",
+      "teamRuns": "C:/Users/User/AI-Atomic-Framework/.atm-temp/atm-team-brokered-write-mqnyjzb3-tr63kf5g/.atm/runtime/team-runs/team-aa48783f592c.json"
+    },
+    {
+      "taskId": "TASK-TEAM-BROKER-HOT-FIRST",
+      "closurePacket": "n/a",
+      "teamRuns": "n/a"
+    }
+  ]
+}

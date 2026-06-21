@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-CID-0119",
+  "title": "Proposal-gated write admission dogfood and adoption gate",
+  "status": "running",
+  "milestone": "M21",
+  "dependencies": [
+    "TASK-CID-0118"
+  ],
+  "acceptance": [
+    "At least one same-file case is captured where broker arbitration happens before the second writer mutates working tree content.",
+    "At least one hot-file case is captured where the first writer enters proposal-first mode before a second writer exists.",
+    "At least one parked-first-writer or equivalent rearbitration trace is captured for uncommitted same-file work.",
+    "At least one composer-routed success trace is captured through the official product path.",
+    "At least one blocked-before-write trace is captured for true overlap.",
+    "A short adoption report states:",
+    "what should remain opt-in,",
+    "what should become default for shared hot files,",
+    "what should stay on the direct fast path."
+  ],
+  "deliverables": [
+    "docs/reports/**",
+    "scripts/**",
+    "tests/cli/**"
+  ],
+  "scopePaths": [
+    "docs/reports/**",
+    "scripts/**",
+    "packages/cli/src/commands/**",
+    "packages/core/src/broker/**",
+    "tests/cli/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not invent paper-only synthetic success stories.",
+    "Do not mark adoption complete without at least one natural or near-natural same-file dogfood run."
+  ],
+  "nonGoals": [
+    "No broad governance rewrite outside proposal-gated write admission."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.proposal-gated-write-admission-adoption-gate",
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0119-proposal-gated-write-admission-dogfood-and-adoption-gate.task.md",
+    "sectionTitle": "TASK-CID-0119",
+    "headingLine": 37,
+    "hash": "8c01bd29be83d9e7"
+  },
+  "importedAt": "2026-06-21T15:44:59.774Z",
+  "lastTransitionId": "2026-06-21T16-05-31-065Z-claim-e5b39520bae5",
+  "lastTransitionAt": "2026-06-21T16:05:31.065Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "captain",
+  "reservedAt": "2026-06-21T16:05:31.017Z",
+  "promotedAt": "2026-06-21T16:05:31.022Z",
+  "claim": {
+    "actorId": "captain",
+    "leaseId": "lease-c1fe1c8c3c64",
+    "claimedAt": "2026-06-21T16:05:31.025Z",
+    "heartbeatAt": "2026-06-21T16:05:31.025Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-CID-0119.json",
+      "docs/reports/**",
+      "packages/cli/src/commands/**",
+      "packages/core/src/broker/**",
+      "scripts/**",
+      "tests/cli/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-21T16:05:31.025Z",
+  "startedByActor": "captain",
+  "startedBySessionId": "session-20260621160531-captain-TASK-CID-0119-e42b788bfb",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-CID-0119",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-CID-0119.*",
+      ".atm/history/task-events/TASK-CID-0119/**",
+      ".atm/history/tasks/TASK-CID-0119.json",
+      "docs/reports/**",
+      "packages/cli/src/commands/**",
+      "packages/core/src/broker/**",
+      "scripts/**",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "250ff2568bec0fbd7c87ae82ef1dcd210f27ea3c8cf1b10803367c6f2d01be2d",
+    "actorId": "captain",
+    "createdAt": "2026-06-21T16:05:31.064Z",
+    "status": "active"
+  }
+}
