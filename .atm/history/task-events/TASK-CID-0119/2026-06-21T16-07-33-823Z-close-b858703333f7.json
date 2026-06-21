@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-21T16-07-33-823Z-close-b858703333f7",
+  "taskId": "TASK-CID-0119",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260621160531-captain-TASK-CID-0119-e42b788bfb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0119.json",
+  "taskSha256": "sha256:31b62343b1761ca9ca8ef70e8558771f5626d90374f4afff2b97a5066dc98f8c",
+  "createdAt": "2026-06-21T16:07:33.823Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0119 --actor captain --status done --historical-delivery 26a5ba4467d73059416adda6a2eade5e9a586e6f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260621160531-captain-TASK-CID-0119-e42b788bfb",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0119.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-brokered-write"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-21T16:07:33.819Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0119-proposal-gated-write-admission-dogfood-and-adoption-gate.task.md",
+        ".atm/history/evidence/TASK-CID-0119.*",
+        ".atm/history/task-events/TASK-CID-0119/**",
+        ".atm/history/tasks/TASK-CID-0119.json",
+        "docs/reports/**",
+        "packages/cli/src/commands/**",
+        "packages/core/src/broker/**",
+        "scripts/**",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/**",
+        "packages/core/src/broker/**",
+        "scripts/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
