@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-21T16-02-16-772Z-close-a893c59ac12f",
+  "taskId": "TASK-CID-0117",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260621155944-captain-TASK-CID-0117-f44d139aa8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0117.json",
+  "taskSha256": "sha256:ba3c4ee845d8e61b64edbf9d6156d64236331e8621330bceb33be95d4bddb761",
+  "createdAt": "2026-06-21T16:02:16.772Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0117 --actor captain --status done --historical-delivery 79315fe16dc95ab1e49d5e2320c7bcdb6ae67b25",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260621155944-captain-TASK-CID-0117-f44d139aa8",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0117.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-brokered-write"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-21T16:02:16.769Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0117-proposal-overlap-arbitration-and-deterministic-composer-routing.task.md",
+        ".atm/history/evidence/TASK-CID-0117.*",
+        ".atm/history/task-events/TASK-CID-0117/**",
+        ".atm/history/tasks/TASK-CID-0117.json",
+        "docs/BROKER_GUIDE.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/**",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
