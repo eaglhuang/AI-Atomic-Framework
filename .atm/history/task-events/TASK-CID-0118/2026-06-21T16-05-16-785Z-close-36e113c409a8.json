@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-21T16-05-16-785Z-close-36e113c409a8",
+  "taskId": "TASK-CID-0118",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260621160230-captain-TASK-CID-0118-5414e5797a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0118.json",
+  "taskSha256": "sha256:80600abf7ba3c37791d60979f7f2b2e16ad4ba5ab3cc08ddb5bd6657cd6fd123",
+  "createdAt": "2026-06-21T16:05:16.785Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0118 --actor captain --status done --historical-delivery fa4fa6f4bb9f41399f1d547c1f3ed48b0a55c55e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260621160230-captain-TASK-CID-0118-5414e5797a",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0118.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-brokered-write"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-21T16:05:16.778Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0118-governed-writer-handoff-and-live-apply-evidence.task.md",
+        ".atm/history/evidence/TASK-CID-0118.*",
+        ".atm/history/task-events/TASK-CID-0118/**",
+        ".atm/history/tasks/TASK-CID-0118.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/**",
+        "scripts/capture-broker-evidence.ts",
+        "scripts/collect-broker-evidence.ts",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/**",
+        "scripts/capture-broker-evidence.ts",
+        "scripts/collect-broker-evidence.ts",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
