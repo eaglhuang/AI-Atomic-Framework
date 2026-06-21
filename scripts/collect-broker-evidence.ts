@@ -50,6 +50,36 @@ interface TeamRun {
   readonly brokerLane?: unknown;
 }
 
+interface RegistryAdmission {
+  readonly trigger?: string | null;
+  readonly state?: string | null;
+}
+
+interface RegistryActiveIntent {
+  readonly taskId?: string | null;
+  readonly actorId?: string | null;
+  readonly baseCommit?: string | null;
+  readonly intentId?: string | null;
+  readonly leaseEpoch?: number | null;
+  readonly resourceKeys?: {
+    readonly files?: readonly string[] | null;
+  } | null;
+  readonly admission?: RegistryAdmission | null;
+}
+
+interface BrokerRegistryDocument {
+  readonly schemaId?: string | null;
+  readonly activeIntents?: readonly RegistryActiveIntent[] | null;
+}
+
+function deriveAdmissionStateFromBrokerLane(brokerLane: unknown): string | null {
+  const brokerLaneObject = brokerLane && typeof brokerLane === 'object'
+    ? brokerLane as Record<string, unknown>
+    : null;
+  const admission = brokerLaneObject?.admission;
+  return firstStringByKey(admission, new Set(['state', 'admissionState']));
+}
+
 interface BrokerRunSummary {
   runId: string;
   planId: string;
@@ -298,7 +328,7 @@ function summarizeEnvelopeRecord(run: BrokerEnvelope, runSource: string): Broker
     scenario: [...scenarios].sort().join(',') || 'field',
     tasks: toCsv(tasks),
     actors: toCsv(actors),
-    files: toCsv(files),
+    files: toCsv(new Set(files)),
     vendor: [...adapters].length === 1 ? [...adapters][0]! : toCsv(adapters),
     lane: [...lanes].length === 1 ? [...lanes][0]! : toCsv(lanes),
     verdict: [...verdicts].length === 1 ? [...verdicts][0]! : toCsv(verdicts),
@@ -369,7 +399,7 @@ function summarizeExperimentRun(run: BrokerExperimentRun): BrokerRunSummary | nu
     scenario: [...scenarios].sort().join(',') || 'field',
     tasks: toCsv(tasks),
     actors: toCsv(actors),
-    files: toCsv(files),
+    files: toCsv(new Set(files)),
     vendor: [...vendors].length === 1 ? [...vendors][0]! : toCsv(vendors),
     lane: [...lanes].length === 1 ? [...lanes][0]! : toCsv(lanes),
     verdict: [...verdicts].length === 1 ? [...verdicts][0]! : toCsv(verdicts),
@@ -405,6 +435,14 @@ function isTeamRun(value: unknown): value is TeamRun {
   }
   const maybe = value as TeamRun;
   return maybe.schemaId === 'atm.teamRun.v1' && typeof maybe.teamRunId === 'string';
+}
+
+function isBrokerRegistry(value: unknown): value is BrokerRegistryDocument {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const maybe = value as BrokerRegistryDocument;
+  return maybe.schemaId === 'atm.writeBrokerRegistry.v1' && Array.isArray(maybe.activeIntents);
 }
 
 function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | null {
@@ -458,8 +496,15 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
     split.tasks.forEach((value) => tasks.add(value));
   }
 
-  const lane = firstStringByKey(decision ?? brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
-  const verdict = firstStringByKey(decision ?? brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+  const admissionState = deriveAdmissionStateFromBrokerLane(brokerLane);
+  const rawLane = firstStringByKey(decision ?? brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
+  const rawVerdict = firstStringByKey(decision ?? brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+  const lane = admissionState && admissionState !== 'not-required'
+    ? `${rawLane}:${admissionState}`
+    : rawLane;
+  const verdict = admissionState && admissionState !== 'not-required'
+    ? `${rawVerdict}:${admissionState}`
+    : rawVerdict;
 
   return {
     runId: run.teamRunId,
@@ -467,7 +512,7 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
     scenario: [...scenarios].sort().join(',') || 'field',
     tasks: toCsv(tasks),
     actors: toCsv(actors),
-    files: toCsv(files),
+    files: toCsv(new Set(files)),
     vendor: 'team-broker-lane',
     lane,
     verdict,
@@ -529,6 +574,53 @@ function loadTeamRunSummaries(teamRunDir: string | null): BrokerRunSummary[] {
   }
 
   return rows;
+}
+
+function summarizeRegistryIntent(intent: RegistryActiveIntent, registryPath: string): BrokerRunSummary | null {
+  const taskId = typeof intent.taskId === 'string' ? intent.taskId.trim() : '';
+  const actorId = typeof intent.actorId === 'string' ? intent.actorId.trim() : '';
+  const admissionState = typeof intent.admission?.state === 'string' ? intent.admission.state.trim() : '';
+  if (!taskId || !admissionState || admissionState === 'not-required') {
+    return null;
+  }
+  const files = Array.isArray(intent.resourceKeys?.files)
+    ? intent.resourceKeys?.files.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    : [];
+  const commit = typeof intent.baseCommit === 'string' ? intent.baseCommit.trim() : '';
+  const identity = typeof intent.intentId === 'string' ? intent.intentId.trim() : '';
+  return {
+    runId: `registry-${taskId}`,
+    planId: taskId,
+    scenario: 'field',
+    tasks: taskId,
+    actors: actorId || 'unknown',
+    files: toCsv(new Set(files)),
+    vendor: 'broker-registry',
+    lane: `direct-brokered:${admissionState}`,
+    verdict: `recorded:${admissionState}`,
+    commits: commit || 'n/a',
+    transactions: identity || 'n/a',
+    identities: identity || taskId,
+    evidence: registryPath.replace(/\\/g, '/')
+  };
+}
+
+function loadRegistryAdmissionSummaries(atmRoot: string): BrokerRunSummary[] {
+  const registryPath = path.join(atmRoot, '.atm', 'runtime', 'write-broker.registry.json');
+  if (!existsSync(registryPath)) {
+    return [];
+  }
+  try {
+    const raw = JSON.parse(readFileSync(registryPath, 'utf8')) as unknown;
+    if (!isBrokerRegistry(raw)) {
+      return [];
+    }
+    return (raw.activeIntents ?? [])
+      .map((intent) => summarizeRegistryIntent(intent, registryPath))
+      .filter((row): row is BrokerRunSummary => Boolean(row));
+  } catch {
+    return [];
+  }
 }
 
 function listActiveTeamRunFiles(teamRunDir: string): string[] {
@@ -648,7 +740,8 @@ function main() {
 
   const rows = [
     ...loadRunSummaries(runDir),
-    ...loadTeamRunSummaries(teamRunDir)
+    ...loadTeamRunSummaries(teamRunDir),
+    ...loadRegistryAdmissionSummaries(atmRoot)
   ]
     .filter((row) => {
       if (runFilter.size > 0 && !runFilter.has(row.runId)) {

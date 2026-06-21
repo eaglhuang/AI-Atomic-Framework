@@ -59,6 +59,14 @@ interface TeamRun {
   readonly brokerLane?: unknown;
 }
 
+function deriveAdmissionStateFromBrokerLane(brokerLane: unknown): string | null {
+  const brokerLaneObject = brokerLane && typeof brokerLane === 'object'
+    ? brokerLane as Record<string, unknown>
+    : null;
+  const admission = brokerLaneObject?.admission;
+  return firstStringByKey(admission, new Set(['state', 'admissionState']));
+}
+
 interface BrokerRunSummary {
   runId: string;
   planId: string;
@@ -661,8 +669,15 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
     split.tasks.forEach((value) => tasks.add(value));
   }
 
-  const lane = firstStringByKey(decision ?? brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
-  const verdict = firstStringByKey(decision ?? brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+  const admissionState = deriveAdmissionStateFromBrokerLane(brokerLane);
+  const rawLane = firstStringByKey(decision ?? brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
+  const rawVerdict = firstStringByKey(decision ?? brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
+  const lane = admissionState && admissionState !== 'not-required'
+    ? `${rawLane}:${admissionState}`
+    : rawLane;
+  const verdict = admissionState && admissionState !== 'not-required'
+    ? `${rawVerdict}:${admissionState}`
+    : rawVerdict;
 
   return {
     runId: run.teamRunId,
