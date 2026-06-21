@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-21T15-59-28-582Z-close-a2c3d1d52cf7",
+  "taskId": "TASK-CID-0116",
+  "action": "close",
+  "actorId": "captain",
+  "sessionId": "session-20260621155714-captain-TASK-CID-0116-5b2447d079",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0116.json",
+  "taskSha256": "sha256:937bab9a945ce5930f8aa10f12e8b5ea6bab430ce4b68d8d6618e0f3456f653f",
+  "createdAt": "2026-06-21T15:59:28.582Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0116 --actor captain --status done --historical-delivery 79315fe16dc95ab1e49d5e2320c7bcdb6ae67b25",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260621155714-captain-TASK-CID-0116-5b2447d079",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0116.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents -- --case capture-broker-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-21T15:59:28.576Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0116-team-start-and-broker-register-proposal-first-gate.task.md",
+        ".atm/history/evidence/TASK-CID-0116.*",
+        ".atm/history/task-events/TASK-CID-0116/**",
+        ".atm/history/tasks/TASK-CID-0116.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/**",
+        "scripts/validate-team-agents.ts",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/**",
+        "scripts/validate-team-agents.ts",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
