@@ -237,6 +237,7 @@ The implemented evolution work can be understood as a sequence of public surface
 | Evidence detector | Group recurring signals and emit reports |
 | Evolution draft bridge | Convert qualified reports into dry-run upgrade proposal drafts |
 | Conversation review bridge | Convert reviewed conversation friction into advisory findings |
+| Broker split suggestion bridge | Convert blocked same-owner broker overlap into a curator-facing atom-map patch draft before any registry promotion |
 | Conversation feedback loop | Preserve user choice and suppression semantics |
 | Atomic map curator | Propose map-level compose, merge, dedup-merge, sweep, or impact changes |
 | Example loop | Demonstrate proposal, review, approval, rejection, and rollback paths |

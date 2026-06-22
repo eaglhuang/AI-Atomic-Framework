@@ -4,7 +4,12 @@ import path from 'node:path';
 import { createRegistryIndex } from '../registry/registry-index.ts';
 
 export type AtomMapCuratorBehaviorId = 'behavior.compose' | 'behavior.merge' | 'behavior.dedup-merge' | 'behavior.sweep';
-export type AtomMapCuratorSignalKind = 'caller-graph' | 'input-output-overlap' | 'recurring-failure-cluster' | 'zero-caller-sweep';
+export type AtomMapCuratorSignalKind =
+  | 'caller-graph'
+  | 'input-output-overlap'
+  | 'recurring-failure-cluster'
+  | 'zero-caller-sweep'
+  | 'broker-split-suggestion';
 export type AtomMapCuratorMutabilityPolicy = 'mutable' | 'frozen-after-release' | 'immutable';
 
 export interface AtomMapCuratorThresholds {
@@ -51,6 +56,36 @@ export interface RecurringFailureClusterInput {
   readonly targetMutabilityPolicy?: AtomMapCuratorMutabilityPolicy;
 }
 
+export interface BrokerSuggestedAtomInput {
+  readonly atomId: string;
+  readonly atomCid: string;
+  readonly role: 'focus' | 'before' | 'after';
+  readonly summary: string;
+  readonly sourceRange: {
+    readonly filePath: string;
+    readonly lineStart: number;
+    readonly lineEnd: number;
+  };
+}
+
+export interface BrokerSplitSuggestionInput {
+  readonly candidateId: string;
+  readonly ownerAtomId: string;
+  readonly ownerAtomCid?: string;
+  readonly targetMapId: string;
+  readonly targetMapVersion?: string;
+  readonly targetFile: string;
+  readonly sourceEvidenceIds: readonly string[];
+  readonly confidence?: number;
+  readonly targetMutabilityPolicy?: AtomMapCuratorMutabilityPolicy;
+  readonly conflictRegion: {
+    readonly filePath: string;
+    readonly lineStart: number;
+    readonly lineEnd: number;
+  };
+  readonly suggestedAtoms: readonly BrokerSuggestedAtomInput[];
+}
+
 export interface AtomMapCuratorInput {
   readonly repositoryRoot: string;
   readonly reportPath?: string;
@@ -61,6 +96,7 @@ export interface AtomMapCuratorInput {
   readonly callerGraphs?: readonly CallerGraphSequenceInput[];
   readonly inputOutputOverlaps?: readonly InputOutputOverlapInput[];
   readonly recurringFailureClusters?: readonly RecurringFailureClusterInput[];
+  readonly brokerSplitSuggestions?: readonly BrokerSplitSuggestionInput[];
 }
 
 export interface AtomMapCuratorObservation {
@@ -79,6 +115,29 @@ export interface AtomMapCuratorProposalDraftItem {
   readonly proposal: Record<string, unknown>;
 }
 
+export interface AtomMapCuratorPatchDraftOperation {
+  readonly op: 'replace-owner-range' | 'add-child-atom-row' | 'rebuild-projection';
+  readonly target: string;
+  readonly summary: string;
+  readonly payload?: Record<string, unknown>;
+}
+
+export interface AtomMapCuratorPatchDraftItem {
+  readonly candidateId: string;
+  readonly draftKind: 'atom-map-patch';
+  readonly signalKind: 'broker-split-suggestion';
+  readonly targetMapId: string;
+  readonly sourceEvidenceIds: readonly string[];
+  readonly patchFiles: readonly string[];
+  readonly ownerAtomId: string;
+  readonly conflictRegion: BrokerSplitSuggestionInput['conflictRegion'];
+  readonly suggestedAtoms: readonly BrokerSuggestedAtomInput[];
+  readonly summary: string;
+  readonly rationale: string;
+  readonly requiresHumanReview: true;
+  readonly operations: readonly AtomMapCuratorPatchDraftOperation[];
+}
+
 export interface AtomMapCuratorReport {
   readonly schemaId: 'atm.atomMapCuratorReport';
   readonly specVersion: '0.1.0';
@@ -95,12 +154,15 @@ export interface AtomMapCuratorReport {
     readonly callerGraphSignals: number;
     readonly inputOutputOverlapSignals: number;
     readonly recurringFailureClusterSignals: number;
+    readonly brokerSplitSuggestionSignals: number;
     readonly proposalDrafts: number;
     readonly blockedProposalDrafts: number;
+    readonly patchDrafts: number;
     readonly observationOnly: number;
   };
   readonly observations: readonly AtomMapCuratorObservation[];
   readonly proposalDrafts: readonly AtomMapCuratorProposalDraftItem[];
+  readonly patchDrafts: readonly AtomMapCuratorPatchDraftItem[];
   readonly empty: boolean;
 }
 
@@ -150,6 +212,7 @@ export function curateAtomMapEvolution(input: AtomMapCuratorInput): AtomMapCurat
   const registry = createRegistryResolver(input.repositoryRoot);
   const observations: AtomMapCuratorObservation[] = [];
   const proposalDrafts: AtomMapCuratorProposalDraftItem[] = [];
+  const patchDrafts: AtomMapCuratorPatchDraftItem[] = [];
 
   for (const signal of input.callerGraphs ?? []) {
     const reasons = validateCallerGraphSignal(signal, thresholds);
@@ -256,8 +319,34 @@ export function curateAtomMapEvolution(input: AtomMapCuratorInput): AtomMapCurat
     }, registry));
   }
 
+  for (const signal of input.brokerSplitSuggestions ?? []) {
+    const reasons = validateBrokerSplitSuggestionSignal(signal, thresholds);
+    const signalKind: AtomMapCuratorSignalKind = 'broker-split-suggestion';
+    if (reasons.length > 0) {
+      observations.push({ candidateId: signal.candidateId, signalKind, reasons });
+      continue;
+    }
+
+    patchDrafts.push(buildBrokerSplitPatchDraft({
+      candidateId: signal.candidateId,
+      signalKind,
+      targetMapId: signal.targetMapId,
+      sourceEvidenceIds: signal.sourceEvidenceIds,
+      ownerAtomId: signal.ownerAtomId,
+      targetFile: signal.targetFile,
+      conflictRegion: signal.conflictRegion,
+      suggestedAtoms: signal.suggestedAtoms,
+      reportPath
+    }));
+  }
+
   const sortedDrafts = proposalDrafts.sort((left, right) => left.candidateId.localeCompare(right.candidateId));
-  const reportId = buildReportId(input.repositoryRoot, reportPath, sortedDrafts.map((draft) => draft.candidateId));
+  const sortedPatchDrafts = patchDrafts.sort((left, right) => left.candidateId.localeCompare(right.candidateId));
+  const reportId = buildReportId(
+    input.repositoryRoot,
+    reportPath,
+    [...sortedDrafts.map((draft) => draft.candidateId), ...sortedPatchDrafts.map((draft) => draft.candidateId)]
+  );
   const blockedProposalDrafts = sortedDrafts.filter((draft) => draft.autoPromoteEligible === false).length;
 
   return {
@@ -276,13 +365,16 @@ export function curateAtomMapEvolution(input: AtomMapCuratorInput): AtomMapCurat
       callerGraphSignals: input.callerGraphs?.length ?? 0,
       inputOutputOverlapSignals: input.inputOutputOverlaps?.length ?? 0,
       recurringFailureClusterSignals: input.recurringFailureClusters?.length ?? 0,
+      brokerSplitSuggestionSignals: input.brokerSplitSuggestions?.length ?? 0,
       proposalDrafts: sortedDrafts.length,
       blockedProposalDrafts,
+      patchDrafts: sortedPatchDrafts.length,
       observationOnly: observations.length
     },
     observations: observations.sort((left, right) => left.candidateId.localeCompare(right.candidateId)),
     proposalDrafts: sortedDrafts,
-    empty: sortedDrafts.length === 0
+    patchDrafts: sortedPatchDrafts,
+    empty: sortedDrafts.length === 0 && sortedPatchDrafts.length === 0
   };
 }
 
@@ -325,6 +417,24 @@ function validateRecurringFailureCluster(signal: RecurringFailureClusterInput, t
     reasons.push('sweep-needs-zero-caller-atoms');
   }
   appendEvidenceAndConfidenceReasons(reasons, signal.evidenceIds, signal.confidence, thresholds);
+  return reasons;
+}
+
+function validateBrokerSplitSuggestionSignal(signal: BrokerSplitSuggestionInput, thresholds: AtomMapCuratorThresholds): string[] {
+  const reasons: string[] = [];
+  if (!signal.ownerAtomId) {
+    reasons.push('broker-split-suggestion-needs-owner-atom');
+  }
+  if (!signal.targetFile) {
+    reasons.push('broker-split-suggestion-needs-target-file');
+  }
+  if (signal.suggestedAtoms.length < 2) {
+    reasons.push('broker-split-suggestion-needs-child-atoms');
+  }
+  if (!signal.suggestedAtoms.some((entry) => entry.role === 'focus')) {
+    reasons.push('broker-split-suggestion-needs-focus-atom');
+  }
+  appendEvidenceAndConfidenceReasons(reasons, signal.sourceEvidenceIds, signal.confidence, thresholds);
   return reasons;
 }
 
@@ -452,6 +562,71 @@ function buildProposalDraft(request: ProposalBuildRequest, registry: RegistryRes
   };
 }
 
+function buildBrokerSplitPatchDraft(request: {
+  readonly candidateId: string;
+  readonly signalKind: 'broker-split-suggestion';
+  readonly targetMapId: string;
+  readonly sourceEvidenceIds: readonly string[];
+  readonly ownerAtomId: string;
+  readonly targetFile: string;
+  readonly conflictRegion: BrokerSplitSuggestionInput['conflictRegion'];
+  readonly suggestedAtoms: readonly BrokerSuggestedAtomInput[];
+  readonly reportPath: string;
+}): AtomMapCuratorPatchDraftItem {
+  const patchFiles = [
+    inferOwnerShardPath(request.targetFile),
+    'atomic_workbench/atomization-coverage/path-to-atom-map.json'
+  ].sort((left, right) => left.localeCompare(right));
+  const operations: AtomMapCuratorPatchDraftOperation[] = [
+    {
+      op: 'replace-owner-range',
+      target: patchFiles[0],
+      summary: `Replace coarse owner atom '${request.ownerAtomId}' coverage on ${request.targetFile} with bounded child atom rows.`,
+      payload: {
+        pathPattern: request.targetFile,
+        ownerAtomId: request.ownerAtomId,
+        conflictRegion: request.conflictRegion
+      }
+    },
+    ...request.suggestedAtoms.map((atom) => ({
+      op: 'add-child-atom-row' as const,
+      target: patchFiles[0],
+      summary: `Add ${atom.role} child atom row '${atom.atomId}' covering ${atom.sourceRange.lineStart}-${atom.sourceRange.lineEnd}.`,
+      payload: {
+        pathPattern: `${request.targetFile}#L${atom.sourceRange.lineStart}-L${atom.sourceRange.lineEnd}`,
+        atomId: atom.atomId,
+        atomCid: atom.atomCid,
+        role: atom.role,
+        capability: atom.summary,
+        coverageStatus: 'active'
+      }
+    })),
+    {
+      op: 'rebuild-projection',
+      target: 'atomic_workbench/atomization-coverage/path-to-atom-map.json',
+      summary: 'Rebuild the path-to-atom-map projection after curator review accepts the owner-shard split.'
+    }
+  ];
+  return {
+    candidateId: request.candidateId,
+    draftKind: 'atom-map-patch',
+    signalKind: request.signalKind,
+    targetMapId: request.targetMapId,
+    sourceEvidenceIds: [...request.sourceEvidenceIds].sort(),
+    patchFiles,
+    ownerAtomId: request.ownerAtomId,
+    conflictRegion: request.conflictRegion,
+    suggestedAtoms: request.suggestedAtoms.map((entry) => ({
+      ...entry,
+      sourceRange: { ...entry.sourceRange }
+    })),
+    summary: `Broker split suggestion for '${request.ownerAtomId}' on ${request.targetFile} is ready as an atom-map patch draft.`,
+    rationale: `Blocked overlap on ${request.targetFile}:${request.conflictRegion.lineStart}-${request.conflictRegion.lineEnd} should be promoted into finer bounded child atoms before future writes reuse the same coarse owner map.`,
+    requiresHumanReview: true,
+    operations
+  };
+}
+
 function makePassGate(gateName: 'nonRegression' | 'qualityComparison' | 'registryCandidate', reportPath: string, summary: string) {
   return {
     passed: true,
@@ -459,6 +634,22 @@ function makePassGate(gateName: 'nonRegression' | 'qualityComparison' | 'registr
     reportPath,
     summary
   };
+}
+
+function inferOwnerShardPath(targetFile: string): string {
+  if (targetFile.startsWith('packages/cli/')) {
+    return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json';
+  }
+  if (targetFile.startsWith('packages/core/')) {
+    return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json';
+  }
+  if (targetFile.startsWith('packages/plugin-')) {
+    return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json';
+  }
+  if (targetFile.startsWith('scripts/')) {
+    return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json';
+  }
+  return 'atomic_workbench/atomization-coverage/path-to-atom-map.json';
 }
 
 function createRegistryResolver(repositoryRoot: string) {

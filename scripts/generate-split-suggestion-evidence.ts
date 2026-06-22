@@ -2,6 +2,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { calculateBrokerDecision } from '../packages/core/src/broker/decision.ts';
+import { curateAtomMapEvolution } from '../packages/core/src/upgrade/map-curator.ts';
 import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from '../packages/core/src/broker/types.ts';
 
 type Scenario = {
@@ -230,6 +231,7 @@ const rows = scenarios.map((scenario) => {
     verdict: decision.verdict,
     lane: decision.lane,
     reason: decision.reason,
+    targetFile: scenario.newIntent.targetFiles[0],
     suggestion: decision.decompositionRequest
       ? `${decision.decompositionRequest.targetFunction.atomId} @ ${decision.decompositionRequest.conflictRegion.filePath}:${decision.decompositionRequest.conflictRegion.lineStart}-${decision.decompositionRequest.conflictRegion.lineEnd}`
       : 'none',
@@ -238,17 +240,49 @@ const rows = scenarios.map((scenario) => {
   };
 });
 
+const curatorReport = curateAtomMapEvolution({
+  repositoryRoot: root,
+  reportPath: path.relative(root, path.join(outputDir, 'split-suggestion-curator-report.json')).replace(/\\/g, '/'),
+  generatedAt: '2026-06-22T04:10:00.000Z',
+  proposedBy: 'ATM Atom Map Curator',
+  brokerSplitSuggestions: scenarios.flatMap((scenario) => {
+    const decision = calculateBrokerDecision(scenario.newIntent, buildRegistry(scenario.activeIntent));
+    if (!decision.decompositionRequest?.suggestedAtoms || decision.decompositionRequest.suggestedAtoms.length === 0) {
+      return [];
+    }
+    return [{
+      candidateId: scenario.id,
+      ownerAtomId: decision.decompositionRequest.ownerAtomId ?? decision.decompositionRequest.targetFunction.atomId,
+      ownerAtomCid: decision.decompositionRequest.targetFunction.atomCid,
+      targetMapId: scenario.id === 'same-owner-blocked-suggestion' ? 'ATM-MAP-0002' : 'ATM-MAP-0001',
+      targetFile: scenario.newIntent.targetFiles[0],
+      sourceEvidenceIds: [`evidence.${scenario.id}.001`, `evidence.${scenario.id}.002`],
+      confidence: 0.9,
+      conflictRegion: decision.decompositionRequest.conflictRegion,
+      suggestedAtoms: decision.decompositionRequest.suggestedAtoms
+    }];
+  })
+});
+writeJson(path.join(outputDir, 'split-suggestion-curator-report.json'), curatorReport);
+
 const reportLines = [
   '# Split Suggestion Evidence',
   '',
-  '| scenario | verdict | lane | suggestion kind | suggestion | suggested atoms |',
-  '| --- | --- | --- | --- | --- | --- |',
-  ...rows.map((row) => `| ${row.id} | ${row.verdict} | ${row.lane} | ${row.suggestionKind} | ${row.suggestion} | ${row.suggestedAtoms.join('<br>')} |`),
+  '| scenario | verdict | lane | suggestion kind | suggestion | suggested atoms | curator patch draft |',
+  '| --- | --- | --- | --- | --- | --- | --- |',
+  ...rows.map((row) => {
+    const patchDraft = curatorReport.patchDrafts.find((entry) => entry.candidateId === row.id);
+    const patchSummary = patchDraft
+      ? `${patchDraft.patchFiles.join('<br>')}<br>${patchDraft.operations.map((operation) => operation.op).join(', ')}`
+      : 'none';
+    return `| ${row.id} | ${row.verdict} | ${row.lane} | ${row.suggestionKind} | ${row.suggestion} | ${row.suggestedAtoms.join('<br>')} | ${patchSummary} |`;
+  }),
   '',
   '## Notes',
   '',
-  '- `same-owner-blocked-suggestion`: same owner map remains blocked, but now emits a bounded split suggestion instead of only a hard stop.',
-  '- `same-owner-close-orch-suggestion`: the same split-suggestion behavior also appears on a second coarse owner map, showing the output is not tied to one file or one hot-file case.'
+  '- `same-owner-blocked-suggestion`: same owner map remains blocked, but now emits a bounded split suggestion and a curator-facing atom-map patch draft instead of only a hard stop.',
+  '- `same-owner-close-orch-suggestion`: the same split-suggestion behavior also appears on a second coarse owner map, showing the output is not tied to one file or one hot-file case.',
+  `- Curator patch draft report: \`split-suggestion-curator-report.json\` (patchDrafts=${curatorReport.patchDrafts.length}).`
 ];
 
 writeFileSync(path.join(outputDir, 'split-suggestion-evidence-zh.md'), `${reportLines.join('\n')}\n`, 'utf8');

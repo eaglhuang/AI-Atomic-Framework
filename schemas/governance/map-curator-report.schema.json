@@ -49,8 +49,10 @@
         "callerGraphSignals",
         "inputOutputOverlapSignals",
         "recurringFailureClusterSignals",
+        "brokerSplitSuggestionSignals",
         "proposalDrafts",
         "blockedProposalDrafts",
+        "patchDrafts",
         "observationOnly"
       ],
       "properties": {
@@ -66,11 +68,19 @@
           "type": "integer",
           "minimum": 0
         },
+        "brokerSplitSuggestionSignals": {
+          "type": "integer",
+          "minimum": 0
+        },
         "proposalDrafts": {
           "type": "integer",
           "minimum": 0
         },
         "blockedProposalDrafts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "patchDrafts": {
           "type": "integer",
           "minimum": 0
         },
@@ -90,6 +100,12 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/proposalDraft"
+      }
+    },
+    "patchDrafts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/patchDraft"
       }
     },
     "empty": {
@@ -149,7 +165,7 @@
           "minLength": 1
         },
         "signalKind": {
-          "enum": ["caller-graph", "input-output-overlap", "recurring-failure-cluster", "zero-caller-sweep"]
+          "enum": ["caller-graph", "input-output-overlap", "recurring-failure-cluster", "zero-caller-sweep", "broker-split-suggestion"]
         },
         "reasons": {
           "type": "array",
@@ -200,6 +216,155 @@
         },
         "proposal": {
           "$ref": "https://schemas.ai-atomic-framework.dev/upgrade/upgrade-proposal.schema.json"
+        }
+      }
+    },
+    "lineRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filePath", "lineStart", "lineEnd"],
+      "properties": {
+        "filePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lineStart": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "suggestedAtom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["atomId", "atomCid", "role", "summary", "sourceRange"],
+      "properties": {
+        "atomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "atomCid": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "enum": ["focus", "before", "after"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRange": {
+          "$ref": "#/$defs/lineRange"
+        }
+      }
+    },
+    "patchDraftOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "target", "summary"],
+      "properties": {
+        "op": {
+          "enum": ["replace-owner-range", "add-child-atom-row", "rebuild-projection"]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        }
+      }
+    },
+    "patchDraft": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "draftKind",
+        "signalKind",
+        "targetMapId",
+        "sourceEvidenceIds",
+        "patchFiles",
+        "ownerAtomId",
+        "conflictRegion",
+        "suggestedAtoms",
+        "summary",
+        "rationale",
+        "requiresHumanReview",
+        "operations"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "draftKind": {
+          "const": "atom-map-patch"
+        },
+        "signalKind": {
+          "const": "broker-split-suggestion"
+        },
+        "targetMapId": {
+          "type": "string",
+          "pattern": "^ATM-MAP-\\d{4}$"
+        },
+        "sourceEvidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "patchFiles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "ownerAtomId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conflictRegion": {
+          "$ref": "#/$defs/lineRange"
+        },
+        "suggestedAtoms": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/suggestedAtom"
+          }
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requiresHumanReview": {
+          "const": true
+        },
+        "operations": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/patchDraftOperation"
+          }
         }
       }
     }
