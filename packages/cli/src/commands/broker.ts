@@ -918,11 +918,18 @@ function classifyExplicitMutationRequest(request: MutationRequest): {
   readonly missingInputs: readonly MutationIntentMissingInput[];
 } {
   const missingInputs: MutationIntentMissingInput[] = [];
-  const requestId = request.requestId || 'unknown-request';
   const filePath = typeof request.filePath === 'string' ? request.filePath : '';
   const normalizedFilePath = filePath.trim();
   const op = typeof request.op === 'string' ? request.op.trim() : '';
   const target = typeof request.target === 'string' ? request.target.trim() : '';
+  const requestId =
+    typeof request.requestId === 'string' && request.requestId.trim()
+      ? request.requestId.trim()
+      : [
+          normalizedFilePath || 'unknown-file',
+          op || 'unknown-op',
+          target || 'unknown-target'
+        ].join(':');
   const kind = resolveExplicitMutationIntentKind(request, filePath, op, target);
 
   if (!normalizedFilePath) {
@@ -1111,7 +1118,8 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--ttl-seconds') {
       const val = requireValue(argv, index, '--ttl-seconds');
-      state.ttlSeconds = parseInt(val, 10);
+      const parsed = parseInt(val, 10);
+      state.ttlSeconds = !Number.isFinite(parsed) || parsed <= 0 ? 1800 : parsed;
       index += 1;
       continue;
     }
