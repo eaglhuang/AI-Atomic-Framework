@@ -646,6 +646,7 @@ function buildDecompositionRequest(
     readonly suggestionKind?: DecompositionRequest['suggestionKind'];
     readonly ownerAtomId?: string | null;
     readonly rationale?: string;
+    readonly containerRange?: LineRange;
   } = {}
 ): DecompositionRequest {
   return {
@@ -655,7 +656,7 @@ function buildDecompositionRequest(
     suggestionKind: options.suggestionKind ?? 'layer2-function-split',
     ownerAtomId: options.ownerAtomId ?? null,
     rationale: options.rationale ?? 'Broker suggests splitting the coarse write surface into smaller bounded atoms.',
-    suggestedAtoms: buildSuggestedSplitAtoms(targetFunction, conflictRegion)
+    suggestedAtoms: buildSuggestedSplitAtoms(targetFunction, conflictRegion, options.containerRange)
   };
 }
 
@@ -698,6 +699,13 @@ function maybeBuildCidConflictDecompositionRequest(
             continue;
           }
           const conflictRegion = intersectRanges(newAtom.sourceRange, activeAtom.sourceRange);
+          const containerCandidate = [newAtom, activeAtom]
+            .filter((candidate) => candidate.sourceRange.lineStart <= conflictRegion.lineStart && candidate.sourceRange.lineEnd >= conflictRegion.lineEnd)
+            .sort((left, right) => {
+              const leftSpan = left.sourceRange.lineEnd - left.sourceRange.lineStart;
+              const rightSpan = right.sourceRange.lineEnd - right.sourceRange.lineStart;
+              return rightSpan - leftSpan;
+            })[0];
           const candidateTargets = [newAtom, activeAtom]
             .filter((candidate) => candidate.sourceRange.lineStart <= conflictRegion.lineStart && candidate.sourceRange.lineEnd >= conflictRegion.lineEnd)
             .sort((left, right) => {
@@ -715,7 +723,8 @@ function maybeBuildCidConflictDecompositionRequest(
             }, conflictRegion, {
               suggestionKind: 'coarse-owner-map-split',
               ownerAtomId: target.atomId,
-              rationale: `Blocked same-owner overlap on '${conflictRegion.filePath}' can be reduced by splitting the coarse owner map into bounded child atoms.`
+              rationale: `Blocked same-owner overlap on '${conflictRegion.filePath}' can be reduced by splitting the coarse owner map into bounded child atoms.`,
+              containerRange: containerCandidate?.sourceRange
             });
           }
           layer2Conflicts.push({
@@ -739,16 +748,18 @@ function maybeBuildCidConflictDecompositionRequest(
   return buildDecompositionRequest(layer2Decision.targetFunction, layer2Decision.conflictRegion, {
     suggestionKind: 'coarse-owner-map-split',
     ownerAtomId: layer2Decision.targetFunction.atomId,
-    rationale: `Blocked same-owner overlap on '${layer2Decision.conflictRegion.filePath}' can be reduced by splitting the coarse owner map into bounded child atoms.`
+    rationale: `Blocked same-owner overlap on '${layer2Decision.conflictRegion.filePath}' can be reduced by splitting the coarse owner map into bounded child atoms.`,
+    containerRange: layer2Decision.targetFunction.sourceRange
   });
 }
 
 function buildSuggestedSplitAtoms(
   targetFunction: DecompositionTargetFunction,
-  conflictRegion: LineRange
+  conflictRegion: LineRange,
+  containerRangeOverride?: LineRange
 ): readonly SuggestedSplitAtom[] {
   const suggestions: SuggestedSplitAtom[] = [];
-  const targetRange = targetFunction.sourceRange;
+  const targetRange = containerRangeOverride ?? targetFunction.sourceRange;
   const baseId = targetFunction.atomId;
 
   suggestions.push({

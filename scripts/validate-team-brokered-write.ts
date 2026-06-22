@@ -738,7 +738,7 @@ try {
   check(sameOwnerBlockLane.evidence.admission.state === 'blocked-before-write', 'same-owner overlapping bounded regions must emit blocked-before-write state');
   check(Boolean(sameOwnerBlockLane.evidence.decision.decompositionRequest), 'same-owner overlapping bounded regions must emit a split suggestion');
   check(sameOwnerBlockLane.evidence.decision.decompositionRequest?.suggestionKind === 'coarse-owner-map-split', 'same-owner overlapping bounded regions must classify the suggestion as coarse-owner-map-split');
-  check((sameOwnerBlockLane.evidence.decision.decompositionRequest?.suggestedAtoms?.length ?? 0) >= 1, 'same-owner overlapping bounded regions must list suggested child atoms');
+  check((sameOwnerBlockLane.evidence.decision.decompositionRequest?.suggestedAtoms?.length ?? 0) >= 3, 'same-owner overlapping bounded regions must list before/focus/after child atoms');
 
   const baseHotFile = readFileSync(path.join(tempRoot, hotSharedFile), 'utf8');
   const hotBaseHash = `sha256:${createHash('sha256').update(baseHotFile).digest('hex')}`;
