@@ -25,10 +25,21 @@ export interface DecompositionTargetFunction {
     readonly symbol: string;
     readonly sourceRange: LineRange;
 }
+export interface SuggestedSplitAtom {
+    readonly atomId: string;
+    readonly atomCid: string;
+    readonly role: 'focus' | 'before' | 'after';
+    readonly summary: string;
+    readonly sourceRange: LineRange;
+}
 export interface DecompositionRequest {
     readonly targetFunction: DecompositionTargetFunction;
     readonly conflictRegion: LineRange;
     readonly constraint: 'preserve-signature';
+    readonly suggestionKind?: 'coarse-owner-map-split' | 'layer2-function-split';
+    readonly ownerAtomId?: string | null;
+    readonly rationale?: string;
+    readonly suggestedAtoms?: readonly SuggestedSplitAtom[];
 }
 export interface SharedSurfacesRecord {
     readonly generators: readonly string[];

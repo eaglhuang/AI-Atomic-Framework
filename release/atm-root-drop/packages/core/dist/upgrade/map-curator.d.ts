@@ -1,5 +1,5 @@
 export type AtomMapCuratorBehaviorId = 'behavior.compose' | 'behavior.merge' | 'behavior.dedup-merge' | 'behavior.sweep';
-export type AtomMapCuratorSignalKind = 'caller-graph' | 'input-output-overlap' | 'recurring-failure-cluster' | 'zero-caller-sweep';
+export type AtomMapCuratorSignalKind = 'caller-graph' | 'input-output-overlap' | 'recurring-failure-cluster' | 'zero-caller-sweep' | 'broker-split-suggestion';
 export type AtomMapCuratorMutabilityPolicy = 'mutable' | 'frozen-after-release' | 'immutable';
 export interface AtomMapCuratorThresholds {
     readonly minCallerGraphOccurrences: number;
@@ -41,6 +41,34 @@ export interface RecurringFailureClusterInput {
     readonly confidence?: number;
     readonly targetMutabilityPolicy?: AtomMapCuratorMutabilityPolicy;
 }
+export interface BrokerSuggestedAtomInput {
+    readonly atomId: string;
+    readonly atomCid: string;
+    readonly role: 'focus' | 'before' | 'after';
+    readonly summary: string;
+    readonly sourceRange: {
+        readonly filePath: string;
+        readonly lineStart: number;
+        readonly lineEnd: number;
+    };
+}
+export interface BrokerSplitSuggestionInput {
+    readonly candidateId: string;
+    readonly ownerAtomId: string;
+    readonly ownerAtomCid?: string;
+    readonly targetMapId: string;
+    readonly targetMapVersion?: string;
+    readonly targetFile: string;
+    readonly sourceEvidenceIds: readonly string[];
+    readonly confidence?: number;
+    readonly targetMutabilityPolicy?: AtomMapCuratorMutabilityPolicy;
+    readonly conflictRegion: {
+        readonly filePath: string;
+        readonly lineStart: number;
+        readonly lineEnd: number;
+    };
+    readonly suggestedAtoms: readonly BrokerSuggestedAtomInput[];
+}
 export interface AtomMapCuratorInput {
     readonly repositoryRoot: string;
     readonly reportPath?: string;
@@ -51,6 +79,7 @@ export interface AtomMapCuratorInput {
     readonly callerGraphs?: readonly CallerGraphSequenceInput[];
     readonly inputOutputOverlaps?: readonly InputOutputOverlapInput[];
     readonly recurringFailureClusters?: readonly RecurringFailureClusterInput[];
+    readonly brokerSplitSuggestions?: readonly BrokerSplitSuggestionInput[];
 }
 export interface AtomMapCuratorObservation {
     readonly candidateId: string;
@@ -65,6 +94,27 @@ export interface AtomMapCuratorProposalDraftItem {
     readonly sourceEvidenceIds: readonly string[];
     readonly autoPromoteEligible: boolean;
     readonly proposal: Record<string, unknown>;
+}
+export interface AtomMapCuratorPatchDraftOperation {
+    readonly op: 'replace-owner-range' | 'add-child-atom-row' | 'rebuild-projection';
+    readonly target: string;
+    readonly summary: string;
+    readonly payload?: Record<string, unknown>;
+}
+export interface AtomMapCuratorPatchDraftItem {
+    readonly candidateId: string;
+    readonly draftKind: 'atom-map-patch';
+    readonly signalKind: 'broker-split-suggestion';
+    readonly targetMapId: string;
+    readonly sourceEvidenceIds: readonly string[];
+    readonly patchFiles: readonly string[];
+    readonly ownerAtomId: string;
+    readonly conflictRegion: BrokerSplitSuggestionInput['conflictRegion'];
+    readonly suggestedAtoms: readonly BrokerSuggestedAtomInput[];
+    readonly summary: string;
+    readonly rationale: string;
+    readonly requiresHumanReview: true;
+    readonly operations: readonly AtomMapCuratorPatchDraftOperation[];
 }
 export interface AtomMapCuratorReport {
     readonly schemaId: 'atm.atomMapCuratorReport';
@@ -82,12 +132,15 @@ export interface AtomMapCuratorReport {
         readonly callerGraphSignals: number;
         readonly inputOutputOverlapSignals: number;
         readonly recurringFailureClusterSignals: number;
+        readonly brokerSplitSuggestionSignals: number;
         readonly proposalDrafts: number;
         readonly blockedProposalDrafts: number;
+        readonly patchDrafts: number;
         readonly observationOnly: number;
     };
     readonly observations: readonly AtomMapCuratorObservation[];
     readonly proposalDrafts: readonly AtomMapCuratorProposalDraftItem[];
+    readonly patchDrafts: readonly AtomMapCuratorPatchDraftItem[];
     readonly empty: boolean;
 }
 export declare const defaultAtomMapCuratorThresholds: AtomMapCuratorThresholds;

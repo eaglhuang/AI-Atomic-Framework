@@ -22,6 +22,7 @@ export function curateAtomMapEvolution(input) {
     const registry = createRegistryResolver(input.repositoryRoot);
     const observations = [];
     const proposalDrafts = [];
+    const patchDrafts = [];
     for (const signal of input.callerGraphs ?? []) {
         const reasons = validateCallerGraphSignal(signal, thresholds);
         if (reasons.length > 0) {
@@ -121,8 +122,28 @@ export function curateAtomMapEvolution(input) {
             }
         }, registry));
     }
+    for (const signal of input.brokerSplitSuggestions ?? []) {
+        const reasons = validateBrokerSplitSuggestionSignal(signal, thresholds);
+        const signalKind = 'broker-split-suggestion';
+        if (reasons.length > 0) {
+            observations.push({ candidateId: signal.candidateId, signalKind, reasons });
+            continue;
+        }
+        patchDrafts.push(buildBrokerSplitPatchDraft({
+            candidateId: signal.candidateId,
+            signalKind,
+            targetMapId: signal.targetMapId,
+            sourceEvidenceIds: signal.sourceEvidenceIds,
+            ownerAtomId: signal.ownerAtomId,
+            targetFile: signal.targetFile,
+            conflictRegion: signal.conflictRegion,
+            suggestedAtoms: signal.suggestedAtoms,
+            reportPath
+        }));
+    }
     const sortedDrafts = proposalDrafts.sort((left, right) => left.candidateId.localeCompare(right.candidateId));
-    const reportId = buildReportId(input.repositoryRoot, reportPath, sortedDrafts.map((draft) => draft.candidateId));
+    const sortedPatchDrafts = patchDrafts.sort((left, right) => left.candidateId.localeCompare(right.candidateId));
+    const reportId = buildReportId(input.repositoryRoot, reportPath, [...sortedDrafts.map((draft) => draft.candidateId), ...sortedPatchDrafts.map((draft) => draft.candidateId)]);
     const blockedProposalDrafts = sortedDrafts.filter((draft) => draft.autoPromoteEligible === false).length;
     return {
         schemaId: 'atm.atomMapCuratorReport',
@@ -140,13 +161,16 @@ export function curateAtomMapEvolution(input) {
             callerGraphSignals: input.callerGraphs?.length ?? 0,
             inputOutputOverlapSignals: input.inputOutputOverlaps?.length ?? 0,
             recurringFailureClusterSignals: input.recurringFailureClusters?.length ?? 0,
+            brokerSplitSuggestionSignals: input.brokerSplitSuggestions?.length ?? 0,
             proposalDrafts: sortedDrafts.length,
             blockedProposalDrafts,
+            patchDrafts: sortedPatchDrafts.length,
             observationOnly: observations.length
         },
         observations: observations.sort((left, right) => left.candidateId.localeCompare(right.candidateId)),
         proposalDrafts: sortedDrafts,
-        empty: sortedDrafts.length === 0
+        patchDrafts: sortedPatchDrafts,
+        empty: sortedDrafts.length === 0 && sortedPatchDrafts.length === 0
     };
 }
 function validateCallerGraphSignal(signal, thresholds) {
@@ -186,6 +210,23 @@ function validateRecurringFailureCluster(signal, thresholds) {
         reasons.push('sweep-needs-zero-caller-atoms');
     }
     appendEvidenceAndConfidenceReasons(reasons, signal.evidenceIds, signal.confidence, thresholds);
+    return reasons;
+}
+function validateBrokerSplitSuggestionSignal(signal, thresholds) {
+    const reasons = [];
+    if (!signal.ownerAtomId) {
+        reasons.push('broker-split-suggestion-needs-owner-atom');
+    }
+    if (!signal.targetFile) {
+        reasons.push('broker-split-suggestion-needs-target-file');
+    }
+    if (signal.suggestedAtoms.length < 2) {
+        reasons.push('broker-split-suggestion-needs-child-atoms');
+    }
+    if (!signal.suggestedAtoms.some((entry) => entry.role === 'focus')) {
+        reasons.push('broker-split-suggestion-needs-focus-atom');
+    }
+    appendEvidenceAndConfidenceReasons(reasons, signal.sourceEvidenceIds, signal.confidence, thresholds);
     return reasons;
 }
 function appendEvidenceAndConfidenceReasons(reasons, evidenceIds, confidence, thresholds) {
@@ -302,6 +343,60 @@ function buildProposalDraft(request, registry) {
         proposal
     };
 }
+function buildBrokerSplitPatchDraft(request) {
+    const patchFiles = [
+        inferOwnerShardPath(request.targetFile),
+        'atomic_workbench/atomization-coverage/path-to-atom-map.json'
+    ].sort((left, right) => left.localeCompare(right));
+    const operations = [
+        {
+            op: 'replace-owner-range',
+            target: patchFiles[0],
+            summary: `Replace coarse owner atom '${request.ownerAtomId}' coverage on ${request.targetFile} with bounded child atom rows.`,
+            payload: {
+                pathPattern: request.targetFile,
+                ownerAtomId: request.ownerAtomId,
+                conflictRegion: request.conflictRegion
+            }
+        },
+        ...request.suggestedAtoms.map((atom) => ({
+            op: 'add-child-atom-row',
+            target: patchFiles[0],
+            summary: `Add ${atom.role} child atom row '${atom.atomId}' covering ${atom.sourceRange.lineStart}-${atom.sourceRange.lineEnd}.`,
+            payload: {
+                pathPattern: `${request.targetFile}#L${atom.sourceRange.lineStart}-L${atom.sourceRange.lineEnd}`,
+                atomId: atom.atomId,
+                atomCid: atom.atomCid,
+                role: atom.role,
+                capability: atom.summary,
+                coverageStatus: 'active'
+            }
+        })),
+        {
+            op: 'rebuild-projection',
+            target: 'atomic_workbench/atomization-coverage/path-to-atom-map.json',
+            summary: 'Rebuild the path-to-atom-map projection after curator review accepts the owner-shard split.'
+        }
+    ];
+    return {
+        candidateId: request.candidateId,
+        draftKind: 'atom-map-patch',
+        signalKind: request.signalKind,
+        targetMapId: request.targetMapId,
+        sourceEvidenceIds: [...request.sourceEvidenceIds].sort(),
+        patchFiles,
+        ownerAtomId: request.ownerAtomId,
+        conflictRegion: request.conflictRegion,
+        suggestedAtoms: request.suggestedAtoms.map((entry) => ({
+            ...entry,
+            sourceRange: { ...entry.sourceRange }
+        })),
+        summary: `Broker split suggestion for '${request.ownerAtomId}' on ${request.targetFile} is ready as an atom-map patch draft.`,
+        rationale: `Blocked overlap on ${request.targetFile}:${request.conflictRegion.lineStart}-${request.conflictRegion.lineEnd} should be promoted into finer bounded child atoms before future writes reuse the same coarse owner map.`,
+        requiresHumanReview: true,
+        operations
+    };
+}
 function makePassGate(gateName, reportPath, summary) {
     return {
         passed: true,
@@ -309,6 +404,21 @@ function makePassGate(gateName, reportPath, summary) {
         reportPath,
         summary
     };
+}
+function inferOwnerShardPath(targetFile) {
+    if (targetFile.startsWith('packages/cli/')) {
+        return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json';
+    }
+    if (targetFile.startsWith('packages/core/')) {
+        return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json';
+    }
+    if (targetFile.startsWith('packages/plugin-')) {
+        return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json';
+    }
+    if (targetFile.startsWith('scripts/')) {
+        return 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json';
+    }
+    return 'atomic_workbench/atomization-coverage/path-to-atom-map.json';
 }
 function createRegistryResolver(repositoryRoot) {
     const registryPath = path.join(repositoryRoot, 'atomic-registry.json');

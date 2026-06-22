@@ -50,6 +50,9 @@ Current v1 rule boundary:
 - Proposal gating is conditional escalation, not the default for every file.
 - Existing direct broker flows stay valid when `trigger = not-required`.
 - Hot-file and overlap-risk lanes can carry proposal-first evidence without changing the envelope shape used by downstream evidence capture.
+- When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, overlapping regions remain blocked.
+- Blocked same-owner overlaps may also emit a structured split suggestion (`decompositionRequest.suggestedAtoms`) so the map curator can promote the coarse owner map into finer child atoms without guessing the first cut by hand.
+- The curator bridge now treats that broker split suggestion as a review-only atom-map patch draft, pointing at the owner shard plus projection rebuild path, so reviewers can approve a concrete split patch before the next collision reuses the same coarse owner map.
 
 ## Candidate Bridge (TASK-ASP-0004)
 

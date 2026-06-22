@@ -18,6 +18,10 @@ export {
   humanReviewDecisionPackage,
   validateHumanReviewDecisionLog
 } from './decision-log.ts';
+export {
+  createAtomMapPatchReviewProposalSnapshot,
+  createAtomMapPatchReviewQueueRecord
+} from './map-curator-bridge.ts';
 export type {
   HumanReviewDecision,
   HumanReviewDecompositionDecision,
@@ -38,6 +42,10 @@ export type {
   HumanReviewDecisionLogInput,
   HumanReviewDecisionValidationResult
 } from './decision-log.ts';
+export type {
+  AtomMapPatchReviewProposalOptions,
+  AtomMapPatchReviewProposalSnapshot
+} from './map-curator-bridge.ts';
 
 export const humanReviewPackage: AtomicPackageDescriptor = {
   packageName: '@ai-atomic-framework/plugin-human-review',

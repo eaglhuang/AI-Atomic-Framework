@@ -16,6 +16,7 @@ const upgradeSchemaPath = 'schemas/upgrade/upgrade-proposal.schema.json';
 const callerGraphFixturePath = 'fixtures/evolution/map-curator/caller-graph-compose.json';
 const overlapFixturePath = 'fixtures/evolution/map-curator/input-output-overlap.json';
 const failureClusterFixturePath = 'fixtures/evolution/map-curator/recurring-failure-cluster.json';
+const brokerSplitFixturePath = 'fixtures/evolution/map-curator/broker-split-suggestion.json';
 const composeProposalPath = 'fixtures/upgrade/map-curator-compose-proposal.json';
 const mergeProposalPath = 'fixtures/upgrade/map-curator-merge-proposal.json';
 const dedupMergeProposalPath = 'fixtures/upgrade/map-curator-dedup-merge-proposal.json';
@@ -46,6 +47,7 @@ for (const relativePath of [
   callerGraphFixturePath,
   overlapFixturePath,
   failureClusterFixturePath,
+  brokerSplitFixturePath,
   composeProposalPath,
   mergeProposalPath,
   dedupMergeProposalPath,
@@ -128,6 +130,20 @@ check(sweepProposalFixture.sweepPlan.deletionAllowed === false, 'sweep proposal 
 check(sweepProposalFixture.members.every((member: any) => member.from === member.to), 'sweep proposal must preserve member versions');
 assertProposalUsesEvidenceInput(sweepProposalFixture, sweepReport.proposalDrafts[0].sourceEvidenceIds, 'sweep proposal');
 
+const brokerSplitReport = curateAtomMapEvolution(materializeInput(brokerSplitFixturePath));
+validateWithSchema(brokerSplitReport, validateCuratorReport, 'broker split curator report');
+check(brokerSplitReport.proposalDrafts.length === 0, 'broker split curator report must not fabricate upgrade proposals for non-canonical owner atoms');
+check(brokerSplitReport.patchDrafts.length === 1, 'broker split curator report must produce one atom-map patch draft');
+const brokerSplitDraft = brokerSplitReport.patchDrafts[0];
+check(brokerSplitDraft.draftKind === 'atom-map-patch', 'broker split curator patch draft must use atom-map-patch draft kind');
+check(brokerSplitDraft.signalKind === 'broker-split-suggestion', 'broker split curator patch draft must keep broker-split-suggestion signal kind');
+check(brokerSplitDraft.patchFiles.includes('atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json'), 'broker split curator patch draft must point at the CLI owner shard');
+check(brokerSplitDraft.patchFiles.includes('atomic_workbench/atomization-coverage/path-to-atom-map.json'), 'broker split curator patch draft must request projection rebuild');
+check(brokerSplitDraft.suggestedAtoms.length === 3, 'broker split curator patch draft must preserve before/focus/after children');
+check(brokerSplitDraft.operations.some((operation: any) => operation.op === 'replace-owner-range'), 'broker split curator patch draft must replace the coarse owner range');
+check(brokerSplitDraft.operations.filter((operation: any) => operation.op === 'add-child-atom-row').length === 3, 'broker split curator patch draft must add one child row per suggested atom');
+check(brokerSplitDraft.requiresHumanReview === true, 'broker split curator patch draft must stay human-review-only');
+
 const emptyReport = curateAtomMapEvolution({
   repositoryRoot: root,
   reportPath: 'synthetic/empty-map-curator.json',
@@ -147,4 +163,4 @@ validateWithSchema(emptyReport, validateCuratorReport, 'empty curator report');
 check(emptyReport.empty === true, 'insufficient map curator signals must produce an empty report');
 check(emptyReport.observations.length === 1, 'insufficient map curator signals must produce observation-only output');
 
-console.log(`[map-curator:${mode}] ok (compose, merge, dedup-merge, sweep, immutable target, evidence refs, and empty report verified)`);
+console.log(`[map-curator:${mode}] ok (compose, merge, dedup-merge, sweep, broker split patch drafts, immutable target, evidence refs, and empty report verified)`);

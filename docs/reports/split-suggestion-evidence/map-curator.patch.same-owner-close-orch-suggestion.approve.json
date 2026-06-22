@@ -1,0 +1,244 @@
+{
+  "schemaId": "atm.humanReviewDecision",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial human review decision contract."
+  },
+  "decisionId": "decision.proposal.map-curator.patch.same-owner-close-orch-suggestion.approve",
+  "proposalId": "proposal.map-curator.patch.same-owner-close-orch-suggestion",
+  "atomId": "ATM-MAP-0001",
+  "decision": "approve",
+  "reason": "Broker blocked the coarse same-owner overlap, curator drafted a bounded split patch, and the resulting split plan is safe to review before any map mutation.",
+  "decidedBy": "ATM Curator Reviewer",
+  "decidedAt": "2026-06-22T05:10:00.000Z",
+  "decisionSnapshotHash": "sha256:9cae10bb372370363d15ba1df57ca41207034694f2f7e4aae00eda053852bbf0",
+  "queuePath": "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.json",
+  "projectionPath": "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.md",
+  "queueRecord": {
+    "proposalId": "proposal.map-curator.patch.same-owner-close-orch-suggestion",
+    "atomId": "ATM-MAP-0001",
+    "fromVersion": "0.1.0",
+    "toVersion": "0.1.1",
+    "decompositionDecision": "split",
+    "automatedGates": {
+      "allPassed": true,
+      "blockedGateNames": []
+    },
+    "status": "approved",
+    "proposalSnapshotHash": "sha256:9cae10bb372370363d15ba1df57ca41207034694f2f7e4aae00eda053852bbf0",
+    "proposal": {
+      "schemaId": "atm.upgradeProposal",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "Broker split suggestion promoted into a human-reviewable atom-map split plan."
+      },
+      "proposalId": "proposal.map-curator.patch.same-owner-close-orch-suggestion",
+      "atomId": "ATM-MAP-0001",
+      "fromVersion": "0.1.0",
+      "toVersion": "0.1.1",
+      "lifecycleMode": "evolution",
+      "behaviorId": "behavior.split",
+      "target": {
+        "kind": "map",
+        "mapId": "ATM-MAP-0001"
+      },
+      "decompositionDecision": "split",
+      "proposalSource": "broker-split-suggestion",
+      "targetSurface": "atom-map",
+      "reviewTemplate": "review.template.split",
+      "automatedGates": {
+        "allPassed": true,
+        "blockedGateNames": []
+      },
+      "humanReview": "pending",
+      "status": "pending",
+      "patchDraft": {
+        "candidateId": "same-owner-close-orch-suggestion",
+        "draftKind": "atom-map-patch",
+        "signalKind": "broker-split-suggestion",
+        "targetMapId": "ATM-MAP-0001",
+        "sourceEvidenceIds": [
+          "evidence.same-owner-close-orch-suggestion.001",
+          "evidence.same-owner-close-orch-suggestion.002"
+        ],
+        "patchFiles": [
+          "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+          "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+        ],
+        "ownerAtomId": "atm.close-orchestration-map",
+        "conflictRegion": {
+          "filePath": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+          "lineStart": 146,
+          "lineEnd": 150
+        },
+        "suggestedAtoms": [
+          {
+            "atomId": "atm.close-orchestration-map.focus.146-150",
+            "atomCid": "atm-close-orchestration-map-focus-146-150",
+            "role": "focus",
+            "summary": "Focused child atom covering the conflict region 146-150.",
+            "sourceRange": {
+              "filePath": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+              "lineStart": 146,
+              "lineEnd": 150
+            }
+          },
+          {
+            "atomId": "atm.close-orchestration-map.before.120-145",
+            "atomCid": "atm-close-orchestration-map-before-120-145",
+            "role": "before",
+            "summary": "Suggested sibling atom for the stable region before the conflict (120-145).",
+            "sourceRange": {
+              "filePath": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+              "lineStart": 120,
+              "lineEnd": 145
+            }
+          },
+          {
+            "atomId": "atm.close-orchestration-map.after.151-180",
+            "atomCid": "atm-close-orchestration-map-after-151-180",
+            "role": "after",
+            "summary": "Suggested sibling atom for the stable region after the conflict (151-180).",
+            "sourceRange": {
+              "filePath": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+              "lineStart": 151,
+              "lineEnd": 180
+            }
+          }
+        ],
+        "summary": "Broker split suggestion for 'atm.close-orchestration-map' on packages/cli/src/commands/taskflow/close-orchestration.ts is ready as an atom-map patch draft.",
+        "rationale": "Blocked overlap on packages/cli/src/commands/taskflow/close-orchestration.ts:146-150 should be promoted into finer bounded child atoms before future writes reuse the same coarse owner map.",
+        "requiresHumanReview": true,
+        "operations": [
+          {
+            "op": "replace-owner-range",
+            "target": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "summary": "Replace coarse owner atom 'atm.close-orchestration-map' coverage on packages/cli/src/commands/taskflow/close-orchestration.ts with bounded child atom rows.",
+            "payload": {
+              "pathPattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+              "ownerAtomId": "atm.close-orchestration-map",
+              "conflictRegion": {
+                "filePath": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+                "lineStart": 146,
+                "lineEnd": 150
+              }
+            }
+          },
+          {
+            "op": "add-child-atom-row",
+            "target": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "summary": "Add focus child atom row 'atm.close-orchestration-map.focus.146-150' covering 146-150.",
+            "payload": {
+              "pathPattern": "packages/cli/src/commands/taskflow/close-orchestration.ts#L146-L150",
+              "atomId": "atm.close-orchestration-map.focus.146-150",
+              "atomCid": "atm-close-orchestration-map-focus-146-150",
+              "role": "focus",
+              "capability": "Focused child atom covering the conflict region 146-150.",
+              "coverageStatus": "active"
+            }
+          },
+          {
+            "op": "add-child-atom-row",
+            "target": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "summary": "Add before child atom row 'atm.close-orchestration-map.before.120-145' covering 120-145.",
+            "payload": {
+              "pathPattern": "packages/cli/src/commands/taskflow/close-orchestration.ts#L120-L145",
+              "atomId": "atm.close-orchestration-map.before.120-145",
+              "atomCid": "atm-close-orchestration-map-before-120-145",
+              "role": "before",
+              "capability": "Suggested sibling atom for the stable region before the conflict (120-145).",
+              "coverageStatus": "active"
+            }
+          },
+          {
+            "op": "add-child-atom-row",
+            "target": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "summary": "Add after child atom row 'atm.close-orchestration-map.after.151-180' covering 151-180.",
+            "payload": {
+              "pathPattern": "packages/cli/src/commands/taskflow/close-orchestration.ts#L151-L180",
+              "atomId": "atm.close-orchestration-map.after.151-180",
+              "atomCid": "atm-close-orchestration-map-after-151-180",
+              "role": "after",
+              "capability": "Suggested sibling atom for the stable region after the conflict (151-180).",
+              "coverageStatus": "active"
+            }
+          },
+          {
+            "op": "rebuild-projection",
+            "target": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "summary": "Rebuild the path-to-atom-map projection after curator review accepts the owner-shard split."
+          }
+        ]
+      },
+      "inputs": [
+        {
+          "kind": "evolution-evidence",
+          "path": "docs/reports/split-suggestion-evidence/split-suggestion-curator-report.json",
+          "schemaId": "atm.atomMapCuratorReport",
+          "reportId": "map-curator-review.same-owner-close-orch-suggestion",
+          "summary": "Curator patch draft derived from broker split suggestion same-owner-close-orch-suggestion."
+        }
+      ],
+      "proposedBy": "ATM Atom Map Curator",
+      "proposedAt": "2026-06-22T04:10:00.000Z"
+    },
+    "queuedAt": "2026-06-22T04:10:00.000Z",
+    "review": {
+      "decision": "approve",
+      "reason": "Broker blocked the coarse same-owner overlap, curator drafted a bounded split patch, and the resulting split plan is safe to review before any map mutation.",
+      "decidedBy": "ATM Curator Reviewer",
+      "decidedAt": "2026-06-22T05:10:00.000Z",
+      "decisionSnapshotHash": "sha256:9cae10bb372370363d15ba1df57ca41207034694f2f7e4aae00eda053852bbf0",
+      "evidenceId": "human-review.proposal.map-curator.patch.same-owner-close-orch-suggestion.approve"
+    }
+  },
+  "evidence": {
+    "schemaId": "atm.evidence.humanReviewDecision",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Human review decision evidence contract."
+    },
+    "evidenceId": "human-review.proposal.map-curator.patch.same-owner-close-orch-suggestion.approve",
+    "workItemId": "ATM-MAP-0001",
+    "evidenceKind": "review",
+    "evidenceType": "human-review-decision",
+    "summary": "Human review approve for proposal.map-curator.patch.same-owner-close-orch-suggestion.",
+    "artifactPaths": [
+      "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.json",
+      "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.md"
+    ],
+    "createdAt": "2026-06-22T05:10:00.000Z",
+    "producedBy": "ATM Curator Reviewer",
+    "reproducibility": {
+      "replayable": true,
+      "replayCommand": [
+        "node",
+        "scripts/validate-human-review.ts"
+      ],
+      "inputs": [
+        "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.json"
+      ],
+      "expectedArtifacts": [
+        "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.json",
+        "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.md"
+      ],
+      "notes": "Replay the human review decision against the queue snapshot and decision hash."
+    },
+    "details": {
+      "proposalId": "proposal.map-curator.patch.same-owner-close-orch-suggestion",
+      "atomId": "ATM-MAP-0001",
+      "decision": "approve",
+      "reason": "Broker blocked the coarse same-owner overlap, curator drafted a bounded split patch, and the resulting split plan is safe to review before any map mutation.",
+      "queuePath": "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.json",
+      "projectionPath": "docs/reports/split-suggestion-evidence/split-suggestion-review-queue.md",
+      "decisionSnapshotHash": "sha256:9cae10bb372370363d15ba1df57ca41207034694f2f7e4aae00eda053852bbf0",
+      "queueStatus": "approved"
+    }
+  }
+}

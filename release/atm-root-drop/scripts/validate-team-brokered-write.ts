@@ -349,6 +349,9 @@ try {
   const hotOverlapTaskId = 'TASK-TEAM-BROKER-HOT-OVERLAP';
   const hotParkSeedTaskId = 'TASK-TEAM-BROKER-HOT-PARK-SEED';
   const hotParkJoinTaskId = 'TASK-TEAM-BROKER-HOT-PARK-JOIN';
+  const sameOwnerSeedTaskId = 'TASK-TEAM-BROKER-SAME-OWNER-SEED';
+  const sameOwnerJoinTaskId = 'TASK-TEAM-BROKER-SAME-OWNER-JOIN';
+  const sameOwnerBlockTaskId = 'TASK-TEAM-BROKER-SAME-OWNER-BLOCK';
 
   writeTaskCard(tempRoot, overlapTaskId, [sharedFile], 'atom-overlap-recipient');
   writeTaskCard(tempRoot, blockedTaskId, [sharedFile], 'atom-overlap-donor');
@@ -386,6 +389,31 @@ try {
       notes: 'Second writer joins while the first writer has not yet submitted bounded-region detail.'
     }
   });
+  writeTaskCard(tempRoot, sameOwnerSeedTaskId, [hotSharedFile], 'atm.hot-owner-map', {
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: true,
+      hotFiles: [hotSharedFile],
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 1, lineEnd: 20 }],
+      notes: 'Owner-map seed writer for same-owner bounded-region broker evidence.'
+    }
+  });
+  writeTaskCard(tempRoot, sameOwnerJoinTaskId, [hotSharedFile], 'atm.hot-owner-map', {
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 24, lineEnd: 28 }],
+      notes: 'Same owner map, disjoint bounded region joiner should route to composer.'
+    }
+  });
+  writeTaskCard(tempRoot, sameOwnerBlockTaskId, [hotSharedFile], 'atm.hot-owner-map', {
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: hotSharedFile, lineStart: 10, lineEnd: 10 }],
+      notes: 'Same owner map, overlapping bounded region joiner must remain blocked.'
+    }
+  });
 
   seedRegistry(tempRoot, {
     schemaId: 'atm.writeIntent.v1',
@@ -413,6 +441,9 @@ try {
   const hotDisjointTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotDisjointTaskId}.json`), 'utf8'));
   const hotOverlapTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotOverlapTaskId}.json`), 'utf8'));
   const hotParkJoinTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${hotParkJoinTaskId}.json`), 'utf8'));
+  const sameOwnerSeedTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${sameOwnerSeedTaskId}.json`), 'utf8'));
+  const sameOwnerJoinTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${sameOwnerJoinTaskId}.json`), 'utf8'));
+  const sameOwnerBlockTask = JSON.parse(readFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', `${sameOwnerBlockTaskId}.json`), 'utf8'));
 
   const overlapResult = evaluateTeamBrokerLane({
     cwd: tempRoot,
@@ -656,6 +687,59 @@ try {
   check(parkJoinLane.evidence.admission.state === 'parked-for-rearbitration', 'rearbitration case must emit parked-for-rearbitration state');
   check(parkJoinLane.evidence.admission.rearbitrationRequired === true, 'rearbitration case must flag rearbitrationRequired');
 
+  const sameOwnerSeedIntent = buildTeamWriteIntent({
+    cwd: tempRoot,
+    taskId: sameOwnerSeedTaskId,
+    actorId: 'coordinator-6',
+    task: sameOwnerSeedTask,
+    writePaths: [hotSharedFile]
+  });
+  const sameOwnerSeedDecision = calculateBrokerDecision(sameOwnerSeedIntent, loadRegistry(path.join(tempRoot, '.atm', 'runtime', 'write-broker.registry.json')));
+  const sameOwnerRegistryPath = path.join(tempRoot, '.atm', 'runtime', 'write-broker-same-owner.registry.json');
+  saveRegistry(
+    sameOwnerRegistryPath,
+    registerIntent(
+      {
+        schemaId: 'atm.writeBrokerRegistry.v1',
+        specVersion: '0.1.0',
+        repoId: 'team-broker-fixture',
+        workspaceId: 'main',
+        activeIntents: []
+      },
+      sameOwnerSeedIntent,
+      'direct-brokered',
+      1800,
+      sameOwnerSeedDecision.admission
+    )
+  );
+
+  const sameOwnerJoinLane = evaluateTeamBrokerLane({
+    cwd: tempRoot,
+    taskId: sameOwnerJoinTaskId,
+    actorId: 'coordinator-7',
+    task: sameOwnerJoinTask,
+    writePaths: [hotSharedFile],
+    registryPath: sameOwnerRegistryPath
+  });
+  check(sameOwnerJoinLane.ok === true, 'same-owner disjoint bounded regions must route into governed composer path');
+  check(sameOwnerJoinLane.evidence.decision.verdict === 'needs-physical-split', 'same-owner disjoint bounded regions must resolve as needs-physical-split');
+  check(sameOwnerJoinLane.evidence.admission.state === 'composer-routed', 'same-owner disjoint bounded regions must emit composer-routed admission state');
+
+  const sameOwnerBlockLane = evaluateTeamBrokerLane({
+    cwd: tempRoot,
+    taskId: sameOwnerBlockTaskId,
+    actorId: 'coordinator-8',
+    task: sameOwnerBlockTask,
+    writePaths: [hotSharedFile],
+    registryPath: sameOwnerRegistryPath
+  });
+  check(sameOwnerBlockLane.ok === false, 'same-owner overlapping bounded regions must fail closed');
+  check(sameOwnerBlockLane.evidence.decision.verdict === 'blocked-cid-conflict', 'same-owner overlapping bounded regions must remain blocked-cid-conflict');
+  check(sameOwnerBlockLane.evidence.admission.state === 'blocked-before-write', 'same-owner overlapping bounded regions must emit blocked-before-write state');
+  check(Boolean(sameOwnerBlockLane.evidence.decision.decompositionRequest), 'same-owner overlapping bounded regions must emit a split suggestion');
+  check(sameOwnerBlockLane.evidence.decision.decompositionRequest?.suggestionKind === 'coarse-owner-map-split', 'same-owner overlapping bounded regions must classify the suggestion as coarse-owner-map-split');
+  check((sameOwnerBlockLane.evidence.decision.decompositionRequest?.suggestedAtoms?.length ?? 0) >= 3, 'same-owner overlapping bounded regions must list before/focus/after child atoms');
+
   const baseHotFile = readFileSync(path.join(tempRoot, hotSharedFile), 'utf8');
   const hotBaseHash = `sha256:${createHash('sha256').update(baseHotFile).digest('hex')}`;
   const hotBaseCommit = spawnSync('git', ['-C', tempRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8' });
@@ -777,6 +861,9 @@ try {
         disjointLane: hotDisjointLane.evidence.admission,
         blockedLane: hotOverlapLane.evidence.admission,
         parkedLane: parkJoinLane.evidence.admission,
+        sameOwnerPositiveLane: sameOwnerJoinLane.evidence.admission,
+        sameOwnerNegativeLane: sameOwnerBlockLane.evidence.admission,
+        sameOwnerNegativeSplitSuggestion: sameOwnerBlockLane.evidence.decision.decompositionRequest ?? null,
         scopedWriteVerdict: scopedWriteExecution?.verdict ?? null
       },
       commands: [

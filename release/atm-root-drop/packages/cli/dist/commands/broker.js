@@ -702,10 +702,11 @@ function classifyExplicitMutationRequest(request) {
     const missingInputs = [];
     const requestId = request.requestId || 'unknown-request';
     const filePath = typeof request.filePath === 'string' ? request.filePath : '';
+    const normalizedFilePath = filePath.trim();
     const op = typeof request.op === 'string' ? request.op.trim() : '';
     const target = typeof request.target === 'string' ? request.target.trim() : '';
     const kind = resolveExplicitMutationIntentKind(request, filePath, op, target);
-    if (!filePath.trim()) {
+    if (!normalizedFilePath) {
         missingInputs.push({
             requestId,
             filePath,
@@ -854,7 +855,7 @@ function parseBrokerArgs(argv) {
             continue;
         }
         if (arg === '--proposal-id') {
-            state.proposalIds.push(requireValue(argv, index, '--proposal-id'));
+            state.proposalIds.push(requireValue(argv, index, '--proposal-id').trim());
             index += 1;
             continue;
         }
