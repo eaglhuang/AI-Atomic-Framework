@@ -51,6 +51,7 @@ Current v1 rule boundary:
 - Existing direct broker flows stay valid when `trigger = not-required`.
 - Hot-file and overlap-risk lanes can carry proposal-first evidence without changing the envelope shape used by downstream evidence capture.
 - When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, overlapping regions remain blocked.
+- Blocked same-owner overlaps may also emit a structured split suggestion (`decompositionRequest.suggestedAtoms`) so the map curator can promote the coarse owner map into finer child atoms without guessing the first cut by hand.
 
 ## Candidate Bridge (TASK-ASP-0004)
 

@@ -232,16 +232,18 @@ const rows = scenarios.map((scenario) => {
     reason: decision.reason,
     suggestion: decision.decompositionRequest
       ? `${decision.decompositionRequest.targetFunction.atomId} @ ${decision.decompositionRequest.conflictRegion.filePath}:${decision.decompositionRequest.conflictRegion.lineStart}-${decision.decompositionRequest.conflictRegion.lineEnd}`
-      : 'none'
+      : 'none',
+    suggestionKind: decision.decompositionRequest?.suggestionKind ?? 'none',
+    suggestedAtoms: decision.decompositionRequest?.suggestedAtoms?.map((atom) => `${atom.role}:${atom.atomId}:${atom.sourceRange.lineStart}-${atom.sourceRange.lineEnd}`) ?? []
   };
 });
 
 const reportLines = [
   '# Split Suggestion Evidence',
   '',
-  '| scenario | verdict | lane | suggestion |',
-  '| --- | --- | --- | --- |',
-  ...rows.map((row) => `| ${row.id} | ${row.verdict} | ${row.lane} | ${row.suggestion} |`),
+  '| scenario | verdict | lane | suggestion kind | suggestion | suggested atoms |',
+  '| --- | --- | --- | --- | --- | --- |',
+  ...rows.map((row) => `| ${row.id} | ${row.verdict} | ${row.lane} | ${row.suggestionKind} | ${row.suggestion} | ${row.suggestedAtoms.join('<br>')} |`),
   '',
   '## Notes',
   '',

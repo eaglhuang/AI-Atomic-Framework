@@ -11,7 +11,7 @@
       "fromVersion": null,
       "notes": "generated"
     },
-    "intentId": "decision-1782098924805",
+    "intentId": "decision-1782099532719",
     "taskId": "TASK-SAME-OWNER-B",
     "verdict": "blocked-cid-conflict",
     "lane": "blocked",
@@ -62,7 +62,23 @@
         "lineStart": 10,
         "lineEnd": 10
       },
-      "constraint": "preserve-signature"
+      "constraint": "preserve-signature",
+      "suggestionKind": "coarse-owner-map-split",
+      "ownerAtomId": "atm.hot-owner-map",
+      "rationale": "Blocked same-owner overlap on 'packages/cli/src/commands/broker.ts' can be reduced by splitting the coarse owner map into bounded child atoms.",
+      "suggestedAtoms": [
+        {
+          "atomId": "atm.hot-owner-map.focus.10-10",
+          "atomCid": "atm-hot-owner-map-focus-10-10",
+          "role": "focus",
+          "summary": "Focused child atom covering the conflict region 10-10.",
+          "sourceRange": {
+            "filePath": "packages/cli/src/commands/broker.ts",
+            "lineStart": 10,
+            "lineEnd": 10
+          }
+        }
+      ]
     },
     "admission": {
       "trigger": "same-file-overlap-risk",

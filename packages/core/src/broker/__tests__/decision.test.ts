@@ -367,6 +367,9 @@ function testSameOwnerProposalOverlapRemainsBlocked() {
   assert.equal(decision.verdict, 'blocked-cid-conflict');
   assert.equal(decision.lane, 'blocked');
   assert.ok(Boolean(decision.decompositionRequest));
+  assert.equal(decision.decompositionRequest?.suggestionKind, 'coarse-owner-map-split');
+  assert.equal(decision.decompositionRequest?.ownerAtomId, 'atm.shared-owner-map');
+  assert.ok((decision.decompositionRequest?.suggestedAtoms?.length ?? 0) >= 1);
   console.log('ok: same-owner overlapping proposal regions remain blocked');
 }
 

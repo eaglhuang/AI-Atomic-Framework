@@ -43,6 +43,9 @@
 - targetFunction.atomId: `atm.hot-owner-map`
 - conflictRegion: `packages/cli/src/commands/broker.ts:10-10`
 - constraint: `preserve-signature`
+- suggestionKind: `coarse-owner-map-split`
+- suggestedAtoms:
+  - `atm.hot-owner-map.focus.10-10`
 
 這不是自動改 map，而是 broker 對 coarse owner map 發出的治理建議：這個 region 已經足以被識別與追蹤，適合後續拆成更細 bounded atom。
 

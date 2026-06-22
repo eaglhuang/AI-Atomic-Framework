@@ -1,6 +1,6 @@
 {
   "schemaId": "atm.teamRun.v1",
-  "teamRunId": "team-c46d91753531",
+  "teamRunId": "team-67828e28db12",
   "channel": "normal",
   "taskId": "TASK-TEAM-BROKER-HOT-DISJOINT",
   "batchId": null,
@@ -927,7 +927,7 @@
       },
       "taskId": "TASK-TEAM-BROKER-HOT-DISJOINT",
       "actorId": "coordinator-2",
-      "baseCommit": "3fb7b2cdc6c8d40a77774b2c03c452b6e4a04213",
+      "baseCommit": "36130fb071eba71c9116e6a33c88823f599c33ca",
       "targetFiles": [
         "packages/cli/src/commands/broker.ts"
       ],
@@ -969,16 +969,16 @@
     },
     "writeTransaction": {
       "schemaId": "atm.teamBrokerWriteTransaction.v1",
-      "transactionId": "txn-b7287f2a30ac91fb",
+      "transactionId": "txn-e1cbc6b1ba9a5870",
       "taskId": "TASK-TEAM-BROKER-HOT-DISJOINT",
       "principalId": "coordinator-2",
       "actorId": "coordinator-2",
       "sessionId": "team-broker-session-fixture",
       "instanceId": "coordinator-2@local",
-      "worktreeId": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp\\atm-team-brokered-write-mqonm7vb-xido2dwc",
+      "worktreeId": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp\\atm-team-brokered-write-mqoo227y-pklslm9f",
       "branchRef": "master",
-      "baseHead": "3fb7b2cdc6c8d40a77774b2c03c452b6e4a04213",
-      "leaseEpoch": 1782098808496,
+      "baseHead": "36130fb071eba71c9116e6a33c88823f599c33ca",
+      "leaseEpoch": 1782099547335,
       "allowedFiles": [
         "packages/cli/src/commands/broker.ts"
       ],
@@ -994,13 +994,13 @@
       "brokerDecision": {
         "verdict": "needs-physical-split",
         "lane": "deterministic-composer",
-        "intentId": "decision-1782098808496",
+        "intentId": "decision-1782099547335",
         "parallelSafetyReason": null
       },
       "admissionState": "composer-routed",
-      "startedAt": "2026-06-22T03:26:48.496Z",
-      "expiresAt": "2026-06-22T03:56:48.496Z",
-      "heartbeatAt": "2026-06-22T03:26:48.496Z"
+      "startedAt": "2026-06-22T03:39:07.335Z",
+      "expiresAt": "2026-06-22T04:09:07.335Z",
+      "heartbeatAt": "2026-06-22T03:39:07.335Z"
     },
     "decision": {
       "schemaId": "atm.brokerDecision.v1",
@@ -1010,7 +1010,7 @@
         "fromVersion": null,
         "notes": "generated"
       },
-      "intentId": "decision-1782098808496",
+      "intentId": "decision-1782099547335",
       "taskId": "TASK-TEAM-BROKER-HOT-DISJOINT",
       "verdict": "needs-physical-split",
       "lane": "deterministic-composer",
@@ -1088,10 +1088,10 @@
           "virtualAtomCid": "task-team-broker-hot-first",
           "taskId": "TASK-TEAM-BROKER-HOT-FIRST",
           "actorId": "coordinator-1",
-          "intentId": "intent-1782098808407",
+          "intentId": "intent-1782099547251",
           "lane": "direct-brokered",
-          "leaseEpoch": 1782098808407,
-          "expiresAt": "2026-06-22T03:56:48.407Z",
+          "leaseEpoch": 1782099547251,
+          "expiresAt": "2026-06-22T04:09:07.251Z",
           "sourceAtomIds": [
             "atom-hot-first"
           ]
@@ -1101,10 +1101,10 @@
           "virtualAtomCid": "cid-donor",
           "taskId": "TASK-TEAM-BROKER-DONOR",
           "actorId": "donor-actor",
-          "intentId": "intent-1782098807085",
+          "intentId": "intent-1782099546244",
           "lane": "direct-brokered",
-          "leaseEpoch": 1782098807085,
-          "expiresAt": "2026-06-22T03:56:47.085Z",
+          "leaseEpoch": 1782099546244,
+          "expiresAt": "2026-06-22T04:09:06.244Z",
           "sourceAtomIds": [
             "atom-overlap-donor"
           ]
@@ -1112,7 +1112,7 @@
       ],
       "activeIntents": [
         {
-          "intentId": "intent-1782098807085",
+          "intentId": "intent-1782099546244",
           "taskId": "TASK-TEAM-BROKER-DONOR",
           "teamRunId": null,
           "actorId": "donor-actor",
@@ -1134,19 +1134,19 @@
             "validators": [],
             "artifacts": []
           },
-          "leaseEpoch": 1782098807085,
+          "leaseEpoch": 1782099546244,
           "leaseSeconds": 1800,
           "leaseMaxSeconds": 1800,
-          "heartbeatAt": "2026-06-22T03:26:47.085Z",
+          "heartbeatAt": "2026-06-22T03:39:06.244Z",
           "lane": "direct-brokered",
-          "expiresAt": "2026-06-22T03:56:47.085Z"
+          "expiresAt": "2026-06-22T04:09:06.244Z"
         },
         {
-          "intentId": "intent-1782098808407",
+          "intentId": "intent-1782099547251",
           "taskId": "TASK-TEAM-BROKER-HOT-FIRST",
           "teamRunId": null,
           "actorId": "coordinator-1",
-          "baseCommit": "3fb7b2cdc6c8d40a77774b2c03c452b6e4a04213",
+          "baseCommit": "36130fb071eba71c9116e6a33c88823f599c33ca",
           "resourceKeys": {
             "files": [
               "packages/cli/src/commands/broker.ts"
@@ -1171,12 +1171,12 @@
             "validators": [],
             "artifacts": []
           },
-          "leaseEpoch": 1782098808407,
+          "leaseEpoch": 1782099547251,
           "leaseSeconds": 1800,
           "leaseMaxSeconds": 1800,
-          "heartbeatAt": "2026-06-22T03:26:48.407Z",
+          "heartbeatAt": "2026-06-22T03:39:07.251Z",
           "lane": "direct-brokered",
-          "expiresAt": "2026-06-22T03:56:48.407Z",
+          "expiresAt": "2026-06-22T04:09:07.251Z",
           "admission": {
             "trigger": "hot-file",
             "state": "proposal-submitted",
@@ -1386,6 +1386,6 @@
     "risk": "low",
     "closeReady": false
   },
-  "createdAt": "2026-06-22T03:26:48.524Z",
-  "updatedAt": "2026-06-22T03:26:48.524Z"
+  "createdAt": "2026-06-22T03:39:07.362Z",
+  "updatedAt": "2026-06-22T03:39:07.362Z"
 }

@@ -10,6 +10,7 @@ import type {
   ProposalAdmissionEvidence,
   ProposalAdmissionRequest,
   ProposalAdmissionState,
+  SuggestedSplitAtom,
   WriteBrokerRegistryDocument,
   WriteIntent
 } from './types.ts';
@@ -640,12 +641,21 @@ function buildLayer2ConflictDetail(region: LineRange): ConflictDetail {
 
 function buildDecompositionRequest(
   targetFunction: DecompositionTargetFunction,
-  conflictRegion: LineRange
+  conflictRegion: LineRange,
+  options: {
+    readonly suggestionKind?: DecompositionRequest['suggestionKind'];
+    readonly ownerAtomId?: string | null;
+    readonly rationale?: string;
+  } = {}
 ): DecompositionRequest {
   return {
     targetFunction,
     conflictRegion,
-    constraint: 'preserve-signature'
+    constraint: 'preserve-signature',
+    suggestionKind: options.suggestionKind ?? 'layer2-function-split',
+    ownerAtomId: options.ownerAtomId ?? null,
+    rationale: options.rationale ?? 'Broker suggests splitting the coarse write surface into smaller bounded atoms.',
+    suggestedAtoms: buildSuggestedSplitAtoms(targetFunction, conflictRegion)
   };
 }
 
@@ -702,7 +712,11 @@ function maybeBuildCidConflictDecompositionRequest(
               atomCid: target.atomCid,
               symbol: target.symbol,
               sourceRange: target.sourceRange
-            }, conflictRegion);
+            }, conflictRegion, {
+              suggestionKind: 'coarse-owner-map-split',
+              ownerAtomId: target.atomId,
+              rationale: `Blocked same-owner overlap on '${conflictRegion.filePath}' can be reduced by splitting the coarse owner map into bounded child atoms.`
+            });
           }
           layer2Conflicts.push({
             leftAtom: newAtom,
@@ -722,5 +736,65 @@ function maybeBuildCidConflictDecompositionRequest(
   if (!layer2Decision.trigger) {
     return null;
   }
-  return buildDecompositionRequest(layer2Decision.targetFunction, layer2Decision.conflictRegion);
+  return buildDecompositionRequest(layer2Decision.targetFunction, layer2Decision.conflictRegion, {
+    suggestionKind: 'coarse-owner-map-split',
+    ownerAtomId: layer2Decision.targetFunction.atomId,
+    rationale: `Blocked same-owner overlap on '${layer2Decision.conflictRegion.filePath}' can be reduced by splitting the coarse owner map into bounded child atoms.`
+  });
+}
+
+function buildSuggestedSplitAtoms(
+  targetFunction: DecompositionTargetFunction,
+  conflictRegion: LineRange
+): readonly SuggestedSplitAtom[] {
+  const suggestions: SuggestedSplitAtom[] = [];
+  const targetRange = targetFunction.sourceRange;
+  const baseId = targetFunction.atomId;
+
+  suggestions.push({
+    atomId: `${baseId}.focus.${conflictRegion.lineStart}-${conflictRegion.lineEnd}`,
+    atomCid: toSuggestedAtomCid(baseId, 'focus', conflictRegion),
+    role: 'focus',
+    summary: `Focused child atom covering the conflict region ${conflictRegion.lineStart}-${conflictRegion.lineEnd}.`,
+    sourceRange: conflictRegion
+  });
+
+  if (targetRange.lineStart < conflictRegion.lineStart) {
+    const beforeRange = normalizeLineRange({
+      filePath: targetRange.filePath,
+      lineStart: targetRange.lineStart,
+      lineEnd: conflictRegion.lineStart - 1
+    });
+    suggestions.push({
+      atomId: `${baseId}.before.${beforeRange.lineStart}-${beforeRange.lineEnd}`,
+      atomCid: toSuggestedAtomCid(baseId, 'before', beforeRange),
+      role: 'before',
+      summary: `Suggested sibling atom for the stable region before the conflict (${beforeRange.lineStart}-${beforeRange.lineEnd}).`,
+      sourceRange: beforeRange
+    });
+  }
+
+  if (targetRange.lineEnd > conflictRegion.lineEnd) {
+    const afterRange = normalizeLineRange({
+      filePath: targetRange.filePath,
+      lineStart: conflictRegion.lineEnd + 1,
+      lineEnd: targetRange.lineEnd
+    });
+    suggestions.push({
+      atomId: `${baseId}.after.${afterRange.lineStart}-${afterRange.lineEnd}`,
+      atomCid: toSuggestedAtomCid(baseId, 'after', afterRange),
+      role: 'after',
+      summary: `Suggested sibling atom for the stable region after the conflict (${afterRange.lineStart}-${afterRange.lineEnd}).`,
+      sourceRange: afterRange
+    });
+  }
+
+  return suggestions;
+}
+
+function toSuggestedAtomCid(atomId: string, role: SuggestedSplitAtom['role'], range: LineRange): string {
+  return `${atomId}-${role}-${range.lineStart}-${range.lineEnd}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }

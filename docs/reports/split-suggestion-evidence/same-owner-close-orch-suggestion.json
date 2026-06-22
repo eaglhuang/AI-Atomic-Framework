@@ -11,7 +11,7 @@
       "fromVersion": null,
       "notes": "generated"
     },
-    "intentId": "decision-1782098924806",
+    "intentId": "decision-1782099532720",
     "taskId": "TASK-CLOSE-ORCH-B",
     "verdict": "blocked-cid-conflict",
     "lane": "blocked",
@@ -62,7 +62,23 @@
         "lineStart": 146,
         "lineEnd": 150
       },
-      "constraint": "preserve-signature"
+      "constraint": "preserve-signature",
+      "suggestionKind": "coarse-owner-map-split",
+      "ownerAtomId": "atm.close-orchestration-map",
+      "rationale": "Blocked same-owner overlap on 'packages/cli/src/commands/taskflow/close-orchestration.ts' can be reduced by splitting the coarse owner map into bounded child atoms.",
+      "suggestedAtoms": [
+        {
+          "atomId": "atm.close-orchestration-map.focus.146-150",
+          "atomCid": "atm-close-orchestration-map-focus-146-150",
+          "role": "focus",
+          "summary": "Focused child atom covering the conflict region 146-150.",
+          "sourceRange": {
+            "filePath": "packages/cli/src/commands/taskflow/close-orchestration.ts",
+            "lineStart": 146,
+            "lineEnd": 150
+          }
+        }
+      ]
     },
     "admission": {
       "trigger": "same-file-overlap-risk",
