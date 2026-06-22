@@ -50,6 +50,7 @@ Current v1 rule boundary:
 - Proposal gating is conditional escalation, not the default for every file.
 - Existing direct broker flows stay valid when `trigger = not-required`.
 - Hot-file and overlap-risk lanes can carry proposal-first evidence without changing the envelope shape used by downstream evidence capture.
+- When two writers still share the same coarse owner map, bounded-region proposal evidence may refine that owner-level conflict: disjoint regions can route to composer, overlapping regions remain blocked.
 
 ## Candidate Bridge (TASK-ASP-0004)
 

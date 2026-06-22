@@ -1,0 +1,47 @@
+{
+  "schemaId": "atm.brokerOperationRunRecordEnvelope.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "deterministic compose"
+  },
+  "runId": "steward-merge-37e2c6d6dab54d12",
+  "planId": "merge-37e2c6d6dab54d12",
+  "records": [
+    {
+      "schemaId": "atm.brokerOperationRunRecord.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "deterministic compose"
+      },
+      "runId": "steward-merge-37e2c6d6dab54d12",
+      "planId": "merge-37e2c6d6dab54d12",
+      "request_identity": [
+        "proposal-hot-first",
+        "proposal-hot-second"
+      ],
+      "actor_ids": [
+        "coordinator-1",
+        "coordinator-2"
+      ],
+      "request_files": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "adapter_choice": "steward.patch-apply",
+      "applied_files": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "lane_decision": "neutral-steward",
+      "merge_verdict": "mergeable",
+      "evidence_path": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp\\atm-team-brokered-write-mqonm7vb-xido2dwc\\.atm\\runtime\\proposal-gated-hot-apply.json",
+      "task_ids": [
+        "TASK-TEAM-BROKER-HOT-DISJOINT",
+        "TASK-TEAM-BROKER-HOT-FIRST"
+      ],
+      "commit_sha": "3fb7b2cdc6c8d40a77774b2c03c452b6e4a04213"
+    }
+  ]
+}

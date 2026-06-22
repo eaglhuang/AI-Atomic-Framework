@@ -1,0 +1,136 @@
+{
+  "schemaId": "atm.proposalGatedWriteAdmissionDogfood.v1",
+  "generatedAt": "2026-06-22T03:26:49.034Z",
+  "mode": "validate",
+  "hotFile": "packages/cli/src/commands/broker.ts",
+  "traces": {
+    "firstWriterAdmission": {
+      "taskId": "TASK-TEAM-BROKER-HOT-FIRST",
+      "actorId": "coordinator-1",
+      "lane": "direct-brokered",
+      "admissionState": "proposal-submitted",
+      "admissionTrigger": "hot-file"
+    },
+    "disjointLane": {
+      "trigger": "same-file-overlap-risk",
+      "state": "composer-routed",
+      "requiresProposal": true,
+      "summarySubmitted": true,
+      "hotFiles": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "boundedRegions": [
+        {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 18,
+          "lineEnd": 24
+        }
+      ],
+      "rearbitrationRequired": true,
+      "reason": "Disjoint bounded proposal regions on 'packages/cli/src/commands/broker.ts' require deterministic-composer routing before write."
+    },
+    "blockedLane": {
+      "trigger": "same-file-overlap-risk",
+      "state": "blocked-before-write",
+      "requiresProposal": true,
+      "summarySubmitted": true,
+      "hotFiles": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "boundedRegions": [
+        {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 8,
+          "lineEnd": 12
+        }
+      ],
+      "rearbitrationRequired": true,
+      "reason": "Proposal overlap detected on the same bounded region for 'packages/cli/src/commands/broker.ts'; rearbitration is required before any write is admitted."
+    },
+    "parkedLane": {
+      "trigger": "same-file-overlap-risk",
+      "state": "parked-for-rearbitration",
+      "requiresProposal": true,
+      "summarySubmitted": true,
+      "hotFiles": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "boundedRegions": [
+        {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 14,
+          "lineEnd": 16
+        }
+      ],
+      "rearbitrationRequired": true,
+      "reason": "An active proposal-first writer already holds 'packages/cli/src/commands/broker.ts'; park and rearbitrate before granting second-writer authority."
+    },
+    "sameOwnerPositiveLane": {
+      "trigger": "same-file-overlap-risk",
+      "state": "composer-routed",
+      "requiresProposal": true,
+      "summarySubmitted": true,
+      "hotFiles": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "boundedRegions": [
+        {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 24,
+          "lineEnd": 28
+        }
+      ],
+      "rearbitrationRequired": true,
+      "reason": "Disjoint bounded proposal regions on 'packages/cli/src/commands/broker.ts' require deterministic-composer routing before write."
+    },
+    "sameOwnerNegativeLane": {
+      "trigger": "same-file-overlap-risk",
+      "state": "blocked-before-write",
+      "requiresProposal": true,
+      "summarySubmitted": true,
+      "hotFiles": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "boundedRegions": [
+        {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 10,
+          "lineEnd": 10
+        }
+      ],
+      "rearbitrationRequired": true,
+      "reason": "Blocked by Atom ID, CID, or read-set semantic conflict before write."
+    },
+    "sameOwnerNegativeSplitSuggestion": {
+      "targetFunction": {
+        "atomId": "atm.hot-owner-map",
+        "atomCid": "task-team-broker-same-owner-block",
+        "symbol": "atm.hot-owner-map",
+        "sourceRange": {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 10,
+          "lineEnd": 10
+        }
+      },
+      "conflictRegion": {
+        "filePath": "packages/cli/src/commands/broker.ts",
+        "lineStart": 10,
+        "lineEnd": 10
+      },
+      "constraint": "preserve-signature"
+    },
+    "scopedWriteVerdict": "applied"
+  },
+  "commands": [
+    "node --strip-types scripts/validate-team-brokered-write.ts --mode validate",
+    "npm run validate:team-agents -- --case capture-broker-evidence",
+    "node --strip-types scripts/collect-broker-evidence.ts --run-dir <bundle>/broker-runs --team-run-dir <bundle>/team-runs --output-dir <dir> --atm-root <fixture-root>"
+  ],
+  "artifactPaths": {
+    "brokerEvidenceBundle": "broker-evidence-bundle/broker-evidence-bundle.json",
+    "brokerEvidenceReport": "broker-evidence-bundle/broker-evidence-bundle.md",
+    "brokerRunsDir": "broker-runs",
+    "teamRunsDir": "team-runs",
+    "applyEvidence": "proposal-gated-hot-apply.json"
+  }
+}

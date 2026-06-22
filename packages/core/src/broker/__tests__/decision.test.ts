@@ -272,6 +272,104 @@ function testProposalDisjointRegionsRouteComposerBeforeWrite() {
   console.log('ok: disjoint proposal regions route through composer before write');
 }
 
+function testSameOwnerProposalDisjointRegionsRouteComposerBeforeWrite() {
+  const active = makeIntent({
+    taskId: 'TASK-A',
+    actorId: 'agent-a',
+    targetFiles: ['src/shared-owner-map.ts'],
+    atomRefs: [{
+      atomId: 'atm.shared-owner-map',
+      atomCid: 'cid-owner-a',
+      operation: 'modify',
+      sourceRange: {
+        filePath: 'src/shared-owner-map.ts',
+        lineStart: 1,
+        lineEnd: 12
+      }
+    }],
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: true,
+      hotFiles: ['src/shared-owner-map.ts'],
+      boundedRegions: [{ filePath: 'src/shared-owner-map.ts', lineStart: 1, lineEnd: 12 }]
+    }
+  });
+  const newIntent = makeIntent({
+    taskId: 'TASK-B',
+    actorId: 'agent-b',
+    targetFiles: ['src/shared-owner-map.ts'],
+    atomRefs: [{
+      atomId: 'atm.shared-owner-map',
+      atomCid: 'cid-owner-b',
+      operation: 'modify',
+      sourceRange: {
+        filePath: 'src/shared-owner-map.ts',
+        lineStart: 20,
+        lineEnd: 28
+      }
+    }],
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: 'src/shared-owner-map.ts', lineStart: 20, lineEnd: 28 }]
+    }
+  });
+  const decision = calculateBrokerDecision(newIntent, registryWith([toActiveIntent(active, 'intent-a')]));
+  assert.equal(decision.verdict, 'needs-physical-split');
+  assert.equal(decision.lane, 'deterministic-composer');
+  assert.equal(decision.admission?.state, 'composer-routed');
+  console.log('ok: same-owner disjoint proposal regions route through composer before write');
+}
+
+function testSameOwnerProposalOverlapRemainsBlocked() {
+  const active = makeIntent({
+    taskId: 'TASK-A',
+    actorId: 'agent-a',
+    targetFiles: ['src/shared-owner-map.ts'],
+    atomRefs: [{
+      atomId: 'atm.shared-owner-map',
+      atomCid: 'cid-owner-a',
+      operation: 'modify',
+      sourceRange: {
+        filePath: 'src/shared-owner-map.ts',
+        lineStart: 1,
+        lineEnd: 20
+      }
+    }],
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: true,
+      hotFiles: ['src/shared-owner-map.ts'],
+      boundedRegions: [{ filePath: 'src/shared-owner-map.ts', lineStart: 1, lineEnd: 20 }]
+    }
+  });
+  const newIntent = makeIntent({
+    taskId: 'TASK-B',
+    actorId: 'agent-b',
+    targetFiles: ['src/shared-owner-map.ts'],
+    atomRefs: [{
+      atomId: 'atm.shared-owner-map',
+      atomCid: 'cid-owner-b',
+      operation: 'modify',
+      sourceRange: {
+        filePath: 'src/shared-owner-map.ts',
+        lineStart: 10,
+        lineEnd: 10
+      }
+    }],
+    proposalAdmission: {
+      trigger: 'same-file-overlap-risk',
+      summarySubmitted: true,
+      boundedRegions: [{ filePath: 'src/shared-owner-map.ts', lineStart: 10, lineEnd: 10 }]
+    }
+  });
+  const decision = calculateBrokerDecision(newIntent, registryWith([toActiveIntent(active, 'intent-a')]));
+  assert.equal(decision.verdict, 'blocked-cid-conflict');
+  assert.equal(decision.lane, 'blocked');
+  assert.ok(Boolean(decision.decompositionRequest));
+  console.log('ok: same-owner overlapping proposal regions remain blocked');
+}
+
 function testProposalOverlapParksFirstWriterForRearbitration() {
   const active = makeIntent({
     taskId: 'TASK-A',
@@ -312,5 +410,7 @@ testFileOverlapWithSyntacticSeparationScenario();
 testProposalFirstHotFileScenario();
 testProposalFirstBlockedBeforeWriteScenario();
 testProposalDisjointRegionsRouteComposerBeforeWrite();
+testSameOwnerProposalDisjointRegionsRouteComposerBeforeWrite();
+testSameOwnerProposalOverlapRemainsBlocked();
 testProposalOverlapParksFirstWriterForRearbitration();
 console.log('all broker decision tests passed');

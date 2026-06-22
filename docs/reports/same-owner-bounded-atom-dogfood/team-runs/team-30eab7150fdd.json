@@ -1,0 +1,1281 @@
+{
+  "schemaId": "atm.teamRun.v1",
+  "teamRunId": "team-30eab7150fdd",
+  "channel": "normal",
+  "taskId": "TASK-TEAM-BROKER-OVERLAP",
+  "batchId": null,
+  "actorId": "coordinator-1",
+  "recipeId": "atm.default.normal.typescript",
+  "status": "active",
+  "executionMode": "manual-team",
+  "executionSurface": "broker-governance",
+  "runtimeMode": "broker-only",
+  "runtimeLanguage": "node",
+  "runtimeAdapterId": "atm.node.broker-only-fallback",
+  "providerId": "local",
+  "sdkId": "none",
+  "modelId": "none",
+  "runtimeContract": {
+    "schemaId": "atm.teamRuntimeContract.v1",
+    "runtimeMode": "broker-only",
+    "runtimeLanguage": "node",
+    "runtimeAdapterId": "atm.node.broker-only-fallback",
+    "providerId": "local",
+    "sdkId": "none",
+    "modelId": "none",
+    "agentsSpawned": false,
+    "executionSurface": "broker-governance",
+    "selectionReason": "broker-only selected; no agents are spawned, language=node, atm.node.broker-only-fallback, selection=explicit-runtime",
+    "workerAdapter": {
+      "schemaId": "atm.teamWorkerAdapterContract.v1",
+      "adapterId": "atm.node.broker-only-fallback",
+      "runtimeMode": "broker-only",
+      "runtimeLanguage": "node",
+      "executionSurface": "broker-governance",
+      "providerId": "local",
+      "sdkId": "none",
+      "modelId": "none",
+      "spawnStrategy": "disabled",
+      "agentsSpawned": false,
+      "brokerFallback": {
+        "enabled": true,
+        "reason": "agent spawning disabled; broker governance remains authoritative",
+        "preservesGovernance": [
+          "broker",
+          "permission-leases",
+          "validators",
+          "police",
+          "evidence",
+          "artifact-contract",
+          "retry-contract"
+        ]
+      },
+      "authorityBoundary": {
+        "gitWrite": false,
+        "taskLifecycle": false,
+        "selfClose": false,
+        "evidenceWriteOwner": "coordinator"
+      },
+      "vendorNeutral": true,
+      "artifactContractPreserved": true,
+      "retryContractPreserved": true
+    },
+    "artifactHandoff": {
+      "schemaId": "atm.teamArtifactHandoffContract.v1",
+      "requiredRoles": [
+        "evidence-collector",
+        "implementer",
+        "reviewer",
+        "validator"
+      ],
+      "roleContracts": [
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "evidence-collector",
+          "role": "evidence-collector",
+          "consumesFrom": [
+            "review-findings",
+            "validator-results"
+          ],
+          "producesTo": [
+            "closure-packet"
+          ],
+          "requiredArtifacts": [
+            "command-backed-evidence",
+            "closure-packet"
+          ]
+        },
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "consumesFrom": [
+            "task-card",
+            "team-plan",
+            "scope-locks"
+          ],
+          "producesTo": [
+            "reviewer",
+            "validator",
+            "evidence-collector"
+          ],
+          "requiredArtifacts": [
+            "implementation-diff",
+            "implementation-notes"
+          ]
+        },
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "reviewer",
+          "role": "reviewer",
+          "consumesFrom": [
+            "implementation-diff",
+            "implementation-notes"
+          ],
+          "producesTo": [
+            "implementer",
+            "evidence-collector"
+          ],
+          "requiredArtifacts": [
+            "review-findings"
+          ]
+        },
+        {
+          "schemaId": "atm.teamRoleArtifactContract.v1",
+          "agentId": "validator",
+          "role": "validator",
+          "consumesFrom": [
+            "implementation-diff",
+            "validator-commands"
+          ],
+          "producesTo": [
+            "evidence-collector"
+          ],
+          "requiredArtifacts": [
+            "validator-results"
+          ]
+        }
+      ],
+      "findings": [
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "evidence-collector",
+          "agentId": "evidence-collector",
+          "artifact": "command-backed-evidence",
+          "blocking": true,
+          "summary": "evidence-collector requires artifact 'command-backed-evidence' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "evidence-collector",
+          "agentId": "evidence-collector",
+          "artifact": "closure-packet",
+          "blocking": true,
+          "summary": "evidence-collector requires artifact 'closure-packet' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "implementer",
+          "agentId": "implementer-typescript",
+          "artifact": "implementation-diff",
+          "blocking": true,
+          "summary": "implementer requires artifact 'implementation-diff' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "implementer",
+          "agentId": "implementer-typescript",
+          "artifact": "implementation-notes",
+          "blocking": true,
+          "summary": "implementer requires artifact 'implementation-notes' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "reviewer",
+          "agentId": "reviewer",
+          "artifact": "review-findings",
+          "blocking": true,
+          "summary": "reviewer requires artifact 'review-findings' before close."
+        },
+        {
+          "level": "error",
+          "code": "missing-required-artifact",
+          "role": "validator",
+          "agentId": "validator",
+          "artifact": "validator-results",
+          "blocking": true,
+          "summary": "validator requires artifact 'validator-results' before close."
+        }
+      ],
+      "closeAllowed": false
+    },
+    "retryBudget": {
+      "schemaId": "atm.teamRetryBudgetContract.v1",
+      "maxReworkCycles": 1,
+      "maxValidatorReruns": 1,
+      "maxReviewerReturns": 1,
+      "usedReworkCycles": 0,
+      "usedValidatorReruns": 0,
+      "usedReviewerReturns": 0,
+      "exhausted": false,
+      "escalationTarget": null,
+      "status": "within-budget"
+    },
+    "commitLane": {
+      "schemaId": "atm.teamCommitLaneContract.v1",
+      "ownerRole": "coordinator",
+      "ownerPermissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ],
+      "workerGitWrite": false,
+      "serializedBy": "branch-commit-queue",
+      "lockSchemaId": "atm.branchCommitQueueLock.v1",
+      "retryableCodes": [
+        "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
+        "ATM_GIT_COMMIT_BRANCH_QUEUE_RACE"
+      ]
+    },
+    "brokerSubagent": {
+      "schemaId": "atm.teamBrokerSubagentContract.v1",
+      "enabled": true,
+      "subagentId": "team-broker-subagent",
+      "lifecycleOwner": "atm",
+      "decisionSurface": "brokerLane",
+      "governs": [
+        "write-intents",
+        "scope-conflicts",
+        "steward-apply",
+        "commit-lane"
+      ],
+      "stewardId": "neutral-write-steward",
+      "evidenceRequired": [
+        "atm.teamBrokerLaneEvidence.v1",
+        "atm.stewardApplyEvidence.v1",
+        "atm.brokerOperationRunRecordEnvelope.v1"
+      ],
+      "authorityBoundary": {
+        "fileWrite": false,
+        "gitWrite": false,
+        "taskLifecycle": false,
+        "selfClose": false
+      },
+      "escalationTarget": "coordinator"
+    },
+    "editorSubagentBridge": {
+      "schemaId": "atm.teamEditorSubagentBridgeContract.v1",
+      "enabled": false,
+      "lifecycleOwner": "atm",
+      "disabledReason": "runtime-mode-is-not-editor-subagent",
+      "editorNeutral": true,
+      "allowedFiles": [
+        "src/shared-target.ts"
+      ],
+      "roleEnvelopes": [
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "coordinator",
+          "role": "coordinator",
+          "profile": "atm.coordinator.v1",
+          "language": "typescript",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [
+              {
+                "permission": "task.lifecycle",
+                "agentId": "coordinator"
+              },
+              {
+                "permission": "git.write",
+                "agentId": "coordinator"
+              },
+              {
+                "permission": "evidence.write",
+                "agentId": "coordinator"
+              }
+            ],
+            "leaseOwner": "coordinator"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "atomization-planner",
+          "role": "atomizationPlanner",
+          "profile": "atm.atomizationPlanner.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "atomization-planner"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "reader",
+          "role": "reader",
+          "profile": "atm.reader.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "reader"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "scope-guardian",
+          "role": "scopeGuardian",
+          "profile": "atm.scopeGuardian.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "scope-guardian"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.write"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [
+              {
+                "permission": "file.write",
+                "agentId": "implementer-typescript",
+                "paths": [
+                  "src/shared-target.ts"
+                ]
+              }
+            ],
+            "leaseOwner": "implementer-typescript"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "task-card",
+              "team-plan",
+              "scope-locks"
+            ],
+            "producesTo": [
+              "reviewer",
+              "validator",
+              "evidence-collector"
+            ],
+            "requiredArtifacts": [
+              "implementation-diff",
+              "implementation-notes"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "validator",
+          "role": "validator",
+          "profile": "atm.validator.v1",
+          "language": "typescript",
+          "permissions": [
+            "exec.validator"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "validator"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "implementation-diff",
+              "validator-commands"
+            ],
+            "producesTo": [
+              "evidence-collector"
+            ],
+            "requiredArtifacts": [
+              "validator-results"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        },
+        {
+          "schemaId": "atm.teamEditorSubagentRoleEnvelope.v1",
+          "agentId": "evidence-collector",
+          "role": "evidenceCollector",
+          "profile": "atm.evidenceCollector.v1",
+          "language": "typescript",
+          "permissions": [
+            "file.read"
+          ],
+          "allowedFiles": [
+            "src/shared-target.ts"
+          ],
+          "leaseMetadata": {
+            "permissionLeases": [],
+            "leaseOwner": "evidence-collector"
+          },
+          "artifactMetadata": {
+            "expectedReports": [
+              "agent report",
+              "validator evidence",
+              "team summary"
+            ],
+            "evidenceRequired": "command-backed",
+            "consumesFrom": [
+              "team-plan"
+            ],
+            "producesTo": [
+              "team-summary"
+            ],
+            "requiredArtifacts": [
+              "role-report"
+            ]
+          },
+          "retryMetadata": {
+            "retryPolicy": "atm-governed",
+            "maxAttempts": 1
+          }
+        }
+      ]
+    }
+  },
+  "artifactHandoff": {
+    "schemaId": "atm.teamArtifactHandoffContract.v1",
+    "requiredRoles": [
+      "evidence-collector",
+      "implementer",
+      "reviewer",
+      "validator"
+    ],
+    "roleContracts": [
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "evidence-collector",
+        "role": "evidence-collector",
+        "consumesFrom": [
+          "review-findings",
+          "validator-results"
+        ],
+        "producesTo": [
+          "closure-packet"
+        ],
+        "requiredArtifacts": [
+          "command-backed-evidence",
+          "closure-packet"
+        ]
+      },
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "implementer-typescript",
+        "role": "implementer",
+        "consumesFrom": [
+          "task-card",
+          "team-plan",
+          "scope-locks"
+        ],
+        "producesTo": [
+          "reviewer",
+          "validator",
+          "evidence-collector"
+        ],
+        "requiredArtifacts": [
+          "implementation-diff",
+          "implementation-notes"
+        ]
+      },
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "reviewer",
+        "role": "reviewer",
+        "consumesFrom": [
+          "implementation-diff",
+          "implementation-notes"
+        ],
+        "producesTo": [
+          "implementer",
+          "evidence-collector"
+        ],
+        "requiredArtifacts": [
+          "review-findings"
+        ]
+      },
+      {
+        "schemaId": "atm.teamRoleArtifactContract.v1",
+        "agentId": "validator",
+        "role": "validator",
+        "consumesFrom": [
+          "implementation-diff",
+          "validator-commands"
+        ],
+        "producesTo": [
+          "evidence-collector"
+        ],
+        "requiredArtifacts": [
+          "validator-results"
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "evidence-collector",
+        "agentId": "evidence-collector",
+        "artifact": "command-backed-evidence",
+        "blocking": true,
+        "summary": "evidence-collector requires artifact 'command-backed-evidence' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "evidence-collector",
+        "agentId": "evidence-collector",
+        "artifact": "closure-packet",
+        "blocking": true,
+        "summary": "evidence-collector requires artifact 'closure-packet' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "implementer",
+        "agentId": "implementer-typescript",
+        "artifact": "implementation-diff",
+        "blocking": true,
+        "summary": "implementer requires artifact 'implementation-diff' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "implementer",
+        "agentId": "implementer-typescript",
+        "artifact": "implementation-notes",
+        "blocking": true,
+        "summary": "implementer requires artifact 'implementation-notes' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "reviewer",
+        "agentId": "reviewer",
+        "artifact": "review-findings",
+        "blocking": true,
+        "summary": "reviewer requires artifact 'review-findings' before close."
+      },
+      {
+        "level": "error",
+        "code": "missing-required-artifact",
+        "role": "validator",
+        "agentId": "validator",
+        "artifact": "validator-results",
+        "blocking": true,
+        "summary": "validator requires artifact 'validator-results' before close."
+      }
+    ],
+    "closeAllowed": false
+  },
+  "retryBudget": {
+    "schemaId": "atm.teamRetryBudgetContract.v1",
+    "maxReworkCycles": 1,
+    "maxValidatorReruns": 1,
+    "maxReviewerReturns": 1,
+    "usedReworkCycles": 0,
+    "usedValidatorReruns": 0,
+    "usedReviewerReturns": 0,
+    "exhausted": false,
+    "escalationTarget": null,
+    "status": "within-budget"
+  },
+  "brokerSubagent": {
+    "schemaId": "atm.teamBrokerSubagentContract.v1",
+    "enabled": true,
+    "subagentId": "team-broker-subagent",
+    "lifecycleOwner": "atm",
+    "decisionSurface": "brokerLane",
+    "governs": [
+      "write-intents",
+      "scope-conflicts",
+      "steward-apply",
+      "commit-lane"
+    ],
+    "stewardId": "neutral-write-steward",
+    "evidenceRequired": [
+      "atm.teamBrokerLaneEvidence.v1",
+      "atm.stewardApplyEvidence.v1",
+      "atm.brokerOperationRunRecordEnvelope.v1"
+    ],
+    "authorityBoundary": {
+      "fileWrite": false,
+      "gitWrite": false,
+      "taskLifecycle": false,
+      "selfClose": false
+    },
+    "escalationTarget": "coordinator"
+  },
+  "agentsSpawned": false,
+  "runtimeWritten": true,
+  "task": {
+    "taskId": "TASK-TEAM-BROKER-OVERLAP",
+    "title": "Team broker fixture TASK-TEAM-BROKER-OVERLAP",
+    "status": "planned",
+    "targetRepo": null,
+    "sourcePlanPath": null
+  },
+  "roles": [
+    {
+      "agentId": "coordinator",
+      "role": "coordinator",
+      "profile": "atm.coordinator.v1",
+      "language": null,
+      "permissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ]
+    },
+    {
+      "agentId": "atomization-planner",
+      "role": "atomizationPlanner",
+      "profile": "atm.atomizationPlanner.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "reader",
+      "role": "reader",
+      "profile": "atm.reader.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "scope-guardian",
+      "role": "scopeGuardian",
+      "profile": "atm.scopeGuardian.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "implementer-typescript",
+      "role": "implementer",
+      "profile": "atm.implementer.typescript.v1",
+      "language": "typescript",
+      "permissions": [
+        "file.write"
+      ]
+    },
+    {
+      "agentId": "validator",
+      "role": "validator",
+      "profile": "atm.validator.v1",
+      "language": null,
+      "permissions": [
+        "exec.validator"
+      ]
+    },
+    {
+      "agentId": "evidence-collector",
+      "role": "evidenceCollector",
+      "profile": "atm.evidenceCollector.v1",
+      "language": null,
+      "permissions": [
+        "file.read"
+      ]
+    }
+  ],
+  "agents": [
+    {
+      "agentId": "coordinator",
+      "role": "coordinator",
+      "profile": "atm.coordinator.v1",
+      "permissions": [
+        "task.lifecycle",
+        "git.write",
+        "evidence.write"
+      ]
+    },
+    {
+      "agentId": "atomization-planner",
+      "role": "atomizationPlanner",
+      "profile": "atm.atomizationPlanner.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "reader",
+      "role": "reader",
+      "profile": "atm.reader.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "scope-guardian",
+      "role": "scopeGuardian",
+      "profile": "atm.scopeGuardian.v1",
+      "permissions": [
+        "file.read"
+      ]
+    },
+    {
+      "agentId": "implementer-typescript",
+      "role": "implementer",
+      "profile": "atm.implementer.typescript.v1",
+      "language": "typescript",
+      "permissions": [
+        "file.write"
+      ]
+    },
+    {
+      "agentId": "validator",
+      "role": "validator",
+      "profile": "atm.validator.v1",
+      "permissions": [
+        "exec.validator"
+      ]
+    },
+    {
+      "agentId": "evidence-collector",
+      "role": "evidenceCollector",
+      "profile": "atm.evidenceCollector.v1",
+      "permissions": [
+        "file.read"
+      ]
+    }
+  ],
+  "leases": [
+    {
+      "permission": "task.lifecycle",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "git.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "evidence.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "file.write",
+      "agentId": "implementer-typescript",
+      "paths": [
+        "src/shared-target.ts"
+      ]
+    }
+  ],
+  "permissionLeases": [
+    {
+      "permission": "task.lifecycle",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "git.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "evidence.write",
+      "agentId": "coordinator"
+    },
+    {
+      "permission": "file.write",
+      "agentId": "implementer-typescript",
+      "paths": [
+        "src/shared-target.ts"
+      ]
+    }
+  ],
+  "validation": {
+    "ok": true,
+    "findings": []
+  },
+  "brokerLane": {
+    "schemaId": "atm.teamBrokerLaneEvidence.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-BROKER-OVERLAP",
+    "actorId": "coordinator-1",
+    "registryPath": ".atm/runtime/write-broker.registry.json",
+    "writeIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "team plan/start broker lane"
+      },
+      "taskId": "TASK-TEAM-BROKER-OVERLAP",
+      "actorId": "coordinator-1",
+      "baseCommit": "3fb7b2cdc6c8d40a77774b2c03c452b6e4a04213",
+      "targetFiles": [
+        "src/shared-target.ts"
+      ],
+      "atomRefs": [
+        {
+          "atomId": "atom-overlap-recipient",
+          "atomCid": "task-team-broker-overlap",
+          "operation": "modify"
+        }
+      ],
+      "sharedSurfaces": {
+        "generators": [],
+        "projections": [],
+        "registries": [],
+        "validators": [],
+        "artifacts": []
+      },
+      "requestedLane": "auto"
+    },
+    "writeTransaction": {
+      "schemaId": "atm.teamBrokerWriteTransaction.v1",
+      "transactionId": "txn-c10ed711f97b9eb3",
+      "taskId": "TASK-TEAM-BROKER-OVERLAP",
+      "principalId": "coordinator-1",
+      "actorId": "coordinator-1",
+      "sessionId": "team-broker-session-fixture",
+      "instanceId": "coordinator-1@local",
+      "worktreeId": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp\\atm-team-brokered-write-mqonm7vb-xido2dwc",
+      "branchRef": "master",
+      "baseHead": "3fb7b2cdc6c8d40a77774b2c03c452b6e4a04213",
+      "leaseEpoch": 1782098807677,
+      "allowedFiles": [
+        "src/shared-target.ts"
+      ],
+      "readSet": [
+        "src/shared-target.ts"
+      ],
+      "writeSet": [
+        "src/shared-target.ts"
+      ],
+      "fileHashesBefore": {
+        "src/shared-target.ts": "sha256:b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060"
+      },
+      "brokerDecision": {
+        "verdict": "needs-physical-split",
+        "lane": "deterministic-composer",
+        "intentId": "decision-1782098807677",
+        "parallelSafetyReason": null
+      },
+      "admissionState": "composer-routed",
+      "startedAt": "2026-06-22T03:26:47.677Z",
+      "expiresAt": "2026-06-22T03:56:47.677Z",
+      "heartbeatAt": "2026-06-22T03:26:47.677Z"
+    },
+    "decision": {
+      "schemaId": "atm.brokerDecision.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "generated"
+      },
+      "intentId": "decision-1782098807677",
+      "taskId": "TASK-TEAM-BROKER-OVERLAP",
+      "verdict": "needs-physical-split",
+      "lane": "deterministic-composer",
+      "conflicts": [
+        {
+          "kind": "file-range",
+          "detail": "Physical file overlap on 'src/shared-target.ts'"
+        }
+      ],
+      "applyMethod": "patch-apply",
+      "reason": "Physical file overlap detected but no bounded overlap evidence; routed to deterministic-composer.",
+      "conflictMatrix": {
+        "schemaId": "atm.brokerConflictMatrix.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "generated"
+        },
+        "taskId": "TASK-TEAM-BROKER-OVERLAP",
+        "arbitrationVerdict": "allow",
+        "conflicts": []
+      },
+      "admission": {
+        "trigger": "not-required",
+        "state": "composer-routed",
+        "requiresProposal": false,
+        "summarySubmitted": false,
+        "hotFiles": [],
+        "boundedRegions": [],
+        "rearbitrationRequired": true,
+        "reason": "Same-file work requires proposal-aware composer routing before write."
+      }
+    },
+    "admission": {
+      "trigger": "not-required",
+      "state": "composer-routed",
+      "requiresProposal": false,
+      "summarySubmitted": false,
+      "hotFiles": [],
+      "boundedRegions": [],
+      "rearbitrationRequired": true,
+      "reason": "Same-file work requires proposal-aware composer routing before write."
+    },
+    "virtualAtomInUseRegistry": {
+      "schemaId": "atm.virtualAtomInUseRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "team-broker-fixture",
+      "workspaceId": "main",
+      "activeVirtualAtoms": [
+        {
+          "virtualAtomId": "atom-overlap-donor",
+          "virtualAtomCid": "cid-donor",
+          "taskId": "TASK-TEAM-BROKER-DONOR",
+          "actorId": "donor-actor",
+          "intentId": "intent-1782098807085",
+          "lane": "direct-brokered",
+          "leaseEpoch": 1782098807085,
+          "expiresAt": "2026-06-22T03:56:47.085Z",
+          "sourceAtomIds": [
+            "atom-overlap-donor"
+          ]
+        }
+      ],
+      "activeIntents": [
+        {
+          "intentId": "intent-1782098807085",
+          "taskId": "TASK-TEAM-BROKER-DONOR",
+          "teamRunId": null,
+          "actorId": "donor-actor",
+          "baseCommit": "fixture-commit",
+          "resourceKeys": {
+            "files": [
+              "src/shared-target.ts"
+            ],
+            "atomIds": [
+              "atom-overlap-donor"
+            ],
+            "atomCids": [
+              "cid-donor"
+            ],
+            "atomRanges": [],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": [],
+            "artifacts": []
+          },
+          "leaseEpoch": 1782098807085,
+          "leaseSeconds": 1800,
+          "leaseMaxSeconds": 1800,
+          "heartbeatAt": "2026-06-22T03:26:47.085Z",
+          "lane": "direct-brokered",
+          "expiresAt": "2026-06-22T03:56:47.085Z"
+        }
+      ]
+    },
+    "chosenLane": "neutral-steward",
+    "stewardId": "neutral-write-steward",
+    "composerPath": "broker compose -> steward plan/apply",
+    "safeToStart": true,
+    "blockedReasons": []
+  },
+  "captainDecision": {
+    "schemaId": "atm.teamCaptainDecision.v1",
+    "captain": {
+      "role": "Task Captain",
+      "agentId": "coordinator"
+    },
+    "taskId": "TASK-TEAM-BROKER-OVERLAP",
+    "authorityChain": {
+      "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+      "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+    },
+    "conflictRules": [
+      "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+      "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+      "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+    ],
+    "teamSize": "medium",
+    "requiredRoles": [
+      "Task Captain",
+      "Atomization Planner",
+      "Code Builder",
+      "Check Runner"
+    ],
+    "optionalRoles": [
+      "Reader",
+      "Evidence Collector",
+      "Scope Guardian"
+    ],
+    "reason": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+    "confidence": "medium",
+    "implementerSelector": {
+      "schemaId": "atm.teamImplementerSelector.v1",
+      "selectedImplementer": {
+        "agentId": "implementer-typescript",
+        "role": "implementer",
+        "profile": "atm.implementer.typescript.v1",
+        "language": "typescript",
+        "recipeId": "atm.default.normal.typescript"
+      },
+      "languageMatch": "typescript",
+      "roleMatch": "typescript-implementer",
+      "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+      "confidence": "high",
+      "deterministicHints": {
+        "scopePaths": [
+          "src/shared-target.ts"
+        ],
+        "deliverables": [
+          "src/shared-target.ts"
+        ],
+        "fileExtensions": [
+          ".ts"
+        ],
+        "pathHints": [
+          "typescript-file",
+          "typescript-heavy"
+        ],
+        "pythonHeavy": false,
+        "typescriptHeavy": true,
+        "uiPaths": false
+      }
+    },
+    "stopConditions": [
+      "scope must stay within declared allowed files",
+      "required roles must each be uniquely represented",
+      "validators must not report blocking permission conflicts",
+      "a broader or stronger lane must stop the plan"
+    ],
+    "escalationRequired": false,
+    "escalationReason": "The task remains small enough for a captain-only crew, so lieutenant escalation is not required.",
+    "needLieutenant": false,
+    "nextTeamShape": {
+      "schemaId": "atm.teamLieutenantEscalationShape.v1",
+      "captain": {
+        "role": "Task Captain",
+        "permissions": [
+          "task.lifecycle",
+          "git.write",
+          "evidence.write"
+        ]
+      },
+      "lieutenant": {
+        "role": "Task Lieutenant",
+        "recommended": false,
+        "permissions": [
+          "file.read",
+          "exec.validator"
+        ],
+        "forbiddenPermissions": [
+          "task.lifecycle",
+          "git.write",
+          "evidence.write"
+        ],
+        "coordinationFocus": [
+          "phase coordination",
+          "blocker tracking",
+          "handoff summarization"
+        ]
+      },
+      "teamSizeHint": "small",
+      "coordinationBoundary": "captain-only",
+      "signals": {
+        "scopeCount": 1,
+        "crossRepoScope": false,
+        "validatorCount": 0,
+        "largeScriptRisk": false,
+        "closureSignals": false,
+        "validationOk": true,
+        "brokerVerdict": "needs-physical-split"
+      },
+      "suggestedPermissions": {
+        "captain": [
+          "task.lifecycle",
+          "git.write",
+          "evidence.write"
+        ],
+        "lieutenant": [
+          "file.read",
+          "exec.validator"
+        ]
+      }
+    },
+    "decisionSurface": {
+      "validationOk": true,
+      "brokerVerdict": "needs-physical-split",
+      "largeScriptRisk": {
+        "level": "low",
+        "threshold": 3,
+        "reasons": []
+      },
+      "mapUpdateNeed": false,
+      "escalationRequired": false,
+      "needLieutenant": false,
+      "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+    }
+  },
+  "reworkRoute": {
+    "schemaId": "atm.teamReworkRoute.v1",
+    "status": "work-in-progress",
+    "retryBudget": {
+      "maxAttempts": 1,
+      "used": 0,
+      "remaining": 1,
+      "escalationTarget": null
+    },
+    "requiredChecksPassed": false,
+    "findings": [],
+    "transitions": []
+  },
+  "agentReports": [],
+  "patrolFindings": [],
+  "evidenceCuratorSummary": null,
+  "teamSummary": {
+    "decision": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+    "implementationSummary": "broker-only selected; no agents are spawned, language=node, atm.node.broker-only-fallback, selection=explicit-runtime; closure remains governed by command-backed evidence.",
+    "validators": [],
+    "evidence": [],
+    "brokerGovernance": {
+      "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+      "brokerSubagentEnabled": true,
+      "brokerDecisionSurface": "brokerLane",
+      "brokerStewardId": "neutral-write-steward",
+      "brokerGoverns": [
+        "write-intents",
+        "scope-conflicts",
+        "steward-apply",
+        "commit-lane"
+      ],
+      "brokerEvidenceRequired": [
+        "atm.teamBrokerLaneEvidence.v1",
+        "atm.stewardApplyEvidence.v1",
+        "atm.brokerOperationRunRecordEnvelope.v1"
+      ],
+      "commitLaneSerializedBy": "branch-commit-queue",
+      "commitLaneOwnerRole": "coordinator",
+      "workerGitWrite": false,
+      "workerTaskLifecycle": false,
+      "workerSelfClose": false
+    },
+    "risk": "low",
+    "closeReady": false
+  },
+  "createdAt": "2026-06-22T03:26:47.781Z",
+  "updatedAt": "2026-06-22T03:26:47.781Z"
+}
