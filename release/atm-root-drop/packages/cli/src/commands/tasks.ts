@@ -215,7 +215,19 @@ export interface TaskImportRecord {
   readonly rollbackNotes?: string | null;
   readonly atomizationImpact?: {
     readonly ownerAtomOrMap?: string | null;
+    readonly atomCid?: string | null;
     readonly mapUpdates?: readonly string[];
+  };
+  readonly proposalAdmission?: {
+    readonly trigger: 'not-required' | 'hot-file' | 'same-file-overlap-risk' | 'shared-surface-risk' | 'manual-review-surface';
+    readonly summarySubmitted: boolean;
+    readonly boundedRegions?: readonly {
+      readonly filePath: string;
+      readonly lineStart: number;
+      readonly lineEnd: number;
+    }[];
+    readonly hotFiles?: readonly string[];
+    readonly notes?: string | null;
   };
   readonly legacyImportAliases?: Record<string, readonly string[] | string>;
   readonly importDiagnostics?: readonly TaskCardImportDiagnostic[];
@@ -6198,6 +6210,7 @@ function parseSingleCard(input: {
     ?? atomizationImpactFrontMatter.mapUpdates
     ?? atomizationImpactFrontMatter.map_updates
   );
+  const proposalAdmission = parseTaskProposalAdmission(frontMatter.data.proposalAdmission ?? frontMatter.data.brokerProposalAdmission);
   const body = input.planText.slice(frontMatter.endIndex);
   const sections = sliceBodyByHeadings(body);
   const acceptance = collectBulletList(sections, acceptanceHeaders);
@@ -6356,8 +6369,15 @@ function parseSingleCard(input: {
         ?? atomizationImpactFrontMatter.ownerAtomOrMap
         ?? atomizationImpactFrontMatter.owner_atom_or_map
       ),
+      atomCid: normalizeOptionalString(
+        frontMatter.data.atomCid
+        ?? frontMatter.data.atom_cid
+        ?? atomizationImpactFrontMatter.atomCid
+        ?? atomizationImpactFrontMatter.atom_cid
+      ),
       mapUpdates
     },
+    ...(proposalAdmission ? { proposalAdmission } : {}),
     legacyImportAliases: {
       ...(frontMatter.data.allowed_files ? { allowed_files: parseYamlList(frontMatter.data.allowed_files) } : {}),
       ...(frontMatter.data.blocked_by ? { blocked_by: parseYamlList(frontMatter.data.blocked_by) } : {}),
@@ -6976,6 +6996,7 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     ?? atomizationImpactFrontMatter.mapUpdates
     ?? atomizationImpactFrontMatter.map_updates
   );
+  const proposalAdmission = parseTaskProposalAdmission(frontData.proposalAdmission ?? frontData.brokerProposalAdmission);
 
   const body = parsed.body || '';
   const sections = sliceBodyByHeadings(body);
@@ -7047,8 +7068,15 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
         ?? atomizationImpactFrontMatter.ownerAtomOrMap
         ?? atomizationImpactFrontMatter.owner_atom_or_map
       ),
+      atomCid: normalizeOptionalString(
+        frontData.atomCid
+        ?? frontData.atom_cid
+        ?? atomizationImpactFrontMatter.atomCid
+        ?? atomizationImpactFrontMatter.atom_cid
+      ),
       mapUpdates
     },
+    ...(proposalAdmission ? { proposalAdmission } : {}),
     legacyImportAliases: {
       ...(frontData.allowed_files ? { allowed_files: parseYamlList(frontData.allowed_files) } : {}),
       ...(frontData.blocked_by ? { blocked_by: parseYamlList(frontData.blocked_by) } : {}),
@@ -7065,6 +7093,68 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     },
     importedAt
   };
+}
+
+function parseTaskProposalAdmission(value: unknown): TaskImportRecord['proposalAdmission'] | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  const record = value as Record<string, unknown>;
+  const trigger = normalizeOptionalString(record.trigger);
+  const normalizedTrigger = trigger === 'not-required'
+    || trigger === 'hot-file'
+    || trigger === 'same-file-overlap-risk'
+    || trigger === 'shared-surface-risk'
+    || trigger === 'manual-review-surface'
+    ? trigger
+    : null;
+  if (!normalizedTrigger) {
+    return undefined;
+  }
+  const boundedRegions = parseProposalAdmissionBoundedRegions(record.boundedRegions);
+  const hotFiles = parseYamlList(record.hotFiles ?? record.hot_files);
+  const summarySubmitted = record.summarySubmitted === true
+    || record.summary_submitted === true
+    || String(record.summarySubmitted ?? record.summary_submitted ?? '').trim().toLowerCase() === 'true';
+  return {
+    trigger: normalizedTrigger,
+    summarySubmitted,
+    ...(boundedRegions.length > 0 ? { boundedRegions } : {}),
+    ...(hotFiles.length > 0 ? { hotFiles } : {}),
+    ...(normalizeOptionalString(record.notes) ? { notes: normalizeOptionalString(record.notes) } : {})
+  };
+}
+
+function parseProposalAdmissionBoundedRegions(value: unknown): readonly {
+  readonly filePath: string;
+  readonly lineStart: number;
+  readonly lineEnd: number;
+}[] {
+  const source = Array.isArray(value)
+    ? value
+    : Array.isArray((value as Record<string, unknown> | null)?.boundedRegions)
+      ? (value as Record<string, unknown>).boundedRegions as unknown[]
+      : Array.isArray((value as Record<string, unknown> | null)?.bounded_regions)
+        ? (value as Record<string, unknown>).bounded_regions as unknown[]
+        : null;
+  if (!source) {
+    return [];
+  }
+  const output: Array<{ filePath: string; lineStart: number; lineEnd: number }> = [];
+  for (const entry of source) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      continue;
+    }
+    const record = entry as Record<string, unknown>;
+    const filePath = normalizeOptionalString(record.filePath)?.replace(/\\/g, '/');
+    const lineStart = typeof record.lineStart === 'number' ? record.lineStart : Number.parseInt(String(record.lineStart ?? ''), 10);
+    const lineEnd = typeof record.lineEnd === 'number' ? record.lineEnd : Number.parseInt(String(record.lineEnd ?? ''), 10);
+    if (!filePath || !Number.isInteger(lineStart) || !Number.isInteger(lineEnd) || lineStart <= 0 || lineEnd < lineStart) {
+      continue;
+    }
+    output.push({ filePath, lineStart, lineEnd });
+  }
+  return output;
 }
 
 interface RosterRowLocation {

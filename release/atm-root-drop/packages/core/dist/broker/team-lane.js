@@ -313,8 +313,8 @@ export function brokerLaneToFindings(result) {
 function deriveTeamAtomRefs(task, taskId) {
     const atomizationImpact = task?.atomizationImpact;
     const ownerAtom = String(atomizationImpact?.ownerAtomOrMap ?? atomizationImpact?.owner_atom_or_map ?? taskId).trim();
-    const atomCid = taskId.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const firstRegion = deriveBoundedRegions(task)[0];
+    const atomCid = deriveTeamAtomCid(task, ownerAtom, taskId, firstRegion);
     return [{
             atomId: ownerAtom,
             atomCid,
@@ -327,6 +327,25 @@ function deriveTeamAtomRefs(task, taskId) {
                 }
             } : {})
         }];
+}
+function deriveTeamAtomCid(task, ownerAtom, taskId, firstRegion) {
+    const atomizationImpact = task?.atomizationImpact;
+    const proposalAdmission = asRecord(task?.proposalAdmission) ?? asRecord(task?.brokerProposalAdmission);
+    const explicitAtomCid = normalizeOptionalString(atomizationImpact?.atomCid
+        ?? atomizationImpact?.atom_cid
+        ?? task?.atomCid
+        ?? task?.atom_cid
+        ?? proposalAdmission?.atomCid
+        ?? proposalAdmission?.atom_cid);
+    if (explicitAtomCid) {
+        return explicitAtomCid;
+    }
+    const base = toSyntheticAtomSlug(ownerAtom || taskId);
+    if (!firstRegion) {
+        return base;
+    }
+    const fileComponent = path.posix.basename(firstRegion.filePath).replace(/\.[^.]+$/, '');
+    return `${base}-${toSyntheticAtomSlug(fileComponent)}-${firstRegion.lineStart}-${firstRegion.lineEnd}`;
 }
 function deriveTeamProposalAdmission(task, hotFiles) {
     const raw = asRecord(task?.proposalAdmission)
@@ -412,6 +431,15 @@ function normalizePositiveInteger(value) {
     }
     return null;
 }
+function normalizeOptionalString(value) {
+    return typeof value === 'string' && value.trim().length > 0
+        ? value.trim()
+        : null;
+}
+function toSyntheticAtomSlug(value) {
+    const normalized = value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return normalized || 'unknown-atom';
+}
 function asRecord(value) {
     return value && typeof value === 'object' && !Array.isArray(value)
         ? value
@@ -419,4 +447,94 @@ function asRecord(value) {
 }
 function asArray(value) {
     return Array.isArray(value) ? value : null;
+}
+function toProposalAdmissionRequest(admission) {
+    if (!admission) {
+        return undefined;
+    }
+    return {
+        trigger: admission.trigger,
+        summarySubmitted: admission.summarySubmitted,
+        ...(admission.boundedRegions.length > 0 ? { boundedRegions: admission.boundedRegions } : {}),
+        ...(admission.hotFiles.length > 0 ? { hotFiles: admission.hotFiles } : {}),
+        ...(admission.reason ? { notes: admission.reason } : {})
+    };
+}
+function rehydrateWriteIntentFromActiveIntent(activeIntent) {
+    const atomRefs = activeIntent.resourceKeys.atomIds.map((atomId, index) => {
+        const atomCid = activeIntent.resourceKeys.atomCids[index] ?? toSyntheticAtomSlug(atomId);
+        const sourceRange = activeIntent.resourceKeys.atomRanges?.find((range) => range.atomCid === atomCid);
+        return {
+            atomId,
+            atomCid,
+            operation: 'modify',
+            ...(sourceRange ? {
+                sourceRange: {
+                    filePath: sourceRange.filePath,
+                    lineStart: sourceRange.lineStart,
+                    lineEnd: sourceRange.lineEnd
+                }
+            } : {})
+        };
+    });
+    return {
+        schemaId: 'atm.writeIntent.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'rehydrated from active write intent' },
+        taskId: activeIntent.taskId,
+        actorId: activeIntent.actorId,
+        baseCommit: activeIntent.baseCommit,
+        targetFiles: activeIntent.resourceKeys.files,
+        atomRefs,
+        sharedSurfaces: {
+            generators: activeIntent.resourceKeys.generators,
+            projections: activeIntent.resourceKeys.projections,
+            registries: activeIntent.resourceKeys.registries,
+            validators: activeIntent.resourceKeys.validators,
+            artifacts: activeIntent.resourceKeys.artifacts
+        },
+        requestedLane: 'auto',
+        ...(activeIntent.admission ? { proposalAdmission: toProposalAdmissionRequest(activeIntent.admission) } : {})
+    };
+}
+export function projectTeamBrokerRearbitrationSnapshot(input) {
+    const shadowRegistry = {
+        schemaId: 'atm.writeBrokerRegistry.v1',
+        specVersion: '0.1.0',
+        repoId: 'local-repo',
+        workspaceId: 'main',
+        currentEpoch: input.registry.currentEpoch ?? Date.now(),
+        activeIntents: input.registry.activeIntents.filter((entry) => entry.intentId !== input.activeIntent.intentId)
+    };
+    const effectiveDecision = calculateBrokerDecision(rehydrateWriteIntentFromActiveIntent(input.activeIntent), shadowRegistry);
+    const effectiveLane = resolveTeamBrokerLane(effectiveDecision);
+    return {
+        observedAt: new Date().toISOString(),
+        triggerTaskId: input.triggerTaskId,
+        triggerActorId: input.triggerActorId,
+        registeredLane: input.activeIntent.lane === 'neutral-steward' ? 'neutral-steward' : input.activeIntent.lane,
+        registeredDecision: {
+            schemaId: 'atm.brokerDecision.v1',
+            specVersion: '0.1.0',
+            migration: { strategy: 'none', fromVersion: null, notes: 'registered active intent snapshot' },
+            intentId: input.activeIntent.intentId,
+            taskId: input.activeIntent.taskId,
+            verdict: input.activeIntent.lane === 'blocked'
+                ? 'blocked-active-lease'
+                : input.activeIntent.lane === 'deterministic-composer'
+                    ? 'needs-physical-split'
+                    : input.activeIntent.lane === 'serial'
+                        ? 'serial'
+                        : 'parallel-safe',
+            lane: input.activeIntent.lane,
+            conflicts: [],
+            applyMethod: input.activeIntent.lane === 'deterministic-composer' ? 'patch-apply' : 'none',
+            reason: 'Registered active intent snapshot.',
+            ...(input.activeIntent.admission ? { admission: input.activeIntent.admission } : {})
+        },
+        effectiveDecision,
+        effectiveChosenLane: effectiveLane.chosenLane,
+        effectiveSafeToStart: effectiveLane.safeToStart,
+        effectiveBlockedReasons: effectiveLane.blockedReasons
+    };
 }

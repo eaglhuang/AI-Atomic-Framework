@@ -41,7 +41,19 @@ export interface TaskImportRecord {
     readonly rollbackNotes?: string | null;
     readonly atomizationImpact?: {
         readonly ownerAtomOrMap?: string | null;
+        readonly atomCid?: string | null;
         readonly mapUpdates?: readonly string[];
+    };
+    readonly proposalAdmission?: {
+        readonly trigger: 'not-required' | 'hot-file' | 'same-file-overlap-risk' | 'shared-surface-risk' | 'manual-review-surface';
+        readonly summarySubmitted: boolean;
+        readonly boundedRegions?: readonly {
+            readonly filePath: string;
+            readonly lineStart: number;
+            readonly lineEnd: number;
+        }[];
+        readonly hotFiles?: readonly string[];
+        readonly notes?: string | null;
     };
     readonly legacyImportAliases?: Record<string, readonly string[] | string>;
     readonly importDiagnostics?: readonly TaskCardImportDiagnostic[];

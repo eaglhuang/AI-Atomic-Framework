@@ -6,7 +6,7 @@ import { loadRegistry, saveRegistry, registerIntent, renewIntentLease, releaseTa
 import { calculateBrokerDecision } from '../../../core/dist/broker/decision.js';
 import { composeBrokerProposals } from '../../../core/dist/broker/compose.js';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../core/dist/broker/steward.js';
-import { buildTeamBrokerRuntimeActivationHandshake, buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope } from '../../../core/dist/broker/team-lane.js';
+import { buildTeamBrokerRuntimeActivationHandshake, buildTeamBrokerRunRecord, buildTeamBrokerRunRecordEnvelope, projectTeamBrokerRearbitrationSnapshot } from '../../../core/dist/broker/team-lane.js';
 import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerProposalSummaries, loadBrokerProposalStore, readBrokerProposalFile, saveBrokerProposalStore, upsertBrokerProposalStore, validateBrokerProposal } from '../../../core/dist/broker/proposal.js';
 import { defaultAdapterRegistry, resolveAdapter } from '../../../core/dist/broker/adapters/registry.js';
 import { planMutationBatch } from '../../../core/dist/broker/adapters/batch-planner.js';
@@ -27,7 +27,7 @@ export async function runBroker(argv) {
             throw new CliError('ATM_FILE_NOT_FOUND', `Intent file not found: ${options.intentFile}`, { exitCode: 1 });
         }
         const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8'));
-        let registry = loadRegistry(registryPath);
+        let registry = cleanupStale(loadRegistry(registryPath));
         const decision = calculateBrokerDecision(newIntent, registry);
         const conflictMatrix = decision.conflictMatrix;
         const isBrokerSafe = decision.verdict !== 'blocked-cid-conflict'
@@ -36,6 +36,7 @@ export async function runBroker(argv) {
         // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
         registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds, decision.admission);
         saveRegistry(registryPath, registry);
+        syncTeamRunRearbitrationSnapshots(options.cwd, registry, newIntent.taskId, newIntent.actorId);
         return makeResult({
             ok: isBrokerSafe,
             command: 'broker',
@@ -56,7 +57,7 @@ export async function runBroker(argv) {
         if (!options.actorId) {
             throw new CliError('ATM_CLI_USAGE', 'broker heartbeat requires --actor <actor-id>.', { exitCode: 2 });
         }
-        let registry = loadRegistry(registryPath);
+        let registry = cleanupStale(loadRegistry(registryPath));
         registry = renewIntentLease(registry, options.task, options.actorId, options.ttlSeconds);
         saveRegistry(registryPath, registry);
         return makeResult({
@@ -82,7 +83,7 @@ export async function runBroker(argv) {
             throw new CliError('ATM_FILE_NOT_FOUND', `Intent file not found: ${options.intentFile}`, { exitCode: 1 });
         }
         const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8'));
-        const registry = loadRegistry(registryPath);
+        const registry = cleanupStale(loadRegistry(registryPath));
         const decision = calculateBrokerDecision(newIntent, registry);
         return makeResult({
             ok: true,
@@ -97,7 +98,13 @@ export async function runBroker(argv) {
         });
     }
     if (options.action === 'status') {
-        const registry = loadRegistry(registryPath);
+        const registry = cleanupStale(loadRegistry(registryPath));
+        const effectiveIntents = registry.activeIntents.map((activeIntent) => projectTeamBrokerRearbitrationSnapshot({
+            activeIntent,
+            registry,
+            triggerTaskId: activeIntent.taskId,
+            triggerActorId: activeIntent.actorId
+        }));
         return makeResult({
             ok: true,
             command: 'broker',
@@ -108,6 +115,7 @@ export async function runBroker(argv) {
             evidence: {
                 registryPath: '.atm/runtime/write-broker.registry.json',
                 activeIntents: registry.activeIntents,
+                effectiveIntents,
                 admissionStates: registry.activeIntents.map((intent) => ({
                     taskId: intent.taskId,
                     actorId: intent.actorId,
@@ -122,7 +130,7 @@ export async function runBroker(argv) {
         if (!options.task) {
             throw new CliError('ATM_CLI_USAGE', 'broker release requires --task <task-id>.', { exitCode: 2 });
         }
-        let registry = loadRegistry(registryPath);
+        let registry = cleanupStale(loadRegistry(registryPath));
         registry = releaseTask(registry, options.task);
         saveRegistry(registryPath, registry);
         return makeResult({
@@ -139,7 +147,7 @@ export async function runBroker(argv) {
         });
     }
     if (options.action === 'cleanup') {
-        let registry = loadRegistry(registryPath);
+        let registry = cleanupStale(loadRegistry(registryPath));
         registry = cleanupStale(registry);
         saveRegistry(registryPath, registry);
         return makeResult({
@@ -697,6 +705,63 @@ export async function runBroker(argv) {
         });
     }
     throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+function syncTeamRunRearbitrationSnapshots(cwd, registry, triggerTaskId, triggerActorId) {
+    const teamRunDir = path.join(cwd, '.atm', 'runtime', 'team-runs');
+    if (!existsSync(teamRunDir)) {
+        return;
+    }
+    const latestRunByTask = new Map();
+    const entries = readdirSync(teamRunDir, { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+        .map((entry) => path.join(teamRunDir, entry.name))
+        .sort();
+    for (const filePath of entries) {
+        try {
+            const payload = JSON.parse(readFileSync(filePath, 'utf8'));
+            if (payload.schemaId !== 'atm.teamRun.v1') {
+                continue;
+            }
+            const taskId = typeof payload.taskId === 'string' ? payload.taskId : '';
+            if (!taskId) {
+                continue;
+            }
+            const current = latestRunByTask.get(taskId);
+            const currentStamp = typeof current?.payload.updatedAt === 'string' ? current.payload.updatedAt : '';
+            const nextStamp = typeof payload.updatedAt === 'string' ? payload.updatedAt : '';
+            if (!current || nextStamp >= currentStamp) {
+                latestRunByTask.set(taskId, { filePath, payload });
+            }
+        }
+        catch {
+            // ignore malformed runtime files
+        }
+    }
+    for (const activeIntent of registry.activeIntents) {
+        const teamRun = latestRunByTask.get(activeIntent.taskId);
+        if (!teamRun) {
+            continue;
+        }
+        const brokerLane = teamRun.payload.brokerLane;
+        if (!brokerLane || typeof brokerLane !== 'object' || Array.isArray(brokerLane)) {
+            continue;
+        }
+        const snapshot = projectTeamBrokerRearbitrationSnapshot({
+            activeIntent,
+            registry,
+            triggerTaskId,
+            triggerActorId
+        });
+        const updated = {
+            ...teamRun.payload,
+            brokerLane: {
+                ...brokerLane,
+                rearbitration: snapshot
+            },
+            updatedAt: snapshot.observedAt
+        };
+        writeFileSync(teamRun.filePath, `${JSON.stringify(updated, null, 2)}\n`, 'utf8');
+    }
 }
 function classifyExplicitMutationRequest(request) {
     const missingInputs = [];

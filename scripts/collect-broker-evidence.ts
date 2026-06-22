@@ -454,9 +454,14 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
   const brokerLaneObject = brokerLane && typeof brokerLane === 'object'
     ? brokerLane as Record<string, unknown>
     : null;
+  const rearbitration = brokerLaneObject?.rearbitration && typeof brokerLaneObject.rearbitration === 'object'
+    ? brokerLaneObject.rearbitration as Record<string, unknown>
+    : null;
   const writeIntent = brokerLaneObject?.writeIntent;
   const writeTransaction = brokerLaneObject?.writeTransaction;
-  const decision = brokerLaneObject?.decision;
+  const decision = (rearbitration?.effectiveDecision && typeof rearbitration.effectiveDecision === 'object'
+    ? rearbitration.effectiveDecision
+    : brokerLaneObject?.decision) as Record<string, unknown> | undefined;
   const identities = new Set<string>();
   const actors = new Set<string>();
   const files = new Set<string>();
@@ -497,7 +502,7 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
   }
 
   const admissionState = deriveAdmissionStateFromBrokerLane(brokerLane);
-  const rawLane = firstStringByKey(decision ?? brokerLane, new Set(['chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
+  const rawLane = firstStringByKey(rearbitration ?? decision ?? brokerLane, new Set(['effectiveChosenLane', 'chosenLane', 'lane', 'lane_decision'])) ?? 'team-broker-lane';
   const rawVerdict = firstStringByKey(decision ?? brokerLane, new Set(['verdict', 'merge_verdict'])) ?? 'recorded';
   const lane = admissionState && admissionState !== 'not-required'
     ? `${rawLane}:${admissionState}`

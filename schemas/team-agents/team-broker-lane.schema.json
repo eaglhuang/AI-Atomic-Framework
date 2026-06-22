@@ -241,6 +241,125 @@
     },
     "blockedReasons": {
       "$ref": "#/$defs/stringList"
+    },
+    "rearbitration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observedAt",
+        "triggerTaskId",
+        "triggerActorId",
+        "registeredLane",
+        "registeredDecision",
+        "effectiveDecision",
+        "effectiveChosenLane",
+        "effectiveSafeToStart",
+        "effectiveBlockedReasons"
+      ],
+      "properties": {
+        "observedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "triggerTaskId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "triggerActorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "registeredLane": {
+          "enum": [
+            "direct-brokered",
+            "deterministic-composer",
+            "neutral-steward",
+            "serial",
+            "blocked"
+          ]
+        },
+        "registeredDecision": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["verdict", "lane", "reason", "conflicts"],
+          "properties": {
+            "verdict": {
+              "enum": [
+                "parallel-safe",
+                "needs-physical-split",
+                "blocked-cid-conflict",
+                "blocked-shared-surface",
+                "serial",
+                "blocked-active-lease"
+              ]
+            },
+            "lane": {
+              "enum": [
+                "direct-brokered",
+                "deterministic-composer",
+                "neutral-steward",
+                "serial",
+                "blocked"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "conflicts": {
+              "type": "array"
+            }
+          }
+        },
+        "effectiveDecision": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["verdict", "lane", "reason", "conflicts"],
+          "properties": {
+            "verdict": {
+              "enum": [
+                "parallel-safe",
+                "needs-physical-split",
+                "blocked-cid-conflict",
+                "blocked-shared-surface",
+                "serial",
+                "blocked-active-lease"
+              ]
+            },
+            "lane": {
+              "enum": [
+                "direct-brokered",
+                "deterministic-composer",
+                "neutral-steward",
+                "serial",
+                "blocked"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "conflicts": {
+              "type": "array"
+            }
+          }
+        },
+        "effectiveChosenLane": {
+          "enum": [
+            "direct-brokered",
+            "deterministic-composer",
+            "neutral-steward",
+            "serial",
+            "blocked"
+          ]
+        },
+        "effectiveSafeToStart": {
+          "type": "boolean"
+        },
+        "effectiveBlockedReasons": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
     }
   },
   "$defs": {

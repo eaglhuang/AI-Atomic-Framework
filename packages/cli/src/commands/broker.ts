@@ -20,7 +20,8 @@ import {
 import {
   buildTeamBrokerRuntimeActivationHandshake,
   buildTeamBrokerRunRecord,
-  buildTeamBrokerRunRecordEnvelope
+  buildTeamBrokerRunRecordEnvelope,
+  projectTeamBrokerRearbitrationSnapshot
 } from '../../../core/src/broker/team-lane.ts';
 import {
   defaultBrokerProposalStoreRelativePath,
@@ -72,7 +73,7 @@ export async function runBroker(argv: string[]) {
     }
 
     const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8')) as WriteIntent;
-    let registry = loadRegistry(registryPath);
+    let registry = cleanupStale(loadRegistry(registryPath));
     const decision = calculateBrokerDecision(newIntent, registry);
     const conflictMatrix = decision.conflictMatrix;
     const isBrokerSafe = decision.verdict !== 'blocked-cid-conflict'
@@ -82,6 +83,7 @@ export async function runBroker(argv: string[]) {
     // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
     registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds, decision.admission);
     saveRegistry(registryPath, registry);
+    syncTeamRunRearbitrationSnapshots(options.cwd, registry, newIntent.taskId, newIntent.actorId);
 
     return makeResult({
       ok: isBrokerSafe,
@@ -109,7 +111,7 @@ export async function runBroker(argv: string[]) {
     if (!options.actorId) {
       throw new CliError('ATM_CLI_USAGE', 'broker heartbeat requires --actor <actor-id>.', { exitCode: 2 });
     }
-    let registry = loadRegistry(registryPath);
+    let registry = cleanupStale(loadRegistry(registryPath));
     registry = renewIntentLease(registry, options.task, options.actorId, options.ttlSeconds);
     saveRegistry(registryPath, registry);
 
@@ -138,7 +140,7 @@ export async function runBroker(argv: string[]) {
     }
 
     const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8')) as WriteIntent;
-    const registry = loadRegistry(registryPath);
+    const registry = cleanupStale(loadRegistry(registryPath));
     const decision = calculateBrokerDecision(newIntent, registry);
 
     return makeResult({
@@ -155,7 +157,15 @@ export async function runBroker(argv: string[]) {
   }
 
   if (options.action === 'status') {
-    const registry = loadRegistry(registryPath);
+    const registry = cleanupStale(loadRegistry(registryPath));
+    const effectiveIntents = registry.activeIntents.map((activeIntent) =>
+      projectTeamBrokerRearbitrationSnapshot({
+        activeIntent,
+        registry,
+        triggerTaskId: activeIntent.taskId,
+        triggerActorId: activeIntent.actorId
+      })
+    );
     return makeResult({
       ok: true,
       command: 'broker',
@@ -166,6 +176,7 @@ export async function runBroker(argv: string[]) {
       evidence: {
         registryPath: '.atm/runtime/write-broker.registry.json',
         activeIntents: registry.activeIntents,
+        effectiveIntents,
         admissionStates: registry.activeIntents.map((intent) => ({
           taskId: intent.taskId,
           actorId: intent.actorId,
@@ -181,7 +192,7 @@ export async function runBroker(argv: string[]) {
     if (!options.task) {
       throw new CliError('ATM_CLI_USAGE', 'broker release requires --task <task-id>.', { exitCode: 2 });
     }
-    let registry = loadRegistry(registryPath);
+    let registry = cleanupStale(loadRegistry(registryPath));
     registry = releaseTask(registry, options.task);
     saveRegistry(registryPath, registry);
 
@@ -200,7 +211,7 @@ export async function runBroker(argv: string[]) {
   }
 
   if (options.action === 'cleanup') {
-    let registry = loadRegistry(registryPath);
+    let registry = cleanupStale(loadRegistry(registryPath));
     registry = cleanupStale(registry);
     saveRegistry(registryPath, registry);
 
@@ -836,6 +847,70 @@ export async function runBroker(argv: string[]) {
   }
 
   throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+
+function syncTeamRunRearbitrationSnapshots(
+  cwd: string,
+  registry: ReturnType<typeof loadRegistry>,
+  triggerTaskId: string,
+  triggerActorId: string
+) {
+  const teamRunDir = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  if (!existsSync(teamRunDir)) {
+    return;
+  }
+  const latestRunByTask = new Map<string, { filePath: string; payload: Record<string, unknown> }>();
+  const entries = readdirSync(teamRunDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.join(teamRunDir, entry.name))
+    .sort();
+
+  for (const filePath of entries) {
+    try {
+      const payload = JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+      if (payload.schemaId !== 'atm.teamRun.v1') {
+        continue;
+      }
+      const taskId = typeof payload.taskId === 'string' ? payload.taskId : '';
+      if (!taskId) {
+        continue;
+      }
+      const current = latestRunByTask.get(taskId);
+      const currentStamp = typeof current?.payload.updatedAt === 'string' ? current.payload.updatedAt : '';
+      const nextStamp = typeof payload.updatedAt === 'string' ? payload.updatedAt : '';
+      if (!current || nextStamp >= currentStamp) {
+        latestRunByTask.set(taskId, { filePath, payload });
+      }
+    } catch {
+      // ignore malformed runtime files
+    }
+  }
+
+  for (const activeIntent of registry.activeIntents) {
+    const teamRun = latestRunByTask.get(activeIntent.taskId);
+    if (!teamRun) {
+      continue;
+    }
+    const brokerLane = teamRun.payload.brokerLane;
+    if (!brokerLane || typeof brokerLane !== 'object' || Array.isArray(brokerLane)) {
+      continue;
+    }
+    const snapshot = projectTeamBrokerRearbitrationSnapshot({
+      activeIntent,
+      registry,
+      triggerTaskId,
+      triggerActorId
+    });
+    const updated = {
+      ...teamRun.payload,
+      brokerLane: {
+        ...(brokerLane as Record<string, unknown>),
+        rearbitration: snapshot
+      },
+      updatedAt: snapshot.observedAt
+    };
+    writeFileSync(teamRun.filePath, `${JSON.stringify(updated, null, 2)}\n`, 'utf8');
+  }
 }
 
 function classifyExplicitMutationRequest(request: MutationRequest): {

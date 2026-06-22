@@ -7,6 +7,7 @@ import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry } from './reg
 import { readGitHeadCommit } from './steward.ts';
 import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
 import type {
+  ActiveWriteIntent,
   ProposalAdmissionBoundedRegion,
   ProposalAdmissionEvidence,
   ProposalAdmissionRequest,
@@ -42,6 +43,7 @@ export interface TeamBrokerLaneEvidence {
   readonly composerPath: string | null;
   readonly safeToStart: boolean;
   readonly blockedReasons: readonly string[];
+  readonly rearbitration?: TeamBrokerRearbitrationSnapshot;
 }
 
 export interface TeamBrokerLaneResult {
@@ -109,6 +111,18 @@ export interface TeamBrokerFinding {
   readonly code: string;
   readonly detail: string;
   readonly paths?: string[];
+}
+
+export interface TeamBrokerRearbitrationSnapshot {
+  readonly observedAt: string;
+  readonly triggerTaskId: string;
+  readonly triggerActorId: string;
+  readonly registeredLane: TeamBrokerChosenLane;
+  readonly registeredDecision: BrokerDecision;
+  readonly effectiveDecision: BrokerDecision;
+  readonly effectiveChosenLane: TeamBrokerChosenLane;
+  readonly effectiveSafeToStart: boolean;
+  readonly effectiveBlockedReasons: readonly string[];
 }
 
 export interface BrokerRunRecordInput {
@@ -493,8 +507,8 @@ export function brokerLaneToFindings(result: TeamBrokerLaneResult): TeamBrokerFi
 function deriveTeamAtomRefs(task: Record<string, unknown> | null, taskId: string): WriteIntentAtomRef[] {
   const atomizationImpact = task?.atomizationImpact as Record<string, unknown> | undefined;
   const ownerAtom = String(atomizationImpact?.ownerAtomOrMap ?? atomizationImpact?.owner_atom_or_map ?? taskId).trim();
-  const atomCid = taskId.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const firstRegion = deriveBoundedRegions(task)[0];
+  const atomCid = deriveTeamAtomCid(task, ownerAtom, taskId, firstRegion);
   return [{
     atomId: ownerAtom,
     atomCid,
@@ -507,6 +521,33 @@ function deriveTeamAtomRefs(task: Record<string, unknown> | null, taskId: string
       }
     } : {})
   }];
+}
+
+function deriveTeamAtomCid(
+  task: Record<string, unknown> | null,
+  ownerAtom: string,
+  taskId: string,
+  firstRegion: ProposalAdmissionBoundedRegion | undefined
+): string {
+  const atomizationImpact = task?.atomizationImpact as Record<string, unknown> | undefined;
+  const proposalAdmission = asRecord(task?.proposalAdmission) ?? asRecord(task?.brokerProposalAdmission);
+  const explicitAtomCid = normalizeOptionalString(
+    atomizationImpact?.atomCid
+    ?? atomizationImpact?.atom_cid
+    ?? task?.atomCid
+    ?? task?.atom_cid
+    ?? proposalAdmission?.atomCid
+    ?? proposalAdmission?.atom_cid
+  );
+  if (explicitAtomCid) {
+    return explicitAtomCid;
+  }
+  const base = toSyntheticAtomSlug(ownerAtom || taskId);
+  if (!firstRegion) {
+    return base;
+  }
+  const fileComponent = path.posix.basename(firstRegion.filePath).replace(/\.[^.]+$/, '');
+  return `${base}-${toSyntheticAtomSlug(fileComponent)}-${firstRegion.lineStart}-${firstRegion.lineEnd}`;
 }
 
 function deriveTeamProposalAdmission(
@@ -608,6 +649,17 @@ function normalizePositiveInteger(value: unknown): number | null {
   return null;
 }
 
+function normalizeOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0
+    ? value.trim()
+    : null;
+}
+
+function toSyntheticAtomSlug(value: string): string {
+  const normalized = value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  return normalized || 'unknown-atom';
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
@@ -616,4 +668,105 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 
 function asArray(value: unknown): readonly unknown[] | null {
   return Array.isArray(value) ? value : null;
+}
+
+function toProposalAdmissionRequest(admission: ProposalAdmissionEvidence | undefined): ProposalAdmissionRequest | undefined {
+  if (!admission) {
+    return undefined;
+  }
+  return {
+    trigger: admission.trigger,
+    summarySubmitted: admission.summarySubmitted,
+    ...(admission.boundedRegions.length > 0 ? { boundedRegions: admission.boundedRegions } : {}),
+    ...(admission.hotFiles.length > 0 ? { hotFiles: admission.hotFiles } : {}),
+    ...(admission.reason ? { notes: admission.reason } : {})
+  };
+}
+
+function rehydrateWriteIntentFromActiveIntent(activeIntent: ActiveWriteIntent): WriteIntent {
+  const atomRefs: WriteIntentAtomRef[] = activeIntent.resourceKeys.atomIds.map((atomId, index) => {
+    const atomCid = activeIntent.resourceKeys.atomCids[index] ?? toSyntheticAtomSlug(atomId);
+    const sourceRange = activeIntent.resourceKeys.atomRanges?.find((range) => range.atomCid === atomCid);
+    return {
+      atomId,
+      atomCid,
+      operation: 'modify' as const,
+      ...(sourceRange ? {
+        sourceRange: {
+          filePath: sourceRange.filePath,
+          lineStart: sourceRange.lineStart,
+          lineEnd: sourceRange.lineEnd
+        }
+      } : {})
+    };
+  });
+  return {
+    schemaId: 'atm.writeIntent.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'rehydrated from active write intent' },
+    taskId: activeIntent.taskId,
+    actorId: activeIntent.actorId,
+    baseCommit: activeIntent.baseCommit,
+    targetFiles: activeIntent.resourceKeys.files,
+    atomRefs,
+    sharedSurfaces: {
+      generators: activeIntent.resourceKeys.generators,
+      projections: activeIntent.resourceKeys.projections,
+      registries: activeIntent.resourceKeys.registries,
+      validators: activeIntent.resourceKeys.validators,
+      artifacts: activeIntent.resourceKeys.artifacts
+    },
+    requestedLane: 'auto',
+    ...(activeIntent.admission ? { proposalAdmission: toProposalAdmissionRequest(activeIntent.admission) } : {})
+  };
+}
+
+export function projectTeamBrokerRearbitrationSnapshot(input: {
+  readonly activeIntent: ActiveWriteIntent;
+  readonly registry: { readonly activeIntents: readonly ActiveWriteIntent[]; readonly currentEpoch?: number };
+  readonly triggerTaskId: string;
+  readonly triggerActorId: string;
+}): TeamBrokerRearbitrationSnapshot {
+  const shadowRegistry = {
+    schemaId: 'atm.writeBrokerRegistry.v1' as const,
+    specVersion: '0.1.0' as const,
+    repoId: 'local-repo',
+    workspaceId: 'main',
+    currentEpoch: input.registry.currentEpoch ?? Date.now(),
+    activeIntents: input.registry.activeIntents.filter((entry) => entry.intentId !== input.activeIntent.intentId)
+  };
+  const effectiveDecision = calculateBrokerDecision(
+    rehydrateWriteIntentFromActiveIntent(input.activeIntent),
+    shadowRegistry
+  );
+  const effectiveLane = resolveTeamBrokerLane(effectiveDecision);
+  return {
+    observedAt: new Date().toISOString(),
+    triggerTaskId: input.triggerTaskId,
+    triggerActorId: input.triggerActorId,
+    registeredLane: input.activeIntent.lane === 'neutral-steward' ? 'neutral-steward' : input.activeIntent.lane,
+    registeredDecision: {
+      schemaId: 'atm.brokerDecision.v1',
+      specVersion: '0.1.0',
+      migration: { strategy: 'none', fromVersion: null, notes: 'registered active intent snapshot' },
+      intentId: input.activeIntent.intentId,
+      taskId: input.activeIntent.taskId,
+      verdict: input.activeIntent.lane === 'blocked'
+        ? 'blocked-active-lease'
+        : input.activeIntent.lane === 'deterministic-composer'
+          ? 'needs-physical-split'
+          : input.activeIntent.lane === 'serial'
+            ? 'serial'
+            : 'parallel-safe',
+      lane: input.activeIntent.lane,
+      conflicts: [],
+      applyMethod: input.activeIntent.lane === 'deterministic-composer' ? 'patch-apply' : 'none',
+      reason: 'Registered active intent snapshot.',
+      ...(input.activeIntent.admission ? { admission: input.activeIntent.admission } : {})
+    },
+    effectiveDecision,
+    effectiveChosenLane: effectiveLane.chosenLane,
+    effectiveSafeToStart: effectiveLane.safeToStart,
+    effectiveBlockedReasons: effectiveLane.blockedReasons
+  };
 }

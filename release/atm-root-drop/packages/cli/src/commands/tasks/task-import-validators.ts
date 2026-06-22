@@ -34,6 +34,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
   let currentKey: string | null = null;
   let currentObjectKey: string | null = null;
   let currentObjectListKey: string | null = null;
+  let currentObjectListItem: Record<string, unknown> | null = null;
   for (const rawLine of block.split(/\r?\n/)) {
     const line = rawLine;
     if (/^[A-Za-z_][A-Za-z0-9_]*\s*:/.test(line)) {
@@ -43,6 +44,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
       currentKey = key;
       currentObjectKey = value.length === 0 ? key : null;
       currentObjectListKey = null;
+      currentObjectListItem = null;
       data[key] = value;
       continue;
     }
@@ -57,6 +59,26 @@ export function extractFrontMatter(text: string): FrontMatter | null {
       objectRecord[key] = value;
       data[currentObjectKey] = objectRecord;
       currentObjectListKey = value.length === 0 ? key : null;
+      currentObjectListItem = null;
+      continue;
+    }
+    const objectListObjectMatch = /^ {4}-\s*([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
+    if (currentObjectKey && currentObjectListKey && objectListObjectMatch) {
+      const objectRecord = data[currentObjectKey] as Record<string, unknown>;
+      const key = objectListObjectMatch[1];
+      const value = objectListObjectMatch[2].trim();
+      const item: Record<string, unknown> = { [key]: value };
+      const existing = objectRecord[currentObjectListKey];
+      objectRecord[currentObjectListKey] = Array.isArray(existing) ? [...existing, item] : [item];
+      data[currentObjectKey] = objectRecord;
+      currentObjectListItem = item;
+      continue;
+    }
+    const objectListObjectFieldMatch = /^ {6}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
+    if (currentObjectKey && currentObjectListKey && currentObjectListItem && objectListObjectFieldMatch) {
+      const key = objectListObjectFieldMatch[1];
+      const value = objectListObjectFieldMatch[2].trim();
+      currentObjectListItem[key] = value;
       continue;
     }
     if (currentObjectKey && currentObjectListKey && /^ {4}-\s+/.test(line)) {
@@ -69,6 +91,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
           ? [existing, value]
           : [value];
       data[currentObjectKey] = objectRecord;
+      currentObjectListItem = null;
       continue;
     }
     if (currentKey && /^\s*-\s+/.test(line)) {
@@ -83,6 +106,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
       } else {
         data[currentKey] = [value];
       }
+      currentObjectListItem = null;
     }
   }
   const endIndex = match.index! + match[0].length;

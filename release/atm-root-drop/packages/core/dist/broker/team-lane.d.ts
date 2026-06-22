@@ -1,5 +1,5 @@
 import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
-import type { ProposalAdmissionEvidence, WriteIntent } from './types.ts';
+import type { ActiveWriteIntent, ProposalAdmissionEvidence, WriteIntent } from './types.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 export declare const DEFAULT_TEAM_STEWARD_ID = "neutral-write-steward";
 export declare const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = ".atm/runtime/write-broker.registry.json";
@@ -20,6 +20,7 @@ export interface TeamBrokerLaneEvidence {
     readonly composerPath: string | null;
     readonly safeToStart: boolean;
     readonly blockedReasons: readonly string[];
+    readonly rearbitration?: TeamBrokerRearbitrationSnapshot;
 }
 export interface TeamBrokerLaneResult {
     readonly ok: boolean;
@@ -83,6 +84,17 @@ export interface TeamBrokerFinding {
     readonly detail: string;
     readonly paths?: string[];
 }
+export interface TeamBrokerRearbitrationSnapshot {
+    readonly observedAt: string;
+    readonly triggerTaskId: string;
+    readonly triggerActorId: string;
+    readonly registeredLane: TeamBrokerChosenLane;
+    readonly registeredDecision: BrokerDecision;
+    readonly effectiveDecision: BrokerDecision;
+    readonly effectiveChosenLane: TeamBrokerChosenLane;
+    readonly effectiveSafeToStart: boolean;
+    readonly effectiveBlockedReasons: readonly string[];
+}
 export interface BrokerRunRecordInput {
     readonly runId: string;
     readonly planId: string;
@@ -142,3 +154,12 @@ export declare function buildTeamBrokerRuntimeActivationHandshake(input: {
     readonly evidencePath?: string | null;
 }): TeamBrokerRuntimeActivationHandshakeResult;
 export declare function brokerLaneToFindings(result: TeamBrokerLaneResult): TeamBrokerFinding[];
+export declare function projectTeamBrokerRearbitrationSnapshot(input: {
+    readonly activeIntent: ActiveWriteIntent;
+    readonly registry: {
+        readonly activeIntents: readonly ActiveWriteIntent[];
+        readonly currentEpoch?: number;
+    };
+    readonly triggerTaskId: string;
+    readonly triggerActorId: string;
+}): TeamBrokerRearbitrationSnapshot;
