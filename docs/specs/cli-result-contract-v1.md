@@ -41,6 +41,10 @@ The bridge projection may also expose:
 - `runnerMode`
 - `frameworkReport`
 - `frameworkClaim`
+- `evidenceSummary`
+- `guardReport`
+- `taskflowReadiness`
+- `commitBundle`
 - `allowedCommands`
 - `blockedCommands`
 - `skillGrowth`
@@ -75,6 +79,31 @@ Use these when the caller is consuming `framework-mode status` or
 framework boundary/status snapshot, while `frameworkClaim` projects the active
 claim scope (`files`, `taskId`, `actorId`, `lock`) without forcing the skill to
 know ATM's deeper evidence nesting.
+
+### `evidenceSummary`
+
+Use this when the caller needs the reusable surface from `evidence run` /
+`evidence add` directly: validator passes, artifact paths, bundle manifest
+location, and command-backed run metadata.
+
+### `guardReport`
+
+Use this when the caller needs stable guard findings without inspecting
+different guard-specific evidence shapes. This projects the common guard-facing
+fields such as `violations`, `findings`, `files`, and optional nested `report`.
+
+### `taskflowReadiness`
+
+Use this for `taskflow pre-close` and `taskflow close` dry-run/write planning.
+It projects the readiness objects that operator-facing skills care about most:
+`writeReadinessHint`, `historicalClosePreflight`, `autoEvidencePlan`, and
+`closebackPathResolution`.
+
+### `commitBundle`
+
+Use this for governed `git commit` dry-run / write flows when the caller needs
+task-scoped staging diagnostics, skipped external dirty files, out-of-scope
+staged files, or the copyable host-git fallback command.
 
 ### `allowedCommands` / `blockedCommands`
 

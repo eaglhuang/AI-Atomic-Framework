@@ -112,6 +112,84 @@ assert.equal(frameworkClaimProjection.frameworkClaim?.action, 'claim');
 assert.deepEqual(frameworkClaimProjection.frameworkClaim?.files, ['packages/cli/src/commands/next.ts']);
 assert.equal(frameworkClaimProjection.frameworkClaim?.linkedTaskId, 'TASK-SKL-0003');
 
+const evidenceProjection = enrichCommandResult(makeResult({
+  ok: true,
+  command: 'evidence',
+  cwd: process.cwd(),
+  messages: [message('info', 'ATM_EVIDENCE_ADDED', 'added', {})],
+  evidence: {
+    action: 'add',
+    taskId: 'TASK-SKL-0004',
+    actorId: 'codex-main',
+    kind: 'test',
+    evidencePath: '.atm/history/evidence/TASK-SKL-0004.json',
+    commandRunCount: 1,
+    commandRunCache: { schemaId: 'atm.commandRunCache.v1', runCount: 1 },
+    bundleManifestPath: '.atm/history/evidence/TASK-SKL-0004.bundle-manifest.json',
+    bundleManifest: {
+      freshValidationPasses: ['git diff --check'],
+      artifactPaths: ['artifacts/report.json']
+    }
+  }
+}));
+assert.equal(evidenceProjection.evidenceSummary?.taskId, 'TASK-SKL-0004');
+assert.deepEqual(evidenceProjection.evidenceSummary?.freshValidationPasses, ['git diff --check']);
+assert.deepEqual(evidenceProjection.evidenceSummary?.artifactPaths, ['artifacts/report.json']);
+
+const guardProjection = enrichCommandResult(makeResult({
+  ok: false,
+  command: 'guard',
+  cwd: process.cwd(),
+  messages: [message('error', 'ATM_GUARD_MUTATION_FAILED', 'failed', {})],
+  evidence: {
+    guard: 'mutation',
+    taskId: 'TASK-SKL-0004',
+    actorId: 'codex-main',
+    files: ['packages/cli/src/commands/taskflow/close-orchestration.ts'],
+    violations: [{ code: 'scope-outside', detail: 'outside scope' }],
+    report: { schemaId: 'atm.guardMutationReport.v1' }
+  }
+}));
+assert.equal(guardProjection.guardReport?.guard, 'mutation');
+assert.equal(Array.isArray(guardProjection.guardReport?.violations), true);
+assert.equal((guardProjection.guardReport?.report as any)?.schemaId, 'atm.guardMutationReport.v1');
+
+const taskflowProjection = enrichCommandResult(makeResult({
+  ok: false,
+  command: 'taskflow pre-close',
+  cwd: process.cwd(),
+  messages: [message('warn', 'ATM_TASKFLOW_PRECLOSE_BLOCKED', 'blocked', {})],
+  evidence: {
+    closeMode: 'normal-close',
+    writeReadinessHint: { schemaId: 'atm.taskflowCloseWriteReadinessHint.v1', status: 'blocked' },
+    historicalClosePreflight: { schemaId: 'atm.historicalClosePreflight.v1', ok: false },
+    autoEvidencePlan: { schemaId: 'atm.autoEvidencePlan.v1', ok: false },
+    closebackPathResolution: { route: 'missing' }
+  }
+}));
+assert.equal((taskflowProjection.taskflowReadiness?.writeReadinessHint as any)?.schemaId, 'atm.taskflowCloseWriteReadinessHint.v1');
+assert.equal((taskflowProjection.taskflowReadiness?.historicalClosePreflight as any)?.schemaId, 'atm.historicalClosePreflight.v1');
+assert.equal(taskflowProjection.taskflowReadiness?.closeMode, 'normal-close');
+
+const commitBundleProjection = enrichCommandResult(makeResult({
+  ok: true,
+  command: 'git',
+  cwd: process.cwd(),
+  messages: [message('info', 'ATM_GIT_COMMIT_BUNDLE_DRY_RUN', 'bundle ready', {})],
+  evidence: {
+    action: 'commit',
+    commitBundle: {
+      schemaId: 'atm.taskScopedCommitBundle.v1',
+      taskId: 'TASK-SKL-0004',
+      ok: true,
+      stageFiles: ['packages/cli/src/commands/taskflow/close-orchestration.ts'],
+      outOfScopeStagedFiles: ['schemas/governance/cli-result.schema.json']
+    }
+  }
+}));
+assert.equal(commitBundleProjection.commitBundle?.schemaId, 'atm.taskScopedCommitBundle.v1');
+assert.deepEqual(commitBundleProjection.commitBundle?.outOfScopeStagedFiles, ['schemas/governance/cli-result.schema.json']);
+
 const usage = enrichCommandResult(makeResult({
   ok: false,
   command: 'help',

@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0004",
+  "title": "Evidence, guard, taskflow, and governed commit tools",
+  "status": "done",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-SKL-0001",
+    "TASK-SKL-0002"
+  ],
+  "acceptance": [
+    "`atm_evidence_run` returns validator summaries, artifact paths, and command-backed evidence metadata.",
+    "`atm_guard_run` exposes pass/fail findings in a stable shape.",
+    "`atm_taskflow_open`, `atm_taskflow_pre_close`, and `atm_taskflow_close` surface readiness hints, blockers, and evidence plans without text scraping.",
+    "`atm_git_commit` exposes commit result, lane diagnostics, and evidence binding metadata.",
+    "Operator-tool output can carry reusable diagnostics that later feed shared skill-growth capture, especially for blocked evidence, guard, close, and commit flows."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/**",
+    "tests/cli/**",
+    "docs/**"
+  ],
+  "tags": [],
+  "notes": "- This card should keep `taskflow` on the official operator lane instead of reusing older ad-hoc `tasks close` style entrypoints.",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0004-evidence-guard-taskflow-governed-commit-tools.task.md",
+    "sectionTitle": "TASK-SKL-0004",
+    "headingLine": 41,
+    "hash": "262abd289006d8e5"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "packages/cli/src/commands/**",
+    "packages/core/src/**",
+    "tests/cli/**",
+    "docs/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not bypass existing taskflow close gates.",
+    "Do not weaken commit trailer or governance evidence binding."
+  ],
+  "nonGoals": [
+    "No full skill migration in this card.",
+    "No remote execution broker."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the operator-tool commit if evidence, guard, close, or commit lanes lose their existing protections.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tool-first-operator-surface",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T16-11-14-468Z-close-e266f4c1c26b",
+  "lastTransitionAt": "2026-06-23T16:11:14.468Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T16:02:41.134Z",
+  "promotedAt": "2026-06-23T16:02:41.137Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-ba48421a8db9",
+    "claimedAt": "2026-06-23T16:02:41.140Z",
+    "heartbeatAt": "2026-06-23T16:11:14.466Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0004.json",
+      "docs/**",
+      "packages/cli/src/commands/**",
+      "packages/core/src/**",
+      "tests/cli/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T16:02:41.140Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623160241-codex-main-TASK-SKL-0004-75ef5ec2ce",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0004",
+    "batchId": "batch-35ec0c2f29a7",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-c719dd9117656950",
+    "queueIndex": 1,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0004.*",
+      ".atm/history/task-events/TASK-SKL-0004/**",
+      ".atm/history/tasks/TASK-SKL-0004.json",
+      "docs/**",
+      "packages/cli/src/commands/**",
+      "packages/core/src/**",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9ed324453c8e9eafc299e521fa34b047fedcf79d982b85b5b714070f00d1dc72",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T16:02:41.370Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T16:11:14.466Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623160241-codex-main-TASK-SKL-0004-75ef5ec2ce",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0004.closure-packet.json"
+}

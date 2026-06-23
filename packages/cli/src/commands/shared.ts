@@ -155,6 +155,10 @@ export interface ToolBridgeProjection {
   runnerMode?: Record<string, unknown> | null;
   frameworkReport?: Record<string, unknown> | null;
   frameworkClaim?: Record<string, unknown> | null;
+  evidenceSummary?: Record<string, unknown> | null;
+  guardReport?: Record<string, unknown> | null;
+  taskflowReadiness?: Record<string, unknown> | null;
+  commitBundle?: Record<string, unknown> | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
   skillGrowth?: Record<string, unknown> | null;
@@ -212,6 +216,47 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
       lock: isRecord(evidence.lock) ? evidence.lock : null
     }
     : null;
+  const evidenceSummary = typeof evidence.action === 'string' && (evidence.action === 'add' || evidence.action === 'run')
+    ? {
+      action: evidence.action,
+      taskId: typeof evidence.taskId === 'string' ? evidence.taskId : null,
+      actorId: typeof evidence.actorId === 'string' ? evidence.actorId : null,
+      kind: typeof evidence.kind === 'string' ? evidence.kind : null,
+      evidencePath: typeof evidence.evidencePath === 'string' ? evidence.evidencePath : null,
+      bundleManifestPath: typeof evidence.bundleManifestPath === 'string' ? evidence.bundleManifestPath : null,
+      artifactPaths: isRecord(evidence.bundleManifest) ? readStringList((evidence.bundleManifest as Record<string, unknown>).artifactPaths) ?? [] : [],
+      freshValidationPasses: isRecord(evidence.bundleManifest) ? readStringList((evidence.bundleManifest as Record<string, unknown>).freshValidationPasses) ?? [] : [],
+      commandRunCount: typeof evidence.commandRunCount === 'number' ? evidence.commandRunCount : null,
+      commandRunCache: isRecord(evidence.commandRunCache) ? evidence.commandRunCache : null
+    }
+    : null;
+  const guardReport = typeof evidence.guard === 'string'
+    ? {
+      guard: evidence.guard,
+      taskId: typeof evidence.taskId === 'string' ? evidence.taskId : null,
+      actorId: typeof evidence.actorId === 'string' ? evidence.actorId : null,
+      files: readStringList(evidence.files) ?? [],
+      violations: Array.isArray(evidence.violations) ? evidence.violations : [],
+      findings: Array.isArray(evidence.findings) ? evidence.findings : [],
+      report: isRecord(evidence.report) ? evidence.report : null,
+      claimLeaseId: typeof evidence.claimLeaseId === 'string' ? evidence.claimLeaseId : null,
+      failOpen: evidence.failOpen === true
+    }
+    : null;
+  const taskflowReadiness = isRecord(evidence.writeReadinessHint) || isRecord(evidence.historicalClosePreflight)
+    ? {
+      writeReadinessHint: isRecord(evidence.writeReadinessHint) ? evidence.writeReadinessHint : null,
+      historicalClosePreflight: isRecord(evidence.historicalClosePreflight) ? evidence.historicalClosePreflight : null,
+      autoEvidencePlan: isRecord(evidence.autoEvidencePlan) ? evidence.autoEvidencePlan : null,
+      closebackPathResolution: isRecord(evidence.closebackPathResolution) ? evidence.closebackPathResolution : null,
+      closeMode: typeof evidence.closeMode === 'string' ? evidence.closeMode : null
+    }
+    : null;
+  const commitBundle = isRecord(evidence.commitBundle)
+    ? evidence.commitBundle
+    : isRecord(evidence.governedCommitBundle)
+      ? evidence.governedCommitBundle
+      : null;
   const skillGrowth = isRecord(evidence.skillGrowth)
     ? evidence.skillGrowth
     : nextAction && isRecord(nextAction.skillGrowth)
@@ -228,6 +273,10 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
     runnerMode,
     frameworkReport,
     frameworkClaim,
+    evidenceSummary,
+    guardReport,
+    taskflowReadiness,
+    commitBundle,
     allowedCommands,
     blockedCommands,
     skillGrowth
