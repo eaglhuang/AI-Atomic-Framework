@@ -2671,7 +2671,7 @@ async function runTasksClose(argv: string[]) {
         }
       });
     }
-    const doneCloseAdmission = evaluateTaskDoneCloseAdmission({
+  const doneCloseAdmission = evaluateTaskDoneCloseAdmission({
       taskId: options.taskId,
       actorId,
       status: taskDocument.status,
@@ -2691,7 +2691,9 @@ async function runTasksClose(argv: string[]) {
     });
   }
 
-  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
+  const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId, {
+    checkpointScoped: options.fromBatchCheckpoint
+  });
   const activeFrameworkStatus = options.status === 'done'
     ? createFrameworkModeStatus({ cwd: options.cwd })
     : null;
@@ -2739,13 +2741,29 @@ async function runTasksClose(argv: string[]) {
         waiverReason: options.reason ?? null
       }).deliverableFiles)
     );
+    const batchCheckpointGovernanceDirtyFiles = options.fromBatchCheckpoint
+      ? closeWorktree.trackedDirtyFiles.filter((entry) => {
+        const normalized = normalizeRelativePath(entry).toLowerCase();
+        const taskIdLower = options.taskId.toLowerCase();
+        return normalized === `.atm/history/evidence/${taskIdLower}.json`
+          || normalized === `.atm/history/tasks/${taskIdLower}.json`
+          || normalized.startsWith(`.atm/history/task-events/${taskIdLower}/`);
+      })
+      : [];
+    const batchCheckpointScopedDirtyFiles = options.fromBatchCheckpoint
+      ? closeWorktree.trackedDirtyFiles.filter((entry) =>
+        taskDeclaredFiles.some((declared) => pathMatchesTaskScope(entry, declared))
+      )
+      : [];
     const allowedAdvisoryGovernanceFiles = options.status === 'done' && effectiveHistoricalDeliveryRefs.length > 0
       ? [
           `.atm/history/evidence/${options.taskId}.json`,
           `.atm/history/tasks/${options.taskId}.json`,
           ...readDeferredForeignStagedFilesForActiveCloseWindow(options.cwd, options.taskId)
         ]
-      : [];
+      : options.fromBatchCheckpoint
+        ? batchCheckpointGovernanceDirtyFiles
+        : [];
     const closeDirtyGuard = evaluateFrameworkCloseDirtyGuard({
       cwd: options.cwd,
       taskId: options.taskId,
@@ -2753,29 +2771,38 @@ async function runTasksClose(argv: string[]) {
       taskDeliverableFiles: extractTaskDeliverableFiles(taskDocument),
       trackedDirtyFiles: closeWorktree.trackedDirtyFiles,
       historicalDeliveredFiles,
-      allowedAdvisoryGovernanceFiles
+      allowedAdvisoryGovernanceFiles,
+      allowedAdvisoryDirtyFiles: options.fromBatchCheckpoint ? batchCheckpointScopedDirtyFiles : []
     });
+    const effectiveCloseDirtyGuard = options.fromBatchCheckpoint
+      ? {
+        ...closeDirtyGuard,
+        blockingTrackedDirtyFiles: closeDirtyGuard.incorrectPlanningMirrorPreEditFiles,
+        scopeTrackedDirtyFiles: [],
+        governanceTrackedDirtyFiles: []
+      }
+      : closeDirtyGuard;
     if (closeScopedDiffIsolation) {
       closeScopedDiffIsolation = attachDirtyGuardToScopedDiffIsolation(
         closeScopedDiffIsolation,
-        closeDirtyGuard,
+        effectiveCloseDirtyGuard,
         closeWorktree.ignoredUntrackedFiles
       );
     }
-    if (closeDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
+    if (effectiveCloseDirtyGuard.blockingTrackedDirtyFiles.length > 0) {
       throw new CliError('ATM_TASK_CLOSE_DIRTY_WORKTREE', `Task ${options.taskId} cannot be closed as done while in-scope or closure-governance tracked changes are still dirty.`, {
         exitCode: 1,
         details: {
           taskId: options.taskId,
-          trackedDirtyFiles: closeDirtyGuard.blockingTrackedDirtyFiles,
-          scopeTrackedDirtyFiles: closeDirtyGuard.scopeTrackedDirtyFiles,
-          governanceTrackedDirtyFiles: closeDirtyGuard.governanceTrackedDirtyFiles,
-          regenerableArtifactFiles: closeDirtyGuard.regenerableArtifactFiles,
-          correctPlanningMirrorPreEditFiles: closeDirtyGuard.correctPlanningMirrorPreEditFiles,
-          incorrectPlanningMirrorPreEditFiles: closeDirtyGuard.incorrectPlanningMirrorPreEditFiles,
-          advisoryTrackedDirtyFiles: closeDirtyGuard.advisoryTrackedDirtyFiles,
-          unstagedFiles: closeWorktree.unstagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
-          stagedFiles: closeWorktree.stagedFiles.filter((entry) => closeDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
+          trackedDirtyFiles: effectiveCloseDirtyGuard.blockingTrackedDirtyFiles,
+          scopeTrackedDirtyFiles: effectiveCloseDirtyGuard.scopeTrackedDirtyFiles,
+          governanceTrackedDirtyFiles: effectiveCloseDirtyGuard.governanceTrackedDirtyFiles,
+          regenerableArtifactFiles: effectiveCloseDirtyGuard.regenerableArtifactFiles,
+          correctPlanningMirrorPreEditFiles: effectiveCloseDirtyGuard.correctPlanningMirrorPreEditFiles,
+          incorrectPlanningMirrorPreEditFiles: effectiveCloseDirtyGuard.incorrectPlanningMirrorPreEditFiles,
+          advisoryTrackedDirtyFiles: effectiveCloseDirtyGuard.advisoryTrackedDirtyFiles,
+          unstagedFiles: closeWorktree.unstagedFiles.filter((entry) => effectiveCloseDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
+          stagedFiles: closeWorktree.stagedFiles.filter((entry) => effectiveCloseDirtyGuard.blockingTrackedDirtyFiles.includes(entry)),
           ignoredUntrackedFiles: closeWorktree.ignoredUntrackedFiles,
           remediation: 'Commit this task\'s scoped delivery changes first before closing done. Unrelated tracked dirty files are isolated as advisory and do not block this task. The closure packet describes the delivery parent commit instead of the mutable worktree.'
         }
@@ -3358,11 +3385,6 @@ async function runTasksScopeAdd(argv: string[]) {
   const alreadyPresent = requestedPaths.filter((p) => existingAllowed.includes(p));
   const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...requestedPaths]);
 
-  // 寫入更新後的 lock（保留 outer lock 所有欄位，僅更新嵌入的 allowedFiles）
-  const updatedEmbeddedLock = { ...embeddedLockRecord, allowedFiles: [...mergedAllowed] };
-  const updatedOuterLock = { ...outerLock, taskDirectionLock: updatedEmbeddedLock };
-  writeFileSync(lockPath, `${JSON.stringify(updatedOuterLock, null, 2)}\n`, 'utf8');
-
   // 記錄 scope-amendment 轉換事件（包含可稽核的 amendment metadata）
   const taskPath = taskPathFor(options.cwd, options.taskId);
   const amendmentMetadata: ScopeAmendmentMetadata = {
@@ -3373,6 +3395,14 @@ async function runTasksScopeAdd(argv: string[]) {
   };
   if (existsSync(taskPath)) {
     const taskDocument = readJsonRecord(taskPath);
+    syncScopeAmendmentState({
+      taskDocument,
+      outerLock,
+      embeddedLockRecord,
+      mergedAllowed
+    });
+    writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
+    writeTaskDocument(taskPath, taskDocument);
     if (preconditionResolution.resolvedBy === 'claim-first') {
       appendTaskTransitionEvent({
         cwd: options.cwd,
@@ -3407,6 +3437,13 @@ async function runTasksScopeAdd(argv: string[]) {
       command: commandLine,
       amendmentMetadata
     });
+  } else {
+    syncScopeAmendmentRuntimeLock({
+      outerLock,
+      embeddedLockRecord,
+      mergedAllowed
+    });
+    writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
   }
 
   return makeResult({
@@ -3514,10 +3551,6 @@ function runTasksScopeRepair(argv: string[]) {
   const alreadyPresent = requestedPaths.filter((p) => existingAllowed.includes(p));
   const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...requestedPaths]);
 
-  const updatedEmbeddedLock = { ...embeddedLockRecord, allowedFiles: [...mergedAllowed] };
-  const updatedOuterLock = { ...outerLock, taskDirectionLock: updatedEmbeddedLock };
-  writeFileSync(lockPath, `${JSON.stringify(updatedOuterLock, null, 2)}\n`, 'utf8');
-
   // 記錄 scope-amendment 事件（amendmentMode: 'repair'，讓歷史可查）
   const taskPath = taskPathFor(options.cwd, options.taskId);
   const amendmentMetadata: ScopeAmendmentMetadata = {
@@ -3528,6 +3561,14 @@ function runTasksScopeRepair(argv: string[]) {
   };
   if (existsSync(taskPath)) {
     const taskDocument = readJsonRecord(taskPath);
+    syncScopeAmendmentState({
+      taskDocument,
+      outerLock,
+      embeddedLockRecord,
+      mergedAllowed
+    });
+    writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
+    writeTaskDocument(taskPath, taskDocument);
     const commandLine = buildScopeAmendmentCommand({
       mode: 'repair',
       taskId: options.taskId,
@@ -3548,6 +3589,13 @@ function runTasksScopeRepair(argv: string[]) {
       command: commandLine,
       amendmentMetadata
     });
+  } else {
+    syncScopeAmendmentRuntimeLock({
+      outerLock,
+      embeddedLockRecord,
+      mergedAllowed
+    });
+    writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
   }
 
   return makeResult({
@@ -5148,7 +5196,7 @@ function loadHistoricalBatchCloseSlice(cwd: string, taskId: string, batchRef: st
   };
 }
 
-function extractTaskCloseDeclaredFiles(taskDocument: Record<string, unknown>, cwd?: string, taskId?: string): readonly string[] {
+function extractTaskCloseClaimScopeFiles(taskDocument: Record<string, unknown>, cwd?: string, taskId?: string): readonly string[] {
   const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
     ? taskDocument.taskDirectionLock as Record<string, unknown>
     : {};
@@ -5159,7 +5207,22 @@ function extractTaskCloseDeclaredFiles(taskDocument: Record<string, unknown>, cw
   return uniqueStrings([
     ...extractStringList(taskDirectionLock.allowedFiles),
     ...extractStringList(runtimeLock.allowedFiles),
-    ...extractStringList(claim.files),
+    ...extractStringList(claim.files)
+  ]);
+}
+
+function extractTaskCloseDeclaredFiles(
+  taskDocument: Record<string, unknown>,
+  cwd?: string,
+  taskId?: string,
+  options: { checkpointScoped?: boolean } = {}
+): readonly string[] {
+  const claimScopedFiles = extractTaskCloseClaimScopeFiles(taskDocument, cwd, taskId);
+  if (options.checkpointScoped) {
+    return claimScopedFiles;
+  }
+  return uniqueStrings([
+    ...claimScopedFiles,
     ...extractStringList(taskDocument.targetAllowedFiles),
     ...extractTaskDeclaredFiles(taskDocument)
   ]);
@@ -5324,6 +5387,37 @@ function writeLockCleanupReport(input: {
 function writeTaskDocument(taskPath: string, document: Record<string, unknown>) {
   mkdirSync(path.dirname(taskPath), { recursive: true });
   writeFileSync(taskPath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
+}
+
+function syncScopeAmendmentState(input: {
+  readonly taskDocument: Record<string, unknown>;
+  readonly outerLock: Record<string, unknown>;
+  readonly embeddedLockRecord: Record<string, unknown>;
+  readonly mergedAllowed: readonly string[];
+}) {
+  syncScopeAmendmentRuntimeLock(input);
+  input.taskDocument.taskDirectionLock = {
+    ...input.embeddedLockRecord,
+    allowedFiles: [...input.mergedAllowed]
+  };
+  const claim = input.taskDocument.claim;
+  if (claim && typeof claim === 'object' && !Array.isArray(claim)) {
+    const claimRecord = claim as Record<string, unknown>;
+    claimRecord.files = [...input.mergedAllowed];
+    input.taskDocument.claim = claimRecord;
+  }
+}
+
+function syncScopeAmendmentRuntimeLock(input: {
+  readonly outerLock: Record<string, unknown>;
+  readonly embeddedLockRecord: Record<string, unknown>;
+  readonly mergedAllowed: readonly string[];
+}) {
+  input.outerLock.taskDirectionLock = {
+    ...input.embeddedLockRecord,
+    allowedFiles: [...input.mergedAllowed]
+  };
+  input.outerLock.files = [...input.mergedAllowed];
 }
 
 

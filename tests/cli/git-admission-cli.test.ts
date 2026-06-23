@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
@@ -52,7 +52,7 @@ function commitAndPush(cwd: string, message: string, files: Record<string, strin
   runGit(cwd, ['push', 'origin', 'main']);
 }
 
-async function runAdmission(local: string) {
+async function runAdmission(local: string, extraArgs: string[] = []) {
   return runAtmGit([
     'admit',
     '--cwd', local,
@@ -60,6 +60,7 @@ async function runAdmission(local: string) {
     '--branch', 'main',
     '--remote', 'origin',
     '--no-fetch',
+    ...extraArgs,
     '--json'
   ]);
 }
@@ -138,6 +139,31 @@ try {
     assert.equal(result.ok, false);
     assert.equal((result.evidence as any).outcome, 'composer-routed');
     assert.deepEqual((result.evidence as any).conflictingFiles, ['data.json']);
+
+    const beforeHead = runGit(local, ['rev-parse', 'HEAD']);
+    const beforeContent = runGit(local, ['show', 'HEAD:data.json']);
+
+    const dryRun = await runAdmission(local, ['--steward-plan']);
+    assert.equal(dryRun.ok, true);
+    assert.equal((dryRun.evidence as any).outcome, 'composer-routed');
+    assert.equal((dryRun.evidence as any).steward?.mode, 'steward-plan');
+    assert.equal((dryRun.evidence as any).steward?.applyEvidence, null);
+    assert.equal(runGit(local, ['rev-parse', 'HEAD']), beforeHead);
+    assert.equal(runGit(local, ['show', 'HEAD:data.json']), beforeContent);
+
+    const apply = await runAdmission(local, ['--apply-to-working-tree']);
+    assert.equal(apply.ok, true);
+    assert.equal((apply.evidence as any).outcome, 'composer-routed');
+    assert.equal((apply.evidence as any).steward?.mode, 'apply-to-working-tree');
+    assert.equal(runGit(local, ['rev-parse', 'HEAD']), beforeHead);
+    assert.equal(
+      runGit(local, ['show', 'HEAD:data.json']),
+      beforeContent,
+      'apply-to-working-tree must not create an automatic commit'
+    );
+    const appliedContent = readFileSync(path.join(local, 'data.json'), 'utf8');
+    assert.match(appliedContent, /\"alpha\": 2/);
+    assert.match(appliedContent, /\"beta\": 2/);
   }
 
   console.log('[git-admission-cli] ok');

@@ -18,6 +18,7 @@ import {
 import { getCommandSpec } from './command-specs.ts';
 import { runTasks } from './tasks.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
+import { validateStrictPathHeuristic } from './tasks/task-import-validators.ts';
 import { buildTeamKnowledgeSummary, runTeamKnowledge, type TeamKnowledgeSummary } from './team-knowledge.ts';
 import { runTeamWave } from './team-wave.ts';
 import {
@@ -1552,11 +1553,7 @@ function selectRecipe(input: {
 }
 
 function inferTaskLanguage(task: any) {
-  const paths = [
-    ...normalizeStringArray(task.targetAllowedFiles),
-    ...normalizeStringArray(task.deliverables),
-    ...normalizeStringArray(task.scopePaths)
-  ];
+  const paths = collectTaskPathHints(task);
   if (paths.some((entry) => entry.endsWith('.py') || entry.includes('pipelines/'))) return 'python';
   if (paths.some((entry) => entry.endsWith('.cs'))) return 'csharp';
   return 'typescript';
@@ -1929,13 +1926,13 @@ function isUnsafeTeamLeasePath(rawPath: string, normalizedPath: string, repoRoot
 }
 
 function deriveAllowedWriteScope(task: any, repoRoot?: string) {
-  const explicitAllowed = normalizeStringArray(task.targetAllowedFiles);
+  const explicitAllowed = normalizeTaskPathArray(task.targetAllowedFiles, repoRoot);
   if (explicitAllowed.length > 0) {
-    return normalizeTaskWriteScope(explicitAllowed, repoRoot);
+    return uniqueStrings(explicitAllowed);
   }
   return normalizeTaskWriteScope([
-    ...normalizeStringArray(task.deliverables),
-    ...normalizeStringArray(task.scopePaths)
+    ...normalizeTaskPathArray(task.deliverables, repoRoot),
+    ...normalizeTaskPathArray(task.scopePaths, repoRoot)
   ], repoRoot);
 }
 
@@ -2167,11 +2164,11 @@ function buildSelectorResult(
 
 function collectImplementerHints(task: any, writePaths: string[]) {
   const scopePaths = uniqueStrings([
-    ...normalizeStringArray(task?.scopePaths),
-    ...normalizeStringArray(task?.targetAllowedFiles),
+    ...normalizeTaskPathArray(task?.scopePaths),
+    ...normalizeTaskPathArray(task?.targetAllowedFiles),
     ...writePaths
   ]);
-  const deliverables = uniqueStrings(normalizeStringArray(task?.deliverables));
+  const deliverables = uniqueStrings(normalizeTaskPathArray(task?.deliverables));
   const allPaths = uniqueStrings([...scopePaths, ...deliverables]);
   const fileExtensions = uniqueStrings(
     allPaths
@@ -2242,9 +2239,9 @@ export function assessLieutenantEscalation(
   const taskId = String(task?.workItemId ?? task?.taskId ?? '').trim();
   const normalizedTitle = String(task?.title ?? '').toLowerCase();
   const scopePaths = uniqueStrings([
-    ...normalizeStringArray(task?.scopePaths),
-    ...normalizeStringArray(task?.deliverables),
-    ...normalizeStringArray(task?.targetAllowedFiles)
+    ...normalizeTaskPathArray(task?.scopePaths),
+    ...normalizeTaskPathArray(task?.deliverables),
+    ...normalizeTaskPathArray(task?.targetAllowedFiles)
   ]);
   const scopeCount = scopePaths.length;
   const taskRepo = String(task?.targetRepo ?? task?.planningRepo ?? '').trim();
@@ -2256,8 +2253,8 @@ export function assessLieutenantEscalation(
   ]).length;
   const closureSignals = Boolean(
     uniqueStrings([
-      ...normalizeStringArray(task?.scopePaths),
-      ...normalizeStringArray(task?.deliverables)
+      ...normalizeTaskPathArray(task?.scopePaths),
+      ...normalizeTaskPathArray(task?.deliverables)
     ]).some((entry) => /closure|evidence|git/i.test(entry))
     || /closure|evidence|git/i.test(normalizedTitle)
   );
@@ -3148,13 +3145,27 @@ function summarizeTask(taskId: string, task: any) {
 
 function deriveWritePaths(task: any, repoRoot?: string) {
   const candidates = [
-    ...normalizeStringArray(task.targetAllowedFiles),
-    ...normalizeStringArray(task.deliverables),
-    ...normalizeStringArray(task.scopePaths)
+    ...normalizeTaskPathArray(task.targetAllowedFiles, repoRoot),
+    ...normalizeTaskPathArray(task.deliverables, repoRoot),
+    ...normalizeTaskPathArray(task.scopePaths, repoRoot)
   ];
   return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
     return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
   }));
+}
+
+function collectTaskPathHints(task: any) {
+  return uniqueStrings([
+    ...normalizeTaskPathArray(task?.targetAllowedFiles),
+    ...normalizeTaskPathArray(task?.deliverables),
+    ...normalizeTaskPathArray(task?.scopePaths)
+  ]);
+}
+
+function normalizeTaskPathArray(value: unknown, repoRoot?: string) {
+  return normalizeStringArray(value)
+    .map((entry) => normalizeTeamLeasePath(entry, repoRoot))
+    .filter((entry) => Boolean(entry) && validateStrictPathHeuristic(entry) === null);
 }
 
 function normalizeStringArray(value: unknown) {

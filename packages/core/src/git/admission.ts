@@ -41,6 +41,7 @@ export interface GitAdmissionBridgeEntry {
   readonly filePath: string;
   readonly adapterId: string;
   readonly conflictKeys: readonly ConflictKey[];
+  readonly requests: readonly MutationRequest[];
   readonly diagnostics: readonly GitDiffBridgeDiagnostic[];
   readonly failClosed: boolean;
 }
@@ -124,9 +125,15 @@ export function evaluateGitAdmission(input: GitAdmissionOptions): GitAdmissionRe
       bridged: remoteBridge.entries
     });
     const registryState = readBrokerLifecycleState(input.cwd);
+    const cleanedRegistry = cleanupStale(loadRegistry(input.registryPath ?? registryState.registryPath));
+    const syntheticActiveIntents = remoteActiveIntent ? [remoteActiveIntent] : [];
+    const syntheticEpoch = syntheticActiveIntents.length > 0
+      ? Math.max(...syntheticActiveIntents.map((intent) => intent.leaseEpoch))
+      : cleanedRegistry.currentEpoch;
     const brokerRegistry: WriteBrokerRegistryDocument = {
-      ...cleanupStale(loadRegistry(input.registryPath ?? registryState.registryPath)),
-      activeIntents: remoteActiveIntent ? [remoteActiveIntent] : []
+      ...cleanedRegistry,
+      currentEpoch: syntheticEpoch,
+      activeIntents: syntheticActiveIntents
     };
 
     const brokerDecision = calculateBrokerDecision(localIntent, brokerRegistry);
@@ -185,6 +192,7 @@ function toAdmissionBridgeEntry(entry: GitDiffBridgeResultEntry): GitAdmissionBr
     filePath: entry.filePath,
     adapterId: entry.adapterId,
     conflictKeys: entry.conflictKeys,
+    requests: entry.requests,
     diagnostics: entry.diagnostics,
     failClosed: entry.failClosed
   };

@@ -66,8 +66,11 @@ try {
   const claimedTask = JSON.parse(readFileSync(path.join(workspace, '.atm', 'history', 'tasks', 'TASK-MAO-CLARITY-0002.json'), 'utf8'));
   assert.equal(claimedTask.status, 'running');
   assert.equal(claimedTask.claim?.state, 'active');
+  assert.ok((claimedTask.taskDirectionLock?.allowedFiles ?? []).includes('docs/linked.md'));
+  assert.ok((claimedTask.claim?.files ?? []).includes('docs/linked.md'));
   const runtimeLock = JSON.parse(readFileSync(path.join(workspace, '.atm', 'runtime', 'locks', 'TASK-MAO-CLARITY-0002.lock.json'), 'utf8'));
   assert.ok((runtimeLock.taskDirectionLock?.allowedFiles ?? []).includes('docs/linked.md'));
+  assert.ok((runtimeLock.files ?? []).includes('docs/linked.md'));
   const claimFirstEventDir = path.join(workspace, '.atm', 'history', 'task-events', 'TASK-MAO-CLARITY-0002');
   assert.equal(existsSync(claimFirstEventDir), true);
   assert.match(readFileSync(findEventByAction(claimFirstEventDir, 'scope-amendment.claim-first-resolved'), 'utf8'), /scope-amendment\.claim-first-resolved/);

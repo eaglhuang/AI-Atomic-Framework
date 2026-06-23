@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0007",
+  "title": "Neutral steward Git apply dry-run",
+  "status": "done",
+  "milestone": "G2",
+  "dependencies": [
+    "TASK-GIT-0004",
+    "TASK-GIT-0006"
+  ],
+  "acceptance": [
+    "Dry-run produces a merge plan without changing files.",
+    "Explicit apply mode writes only scoped files and records evidence.",
+    "Apply mode leaves commit creation to the operator.",
+    "Failed apply leaves a recoverable diagnostic and does not continue to push."
+  ],
+  "deliverables": [
+    "Dry-run steward plan for composer-routed Git-boundary cases.",
+    "Optional apply-to-working-tree mode guarded by explicit flag.",
+    "Evidence of no auto-commit default."
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/**",
+    "packages/core/src/steward/**",
+    "packages/core/src/git/**",
+    "packages/cli/src/commands/**",
+    "tests/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No auto-commit by default.",
+    "No force push."
+  ],
+  "nonGoals": [
+    "No full rebase replacement."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-steward-apply",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0007-neutral-steward-git-apply-dry-run.task.md",
+    "sectionTitle": "TASK-GIT-0007",
+    "headingLine": 38,
+    "hash": "cdd39df0b0a38ee9"
+  },
+  "importedAt": "2026-06-23T04:08:48.295Z",
+  "lastTransitionId": "2026-06-23T06-05-59-896Z-close-1f357c18477a",
+  "lastTransitionAt": "2026-06-23T06:05:59.896Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T05:34:09.608Z",
+  "promotedAt": "2026-06-23T05:34:09.611Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-e4506ff7c662",
+    "claimedAt": "2026-06-23T05:34:09.614Z",
+    "heartbeatAt": "2026-06-23T06:05:59.895Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0007.json",
+      "packages/cli/src/commands/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/git/**",
+      "packages/core/src/steward/**",
+      "tests/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T05:34:09.614Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623053409-codex-main-TASK-GIT-0007-bf8f0645b5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0007",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": 6,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0007.*",
+      ".atm/history/task-events/TASK-GIT-0007/**",
+      ".atm/history/tasks/TASK-GIT-0007.json",
+      "packages/cli/src/commands/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/git/**",
+      "packages/core/src/steward/**",
+      "tests/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "59eb33e05beacf97e9ac3188b1be06202263a333f74546496520f658be1e0c3b",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T05:34:09.969Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T06:05:59.895Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623053409-codex-main-TASK-GIT-0007-bf8f0645b5",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0007.closure-packet.json"
+}
