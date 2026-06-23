@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0009",
+  "title": "Post-push-fail fallback",
+  "status": "done",
+  "milestone": "G3",
+  "dependencies": [
+    "TASK-GIT-0004",
+    "TASK-GIT-0006"
+  ],
+  "acceptance": [
+    "Command detects likely non-fast-forward or remote-changed conditions.",
+    "Command fetches and reruns the same admission comparison.",
+    "Output explains whether the operator should rebase, steward-apply, or retry after no-op.",
+    "Evidence records that this was post-push-fail recovery, not the primary pre-push hook."
+  ],
+  "deliverables": [
+    "Fallback command for non-fast-forward or rejected push cases.",
+    "Guidance that reruns Git-boundary admission after push rejection.",
+    "Evidence that distinguishes pre-push block from post-push recovery."
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git.ts",
+    "packages/core/src/git/**",
+    "docs/governance/**",
+    "tests/cli/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No remote mutation."
+  ],
+  "nonGoals": [
+    "No automatic push retry."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-push-fail-fallback",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0009-post-push-fail-fallback.task.md",
+    "sectionTitle": "TASK-GIT-0009",
+    "headingLine": 36,
+    "hash": "46b287f08a645a0b"
+  },
+  "importedAt": "2026-06-23T04:08:49.321Z",
+  "lastTransitionId": "2026-06-23T06-29-19-689Z-close-fdb7f10b9348",
+  "lastTransitionAt": "2026-06-23T06:29:19.689Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T06:26:22.055Z",
+  "promotedAt": "2026-06-23T06:26:22.057Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-44e79287c9cc",
+    "claimedAt": "2026-06-23T06:26:22.060Z",
+    "heartbeatAt": "2026-06-23T06:29:19.687Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0009.json",
+      "docs/governance/**",
+      "packages/cli/src/commands/git.ts",
+      "packages/core/src/git/**",
+      "tests/cli/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T06:26:22.060Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623062622-codex-main-TASK-GIT-0009-67f105cb5d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0009",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": 8,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0009.*",
+      ".atm/history/task-events/TASK-GIT-0009/**",
+      ".atm/history/tasks/TASK-GIT-0009.json",
+      "docs/governance/**",
+      "packages/cli/src/commands/git.ts",
+      "packages/core/src/git/**",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ff733e064f49d108926e9d9d7b025d12430e7fe54e20d5f185f4e384cb98e000",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T06:26:22.403Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T06:29:19.687Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623062622-codex-main-TASK-GIT-0009-67f105cb5d",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0009.closure-packet.json"
+}

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T06-28-16-405Z-scope-amendment-2094acf22e71",
+  "taskId": "TASK-GIT-0009",
+  "action": "scope-amendment",
+  "actorId": "codex-main",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0009.json",
+  "taskSha256": "sha256:a822e7adaf590e65b0bee8563236a37c767f93b6ad09a8e34531c416740d5c81",
+  "createdAt": "2026-06-23T06:28:16.405Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0009 --actor codex-main --add \"packages/cli/src/commands/git-governance.ts,packages/cli/src/commands/command-specs/git.spec.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T06-29-19-689Z-close-fdb7f10b9348",
+  "taskId": "TASK-GIT-0009",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623062622-codex-main-TASK-GIT-0009-67f105cb5d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0009.json",
+  "taskSha256": "sha256:077b9723bb5d1a025c79fca62d5513c4f2ef39d8aca0aa376fc4554ab1d1817d",
+  "createdAt": "2026-06-23T06:29:19.689Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0009 --actor codex-main --status done --from-batch-checkpoint --batch batch-f47cb3485465",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-f47cb3485465",
+    "sessionId": "session-20260623062622-codex-main-TASK-GIT-0009-67f105cb5d",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0009.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "git-admission-cli-recovery",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T06:29:19.685Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0009.*",
+        ".atm/history/task-events/TASK-GIT-0009/**",
+        ".atm/history/tasks/TASK-GIT-0009.json",
+        "docs/governance/**",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/core/src/git/**",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/core/src/git/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

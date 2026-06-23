@@ -66,6 +66,18 @@ async function runAdmission(local: string, extraArgs: string[] = []) {
   ]);
 }
 
+async function runPostPushFailRecovery(local: string, extraArgs: string[] = []) {
+  return runAtmGit([
+    'recover-push-fail',
+    '--cwd', local,
+    '--actor', 'fixture-agent',
+    '--branch', 'main',
+    '--remote', 'origin',
+    ...extraArgs,
+    '--json'
+  ]);
+}
+
 try {
   rmSync(tempRoot, { recursive: true, force: true });
   mkdirSync(tempRoot, { recursive: true });
@@ -165,6 +177,79 @@ try {
     const appliedContent = readFileSync(path.join(local, 'data.json'), 'utf8');
     assert.match(appliedContent, /\"alpha\": 2/);
     assert.match(appliedContent, /\"beta\": 2/);
+  }
+
+  {
+    const { seed, local } = setupRemoteScenario('recover-block');
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockBase);
+    runGit(seed, ['add', 'data.json']);
+    runGit(seed, ['commit', '-m', 'feat: add data']);
+    runGit(seed, ['push', 'origin', 'main']);
+
+    runGit(local, ['pull', '--ff-only', 'origin', 'main']);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockRemote);
+    runGit(seed, ['add', 'data.json']);
+    runGit(seed, ['commit', '-m', 'feat: remote alpha']);
+    runGit(seed, ['push', 'origin', 'main']);
+
+    writeText(path.join(local, 'data.json'), gitBoundaryFixtures.json.blockLocal);
+    runGit(local, ['add', 'data.json']);
+    runGit(local, ['commit', '-m', 'feat: local alpha']);
+
+    let rejected = '';
+    try {
+      runGit(local, ['push', 'origin', 'main']);
+      assert.fail('push must be rejected when remote advanced first');
+    } catch (error) {
+      rejected = String((error as { stderr?: string }).stderr ?? error);
+    }
+    assert.match(rejected, /rejected|fetch first|non-fast-forward/i);
+
+    const recovery = await runPostPushFailRecovery(local);
+    assert.equal(recovery.ok, false);
+    assert.equal((recovery.evidence as any).action, 'recover-push-fail');
+    assert.equal((recovery.evidence as any).outcome, 'block');
+    assert.equal((recovery.evidence as any).recovery?.mode, 'post-push-fail');
+    assert.equal((recovery.evidence as any).recovery?.fetched, true);
+    assert.equal((recovery.evidence as any).recovery?.likelyNonFastForward, true);
+    assert.equal((recovery.evidence as any).recovery?.recoveryKind, 'rebase');
+    assert.match(String((recovery.evidence as any).recommendedNextStep), /rebase/i);
+  }
+
+  {
+    const { seed, local } = setupRemoteScenario('recover-composer');
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.composerBase);
+    runGit(seed, ['add', 'data.json']);
+    runGit(seed, ['commit', '-m', 'feat: add data']);
+    runGit(seed, ['push', 'origin', 'main']);
+
+    runGit(local, ['pull', '--ff-only', 'origin', 'main']);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.composerRemote);
+    runGit(seed, ['add', 'data.json']);
+    runGit(seed, ['commit', '-m', 'feat: remote alpha']);
+    runGit(seed, ['push', 'origin', 'main']);
+
+    writeText(path.join(local, 'data.json'), gitBoundaryFixtures.json.composerLocal);
+    runGit(local, ['add', 'data.json']);
+    runGit(local, ['commit', '-m', 'feat: local beta']);
+
+    let rejected = '';
+    try {
+      runGit(local, ['push', 'origin', 'main']);
+      assert.fail('push must be rejected when remote advanced first');
+    } catch (error) {
+      rejected = String((error as { stderr?: string }).stderr ?? error);
+    }
+    assert.match(rejected, /rejected|fetch first|non-fast-forward/i);
+
+    const recovery = await runPostPushFailRecovery(local);
+    assert.equal(recovery.ok, true);
+    assert.equal((recovery.evidence as any).action, 'recover-push-fail');
+    assert.equal((recovery.evidence as any).outcome, 'composer-routed');
+    assert.equal((recovery.evidence as any).recovery?.mode, 'post-push-fail');
+    assert.equal((recovery.evidence as any).recovery?.fetched, true);
+    assert.equal((recovery.evidence as any).recovery?.recoveryKind, 'steward-apply');
+    assert.match(String((recovery.evidence as any).recommendedNextStep), /steward-plan|apply-to-working-tree/i);
   }
 
   console.log('[git-admission-cli] ok');
