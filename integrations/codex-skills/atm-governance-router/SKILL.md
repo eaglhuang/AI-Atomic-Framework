@@ -190,6 +190,10 @@ capturing reusable ATM-routing lessons rather than chat-local anecdotes.
 When the agent hits a real recurring wall, use the learning loop in
 `references/learning-loop.md`.
 
+Use the shared taxonomy and promotion model from
+`docs/governance/skills/shared-growth-contract.md`. This keeps the router thin
+while still letting it accumulate durable ATM entry lessons.
+
 Typical wall-hit classes:
 
 - ATM route was technically correct but confusing to execute;

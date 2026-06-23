@@ -24,3 +24,14 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 - Repo defaults provide the baseline provider, SDK, model, and runtime mode.
 - Role overrides may replace those values for implementer, reviewer, validator, planner, or other roles.
 - Selection decisions must remain observable through runtime metadata and operator-facing summaries.
+
+## Role Skill-Pack Compatibility
+
+- Provider selection must bind to a provider-neutral role contract before it
+  binds to a model or SDK.
+- Runtime adapters should consume role and skill-pack semantics from
+  `docs/governance/team-agents/role-skill-pack-contract.md` rather than baking
+  provider-specific role meanings into the runtime.
+- Role-local learning may vary by provider quality or runtime mode, but the
+  growth semantics should still reuse
+  `docs/governance/skills/shared-growth-contract.md`.

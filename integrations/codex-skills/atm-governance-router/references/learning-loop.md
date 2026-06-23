@@ -6,6 +6,10 @@ felt friction, confusion, or nearly bypassed ATM.
 Goal: turn repeated wall-hits into a better entry skill without filling the
 main `SKILL.md` with noise.
 
+Shared taxonomy, capture fields, and promotion semantics are defined in
+`docs/governance/skills/shared-growth-contract.md`. This file is the
+router-local projection of that shared contract.
+
 ## What To Capture
 
 Capture only cases that are reusable across ATM work, not one-off repo trivia.
@@ -71,6 +75,13 @@ Keep `SKILL.md` short. Promote the rule, not the whole story.
 
 - A tool-first path failed and the CLI fallback rule was unclear.
 - A fallback existed, but the agent used a weaker or noisier path than needed.
+
+### Team Routing
+
+- The router started absorbing playbook or role-pack behavior that should stay
+  outside first-touch entry.
+- A Team Agent role was selected without a clear playbook slice or authority
+  boundary.
 
 ## Quality Bar
 

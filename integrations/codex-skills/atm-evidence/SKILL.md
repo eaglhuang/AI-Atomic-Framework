@@ -22,6 +22,19 @@ Use this ATM command only after the first command confirms it is the current gov
 node atm.mjs explain --why blocked --json
 ```
 
+## Learning Loop
+
+Use the shared growth contract in
+`docs/governance/skills/shared-growth-contract.md`.
+
+For this specialist skill, keep `SKILL.md` short and stable:
+
+- durable evidence-routing rules stay here;
+- repeated blocked-lane examples belong in a local or shared learning
+  reference;
+- taxonomy and promotion semantics should stay aligned with the shared growth
+  contract instead of inventing a specialist-only memory model.
+
 ## Handoff
 
 ```bash

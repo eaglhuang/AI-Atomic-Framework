@@ -36,6 +36,12 @@ the existing close path is still the only thing that marks a card done.
 The coordinator-only guard fails closed if any non-coordinator role attempts a
 git write, closeout, or checkpoint.
 
+Role semantics should stay aligned with
+`docs/governance/team-agents/role-skill-pack-contract.md` and the routing split
+described in `docs/governance/team-agents/role-routing-matrix.md`. Wave Mode is
+an orchestration surface over role packs; it is not a replacement for those
+contracts.
+
 ## Workflow
 
 1. **Plan** a candidate wave from declared task metadata:

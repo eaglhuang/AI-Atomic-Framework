@@ -152,6 +152,17 @@ node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <cs
 If no hook is available, continue with task claim + `git prepare/check` +
 `evidence verify` gates as the fallback safety boundary.
 
+## Learning Loop
+
+This skill should get better from repeated real-world friction, but only by
+capturing reusable ATM-routing lessons rather than chat-local anecdotes.
+
+Use the shared taxonomy and promotion model from
+`docs/governance/skills/shared-growth-contract.md`.
+
+If the agent hits a real recurring wall, record the reusable lesson in a
+learning reference instead of bloating this file.
+
 ## Required Evidence
 
 For legacy candidate ranking, final reasoning should cite or create:
