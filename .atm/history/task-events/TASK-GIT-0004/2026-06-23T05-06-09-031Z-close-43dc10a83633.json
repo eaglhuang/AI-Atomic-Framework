@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T05-06-09-031Z-close-43dc10a83633",
+  "taskId": "TASK-GIT-0004",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623045501-codex-main-TASK-GIT-0004-d88423fc3b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0004.json",
+  "taskSha256": "sha256:1394aac2ad724b8d35e62c98555db0a6b8f180a0f811532dd950f947dd6fb16d",
+  "createdAt": "2026-06-23T05:06:09.031Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0004 --actor codex-main --status done --from-batch-checkpoint --batch batch-f47cb3485465",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-f47cb3485465",
+    "sessionId": "session-20260623045501-codex-main-TASK-GIT-0004-d88423fc3b",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T05:06:09.027Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0004.*",
+        ".atm/history/task-events/TASK-GIT-0004/**",
+        ".atm/history/tasks/TASK-GIT-0004.json",
+        "packages/cli/src/commands/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/git/**",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/git/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
