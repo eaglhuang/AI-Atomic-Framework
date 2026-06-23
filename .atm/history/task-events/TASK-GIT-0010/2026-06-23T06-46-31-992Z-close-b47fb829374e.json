@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T06-46-31-992Z-close-b47fb829374e",
+  "taskId": "TASK-GIT-0010",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623062931-codex-main-TASK-GIT-0010-81efa1a2f6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0010.json",
+  "taskSha256": "sha256:24367dce638205e44e188253c48cc52cbc705a3a7803e26fc5ea01f173711039",
+  "createdAt": "2026-06-23T06:46:31.992Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0010 --actor codex-main --status done --from-batch-checkpoint --batch batch-f47cb3485465 --historical-delivery b9f83d14d6ec8f8b49805060c34f6250cf897c28",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-f47cb3485465",
+    "sessionId": "session-20260623062931-codex-main-TASK-GIT-0010-81efa1a2f6",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0010.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T06:46:31.985Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0010.*",
+        ".atm/history/task-events/TASK-GIT-0010/**",
+        ".atm/history/tasks/TASK-GIT-0010.json",
+        "Audit record for hook bypass or disabled hook state where detectable.",
+        "docs/governance/**",
+        "git-boundary-admission/tasks/TASK-GIT-0010-operator-policy-and-bypass-audit.task.md",
+        "Operator-facing guidance for emergency push situations.",
+        "packages/cli/src/commands/git.ts",
+        "packages/core/src/git/**",
+        "Policy for `--no-verify`, manual bypass, and protected branches.",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git.ts",
+        "packages/core/src/git/**",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
