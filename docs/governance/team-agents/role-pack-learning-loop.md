@@ -70,6 +70,24 @@ Record lessons using the shared growth fields:
 - Confidence: medium
 - Reuse scope: coordinator, implementer, validator packs
 
+## 2026-06-24 - source-first pass did not prove frozen team runner
+
+- Category: tooling-mismatch
+- Trigger: `TASK-SKL-0011` and `TASK-SKL-0012` changed Team runtime / CLI
+  surfaces, but validation initially stopped at `node atm.dev.mjs`
+- Symptom: the lane looked fixed in source-first validation while
+  `node atm.mjs` still served stale frozen artifacts, which could mislead role
+  packs into trusting the wrong runtime state
+- Correct route: retain release artifacts with
+  `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build`, rerun the frozen entrypoint,
+  and only then claim proof for Team runtime delivery
+- Durable rule: Team role-pack work that touches CLI, close, taskflow, or
+  runtime-start surfaces must treat source-first success as advisory until the
+  frozen runner is rebuilt and checked
+- Promotion target: shared-growth-contract.md and role-pack-learning-loop.md
+- Confidence: high
+- Reuse scope: coordinator, validator, runtime-pilot dogfood lanes
+
 ## Historical section
 
 Move solved runtime-observability workarounds here once the underlying product

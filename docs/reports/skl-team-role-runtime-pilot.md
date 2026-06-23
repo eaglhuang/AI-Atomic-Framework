@@ -79,6 +79,15 @@ is internally coherent.
 epochs require takeover before conflict arbitration. That blocked state is part
 of the pilot evidence, not a reason to collapse back into one oversized skill.
 
+The same delivery lane also surfaced `ATM-BUG-2026-06-24-022`: source-first
+success did not prove the frozen runner was updated. That dogfood/build lesson
+is now intentionally linked back into the four-layer SKL growth path:
+
+- 3KLife SKL plan dogfood/build rule
+- ATM shared growth contract
+- ATM bug backlog
+- raw-case / historical-move learning references
+
 ## Why this still counts as useful pilot evidence
 
 - The role pack boundaries are explicit and machine-readable.
@@ -93,6 +102,9 @@ of the pilot evidence, not a reason to collapse back into one oversized skill.
 - Keep the role-pack observability surface active for `TASK-SKL-0012`.
 - Build the frozen runner with retained release artifacts before claiming
   frozen-runner proof for these new team surfaces.
+- Keep `ATM-BUG-2026-06-24-022` attached to the `TASK-SKL-0011/0012` delivery
+  narrative until retained-build frozen verification becomes routine enough to
+  demote into the historical section.
 - Treat stale broker lease/takeover cleanup as product follow-up, while keeping
   the operator lesson in active growth references until the product fix is
   stable.
