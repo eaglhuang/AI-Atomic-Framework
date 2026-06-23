@@ -1,0 +1,347 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-GIT-0002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bcecda11c088a6bc46308e759de0b94c67673f29",
+  "governedTreeSha": "97753081bce81954d7188496dc5a2742d7a21de9",
+  "targetCommitDelta": {
+    "currentCommitSha": "bcecda11c088a6bc46308e759de0b94c67673f29",
+    "parentCommitShas": [
+      "bcecda11c088a6bc46308e759de0b94c67673f29"
+    ],
+    "governedTreeSha": "97753081bce81954d7188496dc5a2742d7a21de9",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-GIT-0002.bundle-manifest.json",
+      ".atm/history/evidence/TASK-GIT-0002.json",
+      ".atm/history/task-events/TASK-GIT-0002/2026-06-23T04-08-45-756Z-import-eb8976cbf8eb.json",
+      ".atm/history/task-events/TASK-GIT-0002/2026-06-23T04-35-40-751Z-reserve-86d9e1906f50.json",
+      ".atm/history/task-events/TASK-GIT-0002/2026-06-23T04-35-40-754Z-promote-1d9f73abfccd.json",
+      ".atm/history/task-events/TASK-GIT-0002/2026-06-23T04-35-41-182Z-claim-a68407775c6c.json",
+      ".atm/history/tasks/TASK-GIT-0002.json",
+      ".atm/history/tasks/TASK-PAPER-HOTFILE-POS2-A.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/git/diff-mutation-request.ts",
+      "packages/core/src/git/index.ts",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/docs/governance/command-surface.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-task-ledger-governance.ts",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging.test.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli/git-diff-mutation-request.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-diff-mutation-request.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-23T04:46:06.441Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-GIT-0002.*",
+      ".atm/history/task-events/TASK-GIT-0002/**",
+      ".atm/history/tasks/TASK-GIT-0002.json",
+      "packages/cli/src/commands/git.ts",
+      "packages/core/src/broker/**",
+      "packages/core/src/git/**",
+      "tests/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git.ts",
+      "packages/core/src/broker/**",
+      "packages/core/src/git/**",
+      "tests/**"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-GIT-0002.json",
+  "closedAt": "2026-06-23T04:46:06.441Z",
+  "closedByActor": "codex-main",
+  "sessionId": "session-20260623043540-codex-main-TASK-GIT-0002-70cdd30007",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-06-23T04:46:06.442Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-d67fc42b682c.json"
+    },
+    "teamRunId": "team-d67fc42b682c",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "TASK-GIT-0002",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamSize": "medium",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "confidence": "medium",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-generic",
+          "role": "implementer",
+          "profile": "atm.implementer.generic.v1",
+          "language": "generic",
+          "recipeId": "atm.default.batch"
+        },
+        "languageMatch": "unknown",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "TypeScript-heavy paths were detected, but the selected recipe only exposed implementer-generic as the available implementer.",
+        "confidence": "medium",
+        "deterministicHints": {
+          "scopePaths": [
+            "Git topology resolver for fetch, merge-base, local delta, and remote delta.",
+            "Mutation request builder for local and remote branch diffs.",
+            "packages/cli/src/commands/git.ts",
+            "packages/core/src/broker/**",
+            "packages/core/src/git/**",
+            "tests/**",
+            "Unit tests for no-remote-change, local-only, remote-only, and divergent branches."
+          ],
+          "deliverables": [
+            "Git topology resolver for fetch, merge-base, local delta, and remote delta.",
+            "Mutation request builder for local and remote branch diffs.",
+            "Unit tests for no-remote-change, local-only, remote-only, and divergent branches."
+          ],
+          "fileExtensions": [
+            ".",
+            ".ts"
+          ],
+          "pathHints": [
+            "typescript-file",
+            "typescript-heavy"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": true,
+      "escalationReason": "Scope spans 7 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Large script risk indicates the captain should not keep all coordination signals inline. Closure, evidence, or git signals are present and should be tracked by a lieutenant boundary. Validator fan-out is 8, which merits lieutenant tracking.",
+      "needLieutenant": true,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": true,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "medium",
+        "coordinationBoundary": "captain+lieutenant",
+        "signals": {
+          "scopeCount": 7,
+          "crossRepoScope": true,
+          "validatorCount": 8,
+          "largeScriptRisk": true,
+          "closureSignals": true,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "high",
+          "threshold": 3,
+          "reasons": [
+            "touched files 7 exceed planning threshold 3"
+          ]
+        },
+        "mapUpdateNeed": false,
+        "escalationRequired": true,
+        "needLieutenant": true,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "The task has meaningful atomization or lane risk, so the captain should plan for a medium crew with broader validation support.",
+      "implementationSummary": "editor-subagent selected; adapter metadata is advisory, language=node, codex.desktop.subagent, selection=explicit-runtime; closure remains governed by command-backed evidence.",
+      "validators": [
+        "npm run typecheck",
+        "npm run validate:cli",
+        "git diff --check"
+      ],
+      "evidence": [],
+      "brokerGovernance": {
+        "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+        "brokerSubagentEnabled": true,
+        "brokerDecisionSurface": "brokerLane",
+        "brokerStewardId": "neutral-write-steward",
+        "brokerGoverns": [
+          "write-intents",
+          "scope-conflicts",
+          "steward-apply",
+          "commit-lane"
+        ],
+        "brokerEvidenceRequired": [
+          "atm.teamBrokerLaneEvidence.v1",
+          "atm.stewardApplyEvidence.v1",
+          "atm.brokerOperationRunRecordEnvelope.v1"
+        ],
+        "commitLaneSerializedBy": "branch-commit-queue",
+        "commitLaneOwnerRole": "coordinator",
+        "workerGitWrite": false,
+        "workerTaskLifecycle": false,
+        "workerSelfClose": false
+      },
+      "risk": "medium",
+      "closeReady": false
+    }
+  }
+}
