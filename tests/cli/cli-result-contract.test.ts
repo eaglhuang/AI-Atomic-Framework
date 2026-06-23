@@ -37,11 +37,24 @@ const blocked = enrichCommandResult(makeResult({
   command: 'next',
   cwd: process.cwd(),
   messages: [message('error', 'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED', 'switch repo', {})],
-  evidence: { nextAction: { status: 'blocked' } }
+  evidence: {
+    nextAction: {
+      status: 'blocked',
+      allowedCommands: ['node atm.mjs next --json'],
+      blockedCommands: ['node atm.mjs next --claim --json'],
+      runnerMode: { schemaId: 'atm.runnerMode.v1', mode: 'frozen' }
+    },
+    userNotice: { schemaVersion: 'atm.userNotice.v0.1', spokenLine: 'notice' }
+  }
 }));
 assert.equal(blocked.severity, 'blocked');
 assert.equal(blocked.exitCode, 1);
 assert.equal(blocked.blocking, true);
+assert.equal(blocked.nextAction?.status, 'blocked');
+assert.deepEqual(blocked.allowedCommands, ['node atm.mjs next --json']);
+assert.deepEqual(blocked.blockedCommands, ['node atm.mjs next --claim --json']);
+assert.equal(blocked.runnerMode?.schemaId, 'atm.runnerMode.v1');
+assert.equal(blocked.userNotice?.schemaVersion, 'atm.userNotice.v0.1');
 
 const usage = enrichCommandResult(makeResult({
   ok: false,

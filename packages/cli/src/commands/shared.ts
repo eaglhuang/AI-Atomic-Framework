@@ -148,6 +148,14 @@ export interface CommandResult {
   evidence: Record<string, unknown>;
 }
 
+export interface ToolBridgeProjection {
+  nextAction?: Record<string, unknown> | null;
+  userNotice?: Record<string, unknown> | null;
+  runnerMode?: Record<string, unknown> | null;
+  allowedCommands?: readonly string[];
+  blockedCommands?: readonly string[];
+}
+
 /** Public CLI result severity — part of the machine-readable result contract. */
 export type CliResultSeverity = 'success' | 'advisory' | 'blocked' | 'usage-error' | 'failure';
 
@@ -158,11 +166,42 @@ export interface CliResultDiagnostics {
 }
 
 /** Normalized CLI envelope fields appended to every command result. */
-export interface EnrichedCommandResult extends CommandResult {
+export interface EnrichedCommandResult extends CommandResult, ToolBridgeProjection {
   severity: CliResultSeverity;
   exitCode: number;
   blocking: boolean;
   diagnostics: CliResultDiagnostics;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function readStringList(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const filtered = value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0);
+  return filtered.length > 0 ? filtered : undefined;
+}
+
+export function projectToolBridgeFields(evidence: Record<string, unknown>): ToolBridgeProjection {
+  const nextAction = isRecord(evidence.nextAction) ? evidence.nextAction : null;
+  const userNotice = isRecord(evidence.userNotice) ? evidence.userNotice : null;
+  const runnerMode = isRecord(evidence.runnerMode)
+    ? evidence.runnerMode
+    : nextAction && isRecord(nextAction.runnerMode)
+      ? nextAction.runnerMode
+      : null;
+  const allowedCommands = readStringList(evidence.allowedCommands)
+    ?? (nextAction ? readStringList(nextAction.allowedCommands) : undefined);
+  const blockedCommands = readStringList(evidence.blockedCommands)
+    ?? (nextAction ? readStringList(nextAction.blockedCommands) : undefined);
+  return {
+    nextAction,
+    userNotice,
+    runnerMode,
+    allowedCommands,
+    blockedCommands
+  };
 }
 
 const BLOCKED_ACTION_MESSAGE_CODES = new Set([
@@ -255,8 +294,10 @@ export function enrichCommandResult(
     infoCodes: collectMessageCodes(result.messages, 'info')
   };
   const blocking = severity === 'blocked' || severity === 'failure' || severity === 'usage-error';
+  const toolBridge = projectToolBridgeFields(result.evidence);
   return {
     ...result,
+    ...toolBridge,
     severity,
     exitCode,
     blocking,
