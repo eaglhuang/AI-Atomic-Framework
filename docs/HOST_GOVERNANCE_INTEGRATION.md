@@ -218,7 +218,10 @@ propagation, review advisory, and approved human review evidence.
 2. Keep the single-entry ATM route visible in `AGENTS.md` and the root README.
 3. Optionally install the hook recipe from
    [examples/git-hooks-enforcement/README.md](../examples/git-hooks-enforcement/README.md).
-4. Add a CI step:
+4. For the local Git boundary MVP operator flow, use
+   [docs/governance/adopter-git-boundary-runbook.md](governance/adopter-git-boundary-runbook.md)
+   as the adopter-facing setup and troubleshooting guide.
+5. Add a CI step:
 
 ```bash
 node atm.mjs doctor --json
