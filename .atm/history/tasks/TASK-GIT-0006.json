@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0006",
+  "title": "Git boundary evidence envelope",
+  "status": "done",
+  "milestone": "G2",
+  "dependencies": [
+    "TASK-GIT-0004"
+  ],
+  "acceptance": [
+    "Evidence includes local actor, remote virtual actor, base commit, local head, remote head, target files, conflict keys, lane, verdict, and recommendation.",
+    "Evidence can be indexed together with existing broker evidence reports.",
+    "Composer-routed and blocked outcomes both keep enough detail for later review.",
+    "Evidence does not require changing `atm.brokerOperationRunRecordEnvelope.v1` in MVP."
+  ],
+  "deliverables": [
+    "Evidence record for pre-push admission runs.",
+    "Index/report generator integration.",
+    "Artifact paths suitable for paper evidence archival."
+  ],
+  "scopePaths": [
+    "packages/core/src/evidence/**",
+    "packages/core/src/git/**",
+    "packages/cli/src/commands/git.ts",
+    "scripts/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No broker envelope schema change unless explicitly required by a later card."
+  ],
+  "nonGoals": [
+    "No full paper rewrite."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-evidence",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0006-git-boundary-evidence-envelope.task.md",
+    "sectionTitle": "TASK-GIT-0006",
+    "headingLine": 35,
+    "hash": "a1586436d0b189e5"
+  },
+  "importedAt": "2026-06-23T04:08:47.803Z",
+  "lastTransitionId": "2026-06-23T05-33-49-488Z-close-a77ad0e4c8e3",
+  "lastTransitionAt": "2026-06-23T05:33:49.488Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T05:20:49.262Z",
+  "promotedAt": "2026-06-23T05:20:49.266Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-5ed1557e77b2",
+    "claimedAt": "2026-06-23T05:20:49.269Z",
+    "heartbeatAt": "2026-06-23T05:33:49.486Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0006.json",
+      "packages/cli/src/commands/git.ts",
+      "packages/core/src/evidence/**",
+      "packages/core/src/git/**",
+      "scripts/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T05:20:49.269Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623052049-codex-main-TASK-GIT-0006-5b5a073e71",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0006",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": 5,
+      "allowedFiles": [
+        ".atm/history/evidence/TASK-GIT-0006.*",
+        ".atm/history/task-events/TASK-GIT-0006/**",
+        ".atm/history/tasks/TASK-GIT-0006.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git.ts",
+        "packages/core/src/evidence/**",
+        "packages/core/src/git/**",
+        "packages/core/src/index.ts",
+        "scripts/**"
+      ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "658bc26c43f010ed33518180fe45d803f0bab603f4ee09f1e818aeab4488b079",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T05:20:49.655Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T05:33:49.486Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623052049-codex-main-TASK-GIT-0006-5b5a073e71",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0006.closure-packet.json"
+}

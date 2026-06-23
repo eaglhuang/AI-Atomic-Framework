@@ -96,6 +96,24 @@ interface BrokerRunSummary {
   evidence: string;
 }
 
+interface GitBoundaryEvidenceEnvelope {
+  readonly schemaId?: string | null;
+  readonly actorId?: string | null;
+  readonly remoteVirtualActorId?: string | null;
+  readonly taskId?: string | null;
+  readonly branch?: string | null;
+  readonly remoteRef?: string | null;
+  readonly baseCommit?: string | null;
+  readonly localHead?: string | null;
+  readonly remoteHead?: string | null;
+  readonly targetFiles?: readonly string[] | null;
+  readonly lane?: string | null;
+  readonly verdict?: string | null;
+  readonly outcome?: string | null;
+  readonly recommendation?: string | null;
+  readonly artifactPaths?: readonly string[] | null;
+}
+
 interface TaskArtifactSummary {
   taskId: string;
   closurePacket: string;
@@ -126,11 +144,7 @@ function getArgs(argv: string[]): ArgMap {
 
 function parseDefaultRunDir(value: string | boolean | undefined): string {
   if (typeof value === 'string' && value.trim()) {
-    const explicitDir = path.resolve(value);
-    if (!existsSync(explicitDir)) {
-      throw new Error(`run directory does not exist: ${explicitDir}`);
-    }
-    return explicitDir;
+    return path.resolve(value);
   }
   const repoFallback = path.join(process.cwd(), '.atm', 'history', 'evidence', 'broker-runs');
   const externalFallback = path.resolve(
@@ -445,6 +459,39 @@ function isBrokerRegistry(value: unknown): value is BrokerRegistryDocument {
   return maybe.schemaId === 'atm.writeBrokerRegistry.v1' && Array.isArray(maybe.activeIntents);
 }
 
+function isGitBoundaryEvidenceEnvelope(value: unknown): value is GitBoundaryEvidenceEnvelope {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  const maybe = value as GitBoundaryEvidenceEnvelope;
+  return maybe.schemaId === 'atm.gitBoundaryEvidenceEnvelope.v1';
+}
+
+function summarizeGitBoundaryEvidence(run: GitBoundaryEvidenceEnvelope, runSource: string): BrokerRunSummary | null {
+  if (typeof run.actorId !== 'string' || typeof run.remoteRef !== 'string') {
+    return null;
+  }
+  const taskId = typeof run.taskId === 'string' && run.taskId.trim() ? run.taskId.trim() : 'n/a';
+  const localHead = typeof run.localHead === 'string' && run.localHead.trim() ? run.localHead.trim() : 'n/a';
+  const remoteHead = typeof run.remoteHead === 'string' && run.remoteHead.trim() ? run.remoteHead.trim() : 'n/a';
+  const identities = [localHead, remoteHead].filter((entry) => entry !== 'n/a').join(',');
+  return {
+    runId: `git-boundary-${sanitizeRunId(run.remoteRef)}-${localHead.slice(0, 12) || 'unknown'}`,
+    planId: taskId,
+    scenario: typeof run.branch === 'string' && run.branch.trim() ? run.branch.trim() : 'field',
+    tasks: taskId,
+    actors: [run.actorId, typeof run.remoteVirtualActorId === 'string' ? run.remoteVirtualActorId : ''].filter(Boolean).join(','),
+    files: toCsv(new Set(Array.isArray(run.targetFiles) ? run.targetFiles.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : [])),
+    vendor: 'git-boundary-admission',
+    lane: typeof run.lane === 'string' && run.lane.trim() ? run.lane.trim() : 'n/a',
+    verdict: [run.outcome, run.verdict].filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).join(':') || 'n/a',
+    commits: toCsv(new Set([typeof run.baseCommit === 'string' ? run.baseCommit : '', localHead, remoteHead].filter(Boolean))),
+    transactions: typeof run.recommendation === 'string' && run.recommendation.trim() ? run.recommendation.trim() : 'n/a',
+    identities: identities || 'n/a',
+    evidence: runSource.replace(/\\/g, '/')
+  };
+}
+
 function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | null {
   if (typeof run.teamRunId !== 'string' || !run.teamRunId) {
     return null;
@@ -529,6 +576,9 @@ function summarizeTeamRun(run: TeamRun, runSource: string): BrokerRunSummary | n
 }
 
 function loadRunSummaries(runDir: string): BrokerRunSummary[] {
+  if (!existsSync(runDir)) {
+    return [];
+  }
   const rows: BrokerRunSummary[] = [];
   const entries = readdirSync(runDir, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
@@ -626,6 +676,37 @@ function loadRegistryAdmissionSummaries(atmRoot: string): BrokerRunSummary[] {
   } catch {
     return [];
   }
+}
+
+function loadGitBoundaryRunSummaries(atmRoot: string): BrokerRunSummary[] {
+  const runDir = path.join(atmRoot, '.atm', 'history', 'evidence', 'git-boundary-runs');
+  if (!existsSync(runDir)) {
+    return [];
+  }
+  const rows: BrokerRunSummary[] = [];
+  for (const fullPath of readdirSync(runDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.join(runDir, entry.name))
+    .sort()) {
+    try {
+      const raw = JSON.parse(readFileSync(fullPath, 'utf8')) as unknown;
+      let row: BrokerRunSummary | null = null;
+      if (isGitBoundaryEvidenceEnvelope(raw)) {
+        row = summarizeGitBoundaryEvidence(raw, fullPath);
+      } else if (raw && typeof raw === 'object') {
+        const nested = (raw as { evidence?: { gitBoundaryEvidence?: unknown } }).evidence?.gitBoundaryEvidence;
+        if (isGitBoundaryEvidenceEnvelope(nested)) {
+          row = summarizeGitBoundaryEvidence(nested, fullPath);
+        }
+      }
+      if (row) {
+        rows.push(row);
+      }
+    } catch {
+      // ignore malformed evidence files
+    }
+  }
+  return rows;
 }
 
 function listActiveTeamRunFiles(teamRunDir: string): string[] {
@@ -746,7 +827,8 @@ function main() {
   const rows = [
     ...loadRunSummaries(runDir),
     ...loadTeamRunSummaries(teamRunDir),
-    ...loadRegistryAdmissionSummaries(atmRoot)
+    ...loadRegistryAdmissionSummaries(atmRoot),
+    ...loadGitBoundaryRunSummaries(atmRoot)
   ]
     .filter((row) => {
       if (runFilter.size > 0 && !runFilter.has(row.runId)) {
@@ -785,6 +867,10 @@ function main() {
   writeFileSync(reportOutput, buildReport(uniqRows, taskArtifacts), 'utf8');
 
   console.log(`[collect-broker-evidence] runs=${uniqRows.length}, tasks=${taskArtifacts.length}, json=${jsonOutput}, report=${reportOutput}`);
+}
+
+function sanitizeRunId(value: string): string {
+  return value.replace(/[^A-Za-z0-9._-]+/g, '-');
 }
 
 main();
