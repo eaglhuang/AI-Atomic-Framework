@@ -8,14 +8,17 @@ import {
 
 export default defineCommandSpec({
   name: 'git',
-  summary: 'Prepare actor git identity, create governed commits with actor-scoped author env vars, verify ATM git-governance trailers, resolve task-scoped commit bundles, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
+  summary: 'Prepare actor git identity, evaluate pre-push git admission, create governed commits with actor-scoped author env vars, verify ATM git-governance trailers, resolve task-scoped commit bundles, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
   positional: [
-    { name: 'action', summary: 'prepare | check | commit', required: true }
+    { name: 'action', summary: 'prepare | admit | check | commit', required: true }
   ],
   options: [
     commonCwdOption,
     { flag: '--actor', value: 'id', summary: 'Actor id used for git identity and trailer checks.' },
     { flag: '--task', value: 'id', summary: 'Optional task id to enforce owner/claim/trailer consistency.' },
+    { flag: '--branch', value: 'name', summary: 'Branch name for git admit; defaults to the current HEAD branch.' },
+    { flag: '--remote', value: 'name', summary: 'Remote name for git admit; defaults to origin.' },
+    { flag: '--no-fetch', summary: 'For git admit: do not fetch the remote branch before diffing.' },
     { flag: '--name', value: 'text', summary: 'Override git author name for prepare/commit; with --email, also seeds the actor runtime identity profile during prepare.' },
     { flag: '--email', value: 'text', summary: 'Override git author email for prepare/commit; with --name, also seeds the actor runtime identity profile during prepare.' },
     { flag: '--session', value: 'session-id', summary: 'Optional ATM work session id for check/commit alignment.' },
@@ -34,6 +37,7 @@ export default defineCommandSpec({
   examples: [
     'node atm.mjs git prepare --task ATM-GOV-0105 --actor codex-main --json',
     'node atm.mjs git prepare --actor codex-main --name "Codex Main" --email codex-main@atm.local --json',
+    'node atm.mjs git admit --actor codex-main --branch main --remote origin --json',
     'node atm.mjs git check --task ATM-GOV-0105 --actor codex-main --json',
     'node atm.mjs git check --actor codex-main --json',
     'node atm.mjs git commit --actor codex-main --task TASK-AAO-0036 --message "atm: sync TASK-AAO-0036 ledger mirror" --json',
