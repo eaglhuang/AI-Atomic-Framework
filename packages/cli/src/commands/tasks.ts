@@ -1515,14 +1515,25 @@ async function runTasksDeliverAndClose(argv: string[]): Promise<CommandResult> {
       execFileSync('git', ['-C', options.cwd, 'add', '--', ...modifiedUnstaged], { stdio: 'ignore' });
     }
     const deliveryMessage = options.message ?? `feat: deliver ${options.taskId}`;
-    const deliveryResult = await runAtmGit([
-      'commit',
-      '--cwd', options.cwd,
-      '--actor', actorId,
-      '--task', options.taskId,
-      '--message', deliveryMessage,
-      '--json'
-    ]);
+    const previousBatchDeliverAndClose = process.env.ATM_BATCH_DELIVER_AND_CLOSE;
+    process.env.ATM_BATCH_DELIVER_AND_CLOSE = '1';
+    let deliveryResult;
+    try {
+      deliveryResult = await runAtmGit([
+        'commit',
+        '--cwd', options.cwd,
+        '--actor', actorId,
+        '--task', options.taskId,
+        '--message', deliveryMessage,
+        '--json'
+      ]);
+    } finally {
+      if (previousBatchDeliverAndClose == null) {
+        delete process.env.ATM_BATCH_DELIVER_AND_CLOSE;
+      } else {
+        process.env.ATM_BATCH_DELIVER_AND_CLOSE = previousBatchDeliverAndClose;
+      }
+    }
     if (!deliveryResult.ok) {
       throw new CliError('ATM_DELIVER_AND_CLOSE_DELIVERY_COMMIT_FAILED', `tasks deliver-and-close: delivery commit failed for ${options.taskId}.`, {
         exitCode: 1,

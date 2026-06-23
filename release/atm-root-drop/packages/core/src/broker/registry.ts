@@ -37,7 +37,12 @@ export function loadRegistry(filePath: string): WriteBrokerRegistryDocument {
 
   try {
     const raw = readFileSync(filePath, 'utf8');
-    return JSON.parse(raw) as WriteBrokerRegistryDocument;
+    const parsed = JSON.parse(raw) as WriteBrokerRegistryDocument;
+    const cleaned = cleanupStale(parsed);
+    if (cleaned.activeIntents.length !== parsed.activeIntents.length || cleaned.currentEpoch !== parsed.currentEpoch) {
+      saveRegistry(filePath, cleaned);
+    }
+    return cleaned;
   } catch {
     return {
       schemaId: 'atm.writeBrokerRegistry.v1',

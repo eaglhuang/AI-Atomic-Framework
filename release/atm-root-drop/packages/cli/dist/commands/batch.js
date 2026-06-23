@@ -963,7 +963,7 @@ function buildCompactBatchStatus(cwd, batchRun, taskQueue, consistency, activeBa
         consistency
     };
 }
-function buildPendingCheckpointCommitWindow(cwd, batchRun, taskQueue) {
+export function buildPendingCheckpointCommitWindow(cwd, batchRun, taskQueue) {
     if (!batchRun?.batchId || !Array.isArray(batchRun.taskIds))
         return null;
     const gitChanges = readGitChangedFiles(cwd);

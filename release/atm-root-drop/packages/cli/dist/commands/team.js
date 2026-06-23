@@ -6,6 +6,7 @@ import { TEAM_CLOSURE_ATTESTATION_SCHEMA_ID } from './evidence.js';
 import { getCommandSpec } from './command-specs.js';
 import { runTasks } from './tasks.js';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
+import { validateStrictPathHeuristic } from './tasks/task-import-validators.js';
 import { buildTeamKnowledgeSummary, runTeamKnowledge } from './team-knowledge.js';
 import { runTeamWave } from './team-wave.js';
 import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../core/dist/broker/team-lane.js';
@@ -1093,11 +1094,7 @@ function selectRecipe(input) {
         ?? input.recipes.recipes[0];
 }
 function inferTaskLanguage(task) {
-    const paths = [
-        ...normalizeStringArray(task.targetAllowedFiles),
-        ...normalizeStringArray(task.deliverables),
-        ...normalizeStringArray(task.scopePaths)
-    ];
+    const paths = collectTaskPathHints(task);
     if (paths.some((entry) => entry.endsWith('.py') || entry.includes('pipelines/')))
         return 'python';
     if (paths.some((entry) => entry.endsWith('.cs')))
@@ -1417,13 +1414,13 @@ function isUnsafeTeamLeasePath(rawPath, normalizedPath, repoRoot) {
         || normalizedPath.startsWith('../');
 }
 function deriveAllowedWriteScope(task, repoRoot) {
-    const explicitAllowed = normalizeStringArray(task.targetAllowedFiles);
+    const explicitAllowed = normalizeTaskPathArray(task.targetAllowedFiles, repoRoot);
     if (explicitAllowed.length > 0) {
-        return normalizeTaskWriteScope(explicitAllowed, repoRoot);
+        return uniqueStrings(explicitAllowed);
     }
     return normalizeTaskWriteScope([
-        ...normalizeStringArray(task.deliverables),
-        ...normalizeStringArray(task.scopePaths)
+        ...normalizeTaskPathArray(task.deliverables, repoRoot),
+        ...normalizeTaskPathArray(task.scopePaths, repoRoot)
     ], repoRoot);
 }
 function normalizeTaskWriteScope(paths, repoRoot) {
@@ -1598,11 +1595,11 @@ function buildSelectorResult(agent, recipeId, languageMatch, roleMatch, fallback
 }
 function collectImplementerHints(task, writePaths) {
     const scopePaths = uniqueStrings([
-        ...normalizeStringArray(task?.scopePaths),
-        ...normalizeStringArray(task?.targetAllowedFiles),
+        ...normalizeTaskPathArray(task?.scopePaths),
+        ...normalizeTaskPathArray(task?.targetAllowedFiles),
         ...writePaths
     ]);
-    const deliverables = uniqueStrings(normalizeStringArray(task?.deliverables));
+    const deliverables = uniqueStrings(normalizeTaskPathArray(task?.deliverables));
     const allPaths = uniqueStrings([...scopePaths, ...deliverables]);
     const fileExtensions = uniqueStrings(allPaths
         .map((entry) => path.posix.extname(entry.replace(/\\/g, '/')).toLowerCase())
@@ -1667,9 +1664,9 @@ export function assessLieutenantEscalation(task, writePaths, validation, brokerL
     const taskId = String(task?.workItemId ?? task?.taskId ?? '').trim();
     const normalizedTitle = String(task?.title ?? '').toLowerCase();
     const scopePaths = uniqueStrings([
-        ...normalizeStringArray(task?.scopePaths),
-        ...normalizeStringArray(task?.deliverables),
-        ...normalizeStringArray(task?.targetAllowedFiles)
+        ...normalizeTaskPathArray(task?.scopePaths),
+        ...normalizeTaskPathArray(task?.deliverables),
+        ...normalizeTaskPathArray(task?.targetAllowedFiles)
     ]);
     const scopeCount = scopePaths.length;
     const taskRepo = String(task?.targetRepo ?? task?.planningRepo ?? '').trim();
@@ -1680,8 +1677,8 @@ export function assessLieutenantEscalation(task, writePaths, validation, brokerL
         ...normalizeStringArray(task?.acceptance)
     ]).length;
     const closureSignals = Boolean(uniqueStrings([
-        ...normalizeStringArray(task?.scopePaths),
-        ...normalizeStringArray(task?.deliverables)
+        ...normalizeTaskPathArray(task?.scopePaths),
+        ...normalizeTaskPathArray(task?.deliverables)
     ]).some((entry) => /closure|evidence|git/i.test(entry))
         || /closure|evidence|git/i.test(normalizedTitle));
     const largeScriptRisk = atomizationChecklist.largeScriptRisk.level === 'high';
@@ -2503,13 +2500,25 @@ function summarizeTask(taskId, task) {
 }
 function deriveWritePaths(task, repoRoot) {
     const candidates = [
-        ...normalizeStringArray(task.targetAllowedFiles),
-        ...normalizeStringArray(task.deliverables),
-        ...normalizeStringArray(task.scopePaths)
+        ...normalizeTaskPathArray(task.targetAllowedFiles, repoRoot),
+        ...normalizeTaskPathArray(task.deliverables, repoRoot),
+        ...normalizeTaskPathArray(task.scopePaths, repoRoot)
     ];
     return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
         return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
     }));
+}
+function collectTaskPathHints(task) {
+    return uniqueStrings([
+        ...normalizeTaskPathArray(task?.targetAllowedFiles),
+        ...normalizeTaskPathArray(task?.deliverables),
+        ...normalizeTaskPathArray(task?.scopePaths)
+    ]);
+}
+function normalizeTaskPathArray(value, repoRoot) {
+    return normalizeStringArray(value)
+        .map((entry) => normalizeTeamLeasePath(entry, repoRoot))
+        .filter((entry) => Boolean(entry) && validateStrictPathHeuristic(entry) === null);
 }
 function normalizeStringArray(value) {
     return Array.isArray(value) ? value.map((entry) => String(entry).trim()).filter(Boolean) : [];

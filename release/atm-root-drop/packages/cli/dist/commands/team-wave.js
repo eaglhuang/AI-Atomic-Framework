@@ -5,6 +5,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from './shared.js';
+import { validateStrictPathHeuristic } from './tasks/task-import-validators.js';
 import { planWaves } from '../../../core/dist/broker/team-wave-planner.js';
 import { admitWave } from '../../../core/dist/broker/team-wave-admission.js';
 import { createTeamWaveEnvelope } from '../../../core/dist/broker/team-wave-envelope.js';
@@ -24,13 +25,24 @@ function toCandidate(task) {
     return {
         taskId: task.workItemId,
         dependencies: task.dependencies ?? [],
-        scopePaths: task.scopePaths ?? [],
-        deliverables: task.deliverables ?? [],
+        scopePaths: normalizeTaskPathArray(task.scopePaths),
+        deliverables: normalizeTaskPathArray(task.deliverables),
         validators: task.validators ?? [],
         targetRepo: task.targetRepo ?? null,
         closureAuthority: task.closureAuthority ?? null,
         ownerAtomOrMap: task.atomizationImpact?.ownerAtomOrMap ?? null
     };
+}
+function normalizeTaskPathArray(value) {
+    return uniqueStrings(normalizeStringArray(value)
+        .map((entry) => entry.replace(/\\/g, '/').trim().replace(/^\.\//, ''))
+        .filter((entry) => Boolean(entry) && validateStrictPathHeuristic(entry) === null));
+}
+function normalizeStringArray(value) {
+    return Array.isArray(value) ? value.map((entry) => String(entry).trim()).filter(Boolean) : [];
+}
+function uniqueStrings(values) {
+    return [...new Set(values)].sort((left, right) => left.localeCompare(right));
 }
 function closedTaskIds(cwd) {
     const dir = path.join(cwd, TASKS_DIR);

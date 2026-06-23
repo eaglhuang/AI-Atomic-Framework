@@ -5,6 +5,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message } from './shared.ts';
+import { validateStrictPathHeuristic } from './tasks/task-import-validators.ts';
 import {
   planWaves,
   type WaveCandidateCard,
@@ -41,13 +42,29 @@ function toCandidate(task: LedgerTask): WaveCandidateCard {
   return {
     taskId: task.workItemId,
     dependencies: task.dependencies ?? [],
-    scopePaths: task.scopePaths ?? [],
-    deliverables: task.deliverables ?? [],
+    scopePaths: normalizeTaskPathArray(task.scopePaths),
+    deliverables: normalizeTaskPathArray(task.deliverables),
     validators: task.validators ?? [],
     targetRepo: task.targetRepo ?? null,
     closureAuthority: task.closureAuthority ?? null,
     ownerAtomOrMap: task.atomizationImpact?.ownerAtomOrMap ?? null
   };
+}
+
+function normalizeTaskPathArray(value: unknown): string[] {
+  return uniqueStrings(
+    normalizeStringArray(value)
+      .map((entry) => entry.replace(/\\/g, '/').trim().replace(/^\.\//, ''))
+      .filter((entry) => Boolean(entry) && validateStrictPathHeuristic(entry) === null)
+  );
+}
+
+function normalizeStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((entry) => String(entry).trim()).filter(Boolean) : [];
+}
+
+function uniqueStrings(values: readonly string[]): string[] {
+  return [...new Set(values)].sort((left, right) => left.localeCompare(right));
 }
 
 function closedTaskIds(cwd: string): readonly string[] {

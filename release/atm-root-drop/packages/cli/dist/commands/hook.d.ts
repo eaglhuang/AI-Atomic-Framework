@@ -1,4 +1,4 @@
-import { detectFrameworkRepoIdentity } from './framework-development.ts';
+import { detectFrameworkRepoIdentity, type FrameworkRepoIdentity } from './framework-development.ts';
 export declare const hookContractVersion: "atm.integration-hooks/v1";
 export declare const hookProvider: "atm-framework-development-hooks/v1";
 export declare const hookMarker: "ATM_INTEGRATION_HOOK_CONTRACT_V1";
@@ -36,7 +36,7 @@ export declare function installGitHooks(cwd: string, options?: {
 }): {
     schemaId: string;
     generatedAt: string;
-    repoIdentity: import("./framework-development.ts").FrameworkRepoIdentity;
+    repoIdentity: FrameworkRepoIdentity;
     required: boolean;
     writtenFiles: string[];
     gitConfigExitCode: number;

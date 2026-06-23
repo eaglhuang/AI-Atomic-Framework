@@ -6,7 +6,7 @@ export default defineCommandSpec({
     positional: [
         { name: 'action', summary: 'list | add | verify | remove | hook | hooks', required: false },
         { name: 'adapter-id', summary: 'Adapter id for add/verify/remove or hook event/action.', required: false },
-        { name: 'hook-adapter-id', summary: 'Adapter id for hooks install/verify.', required: false }
+        { name: 'hook-adapter-id', summary: 'Adapter id for hooks install/verify/uninstall, including git-pre-push.', required: false }
     ],
     options: [
         commonCwdOption,
@@ -34,6 +34,9 @@ export default defineCommandSpec({
         'node atm.mjs integration hook pre-agent --editor copilot --json',
         'node atm.mjs integration hook pre-tool --editor claude-code --files packages/core/src/index.ts --json',
         'node atm.mjs integration hooks install copilot --json',
-        'node atm.mjs integration hooks verify claude-code --json'
+        'node atm.mjs integration hooks verify claude-code --json',
+        'node atm.mjs integration hooks install git-pre-push --json',
+        'node atm.mjs integration hooks verify git-pre-push --json',
+        'node atm.mjs integration hooks uninstall git-pre-push --json'
     ]
 });

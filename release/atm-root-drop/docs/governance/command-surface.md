@@ -91,3 +91,28 @@ The guard checks that:
 | `node atm.mjs validate` | Run repository or framework validation checks. |
 | `node atm.mjs verify` | Run verification checks for hashes, neutrality, or agents. |
 | `node atm.mjs welcome` | Print first-touch onboarding guidance. |
+
+## Planned Git Boundary Lane
+
+The current public `git` surface governs identity, governed commit, and git
+governance checks. `TASK-GIT-0001` reserves a future pre-push admission lane
+under the same top-level command family:
+
+- planned subcommand: `node atm.mjs git admit`
+- purpose: compare local and remote branch deltas from a merge base before push
+- contract: [git-boundary-admission-contract.md](./git-boundary-admission-contract.md)
+
+This planned lane must remain a `git` subcommand, not a new top-level ATM
+command.
+
+Related operator policy surfaces:
+
+- `node atm.mjs integration hooks verify git-pre-push`
+- `node atm.mjs git recover-push-fail`
+- `node atm.mjs git commit --no-verify --emergency-approval <leaseId> --reason "<why>"`
+
+Policy note:
+
+- local hooks are detectable but bypassable;
+- protected branch / server-side enforcement remains a deployment policy layer,
+  not a local MVP guarantee.

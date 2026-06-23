@@ -262,7 +262,7 @@ export declare function normalizeUpstreamEvidenceForTask(cwd: string, taskId: st
     evidencePath: string;
     changed: boolean;
 };
-export declare function requiredValidationPassesForClosure(requiredGates: readonly string[]): readonly string[];
+export declare function requiredValidationPassesForClosure(requiredGates: readonly string[], changedFiles?: readonly string[]): readonly string[];
 export declare function createClosurePacket(input: {
     readonly cwd: string;
     readonly taskId: string;

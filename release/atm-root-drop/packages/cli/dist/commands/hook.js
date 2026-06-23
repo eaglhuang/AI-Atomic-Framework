@@ -13,6 +13,7 @@ import { diagnoseTaskDirectionLockAllowedFiles, isPlanningMirrorPath, isTaskDire
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.js';
 import { runContextMapAdvisor } from './hook/context-map-advisor.js';
 import { readBrokerLifecycleState } from '../../../core/dist/broker/lifecycle.js';
+import { buildPendingCheckpointCommitWindow } from './batch.js';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from './tasks/task-import-validators.js';
 export const hookContractVersion = 'atm.integration-hooks/v1';
 export const hookProvider = 'atm-framework-development-hooks/v1';
@@ -141,7 +142,7 @@ export function installGitHooks(cwd, options = {}) {
     mkdirSync(hooksDir, { recursive: true });
     const writtenFiles = hookFileNames.map((hookName) => {
         const hookPath = path.join(hooksDir, hookName);
-        writeFileSync(hookPath, createGitHookScript(hookName), 'utf8');
+        writeFileSync(hookPath, createGitHookScript(hookName, repoIdentity), 'utf8');
         try {
             chmodSync(hookPath, 0o755);
         }
@@ -1558,10 +1559,22 @@ function resolvePushBase(cwd, explicitBase) {
         currentBranch
     };
 }
-function createGitHookScript(hookName) {
-    const command = hookName === 'pre-commit'
-        ? 'node atm.mjs hook pre-commit --json'
-        : 'node atm.mjs hook pre-push --json';
+function createGitHookScript(hookName, repoIdentity) {
+    const action = hookName === 'pre-commit' ? 'pre-commit' : 'pre-push';
+    const command = `node atm.mjs hook ${action} --json`;
+    if (!repoIdentity.isFrameworkRepo) {
+        return [
+            '#!/usr/bin/env sh',
+            'set -eu',
+            `# ${hookMarker}`,
+            '',
+            'repo_root="$(git rev-parse --show-toplevel)"',
+            'cd "$repo_root"',
+            '',
+            command,
+            ''
+        ].join('\n');
+    }
     return [
         '#!/usr/bin/env sh',
         'set -eu',
@@ -1570,7 +1583,12 @@ function createGitHookScript(hookName) {
         'repo_root="$(git rev-parse --show-toplevel)"',
         'cd "$repo_root"',
         '',
-        command,
+        'runner="atm.mjs"',
+        'if [ -f "atm.dev.mjs" ] && [ -f "packages/cli/src/atm.ts" ] && [ -f "packages/core/src/index.ts" ]; then',
+        '  runner="atm.dev.mjs"',
+        'fi',
+        '',
+        `node "$runner" hook ${action} --json`,
         ''
     ].join('\n');
 }
@@ -1584,7 +1602,8 @@ function inspectHookFile(cwd, hookName) {
     return {
         path: relativePath,
         present: true,
-        markerPresent: text.includes(hookMarker) && text.includes(`node atm.mjs hook ${hookName}`),
+        markerPresent: text.includes(hookMarker) && (text.includes(`node atm.mjs hook ${hookName}`)
+            || text.includes(`node "$runner" hook ${hookName} --json`)),
         sha256: sha256(readFileSync(absolutePath))
     };
 }
@@ -2104,10 +2123,15 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
     const findings = [];
     const activeBatches = listActiveBatchRuns(cwd);
     const stagedBatch = activeBatches.find((batchRun) => batchRun.taskIds.some((taskId) => protectedFiles.some((file) => normalizeRelativePath(file).toLowerCase() === `.atm/history/tasks/${taskId.toLowerCase()}.json`))) ?? null;
+    const pendingBatchCheckpointWindow = activeBatches
+        .map((batchRun) => buildPendingCheckpointCommitWindow(cwd, batchRun, null))
+        .find((window) => window && protectedFiles.every((file) => isPathAllowedByScope(file, uniqueSorted([...window.commitFiles, ...window.changedFiles])))) ?? null;
+    const batchDeliverAndCloseCommit = process.env.ATM_BATCH_DELIVER_AND_CLOSE === '1';
     const nonAtmStagedFiles = stagedFiles
         .map((entry) => normalizeRelativePath(entry))
         .filter((entry) => !entry.toLowerCase().startsWith('.atm/'));
     if (stagedBatch?.status === 'active'
+        && !batchDeliverAndCloseCommit
         && nonAtmStagedFiles.length > 0
         && !hasStagedBatchCheckpointClosure(cwd, protectedFiles, stagedBatch.taskIds, stagedBatch.batchId)) {
         const requiredCommand = `node atm.mjs batch checkpoint --actor <id> --batch ${stagedBatch.batchId} --json`;
@@ -2134,6 +2158,11 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
         };
     }
     const stagedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
+    const singleStagedTaskId = stagedTaskIds.length === 1 ? stagedTaskIds[0] : null;
+    const effectiveSingleStagedTaskId = singleStagedTaskId ?? pendingBatchCheckpointWindow?.taskId ?? null;
+    const pendingBatchCheckpointAllowedFiles = pendingBatchCheckpointWindow
+        ? uniqueSorted([...pendingBatchCheckpointWindow.commitFiles, ...pendingBatchCheckpointWindow.changedFiles])
+        : [];
     for (const file of protectedFiles) {
         const normalized = normalizeRelativePath(file);
         const lower = normalized.toLowerCase();
@@ -2239,6 +2268,21 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
                 }
                 continue;
             }
+            if (pendingBatchCheckpointAllowedFiles.length > 0 && isPathAllowedByScope(normalized, pendingBatchCheckpointAllowedFiles)) {
+                continue;
+            }
+            if (effectiveSingleStagedTaskId && isNestedEvidenceArtifactPath(normalized)) {
+                const taskIdLower = effectiveSingleStagedTaskId.toLowerCase();
+                const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${effectiveSingleStagedTaskId}.json`);
+                const hasSiblingEvent = protectedFiles.some((entry) => {
+                    const candidate = normalizeRelativePath(entry).toLowerCase();
+                    return candidate.startsWith(`.atm/history/task-events/${taskIdLower}/`);
+                });
+                const hasSiblingTaskEvidence = stagedSet.has(`.atm/history/evidence/${effectiveSingleStagedTaskId}.json`);
+                if (hasSiblingTask || hasSiblingEvent || hasSiblingTaskEvidence) {
+                    continue;
+                }
+            }
             const taskId = typeof evidence?.taskId === 'string' ? evidence.taskId : path.basename(normalized, '.json');
             const hasSiblingTask = stagedSet.has(`.atm/history/tasks/${taskId}.json`);
             const hasSiblingEvent = protectedFiles.some((entry) => {
@@ -2276,6 +2320,13 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
         files: protectedFiles,
         findings
     };
+}
+function isNestedEvidenceArtifactPath(value) {
+    const normalized = normalizeRelativePath(value).toLowerCase();
+    if (!normalized.startsWith('.atm/history/evidence/'))
+        return false;
+    const relative = normalized.slice('.atm/history/evidence/'.length);
+    return relative.includes('/');
 }
 function hasStagedBatchCheckpointClosure(cwd, protectedFiles, batchTaskIds, batchId = null) {
     const protectedSet = new Set(protectedFiles.map((entry) => normalizeRelativePath(entry)));
@@ -2319,14 +2370,18 @@ function inspectCommitAttribution(cwd, stagedFiles) {
     const claimLeaseId = normalizeOptionalText(process.env.ATM_COMMIT_CLAIM_LEASE_ID);
     const sessionId = normalizeOptionalText(process.env.ATM_COMMIT_SESSION_ID);
     const stagedTaskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+    const pendingBatchCheckpointTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
     const findings = [];
+    const suggestedTaskId = pendingBatchCheckpointTaskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : stagedTaskIds[0] ?? null);
     if (!actorId && !taskId && !sessionId) {
         if (stagedTaskIds.length > 0) {
             const wrapperRequired = {
                 code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
                 source: 'commit-attribution',
                 detail: 'Staged ATM task/evidence changes must commit through node atm.mjs git commit so ATM can bind author, session, claim, and trailers consistently. Direct git commit remains valid for read-only git and non-governed maintenance.',
-                requiredCommand: `node atm.mjs git commit --actor <id> --task ${stagedTaskIds[0]} --message "<summary>" --json`,
+                requiredCommand: suggestedTaskId
+                    ? `node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json`
+                    : 'node atm.mjs git commit --actor <id> --task <task> --message "<summary>" --json',
                 classification: 'current-task'
             };
             return {
@@ -2339,7 +2394,7 @@ function inspectCommitAttribution(cwd, stagedFiles) {
             findings
         };
     }
-    const effectiveTaskId = taskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : null);
+    const effectiveTaskId = taskId ?? pendingBatchCheckpointTaskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : null);
     if (!actorId || (stagedTaskIds.length > 0 && !effectiveTaskId)) {
         findings.push({
             code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
@@ -2394,7 +2449,8 @@ function inspectCommitAttribution(cwd, stagedFiles) {
     const mirrorSyncOnly = inspectMirrorSyncOnlyStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
     const historicalLedgerRestore = inspectHistoricalLedgerRestoreStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
     const closeCommitWindow = inspectCloseCommitWindowStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
-    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok;
+    const pendingBatchCheckpoint = inspectPendingBatchCheckpointStagedArtifacts(cwd, effectiveTaskId, stagedFiles);
+    const bypassesActiveSession = mirrorSyncOnly.ok || historicalLedgerRestore.ok || closeCommitWindow.ok || pendingBatchCheckpoint.ok;
     const claimForSession = bypassesActiveSession ? null : claim;
     const session = bypassesActiveSession && !sessionId ? null : resolveActorWorkSession(cwd, {
         sessionId,
@@ -2610,6 +2666,11 @@ function inferTaskIdsFromStagedFiles(stagedFiles) {
             taskIds.add(closurePacketMatch[1]);
             continue;
         }
+        const bundleManifestMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.bundle-manifest\.json$/i);
+        if (bundleManifestMatch) {
+            taskIds.add(bundleManifestMatch[1]);
+            continue;
+        }
         const evidenceMatch = normalized.match(/^\.atm\/history\/evidence\/([^/]+)\.json$/i);
         if (evidenceMatch) {
             taskIds.add(evidenceMatch[1]);
@@ -2621,6 +2682,23 @@ function inferTaskIdsFromStagedFiles(stagedFiles) {
         }
     }
     return [...taskIds].sort((left, right) => left.localeCompare(right));
+}
+function resolvePendingBatchCheckpointTaskId(cwd, stagedFiles) {
+    const activeBatches = listActiveBatchRuns(cwd);
+    const window = activeBatches
+        .map((batchRun) => buildPendingCheckpointCommitWindow(cwd, batchRun, null))
+        .find((candidate) => candidate && stagedFiles.every((file) => isPathAllowedByScope(file, uniqueSorted([...candidate.commitFiles, ...candidate.changedFiles])))) ?? null;
+    return window?.taskId ?? null;
+}
+function inspectPendingBatchCheckpointStagedArtifacts(cwd, taskId, stagedFiles) {
+    const pendingTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
+    if (!pendingTaskId) {
+        return { ok: false, reason: 'no-pending-batch-checkpoint-window' };
+    }
+    if (!taskIdsEqual(pendingTaskId, taskId)) {
+        return { ok: false, reason: `window-task-mismatch:${pendingTaskId}` };
+    }
+    return { ok: true, reason: 'pending-batch-checkpoint-window' };
 }
 function resolveResidueTaskId(cwd) {
     const stagedTaskIds = inferTaskIdsFromStagedFiles(readStagedFiles(cwd));

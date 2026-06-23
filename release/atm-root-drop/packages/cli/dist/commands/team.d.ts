@@ -807,7 +807,7 @@ export declare function writeTeamRun(input: {
             brokerSubagentEnabled: boolean;
             brokerDecisionSurface: "brokerLane";
             brokerStewardId: "neutral-write-steward";
-            brokerGoverns: ("write-intents" | "scope-conflicts" | "steward-apply" | "commit-lane")[];
+            brokerGoverns: ("steward-apply" | "write-intents" | "scope-conflicts" | "commit-lane")[];
             brokerEvidenceRequired: ("atm.brokerOperationRunRecordEnvelope.v1" | "atm.stewardApplyEvidence.v1" | "atm.teamBrokerLaneEvidence.v1")[];
             commitLaneSerializedBy: "branch-commit-queue";
             commitLaneOwnerRole: "coordinator";

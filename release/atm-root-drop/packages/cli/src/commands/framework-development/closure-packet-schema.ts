@@ -1220,7 +1220,10 @@ export function validateClosurePacket(value: unknown): {
     missing.push('validationPasses');
   } else {
     const recorded = new Set(packet.validationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim()));
-    for (const gate of requiredValidationPassesForClosure(packet.requiredGates ?? [])) {
+    for (const gate of requiredValidationPassesForClosure(
+      packet.requiredGates ?? [],
+      packet.targetCommitDelta?.changedFiles ?? []
+    )) {
       if (!recorded.has(gate)) {
         missing.push(`validationPasses/${gate}`);
       }
@@ -1359,8 +1362,24 @@ function refreshPacketFromEvidenceContext(cwd: string, taskId: string, packet: C
   });
 }
 
-export function requiredValidationPassesForClosure(requiredGates: readonly string[]) {
-  return uniqueSorted(requiredGates.filter((gate) => gate === 'typecheck' || gate.startsWith('validate:')));
+export function requiredValidationPassesForClosure(
+  requiredGates: readonly string[],
+  changedFiles: readonly string[] = []
+) {
+  const concreteChangedFiles = changedFiles.filter((entry) => !looksLikeScopePattern(entry));
+  const touchedIntegrations = concreteChangedFiles.some((entry) => /^(templates|integrations)\//.test(entry));
+  const touchedRelease = concreteChangedFiles.some((entry) => /^(release|templates\/root-drop|scripts\/build-)/.test(entry) || entry === 'atm.mjs');
+  return uniqueSorted(requiredGates.filter((gate) => {
+    if (gate === 'typecheck') return true;
+    if (!gate.startsWith('validate:')) return false;
+    if (gate === 'validate:integration-adapter' || gate === 'validate:skill-templates') {
+      return touchedIntegrations;
+    }
+    if (gate === 'validate:root-drop-release' || gate === 'validate:onefile-release') {
+      return touchedRelease;
+    }
+    return true;
+  }));
 }
 
 export function createClosurePacket(input: {
@@ -2288,15 +2307,20 @@ function inspectPinnedRunner(cwd: string): PinnedRunnerStatus {
 
 function buildRequiredGates(criticalChangedFiles: readonly string[]): readonly string[] {
   const gates = new Set<string>(defaultRequiredGates);
-  if (criticalChangedFiles.some((entry) => /^(templates|integrations)\//.test(entry))) {
+  const concreteChangedFiles = criticalChangedFiles.filter((entry) => !looksLikeScopePattern(entry));
+  if (concreteChangedFiles.some((entry) => /^(templates|integrations)\//.test(entry))) {
     gates.add('validate:integration-adapter');
     gates.add('validate:skill-templates');
   }
-  if (criticalChangedFiles.some((entry) => /^(release|templates\/root-drop|scripts\/build-)/.test(entry) || entry === 'atm.mjs')) {
+  if (concreteChangedFiles.some((entry) => /^(release|templates\/root-drop|scripts\/build-)/.test(entry) || entry === 'atm.mjs')) {
     gates.add('validate:root-drop-release');
     gates.add('validate:onefile-release');
   }
   return [...gates];
+}
+
+function looksLikeScopePattern(relativePath: string): boolean {
+  return relativePath.includes('*');
 }
 
 function isDocOnlyPath(relativePath: string): boolean {

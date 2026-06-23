@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-7ed67dcca57a",
+  "recordedAt": "2026-06-23T06:46:31.990Z",
+  "actorId": "codex-main",
+  "taskId": "TASK-GIT-0010",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0010 --actor codex-main --status done --json",
+  "flags": [
+    "--historical-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-GIT-0010-19ea6d1f25",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.close"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-06-23T06-46-31-989Z-EMG-TASK-GIT-0010-19ea6d1f25.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

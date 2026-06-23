@@ -173,6 +173,9 @@ export async function runAtmGit(argv: string[]) {
   if (options.action === 'admit') {
     return runGitAdmission(options);
   }
+  if (options.action === 'recover-push-fail') {
+    return runGitPostPushFailRecovery(options);
+  }
   if (options.action === 'commit') {
     return runGitCommit(options);
   }
@@ -269,6 +272,112 @@ function runGitAdmission(options: ParsedGitOptions) {
         topology,
         conflictingFiles: result.conflictingFiles,
         recommendedNextStep: stewardAction?.recommendedNextStep ?? result.recommendedNextStep
+      }
+    )],
+    evidence
+  });
+}
+
+function runGitPostPushFailRecovery(options: ParsedGitOptions) {
+  if (!options.actorId?.trim()) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', `git recover-push-fail requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
+  }
+  const branch = options.branch?.trim() || resolveCurrentBranchName(options.cwd);
+  const remote = options.remote?.trim() || 'origin';
+  const remoteRef = `${remote}/${branch}`;
+  const localHeadBeforeFetch = readHeadCommitSha(options.cwd);
+  const remoteHeadBeforeFetch = readRevisionIfExists(options.cwd, remoteRef);
+  const localBehindRemoteBeforeFetch = isAncestorCommit(options.cwd, localHeadBeforeFetch, remoteHeadBeforeFetch);
+  const localDivergedBeforeFetch = haveDiverged(options.cwd, localHeadBeforeFetch, remoteHeadBeforeFetch);
+
+  const result = evaluateGitAdmission({
+    cwd: options.cwd,
+    actorId: options.actorId,
+    taskId: options.taskId,
+    branch,
+    remote,
+    fetch: true,
+    gitExecutable: resolveGitExecutable()
+  });
+
+  const remoteHeadAfterFetch = result.topology.remoteSha;
+  const remoteChangedAfterFetch = Boolean(
+    remoteHeadBeforeFetch
+    && remoteHeadAfterFetch
+    && remoteHeadBeforeFetch !== remoteHeadAfterFetch
+  );
+  const localBehindRemoteAfterFetch = isAncestorCommit(options.cwd, result.topology.headSha, result.topology.remoteSha);
+  const localDivergedAfterFetch = haveDiverged(options.cwd, result.topology.headSha, result.topology.remoteSha);
+  const likelyRemoteChanged = remoteChangedAfterFetch || localBehindRemoteBeforeFetch || localDivergedBeforeFetch;
+  const likelyNonFastForward = localBehindRemoteAfterFetch || localDivergedAfterFetch;
+  const recoveryRecommendation = buildPostPushRecoveryRecommendation({
+    outcome: result.outcome,
+    remoteChangedAfterFetch,
+    likelyRemoteChanged,
+    likelyNonFastForward,
+    conflictingFiles: result.conflictingFiles,
+    defaultRecommendation: result.recommendedNextStep
+  });
+  const recoveryKind = classifyPostPushRecoveryKind({
+    outcome: result.outcome,
+    likelyNonFastForward,
+    remoteChangedAfterFetch
+  });
+  const gitBoundaryEvidence = buildGitBoundaryEvidenceEnvelope({
+    actorId: options.actorId,
+    taskId: options.taskId,
+    result
+  });
+  const evidence = {
+    action: 'recover-push-fail',
+    outcome: result.outcome,
+    topology: result.topology,
+    brokerRegistryPath: path.relative(options.cwd, result.brokerRegistryPath) || path.basename(result.brokerRegistryPath),
+    conflictingFiles: result.conflictingFiles,
+    recommendedNextStep: recoveryRecommendation,
+    brokerDecision: result.brokerDecision,
+    diagnostics: result.diagnostics,
+    local: result.local,
+    remote: result.remote,
+    gitBoundaryEvidence,
+    recovery: {
+      mode: 'post-push-fail',
+      branch,
+      remote,
+      remoteRef,
+      fetched: true,
+      recoveryKind,
+      localHeadBeforeFetch,
+      remoteHeadBeforeFetch,
+      remoteHeadAfterFetch,
+      remoteChangedAfterFetch,
+      likelyRemoteChanged,
+      likelyNonFastForward,
+      localBehindRemoteBeforeFetch,
+      localBehindRemoteAfterFetch,
+      localDivergedBeforeFetch,
+      localDivergedAfterFetch
+    }
+  };
+  const ok = result.outcome === 'allow' || result.outcome === 'no-op' || result.outcome === 'composer-routed';
+  return makeResult({
+    ok,
+    command: 'git',
+    cwd: options.cwd,
+    messages: [message(
+      result.outcome === 'block' || result.outcome === 'internal-error' ? 'error' : result.outcome === 'composer-routed' ? 'warn' : 'info',
+      `ATM_GIT_POST_PUSH_FAIL_${result.outcome.toUpperCase().replace(/-/g, '_')}`,
+      `Post-push recovery outcome '${result.outcome}' after refreshing ${remoteRef}. ${recoveryRecommendation}`,
+      {
+        outcome: result.outcome,
+        branch,
+        remote,
+        remoteRef,
+        conflictingFiles: result.conflictingFiles,
+        recommendedNextStep: recoveryRecommendation,
+        recoveryKind,
+        remoteChangedAfterFetch,
+        likelyNonFastForward
       }
     )],
     evidence
@@ -1001,7 +1110,7 @@ function runGitCommit(options: ParsedGitOptions) {
 
 interface ParsedGitOptions {
   readonly cwd: string;
-  readonly action: 'prepare' | 'admit' | 'check' | 'commit';
+  readonly action: 'prepare' | 'admit' | 'recover-push-fail' | 'check' | 'commit';
   readonly actorId: string | null;
   readonly taskId: string | null;
   readonly branch: string | null;
@@ -1148,13 +1257,13 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     if (options.action) {
       throw new CliError('ATM_CLI_USAGE', 'git accepts only one action.', { exitCode: 2 });
     }
-    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'check' && arg !== 'commit') {
-      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, check, commit', { exitCode: 2 });
+    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit') {
+      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit', { exitCode: 2 });
     }
     options.action = arg;
   }
   if (!options.action) {
-    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | check | commit).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | recover-push-fail | check | commit).', { exitCode: 2 });
   }
   return {
     ...options,
@@ -2093,6 +2202,102 @@ function readHeadCommitSha(cwd: string): string | null {
   } catch {
     return null;
   }
+}
+
+function resolveCurrentBranchName(cwd: string): string {
+  try {
+    const value = execFileSync('git', ['branch', '--show-current'], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    return value || 'main';
+  } catch {
+    return 'main';
+  }
+}
+
+function readRevisionIfExists(cwd: string, revision: string): string | null {
+  try {
+    const value = execFileSync('git', ['rev-parse', '--verify', revision], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+    return value || null;
+  } catch {
+    return null;
+  }
+}
+
+function isAncestorCommit(cwd: string, left: string | null, right: string | null): boolean {
+  if (!left || !right) {
+    return false;
+  }
+  try {
+    execFileSync('git', ['merge-base', '--is-ancestor', left, right], {
+      cwd,
+      stdio: 'ignore'
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function haveDiverged(cwd: string, left: string | null, right: string | null): boolean {
+  if (!left || !right || left === right) {
+    return false;
+  }
+  return !isAncestorCommit(cwd, left, right) && !isAncestorCommit(cwd, right, left);
+}
+
+function classifyPostPushRecoveryKind(input: {
+  outcome: ReturnType<typeof evaluateGitAdmission>['outcome'];
+  likelyNonFastForward: boolean;
+  remoteChangedAfterFetch: boolean;
+}) {
+  if (input.outcome === 'composer-routed') {
+    return 'steward-apply';
+  }
+  if (input.outcome === 'block' || input.likelyNonFastForward) {
+    return 'rebase';
+  }
+  if (input.outcome === 'allow' || input.outcome === 'no-op') {
+    return input.remoteChangedAfterFetch ? 'rebase' : 'retry-after-no-op';
+  }
+  return 'inspect';
+}
+
+function buildPostPushRecoveryRecommendation(input: {
+  outcome: ReturnType<typeof evaluateGitAdmission>['outcome'];
+  remoteChangedAfterFetch: boolean;
+  likelyRemoteChanged: boolean;
+  likelyNonFastForward: boolean;
+  conflictingFiles: readonly string[];
+  defaultRecommendation: string;
+}) {
+  if (input.outcome === 'composer-routed') {
+    return input.conflictingFiles.length > 0
+      ? `Push rejection recovery reran admission after fetch and found a mergeable same-file conflict in ${input.conflictingFiles.join(', ')}. Use git admit --steward-plan or --apply-to-working-tree, then validate and retry the push manually.`
+      : 'Push rejection recovery reran admission after fetch and found a mergeable same-file conflict. Use git admit --steward-plan or --apply-to-working-tree, then validate and retry the push manually.';
+  }
+  if (input.outcome === 'block' || input.likelyNonFastForward) {
+    return input.remoteChangedAfterFetch || input.likelyRemoteChanged
+      ? `Push rejection likely came from a non-fast-forward remote change. Rebase or otherwise replay your local commits on top of the refreshed remote branch before retrying push. ${input.defaultRecommendation}`
+      : `Push rejection still maps to a blocked admission lane. Rebase, split the work, or reroute through the governed conflict workflow before retrying push. ${input.defaultRecommendation}`;
+  }
+  if (input.outcome === 'no-op') {
+    return input.remoteChangedAfterFetch
+      ? 'After refresh, no local-only delta remains to admit. If the remote already contains the intended change, no retry is needed; otherwise inspect your local branch state before pushing again.'
+      : 'After refresh, no local-only delta remains to admit and the remote did not move. Treat the failure as a likely transient/no-op rejection and retry the push if needed.';
+  }
+  if (input.outcome === 'allow') {
+    return input.remoteChangedAfterFetch
+      ? 'Admission is now clean, but the remote advanced during the failed push. Integrate the refreshed remote branch locally, then retry the push.'
+      : 'Admission is clean after the failed push and the remote did not move during recovery. Retry the push if the previous rejection was transient.';
+  }
+  return `Post-push recovery could not classify the rejection cleanly. ${input.defaultRecommendation}`;
 }
 
 function isHeadRaceCommitFailure(stderr: string): boolean {

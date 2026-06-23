@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-e103ed5beed9",
+  "recordedAt": "2026-06-23T05:10:38.696Z",
+  "actorId": "codex-main",
+  "taskId": "TASK-GIT-0004",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-main --task TASK-GIT-0004 --message \"fix(git): recover admission cli source commit\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-GIT-0004-8b1efc7fe4",
+  "reason": "Repair TASK-GIT-0004 source commit gap after batch checkpoint advanced to TASK-GIT-0005",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-06-23T05-10-35-079Z-EMG-TASK-GIT-0004-8b1efc7fe4.json",
+  "parentEventId": "POA-c021f6b1f9b1",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}
