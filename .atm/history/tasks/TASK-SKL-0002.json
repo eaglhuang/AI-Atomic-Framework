@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0002",
+  "title": "Tool Bridge v1 schema and result adapter",
+  "status": "running",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-SKL-0001"
+  ],
+  "acceptance": [
+    "Top-level tool result shape covers `ok`, `command`, `cwd`, `messages`, `evidence`, `nextAction`, `userNotice`, `runnerMode`, and follow-up fields.",
+    "Existing ATM message codes can be preserved as machine-readable `code` values in tool results.",
+    "Bridge transport and parameter validation are separated from governance semantics.",
+    "The bridge contract leaves room for shared skill-growth payloads such as learning categories, durable rules, or tooling-mismatch diagnostics without forcing each skill to invent its own envelope.",
+    "Focused tests prove tool output remains stable across representative success, blocked, and notice-bearing cases."
+  ],
+  "deliverables": [
+    "packages/cli/src/**",
+    "schemas/**",
+    "tests/cli/**",
+    "docs/**"
+  ],
+  "tags": [],
+  "notes": "- This card is the contract foundation for the whole SKL lane. Successor cards should consume the shared bridge rather than invent local response wrappers.",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0002-tool-bridge-v1-schema-and-result-adapter.task.md",
+    "sectionTitle": "TASK-SKL-0002",
+    "headingLine": 42,
+    "hash": "e61921fe2f0be575"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "packages/cli/src/**",
+    "packages/core/src/**",
+    "schemas/**",
+    "tests/cli/**",
+    "docs/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not introduce a second governance engine beside ATM CLI/runtime.",
+    "Do not require a remote service for v1."
+  ],
+  "nonGoals": [
+    "No full editor plugin rewrite in this card.",
+    "No direct skill migration before the bridge contract is stable."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the bridge schema/adapter commit if the result surface or compatibility contract regresses.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tool-bridge-v1-contract",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T15-19-02-714Z-claim-7973336fcd3d",
+  "lastTransitionAt": "2026-06-23T15:19:02.714Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T15:19:02.537Z",
+  "promotedAt": "2026-06-23T15:19:02.540Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-b7fa989ea557",
+    "claimedAt": "2026-06-23T15:19:02.543Z",
+    "heartbeatAt": "2026-06-23T15:19:02.543Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0002.json",
+      "docs/**",
+      "packages/cli/src/**",
+      "packages/core/src/**",
+      "schemas/**",
+      "tests/cli/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-23T15:19:02.543Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623151902-codex-main-TASK-SKL-0002-0382235cc3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0002",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0002.*",
+      ".atm/history/task-events/TASK-SKL-0002/**",
+      ".atm/history/tasks/TASK-SKL-0002.json",
+      "docs/**",
+      "packages/cli/src/**",
+      "packages/core/src/**",
+      "schemas/**",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "921286b71a7b15c15a6438ed9e0f4c84df5d2ee0102c5b364e771e65ba2d6d8f",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T15:19:02.713Z",
+    "status": "active"
+  }
+}

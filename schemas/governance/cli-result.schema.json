@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.dev/schemas/governance/cli-result.schema.json",
+  "title": "ATM CLI Result Contract",
+  "description": "Machine-readable ATM CLI result envelope used by CLI, skill, and tool-bridge consumers.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "ok",
+    "command",
+    "mode",
+    "cwd",
+    "messages",
+    "evidence",
+    "severity",
+    "exitCode",
+    "blocking",
+    "diagnostics"
+  ],
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cwd": {
+      "type": "string",
+      "minLength": 1
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["level", "code", "text", "data"],
+        "properties": {
+          "level": {
+            "type": "string",
+            "minLength": 1
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^ATM_[A-Z0-9_]+$"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object"
+    },
+    "nextAction": {
+      "type": ["object", "null"]
+    },
+    "userNotice": {
+      "type": ["object", "null"]
+    },
+    "runnerMode": {
+      "type": ["object", "null"]
+    },
+    "allowedCommands": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "blockedCommands": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "skillGrowth": {
+      "type": ["object", "null"],
+      "description": "Optional shared growth payload for reusable routing, exception, and learning-loop hints."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["success", "advisory", "blocked", "usage-error", "failure"]
+    },
+    "exitCode": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "blocking": {
+      "type": "boolean"
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["errorCodes", "warningCodes", "infoCodes"],
+      "properties": {
+        "errorCodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ATM_[A-Z0-9_]+$"
+          }
+        },
+        "warningCodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ATM_[A-Z0-9_]+$"
+          }
+        },
+        "infoCodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^ATM_[A-Z0-9_]+$"
+          }
+        }
+      }
+    }
+  }
+}

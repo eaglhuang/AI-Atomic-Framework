@@ -2093,8 +2093,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
         return [];
       }
     }) : [];
-  const skipExternalTaskCardScan = shouldSkipExternalTaskCardScan(jsonTasks, taskIntent);
-  const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent)
+  const skipMarkdownTaskDiscovery = shouldSkipMarkdownTaskDiscovery(cwd, jsonTasks, taskIntent);
+  const skipExternalTaskCardScan = skipMarkdownTaskDiscovery || shouldSkipExternalTaskCardScan(cwd, jsonTasks, taskIntent);
+  const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent) && !skipMarkdownTaskDiscovery
     ? uniqueSorted([
       ...listTaskCardFiles(cwd),
       ...(skipExternalTaskCardScan ? [] : listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots))
@@ -2219,14 +2220,30 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
   };
 }
 
-function shouldSkipExternalTaskCardScan(
+export function shouldSkipExternalTaskCardScan(
+  cwd: string,
   jsonTasks: readonly ImportedTaskSummary[],
   taskIntent: TaskIntent | null
 ): boolean {
   if (!taskIntent?.taskScopeMentioned) return false;
   if (taskIntent.mentionedPlanPaths.length > 0) return false;
+  const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
+  if (promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0) {
+    return true;
+  }
   if (taskIntent.mentionedTaskIds.length === 0 && taskIntent.taskRootHints.length === 0) return false;
   return jsonTasks.some((task) => isTaskExplicitlyMentioned(task, taskIntent));
+}
+
+export function shouldSkipMarkdownTaskDiscovery(
+  cwd: string,
+  jsonTasks: readonly ImportedTaskSummary[],
+  taskIntent: TaskIntent | null
+): boolean {
+  if (!taskIntent?.taskScopeMentioned) return false;
+  if (taskIntent.mentionedPlanPaths.length > 0) return false;
+  const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
+  return Boolean(promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0);
 }
 
 function selectImportedTaskForPromptScope(

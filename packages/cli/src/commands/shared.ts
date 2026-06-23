@@ -154,6 +154,7 @@ export interface ToolBridgeProjection {
   runnerMode?: Record<string, unknown> | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
+  skillGrowth?: Record<string, unknown> | null;
 }
 
 /** Public CLI result severity — part of the machine-readable result contract. */
@@ -191,6 +192,11 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
     : nextAction && isRecord(nextAction.runnerMode)
       ? nextAction.runnerMode
       : null;
+  const skillGrowth = isRecord(evidence.skillGrowth)
+    ? evidence.skillGrowth
+    : nextAction && isRecord(nextAction.skillGrowth)
+      ? nextAction.skillGrowth
+      : null;
   const allowedCommands = readStringList(evidence.allowedCommands)
     ?? (nextAction ? readStringList(nextAction.allowedCommands) : undefined);
   const blockedCommands = readStringList(evidence.blockedCommands)
@@ -200,7 +206,8 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
     userNotice,
     runnerMode,
     allowedCommands,
-    blockedCommands
+    blockedCommands,
+    skillGrowth
   };
 }
 

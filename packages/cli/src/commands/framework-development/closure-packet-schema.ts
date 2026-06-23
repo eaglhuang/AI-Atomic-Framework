@@ -479,10 +479,10 @@ const defaultIgnoredDirs = new Set([
 ]);
 
 const markdownCompletionPatterns = [
-  /status:\s*\*\*(?:all\s+)?completed\*\*/i,
-  /\bALL\s+COMPLETED\b/i,
-  /\b16\s*\/\s*16\b/i,
-  /\b100%\s*\(?\s*completed\s*\)?/i
+  /^\s*status:\s*\*\*(?:all\s+)?completed\*\*\s*$/im,
+  /^\s*ALL\s+COMPLETED\s*$/m,
+  /^\s*(?:progress|status|completion):\s*16\s*\/\s*16\s*$/im,
+  /^\s*(?:progress|status|completion):\s*100%\s*\(?\s*completed\s*\)?\s*$/im
 ];
 
 export function runFrameworkMode(argv: string[]) {
