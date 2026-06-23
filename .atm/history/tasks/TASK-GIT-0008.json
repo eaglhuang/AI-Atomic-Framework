@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0008",
+  "title": "Structured file fixture suite",
+  "status": "done",
+  "milestone": "G3",
+  "dependencies": [
+    "TASK-GIT-0007"
+  ],
+  "acceptance": [
+    "At least one allow case where local and remote touch disjoint files.",
+    "At least one same-file structured mergeable case routed through composer.",
+    "At least one same-file overlapping case blocked before push.",
+    "At least one unknown-file fallback case using conservative text ranges.",
+    "Fixture output writes evidence records that the report generator can index."
+  ],
+  "deliverables": [
+    "Fixture suite for allow, block, composer-routed, and fallback cases.",
+    "Structured JSON and atom-map fixtures.",
+    "Regression command added to validate the Git-boundary lane."
+  ],
+  "scopePaths": [
+    "tests/**",
+    "scripts/**",
+    "fixtures/**",
+    "packages/core/src/git/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No live remote service dependency in deterministic fixtures."
+  ],
+  "nonGoals": [
+    "No benchmark claims without archived evidence."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-fixtures",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0008-structured-file-fixture-suite.task.md",
+    "sectionTitle": "TASK-GIT-0008",
+    "headingLine": 35,
+    "hash": "14cc740db83f751b"
+  },
+  "importedAt": "2026-06-23T04:08:48.806Z",
+  "lastTransitionId": "2026-06-23T06-18-50-055Z-close-d45126b0bab5",
+  "lastTransitionAt": "2026-06-23T06:18:50.055Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T06:06:12.362Z",
+  "promotedAt": "2026-06-23T06:06:12.367Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-5607c61e208f",
+    "claimedAt": "2026-06-23T06:06:12.371Z",
+    "heartbeatAt": "2026-06-23T06:18:50.053Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0008.json",
+      "fixtures/**",
+      "packages/core/src/git/**",
+      "scripts/**",
+      "tests/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T06:06:12.371Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623060612-codex-main-TASK-GIT-0008-ab6bf5dca5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0008",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": 7,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0008.*",
+      ".atm/history/task-events/TASK-GIT-0008/**",
+      ".atm/history/tasks/TASK-GIT-0008.json",
+      "fixtures/**",
+      "packages/core/src/git/**",
+      "scripts/**",
+      "tests/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f3a487497b89a7780d3fdc27e787ddcabf4afe61921c19ac5e3d6e5c304f8622",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T06:06:12.746Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T06:18:50.053Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623060612-codex-main-TASK-GIT-0008-ab6bf5dca5",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0008.closure-packet.json"
+}

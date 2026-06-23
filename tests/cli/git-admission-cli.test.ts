@@ -4,6 +4,7 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { gitBoundaryFixtures } from '../../scripts/lib/git-boundary-fixtures.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempRoot = path.resolve(root, '.atm-temp-test-git-admission-cli');
@@ -72,10 +73,10 @@ try {
   {
     const { seed, local } = setupRemoteScenario('allow');
     commitAndPush(seed, 'feat: remote file', {
-      'remote-only.txt': 'remote branch delta\n'
+      'remote-only.txt': gitBoundaryFixtures.allow.remoteOnly
     });
     runGit(local, ['fetch', 'origin', 'main']);
-    writeText(path.join(local, 'local-only.txt'), 'local branch delta\n');
+    writeText(path.join(local, 'local-only.txt'), gitBoundaryFixtures.allow.localOnly);
     runGit(local, ['add', 'local-only.txt']);
     runGit(local, ['commit', '-m', 'feat: local file']);
     const result = await runAdmission(local);
@@ -93,7 +94,7 @@ try {
 
   {
     const { seed, local } = setupRemoteScenario('block');
-    writeText(path.join(seed, 'data.json'), `${JSON.stringify({ alpha: 1 }, null, 2)}\n`);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockBase);
     runGit(seed, ['add', 'data.json']);
     runGit(seed, ['commit', '-m', 'feat: add data']);
     runGit(seed, ['push', 'origin', 'main']);
@@ -101,13 +102,13 @@ try {
     runGit(local, ['pull', '--ff-only', 'origin', 'main']);
     cpSync(path.join(local, 'data.json'), path.join(seed, 'data.json'));
 
-    writeText(path.join(seed, 'data.json'), `${JSON.stringify({ alpha: 2 }, null, 2)}\n`);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockRemote);
     runGit(seed, ['add', 'data.json']);
     runGit(seed, ['commit', '-m', 'feat: remote alpha']);
     runGit(seed, ['push', 'origin', 'main']);
 
     runGit(local, ['fetch', 'origin', 'main']);
-    writeText(path.join(local, 'data.json'), `${JSON.stringify({ alpha: 3 }, null, 2)}\n`);
+    writeText(path.join(local, 'data.json'), gitBoundaryFixtures.json.blockLocal);
     runGit(local, ['add', 'data.json']);
     runGit(local, ['commit', '-m', 'feat: local alpha']);
 
@@ -119,19 +120,19 @@ try {
 
   {
     const { seed, local } = setupRemoteScenario('composer');
-    writeText(path.join(seed, 'data.json'), `${JSON.stringify({ alpha: 1, beta: 1 }, null, 2)}\n`);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.composerBase);
     runGit(seed, ['add', 'data.json']);
     runGit(seed, ['commit', '-m', 'feat: add data']);
     runGit(seed, ['push', 'origin', 'main']);
 
     runGit(local, ['pull', '--ff-only', 'origin', 'main']);
-    writeText(path.join(seed, 'data.json'), `${JSON.stringify({ alpha: 2, beta: 1 }, null, 2)}\n`);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.composerRemote);
     runGit(seed, ['add', 'data.json']);
     runGit(seed, ['commit', '-m', 'feat: remote alpha']);
     runGit(seed, ['push', 'origin', 'main']);
 
     runGit(local, ['fetch', 'origin', 'main']);
-    writeText(path.join(local, 'data.json'), `${JSON.stringify({ alpha: 1, beta: 2 }, null, 2)}\n`);
+    writeText(path.join(local, 'data.json'), gitBoundaryFixtures.json.composerLocal);
     runGit(local, ['add', 'data.json']);
     runGit(local, ['commit', '-m', 'feat: local beta']);
 

@@ -3,6 +3,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gitBoundaryFixtures } from './lib/git-boundary-fixtures.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const tempRoot = path.join(root, '.atm-temp-validate-git-boundary-evidence');
@@ -54,19 +55,19 @@ try {
   mkdirSync(tempRoot, { recursive: true });
 
   const { seed, local } = setupRemoteScenario();
-  writeText(path.join(seed, 'data.json'), `${JSON.stringify({ alpha: 1 }, null, 2)}\n`);
+  writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockBase);
   runGit(seed, ['add', 'data.json']);
   runGit(seed, ['commit', '-m', 'feat: add data']);
   runGit(seed, ['push', 'origin', 'main']);
 
   runGit(local, ['pull', '--ff-only', 'origin', 'main']);
-  writeText(path.join(seed, 'data.json'), `${JSON.stringify({ alpha: 2 }, null, 2)}\n`);
+  writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockRemote);
   runGit(seed, ['add', 'data.json']);
   runGit(seed, ['commit', '-m', 'feat: remote alpha']);
   runGit(seed, ['push', 'origin', 'main']);
 
   runGit(local, ['fetch', 'origin', 'main']);
-  writeText(path.join(local, 'data.json'), `${JSON.stringify({ alpha: 3 }, null, 2)}\n`);
+  writeText(path.join(local, 'data.json'), gitBoundaryFixtures.json.blockLocal);
   runGit(local, ['add', 'data.json']);
   runGit(local, ['commit', '-m', 'feat: local alpha']);
 
@@ -100,7 +101,7 @@ try {
   assert.deepEqual(envelope?.targetFiles, ['data.json']);
   assert.equal(Array.isArray(envelope?.conflictKeys), true);
   assert.equal(envelope?.lane, 'blocked');
-  assert.equal(envelope?.verdict, 'blocked-active-lease');
+  assert.equal(envelope?.verdict, 'blocked-cid-conflict');
   assert.equal(envelope?.outcome, 'block');
   assert.equal(typeof envelope?.recommendation, 'string');
   assert.equal(Array.isArray(envelope?.artifactPaths), true);
