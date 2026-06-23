@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0011",
+  "title": "Agent plus skill runtime pilot",
+  "status": "done",
+  "milestone": "P4",
+  "dependencies": [
+    "TASK-SKL-0008",
+    "TASK-SKL-0009",
+    "TASK-SKL-0010"
+  ],
+  "acceptance": [
+    "At least one Team role pair or trio can run through a realistic governed workflow using the new role-skill-pack model.",
+    "The pilot shows that role confusion drops because each role loads only its bounded skill pack.",
+    "The pilot preserves Coordinator-only lifecycle authority.",
+    "The pilot produces actionable evidence about where role + skill boundaries still need refinement."
+  ],
+  "deliverables": [
+    "docs/**",
+    "packages/cli/src/commands/team.ts",
+    "integrations/**"
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0011-agent-plus-skill-runtime-pilot.task.md",
+    "sectionTitle": "TASK-SKL-0011",
+    "headingLine": 42,
+    "hash": "6a805b192d55f4e7"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "docs/**",
+    "packages/cli/src/commands/team.ts",
+    "packages/**",
+    "integrations/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not make Team Agents mandatory for all normal work.",
+    "Do not ship a fake pilot that is only prompt theater."
+  ],
+  "nonGoals": [
+    "No full multi-role swarm rollout.",
+    "No bypass of existing Team runtime guardrails."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the pilot commit if Agent+Skill units are not independently governable or confuse Coordinator authority.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.agent-plus-skill-runtime-pilot",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T16-58-20-191Z-close-48bb38c36786",
+  "lastTransitionAt": "2026-06-23T16:58:20.191Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T16:43:45.527Z",
+  "promotedAt": "2026-06-23T16:43:45.529Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-ee79c0912d5e",
+    "claimedAt": "2026-06-23T16:43:45.532Z",
+    "heartbeatAt": "2026-06-23T16:58:20.189Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0011.json",
+      "docs/**",
+      "integrations/**",
+      "packages/**",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T16:43:45.532Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623164345-codex-main-TASK-SKL-0011-0e9f0f942a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0011",
+    "batchId": "batch-35ec0c2f29a7",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-9fd576052253eb2b",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0011.*",
+      ".atm/history/task-events/TASK-SKL-0011/**",
+      ".atm/history/tasks/TASK-SKL-0011.json",
+      "docs/**",
+      "integrations/**",
+      "packages/**",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "744d48d8aaae24fb232c6caaecd64f9a1527595df75b09c2cdd51a7e25d3d209",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T16:43:46.008Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T16:58:20.189Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623164345-codex-main-TASK-SKL-0011-0e9f0f942a",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0011.closure-packet.json"
+}

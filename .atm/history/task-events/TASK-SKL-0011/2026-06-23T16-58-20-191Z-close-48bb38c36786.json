@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T16-58-20-191Z-close-48bb38c36786",
+  "taskId": "TASK-SKL-0011",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623164345-codex-main-TASK-SKL-0011-0e9f0f942a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0011.json",
+  "taskSha256": "sha256:51f89acbb3f13f65c7af8179e1cb5aad685c4774b4d27ce3440d173b536a69a5",
+  "createdAt": "2026-06-23T16:58:20.191Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0011 --actor codex-main --status done --from-batch-checkpoint --batch batch-35ec0c2f29a7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-35ec0c2f29a7",
+    "sessionId": "session-20260623164345-codex-main-TASK-SKL-0011-0e9f0f942a",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T16:58:20.186Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0011.*",
+        ".atm/history/task-events/TASK-SKL-0011/**",
+        ".atm/history/tasks/TASK-SKL-0011.json",
+        "docs/**",
+        "integrations/**",
+        "packages/**",
+        "packages/cli/src/commands/team.ts"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/**",
+        "packages/cli/src/commands/team.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
