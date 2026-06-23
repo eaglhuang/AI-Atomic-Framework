@@ -14,8 +14,8 @@ import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.js';
 import { classifyTaskDelivery } from './task-intent.js';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/dist/broker/lifecycle.js';
-import { buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, writeTaskDirectionLock } from './task-direction.js';
-import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, writeBatchRun, writeQuickfixLock } from './work-channels.js';
+import { abandonTaskQueue, buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, writeTaskDirectionLock } from './task-direction.js';
+import { extractPathLikeStringsFromPrompt, inspectBatchRunConsistency, isQuickfixPrompt, isPathAllowedByScope, listActiveBatchRuns, readActiveBatchRun, repairBatchRunFromQueue, writeBatchRun, writeQuickfixLock } from './work-channels.js';
 import { buildTeamRecommendation } from './team.js';
 import { buildTeamKnowledgeSummary } from './team-knowledge.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
@@ -394,10 +394,20 @@ function buildCrossRepoFrameworkNextResult(input) {
 async function claimNextImportedTask(input) {
     const claimIntent = input.claimIntent ?? 'write';
     const autoIntent = input.autoIntent !== false && input.claimIntent == null;
+    const promptScopeRuntime = input.importedTaskQueue.promptScope?.status === 'queue'
+        ? reconcilePromptScopeRuntimeForClaim(input.cwd, input.taskIntent, input.importedTaskQueue.promptScope.selectedTasks)
+        : null;
+    const importedTaskQueue = promptScopeRuntime
+        ? {
+            ...input.importedTaskQueue,
+            claimableTask: promptScopeRuntime.queueHeadTask ?? input.importedTaskQueue.claimableTask,
+            selectedTask: promptScopeRuntime.queueHeadTask ?? input.importedTaskQueue.selectedTask
+        }
+        : input.importedTaskQueue;
     const promptText = input.taskIntent?.userPrompt?.trim() ?? '';
     const quickfixScope = promptText ? resolveQuickfixScope(promptText) : [];
-    if (!input.importedTaskQueue.claimableTask
-        && !input.importedTaskQueue.promptScope
+    if (!importedTaskQueue.claimableTask
+        && !importedTaskQueue.promptScope
         && isQuickfixPrompt(promptText)
         && quickfixScope.length > 0) {
         const resolvedActor = resolveActorId(input.actor ?? undefined, input.cwd);
@@ -437,14 +447,14 @@ async function claimNextImportedTask(input) {
                 recommendedChannel: 'fast',
                 quickfixLock,
                 taskIntent: input.taskIntent,
-                importedTaskQueue: input.importedTaskQueue,
+                importedTaskQueue,
                 integrationBootstrap: input.integrationBootstrap,
                 runtimeAdapterReadiness: input.runtimeAdapterReadiness
             }
         });
     }
-    const claimDependencyStatusById = new Map(input.importedTaskQueue.tasks.map((task) => [task.workItemId, task.status]));
-    const selectedTask = input.importedTaskQueue.claimableTask || input.importedTaskQueue.selectedTask;
+    const claimDependencyStatusById = new Map(importedTaskQueue.tasks.map((task) => [task.workItemId, task.status]));
+    const selectedTask = importedTaskQueue.claimableTask || importedTaskQueue.selectedTask;
     let selectedTaskDependencyBlockers = [];
     if (selectedTask) {
         const taskPath = taskPathFor(input.cwd, selectedTask.workItemId);
@@ -482,14 +492,14 @@ async function claimNextImportedTask(input) {
                 })],
             evidence: {
                 taskIntent: input.taskIntent,
-                importedTaskQueue: input.importedTaskQueue
+                importedTaskQueue
             }
         });
     }
-    if (!input.importedTaskQueue.claimableTask) {
-        const selectedReviewTask = input.importedTaskQueue.selectedTask
-            && normalizeTaskRouteStatus(input.importedTaskQueue.selectedTask.status) === 'review'
-            ? input.importedTaskQueue.selectedTask
+    if (!importedTaskQueue.claimableTask) {
+        const selectedReviewTask = importedTaskQueue.selectedTask
+            && normalizeTaskRouteStatus(importedTaskQueue.selectedTask.status) === 'review'
+            ? importedTaskQueue.selectedTask
             : null;
         if (selectedReviewTask && claimIntent !== 'closeout-only') {
             const requiredCommand = `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(selectedReviewTask.workItemId)} --claim-intent closeout-only --json`;
@@ -509,7 +519,7 @@ async function claimNextImportedTask(input) {
                 }
             });
         }
-        const claimCode = input.importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
+        const claimCode = importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
             ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
             : 'ATM_NEXT_CLAIM_NO_TASK';
         const claimText = claimCode === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
@@ -520,13 +530,13 @@ async function claimNextImportedTask(input) {
             command: 'next',
             cwd: input.cwd,
             messages: [message('error', claimCode, claimText, {
-                    requiredCommand: input.importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
-                        ? `node atm.mjs tasks import --from ${quoteCliValue(input.importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
+                    requiredCommand: importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
+                        ? `node atm.mjs tasks import --from ${quoteCliValue(importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
                         : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json'
                 })],
             evidence: {
                 taskIntent: input.taskIntent,
-                importedTaskQueue: input.importedTaskQueue
+                importedTaskQueue
             }
         });
     }
@@ -535,22 +545,23 @@ async function claimNextImportedTask(input) {
         throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
     const activeQueueForIntent = findActiveTaskQueueForIntent(input.cwd, input.taskIntent, {
-        taskId: input.importedTaskQueue.claimableTask?.workItemId ?? null
+        taskId: importedTaskQueue.claimableTask?.workItemId ?? null
     });
-    const activeBatchForIntent = activeQueueForIntent?.batchId
-        ? readActiveBatchRun(input.cwd, { batchId: activeQueueForIntent.batchId })
-        : findActiveBatchRunForIntent(input.cwd, input.taskIntent, {
-            taskId: input.importedTaskQueue.claimableTask?.workItemId ?? null
-        });
+    const activeBatchForIntent = promptScopeRuntime?.batchRun
+        ?? (activeQueueForIntent?.batchId
+            ? readActiveBatchRun(input.cwd, { batchId: activeQueueForIntent.batchId })
+            : findActiveBatchRunForIntent(input.cwd, input.taskIntent, {
+                taskId: importedTaskQueue.claimableTask?.workItemId ?? null
+            }));
     assertPromptBatchDoesNotConflict({
         cwd: input.cwd,
-        promptScope: input.importedTaskQueue.promptScope,
-        allTasks: input.importedTaskQueue.tasks,
+        promptScope: importedTaskQueue.promptScope,
+        allTasks: importedTaskQueue.tasks,
         sourcePrompt: input.taskIntent?.userPrompt ?? null,
         currentBatchId: activeBatchForIntent?.batchId ?? null
     });
-    let claimableTask = input.importedTaskQueue.claimableTask;
-    const activeBatchAtClaimStart = input.importedTaskQueue.promptScope?.status === 'queue'
+    let claimableTask = importedTaskQueue.claimableTask;
+    const activeBatchAtClaimStart = importedTaskQueue.promptScope?.status === 'queue'
         ? activeBatchForIntent
         : readActiveBatchRun(input.cwd, { taskId: claimableTask?.workItemId ?? null });
     if (activeBatchAtClaimStart?.status === 'active') {
@@ -574,10 +585,11 @@ async function claimNextImportedTask(input) {
         const batchPromptQueue = inspectImportedTaskQueue(input.cwd, createDeterministicTaskIntent(activeBatchAtClaimStart.sourcePrompt), claimIntent);
         const activeBatchClaimDecision = decideActiveBatchClaimTask({
             activeBatch: activeBatchAtClaimStart,
-            activeQueue: activeQueueForIntent
+            activeQueue: promptScopeRuntime?.queue
+                ?? activeQueueForIntent
                 ?? findActiveTaskQueue(input.cwd, activeBatchAtClaimStart.sourcePrompt, { batchId: activeBatchAtClaimStart.batchId }),
             claimableTask,
-            visibleTasks: input.importedTaskQueue.tasks,
+            visibleTasks: importedTaskQueue.tasks,
             fallbackTasks: batchPromptQueue.tasks
         });
         if (activeBatchClaimDecision?.kind === 'queue-head-missing') {
@@ -800,23 +812,23 @@ async function claimNextImportedTask(input) {
         claimResult.evidence.reusedActiveClaim = true;
         claimResult.evidence.claimIntent = activeClaimIntent;
     }
-    const activeQueue = input.importedTaskQueue.promptScope?.status === 'queue'
-        ? findActiveTaskQueueForIntent(input.cwd, input.taskIntent, { taskId: claimableTask.workItemId }) ?? createOrRefreshTaskQueue({
+    const activeQueue = importedTaskQueue.promptScope?.status === 'queue'
+        ? promptScopeRuntime?.queue ?? findActiveTaskQueueForIntent(input.cwd, input.taskIntent, { taskId: claimableTask.workItemId }) ?? createOrRefreshTaskQueue({
             cwd: input.cwd,
             sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
-            tasks: input.importedTaskQueue.promptScope.selectedTasks,
-            taskIds: input.importedTaskQueue.promptScope.selectedTasks.map((task) => task.workItemId),
+            tasks: importedTaskQueue.promptScope.selectedTasks,
+            taskIds: importedTaskQueue.promptScope.selectedTasks.map((task) => task.workItemId),
             actorId: resolvedActor.actorId
         })
         : findActiveTaskQueue(input.cwd, input.taskIntent?.userPrompt ?? claimableTask.workItemId);
     const inheritedBatchRun = readActiveBatchRun(input.cwd, { taskId: claimableTask.workItemId });
-    const batchRun = input.importedTaskQueue.promptScope?.status === 'queue'
+    const batchRun = importedTaskQueue.promptScope?.status === 'queue'
         ? activeBatchAtClaimStart?.status === 'active' && activeBatchAtClaimStart.taskIds.includes(claimableTask.workItemId)
             ? activeBatchAtClaimStart
             : writeBatchRun({
                 cwd: input.cwd,
                 sourcePrompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
-                tasks: input.importedTaskQueue.promptScope.selectedTasks,
+                tasks: importedTaskQueue.promptScope.selectedTasks,
                 queue: activeQueue,
                 actorId: resolvedActor.actorId
             })
@@ -1813,10 +1825,12 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
             return [];
         }
     }) : [];
-    const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent)
+    const skipMarkdownTaskDiscovery = shouldSkipMarkdownTaskDiscovery(cwd, jsonTasks, taskIntent);
+    const skipExternalTaskCardScan = skipMarkdownTaskDiscovery || shouldSkipExternalTaskCardScan(cwd, jsonTasks, taskIntent);
+    const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent) && !skipMarkdownTaskDiscovery
         ? uniqueSorted([
             ...listTaskCardFiles(cwd),
-            ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots)
+            ...(skipExternalTaskCardScan ? [] : listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots))
         ])
         : [];
     const markdownTasks = markdownTaskFiles
@@ -1929,6 +1943,27 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
         planningRootWarnings: planningRootResolution.warnings,
         planningRootMissing
     };
+}
+export function shouldSkipExternalTaskCardScan(cwd, jsonTasks, taskIntent) {
+    if (!taskIntent?.taskScopeMentioned)
+        return false;
+    if (taskIntent.mentionedPlanPaths.length > 0)
+        return false;
+    const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
+    if (promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0) {
+        return true;
+    }
+    if (taskIntent.mentionedTaskIds.length === 0 && taskIntent.taskRootHints.length === 0)
+        return false;
+    return jsonTasks.some((task) => isTaskExplicitlyMentioned(task, taskIntent));
+}
+export function shouldSkipMarkdownTaskDiscovery(cwd, jsonTasks, taskIntent) {
+    if (!taskIntent?.taskScopeMentioned)
+        return false;
+    if (taskIntent.mentionedPlanPaths.length > 0)
+        return false;
+    const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
+    return Boolean(promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0);
 }
 function selectImportedTaskForPromptScope(selectedTaskPool, isActiveQueue, explicitSingleTaskRoute, statusById, cwd) {
     if (isActiveQueue || explicitSingleTaskRoute) {
@@ -2060,6 +2095,46 @@ function findActiveTaskQueueForIntent(cwd, intent, options = {}) {
             return byTask;
     }
     return null;
+}
+function reconcilePromptScopeRuntimeForClaim(cwd, taskIntent, selectedTasks) {
+    const sourcePrompt = taskIntent?.userPrompt?.trim() ?? '';
+    if (!sourcePrompt || selectedTasks.length === 0)
+        return null;
+    const existingQueue = findActiveTaskQueueForIntent(cwd, taskIntent, {
+        taskId: selectedTasks[0]?.workItemId ?? null
+    });
+    const refreshedQueue = createOrRefreshTaskQueue({
+        cwd,
+        sourcePrompt,
+        tasks: selectedTasks,
+        taskIds: selectedTasks.map((task) => task.workItemId),
+        actorId: null,
+        batchId: existingQueue?.batchId ?? null,
+        scopeKey: existingQueue?.scopeKey ?? null
+    });
+    if (existingQueue && existingQueue.queueId !== refreshedQueue.queueId && existingQueue.status === 'active') {
+        abandonTaskQueue({
+            cwd,
+            queueId: existingQueue.queueId,
+            actorId: 'atm-runtime-reconcile',
+            reason: `superseded by dependency-refreshed prompt queue ${refreshedQueue.queueId}`
+        });
+    }
+    const queueHeadTaskId = refreshedQueue.taskIds[refreshedQueue.currentIndex] ?? null;
+    const queueHeadTask = queueHeadTaskId
+        ? selectedTasks.find((task) => task.workItemId === queueHeadTaskId) ?? null
+        : null;
+    const activeBatch = refreshedQueue.batchId
+        ? readActiveBatchRun(cwd, { batchId: refreshedQueue.batchId })
+        : findActiveBatchRunForIntent(cwd, taskIntent, { taskId: queueHeadTaskId });
+    const batchRun = activeBatch?.status === 'active'
+        ? repairBatchRunFromQueue(cwd, activeBatch, refreshedQueue)
+        : null;
+    return {
+        queue: refreshedQueue,
+        batchRun,
+        queueHeadTask
+    };
 }
 function findActiveBatchRunForIntent(cwd, intent, options = {}) {
     if (intent?.userPrompt) {

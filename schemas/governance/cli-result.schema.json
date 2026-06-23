@@ -64,11 +64,38 @@
     "nextAction": {
       "type": ["object", "null"]
     },
+    "taskIntent": {
+      "type": ["object", "null"]
+    },
     "userNotice": {
       "type": ["object", "null"]
     },
     "runnerMode": {
       "type": ["object", "null"]
+    },
+    "frameworkReport": {
+      "type": ["object", "null"],
+      "description": "Projected framework-mode status payload so tool-first callers can read framework boundaries without digging into evidence.report."
+    },
+    "frameworkClaim": {
+      "type": ["object", "null"],
+      "description": "Projected framework-mode claim payload so tool-first callers can inspect claim scope and lock metadata directly."
+    },
+    "evidenceSummary": {
+      "type": ["object", "null"],
+      "description": "Projected evidence run/add summary so tool-first callers can read validator passes, artifact paths, and command-backed evidence metadata directly."
+    },
+    "guardReport": {
+      "type": ["object", "null"],
+      "description": "Projected guard findings/violations summary for mutation, git, encoding, and related guard surfaces."
+    },
+    "taskflowReadiness": {
+      "type": ["object", "null"],
+      "description": "Projected taskflow pre-close/close readiness payload for blockers, closeback path diagnostics, and auto-evidence hints."
+    },
+    "commitBundle": {
+      "type": ["object", "null"],
+      "description": "Projected governed git commit bundle diagnostics for task-scoped commit dry-run and write flows."
     },
     "allowedCommands": {
       "type": "array",

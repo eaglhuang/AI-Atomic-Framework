@@ -1,4 +1,4 @@
-import { type TaskIntentSource, type RequestedTaskAction } from './next/intent-normalizers.ts';
+import { type TaskIntentSource, type RequestedTaskAction, type TaskIntent } from './next/intent-normalizers.ts';
 import { type ImportedTaskSummary, type PromptScopedRouteStatus } from './next/route-predicates.ts';
 export declare function runNext(argv: any): Promise<import("./shared.ts").CommandResult>;
 export type NextClaimIntent = 'write' | 'closeout-only';
@@ -17,6 +17,8 @@ export interface PromptScopedTaskContext {
         readonly diagnostics: readonly string[];
     } | null;
 }
+export declare function shouldSkipExternalTaskCardScan(cwd: string, jsonTasks: readonly ImportedTaskSummary[], taskIntent: TaskIntent | null): boolean;
+export declare function shouldSkipMarkdownTaskDiscovery(cwd: string, jsonTasks: readonly ImportedTaskSummary[], taskIntent: TaskIntent | null): boolean;
 export declare function resolvePromptScopedTaskContext(cwd: string, input: {
     readonly prompt?: string | null;
     readonly intentPath?: string | null;

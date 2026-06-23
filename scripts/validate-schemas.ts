@@ -78,6 +78,7 @@ const schemaEntries: Record<string, string> = {
 
 const supportSchemaEntries: Record<string, string> = {
   'branch-commit-queue': 'schemas/governance/branch-commit-queue.schema.json',
+  'cli-result': 'schemas/governance/cli-result.schema.json',
   'test-report-metrics': 'schemas/test-report/metrics.schema.json',
   'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
   'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
@@ -344,6 +345,58 @@ const teamBrokerWriteTransactionSchema = ajv.getSchema('team-broker-write-transa
 const teamBrokerLaneSchema = ajv.getSchema('team-broker-lane');
 const teamBrokerRuntimeActivationSchema = ajv.getSchema('team-broker-runtime-activation');
 const teamRuntimeContractSchema = ajv.getSchema('team-runtime-contract');
+const cliResultSchema = ajv.getSchema('cli-result');
+if (!cliResultSchema) {
+  fail('cli result schema must be registered');
+} else {
+  const cliResultEvidence = {
+    ok: false,
+    command: 'next',
+    mode: 'standalone',
+    cwd: 'C:/workspace/schema',
+    messages: [
+      {
+        level: 'error',
+        code: 'ATM_NEXT_CLAIM_BLOCKED',
+        text: 'schema blocker',
+        data: {}
+      }
+    ],
+    evidence: {
+      nextAction: {
+        status: 'blocked',
+        allowedCommands: ['node atm.mjs next --json'],
+        blockedCommands: ['node atm.mjs next --claim --json']
+      }
+    },
+    nextAction: {
+      status: 'blocked'
+    },
+    userNotice: null,
+    runnerMode: {
+      schemaId: 'atm.runnerMode.v1',
+      mode: 'source-first'
+    },
+    allowedCommands: ['node atm.mjs next --json'],
+    blockedCommands: ['node atm.mjs next --claim --json'],
+    skillGrowth: {
+      schemaId: 'atm.skillGrowthHints.v1',
+      categories: ['tooling-mismatch'],
+      durableRule: 'Diagnose runner skew before retrying lifecycle routes.'
+    },
+    severity: 'blocked',
+    exitCode: 1,
+    blocking: true,
+    diagnostics: {
+      errorCodes: ['ATM_NEXT_CLAIM_BLOCKED'],
+      warningCodes: [],
+      infoCodes: []
+    }
+  };
+  if (!cliResultSchema(cliResultEvidence)) {
+    fail(`cli result schema must accept bridge-facing projection fields: ${formatErrors(cliResultSchema.errors)}`);
+  }
+}
 if (!teamBrokerWriteTransactionSchema) {
   fail('team broker write transaction schema must be registered');
 } else {
