@@ -104,3 +104,15 @@ under the same top-level command family:
 
 This planned lane must remain a `git` subcommand, not a new top-level ATM
 command.
+
+Related operator policy surfaces:
+
+- `node atm.mjs integration hooks verify git-pre-push`
+- `node atm.mjs git recover-push-fail`
+- `node atm.mjs git commit --no-verify --emergency-approval <leaseId> --reason "<why>"`
+
+Policy note:
+
+- local hooks are detectable but bypassable;
+- protected branch / server-side enforcement remains a deployment policy layer,
+  not a local MVP guarantee.

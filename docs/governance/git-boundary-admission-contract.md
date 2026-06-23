@@ -54,6 +54,14 @@ MVP command surface:
 node atm.mjs git admit --branch <name> [--json]
 ```
 
+Related operator surfaces:
+
+```bash
+node atm.mjs integration hooks verify git-pre-push --json
+node atm.mjs git recover-push-fail --branch <name> [--json]
+node atm.mjs git commit --no-verify --emergency-approval <leaseId> --reason "<why>"
+```
+
 Required behavior:
 
 - default mode is read-only and does not push, commit, or auto-apply;
@@ -62,6 +70,13 @@ Required behavior:
   affected files, verdict, and next step;
 - composer-routed cases may offer a separate steward dry-run/apply lane, but
   never auto-commit by default.
+
+Operator policy notes:
+
+- local hook install/verify is detectable but bypassable by the local operator;
+- `--no-verify` is an emergency operator lane, not a normal fast path;
+- protected branches, CI gates, and server-side enforcement are future
+  deployment policy, not an MVP guarantee of local hooks.
 
 ## Verdict Matrix
 

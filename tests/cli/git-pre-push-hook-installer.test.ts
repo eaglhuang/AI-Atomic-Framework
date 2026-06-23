@@ -106,6 +106,21 @@ try {
     assert.equal((uninstall.evidence as any).report.removedAtmHook, false);
   }
 
+  {
+    const repoRoot = setupRepo('drifted-hook');
+    const hookPath = path.join(repoRoot, '.git', 'hooks', 'pre-push');
+    writeText(hookPath, '#!/bin/sh\necho bypassed-hook\n');
+
+    const verify = await runHookCommand(repoRoot, ['verify', 'git-pre-push']);
+    assert.equal(verify.ok, false);
+    assert.equal(verify.messages[0]?.code, 'ATM_GIT_PRE_PUSH_HOOK_VERIFY_FAILED');
+    const report = (verify.evidence as any).report;
+    assert.equal(report.installed, true);
+    assert.equal(report.markerPresent, false);
+    assert.equal(report.delegatesToAtmCli, false);
+    assert.equal(report.outputJsonConfigured, false);
+  }
+
   console.log('[git-pre-push-hook-installer] ok');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
