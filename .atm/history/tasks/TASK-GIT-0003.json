@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0003",
+  "title": "Format adapter remote diff bridge",
+  "status": "done",
+  "milestone": "G1",
+  "dependencies": [
+    "TASK-GIT-0002"
+  ],
+  "acceptance": [
+    "JSON-like structured files can produce record-level conflict keys.",
+    "`path-to-atom-map.json` and atom-map-style files can produce atom-aware conflict keys.",
+    "Unknown file types fall back to conservative text ranges.",
+    "Adapter failures fail closed with actionable diagnostics."
+  ],
+  "deliverables": [
+    "Adapter bridge from Git file deltas into conflict keys.",
+    "Structured JSON and atom-map path handling.",
+    "Conservative text-range fallback when no structured adapter exists."
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/**",
+    "packages/core/src/adapters/**",
+    "packages/core/src/git/**",
+    "tests/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No new language parser.",
+    "No speculative semantic inference beyond adapter-provided data."
+  ],
+  "nonGoals": [
+    "No automatic atom-map rewrite."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-format-adapter-bridge",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0003-format-adapter-remote-diff-bridge.task.md",
+    "sectionTitle": "TASK-GIT-0003",
+    "headingLine": 36,
+    "hash": "f3d86c679498ab48"
+  },
+  "importedAt": "2026-06-23T04:08:46.312Z",
+  "lastTransitionId": "2026-06-23T04-54-49-595Z-close-6424169e9351",
+  "lastTransitionAt": "2026-06-23T04:54:49.595Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T04:46:18.496Z",
+  "promotedAt": "2026-06-23T04:46:18.499Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-579dcb34fcad",
+    "claimedAt": "2026-06-23T04:46:18.502Z",
+    "heartbeatAt": "2026-06-23T04:54:49.594Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0003.json",
+      "packages/core/src/adapters/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/git/**",
+      "tests/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T04:46:18.502Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623044618-codex-main-TASK-GIT-0003-7a87da68f9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0003",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": 2,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0003.*",
+      ".atm/history/task-events/TASK-GIT-0003/**",
+      ".atm/history/tasks/TASK-GIT-0003.json",
+      "packages/core/src/adapters/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/git/**",
+      "tests/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "092fa8fe6590cec5aef056c389373693aa04c71afcfb3b1fb87f4c8aca19a12a",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T04:46:18.814Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T04:54:49.594Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623044618-codex-main-TASK-GIT-0003-7a87da68f9",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0003.closure-packet.json"
+}
