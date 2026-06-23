@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T05-20-33-734Z-close-b75fbc03fdf0",
+  "taskId": "TASK-GIT-0005",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623050621-codex-main-TASK-GIT-0005-10d46dcc64",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0005.json",
+  "taskSha256": "sha256:204766f9c1ec5841a18c3b98a8bd3f8a34ba16ebff3d618ec6e6b01a11629beb",
+  "createdAt": "2026-06-23T05:20:33.734Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0005 --actor codex-main --status done --from-batch-checkpoint --batch batch-f47cb3485465",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-f47cb3485465",
+    "sessionId": "session-20260623050621-codex-main-TASK-GIT-0005-10d46dcc64",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0005.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T05:20:33.729Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0005.*",
+        ".atm/history/task-events/TASK-GIT-0005/**",
+        ".atm/history/tasks/TASK-GIT-0005.json",
+        "integrations/**",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/integration.ts",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/cli/src/commands/git.ts",
+        "packages/cli/src/commands/integration.ts",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:integration-adapter",
+        "validate:skill-templates"
+      ]
+    }
+  }
+}

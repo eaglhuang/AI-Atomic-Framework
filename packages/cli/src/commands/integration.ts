@@ -8,6 +8,7 @@ import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } f
 import type { InstallManifest, IntegrationAdapter } from '../../../integrations-core/src/index.ts';
 import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand, readJsonFile, relativePathFrom, resolveValue } from './shared.ts';
 import { getCommandSpec } from './command-specs.ts';
+import { installAtmPrePushHook, uninstallAtmPrePushHook, verifyAtmPrePushHook } from './git.ts';
 type IntegrationHooksModule = typeof import('./integration-hooks.ts');
 
 export type GovernedVendorConfigSurface = {
@@ -201,6 +202,64 @@ export async function runIntegration(argv: string[]) {
   if (action === 'hooks') {
     const hooksAction = adapterId;
     const hookAdapterId = maybeHookAdapterId;
+    if (hookAdapterId === 'git-pre-push') {
+      if (hooksAction === 'install') {
+        const report = installAtmPrePushHook(cwd, {
+          dryRun: parsed.options.dryRun === true,
+          force: parsed.options.force === true
+        });
+        return makeResult({
+          ok: report.ok,
+          command: 'integration',
+          cwd,
+          messages: [
+            message('info', 'ATM_GIT_PRE_PUSH_HOOK_INSTALLED', 'ATM pre-push hook install flow completed.', report)
+          ],
+          evidence: {
+            action: 'hooks install',
+            target: 'git-pre-push',
+            report
+          }
+        });
+      }
+      if (hooksAction === 'verify') {
+        const report = verifyAtmPrePushHook(cwd);
+        return makeResult({
+          ok: report.ok,
+          command: 'integration',
+          cwd,
+          messages: [
+            report.ok
+              ? message('info', 'ATM_GIT_PRE_PUSH_HOOK_VERIFY_OK', 'ATM pre-push hook points at the current CLI entrypoint.', report)
+              : message('error', 'ATM_GIT_PRE_PUSH_HOOK_VERIFY_FAILED', 'ATM pre-push hook is missing or drifted.', report)
+          ],
+          evidence: {
+            action: 'hooks verify',
+            target: 'git-pre-push',
+            report
+          }
+        });
+      }
+      if (hooksAction === 'uninstall') {
+        const report = uninstallAtmPrePushHook(cwd, {
+          dryRun: parsed.options.dryRun === true
+        });
+        return makeResult({
+          ok: report.ok,
+          command: 'integration',
+          cwd,
+          messages: [
+            message('info', 'ATM_GIT_PRE_PUSH_HOOK_UNINSTALLED', 'ATM pre-push hook uninstall flow completed.', report)
+          ],
+          evidence: {
+            action: 'hooks uninstall',
+            target: 'git-pre-push',
+            report
+          }
+        });
+      }
+      throw new CliError('ATM_CLI_USAGE', 'integration hooks git-pre-push supports only: install | verify | uninstall', { exitCode: 2 });
+    }
     if (hooksAction === 'install') {
       const requiredHookAdapterId = requireAdapterId(hookAdapterId, 'hooks install');
       if (parsed.options.dryRun !== true && !existsSync(path.join(cwd, manifestPathForIntegration(requiredHookAdapterId)))) {
@@ -220,7 +279,7 @@ export async function runIntegration(argv: string[]) {
       const hooks = await loadIntegrationHooks();
       return hooks.makeIntegrationHookVerifyResult(cwd, requireAdapterId(hookAdapterId, 'hooks verify'));
     }
-    throw new CliError('ATM_CLI_USAGE', 'integration hooks supports only: install | verify', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'integration hooks supports only: install | verify | uninstall', { exitCode: 2 });
   }
 
   if (action === 'list') {
