@@ -11,6 +11,23 @@ refactor, split, atomize, infect, migrate, or modernize existing source code.
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
 
+## Tool-First Preference
+
+When the editor or bridge can consume structured ATM results directly, prefer
+that tool-capable path before ad-hoc shell-first interpretation.
+
+This means:
+
+- use projected ATM result fields such as `nextAction`, `taskIntent`,
+  `runnerMode`, `frameworkReport`, `guardReport`, `taskflowReadiness`,
+  `commitBundle`, and `skillGrowth` when they exist;
+- surface blocked tool results back to the human or calling layer instead of
+  silently dropping into a weaker shell-first workaround;
+- keep CLI fallback available for read-only inspection, legacy editors, or
+  explicit fallback situations where the tool-capable surface does not exist.
+
+The skill should prefer a structured ATM handoff, not a text-scraping ritual.
+
 ## Captain/Dispatch Entry Gate
 
 If the user asks for Captain, Coordinator, dispatch, task cards, sidecars,
@@ -44,6 +61,23 @@ node atm.mjs next --intent .atm/runtime/task-intent.json --json
 
 Do not rely on keyword-only `next --prompt` extraction when the task intent
 resolver skill is available.
+
+## Router Boundary
+
+`atm-governance-router` is the thin entry skill, not the whole ATM operating
+system.
+
+Keep the split clean:
+
+- router: first-touch entry, repo guidance, route selection, and boundary
+  framing;
+- playbook: the short channel-specific work order returned by ATM in
+  `evidence.nextAction.playbook`;
+- specialist skills: narrow governed roles such as next-action reading,
+  evidence handling, dispatch, lock/scope checks, and handoff.
+
+Do not re-expand the router into a fat all-in-one skill. If a step belongs to a
+playbook or specialist lane, hand off after route truth is known.
 
 ## First Command
 
@@ -148,6 +182,10 @@ node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <cs
 
 If no hook is available, continue with task claim + `git prepare/check` +
 `evidence verify` gates as the fallback safety boundary.
+
+When the tool-capable path is blocked, say what failed and keep the ATM route
+truth visible. Use fallback only when the blocked result or missing bridge
+capability makes it necessary.
 
 ## Required Evidence
 

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0007",
+  "title": "Shared skill growth contract and learning loop",
+  "status": "done",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-SKL-0002"
+  ],
+  "acceptance": [
+    "ATM skills share one growth contract instead of each skill inventing its own learning structure.",
+    "The contract defines:",
+    "a shared taxonomy,",
+    "a shared capture template,",
+    "promotion rules for moving durable rules into `SKILL.md`,",
+    "reference-only handling for raw cases and examples.",
+    "The router/playbook/specialist model clearly states where learning events originate and where they should be promoted.",
+    "At least one ATM entry skill and one specialist skill demonstrate how the shared learning loop is consumed.",
+    "The same growth contract is usable by future Team role skill packs without redefining taxonomy or promotion semantics per role.",
+    "The contract explicitly defines how backlog items are split into product bugs, shared skill lessons, or both.",
+    "The first reusable lesson set includes claim-latency, stale imported dependency truth, and runner capability skew cases from ATM dogfood backlog.",
+    "The contract defines an active-to-historical demotion path so fixed wall-hit lessons do not keep bloating default skill context forever."
+  ],
+  "deliverables": [
+    "integrations/**",
+    "docs/**",
+    ".github/**"
+  ],
+  "tags": [],
+  "notes": "- This card exists so all ATM skills can grow through the same architecture.\n- The desired rule is simple: case first in reference, stable pattern later in `SKILL.md`.\n- Team role skill packs should consume this contract instead of inventing separate role-memory systems.\n- Fixed bug lessons should be moved to a historical section or archive once the live route no longer depends on them.",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md",
+    "sectionTitle": "TASK-SKL-0007",
+    "headingLine": 40,
+    "hash": "10f84057badbafa2"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "integrations/**",
+    "docs/**",
+    "packages/**",
+    ".github/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not build a separate knowledge system outside the existing skill/reference structure.",
+    "Do not force every individual learning note directly into SKILL.md."
+  ],
+  "nonGoals": [
+    "No chat-history-only memory scheme.",
+    "No per-skill bespoke taxonomy that breaks cross-skill reuse."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the shared growth contract commit if the learning-loop architecture becomes inconsistent across ATM skills or bloats skill entry files.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shared-skill-growth-contract",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T16-31-59-304Z-close-2a2667b49ce0",
+  "lastTransitionAt": "2026-06-23T16:31:59.304Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T16:28:41.167Z",
+  "promotedAt": "2026-06-23T16:28:41.169Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-2c1e094d7810",
+    "claimedAt": "2026-06-23T16:28:41.173Z",
+    "heartbeatAt": "2026-06-23T16:31:59.302Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0007.json",
+      ".github/**",
+      "docs/**",
+      "integrations/**",
+      "packages/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T16:28:41.173Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623162841-codex-main-TASK-SKL-0007-fbe423b9db",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0007",
+    "batchId": "batch-35ec0c2f29a7",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-048bc4a57e342df0",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0007.*",
+      ".atm/history/task-events/TASK-SKL-0007/**",
+      ".atm/history/tasks/TASK-SKL-0007.json",
+      ".github/**",
+      "docs/**",
+      "integrations/**",
+      "packages/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9567469666d16b997da4a7c0b6f4860d4d98cd27aeccb8106a41aa257249760a",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T16:28:41.420Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T16:31:59.302Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623162841-codex-main-TASK-SKL-0007-fbe423b9db",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0007.closure-packet.json"
+}

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0006",
+  "title": "Governed commit and close lane hardening",
+  "status": "done",
+  "milestone": "P3",
+  "dependencies": [
+    "TASK-SKL-0003",
+    "TASK-SKL-0004",
+    "TASK-SKL-0005",
+    "TASK-SKL-0007"
+  ],
+  "acceptance": [
+    "Known runtime residue is classified and surfaced without forcing operators to infer meaning from raw filesystem noise.",
+    "Foreign active-claim and staged foreign governance artifacts are disclosed with machine-readable blockers or advisories as appropriate.",
+    "Planning repo vs framework repo boundaries remain explicit in tool results for close/commit flows.",
+    "`taskflow pre-close` and `taskflow close` share a consistent blocker surface for residue-related failures.",
+    "Recurrent tooling mismatches or close/commit wall-hits can be captured through the shared skill-growth contract instead of being rediscovered ad hoc."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/**",
+    "packages/core/src/**",
+    "tests/cli/**",
+    "docs/**"
+  ],
+  "tags": [],
+  "notes": "- This card is the dogfood-safety closer for the SKL lane. It should make tool-first governance survivable in messy real repos, not only in clean fixtures.\n- It should also prove that the shared growth contract produces actionable close/commit lessons instead of dead notes.",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0006-governed-commit-and-close-lane-hardening.task.md",
+    "sectionTitle": "TASK-SKL-0006",
+    "headingLine": 44,
+    "hash": "8a02b7ff7cebbd8b"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "packages/cli/src/commands/**",
+    "packages/core/src/**",
+    "tests/cli/**",
+    "docs/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not normalize residue by mutating .atm runtime state directly.",
+    "Do not turn emergency or foreign governance conditions into silent success."
+  ],
+  "nonGoals": [
+    "No new alternate close lane.",
+    "No broad rewrite of unrelated runtime hygiene rules."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the hardening commit if residue diagnostics or claim protections regress.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.close-commit-lane-hardening",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T16-39-10-351Z-close-d9a8fddca85f",
+  "lastTransitionAt": "2026-06-23T16:39:10.351Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T16:37:55.213Z",
+  "promotedAt": "2026-06-23T16:37:55.215Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-926d332a3b39",
+    "claimedAt": "2026-06-23T16:37:55.218Z",
+    "heartbeatAt": "2026-06-23T16:39:10.350Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0006.json",
+      "docs/**",
+      "packages/cli/src/commands/**",
+      "packages/core/src/**",
+      "tests/cli/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T16:37:55.218Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623163755-codex-main-TASK-SKL-0006-dd560c79b1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0006",
+    "batchId": "batch-35ec0c2f29a7",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-48467d62bd22a527",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0006.*",
+      ".atm/history/task-events/TASK-SKL-0006/**",
+      ".atm/history/tasks/TASK-SKL-0006.json",
+      "docs/**",
+      "packages/cli/src/commands/**",
+      "packages/core/src/**",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "59693eba1564efbcb2959c02ec7a065dfdbb5187411a859e13ef95d35f45b457",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T16:37:55.667Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T16:39:10.350Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623163755-codex-main-TASK-SKL-0006-dd560c79b1",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0006.closure-packet.json"
+}

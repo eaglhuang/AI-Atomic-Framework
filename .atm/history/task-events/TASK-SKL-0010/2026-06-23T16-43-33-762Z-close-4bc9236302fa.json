@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T16-43-33-762Z-close-4bc9236302fa",
+  "taskId": "TASK-SKL-0010",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623164208-codex-main-TASK-SKL-0010-417ecf95a4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0010.json",
+  "taskSha256": "sha256:be0b26163d10a3e49fba6b6e2e242be7d8ec76d5e0c4ea921e62ba0cc6ffe43b",
+  "createdAt": "2026-06-23T16:43:33.762Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0010 --actor codex-main --status done --from-batch-checkpoint --batch batch-35ec0c2f29a7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-35ec0c2f29a7",
+    "sessionId": "session-20260623164208-codex-main-TASK-SKL-0010-417ecf95a4",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0010.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T16:43:33.757Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0010.*",
+        ".atm/history/task-events/TASK-SKL-0010/**",
+        ".atm/history/tasks/TASK-SKL-0010.json",
+        "docs/**",
+        "integrations/**",
+        "packages/**"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0005",
+  "title": "Skill tool-first orchestration migration",
+  "status": "done",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-SKL-0002",
+    "TASK-SKL-0007"
+  ],
+  "acceptance": [
+    "Core governance skills detect tool-capable environments and prefer tool calls before shell commands.",
+    "Skills preserve route truth by surfacing blocked tool results instead of silently bypassing them.",
+    "CLI fallback remains available for read-only inspection, legacy editors, or explicit fallback paths.",
+    "Updated docs and integration entry files explain the tool-first preference and fallback rules.",
+    "`atm-governance-router` no longer needs to be the fat all-in-one skill; it delegates through playbook and specialist skills.",
+    "The router/playbook/specialist split reduces context load and keeps each skill scoped to one ATM governance purpose.",
+    "The migration leaves a clean seam for Team role skill packs so later Team Agents can compose role-specific skill bundles without re-expanding the router."
+  ],
+  "deliverables": [
+    "integrations/**",
+    "docs/**",
+    ".claude/**",
+    ".github/**"
+  ],
+  "tags": [],
+  "notes": "- The migration must optimize for determinism and operator clarity, not for theatrical abstraction. Skills should get shorter, not more magical.\n- This card intentionally moves earlier so the first usable skill skeleton can start dogfooding and collecting reusable learning items during implementation.\n- The shared growth contract from `TASK-SKL-0007` must already exist before this migration expands router/playbook/specialist seams.",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0005-skill-tool-first-orchestration-migration.task.md",
+    "sectionTitle": "TASK-SKL-0005",
+    "headingLine": 43,
+    "hash": "8c2fb9a6e5c23189"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "integrations/**",
+    "packages/**",
+    "docs/**",
+    ".claude/**",
+    ".github/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not remove CLI fallback entirely.",
+    "Do not require every editor integration to support tools on day one."
+  ],
+  "nonGoals": [
+    "No broad copy rewrite of every planning document.",
+    "No hidden shell fallback that masks blocked tools."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the migration commit if skills lose route fidelity or fallback behavior becomes ambiguous.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skill-tool-first-orchestration",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T16-37-43-007Z-close-bc9e631155cb",
+  "lastTransitionAt": "2026-06-23T16:37:43.007Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T16:32:10.322Z",
+  "promotedAt": "2026-06-23T16:32:10.324Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-141e198d0e01",
+    "claimedAt": "2026-06-23T16:32:10.327Z",
+    "heartbeatAt": "2026-06-23T16:37:43.005Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0005.json",
+      ".claude/**",
+      ".github/**",
+      "docs/**",
+      "integrations/**",
+      "packages/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T16:32:10.327Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623163210-codex-main-TASK-SKL-0005-3dba6c289e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0005",
+    "batchId": "batch-35ec0c2f29a7",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-e82a4e8787f32438",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0005.*",
+      ".atm/history/task-events/TASK-SKL-0005/**",
+      ".atm/history/tasks/TASK-SKL-0005.json",
+      ".claude/**",
+      ".github/**",
+      "docs/**",
+      "integrations/**",
+      "packages/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f64846b2763aceb12e71a6a4ec86ba2ccdf05e0df9dd5c69da9dfbfeec542ef3",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T16:32:10.553Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T16:37:43.005Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623163210-codex-main-TASK-SKL-0005-3dba6c289e",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0005.closure-packet.json"
+}

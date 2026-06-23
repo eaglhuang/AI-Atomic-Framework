@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   buildTeamGrowthContract,
+  buildTeamRuntimePilot,
   buildTeamRoleRoutingMatrix,
   buildTeamRoleSkillPackContract
 } from '../../packages/cli/src/commands/team.ts';
@@ -69,5 +70,44 @@ assert.deepEqual(growthContract.promotionPolicy, {
   stableRuleTarget: 'SKILL.md',
   rawCaseTarget: 'docs/governance/team-agents/role-pack-learning-loop.md'
 });
+
+const runtimePilot = buildTeamRuntimePilot({
+  roleSkillPacks,
+  routingMatrix,
+  growthContract,
+  validation: {
+    ok: false,
+    findings: [
+      {
+        level: 'error',
+        code: 'ATM_TEAM_LEASE_CONFLICT',
+        summary: 'Takeover required before conflict arbitration',
+        detail: 'Blocked by stale lease epoch.',
+        suggestedFix: 'Run the governed takeover or cleanup path before retrying.'
+      }
+    ]
+  },
+  brokerLane: {
+    decision: {
+      verdict: 'blocked-active-lease',
+      reason: 'Takeover required before conflict arbitration',
+      conflicts: [
+        {
+          kind: 'lease',
+          detail: 'Active lease epoch stale.'
+        }
+      ]
+    }
+  } as any
+});
+assert.equal(runtimePilot.schemaId, 'atm.teamRuntimePilot.v1');
+assert.equal(runtimePilot.providerNeutral, true);
+assert.equal(runtimePilot.coordinatorOwnsLifecycle, true);
+assert.equal(runtimePilot.pilotMode, 'role-trio');
+assert.deepEqual(runtimePilot.selectedRoles, ['coordinator', 'implementer', 'validator']);
+assert.equal(runtimePilot.selectedSkillPackIds.includes('atm.role-pack.coordinator'), true);
+assert.equal(runtimePilot.roleConfusionReduction.length >= 3, true);
+assert.equal(runtimePilot.actionableRefinementFindings.length >= 2, true);
+assert.equal(runtimePilot.actionableRefinementFindings.every((entry) => entry.promotionTarget === 'docs/governance/team-agents/role-pack-learning-loop.md'), true);
 
 console.log('[team-plan-contract:test] ok');

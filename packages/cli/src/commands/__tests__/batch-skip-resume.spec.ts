@@ -15,6 +15,7 @@ function makeTask(taskId: string): TaskDirectionTask {
   return {
     workItemId: taskId,
     title: taskId,
+    dependencies: [],
     taskPath: `.atm/history/tasks/${taskId}.json`,
     sourcePlanPath: null,
     nearbyPlanPaths: [],
