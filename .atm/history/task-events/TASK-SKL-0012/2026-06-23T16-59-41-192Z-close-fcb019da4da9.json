@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T16-59-41-192Z-close-fcb019da4da9",
+  "taskId": "TASK-SKL-0012",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623165831-codex-main-TASK-SKL-0012-1b9bbbfc69",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0012.json",
+  "taskSha256": "sha256:d5bce0e4490b099301b3cfe2138a59d505e24576f60cf30d72e4a0220cb5076f",
+  "createdAt": "2026-06-23T16:59:41.192Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0012 --actor codex-main --status done --from-batch-checkpoint --batch batch-35ec0c2f29a7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-35ec0c2f29a7",
+    "sessionId": "session-20260623165831-codex-main-TASK-SKL-0012-1b9bbbfc69",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0012.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T16:59:41.187Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0012.*",
+        ".atm/history/task-events/TASK-SKL-0012/**",
+        ".atm/history/tasks/TASK-SKL-0012.json",
+        ".github/**",
+        "docs/**",
+        "integrations/**",
+        "packages/**"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -121,6 +121,12 @@ Starter backlog-fed lessons:
   - Reusable lesson: when host and framework runners expose different command
     surfaces, diagnose capability skew before treating operator failure as a
     normal lifecycle blocker.
+- `ATM-BUG-2026-06-24-022`
+  - Category: `tooling-mismatch`
+  - Reusable lesson: when a fix changes frozen-runner behavior, source-first
+    success is not enough; retain release outputs with
+    `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` and rerun `node atm.mjs`
+    before claiming the frozen entrypoint is updated.
 
 ## Promotion policy
 
@@ -141,6 +147,11 @@ Do not promote:
 Repeated hardening themes such as stale imported task truth, runner skew,
 historical closeback mismatch, or residue cleanup should usually live in
 learning references first and become core skill rules only after repetition.
+
+Another high-value example is runner-sync misread: if a dogfood lane fixes
+`CLI`, `close`, `taskflow`, `hook`, or `evidence` code, but validation stops at
+`node atm.dev.mjs`, the skill should treat frozen-runner verification as still
+unproven until a retained build and frozen rerun happen.
 
 ## Historical demotion policy
 

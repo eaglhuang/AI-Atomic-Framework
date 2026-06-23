@@ -51,3 +51,26 @@ Record lessons using the shared growth fields:
 - Confidence: medium
 - Reuse scope: validator and evidence-collector packs
 ```
+
+## Active runtime-observability cases
+
+## 2026-06-24 - blocked runtime pilot still maps cleanly to role contracts
+
+- Category: role-specific-friction
+- Trigger: `team plan` for a hot-file pilot task hits broker lease takeover and
+  cannot start a worker write lane yet
+- Symptom: the pilot is blocked before runtime start, but the team surface
+  still needs to show which role pack, playbook slice, and authority boundary
+  were involved
+- Correct route: keep the blocker observable on the team plan/runtime pilot
+  surface, return lifecycle control to Coordinator, and record the lesson here
+- Durable rule: blocked pilots still need role-pack observability; failure is
+  evidence, not a reason to collapse back into one giant skill
+- Promotion target: role-pack-learning-loop.md
+- Confidence: medium
+- Reuse scope: coordinator, implementer, validator packs
+
+## Historical section
+
+Move solved runtime-observability workarounds here once the underlying product
+fix is stable and the lesson no longer needs to load by default.

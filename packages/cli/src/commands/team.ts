@@ -128,6 +128,29 @@ type TeamGrowthContract = {
   };
 };
 
+type TeamRuntimePilot = {
+  schemaId: 'atm.teamRuntimePilot.v1';
+  providerNeutral: true;
+  coordinatorOwnsLifecycle: true;
+  pilotMode: 'role-pair' | 'role-trio';
+  selectedRoles: string[];
+  selectedSkillPackIds: string[];
+  realisticWorkflow: string[];
+  roleBoundarySignals: string[];
+  lifecycleAuthority: {
+    ownerRole: string;
+    forbiddenToWorkers: string[];
+  };
+  roleConfusionReduction: string[];
+  actionableRefinementFindings: Array<{
+    category: string;
+    summary: string;
+    detail: string;
+    correctRoute: string;
+    promotionTarget: string;
+  }>;
+};
+
 type TeamImplementerSelector = {
   schemaId: 'atm.teamImplementerSelector.v1';
   selectedImplementer: {
@@ -709,7 +732,8 @@ export async function runTeam(argv: string[]) {
         relatedFindings: nonPermissionFindings,
         suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
         brokerLane: teamPlan.brokerLane,
-        runtimeContract
+        runtimeContract,
+        runtimePilot: teamPlan.runtimePilot
       }
     });
   }
@@ -740,7 +764,8 @@ export async function runTeam(argv: string[]) {
           validation,
           teamPlan,
           brokerLane: teamPlan.brokerLane,
-          runtimeContract
+          runtimeContract,
+          runtimePilot: teamPlan.runtimePilot
         }
       });
     }
@@ -772,7 +797,8 @@ export async function runTeam(argv: string[]) {
         teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
         teamRun,
         brokerLane: teamPlan.brokerLane,
-        runtimeContract
+        runtimeContract,
+        runtimePilot: teamPlan.runtimePilot
       }
     });
   }
@@ -802,7 +828,8 @@ export async function runTeam(argv: string[]) {
       validation,
       teamPlan,
       runtimeContract,
-      brokerLane: teamPlan.brokerLane
+      brokerLane: teamPlan.brokerLane,
+      runtimePilot: teamPlan.runtimePilot
     }
   });
 }
@@ -2020,6 +2047,13 @@ export function buildTeamPlan(input: {
   const roleSkillPacks = buildTeamRoleSkillPackContract(input.recipe);
   const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
   const growthContract = buildTeamGrowthContract();
+  const runtimePilot = buildTeamRuntimePilot({
+    roleSkillPacks,
+    routingMatrix,
+    growthContract,
+    validation: input.validation,
+    brokerLane: input.brokerLane
+  });
   return {
     schemaId: 'atm.teamPlan.v1',
     recipeId: input.recipe.recipeId,
@@ -2031,6 +2065,7 @@ export function buildTeamPlan(input: {
     roleSkillPacks,
     routingMatrix,
     growthContract,
+    runtimePilot,
     ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     requiredRoles: crewBriefingContract.requiredRoles,
     optionalRoles: crewBriefingContract.optionalRoles,
@@ -2173,6 +2208,58 @@ export function buildTeamGrowthContract(): TeamGrowthContract {
       stableRuleTarget: 'SKILL.md',
       rawCaseTarget: 'docs/governance/team-agents/role-pack-learning-loop.md'
     }
+  };
+}
+
+export function buildTeamRuntimePilot(input: {
+  roleSkillPacks: TeamRoleSkillPackContract;
+  routingMatrix: TeamRoleRoutingMatrix;
+  growthContract: TeamGrowthContract;
+  validation: { ok: boolean; findings: PermissionFinding[] };
+  brokerLane: TeamBrokerLaneEvidence;
+}): TeamRuntimePilot {
+  const orderedRoles = ['coordinator', 'implementer', 'validator'];
+  const selectedRoles = orderedRoles.filter((role) => input.roleSkillPacks.roles.some((entry) => entry.role === role));
+  const pilotRoles = selectedRoles.length >= 3 ? selectedRoles.slice(0, 3) : selectedRoles.slice(0, 2);
+  const selectedEntries = input.roleSkillPacks.roles.filter((entry) => pilotRoles.includes(entry.role));
+  const actionableRefinementFindings = [
+    ...input.validation.findings.map((finding) => ({
+      category: classifyTeamPilotFinding(finding.code),
+      summary: finding.summary,
+      detail: finding.detail,
+      correctRoute: 'Keep Coordinator authority primary, resolve lease or scope blockers first, then rerun team validate or team start.',
+      promotionTarget: input.growthContract.promotionPolicy.rawCaseTarget
+    })),
+    ...normalizeTeamBrokerPilotFindings(input.brokerLane, input.growthContract.promotionPolicy.rawCaseTarget)
+  ];
+  return {
+    schemaId: 'atm.teamRuntimePilot.v1',
+    providerNeutral: true,
+    coordinatorOwnsLifecycle: true,
+    pilotMode: pilotRoles.length >= 3 ? 'role-trio' : 'role-pair',
+    selectedRoles: pilotRoles,
+    selectedSkillPackIds: selectedEntries.map((entry) => entry.skillPackId),
+    realisticWorkflow: [
+      'Coordinator routes the task and remains the only lifecycle and git.write owner.',
+      'Implementer loads only the scoped delivery pack for the active workstream.',
+      'Validator loads only validator-evidence guidance and returns findings to Coordinator.'
+    ],
+    roleBoundarySignals: [
+      ...selectedEntries.map((entry) => `${entry.role} -> ${entry.playbookSlice}`),
+      ...input.routingMatrix.routes
+        .filter((route) => ['task-entry-routing', 'scoped-implementation', 'validation-and-evidence'].includes(route.workstream))
+        .map((route) => `${route.workstream}: ${route.primaryRole}`)
+    ],
+    lifecycleAuthority: {
+      ownerRole: 'coordinator',
+      forbiddenToWorkers: ['task.lifecycle', 'git.write', 'self-close']
+    },
+    roleConfusionReduction: [
+      'Each pilot role loads only its bounded skill pack instead of a monolithic governance skill.',
+      'Workers return findings or diffs to Coordinator instead of widening into closeout authority.',
+      'Growth lessons land in a shared taxonomy without contaminating unrelated role packs.'
+    ],
+    actionableRefinementFindings
   };
 }
 
@@ -2809,6 +2896,7 @@ export function writeTeamRun(input: {
     validation: input.validation,
     brokerLane: input.teamPlan.brokerLane,
     captainDecision: input.teamPlan.captainDecision,
+    runtimePilot: input.teamPlan.runtimePilot,
     reworkRoute: buildTeamReworkRouteStateMachine({
       findings: [],
       requiredChecksPassed: false,
@@ -3278,6 +3366,8 @@ function compactTeamRun(run: any) {
     brokerDecisionSurface: run.brokerSubagent?.decisionSurface ?? run.runtimeContract?.brokerSubagent?.decisionSurface ?? null,
     brokerStewardId: run.brokerSubagent?.stewardId ?? run.runtimeContract?.brokerSubagent?.stewardId ?? null,
     brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
+    runtimePilotMode: run.runtimePilot?.pilotMode ?? null,
+    runtimePilotRoles: normalizeStringArray(run.runtimePilot?.selectedRoles),
     brokerEvidenceRequired: normalizeStringArray(
       brokerGovernance?.brokerEvidenceRequired ?? run.brokerSubagent?.evidenceRequired ?? run.runtimeContract?.brokerSubagent?.evidenceRequired
     ),
@@ -3312,6 +3402,47 @@ function summarizeTask(taskId: string, task: any) {
     targetRepo: task.targetRepo ?? null,
     sourcePlanPath: task.source?.planPath ?? task.sourcePlanPath ?? null
   };
+}
+
+function classifyTeamPilotFinding(code: string | null | undefined) {
+  const normalized = String(code ?? '').toLowerCase();
+  if (normalized.includes('scope')) return 'boundary-confusion';
+  if (normalized.includes('lease') || normalized.includes('broker')) return 'role-specific-friction';
+  if (normalized.includes('validator')) return 'validator-gap';
+  return 'tooling-mismatch';
+}
+
+function normalizeTeamBrokerPilotFindings(
+  brokerLane: TeamBrokerLaneEvidence,
+  promotionTarget: string
+): Array<{
+  category: string;
+  summary: string;
+  detail: string;
+  correctRoute: string;
+  promotionTarget: string;
+}> {
+  const decision = brokerLane?.decision;
+  if (!decision) {
+    return [];
+  }
+  const conflicts = Array.isArray(decision.conflicts) ? decision.conflicts : [];
+  if (conflicts.length === 0) {
+    return [{
+      category: 'role-specific-friction',
+      summary: decision.reason ?? 'Broker-governed pilot requires refinement.',
+      detail: decision.reason ?? 'No broker detail was provided.',
+      correctRoute: 'Surface the broker verdict as pilot evidence and keep Coordinator from forcing a start.',
+      promotionTarget
+    }];
+  }
+  return conflicts.map((conflict) => ({
+    category: conflict.kind === 'lease' ? 'role-specific-friction' : 'boundary-confusion',
+    summary: decision.reason ?? 'Broker-governed pilot finding',
+    detail: String(conflict.detail ?? '').trim() || 'Broker conflict detail unavailable.',
+    correctRoute: 'Use takeover, repair, or bounded proposal flow before attempting a worker write lease again.',
+    promotionTarget
+  }));
 }
 
 function deriveWritePaths(task: any, repoRoot?: string) {

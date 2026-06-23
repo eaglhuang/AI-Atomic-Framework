@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0012",
+  "title": "Team role growth and observability integration",
+  "status": "done",
+  "milestone": "P4",
+  "dependencies": [
+    "TASK-SKL-0007",
+    "TASK-SKL-0010",
+    "TASK-SKL-0011"
+  ],
+  "acceptance": [
+    "Team role learning events can be observed and mapped back to role contracts.",
+    "Shared taxonomy works across Coordinator, Implementer, Validator, Review, and other role packs.",
+    "Growth data remains reference-first and does not bloat every role skill entry file.",
+    "Observability can distinguish role-specific friction from shared ATM routing friction."
+  ],
+  "deliverables": [
+    "docs/**",
+    "packages/**",
+    "integrations/**"
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0012-team-role-growth-and-observability-integration.task.md",
+    "sectionTitle": "TASK-SKL-0012",
+    "headingLine": 42,
+    "hash": "d3efe218f7835771"
+  },
+  "importedAt": "2026-06-23T15:18:56.794Z",
+  "scopePaths": [
+    "docs/**",
+    "packages/**",
+    "integrations/**",
+    ".github/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not create a second memory product outside shared skill references.",
+    "Do not couple observability to one vendor bridge."
+  ],
+  "nonGoals": [
+    "No role-specific incompatible learning-loop formats.",
+    "No mandatory knowledge retrieval gate before every Team action."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the role-growth integration commit if Team role learning becomes fragmented or observability cannot map back to role contracts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-role-growth-observability",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "lastTransitionId": "2026-06-23T16-59-41-192Z-close-fcb019da4da9",
+  "lastTransitionAt": "2026-06-23T16:59:41.192Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T16:58:31.317Z",
+  "promotedAt": "2026-06-23T16:58:31.319Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-4c1c38cfcda7",
+    "claimedAt": "2026-06-23T16:58:31.322Z",
+    "heartbeatAt": "2026-06-23T16:59:41.190Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0012.json",
+      ".github/**",
+      "docs/**",
+      "integrations/**",
+      "packages/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T16:58:31.322Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623165831-codex-main-TASK-SKL-0012-1b9bbbfc69",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0012",
+    "batchId": "batch-35ec0c2f29a7",
+    "scopeKey": "TASK-SKL",
+    "queueId": "queue-2cbf0d7360dd1900",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0012.*",
+      ".atm/history/task-events/TASK-SKL-0012/**",
+      ".atm/history/tasks/TASK-SKL-0012.json",
+      ".github/**",
+      "docs/**",
+      "integrations/**",
+      "packages/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bfb5b05d0a8de0777d2ffc4cd26510972ee2384b5f71553f2df8e1fd1992d574",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T16:58:31.613Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T16:59:41.190Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623165831-codex-main-TASK-SKL-0012-1b9bbbfc69",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0012.closure-packet.json"
+}
