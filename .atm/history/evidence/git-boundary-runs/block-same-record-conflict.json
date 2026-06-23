@@ -1,0 +1,317 @@
+{
+  "ok": false,
+  "command": "git",
+  "mode": "standalone",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp-validate-git-boundary-paper-evidence\\block-same-record-conflict\\local",
+  "messages": [
+    {
+      "level": "error",
+      "code": "ATM_GIT_ADMISSION_BLOCK",
+      "text": "Git admission outcome 'block': remote branch=origin/main; base commit=557a6e68b16922eef3133667546b211d21a22f7e; local commit=efbf331bca955dd41a3028719584899cbc0a4728; remote commit=72d8f7558d7ad1b0e221c388fbc9de18e341350f; conflicting files=data.json; recommended next step=Conflicting mutation surfaces were detected in data.json; rebase, split the work, or rearbitrate before push.",
+      "data": {
+        "outcome": "block",
+        "topology": {
+          "branch": "main",
+          "remote": "origin",
+          "remoteRef": "origin/main",
+          "headSha": "efbf331bca955dd41a3028719584899cbc0a4728",
+          "remoteSha": "72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+          "mergeBaseSha": "557a6e68b16922eef3133667546b211d21a22f7e",
+          "fetched": false
+        },
+        "conflictingFiles": [
+          "data.json"
+        ],
+        "recommendedNextStep": "Conflicting mutation surfaces were detected in data.json; rebase, split the work, or rearbitrate before push."
+      }
+    }
+  ],
+  "evidence": {
+    "action": "admit",
+    "outcome": "block",
+    "topology": {
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "headSha": "efbf331bca955dd41a3028719584899cbc0a4728",
+      "remoteSha": "72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+      "mergeBaseSha": "557a6e68b16922eef3133667546b211d21a22f7e",
+      "fetched": false
+    },
+    "brokerRegistryPath": ".atm\\runtime\\write-broker.registry.json",
+    "conflictingFiles": [
+      "data.json"
+    ],
+    "recommendedNextStep": "Conflicting mutation surfaces were detected in data.json; rebase, split the work, or rearbitrate before push.",
+    "brokerDecision": {
+      "schemaId": "atm.brokerDecision.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "generated"
+      },
+      "intentId": "decision-1782198304233",
+      "taskId": "git-local-main",
+      "verdict": "blocked-cid-conflict",
+      "lane": "blocked",
+      "conflicts": [
+        {
+          "kind": "cid",
+          "detail": "CID conflict: Atom ID 'data.json::record::record:data.json::/alpha' is already claimed by task 'git-remote-origin-main'"
+        },
+        {
+          "kind": "cid",
+          "detail": "CID conflict: Atom CID 'c389de385a7a2d8b' is already claimed by task 'git-remote-origin-main'"
+        }
+      ],
+      "applyMethod": "none",
+      "reason": "Blocked by Atom ID, CID, or read-set semantic conflict",
+      "conflictMatrix": {
+        "schemaId": "atm.brokerConflictMatrix.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "generated"
+        },
+        "taskId": "git-local-main",
+        "arbitrationVerdict": "freeze",
+        "conflicts": [
+          {
+            "kind": "cid",
+            "detail": "Write set overlap: atomCid 'c389de385a7a2d8b' is held by 'git-remote-origin-main'.",
+            "blockingTask": "git-remote-origin-main"
+          },
+          {
+            "kind": "cid",
+            "detail": "Write set overlap: atomId 'data.json::record::record:data.json::/alpha' is held by 'git-remote-origin-main'.",
+            "blockingTask": "git-remote-origin-main"
+          }
+        ]
+      },
+      "admission": {
+        "trigger": "not-required",
+        "state": "blocked-before-write",
+        "requiresProposal": false,
+        "summarySubmitted": true,
+        "hotFiles": [],
+        "boundedRegions": [],
+        "rearbitrationRequired": false,
+        "reason": "Blocked by Atom ID, CID, or read-set semantic conflict before write."
+      }
+    },
+    "diagnostics": [],
+    "local": {
+      "diff": [
+        {
+          "filePath": "data.json",
+          "previousFilePath": null,
+          "status": "modified",
+          "rawStatus": "M",
+          "similarityScore": null
+        }
+      ],
+      "requests": [
+        {
+          "schemaId": "atm.mutationRequest.v1",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "none",
+            "fromVersion": null,
+            "notes": "broker format adapter subsystem baseline"
+          },
+          "requestId": "git-local-151ff7e5a4613dd1",
+          "actorId": "fixture-agent",
+          "filePath": "data.json",
+          "op": "modified",
+          "target": "data.json",
+          "value": {
+            "source": "git-diff",
+            "side": "local",
+            "branch": "main",
+            "remote": "origin",
+            "remoteRef": "origin/main",
+            "mergeBaseSha": "557a6e68b16922eef3133667546b211d21a22f7e",
+            "compareRef": "HEAD",
+            "headSha": "efbf331bca955dd41a3028719584899cbc0a4728",
+            "remoteSha": "72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+            "previousFilePath": null,
+            "rawStatus": "M",
+            "similarityScore": null
+          }
+        }
+      ],
+      "bridged": [
+        {
+          "filePath": "data.json",
+          "adapterId": "json-record",
+          "conflictKeys": [
+            {
+              "schemaId": "atm.conflictKey.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "scope": "record",
+              "key": "record:data.json::/alpha"
+            }
+          ],
+          "requests": [
+            {
+              "schemaId": "atm.mutationRequest.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "requestId": "git-bridge-0-data-json",
+              "actorId": "fixture-agent",
+              "filePath": "data.json",
+              "op": "upsert",
+              "target": "/alpha",
+              "value": 3
+            }
+          ],
+          "diagnostics": [],
+          "failClosed": false
+        }
+      ]
+    },
+    "remote": {
+      "diff": [
+        {
+          "filePath": "data.json",
+          "previousFilePath": null,
+          "status": "modified",
+          "rawStatus": "M",
+          "similarityScore": null
+        }
+      ],
+      "requests": [
+        {
+          "schemaId": "atm.mutationRequest.v1",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "none",
+            "fromVersion": null,
+            "notes": "broker format adapter subsystem baseline"
+          },
+          "requestId": "git-remote-5894ab98d76c1078",
+          "actorId": "virtual:git-remote@72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+          "filePath": "data.json",
+          "op": "modified",
+          "target": "data.json",
+          "value": {
+            "source": "git-diff",
+            "side": "remote",
+            "branch": "main",
+            "remote": "origin",
+            "remoteRef": "origin/main",
+            "mergeBaseSha": "557a6e68b16922eef3133667546b211d21a22f7e",
+            "compareRef": "origin/main",
+            "headSha": "efbf331bca955dd41a3028719584899cbc0a4728",
+            "remoteSha": "72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+            "previousFilePath": null,
+            "rawStatus": "M",
+            "similarityScore": null
+          }
+        }
+      ],
+      "bridged": [
+        {
+          "filePath": "data.json",
+          "adapterId": "json-record",
+          "conflictKeys": [
+            {
+              "schemaId": "atm.conflictKey.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "scope": "record",
+              "key": "record:data.json::/alpha"
+            }
+          ],
+          "requests": [
+            {
+              "schemaId": "atm.mutationRequest.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "requestId": "git-bridge-0-data-json",
+              "actorId": "virtual:git-remote@72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+              "filePath": "data.json",
+              "op": "upsert",
+              "target": "/alpha",
+              "value": 2
+            }
+          ],
+          "diagnostics": [],
+          "failClosed": false
+        }
+      ]
+    },
+    "gitBoundaryEvidence": {
+      "schemaId": "atm.gitBoundaryEvidenceEnvelope.v1",
+      "specVersion": "0.1.0",
+      "generatedAt": "2026-06-23T07:05:04.233Z",
+      "actorId": "fixture-agent",
+      "remoteVirtualActorId": "virtual:git-remote@72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+      "taskId": null,
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "baseCommit": "557a6e68b16922eef3133667546b211d21a22f7e",
+      "localHead": "efbf331bca955dd41a3028719584899cbc0a4728",
+      "remoteHead": "72d8f7558d7ad1b0e221c388fbc9de18e341350f",
+      "targetFiles": [
+        "data.json"
+      ],
+      "conflictKeys": [
+        {
+          "side": "local",
+          "filePath": "data.json",
+          "scope": "record",
+          "key": "record:data.json::/alpha"
+        },
+        {
+          "side": "remote",
+          "filePath": "data.json",
+          "scope": "record",
+          "key": "record:data.json::/alpha"
+        }
+      ],
+      "conflictingFiles": [
+        "data.json"
+      ],
+      "lane": "blocked",
+      "verdict": "blocked-cid-conflict",
+      "outcome": "block",
+      "recommendation": "Conflicting mutation surfaces were detected in data.json; rebase, split the work, or rearbitrate before push.",
+      "diagnostics": [],
+      "artifactPaths": [
+        ".atm/history/evidence/git-boundary-runs/origin-main-efbf331bca95.json",
+        ".atm/history/evidence/git-boundary-runs/origin-main-efbf331bca95.md"
+      ]
+    }
+  },
+  "severity": "failure",
+  "exitCode": 1,
+  "blocking": true,
+  "diagnostics": {
+    "errorCodes": [
+      "ATM_GIT_ADMISSION_BLOCK"
+    ],
+    "warningCodes": [],
+    "infoCodes": []
+  }
+}

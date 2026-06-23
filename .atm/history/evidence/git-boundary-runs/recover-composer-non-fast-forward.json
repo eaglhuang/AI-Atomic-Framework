@@ -1,0 +1,317 @@
+{
+  "ok": true,
+  "command": "git",
+  "mode": "standalone",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp-validate-git-boundary-paper-evidence\\recover-composer-non-fast-forward\\local",
+  "messages": [
+    {
+      "level": "warn",
+      "code": "ATM_GIT_POST_PUSH_FAIL_COMPOSER_ROUTED",
+      "text": "Post-push recovery outcome 'composer-routed' after refreshing origin/main. Push rejection recovery reran admission after fetch and found a mergeable same-file conflict in data.json. Use git admit --steward-plan or --apply-to-working-tree, then validate and retry the push manually.",
+      "data": {
+        "outcome": "composer-routed",
+        "branch": "main",
+        "remote": "origin",
+        "remoteRef": "origin/main",
+        "conflictingFiles": [
+          "data.json"
+        ],
+        "recommendedNextStep": "Push rejection recovery reran admission after fetch and found a mergeable same-file conflict in data.json. Use git admit --steward-plan or --apply-to-working-tree, then validate and retry the push manually.",
+        "recoveryKind": "steward-apply",
+        "remoteChangedAfterFetch": true,
+        "likelyNonFastForward": true
+      }
+    }
+  ],
+  "evidence": {
+    "action": "recover-push-fail",
+    "outcome": "composer-routed",
+    "topology": {
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "headSha": "9719ca69fc23ac361265de9a6770f087cd9a203a",
+      "remoteSha": "84ed9bd9d66071f9677537493c8ffeb1129728b5",
+      "mergeBaseSha": "5ea37e6ac3f8118c129299d3a0069b88369fa92c",
+      "fetched": true
+    },
+    "brokerRegistryPath": ".atm\\runtime\\write-broker.registry.json",
+    "conflictingFiles": [
+      "data.json"
+    ],
+    "recommendedNextStep": "Push rejection recovery reran admission after fetch and found a mergeable same-file conflict in data.json. Use git admit --steward-plan or --apply-to-working-tree, then validate and retry the push manually.",
+    "brokerDecision": {
+      "schemaId": "atm.brokerDecision.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "generated"
+      },
+      "intentId": "decision-1782198315228",
+      "taskId": "git-local-main",
+      "verdict": "needs-physical-split",
+      "lane": "deterministic-composer",
+      "conflicts": [
+        {
+          "kind": "file-range",
+          "detail": "Physical file overlap on 'data.json'"
+        }
+      ],
+      "applyMethod": "patch-apply",
+      "reason": "Physical file overlap detected but no bounded overlap evidence; routed to deterministic-composer.",
+      "conflictMatrix": {
+        "schemaId": "atm.brokerConflictMatrix.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "generated"
+        },
+        "taskId": "git-local-main",
+        "arbitrationVerdict": "allow",
+        "conflicts": []
+      },
+      "admission": {
+        "trigger": "not-required",
+        "state": "composer-routed",
+        "requiresProposal": false,
+        "summarySubmitted": true,
+        "hotFiles": [],
+        "boundedRegions": [],
+        "rearbitrationRequired": true,
+        "reason": "Same-file work requires proposal-aware composer routing before write."
+      }
+    },
+    "diagnostics": [],
+    "local": {
+      "diff": [
+        {
+          "filePath": "data.json",
+          "previousFilePath": null,
+          "status": "modified",
+          "rawStatus": "M",
+          "similarityScore": null
+        }
+      ],
+      "requests": [
+        {
+          "schemaId": "atm.mutationRequest.v1",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "none",
+            "fromVersion": null,
+            "notes": "broker format adapter subsystem baseline"
+          },
+          "requestId": "git-local-151ff7e5a4613dd1",
+          "actorId": "fixture-agent",
+          "filePath": "data.json",
+          "op": "modified",
+          "target": "data.json",
+          "value": {
+            "source": "git-diff",
+            "side": "local",
+            "branch": "main",
+            "remote": "origin",
+            "remoteRef": "origin/main",
+            "mergeBaseSha": "5ea37e6ac3f8118c129299d3a0069b88369fa92c",
+            "compareRef": "HEAD",
+            "headSha": "9719ca69fc23ac361265de9a6770f087cd9a203a",
+            "remoteSha": "84ed9bd9d66071f9677537493c8ffeb1129728b5",
+            "previousFilePath": null,
+            "rawStatus": "M",
+            "similarityScore": null
+          }
+        }
+      ],
+      "bridged": [
+        {
+          "filePath": "data.json",
+          "adapterId": "json-record",
+          "conflictKeys": [
+            {
+              "schemaId": "atm.conflictKey.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "scope": "record",
+              "key": "record:data.json::/beta"
+            }
+          ],
+          "requests": [
+            {
+              "schemaId": "atm.mutationRequest.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "requestId": "git-bridge-0-data-json",
+              "actorId": "fixture-agent",
+              "filePath": "data.json",
+              "op": "upsert",
+              "target": "/beta",
+              "value": 2
+            }
+          ],
+          "diagnostics": [],
+          "failClosed": false
+        }
+      ]
+    },
+    "remote": {
+      "diff": [
+        {
+          "filePath": "data.json",
+          "previousFilePath": null,
+          "status": "modified",
+          "rawStatus": "M",
+          "similarityScore": null
+        }
+      ],
+      "requests": [
+        {
+          "schemaId": "atm.mutationRequest.v1",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "none",
+            "fromVersion": null,
+            "notes": "broker format adapter subsystem baseline"
+          },
+          "requestId": "git-remote-5894ab98d76c1078",
+          "actorId": "virtual:git-remote@84ed9bd9d66071f9677537493c8ffeb1129728b5",
+          "filePath": "data.json",
+          "op": "modified",
+          "target": "data.json",
+          "value": {
+            "source": "git-diff",
+            "side": "remote",
+            "branch": "main",
+            "remote": "origin",
+            "remoteRef": "origin/main",
+            "mergeBaseSha": "5ea37e6ac3f8118c129299d3a0069b88369fa92c",
+            "compareRef": "origin/main",
+            "headSha": "9719ca69fc23ac361265de9a6770f087cd9a203a",
+            "remoteSha": "84ed9bd9d66071f9677537493c8ffeb1129728b5",
+            "previousFilePath": null,
+            "rawStatus": "M",
+            "similarityScore": null
+          }
+        }
+      ],
+      "bridged": [
+        {
+          "filePath": "data.json",
+          "adapterId": "json-record",
+          "conflictKeys": [
+            {
+              "schemaId": "atm.conflictKey.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "scope": "record",
+              "key": "record:data.json::/alpha"
+            }
+          ],
+          "requests": [
+            {
+              "schemaId": "atm.mutationRequest.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "requestId": "git-bridge-0-data-json",
+              "actorId": "virtual:git-remote@84ed9bd9d66071f9677537493c8ffeb1129728b5",
+              "filePath": "data.json",
+              "op": "upsert",
+              "target": "/alpha",
+              "value": 2
+            }
+          ],
+          "diagnostics": [],
+          "failClosed": false
+        }
+      ]
+    },
+    "gitBoundaryEvidence": {
+      "schemaId": "atm.gitBoundaryEvidenceEnvelope.v1",
+      "specVersion": "0.1.0",
+      "generatedAt": "2026-06-23T07:05:15.407Z",
+      "actorId": "fixture-agent",
+      "remoteVirtualActorId": "virtual:git-remote@84ed9bd9d66071f9677537493c8ffeb1129728b5",
+      "taskId": null,
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "baseCommit": "5ea37e6ac3f8118c129299d3a0069b88369fa92c",
+      "localHead": "9719ca69fc23ac361265de9a6770f087cd9a203a",
+      "remoteHead": "84ed9bd9d66071f9677537493c8ffeb1129728b5",
+      "targetFiles": [
+        "data.json"
+      ],
+      "conflictKeys": [
+        {
+          "side": "local",
+          "filePath": "data.json",
+          "scope": "record",
+          "key": "record:data.json::/beta"
+        },
+        {
+          "side": "remote",
+          "filePath": "data.json",
+          "scope": "record",
+          "key": "record:data.json::/alpha"
+        }
+      ],
+      "conflictingFiles": [
+        "data.json"
+      ],
+      "lane": "deterministic-composer",
+      "verdict": "needs-physical-split",
+      "outcome": "composer-routed",
+      "recommendation": "Same-file but potentially mergeable work was detected in data.json; route through deterministic-composer before push.",
+      "diagnostics": [],
+      "artifactPaths": [
+        ".atm/history/evidence/git-boundary-runs/origin-main-9719ca69fc23.json",
+        ".atm/history/evidence/git-boundary-runs/origin-main-9719ca69fc23.md"
+      ]
+    },
+    "recovery": {
+      "mode": "post-push-fail",
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "fetched": true,
+      "recoveryKind": "steward-apply",
+      "localHeadBeforeFetch": "9719ca69fc23ac361265de9a6770f087cd9a203a",
+      "remoteHeadBeforeFetch": "5ea37e6ac3f8118c129299d3a0069b88369fa92c",
+      "remoteHeadAfterFetch": "84ed9bd9d66071f9677537493c8ffeb1129728b5",
+      "remoteChangedAfterFetch": true,
+      "likelyRemoteChanged": true,
+      "likelyNonFastForward": true,
+      "localBehindRemoteBeforeFetch": false,
+      "localBehindRemoteAfterFetch": false,
+      "localDivergedBeforeFetch": false,
+      "localDivergedAfterFetch": true
+    }
+  },
+  "severity": "advisory",
+  "exitCode": 0,
+  "blocking": false,
+  "diagnostics": {
+    "errorCodes": [],
+    "warningCodes": [
+      "ATM_GIT_POST_PUSH_FAIL_COMPOSER_ROUTED"
+    ],
+    "infoCodes": []
+  }
+}

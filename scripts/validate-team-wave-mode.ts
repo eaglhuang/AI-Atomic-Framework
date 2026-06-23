@@ -4,7 +4,8 @@
 // family, and asserts the safe / unsafe / mixed / per-task-slicing /
 // close-readiness behaviors end to end. Silent-ish on success, throws on first
 // failed assertion. Used as the TASK-MAO-0033 command-backed validator.
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
@@ -13,6 +14,7 @@ import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/co
 import { createWorkerReport } from '../packages/core/src/broker/team-worker-report.ts';
 import { sliceWaveEvidence, type WaveEvidenceMember } from '../packages/core/src/broker/team-wave-evidence.ts';
 import { checkpointWave } from '../packages/core/src/broker/team-wave-checkpoint.ts';
+import { buildWaveRuntimeRecord } from '../packages/cli/src/commands/team-wave.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fixturePath = path.join(root, 'scripts/fixtures/team-wave-mode/wave-scenarios.json');
@@ -158,4 +160,30 @@ const byName = new Map(fixture.scenarios.map((s) => [s.name, s]));
   assert(checkpoint.closeReadyTaskIds.length === 0, 'gating: needs-review wave must block all close-readiness');
 }
 
-console.log('[team-wave-mode:dogfood] ok (safe / unsafe / mixed / slicing / close-readiness)');
+// --- Scenario 6: CLI team-wave candidate loading must ignore prose deliverables ---
+{
+  const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-team-wave-cli-'));
+  mkdirSync(path.join(tempRoot, '.atm', 'history', 'tasks'), { recursive: true });
+  writeFileSync(path.join(tempRoot, '.atm', 'history', 'tasks', 'TASK-WAVE-CLI-0001.json'), JSON.stringify({
+    workItemId: 'TASK-WAVE-CLI-0001',
+    status: 'open',
+    dependencies: [],
+    scopePaths: ['packages/core/src/broker/adapters/format-a.ts'],
+    deliverables: [
+      'packages/core/src/broker/adapters/format-a.ts',
+      'Closure packet and evidence write-up for the wave run'
+    ],
+    validators: ['npm run typecheck'],
+    targetRepo: 'AI-Atomic-Framework',
+    closureAuthority: 'target_repo'
+  }, null, 2));
+  const record = buildWaveRuntimeRecord(tempRoot, ['TASK-WAVE-CLI-0001'], 'wave-coordinator');
+  const member = record.envelope?.members[0] ?? null;
+  assert(member !== null, 'team-wave CLI: single task should produce an envelope member');
+  assert(
+    member!.deliverables.length === 1 && member!.deliverables[0] === 'packages/core/src/broker/adapters/format-a.ts',
+    `team-wave CLI: prose deliverables must be ignored, got ${JSON.stringify(member?.deliverables ?? null)}`
+  );
+}
+
+console.log('[team-wave-mode:dogfood] ok (safe / unsafe / mixed / slicing / close-readiness / cli-sanitization)');

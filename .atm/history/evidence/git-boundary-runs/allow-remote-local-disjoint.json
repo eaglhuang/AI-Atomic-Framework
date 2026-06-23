@@ -1,0 +1,289 @@
+{
+  "ok": true,
+  "command": "git",
+  "mode": "standalone",
+  "cwd": "C:\\Users\\User\\AI-Atomic-Framework\\.atm-temp-validate-git-boundary-paper-evidence\\allow-remote-local-disjoint\\local",
+  "messages": [
+    {
+      "level": "info",
+      "code": "ATM_GIT_ADMISSION_ALLOW",
+      "text": "Git admission outcome 'allow': remote branch=origin/main; base commit=4fc5f3797aa8d97b57bfe5414c9828f0cf306708; local commit=e5bc33c60ffb7bf4a99fa8d4feaa48e70abf8062; remote commit=bb2d588bc621f85fdd8f9e5443f171a783772fb3; conflicting files=none; recommended next step=Admission passed; you can proceed to push or capture this verdict as hook/CI evidence.",
+      "data": {
+        "outcome": "allow",
+        "topology": {
+          "branch": "main",
+          "remote": "origin",
+          "remoteRef": "origin/main",
+          "headSha": "e5bc33c60ffb7bf4a99fa8d4feaa48e70abf8062",
+          "remoteSha": "bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+          "mergeBaseSha": "4fc5f3797aa8d97b57bfe5414c9828f0cf306708",
+          "fetched": false
+        },
+        "conflictingFiles": [],
+        "recommendedNextStep": "Admission passed; you can proceed to push or capture this verdict as hook/CI evidence."
+      }
+    }
+  ],
+  "evidence": {
+    "action": "admit",
+    "outcome": "allow",
+    "topology": {
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "headSha": "e5bc33c60ffb7bf4a99fa8d4feaa48e70abf8062",
+      "remoteSha": "bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+      "mergeBaseSha": "4fc5f3797aa8d97b57bfe5414c9828f0cf306708",
+      "fetched": false
+    },
+    "brokerRegistryPath": ".atm\\runtime\\write-broker.registry.json",
+    "conflictingFiles": [],
+    "recommendedNextStep": "Admission passed; you can proceed to push or capture this verdict as hook/CI evidence.",
+    "brokerDecision": {
+      "schemaId": "atm.brokerDecision.v1",
+      "specVersion": "0.1.0",
+      "migration": {
+        "strategy": "none",
+        "fromVersion": null,
+        "notes": "generated"
+      },
+      "intentId": "decision-1782198300902",
+      "taskId": "git-local-main",
+      "verdict": "parallel-safe",
+      "lane": "direct-brokered",
+      "conflicts": [],
+      "applyMethod": "none",
+      "reason": "Parallel safe",
+      "conflictMatrix": {
+        "schemaId": "atm.brokerConflictMatrix.v1",
+        "specVersion": "0.1.0",
+        "migration": {
+          "strategy": "none",
+          "fromVersion": null,
+          "notes": "generated"
+        },
+        "taskId": "git-local-main",
+        "arbitrationVerdict": "allow",
+        "conflicts": []
+      },
+      "admission": {
+        "trigger": "not-required",
+        "state": "not-required",
+        "requiresProposal": false,
+        "summarySubmitted": true,
+        "hotFiles": [],
+        "boundedRegions": [],
+        "rearbitrationRequired": false,
+        "reason": "No proposal-first trigger is active; direct brokered write is admitted."
+      }
+    },
+    "diagnostics": [],
+    "local": {
+      "diff": [
+        {
+          "filePath": "local-only.txt",
+          "previousFilePath": null,
+          "status": "added",
+          "rawStatus": "A",
+          "similarityScore": null
+        }
+      ],
+      "requests": [
+        {
+          "schemaId": "atm.mutationRequest.v1",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "none",
+            "fromVersion": null,
+            "notes": "broker format adapter subsystem baseline"
+          },
+          "requestId": "git-local-6620f41d07d7a189",
+          "actorId": "fixture-agent",
+          "filePath": "local-only.txt",
+          "op": "added",
+          "target": "local-only.txt",
+          "value": {
+            "source": "git-diff",
+            "side": "local",
+            "branch": "main",
+            "remote": "origin",
+            "remoteRef": "origin/main",
+            "mergeBaseSha": "4fc5f3797aa8d97b57bfe5414c9828f0cf306708",
+            "compareRef": "HEAD",
+            "headSha": "e5bc33c60ffb7bf4a99fa8d4feaa48e70abf8062",
+            "remoteSha": "bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+            "previousFilePath": null,
+            "rawStatus": "A",
+            "similarityScore": null
+          }
+        }
+      ],
+      "bridged": [
+        {
+          "filePath": "local-only.txt",
+          "adapterId": "text-range",
+          "conflictKeys": [
+            {
+              "schemaId": "atm.conflictKey.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "scope": "line",
+              "key": "range:local-only.txt::1-1"
+            }
+          ],
+          "requests": [
+            {
+              "schemaId": "atm.mutationRequest.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "requestId": "git-bridge-0-local-only-txt",
+              "actorId": "fixture-agent",
+              "filePath": "local-only.txt",
+              "op": "replaceRange",
+              "target": "1:1"
+            }
+          ],
+          "diagnostics": [],
+          "failClosed": false
+        }
+      ]
+    },
+    "remote": {
+      "diff": [
+        {
+          "filePath": "remote-only.txt",
+          "previousFilePath": null,
+          "status": "added",
+          "rawStatus": "A",
+          "similarityScore": null
+        }
+      ],
+      "requests": [
+        {
+          "schemaId": "atm.mutationRequest.v1",
+          "specVersion": "0.1.0",
+          "migration": {
+            "strategy": "none",
+            "fromVersion": null,
+            "notes": "broker format adapter subsystem baseline"
+          },
+          "requestId": "git-remote-7bc567910f2235a5",
+          "actorId": "virtual:git-remote@bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+          "filePath": "remote-only.txt",
+          "op": "added",
+          "target": "remote-only.txt",
+          "value": {
+            "source": "git-diff",
+            "side": "remote",
+            "branch": "main",
+            "remote": "origin",
+            "remoteRef": "origin/main",
+            "mergeBaseSha": "4fc5f3797aa8d97b57bfe5414c9828f0cf306708",
+            "compareRef": "origin/main",
+            "headSha": "e5bc33c60ffb7bf4a99fa8d4feaa48e70abf8062",
+            "remoteSha": "bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+            "previousFilePath": null,
+            "rawStatus": "A",
+            "similarityScore": null
+          }
+        }
+      ],
+      "bridged": [
+        {
+          "filePath": "remote-only.txt",
+          "adapterId": "text-range",
+          "conflictKeys": [
+            {
+              "schemaId": "atm.conflictKey.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "scope": "line",
+              "key": "range:remote-only.txt::1-1"
+            }
+          ],
+          "requests": [
+            {
+              "schemaId": "atm.mutationRequest.v1",
+              "specVersion": "0.1.0",
+              "migration": {
+                "strategy": "none",
+                "fromVersion": null,
+                "notes": "broker format adapter subsystem baseline"
+              },
+              "requestId": "git-bridge-0-remote-only-txt",
+              "actorId": "virtual:git-remote@bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+              "filePath": "remote-only.txt",
+              "op": "replaceRange",
+              "target": "1:1"
+            }
+          ],
+          "diagnostics": [],
+          "failClosed": false
+        }
+      ]
+    },
+    "gitBoundaryEvidence": {
+      "schemaId": "atm.gitBoundaryEvidenceEnvelope.v1",
+      "specVersion": "0.1.0",
+      "generatedAt": "2026-06-23T07:05:00.902Z",
+      "actorId": "fixture-agent",
+      "remoteVirtualActorId": "virtual:git-remote@bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+      "taskId": null,
+      "branch": "main",
+      "remote": "origin",
+      "remoteRef": "origin/main",
+      "baseCommit": "4fc5f3797aa8d97b57bfe5414c9828f0cf306708",
+      "localHead": "e5bc33c60ffb7bf4a99fa8d4feaa48e70abf8062",
+      "remoteHead": "bb2d588bc621f85fdd8f9e5443f171a783772fb3",
+      "targetFiles": [
+        "local-only.txt"
+      ],
+      "conflictKeys": [
+        {
+          "side": "local",
+          "filePath": "local-only.txt",
+          "scope": "line",
+          "key": "range:local-only.txt::1-1"
+        },
+        {
+          "side": "remote",
+          "filePath": "remote-only.txt",
+          "scope": "line",
+          "key": "range:remote-only.txt::1-1"
+        }
+      ],
+      "conflictingFiles": [],
+      "lane": "direct-brokered",
+      "verdict": "parallel-safe",
+      "outcome": "allow",
+      "recommendation": "Admission passed; you can proceed to push or capture this verdict as hook/CI evidence.",
+      "diagnostics": [],
+      "artifactPaths": [
+        ".atm/history/evidence/git-boundary-runs/origin-main-e5bc33c60ffb.json",
+        ".atm/history/evidence/git-boundary-runs/origin-main-e5bc33c60ffb.md"
+      ]
+    }
+  },
+  "severity": "success",
+  "exitCode": 0,
+  "blocking": false,
+  "diagnostics": {
+    "errorCodes": [],
+    "warningCodes": [],
+    "infoCodes": [
+      "ATM_GIT_ADMISSION_ALLOW"
+    ]
+  }
+}

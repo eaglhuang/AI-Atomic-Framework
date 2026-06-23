@@ -1,0 +1,306 @@
+{
+  "taskId": "TASK-GIT-0012",
+  "updatedAt": "2026-06-23T07:06:34.698Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": null,
+      "createdAt": "2026-06-23T07:05:05.396Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-dogfood-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fcb1b5a6e174bed9298ac43d5453ed2a4ef75824",
+            "cacheKey": "sha256:3bbfe1e5bb86d06e00bc3415aa71996084aef5fa753f3e345cbd319c492dae70",
+            "cached": false,
+            "generatedAt": "2026-06-23T07:05:05.513Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:2fe0eb3ded113d8a2ae5863443dc0693787e19c28bb40b8091455f2b1d20db2d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --experimental-strip-types tests/cli/git-admission-cli.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": null,
+      "createdAt": "2026-06-23T07:05:15.402Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-dogfood-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --experimental-strip-types tests/cli/git-admission-cli.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:64dca3c81573fb924ad221042a88306e1cf225161d36b858355deac23494c799",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fcb1b5a6e174bed9298ac43d5453ed2a4ef75824",
+            "cacheKey": "sha256:b5af195c7ce54496b39530a7579b80b521e12f2fd3034f63167ef964d62071a4",
+            "cached": false,
+            "generatedAt": "2026-06-23T07:05:15.494Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:93a11c18571913b064e0ec605860591115948cf1ac964f0a14ca40eb8b12199b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --experimental-strip-types scripts/validate-git-boundary-paper-evidence.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": null,
+      "createdAt": "2026-06-23T07:05:15.729Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-boundary-paper-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-dogfood-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --experimental-strip-types scripts/validate-git-boundary-paper-evidence.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:48b79fb176764b81def6f8109dbc87b2cf6e42a346f2bb96178106136d259baa",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-boundary-paper-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fcb1b5a6e174bed9298ac43d5453ed2a4ef75824",
+            "cacheKey": "sha256:694ff3ec2da3382ce26e3616ae0c1b1f13485b66c8e49da054f5c1f247846716",
+            "cached": false,
+            "generatedAt": "2026-06-23T07:05:15.907Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:734a553d64c2ba547ecfe22eae72484eb2fdf460e552b17f4bb02221613a609d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": null,
+      "createdAt": "2026-06-23T07:05:44.187Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-dogfood-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fcb1b5a6e174bed9298ac43d5453ed2a4ef75824",
+            "cacheKey": "sha256:f5ca7001b05f7970c954febbed0f2250545d82e98cea94f450de95d96321bff7",
+            "cached": false,
+            "generatedAt": "2026-06-23T07:05:44.248Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:13748a48b2729cf2ee7093c47b1a8b70ef3b7af82c8384fcf445a5e4bce1ae81",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": null,
+      "createdAt": "2026-06-23T07:06:20.037Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-dogfood-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fcb1b5a6e174bed9298ac43d5453ed2a4ef75824",
+            "cacheKey": "sha256:d8bc142dbf034088fe6f2a75af8abd78c1adba2adad82de3fa7dbd72437b6cad",
+            "cached": false,
+            "generatedAt": "2026-06-23T07:06:20.101Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4b50d94067dfac16b0a9a898781b0827f9870304fcffc102a21e3cb1c10057f0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-main",
+      "sessionId": null,
+      "createdAt": "2026-06-23T07:06:34.698Z",
+      "details": {
+        "actorId": "codex-main",
+        "sessionId": null,
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-dogfood-evidence",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fcb1b5a6e174bed9298ac43d5453ed2a4ef75824",
+            "cacheKey": "sha256:e4b7e3037623a0b9ca6882ce3b77d7ae68e5bffafc8fa60d4e39051461f9b3c8",
+            "cached": false,
+            "generatedAt": "2026-06-23T07:06:34.757Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:63498e7b022cc4aea033f18f13050969ea5f19547658b3704132bd3e428ca7d5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
