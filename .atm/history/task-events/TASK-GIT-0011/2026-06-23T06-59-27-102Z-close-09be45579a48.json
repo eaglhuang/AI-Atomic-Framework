@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-23T06-59-27-102Z-close-09be45579a48",
+  "taskId": "TASK-GIT-0011",
+  "action": "close",
+  "actorId": "codex-main",
+  "sessionId": "session-20260623064742-codex-main-TASK-GIT-0011-88c992024c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0011.json",
+  "taskSha256": "sha256:a6fb55120ab4109757175e5a2a937cc01f91db8569d2fd5fad940e95d0b1b711",
+  "createdAt": "2026-06-23T06:59:27.102Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0011 --actor codex-main --status done --from-batch-checkpoint --batch batch-f47cb3485465 --historical-delivery d8037c8f72245d38b5c3190ff9c9f2ef0b4fe41b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-f47cb3485465",
+    "sessionId": "session-20260623064742-codex-main-TASK-GIT-0011-88c992024c",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0011.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-23T06:59:27.094Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0011.*",
+        ".atm/history/task-events/TASK-GIT-0011/**",
+        ".atm/history/tasks/TASK-GIT-0011.json",
+        "Adopter-facing setup guide.",
+        "docs/**",
+        "git-boundary-admission/tasks/TASK-GIT-0011-adopter-docs-and-runbook.task.md",
+        "integrations/**",
+        "Operator runbook for allow, block, composer-routed, fallback, and bypass cases.",
+        "packages/cli/src/commands/integration.ts",
+        "Troubleshooting notes for common Git states."
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/cli/src/commands/integration.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:integration-adapter",
+        "validate:skill-templates"
+      ]
+    }
+  }
+}

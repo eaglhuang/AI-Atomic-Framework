@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0011",
+  "title": "Adopter docs and runbook",
+  "status": "done",
+  "milestone": "G4",
+  "dependencies": [
+    "TASK-GIT-0010"
+  ],
+  "acceptance": [
+    "Docs explain the pre-push design in plain terms.",
+    "Docs include install, verify, uninstall, and recovery commands.",
+    "Docs include examples for allow, block, composer-routed, and post-push-fail cases.",
+    "Docs warn that the MVP is local-hook based and not a server-side policy substitute."
+  ],
+  "deliverables": [
+    "Adopter-facing setup guide.",
+    "Operator runbook for allow, block, composer-routed, fallback, and bypass cases.",
+    "Troubleshooting notes for common Git states."
+  ],
+  "scopePaths": [
+    "docs/**",
+    "integrations/**",
+    "packages/cli/src/commands/integration.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No host-specific project policy in framework docs."
+  ],
+  "nonGoals": [
+    "No marketing copy."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-docs",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0011-adopter-docs-and-runbook.task.md",
+    "sectionTitle": "TASK-GIT-0011",
+    "headingLine": 34,
+    "hash": "e9ca09c6dc7fa4ff"
+  },
+  "importedAt": "2026-06-23T04:08:50.303Z",
+  "lastTransitionId": "2026-06-23T06-59-27-102Z-close-09be45579a48",
+  "lastTransitionAt": "2026-06-23T06:59:27.102Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-main",
+  "reservedAt": "2026-06-23T06:47:42.948Z",
+  "promotedAt": "2026-06-23T06:47:42.952Z",
+  "claim": {
+    "actorId": "codex-main",
+    "leaseId": "lease-01c52996a44a",
+    "claimedAt": "2026-06-23T06:47:42.954Z",
+    "heartbeatAt": "2026-06-23T06:59:27.099Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-GIT-0011.json",
+      "docs/**",
+      "integrations/**",
+      "packages/cli/src/commands/integration.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-23T06:47:42.954Z",
+  "startedByActor": "codex-main",
+  "startedBySessionId": "session-20260623064742-codex-main-TASK-GIT-0011-88c992024c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0011",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": 10,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0011.*",
+      ".atm/history/task-events/TASK-GIT-0011/**",
+      ".atm/history/tasks/TASK-GIT-0011.json",
+      "docs/**",
+      "integrations/**",
+      "packages/cli/src/commands/integration.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0bcfcad5a1f69d8585179a05a4405dc6285affc6628e29cc347ca222f2de8940",
+    "actorId": "codex-main",
+    "createdAt": "2026-06-23T06:47:43.302Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-23T06:59:27.099Z",
+  "closedByActor": "codex-main",
+  "closedBySessionId": "session-20260623064742-codex-main-TASK-GIT-0011-88c992024c",
+  "closurePacket": ".atm/history/evidence/TASK-GIT-0011.closure-packet.json"
+}
