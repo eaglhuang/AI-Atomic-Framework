@@ -47,6 +47,11 @@ const blocked = enrichCommandResult(makeResult({
   cwd: process.cwd(),
   messages: [message('error', 'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED', 'switch repo', {})],
   evidence: {
+    taskIntent: {
+      schemaId: 'atm.taskIntent.v1',
+      userPrompt: 'complete selected cards',
+      taskScopeMentioned: true
+    },
     nextAction: {
       status: 'blocked',
       allowedCommands: ['node atm.mjs next --json'],
@@ -68,8 +73,44 @@ assert.equal(blocked.nextAction?.status, 'blocked');
 assert.deepEqual(blocked.allowedCommands, ['node atm.mjs next --json']);
 assert.deepEqual(blocked.blockedCommands, ['node atm.mjs next --claim --json']);
 assert.equal(blocked.runnerMode?.schemaId, 'atm.runnerMode.v1');
+assert.equal(blocked.taskIntent?.schemaId, 'atm.taskIntent.v1');
 assert.equal(blocked.userNotice?.schemaVersion, 'atm.userNotice.v0.1');
 assert.equal(blocked.skillGrowth?.schemaId, 'atm.skillGrowthHints.v1');
+
+const frameworkStatusProjection = enrichCommandResult(makeResult({
+  ok: true,
+  command: 'framework-mode',
+  cwd: process.cwd(),
+  messages: [message('info', 'ATM_FRAMEWORK_MODE_STATUS', 'Framework development mode is required.', {})],
+  evidence: {
+    action: 'status',
+    report: {
+      schemaId: 'atm.frameworkDevelopmentStatus',
+      mode: 'required',
+      repoRole: 'framework'
+    }
+  }
+}));
+assert.equal(frameworkStatusProjection.frameworkReport?.schemaId, 'atm.frameworkDevelopmentStatus');
+
+const frameworkClaimProjection = enrichCommandResult(makeResult({
+  ok: true,
+  command: 'framework-mode',
+  cwd: process.cwd(),
+  messages: [message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_ACQUIRED', 'claimed', {})],
+  evidence: {
+    action: 'claim',
+    taskId: 'ATM-FRAMEWORK-TEMP-codex-main',
+    actorId: 'codex-main',
+    reason: 'bridge inspection',
+    linkedTaskId: 'TASK-SKL-0003',
+    files: ['packages/cli/src/commands/next.ts'],
+    lock: { lockId: 'lock-1' }
+  }
+}));
+assert.equal(frameworkClaimProjection.frameworkClaim?.action, 'claim');
+assert.deepEqual(frameworkClaimProjection.frameworkClaim?.files, ['packages/cli/src/commands/next.ts']);
+assert.equal(frameworkClaimProjection.frameworkClaim?.linkedTaskId, 'TASK-SKL-0003');
 
 const usage = enrichCommandResult(makeResult({
   ok: false,

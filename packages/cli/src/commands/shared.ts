@@ -150,8 +150,11 @@ export interface CommandResult {
 
 export interface ToolBridgeProjection {
   nextAction?: Record<string, unknown> | null;
+  taskIntent?: Record<string, unknown> | null;
   userNotice?: Record<string, unknown> | null;
   runnerMode?: Record<string, unknown> | null;
+  frameworkReport?: Record<string, unknown> | null;
+  frameworkClaim?: Record<string, unknown> | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
   skillGrowth?: Record<string, unknown> | null;
@@ -186,12 +189,29 @@ function readStringList(value: unknown): string[] | undefined {
 
 export function projectToolBridgeFields(evidence: Record<string, unknown>): ToolBridgeProjection {
   const nextAction = isRecord(evidence.nextAction) ? evidence.nextAction : null;
+  const taskIntent = isRecord(evidence.taskIntent) ? evidence.taskIntent : null;
   const userNotice = isRecord(evidence.userNotice) ? evidence.userNotice : null;
   const runnerMode = isRecord(evidence.runnerMode)
     ? evidence.runnerMode
     : nextAction && isRecord(nextAction.runnerMode)
       ? nextAction.runnerMode
       : null;
+  const frameworkReport = isRecord(evidence.report)
+    && typeof evidence.action === 'string'
+    && ((evidence.report as Record<string, unknown>).schemaId === 'atm.frameworkDevelopmentStatus')
+      ? evidence.report as Record<string, unknown>
+      : null;
+  const frameworkClaim = typeof evidence.action === 'string' && evidence.action === 'claim'
+    ? {
+      action: 'claim',
+      taskId: typeof evidence.taskId === 'string' ? evidence.taskId : null,
+      actorId: typeof evidence.actorId === 'string' ? evidence.actorId : null,
+      reason: typeof evidence.reason === 'string' ? evidence.reason : null,
+      linkedTaskId: typeof evidence.linkedTaskId === 'string' ? evidence.linkedTaskId : null,
+      files: readStringList(evidence.files) ?? [],
+      lock: isRecord(evidence.lock) ? evidence.lock : null
+    }
+    : null;
   const skillGrowth = isRecord(evidence.skillGrowth)
     ? evidence.skillGrowth
     : nextAction && isRecord(nextAction.skillGrowth)
@@ -203,8 +223,11 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
     ?? (nextAction ? readStringList(nextAction.blockedCommands) : undefined);
   return {
     nextAction,
+    taskIntent,
     userNotice,
     runnerMode,
+    frameworkReport,
+    frameworkClaim,
     allowedCommands,
     blockedCommands,
     skillGrowth

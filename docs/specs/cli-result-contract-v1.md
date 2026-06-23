@@ -36,8 +36,11 @@ The result contract always includes:
 The bridge projection may also expose:
 
 - `nextAction`
+- `taskIntent`
 - `userNotice`
 - `runnerMode`
+- `frameworkReport`
+- `frameworkClaim`
 - `allowedCommands`
 - `blockedCommands`
 - `skillGrowth`
@@ -54,10 +57,24 @@ handoff object for `next`, blocked routes, and playbook-driven follow-up.
 Use when the CLI wants the human-facing caller to surface a short notice before
  continuing.
 
+### `taskIntent`
+
+Use when the caller needs prompt-scoped routing truth directly, especially for
+`next` and `next --claim` tool surfaces. This avoids re-parsing text to recover
+whether the route was task-scoped, queue-scoped, or action-biased.
+
 ### `runnerMode`
 
 Use when the caller must understand frozen vs source-first execution or a build
 sync requirement.
+
+### `frameworkReport` / `frameworkClaim`
+
+Use these when the caller is consuming `framework-mode status` or
+`framework-mode claim`. `frameworkReport` projects the machine-readable
+framework boundary/status snapshot, while `frameworkClaim` projects the active
+claim scope (`files`, `taskId`, `actorId`, `lock`) without forcing the skill to
+know ATM's deeper evidence nesting.
 
 ### `allowedCommands` / `blockedCommands`
 
