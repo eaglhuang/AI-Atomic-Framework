@@ -1449,11 +1449,14 @@ function buildSuggestedPermissionLeases(recipe, writePaths) {
             }] : [])
     ];
 }
-function buildTeamPlan(input) {
+export function buildTeamPlan(input) {
     const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
     const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
     const implementerSelector = selectTeamImplementer(input.task, input.recipe, input.writePaths);
     const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector);
+    const roleSkillPacks = buildTeamRoleSkillPackContract(input.recipe);
+    const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
+    const growthContract = buildTeamGrowthContract();
     return {
         schemaId: 'atm.teamPlan.v1',
         recipeId: input.recipe.recipeId,
@@ -1462,6 +1465,9 @@ function buildTeamPlan(input) {
         agents: input.recipe.agents,
         captainDecision,
         implementerSelector,
+        roleSkillPacks,
+        routingMatrix,
+        growthContract,
         ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
         requiredRoles: crewBriefingContract.requiredRoles,
         optionalRoles: crewBriefingContract.optionalRoles,
@@ -1479,6 +1485,128 @@ function buildTeamPlan(input) {
             'Do not hand-edit .atm/runtime team state.'
         ],
         validation: input.validation
+    };
+}
+export function buildTeamRoleSkillPackContract(recipe) {
+    const rolePackDefaults = {
+        coordinator: {
+            skillPackId: 'atm.role-pack.coordinator',
+            specialistSkills: ['atm-governance-router', 'atm-next', 'atm-handoff'],
+            playbookSlice: 'route-claim-close-commit'
+        },
+        reader: {
+            skillPackId: 'atm.role-pack.reader',
+            specialistSkills: ['atm-orient'],
+            playbookSlice: 'source-read-discovery'
+        },
+        scopeGuardian: {
+            skillPackId: 'atm.role-pack.scope-guardian',
+            specialistSkills: ['atm-lock'],
+            playbookSlice: 'scope-preflight-boundary-watch'
+        },
+        implementer: {
+            skillPackId: 'atm.role-pack.implementer',
+            specialistSkills: ['atm-task-intent-resolver'],
+            playbookSlice: 'scoped-delivery'
+        },
+        validator: {
+            skillPackId: 'atm.role-pack.validator',
+            specialistSkills: ['atm-evidence'],
+            playbookSlice: 'validator-evidence-pass'
+        },
+        evidenceCollector: {
+            skillPackId: 'atm.role-pack.evidence-collector',
+            specialistSkills: ['atm-evidence', 'atm-handoff'],
+            playbookSlice: 'evidence-summary-handoff'
+        },
+        atomizationPlanner: {
+            skillPackId: 'atm.role-pack.atomization-planner',
+            specialistSkills: ['atm-atom-map-refactor', 'atm-task-card-authoring'],
+            playbookSlice: 'atomization-scope-shaping'
+        }
+    };
+    const coordinatorExclusive = ['task.lifecycle', 'git.write', 'evidence.write'];
+    return {
+        schemaId: 'atm.teamRoleSkillPackContract.v1',
+        providerNeutral: true,
+        coordinatorOwnsLifecycle: true,
+        roles: recipe.agents.map((agent) => {
+            const defaults = rolePackDefaults[agent.role] ?? {
+                skillPackId: `atm.role-pack.${agent.role}`,
+                specialistSkills: [],
+                playbookSlice: 'specialist-advisory'
+            };
+            return {
+                role: agent.role,
+                agentId: agent.agentId,
+                skillPackId: defaults.skillPackId,
+                specialistSkills: defaults.specialistSkills,
+                allowedPermissions: [...agent.permissions],
+                forbiddenPermissions: agent.role === 'coordinator' ? [] : coordinatorExclusive,
+                playbookSlice: defaults.playbookSlice,
+                growthContractAttachment: 'shared-team-growth-contract'
+            };
+        })
+    };
+}
+export function buildTeamRoleRoutingMatrix(roleSkillPacks) {
+    const hasRole = (role) => roleSkillPacks.roles.some((entry) => entry.role === role);
+    const maybe = (role) => hasRole(role) ? [role] : [];
+    return {
+        schemaId: 'atm.teamRoleRoutingMatrix.v1',
+        providerNeutral: true,
+        coordinatorOwnsLifecycle: true,
+        routes: [
+            {
+                workstream: 'task-entry-routing',
+                primaryRole: 'coordinator',
+                supportingRoles: [...maybe('reader'), ...maybe('scopeGuardian')],
+                advisoryRoles: [...maybe('evidenceCollector')],
+                playbookSlice: 'route-claim-close-commit'
+            },
+            {
+                workstream: 'scoped-implementation',
+                primaryRole: hasRole('implementer') ? 'implementer' : 'coordinator',
+                supportingRoles: [...maybe('scopeGuardian')],
+                advisoryRoles: [...maybe('reader')],
+                playbookSlice: 'scoped-delivery'
+            },
+            {
+                workstream: 'validation-and-evidence',
+                primaryRole: hasRole('validator') ? 'validator' : 'coordinator',
+                supportingRoles: [...maybe('evidenceCollector')],
+                advisoryRoles: [...maybe('reader')],
+                playbookSlice: 'validator-evidence-pass'
+            }
+        ]
+    };
+}
+export function buildTeamGrowthContract() {
+    return {
+        schemaId: 'atm.teamGrowthContract.v1',
+        sharedAcrossRolePacks: true,
+        taxonomy: [
+            'entry-friction',
+            'route-confusion',
+            'boundary-confusion',
+            'fallback-misuse',
+            'validator-gap',
+            'tooling-mismatch',
+            'overloaded-context',
+            'role-specific-friction'
+        ],
+        captureTemplate: [
+            'Trigger',
+            'Symptom',
+            'Correct route',
+            'Durable rule',
+            'Promotion target',
+            'Reuse scope'
+        ],
+        promotionPolicy: {
+            stableRuleTarget: 'SKILL.md',
+            rawCaseTarget: 'docs/governance/team-agents/role-pack-learning-loop.md'
+        }
     };
 }
 function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector) {

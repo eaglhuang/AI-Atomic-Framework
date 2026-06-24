@@ -223,6 +223,8 @@ export interface ActiveWriteIntent {
     readonly files: readonly string[];
     readonly atomIds: readonly string[];
     readonly atomCids: readonly string[];
+    readonly readAtomIds?: readonly string[];
+    readonly readAtomCids?: readonly string[];
     readonly generators: readonly string[];
     readonly projections: readonly string[];
     readonly registries: readonly string[];

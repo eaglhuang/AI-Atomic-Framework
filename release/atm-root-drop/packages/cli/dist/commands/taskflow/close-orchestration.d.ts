@@ -156,6 +156,7 @@ export interface CloseWriteRollbackSnapshot {
     readonly planningCard: {
         readonly absolutePath: string;
         readonly previousContent: string;
+        readonly transitionPath?: string | null;
     } | null;
     readonly stagedArtifacts: readonly string[];
     readonly preCloseStagedFiles: readonly string[];
@@ -167,6 +168,7 @@ export interface CloseWriteTransactionReport {
     readonly ok: boolean;
     readonly failureStep: string | null;
     readonly failureCode: string | null;
+    readonly failureReason?: string | null;
     readonly rolledBackArtifacts: readonly string[];
     readonly recoveryCommand: string | null;
     readonly backendCloseApplied: boolean;

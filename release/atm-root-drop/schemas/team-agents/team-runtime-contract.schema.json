@@ -1,0 +1,268 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-runtime-contract.schema.json",
+  "title": "ATM Team Runtime Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "runtimeMode",
+    "runtimeLanguage",
+    "runtimeAdapterId",
+    "providerId",
+    "sdkId",
+    "modelId",
+    "agentsSpawned",
+    "executionSurface",
+    "selectionReason",
+    "workerAdapter",
+    "artifactHandoff",
+    "retryBudget",
+    "commitLane",
+    "brokerSubagent",
+    "editorSubagentBridge"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.teamRuntimeContract.v1"
+    },
+    "runtimeMode": {
+      "enum": ["broker-only", "real-agent", "editor-subagent"]
+    },
+    "runtimeLanguage": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtimeAdapterId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "providerId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "sdkId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "modelId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "agentsSpawned": {
+      "type": "boolean"
+    },
+    "executionSurface": {
+      "enum": ["agent-runtime", "editor-subagent", "broker-governance"]
+    },
+    "selectionReason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workerAdapter": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaId", "authorityBoundary"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamWorkerAdapterContract.v1"
+        },
+        "authorityBoundary": {
+          "$ref": "#/$defs/authorityBoundary"
+        }
+      }
+    },
+    "artifactHandoff": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaId"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamArtifactHandoffContract.v1"
+        }
+      }
+    },
+    "retryBudget": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaId", "status"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamRetryBudgetContract.v1"
+        },
+        "status": {
+          "enum": ["within-budget", "escalation-required"]
+        }
+      }
+    },
+    "commitLane": {
+      "$ref": "#/$defs/commitLane"
+    },
+    "brokerSubagent": {
+      "$ref": "#/$defs/brokerSubagent"
+    },
+    "editorSubagentBridge": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["schemaId"],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamEditorSubagentBridgeContract.v1"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "authorityBoundary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["gitWrite", "taskLifecycle", "selfClose"],
+      "properties": {
+        "fileWrite": {
+          "const": false
+        },
+        "gitWrite": {
+          "const": false
+        },
+        "taskLifecycle": {
+          "const": false
+        },
+        "selfClose": {
+          "const": false
+        }
+      }
+    },
+    "commitLane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "ownerRole",
+        "ownerPermissions",
+        "workerGitWrite",
+        "serializedBy",
+        "lockSchemaId",
+        "retryableCodes"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamCommitLaneContract.v1"
+        },
+        "ownerRole": {
+          "const": "coordinator"
+        },
+        "ownerPermissions": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "task.lifecycle" },
+            { "const": "git.write" },
+            { "const": "evidence.write" }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "workerGitWrite": {
+          "const": false
+        },
+        "serializedBy": {
+          "const": "branch-commit-queue"
+        },
+        "lockSchemaId": {
+          "const": "atm.branchCommitQueueLock.v1"
+        },
+        "retryableCodes": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY" },
+            { "const": "ATM_GIT_COMMIT_BRANCH_QUEUE_RACE" }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "brokerSubagent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaId",
+        "enabled",
+        "subagentId",
+        "lifecycleOwner",
+        "decisionSurface",
+        "governs",
+        "stewardId",
+        "evidenceRequired",
+        "authorityBoundary",
+        "escalationTarget"
+      ],
+      "properties": {
+        "schemaId": {
+          "const": "atm.teamBrokerSubagentContract.v1"
+        },
+        "enabled": {
+          "const": true
+        },
+        "subagentId": {
+          "const": "team-broker-subagent"
+        },
+        "lifecycleOwner": {
+          "const": "atm"
+        },
+        "decisionSurface": {
+          "const": "brokerLane"
+        },
+        "governs": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "write-intents" },
+            { "const": "scope-conflicts" },
+            { "const": "steward-apply" },
+            { "const": "commit-lane" }
+          ],
+          "items": false,
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "stewardId": {
+          "const": "neutral-write-steward"
+        },
+        "evidenceRequired": {
+          "type": "array",
+          "prefixItems": [
+            { "const": "atm.teamBrokerLaneEvidence.v1" },
+            { "const": "atm.stewardApplyEvidence.v1" },
+            { "const": "atm.brokerOperationRunRecordEnvelope.v1" }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "authorityBoundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fileWrite", "gitWrite", "taskLifecycle", "selfClose"],
+          "properties": {
+            "fileWrite": {
+              "const": false
+            },
+            "gitWrite": {
+              "const": false
+            },
+            "taskLifecycle": {
+              "const": false
+            },
+            "selfClose": {
+              "const": false
+            }
+          }
+        },
+        "escalationTarget": {
+          "const": "coordinator"
+        }
+      }
+    }
+  }
+}

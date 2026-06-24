@@ -1,0 +1,187 @@
+import { execFileSync } from 'node:child_process';
+import { existsSync, statSync } from 'node:fs';
+import path from 'node:path';
+import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';
+import { quoteCliValue } from '../shared.js';
+function uniqueSorted(values) {
+    return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+function extractTaskStringList(taskDocument, key) {
+    const value = taskDocument[key];
+    return Array.isArray(value)
+        ? value.map((entry) => typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '').filter(Boolean)
+        : [];
+}
+function normalizeTaskflowAuthority(taskDocument) {
+    return String(taskDocument.closureAuthority ?? taskDocument.closure_authority ?? '')
+        .trim()
+        .toLowerCase()
+        .replace(/-/g, '_');
+}
+function sourcePlanPathOf(taskDocument) {
+    const source = taskDocument.source;
+    if (!source || typeof source !== 'object' || Array.isArray(source))
+        return null;
+    const planPath = source.planPath;
+    return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
+}
+function taskflowPathMatches(filePath, declaredPath) {
+    const file = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+    const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
+    if (!file || !declared)
+        return false;
+    return file === declared || file.startsWith(`${declared}/`);
+}
+function resolvePlanningPath(cwd, planningMirrorPath) {
+    if (!planningMirrorPath) {
+        return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
+    }
+    const absolutePath = path.isAbsolute(planningMirrorPath)
+        ? path.resolve(planningMirrorPath)
+        : path.resolve(cwd, planningMirrorPath);
+    const probe = existsSync(absolutePath) && statSync(absolutePath).isDirectory() ? absolutePath : path.dirname(absolutePath);
+    let repoRoot = null;
+    try {
+        repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
+            cwd: probe,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe']
+        }).trim() || null;
+    }
+    catch {
+        repoRoot = null;
+    }
+    if (!repoRoot) {
+        return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
+    }
+    return {
+        repoRoot: path.resolve(repoRoot),
+        relativePath: path.relative(repoRoot, absolutePath).replace(/\\/g, '/'),
+        reason: null
+    };
+}
+export function extractTaskflowDeclaredFiles(taskDocument) {
+    const explicit = extractTaskStringList(taskDocument, 'deliverables');
+    const deliverables = explicit.length > 0
+        ? explicit
+        : extractTaskStringList(taskDocument, 'scopePaths').filter((value) => value && !value.startsWith('.atm/') && !/[\\/]$/.test(value));
+    return uniqueSorted([
+        ...extractTaskStringList(taskDocument, 'scopePaths'),
+        ...deliverables,
+        ...extractTaskStringList(taskDocument, 'targetAllowedFiles')
+    ].filter((file) => !file.startsWith('.atm/')));
+}
+export function inspectPlanningAuthorityDelivery(input) {
+    if (normalizeTaskflowAuthority(input.taskDocument) !== 'planning_repo') {
+        return { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null };
+    }
+    const planPath = input.resolvedPlanningMirrorPath ?? sourcePlanPathOf(input.taskDocument);
+    const planning = resolvePlanningPath(input.cwd, planPath);
+    if (!planning.repoRoot) {
+        return { required: true, ok: false, repoRoot: null, matchedFiles: [], reason: planning.reason ?? 'planning repo could not be resolved' };
+    }
+    if (input.historicalDeliveryRefs.length === 0) {
+        return { required: true, ok: false, repoRoot: planning.repoRoot, matchedFiles: [], reason: 'planning authority close requires --historical-delivery <planning-repo-commit>' };
+    }
+    const planningMirrorFile = planning.relativePath?.replace(/\\/g, '/') ?? null;
+    const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument)
+        .filter((entry) => entry.replace(/\\/g, '/') !== planningMirrorFile);
+    const matchedFiles = [];
+    for (const ref of input.historicalDeliveryRefs) {
+        let commitSha = null;
+        try {
+            commitSha = execFileSync('git', ['rev-parse', '--verify', `${ref}^{commit}`], {
+                cwd: planning.repoRoot,
+                encoding: 'utf8',
+                stdio: ['ignore', 'pipe', 'pipe']
+            }).trim() || null;
+        }
+        catch {
+            commitSha = null;
+        }
+        if (!commitSha)
+            continue;
+        let changedFiles = '';
+        try {
+            changedFiles = execFileSync('git', ['show', '--pretty=format:', '--name-only', commitSha, '--'], {
+                cwd: planning.repoRoot,
+                encoding: 'utf8',
+                stdio: ['ignore', 'pipe', 'pipe']
+            });
+        }
+        catch {
+            changedFiles = '';
+        }
+        for (const file of changedFiles.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean)) {
+            if (declaredFiles.some((declared) => taskflowPathMatches(file, declared))) {
+                matchedFiles.push(file.replace(/\\/g, '/'));
+            }
+        }
+    }
+    const uniqueMatched = uniqueSorted(matchedFiles);
+    return {
+        required: true,
+        ok: uniqueMatched.length > 0,
+        repoRoot: planning.repoRoot,
+        matchedFiles: uniqueMatched,
+        reason: uniqueMatched.length > 0 ? null : 'planning delivery commit does not contain declared deliverable files'
+    };
+}
+export function buildTaskflowClosePreflight(input) {
+    const summary = buildHistoricalClosePreflight({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: input.actorId || '<actor>',
+        taskDocument: input.taskDocument,
+        previewCommitBundle: input.previewCommitBundle,
+        historicalDeliveryRefs: input.historicalDeliveryRefs,
+        waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery,
+        waiverReason: input.waiverReason
+    });
+    if (summary.unexpectedStagedTasks.length > 0
+        && !summary.blockers.some((entry) => entry.id === 'unexpectedStagedTasks')) {
+        const files = [...new Set(summary.unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles))];
+        const taskIds = summary.unexpectedStagedTasks.map((entry) => entry.taskId);
+        return {
+            ...summary,
+            ok: false,
+            blockers: [
+                {
+                    id: 'unexpectedStagedTasks',
+                    code: 'ATM_TASKFLOW_PRECLOSE_FOREIGN_STAGED_TASKS',
+                    summary: `Git index contains staged governance files for other tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless foreign bundles are deferred or committed separately.`,
+                    files,
+                    taskIds,
+                    remediationChoices: summary.unexpectedStagedTasks.map((entry) => ({
+                        id: 'defer-foreign-staged',
+                        summary: entry.restoreChoice,
+                        requiredCommand: entry.deferCommand
+                    })),
+                    requiredCommand: summary.unexpectedStagedTasks[0]?.deferCommand ?? null
+                },
+                ...summary.blockers
+            ],
+            operationalBlockers: [
+                {
+                    id: 'unexpectedStagedTasks',
+                    code: 'ATM_TASKFLOW_PRECLOSE_FOREIGN_STAGED_TASKS',
+                    summary: `Git index contains staged governance files for other tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless foreign bundles are deferred or committed separately.`,
+                    files,
+                    taskIds,
+                    remediationChoices: summary.unexpectedStagedTasks.map((entry) => ({
+                        id: 'defer-foreign-staged',
+                        summary: entry.restoreChoice,
+                        requiredCommand: entry.deferCommand
+                    })),
+                    requiredCommand: summary.unexpectedStagedTasks[0]?.deferCommand ?? null
+                },
+                ...summary.operationalBlockers
+            ]
+        };
+    }
+    return summary;
+}
+export function buildPlanningDeliveryRequiredCommand(taskId, actorId) {
+    return `node atm.mjs taskflow close --task ${taskId} --actor ${quoteCliValue(actorId || '<actor>')} --historical-delivery <commit> --write --json`;
+}
+export { preflightBlockersToWriteReadinessBlockers };

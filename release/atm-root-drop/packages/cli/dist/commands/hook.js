@@ -181,7 +181,30 @@ function runPreCommitHook(cwd) {
     const allowAdopterInfrastructureSync = isAdopterInfrastructureSyncCommit(stagedFiles.length > 0 ? stagedFiles : frameworkStatus.changedFiles);
     const activeDirectionLocks = readActiveTaskDirectionLocks(root);
     const activeQuickfixLock = readActiveQuickfixLock(root);
-    const directionLockAllowedFiles = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.allowedFiles));
+    const committingTaskIdForHook = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID);
+    const taskGovernedCommitAllowedFiles = collectTaskGovernedCommitAllowedFiles(root, committingTaskIdForHook);
+    // TASK-AAO-0136: collect close-commit-window allowedFiles (short-lived locks
+    // opened by tasks close / tasks reconcile). These authorize landing the close
+    // artifacts after the regular direction lock has already released.
+    const activeCloseCommitWindows = readActiveCloseCommitWindows(root);
+    const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => [
+        ...win.allowedFiles,
+        `.atm/history/tasks/${win.taskId}.json`,
+        `.atm/history/evidence/${win.taskId}.json`,
+        `.atm/history/evidence/${win.taskId}.bundle-manifest.json`,
+        `.atm/history/evidence/${win.taskId}.closure-packet.json`,
+        `.atm/history/task-events/${win.taskId}/**`
+    ]));
+    const closeCommitWindowPlanningMirrorFiles = collectCloseCommitWindowPlanningMirrorFiles(root);
+    const relevantDirectionLocks = selectRelevantDirectionLocksForCommit({
+        activeDirectionLocks,
+        stagedFiles,
+        committingTaskId: committingTaskIdForHook,
+        taskGovernedCommitAllowedFiles,
+        closeCommitWindowAllowedFiles,
+        closeCommitWindowPlanningMirrorFiles
+    });
+    const directionLockAllowedFiles = uniqueSorted(relevantDirectionLocks.flatMap((lock) => lock.allowedFiles));
     const directionLockAllowedFilesDiagnoses = activeDirectionLocks
         .map((lock) => diagnoseTaskDirectionLockAllowedFiles(root, lock.taskId));
     const directionLockAllowedFilesMismatches = directionLockAllowedFilesDiagnoses.filter((entry) => entry.mismatches.length > 0);
@@ -199,25 +222,13 @@ function runPreCommitHook(cwd) {
             return false;
         return true;
     });
-    const frameworkTempClaimAllowedFiles = activeDirectionLocks.length > 0
+    const frameworkTempClaimAllowedFiles = relevantDirectionLocks.length > 0
         ? collectFrameworkTempClaimAllowedFiles(root)
         : [];
-    const directionLockPlanningMirrorPaths = uniqueSorted(activeDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
-    const directionLockAllowsPlanningMirror = activeDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
-    // TASK-AAO-0136: collect close-commit-window allowedFiles (short-lived locks
-    // opened by tasks close / tasks reconcile). These authorize landing the close
-    // artifacts after the regular direction lock has already released.
-    const activeCloseCommitWindows = readActiveCloseCommitWindows(root);
-    const closeCommitWindowAllowedFiles = uniqueSorted(activeCloseCommitWindows.flatMap((win) => [
-        ...win.allowedFiles,
-        `.atm/history/tasks/${win.taskId}.json`,
-        `.atm/history/evidence/${win.taskId}.json`,
-        `.atm/history/evidence/${win.taskId}.bundle-manifest.json`,
-        `.atm/history/evidence/${win.taskId}.closure-packet.json`,
-        `.atm/history/task-events/${win.taskId}/**`
-    ]));
+    const directionLockPlanningMirrorPaths = uniqueSorted(relevantDirectionLocks.flatMap((lock) => lock.planningMirrorPaths ?? []));
+    const directionLockAllowsPlanningMirror = relevantDirectionLocks.some((lock) => lock.allowPlanningMirror === true);
     const taskOpenImportBundle = inspectTaskOpenImportBundleStagedArtifacts(root, stagedFiles);
-    const directionLockDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
+    const directionLockDriftFiles = relevantDirectionLocks.length > 0 && !allowAdopterInfrastructureSync
         ? taskOpenImportBundle.ok
             ? []
             : stagedFiles
@@ -225,12 +236,15 @@ function runPreCommitHook(cwd) {
                 .filter((entry) => !isPathAllowedByTaskDirection(entry, directionLockAllowedFiles))
                 .filter((entry) => !isPathAllowedByTaskDirection(entry, checkpointClosedTaskAllowedFiles))
                 .filter((entry) => !isPathAllowedByTaskDirection(entry, frameworkTempClaimAllowedFiles))
+                .filter((entry) => !isPathAllowedByTaskDirection(entry, taskGovernedCommitAllowedFiles))
                 .filter((entry) => !isPathAllowedByTaskDirection(entry, closeCommitWindowAllowedFiles))
         : [];
-    const planningMirrorDriftFiles = activeDirectionLocks.length > 0 && !allowAdopterInfrastructureSync && directionLockPlanningMirrorPaths.length > 0 && !directionLockAllowsPlanningMirror
+    const planningMirrorDriftFiles = relevantDirectionLocks.length > 0 && !allowAdopterInfrastructureSync && directionLockPlanningMirrorPaths.length > 0 && !directionLockAllowsPlanningMirror
         ? stagedFiles
             .filter((entry) => !isTaskDirectionPreCommitExempt(entry))
             .filter((entry) => isPlanningMirrorPath(entry, directionLockPlanningMirrorPaths))
+            .filter((entry) => !isPathAllowedByTaskDirection(entry, taskGovernedCommitAllowedFiles))
+            .filter((entry) => !isPathAllowedByTaskDirection(entry, closeCommitWindowPlanningMirrorFiles))
         : [];
     const quickfixDriftFiles = activeQuickfixLock && !allowAdopterInfrastructureSync
         ? stagedFiles
@@ -258,9 +272,10 @@ function runPreCommitHook(cwd) {
         : inspectSameFileClaimOwnership({
             cwd: root,
             stagedFiles,
-            activeDirectionLocks,
+            activeDirectionLocks: relevantDirectionLocks,
             exemptAllowedFileSets: [
                 checkpointClosedTaskAllowedFiles,
+                taskGovernedCommitAllowedFiles,
                 closeCommitWindowAllowedFiles,
                 frameworkTempClaimAllowedFiles
             ]
@@ -2026,6 +2041,27 @@ function inspectSameFileClaimOwnership(input) {
         findings
     };
 }
+function selectRelevantDirectionLocksForCommit(input) {
+    const currentTaskAllowedFiles = uniqueSorted([
+        ...input.taskGovernedCommitAllowedFiles,
+        ...input.closeCommitWindowAllowedFiles,
+        ...input.closeCommitWindowPlanningMirrorFiles
+    ]);
+    return input.activeDirectionLocks.filter((lock) => {
+        if (input.committingTaskId && taskIdsEqual(lock.taskId, input.committingTaskId)) {
+            return true;
+        }
+        return input.stagedFiles.some((entry) => {
+            if (isTaskDirectionPreCommitExempt(entry))
+                return false;
+            if (currentTaskAllowedFiles.length > 0 && isPathAllowedByTaskDirection(entry, currentTaskAllowedFiles)) {
+                return false;
+            }
+            return isPathAllowedByTaskDirection(entry, lock.allowedFiles)
+                || isPlanningMirrorPath(entry, lock.planningMirrorPaths ?? []);
+        });
+    });
+}
 // TASK-CID-0024: files currently covered by an active steward/composer broker
 // intent count as steward/broker evidence for staged ownership decisions.
 function collectStewardBrokerCoveredFiles(cwd) {
@@ -2090,6 +2126,40 @@ function collectFrameworkTempClaimAllowedFiles(cwd) {
         collectStringArrayField(lock?.files, allowedFiles);
     }
     return uniqueSorted(allowedFiles.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+function collectCloseCommitWindowPlanningMirrorFiles(cwd) {
+    const files = [];
+    for (const win of readActiveCloseCommitWindows(cwd)) {
+        const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${win.taskId}.json`));
+        if (!task || typeof task !== 'object')
+            continue;
+        const source = isPlainObject(task.source) ? task.source : null;
+        const planPath = typeof source?.planPath === 'string' ? normalizeRelativePath(source.planPath) : '';
+        if (planPath)
+            files.push(planPath);
+        collectStringArrayField(task.planningMirrorPaths, files);
+    }
+    return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
+}
+function collectTaskGovernedCommitAllowedFiles(cwd, taskId) {
+    if (!taskId)
+        return [];
+    const files = [
+        `.atm/history/tasks/${taskId}.json`,
+        `.atm/history/evidence/${taskId}.json`,
+        `.atm/history/evidence/${taskId}.bundle-manifest.json`,
+        `.atm/history/evidence/${taskId}.closure-packet.json`,
+        `.atm/history/task-events/${taskId}/**`
+    ];
+    const task = readJsonFile(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`));
+    if (task && typeof task === 'object') {
+        const source = isPlainObject(task.source) ? task.source : null;
+        const planPath = typeof source?.planPath === 'string' ? normalizeRelativePath(source.planPath) : '';
+        if (planPath)
+            files.push(planPath);
+        collectStringArrayField(task.planningMirrorPaths, files);
+    }
+    return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
 }
 function extractCheckpointTaskScopeFiles(task) {
     const candidates = [];

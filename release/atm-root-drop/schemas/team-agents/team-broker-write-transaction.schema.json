@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/team-agents/team-broker-write-transaction.schema.json",
+  "title": "ATM Team Broker WriteTransaction v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "transactionId",
+    "taskId",
+    "principalId",
+    "actorId",
+    "sessionId",
+    "instanceId",
+    "worktreeId",
+    "branchRef",
+    "baseHead",
+    "leaseEpoch",
+    "allowedFiles",
+    "readSet",
+    "writeSet",
+    "fileHashesBefore",
+    "brokerDecision",
+    "admissionState",
+    "startedAt",
+    "expiresAt",
+    "heartbeatAt"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.teamBrokerWriteTransaction.v1"
+    },
+    "transactionId": {
+      "type": "string",
+      "pattern": "^txn-[A-Za-z0-9._:-]+$"
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "principalId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sessionId": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "instanceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "worktreeId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branchRef": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "baseHead": {
+      "type": "string",
+      "minLength": 1
+    },
+    "leaseEpoch": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "allowedFiles": {
+      "$ref": "#/$defs/pathList"
+    },
+    "readSet": {
+      "$ref": "#/$defs/pathList"
+    },
+    "writeSet": {
+      "$ref": "#/$defs/pathList"
+    },
+    "fileHashesBefore": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "null"],
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      }
+    },
+    "brokerDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "lane", "intentId", "parallelSafetyReason"],
+      "properties": {
+        "verdict": {
+          "enum": [
+            "parallel-safe",
+            "needs-physical-split",
+            "blocked-cid-conflict",
+            "blocked-shared-surface",
+            "serial",
+            "blocked-active-lease"
+          ]
+        },
+        "lane": {
+          "enum": [
+            "direct-brokered",
+            "deterministic-composer",
+            "neutral-steward",
+            "serial",
+            "blocked"
+          ]
+        },
+        "intentId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parallelSafetyReason": {
+          "type": ["string", "null"],
+          "enum": ["no-known-textual-or-resource-conflict", null]
+        }
+      }
+    },
+    "admissionState": {
+      "enum": [
+        "not-required",
+        "proposal-submitted",
+        "provisional-write-lease",
+        "write-admitted",
+        "composer-routed",
+        "blocked-before-write",
+        "parked-for-rearbitration",
+        "applied"
+      ]
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "heartbeatAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "pathList": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

@@ -176,10 +176,10 @@ const defaultIgnoredDirs = new Set([
     'temp'
 ]);
 const markdownCompletionPatterns = [
-    /^\s*status:\s*\*\*(?:all\s+)?completed\*\*\s*$/im,
-    /^\s*ALL\s+COMPLETED\s*$/m,
-    /^\s*(?:progress|status|completion):\s*16\s*\/\s*16\s*$/im,
-    /^\s*(?:progress|status|completion):\s*100%\s*\(?\s*completed\s*\)?\s*$/im
+    /status:\s*\*\*(?:all\s+)?completed\*\*/i,
+    /\bALL\s+COMPLETED\b/i,
+    /\b16\s*\/\s*16\b/i,
+    /\b100%\s*\(?\s*completed\s*\)?/i
 ];
 export function runFrameworkMode(argv) {
     const options = parseFrameworkModeArgs(argv);
@@ -2082,7 +2082,7 @@ function parseMarkdownFrontmatter(text) {
         if (separatorIndex === -1)
             continue;
         const key = rawLine.slice(0, separatorIndex).trim();
-        const value = rawLine.slice(separatorIndex + 1).trim();
+        const value = rawLine.slice(separatorIndex + 1).trim().replace(/^"(.*)"$/, '$1');
         result[key] = value;
     }
     return result;
@@ -2468,7 +2468,12 @@ function readJsonIfExists(filePath) {
     }
 }
 function normalizeOptionalString(value) {
-    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+    if (typeof value !== 'string')
+        return null;
+    const trimmed = value.trim();
+    if (!trimmed)
+        return null;
+    return trimmed.replace(/^"(.*)"$/, '$1');
 }
 function normalizeRelativePath(value) {
     return String(value).replace(/\\/g, '/').replace(/^\.\//, '').trim();

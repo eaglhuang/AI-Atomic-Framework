@@ -94,6 +94,8 @@ function toActiveIntent(intent) {
             files: intent.targetFiles,
             atomIds: intent.atomRefs.map((ref) => ref.atomId),
             atomCids: intent.atomRefs.map((ref) => ref.atomCid),
+            readAtomIds: (intent.readAtoms ?? []).map((ref) => ref.atomId),
+            readAtomCids: (intent.readAtoms ?? []).map((ref) => ref.atomCid),
             generators: intent.sharedSurfaces.generators,
             projections: intent.sharedSurfaces.projections,
             registries: intent.sharedSurfaces.registries,

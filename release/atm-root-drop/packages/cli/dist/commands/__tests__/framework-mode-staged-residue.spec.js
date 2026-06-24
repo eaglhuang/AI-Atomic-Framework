@@ -106,10 +106,115 @@ async function testCrossFileConsistencyIgnoresTemplateLiteralImportLookalikes() 
         rmSync(tempRoot, { recursive: true, force: true });
     }
 }
+async function testCloseCommitTaskMirrorIsNotBlockedByForeignPlanningLock() {
+    const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-close-mirror-test-'));
+    const originalActorId = process.env.ATM_COMMIT_ACTOR_ID;
+    const originalTaskId = process.env.ATM_COMMIT_TASK_ID;
+    try {
+        initGitRepo(tempRoot);
+        const taskId = 'TASK-CID-0120';
+        const taskPath = `.atm/history/tasks/${taskId}.json`;
+        const eventPath = `.atm/history/task-events/${taskId}/2026-06-24T00-00-00-000Z-close.json`;
+        const planPath = 'docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0120-broker-active-read-set-registry.task.md';
+        const foreignLockPath = '.atm/runtime/locks/TASK-FOREIGN.lock.json';
+        mkdirSync(path.join(tempRoot, '.atm/history/tasks'), { recursive: true });
+        mkdirSync(path.join(tempRoot, '.atm/history/task-events', taskId), { recursive: true });
+        mkdirSync(path.join(tempRoot, 'docs/ai_atomic_framework/cid-hardening/tasks'), { recursive: true });
+        mkdirSync(path.join(tempRoot, '.atm/runtime/locks'), { recursive: true });
+        writeFileSync(path.join(tempRoot, planPath), '# TASK-CID-0120\n', 'utf8');
+        writeFileSync(path.join(tempRoot, taskPath), JSON.stringify({
+            schemaVersion: 'atm.workItem.v0.2',
+            workItemId: taskId,
+            title: 'close bundle mirror regression',
+            status: 'running',
+            deliverables: [],
+            scopePaths: [],
+            validators: [],
+            planningMirrorPaths: [],
+            source: {
+                planPath
+            },
+            lastTransitionId: '2026-06-24T00-00-00-000Z-close',
+            taskDirectionLock: {
+                schemaId: 'atm.taskDirectionLock.v1',
+                specVersion: '0.1.0',
+                taskId,
+                batchId: null,
+                scopeKey: null,
+                queueId: null,
+                queueIndex: null,
+                allowedFiles: [
+                    `.atm/history/tasks/${taskId}.json`,
+                    `.atm/history/task-events/${taskId}/**`
+                ],
+                planningReadOnlyPaths: [],
+                planningMirrorPaths: [],
+                allowPlanningMirror: false,
+                promptHash: null,
+                actorId: 'codex-gpt-5.4-mini',
+                createdAt: '2026-06-24T00:00:00.000Z',
+                status: 'active'
+            }
+        }, null, 2), 'utf8');
+        writeFileSync(path.join(tempRoot, eventPath), JSON.stringify({
+            command: `node atm.mjs tasks close --task ${taskId} --write`,
+            closure: {
+                schemaId: 'atm.taskClosureTransition.v1'
+            }
+        }, null, 2), 'utf8');
+        writeFileSync(path.join(tempRoot, foreignLockPath), JSON.stringify({
+            taskDirectionLock: {
+                schemaId: 'atm.taskDirectionLock.v1',
+                specVersion: '0.1.0',
+                taskId: 'TASK-FOREIGN',
+                batchId: null,
+                scopeKey: null,
+                queueId: null,
+                queueIndex: null,
+                allowedFiles: [
+                    '.atm/history/tasks/TASK-FOREIGN.json',
+                    'packages/cli/src/commands/taskflow/close-orchestration.ts'
+                ],
+                planningReadOnlyPaths: [
+                    '../AdopterRepo/docs/ai_atomic_framework/arxiv-paper-v1/TASK-FOREIGN.task.md'
+                ],
+                planningMirrorPaths: [
+                    'docs/ai_atomic_framework/',
+                    'docs/ai_atomic_framework/arxiv-paper-v1/',
+                    'docs/ai_atomic_framework/arxiv-paper-v1/TASK-FOREIGN.task.md'
+                ],
+                allowPlanningMirror: false,
+                promptHash: 'foreign',
+                actorId: 'bench:foreign',
+                createdAt: '2026-06-24T00:00:00.000Z',
+                status: 'active'
+            }
+        }, null, 2), 'utf8');
+        execFileSync('git', ['add', taskPath, eventPath, planPath], { cwd: tempRoot });
+        process.env.ATM_COMMIT_ACTOR_ID = 'codex-gpt-5.4-mini';
+        process.env.ATM_COMMIT_TASK_ID = taskId;
+        const hookResult = await runHook(['pre-commit', '--cwd', tempRoot]);
+        const blockingCodes = hookResult.evidence.blockingFindings.map((finding) => finding.code);
+        assert.ok(!blockingCodes.includes('ATM_PLANNING_MIRROR_DRIFT'));
+        assert.ok(!blockingCodes.includes('ATM_TASK_DIRECTION_SCOPE_DRIFT'));
+    }
+    finally {
+        if (originalActorId === undefined)
+            delete process.env.ATM_COMMIT_ACTOR_ID;
+        else
+            process.env.ATM_COMMIT_ACTOR_ID = originalActorId;
+        if (originalTaskId === undefined)
+            delete process.env.ATM_COMMIT_TASK_ID;
+        else
+            process.env.ATM_COMMIT_TASK_ID = originalTaskId;
+        rmSync(tempRoot, { recursive: true, force: true });
+    }
+}
 async function main() {
     await testSessionResidueWarnings();
     await testCrossFileConsistency();
     await testCrossFileConsistencyIgnoresTemplateLiteralImportLookalikes();
+    await testCloseCommitTaskMirrorIsNotBlockedByForeignPlanningLock();
     console.log('[framework-mode-staged-residue] all assertions passed.');
 }
 main().catch((err) => {

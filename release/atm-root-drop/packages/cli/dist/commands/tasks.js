@@ -4334,7 +4334,9 @@ function evaluateFrameworkDeliveryWindow(input) {
     const hasGovernedDeliveryFlag = input.fromBatchCheckpoint || hasHistoricalDelivery;
     const ok = input.historicalBatchCloseReady === true
         ? hasHistoricalDelivery
-        : hasGovernedDeliveryFlag && criticalChangedFiles.length > 0;
+        : input.fromBatchCheckpoint
+            ? hasGovernedDeliveryFlag && scopedCriticalChangedFiles.length > 0
+            : hasHistoricalDelivery;
     return {
         schemaId: 'atm.frameworkDeliveryWindow.v1',
         taskId: input.taskId,
@@ -4348,7 +4350,9 @@ function evaluateFrameworkDeliveryWindow(input) {
                     : 'historical-delivery-scoped-framework-critical-diff'
             : !hasGovernedDeliveryFlag
                 ? 'not-from-batch-checkpoint'
-                : 'no-active-framework-critical-diff',
+                : input.fromBatchCheckpoint
+                    ? 'no-active-framework-critical-diff'
+                    : 'historical-delivery-gate',
         criticalChangedFiles,
         scopedCriticalChangedFiles,
         unscopedCriticalChangedFiles,
@@ -4879,7 +4883,7 @@ function parseTaskMarkdownFrontmatter(text) {
         if (separatorIndex === -1)
             continue;
         const key = rawLine.slice(0, separatorIndex).trim();
-        const value = rawLine.slice(separatorIndex + 1).trim();
+        const value = rawLine.slice(separatorIndex + 1).trim().replace(/^"(.*)"$/, '$1');
         if (key)
             result[key] = value;
     }

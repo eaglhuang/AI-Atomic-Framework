@@ -55,6 +55,8 @@ export function registerIntent(doc, intent, lane, ttlSeconds = 1800, admissionOv
             files: intent.targetFiles,
             atomIds: intent.atomRefs.map((ref) => ref.atomId),
             atomCids: intent.atomRefs.map((ref) => ref.atomCid),
+            readAtomIds: (intent.readAtoms ?? []).map((ref) => ref.atomId),
+            readAtomCids: (intent.readAtoms ?? []).map((ref) => ref.atomCid),
             atomRanges: intent.atomRefs
                 .map((ref) => ({
                 filePath: ref.sourceRange?.filePath ?? '',

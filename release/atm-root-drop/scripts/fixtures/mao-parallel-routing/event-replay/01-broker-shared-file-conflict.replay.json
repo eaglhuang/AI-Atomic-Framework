@@ -1,0 +1,60 @@
+{
+  "id": "broker-shared-file-conflict-replay",
+  "description": "Sanitized replay of broker-run c393df1d where REQ-0042-EVIDENCE-GATES blocked on a file already applied by REQ-0041-EVIDENCE-GATES.",
+  "layer": "event-replay",
+  "replayKind": "broker-conflict",
+  "capabilityIntroducedBy": "TASK-MAO-0006",
+  "coverageTier": "generic-mao",
+  "replayProvenance": {
+    "origin": "broker-evidence",
+    "sanitizedFrom": ".atm/history/evidence/broker-runs/c393df1d-f9ab-4331-ac3e-3182df57ac45.json",
+    "notes": "Actor ids and request ids normalized; file path retained."
+  },
+  "registryCase": {
+    "newIntent": {
+      "schemaId": "atm.writeIntent.v1",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "event-replay broker conflict" },
+      "taskId": "TASK-REPLAY-0042",
+      "actorId": "replay-actor-b",
+      "baseCommit": "commit-replay-base",
+      "targetFiles": ["docs/governance/evidence-gates.md"],
+      "atomRefs": [{ "atomId": "atom-evidence-gates", "atomCid": "cid:atm.evidence-gates-map", "operation": "modify" }],
+      "sharedSurfaces": { "generators": [], "projections": [], "registries": [], "validators": ["docs/governance/evidence-gates.md"], "artifacts": [] },
+      "requestedLane": "auto"
+    },
+    "registry": {
+      "schemaId": "atm.writeBrokerRegistry.v1",
+      "specVersion": "0.1.0",
+      "repoId": "bench-repo",
+      "workspaceId": "main",
+      "activeIntents": [
+        {
+          "intentId": "intent-replay-0041",
+          "taskId": "TASK-REPLAY-0041",
+          "teamRunId": null,
+          "actorId": "replay-actor-a",
+          "baseCommit": "commit-replay-base",
+          "resourceKeys": {
+            "files": ["docs/governance/evidence-gates.md"],
+            "atomIds": ["atom-evidence-gates"],
+            "atomCids": ["cid:atm.evidence-gates-map"],
+            "generators": [],
+            "projections": [],
+            "registries": [],
+            "validators": ["docs/governance/evidence-gates.md"],
+            "artifacts": []
+          },
+          "leaseEpoch": 1,
+          "leaseSeconds": 300,
+          "leaseMaxSeconds": 1800,
+          "heartbeatAt": "2026-06-15T08:00:00.000Z",
+          "lane": "direct-brokered",
+          "expiresAt": "2030-06-15T08:10:00.000Z"
+        }
+      ]
+    }
+  },
+  "groundTruth": { "safeToParallelize": false, "validatorShouldCatch": true },
+  "expected": { "routingVerdict": "freeze", "validatorOutcome": "pass" }
+}

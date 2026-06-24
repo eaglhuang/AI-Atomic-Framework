@@ -37,6 +37,8 @@ function asActive(intent: WriteIntent, taskId: string, overrides: Partial<Active
       files: intent.targetFiles,
       atomIds: intent.atomRefs.map((ref) => ref.atomId),
       atomCids: intent.atomRefs.map((ref) => ref.atomCid),
+      readAtomIds: (intent.readAtoms ?? []).map((ref) => ref.atomId),
+      readAtomCids: (intent.readAtoms ?? []).map((ref) => ref.atomCid),
       generators: intent.sharedSurfaces.generators,
       projections: intent.sharedSurfaces.projections,
       registries: intent.sharedSurfaces.registries,
@@ -173,6 +175,34 @@ function testReadSetConflict() {
   assert.equal(matrix.arbitrationVerdict, 'watch');
   assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'read-set'));
   console.log('ok: read-set overlap maps to watch');
+}
+
+function testActiveReadSetConflict() {
+  const activeIntent = asActive(
+    makeIntent({
+      taskId: 'TASK-B',
+      actorId: 'actor-b',
+      readAtoms: [{ atomId: 'atom-c', atomCid: 'cid-c', operation: 'modify' }],
+      atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify' }]
+    }),
+    'TASK-B'
+  );
+  const newIntent = makeIntent({
+    taskId: 'TASK-C',
+    actorId: 'actor-c',
+    sharedSurfaces: {
+      generators: [],
+      projections: [],
+      registries: [],
+      validators: [],
+      artifacts: []
+    },
+    atomRefs: [{ atomId: 'atom-c', atomCid: 'cid-c', operation: 'modify' }]
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [activeIntent]);
+  assert.equal(matrix.arbitrationVerdict, 'watch');
+  assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'read-set' && conflict.detail.includes('read by active task')));
+  console.log('ok: active read-set overlap maps to watch');
 }
 
 function testTakeoverForMalformedIntent() {
@@ -359,6 +389,7 @@ testWatchForSharedSurface();
 testWatchForFileRangeOverlap();
 testWatchForDisjointFileRange();
 testReadSetConflict();
+testActiveReadSetConflict();
 testTakeoverForMalformedIntent();
 testTakeoverForStaleLease();
 testTakeoverForStaleLeaseEpoch();

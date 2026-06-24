@@ -669,6 +669,16 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
                 })
                 : null;
+            const rollbackSnapshotWithPlanning = planningCardCloseback?.transitionPath && rollbackSnapshot.planningCard
+                ? {
+                    ...rollbackSnapshot,
+                    planningCard: {
+                        ...rollbackSnapshot.planningCard,
+                        transitionPath: planningCardCloseback.transitionPath
+                    },
+                    stagedArtifacts: [...rollbackSnapshot.stagedArtifacts, planningCardCloseback.transitionPath]
+                }
+                : rollbackSnapshot;
             let rosterCloseback = null;
             const closeMessages = [];
             const planningRosterPaths = closebackPlan.writerBoundary.rosterClosebackCommand && closebackPlan.writerBoundary.rosterIndexPath && closebackPlan.writerBoundary.planningMirrorPath
@@ -730,6 +740,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                 rosterIndexPath: closebackPlan.writerBoundary.rosterSyncPolicy === 'inline'
                     ? closebackPlan.writerBoundary.rosterIndexPath
                     : null,
+                extraPlanningStageFiles: planningCardCloseback?.transitionPath ? [planningCardCloseback.transitionPath] : [],
                 backendResult: backendResult,
                 historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
                 historicalBatchRef,
@@ -740,7 +751,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     cwd,
                     taskId,
                     actorId,
-                    snapshot: rollbackSnapshot,
+                    snapshot: rollbackSnapshotWithPlanning,
                     commit: () => finalizeTaskflowCommitBundle({
                         bundle: commitBundleInput,
                         actorId,
@@ -756,6 +767,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                         ok: false,
                         failureStep: 'backend-close',
                         failureCode: 'ATM_TASKFLOW_CLOSE_WRITE_FAILED',
+                        failureReason: 'backend close did not complete',
                         rolledBackArtifacts: [],
                         recoveryCommand: diagnosis.nextCommand,
                         backendCloseApplied: false,

@@ -44,6 +44,43 @@ type TeamCrewRole = {
     permissions: string[];
     description: string;
 };
+type TeamRoleSkillPackContract = {
+    schemaId: 'atm.teamRoleSkillPackContract.v1';
+    providerNeutral: true;
+    coordinatorOwnsLifecycle: true;
+    roles: Array<{
+        role: string;
+        agentId: string;
+        skillPackId: string;
+        specialistSkills: string[];
+        allowedPermissions: string[];
+        forbiddenPermissions: string[];
+        playbookSlice: string;
+        growthContractAttachment: string;
+    }>;
+};
+type TeamRoleRoutingMatrix = {
+    schemaId: 'atm.teamRoleRoutingMatrix.v1';
+    providerNeutral: true;
+    coordinatorOwnsLifecycle: true;
+    routes: Array<{
+        workstream: string;
+        primaryRole: string;
+        supportingRoles: string[];
+        advisoryRoles: string[];
+        playbookSlice: string;
+    }>;
+};
+type TeamGrowthContract = {
+    schemaId: 'atm.teamGrowthContract.v1';
+    sharedAcrossRolePacks: true;
+    taxonomy: string[];
+    captureTemplate: string[];
+    promotionPolicy: {
+        stableRuleTarget: string;
+        rawCaseTarget: string;
+    };
+};
 type TeamImplementerSelector = {
     schemaId: 'atm.teamImplementerSelector.v1';
     selectedImplementer: {
@@ -417,7 +454,7 @@ export declare function planTeamBrokerLane(input: {
     evidence: TeamBrokerLaneEvidence;
     findings: PermissionFinding[];
 };
-declare function buildTeamPlan(input: {
+export declare function buildTeamPlan(input: {
     task: any;
     recipe: TeamRecipe;
     writePaths: string[];
@@ -571,7 +608,13 @@ declare function buildTeamPlan(input: {
         };
     };
     implementerSelector: TeamImplementerSelector;
+    roleSkillPacks: TeamRoleSkillPackContract;
+    routingMatrix: TeamRoleRoutingMatrix;
+    growthContract: TeamGrowthContract;
 };
+export declare function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract;
+export declare function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix;
+export declare function buildTeamGrowthContract(): TeamGrowthContract;
 export declare function selectTeamImplementer(task: any, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector;
 export declare function assessLieutenantEscalation(task: any, writePaths: string[], validation: {
     ok: boolean;

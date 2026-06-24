@@ -101,7 +101,9 @@ export function calculateBrokerDecision(newIntent, registry) {
             kind: 'cid',
             detail: kind === 'read'
                 ? `Read-set conflict: Atom ${resourceKind} '${resourceValue}' is already written by task '${activeTaskId}'`
-                : `CID conflict: Atom ${resourceKind} '${resourceValue}' is already claimed by task '${activeTaskId}'`
+                : kind === 'active-read'
+                    ? `Read-set conflict: Atom ${resourceKind} '${resourceValue}' is already read by active task '${activeTaskId}'`
+                    : `CID conflict: Atom ${resourceKind} '${resourceValue}' is already claimed by task '${activeTaskId}'`
         });
     };
     for (const active of registry.activeIntents) {
@@ -109,6 +111,8 @@ export function calculateBrokerDecision(newIntent, registry) {
             continue;
         }
         const allowProposalScopedCidRefinement = shouldRefineProposalScopedCidConflict(newIntent, active, baseAdmission);
+        const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
+        const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
         for (const refId of active.resourceKeys.atomIds) {
             if (newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
                 pushCidConflict('write', 'ID', refId, active.taskId);
@@ -117,12 +121,22 @@ export function calculateBrokerDecision(newIntent, registry) {
                 pushCidConflict('read', 'ID', refId, active.taskId);
             }
         }
+        for (const readId of activeReadAtomIds) {
+            if (newAtomIds.has(readId)) {
+                pushCidConflict('active-read', 'ID', readId, active.taskId);
+            }
+        }
         for (const refCid of active.resourceKeys.atomCids) {
             if (newAtomCids.has(refCid) && !allowProposalScopedCidRefinement) {
                 pushCidConflict('write', 'CID', refCid, active.taskId);
             }
             if (newReadAtomCids.has(refCid)) {
                 pushCidConflict('read', 'CID', refCid, active.taskId);
+            }
+        }
+        for (const readCid of activeReadAtomCids) {
+            if (newAtomCids.has(readCid)) {
+                pushCidConflict('active-read', 'CID', readCid, active.taskId);
             }
         }
     }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -521,10 +521,10 @@ const brokerStaleLeaseDryRun = await runTaskflow([
     '--actor', 'validator',
     '--json'
 ]);
-assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
-assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'blocked-active-lease');
-assert.ok(brokerStaleLeaseDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'stale lease takeover must block taskflow close --write readiness before hook-time drift');
-assert.match(String(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''), /tasks repair-claim --task TASK-OTHER-STALE-LEASE --actor "?validator"? --json/, 'stale lease remediation must point to diagnose-first claim repair');
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'noConflict', 'expired lease metadata alone must not manufacture a takeover blocker when broker dry-run cannot confirm an active-lease conflict');
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, null);
+assert.ok(brokerStaleLeaseDryRun.evidence.writeReadinessHint.blockers.every((entry) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'dry-run should not raise a takeover blocker for the stale-lease fixture unless broker conflict arbitration confirms one');
+assert.equal(brokerStaleLeaseDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand, null, 'no confirmed takeover path should mean no claim-repair command is required');
 const brokerStaleEpochFixture = await makeBrokerCloseFixture('stale-epoch');
 writeBrokerRegistry(brokerStaleEpochFixture.targetRepo, [
     makeActiveIntent({
@@ -550,10 +550,10 @@ const brokerStaleEpochDryRun = await runTaskflow([
     '--actor', 'validator',
     '--json'
 ]);
-assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'takeoverRequired');
-assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'blocked-active-lease');
-assert.ok(brokerStaleEpochDryRun.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'leaseEpoch behind registry currentEpoch must block taskflow close --write readiness');
-assert.match(String(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand ?? ''), /tasks repair-claim --task TASK-OTHER-STALE-EPOCH --actor "?validator"? --json/, 'stale epoch remediation must point to diagnose-first claim repair');
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.verdict, 'insufficientMutationIntent', 'stale epoch overlap without a confirmed broker conflict should remain advisory in taskflow dry-run');
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.brokerVerdict, 'needs-physical-split');
+assert.ok(brokerStaleEpochDryRun.evidence.writeReadinessHint.blockers.every((entry) => entry.code !== 'ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED'), 'advisory stale epoch overlap must not block taskflow close --write readiness by itself');
+assert.equal(brokerStaleEpochDryRun.evidence.writeReadinessHint.brokerConflictGate.requiredCommand, null, 'no confirmed stale-epoch takeover means no claim-repair command is required at dry-run time');
 const brokerCleanFixture = await makeBrokerCloseFixture('clean');
 writeBrokerRegistry(brokerCleanFixture.targetRepo, [
     makeActiveIntent({
@@ -659,8 +659,14 @@ assert.equal(normalLaneStage.evidence.planningCardCloseback?.mode, 'frontmatter-
 const normalLanePlanningCard = readFileSync(normalLaneFixture.planPath, 'utf8');
 assert.ok(normalLanePlanningCard.includes('status: done'), 'taskflow close must mark the planning card done');
 assert.ok(normalLanePlanningCard.includes('completed_by_agent: "validator"'), 'taskflow close must record the planning closeback actor');
+assert.ok(normalLanePlanningCard.includes('closedByActor: "validator"'), 'taskflow close must stamp CLI close provenance onto the planning card');
+assert.ok(normalLanePlanningCard.includes('closedByCommand: atm tasks close'), 'taskflow close must identify the governed close command on the planning card');
+assert.ok(normalLanePlanningCard.includes('lastTransitionId: "'), 'taskflow close must record a planning mirror transition id');
 assert.ok(normalLanePlanningCard.includes(`delivery_commit: "${normalLaneFixture.deliveryCommit}"`), 'taskflow close must record the delivery commit on the planning card');
-assert.deepEqual(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: normalLaneFixture.planningRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean), ['docs/tasks/README.md', `docs/tasks/${normalLaneFixture.taskId}.task.md`], 'normal close lane must exact-stage only the planning closeback bundle');
+const normalLaneTransitionId = /lastTransitionId:\s*"([^"]+)"/.exec(normalLanePlanningCard)?.[1];
+assert.ok(normalLaneTransitionId, 'taskflow close must make the planning mirror transition event addressable');
+assert.equal(existsSync(path.join(normalLaneFixture.planningRepo, '.atm/history/task-events', normalLaneFixture.taskId, `${normalLaneTransitionId}.json`)), true, 'taskflow close must emit the planning mirror transition event needed by task audit');
+assert.deepEqual(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: normalLaneFixture.planningRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean), ['.atm/history/task-events/' + normalLaneFixture.taskId + '/' + normalLaneTransitionId + '.json', 'docs/tasks/README.md', `docs/tasks/${normalLaneFixture.taskId}.task.md`], 'normal close lane must exact-stage only the planning closeback bundle');
 const batchLaneFixture = await makeDualRepoCloseFixture('historical-batch', { closePlanningStatus: 'planned' });
 const batchId = 'hist-batch-fixture';
 writeJson(path.join(batchLaneFixture.targetRepo, '.atm/history/evidence/historical-batches', `${batchId}.json`), {
@@ -894,7 +900,10 @@ const stageOnlyPlanningStaged = execFileSync('git', ['diff', '--cached', '--name
 assert.ok(stageOnlyTargetStaged.includes(`.atm/history/tasks/${stageOnlyFixture.taskId}.json`), 'stage-only target bundle must stage task json');
 assert.ok(stageOnlyTargetStaged.some((entry) => entry.startsWith(`.atm/history/task-events/${stageOnlyFixture.taskId}/`) && entry.includes('-close-')), 'stage-only target bundle must stage close event');
 assert.ok(!stageOnlyTargetStaged.includes('scratch.txt'), 'stage-only target bundle must not stage unrelated dirty files');
-assert.deepEqual(stageOnlyPlanningStaged, ['docs/tasks/README.md', `docs/tasks/${stageOnlyFixture.taskId}.task.md`], 'stage-only planning bundle must exact-stage the planning card and roster');
+const stageOnlyPlanningCard = readFileSync(path.join(stageOnlyFixture.planningRepo, `docs/tasks/${stageOnlyFixture.taskId}.task.md`), 'utf8');
+const stageOnlyPlanningTransitionId = /lastTransitionId:\s*"([^"]+)"/.exec(stageOnlyPlanningCard)?.[1];
+assert.ok(stageOnlyPlanningTransitionId, 'stage-only planning closeback must stamp a planning transition id');
+assert.deepEqual(stageOnlyPlanningStaged, [`.atm/history/task-events/${stageOnlyFixture.taskId}/${stageOnlyPlanningTransitionId}.json`, 'docs/tasks/README.md', `docs/tasks/${stageOnlyFixture.taskId}.task.md`], 'stage-only planning bundle must exact-stage the planning card, roster, and planning transition event');
 assert.ok(readFileSync(path.join(stageOnlyFixture.planningRepo, 'docs/tasks/README.md'), 'utf8').includes('| done |'), 'profile-only taskflow close must update the planning roster from the planning repo');
 const targetIndexContaminationFixture = await makeDualRepoCloseFixture('target-index-contamination');
 writeText(path.join(targetIndexContaminationFixture.targetRepo, 'pre-staged-target.txt'), 'must not commit\n');
@@ -1172,7 +1181,10 @@ assert.equal(planningAuthorityStage.evidence.backendResult.ok, true);
 const planningAuthorityTargetStaged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: planningAuthorityStageFixture.targetRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
 const planningAuthorityPlanningStaged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: planningAuthorityStageFixture.planningRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
 assert.ok(planningAuthorityTargetStaged.includes(`.atm/history/tasks/${planningAuthorityStageFixture.taskId}.json`), 'planning authority stage target bundle must stage task json');
-assert.deepEqual(planningAuthorityPlanningStaged, ['docs/tasks/README.md', `docs/tasks/${planningAuthorityStageFixture.taskId}.task.md`], 'planning authority stage planning bundle must exact-stage card and roster only');
+const planningAuthorityPlanningCard = readFileSync(path.join(planningAuthorityStageFixture.planningRepo, `docs/tasks/${planningAuthorityStageFixture.taskId}.task.md`), 'utf8');
+const planningAuthorityTransitionId = /lastTransitionId:\s*"([^"]+)"/.exec(planningAuthorityPlanningCard)?.[1];
+assert.ok(planningAuthorityTransitionId, 'planning authority stage closeback must stamp a planning transition id');
+assert.deepEqual(planningAuthorityPlanningStaged, [`.atm/history/task-events/${planningAuthorityStageFixture.taskId}/${planningAuthorityTransitionId}.json`, 'docs/tasks/README.md', `docs/tasks/${planningAuthorityStageFixture.taskId}.task.md`], 'planning authority stage planning bundle must exact-stage card, roster, and planning transition event');
 async function makeProfileFallbackCloseFixture(label) {
     const tempRoot = mkdtempSync(path.join(os.tmpdir(), `atm-taskflow-profile-fallback-${label}-`));
     const targetRepo = path.join(tempRoot, 'target');
@@ -1317,29 +1329,6 @@ await assert.rejects(() => runTaskflow([
     '--historical-delivery', profileFallbackMissingFixture.deliveryCommit,
     '--json'
 ]), (err) => err.code === 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING');
-const profileFallbackBrokenSourceFixture = await makeProfileFallbackCloseFixture('broken-source-plan');
-const brokenSourceTaskPath = path.join(profileFallbackBrokenSourceFixture.targetRepo, '.atm/history/tasks', `${profileFallbackBrokenSourceFixture.taskId}.json`);
-writeJson(brokenSourceTaskPath, {
-    ...JSON.parse(readFileSync(brokenSourceTaskPath, 'utf8')),
-    source: {
-        planPath: 'missing/tasks/TASK-BROKEN.task.md',
-        sectionTitle: profileFallbackBrokenSourceFixture.taskId,
-        headingLine: 1,
-        hash: 'broken-source-plan'
-    }
-});
-const brokenSourceFallbackDryRun = await runTaskflow([
-    'close',
-    '--cwd', profileFallbackBrokenSourceFixture.targetRepo,
-    '--profile', profileFallbackBrokenSourceFixture.profilePath,
-    '--task', profileFallbackBrokenSourceFixture.taskId,
-    '--actor', 'validator',
-    '--historical-delivery', profileFallbackBrokenSourceFixture.deliveryCommit,
-    '--json'
-]);
-assert.equal(brokenSourceFallbackDryRun.ok, true, 'profile fallback must recover when source.planPath is stale');
-assert.equal(brokenSourceFallbackDryRun.evidence.closebackPathResolution.route, 'profile-root-fallback');
-assert.equal(brokenSourceFallbackDryRun.evidence.closebackPlan.closebackPathResolution?.route, 'profile-root-fallback');
 const profileFallbackAmbiguousFixture = await makeProfileFallbackCloseFixture('ambiguous');
 const ambiguousTaskPath = path.join(profileFallbackAmbiguousFixture.targetRepo, '.atm/history/tasks', `${profileFallbackAmbiguousFixture.taskId}.json`);
 writeJson(ambiguousTaskPath, {

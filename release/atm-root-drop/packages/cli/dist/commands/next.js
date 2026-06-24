@@ -1813,10 +1813,11 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
             return [];
         }
     }) : [];
+    const skipExternalTaskCardScan = shouldSkipExternalTaskCardScan(jsonTasks, taskIntent);
     const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent)
         ? uniqueSorted([
             ...listTaskCardFiles(cwd),
-            ...listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots)
+            ...(skipExternalTaskCardScan ? [] : listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots))
         ])
         : [];
     const markdownTasks = markdownTaskFiles
@@ -1929,6 +1930,15 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
         planningRootWarnings: planningRootResolution.warnings,
         planningRootMissing
     };
+}
+function shouldSkipExternalTaskCardScan(jsonTasks, taskIntent) {
+    if (!taskIntent?.taskScopeMentioned)
+        return false;
+    if (taskIntent.mentionedPlanPaths.length > 0)
+        return false;
+    if (taskIntent.mentionedTaskIds.length === 0 && taskIntent.taskRootHints.length === 0)
+        return false;
+    return jsonTasks.some((task) => isTaskExplicitlyMentioned(task, taskIntent));
 }
 function selectImportedTaskForPromptScope(selectedTaskPool, isActiveQueue, explicitSingleTaskRoute, statusById, cwd) {
     if (isActiveQueue || explicitSingleTaskRoute) {

@@ -1,6 +1,6 @@
 ---
 name: atm-governance-router
-description: Route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis.
+description: First-touch ATM entry skill for AI agents working inside an ATM repository. Use when the user asks in natural language to inspect, implement, fix, plan, import task cards, validate, clean up, refactor, migrate, modernize, rank candidates, or otherwise do governed repository work and the agent should route through ATM before local analysis or edits.
 argument-hint: "<ATM context>"
 charter-invariants-injected: true
 ---
@@ -8,11 +8,32 @@ charter-invariants-injected: true
 
 # ATM Governance Router
 
-Use this skill when a user asks in natural language to inspect, rank, clean up,
-refactor, split, atomize, infect, migrate, or modernize existing source code.
+Treat this skill as the default ATM entrypoint for natural-language work in an
+ATM repository. If the agent knows to use this skill, the agent should enter
+ATM before doing local implementation work.
+
+Do not treat this skill as "refactor-only". It is the first-touch route for
+ordinary ATM-governed work unless another more specific ATM skill is explicitly
+required by the request.
+
+Use this skill when a user asks in natural language to inspect, implement, fix,
+rank, clean up, refactor, split, atomize, infect, migrate, modernize, validate,
+or import governed work.
 
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
+
+## Entry Contract
+
+If this skill triggers, the agent must assume:
+
+1. Read the repository entry guidance first.
+2. Route through ATM before local edits.
+3. Treat ATM output as the authoritative work order for scope, evidence, and
+   close/commit timing.
+
+If a later specialized ATM skill is needed, this skill still owns the first
+touch and hands off only after the official ATM route is known.
 
 ## Captain/Dispatch Entry Gate
 
@@ -56,6 +77,15 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 
 If the first command returns a user notice, surface it briefly, then continue the
 original user request.
+
+This is the minimum "agent knows ATM" contract:
+
+- read repo entry guidance;
+- run `node atm.mjs next --prompt "<user prompt>" --json`;
+- follow `evidence.nextAction.playbook` before editing, closing, or committing.
+
+If the agent can only remember one ATM behavior, it should remember that
+sequence.
 
 Before editing implementation files, inspect framework mode:
 
@@ -151,6 +181,28 @@ node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <cs
 
 If no hook is available, continue with task claim + `git prepare/check` +
 `evidence verify` gates as the fallback safety boundary.
+
+## Learning Loop
+
+This skill should get better from repeated real-world friction, but only by
+capturing reusable ATM-routing lessons rather than chat-local anecdotes.
+
+When the agent hits a real recurring wall, use the learning loop in
+`references/learning-loop.md`.
+
+Use the shared taxonomy and promotion model from
+`docs/governance/skills/shared-growth-contract.md`. This keeps the router thin
+while still letting it accumulate durable ATM entry lessons.
+
+Typical wall-hit classes:
+
+- ATM route was technically correct but confusing to execute;
+- the agent almost bypassed ATM because the first-touch rule was too implicit;
+- a repeated blocker needed a smaller, more memorable rule;
+- a repo-specific failure exposed a generalizable ATM entry or fallback pattern.
+
+Do not bloat this file with every case. Keep only the stable entry contract
+here. Put examples, capture format, and promotion rules in the reference file.
 
 ## Required Evidence
 
