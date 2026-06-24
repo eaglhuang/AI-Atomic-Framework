@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0147",
+  "title": "Repair main-push audit baseline blockers",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0145"
+  ],
+  "acceptance": [
+    "`node atm.mjs tasks audit --json` returns `ok: true`.",
+    "`TASK-PAPER-HOTFILE-POS2-A` has a valid handoff transition artifact at the path referenced by `lastTransitionId`.",
+    "`CHANGELOG.md` no longer matches the task-audit completion-report detector unless it is intentionally being used as a verified completion report.",
+    "The repair does not alter unrelated task ledgers, release artifacts, or framework runtime semantics."
+  ],
+  "deliverables": [
+    "CHANGELOG.md",
+    ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-23T04-16-26-573Z-handoff-b256aa30342e.json"
+  ],
+  "scopePaths": [
+    "CHANGELOG.md",
+    ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-23T04-16-26-573Z-handoff-b256aa30342e.json"
+  ],
+  "validators": [
+    "node atm.mjs tasks audit --json",
+    "node atm.mjs hook pre-push --json",
+    "git diff --check"
+  ],
+  "planningRepo": null,
+  "targetRepo": null,
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Editing unrelated framework source files while repairing audit baseline.",
+    "Changing release semantics or version policy beyond audit-safe wording."
+  ],
+  "nonGoals": [
+    "Do not weaken task-audit completion detection.",
+    "Do not rewrite historical task ownership or claim history outside the missing transition artifact."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Prefer a truthful reconstruction of the missing handoff transition artifact over mutating the task ledger to point elsewhere.\n- Preserve changelog meaning, but replace wording that implies repository-wide completion when the file is only a historical release narrative.\n- Keep the patch minimal so the resulting governed commit can be audited independently from other in-flight framework changes.",
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0147-main-push-audit-baseline-repair.task.md",
+    "sectionTitle": "TASK-AAO-0147",
+    "headingLine": 30,
+    "hash": "3ef0f487dedddc6d"
+  },
+  "importedAt": "2026-06-24T07:12:57.732Z",
+  "lastTransitionId": "2026-06-24T07-13-17-587Z-claim-1eb53d141730",
+  "lastTransitionAt": "2026-06-24T07:13:17.587Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-24T07:12:57.726Z",
+  "promotedAt": "2026-06-24T07:12:57.732Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-841be291994f",
+    "claimedAt": "2026-06-24T07:13:17.305Z",
+    "heartbeatAt": "2026-06-24T07:13:17.305Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "CHANGELOG.md",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-23T04-16-26-573Z-handoff-b256aa30342e.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-06-24T07:13:17.305Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260624071317-codex-gpt-5.4-mini-TASK-AAO-0147-92f8ff7a8f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0147",
+    "batchId": "batch-f47cb3485465",
+    "scopeKey": "tasks-023ae6299ffc",
+    "queueId": "queue-22c39256af85f43e",
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0147.*",
+      ".atm/history/task-events/TASK-AAO-0147/**",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-23T04-16-26-573Z-handoff-b256aa30342e.json",
+      ".atm/history/tasks/TASK-AAO-0147.json",
+      "CHANGELOG.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e9bfe8e5ea4e5c253305eaef22dc431bebc6d4ee33796bfd175844725c73c867",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-24T07:13:17.586Z",
+    "status": "active"
+  }
+}

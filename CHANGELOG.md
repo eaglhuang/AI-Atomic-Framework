@@ -69,7 +69,7 @@ scope and remains delegated to Git's three-way merge and human review.
   crash-safe arbitration with WIP capture
   (`packages/core/src/broker/freeze.ts`, `patch-envelope.ts`,
   `conflict-matrix.ts`, TASK-CID-0040 / 0041).
-- **MAO parallel routing benchmark** — 12 scenarios, 100% catch
+- **MAO parallel routing benchmark** — 12 scenarios, full hazard-catch coverage
   (8/8 unsafe), 0 false-safe, 0 expectation failures
   (TASK-MAO-0010, `docs/reports/mao-parallel-routing-benchmark.md`).
 - **Team Agents Wave Mode** — batch admission for related task cards
@@ -84,7 +84,7 @@ scope and remains delegated to Git's three-way merge and human review.
 
 - **`atm git admit` CLI** — pre-push admission entry point reusing
   the broker / format-adapter / composer / steward pipeline
-  (TASK-GIT-0001 ~ TASK-GIT-0012, all completed 2026-06-23).
+  (TASK-GIT-0001 ~ TASK-GIT-0012 delivered across the 2026-06-23 release wave).
 - **Pre-push Git hook** — invokes `atm git admit` against
   `git merge-base HEAD origin/<branch>`, builds local and remote
   mutation requests, and either allows the push, blocks with
@@ -138,7 +138,7 @@ scope and remains delegated to Git's three-way merge and human review.
   (`scripts/validate-team-wave-mode.ts`, 5/5 scenarios).
 - **MAO parallel routing benchmark**
   (`scripts/validate-mao-parallel-routing.ts`,
-  12 scenarios, 100% catch).
+  12 scenarios, full hazard-catch coverage).
 - **CID stability validator**
   (`scripts/validate-atom-id-to-cid.ts`).
 
@@ -209,7 +209,7 @@ holds frozen artifact snapshots tagged `v0.9.0-paper`.
 
 - Delivered **format-adapter subsystem**: mutation adapter registry plus JSON / text / numeric format adapters and the atom-map domain adapter (TASK-CID-0091~0098).
 - Delivered batch planner + content-addressed CAS, dogfood gate, atomization receipts, historical batch envelope MVP.
-- Delivered TASK-MAO-0009 steward arbitration flow, TASK-MAO-0010 parallel routing benchmark (12 scenarios, 100% catch), TASK-MAO-0004 next route + task selector with fresh evidence, TASK-MAO-0007 / 0008 / 0035 closebacks, TASK-CID-0099~0111 governance bundles, broker neutrality fix (adopter path to config).
+- Delivered TASK-MAO-0009 steward arbitration flow, TASK-MAO-0010 parallel routing benchmark (12 scenarios, full hazard-catch coverage), TASK-MAO-0004 next route + task selector with fresh evidence, TASK-MAO-0007 / 0008 / 0035 closebacks, TASK-CID-0099~0111 governance bundles, broker neutrality fix (adopter path to config).
 
 ---
 
