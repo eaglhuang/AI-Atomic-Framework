@@ -79,6 +79,14 @@ function testRegisterIntentPersistsReadSetKeys() {
   console.log('ok: registerIntent persists read-set resource keys');
 }
 
+function testRegisterIntentDefaultsMissingReadSetKeysToEmptyLists() {
+  const registry = registerIntent(emptyRegistry(), makeIntent(), 'direct-brokered', 300);
+  const [active] = registry.activeIntents;
+  assert.deepEqual(active.resourceKeys.readAtomIds, []);
+  assert.deepEqual(active.resourceKeys.readAtomCids, []);
+  console.log('ok: registerIntent defaults missing read-set keys to empty lists');
+}
+
 function testRegisterIntentFailsClosedOnLeaseOverflow() {
   assert.throws(
     () =>
@@ -124,6 +132,7 @@ function testReleaseTask() {
 
 testRegisterIntentEncodesLeaseBounds();
 testRegisterIntentPersistsReadSetKeys();
+testRegisterIntentDefaultsMissingReadSetKeysToEmptyLists();
 testRegisterIntentFailsClosedOnLeaseOverflow();
 testRenewIntentLease();
 testRenewIntentLeaseIgnoresMismatchedActor();

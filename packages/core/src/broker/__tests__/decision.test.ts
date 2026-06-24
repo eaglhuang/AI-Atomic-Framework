@@ -133,6 +133,28 @@ function testActiveReadSetConflictScenario() {
   console.log('ok: active read-set conflict scenario (later writer blocks on active reader)');
 }
 
+function testLegacyActiveIntentWithoutReadSetKeysRemainsCompatible() {
+  const active = toActiveIntent(makeIntent(), 'intent-a');
+  const legacyActive = {
+    ...active,
+    resourceKeys: {
+      ...active.resourceKeys
+    }
+  };
+  delete (legacyActive.resourceKeys as { readAtomIds?: readonly string[] }).readAtomIds;
+  delete (legacyActive.resourceKeys as { readAtomCids?: readonly string[] }).readAtomCids;
+
+  const decision = calculateBrokerDecision(makeIntent({
+    taskId: 'TASK-B',
+    actorId: 'agent-b',
+    targetFiles: ['src/file-b.ts'],
+    atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify' }]
+  }), registryWith([legacyActive as ActiveWriteIntent]));
+  assert.equal(decision.verdict, 'parallel-safe');
+  assert.equal(decision.lane, 'direct-brokered');
+  console.log('ok: legacy active intent without read-set keys remains compatible');
+}
+
 function testSharedSurfaceWinsOverReadSetScenario() {
   const active = makeIntent({
     sharedSurfaces: {
@@ -431,6 +453,7 @@ function testProposalOverlapParksFirstWriterForRearbitration() {
 testParallelSafeScenario();
 testReadSetConflictScenario();
 testActiveReadSetConflictScenario();
+testLegacyActiveIntentWithoutReadSetKeysRemainsCompatible();
 testSharedSurfaceWinsOverReadSetScenario();
 testCidConflictScenario();
 testFileOverlapScenario();
