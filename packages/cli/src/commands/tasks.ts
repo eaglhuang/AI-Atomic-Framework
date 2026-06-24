@@ -4952,7 +4952,9 @@ function evaluateFrameworkDeliveryWindow(input: {
   const hasGovernedDeliveryFlag = input.fromBatchCheckpoint || hasHistoricalDelivery;
   const ok = input.historicalBatchCloseReady === true
     ? hasHistoricalDelivery
-    : hasGovernedDeliveryFlag && criticalChangedFiles.length > 0;
+    : input.fromBatchCheckpoint
+      ? hasGovernedDeliveryFlag && scopedCriticalChangedFiles.length > 0
+      : hasHistoricalDelivery;
   return {
     schemaId: 'atm.frameworkDeliveryWindow.v1',
     taskId: input.taskId,
@@ -4966,7 +4968,9 @@ function evaluateFrameworkDeliveryWindow(input: {
         : 'historical-delivery-scoped-framework-critical-diff'
       : !hasGovernedDeliveryFlag
         ? 'not-from-batch-checkpoint'
-        : 'no-active-framework-critical-diff',
+        : input.fromBatchCheckpoint
+          ? 'no-active-framework-critical-diff'
+          : 'historical-delivery-gate',
     criticalChangedFiles,
     scopedCriticalChangedFiles,
     unscopedCriticalChangedFiles,
