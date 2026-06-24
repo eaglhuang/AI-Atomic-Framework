@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0120",
   "title": "Broker active read-set registry for symmetric dependency admission",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -140,7 +140,7 @@
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-eb1a0feef52b",
     "claimedAt": "2026-06-24T03:10:44.053Z",
-    "heartbeatAt": "2026-06-24T05:15:20.957Z",
+    "heartbeatAt": "2026-06-24T06:44:33.824Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0120.json",
@@ -156,7 +156,8 @@
       "packages/core/src/broker/types.ts",
       "packages/core/src/git/admission.ts"
     ],
-    "state": "active"
+    "state": "released",
+    "reason": "closed"
   },
   "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-06-24T03:10:44.053Z",
@@ -193,7 +194,11 @@
     "createdAt": "2026-06-24T03:10:44.936Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-06-24T05-51-41-127Z-import-6ce0550fdc04",
-  "lastTransitionAt": "2026-06-24T05:51:41.127Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-24T06-44-33-826Z-close-4fbfa25d8a04",
+  "lastTransitionAt": "2026-06-24T06:44:33.826Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-06-24T06:44:33.824Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260624031044-codex-gpt-5.4-mini-TASK-CID-0120-a56fc1a806",
+  "closurePacket": ".atm/history/evidence/TASK-CID-0120.closure-packet.json"
 }
