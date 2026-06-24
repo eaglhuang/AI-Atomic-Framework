@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-CID-0120",
+  "updatedAt": "2026-06-24T03:15:18.689Z",
+  "updatedBy": "codex-gpt-5.4-mini",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/decision.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2ea57b639811a367f06ba3542afe4a97f48835a3a8672b7e7c3f9f688edc458e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts"
+      ],
+      "generatedAt": "2026-06-24T03:14:26.357Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3adfacb1628285e6722f2dd5e6b72d7ba1908df7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/decision.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:798b4cd8418e4d11ebfc074d5b4ef323484d4c89a3f27c28c66bd1d85a7a7bdb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/decision.test.ts"
+      ],
+      "generatedAt": "2026-06-24T03:14:26.877Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3adfacb1628285e6722f2dd5e6b72d7ba1908df7",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:314d058a24d3c27ad099ec524506e78d26c49da88222d791f3e3fc965f8d7882",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/intent-registry.test.ts"
+      ],
+      "generatedAt": "2026-06-24T03:14:27.278Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3adfacb1628285e6722f2dd5e6b72d7ba1908df7",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-24T03:14:33.387Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3adfacb1628285e6722f2dd5e6b72d7ba1908df7",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-06-24T03:15:18.836Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3adfacb1628285e6722f2dd5e6b72d7ba1908df7",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

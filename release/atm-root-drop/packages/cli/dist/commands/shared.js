@@ -118,6 +118,106 @@ export class CliError extends Error {
         this.details = options.details ?? {};
     }
 }
+function isRecord(value) {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+function readStringList(value) {
+    if (!Array.isArray(value))
+        return undefined;
+    const filtered = value.filter((entry) => typeof entry === 'string' && entry.trim().length > 0);
+    return filtered.length > 0 ? filtered : undefined;
+}
+export function projectToolBridgeFields(evidence) {
+    const nextAction = isRecord(evidence.nextAction) ? evidence.nextAction : null;
+    const taskIntent = isRecord(evidence.taskIntent) ? evidence.taskIntent : null;
+    const userNotice = isRecord(evidence.userNotice) ? evidence.userNotice : null;
+    const runnerMode = isRecord(evidence.runnerMode)
+        ? evidence.runnerMode
+        : nextAction && isRecord(nextAction.runnerMode)
+            ? nextAction.runnerMode
+            : null;
+    const frameworkReport = isRecord(evidence.report)
+        && typeof evidence.action === 'string'
+        && (evidence.report.schemaId === 'atm.frameworkDevelopmentStatus')
+        ? evidence.report
+        : null;
+    const frameworkClaim = typeof evidence.action === 'string' && evidence.action === 'claim'
+        ? {
+            action: 'claim',
+            taskId: typeof evidence.taskId === 'string' ? evidence.taskId : null,
+            actorId: typeof evidence.actorId === 'string' ? evidence.actorId : null,
+            reason: typeof evidence.reason === 'string' ? evidence.reason : null,
+            linkedTaskId: typeof evidence.linkedTaskId === 'string' ? evidence.linkedTaskId : null,
+            files: readStringList(evidence.files) ?? [],
+            lock: isRecord(evidence.lock) ? evidence.lock : null
+        }
+        : null;
+    const evidenceSummary = typeof evidence.action === 'string' && (evidence.action === 'add' || evidence.action === 'run')
+        ? {
+            action: evidence.action,
+            taskId: typeof evidence.taskId === 'string' ? evidence.taskId : null,
+            actorId: typeof evidence.actorId === 'string' ? evidence.actorId : null,
+            kind: typeof evidence.kind === 'string' ? evidence.kind : null,
+            evidencePath: typeof evidence.evidencePath === 'string' ? evidence.evidencePath : null,
+            bundleManifestPath: typeof evidence.bundleManifestPath === 'string' ? evidence.bundleManifestPath : null,
+            artifactPaths: isRecord(evidence.bundleManifest) ? readStringList(evidence.bundleManifest.artifactPaths) ?? [] : [],
+            freshValidationPasses: isRecord(evidence.bundleManifest) ? readStringList(evidence.bundleManifest.freshValidationPasses) ?? [] : [],
+            commandRunCount: typeof evidence.commandRunCount === 'number' ? evidence.commandRunCount : null,
+            commandRunCache: isRecord(evidence.commandRunCache) ? evidence.commandRunCache : null
+        }
+        : null;
+    const guardReport = typeof evidence.guard === 'string'
+        ? {
+            guard: evidence.guard,
+            taskId: typeof evidence.taskId === 'string' ? evidence.taskId : null,
+            actorId: typeof evidence.actorId === 'string' ? evidence.actorId : null,
+            files: readStringList(evidence.files) ?? [],
+            violations: Array.isArray(evidence.violations) ? evidence.violations : [],
+            findings: Array.isArray(evidence.findings) ? evidence.findings : [],
+            report: isRecord(evidence.report) ? evidence.report : null,
+            claimLeaseId: typeof evidence.claimLeaseId === 'string' ? evidence.claimLeaseId : null,
+            failOpen: evidence.failOpen === true
+        }
+        : null;
+    const taskflowReadiness = isRecord(evidence.writeReadinessHint) || isRecord(evidence.historicalClosePreflight)
+        ? {
+            writeReadinessHint: isRecord(evidence.writeReadinessHint) ? evidence.writeReadinessHint : null,
+            historicalClosePreflight: isRecord(evidence.historicalClosePreflight) ? evidence.historicalClosePreflight : null,
+            autoEvidencePlan: isRecord(evidence.autoEvidencePlan) ? evidence.autoEvidencePlan : null,
+            closebackPathResolution: isRecord(evidence.closebackPathResolution) ? evidence.closebackPathResolution : null,
+            closeMode: typeof evidence.closeMode === 'string' ? evidence.closeMode : null
+        }
+        : null;
+    const commitBundle = isRecord(evidence.commitBundle)
+        ? evidence.commitBundle
+        : isRecord(evidence.governedCommitBundle)
+            ? evidence.governedCommitBundle
+            : null;
+    const skillGrowth = isRecord(evidence.skillGrowth)
+        ? evidence.skillGrowth
+        : nextAction && isRecord(nextAction.skillGrowth)
+            ? nextAction.skillGrowth
+            : null;
+    const allowedCommands = readStringList(evidence.allowedCommands)
+        ?? (nextAction ? readStringList(nextAction.allowedCommands) : undefined);
+    const blockedCommands = readStringList(evidence.blockedCommands)
+        ?? (nextAction ? readStringList(nextAction.blockedCommands) : undefined);
+    return {
+        nextAction,
+        taskIntent,
+        userNotice,
+        runnerMode,
+        frameworkReport,
+        frameworkClaim,
+        evidenceSummary,
+        guardReport,
+        taskflowReadiness,
+        commitBundle,
+        allowedCommands,
+        blockedCommands,
+        skillGrowth
+    };
+}
 const BLOCKED_ACTION_MESSAGE_CODES = new Set([
     'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED',
     'ATM_GUIDANCE_NEXT_BLOCKED',
@@ -194,8 +294,10 @@ export function enrichCommandResult(result, options = {}) {
         infoCodes: collectMessageCodes(result.messages, 'info')
     };
     const blocking = severity === 'blocked' || severity === 'failure' || severity === 'usage-error';
+    const toolBridge = projectToolBridgeFields(result.evidence);
     return {
         ...result,
+        ...toolBridge,
         severity,
         exitCode,
         blocking,

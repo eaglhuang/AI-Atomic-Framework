@@ -65,6 +65,21 @@ export interface CommandResult {
     messages: CommandMessage[];
     evidence: Record<string, unknown>;
 }
+export interface ToolBridgeProjection {
+    nextAction?: Record<string, unknown> | null;
+    taskIntent?: Record<string, unknown> | null;
+    userNotice?: Record<string, unknown> | null;
+    runnerMode?: Record<string, unknown> | null;
+    frameworkReport?: Record<string, unknown> | null;
+    frameworkClaim?: Record<string, unknown> | null;
+    evidenceSummary?: Record<string, unknown> | null;
+    guardReport?: Record<string, unknown> | null;
+    taskflowReadiness?: Record<string, unknown> | null;
+    commitBundle?: Record<string, unknown> | null;
+    allowedCommands?: readonly string[];
+    blockedCommands?: readonly string[];
+    skillGrowth?: Record<string, unknown> | null;
+}
 /** Public CLI result severity — part of the machine-readable result contract. */
 export type CliResultSeverity = 'success' | 'advisory' | 'blocked' | 'usage-error' | 'failure';
 export interface CliResultDiagnostics {
@@ -73,12 +88,13 @@ export interface CliResultDiagnostics {
     infoCodes: string[];
 }
 /** Normalized CLI envelope fields appended to every command result. */
-export interface EnrichedCommandResult extends CommandResult {
+export interface EnrichedCommandResult extends CommandResult, ToolBridgeProjection {
     severity: CliResultSeverity;
     exitCode: number;
     blocking: boolean;
     diagnostics: CliResultDiagnostics;
 }
+export declare function projectToolBridgeFields(evidence: Record<string, unknown>): ToolBridgeProjection;
 export declare function resolveCommandExitCode(input: {
     ok: boolean;
     messages?: readonly CommandMessage[];

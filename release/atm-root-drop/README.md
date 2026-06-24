@@ -1,5 +1,7 @@
 # AI-Atomic-Framework
 
+[![Release v0.9.0](https://img.shields.io/badge/Release-v0.9.0-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0)
+[![Paper](https://img.shields.io/badge/Paper-arXiv%20preprint-b91c1c.svg)](CITATION.cff)
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-0f172a.svg)](LICENSE)
 [![Node 24](https://img.shields.io/badge/Node-24-1f6feb.svg)](package.json)

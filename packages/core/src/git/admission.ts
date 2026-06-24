@@ -257,6 +257,8 @@ function buildActiveAdmissionIntent(input: {
       files: dedupeStrings(input.entries.map((entry) => entry.filePath)),
       atomIds: atomRefs.map((ref) => ref.atomId),
       atomCids: atomRefs.map((ref) => ref.atomCid),
+      readAtomIds: [],
+      readAtomCids: [],
       atomRanges: atomRefs
         .filter((ref) => ref.sourceRange)
         .map((ref) => ({

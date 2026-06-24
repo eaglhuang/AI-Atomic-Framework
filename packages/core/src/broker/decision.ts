@@ -119,7 +119,7 @@ export function calculateBrokerDecision(
   const seenConflictKeys = new Set<string>();
 
   const pushCidConflict = (
-    kind: 'write' | 'read',
+    kind: 'write' | 'read' | 'active-read',
     resourceKind: 'ID' | 'CID',
     resourceValue: string,
     activeTaskId: string
@@ -133,7 +133,9 @@ export function calculateBrokerDecision(
       kind: 'cid',
       detail: kind === 'read'
         ? `Read-set conflict: Atom ${resourceKind} '${resourceValue}' is already written by task '${activeTaskId}'`
-        : `CID conflict: Atom ${resourceKind} '${resourceValue}' is already claimed by task '${activeTaskId}'`
+        : kind === 'active-read'
+          ? `Read-set conflict: Atom ${resourceKind} '${resourceValue}' is already read by active task '${activeTaskId}'`
+          : `CID conflict: Atom ${resourceKind} '${resourceValue}' is already claimed by task '${activeTaskId}'`
     });
   };
 
@@ -143,6 +145,8 @@ export function calculateBrokerDecision(
     }
 
     const allowProposalScopedCidRefinement = shouldRefineProposalScopedCidConflict(newIntent, active, baseAdmission);
+    const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
+    const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
 
     for (const refId of active.resourceKeys.atomIds) {
       if (newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
@@ -153,12 +157,24 @@ export function calculateBrokerDecision(
       }
     }
 
+    for (const readId of activeReadAtomIds) {
+      if (newAtomIds.has(readId)) {
+        pushCidConflict('active-read', 'ID', readId, active.taskId);
+      }
+    }
+
     for (const refCid of active.resourceKeys.atomCids) {
       if (newAtomCids.has(refCid) && !allowProposalScopedCidRefinement) {
         pushCidConflict('write', 'CID', refCid, active.taskId);
       }
       if (newReadAtomCids.has(refCid)) {
         pushCidConflict('read', 'CID', refCid, active.taskId);
+      }
+    }
+
+    for (const readCid of activeReadAtomCids) {
+      if (newAtomCids.has(readCid)) {
+        pushCidConflict('active-read', 'CID', readCid, active.taskId);
       }
     }
   }

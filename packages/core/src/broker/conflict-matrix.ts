@@ -176,6 +176,8 @@ function detectCidConflictClasses(
 
   for (const active of activeIntents) {
     if (active.taskId === newIntent.taskId) continue;
+    const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
+    const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
 
     for (const activeAtomId of active.resourceKeys.atomIds) {
       if (newAtomIds.has(activeAtomId)) {
@@ -202,6 +204,20 @@ function detectCidConflictClasses(
       }
     }
 
+    for (const activeReadAtomId of activeReadAtomIds) {
+      if (newAtomIds.has(activeReadAtomId)) {
+        const key = `active-read:${active.taskId}:${activeReadAtomId}`;
+        if (!seen.has(key)) {
+          conflicts.push({
+            kind: 'read-set',
+            detail: `Read/write overlap: atomId '${activeReadAtomId}' is read by active task '${active.taskId}'.`,
+            blockingTask: active.taskId
+          });
+          seen.add(key);
+        }
+      }
+    }
+
     for (const activeAtomCid of active.resourceKeys.atomCids) {
       if (newAtomCids.has(activeAtomCid)) {
         const key = `cid-c:${active.taskId}:${activeAtomCid}`;
@@ -220,6 +236,20 @@ function detectCidConflictClasses(
           conflicts.push({
             kind: 'read-set',
             detail: `Read/write overlap: atomCid '${activeAtomCid}' is written by '${active.taskId}'.`,
+            blockingTask: active.taskId
+          });
+          seen.add(key);
+        }
+      }
+    }
+
+    for (const activeReadAtomCid of activeReadAtomCids) {
+      if (newAtomCids.has(activeReadAtomCid)) {
+        const key = `active-read-c:${active.taskId}:${activeReadAtomCid}`;
+        if (!seen.has(key)) {
+          conflicts.push({
+            kind: 'read-set',
+            detail: `Read/write overlap: atomCid '${activeReadAtomCid}' is read by active task '${active.taskId}'.`,
             blockingTask: active.taskId
           });
           seen.add(key);

@@ -63,6 +63,22 @@ function testRegisterIntentEncodesLeaseBounds() {
   console.log('ok: registerIntent encodes lease bounds and heartbeat');
 }
 
+function testRegisterIntentPersistsReadSetKeys() {
+  const registry = registerIntent(emptyRegistry(), makeIntent({
+    readAtoms: [
+      {
+        atomId: 'atom-read',
+        atomCid: 'cid-read',
+        operation: 'modify'
+      }
+    ]
+  }), 'direct-brokered', 300);
+  const [active] = registry.activeIntents;
+  assert.deepEqual(active.resourceKeys.readAtomIds, ['atom-read']);
+  assert.deepEqual(active.resourceKeys.readAtomCids, ['cid-read']);
+  console.log('ok: registerIntent persists read-set resource keys');
+}
+
 function testRegisterIntentFailsClosedOnLeaseOverflow() {
   assert.throws(
     () =>
@@ -107,6 +123,7 @@ function testReleaseTask() {
 }
 
 testRegisterIntentEncodesLeaseBounds();
+testRegisterIntentPersistsReadSetKeys();
 testRegisterIntentFailsClosedOnLeaseOverflow();
 testRenewIntentLease();
 testRenewIntentLeaseIgnoresMismatchedActor();

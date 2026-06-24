@@ -30,6 +30,12 @@ commands both include the normalized result-contract fields:
 }
 ```
 
+Bridge-facing consumers may also receive top-level projection fields such as
+`nextAction`, `userNotice`, `runnerMode`, `allowedCommands`,
+`blockedCommands`, and `skillGrowth` when the command evidence contains them.
+The schema for the full envelope lives at
+[`schemas/governance/cli-result.schema.json`](../schemas/governance/cli-result.schema.json).
+
 When a command fails, `ok` is `false`, `blocking` is usually `true`, and at
 least one `level: "error"` message is present:
 

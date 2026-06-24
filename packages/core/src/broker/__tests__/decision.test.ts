@@ -23,6 +23,8 @@ function toActiveIntent(intent: WriteIntent, intentId: string): ActiveWriteInten
       files: intent.targetFiles,
       atomIds: intent.atomRefs.map((ref) => ref.atomId),
       atomCids: intent.atomRefs.map((ref) => ref.atomCid),
+      readAtomIds: (intent.readAtoms ?? []).map((ref) => ref.atomId),
+      readAtomCids: (intent.readAtoms ?? []).map((ref) => ref.atomCid),
       atomRanges: intent.atomRefs
         .map((ref) => ref.sourceRange && {
           filePath: ref.sourceRange.filePath,
@@ -111,6 +113,24 @@ function testReadSetConflictScenario() {
   assert.equal(decision.lane, 'blocked');
   assert.ok(decision.conflicts.some((conflict) => conflict.detail.includes('Read-set conflict')));
   console.log('ok: read-set conflict scenario (read dependency blocks parallel-safe admission)');
+}
+
+function testActiveReadSetConflictScenario() {
+  const activeReader = makeIntent({
+    readAtoms: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify' }]
+  });
+  const writerIntent = makeIntent({
+    taskId: 'TASK-B',
+    actorId: 'agent-b',
+    targetFiles: ['src/file-b.ts'],
+    atomRefs: [{ atomId: 'atom-b', atomCid: 'cid-b', operation: 'modify' }]
+  });
+
+  const decision = calculateBrokerDecision(writerIntent, registryWith([toActiveIntent(activeReader, 'intent-a')]));
+  assert.equal(decision.verdict, 'blocked-cid-conflict');
+  assert.equal(decision.lane, 'blocked');
+  assert.ok(decision.conflicts.some((conflict) => conflict.detail.includes('already read by active task')));
+  console.log('ok: active read-set conflict scenario (later writer blocks on active reader)');
 }
 
 function testSharedSurfaceWinsOverReadSetScenario() {
@@ -410,6 +430,7 @@ function testProposalOverlapParksFirstWriterForRearbitration() {
 
 testParallelSafeScenario();
 testReadSetConflictScenario();
+testActiveReadSetConflictScenario();
 testSharedSurfaceWinsOverReadSetScenario();
 testCidConflictScenario();
 testFileOverlapScenario();

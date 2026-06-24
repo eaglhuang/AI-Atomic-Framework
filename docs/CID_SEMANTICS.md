@@ -46,6 +46,17 @@ The current CID semantics scope covers:
 
 The scope intentionally does not include AST semantics, LLM embeddings, or effect tracking.
 
+## Broker read/write dependency admission
+
+Broker admission uses CID identity as one dimension of a conservative static dependency check. A `WriteIntent` may declare `readAtoms` in addition to its write-side `atomRefs`; when that intent becomes active, the broker registry persists the declared read atom IDs and CIDs as optional active resource keys.
+
+This makes read/write dependency admission symmetric at the declared atom level:
+
+- a new intent reading an atom currently written by an active intent is blocked or routed to serial review;
+- a new intent writing an atom currently read by an active intent is also blocked or routed to serial review.
+
+This rule is intentionally scoped to declared `readAtoms`. It is not dynamic runtime read tracking, and it does not claim to discover hidden effects that an adapter or agent failed to declare. Those residual risks remain validator, CAS base-hash, or fail-closed concerns.
+
 ## Canonical mapping
 
 - `semanticFingerprint` maps to `CID.Interface`

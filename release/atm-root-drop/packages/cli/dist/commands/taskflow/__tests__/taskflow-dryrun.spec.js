@@ -1317,6 +1317,29 @@ await assert.rejects(() => runTaskflow([
     '--historical-delivery', profileFallbackMissingFixture.deliveryCommit,
     '--json'
 ]), (err) => err.code === 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING');
+const profileFallbackBrokenSourceFixture = await makeProfileFallbackCloseFixture('broken-source-plan');
+const brokenSourceTaskPath = path.join(profileFallbackBrokenSourceFixture.targetRepo, '.atm/history/tasks', `${profileFallbackBrokenSourceFixture.taskId}.json`);
+writeJson(brokenSourceTaskPath, {
+    ...JSON.parse(readFileSync(brokenSourceTaskPath, 'utf8')),
+    source: {
+        planPath: 'missing/tasks/TASK-BROKEN.task.md',
+        sectionTitle: profileFallbackBrokenSourceFixture.taskId,
+        headingLine: 1,
+        hash: 'broken-source-plan'
+    }
+});
+const brokenSourceFallbackDryRun = await runTaskflow([
+    'close',
+    '--cwd', profileFallbackBrokenSourceFixture.targetRepo,
+    '--profile', profileFallbackBrokenSourceFixture.profilePath,
+    '--task', profileFallbackBrokenSourceFixture.taskId,
+    '--actor', 'validator',
+    '--historical-delivery', profileFallbackBrokenSourceFixture.deliveryCommit,
+    '--json'
+]);
+assert.equal(brokenSourceFallbackDryRun.ok, true, 'profile fallback must recover when source.planPath is stale');
+assert.equal(brokenSourceFallbackDryRun.evidence.closebackPathResolution.route, 'profile-root-fallback');
+assert.equal(brokenSourceFallbackDryRun.evidence.closebackPlan.closebackPathResolution?.route, 'profile-root-fallback');
 const profileFallbackAmbiguousFixture = await makeProfileFallbackCloseFixture('ambiguous');
 const ambiguousTaskPath = path.join(profileFallbackAmbiguousFixture.targetRepo, '.atm/history/tasks', `${profileFallbackAmbiguousFixture.taskId}.json`);
 writeJson(ambiguousTaskPath, {
