@@ -13,10 +13,17 @@
     "`docs/CID_SEMANTICS.md` and `paper.v3.1.md` describe the symmetric dependency rule without overstating dynamic runtime read tracking."
   ],
   "deliverables": [
-    "ActiveWriteIntent persists read-set resource keys derived from WriteIntent.readAtoms.",
-    "Broker admission blocks both D(new) intersect W(active) and W(new) intersect D(active).",
-    "Regression tests cover symmetric read/write dependency hazards and legacy registry compatibility.",
-    "CID semantics documentation and paper draft describe the symmetric dependency rule honestly."
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/registry.ts",
+    "packages/core/src/broker/decision.ts",
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/core/src/broker/team-wave-admission.ts",
+    "packages/core/src/git/admission.ts",
+    "packages/core/src/broker/__tests__/decision.test.ts",
+    "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+    "packages/core/src/broker/__tests__/intent-registry.test.ts",
+    "docs/CID_SEMANTICS.md",
+    "docs/ai_atomic_framework/arxiv-paper-v1/paper.v3.1.md"
   ],
   "scopePaths": [
     "packages/core/src/broker/types.ts",
@@ -123,18 +130,12 @@
   "tags": [],
   "notes": null,
   "source": {
-    "planPath": "cid-hardening/tasks/TASK-CID-0120-broker-active-read-set-registry.task.md",
+    "planPath": "docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0120-broker-active-read-set-registry.task.md",
     "sectionTitle": "TASK-CID-0120",
-    "headingLine": 77,
-    "hash": "ced2ced1571f11a5"
+    "headingLine": 84,
+    "hash": "8f183da1e49be457"
   },
-  "importedAt": "2026-06-24T03:10:27.729Z",
-  "lastTransitionId": "2026-06-24T05-15-21-093Z-renew-a082d12b5f88",
-  "lastTransitionAt": "2026-06-24T05:15:21.093Z",
-  "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-06-24T03:10:44.045Z",
-  "promotedAt": "2026-06-24T03:10:44.049Z",
+  "importedAt": "2026-06-24T05:51:41.121Z",
   "claim": {
     "actorId": "codex-gpt-5.4-mini",
     "leaseId": "lease-eb1a0feef52b",
@@ -157,8 +158,8 @@
     ],
     "state": "active"
   },
+  "owner": "codex-gpt-5.4-mini",
   "startedAt": "2026-06-24T03:10:44.053Z",
-  "startedByActor": "codex-gpt-5.4-mini",
   "startedBySessionId": "session-20260624031044-codex-gpt-5.4-mini-TASK-CID-0120-a56fc1a806",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
@@ -191,5 +192,8 @@
     "actorId": "codex-gpt-5.4-mini",
     "createdAt": "2026-06-24T03:10:44.936Z",
     "status": "active"
-  }
+  },
+  "lastTransitionId": "2026-06-24T05-51-41-127Z-import-6ce0550fdc04",
+  "lastTransitionAt": "2026-06-24T05:51:41.127Z",
+  "ledgerContractVersion": "task-ledger/v1"
 }
