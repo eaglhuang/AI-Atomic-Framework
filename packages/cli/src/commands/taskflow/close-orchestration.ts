@@ -673,6 +673,7 @@ export interface CloseWriteRollbackSnapshot {
   readonly planningCard: {
     readonly absolutePath: string;
     readonly previousContent: string;
+    readonly transitionPath?: string | null;
   } | null;
   readonly stagedArtifacts: readonly string[];
   readonly preCloseStagedFiles: readonly string[];
@@ -685,6 +686,7 @@ export interface CloseWriteTransactionReport {
   readonly ok: boolean;
   readonly failureStep: string | null;
   readonly failureCode: string | null;
+  readonly failureReason?: string | null;
   readonly rolledBackArtifacts: readonly string[];
   readonly recoveryCommand: string | null;
   readonly backendCloseApplied: boolean;
@@ -804,6 +806,13 @@ export function rollbackCloseWriteTransaction(input: {
   }
 
   if (input.snapshot.planningCard) {
+    if (input.snapshot.planningCard.transitionPath) {
+      const planningTransitionAbsolute = path.resolve(input.cwd, input.snapshot.planningCard.transitionPath);
+      if (existsSync(planningTransitionAbsolute)) {
+        unlinkSync(planningTransitionAbsolute);
+        rolledBackArtifacts.push(relativePathFrom(input.cwd, planningTransitionAbsolute));
+      }
+    }
     writeFileSync(input.snapshot.planningCard.absolutePath, input.snapshot.planningCard.previousContent, 'utf8');
     rolledBackArtifacts.push(input.snapshot.planningCard.absolutePath);
   }
@@ -846,6 +855,7 @@ export function rollbackCloseWriteTransaction(input: {
     ok: false,
     failureStep: input.failureStep,
     failureCode: input.failureCode,
+    failureReason: input.failureReason ?? null,
     rolledBackArtifacts,
     recoveryCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
     backendCloseApplied: true,
@@ -885,6 +895,7 @@ export async function executeCloseWriteCommitPhase<TBundle extends { failClosed?
         ok: true,
         failureStep: null,
         failureCode: null,
+        failureReason: null,
         rolledBackArtifacts: [],
         recoveryCommand: null,
         backendCloseApplied: true,

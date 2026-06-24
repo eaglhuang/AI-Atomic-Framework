@@ -2,6 +2,7 @@ import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildPlanningMirrorClosebackExpectation, classifyPlanningMirrorPreEdit } from '../tasks/planning-mirror-close-diagnostics.ts';
+import { appendTaskTransitionEvent, createTaskTransitionId } from '../task-ledger.ts';
 import { CliError } from '../shared.ts';
 export {
   assertClosebackPlanningPathReady,
@@ -22,6 +23,7 @@ export interface PlanningCardCloseback {
   mode: 'frontmatter-closeback' | 'frontmatter-pre-edit-absorbed';
   repoRoot: string;
   relativePath: string;
+  transitionPath: string | null;
   updatedFields: string[];
 }
 
@@ -79,6 +81,20 @@ function upsertFrontmatterField(frontmatter: string, key: string, value: string)
   return `${trimmed}\n${key}: ${value}`;
 }
 
+function parseTaskMarkdownFrontmatter(text: string): Record<string, unknown> {
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return {};
+  const result: Record<string, unknown> = {};
+  for (const rawLine of match[1].split(/\r?\n/)) {
+    const separatorIndex = rawLine.indexOf(':');
+    if (separatorIndex === -1) continue;
+    const key = rawLine.slice(0, separatorIndex).trim();
+    const value = rawLine.slice(separatorIndex + 1).trim().replace(/^"(.*)"$/, '$1');
+    if (key) result[key] = value;
+  }
+  return result;
+}
+
 export function capturePlanningCardSnapshot(input: {
   cwd: string;
   planningMirrorPath: string | null;
@@ -129,6 +145,7 @@ export function applyPlanningCardCloseback(input: {
       mode: 'frontmatter-pre-edit-absorbed',
       repoRoot: planning.repoRoot,
       relativePath: planning.relativePath,
+      transitionPath: null,
       updatedFields: ['status', 'completed_at', 'completed_by_agent', ...(expectation.deliveryCommit ? ['delivery_commit'] : [])]
     };
   }
@@ -140,22 +157,78 @@ export function applyPlanningCardCloseback(input: {
     });
   }
   const lineEnding = content.includes('\r\n') ? '\r\n' : '\n';
-  const updatedFields = ['status', 'completed_at', 'completed_by_agent'];
+  const previousDocument = parseTaskMarkdownFrontmatter(content);
+  const taskId = typeof previousDocument.task_id === 'string'
+    ? previousDocument.task_id
+    : (typeof previousDocument.taskId === 'string' ? previousDocument.taskId : path.basename(absolutePath).replace(/\.task\.md$/, ''));
+  const previousStatus = typeof previousDocument.status === 'string' ? previousDocument.status : null;
+  const completedAt = new Date().toISOString();
+  const updatedFields = [
+    'status',
+    'completed_at',
+    'completed_by_agent',
+    'closedAt',
+    'closedByActor',
+    'closedByCommand',
+    'lastTransitionId',
+    'lastTransitionAt',
+    'ledgerContractVersion'
+  ];
+  const nextDocument: Record<string, unknown> = {
+    ...previousDocument,
+    status: 'done',
+    completed_at: completedAt,
+    completed_by_agent: input.actorId,
+    closedAt: completedAt,
+    closedByActor: input.actorId,
+    closedByCommand: 'atm tasks close',
+    ledgerContractVersion: 'task-ledger/v1'
+  };
+  const transitionId = createTaskTransitionId({
+    createdAt: completedAt,
+    taskId,
+    action: 'close',
+    taskDocument: nextDocument
+  });
+  nextDocument.lastTransitionId = transitionId;
+  nextDocument.lastTransitionAt = completedAt;
+
   let frontmatter = match[1].replace(/\r\n/g, '\n');
   frontmatter = upsertFrontmatterField(frontmatter, 'status', 'done');
-  frontmatter = upsertFrontmatterField(frontmatter, 'completed_at', quoteYamlString(new Date().toISOString()));
+  frontmatter = upsertFrontmatterField(frontmatter, 'completed_at', quoteYamlString(completedAt));
   frontmatter = upsertFrontmatterField(frontmatter, 'completed_by_agent', quoteYamlString(input.actorId));
+  frontmatter = upsertFrontmatterField(frontmatter, 'closedAt', quoteYamlString(completedAt));
+  frontmatter = upsertFrontmatterField(frontmatter, 'closedByActor', quoteYamlString(input.actorId));
+  frontmatter = upsertFrontmatterField(frontmatter, 'closedByCommand', 'atm tasks close');
+  frontmatter = upsertFrontmatterField(frontmatter, 'lastTransitionId', quoteYamlString(transitionId));
+  frontmatter = upsertFrontmatterField(frontmatter, 'lastTransitionAt', quoteYamlString(completedAt));
+  frontmatter = upsertFrontmatterField(frontmatter, 'ledgerContractVersion', 'task-ledger/v1');
   if (input.historicalDeliveryRefs[0]) {
     frontmatter = upsertFrontmatterField(frontmatter, 'delivery_commit', quoteYamlString(input.historicalDeliveryRefs[0]));
     updatedFields.push('delivery_commit');
+    nextDocument.delivery_commit = input.historicalDeliveryRefs[0];
   }
   const rest = content.slice(match[0].length);
   const normalizedFrontmatter = frontmatter.split('\n').join(lineEnding);
   writeFileSync(absolutePath, `---${lineEnding}${normalizedFrontmatter}${lineEnding}---${lineEnding}${rest}`, 'utf8');
+  const transition = appendTaskTransitionEvent({
+    cwd: planning.repoRoot,
+    taskId,
+    action: 'close',
+    actorId: input.actorId,
+    fromStatus: previousStatus,
+    toStatus: 'done',
+    taskPath: absolutePath,
+    taskDocument: nextDocument,
+    command: `node atm.mjs tasks close --task ${taskId} --actor ${input.actorId}`,
+    createdAt: completedAt,
+    transitionId
+  });
   return {
     mode: 'frontmatter-closeback',
     repoRoot: planning.repoRoot,
     relativePath: planning.relativePath,
+    transitionPath: transition.eventPath,
     updatedFields
   };
 }

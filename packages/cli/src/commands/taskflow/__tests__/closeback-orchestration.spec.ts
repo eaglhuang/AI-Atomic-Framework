@@ -25,7 +25,16 @@ const closeback = applyPlanningCardCloseback({
 });
 
 assert.equal(closeback?.mode, 'frontmatter-closeback');
-assert.ok(readFileSync(planningCard, 'utf8').includes('status: done'));
+const updatedPlanningCard = readFileSync(planningCard, 'utf8');
+assert.ok(updatedPlanningCard.includes('status: done'));
+assert.ok(updatedPlanningCard.includes('closedByActor: "validator"'));
+const transitionIdMatch = updatedPlanningCard.match(/lastTransitionId:\s*"([^"]+)"/);
+assert.ok(transitionIdMatch, 'closeback must stamp a task transition id onto the planning card');
+const transitionId = transitionIdMatch?.[1] ?? '';
+const transitionEventPath = path.join(repo, '.atm/history/task-events/TASK-CLOSEBACK-0001', `${transitionId}.json`);
+const transitionEvent = JSON.parse(readFileSync(transitionEventPath, 'utf8'));
+assert.equal(transitionEvent.action, 'close');
+assert.equal(transitionEvent.toStatus, 'done');
 
 const roster = resolvePlanningRosterPaths({
   cwd: repo,

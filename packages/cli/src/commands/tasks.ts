@@ -5578,7 +5578,7 @@ function parseTaskMarkdownFrontmatter(text: string): Record<string, unknown> {
     const separatorIndex = rawLine.indexOf(':');
     if (separatorIndex === -1) continue;
     const key = rawLine.slice(0, separatorIndex).trim();
-    const value = rawLine.slice(separatorIndex + 1).trim();
+    const value = rawLine.slice(separatorIndex + 1).trim().replace(/^"(.*)"$/, '$1');
     if (key) result[key] = value;
   }
   return result;

@@ -130,4 +130,61 @@ assert.equal(
   `chore(taskflow): close ${autoCommitTaskId} target governance bundle`
 );
 
+const sameRepoTaskId = 'TASK-BUNDLE-0003';
+const sameRepo = path.join(tempRoot, 'same-repo');
+initGitRepo(sameRepo);
+const sameRepoPlanPath = path.join(sameRepo, 'docs/tasks/TASK-BUNDLE-0003.task.md');
+writeText(sameRepoPlanPath, `---\ntask_id: ${sameRepoTaskId}\nstatus: running\n---\n# ${sameRepoTaskId}\n`);
+writeJson(path.join(sameRepo, '.atm/history/tasks/TASK-BUNDLE-0003.json'), {
+  workItemId: sameRepoTaskId,
+  title: `${sameRepoTaskId} fixture`,
+  status: 'running',
+  claim: {
+    actorId: 'validator',
+    leaseId: 'lease-bundle-0003',
+    state: 'active'
+  },
+  deliverables: ['src/app.ts'],
+  scopePaths: ['src/app.ts'],
+  source: { planPath: sameRepoPlanPath }
+});
+writeJson(path.join(sameRepo, '.atm/history/evidence/TASK-BUNDLE-0003.json'), {
+  taskId: sameRepoTaskId,
+  schemaId: 'atm.taskEvidence.v1'
+});
+writeJson(path.join(sameRepo, '.atm/history/evidence/TASK-BUNDLE-0003.closure-packet.json'), {
+  taskId: sameRepoTaskId,
+  schemaId: 'atm.closurePacket.v1'
+});
+writeText(path.join(sameRepo, 'src/app.ts'), 'export const value = 3;\n');
+execFileSync('git', ['add', '.'], { cwd: sameRepo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'base same repo fixture'], { cwd: sameRepo, stdio: 'ignore' });
+writeText(sameRepoPlanPath, `---\ntask_id: ${sameRepoTaskId}\nstatus: done\n---\n# ${sameRepoTaskId}\n`);
+writeText(path.join(sameRepo, 'scratch/foreign.txt'), 'foreign staged same-repo WIP\n');
+execFileSync('git', ['add', 'scratch/foreign.txt'], { cwd: sameRepo, stdio: 'ignore' });
+const sameRepoBundle = buildTaskflowCommitBundle({
+  cwd: sameRepo,
+  taskId: sameRepoTaskId,
+  actorId: 'validator',
+  commitMode: 'auto-commit',
+  planningMirrorPath: sameRepoPlanPath,
+  rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+const sameRepoFinal = await finalizeTaskflowCommitBundle({
+  bundle: sameRepoBundle,
+  actorId: 'validator',
+  taskId: sameRepoTaskId
+});
+assert.equal(sameRepoFinal.failClosed, false, 'same-repo bundle must commit successfully');
+assert.equal(sameRepoFinal.targetRepo.status, 'committed');
+assert.equal(sameRepoFinal.planningRepo.status, 'committed');
+assert.equal(sameRepoFinal.targetRepo.commitSha, sameRepoFinal.planningRepo.commitSha, 'same-repo close must share one commit');
+const sameRepoStaged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: sameRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
+assert.ok(sameRepoStaged.includes('scratch/foreign.txt'), 'foreign staged work must remain staged in same-repo mode');
+assert.equal(
+  execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: sameRepo, encoding: 'utf8' }).trim(),
+  `chore(taskflow): close ${sameRepoTaskId} target governance bundle`
+);
+
 console.log('ok: commit bundle assembly spec passed');
