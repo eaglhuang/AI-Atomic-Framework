@@ -129,28 +129,36 @@
     "atomCid": null,
     "mapUpdates": []
   },
-  "legacyImportAliases": {},
+  "legacyImportAliases": {
+    "keep": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0148-same-repo-close-bundle-and-scope-hardening.task.md"
+    ],
+    "discard": [
+      "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0148-harden-same-repo-close-bundle-and-scope-filtering.task.md"
+    ],
+    "upstream_repo": "3KLife"
+  },
   "importDiagnostics": [],
   "tags": [],
-  "notes": "- Prefer staged-bundle-based filtering over path allowlists keyed to specific task ids, planning repos, or filenames.\n- Treat planning mirror closeback as a first-class governed close participant: metadata, transition event, staging, and rollback must all stay in the same lifecycle.\n- Keep the repair source-first and minimal. Release mirrors should be regenerated only after the source patch is accepted, not during this card.\n- When backlog updates mention previously known failures, annotate them as reconfirmations or narrower manifestations instead of creating duplicate bug stories.",
+  "notes": "- Prefer staged-bundle-based filtering over path allowlists keyed to specific task ids, planning repos, or filenames.\n- Treat planning mirror closeback as a first-class governed close participant: metadata, transition event, staging, and rollback must all stay in the same lifecycle.\n- Keep the repair source-first and minimal. Release mirrors should be regenerated only after the source patch is accepted, not during this card.\n- When backlog updates mention previously known failures, annotate them as reconfirmations or narrower manifestations instead of creating duplicate bug stories.\n- 3KLife import residue 分類（本次 close scope）：\n  - 保留（保留用於 closeback）：`../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0148-same-repo-close-bundle-and-scope-hardening.task.md`\n  - 可捨棄（待清理的重複導入殮留）：`../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0148-harden-same-repo-close-bundle-and-scope-filtering.task.md`",
   "source": {
-    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0148-same-repo-close-bundle-and-scope-hardening.task.md",
+    "planPath": "../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0148-same-repo-close-bundle-and-scope-hardening.task.md",
     "sectionTitle": "TASK-AAO-0148",
     "headingLine": 94,
     "hash": "45e9325e89fd3759"
   },
-  "importedAt": "2026-06-24T07:27:16.518Z",
-  "lastTransitionId": "2026-06-24T09-02-50-976Z-close-44b79e588612",
-  "lastTransitionAt": "2026-06-24T09:02:50.976Z",
+  "importedAt": "2026-06-24T09:50:40.856Z",
+  "lastTransitionId": "2026-06-24T12-32-21-026Z-close-409dca1baa42",
+  "lastTransitionAt": "2026-06-24T12:32:21.026Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
-  "reservedAt": "2026-06-24T07:27:22.984Z",
-  "promotedAt": "2026-06-24T07:27:22.987Z",
+  "owner": "codex",
+  "reservedAt": "2026-06-24T09:51:25.223Z",
+  "promotedAt": "2026-06-24T09:51:25.229Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-c279901428cd",
-    "claimedAt": "2026-06-24T07:27:22.990Z",
-    "heartbeatAt": "2026-06-24T09:02:50.975Z",
+    "actorId": "codex",
+    "leaseId": "lease-71aaebf75ce9",
+    "claimedAt": "2026-06-24T09:51:25.236Z",
+    "heartbeatAt": "2026-06-24T12:32:21.024Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0148.json",
@@ -170,16 +178,16 @@
     "state": "released",
     "reason": "closed"
   },
-  "startedAt": "2026-06-24T07:27:22.990Z",
-  "startedByActor": "codex-gpt-5.4-mini",
-  "startedBySessionId": "session-20260624072722-codex-gpt-5.4-mini-TASK-AAO-0148-4f7cac7d05",
+  "startedAt": "2026-06-24T09:51:25.236Z",
+  "startedByActor": "codex",
+  "startedBySessionId": "session-20260624095125-codex-TASK-AAO-0148-b6dbb7ef18",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
     "taskId": "TASK-AAO-0148",
     "batchId": "batch-f47cb3485465",
     "scopeKey": "tasks-023ae6299ffc",
-    "queueId": "queue-22c39256af85f43e",
+    "queueId": "queue-e5c7da0d122e05d5",
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/TASK-AAO-0148.*",
@@ -202,12 +210,12 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "6535546bac7e165feea1feaed6457cb5a1e299cdad83466733845829832e9a3b",
-    "actorId": "codex-gpt-5.4-mini",
-    "createdAt": "2026-06-24T07:27:23.933Z",
+    "actorId": "codex",
+    "createdAt": "2026-06-24T09:51:26.125Z",
     "status": "active"
   },
-  "closedAt": "2026-06-24T09:02:50.975Z",
-  "closedByActor": "codex-gpt-5.4-mini",
-  "closedBySessionId": "session-20260624072722-codex-gpt-5.4-mini-TASK-AAO-0148-4f7cac7d05",
+  "closedAt": "2026-06-24T12:32:21.024Z",
+  "closedByActor": "codex",
+  "closedBySessionId": "session-20260624095125-codex-TASK-AAO-0148-b6dbb7ef18",
   "closurePacket": ".atm/history/evidence/TASK-AAO-0148.closure-packet.json"
 }
