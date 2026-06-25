@@ -1,1 +1,0 @@
-export const leakFixture = () => 'html-to-ucuf';
