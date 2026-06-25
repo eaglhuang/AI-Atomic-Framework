@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "atm.workItem.v0.1",
+  "id": "BOOTSTRAP-0001",
+  "title": "Bootstrap ATM in this repository",
+  "status": "open",
+  "taskKind": "bootstrap",
+  "repositoryKind": "generic-repository",
+  "summary": "Establish the default ATM bootstrap pack, verify the host workflow, and leave initial evidence for the next agent run.",
+  "scope": [
+    "atm.mjs",
+    "README.md",
+    "AGENTS.md",
+    ".atm/runtime/pinned-runner.json",
+    ".atm/history/tasks/BOOTSTRAP-0001.json",
+    ".atm/runtime/locks/BOOTSTRAP-0001.lock.json"
+  ],
+  "guardPaths": [
+    ".atm/runtime/default-guards.json"
+  ],
+  "evidencePath": ".atm/history/evidence/BOOTSTRAP-0001.json",
+  "nextPrompt": "Read README.md if present, then run `node atm.mjs next --prompt \"<current user prompt>\" --json` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, `node atm.mjs next --json` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/BOOTSTRAP-0001.json, .atm/runtime/profile/default.md, and .atm/history/evidence/BOOTSTRAP-0001.json only as supporting runtime state."
+}
