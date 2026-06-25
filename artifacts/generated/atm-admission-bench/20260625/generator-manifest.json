@@ -1,0 +1,22 @@
+{
+  "schemaId": "atm.admissionBenchGeneratorManifest.v1",
+  "contract": "docs/bench/ATM-AdmissionBench-CONTRACT.md",
+  "seed": 20260625,
+  "baseCommit": "3eec69a73a04112e2af8d3630c32138c37143eab",
+  "generatorCommit": "3eec69a73a04112e2af8d3630c32138c37143eab",
+  "generatedAt": "2026-06-25T12:57:18+08:00",
+  "commands": [
+    "npm run typecheck",
+    "npm run validate:agr-benchmark",
+    "npm run validate:agr-conflict-benchmark",
+    "npm run bench:admission:smoke -- --seed 20260625",
+    "npm run bench:admission:export-blind -- --seed 20260625",
+    "git diff --check"
+  ],
+  "knownLimitations": [
+    "Smoke corpus only — does not exercise CAS re-plan, throughput, or vendor providers.",
+    "Validator outcomes are derived from the in-repo deterministic harness, not from running external tools per scenario.",
+    "Scenario verdicts are computed by the same code path that the AGR validators gate; this bench measures consistency, not correctness of that code path.",
+    "Blind export removes per-mode expected routes but keeps ground-truth labels; auditor must derive expected verdicts independently."
+  ]
+}

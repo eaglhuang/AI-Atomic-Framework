@@ -1,0 +1,28 @@
+{
+  "schemaId": "atm.admissionBenchGeneratorManifest.v1",
+  "contract": "docs/bench/ATM-AdmissionBench-CONTRACT.md",
+  "contractVersion": "0.2",
+  "profile": "paper",
+  "track": "all",
+  "seed": 20260625,
+  "baseCommit": "3eec69a73a04112e2af8d3630c32138c37143eab",
+  "generatorCommit": "3eec69a73a04112e2af8d3630c32138c37143eab",
+  "generatedAt": "2026-06-25T12:57:18+08:00",
+  "commands": [
+    "npm run typecheck",
+    "npm run validate:agr-benchmark",
+    "npm run validate:agr-conflict-benchmark",
+    "npm run bench:admission:smoke -- --seed 20260625",
+    "npm run bench:admission:paper -- --seed 20260625",
+    "npm run bench:admission:report -- --seed 20260625",
+    "git diff --check"
+  ],
+  "knownLimitations": [
+    "Frozen denominator: v0.1 corpus only (20 scenarios / 42 mode comparisons).",
+    "direct, git-diff3, file-serial, file-occ, text-range are deterministic baseline models, not real external tool executions.",
+    "p95 latency is not-measured (no timing source wired).",
+    "Field forwarding evidence is not mixed into policy baseline; if no field-evidence path is present the field source is reported as not-applicable.",
+    "Adversarial fault model perturbs scenario oracle/inputs deterministically; it does not generate new free-form scenarios.",
+    "Ablation perturbs atm-full oracle for the affected family rather than rewiring ATM internals; main-affected-families captures route divergence."
+  ]
+}

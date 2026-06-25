@@ -1,0 +1,202 @@
+{
+  "schemaId": "atm.admissionBenchPaperSummary.v1",
+  "seed": 20260625,
+  "profile": "paper",
+  "contractVersion": "0.2",
+  "track": "all",
+  "scenarioCount": 20,
+  "modeComparisons": 42,
+  "unresolvedCount": 0,
+  "policyRows": 252,
+  "ablationRows": 294,
+  "adversarialRows": 210,
+  "enforcementRows": 4,
+  "policyAggregates": [
+    {
+      "schemaId": "atm.admissionBenchPolicyAggregate.v1",
+      "policy": "direct",
+      "scenarios": 42,
+      "falseSafe": 17,
+      "overSerialization": 0,
+      "routeF1": 0.5763,
+      "intentPreservation": 1,
+      "p95LatencyNs": "not-measured"
+    },
+    {
+      "schemaId": "atm.admissionBenchPolicyAggregate.v1",
+      "policy": "git-diff3",
+      "scenarios": 42,
+      "falseSafe": 14,
+      "overSerialization": 0,
+      "routeF1": 0.6452,
+      "intentPreservation": 1,
+      "p95LatencyNs": "not-measured"
+    },
+    {
+      "schemaId": "atm.admissionBenchPolicyAggregate.v1",
+      "policy": "file-serial",
+      "scenarios": 42,
+      "falseSafe": 6,
+      "overSerialization": 6,
+      "routeF1": 0.4151,
+      "intentPreservation": 1,
+      "p95LatencyNs": "not-measured"
+    },
+    {
+      "schemaId": "atm.admissionBenchPolicyAggregate.v1",
+      "policy": "file-occ",
+      "scenarios": 42,
+      "falseSafe": 6,
+      "overSerialization": 6,
+      "routeF1": 0.5,
+      "intentPreservation": 1,
+      "p95LatencyNs": "not-measured"
+    },
+    {
+      "schemaId": "atm.admissionBenchPolicyAggregate.v1",
+      "policy": "text-range",
+      "scenarios": 42,
+      "falseSafe": 14,
+      "overSerialization": 0,
+      "routeF1": 0.5517,
+      "intentPreservation": 1,
+      "p95LatencyNs": "not-measured"
+    },
+    {
+      "schemaId": "atm.admissionBenchPolicyAggregate.v1",
+      "policy": "atm-full",
+      "scenarios": 42,
+      "falseSafe": 2,
+      "overSerialization": 4,
+      "routeF1": 1,
+      "intentPreservation": 0.9762,
+      "p95LatencyNs": "not-measured"
+    }
+  ],
+  "ablationAggregates": [
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-cid",
+      "deltaFalseSafe": 3,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -4,
+      "mainAffectedFamilies": [
+        "cid-conflict"
+      ]
+    },
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-shared-surface",
+      "deltaFalseSafe": 3,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -4,
+      "mainAffectedFamilies": [
+        "shared-surface"
+      ]
+    },
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-rw-dependency",
+      "deltaFalseSafe": 1,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -1,
+      "mainAffectedFamilies": [
+        "rw-dependency"
+      ]
+    },
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-virtual-atom",
+      "deltaFalseSafe": 8,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -9,
+      "mainAffectedFamilies": [
+        "physical-overlap"
+      ]
+    },
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-conflict-key",
+      "deltaFalseSafe": 4,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -5,
+      "mainAffectedFamilies": [
+        "rw-dependency",
+        "shared-surface"
+      ]
+    },
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-cas",
+      "deltaFalseSafe": 3,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -5,
+      "mainAffectedFamilies": [
+        "capsule-drift",
+        "cid-conflict"
+      ]
+    },
+    {
+      "schemaId": "atm.admissionBenchAblationAggregate.v1",
+      "variant": "no-fallback-lock",
+      "deltaFalseSafe": 0,
+      "deltaOverSerialization": 0,
+      "deltaE2ESuccess": -2,
+      "mainAffectedFamilies": [
+        "manual-override",
+        "orphan-lock"
+      ]
+    }
+  ],
+  "enforcementAggregates": [
+    {
+      "schemaId": "atm.admissionBenchEnforcementRow.v1",
+      "condition": "unsafe-input",
+      "admissionCaught": 18,
+      "applyCaught": 3,
+      "validatorCaught": 0,
+      "silentMiss": 0,
+      "total": 25
+    },
+    {
+      "schemaId": "atm.admissionBenchEnforcementRow.v1",
+      "condition": "safe-input",
+      "admissionCaught": 0,
+      "applyCaught": 0,
+      "validatorCaught": 3,
+      "silentMiss": 2,
+      "total": 17
+    },
+    {
+      "schemaId": "atm.admissionBenchEnforcementRow.v1",
+      "condition": "mixed",
+      "admissionCaught": 0,
+      "applyCaught": 0,
+      "validatorCaught": 0,
+      "silentMiss": 0,
+      "total": 0
+    },
+    {
+      "schemaId": "atm.admissionBenchEnforcementRow.v1",
+      "condition": "adversarial-input",
+      "admissionCaught": 0,
+      "applyCaught": 0,
+      "validatorCaught": 0,
+      "silentMiss": 0,
+      "total": 0
+    }
+  ],
+  "forwarding": {
+    "schemaId": "atm.admissionBenchForwardingSummary.v1",
+    "admissionForwardedCount": 9,
+    "forwardedToApply": 6,
+    "forwardedToValidator": 3,
+    "forwardedToHuman": 0,
+    "notForwarded": 33,
+    "fieldEvidenceMixedIntoBaseline": false,
+    "fieldEvidenceSourcePath": "not-applicable"
+  },
+  "atmFullFalseSafeCount": 2,
+  "primaryDenominator": 42,
+  "unresolvedExcludedFromPrimary": true
+}
