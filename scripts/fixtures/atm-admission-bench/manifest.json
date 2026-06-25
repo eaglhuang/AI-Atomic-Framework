@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.admissionBenchFixtureManifest.v1",
+  "contract": "docs/bench/ATM-AdmissionBench-CONTRACT.md",
+  "contractVersion": "0.1",
+  "seedDefault": 20260625,
+  "packs": [
+    {
+      "id": "agr-benchmark",
+      "manifest": "scripts/fixtures/agr-benchmark/manifest.json"
+    },
+    {
+      "id": "agr-conflict-benchmark",
+      "manifest": "scripts/fixtures/agr-conflict-benchmark/manifest.json"
+    }
+  ],
+  "notes": [
+    "Smoke corpus: every scenario from both packs.",
+    "Selection is append-only; removal requires a contract major bump."
+  ]
+}
