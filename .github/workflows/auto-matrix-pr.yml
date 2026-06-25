@@ -47,7 +47,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           branch: automation/compatibility-matrix-${{ steps.matrix.outputs.release_version }}
-          commit-message: chore(release): refresh compatibility matrix for ${{ steps.matrix.outputs.release_version }}
+          commit-message: "chore(release): refresh compatibility matrix for ${{ steps.matrix.outputs.release_version }}"
           title: ${{ steps.matrix.outputs.pr_title }}
           body: ${{ steps.matrix.outputs.pr_body }}
           labels: release, compatibility-matrix
