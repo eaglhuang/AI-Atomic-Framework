@@ -38,6 +38,23 @@ jobs:
       - name: ATM Task Audit
         run: node atm.mjs tasks audit --json
 
+      - name: ATM Framework Development Claim
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}"...HEAD)"
+          elif [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            changed_files="$(git diff --name-only "${{ github.event.before }}"...HEAD)"
+          else
+            changed_files="$(git diff --name-only HEAD 2>/dev/null || true)"
+          fi
+          if [ -n "$changed_files" ]; then
+            changed_csv="$(printf '%s\n' "$changed_files" | paste -sd, -)"
+            node atm.mjs framework-mode claim --actor "ci-${GITHUB_RUN_ID}" --files "$changed_csv" --reason "CI preflight framework-development claim" --json
+          else
+            echo "No changed files to claim."
+          fi
+
       - name: ATM Framework Development Gate
         shell: bash
         run: |
@@ -66,3 +83,8 @@ jobs:
 
       - name: Validate Standard
         run: npm run validate:standard
+
+      - name: ATM Framework Development Release
+        if: always()
+        shell: bash
+        run: node atm.mjs framework-mode release --actor "ci-${GITHUB_RUN_ID}" --json || true
