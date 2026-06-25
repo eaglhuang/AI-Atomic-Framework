@@ -1,0 +1,9 @@
+---
+description: Bootstrap ATM only when the repository has not been initialized.
+---
+
+1. Check whether `.atm/config.json` already exists.
+2. If missing, run:
+   - `node atm.mjs bootstrap --task "Bootstrap ATM in this repository" --json`
+3. If present, do not re-bootstrap; continue with `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested task work.
+4. Report which path you took and include the full command output as evidence.
