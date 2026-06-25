@@ -1,1 +1,1 @@
-export const owned = true;
+export const owned = false;
