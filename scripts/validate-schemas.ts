@@ -82,7 +82,8 @@ const supportSchemaEntries: Record<string, string> = {
   'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
   'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
   'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json',
-  'team-runtime-contract': 'schemas/team-agents/team-runtime-contract.schema.json'
+  'team-runtime-contract': 'schemas/team-agents/team-runtime-contract.schema.json',
+  'atm-operational-bench': 'schemas/bench/atm-operational-bench.schema.json'
 };
 
 const bannedProtectedSurfaceTerms = [
@@ -371,6 +372,7 @@ if (!teamBrokerWriteTransactionSchema) {
       intentId: 'intent-schema-write-transaction',
       parallelSafetyReason: 'no-known-textual-or-resource-conflict'
     },
+    admissionState: 'write-admitted',
     startedAt: '2026-06-19T00:00:00.000Z',
     expiresAt: '2026-06-19T00:30:00.000Z',
     heartbeatAt: '2026-06-19T00:00:00.000Z'
@@ -414,6 +416,16 @@ if (!teamBrokerWriteTransactionSchema) {
         lane: 'direct-brokered',
         reason: 'schema broker lane fixture',
         conflicts: []
+      },
+      admission: {
+        trigger: 'not-required',
+        state: 'write-admitted',
+        requiresProposal: false,
+        summarySubmitted: true,
+        hotFiles: [],
+        boundedRegions: [],
+        rearbitrationRequired: false,
+        reason: 'schema broker lane fixture'
       },
       virtualAtomInUseRegistry: {
         schemaId: 'atm.virtualAtomInUseRegistry.v1',
