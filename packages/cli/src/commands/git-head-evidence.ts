@@ -279,10 +279,7 @@ function sameStringSet(left: any, right: any) {
 function runGit(cwd: any, args: any, env = {}) {
   const result = spawnSync('git', args, {
     cwd,
-    env: {
-      ...process.env,
-      ...env
-    },
+    env: createSanitizedGitEnv(env),
     encoding: 'utf8'
   });
   return {
@@ -290,6 +287,20 @@ function runGit(cwd: any, args: any, env = {}) {
     stdout: result.stdout ?? '',
     stderr: [result.stderr ?? '', result.error?.message ?? ''].filter(Boolean).join('\n')
   };
+}
+
+function createSanitizedGitEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {
+    ...process.env,
+    ...extra
+  };
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+    delete env[key];
+  }
+  if (!Object.prototype.hasOwnProperty.call(extra, 'GIT_INDEX_FILE')) {
+    delete env.GIT_INDEX_FILE;
+  }
+  return env;
 }
 
 function toPortablePath(value: any) {

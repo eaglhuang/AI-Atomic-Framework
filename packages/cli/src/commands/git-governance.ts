@@ -41,7 +41,8 @@ function runGitCommand(cwd: string, args: readonly string[], stdio: ['ignore', '
   return execFileSync(resolveGitExecutable(), args, {
     cwd,
     encoding: 'utf8',
-    stdio
+    stdio,
+    env: createSanitizedGitEnv()
   });
 }
 
@@ -55,8 +56,19 @@ function runGitCommandWithEnv(
     cwd,
     encoding: 'utf8',
     stdio,
-    env
+    env: createSanitizedGitEnv(env)
   });
+}
+
+function createSanitizedGitEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...process.env, ...extra };
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+    delete env[key];
+  }
+  if (!('GIT_INDEX_FILE' in extra)) {
+    delete env.GIT_INDEX_FILE;
+  }
+  return env;
 }
 
 function isRuntimeCommitSideEffect(filePath: string): boolean {
@@ -896,8 +908,7 @@ function runGitCommit(options: ParsedGitOptions) {
           }
         });
       }
-      const commitEnv = {
-        ...process.env,
+      const commitEnv = createSanitizedGitEnv({
         GIT_AUTHOR_NAME: gitName,
         GIT_AUTHOR_EMAIL: gitEmail,
         GIT_COMMITTER_NAME: gitName,
@@ -907,7 +918,7 @@ function runGitCommit(options: ParsedGitOptions) {
         ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
         ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
         ATM_COMMIT_TRAILERS: trailers.join('\n')
-      };
+      });
       const bundleFiles = options.taskId !== null && taskDocument && !bypassesActiveSession
         ? resolveTaskScopedCommitBundle({
           cwd: options.cwd,
@@ -1538,7 +1549,8 @@ function readStagedJsonFile(cwd: string, relativeFile: string): Record<string, u
     const content = execFileSync('git', ['show', `:${normalizeRelativePath(relativeFile)}`], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     });
     const parsed = JSON.parse(content) as unknown;
     return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : null;
@@ -2087,7 +2099,8 @@ function readGitConfig(cwd: string, key: 'user.name' | 'user.email'): string | n
     const value = execFileSync('git', ['config', '--local', '--get', key], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     }).trim();
     return value || null;
   } catch {
@@ -2099,7 +2112,8 @@ function writeGitConfig(cwd: string, key: 'user.name' | 'user.email', value: str
   execFileSync('git', ['config', '--local', key, value], {
     cwd,
     encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe']
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: createSanitizedGitEnv()
   });
 }
 
@@ -2171,7 +2185,8 @@ function readHeadCommitMessage(cwd: string): string | null {
     return execFileSync('git', ['log', '-1', '--pretty=%B'], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     });
   } catch {
     return null;
@@ -2183,7 +2198,8 @@ function readHeadBranchRef(cwd: string): string | null {
     const value = execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     }).trim();
     return value || null;
   } catch {
@@ -2196,7 +2212,8 @@ function readHeadCommitSha(cwd: string): string | null {
     const value = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     }).trim();
     return value || null;
   } catch {
@@ -2209,7 +2226,8 @@ function resolveCurrentBranchName(cwd: string): string {
     const value = execFileSync('git', ['branch', '--show-current'], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     }).trim();
     return value || 'main';
   } catch {
@@ -2222,7 +2240,8 @@ function readRevisionIfExists(cwd: string, revision: string): string | null {
     const value = execFileSync('git', ['rev-parse', '--verify', revision], {
       cwd,
       encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore']
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: createSanitizedGitEnv()
     }).trim();
     return value || null;
   } catch {
@@ -2237,7 +2256,8 @@ function isAncestorCommit(cwd: string, left: string | null, right: string | null
   try {
     execFileSync('git', ['merge-base', '--is-ancestor', left, right], {
       cwd,
-      stdio: 'ignore'
+      stdio: 'ignore',
+      env: createSanitizedGitEnv()
     });
     return true;
   } catch {

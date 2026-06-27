@@ -1400,8 +1400,7 @@ function runCommandForReport(cwd: string, command: string, args: readonly string
 }
 
 function runShellCommandForReport(cwd: string, commandLine: string): CommandRunReport {
-  const env = { ...process.env };
-  delete env.GIT_INDEX_FILE;
+  const env = createSanitizedValidatorEnv();
   const result = spawnSync(commandLine, {
     cwd,
     encoding: 'utf8',
@@ -1419,6 +1418,21 @@ function runShellCommandForReport(cwd: string, commandLine: string): CommandRunR
     stdoutPreview: stdout.slice(-2000),
     stderrPreview: stderr.slice(-2000)
   };
+}
+
+function createSanitizedValidatorEnv(): NodeJS.ProcessEnv {
+  return createSanitizedGitEnv();
+}
+
+function createSanitizedGitEnv(extra: Record<string, string> = {}): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = { ...process.env, ...extra };
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+    delete env[key];
+  }
+  if (!('GIT_INDEX_FILE' in extra)) {
+    delete env.GIT_INDEX_FILE;
+  }
+  return env;
 }
 
 function readStagedFiles(cwd: string): readonly string[] {
@@ -2213,7 +2227,7 @@ function runGitScalar(cwd: string, args: readonly string[]): string | null {
 function runGit(cwd: string, args: readonly string[], env: Record<string, string> = {}) {
   const result = spawnSync('git', [...args], {
     cwd,
-    env: { ...process.env, ...env },
+    env: createSanitizedGitEnv(env),
     encoding: 'utf8'
   });
   return {
@@ -3451,7 +3465,11 @@ function requireValue(argv: string[], index: number, flag: string) {
 
 function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly string[]): PreCommitBlockingFinding[] {
   const findings: PreCommitBlockingFinding[] = [];
-  const statusResult = spawnSync('git', ['status', '--short'], { cwd: root, encoding: 'utf8' });
+  const statusResult = spawnSync('git', ['status', '--short'], {
+    cwd: root,
+    encoding: 'utf8',
+    env: createSanitizedGitEnv()
+  });
   const statusLines = String(statusResult.stdout || '').split(/\r?\n/).filter(Boolean);
   const unstagedModified = new Set<string>();
   const untrackedFiles = new Set<string>();
