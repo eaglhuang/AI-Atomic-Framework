@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { validateClosurePacket, type ClosurePacket } from '../closure-packet-schema.ts';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { auditTasks, validateClosurePacket, type ClosurePacket } from '../closure-packet-schema.ts';
 
 const digest = `sha256:${'a'.repeat(64)}`;
 
@@ -87,5 +90,37 @@ const repairRoundTrip = validateClosurePacket(validPacket({
   }
 }));
 assert.equal(repairRoundTrip.ok, true);
+
+const auditRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-task-audit-'));
+try {
+  writeFileSync(path.join(auditRoot, 'package.json'), JSON.stringify({
+    name: 'ai-atomic-framework',
+    workspaces: ['packages/*']
+  }, null, 2));
+  mkdirSync(path.join(auditRoot, 'packages', 'core', 'src'), { recursive: true });
+  mkdirSync(path.join(auditRoot, 'packages', 'cli', 'src'), { recursive: true });
+  writeFileSync(path.join(auditRoot, 'packages', 'core', 'src', 'index.ts'), 'export {};\n');
+  writeFileSync(path.join(auditRoot, 'packages', 'cli', 'src', 'atm.ts'), 'export {};\n');
+  writeFileSync(path.join(auditRoot, 'atomic-registry.json'), '{}\n');
+  mkdirSync(path.join(auditRoot, 'docs', 'governance'), { recursive: true });
+  writeFileSync(
+    path.join(auditRoot, 'docs', 'governance', 'atm-bug-and-optimization-backlog.md'),
+    '# ATM Bug and Optimization Backlog\n\n'
+      + '| ID | Evidence |\n| --- | --- |\n'
+      + '| ATM-BUG-TEST | Reproduced with `node atm.mjs next --claim --prompt "[SKL batch execution prompt omitted for audit safety]" --json`. |\n'
+  );
+  writeFileSync(
+    path.join(auditRoot, 'docs', 'closeout-report.md'),
+    '# Closeout\n\nstatus: **all completed**\n'
+  );
+  const audit = auditTasks(auditRoot);
+  const completionFindings = audit.findings.filter((entry) => entry.code === 'ATM_TASK_AUDIT_COMPLETION_REPORT_UNVERIFIED');
+  assert.deepEqual(
+    completionFindings.map((entry) => entry.path),
+    ['docs/closeout-report.md']
+  );
+} finally {
+  rmSync(auditRoot, { recursive: true, force: true });
+}
 
 console.log('[framework-development-closure-packet-schema:test] ok');
