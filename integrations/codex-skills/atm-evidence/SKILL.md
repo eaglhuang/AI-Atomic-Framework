@@ -27,6 +27,11 @@ node atm.mjs explain --why blocked --json
 Use the shared growth contract in
 `docs/governance/skills/shared-growth-contract.md`.
 
+Prefer structured blocked/evidence payloads when a tool-capable bridge exposes
+them. Do not hide blocked evidence collection behind a silent shell fallback;
+surface the blocker, then use the CLI fallback lane only when the structured
+surface is missing or explicitly unavailable.
+
 For this specialist skill, keep `SKILL.md` short and stable:
 
 - durable evidence-routing rules stay here;

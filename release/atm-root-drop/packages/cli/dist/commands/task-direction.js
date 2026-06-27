@@ -6,9 +6,10 @@ import { isExternalPlanningStoredPath, isPlanningRootDocStoredPath, looksLikePla
 import { isPathAllowedByScope } from './work-channels.js';
 export function createOrRefreshTaskQueue(input) {
     const sourcePrompt = input.sourcePrompt.trim();
-    const taskIds = input.taskIds && input.taskIds.length > 0
+    const requestedTaskIds = input.taskIds && input.taskIds.length > 0
         ? uniqueInOrder(input.taskIds)
         : uniqueInOrder(input.tasks.map((task) => task.workItemId));
+    const taskIds = orderTaskIdsByDependencies(input.tasks, requestedTaskIds);
     const queueId = buildQueueId(sourcePrompt, taskIds);
     const now = new Date().toISOString();
     const existing = readTaskQueue(input.cwd, queueId);
@@ -36,6 +37,54 @@ export function createOrRefreshTaskQueue(input) {
     };
     writeTaskQueue(input.cwd, record);
     return record;
+}
+function orderTaskIdsByDependencies(tasks, requestedTaskIds) {
+    const requested = uniqueInOrder(requestedTaskIds);
+    if (requested.length <= 1)
+        return requested;
+    const requestedSet = new Set(requested.map((taskId) => taskId.toLowerCase()));
+    const taskById = new Map(tasks.map((task) => [task.workItemId.toLowerCase(), task]));
+    const originalIndex = new Map(requested.map((taskId, index) => [taskId.toLowerCase(), index]));
+    const indegree = new Map();
+    const dependents = new Map();
+    for (const taskId of requested) {
+        indegree.set(taskId, 0);
+        dependents.set(taskId, []);
+    }
+    for (const taskId of requested) {
+        const task = taskById.get(taskId.toLowerCase());
+        if (!task)
+            continue;
+        const inQueueDependencies = uniqueInOrder(task.dependencies)
+            .map((dependency) => requested.find((candidate) => candidate.toLowerCase() === dependency.toLowerCase()) ?? null)
+            .filter((dependency) => Boolean(dependency));
+        for (const dependencyId of inQueueDependencies) {
+            indegree.set(taskId, (indegree.get(taskId) ?? 0) + 1);
+            dependents.get(dependencyId)?.push(taskId);
+        }
+    }
+    const ready = requested.filter((taskId) => (indegree.get(taskId) ?? 0) === 0);
+    const ordered = [];
+    const seen = new Set();
+    while (ready.length > 0) {
+        ready.sort((left, right) => (originalIndex.get(left.toLowerCase()) ?? 0) - (originalIndex.get(right.toLowerCase()) ?? 0));
+        const nextTaskId = ready.shift() ?? null;
+        if (!nextTaskId || seen.has(nextTaskId))
+            continue;
+        seen.add(nextTaskId);
+        ordered.push(nextTaskId);
+        for (const dependentId of dependents.get(nextTaskId) ?? []) {
+            const remaining = (indegree.get(dependentId) ?? 0) - 1;
+            indegree.set(dependentId, remaining);
+            if (remaining === 0) {
+                ready.push(dependentId);
+            }
+        }
+    }
+    if (ordered.length === requested.length)
+        return ordered;
+    // Cycles or malformed dependency references should not destroy queue creation.
+    return requested;
 }
 export function findActiveTaskQueue(cwd, sourcePrompt, selector = {}) {
     const promptHash = sourcePrompt?.trim() ? sha256(sourcePrompt.trim()) : null;

@@ -1,6 +1,7 @@
 export interface TaskDirectionTask {
     readonly workItemId: string;
     readonly title: string;
+    readonly dependencies: readonly string[];
     readonly taskPath: string;
     readonly sourcePlanPath: string | null;
     readonly nearbyPlanPaths: readonly string[];

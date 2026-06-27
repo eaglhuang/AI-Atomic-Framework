@@ -81,6 +81,28 @@ type TeamGrowthContract = {
         rawCaseTarget: string;
     };
 };
+type TeamRuntimePilot = {
+    schemaId: 'atm.teamRuntimePilot.v1';
+    providerNeutral: true;
+    coordinatorOwnsLifecycle: true;
+    pilotMode: 'role-pair' | 'role-trio';
+    selectedRoles: string[];
+    selectedSkillPackIds: string[];
+    realisticWorkflow: string[];
+    roleBoundarySignals: string[];
+    lifecycleAuthority: {
+        ownerRole: string;
+        forbiddenToWorkers: string[];
+    };
+    roleConfusionReduction: string[];
+    actionableRefinementFindings: Array<{
+        category: string;
+        summary: string;
+        detail: string;
+        correctRoute: string;
+        promotionTarget: string;
+    }>;
+};
 type TeamImplementerSelector = {
     schemaId: 'atm.teamImplementerSelector.v1';
     selectedImplementer: {
@@ -611,10 +633,21 @@ export declare function buildTeamPlan(input: {
     roleSkillPacks: TeamRoleSkillPackContract;
     routingMatrix: TeamRoleRoutingMatrix;
     growthContract: TeamGrowthContract;
+    runtimePilot: TeamRuntimePilot;
 };
 export declare function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract;
 export declare function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix;
 export declare function buildTeamGrowthContract(): TeamGrowthContract;
+export declare function buildTeamRuntimePilot(input: {
+    roleSkillPacks: TeamRoleSkillPackContract;
+    routingMatrix: TeamRoleRoutingMatrix;
+    growthContract: TeamGrowthContract;
+    validation: {
+        ok: boolean;
+        findings: PermissionFinding[];
+    };
+    brokerLane: TeamBrokerLaneEvidence;
+}): TeamRuntimePilot;
 export declare function selectTeamImplementer(task: any, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector;
 export declare function assessLieutenantEscalation(task: any, writePaths: string[], validation: {
     ok: boolean;
@@ -836,6 +869,7 @@ export declare function writeTeamRun(input: {
             authorityChain: string;
         };
     };
+    runtimePilot: TeamRuntimePilot;
     reworkRoute: TeamReworkRoute;
     agentReports: never[];
     patrolFindings: never[];
