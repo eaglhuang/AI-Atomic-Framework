@@ -1,0 +1,2223 @@
+{
+  "schemaId": "atm.operationalBenchSummary.v1",
+  "benchFamily": "ATM Bench",
+  "benchName": "ATM OperationalBench",
+  "benchVersion": "0.1",
+  "seed": 20260628,
+  "profile": "paper",
+  "warmup": 10,
+  "repeat": 100,
+  "concurrency": [
+    1,
+    5,
+    10,
+    20
+  ],
+  "scenarioCount": 14,
+  "resultRows": 5600,
+  "trackCounts": {
+    "broker-admission": 1600,
+    "git-boundary": 2000,
+    "recovery-routing": 2000
+  },
+  "blockedCaseCounts": {
+    "none": 1600,
+    "serialization": 1200,
+    "rebase-replay": 1200,
+    "queue": 400,
+    "steward-review": 400,
+    "refinement": 400,
+    "terminal-fail-closed": 400
+  },
+  "routeCounts": {
+    "direct-brokered": 800,
+    "blocked": 800,
+    "allow": 400,
+    "block": 400,
+    "composer": 400,
+    "block-rebase-replay": 400,
+    "composer-rebase-replay": 400,
+    "serial": 400,
+    "neutral-steward": 400,
+    "rebase-replay": 400,
+    "refinement-needed": 400,
+    "terminal-fail-closed": 400
+  },
+  "spanStats": {
+    "diffConstructionMs": {
+      "count": 2000,
+      "min": 0.001,
+      "max": 0.02,
+      "mean": 0.001,
+      "stddev": 0.001,
+      "p50": 0.001,
+      "p95": 0.001,
+      "p99": 0.001
+    },
+    "mutationRequestConstructionMs": {
+      "count": 5600,
+      "min": 0.001,
+      "max": 0.381,
+      "mean": 0.004,
+      "stddev": 0.012,
+      "p50": 0.004,
+      "p95": 0.008,
+      "p99": 0.018
+    },
+    "admissionDecisionMs": {
+      "count": 3600,
+      "min": 0.002,
+      "max": 0.743,
+      "mean": 0.009,
+      "stddev": 0.022,
+      "p50": 0.005,
+      "p95": 0.025,
+      "p99": 0.048
+    },
+    "composerPlanMs": {
+      "count": 1200,
+      "min": 0.006,
+      "max": 0.445,
+      "mean": 0.016,
+      "stddev": 0.028,
+      "p50": 0.01,
+      "p95": 0.028,
+      "p99": 0.158
+    },
+    "stewardDryRunMs": {
+      "count": 400,
+      "min": 29.199,
+      "max": 546.428,
+      "mean": 59.593,
+      "stddev": 78.624,
+      "p50": 34.733,
+      "p95": 291.92,
+      "p99": 332.274
+    },
+    "stewardApplyMs": {
+      "count": 400,
+      "min": 29.756,
+      "max": 1009.199,
+      "mean": 77.008,
+      "stddev": 113.342,
+      "p50": 35.901,
+      "p95": 317.522,
+      "p99": 428.165
+    },
+    "validatorMs": {
+      "count": 5600,
+      "min": 0.001,
+      "max": 0.036,
+      "mean": 0.001,
+      "stddev": 0.001,
+      "p50": 0.001,
+      "p95": 0.001,
+      "p99": 0.002
+    },
+    "gitAdmitDryRunMs": {
+      "count": 2000,
+      "min": 0.001,
+      "max": 2.147,
+      "mean": 0.011,
+      "stddev": 0.05,
+      "p50": 0.008,
+      "p95": 0.022,
+      "p99": 0.044
+    },
+    "casMismatchRecoveryMs": {
+      "count": 2000,
+      "min": 0.001,
+      "max": 0.263,
+      "mean": 0.002,
+      "stddev": 0.006,
+      "p50": 0.002,
+      "p95": 0.003,
+      "p99": 0.007
+    },
+    "queueWaitMs": {
+      "count": 400,
+      "min": 0.001,
+      "max": 0.02,
+      "mean": 0.001,
+      "stddev": 0.001,
+      "p50": 0.001,
+      "p95": 0.002,
+      "p99": 0.003
+    },
+    "totalScenarioMs": {
+      "count": 5600,
+      "min": 0.007,
+      "max": 3770.192,
+      "mean": 46.978,
+      "stddev": 202.374,
+      "p50": 0.014,
+      "p95": 559.977,
+      "p99": 845.043
+    }
+  },
+  "scenarioSpanStats": {
+    "different-file": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.003,
+        "max": 0.277,
+        "mean": 0.005,
+        "stddev": 0.016,
+        "p50": 0.004,
+        "p95": 0.008,
+        "p99": 0.014
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.005,
+        "max": 0.743,
+        "mean": 0.011,
+        "stddev": 0.039,
+        "p50": 0.007,
+        "p95": 0.017,
+        "p99": 0.029
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.002,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.009,
+        "max": 0.751,
+        "mean": 0.02,
+        "stddev": 0.047,
+        "p50": 0.012,
+        "p95": 0.03,
+        "p99": 0.206
+      }
+    },
+    "same-file-bounded-disjoint": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.003,
+        "max": 0.24,
+        "mean": 0.005,
+        "stddev": 0.013,
+        "p50": 0.003,
+        "p95": 0.007,
+        "p99": 0.019
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.005,
+        "max": 0.397,
+        "mean": 0.011,
+        "stddev": 0.032,
+        "p50": 0.006,
+        "p95": 0.014,
+        "p99": 0.105
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.027,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.002
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.009,
+        "max": 0.56,
+        "mean": 0.018,
+        "stddev": 0.043,
+        "p50": 0.011,
+        "p95": 0.024,
+        "p99": 0.193
+      }
+    },
+    "shared-surface-conflict": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.003,
+        "max": 0.261,
+        "mean": 0.005,
+        "stddev": 0.017,
+        "p50": 0.003,
+        "p95": 0.006,
+        "p99": 0.01
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.003,
+        "max": 0.055,
+        "mean": 0.005,
+        "stddev": 0.005,
+        "p50": 0.004,
+        "p95": 0.009,
+        "p99": 0.032
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.002,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.305,
+        "mean": 0.012,
+        "stddev": 0.022,
+        "p50": 0.009,
+        "p95": 0.019,
+        "p99": 0.059
+      }
+    },
+    "read-write-dependency": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.003,
+        "max": 0.044,
+        "mean": 0.004,
+        "stddev": 0.003,
+        "p50": 0.003,
+        "p95": 0.007,
+        "p99": 0.018
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.005,
+        "max": 0.221,
+        "mean": 0.011,
+        "stddev": 0.019,
+        "p50": 0.008,
+        "p95": 0.014,
+        "p99": 0.119
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.036,
+        "mean": 0.001,
+        "stddev": 0.002,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.002
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.01,
+        "max": 0.227,
+        "mean": 0.016,
+        "stddev": 0.019,
+        "p50": 0.013,
+        "p95": 0.025,
+        "p99": 0.124
+      }
+    },
+    "allow-remote-local-disjoint": {
+      "diffConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.009,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.002
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.004,
+        "max": 0.326,
+        "mean": 0.009,
+        "stddev": 0.022,
+        "p50": 0.006,
+        "p95": 0.013,
+        "p99": 0.06
+      },
+      "admissionDecisionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.208,
+        "mean": 0.01,
+        "stddev": 0.013,
+        "p50": 0.008,
+        "p95": 0.015,
+        "p99": 0.038
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.013,
+        "max": 0.364,
+        "mean": 0.021,
+        "stddev": 0.027,
+        "p50": 0.016,
+        "p95": 0.031,
+        "p99": 0.184
+      }
+    },
+    "block-same-record-conflict": {
+      "diffConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.008,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.004,
+        "max": 0.077,
+        "mean": 0.006,
+        "stddev": 0.005,
+        "p50": 0.005,
+        "p95": 0.009,
+        "p99": 0.028
+      },
+      "admissionDecisionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 400,
+        "min": 0.013,
+        "max": 0.311,
+        "mean": 0.021,
+        "stddev": 0.025,
+        "p50": 0.015,
+        "p95": 0.032,
+        "p99": 0.088
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.019,
+        "max": 0.318,
+        "mean": 0.029,
+        "stddev": 0.029,
+        "p50": 0.022,
+        "p95": 0.049,
+        "p99": 0.197
+      }
+    },
+    "composer-disjoint-records": {
+      "diffConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.002,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.004,
+        "max": 0.024,
+        "mean": 0.006,
+        "stddev": 0.003,
+        "p50": 0.004,
+        "p95": 0.011,
+        "p99": 0.018
+      },
+      "admissionDecisionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "composerPlanMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.445,
+        "mean": 0.013,
+        "stddev": 0.023,
+        "p50": 0.01,
+        "p95": 0.021,
+        "p99": 0.049
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.005,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.014,
+        "max": 0.455,
+        "mean": 0.023,
+        "stddev": 0.031,
+        "p50": 0.018,
+        "p95": 0.04,
+        "p99": 0.07
+      }
+    },
+    "recover-block-non-fast-forward": {
+      "diffConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.02,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.004,
+        "max": 0.26,
+        "mean": 0.006,
+        "stddev": 0.014,
+        "p50": 0.005,
+        "p95": 0.007,
+        "p99": 0.024
+      },
+      "admissionDecisionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 400,
+        "min": 0.011,
+        "max": 2.147,
+        "mean": 0.02,
+        "stddev": 0.107,
+        "p50": 0.012,
+        "p95": 0.022,
+        "p99": 0.07
+      },
+      "casMismatchRecoveryMs": {
+        "count": 400,
+        "min": 0.002,
+        "max": 0.263,
+        "mean": 0.003,
+        "stddev": 0.013,
+        "p50": 0.002,
+        "p95": 0.003,
+        "p99": 0.008
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.02,
+        "max": 2.203,
+        "mean": 0.032,
+        "stddev": 0.113,
+        "p50": 0.021,
+        "p95": 0.039,
+        "p99": 0.14
+      }
+    },
+    "recover-composer-non-fast-forward": {
+      "diffConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.002,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.004,
+        "max": 0.225,
+        "mean": 0.006,
+        "stddev": 0.012,
+        "p50": 0.005,
+        "p95": 0.009,
+        "p99": 0.02
+      },
+      "admissionDecisionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "composerPlanMs": {
+        "count": 400,
+        "min": 0.006,
+        "max": 0.431,
+        "mean": 0.01,
+        "stddev": 0.029,
+        "p50": 0.007,
+        "p95": 0.012,
+        "p99": 0.057
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.004,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.029,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "casMismatchRecoveryMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.034,
+        "mean": 0.002,
+        "stddev": 0.002,
+        "p50": 0.002,
+        "p95": 0.003,
+        "p99": 0.009
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.015,
+        "max": 0.442,
+        "mean": 0.022,
+        "stddev": 0.033,
+        "p50": 0.016,
+        "p95": 0.031,
+        "p99": 0.212
+      }
+    },
+    "serial-queue": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.007,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.002,
+        "max": 0.272,
+        "mean": 0.004,
+        "stddev": 0.017,
+        "p50": 0.002,
+        "p95": 0.003,
+        "p99": 0.006
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.02,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.002,
+        "p99": 0.003
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.287,
+        "mean": 0.009,
+        "stddev": 0.018,
+        "p50": 0.007,
+        "p95": 0.011,
+        "p99": 0.024
+      }
+    },
+    "steward-review": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.003,
+        "max": 0.05,
+        "mean": 0.005,
+        "stddev": 0.003,
+        "p50": 0.004,
+        "p95": 0.008,
+        "p99": 0.012
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.016,
+        "max": 0.256,
+        "mean": 0.026,
+        "stddev": 0.016,
+        "p50": 0.023,
+        "p95": 0.039,
+        "p99": 0.057
+      },
+      "composerPlanMs": {
+        "count": 400,
+        "min": 0.015,
+        "max": 0.311,
+        "mean": 0.025,
+        "stddev": 0.031,
+        "p50": 0.018,
+        "p95": 0.035,
+        "p99": 0.206
+      },
+      "stewardDryRunMs": {
+        "count": 400,
+        "min": 29.199,
+        "max": 546.428,
+        "mean": 59.593,
+        "stddev": 78.624,
+        "p50": 34.733,
+        "p95": 291.92,
+        "p99": 332.274
+      },
+      "stewardApplyMs": {
+        "count": 400,
+        "min": 29.756,
+        "max": 1009.199,
+        "mean": 77.008,
+        "stddev": 113.342,
+        "p50": 35.901,
+        "p95": 317.522,
+        "p99": 428.165
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.006,
+        "mean": 0.002,
+        "stddev": 0.001,
+        "p50": 0.002,
+        "p95": 0.002,
+        "p99": 0.003
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 287.788,
+        "max": 3770.192,
+        "mean": 657.461,
+        "stddev": 414.751,
+        "p50": 582.495,
+        "p95": 1364.454,
+        "p99": 2440.007
+      }
+    },
+    "rebase-replay": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.003,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.002,
+        "max": 0.196,
+        "mean": 0.004,
+        "stddev": 0.015,
+        "p50": 0.003,
+        "p95": 0.004,
+        "p99": 0.013
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 400,
+        "min": 0.002,
+        "max": 0.013,
+        "mean": 0.002,
+        "stddev": 0.001,
+        "p50": 0.002,
+        "p95": 0.003,
+        "p99": 0.007
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.221,
+        "mean": 0.011,
+        "stddev": 0.018,
+        "p50": 0.008,
+        "p95": 0.012,
+        "p99": 0.03
+      }
+    },
+    "refinement-needed": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.002,
+        "max": 0.16,
+        "mean": 0.003,
+        "stddev": 0.011,
+        "p50": 0.002,
+        "p95": 0.004,
+        "p99": 0.008
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.018,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.002,
+        "p99": 0.005
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.182,
+        "mean": 0.009,
+        "stddev": 0.012,
+        "p50": 0.007,
+        "p95": 0.01,
+        "p99": 0.021
+      }
+    },
+    "terminal-insufficient-evidence": {
+      "diffConstructionMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "mutationRequestConstructionMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.381,
+        "mean": 0.002,
+        "stddev": 0.021,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "admissionDecisionMs": {
+        "count": 400,
+        "min": 0.002,
+        "max": 0.159,
+        "mean": 0.004,
+        "stddev": 0.011,
+        "p50": 0.003,
+        "p95": 0.004,
+        "p99": 0.006
+      },
+      "composerPlanMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "stewardApplyMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "validatorMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.001,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.001,
+        "p99": 0.001
+      },
+      "gitAdmitDryRunMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "casMismatchRecoveryMs": {
+        "count": 400,
+        "min": 0.001,
+        "max": 0.014,
+        "mean": 0.001,
+        "stddev": 0.001,
+        "p50": 0.001,
+        "p95": 0.002,
+        "p99": 0.005
+      },
+      "queueWaitMs": {
+        "count": 0,
+        "min": null,
+        "max": null,
+        "mean": null,
+        "stddev": null,
+        "p50": null,
+        "p95": null,
+        "p99": null
+      },
+      "totalScenarioMs": {
+        "count": 400,
+        "min": 0.007,
+        "max": 0.417,
+        "mean": 0.011,
+        "stddev": 0.025,
+        "p50": 0.008,
+        "p95": 0.011,
+        "p99": 0.022
+      }
+    }
+  },
+  "recoveryMetrics": {
+    "preservedIntentSalvageRate": 1,
+    "terminalFailClosedRate": 0.1,
+    "overSerializationRate": 0,
+    "fullRegenerationRate": null,
+    "fullRegenerationNote": "not observed by this harness"
+  },
+  "nullMetricReasons": [
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "admissionDecisionMs",
+      "reason": "not executed by this scenario shape"
+    },
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "allow-remote-local-disjoint",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "admissionDecisionMs",
+      "reason": "not executed by this scenario shape"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "block-same-record-conflict",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "composer-disjoint-records",
+      "metric": "admissionDecisionMs",
+      "reason": "not executed by this scenario shape"
+    },
+    {
+      "scenarioId": "composer-disjoint-records",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "composer-disjoint-records",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "composer-disjoint-records",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "composer-disjoint-records",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "composer-disjoint-records",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "different-file",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "read-write-dependency",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "rebase-replay",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "recover-block-non-fast-forward",
+      "metric": "admissionDecisionMs",
+      "reason": "not executed by this scenario shape"
+    },
+    {
+      "scenarioId": "recover-block-non-fast-forward",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "recover-block-non-fast-forward",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "recover-block-non-fast-forward",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "recover-block-non-fast-forward",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "recover-block-non-fast-forward",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "recover-composer-non-fast-forward",
+      "metric": "admissionDecisionMs",
+      "reason": "not executed by this scenario shape"
+    },
+    {
+      "scenarioId": "recover-composer-non-fast-forward",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "recover-composer-non-fast-forward",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "recover-composer-non-fast-forward",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "recover-composer-non-fast-forward",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "refinement-needed",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "same-file-bounded-disjoint",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "serial-queue",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "shared-surface-conflict",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    },
+    {
+      "scenarioId": "steward-review",
+      "metric": "casMismatchRecoveryMs",
+      "reason": "scenario did not observe a CAS/non-fast-forward recovery path"
+    },
+    {
+      "scenarioId": "steward-review",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "steward-review",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "steward-review",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "steward-review",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "composerPlanMs",
+      "reason": "scenario did not route through deterministic composer planning"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "diffConstructionMs",
+      "reason": "scenario did not construct a Git diff envelope"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "fullRegenerationRate",
+      "reason": "not observed by this harness"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "gitAdmitDryRunMs",
+      "reason": "scenario is not a Git boundary pre-push dry-run case"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "queueWaitMs",
+      "reason": "scenario did not enter a serial queue path"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "stewardApplyMs",
+      "reason": "scenario did not route through neutral steward apply"
+    },
+    {
+      "scenarioId": "terminal-insufficient-evidence",
+      "metric": "stewardDryRunMs",
+      "reason": "scenario did not route through neutral steward dry-run"
+    }
+  ],
+  "notes": [
+    "OperationalBench measures ATM-local operational overhead only; it is not an external comparison benchmark.",
+    "Validator cost is listed independently in validatorMs.",
+    "Fail-closed means fail-closed to unsafe direct or parallel apply; preserved intent is not discarded.",
+    "Blocked cases are separated into queue, serialization, steward review, rebase replay, refinement, and terminal fail-closed."
+  ]
+}

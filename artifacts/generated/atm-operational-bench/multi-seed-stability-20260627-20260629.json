@@ -1,0 +1,234 @@
+{
+  "schemaId": "atm.operationalBenchMultiSeedStability.v1",
+  "benchmark": "ATM OperationalBench",
+  "benchmarkVersion": "0.1",
+  "comparedSeeds": [
+    20260627,
+    20260628,
+    20260629
+  ],
+  "distributionsIdentical": true,
+  "recoveryIdentical": true,
+  "conclusion": "scenario and route distributions remained identical across the tested seeds; tail latencies varied across seeds while preserving the same route and recovery structure.",
+  "seeds": [
+    {
+      "seed": 20260627,
+      "profile": "paper",
+      "scenarioCount": 14,
+      "resultRows": 5600,
+      "trackCounts": {
+        "broker-admission": 1600,
+        "git-boundary": 2000,
+        "recovery-routing": 2000
+      },
+      "blockedCaseCounts": {
+        "none": 1600,
+        "serialization": 1200,
+        "rebase-replay": 1200,
+        "queue": 400,
+        "steward-review": 400,
+        "refinement": 400,
+        "terminal-fail-closed": 400
+      },
+      "routeCounts": {
+        "direct-brokered": 800,
+        "blocked": 800,
+        "allow": 400,
+        "block": 400,
+        "composer": 400,
+        "block-rebase-replay": 400,
+        "composer-rebase-replay": 400,
+        "serial": 400,
+        "neutral-steward": 400,
+        "rebase-replay": 400,
+        "refinement-needed": 400,
+        "terminal-fail-closed": 400
+      },
+      "recoveryMetrics": {
+        "preservedIntentSalvageRate": 1,
+        "terminalFailClosedRate": 0.1,
+        "overSerializationRate": 0,
+        "fullRegenerationRate": null,
+        "fullRegenerationNote": "not observed by this harness"
+      },
+      "spanStats": {
+        "admissionDecisionMs": {
+          "p50": 0.004,
+          "p95": 0.024,
+          "p99": 0.05
+        },
+        "gitAdmitDryRunMs": {
+          "p50": 0.007,
+          "p95": 0.021,
+          "p99": 0.04
+        },
+        "stewardDryRunMs": {
+          "p50": 32.65,
+          "p95": 306.279,
+          "p99": 547.318
+        },
+        "stewardApplyMs": {
+          "p50": 33.181,
+          "p95": 302.424,
+          "p99": 541.92
+        },
+        "queueWaitMs": {
+          "p50": 0.001,
+          "p95": 0.001,
+          "p99": 0.004
+        },
+        "totalScenarioMs": {
+          "p50": 0.012,
+          "p95": 310.159,
+          "p99": 1088.094
+        }
+      }
+    },
+    {
+      "seed": 20260628,
+      "profile": "paper",
+      "scenarioCount": 14,
+      "resultRows": 5600,
+      "trackCounts": {
+        "broker-admission": 1600,
+        "git-boundary": 2000,
+        "recovery-routing": 2000
+      },
+      "blockedCaseCounts": {
+        "none": 1600,
+        "serialization": 1200,
+        "rebase-replay": 1200,
+        "queue": 400,
+        "steward-review": 400,
+        "refinement": 400,
+        "terminal-fail-closed": 400
+      },
+      "routeCounts": {
+        "direct-brokered": 800,
+        "blocked": 800,
+        "allow": 400,
+        "block": 400,
+        "composer": 400,
+        "block-rebase-replay": 400,
+        "composer-rebase-replay": 400,
+        "serial": 400,
+        "neutral-steward": 400,
+        "rebase-replay": 400,
+        "refinement-needed": 400,
+        "terminal-fail-closed": 400
+      },
+      "recoveryMetrics": {
+        "preservedIntentSalvageRate": 1,
+        "terminalFailClosedRate": 0.1,
+        "overSerializationRate": 0,
+        "fullRegenerationRate": null,
+        "fullRegenerationNote": "not observed by this harness"
+      },
+      "spanStats": {
+        "admissionDecisionMs": {
+          "p50": 0.005,
+          "p95": 0.025,
+          "p99": 0.048
+        },
+        "gitAdmitDryRunMs": {
+          "p50": 0.008,
+          "p95": 0.022,
+          "p99": 0.044
+        },
+        "stewardDryRunMs": {
+          "p50": 34.733,
+          "p95": 291.92,
+          "p99": 332.274
+        },
+        "stewardApplyMs": {
+          "p50": 35.901,
+          "p95": 317.522,
+          "p99": 428.165
+        },
+        "queueWaitMs": {
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.003
+        },
+        "totalScenarioMs": {
+          "p50": 0.014,
+          "p95": 559.977,
+          "p99": 845.043
+        }
+      }
+    },
+    {
+      "seed": 20260629,
+      "profile": "paper",
+      "scenarioCount": 14,
+      "resultRows": 5600,
+      "trackCounts": {
+        "broker-admission": 1600,
+        "git-boundary": 2000,
+        "recovery-routing": 2000
+      },
+      "blockedCaseCounts": {
+        "none": 1600,
+        "serialization": 1200,
+        "rebase-replay": 1200,
+        "queue": 400,
+        "steward-review": 400,
+        "refinement": 400,
+        "terminal-fail-closed": 400
+      },
+      "routeCounts": {
+        "direct-brokered": 800,
+        "blocked": 800,
+        "allow": 400,
+        "block": 400,
+        "composer": 400,
+        "block-rebase-replay": 400,
+        "composer-rebase-replay": 400,
+        "serial": 400,
+        "neutral-steward": 400,
+        "rebase-replay": 400,
+        "refinement-needed": 400,
+        "terminal-fail-closed": 400
+      },
+      "recoveryMetrics": {
+        "preservedIntentSalvageRate": 1,
+        "terminalFailClosedRate": 0.1,
+        "overSerializationRate": 0,
+        "fullRegenerationRate": null,
+        "fullRegenerationNote": "not observed by this harness"
+      },
+      "spanStats": {
+        "admissionDecisionMs": {
+          "p50": 0.005,
+          "p95": 0.025,
+          "p99": 0.068
+        },
+        "gitAdmitDryRunMs": {
+          "p50": 0.008,
+          "p95": 0.023,
+          "p99": 0.056
+        },
+        "stewardDryRunMs": {
+          "p50": 37.07,
+          "p95": 287.86,
+          "p99": 334.178
+        },
+        "stewardApplyMs": {
+          "p50": 37.998,
+          "p95": 302.274,
+          "p99": 323.19
+        },
+        "queueWaitMs": {
+          "p50": 0.001,
+          "p95": 0.002,
+          "p99": 0.005
+        },
+        "totalScenarioMs": {
+          "p50": 0.014,
+          "p95": 563.52,
+          "p99": 776.279
+        }
+      }
+    }
+  ]
+}
