@@ -1065,8 +1065,7 @@ function runCommandForReport(cwd, command, args) {
     };
 }
 function runShellCommandForReport(cwd, commandLine) {
-    const env = { ...process.env };
-    delete env.GIT_INDEX_FILE;
+    const env = createSanitizedValidatorEnv();
     const result = spawnSync(commandLine, {
         cwd,
         encoding: 'utf8',
@@ -1084,6 +1083,19 @@ function runShellCommandForReport(cwd, commandLine) {
         stdoutPreview: stdout.slice(-2000),
         stderrPreview: stderr.slice(-2000)
     };
+}
+function createSanitizedValidatorEnv() {
+    return createSanitizedGitEnv();
+}
+function createSanitizedGitEnv(extra = {}) {
+    const env = { ...process.env, ...extra };
+    for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+        delete env[key];
+    }
+    if (!('GIT_INDEX_FILE' in extra)) {
+        delete env.GIT_INDEX_FILE;
+    }
+    return env;
 }
 function readStagedFiles(cwd) {
     return uniqueSorted(runGitLines(cwd, ['diff', '--cached', '--name-only', '--diff-filter=ACMRT'])
@@ -1864,7 +1876,7 @@ function runGitScalar(cwd, args) {
 function runGit(cwd, args, env = {}) {
     const result = spawnSync('git', [...args], {
         cwd,
-        env: { ...process.env, ...env },
+        env: createSanitizedGitEnv(env),
         encoding: 'utf8'
     });
     return {
@@ -3037,7 +3049,11 @@ function requireValue(argv, index, flag) {
 }
 function checkStageTimeCrossFileConsistency(root, stagedFiles) {
     const findings = [];
-    const statusResult = spawnSync('git', ['status', '--short'], { cwd: root, encoding: 'utf8' });
+    const statusResult = spawnSync('git', ['status', '--short'], {
+        cwd: root,
+        encoding: 'utf8',
+        env: createSanitizedGitEnv()
+    });
     const statusLines = String(statusResult.stdout || '').split(/\r?\n/).filter(Boolean);
     const unstagedModified = new Set();
     const untrackedFiles = new Set();

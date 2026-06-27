@@ -1,6 +1,7 @@
 import { evaluateConflictMatrix } from './conflict-matrix.js';
 import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from './policy.js';
 import { intersectRanges, normalizeLineRange, rangesOverlap } from './agr.js';
+import { buildBrokerDecisionFailureReason } from './failure-reason.js';
 export function calculateBrokerDecision(newIntent, registry) {
     const conflicts = [];
     const taskId = newIntent.taskId;
@@ -9,7 +10,7 @@ export function calculateBrokerDecision(newIntent, registry) {
     });
     const baseAdmission = buildProposalAdmissionBase(newIntent);
     if (conflictMatrix.arbitrationVerdict === 'takeover') {
-        return {
+        const decision = {
             schemaId: 'atm.brokerDecision.v1',
             specVersion: '0.1.0',
             migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -28,6 +29,7 @@ export function calculateBrokerDecision(newIntent, registry) {
                 rearbitrationRequired: true
             })
         };
+        return withFailureReason(decision);
     }
     // 1. Shared Surfaces conflict check
     const newGenerators = new Set(newIntent.sharedSurfaces.generators);
@@ -67,7 +69,7 @@ export function calculateBrokerDecision(newIntent, registry) {
     }
     if (conflicts.length > 0) {
         const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
-        return {
+        const decision = {
             schemaId: 'atm.brokerDecision.v1',
             specVersion: '0.1.0',
             migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -84,6 +86,7 @@ export function calculateBrokerDecision(newIntent, registry) {
                 rearbitrationRequired: baseAdmission.requiresProposal
             })
         };
+        return withFailureReason(decision);
     }
     // 2. CID / read-set semantic conflicts
     const newAtomIds = new Set(newIntent.atomRefs.map((ref) => ref.atomId));
@@ -142,7 +145,7 @@ export function calculateBrokerDecision(newIntent, registry) {
     }
     if (conflicts.length > 0) {
         const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
-        return {
+        const decision = {
             schemaId: 'atm.brokerDecision.v1',
             specVersion: '0.1.0',
             migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -160,6 +163,7 @@ export function calculateBrokerDecision(newIntent, registry) {
                 rearbitrationRequired: baseAdmission.requiresProposal
             })
         };
+        return withFailureReason(decision);
     }
     const proposalOverlapDecision = evaluateProposalOverlap(newIntent, registry.activeIntents, baseAdmission, conflictMatrix);
     if (proposalOverlapDecision) {
@@ -186,15 +190,15 @@ export function calculateBrokerDecision(newIntent, registry) {
             })
         };
         if (fileOverlapResult.decompositionRequest) {
-            return {
+            return withFailureReason({
                 ...decision,
                 decompositionRequest: fileOverlapResult.decompositionRequest
-            };
+            });
         }
-        return decision;
+        return withFailureReason(decision);
     }
     // 4. Allowed path
-    return {
+    return withFailureReason({
         schemaId: 'atm.brokerDecision.v1',
         specVersion: '0.1.0',
         migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -211,7 +215,11 @@ export function calculateBrokerDecision(newIntent, registry) {
                 ? 'Proposal-first lane is active; broker recorded a provisional write lease before final admission.'
                 : 'No proposal-first trigger is active; direct brokered write is admitted.'
         })
-    };
+    });
+}
+function withFailureReason(decision) {
+    const failureReason = buildBrokerDecisionFailureReason(decision);
+    return failureReason ? { ...decision, failureReason } : decision;
 }
 function buildProposalAdmissionBase(intent) {
     const request = intent.proposalAdmission ?? defaultProposalAdmissionRequest();
@@ -360,28 +368,30 @@ function evaluateProposalOverlap(newIntent, activeIntents, baseAdmission, confli
             const overlapping = findOverlappingProposalRegion(newRegions, activeRegions);
             if (overlapping) {
                 return {
-                    schemaId: 'atm.brokerDecision.v1',
-                    specVersion: '0.1.0',
-                    migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
-                    intentId: `decision-${Date.now()}`,
-                    taskId: newIntent.taskId,
-                    verdict: 'blocked-active-lease',
-                    lane: 'blocked',
-                    conflicts: [{
-                            kind: 'file-range',
-                            detail: `Proposal overlap detected on '${filePath}' lines [${overlapping.lineStart}-${overlapping.lineEnd}] with active task '${activeIntent.taskId}'.`
-                        }],
-                    applyMethod: 'none',
-                    reason: `Second writer must wait; active writer '${activeIntent.taskId}' should be parked for rearbitration before same-region write.`,
-                    conflictMatrix,
-                    admission: finalizeProposalAdmission(baseAdmission, 'blocked-before-write', {
-                        reason: `Proposal overlap detected on the same bounded region for '${filePath}'; rearbitration is required before any write is admitted.`,
-                        rearbitrationRequired: true
+                    ...withFailureReason({
+                        schemaId: 'atm.brokerDecision.v1',
+                        specVersion: '0.1.0',
+                        migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
+                        intentId: `decision-${Date.now()}`,
+                        taskId: newIntent.taskId,
+                        verdict: 'blocked-active-lease',
+                        lane: 'blocked',
+                        conflicts: [{
+                                kind: 'file-range',
+                                detail: `Proposal overlap detected on '${filePath}' lines [${overlapping.lineStart}-${overlapping.lineEnd}] with active task '${activeIntent.taskId}'.`
+                            }],
+                        applyMethod: 'none',
+                        reason: `Second writer must wait; active writer '${activeIntent.taskId}' should be parked for rearbitration before same-region write.`,
+                        conflictMatrix,
+                        admission: finalizeProposalAdmission(baseAdmission, 'blocked-before-write', {
+                            reason: `Proposal overlap detected on the same bounded region for '${filePath}'; rearbitration is required before any write is admitted.`,
+                            rearbitrationRequired: true
+                        })
                     })
                 };
             }
             if (newRegions.length > 0 && activeRegions.length > 0) {
-                return {
+                return withFailureReason({
                     schemaId: 'atm.brokerDecision.v1',
                     specVersion: '0.1.0',
                     migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -400,9 +410,9 @@ function evaluateProposalOverlap(newIntent, activeIntents, baseAdmission, confli
                         reason: `Disjoint bounded proposal regions on '${filePath}' require deterministic-composer routing before write.`,
                         rearbitrationRequired: true
                     })
-                };
+                });
             }
-            return {
+            return withFailureReason({
                 schemaId: 'atm.brokerDecision.v1',
                 specVersion: '0.1.0',
                 migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -421,7 +431,7 @@ function evaluateProposalOverlap(newIntent, activeIntents, baseAdmission, confli
                     reason: `An active proposal-first writer already holds '${filePath}'; park and rearbitrate before granting second-writer authority.`,
                     rearbitrationRequired: true
                 })
-            };
+            });
         }
     }
     return null;

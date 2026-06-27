@@ -54,6 +54,9 @@
     },
     "reason": {
       "type": "string"
+    },
+    "failureReason": {
+      "$ref": "#/$defs/failureReason"
     }
   },
   "$defs": {
@@ -85,6 +88,40 @@
         "detail": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "failureReason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "blockingLayer", "recommendedRoute"],
+      "properties": {
+        "verdict": {
+          "enum": ["parallel-safe", "needs-physical-split", "blocked-cid-conflict", "blocked-shared-surface", "serial", "blocked-active-lease"]
+        },
+        "blockingLayer": {
+          "enum": ["shared-surface", "cid", "file-range", "lease", "admission", "none"]
+        },
+        "conflictingCid": {
+          "type": ["string", "null"]
+        },
+        "conflictKey": {
+          "type": ["string", "null"]
+        },
+        "sharedSurface": {
+          "type": ["string", "null"]
+        },
+        "preservedIntentId": {
+          "type": ["string", "null"]
+        },
+        "patchEnvelope": {
+          "type": ["string", "null"]
+        },
+        "recommendedRoute": {
+          "enum": ["direct", "serialize", "compose", "rearbitrate", "takeover"]
+        },
+        "validatorTranscript": {
+          "type": ["string", "null"]
         }
       }
     }

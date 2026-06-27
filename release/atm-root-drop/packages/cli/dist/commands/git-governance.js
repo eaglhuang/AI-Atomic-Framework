@@ -33,7 +33,8 @@ function runGitCommand(cwd, args, stdio = ['ignore', 'pipe', 'ignore']) {
     return execFileSync(resolveGitExecutable(), args, {
         cwd,
         encoding: 'utf8',
-        stdio
+        stdio,
+        env: createSanitizedGitEnv()
     });
 }
 function runGitCommandWithEnv(cwd, args, env, stdio = ['ignore', 'pipe', 'ignore']) {
@@ -41,8 +42,18 @@ function runGitCommandWithEnv(cwd, args, env, stdio = ['ignore', 'pipe', 'ignore
         cwd,
         encoding: 'utf8',
         stdio,
-        env
+        env: createSanitizedGitEnv(env)
     });
+}
+function createSanitizedGitEnv(extra = {}) {
+    const env = { ...process.env, ...extra };
+    for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+        delete env[key];
+    }
+    if (!('GIT_INDEX_FILE' in extra)) {
+        delete env.GIT_INDEX_FILE;
+    }
+    return env;
 }
 function isRuntimeCommitSideEffect(filePath) {
     return normalizeRelativePath(filePath).toLowerCase().startsWith('.atm/runtime/');
@@ -749,8 +760,7 @@ function runGitCommit(options) {
                     }
                 });
             }
-            const commitEnv = {
-                ...process.env,
+            const commitEnv = createSanitizedGitEnv({
                 GIT_AUTHOR_NAME: gitName,
                 GIT_AUTHOR_EMAIL: gitEmail,
                 GIT_COMMITTER_NAME: gitName,
@@ -760,7 +770,7 @@ function runGitCommit(options) {
                 ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
                 ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
                 ATM_COMMIT_TRAILERS: trailers.join('\n')
-            };
+            });
             const bundleFiles = options.taskId !== null && taskDocument && !bypassesActiveSession
                 ? resolveTaskScopedCommitBundle({
                     cwd: options.cwd,
@@ -1339,7 +1349,8 @@ function readStagedJsonFile(cwd, relativeFile) {
         const content = execFileSync('git', ['show', `:${normalizeRelativePath(relativeFile)}`], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         });
         const parsed = JSON.parse(content);
         return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
@@ -1814,7 +1825,8 @@ function readGitConfig(cwd, key) {
         const value = execFileSync('git', ['config', '--local', '--get', key], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         }).trim();
         return value || null;
     }
@@ -1826,7 +1838,8 @@ function writeGitConfig(cwd, key, value) {
     execFileSync('git', ['config', '--local', key, value], {
         cwd,
         encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'pipe']
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: createSanitizedGitEnv()
     });
 }
 function branchCommitQueueLockPath(cwd, branchRef) {
@@ -1890,7 +1903,8 @@ function readHeadCommitMessage(cwd) {
         return execFileSync('git', ['log', '-1', '--pretty=%B'], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         });
     }
     catch {
@@ -1902,7 +1916,8 @@ function readHeadBranchRef(cwd) {
         const value = execFileSync('git', ['symbolic-ref', '-q', 'HEAD'], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         }).trim();
         return value || null;
     }
@@ -1915,7 +1930,8 @@ function readHeadCommitSha(cwd) {
         const value = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         }).trim();
         return value || null;
     }
@@ -1928,7 +1944,8 @@ function resolveCurrentBranchName(cwd) {
         const value = execFileSync('git', ['branch', '--show-current'], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         }).trim();
         return value || 'main';
     }
@@ -1941,7 +1958,8 @@ function readRevisionIfExists(cwd, revision) {
         const value = execFileSync('git', ['rev-parse', '--verify', revision], {
             cwd,
             encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'ignore']
+            stdio: ['ignore', 'pipe', 'ignore'],
+            env: createSanitizedGitEnv()
         }).trim();
         return value || null;
     }
@@ -1956,7 +1974,8 @@ function isAncestorCommit(cwd, left, right) {
     try {
         execFileSync('git', ['merge-base', '--is-ancestor', left, right], {
             cwd,
-            stdio: 'ignore'
+            stdio: 'ignore',
+            env: createSanitizedGitEnv()
         });
         return true;
     }

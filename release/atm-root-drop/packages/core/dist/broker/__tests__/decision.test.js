@@ -170,6 +170,9 @@ function testSharedSurfaceWinsOverReadSetScenario() {
     assert.equal(decision.verdict, 'blocked-shared-surface');
     assert.equal(decision.lane, 'blocked');
     assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'generator'));
+    assert.equal(decision.failureReason?.blockingLayer, 'shared-surface');
+    assert.equal(decision.failureReason?.sharedSurface, 'gen-a');
+    assert.equal(decision.failureReason?.recommendedRoute, 'serialize');
     console.log('ok: shared-surface blocker wins over read-set conflict');
 }
 function testCidConflictScenario() {
@@ -184,6 +187,8 @@ function testCidConflictScenario() {
     assert.equal(decision.verdict, 'blocked-cid-conflict');
     assert.equal(decision.lane, 'blocked');
     assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'cid'));
+    assert.equal(decision.failureReason?.blockingLayer, 'cid');
+    assert.equal(decision.failureReason?.recommendedRoute, 'serialize');
     console.log('ok: CID conflict scenario (same atom identity is blocked)');
 }
 function testFileOverlapScenario() {
@@ -202,6 +207,8 @@ function testFileOverlapScenario() {
     assert.equal(decision.lane, 'deterministic-composer');
     assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'file-range' && conflict.detail.includes('src/shared-module.ts')));
     assert.equal(decision.admission?.state, 'composer-routed');
+    assert.equal(decision.failureReason?.blockingLayer, 'file-range');
+    assert.equal(decision.failureReason?.recommendedRoute, 'compose');
     console.log('ok: file overlap scenario (same file, disjoint CIDs -> needs-physical-split)');
 }
 function testFileOverlapWithSyntacticSeparationScenario() {

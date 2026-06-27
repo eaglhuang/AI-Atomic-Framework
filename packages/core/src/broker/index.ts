@@ -13,4 +13,6 @@ export * from './orphan-cleanup.ts';
 export * from './recovery.ts';
 export * from './freeze.ts';
 export * from './patch-envelope.ts';
+export * from './failure-reason.ts';
+export * from './conflict-key-overlap.ts';
 export * from './adapters/index.ts';

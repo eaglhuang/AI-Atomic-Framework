@@ -99,3 +99,15 @@ That keeps growth semantics aligned across:
 - Team Agent role packs.
 
 The result is shared learning mechanics with isolated domain memory.
+
+## Observability mapping
+
+Role-pack growth must stay observable from Team runtime surfaces.
+
+- Team plan/start/status should expose enough metadata to map a learning event
+  back to the originating role contract and bounded skill pack.
+- Observability should distinguish shared ATM routing friction from
+  role-specific friction such as lease, scope, or validation boundary drift.
+- Raw role-pack lessons should remain reference-first and point back to
+  `docs/governance/team-agents/role-pack-learning-loop.md` instead of bloating
+  every role entry file.

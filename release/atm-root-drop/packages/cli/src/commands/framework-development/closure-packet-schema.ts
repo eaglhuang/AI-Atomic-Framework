@@ -485,6 +485,11 @@ const markdownCompletionPatterns = [
   /^\s*(?:progress|status|completion):\s*100%\s*\(?\s*completed\s*\)?\s*$/im
 ];
 
+const markdownCompletionReportNamePatterns = [
+  /(?:^|[-_.])closeout[-_.]?report\.md$/i,
+  /(?:^|[-_.])completion[-_.]?report\.md$/i
+];
+
 export function runFrameworkMode(argv: string[]) {
   const options = parseFrameworkModeArgs(argv);
   if (options.action === 'claim') {
@@ -2431,6 +2436,7 @@ function hasBulkClosureManifest(root: string): boolean {
 function findMarkdownCompletionReports(root: string): readonly string[] {
   return listFiles(root, (filePath) => filePath.endsWith('.md'))
     .filter((absolutePath) => !absolutePath.includes(`${path.sep}node_modules${path.sep}`))
+    .filter((absolutePath) => markdownCompletionReportNamePatterns.some((pattern) => pattern.test(path.basename(absolutePath))))
     .filter((absolutePath) => {
       const text = readFileSync(absolutePath, 'utf8');
       if (text.includes('ATM_GOVERNANCE_AUDIT_SUPERSEDED')) return false;

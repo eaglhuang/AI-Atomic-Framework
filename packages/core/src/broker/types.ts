@@ -170,6 +170,19 @@ export interface BrokerDecision {
   readonly applyMethod: 'patch-apply' | 'ast-rewrite' | 'git-three-way-fallback' | 'steward-authored-final-patch' | 'none';
   readonly reason: string;
   readonly admission?: ProposalAdmissionEvidence;
+  readonly failureReason?: BrokerDecisionFailureReason;
+}
+
+export interface BrokerDecisionFailureReason {
+  readonly verdict: BrokerDecision['verdict'];
+  readonly blockingLayer: 'shared-surface' | 'cid' | 'file-range' | 'lease' | 'admission' | 'none';
+  readonly conflictingCid?: string | null;
+  readonly conflictKey?: string | null;
+  readonly sharedSurface?: string | null;
+  readonly preservedIntentId?: string | null;
+  readonly patchEnvelope?: string | null;
+  readonly recommendedRoute: 'direct' | 'serialize' | 'compose' | 'rearbitrate' | 'takeover';
+  readonly validatorTranscript?: string | null;
 }
 
 export interface MergePlan {

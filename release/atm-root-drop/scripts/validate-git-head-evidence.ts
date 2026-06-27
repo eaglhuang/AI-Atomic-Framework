@@ -23,7 +23,8 @@ function assert(condition: any, message: any) {
 function run(command: any, args: any, cwd: any) {
   const result = spawnSync(command, args, {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: createSanitizedGitEnv()
   });
   if (result.error || result.status !== 0) {
     fail(`${command} ${args.join(' ')} failed\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
@@ -38,7 +39,8 @@ function runGit(cwd: any, args: any) {
 function runAtmDoctor(cwd: any) {
   const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), 'doctor', '--cwd', cwd, '--json'], {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: createSanitizedGitEnv()
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
@@ -123,6 +125,14 @@ function createGitEvidence(details: any) {
   };
 }
 
+function createSanitizedGitEnv() {
+  const env = { ...process.env };
+  for (const key of ['GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+    delete env[key];
+  }
+  return env;
+}
+
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-head-evidence-'));
 try {
   const nonGitRepo = path.join(tempRoot, 'non-git');
@@ -193,6 +203,31 @@ try {
   assert(treeMatched.exitCode === 0, 'tree evidence doctor must exit 0');
   assert(treeMatched.parsed.ok === true, 'tree evidence doctor must report ok=true');
   assert(gitCheck(treeMatched)?.details?.matchedBy === 'treeSha+parentCommitShas', 'tree evidence must match by treeSha+parentCommitShas');
+
+  const inheritedGitEnvRepo = path.join(tempRoot, 'inherited-git-env');
+  initGitRepo(inheritedGitEnvRepo);
+  bootstrap(inheritedGitEnvRepo);
+  writeFileSync(path.join(inheritedGitEnvRepo, 'README.md'), '# Host\n', 'utf8');
+  commitAll(inheritedGitEnvRepo, 'initial');
+  const originalGitDir = process.env.GIT_DIR;
+  const originalGitWorkTree = process.env.GIT_WORK_TREE;
+  const originalGitPrefix = process.env.GIT_PREFIX;
+  process.env.GIT_DIR = path.join(orphanRepo, '.git');
+  process.env.GIT_WORK_TREE = orphanRepo;
+  process.env.GIT_PREFIX = 'poisoned/';
+  try {
+    const inheritedGitEnv = runAtmDoctor(inheritedGitEnvRepo);
+    assert(inheritedGitEnv.exitCode === 0, 'doctor must ignore inherited git env contamination');
+    assert(inheritedGitEnv.parsed.ok === true, 'doctor under inherited git env contamination must report ok=true');
+    assert(gitCheck(inheritedGitEnv)?.details?.status === 'missing', 'doctor under inherited git env contamination must still inspect the target repo');
+  } finally {
+    if (originalGitDir === undefined) delete process.env.GIT_DIR;
+    else process.env.GIT_DIR = originalGitDir;
+    if (originalGitWorkTree === undefined) delete process.env.GIT_WORK_TREE;
+    else process.env.GIT_WORK_TREE = originalGitWorkTree;
+    if (originalGitPrefix === undefined) delete process.env.GIT_PREFIX;
+    else process.env.GIT_PREFIX = originalGitPrefix;
+  }
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

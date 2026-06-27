@@ -43,10 +43,6 @@ instruction sheet for the selected channel:
 - `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
   -> batch checkpoint -> commit -> continue next queue head.
 
-Prefer the projected ATM result fields over prose scraping when a tool-capable
-bridge exposes them. If the tool-facing route is blocked, surface that blocked
-result first; use CLI fallback only for legacy or explicit fallback lanes.
-
 For normal task-card work, keep this order fixed:
 
 ```text

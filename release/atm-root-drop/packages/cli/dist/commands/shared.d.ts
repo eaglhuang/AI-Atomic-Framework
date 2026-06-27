@@ -67,10 +67,18 @@ export interface CommandResult {
 }
 export interface ToolBridgeProjection {
     nextAction?: Record<string, unknown> | null;
+    taskIntent?: Record<string, unknown> | null;
     userNotice?: Record<string, unknown> | null;
     runnerMode?: Record<string, unknown> | null;
+    frameworkReport?: Record<string, unknown> | null;
+    frameworkClaim?: Record<string, unknown> | null;
+    evidenceSummary?: Record<string, unknown> | null;
+    guardReport?: Record<string, unknown> | null;
+    taskflowReadiness?: Record<string, unknown> | null;
+    commitBundle?: Record<string, unknown> | null;
     allowedCommands?: readonly string[];
     blockedCommands?: readonly string[];
+    skillGrowth?: Record<string, unknown> | null;
 }
 /** Public CLI result severity — part of the machine-readable result contract. */
 export type CliResultSeverity = 'success' | 'advisory' | 'blocked' | 'usage-error' | 'failure';

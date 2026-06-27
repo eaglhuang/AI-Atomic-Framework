@@ -17,6 +17,7 @@ import type {
 import { evaluateConflictMatrix } from './conflict-matrix.ts';
 import { DEFAULT_AGR_LAYER2_THRESHOLDS, shouldTriggerLayer2 } from './policy.ts';
 import { intersectRanges, normalizeLineRange, rangesOverlap, type Layer2Conflict, type VirtualAtomCandidate } from './agr.ts';
+import { buildBrokerDecisionFailureReason } from './failure-reason.ts';
 
 export function calculateBrokerDecision(
   newIntent: WriteIntent,
@@ -30,7 +31,7 @@ export function calculateBrokerDecision(
   const baseAdmission = buildProposalAdmissionBase(newIntent);
 
   if (conflictMatrix.arbitrationVerdict === 'takeover') {
-    return {
+    const decision: BrokerDecision = {
       schemaId: 'atm.brokerDecision.v1',
       specVersion: '0.1.0',
       migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -49,6 +50,7 @@ export function calculateBrokerDecision(
         rearbitrationRequired: true
       })
     };
+    return withFailureReason(decision);
   }
 
   // 1. Shared Surfaces conflict check
@@ -92,7 +94,7 @@ export function calculateBrokerDecision(
 
   if (conflicts.length > 0) {
     const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
-    return {
+    const decision: BrokerDecision = {
       schemaId: 'atm.brokerDecision.v1',
       specVersion: '0.1.0',
       migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -109,6 +111,7 @@ export function calculateBrokerDecision(
         rearbitrationRequired: baseAdmission.requiresProposal
       })
     };
+    return withFailureReason(decision);
   }
 
   // 2. CID / read-set semantic conflicts
@@ -181,7 +184,7 @@ export function calculateBrokerDecision(
 
   if (conflicts.length > 0) {
     const decompositionRequest = maybeBuildCidConflictDecompositionRequest(newIntent, registry.activeIntents);
-    return {
+    const decision: BrokerDecision = {
       schemaId: 'atm.brokerDecision.v1',
       specVersion: '0.1.0',
       migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -199,6 +202,7 @@ export function calculateBrokerDecision(
         rearbitrationRequired: baseAdmission.requiresProposal
       })
     };
+    return withFailureReason(decision);
   }
 
   const proposalOverlapDecision = evaluateProposalOverlap(newIntent, registry.activeIntents, baseAdmission, conflictMatrix);
@@ -228,17 +232,17 @@ export function calculateBrokerDecision(
     };
 
     if (fileOverlapResult.decompositionRequest) {
-      return {
+      return withFailureReason({
         ...decision,
         decompositionRequest: fileOverlapResult.decompositionRequest
-      };
+      });
     }
 
-    return decision;
+    return withFailureReason(decision);
   }
 
   // 4. Allowed path
-  return {
+  return withFailureReason({
     schemaId: 'atm.brokerDecision.v1',
     specVersion: '0.1.0',
     migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -259,7 +263,12 @@ export function calculateBrokerDecision(
           : 'No proposal-first trigger is active; direct brokered write is admitted.'
       }
     )
-  };
+  });
+}
+
+function withFailureReason(decision: BrokerDecision): BrokerDecision {
+  const failureReason = buildBrokerDecisionFailureReason(decision);
+  return failureReason ? { ...decision, failureReason } : decision;
 }
 
 function buildProposalAdmissionBase(intent: WriteIntent): ProposalAdmissionEvidence {
@@ -449,6 +458,7 @@ function evaluateProposalOverlap(
 
       if (overlapping) {
         return {
+          ...withFailureReason({
           schemaId: 'atm.brokerDecision.v1',
           specVersion: '0.1.0',
           migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -467,11 +477,12 @@ function evaluateProposalOverlap(
             reason: `Proposal overlap detected on the same bounded region for '${filePath}'; rearbitration is required before any write is admitted.`,
             rearbitrationRequired: true
           })
+          })
         };
       }
 
       if (newRegions.length > 0 && activeRegions.length > 0) {
-        return {
+        return withFailureReason({
           schemaId: 'atm.brokerDecision.v1',
           specVersion: '0.1.0',
           migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -490,10 +501,10 @@ function evaluateProposalOverlap(
             reason: `Disjoint bounded proposal regions on '${filePath}' require deterministic-composer routing before write.`,
             rearbitrationRequired: true
           })
-        };
+        });
       }
 
-      return {
+      return withFailureReason({
         schemaId: 'atm.brokerDecision.v1',
         specVersion: '0.1.0',
         migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
@@ -512,7 +523,7 @@ function evaluateProposalOverlap(
           reason: `An active proposal-first writer already holds '${filePath}'; park and rearbitrate before granting second-writer authority.`,
           rearbitrationRequired: true
         })
-      };
+      });
     }
   }
 

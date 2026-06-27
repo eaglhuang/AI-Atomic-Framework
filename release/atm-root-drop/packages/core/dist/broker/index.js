@@ -13,4 +13,6 @@ export * from './orphan-cleanup.js';
 export * from './recovery.js';
 export * from './freeze.js';
 export * from './patch-envelope.js';
+export * from './failure-reason.js';
+export * from './conflict-key-overlap.js';
 export * from './adapters/index.js';

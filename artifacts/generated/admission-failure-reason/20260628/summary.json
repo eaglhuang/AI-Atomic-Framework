@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.admissionFailureReasonSummary.v1",
+  "generatedAt": "2026-06-27T16:59:47.564Z",
+  "cases": [
+    {
+      "id": "blocked-shared-surface",
+      "verdict": "blocked-shared-surface",
+      "failureReason": {
+        "verdict": "blocked-shared-surface",
+        "blockingLayer": "shared-surface",
+        "conflictingCid": null,
+        "conflictKey": "Shared generator conflict: 'gen-hot' is in use by task 'TASK-A'",
+        "sharedSurface": "gen-hot",
+        "preservedIntentId": "active:TASK-A",
+        "patchEnvelope": null,
+        "recommendedRoute": "serialize",
+        "validatorTranscript": null
+      }
+    },
+    {
+      "id": "blocked-cid-conflict",
+      "verdict": "blocked-cid-conflict",
+      "failureReason": {
+        "verdict": "blocked-cid-conflict",
+        "blockingLayer": "cid",
+        "conflictingCid": "atom-a",
+        "conflictKey": "CID conflict: Atom ID 'atom-a' is already claimed by task 'TASK-A'",
+        "sharedSurface": null,
+        "preservedIntentId": "active:TASK-A",
+        "patchEnvelope": null,
+        "recommendedRoute": "serialize",
+        "validatorTranscript": null
+      }
+    },
+    {
+      "id": "composer-routed-disjoint-file-range",
+      "verdict": "needs-physical-split",
+      "failureReason": {
+        "verdict": "needs-physical-split",
+        "blockingLayer": "file-range",
+        "conflictingCid": null,
+        "conflictKey": "file:src/shared.ts",
+        "sharedSurface": null,
+        "preservedIntentId": null,
+        "patchEnvelope": "patch-apply-envelope",
+        "recommendedRoute": "compose",
+        "validatorTranscript": null
+      }
+    }
+  ]
+}

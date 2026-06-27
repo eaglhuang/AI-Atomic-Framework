@@ -50,6 +50,10 @@ Use one of these categories when recording a learning item:
 - `overloaded-context`
 - `repo-specific-but-generalizable`
 
+These categories are shared with backlog triage on purpose. A backlog item may
+stay open as a product defect while its reusable symptom and safer route are
+promoted into skill learning references immediately.
+
 Skills may add a local subcategory, but they should not replace the shared top
 level category set unless a governed task updates this contract.
 
@@ -84,6 +88,46 @@ Suggested Markdown shape:
 - Reuse scope: all ATM entry and dispatch skills
 ```
 
+## Backlog-to-skill promotion
+
+Treat the ATM bug backlog as a feeder system for reusable skill knowledge, not
+just a repair queue.
+
+- Keep the product defect in backlog when code or workflow still needs a fix.
+- Promote the reusable operator lesson into a shared or skill-local learning
+  reference as soon as the route is clear enough to help the next run.
+- Promote into `SKILL.md` only after the lesson meets the normal promotion bar.
+
+Use this triage split:
+
+- `Bug only`: implementation defect with no stable operator rule yet.
+- `Skill lesson only`: operator-facing pattern with no product change needed.
+- `Both`: the system needs a fix and the skill also needs to know how not to
+  get lost before that fix lands.
+
+Starter backlog-fed lessons:
+
+- `ATM-BUG-2026-06-23-019`
+  - Category: `entry-friction`
+  - Reusable lesson: when imported prompt-scoped tasks already exist in the
+    JSON ledger, prefer ledger truth over repeated planning-root rediscovery.
+- `ATM-BUG-2026-06-23-020`
+  - Category: `boundary-confusion`
+  - Reusable lesson: after planning-repo reconcile or close, verify whether
+    the target repo still holds a stale imported snapshot before trusting a
+    dependency blocker.
+- `ATM-BUG-2026-06-23-021`
+  - Category: `tooling-mismatch`
+  - Reusable lesson: when host and framework runners expose different command
+    surfaces, diagnose capability skew before treating operator failure as a
+    normal lifecycle blocker.
+- `ATM-BUG-2026-06-24-022`
+  - Category: `tooling-mismatch`
+  - Reusable lesson: when a fix changes frozen-runner behavior, source-first
+    success is not enough; retain release outputs with
+    `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` and rerun `node atm.mjs`
+    before claiming the frozen entrypoint is updated.
+
 ## Promotion policy
 
 Promote a learning item from a reference file into `SKILL.md` only when one or
@@ -99,6 +143,49 @@ Do not promote:
 - one-off user preference;
 - host-only trivia better kept in repo docs;
 - long narrative examples that belong in learning references.
+
+Repeated hardening themes such as stale imported task truth, runner skew,
+historical closeback mismatch, or residue cleanup should usually live in
+learning references first and become core skill rules only after repetition.
+
+Another high-value example is runner-sync misread: if a dogfood lane fixes
+`CLI`, `close`, `taskflow`, `hook`, or `evidence` code, but validation stops at
+`node atm.dev.mjs`, the skill should treat frozen-runner verification as still
+unproven until a retained build and frozen rerun happen.
+
+## Historical demotion policy
+
+Growth memory also needs a slimming path. When a bug is fixed or a workaround
+is no longer part of the preferred route, the lesson should be reviewed and
+possibly moved out of the active learning surface.
+
+Use this lifecycle:
+
+- `Active`: the bug or friction still exists, or the lesson is still needed as
+  part of the normal operator route.
+- `Watch`: the product fix landed, but we still want short-term observation in
+  case the symptom repeats.
+- `Historical`: the fix is stable and the lesson no longer needs to load in the
+  default skill-growth path.
+
+Demote a lesson from active references when all are true:
+
+1. The related bug is fixed or the product gap is intentionally closed.
+2. The safer route is no longer a common operator decision point.
+3. Keeping the lesson active would mostly add noise or token cost.
+
+When demoting:
+
+- keep a short historical note or archive entry for traceability;
+- remove or shorten the active reference so future skill loads stay lean;
+- do not keep obsolete workaround text in `SKILL.md`.
+- if the lesson came from backlog, move the narrative workaround out of the
+  active learning surface and retain only the stable post-fix rule or archive
+  pointer.
+
+This means backlog-fed knowledge is not append-only. Skills should learn fast,
+then shed solved wall-hits into history once the product no longer needs that
+live caution.
 
 ## Team Agents compatibility
 

@@ -300,48 +300,53 @@ function normalizeComparablePath(filePath) {
 export function resolveClosebackPlanningPath(input) {
     const normalizedTaskId = normalizeTaskId(input.taskId);
     const title = typeof input.taskDocument.title === 'string' ? input.taskDocument.title : null;
+    const profileFallbackAvailable = Boolean(input.profile && input.profileRepoRoot);
     const directPlanPath = readTaskDocumentSourcePlanPath(input.taskDocument);
     if (directPlanPath) {
         const absolutePath = path.isAbsolute(directPlanPath)
             ? path.resolve(directPlanPath)
             : path.resolve(input.cwd, directPlanPath);
         if (!existsSync(absolutePath)) {
-            return {
-                route: 'missing',
-                planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
-                profileRepoRoot: null,
-                planningStatus: null,
-                diagnostics: {
-                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
-                    messages: [`Planning card path from source.planPath does not exist: ${directPlanPath}.`]
-                }
-            };
+            if (!profileFallbackAvailable) {
+                return {
+                    route: 'missing',
+                    planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
+                    profileRepoRoot: null,
+                    planningStatus: null,
+                    diagnostics: {
+                        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
+                        messages: [`Planning card path from source.planPath does not exist: ${directPlanPath}.`]
+                    }
+                };
+            }
         }
-        const metadata = readPlanningCardMetadata(absolutePath);
-        if (metadata.taskId && metadata.taskId !== normalizedTaskId) {
+        else {
+            const metadata = readPlanningCardMetadata(absolutePath);
+            if (metadata.taskId && metadata.taskId !== normalizedTaskId) {
+                return {
+                    route: 'missing',
+                    planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
+                    profileRepoRoot: null,
+                    planningStatus: metadata.status,
+                    diagnostics: {
+                        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
+                        messages: [`Planning card task id ${metadata.taskId} does not match runtime task ${normalizedTaskId}.`]
+                    }
+                };
+            }
             return {
-                route: 'missing',
+                route: 'source-plan-path',
                 planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
                 profileRepoRoot: null,
                 planningStatus: metadata.status,
                 diagnostics: {
-                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
-                    messages: [`Planning card task id ${metadata.taskId} does not match runtime task ${normalizedTaskId}.`]
+                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT'],
+                    messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`]
                 }
             };
         }
-        return {
-            route: 'source-plan-path',
-            planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
-            profileRepoRoot: null,
-            planningStatus: metadata.status,
-            diagnostics: {
-                codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT'],
-                messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`]
-            }
-        };
     }
-    if (!input.profile || !input.profileRepoRoot) {
+    if (!profileFallbackAvailable) {
         return {
             route: 'missing',
             planningMirrorPath: null,
@@ -353,12 +358,13 @@ export function resolveClosebackPlanningPath(input) {
             }
         };
     }
+    const profileRepoRoot = input.profileRepoRoot;
     const relativeOutput = resolveCanonicalPlanningRelativePath(normalizedTaskId, title, input.delegationContract.policy);
     if (!relativeOutput) {
         return {
             route: 'missing',
             planningMirrorPath: null,
-            profileRepoRoot: input.profileRepoRoot,
+            profileRepoRoot,
             planningStatus: null,
             diagnostics: {
                 codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_POLICY_MISSING'],
@@ -366,7 +372,7 @@ export function resolveClosebackPlanningPath(input) {
             }
         };
     }
-    const profileAbsolutePath = path.resolve(input.profileRepoRoot, relativeOutput);
+    const profileAbsolutePath = path.resolve(profileRepoRoot, relativeOutput);
     const relatedPlanPath = readTaskDocumentRelatedPlanPath(input.taskDocument);
     if (relatedPlanPath) {
         const relatedAbsolutePath = path.isAbsolute(relatedPlanPath)
@@ -377,7 +383,7 @@ export function resolveClosebackPlanningPath(input) {
             return {
                 route: 'ambiguous',
                 planningMirrorPath: null,
-                profileRepoRoot: input.profileRepoRoot,
+                profileRepoRoot,
                 planningStatus: null,
                 diagnostics: {
                     codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS'],
@@ -392,7 +398,7 @@ export function resolveClosebackPlanningPath(input) {
         return {
             route: 'missing',
             planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
-            profileRepoRoot: input.profileRepoRoot,
+            profileRepoRoot,
             planningStatus: null,
             diagnostics: {
                 codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
@@ -405,7 +411,7 @@ export function resolveClosebackPlanningPath(input) {
         return {
             route: 'missing',
             planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
-            profileRepoRoot: input.profileRepoRoot,
+            profileRepoRoot,
             planningStatus: metadata.status,
             diagnostics: {
                 codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
@@ -416,7 +422,7 @@ export function resolveClosebackPlanningPath(input) {
     return {
         route: 'profile-root-fallback',
         planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
-        profileRepoRoot: input.profileRepoRoot,
+        profileRepoRoot,
         planningStatus: metadata.status,
         diagnostics: {
             codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_PROFILE_FALLBACK'],

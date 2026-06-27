@@ -56,6 +56,15 @@ const internalCommandNames = Object.values(commandSpecs)
   .sort((left: any, right: any) => left.localeCompare(right));
 const runnerCommandNames = Object.keys(cliCommandRunners).sort((left, right) => left.localeCompare(right));
 const allSpecCommandNames = Object.keys(commandSpecs).sort((left, right) => left.localeCompare(right));
+const aao0063TaskFixtureCandidates = [
+  path.resolve(root, '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md'),
+  process.env.USERPROFILE
+    ? path.join(process.env.USERPROFILE, '3KLife', 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', 'TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md')
+    : null
+].filter((candidate): candidate is string => Boolean(candidate));
+const aao0063TaskFixturePath = aao0063TaskFixtureCandidates.find((candidate) => existsSync(candidate));
+
+assert(aao0063TaskFixturePath, 'missing TASK-AAO-0063 task fixture path for validate-cli regression tests');
 
 function fail(message: any) {
   console.error(`[cli:${mode}] ${message}`);
@@ -100,6 +109,24 @@ async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
   return runAtmInProcess(args, cwd, env);
 }
 
+function parseCliJsonFromStreams(stdout: string, stderr: string, args: any) {
+  const attempts = [stdout.trim(), stderr.trim(), `${stdout}\n${stderr}`.trim()].filter(Boolean);
+  for (const candidate of attempts) {
+    try {
+      return JSON.parse(candidate);
+    } catch {}
+    const jsonStart = candidate.indexOf('{');
+    const jsonEnd = candidate.lastIndexOf('}');
+    if (jsonStart >= 0 && jsonEnd > jsonStart) {
+      try {
+        return JSON.parse(candidate.slice(jsonStart, jsonEnd + 1));
+      } catch {}
+    }
+  }
+  fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${(stdout || stderr).trim()}`);
+  return {};
+}
+
 async function runAtmSpawned(args: any, cwd = root, env: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [path.join(root, fixture.entrypoint), ...args], {
     cwd,
@@ -111,14 +138,31 @@ async function runAtmSpawned(args: any, cwd = root, env: Record<string, string> 
     return runAtmInProcess(args, cwd, env);
   }
   const payload = (result.stdout || result.stderr || '').trim();
-  let parsed: any = {};
-  if (payload || !args.includes('--output-json')) {
-    try {
-      parsed = JSON.parse(payload);
-    } catch (error: any) {
-      fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
-    }
+  const parsed: any = payload || !args.includes('--output-json')
+    ? parseCliJsonFromStreams(result.stdout ?? '', result.stderr ?? '', args)
+    : {};
+  return {
+    exitCode: result.status ?? 0,
+    stdout: result.stdout,
+    stderr: result.stderr,
+    parsed
+  };
+}
+
+async function runAtmFrozenSpawned(args: any, cwd = root, env: Record<string, string> = {}) {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, ...env }
+  });
+  if ((result.error as NodeJS.ErrnoException | undefined)?.code === 'EPERM') {
+    console.error(`[cli:${mode}] warning: ${sandboxEpermHint(args, cwd)}`);
+    return runAtmInProcess(args, cwd, env);
   }
+  const payload = (result.stdout || result.stderr || '').trim();
+  const parsed: any = payload || !args.includes('--output-json')
+    ? parseCliJsonFromStreams(result.stdout ?? '', result.stderr ?? '', args)
+    : {};
   return {
     exitCode: result.status ?? 0,
     stdout: result.stdout,
@@ -142,14 +186,9 @@ async function runAtmInProcess(args: any, cwd = root, env: Record<string, string
       stderr: { write(chunk: unknown) { stderr += String(chunk); return true; } } as any
     });
     const payload = (stdout || stderr || '').trim();
-    let parsed: any = {};
-    if (payload || !args.includes('--output-json')) {
-      try {
-        parsed = JSON.parse(payload);
-      } catch (error: any) {
-        fail(`CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
-      }
-    }
+    const parsed: any = payload || !args.includes('--output-json')
+      ? parseCliJsonFromStreams(stdout, stderr, args)
+      : {};
     return {
       exitCode,
       stdout,
@@ -563,10 +602,12 @@ try {
   const atmChartRepo = path.join(tempRoot, 'atm-chart-repo');
   mkdirSync(atmChartRepo, { recursive: true });
   initializeGitRepository(atmChartRepo);
-  const atmChartBootstrap = await runAtm(['bootstrap', '--cwd', atmChartRepo], atmChartRepo);
+  // Keep ATMChart / onboarding validation process-isolated so command-level
+  // root and cwd resolution cannot inherit earlier in-process CLI state.
+  const atmChartBootstrap = await runAtmFrozenSpawned(['bootstrap', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartBootstrap.exitCode === 0, 'bootstrap must exit 0 before ATMChart render');
 
-  const atmChartRender = await runAtm(['atm-chart', 'render', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartRender = await runAtmFrozenSpawned(['atm-chart', 'render', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartRender.exitCode === 0, 'atm-chart render must exit 0 after bootstrap');
   assertReadable(atmChartRender, 'atm-chart');
   assert(atmChartRender.parsed.ok === true, 'atm-chart render must report ok=true');
@@ -574,25 +615,25 @@ try {
   assert(existsSync(path.join(atmChartRepo, '.atm/memory/atm-chart.md')), 'atm-chart render must write .atm/memory/atm-chart.md');
   assertMessageCode(atmChartRender, 'ATM_CHART_RENDERED');
 
-  const atmChartVerify = await runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartVerify = await runAtmFrozenSpawned(['atm-chart', 'verify', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartVerify.exitCode === 0, 'atm-chart verify must exit 0 immediately after render');
   assertReadable(atmChartVerify, 'atm-chart');
   assert(atmChartVerify.parsed.ok === true, 'atm-chart verify must report ok=true when fresh');
   assertMessageCode(atmChartVerify, 'ATM_CHART_VERIFY_OK');
 
-  const atmChartVersionVerify = await runAtm(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartVersionVerify = await runAtmFrozenSpawned(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartVersionVerify.exitCode === 0, 'atm-chart verify --version-check must exit 0 for default rendered chart');
   assertReadable(atmChartVersionVerify, 'atm-chart');
   assert(atmChartVersionVerify.parsed.evidence.versionCompatibility.status === 'supported', 'atm-chart verify --version-check must report supported status');
   assertMessageCode(atmChartVersionVerify, 'ATM_CHART_VERSION_CHECK_OK');
 
-  const agentPackList = await runAtm(['agent-pack', 'list', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackList = await runAtmFrozenSpawned(['agent-pack', 'list', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackList.exitCode === 0, 'agent-pack list must exit 0');
   assertReadable(agentPackList, 'agent-pack');
   assert(agentPackList.parsed.ok === true, 'agent-pack list must report ok=true');
   assert(Array.isArray(agentPackList.parsed.evidence.installedPacks), 'agent-pack list must report installedPacks array');
 
-  const agentPackInstall = await runAtm(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackInstall = await runAtmFrozenSpawned(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackInstall.exitCode === 0, 'agent-pack install --id must exit 0 after bootstrap');
   assertReadable(agentPackInstall, 'agent-pack');
   assert(agentPackInstall.parsed.ok === true, 'agent-pack install --id must report ok=true');
@@ -600,13 +641,13 @@ try {
   assert(existsSync(path.join(atmChartRepo, '.atm/agent-pack/claude-code.manifest.json')), 'agent-pack install must write the pack manifest');
   assertMessageCode(agentPackInstall, 'ATM_AGENT_PACK_INSTALL');
 
-  const agentPackVerifyFresh = await runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackVerifyFresh = await runAtmFrozenSpawned(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackVerifyFresh.exitCode === 0, 'agent-pack verify-fresh must exit 0 immediately after install');
   assertReadable(agentPackVerifyFresh, 'agent-pack');
   assert(agentPackVerifyFresh.parsed.ok === true, 'agent-pack verify-fresh must report ok=true when fresh');
   assertMessageCode(agentPackVerifyFresh, 'ATM_AGENT_PACK_VERIFY_FRESH_OK');
 
-  const welcomeDryRun = await runAtm(['welcome', '--cwd', atmChartRepo, '--dry-run'], atmChartRepo);
+  const welcomeDryRun = await runAtmFrozenSpawned(['welcome', '--cwd', atmChartRepo, '--dry-run', '--json'], atmChartRepo);
   assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after ATMChart render');
   assertReadable(welcomeDryRun, 'welcome');
   assert(welcomeDryRun.parsed.ok === true, 'welcome --dry-run must report ok=true');
@@ -620,7 +661,7 @@ try {
   assertMessageCode(welcomeDryRun, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
   assert(welcomeDryRun.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'welcome --dry-run must recommend editor integration install when none are present');
 
-  const welcome = await runAtm(['welcome', '--cwd', atmChartRepo], atmChartRepo);
+  const welcome = await runAtmFrozenSpawned(['welcome', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(welcome.exitCode === 0, 'welcome must exit 0 after ATMChart render');
   assertReadable(welcome, 'welcome');
   assert(welcome.parsed.ok === true, 'welcome must report ok=true');
@@ -631,7 +672,7 @@ try {
   assertMessageCode(welcome, 'ATM_WELCOME_READY');
   assertMessageCode(welcome, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
 
-  const nextAfterWelcome = await runAtm(['next', '--cwd', atmChartRepo], atmChartRepo);
+  const nextAfterWelcome = await runAtmFrozenSpawned(['next', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assertReadable(nextAfterWelcome, 'next');
   assert(nextAfterWelcome.parsed.evidence.agent_pack_hint != null, 'next must surface agent_pack_hint');
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.slashCommandId === 'string', 'agent_pack_hint must have slashCommandId');
@@ -639,7 +680,7 @@ try {
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.command === 'string', 'agent_pack_hint must have command');
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.reason === 'string', 'agent_pack_hint must have reason');
 
-  const welcomeDoctor = await runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  const welcomeDoctor = await runAtmFrozenSpawned(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assertReadable(welcomeDoctor, 'doctor');
   const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
   const versionCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'version-compatibility');
@@ -652,7 +693,7 @@ try {
   assert(welcomeDoctor.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'doctor must recommend editor integration install when none are present');
 
   writeHostPackageLockSignals(atmChartRepo);
-  const packageLockHostDoctor = await runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  const packageLockHostDoctor = await runAtmFrozenSpawned(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(packageLockHostDoctor.exitCode === 0, 'doctor must stay green for host repos that happen to use package-lock');
   assertReadable(packageLockHostDoctor, 'doctor');
   assert(packageLockHostDoctor.parsed.ok === true, 'doctor must report ok=true for package-lock host repos');
@@ -667,17 +708,17 @@ try {
   guards.guards[0].summary = `${guards.guards[0].summary} (drift)`;
   writeFileSync(guardsPath, `${JSON.stringify(guards, null, 2)}\n`, 'utf8');
 
-  const atmChartStale = await runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo], atmChartRepo);
+  const atmChartStale = await runAtmFrozenSpawned(['atm-chart', 'verify', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartStale.exitCode === 2, 'atm-chart verify must exit 2 when source guards drift');
   assert(atmChartStale.parsed.ok === false, 'atm-chart verify must report ok=false when stale');
   assertMessageCode(atmChartStale, 'ATM_CHART_STALE');
 
-  const agentPackStale = await runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo], atmChartRepo);
+  const agentPackStale = await runAtmFrozenSpawned(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackStale.exitCode === 2, 'agent-pack verify-fresh must exit 2 when source guards drift');
   assert(agentPackStale.parsed.ok === false, 'agent-pack verify-fresh must report ok=false when stale');
   assertMessageCode(agentPackStale, 'ATM_AGENT_PACK_STALE');
 
-  const staleDoctor = await runAtm(['doctor', '--cwd', atmChartRepo], atmChartRepo);
+  const staleDoctor = await runAtmFrozenSpawned(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding ATMChart is stale');
   assertReadable(staleDoctor, 'doctor');
   const staleOnboardingCheck = staleDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
@@ -1337,7 +1378,7 @@ try {
     // Import task to allow evidence verification
     const importRes = await runAtm([
       'tasks', 'import',
-      '--from', path.resolve(root, '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md'),
+      '--from', aao0063TaskFixturePath,
       '--write'
     ], autoLinkTempWorkspace);
     assert(importRes.parsed.ok === true, 'import task must succeed');
@@ -1395,7 +1436,10 @@ try {
     assert(secondRecord.details.validationPasses.includes('typecheck'), 'must include typecheck');
     assert(!secondRecord.details.validationPasses.includes('validate:cli'), 'must not include validate:cli if custom validators provided');
 
-    const importedTaskPath = path.join(autoLinkTempWorkspace, '.atm/history/tasks/TASK-AAO-0063.json');
+    const importedTaskRelativePath = importRes.parsed.evidence?.writtenPaths?.find((entry: string) => entry.endsWith('TASK-AAO-0063.json'))
+      ?? '.atm/history/tasks/TASK-AAO-0063.json';
+    const importedTaskPath = path.join(autoLinkTempWorkspace, importedTaskRelativePath);
+    assert(existsSync(importedTaskPath), 'imported task file must exist after tasks import');
     const importedTask = JSON.parse(readFileSync(importedTaskPath, 'utf8'));
     importedTask.validators = [...(Array.isArray(importedTask.validators) ? importedTask.validators : []), 'node --version'];
     writeJson(importedTaskPath, importedTask);

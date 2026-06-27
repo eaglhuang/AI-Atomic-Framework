@@ -1,6 +1,6 @@
 # AI-Atomic-Framework
 
-[![Release v0.9.0](https://img.shields.io/badge/Release-v0.9.0-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0)
+[![Release v0.9.0-alpha.1](https://img.shields.io/badge/Release-v0.9.0--alpha.1-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0-alpha.1)
 [![Paper](https://img.shields.io/badge/Paper-arXiv%20preprint-b91c1c.svg)](CITATION.cff)
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-0f172a.svg)](LICENSE)
@@ -62,6 +62,17 @@ ATM is not just an atom runner. It is the route, scope, evidence, close, and han
 ## 60-Second Start
 
 > New to ATM? Start with [docs/ATM_NEW_USER_WORKFLOW.md](docs/ATM_NEW_USER_WORKFLOW.md) for the 7-step normal workflow before diving into the bootstrap routes below.
+
+### Quick Verify for the Paper Evidence
+
+```bash
+git clone https://github.com/eaglhuang/AI-Atomic-Framework
+cd AI-Atomic-Framework
+git checkout v0.9.0-alpha.1
+npm install
+npm test -- broker/decision
+npm run bench:admission:paper -- --seed 20260625
+```
 
 ### Start a new governed project
 

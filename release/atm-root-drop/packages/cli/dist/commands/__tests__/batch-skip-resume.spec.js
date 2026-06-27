@@ -13,6 +13,7 @@ function makeTask(taskId) {
     return {
         workItemId: taskId,
         title: taskId,
+        dependencies: [],
         taskPath: `.atm/history/tasks/${taskId}.json`,
         sourcePlanPath: null,
         nearbyPlanPaths: [],

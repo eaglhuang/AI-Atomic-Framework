@@ -2464,6 +2464,97 @@ function assertBrokerRunScanIndex(): void {
   assert.equal(index.runs?.[0]?.lane, 'queued');
   assert.equal(index.runs?.[0]?.verdict, 'conflict');
 
+  const repoLocalCwd = path.join(cwd, 'repo-local-default');
+  const repoLocalRunDir = path.join(repoLocalCwd, '.atm', 'history', 'evidence', 'broker-runs');
+  const repoLocalLogPath = path.join(repoLocalCwd, '.atm', 'history', 'evidence', 'CID-Conflict-Run-Log.md');
+  const repoLocalCaptureDir = path.join(repoLocalRunDir, 'broker-capture');
+  const repoLocalCollectDir = path.join(repoLocalRunDir, 'broker-evidence-bundle');
+  mkdirSync(repoLocalRunDir, { recursive: true });
+
+  const repoLocalEnvelope = {
+    schemaId: 'atm.brokerOperationRunRecordEnvelope.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'repo-local default resolution fixture' },
+    runId: 'run-local-default-1',
+    planId: 'plan-local-default-1',
+    records: [
+      {
+        schemaId: 'atm.brokerOperationRunRecord.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'repo-local default resolution fixture' },
+        runId: 'run-local-default-1',
+        planId: 'plan-local-default-1',
+        request_identity: ['bench:B-12:TASK-TEAM-LOCAL-DEFAULT:scan'],
+        actor_ids: ['codex-local'],
+        request_files: ['packages/cli/src/commands/team.ts'],
+        applied_files: ['packages/cli/src/commands/team.ts'],
+        adapter_choice: 'text-range',
+        lane_decision: 'applied',
+        merge_verdict: 'mergeable',
+        evidence_path: '.atm/history/evidence/broker-runs/run-local-default-1.json',
+        task_ids: ['TASK-TEAM-LOCAL-DEFAULT'],
+        commit_sha: 'feedface5678',
+        transaction_ids: ['txn-local-default-1']
+      }
+    ]
+  };
+  writeFileSync(path.join(repoLocalRunDir, 'run-local-default-1.json'), `${JSON.stringify(repoLocalEnvelope, null, 2)}\n`, 'utf8');
+
+  const repoLocalScan = spawnSync(
+    process.execPath,
+    [
+      '--strip-types',
+      path.join(process.cwd(), 'scripts', 'scan-broker-runs.ts'),
+      '--compact'
+    ],
+    { cwd: repoLocalCwd, encoding: 'utf8' }
+  );
+  assert.equal(repoLocalScan.status, 0, repoLocalScan.stderr || repoLocalScan.stdout);
+  assert.equal(existsSync(repoLocalLogPath), true, 'scan-broker-runs without --run-dir must write to repo-local evidence log');
+  const repoLocalLogText = readFileSync(repoLocalLogPath, 'utf8');
+  assert.ok(repoLocalLogText.includes('run-local-default-1'));
+  assert.ok(repoLocalLogText.includes('txn-local-default-1'));
+
+  const repoLocalCollect = spawnSync(
+    process.execPath,
+    [
+      '--strip-types',
+      path.join(process.cwd(), 'scripts', 'collect-broker-evidence.ts'),
+      '--output-dir',
+      repoLocalCollectDir
+    ],
+    { cwd: repoLocalCwd, encoding: 'utf8' }
+  );
+  assert.equal(repoLocalCollect.status, 0, repoLocalCollect.stderr || repoLocalCollect.stdout);
+  const repoLocalBundle = JSON.parse(readFileSync(path.join(repoLocalCollectDir, 'broker-evidence-bundle.json'), 'utf8')) as {
+    sourceRunDir?: string;
+    runs?: Array<Record<string, unknown>>;
+  };
+  assert.equal(repoLocalBundle.sourceRunDir, repoLocalRunDir.replace(/\\/g, '/'));
+  assert.ok(repoLocalBundle.runs?.some((run) => run.runId === 'run-local-default-1'));
+
+  const repoLocalCapture = spawnSync(
+    process.execPath,
+    [
+      '--strip-types',
+      path.join(process.cwd(), 'scripts', 'capture-broker-evidence.ts'),
+      '--run-ids',
+      'run-local-default-1',
+      '--output-dir',
+      repoLocalCaptureDir,
+      '--strict',
+      'false'
+    ],
+    { cwd: repoLocalCwd, encoding: 'utf8' }
+  );
+  assert.equal(repoLocalCapture.status, 0, repoLocalCapture.stderr || repoLocalCapture.stdout);
+  const repoLocalCaptured = JSON.parse(readFileSync(path.join(repoLocalCaptureDir, 'broker-capture.json'), 'utf8')) as {
+    sourceRunDirs?: string[];
+    runs?: Array<Record<string, unknown>>;
+  };
+  assert.equal(repoLocalCaptured.sourceRunDirs?.[0], repoLocalRunDir.replace(/\\/g, '/'));
+  assert.ok(repoLocalCaptured.runs?.some((run) => run.runId === 'run-local-default-1'));
+
   const realRunDir = path.resolve(
     process.env.USERPROFILE ?? process.env.HOME ?? process.cwd(),
     '3KLife',

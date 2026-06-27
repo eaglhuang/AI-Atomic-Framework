@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 interface BrokerOperationRunRecordEnvelope {
@@ -62,6 +62,10 @@ function parseRunDir(runDir: string | boolean | undefined): string {
   if (typeof runDir === 'string' && runDir.trim()) {
     return path.resolve(runDir);
   }
+  const repoFallback = path.resolve(process.cwd(), '.atm', 'history', 'evidence', 'broker-runs');
+  if (existsSync(repoFallback)) {
+    return repoFallback;
+  }
   return path.resolve(
     process.env.USERPROFILE ?? process.env.HOME ?? process.cwd(),
     '3KLife',
@@ -72,7 +76,7 @@ function parseRunDir(runDir: string | boolean | undefined): string {
   );
 }
 
-function parseLogFile(logFile: string | boolean | undefined): string {
+function parseLogFile(logFile: string | boolean | undefined, runDir: string): string {
   if (typeof logFile === 'string' && logFile.trim()) {
     return path.resolve(logFile);
   }
@@ -80,14 +84,11 @@ function parseLogFile(logFile: string | boolean | undefined): string {
   if (envLogFile) {
     return path.resolve(envLogFile);
   }
-  // Fallback to a UTF-8-friendly default path that is stable across shells.
-  return path.resolve(
-    process.env.USERPROFILE ?? process.env.HOME ?? process.cwd(),
-    '3KLife',
-    'docs',
-    'ai_atomic_framework',
-    'CID-Conflict-Run-Log.md'
-  );
+  const repoRunDir = path.resolve(process.cwd(), '.atm', 'history', 'evidence', 'broker-runs');
+  if (path.resolve(runDir) === repoRunDir) {
+    return path.resolve(process.cwd(), '.atm', 'history', 'evidence', 'CID-Conflict-Run-Log.md');
+  }
+  return path.resolve(path.dirname(runDir), 'CID-Conflict-Run-Log.md');
 }
 
 function parseJsonOutputFile(jsonOutputFile: string | boolean | undefined): string | null {
@@ -95,6 +96,23 @@ function parseJsonOutputFile(jsonOutputFile: string | boolean | undefined): stri
     return path.resolve(jsonOutputFile);
   }
   return null;
+}
+
+function printHelp(): void {
+  const lines = [
+    'scan-broker-runs',
+    '',
+    'Usage:',
+    '  node --strip-types scripts/scan-broker-runs.ts [--run-dir <dir>] [--log-file <file>] [--json-output <file>] [--report-output <file>] [--compact]',
+    '',
+    'Default behavior:',
+    '- run-dir: current repo .atm/history/evidence/broker-runs if it exists, otherwise',
+    '  legacy fallback %USERPROFILE%\\3KLife\\docs\\ai_atomic_framework\\broker-collision-evidence\\runs',
+    '- log-file: <run-dir-parent>/CID-Conflict-Run-Log.md',
+    '- compact: rewrite the log from the current unique run set instead of appending only unseen runIds',
+    ''
+  ];
+  console.log(lines.join('\n'));
 }
 
 function getUniqueSet(values: readonly string[] | undefined | null): readonly string[] {
@@ -305,8 +323,12 @@ function loadEntries(runDir: string): BrokerRunSummary[] {
 
 function main() {
   const args = getArgs(process.argv.slice(2));
+  if (args['--help'] || args['-h']) {
+    printHelp();
+    return;
+  }
   const runDir = parseRunDir(args['--run-dir'] || args['--run-evidence-dir']);
-  const logFile = parseLogFile(args['--log-file']);
+  const logFile = parseLogFile(args['--log-file'], runDir);
   const jsonOutputFile = parseJsonOutputFile(args['--json-output']);
   const reportOutput = parseJsonOutputFile(args['--report-output']);
   const compactLog = Boolean(args['--compact']);
