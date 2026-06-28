@@ -8,10 +8,11 @@ import { buildAutoEvidencePlan, executeAutoEvidencePlan } from './evidence.js';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
-import { buildTaskflowClosePreflight, extractTaskflowDeclaredFiles, inspectPlanningAuthorityDelivery, preflightBlockersToWriteReadinessBlockers } from './taskflow/close-preflight.js';
+import { buildTaskflowClosePreflight, inspectPlanningAuthorityDelivery, preflightBlockersToWriteReadinessBlockers } from './taskflow/close-preflight.js';
 import { withTaskflowOperatorLane } from './emergency/context.js';
 import { quoteCliValue, relativePathFrom } from './shared.js';
 import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.js';
+import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './taskflow/commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from './tasks/close-window-lock.js';
 function buildTasksNewCommand(input) {
@@ -466,7 +467,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         planningAuthorityDeliveryOk: planningAuthorityDeliveryGate.ok
     });
     const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
-    const declaredFiles = extractTaskflowDeclaredFiles(taskDocument);
+    const declaredFiles = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
     const historicalClosePreflight = buildTaskflowClosePreflight({
         cwd,
         taskId,

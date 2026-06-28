@@ -2,7 +2,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';
+import { resolveTaskflowDeclaredFiles } from './task-scope.js';
 import { quoteCliValue } from '../shared.js';
+import { isPathAllowedByScope } from '../work-channels.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -26,11 +28,7 @@ function sourcePlanPathOf(taskDocument) {
     return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
 }
 function taskflowPathMatches(filePath, declaredPath) {
-    const file = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
-    const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
-    if (!file || !declared)
-        return false;
-    return file === declared || file.startsWith(`${declared}/`);
+    return isPathAllowedByScope(filePath, [declaredPath]);
 }
 function resolvePlanningPath(cwd, planningMirrorPath) {
     if (!planningMirrorPath) {
@@ -60,16 +58,17 @@ function resolvePlanningPath(cwd, planningMirrorPath) {
         reason: null
     };
 }
-export function extractTaskflowDeclaredFiles(taskDocument) {
+export function extractTaskflowDeclaredFiles(cwd, taskId, taskDocument) {
+    const runtimeResolved = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
     const explicit = extractTaskStringList(taskDocument, 'deliverables');
     const deliverables = explicit.length > 0
         ? explicit
         : extractTaskStringList(taskDocument, 'scopePaths').filter((value) => value && !value.startsWith('.atm/') && !/[\\/]$/.test(value));
-    return uniqueSorted([
+    return uniqueSorted(runtimeResolved.concat([
         ...extractTaskStringList(taskDocument, 'scopePaths'),
         ...deliverables,
         ...extractTaskStringList(taskDocument, 'targetAllowedFiles')
-    ].filter((file) => !file.startsWith('.atm/')));
+    ].filter((file) => !file.startsWith('.atm/'))));
 }
 export function inspectPlanningAuthorityDelivery(input) {
     if (normalizeTaskflowAuthority(input.taskDocument) !== 'planning_repo') {
@@ -84,7 +83,7 @@ export function inspectPlanningAuthorityDelivery(input) {
         return { required: true, ok: false, repoRoot: planning.repoRoot, matchedFiles: [], reason: 'planning authority close requires --historical-delivery <planning-repo-commit>' };
     }
     const planningMirrorFile = planning.relativePath?.replace(/\\/g, '/') ?? null;
-    const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument)
+    const declaredFiles = extractTaskflowDeclaredFiles(input.cwd, String(input.taskDocument.workItemId ?? input.taskDocument.taskId ?? ''), input.taskDocument)
         .filter((entry) => entry.replace(/\\/g, '/') !== planningMirrorFile);
     const matchedFiles = [];
     for (const ref of input.historicalDeliveryRefs) {

@@ -32,6 +32,7 @@ import {
 
 export type ClosebackPlanningPathRoute =
   | 'source-plan-path'
+  | 'task-direction-fallback'
   | 'profile-root-fallback'
   | 'missing'
   | 'ambiguous';
@@ -415,9 +416,41 @@ function readTaskDocumentSourcePlanPath(taskDocument: Record<string, unknown>): 
   return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
 }
 
+function extractTaskStringList(taskDocument: Record<string, unknown>, key: string): string[] {
+  const value = taskDocument[key];
+  return Array.isArray(value)
+    ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
+    : [];
+}
+
+function readTaskDirectionPlanningCandidates(taskDocument: Record<string, unknown>): readonly string[] {
+  const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
+    ? taskDocument.taskDirectionLock as Record<string, unknown>
+    : {};
+  return [
+    ...extractTaskStringList(taskDirectionLock, 'planningReadOnlyPaths'),
+    ...extractTaskStringList(taskDirectionLock, 'planningMirrorPaths'),
+    ...extractTaskStringList(taskDocument, 'planningReadOnlyPaths'),
+    ...extractTaskStringList(taskDocument, 'planningMirrorPaths')
+  ];
+}
+
 function readTaskDocumentRelatedPlanPath(taskDocument: Record<string, unknown>): string | null {
   const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;
   return typeof relatedPlan === 'string' && relatedPlan.trim() ? relatedPlan.trim() : null;
+}
+
+function tryResolvePlanningCandidate(candidatePath: string, normalizedTaskId: string, cwd: string) {
+  const absolutePath = path.isAbsolute(candidatePath)
+    ? path.resolve(candidatePath)
+    : path.resolve(cwd, candidatePath);
+  if (!existsSync(absolutePath)) return null;
+  const metadata = readPlanningCardMetadata(absolutePath);
+  if (metadata.taskId && metadata.taskId !== normalizedTaskId) return null;
+  return {
+    absolutePath,
+    metadata
+  };
 }
 
 function slugifyPlanningTitle(title: string): string {
@@ -480,6 +513,7 @@ export function resolveClosebackPlanningPath(input: {
   const normalizedTaskId = normalizeTaskId(input.taskId);
   const title = typeof input.taskDocument.title === 'string' ? input.taskDocument.title : null;
   const profileFallbackAvailable = Boolean(input.profile && input.profileRepoRoot);
+  let directPlanPathMissingMessage: string | null = null;
 
   const directPlanPath = readTaskDocumentSourcePlanPath(input.taskDocument);
   if (directPlanPath) {
@@ -487,18 +521,7 @@ export function resolveClosebackPlanningPath(input: {
       ? path.resolve(directPlanPath)
       : path.resolve(input.cwd, directPlanPath);
     if (!existsSync(absolutePath)) {
-      if (!profileFallbackAvailable) {
-        return {
-          route: 'missing',
-          planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
-          profileRepoRoot: null,
-          planningStatus: null,
-          diagnostics: {
-            codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
-            messages: [`Planning card path from source.planPath does not exist: ${directPlanPath}.`]
-          }
-        };
-      }
+      directPlanPathMissingMessage = `Planning card path from source.planPath does not exist: ${directPlanPath}.`;
     } else {
       const metadata = readPlanningCardMetadata(absolutePath);
       if (metadata.taskId && metadata.taskId !== normalizedTaskId) {
@@ -526,6 +549,21 @@ export function resolveClosebackPlanningPath(input: {
     }
   }
 
+  for (const candidatePath of readTaskDirectionPlanningCandidates(input.taskDocument)) {
+    const resolved = tryResolvePlanningCandidate(candidatePath, normalizedTaskId, input.cwd);
+    if (!resolved) continue;
+    return {
+      route: 'task-direction-fallback',
+      planningMirrorPath: resolved.absolutePath.replace(/\\/g, '/'),
+      profileRepoRoot: null,
+      planningStatus: resolved.metadata.status,
+      diagnostics: {
+        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_DIRECTION_FALLBACK'],
+        messages: [`Recovered planning path from task-direction runtime context: ${candidatePath}.`]
+      }
+    };
+  }
+
   if (!profileFallbackAvailable) {
     return {
       route: 'missing',
@@ -533,8 +571,8 @@ export function resolveClosebackPlanningPath(input: {
       profileRepoRoot: null,
       planningStatus: null,
       diagnostics: {
-        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE'],
-        messages: ['source.planPath is absent and no taskflow profile was supplied for governed fallback recovery.']
+        codes: [directPlanPathMissingMessage ? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING' : 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE'],
+        messages: [directPlanPathMissingMessage ?? 'source.planPath is absent and no taskflow profile was supplied for governed fallback recovery.']
       }
     };
   }
@@ -629,7 +667,7 @@ export function assertClosebackPlanningPathReady(
   if (!input.requirePlanningPath) {
     return;
   }
-  if (resolution.route === 'source-plan-path' || resolution.route === 'profile-root-fallback') {
+  if (resolution.route === 'source-plan-path' || resolution.route === 'task-direction-fallback' || resolution.route === 'profile-root-fallback') {
     return;
   }
   const code = resolution.diagnostics.codes[0] ?? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING';

@@ -12,6 +12,7 @@ import {
 import { evaluatePlanningMirrorDirtyFiles } from '../tasks/planning-mirror-close-diagnostics.ts';
 import { inspectHistoricalDelivery, type TaskHistoricalDeliveryReport } from '../tasks/historical-delivery.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
+import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
 
 interface PreflightCommitRepoBundle {
   readonly repoRoot: string | null;
@@ -392,23 +393,12 @@ function buildWriteRollbackSummary(taskId: string): HistoricalCloseWriteRollback
   };
 }
 
-export function extractTaskflowDeclaredFiles(taskDocument: Record<string, unknown>): string[] {
-  const readList = (key: string) => {
-    const value = taskDocument[key];
-    if (!Array.isArray(value)) return [] as string[];
-    return value.filter((entry): entry is string => typeof entry === 'string');
-  };
-  return uniqueStrings([
-    ...readList('deliverables'),
-    ...readList('scopePaths'),
-    ...readList('targetAllowedFiles')
-  ]);
+export function extractTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[] {
+  return uniqueStrings([...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)]);
 }
 
-function extractTaskflowDeliverableFiles(taskDocument: Record<string, unknown>): string[] {
-  const value = taskDocument.deliverables;
-  if (!Array.isArray(value)) return [];
-  return uniqueStrings(value.filter((entry): entry is string => typeof entry === 'string'));
+function extractTaskflowDeliverableFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[] {
+  return uniqueStrings([...resolveTaskflowEffectiveDeliverables(cwd, taskId, taskDocument)]);
 }
 
 export function buildHistoricalClosePreflight(input: {
@@ -421,8 +411,8 @@ export function buildHistoricalClosePreflight(input: {
   waiverOutOfScopeDelivery: boolean;
   waiverReason: string | null;
 }): HistoricalClosePreflightSummary {
-  const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
-  const deliverableFiles = extractTaskflowDeliverableFiles(input.taskDocument);
+  const declaredFiles = extractTaskflowDeclaredFiles(input.cwd, input.taskId, input.taskDocument);
+  const deliverableFiles = extractTaskflowDeliverableFiles(input.cwd, input.taskId, input.taskDocument);
   const expectedCloseBundleFiles = uniqueStrings([
     ...input.previewCommitBundle.targetRepo.stageFiles,
     ...(input.previewCommitBundle.planningRepo.repoRoot ? input.previewCommitBundle.planningRepo.stageFiles : [])

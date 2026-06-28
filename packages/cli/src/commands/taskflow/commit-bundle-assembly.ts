@@ -9,8 +9,10 @@ import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-deli
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.ts';
 import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.ts';
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.ts';
+import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
 import { runAtmGit } from '../git-governance.ts';
 import { CliError, quoteCliValue } from '../shared.ts';
+import { isPathAllowedByScope } from '../work-channels.ts';
 
 export type TaskflowCommitMode = 'auto-commit' | 'stage-only' | 'dry-run';
 
@@ -174,10 +176,7 @@ function sourcePlanPathOf(taskDocument: Record<string, unknown>): string | null 
 }
 
 function taskflowPathMatches(filePath: string, declaredPath: string): boolean {
-  const file = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
-  const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
-  if (!file || !declared) return false;
-  return file === declared || file.startsWith(`${declared}/`);
+  return isPathAllowedByScope(filePath, [declaredPath]);
 }
 
 function buildScopeAmendmentProposal(input: {
@@ -489,27 +488,33 @@ export function buildTaskflowCommitBundle(input: {
   const deliverables = extractTaskflowDeliverables(taskDocument);
   const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
   const targetAllowedFiles = extractTaskStringList(taskDocument, 'targetAllowedFiles');
+  const effectiveRuntimeDeliverables = [...resolveTaskflowEffectiveDeliverables(targetRepoRoot, input.taskId, taskDocument)];
 
   const dirtyFiles = getDirtyFiles(targetRepoRoot);
   const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
   const historicalCloseback = historicalCommitted.length > 0;
 
-  let allowed = targetAllowedFiles;
+  let allowed = uniqueSorted([
+    ...targetAllowedFiles,
+    ...resolveTaskflowDeclaredFiles(targetRepoRoot, input.taskId, taskDocument)
+      .filter((entry) => !entry.startsWith('.atm/'))
+  ]);
   if (allowed.length === 0) {
     allowed = scopePaths;
   }
 
   const targetDeliveryFiles: string[] = [];
   const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
-  const targetGovernanceFiles: string[] = [
-    `.atm/history/tasks/${input.taskId}.json`,
-    `.atm/history/evidence/${input.taskId}.json`,
-    `.atm/history/evidence/${input.taskId}.closure-packet.json`,
-    ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
+  const backendGovernanceFiles = input.backendResult
+    ? [
+      ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
+      ...extractBackendStageFiles(input.backendResult)
+    ]
+    : [];
+  const targetGovernanceFiles = uniqueSorted([
     ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
-    ...listExistingFilesRecursively(targetRepoRoot, `.atm/history/task-events/${input.taskId}`),
-    ...extractBackendStageFiles(input.backendResult ?? null)
-  ];
+    ...backendGovernanceFiles
+  ]);
 
   const excludedDirtyFiles: string[] = [];
   const excludedReasons: Record<string, string> = {};
@@ -527,7 +532,10 @@ export function buildTaskflowCommitBundle(input: {
     metadataFailClosed = true;
     failClosedReason = directoryExpansion.failClosedReason;
   }
-  const effectiveDeliverables = directoryExpansion.ok ? directoryExpansion.effectiveDeliverables : deliverables;
+  const effectiveDeliverables = uniqueSorted([
+    ...(directoryExpansion.ok ? directoryExpansion.effectiveDeliverables : deliverables),
+    ...effectiveRuntimeDeliverables
+  ]);
 
   for (const del of effectiveDeliverables) {
     const isAllowed = allowed.some((all) => taskflowPathMatches(del, all));

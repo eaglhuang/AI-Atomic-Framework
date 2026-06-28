@@ -11,6 +11,20 @@ refactor, split, atomize, infect, migrate, or modernize existing source code.
 The goal is to keep the user request natural while still routing the work
 through ATM evidence before choosing a local implementation path.
 
+## Selective Learning Loop
+
+When the router basically worked but the agent still felt friction, near-bypass,
+or repeated uncertainty, do not read a monolithic lesson log by default.
+
+Read order:
+
+1. Read `references/index.md`.
+2. Pick only the single shard that matches the current symptom.
+3. Stop after the first relevant shard unless the blocker still remains
+   unresolved.
+4. Prefer durable rules already promoted into this `SKILL.md` or `atm-next`;
+   use the shard files for examples, edge cases, and recovery patterns.
+
 ## Captain/Dispatch Entry Gate
 
 If the user asks for Captain, Coordinator, dispatch, task cards, sidecars,
@@ -68,6 +82,15 @@ If `evidence.nextAction.governanceReadiness` is present, prepare those items
 before you reach commit or push. Treat framework claim, protected push
 evidence, `doctor`, and branch queue retry codes as early blockers, not as
 something to discover only after a hook or push failure.
+
+Turn `evidence.nextAction.governanceReadiness` into an immediate preparation
+checklist before implementation:
+
+1. Resolve actor identity now, not at commit time.
+2. If framework claim is required, inspect `node atm.mjs framework-mode status --json` and acquire the returned `framework-mode claim` before editing framework-critical files.
+3. If the route is on a protected or shared branch, run `node atm.mjs doctor --json` before the first governed write so readiness blockers surface early.
+4. Use `governanceReadiness.upstreamRef` when present and run `node atm.mjs hook pre-push --base <upstream-ref> --head HEAD --json` proactively before the final push, or earlier once the branch is ahead, so git-head evidence and branch-queue blockers show up before the real push.
+5. Treat `queueRetryCodes` as a shared-branch retry contract, not as an unexpected raw Git failure.
 
 Before editing implementation files, inspect framework mode:
 

@@ -9,8 +9,10 @@ import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-deli
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.js';
 import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.js';
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.js';
+import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
 import { runAtmGit } from '../git-governance.js';
 import { CliError, quoteCliValue } from '../shared.js';
+import { isPathAllowedByScope } from '../work-channels.js';
 function uniqueSorted(values) {
     return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
@@ -101,11 +103,7 @@ function sourcePlanPathOf(taskDocument) {
     return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
 }
 function taskflowPathMatches(filePath, declaredPath) {
-    const file = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
-    const declared = declaredPath.replace(/\\/g, '/').replace(/^\.\//, '').replace(/\/+$/, '');
-    if (!file || !declared)
-        return false;
-    return file === declared || file.startsWith(`${declared}/`);
+    return isPathAllowedByScope(filePath, [declaredPath]);
 }
 function buildScopeAmendmentProposal(input) {
     const candidateFiles = uniqueSorted(input.candidateFiles);
@@ -389,24 +387,30 @@ export function buildTaskflowCommitBundle(input) {
     const deliverables = extractTaskflowDeliverables(taskDocument);
     const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
     const targetAllowedFiles = extractTaskStringList(taskDocument, 'targetAllowedFiles');
+    const effectiveRuntimeDeliverables = [...resolveTaskflowEffectiveDeliverables(targetRepoRoot, input.taskId, taskDocument)];
     const dirtyFiles = getDirtyFiles(targetRepoRoot);
     const historicalCommitted = getHistoricalCommittedFiles(targetRepoRoot, input.historicalDeliveryRefs ?? []);
     const historicalCloseback = historicalCommitted.length > 0;
-    let allowed = targetAllowedFiles;
+    let allowed = uniqueSorted([
+        ...targetAllowedFiles,
+        ...resolveTaskflowDeclaredFiles(targetRepoRoot, input.taskId, taskDocument)
+            .filter((entry) => !entry.startsWith('.atm/'))
+    ]);
     if (allowed.length === 0) {
         allowed = scopePaths;
     }
     const targetDeliveryFiles = [];
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
-    const targetGovernanceFiles = [
-        `.atm/history/tasks/${input.taskId}.json`,
-        `.atm/history/evidence/${input.taskId}.json`,
-        `.atm/history/evidence/${input.taskId}.closure-packet.json`,
-        ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
+    const backendGovernanceFiles = input.backendResult
+        ? [
+            ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
+            ...extractBackendStageFiles(input.backendResult)
+        ]
+        : [];
+    const targetGovernanceFiles = uniqueSorted([
         ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
-        ...listExistingFilesRecursively(targetRepoRoot, `.atm/history/task-events/${input.taskId}`),
-        ...extractBackendStageFiles(input.backendResult ?? null)
-    ];
+        ...backendGovernanceFiles
+    ]);
     const excludedDirtyFiles = [];
     const excludedReasons = {};
     const scopeAmendmentCandidateFiles = [];
@@ -421,7 +425,10 @@ export function buildTaskflowCommitBundle(input) {
         metadataFailClosed = true;
         failClosedReason = directoryExpansion.failClosedReason;
     }
-    const effectiveDeliverables = directoryExpansion.ok ? directoryExpansion.effectiveDeliverables : deliverables;
+    const effectiveDeliverables = uniqueSorted([
+        ...(directoryExpansion.ok ? directoryExpansion.effectiveDeliverables : deliverables),
+        ...effectiveRuntimeDeliverables
+    ]);
     for (const del of effectiveDeliverables) {
         const isAllowed = allowed.some((all) => taskflowPathMatches(del, all));
         if (!isAllowed) {

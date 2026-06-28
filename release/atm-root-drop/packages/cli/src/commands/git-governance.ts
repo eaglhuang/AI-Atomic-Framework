@@ -71,6 +71,21 @@ function stageTrackedActorRegistryIfNeeded(cwd: string): string | null {
   return actorRegistryRelativePath;
 }
 
+function listCommitAttributionSideEffectPaths(cwd: string): readonly string[] {
+  const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+  if (!actorRegistryState.tracked) {
+    return [];
+  }
+  if (!actorRegistryState.staged && !actorRegistryState.unstaged) {
+    return [];
+  }
+  return [normalizeRelativePath(actorRegistryState.path)];
+}
+
+function isCommitAttributionSideEffectPath(filePath: string): boolean {
+  return normalizeRelativePath(filePath).toLowerCase() === actorRegistryRelativePath.toLowerCase();
+}
+
 function createSanitizedGitEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...process.env, ...extra };
   for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
@@ -2008,11 +2023,19 @@ function withTaskScopedCommitIndex<T>(
   };
   try {
     runGitCommandWithEnv(cwd, ['read-tree', 'HEAD'], env, ['ignore', 'pipe', 'pipe']);
-    runGitCommandWithEnv(cwd, ['add', '-A', '--', ...normalizedFiles], env, ['ignore', 'pipe', 'pipe']);
+    stageTaskScopedBundleFiles(cwd, normalizedFiles, env);
     return run(env);
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }
+}
+
+function stageTaskScopedBundleFiles(cwd: string, files: readonly string[], env?: NodeJS.ProcessEnv) {
+  const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+  if (normalizedFiles.length === 0) {
+    return;
+  }
+  runGitCommandWithEnv(cwd, ['add', '-A', '-f', '--', ...normalizedFiles], env ?? process.env, ['ignore', 'pipe', 'pipe']);
 }
 
 export function resolveTaskScopedCommitBundle(input: {
@@ -2057,12 +2080,16 @@ export function resolveTaskScopedCommitBundle(input: {
   const inScopeUnstagedDirty = unstagedDirtyFiles.filter((filePath) =>
     !isRuntimeCommitSideEffect(filePath)
     && (
-      declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
-      || isAllowedGovernanceArtifactPath(filePath, input.taskId)
+      isCommitAttributionSideEffectPath(filePath)
+      || (
+        declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+        || isAllowedGovernanceArtifactPath(filePath, input.taskId)
+      )
     )
   );
   const skippedExternalDirtyFiles = unstagedDirtyFiles.filter((filePath) =>
-    !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
+    !isCommitAttributionSideEffectPath(filePath)
+    && !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
     && !isIgnorableTaskScopedDirtySideEffect(filePath)
     && !isIgnorableCommitStagingSideEffect(filePath, input.taskId)
   );
@@ -2075,7 +2102,13 @@ export function resolveTaskScopedCommitBundle(input: {
     !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope)
   );
   const governanceBundleWarnings: string[] = [];
-  const stageCandidates = input.autoStage ? uniqueSorted(inScopeUnstagedDirty) : [];
+  const commitAttributionStageCandidates = unstagedDirtyFiles.filter((filePath) => isCommitAttributionSideEffectPath(filePath));
+  const stageCandidates = uniqueSorted([
+    ...commitAttributionStageCandidates,
+    ...(input.autoStage
+      ? inScopeUnstagedDirty.filter((filePath) => !isCommitAttributionSideEffectPath(filePath))
+      : [])
+  ]);
   const commitFiles = uniqueSorted([
     ...inScopeStagedFiles,
     ...inScopeStagedDeletions,
@@ -2094,7 +2127,7 @@ export function resolveTaskScopedCommitBundle(input: {
   }
 
   if (!blockedCode && input.apply && stageCandidates.length > 0) {
-    runGitCommand(input.cwd, ['add', '--', ...stageCandidates], ['ignore', 'pipe', 'pipe']);
+    stageTaskScopedBundleFiles(input.cwd, stageCandidates);
     stagedFiles = readStagedFiles(input.cwd);
   }
 
@@ -2216,6 +2249,7 @@ function inspectTaskScopedUnstagedCommit(
   const unstagedInScopeDirty = deliverableDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
   const unstagedDeliverableDirty = unstagedInScopeDirty.filter((filePath) =>
     !isAllowedGovernanceArtifactPath(filePath, taskId)
+    && !isCommitAttributionSideEffectPath(filePath)
   );
 
   if (
@@ -2320,7 +2354,8 @@ function resolveTaskDeclaredScope(cwd: string, taskId: string, taskDocument: Rec
     ...extractStringList(taskDirectionLock.allowedFiles),
     ...extractStringList(claim.files),
     ...extractStringList(taskDocument.targetAllowedFiles),
-    ...extractTaskDeclaredFiles(taskDocument)
+    ...extractTaskDeclaredFiles(taskDocument),
+    ...listCommitAttributionSideEffectPaths(cwd)
   ]));
 }
 

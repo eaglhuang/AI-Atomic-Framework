@@ -6,6 +6,7 @@
  * Adapter-specific skill template compiler. Emits IntegrationSourceFile
  * objects ready for installation by the manifest/construct layer.
  */
+import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderCharterInvariantsBlock as renderCharterInvariantsBlockCore } from './charter-block.js';
@@ -31,20 +32,26 @@ export function renderCharterInvariantsBlock(repositoryRoot = integrationsCoreRe
 export function compileSkillTemplatesForAdapter(adapterTarget, templates = loadMinimumAtmSkillTemplates(), options = {}) {
     const resolvedTemplates = templates ?? loadMinimumAtmSkillTemplates();
     if (adapterTarget === 'claude-code' || adapterTarget === 'codex') {
-        return resolvedTemplates.map((template) => ({
-            relativePath: `${template.frontmatter.id}/SKILL.md`,
-            content: compileSkillTemplate(template, adapterTarget, options),
-            fileFormat: 'skill',
-            source: 'template'
-        }));
+        return resolvedTemplates.flatMap((template) => [
+            {
+                relativePath: `${template.frontmatter.id}/SKILL.md`,
+                content: compileSkillTemplate(template, adapterTarget, options),
+                fileFormat: 'skill',
+                source: 'template'
+            },
+            ...loadSkillTemplateCompanionFiles(template.frontmatter.id)
+        ]);
     }
     if (adapterTarget === 'cursor') {
-        return resolvedTemplates.map((template) => ({
-            relativePath: `${template.frontmatter.id}/SKILL.md`,
-            content: compileSkillTemplate(template, 'cursor', options),
-            fileFormat: 'markdown',
-            source: 'template'
-        }));
+        return resolvedTemplates.flatMap((template) => [
+            {
+                relativePath: `${template.frontmatter.id}/SKILL.md`,
+                content: compileSkillTemplate(template, 'cursor', options),
+                fileFormat: 'markdown',
+                source: 'template'
+            },
+            ...loadSkillTemplateCompanionFiles(template.frontmatter.id)
+        ]);
     }
     if (adapterTarget === 'gemini') {
         return resolvedTemplates.map((template) => ({
@@ -155,6 +162,43 @@ function renderSkillTemplateBody(template, options = {}) {
         .replaceAll(actorIdentityHandoffGatePlaceholder, actorIdentityHandoffGate)
         .replaceAll(charterInvariantsPlaceholder, charterInvariants.text)
         .trimEnd();
+}
+function loadSkillTemplateCompanionFiles(templateId) {
+    const companionRoot = path.join(integrationsCoreRepoRoot, 'templates', 'skills', `${templateId}.files`);
+    return walkCompanionDirectory(companionRoot).map((filePath) => ({
+        relativePath: `${templateId}/${path.relative(companionRoot, filePath).replace(/\\/g, '/')}`,
+        content: readFileSync(filePath, 'utf8'),
+        fileFormat: inferIntegrationFileFormat(filePath),
+        source: 'template'
+    }));
+}
+function walkCompanionDirectory(directoryPath) {
+    try {
+        const entries = readdirSync(directoryPath, { withFileTypes: true });
+        return entries.flatMap((entry) => {
+            const fullPath = path.join(directoryPath, entry.name);
+            if (entry.isDirectory()) {
+                return walkCompanionDirectory(fullPath);
+            }
+            if (entry.isFile()) {
+                return [fullPath];
+            }
+            return [];
+        });
+    }
+    catch {
+        return [];
+    }
+}
+function inferIntegrationFileFormat(filePath) {
+    const extension = path.extname(filePath).toLowerCase();
+    if (extension === '.md')
+        return 'markdown';
+    if (extension === '.toml')
+        return 'toml';
+    if (extension === '.yml' || extension === '.yaml')
+        return 'yaml';
+    return 'markdown';
 }
 function escapeTomlBasicString(value) {
     return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');

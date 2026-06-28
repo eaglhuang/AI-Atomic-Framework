@@ -57,7 +57,7 @@ export interface HistoricalClosePreflightSummary {
     readonly dirtyGuard: FrameworkCloseDirtyGuardReport;
     readonly writeRollbackSummary: HistoricalCloseWriteRollbackSummary;
 }
-export declare function extractTaskflowDeclaredFiles(taskDocument: Record<string, unknown>): string[];
+export declare function extractTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[];
 export declare function buildHistoricalClosePreflight(input: {
     cwd: string;
     taskId: string;

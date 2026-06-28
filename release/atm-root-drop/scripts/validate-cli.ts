@@ -28,6 +28,9 @@ for (const key of Object.keys(process.env)) {
     delete process.env[key];
   }
 }
+for (const key of ['GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+  delete process.env[key];
+}
 
 const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
 const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');

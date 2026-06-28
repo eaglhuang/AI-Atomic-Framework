@@ -680,7 +680,8 @@ assert.equal(
   buildTaskflowCommitMessage('planning', { taskId: dryRunFixture.taskId }),
   'planning close commit message must come from the taskflow commit-message strategy'
 );
-assert.ok(dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/tasks/${dryRunFixture.taskId}.json`));
+assert.ok(dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes('src/deliver.txt'));
+assert.ok(!dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/tasks/${dryRunFixture.taskId}.json`), 'pre-close dry-run must not stage current-task governance files before backend close output exists');
 assert.ok(dryRunClose.evidence.governedCommitBundle.planningRepo.stageFiles.includes(`docs/tasks/${dryRunFixture.taskId}.task.md`));
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.targetRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage target repo');
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.planningRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage planning repo');
@@ -1518,6 +1519,33 @@ const brokenSourceFallbackDryRun = await runTaskflow([
 assert.equal(brokenSourceFallbackDryRun.ok, true, 'profile fallback must recover when source.planPath is stale');
 assert.equal(brokenSourceFallbackDryRun.evidence.closebackPathResolution.route, 'profile-root-fallback');
 assert.equal(brokenSourceFallbackDryRun.evidence.closebackPlan.closebackPathResolution?.route, 'profile-root-fallback');
+
+const taskDirectionFallbackFixture = await makeProfileFallbackCloseFixture('task-direction-fallback');
+const taskDirectionFallbackTaskPath = path.join(taskDirectionFallbackFixture.targetRepo, '.atm/history/tasks', `${taskDirectionFallbackFixture.taskId}.json`);
+writeJson(taskDirectionFallbackTaskPath, {
+  ...JSON.parse(readFileSync(taskDirectionFallbackTaskPath, 'utf8')),
+  source: {
+    planPath: 'missing/tasks/TASK-BROKEN.task.md',
+    sectionTitle: taskDirectionFallbackFixture.taskId,
+    headingLine: 1,
+    hash: 'broken-source-plan'
+  },
+  taskDirectionLock: {
+    planningReadOnlyPaths: [taskDirectionFallbackFixture.planPath],
+    planningMirrorPaths: [taskDirectionFallbackFixture.planPath]
+  }
+});
+const taskDirectionFallbackDryRun = await runTaskflow([
+  'close',
+  '--cwd', taskDirectionFallbackFixture.targetRepo,
+  '--task', taskDirectionFallbackFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', taskDirectionFallbackFixture.deliveryCommit,
+  '--json'
+]) as any;
+assert.equal(taskDirectionFallbackDryRun.ok, true, 'task-direction fallback must recover when source.planPath is stale without a profile');
+assert.equal(taskDirectionFallbackDryRun.evidence.closebackPathResolution.route, 'task-direction-fallback');
+assert.equal(taskDirectionFallbackDryRun.evidence.closebackPlan.closebackPathResolution?.route, 'task-direction-fallback');
 
 const profileFallbackAmbiguousFixture = await makeProfileFallbackCloseFixture('ambiguous');
 const ambiguousTaskPath = path.join(profileFallbackAmbiguousFixture.targetRepo, '.atm/history/tasks', `${profileFallbackAmbiguousFixture.taskId}.json`);

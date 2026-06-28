@@ -41,13 +41,13 @@ import {
 import { buildTaskflowCommitMessage } from './taskflow/commit-messages.ts';
 import {
   buildTaskflowClosePreflight,
-  extractTaskflowDeclaredFiles,
   inspectPlanningAuthorityDelivery,
   preflightBlockersToWriteReadinessBlockers
 } from './taskflow/close-preflight.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { quoteCliValue, relativePathFrom } from './shared.ts';
 import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.ts';
+import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.ts';
 import {
   assertCommitBundleReady,
   buildTaskflowCommitBundle,
@@ -648,7 +648,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
   });
 
   const hasUncommittedDeliverables = previewCommitBundle.targetDeliveryFiles.length > 0;
-  const declaredFiles = extractTaskflowDeclaredFiles(taskDocument);
+  const declaredFiles = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];
   const historicalClosePreflight = buildTaskflowClosePreflight({
     cwd,
     taskId,

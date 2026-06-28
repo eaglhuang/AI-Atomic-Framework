@@ -9,6 +9,7 @@ import { evaluateFrameworkCloseDirtyGuard } from '../tasks/scope-lock-diagnostic
 import { evaluatePlanningMirrorDirtyFiles } from '../tasks/planning-mirror-close-diagnostics.js';
 import { inspectHistoricalDelivery } from '../tasks/historical-delivery.js';
 import { isPathAllowedByScope } from '../work-channels.js';
+import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
 function uniqueStrings(values) {
     return [...new Set(values.map((entry) => entry.trim()).filter(Boolean))];
 }
@@ -283,28 +284,15 @@ function buildWriteRollbackSummary(taskId) {
         ]
     };
 }
-export function extractTaskflowDeclaredFiles(taskDocument) {
-    const readList = (key) => {
-        const value = taskDocument[key];
-        if (!Array.isArray(value))
-            return [];
-        return value.filter((entry) => typeof entry === 'string');
-    };
-    return uniqueStrings([
-        ...readList('deliverables'),
-        ...readList('scopePaths'),
-        ...readList('targetAllowedFiles')
-    ]);
+export function extractTaskflowDeclaredFiles(cwd, taskId, taskDocument) {
+    return uniqueStrings([...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)]);
 }
-function extractTaskflowDeliverableFiles(taskDocument) {
-    const value = taskDocument.deliverables;
-    if (!Array.isArray(value))
-        return [];
-    return uniqueStrings(value.filter((entry) => typeof entry === 'string'));
+function extractTaskflowDeliverableFiles(cwd, taskId, taskDocument) {
+    return uniqueStrings([...resolveTaskflowEffectiveDeliverables(cwd, taskId, taskDocument)]);
 }
 export function buildHistoricalClosePreflight(input) {
-    const declaredFiles = extractTaskflowDeclaredFiles(input.taskDocument);
-    const deliverableFiles = extractTaskflowDeliverableFiles(input.taskDocument);
+    const declaredFiles = extractTaskflowDeclaredFiles(input.cwd, input.taskId, input.taskDocument);
+    const deliverableFiles = extractTaskflowDeliverableFiles(input.cwd, input.taskId, input.taskDocument);
     const expectedCloseBundleFiles = uniqueStrings([
         ...input.previewCommitBundle.targetRepo.stageFiles,
         ...(input.previewCommitBundle.planningRepo.repoRoot ? input.previewCommitBundle.planningRepo.stageFiles : [])

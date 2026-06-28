@@ -51,6 +51,29 @@ const bundle = buildTaskflowCommitBundle({
 assert.equal(bundle.targetRepo.commitMessage, 'chore(taskflow): close TASK-BUNDLE-0001 target governance bundle');
 assert.equal(bundle.planningRepo.commitMessage, 'docs(taskflow): close TASK-BUNDLE-0001 planning bundle');
 assert.ok(bundle.targetDeliveryFiles.includes('src/app.ts'));
+assert.ok(!bundle.targetRepo.stageFiles.includes('.atm/history/tasks/TASK-BUNDLE-0001.json'), 'pre-close bundle must not stage current-task governance files before backend close artifacts exist');
+
+writeJson(path.join(targetRepo, '.atm/history/evidence/TASK-BUNDLE-0001.closure-packet.json'), {
+  schemaId: 'atm.closurePacket.v1',
+  taskId: 'TASK-BUNDLE-0001'
+});
+const backendBundle = buildTaskflowCommitBundle({
+  cwd: targetRepo,
+  taskId: 'TASK-BUNDLE-0001',
+  actorId: 'validator',
+  commitMode: 'dry-run',
+  planningMirrorPath: planPath,
+  rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false,
+  backendResult: {
+    evidence: {
+      taskPath: '.atm/history/tasks/TASK-BUNDLE-0001.json',
+      closurePacketPath: '.atm/history/evidence/TASK-BUNDLE-0001.closure-packet.json',
+      transitionPath: '.atm/history/task-events/TASK-BUNDLE-0001/close.json'
+    }
+  }
+});
+assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/tasks/TASK-BUNDLE-0001.json'), 'post-close bundle must stage task governance files once backend close artifacts exist');
 
 const autoCommitTaskId = 'TASK-BUNDLE-0002';
 const autoTargetRepo = path.join(tempRoot, 'target-auto');
@@ -156,6 +179,10 @@ writeJson(path.join(sameRepo, '.atm/history/evidence/TASK-BUNDLE-0003.closure-pa
   taskId: sameRepoTaskId,
   schemaId: 'atm.closurePacket.v1'
 });
+writeJson(path.join(sameRepo, '.atm/history/task-events/TASK-BUNDLE-0003/close.json'), {
+  taskId: sameRepoTaskId,
+  action: 'close'
+});
 writeText(path.join(sameRepo, 'src/app.ts'), 'export const value = 3;\n');
 execFileSync('git', ['add', '.'], { cwd: sameRepo, stdio: 'ignore' });
 execFileSync('git', ['commit', '-m', 'base same repo fixture'], { cwd: sameRepo, stdio: 'ignore' });
@@ -169,7 +196,14 @@ const sameRepoBundle = buildTaskflowCommitBundle({
   commitMode: 'auto-commit',
   planningMirrorPath: sameRepoPlanPath,
   rosterIndexPath: null,
-  planningAuthorityDeliveryOk: false
+  planningAuthorityDeliveryOk: false,
+  backendResult: {
+    evidence: {
+      taskPath: `.atm/history/tasks/${sameRepoTaskId}.json`,
+      closurePacketPath: `.atm/history/evidence/${sameRepoTaskId}.closure-packet.json`,
+      transitionPath: `.atm/history/task-events/${sameRepoTaskId}/close.json`
+    }
+  }
 });
 const sameRepoFinal = await finalizeTaskflowCommitBundle({
   bundle: sameRepoBundle,
@@ -186,5 +220,43 @@ assert.equal(
   execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: sameRepo, encoding: 'utf8' }).trim(),
   `chore(taskflow): close ${sameRepoTaskId} target governance bundle`
 );
+
+const amendedTaskId = 'TASK-BUNDLE-0004';
+const amendedTargetRepo = path.join(tempRoot, 'target-amended');
+const amendedPlanningRepo = path.join(tempRoot, 'planning-amended');
+initGitRepo(amendedTargetRepo);
+initGitRepo(amendedPlanningRepo);
+const amendedPlanPath = path.join(amendedPlanningRepo, 'docs/tasks/TASK-BUNDLE-0004.task.md');
+writeText(amendedPlanPath, `---\ntask_id: ${amendedTaskId}\nstatus: running\n---\n# ${amendedTaskId}\n`);
+writeJson(path.join(amendedTargetRepo, '.atm/history/tasks/TASK-BUNDLE-0004.json'), {
+  workItemId: amendedTaskId,
+  title: `${amendedTaskId} fixture`,
+  status: 'running',
+  claim: {
+    actorId: 'validator',
+    leaseId: 'lease-bundle-0004',
+    state: 'active',
+    files: ['packages/**']
+  },
+  taskDirectionLock: {
+    allowedFiles: ['packages/**']
+  },
+  deliverables: ['docs/guide.md'],
+  scopePaths: ['docs/**', 'packages/**'],
+  targetAllowedFiles: ['docs/**'],
+  source: { planPath: amendedPlanPath }
+});
+writeText(path.join(amendedTargetRepo, 'packages/cli/src/runtime-scope.ts'), 'export const runtimeScoped = true;\n');
+const amendedBundle = buildTaskflowCommitBundle({
+  cwd: amendedTargetRepo,
+  taskId: amendedTaskId,
+  actorId: 'validator',
+  commitMode: 'dry-run',
+  planningMirrorPath: amendedPlanPath,
+  rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+assert.equal(amendedBundle.failClosed, false, 'runtime-amended deliverables should not force historical lane fail-close');
+assert.ok(amendedBundle.targetDeliveryFiles.includes('packages/cli/src/runtime-scope.ts'), 'claim-expanded runtime file must be treated as deliverable');
 
 console.log('ok: commit bundle assembly spec passed');

@@ -7,7 +7,7 @@ export interface TaskflowPlanningAuthorityDeliveryGate {
     matchedFiles: string[];
     reason: string | null;
 }
-export declare function extractTaskflowDeclaredFiles(taskDocument: Record<string, unknown>): string[];
+export declare function extractTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[];
 export declare function inspectPlanningAuthorityDelivery(input: {
     cwd: string;
     taskDocument: Record<string, unknown>;

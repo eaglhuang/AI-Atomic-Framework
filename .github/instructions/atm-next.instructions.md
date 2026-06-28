@@ -55,6 +55,15 @@ before you reach commit or push. Treat framework claim, protected push
 evidence, `doctor`, and branch queue retry codes as early blockers, not as
 something to discover only after a hook or push failure.
 
+Translate `evidence.nextAction.governanceReadiness` into an immediate
+preparation checklist before implementation:
+
+1. Resolve actor identity now, not at commit time.
+2. If framework claim is required, inspect `node atm.mjs framework-mode status --json` and acquire the returned `framework-mode claim` before editing framework-critical files.
+3. If the route is on a protected or shared branch, run `node atm.mjs doctor --json` before the first governed write so readiness blockers surface early.
+4. Use `governanceReadiness.upstreamRef` when present and run `node atm.mjs hook pre-push --base <upstream-ref> --head HEAD --json` proactively before the final push, or earlier once the branch is ahead, so git-head evidence and branch-queue blockers show up before the real push.
+5. Treat `queueRetryCodes` as a shared-branch retry contract, not as an unexpected raw Git failure.
+
 For normal task-card work, keep this order fixed:
 
 ```text
@@ -112,6 +121,21 @@ bookkeeping, not from weaker delivery or evidence requirements.
 After checkpoint succeeds, commit the queue-head deliverables together with the
 matching `.atm/history/tasks/<task>.json`, `.atm/history/evidence/<task>.json`,
 and `.atm/history/task-events/<task>/` files.
+
+If `next --task <id>` resolves one planning-repo Markdown card but
+`next --claim` returns `ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED`, import that
+single task card path first instead of widening to the whole planning document.
+Use the narrowest materialization lane that makes the selected card claimable.
+
+If `next --claim` reports dependency blockers and the blocker detail says the
+prerequisite task snapshots are `missing`, do not assume the implementation is
+still undone. Check the planning-source task status and refresh/import the
+missing prerequisite snapshots before redesigning the work.
+
+If a dependency blocker says `source-done-governance-incomplete`, do not treat
+it as missing product work. Resolve the target-ledger closure proof through the
+governed reconcile or attestation path before widening scope or redoing the
+implementation.
 
 ## Handoff
 

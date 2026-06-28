@@ -2659,6 +2659,10 @@ function collectTaskGovernedCommitAllowedFiles(cwd: string, taskId: string | nul
     if (planPath) files.push(planPath);
     collectStringArrayField((task as Record<string, unknown>).planningMirrorPaths, files);
   }
+  const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+  if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
+    files.push(actorRegistryState.path);
+  }
   return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
 }
 
@@ -2968,7 +2972,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
     findings.push({
       code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED',
       source: 'commit-attribution',
-      detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit auto-stages that tracked registry for non-task commits, but bare git commit cannot; task-scoped commits still need the registry explicitly staged in scope. Re-run through the ATM wrapper or restore the drift first.`,
+      detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit can auto-stage that tracked registry when it belongs to the governed commit surface, but bare git commit cannot. Re-run through the ATM wrapper or restore the drift first.`,
       requiredCommand: governedRecoveryCommand,
       classification: 'current-task'
     });
