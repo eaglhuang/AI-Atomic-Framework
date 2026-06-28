@@ -274,6 +274,101 @@ function normalizeRelativePath(root, entryPath) {
     const relative = path.relative(root, entryPath).replace(/\\/g, '/');
     return relative && !relative.startsWith('..') ? relative : entryPath.replace(/\\/g, '/');
 }
+export function diagnoseClaimReadinessForTasks(cwd, tasks, claimIntent) {
+    const diagnostics = [];
+    for (const task of tasks) {
+        const status = normalizeTaskRouteStatus(task.status);
+        const claimable = canTaskBePreparedForClaim(status) || (status === 'review' && claimIntent === 'closeout-only');
+        if (task.format === 'markdown') {
+            diagnostics.push({
+                taskId: task.workItemId,
+                status,
+                format: task.format,
+                claimable: false,
+                blockerCode: 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED',
+                blockerSummary: `Task ${task.workItemId} is still a Markdown task card and must be imported before claim.`,
+                requiredCommand: task.sourcePlanPath
+                    ? `node atm.mjs tasks import --from ${quoteCliValue(task.sourcePlanPath)} --dry-run --cwd . --json`
+                    : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json',
+                dependencyBlockers: []
+            });
+            continue;
+        }
+        if (status === 'review' && claimIntent !== 'closeout-only') {
+            diagnostics.push({
+                taskId: task.workItemId,
+                status,
+                format: task.format,
+                claimable: false,
+                blockerCode: 'ATM_NEXT_CLAIM_REVIEW_CLOSEOUT_ONLY_REQUIRED',
+                blockerSummary: `Task ${task.workItemId} is in review; reclaim it only through closeout-only when no more source mutation is needed.`,
+                requiredCommand: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(task.workItemId)} --claim-intent closeout-only --json`,
+                dependencyBlockers: []
+            });
+            continue;
+        }
+        const taskPath = taskPathFor(cwd, task.workItemId);
+        const dependencyBlockers = existsSync(taskPath)
+            ? (() => {
+                try {
+                    const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+                    return findTaskClaimDependencyBlockers(cwd, task.workItemId, taskDocument);
+                }
+                catch {
+                    return [];
+                }
+            })()
+            : [];
+        if (dependencyBlockers.length > 0) {
+            const firstBlocker = dependencyBlockers[0];
+            diagnostics.push({
+                taskId: task.workItemId,
+                status,
+                format: task.format,
+                claimable: false,
+                blockerCode: 'ATM_NEXT_CLAIM_DEPENDENCY_BLOCKED',
+                blockerSummary: firstBlocker.status === 'source-done-governance-incomplete'
+                    ? `Task ${task.workItemId} is blocked because prerequisite ${firstBlocker.taskId} is source-done but not governably closed.`
+                    : `Task ${task.workItemId} is blocked until prerequisite task(s) close.`,
+                requiredCommand: firstBlocker.requiredCommand
+                    ?? (firstBlocker.status === 'incomplete-closeout' || firstBlocker.status === 'source-done-governance-incomplete'
+                        ? `node atm.mjs tasks status --task ${firstBlocker.taskId} --residue --json`
+                        : `node atm.mjs tasks status --task ${firstBlocker.taskId} --json`),
+                dependencyBlockers
+            });
+            continue;
+        }
+        if (!claimable) {
+            diagnostics.push({
+                taskId: task.workItemId,
+                status,
+                format: task.format,
+                claimable: false,
+                blockerCode: 'ATM_NEXT_CLAIM_NOT_READY',
+                blockerSummary: `Task ${task.workItemId} is currently ${status} and cannot be claimed yet.`,
+                requiredCommand: `node atm.mjs tasks status --task ${task.workItemId} --json`,
+                dependencyBlockers: []
+            });
+            continue;
+        }
+        diagnostics.push({
+            taskId: task.workItemId,
+            status,
+            format: task.format,
+            claimable: true,
+            blockerCode: 'ATM_NEXT_CLAIM_READY',
+            blockerSummary: `Task ${task.workItemId} can be prepared for claim.`,
+            requiredCommand: `node atm.mjs next --claim --actor <id> --task ${task.workItemId} --auto-intent --json`,
+            dependencyBlockers: []
+        });
+    }
+    const primaryBlocker = diagnostics.find((entry) => !entry.claimable) ?? null;
+    return {
+        schemaId: 'atm.claimReadinessReport.v1',
+        diagnostics,
+        primaryBlocker
+    };
+}
 function decideNextAction(runtime, failedCheckName, importedTaskQueue) {
     if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
         return {
@@ -394,6 +489,8 @@ function buildCrossRepoFrameworkNextResult(input) {
     });
 }
 async function claimNextImportedTask(input) {
+    const claimStartedAt = Date.now();
+    const claimLatencyPhases = [];
     const claimIntent = input.claimIntent ?? 'write';
     const autoIntent = input.autoIntent !== false && input.claimIntent == null;
     const promptScopeRuntime = input.importedTaskQueue.promptScope?.status === 'queue'
@@ -499,6 +596,8 @@ async function claimNextImportedTask(input) {
         });
     }
     if (!importedTaskQueue.claimableTask) {
+        const claimReadiness = diagnoseClaimReadinessForTasks(input.cwd, importedTaskQueue.promptScope?.selectedTasks ?? importedTaskQueue.tasks, claimIntent);
+        const primaryBlocker = claimReadiness.primaryBlocker;
         const selectedReviewTask = importedTaskQueue.selectedTask
             && normalizeTaskRouteStatus(importedTaskQueue.selectedTask.status) === 'review'
             ? importedTaskQueue.selectedTask
@@ -524,21 +623,34 @@ async function claimNextImportedTask(input) {
         const claimCode = importedTaskQueue.promptScope?.selectedTasks.some((task) => task.format === 'markdown')
             ? 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
             : 'ATM_NEXT_CLAIM_NO_TASK';
-        const claimText = claimCode === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
-            ? 'The prompt-scoped task is a Markdown task card; import or mirror it into the ATM task ledger before claim.'
-            : 'No claimable imported task is ready at the moment.';
+        const singleVisibleTask = importedTaskQueue.tasks.length === 1 ? importedTaskQueue.tasks[0] : null;
+        const promptScopeMiss = !importedTaskQueue.promptScope && !primaryBlocker && singleVisibleTask;
+        const claimText = primaryBlocker?.blockerSummary
+            ?? (promptScopeMiss
+                ? `Prompt did not resolve to a scoped imported task. ATM found ${singleVisibleTask.workItemId}, but it will not auto-claim unrelated open work from an unscoped prompt.`
+                : null)
+            ?? (claimCode === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'
+                ? 'The prompt-scoped task is a Markdown task card; import or mirror it into the ATM task ledger before claim.'
+                : 'No claimable imported task is ready at the moment.');
         return makeResult({
             ok: false,
             command: 'next',
             cwd: input.cwd,
             messages: [message('error', claimCode, claimText, {
-                    requiredCommand: importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
-                        ? `node atm.mjs tasks import --from ${quoteCliValue(importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
-                        : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json'
+                    requiredCommand: primaryBlocker?.requiredCommand
+                        ?? (promptScopeMiss
+                            ? `node atm.mjs next --claim --actor <id> --task ${singleVisibleTask.workItemId} --auto-intent --json`
+                            : null)
+                        ?? (importedTaskQueue.promptScope?.selectedTasks[0]?.sourcePlanPath
+                            ? `node atm.mjs tasks import --from ${quoteCliValue(importedTaskQueue.promptScope.selectedTasks[0].sourcePlanPath ?? '')} --dry-run --cwd . --json`
+                            : 'node atm.mjs tasks import --from <plan.md> --dry-run --cwd . --json'),
+                    primaryBlocker,
+                    claimReadiness
                 })],
             evidence: {
                 taskIntent: input.taskIntent,
-                importedTaskQueue
+                importedTaskQueue,
+                claimReadiness
             }
         });
     }
@@ -640,6 +752,7 @@ async function claimNextImportedTask(input) {
     }
     let parallelAdvisory = undefined;
     // Parallel preflight check
+    const parallelStartedAt = Date.now();
     try {
         const parallelResult = await runTasks([
             'parallel',
@@ -717,6 +830,7 @@ async function claimNextImportedTask(input) {
         }
         // Other parallel errors are handled as best-effort
     }
+    claimLatencyPhases.push({ phase: 'parallel-preflight', durationMs: Date.now() - parallelStartedAt });
     const claimDeliveryClassification = classifyTaskDelivery({
         cwd: input.cwd,
         task: {
@@ -771,6 +885,7 @@ async function claimNextImportedTask(input) {
     const activeClaimIntent = claimableTask.activeClaimIntent ?? 'write';
     const shouldReuseActiveClaim = alreadyClaimedByActor
         && (autoIntent || activeClaimIntent === claimIntent);
+    const claimPreparationStartedAt = Date.now();
     const claimPreparation = shouldReuseActiveClaim
         ? {
             taskId: claimableTask.workItemId,
@@ -783,6 +898,8 @@ async function claimNextImportedTask(input) {
             task: claimableTask,
             actorId: resolvedActor.actorId
         });
+    claimLatencyPhases.push({ phase: 'claim-preparation', durationMs: Date.now() - claimPreparationStartedAt });
+    const claimCommandStartedAt = Date.now();
     const claimResult = shouldReuseActiveClaim
         ? await runTasks([
             'renew',
@@ -810,6 +927,7 @@ async function claimNextImportedTask(input) {
             ])).join(','),
             '--json'
         ]);
+    claimLatencyPhases.push({ phase: shouldReuseActiveClaim ? 'renew-claim' : 'tasks-claim', durationMs: Date.now() - claimCommandStartedAt });
     if (shouldReuseActiveClaim && claimResult.ok && claimResult.evidence) {
         claimResult.evidence.reusedActiveClaim = true;
         claimResult.evidence.claimIntent = activeClaimIntent;
@@ -855,6 +973,7 @@ async function claimNextImportedTask(input) {
             queue: queueForDirection
         });
     }
+    const directionLockStartedAt = Date.now();
     const directionLock = writeTaskDirectionLock({
         cwd: input.cwd,
         taskId: claimableTask.workItemId,
@@ -868,6 +987,7 @@ async function claimNextImportedTask(input) {
         allowPlanningMirror: claimableTask.allowPlanningMirror,
         prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
     });
+    claimLatencyPhases.push({ phase: 'direction-lock-write', durationMs: Date.now() - directionLockStartedAt });
     const claimEvidence = claimResult && typeof claimResult === 'object' && 'evidence' in claimResult && claimResult.evidence && typeof claimResult.evidence === 'object'
         ? claimResult.evidence
         : null;
@@ -1010,7 +1130,12 @@ async function claimNextImportedTask(input) {
             taskIntent: input.taskIntent,
             importedTaskQueue: input.importedTaskQueue,
             integrationBootstrap: input.integrationBootstrap,
-            runtimeAdapterReadiness: input.runtimeAdapterReadiness
+            runtimeAdapterReadiness: input.runtimeAdapterReadiness,
+            claimLatency: {
+                schemaId: 'atm.claimLatencyTelemetry.v1',
+                totalMs: Date.now() - claimStartedAt,
+                phases: claimLatencyPhases
+            }
         }
     });
 }

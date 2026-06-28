@@ -4375,6 +4375,8 @@ async function runTasksMigrateLegacyLedger(argv: string[]) {
 }
 
 async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) {
+  const claimLifecycleStartedAt = Date.now();
+  const claimLifecyclePhases: Array<{ readonly phase: string; readonly durationMs: number }> = [];
   const options = parseClaimLifecycleOptions(action, argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
@@ -4415,6 +4417,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       autoIntent: options.autoIntent === true && options.claimIntentExplicit !== true,
       explicitClaimIntent: options.claimIntentExplicit === true
     });
+    claimLifecyclePhases.push({ phase: 'claim-intent-resolution', durationMs: 0 });
     if (options.claimIntentExplicit === true
       && options.claimIntent === 'closeout-only'
       && claimIntentResolution.dirtyInScopeFiles.length > 0) {
@@ -4436,6 +4439,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       currentClaimActorId: currentClaim?.actorId ?? null,
       currentClaimState: currentClaim?.state ?? null
     });
+    claimLifecyclePhases.push({ phase: 'claim-admission', durationMs: 0 });
     if (!claimAdmission.ok) {
       throw new CliError(claimAdmission.code, claimAdmission.message, {
         exitCode: 1,
@@ -4443,6 +4447,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       });
     }
     const dependencyBlockers = findTaskClaimDependencyBlockers(options.cwd, options.taskId, taskDocument);
+    claimLifecyclePhases.push({ phase: 'dependency-gate', durationMs: 0 });
     if (dependencyBlockers.length > 0) {
       const firstBlocker = dependencyBlockers[0];
       const closeoutBlocker = firstBlocker as TaskClaimDependencyBlocker;
@@ -4480,7 +4485,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       intent: claimIntentResolution.resolvedClaimIntent
     };
     try {
+      const lockAcquireStartedAt = Date.now();
       await resolveValue(adapter.stores.lockStore.acquireLock(taskRef, files, actorId));
+      claimLifecyclePhases.push({ phase: 'lock-acquire', durationMs: Date.now() - lockAcquireStartedAt });
     } catch (error) {
       const code = extractErrorCode(error);
       if (code === 'ATM_LOCK_CONFLICT') {
@@ -4507,6 +4514,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
     taskDocument.startedBySessionId = sessionRecord.session.sessionId;
     const previousStatus = String(taskDocument.status ?? '');
     taskDocument.status = 'running';
+    const directionLockStartedAt = Date.now();
     const directionLock = writeTaskDirectionLock({
       cwd: options.cwd,
       taskId: options.taskId,
@@ -4520,7 +4528,9 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       allowPlanningMirror: taskDocument.allowPlanningMirror === true,
       prompt: options.taskId
     });
+    claimLifecyclePhases.push({ phase: 'direction-lock-write', durationMs: Date.now() - directionLockStartedAt });
     taskDocument.taskDirectionLock = directionLock;
+    const transitionStartedAt = Date.now();
     const transitionPath = writeTaskDocumentWithTransition({
       cwd: options.cwd,
       taskPath,
@@ -4531,6 +4541,7 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
       sessionId: sessionRecord.session.sessionId,
       previousStatus
     });
+    claimLifecyclePhases.push({ phase: 'task-transition-write', durationMs: Date.now() - transitionStartedAt });
     return makeResult({
       ok: true,
       command: 'tasks',
@@ -4551,7 +4562,12 @@ async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'release' | 'h
         transitionPath,
         sessionId: sessionRecord.session.sessionId,
         session: sessionRecord.session,
-        taskDirectionLock: directionLock
+        taskDirectionLock: directionLock,
+        claimLatency: {
+          schemaId: 'atm.claimLatencyTelemetry.v1',
+          totalMs: Date.now() - claimLifecycleStartedAt,
+          phases: claimLifecyclePhases
+        }
       }
     });
 }
