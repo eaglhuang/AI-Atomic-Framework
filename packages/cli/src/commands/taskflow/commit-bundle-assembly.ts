@@ -687,7 +687,7 @@ function stageRepoBundle(repo: TaskflowCommitRepoBundle, taskId?: string): Taskf
       indexIsolation: buildIndexIsolation(repo, readStagedFiles(repo.repoRoot))
     };
   }
-  runGitOrThrow(repo.repoRoot, ['add', '--', ...existingFiles]);
+  runGitOrThrow(repo.repoRoot, ['add', '-A', '-f', '--', ...existingFiles]);
   return { ...repo, stageFiles: existingFiles, status: 'staged' };
 }
 
@@ -713,7 +713,7 @@ async function commitTaskflowBundle(input: {
     ? tryGitScalar(input.bundle.targetRepo.repoRoot, ['rev-parse', '--verify', 'HEAD'])
     : null;
   if (input.bundle.targetRepo.repoRoot && targetForeignStagedFiles.length > 0) {
-    runGitOrThrow(input.bundle.targetRepo.repoRoot, ['add', '--', ...targetForeignStagedFiles]);
+    runGitOrThrow(input.bundle.targetRepo.repoRoot, ['add', '-A', '-f', '--', ...targetForeignStagedFiles]);
   }
   let targetRepo: TaskflowCommitRepoBundle = {
     ...input.bundle.targetRepo,
@@ -746,7 +746,7 @@ async function commitTaskflowBundle(input: {
       taskId: input.taskId
     });
     if (planningForeignStagedFiles.length > 0) {
-      runGitOrThrow(planningRepo.repoRoot, ['add', '--', ...planningForeignStagedFiles]);
+      runGitOrThrow(planningRepo.repoRoot, ['add', '-A', '-f', '--', ...planningForeignStagedFiles]);
     }
     planningRepo = {
       ...planningRepo,
@@ -797,7 +797,7 @@ function commitRepoWithTemporaryIndex(input: {
     // residue in the live index cannot leak into a governed close bundle.
     runGitWithEnv(input.repoRoot, ['read-tree', 'HEAD'], env);
     if (input.stageFiles.length > 0) {
-      runGitWithEnv(input.repoRoot, ['add', '-A', '--', ...input.stageFiles], env);
+      runGitWithEnv(input.repoRoot, ['add', '-A', '-f', '--', ...input.stageFiles], env);
     }
     runGitWithEnv(input.repoRoot, input.args, env);
   } finally {
@@ -908,7 +908,7 @@ export async function finalizeTaskflowCommitBundle(input: {
     });
     const commitSha = tryGitScalar(repoRoot, ['rev-parse', '--verify', 'HEAD']);
     if (foreignStagedFiles.length > 0) {
-      runGitOrThrow(repoRoot, ['add', '--', ...foreignStagedFiles]);
+      runGitOrThrow(repoRoot, ['add', '-A', '-f', '--', ...foreignStagedFiles]);
     }
     return {
       ...input.bundle,
