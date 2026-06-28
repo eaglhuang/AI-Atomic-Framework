@@ -42,11 +42,23 @@ function runAtmDoctor(cwd: any) {
     encoding: 'utf8',
     env: createSanitizedGitEnv()
   });
-  const payload = (result.stdout || result.stderr || '').trim();
+  const payload = extractJsonPayload((result.stdout || result.stderr || '').trim());
   return {
     exitCode: result.status ?? 0,
     parsed: payload ? JSON.parse(payload) : {}
   };
+}
+
+function extractJsonPayload(payload: string) {
+  if (!payload) return payload;
+  const objectIndex = payload.indexOf('{');
+  const arrayIndex = payload.indexOf('[');
+  const start = objectIndex === -1
+    ? arrayIndex
+    : arrayIndex === -1
+      ? objectIndex
+      : Math.min(objectIndex, arrayIndex);
+  return start >= 0 ? payload.slice(start) : payload;
 }
 
 function gitCheck(result: any) {
