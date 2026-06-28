@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-28T21-21-25-063Z-close-02021b32404f",
+  "taskId": "TASK-SKL-0007",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260628145104-codex-gpt-5.4-mini-TASK-SKL-0007-cefcd13ca2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0007.json",
+  "taskSha256": "sha256:9f23f08c75099ee00912ad7dabdb8e9fe8a2d86bda18222e65c7402e43c81324",
+  "createdAt": "2026-06-28T21:21:25.063Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0007 --actor codex-gpt-5.4-mini --status done --historical-delivery d6eeab308db78934f1c48914795defab65efe6cc",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260628145104-codex-gpt-5.4-mini-TASK-SKL-0007-cefcd13ca2",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0007.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-28T21:21:25.055Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/**",
+        ".atm/history/evidence/TASK-SKL-0002.closure-packet.json",
+        ".atm/history/evidence/TASK-SKL-0002.json",
+        ".atm/history/evidence/TASK-SKL-0007.*",
+        ".atm/history/protected-override-audit/**",
+        ".atm/history/task-events/TASK-SKL-0002/**",
+        ".atm/history/task-events/TASK-SKL-0007/**",
+        ".atm/history/tasks/TASK-SKL-0002.json",
+        ".atm/history/tasks/TASK-SKL-0007.json",
+        ".claude/**",
+        ".cursor/**",
+        ".gemini/**",
+        ".github/**",
+        "docs/**",
+        "GEMINI.md",
+        "integrations/**",
+        "packages/**",
+        "release/**",
+        "skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md",
+        "templates/**"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/**",
+        "templates/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0007",
+  "title": "Shared skill growth contract and learning loop",
+  "status": "done",
+  "milestone": "P1",
+  "dependencies": [
+    "TASK-SKL-0002"
+  ],
+  "acceptance": [
+    "ATM skills share one growth contract instead of each skill inventing its own learning structure.",
+    "The contract defines:",
+    "a shared taxonomy,",
+    "a shared capture template,",
+    "promotion rules for moving durable rules into `SKILL.md`,",
+    "reference-only handling for raw cases and examples.",
+    "The router/playbook/specialist model clearly states where learning events originate and where they should be promoted.",
+    "At least one ATM entry skill and one specialist skill demonstrate how the shared learning loop is consumed.",
+    "The same growth contract is usable by future Team role skill packs without redefining taxonomy or promotion semantics per role.",
+    "The contract explicitly defines how backlog items are split into product bugs, shared skill lessons, or both.",
+    "The first reusable lesson set includes claim-latency, stale imported dependency truth, and runner capability skew cases from ATM dogfood backlog.",
+    "The contract defines an active-to-historical demotion path so fixed wall-hit lessons do not keep bloating default skill context forever."
+  ],
+  "deliverables": [
+    "integrations/**",
+    "docs/**",
+    ".github/**"
+  ],
+  "scopePaths": [
+    "integrations/**",
+    "docs/**",
+    "packages/**",
+    ".github/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not build a separate knowledge system outside the existing skill/reference structure.",
+    "Do not force every individual learning note directly into SKILL.md."
+  ],
+  "nonGoals": [
+    "No chat-history-only memory scheme.",
+    "No per-skill bespoke taxonomy that breaks cross-skill reuse."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the shared growth contract commit if the learning-loop architecture becomes inconsistent across ATM skills or bloats skill entry files.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.shared-skill-growth-contract",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- This card exists so all ATM skills can grow through the same architecture.\n- The desired rule is simple: case first in reference, stable pattern later in `SKILL.md`.\n- Team role skill packs should consume this contract instead of inventing separate role-memory systems.\n- Fixed bug lessons should be moved to a historical section or archive once the live route no longer depends on them.",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md",
+    "sectionTitle": "TASK-SKL-0007",
+    "headingLine": 40,
+    "hash": "10f84057badbafa2"
+  },
+  "importedAt": "2026-06-28T14:48:45.312Z",
+  "lastTransitionId": "2026-06-28T21-21-25-063Z-close-02021b32404f",
+  "lastTransitionAt": "2026-06-28T21:21:25.063Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-28T14:51:04.179Z",
+  "promotedAt": "2026-06-28T14:51:04.183Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-697d82beff9b",
+    "claimedAt": "2026-06-28T14:51:04.187Z",
+    "heartbeatAt": "2026-06-28T21:21:25.060Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".agents/**",
+      ".atm/history/evidence/TASK-SKL-0002.closure-packet.json",
+      ".atm/history/evidence/TASK-SKL-0002.json",
+      ".atm/history/evidence/TASK-SKL-0007.*",
+      ".atm/history/protected-override-audit/**",
+      ".atm/history/task-events/TASK-SKL-0002/**",
+      ".atm/history/task-events/TASK-SKL-0007/**",
+      ".atm/history/tasks/TASK-SKL-0002.json",
+      ".atm/history/tasks/TASK-SKL-0007.json",
+      ".claude/**",
+      ".cursor/**",
+      ".gemini/**",
+      ".github/**",
+      "docs/**",
+      "GEMINI.md",
+      "integrations/**",
+      "packages/**",
+      "release/**",
+      "templates/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-28T14:51:04.187Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260628145104-codex-gpt-5.4-mini-TASK-SKL-0007-cefcd13ca2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0007",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".agents/**",
+      ".atm/history/evidence/TASK-SKL-0002.closure-packet.json",
+      ".atm/history/evidence/TASK-SKL-0002.json",
+      ".atm/history/evidence/TASK-SKL-0007.*",
+      ".atm/history/protected-override-audit/**",
+      ".atm/history/task-events/TASK-SKL-0002/**",
+      ".atm/history/task-events/TASK-SKL-0007/**",
+      ".atm/history/tasks/TASK-SKL-0002.json",
+      ".atm/history/tasks/TASK-SKL-0007.json",
+      ".claude/**",
+      ".cursor/**",
+      ".gemini/**",
+      ".github/**",
+      "docs/**",
+      "GEMINI.md",
+      "integrations/**",
+      "packages/**",
+      "release/**",
+      "templates/**"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/",
+      "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "9567469666d16b997da4a7c0b6f4860d4d98cd27aeccb8106a41aa257249760a",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-28T14:51:04.428Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-28T21:21:25.060Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260628145104-codex-gpt-5.4-mini-TASK-SKL-0007-cefcd13ca2",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0007.closure-packet.json"
+}
