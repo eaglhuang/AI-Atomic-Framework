@@ -181,44 +181,144 @@ function decodePayload() {
   return JSON.parse(gunzipSync(compressed).toString('utf8'));
 }
 
+function readPositiveIntEnv(name, fallback) {
+  const rawValue = process.env[name];
+  if (rawValue === undefined || rawValue === null || rawValue === '') {
+    return fallback;
+  }
+  const parsed = Number(rawValue);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return Math.floor(parsed);
+}
+
+function sleepMs(durationMs) {
+  const waitMs = Math.max(1, Math.floor(durationMs));
+  if (typeof SharedArrayBuffer === 'function' && typeof Atomics?.wait === 'function') {
+    const signal = new Int32Array(new SharedArrayBuffer(4));
+    Atomics.wait(signal, 0, 0, waitMs);
+    return;
+  }
+  const deadline = Date.now() + waitMs;
+  while (Date.now() < deadline) {
+    // Fallback only for runtimes without Atomics.wait.
+  }
+}
+
+function resolveCacheBaseRoot() {
+  return process.env.ATM_ONEFILE_CACHE_ROOT
+    ? path.resolve(process.env.ATM_ONEFILE_CACHE_ROOT)
+    : path.join(os.tmpdir(), 'atm-onefile-cache');
+}
+
+function extractionLockRoot(cacheRoot) {
+  return \`\${cacheRoot}.lock\`;
+}
+
+function isExtractedRootReady(cacheRoot) {
+  return existsSync(path.join(cacheRoot, '.payload-ready.json'))
+    && existsSync(path.join(cacheRoot, 'atm.mjs'));
+}
+
+function tryAcquireExtractionLock(lockRoot) {
+  try {
+    mkdirSync(lockRoot, { recursive: false });
+    writeFileSync(path.join(lockRoot, 'owner.json'), JSON.stringify({
+      pid: process.pid,
+      acquiredAt: new Date().toISOString(),
+      payloadSha256
+    }, null, 2) + '\\n');
+    return true;
+  } catch (error) {
+    if (error && typeof error === 'object' && error.code === 'EEXIST') {
+      return false;
+    }
+    throw error;
+  }
+}
+
+function releaseExtractionLock(lockRoot) {
+  rmSync(lockRoot, { recursive: true, force: true });
+}
+
 function extractPayload(cacheRoot) {
   const payload = decodePayload();
-  const stagingRoot = \`\${cacheRoot}.staging-\${process.pid}\`;
+  const stagingRoot = \`\${cacheRoot}.staging-\${process.pid}-\${Date.now()}\`;
   rmSync(stagingRoot, { recursive: true, force: true });
   mkdirSync(stagingRoot, { recursive: true });
-  for (const file of payload.files) {
-    const absolutePath = resolveFilePath(stagingRoot, file.path);
-    mkdirSync(path.dirname(absolutePath), { recursive: true });
-    writeFileSync(absolutePath, Buffer.from(file.dataBase64, 'base64'));
-    if (typeof file.mode === 'number' && process.platform !== 'win32') {
-      try {
-        const current = statSync(absolutePath);
-        if ((current.mode & 0o777) !== file.mode) {
-          chmodSync(absolutePath, file.mode);
+  try {
+    for (const file of payload.files) {
+      const absolutePath = resolveFilePath(stagingRoot, file.path);
+      mkdirSync(path.dirname(absolutePath), { recursive: true });
+      writeFileSync(absolutePath, Buffer.from(file.dataBase64, 'base64'));
+      if (typeof file.mode === 'number' && process.platform !== 'win32') {
+        try {
+          const current = statSync(absolutePath);
+          if ((current.mode & 0o777) !== file.mode) {
+            chmodSync(absolutePath, file.mode);
+          }
+        } catch {
+          // ignore mode sync failures
         }
-      } catch {
-        // ignore mode sync failures
       }
     }
+    writeFileSync(path.join(stagingRoot, '.payload-ready.json'), JSON.stringify({
+      schemaVersion: payload.schemaVersion,
+      generatedAt: payload.generatedAt,
+      payloadSha256
+    }, null, 2) + '\\n');
+    rmSync(cacheRoot, { recursive: true, force: true });
+    mkdirSync(path.dirname(cacheRoot), { recursive: true });
+    // Use rename semantics through copy-less move by relying on same root.
+    // On Windows, rename over existing path fails, so cacheRoot is removed above.
+    renameSync(stagingRoot, cacheRoot);
+  } finally {
+    rmSync(stagingRoot, { recursive: true, force: true });
   }
-  writeFileSync(path.join(stagingRoot, '.payload-ready.json'), JSON.stringify({
-    schemaVersion: payload.schemaVersion,
-    generatedAt: payload.generatedAt,
-    payloadSha256
-  }, null, 2) + '\\n');
-  rmSync(cacheRoot, { recursive: true, force: true });
-  mkdirSync(path.dirname(cacheRoot), { recursive: true });
-  // Use rename semantics through copy-less move by relying on same root.
-  // On Windows, rename over existing path fails, so cacheRoot is removed above.
-  renameSync(stagingRoot, cacheRoot);
+}
+
+function waitForExtractedRoot(cacheRoot) {
+  const lockRoot = extractionLockRoot(cacheRoot);
+  const timeoutMs = readPositiveIntEnv('ATM_ONEFILE_EXTRACT_LOCK_TIMEOUT_MS', 15000);
+  const pollMs = readPositiveIntEnv('ATM_ONEFILE_EXTRACT_LOCK_POLL_MS', 50);
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (isExtractedRootReady(cacheRoot)) {
+      return;
+    }
+    if (!existsSync(lockRoot) && tryAcquireExtractionLock(lockRoot)) {
+      try {
+        if (!isExtractedRootReady(cacheRoot)) {
+          extractPayload(cacheRoot);
+        }
+        return;
+      } finally {
+        releaseExtractionLock(lockRoot);
+      }
+    }
+    sleepMs(pollMs);
+  }
+  throw new Error(\`Timed out waiting for ATM onefile extraction lock for payload \${payloadSha256}.\`);
 }
 
 function ensureExtractedRoot() {
-  const cacheRoot = path.join(os.tmpdir(), 'atm-onefile-cache', payloadSha256);
-  const markerPath = path.join(cacheRoot, '.payload-ready.json');
-  const entrypointPath = path.join(cacheRoot, 'atm.mjs');
-  if (!existsSync(markerPath) || !existsSync(entrypointPath)) {
-    extractPayload(cacheRoot);
+  const cacheRoot = path.join(resolveCacheBaseRoot(), payloadSha256);
+  const lockRoot = extractionLockRoot(cacheRoot);
+  if (isExtractedRootReady(cacheRoot)) {
+    return cacheRoot;
+  }
+  mkdirSync(path.dirname(cacheRoot), { recursive: true });
+  if (tryAcquireExtractionLock(lockRoot)) {
+    try {
+      if (!isExtractedRootReady(cacheRoot)) {
+        extractPayload(cacheRoot);
+      }
+    } finally {
+      releaseExtractionLock(lockRoot);
+    }
+  } else {
+    waitForExtractedRoot(cacheRoot);
   }
   return cacheRoot;
 }

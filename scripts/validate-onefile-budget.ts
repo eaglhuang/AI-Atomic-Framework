@@ -1,7 +1,6 @@
-import { existsSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { tmpdir } from 'node:os';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
@@ -29,6 +28,9 @@ type Finding = {
 };
 
 const tempRoot = createTempWorkspace('atm-onefile-budget-');
+await main();
+
+async function main() {
 try {
   const rootDrop = buildRootDropRelease({
     repositoryRoot: repoRoot,
@@ -42,11 +44,23 @@ try {
   const manifest = JSON.parse(readFileSync(release.manifestPath, 'utf8'));
   const onefileSizeBytes = statSync(release.outputFilePath).size;
   const largestPayloadFiles = collectLargestFiles(rootDrop.releaseRoot, 8);
-  const cacheRoot = path.join(tmpdir(), 'atm-onefile-cache', String(manifest.payloadSha256));
-  rmSync(cacheRoot, { recursive: true, force: true });
+  const cacheBaseRoot = path.join(tempRoot, 'onefile-cache');
+  const cacheRoot = path.join(cacheBaseRoot, String(manifest.payloadSha256));
+  rmSync(cacheBaseRoot, { recursive: true, force: true });
 
-  const coldStartup = runTimed(release.outputFilePath, ['--version']);
-  const warmStartup = runTimed(release.outputFilePath, ['--version']);
+  const coldStartup = runTimed(release.outputFilePath, ['--version'], {
+    ATM_ONEFILE_CACHE_ROOT: cacheBaseRoot
+  });
+  const warmStartup = runTimed(release.outputFilePath, ['--version'], {
+    ATM_ONEFILE_CACHE_ROOT: cacheBaseRoot
+  });
+  const lockWait = await validateExtractionLockHandoff({
+    entrypointPath: release.outputFilePath,
+    cacheBaseRoot,
+    cacheRoot,
+    payloadSha256: String(manifest.payloadSha256),
+    releaseRoot: rootDrop.releaseRoot
+  });
   const packageManifest = JSON.parse(readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
   const runnerBoundary = validateRunnerBoundary(packageManifest.scripts ?? {});
   const findings: Finding[] = [];
@@ -87,6 +101,7 @@ try {
   }
 
   findings.push(...runnerBoundary.findings);
+  findings.push(...lockWait.findings);
 
   const report = {
     ok: findings.length === 0,
@@ -99,6 +114,7 @@ try {
       coldMs: Number(coldStartup.elapsedMs.toFixed(2)),
       warmMs: Number(warmStartup.elapsedMs.toFixed(2))
     },
+    extractionLock: lockWait.summary,
     fileCount: release.fileCount,
     payloadSha256: manifest.payloadSha256,
     largestPayloadFiles,
@@ -111,6 +127,7 @@ try {
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
+}
 
 function readBudgetNumber(name: string, defaultValue: number) {
   const rawValue = process.env[name];
@@ -122,11 +139,15 @@ function readBudgetNumber(name: string, defaultValue: number) {
   return Math.floor(parsed);
 }
 
-function runTimed(entrypointPath: string, args: string[]): TimedRun {
+function runTimed(entrypointPath: string, args: string[], extraEnv: Record<string, string> = {}): TimedRun {
   const startedAt = process.hrtime.bigint();
   const result = spawnSync(process.execPath, [entrypointPath, ...args], {
     cwd: repoRoot,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      ...extraEnv
+    }
   });
   const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
   return {
@@ -135,6 +156,97 @@ function runTimed(entrypointPath: string, args: string[]): TimedRun {
     stdout: result.stdout ?? '',
     stderr: result.stderr ?? ''
   };
+}
+
+async function validateExtractionLockHandoff(input: {
+  entrypointPath: string;
+  cacheBaseRoot: string;
+  cacheRoot: string;
+  payloadSha256: string;
+  releaseRoot: string;
+}) {
+  const findings: Finding[] = [];
+  const lockRoot = `${input.cacheRoot}.lock`;
+  rmSync(input.cacheBaseRoot, { recursive: true, force: true });
+  mkdirSync(lockRoot, { recursive: true });
+  writeFileSync(path.join(lockRoot, 'owner.json'), JSON.stringify({
+    pid: process.pid,
+    fixture: 'validate-onefile-budget',
+    payloadSha256: input.payloadSha256
+  }, null, 2) + '\n');
+
+  const startedAt = process.hrtime.bigint();
+  const child = spawn(process.execPath, [input.entrypointPath, '--version'], {
+    cwd: repoRoot,
+    env: {
+      ...process.env,
+      ATM_ONEFILE_CACHE_ROOT: input.cacheBaseRoot,
+      ATM_ONEFILE_EXTRACT_LOCK_TIMEOUT_MS: '4000',
+      ATM_ONEFILE_EXTRACT_LOCK_POLL_MS: '20'
+    },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+
+  const stdoutChunks: Buffer[] = [];
+  const stderrChunks: Buffer[] = [];
+  child.stdout.on('data', (chunk) => stdoutChunks.push(Buffer.from(chunk)));
+  child.stderr.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
+
+  await delay(150);
+  mkdirSync(input.cacheRoot, { recursive: true });
+  cpSync(input.releaseRoot, input.cacheRoot, { recursive: true });
+  writeFileSync(path.join(input.cacheRoot, '.payload-ready.json'), JSON.stringify({
+    schemaVersion: 'atm.onefilePayload.v0.1',
+    generatedAt: '1970-01-01T00:00:00.000Z',
+    payloadSha256: input.payloadSha256
+  }, null, 2) + '\n');
+  rmSync(lockRoot, { recursive: true, force: true });
+
+  const exitCode = await new Promise<number>((resolve, reject) => {
+    child.once('error', reject);
+    child.once('close', (code) => resolve(code ?? 1));
+  });
+  const elapsedMs = Number(process.hrtime.bigint() - startedAt) / 1_000_000;
+  const stdout = Buffer.concat(stdoutChunks).toString('utf8');
+  const stderr = Buffer.concat(stderrChunks).toString('utf8');
+
+  if (exitCode !== 0) {
+    findings.push({
+      code: 'ONEFILE_EXTRACTION_LOCK_WAIT_FAILED',
+      message: `runner failed while waiting for an in-flight extraction handoff (exit=${exitCode}).`,
+      remediation: 'Keep onefile extraction lock handoff atomic so a second process can wait for readiness instead of crashing on a partially refreshed cache.'
+    });
+  } else {
+    try {
+      const parsed = JSON.parse((stdout || stderr).trim());
+      if (parsed.command !== 'version' || parsed.ok !== true) {
+        findings.push({
+          code: 'ONEFILE_EXTRACTION_LOCK_WAIT_OUTPUT_INVALID',
+          message: 'runner returned unexpected output after extraction lock handoff.',
+          remediation: 'Preserve the normal ATM JSON envelope after extraction lock wait completes.'
+        });
+      }
+    } catch (error: any) {
+      findings.push({
+        code: 'ONEFILE_EXTRACTION_LOCK_WAIT_OUTPUT_NOT_JSON',
+        message: `runner output after extraction lock handoff was not JSON: ${error.message}`,
+        remediation: 'Keep onefile extraction wait-path output identical to the standard version command envelope.'
+      });
+    }
+  }
+
+  return {
+    findings,
+    summary: {
+      cacheBaseRoot: path.relative(repoRoot, input.cacheBaseRoot).replace(/\\/g, '/'),
+      handoffElapsedMs: Number(elapsedMs.toFixed(2)),
+      exitCode
+    }
+  };
+}
+
+function delay(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
 }
 
 function assertVersionOutput(run: TimedRun, findings: Finding[], phase: string) {

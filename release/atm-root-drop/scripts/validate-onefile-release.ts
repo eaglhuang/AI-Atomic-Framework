@@ -1,6 +1,6 @@
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
@@ -24,10 +24,14 @@ function assert(condition: any, message: any) {
   }
 }
 
-function runOnefile(entrypointPath: any, cwd: any, args: any) {
+function runOnefile(entrypointPath: any, cwd: any, args: any, extraEnv: Record<string, string> = {}) {
   const result = spawnSync(process.execPath, [entrypointPath, ...args], {
     cwd,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      ...extraEnv
+    }
   });
   const payload = (result.stdout || result.stderr || '').trim();
   return {
@@ -109,6 +113,9 @@ function writeAdopterBackfillFixture(cwd: any) {
 }
 
 const tempRoot = createTempWorkspace('atm-onefile-release-');
+await main();
+
+async function main() {
 try {
   const rootDrop = buildRootDropRelease({
     repositoryRoot: root,
@@ -237,12 +244,73 @@ try {
   assert(selfHostAlpha.exitCode === 0, 'onefile self-host-alpha must exit 0');
   assert(selfHostAlpha.parsed.ok === true, 'onefile self-host-alpha must report ok=true');
 
+  await validateExtractionLockWait({
+    entrypointPath: release.outputFilePath,
+    releaseRoot: rootDrop.releaseRoot,
+    payloadSha256: JSON.parse(readFileSync(release.manifestPath, 'utf8')).payloadSha256
+  });
+
   assert(!existsSync(path.join(blankRepo, 'packages')), 'onefile runtime must not unpack package files into host repository');
   assert(!existsSync(path.join(blankRepo, 'scripts')), 'onefile runtime must not unpack script files into host repository');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
+}
+
+async function validateExtractionLockWait(input: {
+  entrypointPath: string;
+  releaseRoot: string;
+  payloadSha256: string;
+}) {
+  const cacheBaseRoot = path.join(tempRoot, 'onefile-lock-cache');
+  const cacheRoot = path.join(cacheBaseRoot, input.payloadSha256);
+  const lockRoot = `${cacheRoot}.lock`;
+  rmSync(cacheBaseRoot, { recursive: true, force: true });
+  mkdirSync(lockRoot, { recursive: true });
+  writeFileSync(path.join(lockRoot, 'owner.json'), JSON.stringify({
+    pid: process.pid,
+    fixture: 'validate-onefile-release'
+  }, null, 2) + '\n', 'utf8');
+
+  const child = spawn(process.execPath, [input.entrypointPath, '--version'], {
+    cwd: root,
+    env: {
+      ...process.env,
+      ATM_ONEFILE_CACHE_ROOT: cacheBaseRoot,
+      ATM_ONEFILE_EXTRACT_LOCK_TIMEOUT_MS: '4000',
+      ATM_ONEFILE_EXTRACT_LOCK_POLL_MS: '20'
+    },
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const stdoutChunks: Buffer[] = [];
+  const stderrChunks: Buffer[] = [];
+  child.stdout.on('data', (chunk) => stdoutChunks.push(Buffer.from(chunk)));
+  child.stderr.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
+
+  await delay(150);
+  mkdirSync(cacheRoot, { recursive: true });
+  cpSync(input.releaseRoot, cacheRoot, { recursive: true });
+  writeFileSync(path.join(cacheRoot, '.payload-ready.json'), JSON.stringify({
+    schemaVersion: 'atm.onefilePayload.v0.1',
+    generatedAt: '1970-01-01T00:00:00.000Z',
+    payloadSha256: input.payloadSha256
+  }, null, 2) + '\n', 'utf8');
+  rmSync(lockRoot, { recursive: true, force: true });
+
+  const exitCode = await new Promise<number>((resolve, reject) => {
+    child.once('error', reject);
+    child.once('close', (code) => resolve(code ?? 1));
+  });
+  const payload = (Buffer.concat(stdoutChunks).toString('utf8') || Buffer.concat(stderrChunks).toString('utf8')).trim();
+  assert(exitCode === 0, 'onefile runner must survive extraction-lock handoff');
+  const parsed = payload ? JSON.parse(payload) : {};
+  assert(parsed.command === 'version' && parsed.ok === true, 'onefile extraction-lock handoff must preserve version output');
+}
+
+function delay(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
 
 if (!process.exitCode) {
-  console.log('[onefile-release:' + mode + '] ok (single-file bootstrap, doctor, and self-host-alpha verified)');
+  console.log('[onefile-release:' + mode + '] ok (single-file bootstrap, doctor, self-host-alpha, and extraction-lock wait verified)');
 }
