@@ -1,0 +1,39 @@
+{
+  "artifactDate": "20260628",
+  "release": "v0.9.0-alpha.1",
+  "commit": "141e48a6b0811919faa258cf46e30c8917572f00",
+  "generatedAt": "2026-06-28T10:13:34.3832157+08:00",
+  "status": "pass",
+  "caseCount": 5,
+  "passedCaseCount": 5,
+  "scope": "adapter trust containment evidence",
+  "paperSafeClaim": "Deterministic local containment checks show malformed scope, conservative shared-surface blocking, validator-backed dependency detection, and CAS mismatch recovery all preserve fail-closed or replay-oriented boundaries.",
+  "nonClaimBoundary": "This artifact does not establish adversarial adapter soundness or completeness for all malformed adapter declarations.",
+  "cases": [
+    {
+      "caseId": "malformed-conflict-scope-fail-closed",
+      "observed": "steward-required",
+      "boundary": "containment-evidence"
+    },
+    {
+      "caseId": "over-declared-surface-conservative-block",
+      "observed": "freeze",
+      "boundary": "containment-evidence"
+    },
+    {
+      "caseId": "under-declared-read-dependency-outside-positive-guarantee",
+      "observed": "allow",
+      "boundary": "outside-positive-guarantee"
+    },
+    {
+      "caseId": "validator-catches-under-declared-dependency",
+      "observed": "fail",
+      "boundary": "containment-evidence"
+    },
+    {
+      "caseId": "cas-mismatch-after-under-declaration-recovery-route",
+      "observed": "cas-mismatch-blocked",
+      "boundary": "containment-evidence"
+    }
+  ]
+}
