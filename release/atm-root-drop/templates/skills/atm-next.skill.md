@@ -49,6 +49,11 @@ instruction sheet for the selected channel:
 - `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
   -> batch checkpoint -> commit -> continue next queue head.
 
+If `evidence.nextAction.governanceReadiness` is present, prepare those items
+before you reach commit or push. Treat framework claim, protected push
+evidence, `doctor`, and branch queue retry codes as early blockers, not as
+something to discover only after a hook or push failure.
+
 For normal task-card work, keep this order fixed:
 
 ```text

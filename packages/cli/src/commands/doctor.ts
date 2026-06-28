@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { runHashPlaceholderAudit } from './hash-placeholder-audit.ts';
@@ -75,6 +76,8 @@ export async function runDoctor(argv: any) {
     downgradeAdopterGitHeadEvidenceCheck(rawGitHeadEvidenceCheck, repoIdentity),
     doctorPolicy
   );
+  const governanceEntryReadiness = createGovernanceEntryReadinessCheck(root, repoIdentity, rawGitHeadEvidenceCheck);
+  const backlogSyncCheck = createBacklogSyncCheck(root, repoIdentity);
   const checks = [
     createCheck('package-manager', !frameworkContractExpected || (rootPackage.packageManager === undefined && existsSync(path.join(root, 'package-lock.json')) && !existsSync(path.join(root, 'pnpm-workspace.yaml'))), {
       official: 'npm', packageLock: existsSync(path.join(root, 'package-lock.json')), packageManagerField: rootPackage.packageManager ?? null, pnpmWorkspace: existsSync(path.join(root, 'pnpm-workspace.yaml'))
@@ -125,7 +128,9 @@ export async function runDoctor(argv: any) {
     ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
     ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
     createCheck('git-worktree-readiness', gitWorktreeReadiness.ok, gitWorktreeReadiness),
-    gitHeadEvidenceCheck
+    gitHeadEvidenceCheck,
+    governanceEntryReadiness,
+    backlogSyncCheck
   ];
   const ok = checks.every((check) => check.ok);
   const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
@@ -146,6 +151,10 @@ export async function runDoctor(argv: any) {
       ? gitWorktreeReadiness.recommendedFixCommand ?? 'Repair the local Git worktree readiness before continuing.'
     : failedChecks.includes('git-head-evidence')
       ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
+    : failedChecks.includes('governance-entry-readiness')
+      ? governanceEntryReadiness.details?.recommendedAction ?? 'Review ATM governance readiness hints before editing or pushing framework changes.'
+    : failedChecks.includes('backlog-sync')
+      ? 'Review the ATM bug backlog for rows whose status appears to lag behind current source reality, then update the backlog or add the missing validator/documentation closeout.'
     : failedChecks.includes('integration-adapters')
       ? integrationDriftRemediation.recommendedAction
     : failedChecks.includes('framework-integration-hooks')
@@ -195,6 +204,12 @@ export async function runDoctor(argv: any) {
         originalStatus: gitHeadEvidenceCheck.details.originalStatus ?? null
       })]
       : []),
+    ...(!governanceEntryReadiness.ok
+      ? [message('warning', 'ATM_DOCTOR_GOVERNANCE_ENTRY_NOT_READY', 'ATM detected a governance readiness blocker that should be resolved before a protected push or governed framework commit.', governanceEntryReadiness.details)]
+      : []),
+    ...(!backlogSyncCheck.ok
+      ? [message('warning', 'ATM_DOCTOR_BACKLOG_SYNC_DRIFT', 'ATM found backlog rows whose status may lag behind current source or validator reality.', backlogSyncCheck.details)]
+      : []),
     ...(ok
       ? [message('info', 'ATM_DOCTOR_OK', 'ATM engineering and runtime signals are ready.')]
       : failedChecks.includes('charter-integrity')
@@ -223,6 +238,10 @@ export async function runDoctor(argv: any) {
         })]
       : failedChecks.includes('git-head-evidence')
         ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
+      : failedChecks.includes('governance-entry-readiness')
+        ? [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })]
+      : failedChecks.includes('backlog-sync')
+        ? [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })]
       : failedChecks.includes('integration-adapters')
         ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', {
           failedChecks,
@@ -269,6 +288,8 @@ export async function runDoctor(argv: any) {
       integrationDriftRemediation: integrationDriftRemediation.failedAdapters.length > 0 ? integrationDriftRemediation : undefined,
       frameworkHookReadiness,
       gitWorktreeReadiness,
+      governanceEntryReadiness: governanceEntryReadiness.details,
+      backlogSync: backlogSyncCheck.details,
       runtimeAdapterReadiness,
       trustIntegrity: trustMode ? trustIntegrity : undefined,
       knownBadStatus: knownBadMode ? knownBadStatus : undefined,
@@ -492,6 +513,103 @@ function createIntegrationDriftRemediation(integrationHealth: any) {
 }
 
 function readJsonIfExists(filePath: any): Record<string, any> | null { return existsSync(filePath) ? JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any> : null; }
+
+function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFrameworkRepo: boolean }, gitHeadEvidenceCheck: any) {
+  const branch = runGitScalar(root, ['branch', '--show-current']);
+  const upstream = branch ? runGitScalar(root, ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`]) : null;
+  const aheadCount = upstream ? Number.parseInt(runGitScalar(root, ['rev-list', '--count', `${upstream}..HEAD`]) ?? '0', 10) || 0 : 0;
+  const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'];
+  const protectedBranchTarget = branch ? isProtectedFrameworkBranchTarget(branch) : false;
+  const latestGitHeadStatus = gitHeadEvidenceCheck?.details?.status ?? null;
+  const requiresProtectedPushReadiness = repoIdentity.isFrameworkRepo && protectedBranchTarget && aheadCount > 0;
+  const protectedPushReadiness = !repoIdentity.isFrameworkRepo
+    ? 'not-applicable'
+    : !protectedBranchTarget
+      ? 'non-protected-branch'
+      : !upstream
+        ? 'no-upstream'
+        : aheadCount === 0
+          ? 'no-ahead-commits'
+          : latestGitHeadStatus === 'missing'
+            ? 'missing-git-head-evidence'
+            : 'ready';
+  const ok = protectedPushReadiness !== 'missing-git-head-evidence';
+  return createCheck('governance-entry-readiness', ok, {
+    schemaId: 'atm.governanceEntryReadiness.v1',
+    repoRole: repoIdentity.isFrameworkRepo ? 'framework' : 'host',
+    currentBranch: branch,
+    upstreamRef: upstream,
+    aheadCount,
+    protectedBranchPatterns,
+    protectedBranchTarget,
+    requiresProtectedPushReadiness,
+    protectedPushReadiness,
+    latestGitHeadStatus,
+    queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
+    branchQueueSummary: 'Governed framework commits may serialize through the branch commit queue and retry on safe HEAD drift instead of surfacing raw Git races.',
+    recommendedAction: protectedPushReadiness === 'missing-git-head-evidence'
+      ? 'Generate governed git-head evidence before pushing protected framework history. Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json and rerun doctor or hook pre-push.'
+      : protectedPushReadiness === 'no-upstream'
+        ? 'Set or fetch the upstream branch before relying on protected push readiness diagnostics.'
+        : 'Before editing or pushing framework changes, confirm actor identity, framework claim, doctor readiness, and protected-branch push readiness.'
+  });
+}
+
+function createBacklogSyncCheck(root: string, repoIdentity: { isFrameworkRepo: boolean }) {
+  const backlogPath = path.join(root, 'docs', 'governance', 'atm-bug-and-optimization-backlog.md');
+  if (!repoIdentity.isFrameworkRepo || !existsSync(backlogPath)) {
+    return createCheck('backlog-sync', true, {
+      schemaId: 'atm.backlogSyncCheck.v1',
+      backlogPath: relativePathFrom(root, backlogPath),
+      suspiciousRows: []
+    });
+  }
+  const suspiciousRows = parseBacklogRows(readFileSync(backlogPath, 'utf8'))
+    .filter((row) => row.status === 'Open')
+    .filter((row) => /(current source now satisfies|repaired on|closed on|landed in|verified by|regression coverage now lives)/i.test(`${row.evidence} ${row.followUp}`))
+    .map((row) => ({
+      id: row.id,
+      area: row.area,
+      status: row.status
+    }));
+  return createCheck('backlog-sync', suspiciousRows.length === 0, {
+    schemaId: 'atm.backlogSyncCheck.v1',
+    backlogPath: relativePathFrom(root, backlogPath),
+    suspiciousRows,
+    recommendedAction: suspiciousRows.length > 0
+      ? 'Update the backlog status to match current source reality, or land the missing validator/documentation closeout referenced by the row.'
+      : 'Backlog open rows appear consistent with current source reality.'
+  });
+}
+
+function parseBacklogRows(markdown: string) {
+  return markdown
+    .split(/\r?\n/)
+    .filter((line) => /^\|\s*(ATM|PROJECT)-BUG-/.test(line))
+    .map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()))
+    .filter((cells) => cells.length >= 11)
+    .map((cells) => ({
+      id: cells[0],
+      status: cells[5],
+      area: cells[6],
+      evidence: cells[9],
+      followUp: cells[10]
+    }));
+}
+
+function runGitScalar(cwd: string, args: readonly string[]) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  if (result.status !== 0) return null;
+  const value = String(result.stdout ?? '').trim();
+  return value.length > 0 ? value : null;
+}
+
+function isProtectedFrameworkBranchTarget(branch: string) {
+  return branch === 'main'
+    || branch === 'master'
+    || branch === 'trunk'
+    || /^release\/.+/.test(branch);
+}
 function hasRequiredScripts(scripts: Record<string, string> = {}) {
   const required = ['build', 'typecheck', 'lint', 'test', 'validate:quick', 'validate:standard', 'validate:full'];
   return required.every((name) => typeof scripts[name] === 'string' && scripts[name].length > 0);

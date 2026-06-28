@@ -251,6 +251,8 @@ try {
   const governedDoctor = parsePayload(runCli(repo, ['doctor', '--json']));
   assert(governedDoctor.ok === true, 'doctor must report ok=true after non-critical docs commit without git-head evidence');
   assert(governedDoctor.evidence?.checks?.some((entry: any) => entry.name === 'git-head-evidence' && entry.details?.status === 'not-required-non-critical-head'), 'doctor must classify docs-only HEAD evidence as not required');
+  assert(governedDoctor.evidence?.checks?.some((entry: any) => entry.name === 'governance-entry-readiness'), 'doctor must emit governance-entry-readiness check');
+  assert(governedDoctor.evidence?.governanceEntryReadiness?.queueRetryCodes?.includes('ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY'), 'doctor governance readiness must surface branch queue retry codes');
 
   writeFileSync(path.join(repo, 'packages', 'core', 'src', 'index.ts'), 'export const bypass = true;\n', 'utf8');
   runGit(repo, ['add', 'packages/core/src/index.ts']);
@@ -263,6 +265,7 @@ try {
   assert(bypassDoctor.status === 1, 'doctor must fail after bypass commit');
   assert(bypassDoctorPayload.ok === false, 'doctor must report ok=false after bypass commit');
   assert(bypassDoctorPayload.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_MISSING'), 'doctor must emit ATM_DOCTOR_GIT_EVIDENCE_MISSING after bypass commit');
+  assert(bypassDoctorPayload.evidence?.checks?.some((entry: any) => entry.name === 'governance-entry-readiness'), 'doctor must keep governance-entry-readiness visible after bypass commit');
 
   const commitRange = runCli(repo, ['guard', 'commit-range', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
   const commitRangePayload = parsePayload(commitRange);

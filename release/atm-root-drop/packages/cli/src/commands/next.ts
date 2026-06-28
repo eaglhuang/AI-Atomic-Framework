@@ -1407,6 +1407,11 @@ function buildPromptScopedNextResult(input: {
       scopeKey: activeBatch?.scopeKey ?? null,
       queueHeadTaskId,
       queueSize: selectedTasks.length,
+      governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+        channel: 'batch',
+        prompt: queuePrompt,
+        taskId: queueHeadTaskId
+      }),
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
     }, {
@@ -1698,6 +1703,11 @@ function buildPromptScopedNextResult(input: {
       queueHeadTaskId,
       queueSize: activeBatch.taskIds.length,
       activeBatchRunId: activeBatch.batchId,
+      governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+        channel: 'batch',
+        prompt: activeBatch.sourcePrompt,
+        taskId: queueHeadTaskId ?? selectedTask.workItemId
+      }),
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
     }, {
@@ -1761,6 +1771,11 @@ function buildPromptScopedNextResult(input: {
       channel: 'normal',
       taskId: selectedTask.workItemId,
       originalPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId
+    }),
+    governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+      channel: 'normal',
+      prompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId,
+      taskId: selectedTask.workItemId
     }),
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: 'normal',
@@ -1826,6 +1841,10 @@ function buildPromptGuidanceNextResult(input: {
         channel: 'fast',
         originalPrompt: prompt
       }),
+      governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+        channel: 'fast',
+        prompt
+      }),
       allowedFiles: quickfixScope,
       allowedCommands: allowedGuidanceBootstrapCommands(),
       blockedCommands: blockedMutationCommands()
@@ -1865,6 +1884,11 @@ function buildPromptGuidanceNextResult(input: {
       playbook: buildChannelPlaybook({
         channel: 'fast',
         originalPrompt: prompt
+      }),
+      governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+        channel: 'fast',
+        prompt,
+        frameworkClaimRequired: true
       }),
       allowedCommands: [
         claimCommand,
@@ -1906,6 +1930,10 @@ function buildPromptGuidanceNextResult(input: {
     reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance',
     recommendedChannel: null,
     riskLevel: 'medium',
+    governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
+      channel: null,
+      prompt
+    }),
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands(),
     ...buildNonPlaybookRouteHints(input.cwd, prompt)
@@ -4095,6 +4123,18 @@ type NextActionLike = {
     readonly ignoredArtifactCount: number;
     readonly note: string;
   };
+  governanceReadiness?: {
+    readonly schemaId: 'atm.nextGovernanceReadinessHint.v1';
+    readonly channel: GovernanceChannel | null;
+    readonly currentBranch: string | null;
+    readonly upstreamRef: string | null;
+    readonly protectedBranchTarget: boolean;
+    readonly aheadCount: number;
+    readonly frameworkClaimRequired: boolean;
+    readonly earlyPreparation: readonly string[];
+    readonly queueRetryCodes: readonly string[];
+    readonly protectedPushHint: string | null;
+  };
 };
 
 function ensureDecisionTrail(nextAction: NextActionLike) {
@@ -4363,6 +4403,68 @@ function buildNextMessages(
       }
     ));
   }
+  if (nextAction.governanceReadiness) {
+    messages.push(message(
+      'info',
+      'ATM_NEXT_GOVERNANCE_READINESS_HINT',
+      'ATM surfaced the governance prerequisites early so the agent can prepare claim, evidence, and protected-push checks before reaching commit or push.',
+      nextAction.governanceReadiness
+    ));
+  }
   messages.push(routeMessage);
   return messages;
+}
+
+function buildGovernanceReadinessHint(cwd: string, input: {
+  readonly channel: GovernanceChannel | null;
+  readonly prompt: string;
+  readonly taskId?: string | null;
+  readonly frameworkClaimRequired?: boolean;
+}) {
+  const frameworkStatus = createFrameworkModeStatus({ cwd });
+  const currentBranch = runGitScalar(cwd, ['branch', '--show-current']);
+  const upstreamRef = currentBranch ? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`]) : null;
+  const aheadCount = upstreamRef ? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10) || 0 : 0;
+  const protectedBranchTarget = Boolean(currentBranch && isProtectedFrameworkBranchTarget(currentBranch));
+  const earlyPreparation = [
+    'Read evidence.nextAction.playbook before editing, closing, or committing.',
+    'Resolve explicit actor identity before claim, commit, or report.',
+    ...(input.frameworkClaimRequired || (frameworkStatus.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(input.prompt))
+      ? ['Acquire framework-mode claim before editing framework-critical files.']
+      : []),
+    ...(input.channel === 'batch'
+      ? ['Stay on the queue head and expect batch checkpoint before commit.']
+      : []),
+    ...(protectedBranchTarget
+      ? ['Do not wait until push to discover protected-branch evidence or branch-queue blockers; rerun doctor and hook pre-push proactively.']
+      : [])
+  ];
+  return {
+    schemaId: 'atm.nextGovernanceReadinessHint.v1' as const,
+    channel: input.channel,
+    currentBranch,
+    upstreamRef,
+    protectedBranchTarget,
+    aheadCount,
+    frameworkClaimRequired: Boolean(input.frameworkClaimRequired),
+    earlyPreparation,
+    queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'] as const,
+    protectedPushHint: protectedBranchTarget
+      ? 'Protected framework branches enforce commit-range git-head evidence and may serialize final commit mutation through the branch queue.'
+      : null
+  };
+}
+
+function runGitScalar(cwd: string, args: readonly string[]) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  if (result.status !== 0) return null;
+  const value = String(result.stdout ?? '').trim();
+  return value.length > 0 ? value : null;
+}
+
+function isProtectedFrameworkBranchTarget(branch: string) {
+  return branch === 'main'
+    || branch === 'master'
+    || branch === 'trunk'
+    || /^release\/.+/.test(branch);
 }

@@ -50,6 +50,11 @@ export interface ValidatorFailureEnvelopeInput {
   readonly spawnError?: string | null;
 }
 
+export interface SourceContractAnchor {
+  readonly token: string;
+  readonly detail: string;
+}
+
 function normalizeCommandToken(raw: string): string {
   return raw.trim().replace(/\s+/g, ' ');
 }
@@ -321,6 +326,12 @@ export function summarizeBlockingFindings(envelopes: readonly ValidatorFailureEn
 
 export function firstRequiredCommand(envelopes: readonly ValidatorFailureEnvelope[]): string | null {
   return envelopes.find((envelope) => envelope.requiredCommand)?.requiredCommand ?? null;
+}
+
+export function collectMissingSourceContractAnchors(sourceText: string, anchors: readonly SourceContractAnchor[]): readonly string[] {
+  return anchors
+    .filter((anchor) => !sourceText.includes(anchor.token))
+    .map((anchor) => anchor.detail);
 }
 
 function extractAtmJsonFindings(stdout: string, stderr: string, fallbackCommand: string): readonly ValidatorBlockingFinding[] {

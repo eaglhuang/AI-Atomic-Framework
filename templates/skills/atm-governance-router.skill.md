@@ -63,6 +63,11 @@ resolver skill is available.
 If the first command returns a user notice, surface it briefly, then continue the
 original user request.
 
+If `evidence.nextAction.governanceReadiness` is present, prepare those items
+before you reach commit or push. Treat framework claim, protected push
+evidence, `doctor`, and branch queue retry codes as early blockers, not as
+something to discover only after a hook or push failure.
+
 Before editing implementation files, inspect framework mode:
 
 ```bash

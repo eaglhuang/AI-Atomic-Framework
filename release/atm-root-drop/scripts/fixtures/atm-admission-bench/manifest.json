@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.admissionBenchFixtureManifest.v2",
+  "contract": "docs/bench/ATM-AdmissionBench-CONTRACT.md",
+  "contractVersion": "0.2",
+  "seedDefault": 20260625,
+  "profiles": ["smoke", "paper"],
+  "tracks": ["all", "policy", "ablation", "adversarial", "forwarding", "field", "report"],
+  "packs": [
+    { "id": "agr-benchmark", "manifest": "scripts/fixtures/agr-benchmark/manifest.json" },
+    { "id": "agr-conflict-benchmark", "manifest": "scripts/fixtures/agr-conflict-benchmark/manifest.json" }
+  ],
+  "policies": ["direct", "git-diff3", "file-serial", "file-occ", "text-range", "atm-full"],
+  "ablations": ["no-cid", "no-shared-surface", "no-rw-dependency", "no-virtual-atom", "no-conflict-key", "no-cas", "no-fallback-lock"],
+  "adversarialFaults": ["dropped-read-set", "dropped-write-surface", "wrong-conflict-key", "shrunk-range", "all-conflict-dos"],
+  "denominator": {
+    "rule": "primary metrics use the v0.1 corpus mode-comparison count minus the unresolved set",
+    "v01CorpusModeComparisons": 42,
+    "v01CorpusScenarios": 20
+  },
+  "unresolved": {
+    "manifest": "scripts/fixtures/atm-admission-bench/unresolved.json",
+    "rule": "scenarios listed in unresolved.json are excluded from primary metrics and surfaced only in unresolved-set.json"
+  },
+  "notes": [
+    "v0.1 smoke corpus is the frozen denominator: append-only; removal requires a contract major bump.",
+    "v0.2 paper profile reuses the same corpus and overlays policy / ablation / adversarial / forwarding / enforcement tracks.",
+    "direct, git-diff3, file-serial, file-occ, text-range are deterministic baseline models — they are not real external tool executions.",
+    "p95 latency is reported as not-measured unless a real timing source is later wired."
+  ]
+}

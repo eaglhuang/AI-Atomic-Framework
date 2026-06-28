@@ -85,7 +85,9 @@ for (const requiredText of [
   'atm start --legacy-flow',
   'atm next',
   'dry-run proposal',
-  'human review'
+  'human review',
+  'governanceReadiness',
+  'protected push'
 ]) {
   assert(skill.includes(requiredText), `skill must include trigger/workflow text: ${requiredText}`);
 }

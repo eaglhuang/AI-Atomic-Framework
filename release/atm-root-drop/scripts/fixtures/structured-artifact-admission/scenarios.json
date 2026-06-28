@@ -1,0 +1,370 @@
+{
+  "schemaId": "atm.structuredArtifactAdmissionScenarioSet.v1",
+  "scenarios": [
+    {
+      "id": "json-manifest-disjoint-keys",
+      "format": "json",
+      "family": "json-manifest",
+      "kind": "compose",
+      "targetFile": "configs/project-manifest.json",
+      "description": "Two manifest edits touch disjoint top-level keys and should remain parallel-safe.",
+      "expectedVerdict": "parallel-safe",
+      "proposals": [
+        {
+          "proposalId": "sa.json.01.a",
+          "atomId": "JSON-MANIFEST-NAME",
+          "atomCid": "cid-json-manifest-name",
+          "patch": "--- a/configs/project-manifest.json\n+++ b/configs/project-manifest.json\n@@ -1,1 +1,1 @@\n-\"name\": \"npc-brain\"\n+\"name\": \"npc-brain-v2\"\n",
+          "intent": "Update manifest name."
+        },
+        {
+          "proposalId": "sa.json.01.b",
+          "atomId": "JSON-MANIFEST-VERSION",
+          "atomCid": "cid-json-manifest-version",
+          "patch": "--- a/configs/project-manifest.json\n+++ b/configs/project-manifest.json\n@@ -5,1 +5,1 @@\n-\"version\": \"1.0.0\"\n+\"version\": \"1.1.0\"\n",
+          "intent": "Update manifest version."
+        }
+      ]
+    },
+    {
+      "id": "json-manifest-shared-key-blocked",
+      "format": "json",
+      "family": "json-manifest",
+      "kind": "compose",
+      "targetFile": "configs/project-manifest.json",
+      "description": "Two manifest edits target the same scripts.install key and should block.",
+      "expectedVerdict": "blocked-cid-conflict",
+      "proposals": [
+        {
+          "proposalId": "sa.json.02.a",
+          "atomId": "JSON-MANIFEST-INSTALL",
+          "atomCid": "cid-json-manifest-install",
+          "patch": "--- a/configs/project-manifest.json\n+++ b/configs/project-manifest.json\n@@ -9,1 +9,1 @@\n-\"install\": \"npm ci\"\n+\"install\": \"npm ci --ignore-scripts\"\n",
+          "intent": "Harden install script."
+        },
+        {
+          "proposalId": "sa.json.02.b",
+          "atomId": "JSON-MANIFEST-INSTALL",
+          "atomCid": "cid-json-manifest-install",
+          "patch": "--- a/configs/project-manifest.json\n+++ b/configs/project-manifest.json\n@@ -9,1 +9,1 @@\n-\"install\": \"npm ci\"\n+\"install\": \"pnpm install --frozen-lockfile\"\n",
+          "intent": "Switch installer."
+        }
+      ]
+    },
+    {
+      "id": "json-manifest-readwrite-serial",
+      "format": "json",
+      "family": "json-manifest",
+      "kind": "registry",
+      "targetFile": "configs/project-manifest.json",
+      "description": "A new manifest write depends on an active dependencyVersions key and should serialize.",
+      "expectedVerdict": "serial",
+      "newIntent": {
+        "taskId": "TASK-SA-JSON-03",
+        "actorId": "structured-bench",
+        "atomId": "JSON-MANIFEST-SCRIPTS",
+        "atomCid": "cid-json-manifest-scripts",
+        "readAtoms": ["JSON-MANIFEST-DEPS", "cid-json-manifest-deps"]
+      },
+      "activeIntent": {
+        "taskId": "TASK-SA-JSON-BASE",
+        "actorId": "seed-agent",
+        "file": "configs/project-manifest.json",
+        "atomId": "JSON-MANIFEST-DEPS",
+        "atomCid": "cid-json-manifest-deps"
+      }
+    },
+    {
+      "id": "yaml-workflow-disjoint-jobs",
+      "format": "yaml",
+      "family": "yaml-workflow",
+      "kind": "compose",
+      "targetFile": ".github/workflows/ci.yml",
+      "description": "Workflow edits touching separate jobs should remain parallel-safe.",
+      "expectedVerdict": "parallel-safe",
+      "proposals": [
+        {
+          "proposalId": "sa.yaml.01.a",
+          "atomId": "YAML-WORKFLOW-LINT",
+          "atomCid": "cid-yaml-workflow-lint",
+          "patch": "--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -10,1 +10,1 @@\n-      run: npm run lint\n+      run: npm run lint -- --max-warnings=0\n",
+          "intent": "Harden lint job."
+        },
+        {
+          "proposalId": "sa.yaml.01.b",
+          "atomId": "YAML-WORKFLOW-TEST",
+          "atomCid": "cid-yaml-workflow-test",
+          "patch": "--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -22,1 +22,1 @@\n-      run: npm test\n+      run: npm test -- --runInBand\n",
+          "intent": "Adjust test job."
+        }
+      ]
+    },
+    {
+      "id": "yaml-workflow-shared-job-blocked",
+      "format": "yaml",
+      "family": "yaml-workflow",
+      "kind": "compose",
+      "targetFile": ".github/workflows/ci.yml",
+      "description": "Workflow edits targeting the same deploy step should block.",
+      "expectedVerdict": "blocked-cid-conflict",
+      "proposals": [
+        {
+          "proposalId": "sa.yaml.02.a",
+          "atomId": "YAML-WORKFLOW-DEPLOY",
+          "atomCid": "cid-yaml-workflow-deploy",
+          "patch": "--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -30,1 +30,1 @@\n-      run: npm run deploy\n+      run: npm run deploy -- --dry-run\n",
+          "intent": "Dry-run deploy."
+        },
+        {
+          "proposalId": "sa.yaml.02.b",
+          "atomId": "YAML-WORKFLOW-DEPLOY",
+          "atomCid": "cid-yaml-workflow-deploy",
+          "patch": "--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -30,1 +30,1 @@\n-      run: npm run deploy\n+      run: npm run deploy -- --region us-east-1\n",
+          "intent": "Pin deploy region."
+        }
+      ]
+    },
+    {
+      "id": "yaml-workflow-readwrite-serial",
+      "format": "yaml",
+      "family": "yaml-workflow",
+      "kind": "registry",
+      "targetFile": ".github/workflows/ci.yml",
+      "description": "A workflow matrix write depends on an active cache strategy section and should serialize.",
+      "expectedVerdict": "serial",
+      "newIntent": {
+        "taskId": "TASK-SA-YAML-03",
+        "actorId": "structured-bench",
+        "atomId": "YAML-WORKFLOW-MATRIX",
+        "atomCid": "cid-yaml-workflow-matrix",
+        "readAtoms": ["YAML-WORKFLOW-CACHE", "cid-yaml-workflow-cache"]
+      },
+      "activeIntent": {
+        "taskId": "TASK-SA-YAML-BASE",
+        "actorId": "seed-agent",
+        "file": ".github/workflows/ci.yml",
+        "atomId": "YAML-WORKFLOW-CACHE",
+        "atomCid": "cid-yaml-workflow-cache"
+      }
+    },
+    {
+      "id": "toml-config-disjoint-tables",
+      "format": "toml",
+      "family": "toml-config",
+      "kind": "compose",
+      "targetFile": "pyproject.toml",
+      "description": "TOML edits on disjoint tables should remain parallel-safe.",
+      "expectedVerdict": "parallel-safe",
+      "proposals": [
+        {
+          "proposalId": "sa.toml.01.a",
+          "atomId": "TOML-TOOL-BLACK",
+          "atomCid": "cid-toml-tool-black",
+          "patch": "--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -4,1 +4,1 @@\n-line-length = 88\n+line-length = 100\n",
+          "intent": "Adjust Black line length."
+        },
+        {
+          "proposalId": "sa.toml.01.b",
+          "atomId": "TOML-TOOL-PYTEST",
+          "atomCid": "cid-toml-tool-pytest",
+          "patch": "--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -12,1 +12,1 @@\n-addopts = \"-q\"\n+addopts = \"-q -ra\"\n",
+          "intent": "Adjust pytest flags."
+        }
+      ]
+    },
+    {
+      "id": "toml-config-shared-table-blocked",
+      "format": "toml",
+      "family": "toml-config",
+      "kind": "compose",
+      "targetFile": "pyproject.toml",
+      "description": "Two TOML edits targeting the same dependency entry should block.",
+      "expectedVerdict": "blocked-cid-conflict",
+      "proposals": [
+        {
+          "proposalId": "sa.toml.02.a",
+          "atomId": "TOML-DEPS-FASTAPI",
+          "atomCid": "cid-toml-deps-fastapi",
+          "patch": "--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -20,1 +20,1 @@\n-fastapi = \"^0.136.3\"\n+fastapi = \"^0.137.0\"\n",
+          "intent": "Upgrade FastAPI dependency."
+        },
+        {
+          "proposalId": "sa.toml.02.b",
+          "atomId": "TOML-DEPS-FASTAPI",
+          "atomCid": "cid-toml-deps-fastapi",
+          "patch": "--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -20,1 +20,1 @@\n-fastapi = \"^0.136.3\"\n+fastapi = \"^0.136.3,<0.137.0\"\n",
+          "intent": "Pin FastAPI upper bound."
+        }
+      ]
+    },
+    {
+      "id": "toml-config-readwrite-serial",
+      "format": "toml",
+      "family": "toml-config",
+      "kind": "registry",
+      "targetFile": "pyproject.toml",
+      "description": "A TOML write that depends on an active build-system stanza should serialize.",
+      "expectedVerdict": "serial",
+      "newIntent": {
+        "taskId": "TASK-SA-TOML-03",
+        "actorId": "structured-bench",
+        "atomId": "TOML-TOOL-RUFF",
+        "atomCid": "cid-toml-tool-ruff",
+        "readAtoms": ["TOML-BUILD-SYSTEM", "cid-toml-build-system"]
+      },
+      "activeIntent": {
+        "taskId": "TASK-SA-TOML-BASE",
+        "actorId": "seed-agent",
+        "file": "pyproject.toml",
+        "atomId": "TOML-BUILD-SYSTEM",
+        "atomCid": "cid-toml-build-system"
+      }
+    },
+    {
+      "id": "openapi-disjoint-paths",
+      "format": "openapi",
+      "family": "openapi-schema",
+      "kind": "compose",
+      "targetFile": "openapi/openapi.yaml",
+      "description": "OpenAPI edits on disjoint paths should remain parallel-safe.",
+      "expectedVerdict": "parallel-safe",
+      "proposals": [
+        {
+          "proposalId": "sa.openapi.01.a",
+          "atomId": "OPENAPI-PATH-ITEMS",
+          "atomCid": "cid-openapi-path-items",
+          "patch": "--- a/openapi/openapi.yaml\n+++ b/openapi/openapi.yaml\n@@ -15,1 +15,1 @@\n-      summary: List items\n+      summary: List catalog items\n",
+          "intent": "Update /items summary."
+        },
+        {
+          "proposalId": "sa.openapi.01.b",
+          "atomId": "OPENAPI-PATH-USERS",
+          "atomCid": "cid-openapi-path-users",
+          "patch": "--- a/openapi/openapi.yaml\n+++ b/openapi/openapi.yaml\n@@ -42,1 +42,1 @@\n-      summary: List users\n+      summary: List active users\n",
+          "intent": "Update /users summary."
+        }
+      ]
+    },
+    {
+      "id": "openapi-shared-operation-blocked",
+      "format": "openapi",
+      "family": "openapi-schema",
+      "kind": "compose",
+      "targetFile": "openapi/openapi.yaml",
+      "description": "OpenAPI edits targeting the same path+method operation should block.",
+      "expectedVerdict": "blocked-cid-conflict",
+      "proposals": [
+        {
+          "proposalId": "sa.openapi.02.a",
+          "atomId": "OPENAPI-POST-ITEMS",
+          "atomCid": "cid-openapi-post-items",
+          "patch": "--- a/openapi/openapi.yaml\n+++ b/openapi/openapi.yaml\n@@ -28,1 +28,1 @@\n-      operationId: createItem\n+      operationId: createCatalogItem\n",
+          "intent": "Rename create item operation."
+        },
+        {
+          "proposalId": "sa.openapi.02.b",
+          "atomId": "OPENAPI-POST-ITEMS",
+          "atomCid": "cid-openapi-post-items",
+          "patch": "--- a/openapi/openapi.yaml\n+++ b/openapi/openapi.yaml\n@@ -28,1 +28,1 @@\n-      operationId: createItem\n+      operationId: addItem\n",
+          "intent": "Alternative operation rename."
+        }
+      ]
+    },
+    {
+      "id": "openapi-schema-readwrite-serial",
+      "format": "openapi",
+      "family": "openapi-schema",
+      "kind": "registry",
+      "targetFile": "openapi/openapi.yaml",
+      "description": "A response schema write that depends on an active shared component should serialize.",
+      "expectedVerdict": "serial",
+      "newIntent": {
+        "taskId": "TASK-SA-OPENAPI-03",
+        "actorId": "structured-bench",
+        "atomId": "OPENAPI-RESPONSES-ITEMS",
+        "atomCid": "cid-openapi-responses-items",
+        "readAtoms": ["OPENAPI-COMPONENT-ITEM", "cid-openapi-component-item"]
+      },
+      "activeIntent": {
+        "taskId": "TASK-SA-OPENAPI-BASE",
+        "actorId": "seed-agent",
+        "file": "openapi/openapi.yaml",
+        "atomId": "OPENAPI-COMPONENT-ITEM",
+        "atomCid": "cid-openapi-component-item"
+      }
+    },
+    {
+      "id": "atom-map-shard-disjoint-atoms",
+      "format": "atom-map-shard",
+      "family": "atom-map-shard",
+      "kind": "compose",
+      "targetFile": "atomic_workbench/path-to-atom-map-shards/tasks-command.json",
+      "description": "Atom-map shard edits touching disjoint atom records should remain parallel-safe.",
+      "expectedVerdict": "parallel-safe",
+      "proposals": [
+        {
+          "proposalId": "sa.map.01.a",
+          "atomId": "ATOM-MAP-TASK-CLAIM",
+          "atomCid": "cid-atom-map-task-claim",
+          "patch": "--- a/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n+++ b/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n@@ -8,1 +8,1 @@\n-\"atom_id\": \"tasks.claim\"\n+\"atom_id\": \"tasks.claim.lifecycle\"\n",
+          "intent": "Refine claim atom id."
+        },
+        {
+          "proposalId": "sa.map.01.b",
+          "atomId": "ATOM-MAP-TASK-CLOSE",
+          "atomCid": "cid-atom-map-task-close",
+          "patch": "--- a/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n+++ b/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n@@ -16,1 +16,1 @@\n-\"atom_id\": \"tasks.close\"\n+\"atom_id\": \"tasks.close.governance\"\n",
+          "intent": "Refine close atom id."
+        }
+      ]
+    },
+    {
+      "id": "atom-map-shard-shared-record-blocked",
+      "format": "atom-map-shard",
+      "family": "atom-map-shard",
+      "kind": "compose",
+      "targetFile": "atomic_workbench/path-to-atom-map-shards/tasks-command.json",
+      "description": "Atom-map shard edits targeting the same record should block.",
+      "expectedVerdict": "blocked-cid-conflict",
+      "proposals": [
+        {
+          "proposalId": "sa.map.02.a",
+          "atomId": "ATOM-MAP-TASKS-SURFACE",
+          "atomCid": "cid-atom-map-tasks-surface",
+          "patch": "--- a/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n+++ b/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n@@ -24,1 +24,1 @@\n-\"capability\": \"tasks surface\"\n+\"capability\": \"tasks surface contract\"\n",
+          "intent": "Clarify capability wording."
+        },
+        {
+          "proposalId": "sa.map.02.b",
+          "atomId": "ATOM-MAP-TASKS-SURFACE",
+          "atomCid": "cid-atom-map-tasks-surface",
+          "patch": "--- a/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n+++ b/atomic_workbench/path-to-atom-map-shards/tasks-command.json\n@@ -24,1 +24,1 @@\n-\"capability\": \"tasks surface\"\n+\"capability\": \"tasks surface and lifecycle\"\n",
+          "intent": "Alternative capability wording."
+        }
+      ]
+    },
+    {
+      "id": "atom-map-shard-readwrite-serial",
+      "format": "atom-map-shard",
+      "family": "atom-map-shard",
+      "kind": "registry",
+      "targetFile": "atomic_workbench/path-to-atom-map-shards/tasks-command.json",
+      "description": "A shard write that depends on an active map manifest entry should serialize.",
+      "expectedVerdict": "serial",
+      "newIntent": {
+        "taskId": "TASK-SA-MAP-03",
+        "actorId": "structured-bench",
+        "atomId": "ATOM-MAP-SHARD-ENTRY",
+        "atomCid": "cid-atom-map-shard-entry",
+        "readAtoms": ["ATOM-MAP-SHARD-MANIFEST", "cid-atom-map-shard-manifest"]
+      },
+      "activeIntent": {
+        "taskId": "TASK-SA-MAP-BASE",
+        "actorId": "seed-agent",
+        "file": "atomic_workbench/path-to-atom-map-shards/manifest.json",
+        "atomId": "ATOM-MAP-SHARD-MANIFEST",
+        "atomCid": "cid-atom-map-shard-manifest"
+      }
+    }
+  ]
+}

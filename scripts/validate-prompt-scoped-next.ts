@@ -148,7 +148,9 @@ async function main() {
     const quickfixPrompt = '請小修 tsconfig.json typo';
     const quickfixRoute = await runNext(['--cwd', tempRoot, '--prompt', quickfixPrompt]);
     assert(quickfixRoute.messages.some((entry) => entry.code === 'ATM_NEXT_QUICKFIX_ROUTE_READY'), 'quickfix prompt must route to the fast channel');
+    assert(quickfixRoute.messages.some((entry) => entry.code === 'ATM_NEXT_GOVERNANCE_READINESS_HINT'), 'quickfix prompt must emit early governance readiness hints');
     assert((quickfixRoute.evidence.nextAction as any).recommendedChannel === 'fast', 'quickfix route must recommend fast channel');
+    assert(Array.isArray((quickfixRoute.evidence.nextAction as any).governanceReadiness?.earlyPreparation), 'quickfix route must expose governanceReadiness.earlyPreparation');
     const quickfixClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', quickfixPrompt]);
     assert(quickfixClaim.ok === true, 'quickfix next --claim must succeed');
     assert((quickfixClaim.evidence.quickfixLock as any)?.schemaId === 'atm.quickfixLock.v1', 'quickfix next --claim must persist atm.quickfixLock.v1');
@@ -182,6 +184,7 @@ async function main() {
     const queue = await runNext(['--cwd', tempRoot, '--prompt', 'PlanAlpha first 2 task cards']);
     assert(queue.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'plan-scoped ordinal prompt must return a task queue');
     assert(queue.messages.some((entry) => entry.code === 'ATM_TASK_DELIVERY_PRINCIPLE'), 'plan-scoped queue route must remind agents that delivery comes before closure');
+    assert(queue.messages.some((entry) => entry.code === 'ATM_NEXT_GOVERNANCE_READINESS_HINT'), 'plan-scoped queue route must emit early governance readiness hints');
     assert((queue.evidence.nextAction as any).queueSize === 2, 'plan-scoped ordinal prompt must select two tasks');
     assert((queue.evidence.nextAction as any).recommendedChannel === 'batch', 'plan-scoped queue prompt must recommend batch channel');
     assert((queue.evidence.nextAction as any).deliveryPrinciple?.schemaId === 'atm.taskDeliveryPrinciple.v1', 'plan-scoped queue prompt must carry delivery principle evidence');
@@ -630,10 +633,12 @@ scopePaths:
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PLAYBOOK_ABSENT'), 'non-task prompt must state when no playbook exists');
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_IGNORED_ARTIFACT_FORCE_ADD_HINT'), 'non-task prompt must surface ignored artifact force-add hints');
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_WORKTREE_SCOPE_HINT'), 'non-task prompt must surface dirty worktree classification hints');
+    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_GOVERNANCE_READINESS_HINT'), 'non-task prompt must still surface early governance readiness hints');
     const nonTaskNextAction = (nonTaskPrompt.evidence.nextAction as any) ?? {};
     assert(nonTaskNextAction.playbookState === 'absent', 'non-task prompt must mark playbookState=absent');
     assert(nonTaskNextAction.structuredOutputHint?.hasPlaybook === false, 'non-task prompt must expose structuredOutputHint.hasPlaybook=false');
     assert(nonTaskNextAction.structuredOutputHint?.followNextActionField === 'evidence.nextAction.command', 'non-task prompt must point agents at evidence.nextAction.command');
+    assert(Array.isArray(nonTaskNextAction.governanceReadiness?.queueRetryCodes), 'non-task prompt must expose governance readiness queue retry codes');
     assert((nonTaskNextAction.ignoredArtifactForceAddHints ?? []).some((entry: any) => String(entry.path).startsWith('artifacts/')), 'non-task prompt must hint ignored artifact force-add paths');
     assert((nonTaskNextAction.promptWorktreeHint?.releaseMirrorFiles ?? []).includes('release/fixture.txt'), 'non-task prompt must classify release mirror dirty files');
     assert((nonTaskNextAction.promptWorktreeHint?.unrelatedTrackedFiles ?? []).includes('notes/unrelated.txt'), 'non-task prompt must classify unrelated tracked dirty files');
