@@ -1,0 +1,39 @@
+{
+  "taskId": "TASK-SKL-0002",
+  "updatedAt": "2026-06-28T14:50:56.571Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-SKL-0002 against commit 09865d5099a147fbec60c8d41d69d2a09df7ed2c.",
+      "artifactPaths": [
+        "docs/**",
+        "packages/cli/src/**",
+        "packages/core/src/**",
+        "schemas/**",
+        "skl-tool-first-upgrade/tasks/TASK-SKL-0002-tool-bridge-v1-schema-and-result-adapter.task.md",
+        "tests/cli/**"
+      ],
+      "producedBy": "codex-gpt-5.4-mini",
+      "createdAt": "2026-06-28T14:50:56.571Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 09865d5099a147fbec60c8d41d69d2a09df7ed2c",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:859ea1df0e6e24155805fd0d55eedc41725ae029cd5fced9d32db556dd6ed40c",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "09865d5099a147fbec60c8d41d69d2a09df7ed2c"
+      }
+    }
+  ]
+}

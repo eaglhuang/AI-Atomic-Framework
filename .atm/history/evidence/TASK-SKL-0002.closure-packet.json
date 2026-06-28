@@ -1,0 +1,173 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e73ba590595fdd7589dd287a6e2c6684f461dea4",
+  "governedTreeSha": "bec353bbdac05e0f5f98af7f6ae86ec9fc51cbcf",
+  "targetCommitDelta": {
+    "currentCommitSha": "e73ba590595fdd7589dd287a6e2c6684f461dea4",
+    "parentCommitShas": [
+      "e73ba590595fdd7589dd287a6e2c6684f461dea4"
+    ],
+    "governedTreeSha": "bec353bbdac05e0f5f98af7f6ae86ec9fc51cbcf",
+    "changedFiles": [
+      ".agents/skills/atm-governance-router/SKILL.md",
+      ".agents/skills/atm-next/SKILL.md",
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-SKL-0002.json",
+      ".atm/history/task-events/TASK-SKL-0002/2026-06-28T14-49-33-272Z-import-64f60b6cbd55.json",
+      ".atm/history/tasks/TASK-SKL-0002.json",
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".claude/skills/atm-next/SKILL.md",
+      ".cursor/rules/skills/atm-governance-router/SKILL.md",
+      ".cursor/rules/skills/atm-next/SKILL.md",
+      ".gemini/commands/atm-governance-router.toml",
+      ".gemini/commands/atm-next.toml",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/instructions/atm-next.instructions.md",
+      ".github/prompts/atm-governance-router.prompt.md",
+      ".github/prompts/atm-next.prompt.md",
+      "docs/cli-error-policy.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/skills/shared-growth-contract.md",
+      "docs/specs/cli-result-contract-v1.md",
+      "GEMINI.md",
+      "integrations/codex-skills/atm-governance-router/references/learning-loop.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "integrations/codex-skills/atm-next/SKILL.md",
+      "packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/shared.ts",
+      "packages/integration-gemini/src/index.ts",
+      "packages/integrations-core/src/compiler/compile.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/integrations/codex-skills/atm-governance-router/references/learning-loop.md",
+      "release/atm-root-drop/packages/integration-gemini/dist/index.js",
+      "release/atm-root-drop/packages/integration-gemini/src/index.ts",
+      "release/atm-root-drop/packages/integrations-core/dist/compiler/compile.js",
+      "release/atm-root-drop/packages/integrations-core/src/compiler/compile.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/templates/skills/atm-governance-router.skill.md",
+      "release/atm-root-drop/templates/skills/atm-next.skill.md",
+      "schemas/governance/cli-result.schema.json",
+      "templates/skills/atm-governance-router.skill.md",
+      "templates/skills/atm-next.skill.md",
+      "tests/cli/cli-result-contract.test.ts",
+      "tests/cli/next-external-scan-guard.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show 09865d5099a147fbec60c8d41d69d2a09df7ed2c",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:859ea1df0e6e24155805fd0d55eedc41725ae029cd5fced9d32db556dd6ed40c",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-28T14:50:58.646Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "docs/**",
+      "packages/cli/src/**",
+      "packages/core/src/**",
+      "schemas/**",
+      "skl-tool-first-upgrade/tasks/TASK-SKL-0002-tool-bridge-v1-schema-and-result-adapter.task.md",
+      "tests/cli/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/**",
+      "packages/core/src/**",
+      "schemas/**",
+      "tests/cli/**"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0002.json",
+  "closedAt": "2026-06-28T14:50:58.646Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "09865d5099a147fbec60c8d41d69d2a09df7ed2c",
+    "reconciledAt": "2026-06-28T14:50:56.572Z",
+    "reconciledByActor": "codex-gpt-5.4-mini",
+    "reason": "Historical reconcile sync against commit 09865d5099a147fbec60c8d41d69d2a09df7ed2c"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "09865d5099a147fbec60c8d41d69d2a09df7ed2c",
+    "taskMatchedFiles": [
+      "docs/cli-error-policy.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/skills/shared-growth-contract.md",
+      "docs/specs/cli-result-contract-v1.md",
+      "packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/shared.ts",
+      "schemas/governance/cli-result.schema.json",
+      "tests/cli/cli-result-contract.test.ts",
+      "tests/cli/next-external-scan-guard.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0002.json",
+      ".atm/history/task-events/TASK-SKL-0002/2026-06-23T15-05-38-745Z-import-59eb1d85789b.json",
+      ".atm/history/task-events/TASK-SKL-0002/2026-06-23T15-18-56-824Z-import-367fb6dad7a1.json",
+      ".atm/history/task-events/TASK-SKL-0002/2026-06-23T15-19-02-537Z-reserve-0df07766b7de.json",
+      ".atm/history/task-events/TASK-SKL-0002/2026-06-23T15-19-02-540Z-promote-d471d0d2e4a7.json",
+      ".atm/history/task-events/TASK-SKL-0002/2026-06-23T15-19-02-714Z-claim-7973336fcd3d.json",
+      ".atm/history/tasks/TASK-SKL-0002.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
