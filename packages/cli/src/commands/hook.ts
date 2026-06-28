@@ -192,6 +192,7 @@ interface PreCommitBlockingFinding {
   readonly files?: readonly string[];
   readonly requiredCommand?: string | null;
   readonly classification?: 'environment' | 'baseline' | 'current-task' | 'blocking';
+  readonly blockerKind?: 'governance-state' | 'content-validation' | 'environment' | 'baseline';
   readonly scope?: 'staged' | 'tree-wide';
   readonly data?: unknown;
 }
@@ -233,6 +234,9 @@ interface PreCommitFailureEnvelope {
   readonly blockingFindings: readonly PreCommitBlockingFinding[];
   readonly baselineFailures: readonly PreCommitBlockingFinding[];
   readonly currentTaskFailures: readonly PreCommitBlockingFinding[];
+  readonly governanceStateFailures: readonly PreCommitBlockingFinding[];
+  readonly contentValidationFailures: readonly PreCommitBlockingFinding[];
+  readonly deferredGovernanceCandidate: boolean;
   readonly repairHints: readonly string[];
   readonly diagnostics: {
     readonly gitIndexDiagnostic: ReturnType<typeof inspectGitIndexAccess>;
@@ -686,7 +690,15 @@ function runPreCommitHook(cwd: string) {
           scopedIndexActive,
           advisoryTreeWideFindingsCount: advisoryFindings.length
         })
-        : message('error', 'ATM_HOOK_PRE_COMMIT_FAILED', 'ATM pre-commit hook blocked this commit.', {
+        : message(
+          'error',
+          failureEnvelope?.deferredGovernanceCandidate
+            ? 'ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED'
+            : 'ATM_HOOK_PRE_COMMIT_FAILED',
+          failureEnvelope?.deferredGovernanceCandidate
+            ? 'ATM pre-commit blocked this commit on governance-state requirements; content validation did not report a failure.'
+            : 'ATM pre-commit hook blocked this commit.',
+          {
           encodingFindings: encodingReport.findings.length,
           frameworkBlockers: blockingFrameworkIssues,
           planningMirrorDriftFiles,
@@ -706,6 +718,9 @@ function runPreCommitHook(cwd: string) {
           // TASK-AAO-0136: blockingStagedFindings is the operator-facing split.
           blockingStagedFindings: blockingFindings,
           blockingFindings,
+          governanceStateFindings: failureEnvelope?.governanceStateFailures ?? [],
+          contentValidationFindings: failureEnvelope?.contentValidationFailures ?? [],
+          deferredGovernanceCandidate: failureEnvelope?.deferredGovernanceCandidate ?? false,
           advisoryTreeWideFindings: advisoryFindings,
           failureEnvelope,
           nextStep: blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand ?? frameworkClaimCommand
@@ -992,6 +1007,8 @@ function buildPreCommitFailureEnvelope(input: {
     ?? null;
   const baselineFailures = input.blockingFindings.filter(isPreCommitBaselineFinding);
   const currentTaskFailures = input.blockingFindings.filter((finding) => !isPreCommitBaselineFinding(finding) && !isPreCommitEnvironmentFinding(finding));
+  const governanceStateFailures = currentTaskFailures.filter(isPreCommitGovernanceStateFinding);
+  const contentValidationFailures = currentTaskFailures.filter((finding) => !isPreCommitGovernanceStateFinding(finding));
   return {
     schemaId: 'atm.validatorFailureEnvelope.v1',
     ok: false,
@@ -1000,6 +1017,9 @@ function buildPreCommitFailureEnvelope(input: {
     blockingFindings: input.blockingFindings,
     baselineFailures,
     currentTaskFailures,
+    governanceStateFailures,
+    contentValidationFailures,
+    deferredGovernanceCandidate: governanceStateFailures.length > 0 && contentValidationFailures.length === 0,
     repairHints: buildPreCommitRepairHints(input.blockingFindings, requiredCommand),
     diagnostics: {
       gitIndexDiagnostic: input.gitIndexDiagnostic,
@@ -1044,6 +1064,19 @@ function isPreCommitEnvironmentFinding(finding: PreCommitBlockingFinding): boole
     || finding.source === 'git-index'
     || finding.code.startsWith('ATM_ENV_')
     || finding.code.startsWith('ATM_GIT_INDEX_');
+}
+
+function isPreCommitGovernanceStateFinding(finding: PreCommitBlockingFinding): boolean {
+  if (finding.blockerKind) {
+    return finding.blockerKind === 'governance-state';
+  }
+  return finding.source === 'framework-development'
+    || finding.source === 'direction-lock'
+    || finding.source === 'quickfix'
+    || finding.source === 'protected-atm-state'
+    || finding.source === 'same-file-claim-ownership'
+    || finding.source === 'generated-residue'
+    || finding.source === 'emergency-use-audit';
 }
 
 function inspectGitIndexAccess(cwd: string) {

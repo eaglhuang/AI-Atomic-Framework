@@ -68,6 +68,16 @@ function createCommandRun(command: string, stdoutSha256: string) {
   };
 }
 
+function rewritePackageScripts(repo: string, scripts: Record<string, string>) {
+  const packageJsonPath = path.join(repo, 'package.json');
+  const parsed = JSON.parse(readFileSync(packageJsonPath, 'utf8')) as Record<string, any>;
+  parsed.scripts = {
+    ...(parsed.scripts ?? {}),
+    ...scripts
+  };
+  writeFileSync(packageJsonPath, `${JSON.stringify(parsed, null, 2)}\n`, 'utf8');
+}
+
 function writeHistoricalRestorePacket(repo: string, taskId: string, status = 'done') {
   const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
   const evidencePath = path.join(repo, '.atm', 'history', 'evidence', `${taskId}.json`);
@@ -183,6 +193,22 @@ try {
   assert(existsSync(path.join(repo, '.atm', 'git-hooks', 'pre-commit')), 'git-hooks install must write .atm/git-hooks/pre-commit');
   assert(existsSync(path.join(repo, '.atm', 'git-hooks', 'pre-push')), 'git-hooks install must write .atm/git-hooks/pre-push');
   assert(runGit(repo, ['config', '--get', 'core.hooksPath']).stdout.trim() === '.atm/git-hooks', 'git-hooks install must configure core.hooksPath to .atm/git-hooks');
+  rewritePackageScripts(repo, {
+    typecheck: 'node -e "process.exit(0)"',
+    'validate:cli': 'node -e "process.exit(0)"',
+    'validate:git-head-evidence': 'node -e "process.exit(0)"'
+  });
+
+  writeFileSync(path.join(repo, 'packages', 'core', 'src', 'index.ts'), 'export const deferredGovernanceOnly = true;\n', 'utf8');
+  runGit(repo, ['add', 'packages/core/src/index.ts']);
+  const deferredGovernanceHook = parsePayload(runCli(repo, ['hook', 'pre-commit', '--json'], { allowFailure: true }));
+  assert(deferredGovernanceHook.ok === false, 'critical framework edit without claim must fail pre-commit');
+  assert(deferredGovernanceHook.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED'), 'missing framework claim must surface deferred-governance hook code');
+  assert(deferredGovernanceHook.evidence?.failureEnvelope?.deferredGovernanceCandidate === true, 'missing framework claim must mark deferredGovernanceCandidate=true');
+  assert((deferredGovernanceHook.evidence?.failureEnvelope?.governanceStateFailures ?? []).some((entry: any) => entry.code === 'ATM_FRAMEWORK_ACTIVE_FRAMEWORK_CLAIM_REQUIRED'), 'missing framework claim must classify the blocker as governance-state');
+  assert((deferredGovernanceHook.evidence?.failureEnvelope?.contentValidationFailures ?? []).length === 0, 'governance-only pre-commit block must not report content validation failures');
+  runGit(repo, ['restore', '--staged', 'packages/core/src/index.ts']);
+  runGit(repo, ['restore', 'packages/core/src/index.ts']);
 
   writeFileSync(path.join(repo, 'docs-only.txt'), 'governed commit\n', 'utf8');
   runGit(repo, ['add', 'docs-only.txt']);
