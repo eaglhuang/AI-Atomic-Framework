@@ -9,6 +9,15 @@ export const runtimeActorIdentityDirectoryRelativePath = '.atm/runtime/identity/
 export const actorIdEnvVar = 'ATM_ACTOR_ID' as const;
 export const legacyActorIdEnvVar = 'AGENT_IDENTITY' as const;
 
+export interface TrackedActorRegistryState {
+  readonly path: typeof actorRegistryRelativePath;
+  readonly tracked: boolean;
+  readonly staged: boolean;
+  readonly unstaged: boolean;
+  readonly blocking: boolean;
+  readonly status: 'untracked' | 'clean' | 'staged-only' | 'unstaged-only' | 'mixed';
+}
+
 export interface ResolvedActorId {
   readonly actorId: string;
   readonly source: 'option' | 'env' | 'legacy-env' | 'repo-default';
@@ -76,6 +85,37 @@ export function writeActorRegistry(cwd: string, actors: readonly ActorRecord[]):
   };
   writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
   return actorRegistryRelativePath;
+}
+
+export function inspectTrackedActorRegistryState(cwd: string): TrackedActorRegistryState {
+  const tracked = runGitPathProbe(cwd, ['ls-files', '--error-unmatch', '--', actorRegistryRelativePath]);
+  if (!tracked) {
+    return {
+      path: actorRegistryRelativePath,
+      tracked: false,
+      staged: false,
+      unstaged: false,
+      blocking: false,
+      status: 'untracked'
+    };
+  }
+  const staged = runGitPathProbe(cwd, ['diff', '--cached', '--name-only', '--', actorRegistryRelativePath]);
+  const unstaged = runGitPathProbe(cwd, ['diff', '--name-only', '--', actorRegistryRelativePath]);
+  const status = staged && unstaged
+    ? 'mixed'
+    : staged
+      ? 'staged-only'
+      : unstaged
+        ? 'unstaged-only'
+        : 'clean';
+  return {
+    path: actorRegistryRelativePath,
+    tracked: true,
+    staged,
+    unstaged,
+    blocking: unstaged,
+    status
+  };
 }
 
 export function upsertActorRecord(cwd: string, input: CreateActorInput): { actor: ActorRecord; path: string } {
@@ -203,6 +243,19 @@ export function resolveActorId(inputActorId?: string | null, cwd?: string | null
 
 export function findActorByResolvedId(cwd: string, resolved: ResolvedActorId): ActorRecord | null {
   return readActorRegistry(cwd).actors.find((entry) => entry.actorId === resolved.actorId) ?? null;
+}
+
+function runGitPathProbe(cwd: string, args: readonly string[]): boolean {
+  try {
+    const output = execFileSync('git', args, {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+    return output.trim().length > 0;
+  } catch {
+    return false;
+  }
 }
 
 function normalizeActorRecord(value: ActorRecord): ActorRecord | null {

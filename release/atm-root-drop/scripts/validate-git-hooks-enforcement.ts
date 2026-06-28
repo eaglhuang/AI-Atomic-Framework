@@ -312,6 +312,38 @@ try {
   runGit(governedWrapperRepo, ['config', 'user.email', 'hook-validator@example.com']);
   runGit(governedWrapperRepo, ['add', '.atm/catalog/registry/actors.json']);
   runGit(governedWrapperRepo, ['commit', '--no-verify', '-m', 'register governed wrapper actor']);
+  const registryDrift = parsePayload(runCli(governedWrapperRepo, [
+    'actor',
+    'register',
+    '--id',
+    'hook-validator',
+    '--kind',
+    'ai-agent',
+    '--name',
+    'Hook Validator',
+    '--git-name',
+    'Hook Validator',
+    '--git-email',
+    'hook-validator@example.com',
+    '--json'
+  ]));
+  assert(registryDrift.ok === true, 're-registering the same actor must still succeed while creating tracked registry drift');
+  writeFileSync(path.join(governedWrapperRepo, 'docs', 'tracked-actor-registry-drift.md'), 'registry drift\n', 'utf8');
+  runGit(governedWrapperRepo, ['add', 'docs/tracked-actor-registry-drift.md']);
+  const driftHook = parsePayload(runCli(governedWrapperRepo, ['hook', 'pre-commit', '--json'], { allowFailure: true }));
+  assert(driftHook.ok === false, 'pre-commit must fail when tracked actor registry has unstaged drift');
+  assert((driftHook.evidence?.commitAttributionReport?.findings ?? []).some((entry: any) => entry.code === 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED'), 'pre-commit must surface tracked actor registry drift as a commit-attribution blocker');
+  const driftDoctorResult = runCli(governedWrapperRepo, ['doctor', '--json'], { allowFailure: true });
+  const driftDoctor = parsePayload(driftDoctorResult);
+  assert(driftDoctorResult.status === 1, 'doctor must exit non-zero when tracked actor registry has unstaged drift');
+  assert(driftDoctor.ok === false, 'doctor must fail when tracked actor registry has unstaged drift');
+  const governanceReadinessCheck = (driftDoctor.evidence?.checks ?? []).find((entry: any) => entry.name === 'governance-entry-readiness');
+  assert(governanceReadinessCheck?.ok === false, 'doctor governance-entry-readiness must fail for tracked actor registry drift');
+  assert(governanceReadinessCheck?.details?.actorRegistryState?.blocking === true, 'doctor must report actor registry drift details');
+  runGit(governedWrapperRepo, ['restore', '--staged', 'docs/tracked-actor-registry-drift.md']);
+  rmSync(path.join(governedWrapperRepo, 'docs', 'tracked-actor-registry-drift.md'), { force: true });
+  runGit(governedWrapperRepo, ['add', '.atm/catalog/registry/actors.json']);
+  runGit(governedWrapperRepo, ['commit', '--no-verify', '-m', 'refresh governed wrapper actor registry']);
   writeFileSync(path.join(governedWrapperRepo, 'packages', 'core', 'src', 'index.ts'), 'export const governedWrapperEvidence = true;\n', 'utf8');
   runGit(governedWrapperRepo, ['add', 'packages/core/src/index.ts']);
   const wrapperCommit = parsePayload(runCli(governedWrapperRepo, [

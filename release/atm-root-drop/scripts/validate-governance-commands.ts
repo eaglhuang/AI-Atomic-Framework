@@ -404,6 +404,32 @@ try {
   assert(runGit(repo, ['config', 'user.email', 'fixture-agent@example.com']).exitCode === 0, 'fixture git user.email must match the registered actor before governed commits');
   assert(runGit(repo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'fixture actor registry must be stageable');
   assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: register fixture actor']).exitCode === 0, 'fixture actor registry commit must succeed');
+  const registerActorDrift = runAtm([
+    'actor',
+    'register',
+    '--cwd',
+    repo,
+    '--id',
+    'fixture-agent',
+    '--kind',
+    'ai-agent',
+    '--name',
+    'Fixture Agent',
+    '--git-name',
+    'fixture-agent',
+    '--git-email',
+    'fixture-agent@example.com',
+    '--json'
+  ]);
+  assert(registerActorDrift.exitCode === 0, 're-registering fixture actor must still exit 0');
+  const actorRegistryDriftDoctor = runAtm(['doctor', '--cwd', repo, '--json']);
+  assert(actorRegistryDriftDoctor.exitCode === 1, 'doctor must fail when tracked actor registry has unstaged drift');
+  assert(actorRegistryDriftDoctor.parsed.ok === false, 'doctor must report ok=false for tracked actor registry drift');
+  const actorRegistryGovernanceReadiness = (actorRegistryDriftDoctor.parsed.evidence?.checks ?? []).find((entry: any) => entry.name === 'governance-entry-readiness');
+  assert(actorRegistryGovernanceReadiness?.ok === false, 'governance-entry-readiness must fail for tracked actor registry drift');
+  assert(actorRegistryGovernanceReadiness?.details?.actorRegistryState?.blocking === true, 'governance-entry-readiness must report actor registry drift details');
+  assert(runGit(repo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'drifted fixture actor registry must still be stageable');
+  assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: refresh fixture actor registry']).exitCode === 0, 'drifted fixture actor registry commit must succeed');
 
   const evidenceOnlyRepo = path.join(tempRoot, 'evidence-only-followup');
   mkdirSync(evidenceOnlyRepo, { recursive: true });

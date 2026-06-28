@@ -12,6 +12,7 @@ import { createGitHeadEvidenceCheck } from './git-head-evidence.js';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.js';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
+import { inspectTrackedActorRegistryState } from './actor-registry.js';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.js';
 const legacyBehaviorPackageNames = [
     'plugin-behavior-atomize',
@@ -484,6 +485,7 @@ function createGovernanceEntryReadinessCheck(root, repoIdentity, gitHeadEvidence
     const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'];
     const protectedBranchTarget = branch ? isProtectedFrameworkBranchTarget(branch) : false;
     const latestGitHeadStatus = gitHeadEvidenceCheck?.details?.status ?? null;
+    const actorRegistryState = inspectTrackedActorRegistryState(root);
     const requiresProtectedPushReadiness = repoIdentity.isFrameworkRepo && protectedBranchTarget && aheadCount > 0;
     const protectedPushReadiness = !repoIdentity.isFrameworkRepo
         ? 'not-applicable'
@@ -496,7 +498,7 @@ function createGovernanceEntryReadinessCheck(root, repoIdentity, gitHeadEvidence
                     : latestGitHeadStatus === 'missing'
                         ? 'missing-git-head-evidence'
                         : 'ready';
-    const ok = protectedPushReadiness !== 'missing-git-head-evidence';
+    const ok = protectedPushReadiness !== 'missing-git-head-evidence' && !actorRegistryState.blocking;
     return createCheck('governance-entry-readiness', ok, {
         schemaId: 'atm.governanceEntryReadiness.v1',
         repoRole: repoIdentity.isFrameworkRepo ? 'framework' : 'host',
@@ -508,13 +510,16 @@ function createGovernanceEntryReadinessCheck(root, repoIdentity, gitHeadEvidence
         requiresProtectedPushReadiness,
         protectedPushReadiness,
         latestGitHeadStatus,
+        actorRegistryState,
         queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
         branchQueueSummary: 'Governed framework commits may serialize through the branch commit queue and retry on safe HEAD drift instead of surfacing raw Git races.',
-        recommendedAction: protectedPushReadiness === 'missing-git-head-evidence'
-            ? 'Generate governed git-head evidence before pushing protected framework history. Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json and rerun doctor or hook pre-push.'
-            : protectedPushReadiness === 'no-upstream'
-                ? 'Set or fetch the upstream branch before relying on protected push readiness diagnostics.'
-                : 'Before editing or pushing framework changes, confirm actor identity, framework claim, doctor readiness, and protected-branch push readiness.'
+        recommendedAction: actorRegistryState.blocking
+            ? `Actor registry is a tracked governance surface and currently has unstaged drift at ${actorRegistryState.path}. Stage and commit it with the matching identity/governance change, or restore it before continuing.`
+            : protectedPushReadiness === 'missing-git-head-evidence'
+                ? 'Generate governed git-head evidence before pushing protected framework history. Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json and rerun doctor or hook pre-push.'
+                : protectedPushReadiness === 'no-upstream'
+                    ? 'Set or fetch the upstream branch before relying on protected push readiness diagnostics.'
+                    : 'Before editing or pushing framework changes, confirm actor identity, framework claim, doctor readiness, and protected-branch push readiness.'
     });
 }
 function createBacklogSyncCheck(root, repoIdentity) {

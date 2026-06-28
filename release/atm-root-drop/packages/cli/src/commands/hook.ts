@@ -21,7 +21,7 @@ import {
   requiredValidationPassesForClosure,
   validateClosurePacket
 } from './framework-development.ts';
-import { findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from './actor-registry.ts';
+import { findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.ts';
 import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.ts';
@@ -2959,6 +2959,21 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
   const pendingBatchCheckpointTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
   const findings: PreCommitBlockingFinding[] = [];
   const suggestedTaskId = pendingBatchCheckpointTaskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : stagedTaskIds[0] ?? null);
+  const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+
+  if (actorRegistryState.blocking) {
+    findings.push({
+      code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED',
+      source: 'commit-attribution',
+      detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governance cannot prove actor identity state unless that tracked registry is either fully staged for this commit or restored.`,
+      requiredCommand: `git add ${quoteCliValue(actorRegistryState.path)} && node atm.mjs git commit --actor <id>${suggestedTaskId ? ` --task ${suggestedTaskId}` : ''} --message "<summary>" --json`,
+      classification: 'current-task'
+    });
+    return {
+      ok: false,
+      findings
+    };
+  }
 
   if (!actorId && !taskId && !sessionId) {
     if (stagedTaskIds.length > 0) {

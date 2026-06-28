@@ -44,6 +44,36 @@ export function writeActorRegistry(cwd, actors) {
     writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
     return actorRegistryRelativePath;
 }
+export function inspectTrackedActorRegistryState(cwd) {
+    const tracked = runGitPathProbe(cwd, ['ls-files', '--error-unmatch', '--', actorRegistryRelativePath]);
+    if (!tracked) {
+        return {
+            path: actorRegistryRelativePath,
+            tracked: false,
+            staged: false,
+            unstaged: false,
+            blocking: false,
+            status: 'untracked'
+        };
+    }
+    const staged = runGitPathProbe(cwd, ['diff', '--cached', '--name-only', '--', actorRegistryRelativePath]);
+    const unstaged = runGitPathProbe(cwd, ['diff', '--name-only', '--', actorRegistryRelativePath]);
+    const status = staged && unstaged
+        ? 'mixed'
+        : staged
+            ? 'staged-only'
+            : unstaged
+                ? 'unstaged-only'
+                : 'clean';
+    return {
+        path: actorRegistryRelativePath,
+        tracked: true,
+        staged,
+        unstaged,
+        blocking: unstaged,
+        status
+    };
+}
 export function upsertActorRecord(cwd, input) {
     const registry = readActorRegistry(cwd);
     const now = new Date().toISOString();
@@ -168,6 +198,19 @@ export function resolveActorId(inputActorId, cwd) {
 }
 export function findActorByResolvedId(cwd, resolved) {
     return readActorRegistry(cwd).actors.find((entry) => entry.actorId === resolved.actorId) ?? null;
+}
+function runGitPathProbe(cwd, args) {
+    try {
+        const output = execFileSync('git', args, {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore']
+        });
+        return output.trim().length > 0;
+    }
+    catch {
+        return false;
+    }
 }
 function normalizeActorRecord(value) {
     const actorId = sanitizeOptional(value.actorId);

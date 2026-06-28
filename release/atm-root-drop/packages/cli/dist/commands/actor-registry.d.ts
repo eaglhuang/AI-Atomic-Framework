@@ -4,6 +4,14 @@ export declare const runtimeIdentityRelativePath: ".atm/runtime/identity/default
 export declare const runtimeActorIdentityDirectoryRelativePath: ".atm/runtime/identity/actors";
 export declare const actorIdEnvVar: "ATM_ACTOR_ID";
 export declare const legacyActorIdEnvVar: "AGENT_IDENTITY";
+export interface TrackedActorRegistryState {
+    readonly path: typeof actorRegistryRelativePath;
+    readonly tracked: boolean;
+    readonly staged: boolean;
+    readonly unstaged: boolean;
+    readonly blocking: boolean;
+    readonly status: 'untracked' | 'clean' | 'staged-only' | 'unstaged-only' | 'mixed';
+}
 export interface ResolvedActorId {
     readonly actorId: string;
     readonly source: 'option' | 'env' | 'legacy-env' | 'repo-default';
@@ -32,6 +40,7 @@ export interface CreateActorInput {
 }
 export declare function readActorRegistry(cwd: string): ActorRegistryDocument;
 export declare function writeActorRegistry(cwd: string, actors: readonly ActorRecord[]): string;
+export declare function inspectTrackedActorRegistryState(cwd: string): TrackedActorRegistryState;
 export declare function upsertActorRecord(cwd: string, input: CreateActorInput): {
     actor: ActorRecord;
     path: string;

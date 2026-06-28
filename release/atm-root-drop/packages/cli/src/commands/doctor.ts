@@ -12,6 +12,7 @@ import { createGitHeadEvidenceCheck } from './git-head-evidence.ts';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
+import { inspectTrackedActorRegistryState } from './actor-registry.ts';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 
 const legacyBehaviorPackageNames = [
@@ -521,6 +522,7 @@ function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFra
   const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'];
   const protectedBranchTarget = branch ? isProtectedFrameworkBranchTarget(branch) : false;
   const latestGitHeadStatus = gitHeadEvidenceCheck?.details?.status ?? null;
+  const actorRegistryState = inspectTrackedActorRegistryState(root);
   const requiresProtectedPushReadiness = repoIdentity.isFrameworkRepo && protectedBranchTarget && aheadCount > 0;
   const protectedPushReadiness = !repoIdentity.isFrameworkRepo
     ? 'not-applicable'
@@ -533,7 +535,7 @@ function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFra
           : latestGitHeadStatus === 'missing'
             ? 'missing-git-head-evidence'
             : 'ready';
-  const ok = protectedPushReadiness !== 'missing-git-head-evidence';
+  const ok = protectedPushReadiness !== 'missing-git-head-evidence' && !actorRegistryState.blocking;
   return createCheck('governance-entry-readiness', ok, {
     schemaId: 'atm.governanceEntryReadiness.v1',
     repoRole: repoIdentity.isFrameworkRepo ? 'framework' : 'host',
@@ -545,9 +547,12 @@ function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFra
     requiresProtectedPushReadiness,
     protectedPushReadiness,
     latestGitHeadStatus,
+    actorRegistryState,
     queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
     branchQueueSummary: 'Governed framework commits may serialize through the branch commit queue and retry on safe HEAD drift instead of surfacing raw Git races.',
-    recommendedAction: protectedPushReadiness === 'missing-git-head-evidence'
+    recommendedAction: actorRegistryState.blocking
+      ? `Actor registry is a tracked governance surface and currently has unstaged drift at ${actorRegistryState.path}. Stage and commit it with the matching identity/governance change, or restore it before continuing.`
+      : protectedPushReadiness === 'missing-git-head-evidence'
       ? 'Generate governed git-head evidence before pushing protected framework history. Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json and rerun doctor or hook pre-push.'
       : protectedPushReadiness === 'no-upstream'
         ? 'Set or fetch the upstream branch before relying on protected push readiness diagnostics.'
