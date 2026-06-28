@@ -1,0 +1,18 @@
+{
+  "description": "Polymorph Police: same polymorph group with synchronized propagation does not falsely trigger Dedup or drift.",
+  "input": {
+    "template": {
+      "templateId": "ATM-POLY-0004",
+      "templateVersion": "3.1.0"
+    },
+    "instances": [
+      { "instanceId": "ATM-INST-0200", "templateId": "ATM-POLY-0004", "inheritedTemplateVersion": "3.1.0" },
+      { "instanceId": "ATM-INST-0201", "templateId": "ATM-POLY-0004", "inheritedTemplateVersion": "3.1.0" }
+    ],
+    "variantThreshold": 12
+  },
+  "expected": {
+    "findingCount": 0,
+    "reason": "All instances synchronized to template version and within threshold"
+  }
+}

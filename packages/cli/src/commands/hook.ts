@@ -21,7 +21,7 @@ import {
   requiredValidationPassesForClosure,
   validateClosurePacket
 } from './framework-development.ts';
-import { findActorByResolvedId, readRuntimeIdentityDefault } from './actor-registry.ts';
+import { findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { gitHeadEvidencePath, gitHeadEvidencePaths } from './git-head-evidence.ts';
 import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, relativePathFrom } from './shared.ts';
@@ -194,6 +194,14 @@ interface PreCommitBlockingFinding {
   readonly classification?: 'environment' | 'baseline' | 'current-task' | 'blocking';
   readonly scope?: 'staged' | 'tree-wide';
   readonly data?: unknown;
+}
+
+interface ExpectedGitIdentity {
+  readonly gitName: string | null;
+  readonly gitEmail: string | null;
+  readonly editor: string | null;
+  readonly provider: string | null;
+  readonly source: 'actor-registry' | 'actor-runtime' | 'matching-default' | 'missing';
 }
 
 // TASK-AAO-0136: tree-wide advisory finding — task-audit findings whose path
@@ -538,6 +546,13 @@ function runPreCommitHook(cwd: string) {
   const emergencyUseAuditReport = inspectEmergencyUseAudit(root, stagedFiles);
   const taskCardStatusReport = inspectTaskCardStatusChanges(root, stagedFiles);
   const commitAttributionReport = inspectCommitAttribution(root, stagedFiles);
+  const explicitActorWarning = stagedFiles.length > 0 && !normalizeOptionalText(process.env.ATM_COMMIT_ACTOR_ID)
+    ? message('warn', 'ATM_HOOK_COMMIT_ACTOR_NOT_EXPLICIT', 'No explicit commit actor was provided. Configure this editor/agent with its own actor identity instead of relying on repo default identity.', {
+      clearStaleDefaultCommand: 'node atm.mjs identity clear --json',
+      requiredCommand: 'node atm.mjs identity clear --json && node atm.mjs identity set --actor <actor-id> --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json',
+      env: 'ATM_COMMIT_ACTOR_ID or ATM_ACTOR_ID'
+    })
+    : null;
   // TASK-CID-0024: same-file parallel claims are first-class. Multiple active
   // claims covering one staged file must not block by themselves; only
   // ambiguous staged ownership without steward/broker evidence blocks.
@@ -600,7 +615,11 @@ function runPreCommitHook(cwd: string) {
     && crossFileConsistencyFindings.length === 0
     && residueReport.blockAndExplain.length === 0
     && residueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path)).length === 0;
-  const evidenceWrite = ok && stagedFiles.length > 0 && !scopedIndexActive
+  const gitHeadEvidenceRequired = shouldWriteGitHeadEvidenceForStagedCommit({
+    stagedFiles,
+    criticalChangedFiles: frameworkStatus.criticalChangedFiles
+  });
+  const evidenceWrite = ok && gitHeadEvidenceRequired && !scopedIndexActive
     ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
     : null;
   // TASK-AAO-0136: collect tree-wide advisory findings (warnings only, not blockers).
@@ -662,6 +681,7 @@ function runPreCommitHook(cwd: string) {
         ? message('info', 'ATM_HOOK_PRE_COMMIT_OK', 'ATM pre-commit hook passed and staged git-head evidence when needed.', {
           stagedFileCount: stagedFiles.length,
           criticalChangedFileCount: frameworkStatus.criticalChangedFiles.length,
+          gitHeadEvidenceRequired,
           evidencePath: evidenceWrite?.evidencePath ?? null,
           scopedIndexActive,
           advisoryTreeWideFindingsCount: advisoryFindings.length
@@ -691,6 +711,7 @@ function runPreCommitHook(cwd: string) {
           nextStep: blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand ?? frameworkClaimCommand
         }),
       ...(directionLockAllowedFilesWarning ? [directionLockAllowedFilesWarning] : []),
+      ...(explicitActorWarning ? [explicitActorWarning] : []),
       ...(autoCleanedResidue.length > 0
         ? [message('warn', 'ATM_HOOK_AUTO_CLEANED_GENERATED_RESIDUE', 'ATM auto-cleaned known generated residue before pre-commit evaluation.', {
             autoCleanedResidue
@@ -735,6 +756,7 @@ function runPreCommitHook(cwd: string) {
       autoCleanedResidue,
       residueReport,
       failureEnvelope,
+      gitHeadEvidenceRequired,
       evidenceWrite
     }
   });
@@ -1558,6 +1580,25 @@ function readGitObjectText(cwd: string, ref: string): string | null {
   return result.exitCode === 0 ? result.stdout : null;
 }
 
+function shouldWriteGitHeadEvidenceForStagedCommit(input: {
+  readonly stagedFiles: readonly string[];
+  readonly criticalChangedFiles: readonly string[];
+}): boolean {
+  if (input.stagedFiles.length === 0) return false;
+  if (input.criticalChangedFiles.length > 0) return true;
+  return input.stagedFiles.some((file) => isGovernedLedgerBoundaryPath(file));
+}
+
+function isGovernedLedgerBoundaryPath(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  if (normalized === gitHeadEvidencePaths.legacyJson || normalized === gitHeadEvidencePaths.jsonl) {
+    return false;
+  }
+  return normalized.startsWith('.atm/history/tasks/')
+    || normalized.startsWith('.atm/history/task-events/')
+    || /^\.atm\/history\/evidence\/[^/]+\.(?:closure-packet|bundle-manifest)\.json$/.test(normalized);
+}
+
 function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly string[], commandRuns: readonly CommandRunReport[]) {
   const treeSha = readStagedTreeWithoutEvidence(cwd);
   const parentCommitShas = readCurrentHeadForFutureCommit(cwd);
@@ -1638,10 +1679,32 @@ function readGitHeadEvidenceRecordsAtRef(cwd: string, ref: string): readonly any
   return extractEvidenceRecords(evidence);
 }
 
+function readGitHeadEvidenceRecordsFromWorktree(cwd: string): readonly any[] {
+  const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+  if (existsSync(evidenceAbsolute)) {
+    const text = readFileSync(evidenceAbsolute, 'utf8');
+    return text
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .flatMap((line) => {
+        try {
+          return extractEvidenceRecords(JSON.parse(line));
+        } catch {
+          return [];
+        }
+      });
+  }
+  const legacyAbsolute = path.join(cwd, gitHeadEvidencePaths.legacyJson);
+  const evidence = existsSync(legacyAbsolute) ? readJsonText(readFileSync(legacyAbsolute, 'utf8')) : null;
+  return extractEvidenceRecords(evidence);
+}
+
 function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalChangedFiles: readonly string[], headRef = 'HEAD'): CommitEvidenceMatch {
   const records = [
     ...readGitHeadEvidenceRecordsAtRef(cwd, commitSha),
-    ...readGitHeadEvidenceRecordsAtRef(cwd, headRef)
+    ...readGitHeadEvidenceRecordsAtRef(cwd, headRef),
+    ...readGitHeadEvidenceRecordsFromWorktree(cwd)
   ];
   const commitTreeSha = runGitScalar(cwd, ['rev-parse', `${commitSha}^{tree}`]);
   const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
@@ -2881,6 +2944,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
 
   if (!effectiveTaskId) {
     const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+    findings.push(...collectIdentityProvenanceFindings(actorId, expectedIdentity));
     const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
     const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
     if (!expectedIdentity.gitName || !expectedIdentity.gitEmail) {
@@ -2968,6 +3032,7 @@ function inspectCommitAttribution(cwd: string, stagedFiles: readonly string[]): 
     });
   }
   const expectedIdentity = resolveExpectedGitIdentityForActor(cwd, actorId);
+  findings.push(...collectIdentityProvenanceFindings(actorId, expectedIdentity));
   const authorName = normalizeOptionalText(process.env.GIT_AUTHOR_NAME) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.name']);
   const authorEmail = normalizeOptionalText(process.env.GIT_AUTHOR_EMAIL) ?? runGitScalar(cwd, ['config', '--local', '--get', 'user.email']);
   if (!expectedIdentity.gitName || !expectedIdentity.gitEmail) {
@@ -3396,12 +3461,49 @@ function parseHookTaskClaim(value: unknown): { actorId: string; leaseId: string 
 
 function resolveExpectedGitIdentityForActor(cwd: string, actorId: string) {
   const actorRecord = findActorByResolvedId(cwd, { actorId, source: 'option' });
+  const actorIdentity = readRuntimeIdentityForActor(cwd, actorId);
   const defaultIdentity = readRuntimeIdentityDefault(cwd);
   const defaultMatches = defaultIdentity?.actorId === actorId;
+  const source: ExpectedGitIdentity['source'] = actorRecord?.gitName || actorRecord?.gitEmail
+    ? 'actor-registry'
+    : actorIdentity?.gitName || actorIdentity?.gitEmail
+      ? 'actor-runtime'
+      : defaultMatches && (defaultIdentity?.gitName || defaultIdentity?.gitEmail)
+        ? 'matching-default'
+        : 'missing';
   return {
-    gitName: actorRecord?.gitName ?? (defaultMatches ? defaultIdentity?.gitName ?? null : null),
-    gitEmail: actorRecord?.gitEmail ?? (defaultMatches ? defaultIdentity?.gitEmail ?? null : null)
-  };
+    gitName: actorRecord?.gitName ?? actorIdentity?.gitName ?? (defaultMatches ? defaultIdentity?.gitName ?? null : null),
+    gitEmail: actorRecord?.gitEmail ?? actorIdentity?.gitEmail ?? (defaultMatches ? defaultIdentity?.gitEmail ?? null : null),
+    editor: actorRecord?.editor ?? actorIdentity?.editor ?? (defaultMatches ? defaultIdentity?.editor ?? null : null),
+    provider: actorRecord?.provider ?? actorIdentity?.provider ?? (defaultMatches ? defaultIdentity?.provider ?? null : null),
+    source
+  } satisfies ExpectedGitIdentity;
+}
+
+function collectIdentityProvenanceFindings(actorId: string, expectedIdentity: ExpectedGitIdentity): readonly PreCommitBlockingFinding[] {
+  const findings: PreCommitBlockingFinding[] = [];
+  const currentEditor = normalizeOptionalText(process.env.ATM_EDITOR_ID)
+    ?? (normalizeOptionalText(process.env.CODEX_HOME) ? 'codex' : null);
+  const currentProvider = normalizeOptionalText(process.env.ATM_PROVIDER_ID);
+  if (expectedIdentity.editor && currentEditor && expectedIdentity.editor !== currentEditor) {
+    findings.push({
+      code: 'ATM_COMMIT_IDENTITY_EDITOR_MISMATCH',
+      source: 'commit-attribution',
+      detail: `Actor ${actorId} identity is bound to editor ${expectedIdentity.editor}, but the current environment reports ${currentEditor}.`,
+      requiredCommand: `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --editor ${quoteCliValue(currentEditor)} --git-name "<git user.name>" --git-email "<git user.email>" --json`,
+      classification: 'current-task'
+    });
+  }
+  if (expectedIdentity.provider && currentProvider && expectedIdentity.provider !== currentProvider) {
+    findings.push({
+      code: 'ATM_COMMIT_IDENTITY_PROVIDER_MISMATCH',
+      source: 'commit-attribution',
+      detail: `Actor ${actorId} identity is bound to provider ${expectedIdentity.provider}, but the current environment reports ${currentProvider}.`,
+      requiredCommand: `node atm.mjs identity set --actor ${quoteCliValue(actorId)} --provider ${quoteCliValue(currentProvider)} --git-name "<git user.name>" --git-email "<git user.email>" --json`,
+      classification: 'current-task'
+    });
+  }
+  return findings;
 }
 
 function buildIdentitySetRequiredCommand(cwd: string, actorId: string) {

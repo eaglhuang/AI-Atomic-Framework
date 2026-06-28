@@ -1,0 +1,28 @@
+{
+  "reviewId": "cross-review-20260628-002",
+  "taskId": "PHASE-C-FASTAPI-DUAL-LIVE-CONFLICT",
+  "atomId": "broker-run:external-public-source-fastapi:d66566dc-d055-41db-87cc-939aa27e0910",
+  "authorAgent": "codex-gpt-5.4-mini",
+  "reviewerAgent": "antigravity-gemini-3.5-flash",
+  "reviewerModelSource": "google-gemini",
+  "reviewedDiffHash": "sha256:4f6e29f037fd77c6d9f2b68d29253121f6e7e0d48737e035ba32679e8c07f9aa",
+  "reviewedEvidenceRefs": [
+    "C:/Users/User/3klife-npc-brain/.atm/history/evidence/broker-runs/d66566dc-d055-41db-87cc-939aa27e0910.json",
+    "C:/Users/User/3klife-npc-brain-phase-a/artifacts/external-public-repo/fastapi/2026-06-27/summary.json"
+  ],
+  "rubricVersion": "atm-cross-agent-review-rubric.v0.prototype",
+  "verdict": "advisory-warning",
+  "reasons": [
+    "The broker artifact supports the narrow claim that Team Broker mode records applied and queued conflict outcomes on an external public-source snapshot touched path.",
+    "The artifact should not be used to claim FastAPI upstream maintainer workflow governance.",
+    "The Phase A baseline remains caveated until helper replay proves post-change execution through the local snapshot helper."
+  ],
+  "missingTests": [
+    "Independent helper-replay artifact is still required before claiming clean post-change snapshot-helper execution."
+  ],
+  "scopeConcerns": [
+    "The evidence path is adopter-side and should be cited as a local snapshot governance artifact, not as upstream repository governance."
+  ],
+  "consumerContractConcerns": [],
+  "signedAt": "2026-06-28T12:05:00+08:00"
+}

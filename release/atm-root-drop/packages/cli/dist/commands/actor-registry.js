@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 export const actorRegistryRelativePath = '.atm/catalog/registry/actors.json';
@@ -99,6 +99,13 @@ export function writeRuntimeIdentityDefault(cwd, document) {
     writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
     return runtimeIdentityRelativePath;
 }
+export function clearRuntimeIdentityDefault(cwd) {
+    const absolutePath = path.join(path.resolve(cwd), runtimeIdentityRelativePath);
+    if (!existsSync(absolutePath))
+        return false;
+    unlinkSync(absolutePath);
+    return true;
+}
 export function runtimeIdentityActorRelativePath(actorId) {
     return `${runtimeActorIdentityDirectoryRelativePath}/${actorId}.json`;
 }
@@ -132,6 +139,13 @@ export function writeRuntimeIdentityForActor(cwd, actorId, document) {
     mkdirSync(path.dirname(absolutePath), { recursive: true });
     writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
     return runtimeIdentityActorRelativePath(actorId);
+}
+export function clearRuntimeIdentityForActor(cwd, actorId) {
+    const absolutePath = path.join(path.resolve(cwd), runtimeIdentityActorRelativePath(actorId));
+    if (!existsSync(absolutePath))
+        return false;
+    unlinkSync(absolutePath);
+    return true;
 }
 export function resolveActorId(inputActorId, cwd) {
     const explicit = sanitizeOptional(inputActorId);

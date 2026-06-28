@@ -249,7 +249,6 @@ export declare function runFrameworkDevelopmentValidation(cwd: string, files?: r
 export declare function createFrameworkModeStatus(input: FrameworkModeOptions): FrameworkModeStatusReport;
 export declare function detectFrameworkRepoIdentity(repositoryRoot: string): FrameworkRepoIdentity;
 export declare function inferFrameworkTargetRepoFromTasks(cwd: string): InferredFrameworkTargetRepo | null;
-export declare function isAtmCriticalNonDocSurface(filePath: string): boolean;
 export declare function isAdopterInfrastructureSyncCommit(files: readonly string[]): boolean;
 export declare function isAdopterInfrastructureSyncPath(value: string): boolean;
 export declare function auditTasks(cwd: string): TaskAuditReport;

@@ -1,0 +1,31 @@
+{
+  "schemaId": "taskflow.profile.v1",
+  "id": "adopter-profile-v1",
+  "name": "Adopter Planning Repo Profile",
+  "repoLabel": "Adopter Planning Repo",
+  "ownerRepo": "adopter-repo",
+  "taskIdPrefix": "TASK-ADOPTER",
+  "taskId": {
+    "format": "TASK-ADOPTER-NNNN"
+  },
+  "template": {
+    "defaultMarkdown": "# ${taskId} ${title}\n\n## Goal\n${description}",
+    "namedTemplates": {
+      "bug": "# ${taskId} [BUG] ${title}\n\n## Repro\n...",
+      "feature": "# ${taskId} [FEAT] ${title}\n\n## Goal\n..."
+    }
+  },
+  "capabilities": {
+    "supportsDryRun": true,
+    "supportsWrite": false
+  },
+  "delegationDisplayHint": "All task mutations must pass through the adopter specified task opener.",
+  "delegation": {
+    "hint": "All task ledger mutations remain delegated to the repo-profile specified task opener and compiler.",
+    "openerPath": "tools/task-card-opener.js",
+    "writerInvocation": {
+      "describeOnly": true,
+      "displayHint": "node tools/task-card-opener.js --task ${taskId} --dry-run"
+    }
+  }
+}

@@ -31,6 +31,8 @@ node atm.mjs next --intent .atm/runtime/task-intent.json --json
 Use the prompt-scoped command below only when no task or plan scope is present or
 when the editor cannot run the semantic intent skill.
 
+{{ACTOR_IDENTITY_HANDOFF_GATE}}
+
 First command:
 
 ```bash

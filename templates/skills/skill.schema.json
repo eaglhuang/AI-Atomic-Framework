@@ -18,7 +18,7 @@
   "properties": {
     "schemaId": { "const": "atm.skillTemplate" },
     "specVersion": { "const": "0.1.0" },
-    "id": { "type": "string", "pattern": "^atm-[a-z0-9-]+$" },
+    "id": { "type": "string", "pattern": "^(atm|mailbox)-[a-z0-9-]+$" },
     "title": { "type": "string", "minLength": 1 },
     "summary": { "type": "string", "minLength": 1 },
     "command": { "type": "string", "pattern": "^node atm\\.mjs " },

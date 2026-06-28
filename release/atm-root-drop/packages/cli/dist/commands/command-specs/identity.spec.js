@@ -2,9 +2,9 @@ import { defineCommandSpec } from '../shared.js';
 import { commonCwdOption, commonHelpOption, commonJsonOption, commonPrettyOption, } from './_common.js';
 export default defineCommandSpec({
     name: 'identity',
-    summary: 'Manage per-actor runtime git identity profiles and inspect the current repo-default/session hint.',
+    summary: 'Manage per-actor runtime git identity profiles, inspect hints, and clear stale repo-default identities before agent handoff.',
     positional: [
-        { name: 'action', summary: 'set | show', required: true }
+        { name: 'action', summary: 'set | show | clear', required: true }
     ],
     options: [
         commonCwdOption,
@@ -25,6 +25,8 @@ export default defineCommandSpec({
     examples: [
         'node atm.mjs identity set --actor codex-main --git-name "codex-main" --git-email codex-main@atm.local --editor codex --json',
         'node atm.mjs identity set --git-name "solo-user" --git-email solo-user@example.local --json',
+        'node atm.mjs identity clear --json',
+        'node atm.mjs identity clear --actor codex-main --json',
         'node atm.mjs identity show --actor codex-main --json',
         'node atm.mjs identity show --json'
     ]

@@ -1,0 +1,31 @@
+{
+  "schemaId": "atm.validatorFixture.v1",
+  "specVersion": "0.1.0",
+  "fixtureId": "framework-governance-repairs",
+  "description": "Minimal source-first fixture for framework governance repair regressions without inherited historical task cards.",
+  "copyEntries": [
+    { "source": "README.md" },
+    { "source": ".github" },
+    { "source": "docs/SELF_HOSTING_ALPHA.md" },
+    { "source": "atm.mjs" },
+    { "source": "atm.dev.mjs" },
+    { "source": "atomic-registry.json" },
+    { "source": "package.json" },
+    { "source": "package-lock.json" },
+    { "source": "tsconfig.json" },
+    { "source": "tsconfig.build.json" },
+    { "source": "eslint.config.mjs" },
+    { "source": "packages" },
+    { "source": "scripts" },
+    { "source": "schemas" },
+    { "source": "specs" },
+    { "source": "templates" },
+    { "source": "examples" }
+  ],
+  "runtimeIdentities": [
+    { "actorId": "fixture-agent", "gitName": "Fixture Agent", "gitEmail": "fixture-agent@example.com" },
+    { "actorId": "hook-validator", "gitName": "ATM Hook Validator", "gitEmail": "atm@example.invalid" },
+    { "actorId": "restore-operator", "gitName": "Restore Operator", "gitEmail": "restore@example.invalid" },
+    { "actorId": "validator-maintainer", "gitName": "ATM Hook Validator", "gitEmail": "atm@example.invalid" }
+  ]
+}

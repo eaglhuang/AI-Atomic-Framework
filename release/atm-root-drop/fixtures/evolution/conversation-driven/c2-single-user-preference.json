@@ -1,0 +1,99 @@
+{
+  "description": "C2 - Single-user preference is downgraded to host-local at extraction time; downstream detector cannot produce an atom-spec candidate.",
+  "input": {
+    "window": "2026-W20",
+    "logs": [
+      {
+        "sessionId": "s-c2-single-user-preference",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0002",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 },
+          { "role": "user", "intent": "preference", "summary": "Prefers markdown output for this atom.", "tags": ["prefers-markdown"], "confidence": 0.9 }
+        ]
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.conversationEvidenceExtractionReport",
+    "specVersion": "0.1.0",
+    "extractorName": "deterministic-conversation-evidence-extractor",
+    "window": "2026-W20",
+    "summary": {
+      "totalLogs": 1,
+      "totalTurns": 12,
+      "emittedEvidence": 1,
+      "skippedSessions": 0
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.conv.s-c2-single-user-preference.user-correction.none",
+        "evidenceKind": "review",
+        "signalKind": "user-correction",
+        "signalScope": "host-local",
+        "patternTags": ["prefers-markdown"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 12 },
+        "summary": "Prefers markdown output for this atom.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      }
+    ],
+    "skippedSessions": []
+  },
+  "detector": {
+    "input": {
+      "window": "2026-W20",
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 }
+    },
+    "expectedReport": {
+      "schemaId": "atm.evidencePatternDetectorReport",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial deterministic evidence pattern detector report." },
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "detectorName": "deterministic-evidence-pattern-detector",
+      "window": "2026-W20",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 },
+      "summary": { "totalEvidence": 1, "acceptedEvidence": 1, "rejectedEvidence": 0, "candidateGroups": 0 },
+      "groups": [
+        {
+          "groupId": "evidence-pattern.host-local.unscoped.2026-w20.user-correction",
+          "targetKind": "host-local",
+          "signalKind": "user-correction",
+          "signalScope": "host-local",
+          "window": "2026-W20",
+          "usageCount": 12,
+          "frictionEvidenceCount": 1,
+          "positiveEvidenceCount": 0,
+          "neutralEvidenceCount": 0,
+          "matchedEvidenceIds": ["evidence.conv.s-c2-single-user-preference.user-correction.none"],
+          "rejectedEvidenceIds": [],
+          "patternTags": ["prefers-markdown"],
+          "confidence": 0.9,
+          "recommendation": "observation-only",
+          "reasons": ["target-not-proposal-surface"]
+        }
+      ],
+      "proposalCandidateGroupIds": [],
+      "rejectedEvidenceIds": [],
+      "empty": false
+    }
+  },
+  "assertions": {
+    "noAtomIdLeak": true,
+    "downgradedToHostLocal": true
+  }
+}

@@ -12,6 +12,13 @@ handoffs: node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 
 # {{title}}
 
+{{ACTOR_IDENTITY_HANDOFF_GATE}}
+
+Handoff transfers context, evidence, blockers, and next recommended commands. It
+does not transfer actor authority. The receiving agent must clear stale default
+identity when needed and claim with its own explicit actor id before editing,
+closing, reporting, or committing.
+
 First command:
 
 ```bash

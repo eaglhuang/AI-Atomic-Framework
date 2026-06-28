@@ -1,0 +1,103 @@
+{
+  "schemaId": "atm.upgradeProposal",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Atom Map curator generated behavior.merge proposal from input-output-overlap signal."
+  },
+  "proposalId": "proposal.map-curator.merge.input-output-overlap-merge",
+  "atomId": "ATM-CORE-0001",
+  "fromVersion": "0.1.0",
+  "toVersion": "0.1.1",
+  "lifecycleMode": "evolution",
+  "behaviorId": "behavior.merge",
+  "target": {
+    "kind": "map",
+    "mapId": "ATM-MAP-0002"
+  },
+  "decompositionDecision": "map-bump",
+  "proposalSource": "evidence-driven",
+  "targetSurface": "atom-map",
+  "baseMapVersion": "0.1.0",
+  "baseEvidenceWatermark": "evidence.watermark.2026-05-15T12-10-00Z",
+  "reversibility": "rollback-safe",
+  "evidenceGate": {
+    "requiredSignals": ["loaded-but-wrong"],
+    "matchedEvidenceIds": [
+      "evidence.map-curator.overlap.merge.001",
+      "evidence.map-curator.overlap.merge.002"
+    ],
+    "rejectedEvidenceIds": [],
+    "notes": "Derived from Atom Map curator candidate input-output-overlap-merge."
+  },
+  "reviewTemplate": "review.template.map-bump",
+  "automatedGates": {
+    "nonRegression": {
+      "passed": true,
+      "reportId": "map-curator.nonRegression",
+      "reportPath": "fixtures/evolution/map-curator/input-output-overlap.json",
+      "summary": "pass (curator dry-run did not re-run non-regression)"
+    },
+    "qualityComparison": {
+      "passed": true,
+      "reportId": "map-curator.qualityComparison",
+      "reportPath": "fixtures/evolution/map-curator/input-output-overlap.json",
+      "summary": "pass (curator dry-run did not re-run quality comparison)"
+    },
+    "registryCandidate": {
+      "passed": true,
+      "reportId": "map-curator.registryCandidate",
+      "reportPath": "fixtures/evolution/map-curator/input-output-overlap.json",
+      "summary": "pass (curator produced a reviewable registry candidate)"
+    },
+    "mutabilityPolicy": {
+      "passed": true,
+      "reportId": "map-curator.mutability.input-output-overlap-merge",
+      "reportPath": "fixtures/evolution/map-curator/input-output-overlap.json",
+      "summary": "pass (target mutability policy allows a reviewable dry-run proposal)"
+    },
+    "allPassed": true,
+    "blockedGateNames": []
+  },
+  "humanReview": "pending",
+  "status": "pending",
+  "inputs": [
+    {
+      "kind": "evolution-evidence",
+      "path": "fixtures/evolution/map-curator/input-output-overlap.json",
+      "schemaId": "atm.atomMapCuratorReport",
+      "reportId": "proposal.map-curator.merge.input-output-overlap-merge.curator-report",
+      "summary": "input-output-overlap input for behavior.merge"
+    }
+  ],
+  "mapImpactScope": {
+    "affectedMapIds": ["ATM-MAP-0002"],
+    "propagationStatus": [
+      {
+        "mapId": "ATM-MAP-0002",
+        "integrationTestPassed": true,
+        "message": "Curator dry-run; map integration must run before promotion."
+      }
+    ]
+  },
+  "members": [
+    {
+      "from": "ATM-CORE-0003@0.1.0",
+      "to": "ATM-CORE-0001@0.1.1"
+    },
+    {
+      "from": "ATM-CORE-0004@0.1.0",
+      "to": "ATM-CORE-0001@0.1.1"
+    },
+    {
+      "from": "ATM-CORE-0001@0.1.0",
+      "to": "ATM-CORE-0001@0.1.1"
+    }
+  ],
+  "sourceAtomIds": ["ATM-CORE-0003", "ATM-CORE-0004"],
+  "targetAtomId": "ATM-CORE-0001",
+  "generatorProvenance": "atom-map-curator.detector-v1",
+  "proposedBy": "ATM Atom Map Curator",
+  "proposedAt": "2026-05-15T12:10:00.000Z"
+}

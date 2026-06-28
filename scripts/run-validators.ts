@@ -18,11 +18,14 @@ if (!existsSync(configPath)) {
 }
 const config: any = JSON.parse(readFileSync(configPath, 'utf8'));
 const validatorMap = new Map(config.validators.map((entry: any) => [entry.name, entry]));
+const DEFAULT_FAST_VALIDATOR_BUDGET_MS = 10_000;
+const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000;
 
 const parsedCli = parseCliArgs(process.argv.slice(2));
 const profileConfig = resolveProfileConfig(parsedCli.profile);
 const selectedNames = applyFilters(resolveProfileValidatorNames(parsedCli.profile), parsedCli.filters);
 const baselineSummary = parsedCli.baselinePath ? readBaselineSummary(parsedCli.baselinePath) : null;
+const performanceBaselineSummary = parsedCli.performanceBaselinePath ? readBaselineSummary(parsedCli.performanceBaselinePath) : null;
 const baselineFingerprints = collectBaselineFindingFingerprints(baselineSummary);
 const selectedValidators = selectedNames.map((name: any) => {
   const validator = validatorMap.get(name);
@@ -42,10 +45,17 @@ if (selectedValidators.length === 0) {
     cache: parsedCli.cache,
     skipSlow: parsedCli.skipSlow,
     baselinePath: parsedCli.baselinePath,
+    performanceBaselinePath: parsedCli.performanceBaselinePath,
+    performanceBaselineSummary,
+    performanceBudgetOverrides: {
+      fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
+      slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
+    },
     baselineFingerprintCount: baselineFingerprints.size,
     startedAt: Date.now(),
     results: []
   });
+  writePerformanceOutputIfRequested(summary, parsedCli.performanceOutputPath);
   emitSummary(summary, parsedCli.json);
   process.exitCode = 0;
   process.exit();
@@ -71,10 +81,17 @@ const summary = createSummary({
   cache: parsedCli.cache,
   skipSlow: parsedCli.skipSlow,
   baselinePath: parsedCli.baselinePath,
+  performanceBaselinePath: parsedCli.performanceBaselinePath,
+  performanceBaselineSummary,
+  performanceBudgetOverrides: {
+    fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
+    slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
+  },
   baselineFingerprintCount: baselineFingerprints.size,
   startedAt,
   results
 });
+writePerformanceOutputIfRequested(summary, parsedCli.performanceOutputPath);
 emitSummary(summary, parsedCli.json);
 process.exitCode = summary.failed > 0 ? 1 : 0;
 
@@ -88,6 +105,10 @@ function parseCliArgs(argv: any) {
     cache: boolean;
     skipSlow: boolean;
     baselinePath: string | null;
+    performanceBaselinePath: string | null;
+    performanceOutputPath: string | null;
+    fastValidatorBudgetMs: number | null;
+    slowValidatorBudgetMs: number | null;
   } = {
     filters: [],
     parallel: false,
@@ -95,7 +116,11 @@ function parseCliArgs(argv: any) {
     legacy: false,
     cache: false,
     skipSlow: false,
-    baselinePath: null
+    baselinePath: null,
+    performanceBaselinePath: null,
+    performanceOutputPath: null,
+    fastValidatorBudgetMs: null,
+    slowValidatorBudgetMs: null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -140,6 +165,36 @@ function parseCliArgs(argv: any) {
       index += 1;
       continue;
     }
+    if (arg === '--performance-baseline') {
+      const value = argv[index + 1];
+      const valueText = String(value ?? '');
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--performance-baseline requires a validator summary JSON path');
+      }
+      options.performanceBaselinePath = valueText;
+      index += 1;
+      continue;
+    }
+    if (arg === '--performance-output') {
+      const value = argv[index + 1];
+      const valueText = String(value ?? '');
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--performance-output requires an output JSON path');
+      }
+      options.performanceOutputPath = valueText;
+      index += 1;
+      continue;
+    }
+    if (arg === '--fast-validator-budget-ms') {
+      options.fastValidatorBudgetMs = parsePositiveIntegerOption(argv[index + 1], '--fast-validator-budget-ms');
+      index += 1;
+      continue;
+    }
+    if (arg === '--slow-validator-budget-ms') {
+      options.slowValidatorBudgetMs = parsePositiveIntegerOption(argv[index + 1], '--slow-validator-budget-ms');
+      index += 1;
+      continue;
+    }
     if (arg.startsWith('--')) {
       throw new Error(`Unsupported option: ${arg}`);
     }
@@ -158,6 +213,18 @@ function resolveProfileConfig(profileName: any) {
     throw new Error(`Unknown validator profile: ${profileName}`);
   }
   return profile;
+}
+
+function parsePositiveIntegerOption(value: unknown, flag: string): number {
+  const valueText = String(value ?? '');
+  if (!valueText || valueText.startsWith('--')) {
+    throw new Error(`${flag} requires a positive integer value`);
+  }
+  const parsed = Number(valueText);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${flag} requires a positive integer value`);
+  }
+  return parsed;
 }
 
 function resolveProfileValidatorNames(profileName: any): string[] {
@@ -290,6 +357,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
         entry: validator.entry,
         tags: validator.tags ?? [],
         slow: validator.slow === true,
+        performanceBudgetMs: Number.isFinite(validator.performanceBudgetMs) ? Number(validator.performanceBudgetMs) : null,
         mode,
         ok: exitCode === 0,
         exitCode,
@@ -309,7 +377,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
   });
 }
 
-function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSlow, baselinePath, baselineFingerprintCount, startedAt, results }: any) {
+function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSlow, baselinePath, performanceBaselinePath, performanceBaselineSummary, performanceBudgetOverrides, baselineFingerprintCount, startedAt, results }: any) {
   const durationMs = Date.now() - startedAt;
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
@@ -321,6 +389,14 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
   const currentTaskFindings = currentTaskFailures.length > 0
     ? currentTaskFailures
     : blockingFindings.filter((finding: any) => !isEnvironmentFinding(finding) && !isBaselineFinding(finding));
+  const performance = createPerformanceReport({
+    profile,
+    durationMs,
+    results,
+    profileConfig,
+    performanceBudgetOverrides,
+    performanceBaselineSummary
+  });
   return {
     schemaId: 'atm.validatorRunSummary.v1',
     profile,
@@ -335,8 +411,10 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
     cache,
     skipSlow,
     baselinePath: baselinePath ?? null,
+    performanceBaselinePath: performanceBaselinePath ?? null,
     baselineFingerprintCount: baselineFingerprintCount ?? 0,
     cached: results.filter((entry: any) => entry.cached === true).length,
+    performance,
     requiredCommand: firstRequiredCommand(envelopes),
     blockingFindings,
     baselineFailures,
@@ -357,6 +435,9 @@ function emitSummary(summary: any, jsonMode: any) {
   }
   const status = summary.failed === 0 ? 'ok' : 'failed';
   process.stdout.write(`[validators:${summary.profile}] ${status} (passed=${summary.passed}, failed=${summary.failed}, total=${summary.total}, cached=${summary.cached}, durationMs=${summary.durationMs})\n`);
+  for (const warning of summary.performance?.warnings ?? []) {
+    process.stderr.write(`[validators:${summary.profile}:performance] ${warning.code} ${warning.message}\n`);
+  }
 }
 
 function normalizeCommandPath(relativePath: string): string {
@@ -429,6 +510,130 @@ function readBaselineSummary(baselinePath: string): unknown {
     throw new Error(`Baseline validator summary not found: ${baselinePath}`);
   }
   return JSON.parse(readFileSync(resolved, 'utf8').replace(/^\uFEFF/, ''));
+}
+
+function writePerformanceOutputIfRequested(summary: any, outputPath: string | null): void {
+  if (!outputPath) return;
+  const resolved = path.resolve(root, outputPath);
+  mkdirSync(path.dirname(resolved), { recursive: true });
+  writeFileSync(resolved, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+}
+
+function createPerformanceReport({ profile, durationMs, results, profileConfig, performanceBudgetOverrides, performanceBaselineSummary }: any) {
+  const budgetMs = Number.isFinite(profileConfig?.performanceBudgetMs) ? Number(profileConfig.performanceBudgetMs) : null;
+  const performanceDefaults = resolvePerformanceDefaults();
+  const fastValidatorBudgetMs = Number.isFinite(performanceBudgetOverrides?.fastValidatorBudgetMs)
+    ? Number(performanceBudgetOverrides.fastValidatorBudgetMs)
+    : performanceDefaults.fastValidatorBudgetMs;
+  const slowValidatorBudgetMs = Number.isFinite(performanceBudgetOverrides?.slowValidatorBudgetMs)
+    ? Number(performanceBudgetOverrides.slowValidatorBudgetMs)
+    : performanceDefaults.slowValidatorBudgetMs;
+  const slowestValidators = [...results]
+    .sort((left: any, right: any) => Number(right.durationMs ?? 0) - Number(left.durationMs ?? 0))
+    .slice(0, 10)
+    .map((entry: any) => ({
+      name: entry.name,
+      durationMs: entry.durationMs,
+      durationBudgetMs: resolveValidatorDurationBudget(entry, fastValidatorBudgetMs, slowValidatorBudgetMs),
+      overBudgetMs: Math.max(0, Number(entry.durationMs ?? 0) - resolveValidatorDurationBudget(entry, fastValidatorBudgetMs, slowValidatorBudgetMs)),
+      cached: entry.cached === true,
+      slow: entry.slow === true,
+      command: entry.command
+    }));
+  const baselineByName = new Map(
+    Array.isArray((performanceBaselineSummary as any)?.validators)
+      ? (performanceBaselineSummary as any).validators.map((entry: any) => [String(entry.name ?? ''), entry])
+      : []
+  );
+  const warnings: any[] = [];
+  if (budgetMs !== null && durationMs > budgetMs) {
+    warnings.push({
+      code: 'ATM_VALIDATOR_PROFILE_BUDGET_EXCEEDED',
+      message: `profile ${profile} took ${durationMs}ms, over budget ${budgetMs}ms`,
+      profile,
+      durationMs,
+      budgetMs,
+      remediation: 'Inspect performance.slowestValidators and split or narrow heavyweight validators before adding more cases.'
+    });
+  }
+  const budgetViolations = results
+    .filter((entry: any) => entry.cached !== true)
+    .flatMap((entry: any) => {
+      const durationBudgetMs = resolveValidatorDurationBudget(entry, fastValidatorBudgetMs, slowValidatorBudgetMs);
+      const durationMsValue = Number(entry.durationMs ?? 0);
+      if (!Number.isFinite(durationMsValue) || durationMsValue <= durationBudgetMs) return [];
+      return [{
+        code: 'ATM_VALIDATOR_DURATION_BUDGET_EXCEEDED',
+        validatorName: entry.name,
+        durationMs: durationMsValue,
+        durationBudgetMs,
+        overBudgetMs: durationMsValue - durationBudgetMs,
+        slow: entry.slow === true,
+        command: entry.command,
+        message: `${entry.name} took ${durationMsValue}ms, over budget ${durationBudgetMs}ms`,
+        remediation: 'Reduce fixture scope, split broad assertions, use focused regressions, or explicitly raise the validator budget with justification.'
+      }];
+    });
+  warnings.push(...budgetViolations);
+  const regressions = results
+    .filter((entry: any) => entry.cached !== true)
+    .flatMap((entry: any) => {
+      const baseline = baselineByName.get(String(entry.name ?? '')) as any;
+      const baselineDurationMs = Number(baseline?.durationMs ?? 0);
+      const currentDurationMs = Number(entry.durationMs ?? 0);
+      if (!Number.isFinite(baselineDurationMs) || baselineDurationMs <= 0 || !Number.isFinite(currentDurationMs)) return [];
+      const deltaMs = currentDurationMs - baselineDurationMs;
+      const ratio = currentDurationMs / baselineDurationMs;
+      if (deltaMs < 1000 || ratio < 1.5) return [];
+      return [{
+        code: 'ATM_VALIDATOR_DURATION_REGRESSION',
+        validatorName: entry.name,
+        baselineDurationMs,
+        durationMs: currentDurationMs,
+        deltaMs,
+        ratio: Number(ratio.toFixed(2)),
+        message: `${entry.name} grew from ${baselineDurationMs}ms to ${currentDurationMs}ms`,
+        remediation: 'Check fixture size, temp-repo setup, broad scans, and duplicated validator coverage before raising the budget.'
+      }];
+    });
+  warnings.push(...regressions);
+  return {
+    schemaId: 'atm.validatorPerformanceReport.v1',
+    profile,
+    durationMs,
+    budgetMs,
+    fastValidatorBudgetMs,
+    slowValidatorBudgetMs,
+    baselinePresent: performanceBaselineSummary !== null && performanceBaselineSummary !== undefined,
+    warningCount: warnings.length,
+    slowestValidators,
+    budgetViolations,
+    regressions,
+    warnings
+  };
+}
+
+function resolveValidatorDurationBudget(entry: any, fastValidatorBudgetMs: number, slowValidatorBudgetMs: number): number {
+  if (Number.isFinite(entry?.performanceBudgetMs)) {
+    return Number(entry.performanceBudgetMs);
+  }
+  const configEntry: any = validatorMap.get(entry?.name);
+  if (Number.isFinite(configEntry?.performanceBudgetMs)) {
+    return Number(configEntry.performanceBudgetMs);
+  }
+  return entry?.slow === true ? slowValidatorBudgetMs : fastValidatorBudgetMs;
+}
+
+function resolvePerformanceDefaults() {
+  const defaults = config.performanceDefaults ?? {};
+  return {
+    fastValidatorBudgetMs: Number.isFinite(defaults.fastValidatorBudgetMs)
+      ? Number(defaults.fastValidatorBudgetMs)
+      : DEFAULT_FAST_VALIDATOR_BUDGET_MS,
+    slowValidatorBudgetMs: Number.isFinite(defaults.slowValidatorBudgetMs)
+      ? Number(defaults.slowValidatorBudgetMs)
+      : DEFAULT_SLOW_VALIDATOR_BUDGET_MS
+  };
 }
 
 function buildFocusedValidatorCommand(results: readonly any[]): string | null {

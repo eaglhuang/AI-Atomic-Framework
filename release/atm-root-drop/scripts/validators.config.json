@@ -1,7 +1,12 @@
 {
+  "performanceDefaults": {
+    "fastValidatorBudgetMs": 10000,
+    "slowValidatorBudgetMs": 90000
+  },
   "profiles": {
     "test": {
       "mode": "test",
+      "performanceBudgetMs": 120000,
       "validators": [
         "validate-behavior-pack",
         "validate-schemas",
@@ -20,6 +25,7 @@
     },
     "quick": {
       "mode": "validate",
+      "performanceBudgetMs": 60000,
       "validators": [
         "validate-product-charter",
         "validate-package-skeleton",
@@ -31,6 +37,7 @@
     },
     "standard": {
       "mode": "validate",
+      "performanceBudgetMs": 600000,
       "validators": [
         "validate-product-charter",
         "validate-package-skeleton",
@@ -63,6 +70,7 @@
         "validate-map-curator",
         "validate-git-head-evidence",
         "validate-git-hooks-enforcement",
+        "validate-framework-governance-repairs",
         "validate-framework-development-governance",
         "validate-broker-lifecycle",
         "validate-internal-release-sync",
@@ -117,6 +125,7 @@
     "full": {
       "mode": "validate",
       "extends": "standard",
+      "performanceBudgetMs": 900000,
       "validators": [
         "validate-upgrade-proposal",
         "validate-rollback-proof",
@@ -170,6 +179,7 @@
     { "name": "validate-map-curator", "entry": "scripts/validate-map-curator.ts", "tags": ["map", "evolution"], "slow": false },
     { "name": "validate-git-head-evidence", "entry": "scripts/validate-git-head-evidence.ts", "tags": ["cli", "git", "evidence"], "slow": false },
     { "name": "validate-git-hooks-enforcement", "entry": "scripts/validate-git-hooks-enforcement.ts", "tags": ["examples", "git", "evidence"], "slow": false },
+    { "name": "validate-framework-governance-repairs", "entry": "scripts/validate-framework-governance-repairs.ts", "tags": ["framework", "git", "hooks", "claims"], "slow": false },
     { "name": "validate-framework-development-governance", "entry": "scripts/validate-framework-development-governance.ts", "tags": ["cli", "tasks", "framework-governance"], "slow": false },
     { "name": "validate-broker-lifecycle", "entry": "scripts/validate-broker-lifecycle.ts", "tags": ["broker", "lifecycle", "logic"], "slow": false },
     { "name": "validate-internal-release-sync", "entry": "scripts/validate-internal-release-sync.ts", "tags": ["cli", "release", "internal-sync"], "slow": false },

@@ -1,0 +1,27 @@
+{
+  "description": "Police machine finding enters ReviewAdvisory via metadata.policeFinding bridge.",
+  "finding": {
+    "id": "finding.police.dependency-graph.cycle-detected",
+    "severity": "high",
+    "trigger": "machine-finding",
+    "scope": "registry",
+    "action": "request-human-review",
+    "routeHint": "human-review.police-family.blocker",
+    "message": "Dependency graph cycle detected by police family gate runner.",
+    "evidenceRefs": ["police-family.dependency-graph.cycle"],
+    "metadata": {
+      "policeFinding": {
+        "findingId": "police-family.core.dependency-graph.0",
+        "policeFamily": "dependency-graph",
+        "severity": "blocker",
+        "trigger": "ATM_POLICE_DEPENDENCY_CYCLE",
+        "message": "Dependency graph cycle detected"
+      }
+    }
+  },
+  "expected": {
+    "triggerIsMachineFinding": true,
+    "metadataHasPoliceFinding": true,
+    "policeFindingFamilyIsValid": true
+  }
+}

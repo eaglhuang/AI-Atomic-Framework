@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/atm/review-signature.schema.json",
+  "title": "ATM Prototype Cross-Agent Review Signature",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reviewId",
+    "taskId",
+    "atomId",
+    "authorAgent",
+    "reviewerAgent",
+    "reviewerModelSource",
+    "reviewedDiffHash",
+    "reviewedEvidenceRefs",
+    "rubricVersion",
+    "verdict",
+    "reasons",
+    "missingTests",
+    "scopeConcerns",
+    "consumerContractConcerns",
+    "signedAt"
+  ],
+  "properties": {
+    "reviewId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "atomId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorAgent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewerAgent": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewerModelSource": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewedDiffHash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewedEvidenceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rubricVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "approve",
+        "advisory-warning",
+        "block",
+        "needs-human-review"
+      ]
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "missingTests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scopeConcerns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "consumerContractConcerns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "signedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

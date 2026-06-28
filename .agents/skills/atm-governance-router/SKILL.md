@@ -48,6 +48,16 @@ node atm.mjs next --intent .atm/runtime/task-intent.json --json
 Do not rely on keyword-only `next --prompt` extraction when the task intent
 resolver skill is available.
 
+## Actor Identity Handoff Gate
+
+Before any `next --claim`, worker claim, batch checkpoint, `tasks ... --actor`,
+or governed `git ...` command, resolve this agent's explicit actor id.
+
+- If this is a new editor, new agent, takeover, or uncertain identity state, run `node atm.mjs identity clear --json` before claiming.
+- Set an actor-scoped identity before taking authority: `node atm.mjs identity set --actor "$ATM_ACTOR_ID" --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json`.
+- Never treat repo default identity as authority. It is only a stale-prone hint and may belong to the previous agent.
+- Do not claim, commit, or report as another actor unless ATM returned an explicit takeover route for that actor and task.
+
 ## First Command
 
 ```bash
@@ -151,17 +161,6 @@ node atm.mjs guard mutation --task <task-id> --actor "$ATM_ACTOR_ID" --files <cs
 
 If no hook is available, continue with task claim + `git prepare/check` +
 `evidence verify` gates as the fallback safety boundary.
-
-## Learning Loop
-
-This skill should get better from repeated real-world friction, but only by
-capturing reusable ATM-routing lessons rather than chat-local anecdotes.
-
-Use the shared taxonomy and promotion model from
-`docs/governance/skills/shared-growth-contract.md`.
-
-If the agent hits a real recurring wall, record the reusable lesson in a
-learning reference instead of bloating this file.
 
 ## Required Evidence
 

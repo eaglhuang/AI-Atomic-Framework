@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework/schemas/validators/validator-fixture.schema.json",
+  "title": "ATM Validator Fixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "specVersion", "fixtureId", "copyEntries"],
+  "properties": {
+    "schemaId": { "const": "atm.validatorFixture.v1" },
+    "specVersion": { "type": "string" },
+    "fixtureId": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "copyEntries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source"],
+        "properties": {
+          "source": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "runtimeIdentities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["actorId", "gitName", "gitEmail"],
+        "properties": {
+          "actorId": { "type": "string", "minLength": 1 },
+          "gitName": { "type": "string", "minLength": 1 },
+          "gitEmail": { "type": "string", "minLength": 1 },
+          "editor": { "type": ["string", "null"] },
+          "provider": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "planningCards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["taskId", "title"],
+        "properties": {
+          "taskId": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "minLength": 1 },
+          "priority": { "type": "string", "minLength": 1 },
+          "scopePaths": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "deliverables": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "validators": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

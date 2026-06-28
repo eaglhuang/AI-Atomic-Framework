@@ -1,0 +1,22 @@
+{
+  "description": "Evolution Police: usage-only evidence (no friction/regression/review) does not produce evolution finding.",
+  "input": {
+    "evidencePatterns": [
+      {
+        "targetSurface": "atom:ATM-CORE-0002",
+        "signalKind": "evidence-evolution-signal",
+        "atomId": "ATM-CORE-0002",
+        "patternTags": ["usage-only"],
+        "recurrence": 12,
+        "confidence": 0.95,
+        "hasUsageOnlyEvidence": true,
+        "baseAtomVersion": "1.0.0",
+        "currentAtomVersion": "1.0.0"
+      }
+    ]
+  },
+  "expected": {
+    "findingCount": 0,
+    "reason": "usage-only evidence cannot alone trigger evolution proposal"
+  }
+}

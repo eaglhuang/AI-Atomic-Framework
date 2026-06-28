@@ -1,0 +1,63 @@
+{
+  "input": {
+    "repositoryRoot": ".",
+    "reportPath": "fixtures/evolution/map-curator/broker-split-suggestion.json",
+    "generatedAt": "2026-06-22T04:10:00.000Z",
+    "proposedBy": "ATM Atom Map Curator",
+    "brokerSplitSuggestions": [
+      {
+        "candidateId": "broker-split-cli-broker-ts",
+        "ownerAtomId": "atm.hot-owner-map",
+        "ownerAtomCid": "task-team-broker-same-owner-block",
+        "targetMapId": "ATM-MAP-0002",
+        "targetFile": "packages/cli/src/commands/broker.ts",
+        "sourceEvidenceIds": [
+          "evidence.broker.split.001",
+          "evidence.broker.split.002"
+        ],
+        "confidence": 0.92,
+        "targetMutabilityPolicy": "mutable",
+        "conflictRegion": {
+          "filePath": "packages/cli/src/commands/broker.ts",
+          "lineStart": 10,
+          "lineEnd": 10
+        },
+        "suggestedAtoms": [
+          {
+            "atomId": "atm.hot-owner-map.focus.10-10",
+            "atomCid": "atm-hot-owner-map-focus-10-10",
+            "role": "focus",
+            "summary": "Focused child atom covering the conflict region 10-10.",
+            "sourceRange": {
+              "filePath": "packages/cli/src/commands/broker.ts",
+              "lineStart": 10,
+              "lineEnd": 10
+            }
+          },
+          {
+            "atomId": "atm.hot-owner-map.before.1-9",
+            "atomCid": "atm-hot-owner-map-before-1-9",
+            "role": "before",
+            "summary": "Suggested sibling atom for the stable region before the conflict (1-9).",
+            "sourceRange": {
+              "filePath": "packages/cli/src/commands/broker.ts",
+              "lineStart": 1,
+              "lineEnd": 9
+            }
+          },
+          {
+            "atomId": "atm.hot-owner-map.after.11-20",
+            "atomCid": "atm-hot-owner-map-after-11-20",
+            "role": "after",
+            "summary": "Suggested sibling atom for the stable region after the conflict (11-20).",
+            "sourceRange": {
+              "filePath": "packages/cli/src/commands/broker.ts",
+              "lineStart": 11,
+              "lineEnd": 20
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

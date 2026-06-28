@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, type RuntimeIdentityDefaultDocument, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.ts';
+import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, type RuntimeIdentityDefaultDocument, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { listActorWorkSessions, resolveActorWorkSession } from './actor-session.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
@@ -30,6 +30,34 @@ export async function runIdentity(argv: string[]) {
           : null,
         activeSession: session,
         recentSessions: listActorWorkSessions(options.cwd).slice(0, 5)
+      }
+    });
+  }
+
+  if (options.action === 'clear') {
+    const identityPath = options.actorId
+      ? runtimeIdentityActorRelativePath(options.actorId)
+      : runtimeIdentityRelativePath;
+    const removed = options.actorId
+      ? clearRuntimeIdentityForActor(options.cwd, options.actorId)
+      : clearRuntimeIdentityDefault(options.cwd);
+    return makeResult({
+      ok: true,
+      command: 'identity',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_IDENTITY_CLEARED', options.actorId
+        ? `Actor runtime identity cleared for ${options.actorId}.`
+        : 'Repo default runtime identity cleared.', {
+        actorId: options.actorId,
+        identityPath,
+        removed,
+        nextStep: 'Set an explicit editor/agent actor identity before governed work: node atm.mjs identity set --actor <actor-id> --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json'
+      })],
+      evidence: {
+        action: 'clear',
+        actorId: options.actorId,
+        identityPath,
+        removed
       }
     });
   }
@@ -99,7 +127,7 @@ export async function runIdentity(argv: string[]) {
 
 interface ParsedIdentityOptions {
   readonly cwd: string;
-  readonly action: 'set' | 'show';
+  readonly action: 'set' | 'show' | 'clear';
   readonly actorId: string | null;
   readonly displayName: string | null;
   readonly actorKind: string | null;
@@ -197,8 +225,8 @@ function parseIdentityOptions(argv: string[]): ParsedIdentityOptions {
     state.action = arg as ParsedIdentityOptions['action'];
   }
 
-  if (!state.action || (state.action !== 'set' && state.action !== 'show')) {
-    throw new CliError('ATM_CLI_USAGE', 'identity supports: set, show', { exitCode: 2 });
+  if (!state.action || (state.action !== 'set' && state.action !== 'show' && state.action !== 'clear')) {
+    throw new CliError('ATM_CLI_USAGE', 'identity supports: set, show, clear', { exitCode: 2 });
   }
 
   return {

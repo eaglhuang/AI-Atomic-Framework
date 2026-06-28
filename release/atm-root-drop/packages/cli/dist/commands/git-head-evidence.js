@@ -2,6 +2,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { hasAtmCriticalNonDocSurface } from './framework-development/path-classification.js';
 export const gitHeadEvidencePaths = {
     legacyJson: '.atm/history/evidence/git-head.json',
     jsonl: '.atm/history/evidence/git-head.jsonl'
@@ -50,6 +51,26 @@ export function createGitHeadEvidenceCheck(cwd, runtime) {
             ? 'treeSha+parentCommitShas'
             : evidenceOnlyParentMatch?.matchedBy ?? null;
     const ok = matchedRecord !== null;
+    if (!ok) {
+        const changedPaths = readCommitChangedPaths(cwd, commitSha);
+        if (!hasAtmCriticalNonDocSurface(changedPaths)) {
+            return createGitEvidenceDetails('not-required-non-critical-head', {
+                workTreeRoot: workTree.root,
+                commitSha,
+                treeSha,
+                governedTreeSha,
+                parentCommitShas,
+                expectedEvidencePath: gitHeadEvidencePath,
+                evidenceRecordsScanned: evidenceRecords.length,
+                matchedBy,
+                matchedEvidencePath: null,
+                evidenceOnlyHead: evidenceOnlyParentMatch !== null,
+                evidenceOnlyCoveredCommitSha: evidenceOnlyParentMatch?.coveredCommitSha ?? null,
+                changedPaths,
+                criticalChangedFiles: []
+            }, true);
+        }
+    }
     return createGitEvidenceDetails(ok ? 'matched' : 'missing', {
         workTreeRoot: workTree.root,
         commitSha,

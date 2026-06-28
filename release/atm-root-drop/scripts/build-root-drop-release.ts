@@ -18,6 +18,7 @@ const releaseEntries = [
   'docs',
   'eslint.config.mjs',
   'examples',
+  'fixtures',
   'integrations',
   'package-lock.json',
   'package.json',

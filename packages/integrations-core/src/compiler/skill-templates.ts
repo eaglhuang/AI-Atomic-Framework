@@ -64,6 +64,12 @@ export const minimumAtmEntrySkillDefinitions = [
     command: 'node atm.mjs guide --goal "$ARGUMENTS" --cwd . --json'
   },
   {
+    id: 'atm-dispatch',
+    title: 'ATM Dispatch',
+    summary: 'ATM Captain dispatch routing for task cards, sidecars, subagents, condition review, mailbox work, and closeout coordination.',
+    command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
+  },
+  {
     id: 'atm-create',
     title: 'ATM Create',
     summary: 'Create and register an atom through the provisioning facade.',
@@ -92,6 +98,12 @@ export const minimumAtmEntrySkillDefinitions = [
     title: 'ATM Handoff',
     summary: 'Write a continuation summary for governed work.',
     command: 'node atm.mjs handoff summarize --task "$ARGUMENTS" --json'
+  },
+  {
+    id: 'mailbox-worker-execution',
+    title: 'Mailbox Worker Execution',
+    summary: 'Mailbox worker execution workflow for agents that claim dispatch cards, complete scoped work, run required checks, and report done or blocked with evidence.',
+    command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
   },
   {
     id: 'atm-internal-build-sync',

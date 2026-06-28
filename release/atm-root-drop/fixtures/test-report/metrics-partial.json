@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.testReport",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "additive",
+    "fromVersion": "0.1.0",
+    "notes": "Metrics partial fixture proving additive reports can provide a subset of metrics."
+  },
+  "atomId": "ATM-FIXTURE-1003",
+  "ok": false,
+  "exitCode": 1,
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "repositoryRoot": "fixtures/test-report",
+  "specPath": null,
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "canonicalization": "json-stable-v1"
+  },
+  "validation": {
+    "evidenceRequired": true,
+    "commandCount": 1
+  },
+  "runnerContract": {
+    "executionMode": "delegated",
+    "evidenceRequired": true,
+    "commands": [
+      {
+        "commandId": "validation-1",
+        "commandKind": "test",
+        "command": "npm test",
+        "required": true
+      }
+    ]
+  },
+  "results": [
+    {
+      "commandId": "validation-1",
+      "commandKind": "test",
+      "command": "npm test",
+      "required": true,
+      "exitCode": 1,
+      "ok": false,
+      "durationMs": 55,
+      "stdout": "",
+      "stderr": "failed",
+      "signal": null
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1,
+    "durationMs": 55
+  },
+  "metrics": {
+    "latency": 55,
+    "errorRate": 1
+  },
+  "artifacts": [
+    {
+      "artifactPath": "fixtures/test-report/metrics-partial.report.json",
+      "artifactKind": "report",
+      "producedBy": "@ai-atomic-framework/core:test-runner"
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceKind": "metric",
+      "summary": "Metrics-partial report keeps only the metrics that are currently known.",
+      "artifactPaths": [
+        "fixtures/test-report/metrics-partial.report.json"
+      ]
+    }
+  ]
+}

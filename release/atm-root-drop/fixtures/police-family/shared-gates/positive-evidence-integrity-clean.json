@@ -1,0 +1,23 @@
+{
+  "description": "Evidence Integrity Gate: clean evidence references produce no finding.",
+  "input": {
+    "findings": [],
+    "catalog": [
+      {
+        "evidenceId": "evidence.quality.001",
+        "schemaId": "atm.qualityComparison",
+        "generatedAt": "2026-05-10T00:00:00.000Z",
+        "trustLevel": "trusted",
+        "evidenceType": "quality-comparison"
+      }
+    ],
+    "proposalEvidenceRefs": [
+      { "proposalId": "proposal.001", "refIds": ["evidence.quality.001"] }
+    ],
+    "nowIso": "2026-05-19T00:00:00.000Z"
+  },
+  "expected": {
+    "findingCount": 0,
+    "status": "pass"
+  }
+}

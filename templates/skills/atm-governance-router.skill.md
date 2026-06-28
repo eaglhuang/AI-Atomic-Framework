@@ -52,6 +52,8 @@ node atm.mjs next --intent .atm/runtime/task-intent.json --json
 Do not rely on keyword-only `next --prompt` extraction when the task intent
 resolver skill is available.
 
+{{ACTOR_IDENTITY_HANDOFF_GATE}}
+
 ## First Command
 
 ```bash

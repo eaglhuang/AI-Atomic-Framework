@@ -27,6 +27,16 @@ node atm.mjs next --intent .atm/runtime/task-intent.json --json
 Use the prompt-scoped command below only when no task or plan scope is present or
 when the editor cannot run the semantic intent skill.
 
+## Actor Identity Handoff Gate
+
+Before any `next --claim`, worker claim, batch checkpoint, `tasks ... --actor`,
+or governed `git ...` command, resolve this agent's explicit actor id.
+
+- If this is a new editor, new agent, takeover, or uncertain identity state, run `node atm.mjs identity clear --json` before claiming.
+- Set an actor-scoped identity before taking authority: `node atm.mjs identity set --actor "$ATM_ACTOR_ID" --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json`.
+- Never treat repo default identity as authority. It is only a stale-prone hint and may belong to the previous agent.
+- Do not claim, commit, or report as another actor unless ATM returned an explicit takeover route for that actor and task.
+
 First command:
 
 ```bash
@@ -42,10 +52,6 @@ instruction sheet for the selected channel:
   close -> commit.
 - `batch`: many tasks, claim original prompt -> deliver queue head -> evidence
   -> batch checkpoint -> commit -> continue next queue head.
-
-Prefer the projected ATM result fields over prose scraping when a tool-capable
-bridge exposes them. If the tool-facing route is blocked, surface that blocked
-result first; use CLI fallback only for legacy or explicit fallback lanes.
 
 For normal task-card work, keep this order fixed:
 

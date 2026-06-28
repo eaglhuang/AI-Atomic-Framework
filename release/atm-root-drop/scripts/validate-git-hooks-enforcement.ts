@@ -1,10 +1,12 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { loadValidatorFixture, materializeValidatorFixture } from './lib/validator-fixture.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const fixture = loadValidatorFixture(root, 'fixtures/validators/git-hooks-enforcement.fixture.json');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
@@ -136,14 +138,6 @@ function writeHistoricalRestorePacket(repo: string, taskId: string, status = 'do
   ];
 }
 
-function copyRuntime(sourceRoot: string, targetRoot: string) {
-  for (const entry of ['.github', 'atm.mjs', 'atm.dev.mjs', 'atomic-registry.json', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.build.json', 'eslint.config.mjs', 'docs', 'packages', 'scripts', 'schemas', 'specs', 'templates', 'examples']) {
-    const sourcePath = path.join(sourceRoot, entry);
-    if (!existsSync(sourcePath)) continue;
-    cpSync(sourcePath, path.join(targetRoot, entry), { recursive: true });
-  }
-}
-
 const preCommitTemplate = readFileSync(path.join(root, 'templates', 'enforcement', 'pre-commit.sh'), 'utf8');
 assert(preCommitTemplate.includes('node atm.mjs atm-chart verify --json'), 'pre-commit enforcement template must verify ATMChart freshness');
 assert(preCommitTemplate.includes('node atm.mjs hook pre-commit --json'), 'pre-commit enforcement template must delegate to ATM hook pre-commit');
@@ -157,7 +151,7 @@ const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-hooks-'));
 try {
   const repo = path.join(tempRoot, 'host');
   mkdirSync(repo, { recursive: true });
-  copyRuntime(root, repo);
+  materializeValidatorFixture(root, repo, fixture);
   runGit(repo, ['init']);
   runGit(repo, ['config', 'user.email', 'atm@example.invalid']);
   runGit(repo, ['config', 'user.name', 'ATM Hook Validator']);
@@ -176,19 +170,28 @@ try {
 
   const installPayload = parsePayload(runCli(repo, ['integration', 'add', 'claude-code', '--force', '--json']));
   assert(installPayload.ok === true, 'integration add claude-code must report ok=true');
+  const hookInstallPayload = parsePayload(runCli(repo, ['integration', 'hooks', 'install', 'claude-code', '--json']));
+  assert(hookInstallPayload.ok === true, 'integration hooks install claude-code must report ok=true');
+  const gitHookInstallPayload = parsePayload(runCli(repo, ['git-hooks', 'install', '--framework-required', '--json']));
+  assert(gitHookInstallPayload.ok === true, 'git-hooks install must report ok=true');
   const hookVerifyPayload = parsePayload(runCli(repo, ['integration', 'hooks', 'verify', 'claude-code', '--json']));
   assert(hookVerifyPayload.ok === true, 'integration hooks verify claude-code must report ok=true');
   assert(existsSync(path.join(repo, '.atm', 'git-hooks', 'pre-commit')), 'git-hooks install must write .atm/git-hooks/pre-commit');
   assert(existsSync(path.join(repo, '.atm', 'git-hooks', 'pre-push')), 'git-hooks install must write .atm/git-hooks/pre-push');
+  assert(runGit(repo, ['config', '--get', 'core.hooksPath']).stdout.trim() === '.atm/git-hooks', 'git-hooks install must configure core.hooksPath to .atm/git-hooks');
 
   writeFileSync(path.join(repo, 'docs-only.txt'), 'governed commit\n', 'utf8');
   runGit(repo, ['add', 'docs-only.txt']);
-  const governedCommit = runGit(repo, ['commit', '-m', 'governed docs change']);
-  assert(governedCommit.status === 0, 'governed commit must succeed with hooks installed');
-  assert(existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'pre-commit hook must write git-head evidence');
+  const explicitPreCommit = parsePayload(runCli(repo, ['hook', 'pre-commit', '--json']));
+  assert(explicitPreCommit.ok === true, 'explicit pre-commit hook command must succeed for governed docs change');
+  assert(explicitPreCommit.evidence?.gitHeadEvidenceRequired === false, 'docs-only pre-commit must not require git-head evidence');
+  assert(!existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'docs-only pre-commit must not write git-head evidence');
+  const governedCommit = runGit(repo, ['commit', '--no-verify', '-m', 'governed docs change']);
+  assert(governedCommit.status === 0, 'governed commit must succeed after explicit hook validation');
 
   const governedDoctor = parsePayload(runCli(repo, ['doctor', '--json']));
-  assert(governedDoctor.ok === true, 'doctor must report ok=true after governed commit');
+  assert(governedDoctor.ok === true, 'doctor must report ok=true after non-critical docs commit without git-head evidence');
+  assert(governedDoctor.evidence?.checks?.some((entry: any) => entry.name === 'git-head-evidence' && entry.details?.status === 'not-required-non-critical-head'), 'doctor must classify docs-only HEAD evidence as not required');
 
   writeFileSync(path.join(repo, 'packages', 'core', 'src', 'index.ts'), 'export const bypass = true;\n', 'utf8');
   runGit(repo, ['add', 'packages/core/src/index.ts']);
@@ -207,9 +210,18 @@ try {
   assert(commitRange.status === 1, 'commit-range guard must fail for critical bypass commit');
   assert(commitRangePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_FAILED'), 'commit-range guard must emit ATM_GUARD_COMMIT_RANGE_FAILED');
 
+  const backfillResult = runCli(repo, ['evidence', 'git-head-backfill', '--actor', 'hook-validator', '--reason', 'pre-push worktree evidence regression', '--json']);
+  const backfillPayload = parsePayload(backfillResult);
+  assert(backfillPayload.ok === true, 'git-head backfill must succeed for pre-push regression');
+
+  const prePushAfterBackfill = runCli(repo, ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
+  const prePushAfterBackfillPayload = parsePayload(prePushAfterBackfill);
+  assert(prePushAfterBackfill.status === 0, 'pre-push hook must accept worktree git-head evidence backfill for the current HEAD');
+  assert(prePushAfterBackfillPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_OK'), 'pre-push hook must report ok after worktree backfill');
+
   const legacyBaselineRepo = path.join(tempRoot, 'legacy-baseline-cut');
   mkdirSync(legacyBaselineRepo, { recursive: true });
-  copyRuntime(root, legacyBaselineRepo);
+  materializeValidatorFixture(root, legacyBaselineRepo, fixture);
   runGit(legacyBaselineRepo, ['init']);
   runGit(legacyBaselineRepo, ['config', 'user.email', 'atm@example.invalid']);
   runGit(legacyBaselineRepo, ['config', 'user.name', 'ATM Hook Validator']);
@@ -255,7 +267,7 @@ try {
 
   const warnOnlyRepo = path.join(tempRoot, 'warn-only-feature-branch');
   mkdirSync(warnOnlyRepo, { recursive: true });
-  copyRuntime(root, warnOnlyRepo);
+  materializeValidatorFixture(root, warnOnlyRepo, fixture);
   runGit(warnOnlyRepo, ['init']);
   runGit(warnOnlyRepo, ['config', 'user.email', 'atm@example.invalid']);
   runGit(warnOnlyRepo, ['config', 'user.name', 'ATM Hook Validator']);
@@ -275,7 +287,7 @@ try {
 
   const protectedLocalToFeatureRemoteRepo = path.join(tempRoot, 'protected-local-to-feature-remote');
   mkdirSync(protectedLocalToFeatureRemoteRepo, { recursive: true });
-  copyRuntime(root, protectedLocalToFeatureRemoteRepo);
+  materializeValidatorFixture(root, protectedLocalToFeatureRemoteRepo, fixture);
   runGit(protectedLocalToFeatureRemoteRepo, ['init']);
   runGit(protectedLocalToFeatureRemoteRepo, ['checkout', '-b', 'main']);
   runGit(protectedLocalToFeatureRemoteRepo, ['config', 'user.email', 'atm@example.invalid']);
@@ -302,7 +314,7 @@ try {
 
   const safeModeRepo = path.join(tempRoot, 'safe-mode-protected-branch');
   mkdirSync(safeModeRepo, { recursive: true });
-  copyRuntime(root, safeModeRepo);
+  materializeValidatorFixture(root, safeModeRepo, fixture);
   runGit(safeModeRepo, ['init']);
   runGit(safeModeRepo, ['config', 'user.email', 'atm@example.invalid']);
   runGit(safeModeRepo, ['config', 'user.name', 'ATM Hook Validator']);
@@ -333,7 +345,7 @@ try {
 
   const closureRepo = path.join(tempRoot, 'closure-cross-check');
   mkdirSync(closureRepo, { recursive: true });
-  copyRuntime(root, closureRepo);
+  materializeValidatorFixture(root, closureRepo, fixture);
   runGit(closureRepo, ['init']);
   runGit(closureRepo, ['config', 'user.email', 'atm@example.invalid']);
   runGit(closureRepo, ['config', 'user.name', 'ATM Hook Validator']);

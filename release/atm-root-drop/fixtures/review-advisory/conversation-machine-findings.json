@@ -1,0 +1,24 @@
+{
+  "description": "M12 fixture: conversation patch drafts enter ReviewAdvisory as machine findings instead of a separate approval workflow.",
+  "input": {
+    "patchDraftFixturePath": "fixtures/evolution/conversation-skill-review/patch-draft-bridge/four-findings-patch-drafts.json",
+    "reportId": "review-advisory.conversation.machine-findings",
+    "generatedAt": "2026-05-17T03:00:00.000Z"
+  },
+  "expected": {
+    "status": "warn",
+    "needsReview": true,
+    "summary": {
+      "high": 2,
+      "medium": 1,
+      "low": 1,
+      "info": 0
+    },
+    "routeHints": [
+      "conversation-review.atom-patch.human-review-required",
+      "conversation-review.host-local-overlay.review-required",
+      "conversation-review.skill-patch.human-review-required",
+      "conversation-review.stale-skill-repair.human-review-required"
+    ]
+  }
+}

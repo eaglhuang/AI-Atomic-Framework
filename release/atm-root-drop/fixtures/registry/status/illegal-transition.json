@@ -1,0 +1,91 @@
+{
+  "cases": [
+    {
+      "name": "quarantined-atom-evolve",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-ILLEGAL-0001",
+        "status": "quarantined",
+        "action": "behavior.evolve",
+        "governanceTier": "standard",
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "issues": [
+          "quarantined-entry-is-read-only",
+          "source-status-not-allowed"
+        ]
+      }
+    },
+    {
+      "name": "immutable-atom-evolve",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-ILLEGAL-0002",
+        "status": "active",
+        "action": "behavior.evolve",
+        "governanceTier": "standard",
+        "mutabilityPolicy": "immutable"
+      },
+      "expect": {
+        "issues": [
+          "mutability-policy-not-allowed"
+        ]
+      }
+    },
+    {
+      "name": "frozen-map-compose",
+      "input": {
+        "entryType": "map",
+        "mapId": "ATM-ILLEGAL-0003",
+        "status": "active",
+        "action": "behavior.compose",
+        "governanceTier": "standard",
+        "sourceStatuses": [
+          "active",
+          "active"
+        ],
+        "mutabilityPolicy": "frozen-after-release"
+      },
+      "expect": {
+        "issues": [
+          "mutability-policy-not-allowed"
+        ]
+      }
+    },
+    {
+      "name": "quarantine-without-police",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-ILLEGAL-0004",
+        "status": "active",
+        "action": "transition.quarantine",
+        "governanceTier": "governed",
+        "policeAction": false,
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "issues": [
+          "quarantine-requires-police-action"
+        ]
+      }
+    },
+    {
+      "name": "ttl-expired-active-evolve",
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-ILLEGAL-0005",
+        "status": "active",
+        "action": "behavior.evolve",
+        "governanceTier": "experimental",
+        "ttlExpired": true,
+        "mutabilityPolicy": "mutable"
+      },
+      "expect": {
+        "issues": [
+          "ttl-expired-active-must-fail"
+        ]
+      }
+    }
+  ]
+}

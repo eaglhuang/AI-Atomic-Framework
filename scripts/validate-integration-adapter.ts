@@ -34,11 +34,13 @@ const requiredFiles = [
   'templates/skills/atm-next.skill.md',
   'templates/skills/atm-orient.skill.md',
   'templates/skills/atm-governance-router.skill.md',
+  'templates/skills/atm-dispatch.skill.md',
   'templates/skills/atm-create.skill.md',
   'templates/skills/atm-lock.skill.md',
   'templates/skills/atm-evidence.skill.md',
   'templates/skills/atm-upgrade-scan.skill.md',
   'templates/skills/atm-handoff.skill.md',
+  'templates/skills/mailbox-worker-execution.skill.md',
   'templates/skills/atm-atom-map-refactor.skill.md',
   'schemas/integrations/install-manifest.schema.json',
   'tests/schema-fixtures/positive/integration-install-manifest.json',
@@ -241,6 +243,11 @@ function exerciseAdapter(
           `${adapterSpec.id} file missing first command: ${fileRecord.path}`
         );
       }
+      if (requiresActorIdentityHandoffGate(fileRecord.path)) {
+        assert(installedContent.includes('Actor Identity Handoff Gate'), `${adapterSpec.id} file missing actor identity handoff gate: ${fileRecord.path}`);
+        assert(installedContent.includes('node atm.mjs identity clear --json'), `${adapterSpec.id} file missing stale default clear guidance: ${fileRecord.path}`);
+        assert(installedContent.includes('identity set --actor'), `${adapterSpec.id} file missing actor-scoped identity guidance: ${fileRecord.path}`);
+      }
     }
 
     const verify = adapter.verify(context, install.manifest);
@@ -269,6 +276,16 @@ function exerciseAdapter(
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
   }
+}
+
+function requiresActorIdentityHandoffGate(filePath: string) {
+  return [
+    'atm-dispatch',
+    'atm-governance-router',
+    'atm-handoff',
+    'atm-next',
+    'mailbox-worker-execution'
+  ].some((entryId) => filePath.includes(entryId));
 }
 
 function seedCharterFiles(repositoryRoot: string) {

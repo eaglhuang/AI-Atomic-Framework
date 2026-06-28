@@ -40,6 +40,11 @@ export declare const minimumAtmEntrySkillDefinitions: readonly [{
     readonly summary: "Route natural-language cleanup, refactor, migration, and candidate ranking goals through ATM before local analysis.";
     readonly command: "node atm.mjs guide --goal \"$ARGUMENTS\" --cwd . --json";
 }, {
+    readonly id: "atm-dispatch";
+    readonly title: "ATM Dispatch";
+    readonly summary: "ATM Captain dispatch routing for task cards, sidecars, subagents, condition review, mailbox work, and closeout coordination.";
+    readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
+}, {
     readonly id: "atm-create";
     readonly title: "ATM Create";
     readonly summary: "Create and register an atom through the provisioning facade.";
@@ -64,6 +69,11 @@ export declare const minimumAtmEntrySkillDefinitions: readonly [{
     readonly title: "ATM Handoff";
     readonly summary: "Write a continuation summary for governed work.";
     readonly command: "node atm.mjs handoff summarize --task \"$ARGUMENTS\" --json";
+}, {
+    readonly id: "mailbox-worker-execution";
+    readonly title: "Mailbox Worker Execution";
+    readonly summary: "Mailbox worker execution workflow for agents that claim dispatch cards, complete scoped work, run required checks, and report done or blocked with evidence.";
+    readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
 }, {
     readonly id: "atm-internal-build-sync";
     readonly title: "ATM Internal Build Sync";

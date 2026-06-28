@@ -1,0 +1,38 @@
+{
+  "$schema": "atm.adopterSentinelFixture.v0.1",
+  "fixtureId": "synthetic-adopter",
+  "description": "Neutral synthetic adopter shape — minimal bootstrap + one integration + one governed task + one evidence. Used by validate:adopter-sentinel as a canary that the framework's downstream-facing contract still works.",
+  "repositoryKind": "javascript-package",
+  "packageManager": "npm",
+  "installedIntegrations": [
+    "vscode"
+  ],
+  "lifecycle": {
+    "bootstrapAt": "2026-05-19T10:00:00.000Z",
+    "firstWelcomedAt": "2026-05-19T10:01:00.000Z",
+    "welcomeCount": 1
+  },
+  "tasks": [
+    {
+      "id": "EXAMPLE-0001",
+      "title": "Add hello-world acceptance smoke",
+      "status": "done",
+      "evidencePath": ".atm/history/evidence/EXAMPLE-0001.json"
+    }
+  ],
+  "evidence": [
+    {
+      "taskId": "EXAMPLE-0001",
+      "evidenceKind": "smoke-pass",
+      "summary": "Hello-world acceptance smoke ran clean against the example adopter sandbox.",
+      "artifactPaths": [
+        ".atm/history/artifacts/EXAMPLE-0001/smoke-output.txt"
+      ]
+    }
+  ],
+  "neutrality": {
+    "verifiedAt": "2026-05-19T10:00:00.000Z",
+    "scannerCode": "ATM_NEUTRALITY_OK",
+    "notes": "All identifiers are generic placeholders (example-, EXAMPLE-, synthetic-adopter). No real adopter names, no proprietary identifiers."
+  }
+}

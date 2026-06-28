@@ -1,0 +1,27 @@
+{
+  "description": "Blocker family finding tagged into blockingFindings, requires human review context.",
+  "finding": {
+    "id": "finding.police.registry-consistency.promote-blocked",
+    "severity": "high",
+    "trigger": "machine-finding",
+    "scope": "registry",
+    "action": "request-human-review",
+    "routeHint": "human-review.police-family.blocker",
+    "message": "Registry consistency gate blocked evolution promote.",
+    "evidenceRefs": ["police-family.registry-consistency.promote-blocked"],
+    "metadata": {
+      "policeFinding": {
+        "findingId": "police-family.core.registry-consistency.0",
+        "policeFamily": "registry-consistency",
+        "severity": "blocker",
+        "trigger": "ATM_POLICE_PROMOTE_BLOCKED",
+        "message": "Evolution promote blocked by registry consistency gate"
+      }
+    }
+  },
+  "expected": {
+    "isBlockingFinding": true,
+    "requiresHumanReviewContext": true,
+    "routeHintContainsBlocker": true
+  }
+}

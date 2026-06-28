@@ -521,6 +521,7 @@ export function evaluateGitGovernanceCheck(input: {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', `git check requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
   }
+  requireExplicitGitActor(resolvedActor, 'git check');
   const actorId = resolvedActor.actorId;
   const actorRecord = findActorByResolvedId(cwd, resolvedActor);
   const profile = resolveGitIdentityProfile(cwd, actorId, actorRecord);
@@ -623,6 +624,7 @@ function runGitPrepare(options: ParsedGitOptions) {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', `git prepare requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
   }
+  requireExplicitGitActor(resolvedActor, 'git prepare');
   const actorId = resolvedActor.actorId;
   const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
   const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord, {
@@ -688,6 +690,7 @@ function runGitCommit(options: ParsedGitOptions) {
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', `git commit requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
   }
+  requireExplicitGitActor(resolvedActor, 'git commit');
   if (!options.message) {
     throw new CliError('ATM_CLI_USAGE', 'git commit requires --message <summary>.', { exitCode: 2 });
   }
@@ -1283,6 +1286,27 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
   };
 }
 
+function requireExplicitGitActor(
+  resolvedActor: NonNullable<ReturnType<typeof resolveActorId>>,
+  action: string
+) {
+  if (resolvedActor.source !== 'repo-default') return;
+  const editorHint = process.env.ATM_EDITOR_ID?.trim()
+    || (process.env.CODEX_HOME?.trim() ? 'codex' : null)
+    || '<editor-id>';
+  throw new CliError('ATM_ACTOR_ID_EXPLICIT_REQUIRED', `${action} requires an explicit actor. Repo default identity is advisory only and must not be reused across editors or agents.`, {
+    exitCode: 2,
+    details: {
+      resolvedActorId: resolvedActor.actorId,
+      resolvedFrom: resolvedActor.source,
+      currentEditorHint: editorHint,
+      clearStaleDefaultCommand: 'node atm.mjs identity clear --json',
+      requiredCommand: `node atm.mjs identity clear --json && node atm.mjs identity set --actor <actor-id> --editor ${quoteCliValue(editorHint)} --git-name "<git user.name>" --git-email "<git user.email>" --json`,
+      usage: `node atm.mjs ${action} --actor <actor-id> ...`
+    }
+  });
+}
+
 function resolveGitIdentityProfile(
   cwd: string,
   actorId: string,
@@ -1319,7 +1343,7 @@ function resolveGitIdentityProfile(
     };
   }
   const defaultIdentity = readRuntimeIdentityDefault(cwd);
-  if (defaultIdentity?.gitName || defaultIdentity?.gitEmail) {
+  if (defaultIdentity?.actorId === actorId && (defaultIdentity.gitName || defaultIdentity.gitEmail)) {
     return {
       gitName: defaultIdentity.gitName ?? null,
       gitEmail: defaultIdentity.gitEmail ?? null
@@ -1338,7 +1362,8 @@ function writePreparedRuntimeIdentity(
   gitEmail: string,
   actorRecord: ReturnType<typeof findActorByResolvedId>
 ) {
-  const existing = readRuntimeIdentityForActor(cwd, actorId) ?? readRuntimeIdentityDefault(cwd);
+  const defaultIdentity = readRuntimeIdentityDefault(cwd);
+  const existing = readRuntimeIdentityForActor(cwd, actorId) ?? (defaultIdentity?.actorId === actorId ? defaultIdentity : null);
   return writeRuntimeIdentityForActor(cwd, actorId, {
     schemaId: 'atm.identityDefault.v1',
     specVersion: '0.1.0',

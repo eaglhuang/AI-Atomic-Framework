@@ -62,3 +62,14 @@ assert.match(claimCommand, /--files "a.ts,b.ts"/);
     assert.equal(staleLock?.kind, 'stale-ttl-expired');
     assert.equal(isFrameworkStaleLockReleasable(staleLock), true);
 }
+{
+    const root = tempRoot();
+    writeLock(root, 'agent-one', {
+        workItemId: 'ATM-FRAMEWORK-TEMP-agent-one',
+        lockedBy: 'agent-one',
+        heartbeatAt: new Date().toISOString(),
+        ttlSeconds: 3600
+    });
+    const staleLock = classifyFrameworkStaleLock(root, 'agent-one');
+    assert.equal(staleLock, null, 'same-actor unlabeled temp lock must be reusable for scope refresh');
+}

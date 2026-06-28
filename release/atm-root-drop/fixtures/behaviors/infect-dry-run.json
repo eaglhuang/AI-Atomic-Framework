@@ -1,0 +1,20 @@
+{
+  "action": "behavior.infect",
+  "input": {
+    "entryType": "atom",
+    "atomId": "ATM-CORE-0001",
+    "action": "behavior.infect",
+    "requestedBy": "atm-test",
+    "payload": {
+      "target": {
+        "kind": "atom"
+      }
+    }
+  },
+  "expect": {
+    "ok": true,
+    "issues": [],
+    "requiresProposalEnvelope": true,
+    "decompositionDecision": "atom-extract"
+  }
+}

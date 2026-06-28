@@ -1,236 +1,107 @@
 ---
 name: atm-dispatch
-description: ATM Captain 派工治理。觸發詞 派工 / 派工單 / dispatch / 開卡 / 派任務 / 派代理 / Phase 0 / Phase 1 / AAO / task card / condition review / 收口。負責 AI-Atomic-Framework repo + 3KLife 雙 repo 治理：強制 Context Map 4 層、雙代理拆分（防外卡 mirror commit）、ATM framework repo 嚴格 2 commit、3KLife target_repo 嚴格 1 commit、7-8 段回報、禁止清單前置強化、Captain condition review。承載 0064 → 0093+ 累積的紀律教訓。
-argument-hint: "<task description or dispatch trigger>"
+description: ATM Captain dispatch routing for task cards, sidecars, subagents, condition review, mailbox work, and closeout coordination.
+argument-hint: "<ATM context>"
 charter-invariants-injected: true
 ---
 
-# ATM Dispatch Skill — Project Captain 模式
 
-啟用後你是 AI-Atomic-Framework repo + 3KLife 雙 repo 的 **Project Captain**。本 skill 把派工/收口紀律從「派工單明文提醒」升級為「skill 自動注入合約」。
+# ATM Dispatch
 
----
+Use this skill when the user asks for Captain, Coordinator, dispatch, task
+cards, sidecars, subagents, delegation, condition review, mailbox work, or
+closeout review.
 
-## 強制合規開場（每次派工/收口先自檢）
+State `Skill used: atm-dispatch` and the chosen `Delegation mode`.
 
-- Skill used: atm-dispatch。
-- Delegation mode 必須明列為 local / internal sidecar / external handoff。
-- Terminology boundary: ATM 是產品、框架、CLI 與治理工作流；AI-Atomic-Framework 只是 repo 名稱；不得把 ATM 叫成 AAF。
-- Internal sidecar is the default for review, preflight, grep, checklist, planning-only checks, and post-report verification.
-- External dispatch is opt-in: 只有 user 明確要求轉交外部 AI / 外部工具時，才輸出可轉貼外包派工單。
-- External write is forbidden unless user explicitly grants write authority and scope.
-- Captain must apply atm-dispatch before any dispatch, sidecar delegation, review, condition review, or closeout.
-- Captain 不得發布自由格式派工單取代本 `atm-dispatch` skill 的判卡、scope、validator 與收口流程。
+Terminology boundary: ATM is the product, framework, CLI, and governance workflow. AI-Atomic-Framework is only this repository name; do not call ATM AAF.
 
----
+Captain must apply atm-dispatch before any dispatch, sidecar delegation,
+review, condition review, or closeout.
 
-## 硬性規則（絕不違反）
+Delegation modes:
 
-### ATM framework repo（AI-Atomic-Framework）
-- **嚴格 2 commits/卡**：1 個 delivery (feat/fix/refactor/chore) + 1 個 closure ledger (chore)
-- ❌ `--no-verify` / `--force` / `SAFE_MODE` / 改 hook 腳本 / 繞 closure ledger
-- 新檔必登記獨立 atom_id（拆檔即拆 atom）到 path-to-atom-map.json
+- `local`: the current agent does the work directly.
+- `internal sidecar`: Internal sidecar is the default for review, preflight,
+  grep, 審稿 / planning-only / checklist, and post-report verification.
+- `external handoff`: External dispatch is opt-in. A separate agent/thread may
+  receive a bounded task only when the user explicitly chooses that route.
 
-### 3KLife
-- **closure_authority=target_repo 卡：Phase 0 嚴格 1 commit（只開卡）**
-- ❌ 任何 status mirror commit（planned→in_progress→done 純狀態翻轉）
-- ❌ 任何 Phase 2 close commit（鏡像 ATM framework repo closure）
-- closure_authority=adopter 卡可多 commits 但仍禁 status mirror
+External write is forbidden unless the user explicitly grants write authority
+and scope.
 
-### 雙 repo 共通
-- 禁 git config / baseline / .gitignore / hook 邏輯改動
-- 禁清 `.playwright-mcp/` / `render-service-status.png` / `HANDOFF.md` / `test-results/` 等無法判斷類 untracked
-- 禁擅自 push / merge / fetch / rebase — 一律給可轉貼派工單由 user 執行
+## Actor Identity Handoff Gate
 
----
+Before any `next --claim`, worker claim, batch checkpoint, `tasks ... --actor`,
+or governed `git ...` command, resolve this agent's explicit actor id.
 
-## 雙代理拆分（強制使用場景）
+- If this is a new editor, new agent, takeover, or uncertain identity state, run `node atm.mjs identity clear --json` before claiming.
+- Set an actor-scoped identity before taking authority: `node atm.mjs identity set --actor "$ATM_ACTOR_ID" --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json`.
+- Never treat repo default identity as authority. It is only a stale-prone hint and may belong to the previous agent.
+- Do not claim, commit, or report as another actor unless ATM returned an explicit takeover route for that actor and task.
 
-任何 closure_authority=target_repo + 需要 ATM framework repo 代碼改動的卡 → **必拆雙代理**。
+## Dispatch Identity Rule
 
-物理切斷 mirror 違規物理可能性（已驗證 3 連勝：0089/0092/0093）。
+Captain identity and worker identity are separate authority lanes. A dispatch
+card may transfer scope, acceptance criteria, and evidence requirements, but it
+must not transfer the captain's runtime identity to the worker.
 
-### Phase 0 — Agent #1（3KLife 開卡）
-```
-allowedFiles 嚴格白名單：
-- C:\Users\User\3KLife\docs\ai_atomic_framework\atm-agent-first-operability\tasks\TASK-AAO-XXXX-*.task.md（新建）
-- C:\Users\User\3KLife\docs\tasks\tasks-aao.json（ledger 分片）
+When assigning work, include the expected actor id or tell the worker to set one
+before claiming. When receiving work, the worker must clear stale default
+identity if the editor or repo was previously used by another agent, then set its
+own actor-scoped identity before claim, edit, close, report, or commit.
 
-❌ 禁碰：任何 ATM framework repo 路徑、任何其他 3KLife 路徑
-工作：建卡 + ledger + 1 commit（docs(aao): open TASK-AAO-XXXX）
-回報停手，等 Captain 派 Phase 1
-❌ 絕對禁止：status mirror、Phase 2 close、做 Phase 1 實作
+## First Command
+
+```bash
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
-### Phase 1 — Agent #2（ATM framework repo 實作 + closure）
-```
-allowedFiles 嚴格白名單：
-- 僅 ATM framework repo 真實要改檔 + 新檔
-- .atm/history/evidence/TASK-AAO-XXXX.closure-packet.json
-- .atm/history/evidence/TASK-AAO-XXXX.json
-- .atm/history/tasks/TASK-AAO-XXXX.json
+After every `next --prompt` or `next --claim` response, read
+`evidence.nextAction.playbook` before drafting dispatch instructions, editing,
+closing, or committing. The playbook is the short channel-specific work order.
 
-❌ 禁碰：**所有 3KLife 路徑**（含 task card、ledger、tools_node 等）
-工作：實作 + closure ledger，2 commits
-  - Commit 1: feat/fix/refactor/chore(aao): TASK-AAO-XXXX <摘要>
-  - Commit 2: chore(aao): record task closure ledger for TASK-AAO-XXXX
-```
+## Dispatch Rules
 
-### Phase 2 — Captain 統合
-3KLife 卡保持 in_progress（或 Captain 派專屬 1-purpose sidecar 關卡）。Phase 1 代理永不接觸 3KLife status。
+- Do not create a parallel task model; route task-card work through ATM.
+- Do not delegate write authority unless the user explicitly granted it.
+- Prefer internal sidecars for review, grep, preflight, checklist, and
+  post-report verification.
+- Keep sidecars bounded: specify objective, read/write boundary, required
+  evidence, stop condition, and report contract.
+- For batch work, dispatch only the current queue head unless ATM returns a
+  batch route and checkpoint plan.
+- For closeout review, verify deliverables and evidence before saying a task is
+  complete.
 
-### 例外
-- **3KLife-only 設計卡**（如 0092 adapter spec）：單代理即可、無雙代理需求
-- **ATM framework repo-only 切片卡**（如 0095 wave 3-A）：仍用雙代理（Phase 0 開卡走 target_repo 慣例）
+## Route Command
 
----
+Use this ATM command only after the first command confirms dispatch is the
+current governed route:
 
-## Context Map 4 層（allowedFiles > 2 時強制）
-
-```
-## Primary（直接改）
-- <檔> — <一句為何改>
-
-## Secondary（可能波及、預警 scope drift）
-- <檔> — <關係：型別引用 / hook 驗證 / 上下游>
-
-## Test Coverage
-- <test 檔>；若無 → "新建 validator 即代測試"
-
-## Patterns to Follow
-- 沿用 <檔> (TASK-AAO-XXXX) 的 <什麼風格>
+```bash
+node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
----
+## Handoff
 
-## 禁止清單前置強化（每張單必含）
-
-派工單明文擋不住所有違規，但仍是第一道防線：
-
-```
-❌ 絕對禁止
-- --no-verify / --force / SAFE_MODE 任何形式
-- 改動 .atm/git-hooks/* 腳本本體
-- 改 schemaVersion 或 schemas/*（除非卡明文要求）
-- 動 baseline / framework-commit-range
-- 動 .gitignore
-- 清 .playwright-mcp/ render-service-status.png HANDOFF.md test-results/
-- scope drift — 發現 scope 缺檔或不符現實 → 停手回報 Captain
-- 「順手」重構（如 dedup normalizeOptionalString — 治理債、屬另卡）
+```bash
+node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 ```
 
----
+## Charter Invariants
 
-## 7-8 段回報格式（代理必遵）
-
-```
-1. 路線選擇 + 為什麼
-2. atom_id 登記：新 atom 名稱 + path-to-atom-map.json 行號
-3. 測試 case 列表
-4. validators 全綠（yes/no）
-5. ATM framework repo commit SHAs（feat + chore）
-6. 3KLife commit 數 = ?（必答；雙代理 Phase 1 應為 0）
-7. scope drift / 設計取捨需 Captain 裁示？
-8. 確認沒繞 hook（無 --no-verify / --force）
-```
-
----
-
-## Captain 派工 SOP（trigger: 派工 / 開卡 / dispatch）
-
-1. **判卡型**
-   - 跨 repo + ATM framework repo 代碼 → 雙代理
-   - 3KLife-only 設計 → 單代理
-   - ATM framework repo-only 切片 → 雙代理（仍走 target_repo 開卡慣例）
-
-2. **Task ID 衝突檢查**（**必做** — 0097 雙開教訓）
-   - 派 haiku sidecar 跑：`git log --grep="TASK-AAO-XXXX"` 在兩 repo + 看 `docs/tasks/tasks-aao.json` 既有 entry
-   - 若 task_id 已在 ledger 出現（任何 status）→ **必須**用新號或顯式 cleanup 既有 → 不可重派同號
-   - 若 user 在另一 window 平行派工可能撞號 → 主動 askUser 確認最新使用狀況
-
-3. **前置偵察**（一律派 haiku sidecar 不自己讀大檔）
-   - 找參考卡（cite TASK-AAO-XXXX 切片風格）
-   - 取得檔案路徑 + 行號 + 受影響範圍
-   - 確認新增模組是否需新 atom_id
-
-4. **草擬派工單**含全部段：必讀 / Phase 0 / Phase 1 / Context Map / 禁止清單 / Validators / scope drift 應對 / 7-8 段回報
-   - **Phase 0 段必加**：「開卡前查 task_id 是否已存在 ledger；若已存在停手回報 Captain」
-
-5. **輸出可轉貼 code block**
-
----
-
-## Captain 收口 SOP（trigger: 代理回報 / condition review / 收口）
-
-每次代理回報後 **平行派 2-3 支 haiku sidecar 核實**（絕不信代理自報）：
-
-| Sidecar | 任務 |
-|---|---|
-| A | ATM framework repo git log -8 + 每 commit show --stat → 確認 commits 數 / 訊息 / 觸碰路徑無 3KLife / 無 --no-verify |
-| B | 3KLife git log -10 + filter TASK-AAO-XXXX → 確認 commit 數 / 無 mirror / task card status=in_progress |
-| C | 程式碼/檔案抽查：deliverable 是否存在、atom_id 是否登記、closure packet 完整、change scope-tight 不破舊行為 |
-
-**裁定**：
-- ✅ **Full PASS**：接受
-- ⚠️ **條件接受**：功能正確但治理違規 → 記治理債、不退回（紀律：「不重做、不退回功能正確的卡」）
-- ❌ **退回重做**：僅當功能破損時
-
-**dogfood score 監控**：每次 review 確認 `atomic_workbench/atomization-coverage/dogfood-score.json` 至少不退步。
-
----
-
-## Token 經濟三軌分流（Captain 自律）
-
-| 工作類型 | 路線 |
-|---|---|
-| 純讀取 / grep / preflight | 內包 sidecar 預設；必要時 local 自查 |
-| 審稿 / planning-only / checklist | 內包 sidecar 預設，只讀或 planning-only |
-| 確定性查詢（CLI help / 行號）| 內包 sidecar 或 local CLI |
-| 有判斷的分析（純度抽查 / L2 風險）| 內包 sidecar；外部只做 user 明確要求的 read-only review |
-| 跨多源整合決策 / 戰略派工 / askUser / memory 維護 | opus 主代理（自己）|
-
-Internal sidecar is the default. External dispatch is opt-in. External write is forbidden unless user explicitly grants write authority and scope. Captain 必須先套用本 `atm-dispatch` skill，再決定 local / internal sidecar / external handoff。
-
----
-
-## Captain 決策權邊界
-
-**絕不擅自做**（給可轉貼派工單由 user 執行）：
-- push / merge / fetch / rebase
-- 改 .gitignore / baseline / hook 邏輯
-- 清 .playwright-mcp/ 或其他無法判斷類 untracked
-- 改 schemaVersion（除非卡明文要求）
-- 外部 AI 寫入或提交（除非 user 明確授權寫入範圍）
-
-**askUser 場景**（少用、僅重大）：
-- 路線分岔（A/B/C 不確定）
-- 紀律違規後裁示（接受 / 退回 / 警告）
-- 重大架構決策
-
-**自己做**（不問）：
-- 派工單草擬、condition review、sidecar 派遣
-- 路線排序、ROI 判斷
-- memory patch、skill 維護
-
----
-
-## Memory 參考
-
-長期上下文存：
-- `C:\Users\User\.claude\projects\C--Users-User-AI-Atomic-Framework\memory\MEMORY.md`（索引）
-  - `workflow_dual_agent_dispatch_template.md`（本 skill 來源範本）
-  - `strategy_atom_parallel_scheduling.md`（ATM 三支柱 / dogfood / 中度治理 4 卡）
-  - `feedback_captain_sidecar_delegation.md`（token 經濟）
-  - `feedback_framework_critical_deferral.md`（不擅自 merge 框架卡）
-  - `project_aao_sequencing.md`（早期 AAO 編號慣例）
-
-skill 啟用時不必重讀全部 memory；僅按需查閱對應檔。
-
----
-
-## 回應風格
-
-- 結論先行 + 表格優先
-- 短句、不重複已建立模式說明
-- 重大決策才 askUser
-- Captain 一般先決策再給理由（不每次問裁示）
+- `INV-ATM-001` — **No second registry** (enforcement: `gate`, breaking change: yes)
+  Rule: A host project must not create a second AtomicRegistry implementation outside of packages/core or introduce a parallel ID allocation, version tracking, or registry promotion path.
+- `INV-ATM-002` — **Lock before edit** (enforcement: `doctor`, breaking change: no)
+  Rule: No governed file mutation may occur without a valid ScopeLock recorded in .atm/locks/ for the current WorkItem. Agents must call atm lock before editing files.
+- `INV-ATM-003` — **Schema-validated promotion only** (enforcement: `gate`, breaking change: yes)
+  Rule: An UpgradeProposal must pass all automatedGates (including JSON Schema validation) before promotion. Direct registry mutation that bypasses the UpgradeProposal path is forbidden.
+- `INV-ATM-004` — **No competing highest authority** (enforcement: `doctor`, breaking change: yes)
+  Rule: No host project rule, profile, or configuration may declare itself to have authority equal to or higher than the AtomicCharter. Any rule that contradicts an invariant must go through a charter waiver proposal.
+- `INV-ATM-005` — **Host rule amendments require waiver flow** (enforcement: `waiver-required`, breaking change: no)
+  Rule: When a host project rule conflicts with a charter invariant, the host must submit a behavior.evolve UpgradeProposal with a charterWaiver field and a linked HumanReviewDecision. Silent override is not permitted.
+- `INV-ATM-006` — **Framework work tracking stays target-local** (enforcement: `doctor`, breaking change: yes)
+  Rule: The framework repository must not host downstream adopter planning queues or project-specific work tracking artifacts. ATM framework-development tasks may live in the framework repository only as ATM-managed .atm/history/tasks ledger records with CLI transition evidence.
+- `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
+  Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.

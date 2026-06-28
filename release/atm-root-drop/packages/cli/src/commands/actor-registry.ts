@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import type { ActorKind, ActorRecord, ActorRegistryDocument } from '@ai-atomic-framework/core';
@@ -133,6 +133,13 @@ export function writeRuntimeIdentityDefault(cwd: string, document: RuntimeIdenti
   return runtimeIdentityRelativePath;
 }
 
+export function clearRuntimeIdentityDefault(cwd: string): boolean {
+  const absolutePath = path.join(path.resolve(cwd), runtimeIdentityRelativePath);
+  if (!existsSync(absolutePath)) return false;
+  unlinkSync(absolutePath);
+  return true;
+}
+
 export function runtimeIdentityActorRelativePath(actorId: string): string {
   return `${runtimeActorIdentityDirectoryRelativePath}/${actorId}.json`;
 }
@@ -165,6 +172,13 @@ export function writeRuntimeIdentityForActor(cwd: string, actorId: string, docum
   mkdirSync(path.dirname(absolutePath), { recursive: true });
   writeFileSync(absolutePath, `${JSON.stringify(document, null, 2)}\n`, 'utf8');
   return runtimeIdentityActorRelativePath(actorId);
+}
+
+export function clearRuntimeIdentityForActor(cwd: string, actorId: string): boolean {
+  const absolutePath = path.join(path.resolve(cwd), runtimeIdentityActorRelativePath(actorId));
+  if (!existsSync(absolutePath)) return false;
+  unlinkSync(absolutePath);
+  return true;
 }
 
 export function resolveActorId(inputActorId?: string | null, cwd?: string | null): ResolvedActorId | null {

@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.validatorFixture.v1",
+  "specVersion": "0.1.0",
+  "fixtureId": "git-hooks-enforcement",
+  "description": "Minimal source-first fixture for git hook enforcement regressions with explicit hook-install lanes and no inherited task history.",
+  "copyEntries": [
+    { "source": "README.md" },
+    { "source": ".github" },
+    { "source": "docs/SELF_HOSTING_ALPHA.md" },
+    { "source": "atm.mjs" },
+    { "source": "atm.dev.mjs" },
+    { "source": "atomic-registry.json" },
+    { "source": "package.json" },
+    { "source": "package-lock.json" },
+    { "source": "tsconfig.json" },
+    { "source": "tsconfig.build.json" },
+    { "source": "eslint.config.mjs" },
+    { "source": "packages" },
+    { "source": "scripts" },
+    { "source": "schemas" },
+    { "source": "specs" },
+    { "source": "templates" },
+    { "source": "examples" }
+  ],
+  "runtimeIdentities": [
+    { "actorId": "fixture-agent", "gitName": "Fixture Agent", "gitEmail": "fixture-agent@example.com" },
+    { "actorId": "hook-validator", "gitName": "ATM Hook Validator", "gitEmail": "atm@example.invalid" },
+    { "actorId": "restore-operator", "gitName": "Restore Operator", "gitEmail": "restore@example.invalid" },
+    { "actorId": "validator-maintainer", "gitName": "ATM Hook Validator", "gitEmail": "atm@example.invalid" }
+  ],
+  "planningCards": [
+    {
+      "taskId": "TASK-X-RECONCILE",
+      "title": "Reconcile hook close window regression",
+      "scopePaths": ["packages/core/src/reconcile-close-window.ts"],
+      "deliverables": ["packages/core/src/reconcile-close-window.ts"]
+    },
+    {
+      "taskId": "TASK-X-SAME-A",
+      "title": "Same-file claim fixture A",
+      "scopePaths": ["docs/same-file-shared.md", "docs/same-file-a-only.md"],
+      "deliverables": ["docs/same-file-shared.md", "docs/same-file-a-only.md"]
+    },
+    {
+      "taskId": "TASK-X-SAME-B",
+      "title": "Same-file claim fixture B",
+      "scopePaths": ["docs/same-file-shared.md", "docs/same-file-b-only.md"],
+      "deliverables": ["docs/same-file-shared.md", "docs/same-file-b-only.md"]
+    }
+  ]
+}

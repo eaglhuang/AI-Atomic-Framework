@@ -1,0 +1,66 @@
+{
+  "contractA": {
+    "inputs": [
+      {
+        "name": "goal",
+        "kind": "text",
+        "required": true
+      },
+      {
+        "name": "evidence",
+        "kind": "evidence",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "report",
+        "kind": "report",
+        "required": true
+      }
+    ],
+    "language": {
+      "primary": "typescript"
+    },
+    "validation": {
+      "evidenceRequired": true
+    },
+    "performanceBudget": {
+      "hotPath": false,
+      "inputMutation": "forbidden",
+      "maxDurationMs": 1200
+    }
+  },
+  "contractB": {
+    "outputs": [
+      {
+        "required": true,
+        "kind": "report",
+        "name": "report"
+      }
+    ],
+    "validation": {
+      "evidenceRequired": true
+    },
+    "language": {
+      "primary": "typescript"
+    },
+    "inputs": [
+      {
+        "required": true,
+        "kind": "text",
+        "name": "goal"
+      },
+      {
+        "required": true,
+        "kind": "evidence",
+        "name": "evidence"
+      }
+    ],
+    "performanceBudget": {
+      "maxDurationMs": 1200,
+      "inputMutation": "forbidden",
+      "hotPath": false
+    }
+  }
+}

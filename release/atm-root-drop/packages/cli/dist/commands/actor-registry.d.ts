@@ -38,9 +38,11 @@ export declare function upsertActorRecord(cwd: string, input: CreateActorInput):
 };
 export declare function readRuntimeIdentityDefault(cwd: string): RuntimeIdentityDefaultDocument | null;
 export declare function writeRuntimeIdentityDefault(cwd: string, document: RuntimeIdentityDefaultDocument): string;
+export declare function clearRuntimeIdentityDefault(cwd: string): boolean;
 export declare function runtimeIdentityActorRelativePath(actorId: string): string;
 export declare function readRuntimeIdentityForActor(cwd: string, actorId: string): RuntimeIdentityDefaultDocument | null;
 export declare function writeRuntimeIdentityForActor(cwd: string, actorId: string, document: RuntimeIdentityDefaultDocument): string;
+export declare function clearRuntimeIdentityForActor(cwd: string, actorId: string): boolean;
 export declare function resolveActorId(inputActorId?: string | null, cwd?: string | null): ResolvedActorId | null;
 export declare function findActorByResolvedId(cwd: string, resolved: ResolvedActorId): ActorRecord | null;
 export declare function sanitizeActorKind(value: unknown): ActorKind | null;

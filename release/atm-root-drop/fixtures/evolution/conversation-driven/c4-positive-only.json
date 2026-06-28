@@ -1,0 +1,97 @@
+{
+  "description": "C4 - 12 workflow-success turns produce a non-friction observation-only group (no proposal candidate).",
+  "input": {
+    "window": "2026-W20",
+    "logs": [
+      {
+        "sessionId": "s-c4-positive-only",
+        "window": "2026-W20",
+        "redacted": true,
+        "atomId": "ATM-CORE-0004",
+        "producedBy": "test-suite",
+        "turns": [
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 },
+          { "role": "agent", "intent": "success", "summary": "Workflow ran cleanly to completion.", "tags": ["green"], "confidence": 0.9 }
+        ]
+      }
+    ]
+  },
+  "expectedReport": {
+    "schemaId": "atm.conversationEvidenceExtractionReport",
+    "specVersion": "0.1.0",
+    "extractorName": "deterministic-conversation-evidence-extractor",
+    "window": "2026-W20",
+    "summary": {
+      "totalLogs": 1,
+      "totalTurns": 12,
+      "emittedEvidence": 1,
+      "skippedSessions": 0
+    },
+    "evidence": [
+      {
+        "evidenceId": "evidence.conv.s-c4-positive-only.workflow-success.ATM-CORE-0004",
+        "evidenceKind": "review",
+        "signalKind": "workflow-success",
+        "signalScope": "atom",
+        "atomId": "ATM-CORE-0004",
+        "patternTags": ["green"],
+        "confidence": 0.9,
+        "recurrence": { "window": "2026-W20", "count": 12 },
+        "summary": "Workflow ran cleanly to completion.",
+        "artifactPaths": [],
+        "producedBy": "test-suite"
+      }
+    ],
+    "skippedSessions": []
+  },
+  "detector": {
+    "input": {
+      "window": "2026-W20",
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 }
+    },
+    "expectedReport": {
+      "schemaId": "atm.evidencePatternDetectorReport",
+      "specVersion": "0.1.0",
+      "migration": { "strategy": "none", "fromVersion": null, "notes": "Initial deterministic evidence pattern detector report." },
+      "generatedAt": "2026-05-16T00:00:00.000Z",
+      "detectorName": "deterministic-evidence-pattern-detector",
+      "window": "2026-W20",
+      "thresholds": { "minUsageCount": 10, "minFrictionEvidence": 1, "minConfidence": 0.5 },
+      "summary": { "totalEvidence": 1, "acceptedEvidence": 1, "rejectedEvidence": 0, "candidateGroups": 0 },
+      "groups": [
+        {
+          "groupId": "evidence-pattern.atom.atm-core-0004.2026-w20.workflow-success",
+          "targetKind": "atom",
+          "targetId": "ATM-CORE-0004",
+          "signalKind": "workflow-success",
+          "signalScope": "atom",
+          "window": "2026-W20",
+          "usageCount": 12,
+          "frictionEvidenceCount": 0,
+          "positiveEvidenceCount": 1,
+          "neutralEvidenceCount": 0,
+          "matchedEvidenceIds": ["evidence.conv.s-c4-positive-only.workflow-success.ATM-CORE-0004"],
+          "rejectedEvidenceIds": [],
+          "patternTags": ["green"],
+          "confidence": 0.9,
+          "recommendation": "observation-only",
+          "reasons": ["non-friction-signal", "friction-threshold-not-met"]
+        }
+      ],
+      "proposalCandidateGroupIds": [],
+      "rejectedEvidenceIds": [],
+      "empty": false
+    }
+  }
+}

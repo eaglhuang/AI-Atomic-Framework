@@ -1,0 +1,98 @@
+{
+  "schemaId": "atm.humanReviewDecision",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial human review decision contract."
+  },
+  "decisionId": "decision.proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.approve",
+  "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+  "atomId": "ATM-CORE-0001",
+  "decision": "approve",
+  "reason": "Corrupted snapshot hash test fixture.",
+  "decidedBy": "ATM reviewer",
+  "decidedAt": "2026-01-02T00:00:00.000Z",
+  "decisionSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "queuePath": ".atm/reports/upgrade-proposals.json",
+  "projectionPath": ".atm/reports/upgrade-proposals.md",
+  "queueRecord": {
+    "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+    "atomId": "ATM-CORE-0001",
+    "fromVersion": "1.0.0",
+    "toVersion": "1.1.0",
+    "decompositionDecision": "atom-bump",
+    "automatedGates": {
+      "allPassed": true,
+      "blockedGateNames": []
+    },
+    "status": "approved",
+    "proposalSnapshotHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "proposal": {
+      "schemaId": "atm.upgradeProposal",
+      "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+      "atomId": "ATM-CORE-0001",
+      "fromVersion": "1.0.0",
+      "toVersion": "1.1.0",
+      "decompositionDecision": "atom-bump",
+      "status": "pending",
+      "automatedGates": {
+        "allPassed": true,
+        "blockedGateNames": []
+      }
+    },
+    "review": {
+      "decision": "approve",
+      "reason": "Corrupted snapshot hash test fixture.",
+      "decidedBy": "ATM reviewer",
+      "decidedAt": "2026-01-02T00:00:00.000Z",
+      "decisionSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "evidenceId": "human-review.proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.approve"
+    }
+  },
+  "evidence": {
+    "schemaId": "atm.evidence.humanReviewDecision",
+    "specVersion": "0.1.0",
+    "migration": {
+      "strategy": "none",
+      "fromVersion": null,
+      "notes": "Human review decision evidence fixture."
+    },
+    "evidenceId": "human-review.proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.approve",
+    "workItemId": "ATM-CORE-0001",
+    "evidenceKind": "review",
+    "evidenceType": "human-review-decision",
+    "summary": "Human review approve for proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve.",
+    "artifactPaths": [
+      ".atm/reports/upgrade-proposals.json",
+      ".atm/reports/upgrade-proposals.md"
+    ],
+    "createdAt": "2026-01-02T00:00:00.000Z",
+    "producedBy": "ATM reviewer",
+    "reproducibility": {
+      "replayable": true,
+      "replayCommand": [
+        "node",
+        "scripts/validate-human-review.mjs"
+      ],
+      "inputs": [
+        ".atm/reports/upgrade-proposals.json"
+      ],
+      "expectedArtifacts": [
+        ".atm/reports/upgrade-proposals.json",
+        ".atm/reports/upgrade-proposals.md"
+      ],
+      "notes": "Replay the human review decision against the queue snapshot and decision hash."
+    },
+    "details": {
+      "proposalId": "proposal.atm-core-0001.from-1.0.0.to-1.1.0.atom.behavior-evolve",
+      "atomId": "ATM-CORE-0001",
+      "decision": "approve",
+      "reason": "Corrupted snapshot hash test fixture.",
+      "queuePath": ".atm/reports/upgrade-proposals.json",
+      "projectionPath": ".atm/reports/upgrade-proposals.md",
+      "decisionSnapshotHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "queueStatus": "approved"
+    }
+  }
+}

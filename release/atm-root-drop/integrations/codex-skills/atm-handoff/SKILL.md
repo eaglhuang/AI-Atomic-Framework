@@ -8,6 +8,21 @@ charter-invariants-injected: true
 
 # ATM Handoff
 
+## Actor Identity Handoff Gate
+
+Before any `next --claim`, worker claim, batch checkpoint, `tasks ... --actor`,
+or governed `git ...` command, resolve this agent's explicit actor id.
+
+- If this is a new editor, new agent, takeover, or uncertain identity state, run `node atm.mjs identity clear --json` before claiming.
+- Set an actor-scoped identity before taking authority: `node atm.mjs identity set --actor "$ATM_ACTOR_ID" --editor <editor-id> --git-name "<git user.name>" --git-email "<git user.email>" --json`.
+- Never treat repo default identity as authority. It is only a stale-prone hint and may belong to the previous agent.
+- Do not claim, commit, or report as another actor unless ATM returned an explicit takeover route for that actor and task.
+
+Handoff transfers context, evidence, blockers, and next recommended commands. It
+does not transfer actor authority. The receiving agent must clear stale default
+identity when needed and claim with its own explicit actor id before editing,
+closing, reporting, or committing.
+
 First command:
 
 ```bash

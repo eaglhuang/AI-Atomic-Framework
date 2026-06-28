@@ -1,0 +1,47 @@
+{
+  "schemaId": "atm.rollbackPlan",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial dry-run rollback plan fixture."
+  },
+  "planId": "rollback-plan.atm-core-0005.v0.1.0.dry-run",
+  "forwardPlanId": "inject-plan.atm-core-0005.v0.1.0.dry-run",
+  "target": {
+    "atomId": "ATM-CORE-0005",
+    "fromVersion": "0.1.0",
+    "toVersion": "0.1.0"
+  },
+  "behaviorId": "behavior.infect",
+  "reverseBehaviorId": "behavior.rollback-infect",
+  "dryRunOnly": true,
+  "rollbackSteps": [
+    {
+      "step": 1,
+      "action": "Discard patch plan output and clear generated dry-run artifacts.",
+      "verify": "No planned patch remains under the temporary report path."
+    },
+    {
+      "step": 2,
+      "action": "Re-run rollback proof validation contract in plan mode.",
+      "verify": "Proof contract fields for behavior symmetry and status/sf revert stay true."
+    }
+  ],
+  "rollbackProofContract": {
+    "schemaId": "atm.rollbackProof",
+    "schemaPath": "schemas/registry/rollback-proof.schema.json",
+    "requiredFields": [
+      "behaviorId",
+      "reverseBehaviorId",
+      "rollbackContractSymmetric",
+      "statusReverted",
+      "semanticFingerprintReverted"
+    ]
+  },
+  "symmetry": {
+    "contractSymmetric": true,
+    "sameTarget": true,
+    "samePatchBoundary": true
+  }
+}

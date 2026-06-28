@@ -19,11 +19,6 @@ Use this ATM command only after the first command confirms it is the current gov
 node atm.mjs explain --why blocked --json
 ```
 
-Prefer structured blocked/evidence payloads when a tool-capable bridge exposes
-them. Do not hide blocked evidence collection behind a silent shell fallback;
-surface the blocker, then use the CLI fallback lane only when the structured
-surface is missing or explicitly unavailable.
-
 ## Handoff
 
 ```bash

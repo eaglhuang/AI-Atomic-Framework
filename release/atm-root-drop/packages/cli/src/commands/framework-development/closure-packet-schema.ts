@@ -19,6 +19,7 @@ import {
   type TaskLedgerMode,
   type TaskLedgerPolicy
 } from '../task-ledger.ts';
+import { isAtmCriticalNonDocSurface, isDocOnlyPath } from './path-classification.ts';
 
 export type FrameworkMode = 'inactive' | 'suspected' | 'required' | 'cross-repo-target-required';
 export type ClosureAuthority = 'local' | 'target_repo' | 'none';
@@ -720,6 +721,16 @@ export function classifyFrameworkStaleLock(cwd: string, actorId: string, options
     };
   }
 
+  // Allow the same actor to keep using its unlabeled temporary framework lock.
+  // This covers the common "claim more files in the same session" path where
+  // there is no linked task id yet, so treating the lock as stale would block
+  // a legitimate scope refresh.
+  const lockActorId = normalizeOptionalString(document.actorId ?? document.lockedBy);
+  const lockWorkItemId = normalizeOptionalString(document.workItemId ?? null);
+  if (lockActorId === actorId && lockWorkItemId === lockId && !linkedTaskId && !currentTaskId) {
+    return null;
+  }
+
   return {
     kind: 'possibly-stale',
     ...base,
@@ -871,7 +882,7 @@ export function createFrameworkModeStatus(input: FrameworkModeOptions): Framewor
   if (mode === 'required') {
     const gitHead = createGitHeadEvidenceCheck(cwd, detectGovernanceRuntime(cwd, bootstrapTaskId));
     if (!gitHead.ok) {
-      blockers.push('git-head-evidence-missing');
+      warnings.push('git-head-evidence-missing');
     }
   }
   const taskLedgerMode = resolveTaskLedgerMode({
@@ -959,19 +970,6 @@ export function inferFrameworkTargetRepoFromTasks(cwd: string): InferredFramewor
   }
 
   return null;
-}
-
-export function isAtmCriticalNonDocSurface(filePath: string): boolean {
-  const relativePath = normalizeRelativePath(filePath);
-  if (!relativePath || isDocOnlyPath(relativePath)) {
-    return false;
-  }
-  if (relativePath === 'atm.mjs') return true;
-  if (relativePath === 'package.json' || relativePath === 'package-lock.json') return true;
-  if (/^tsconfig[^/]*\.json$/.test(relativePath)) return true;
-  if (relativePath === 'atomic-registry.json') return true;
-  if (/^compatibility-matrix[^/]*\.json$/.test(relativePath)) return true;
-  return /^(packages|schemas|specs|scripts|templates|integrations|examples|tests)\//.test(relativePath);
 }
 
 export function isAdopterInfrastructureSyncCommit(files: readonly string[]): boolean {
@@ -2326,15 +2324,6 @@ function buildRequiredGates(criticalChangedFiles: readonly string[]): readonly s
 
 function looksLikeScopePattern(relativePath: string): boolean {
   return relativePath.includes('*');
-}
-
-function isDocOnlyPath(relativePath: string): boolean {
-  return relativePath === 'README.md'
-    || relativePath === 'AGENTS.md'
-    || relativePath.endsWith('.md')
-    || relativePath.startsWith('docs/')
-    || relativePath.startsWith('atomic_workbench/reports/')
-    || relativePath.startsWith('atomic_workbench/evidence/');
 }
 
 function buildRepairClosureCommitMessage(taskId: string): string {

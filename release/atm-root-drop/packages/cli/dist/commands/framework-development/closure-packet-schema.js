@@ -11,6 +11,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from '../governance-runtime.
 import { listActorWorkSessions } from '../actor-session.js';
 import { readActiveTaskDirectionLocks } from '../task-direction.js';
 import { externalTaskKey, readTaskLedgerPolicy, resolveTaskLedgerMode, transitionEventExists } from '../task-ledger.js';
+import { isAtmCriticalNonDocSurface } from './path-classification.js';
 export function isTaskCloseGovernanceCriticalPath(filePath, taskId) {
     const relativePath = normalizeRelativePath(filePath);
     const normalizedTaskId = taskId.trim();
@@ -391,6 +392,15 @@ export function classifyFrameworkStaleLock(cwd, actorId, options = {}) {
             detail: `Framework-mode lock for actor ${actorId} exceeded its TTL without heartbeat renewal. Release the stale lock, then claim fresh.`
         };
     }
+    // Allow the same actor to keep using its unlabeled temporary framework lock.
+    // This covers the common "claim more files in the same session" path where
+    // there is no linked task id yet, so treating the lock as stale would block
+    // a legitimate scope refresh.
+    const lockActorId = normalizeOptionalString(document.actorId ?? document.lockedBy);
+    const lockWorkItemId = normalizeOptionalString(document.workItemId ?? null);
+    if (lockActorId === actorId && lockWorkItemId === lockId && !linkedTaskId && !currentTaskId) {
+        return null;
+    }
     return {
         kind: 'possibly-stale',
         ...base,
@@ -536,7 +546,7 @@ export function createFrameworkModeStatus(input) {
     if (mode === 'required') {
         const gitHead = createGitHeadEvidenceCheck(cwd, detectGovernanceRuntime(cwd, bootstrapTaskId));
         if (!gitHead.ok) {
-            blockers.push('git-head-evidence-missing');
+            warnings.push('git-head-evidence-missing');
         }
     }
     const taskLedgerMode = resolveTaskLedgerMode({
@@ -622,23 +632,6 @@ export function inferFrameworkTargetRepoFromTasks(cwd) {
         };
     }
     return null;
-}
-export function isAtmCriticalNonDocSurface(filePath) {
-    const relativePath = normalizeRelativePath(filePath);
-    if (!relativePath || isDocOnlyPath(relativePath)) {
-        return false;
-    }
-    if (relativePath === 'atm.mjs')
-        return true;
-    if (relativePath === 'package.json' || relativePath === 'package-lock.json')
-        return true;
-    if (/^tsconfig[^/]*\.json$/.test(relativePath))
-        return true;
-    if (relativePath === 'atomic-registry.json')
-        return true;
-    if (/^compatibility-matrix[^/]*\.json$/.test(relativePath))
-        return true;
-    return /^(packages|schemas|specs|scripts|templates|integrations|examples|tests)\//.test(relativePath);
 }
 export function isAdopterInfrastructureSyncCommit(files) {
     if (files.length === 0)
@@ -1919,14 +1912,6 @@ function buildRequiredGates(criticalChangedFiles) {
 }
 function looksLikeScopePattern(relativePath) {
     return relativePath.includes('*');
-}
-function isDocOnlyPath(relativePath) {
-    return relativePath === 'README.md'
-        || relativePath === 'AGENTS.md'
-        || relativePath.endsWith('.md')
-        || relativePath.startsWith('docs/')
-        || relativePath.startsWith('atomic_workbench/reports/')
-        || relativePath.startsWith('atomic_workbench/evidence/');
 }
 function buildRepairClosureCommitMessage(taskId) {
     return `chore(${taskId}): repair closure packet`;

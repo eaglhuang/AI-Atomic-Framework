@@ -166,9 +166,9 @@ try {
   const orphan = runAtmDoctor(orphanRepo);
   assert(orphan.exitCode === 0, 'adopter orphan doctor must exit 0');
   assert(orphan.parsed.ok === true, 'adopter orphan doctor must report ok=true');
-  assert(orphan.parsed.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_WARNING'), 'adopter orphan doctor must emit ATM_DOCTOR_GIT_EVIDENCE_WARNING');
-  assert(gitCheck(orphan)?.details?.status === 'missing', 'orphan doctor must report status=missing');
-  assert(gitCheck(orphan)?.details?.enforcement === 'warning', 'adopter orphan git evidence must be warning enforcement');
+  assert(!orphan.parsed.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_WARNING'), 'adopter non-critical orphan doctor must not emit ATM_DOCTOR_GIT_EVIDENCE_WARNING');
+  assert(gitCheck(orphan)?.details?.status === 'not-required-non-critical-head', 'non-critical orphan doctor must report status=not-required-non-critical-head');
+  assert((gitCheck(orphan)?.details?.criticalChangedFiles || []).length === 0, 'non-critical orphan doctor must report no critical changed files');
 
   const commitSha = runGit(orphanRepo, ['rev-parse', 'HEAD']);
   writeGitEvidenceLegacy(orphanRepo, createGitEvidence({ commitSha }));
@@ -219,7 +219,7 @@ try {
     const inheritedGitEnv = runAtmDoctor(inheritedGitEnvRepo);
     assert(inheritedGitEnv.exitCode === 0, 'doctor must ignore inherited git env contamination');
     assert(inheritedGitEnv.parsed.ok === true, 'doctor under inherited git env contamination must report ok=true');
-    assert(gitCheck(inheritedGitEnv)?.details?.status === 'missing', 'doctor under inherited git env contamination must still inspect the target repo');
+    assert(gitCheck(inheritedGitEnv)?.details?.status === 'not-required-non-critical-head', 'doctor under inherited git env contamination must still inspect the target repo as non-critical head');
   } finally {
     if (originalGitDir === undefined) delete process.env.GIT_DIR;
     else process.env.GIT_DIR = originalGitDir;

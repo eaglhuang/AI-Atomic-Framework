@@ -1,0 +1,29 @@
+{
+  "description": "Resolve missing behavior: BehaviorRegistry.resolve() returns null and executeGuarded returns ok:false for unregistered actions.",
+  "cases": [
+    {
+      "name": "resolve-missing-behavior",
+      "description": "BehaviorRegistry.resolve() returns null for an action with no registered behavior",
+      "registeredBehaviors": [],
+      "resolveAction": "behavior.merge",
+      "expect": {
+        "resolved": false
+      }
+    },
+    {
+      "name": "execute-missing-behavior",
+      "description": "BehaviorRegistry.executeGuarded() returns ok:false with issue behavior-not-found when no behavior is registered",
+      "registeredBehaviors": [],
+      "input": {
+        "entryType": "atom",
+        "atomId": "ATM-CORE-0001",
+        "action": "behavior.merge",
+        "requestedBy": "test-agent"
+      },
+      "expect": {
+        "ok": false,
+        "issuesInclude": ["behavior-not-found:behavior.merge"]
+      }
+    }
+  ]
+}
