@@ -2062,7 +2062,7 @@ function autoStageFrameworkClaimFiles(cwd, actorId) {
         && !isIgnorableFrameworkCommitStagingSideEffect(filePath)
         && isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
     if (candidates.length > 0) {
-        runGitCommand(cwd, ['add', '-A', '--', ...candidates], ['ignore', 'pipe', 'pipe']);
+        runGitCommand(cwd, ['add', '-A', '-f', '--', ...candidates], ['ignore', 'pipe', 'pipe']);
     }
     return candidates;
 }

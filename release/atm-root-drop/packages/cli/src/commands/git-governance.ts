@@ -2361,7 +2361,7 @@ function autoStageFrameworkClaimFiles(cwd: string, actorId: string): readonly st
     )
   );
   if (candidates.length > 0) {
-    runGitCommand(cwd, ['add', '-A', '--', ...candidates], ['ignore', 'pipe', 'pipe']);
+    runGitCommand(cwd, ['add', '-A', '-f', '--', ...candidates], ['ignore', 'pipe', 'pipe']);
   }
   return candidates;
 }
