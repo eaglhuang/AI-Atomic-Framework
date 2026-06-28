@@ -340,10 +340,22 @@ try {
   const governanceReadinessCheck = (driftDoctor.evidence?.checks ?? []).find((entry: any) => entry.name === 'governance-entry-readiness');
   assert(governanceReadinessCheck?.ok === false, 'doctor governance-entry-readiness must fail for tracked actor registry drift');
   assert(governanceReadinessCheck?.details?.actorRegistryState?.blocking === true, 'doctor must report actor registry drift details');
-  runGit(governedWrapperRepo, ['restore', '--staged', 'docs/tracked-actor-registry-drift.md']);
-  rmSync(path.join(governedWrapperRepo, 'docs', 'tracked-actor-registry-drift.md'), { force: true });
-  runGit(governedWrapperRepo, ['add', '.atm/catalog/registry/actors.json']);
-  runGit(governedWrapperRepo, ['commit', '--no-verify', '-m', 'refresh governed wrapper actor registry']);
+  const driftRecoveryCommit = parsePayload(runCli(governedWrapperRepo, [
+    'git',
+    'commit',
+    '--cwd',
+    governedWrapperRepo,
+    '--actor',
+    'hook-validator',
+    '--message',
+    'chore: auto-stage tracked actor registry drift',
+    '--json'
+  ]));
+  assert(driftRecoveryCommit.ok === true, 'governed git commit must auto-stage tracked actor registry drift for non-task commits');
+  const driftRecoverySha = String(driftRecoveryCommit.evidence?.commitSha ?? '');
+  const driftRecoveryTouchedPaths = String(runGit(governedWrapperRepo, ['show', '--pretty=', '--name-only', driftRecoverySha]).stdout || '').trim().split(/\r?\n/).filter(Boolean);
+  assert(driftRecoveryTouchedPaths.includes('.atm/catalog/registry/actors.json'), 'governed drift-recovery commit must include the tracked actor registry');
+  assert(driftRecoveryTouchedPaths.includes('docs/tracked-actor-registry-drift.md'), 'governed drift-recovery commit must preserve the caller-staged payload');
   writeFileSync(path.join(governedWrapperRepo, 'packages', 'core', 'src', 'index.ts'), 'export const governedWrapperEvidence = true;\n', 'utf8');
   runGit(governedWrapperRepo, ['add', 'packages/core/src/index.ts']);
   const wrapperCommit = parsePayload(runCli(governedWrapperRepo, [

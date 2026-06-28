@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.js';
+import { actorIdEnvVar, actorRegistryRelativePath, findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.js';
 import { resolveActorWorkSession } from './actor-session.js';
 import { evaluateGitAdmission } from '../../../core/dist/git/admission.js';
 import { composeBrokerProposals } from '../../../core/dist/broker/compose.js';
@@ -46,6 +46,14 @@ function runGitCommandWithEnv(cwd, args, env, stdio = ['ignore', 'pipe', 'ignore
         stdio,
         env: createSanitizedGitEnv(env)
     });
+}
+function stageTrackedActorRegistryIfNeeded(cwd) {
+    const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+    if (!actorRegistryState.tracked || !actorRegistryState.unstaged) {
+        return null;
+    }
+    runGitCommand(cwd, ['add', '--', actorRegistryRelativePath], ['ignore', 'pipe', 'pipe']);
+    return actorRegistryRelativePath;
 }
 function createSanitizedGitEnv(extra = {}) {
     const env = { ...process.env, ...extra };
@@ -946,6 +954,9 @@ function runGitCommit(options) {
                     trailers
                 }).commitFiles
                 : [];
+            const autoStagedActorRegistryPath = options.taskId === null
+                ? stageTrackedActorRegistryIfNeeded(options.cwd)
+                : null;
             const preStagedEvidence = !options.noVerify && bundleFiles.length === 0
                 ? ensureGovernedGitHeadEvidenceStagedForCommit(options.cwd, actorId)
                 : null;
@@ -956,7 +967,8 @@ function runGitCommit(options) {
                     details: {
                         actorId,
                         taskId: options.taskId,
-                        stagedCommitSurface
+                        stagedCommitSurface,
+                        autoStagedActorRegistryPath
                     }
                 });
             }

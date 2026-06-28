@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { actorIdEnvVar, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.ts';
+import { actorIdEnvVar, actorRegistryRelativePath, findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { resolveActorWorkSession } from './actor-session.ts';
 import { evaluateGitAdmission } from '../../../core/src/git/admission.ts';
 import { composeBrokerProposals } from '../../../core/src/broker/compose.ts';
@@ -60,6 +60,15 @@ function runGitCommandWithEnv(
     stdio,
     env: createSanitizedGitEnv(env)
   });
+}
+
+function stageTrackedActorRegistryIfNeeded(cwd: string): string | null {
+  const actorRegistryState = inspectTrackedActorRegistryState(cwd);
+  if (!actorRegistryState.tracked || !actorRegistryState.unstaged) {
+    return null;
+  }
+  runGitCommand(cwd, ['add', '--', actorRegistryRelativePath], ['ignore', 'pipe', 'pipe']);
+  return actorRegistryRelativePath;
 }
 
 function createSanitizedGitEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
@@ -1093,6 +1102,9 @@ function runGitCommit(options: ParsedGitOptions) {
           trailers
         }).commitFiles
         : [];
+      const autoStagedActorRegistryPath = options.taskId === null
+        ? stageTrackedActorRegistryIfNeeded(options.cwd)
+        : null;
       const preStagedEvidence = !options.noVerify && bundleFiles.length === 0
         ? ensureGovernedGitHeadEvidenceStagedForCommit(
           options.cwd,
@@ -1106,7 +1118,8 @@ function runGitCommit(options: ParsedGitOptions) {
           details: {
             actorId,
             taskId: options.taskId,
-            stagedCommitSurface
+            stagedCommitSurface,
+            autoStagedActorRegistryPath
           }
         });
       }

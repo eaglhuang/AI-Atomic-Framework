@@ -2556,11 +2556,14 @@ function inspectCommitAttribution(cwd, stagedFiles) {
     const suggestedTaskId = pendingBatchCheckpointTaskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : stagedTaskIds[0] ?? null);
     const actorRegistryState = inspectTrackedActorRegistryState(cwd);
     if (actorRegistryState.blocking) {
+        const governedRecoveryCommand = suggestedTaskId
+            ? `git add ${quoteCliValue(actorRegistryState.path)} && node atm.mjs git commit --actor <id> --task ${suggestedTaskId} --message "<summary>" --json`
+            : `node atm.mjs git commit --actor <id> --message "<summary>" --json`;
         findings.push({
             code: 'ATM_COMMIT_ACTOR_REGISTRY_UNSTAGED',
             source: 'commit-attribution',
-            detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governance cannot prove actor identity state unless that tracked registry is either fully staged for this commit or restored.`,
-            requiredCommand: `git add ${quoteCliValue(actorRegistryState.path)} && node atm.mjs git commit --actor <id>${suggestedTaskId ? ` --task ${suggestedTaskId}` : ''} --message "<summary>" --json`,
+            detail: `Tracked actor registry ${actorRegistryState.path} has ${actorRegistryState.status === 'mixed' ? 'both staged and unstaged' : 'unstaged'} changes. Governed node atm.mjs git commit auto-stages that tracked registry for non-task commits, but bare git commit cannot; task-scoped commits still need the registry explicitly staged in scope. Re-run through the ATM wrapper or restore the drift first.`,
+            requiredCommand: governedRecoveryCommand,
             classification: 'current-task'
         });
         return {

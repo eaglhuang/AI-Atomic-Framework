@@ -428,8 +428,26 @@ try {
   const actorRegistryGovernanceReadiness = (actorRegistryDriftDoctor.parsed.evidence?.checks ?? []).find((entry: any) => entry.name === 'governance-entry-readiness');
   assert(actorRegistryGovernanceReadiness?.ok === false, 'governance-entry-readiness must fail for tracked actor registry drift');
   assert(actorRegistryGovernanceReadiness?.details?.actorRegistryState?.blocking === true, 'governance-entry-readiness must report actor registry drift details');
-  assert(runGit(repo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'drifted fixture actor registry must still be stageable');
-  assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: refresh fixture actor registry']).exitCode === 0, 'drifted fixture actor registry commit must succeed');
+  writeFileSync(path.join(repo, 'docs-wrapper-payload.txt'), 'wrapper payload\n', 'utf8');
+  assert(runGit(repo, ['add', 'docs-wrapper-payload.txt']).exitCode === 0, 'wrapper payload must be stageable');
+  const actorRegistryWrapperCommit = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'chore: auto-stage actor registry drift',
+    '--json'
+  ]);
+  assert(actorRegistryWrapperCommit.exitCode === 0, 'governed git commit must auto-stage tracked actor registry drift');
+  assert(actorRegistryWrapperCommit.parsed.ok === true, 'governed git commit must report ok=true when auto-staging tracked actor registry drift');
+  const actorRegistryWrapperSha = String(actorRegistryWrapperCommit.parsed.evidence?.commitSha ?? '');
+  const actorRegistryWrapperPaths = runGit(repo, ['show', '--pretty=', '--name-only', actorRegistryWrapperSha]).stdout
+    .split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  assert(actorRegistryWrapperPaths.includes('.atm/catalog/registry/actors.json'), 'governed wrapper commit must include tracked actor registry drift');
+  assert(actorRegistryWrapperPaths.includes('docs-wrapper-payload.txt'), 'governed wrapper commit must preserve the caller-staged payload');
 
   const evidenceOnlyRepo = path.join(tempRoot, 'evidence-only-followup');
   mkdirSync(evidenceOnlyRepo, { recursive: true });
@@ -602,7 +620,7 @@ try {
   const residueAutoCleanCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: safe generated residue', '--auto-stage', '--json']);
   assert(residueAutoCleanCommit.exitCode === 0, 'git commit must auto-clean safe generated residue');
   assert(residueAutoCleanCommit.parsed.ok === true, 'safe generated residue commit must report ok=true');
-  assert(!existsSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl')), 'safe git-head residue must be removed after governed commit');
+  assert(runGit(repo, ['status', '--short', '--', '.atm/history/evidence/git-head.jsonl']).stdout === '', 'safe git-head residue must settle back to a clean status after governed commit');
 
   writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "runtime-side-effects";\n', 'utf8');
   const teamRunResidue = path.join(repo, '.atm', 'runtime', 'team-runs', 'team-fixture.json');
