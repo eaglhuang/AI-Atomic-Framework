@@ -662,6 +662,24 @@ try {
     unstagedFrameworkCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_FRAMEWORK_STAGING_REQUIRED',
     `framework claim commit must return staging-required diagnostic (got ${String(unstagedFrameworkCommit.parsed.messages?.[0]?.code)})`
   );
+  const frameworkDryRunHeadBefore = runGit(repo, ['rev-parse', 'HEAD']).stdout.trim();
+  const frameworkAutoStageDryRun = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'feat: framework auto-stage dry run',
+    '--auto-stage',
+    '--dry-run',
+    '--json'
+  ]);
+  assert(frameworkAutoStageDryRun.exitCode === 0, 'framework claim auto-stage dry run must succeed');
+  assert(frameworkAutoStageDryRun.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_FRAMEWORK_DRY_RUN', 'framework claim auto-stage dry run must report the framework dry-run code');
+  assert(runGit(repo, ['rev-parse', 'HEAD']).stdout.trim() === frameworkDryRunHeadBefore, 'framework claim auto-stage dry run must not create a commit');
+  assert(runGit(repo, ['diff', '--cached', '--name-only']).stdout.trim() === '', 'framework claim auto-stage dry run must not mutate the index');
   const frameworkAutoStageCommit = runAtm([
     'git',
     'commit',

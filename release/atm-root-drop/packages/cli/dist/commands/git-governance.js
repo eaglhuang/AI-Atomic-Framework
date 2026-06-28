@@ -886,10 +886,46 @@ function runGitCommit(options) {
         }
     }
     const autoStagedFrameworkPaths = options.taskId === null && options.autoStage
-        ? autoStageFrameworkClaimFiles(options.cwd, actorId)
+        ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun)
         : [];
     if (options.taskId === null) {
         const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId);
+        if (options.dryRun && options.autoStage) {
+            if (frameworkStagingInspection?.kind === 'mixed-scope') {
+                throw new CliError('ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS', 'git commit found unstaged framework-claim changes mixed with already staged out-of-claim files; stage only the claim scope or reset the foreign staged files before retrying.', {
+                    exitCode: 1,
+                    details: {
+                        actorId,
+                        inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
+                        outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles
+                    }
+                });
+            }
+            return makeResult({
+                ok: true,
+                command: 'git',
+                cwd: options.cwd,
+                messages: [message('info', 'ATM_GIT_COMMIT_FRAMEWORK_DRY_RUN', 'git commit dry-run for the active framework claim resolved the governed commit surface without mutating the index.', {
+                        actorId,
+                        frameworkClaimFiles: readActiveFrameworkClaimFiles(options.cwd, actorId),
+                        autoStageCandidates: autoStagedFrameworkPaths
+                    })],
+                evidence: {
+                    action: 'commit',
+                    dryRun: true,
+                    actorId,
+                    taskId: null,
+                    frameworkClaimFiles: readActiveFrameworkClaimFiles(options.cwd, actorId),
+                    autoStageCandidates: autoStagedFrameworkPaths,
+                    stagedFiles: readStagedFiles(options.cwd),
+                    copyableCommitCommand: buildCopyableGitCommitCommand({
+                        cwd: options.cwd,
+                        message: options.message,
+                        trailers: [`ATM-Actor: ${actorId}`]
+                    })
+                }
+            });
+        }
         if (frameworkStagingInspection?.kind === 'staging-required') {
             throw new CliError('ATM_GIT_COMMIT_FRAMEWORK_STAGING_REQUIRED', 'git commit found unstaged framework-claim changes; stage the claimed files (and derived release artifacts) before the wrapper can create a governed commit.', {
                 exitCode: 1,
@@ -2051,7 +2087,7 @@ function isIgnorableFrameworkCommitStagingSideEffect(filePath) {
     }
     return isIgnorableTaskScopedDirtySideEffect(filePath);
 }
-function autoStageFrameworkClaimFiles(cwd, actorId) {
+function autoStageFrameworkClaimFiles(cwd, actorId, apply = true) {
     const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
     if (claimedFiles.size === 0) {
         return [];
@@ -2061,7 +2097,7 @@ function autoStageFrameworkClaimFiles(cwd, actorId) {
     const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => !stagedFiles.has(filePath)
         && !isIgnorableFrameworkCommitStagingSideEffect(filePath)
         && isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
-    if (candidates.length > 0) {
+    if (apply && candidates.length > 0) {
         runGitCommand(cwd, ['add', '-A', '-f', '--', ...candidates], ['ignore', 'pipe', 'pipe']);
     }
     return candidates;
