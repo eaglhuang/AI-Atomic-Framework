@@ -49,9 +49,10 @@ bridge after the paper-aligned public release.
   explicit governed actor enforcement, `identity clear`, per-actor
   identity resolution, editor/provider mismatch checks, non-critical
   git-head scope narrowing, pre-push worktree-local git-head evidence
-  visibility, shared validator fixture contracts, and validator
-  duration budget reporting (`c589f1250`, with commit-level
-  git-head backfill in `f57dbfe0b`).
+  visibility, shared validator fixture contracts, validator duration
+  budget reporting, scoped git-lane prompt repair, and governance
+  repair git-head evidence backfill (`c589f1250`, `004802818`,
+  `f57dbfe0b`, `8006bb7e6`).
 
 ### Daily log
 
@@ -69,6 +70,8 @@ bridge after the paper-aligned public release.
   validator fixture contracts, and validator duration budget reporting.
 - Published fast-path verification and containment evidence and synced
   backlog / handoff governance records for the repair lane.
+- Repaired prompt guidance and scoped git lanes, then backfilled the
+  matching governance repair git-head evidence.
 
 #### 2026-06-27
 
