@@ -13,7 +13,7 @@ export default defineCommandSpec({
     options: [
         commonCwdOption,
         { flag: '--task', value: 'id', summary: 'Task ID to register or release.' },
-        { flag: '--actor', value: 'id', summary: 'Actor id for runtime activate.' },
+        { flag: '--actor', value: 'id', summary: 'Actor id for register payload parity checks or runtime activate.' },
         { flag: '--intent-file', value: 'path', summary: 'Path to WriteIntent JSON payload.' },
         { flag: '--ttl-seconds', value: 'number', summary: 'TTL lease duration in seconds for registering write intent.' },
         { flag: '--proposal-file', value: 'path', summary: 'Path to PatchProposal JSON payload. Repeatable for compose / steward.' },
@@ -29,7 +29,7 @@ export default defineCommandSpec({
         commonHelpOption
     ],
     examples: [
-        'node atm.mjs broker register --task TASK-GOV-0100 --intent-file intent.json --json',
+        'node atm.mjs broker register --task TASK-GOV-0100 --actor worker-1 --intent-file intent.json --json',
         'node atm.mjs broker decision --intent-file intent.json --json',
         'node atm.mjs broker status --json',
         'node atm.mjs broker release --task TASK-GOV-0100 --json',

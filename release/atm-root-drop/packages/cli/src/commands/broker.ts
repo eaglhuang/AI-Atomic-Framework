@@ -73,6 +73,7 @@ export async function runBroker(argv: string[]) {
     }
 
     const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8')) as WriteIntent;
+    assertBrokerRegisterCliParity(newIntent, options);
     let registry = cleanupStale(loadRegistry(registryPath));
     const decision = calculateBrokerDecision(newIntent, registry);
     const conflictMatrix = decision.conflictMatrix;
@@ -847,6 +848,41 @@ export async function runBroker(argv: string[]) {
   }
 
   throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+
+function assertBrokerRegisterCliParity(intent: WriteIntent, options: Pick<ParsedBrokerOptions, 'task' | 'actorId' | 'intentFile'>): void {
+  const mismatches: Array<{ field: 'taskId' | 'actorId'; cliValue: string; payloadValue: string }> = [];
+  if (options.task && intent.taskId !== options.task) {
+    mismatches.push({
+      field: 'taskId',
+      cliValue: options.task,
+      payloadValue: intent.taskId
+    });
+  }
+  if (options.actorId && intent.actorId !== options.actorId) {
+    mismatches.push({
+      field: 'actorId',
+      cliValue: options.actorId,
+      payloadValue: intent.actorId
+    });
+  }
+  if (mismatches.length === 0) {
+    return;
+  }
+  const mismatchSummary = mismatches
+    .map((entry) => `${entry.field}: CLI=${entry.cliValue} payload=${entry.payloadValue}`)
+    .join('; ');
+  throw new CliError(
+    'ATM_BROKER_REGISTER_PAYLOAD_FLAG_MISMATCH',
+    `broker register CLI flags do not match intent payload. ${mismatchSummary}`,
+    {
+      exitCode: 1,
+      details: {
+        intentFile: options.intentFile,
+        mismatches
+      }
+    }
+  );
 }
 
 function syncTeamRunRearbitrationSnapshots(

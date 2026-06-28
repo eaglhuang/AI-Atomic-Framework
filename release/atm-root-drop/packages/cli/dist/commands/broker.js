@@ -27,6 +27,7 @@ export async function runBroker(argv) {
             throw new CliError('ATM_FILE_NOT_FOUND', `Intent file not found: ${options.intentFile}`, { exitCode: 1 });
         }
         const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8'));
+        assertBrokerRegisterCliParity(newIntent, options);
         let registry = cleanupStale(loadRegistry(registryPath));
         const decision = calculateBrokerDecision(newIntent, registry);
         const conflictMatrix = decision.conflictMatrix;
@@ -705,6 +706,36 @@ export async function runBroker(argv) {
         });
     }
     throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+function assertBrokerRegisterCliParity(intent, options) {
+    const mismatches = [];
+    if (options.task && intent.taskId !== options.task) {
+        mismatches.push({
+            field: 'taskId',
+            cliValue: options.task,
+            payloadValue: intent.taskId
+        });
+    }
+    if (options.actorId && intent.actorId !== options.actorId) {
+        mismatches.push({
+            field: 'actorId',
+            cliValue: options.actorId,
+            payloadValue: intent.actorId
+        });
+    }
+    if (mismatches.length === 0) {
+        return;
+    }
+    const mismatchSummary = mismatches
+        .map((entry) => `${entry.field}: CLI=${entry.cliValue} payload=${entry.payloadValue}`)
+        .join('; ');
+    throw new CliError('ATM_BROKER_REGISTER_PAYLOAD_FLAG_MISMATCH', `broker register CLI flags do not match intent payload. ${mismatchSummary}`, {
+        exitCode: 1,
+        details: {
+            intentFile: options.intentFile,
+            mismatches
+        }
+    });
 }
 function syncTeamRunRearbitrationSnapshots(cwd, registry, triggerTaskId, triggerActorId) {
     const teamRunDir = path.join(cwd, '.atm', 'runtime', 'team-runs');
