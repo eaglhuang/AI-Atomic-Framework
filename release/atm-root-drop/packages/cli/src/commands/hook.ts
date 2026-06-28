@@ -1634,6 +1634,18 @@ function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly string[],
   const parentCommitShas = readCurrentHeadForFutureCommit(cwd);
   const generatedAt = new Date().toISOString();
   const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+  const existingMatch = findFutureCommitEvidenceMatchInWorktree(cwd, treeSha, parentCommitShas);
+  if (existingMatch) {
+    const addResult = runGit(cwd, ['add', '--', gitHeadEvidencePath]);
+    return {
+      evidencePath: gitHeadEvidencePath,
+      treeSha,
+      parentCommitShas,
+      gitAddExitCode: addResult.exitCode,
+      ok: addResult.exitCode === 0,
+      reusedExisting: true
+    };
+  }
   mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
   const payload = {
     schemaVersion: 'atm.gitHeadEvidence.v0.1',
@@ -1668,6 +1680,19 @@ function writeStagedGitHeadEvidence(cwd: string, stagedFiles: readonly string[],
     gitAddExitCode: addResult.exitCode,
     ok: addResult.exitCode === 0
   };
+}
+
+function findFutureCommitEvidenceMatchInWorktree(cwd: string, treeSha: string | null, parentCommitShas: readonly string[]) {
+  if (!treeSha) return null;
+  const records = readGitHeadEvidenceRecordsFromWorktree(cwd);
+  for (const record of records) {
+    const git = normalizeGitDetails(record?.details?.git);
+    if (!git) continue;
+    if (git.treeSha === treeSha && sameStringSet(git.parentCommitShas, parentCommitShas)) {
+      return git;
+    }
+  }
+  return null;
 }
 
 function readStagedTreeWithoutEvidence(cwd: string): string | null {

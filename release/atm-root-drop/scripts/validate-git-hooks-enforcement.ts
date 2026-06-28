@@ -281,6 +281,62 @@ try {
   assert(prePushAfterBackfill.status === 0, 'pre-push hook must accept worktree git-head evidence backfill for the current HEAD');
   assert(prePushAfterBackfillPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_OK'), 'pre-push hook must report ok after worktree backfill');
 
+  const governedWrapperRepo = path.join(tempRoot, 'governed-wrapper-same-commit-evidence');
+  mkdirSync(governedWrapperRepo, { recursive: true });
+  materializeValidatorFixture(root, governedWrapperRepo, fixture);
+  runGit(governedWrapperRepo, ['init']);
+  runGit(governedWrapperRepo, ['config', 'user.email', 'atm@example.invalid']);
+  runGit(governedWrapperRepo, ['config', 'user.name', 'ATM Hook Validator']);
+  assert(parsePayload(runCli(governedWrapperRepo, ['bootstrap', '--cwd', governedWrapperRepo, '--json'])).ok === true, 'governed wrapper fixture bootstrap must report ok=true');
+  assert(parsePayload(runCli(governedWrapperRepo, ['atm-chart', 'render', '--cwd', governedWrapperRepo, '--json'])).ok === true, 'governed wrapper fixture atm-chart render must report ok=true');
+  assert(parsePayload(runCli(governedWrapperRepo, ['welcome', '--cwd', governedWrapperRepo, '--json'])).ok === true, 'governed wrapper fixture welcome must report ok=true');
+  runGit(governedWrapperRepo, ['add', '.']);
+  runGit(governedWrapperRepo, ['commit', '--no-verify', '-m', 'initial wrapper baseline']);
+  const registerGovernedActor = parsePayload(runCli(governedWrapperRepo, [
+    'actor',
+    'register',
+    '--id',
+    'hook-validator',
+    '--kind',
+    'ai-agent',
+    '--name',
+    'Hook Validator',
+    '--git-name',
+    'Hook Validator',
+    '--git-email',
+    'hook-validator@example.com',
+    '--json'
+  ]));
+  assert(registerGovernedActor.ok === true, 'governed wrapper fixture actor register must report ok=true');
+  runGit(governedWrapperRepo, ['config', 'user.name', 'Hook Validator']);
+  runGit(governedWrapperRepo, ['config', 'user.email', 'hook-validator@example.com']);
+  runGit(governedWrapperRepo, ['add', '.atm/catalog/registry/actors.json']);
+  runGit(governedWrapperRepo, ['commit', '--no-verify', '-m', 'register governed wrapper actor']);
+  writeFileSync(path.join(governedWrapperRepo, 'packages', 'core', 'src', 'index.ts'), 'export const governedWrapperEvidence = true;\n', 'utf8');
+  runGit(governedWrapperRepo, ['add', 'packages/core/src/index.ts']);
+  const wrapperCommit = parsePayload(runCli(governedWrapperRepo, [
+    'git',
+    'commit',
+    '--cwd',
+    governedWrapperRepo,
+    '--actor',
+    'hook-validator',
+    '--message',
+    'feat: governed wrapper same-commit evidence',
+    '--json'
+  ]));
+  assert(wrapperCommit.ok === true, 'governed git wrapper critical commit must report ok=true');
+  const wrapperCommitSha = String(wrapperCommit.evidence?.commitSha ?? '');
+  assert(Boolean(wrapperCommitSha), 'governed git wrapper critical commit must return commitSha');
+  const wrapperTouchedPaths = String(runGit(governedWrapperRepo, ['show', '--pretty=', '--name-only', wrapperCommitSha]).stdout || '').trim().split(/\r?\n/).filter(Boolean);
+  assert(wrapperTouchedPaths.includes('packages/core/src/index.ts'), 'governed git wrapper critical commit must include the critical file');
+  assert(wrapperTouchedPaths.includes('.atm/history/evidence/git-head.jsonl'), 'governed git wrapper critical commit must include git-head evidence in the same commit');
+  const governedPrePush = parsePayload(runCli(governedWrapperRepo, ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true }));
+  assert(governedPrePush.ok === true, 'same-commit governed git-head evidence must satisfy pre-push without a backfill-only follow-up commit');
+  assert(parsePayload(runCli(governedWrapperRepo, ['git-hooks', 'install', '--framework-required', '--json'])).ok === true, 'governed wrapper fixture must install framework-required git hooks before doctor verification');
+  const governedDoctorAfterCommit = parsePayload(runCli(governedWrapperRepo, ['doctor', '--json']));
+  assert(governedDoctorAfterCommit.ok === true, 'doctor must stay green after same-commit governed git-head evidence');
+
   const legacyBaselineRepo = path.join(tempRoot, 'legacy-baseline-cut');
   mkdirSync(legacyBaselineRepo, { recursive: true });
   materializeValidatorFixture(root, legacyBaselineRepo, fixture);

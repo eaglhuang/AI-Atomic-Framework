@@ -87,7 +87,11 @@ for (const requiredText of [
   'dry-run proposal',
   'human review',
   'governanceReadiness',
-  'protected push'
+  'protected push',
+  'doctor --json',
+  'hook pre-push',
+  'queueRetryCodes',
+  'upstreamRef'
 ]) {
   assert(skill.includes(requiredText), `skill must include trigger/workflow text: ${requiredText}`);
 }
