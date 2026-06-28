@@ -139,13 +139,17 @@ function writeHistoricalRestorePacket(repo: string, taskId: string, status = 'do
 }
 
 const preCommitTemplate = readFileSync(path.join(root, 'templates', 'enforcement', 'pre-commit.sh'), 'utf8');
-assert(preCommitTemplate.includes('node atm.mjs atm-chart verify --json'), 'pre-commit enforcement template must verify ATMChart freshness');
-assert(preCommitTemplate.includes('node atm.mjs hook pre-commit --json'), 'pre-commit enforcement template must delegate to ATM hook pre-commit');
-assert(preCommitTemplate.includes('node atm.mjs tasks audit --json'), 'pre-commit enforcement template must audit task closure integrity');
-assert(preCommitTemplate.includes('node atm.mjs agent-pack verify-fresh --id "$pack_id" --json'), 'pre-commit enforcement template must verify installed agent-pack freshness');
+assert(preCommitTemplate.includes('runner="atm.mjs"'), 'pre-commit enforcement template must declare the stable-runner fallback');
+assert(preCommitTemplate.includes('runner="atm.dev.mjs"'), 'pre-commit enforcement template must allow source-first framework routing');
+assert(preCommitTemplate.includes('node "$runner" atm-chart verify --json'), 'pre-commit enforcement template must verify ATMChart freshness through the selected runner');
+assert(preCommitTemplate.includes('node "$runner" hook pre-commit --json'), 'pre-commit enforcement template must delegate to ATM hook pre-commit through the selected runner');
+assert(preCommitTemplate.includes('node "$runner" tasks audit --json'), 'pre-commit enforcement template must audit task closure integrity through the selected runner');
+assert(preCommitTemplate.includes('node "$runner" agent-pack verify-fresh --id "$pack_id" --json'), 'pre-commit enforcement template must verify installed agent-pack freshness through the selected runner');
 
 const examplePreCommit = readFileSync(path.join(root, 'examples', 'git-hooks-enforcement', 'hooks', 'pre-commit'), 'utf8');
-assert(examplePreCommit.includes('node atm.mjs hook pre-commit --json'), 'example pre-commit hook must use hook pre-commit command');
+assert(examplePreCommit.includes('runner="atm.mjs"'), 'example pre-commit hook must declare the stable-runner fallback');
+assert(examplePreCommit.includes('runner="atm.dev.mjs"'), 'example pre-commit hook must allow source-first framework routing');
+assert(examplePreCommit.includes('node "$runner" hook pre-commit --json'), 'example pre-commit hook must use hook pre-commit through the selected runner');
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-hooks-'));
 try {

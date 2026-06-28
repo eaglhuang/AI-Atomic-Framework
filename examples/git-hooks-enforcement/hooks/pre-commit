@@ -4,4 +4,9 @@ set -eu
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-node atm.mjs hook pre-commit --json
+runner="atm.mjs"
+if [ -f "atm.dev.mjs" ] && [ -f "packages/cli/src/atm.ts" ] && [ -f "packages/core/src/index.ts" ]; then
+  runner="atm.dev.mjs"
+fi
+
+node "$runner" hook pre-commit --json
