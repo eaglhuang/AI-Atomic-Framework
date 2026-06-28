@@ -1649,12 +1649,48 @@ function appendHistoricalBatchTaskEvidence(input) {
             commandRuns: input.validatorRuns
         }
     };
+    const reusableValidationPasses = uniqueStrings([
+        ...input.slice.taskSpecificValidationPasses,
+        ...input.slice.batchWideValidationPasses,
+        ...input.slice.advisoryValidationPasses
+    ]);
+    const freshValidatorAttestationRecord = reusableValidationPasses.length > 0 && input.validatorRuns.length > 0
+        ? {
+            evidenceKind: 'validation',
+            evidenceType: 'test',
+            summary: `Fresh validator attestation slice ${input.batchId} for ${input.slice.taskId}.`,
+            artifactPaths: [normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath))],
+            evidenceFreshness: 'fresh',
+            producedBy: input.actorId,
+            sessionId: null,
+            createdAt: input.nowIso,
+            details: {
+                actorId: input.actorId,
+                sessionId: null,
+                kind: 'test',
+                freshness: 'fresh',
+                validationPasses: reusableValidationPasses,
+                historicalBatchValidatorAttestation: {
+                    schemaId: 'atm.historicalBatchValidatorAttestation.v1',
+                    batchId: input.batchId,
+                    batchPath: normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath)),
+                    taskId: input.slice.taskId,
+                    taskSpecificValidationPasses: input.slice.taskSpecificValidationPasses,
+                    batchWideValidationPasses: input.slice.batchWideValidationPasses,
+                    advisoryValidationPasses: input.slice.advisoryValidationPasses
+                },
+                commandRuns: input.validatorRuns
+            }
+        }
+        : null;
     withTaskEvidenceWriteLock(input.cwd, input.slice.taskId, input.actorId, () => {
         const bundle = readEvidenceBundle(input.cwd, input.slice.taskId);
         const envelope = {
             taskId: input.slice.taskId,
             updatedAt: input.nowIso,
-            evidence: [...bundle.evidence, evidenceRecord]
+            evidence: freshValidatorAttestationRecord
+                ? [...bundle.evidence, evidenceRecord, freshValidatorAttestationRecord]
+                : [...bundle.evidence, evidenceRecord]
         };
         writeEvidenceEnvelope(evidencePath, envelope);
     });

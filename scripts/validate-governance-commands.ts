@@ -614,6 +614,75 @@ try {
   const stagedScopedCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable', '--json']);
   assert(stagedScopedCommit.exitCode === 0, 'git commit must succeed once scoped files are staged');
   assert(stagedScopedCommit.parsed.ok === true, 'staged scoped git commit must report ok=true');
+  assert(runGit(repo, ['reset']).exitCode === 0, 'framework auto-stage fixture must start with an empty index');
+
+  const frameworkClaimFiles = [
+    'packages/cli/src/commands/framework-auto-stage.ts',
+    'docs/governance/framework-auto-stage.md'
+  ];
+  const frameworkClaim = runAtm([
+    'framework-mode',
+    'claim',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--files',
+    frameworkClaimFiles.join(','),
+    '--reason',
+    'framework auto-stage governance regression fixture',
+    '--json'
+  ]);
+  assert(frameworkClaim.exitCode === 0, 'framework auto-stage fixture claim must exit 0');
+  mkdirSync(path.join(repo, 'packages', 'cli', 'src', 'commands'), { recursive: true });
+  writeFileSync(path.join(repo, frameworkClaimFiles[0]), 'export const frameworkAutoStage = true;\n', 'utf8');
+  mkdirSync(path.join(repo, 'release', 'atm-root-drop', 'packages', 'cli', 'src', 'commands'), { recursive: true });
+  writeFileSync(path.join(repo, 'release', 'atm-root-drop', 'packages', 'cli', 'src', 'commands', 'framework-auto-stage.ts'), 'export const frameworkAutoStage = true;\n', 'utf8');
+  mkdirSync(path.join(repo, 'release', 'atm-onefile'), { recursive: true });
+  writeFileSync(path.join(repo, 'release', 'atm-onefile', 'atm.mjs'), '#!/usr/bin/env node\nconsole.log("fixture");\n', 'utf8');
+  writeJson(path.join(repo, 'release', 'atm-root-drop', 'release-manifest.json'), {
+    generatedFiles: ['release/atm-root-drop/packages/cli/src/commands/framework-auto-stage.ts']
+  });
+  writeJson(path.join(repo, 'release', 'atm-onefile', 'release-manifest.json'), {
+    generatedFiles: ['release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json']
+  });
+  const unstagedFrameworkCommit = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'feat: framework unstaged claim should block',
+    '--json'
+  ]);
+  assert(unstagedFrameworkCommit.exitCode === 1, 'framework claim commit without staging must exit 1');
+  assert(
+    unstagedFrameworkCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_FRAMEWORK_STAGING_REQUIRED',
+    `framework claim commit must return staging-required diagnostic (got ${String(unstagedFrameworkCommit.parsed.messages?.[0]?.code)})`
+  );
+  const frameworkAutoStageCommit = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'feat: framework auto-stage claim bundle',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert(frameworkAutoStageCommit.exitCode === 0, 'framework claim auto-stage commit must succeed');
+  const frameworkAutoStageSha = String(frameworkAutoStageCommit.parsed.evidence?.commitSha ?? '').trim();
+  assert(Boolean(frameworkAutoStageSha), 'framework claim auto-stage commit must return a commit sha');
+  const frameworkAutoStageTouched = runGit(repo, ['show', '--name-only', '--pretty=format:', frameworkAutoStageSha]).stdout
+    .split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  assert(frameworkAutoStageTouched.includes(frameworkClaimFiles[0]), 'framework auto-stage commit must include the claimed source file');
+  assert(frameworkAutoStageTouched.includes('release/atm-root-drop/packages/cli/src/commands/framework-auto-stage.ts'), 'framework auto-stage commit must include the mirrored root-drop artifact');
+  assert(frameworkAutoStageTouched.includes('release/atm-onefile/atm.mjs'), 'framework auto-stage commit must include generated onefile artifact');
+  assert(frameworkAutoStageTouched.includes('.atm/history/evidence/git-head.jsonl'), 'framework auto-stage commit must still include git-head evidence');
 
   writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "safe-residue";\n', 'utf8');
   writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl'), '{"fixture":true}\n', 'utf8');

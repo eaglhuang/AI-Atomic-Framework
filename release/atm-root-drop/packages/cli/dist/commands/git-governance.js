@@ -885,6 +885,34 @@ function runGitCommit(options) {
             });
         }
     }
+    const autoStagedFrameworkPaths = options.taskId === null && options.autoStage
+        ? autoStageFrameworkClaimFiles(options.cwd, actorId)
+        : [];
+    if (options.taskId === null) {
+        const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId);
+        if (frameworkStagingInspection?.kind === 'staging-required') {
+            throw new CliError('ATM_GIT_COMMIT_FRAMEWORK_STAGING_REQUIRED', 'git commit found unstaged framework-claim changes; stage the claimed files (and derived release artifacts) before the wrapper can create a governed commit.', {
+                exitCode: 1,
+                details: {
+                    actorId,
+                    inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
+                    skippedExternalDirtyFiles: frameworkStagingInspection.skippedExternalDirtyFiles,
+                    requiredCommand: frameworkStagingInspection.requiredCommand,
+                    autoStageCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --message ${quoteCliValue(options.message)} --auto-stage --json`
+                }
+            });
+        }
+        if (frameworkStagingInspection?.kind === 'mixed-scope') {
+            throw new CliError('ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS', 'git commit found unstaged framework-claim changes mixed with already staged out-of-claim files; stage only the claim scope or reset the foreign staged files before retrying.', {
+                exitCode: 1,
+                details: {
+                    actorId,
+                    inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
+                    outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles
+                }
+            });
+        }
+    }
     const trailers = [
         `ATM-Actor: ${actorId}`,
         ...(options.taskId ? [`ATM-Task: ${options.taskId}`] : []),
@@ -968,7 +996,8 @@ function runGitCommit(options) {
                         actorId,
                         taskId: options.taskId,
                         stagedCommitSurface,
-                        autoStagedActorRegistryPath
+                        autoStagedActorRegistryPath,
+                        autoStagedFrameworkPaths
                     }
                 });
             }
@@ -1965,6 +1994,110 @@ function resolveTaskDeclaredScope(cwd, taskId, taskDocument) {
         ...extractStringList(taskDocument.targetAllowedFiles),
         ...extractTaskDeclaredFiles(taskDocument)
     ]));
+}
+function frameworkTempTaskId(actorId) {
+    const normalized = actorId.trim().replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+    return `ATM-FRAMEWORK-TEMP-${normalized || 'actor'}`;
+}
+function readActiveFrameworkClaimFiles(cwd, actorId) {
+    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${frameworkTempTaskId(actorId)}.lock.json`);
+    if (!existsSync(lockPath)) {
+        return [];
+    }
+    try {
+        const parsed = JSON.parse(readFileSync(lockPath, 'utf8'));
+        return extractStringList(parsed.files).map(normalizeRelativePath);
+    }
+    catch {
+        return [];
+    }
+}
+function readReleaseGeneratedArtifactPaths(cwd) {
+    const generated = new Set();
+    for (const manifestPath of [
+        path.join(cwd, 'release', 'atm-root-drop', 'release-manifest.json'),
+        path.join(cwd, 'release', 'atm-onefile', 'release-manifest.json')
+    ]) {
+        if (!existsSync(manifestPath))
+            continue;
+        try {
+            const parsed = JSON.parse(readFileSync(manifestPath, 'utf8'));
+            for (const entry of extractStringList(parsed.generatedFiles)) {
+                generated.add(normalizeRelativePath(entry));
+            }
+        }
+        catch {
+            // Ignore malformed manifests and fall back to direct claim matching only.
+        }
+    }
+    return generated;
+}
+function isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts) {
+    const normalized = normalizeRelativePath(filePath);
+    if (claimedFiles.has(normalized)) {
+        return true;
+    }
+    for (const claimedFile of claimedFiles) {
+        if (normalized === `release/atm-root-drop/${claimedFile}`) {
+            return true;
+        }
+    }
+    return releaseGeneratedArtifacts.has(normalized) && claimedFiles.size > 0;
+}
+function isIgnorableFrameworkCommitStagingSideEffect(filePath) {
+    const normalized = normalizeRelativePath(filePath).toLowerCase();
+    if (normalized === gitHeadEvidencePaths.legacyJson || normalized === gitHeadEvidencePaths.jsonl) {
+        return true;
+    }
+    return isIgnorableTaskScopedDirtySideEffect(filePath);
+}
+function autoStageFrameworkClaimFiles(cwd, actorId) {
+    const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
+    if (claimedFiles.size === 0) {
+        return [];
+    }
+    const stagedFiles = new Set(readStagedFiles(cwd));
+    const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
+    const candidates = uniqueSorted(listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => !stagedFiles.has(filePath)
+        && !isIgnorableFrameworkCommitStagingSideEffect(filePath)
+        && isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+    if (candidates.length > 0) {
+        runGitCommand(cwd, ['add', '-A', '--', ...candidates], ['ignore', 'pipe', 'pipe']);
+    }
+    return candidates;
+}
+function inspectFrameworkScopedUnstagedCommit(cwd, actorId) {
+    const claimedFiles = new Set(readActiveFrameworkClaimFiles(cwd, actorId));
+    if (claimedFiles.size === 0) {
+        return null;
+    }
+    const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(cwd);
+    const stagedFiles = readStagedFiles(cwd);
+    const dirtyFiles = listTaskScopedWorktreeDirtyFiles(cwd).filter((filePath) => !isIgnorableTaskScopedDirtySideEffect(filePath));
+    if (dirtyFiles.length === 0 && stagedFiles.length === 0) {
+        return null;
+    }
+    const inScopeDirtyFiles = uniqueSorted(dirtyFiles.filter((filePath) => isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+    const unstagedInScopeDirtyFiles = inScopeDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
+    if (unstagedInScopeDirtyFiles.length === 0) {
+        return null;
+    }
+    const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isIgnorableFrameworkCommitStagingSideEffect(filePath)
+        && !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts));
+    if (outOfScopeStagedFiles.length > 0) {
+        return {
+            kind: 'mixed-scope',
+            inScopeDirtyFiles: uniqueSorted(unstagedInScopeDirtyFiles),
+            outOfScopeStagedFiles: uniqueSorted(outOfScopeStagedFiles)
+        };
+    }
+    const skippedExternalDirtyFiles = uniqueSorted(dirtyFiles.filter((filePath) => !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)));
+    return {
+        kind: 'staging-required',
+        inScopeDirtyFiles: uniqueSorted(inScopeDirtyFiles),
+        skippedExternalDirtyFiles,
+        requiredCommand: buildTaskScopedStagingRequiredCommand(cwd, inScopeDirtyFiles)
+    };
 }
 function listTaskScopedWorktreeDirtyFiles(cwd) {
     const files = new Set();

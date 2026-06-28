@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { categorizeHistoricalCommitFiles, detectHistoricalDeliveryCommit, inspectHistoricalDelivery, readPlanningCardDeliveryCommit } from '../historical-delivery.js';
-import { runEvidence } from '../../evidence.js';
+import { runEvidence, verifyTaskEvidence } from '../../evidence.js';
 import { createClaimRecord } from '../task-ledger-readers.js';
 import { upsertActorWorkSession } from '../../actor-session.js';
 function fail(message) {
@@ -177,7 +177,7 @@ try {
     assert(batchPath.includes(path.join('.atm', 'history', 'evidence', 'historical-batches')), 'historical batch path must be under historical-batches');
     const taskEvidencePath = path.join(repo, '.atm', 'history', 'evidence', 'TASK-HIST.json');
     const taskEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8'));
-    const record = taskEvidence.evidence?.[0];
+    const record = taskEvidence.evidence?.find((entry) => entry.summary === `Historical batch evidence ${batchResult.evidence.batchId} for TASK-HIST.`);
     assert(record?.evidenceFreshness === 'historical-reference', 'task slice must be historical-reference');
     assert(record?.details?.historicalBatch?.batchId, 'task slice must reference historical batch id');
     assert(record?.details?.historicalBatch?.matchedFiles?.includes('src/task-owned.ts'), 'task slice must keep matched files');
@@ -187,6 +187,18 @@ try {
     assertEqual(record?.details?.historicalBatch?.okToCloseTask, true, 'complete slice with satisfied validator must be close-ready');
     assertEqual(record?.details?.historicalBatch?.atomHealthClaims?.length, 2, 'owner atom and map update must both leave health claims');
     assert(record?.details?.historicalBatch?.atomHealthClaims?.every((entry) => entry.generatedByTask === true && entry.validatorHealthy === true), 'atom health claims must be healthy when validators pass');
+    const freshAttestation = taskEvidence.evidence?.find((entry) => entry.summary === `Fresh validator attestation slice ${batchResult.evidence.batchId} for TASK-HIST.`);
+    assertEqual(freshAttestation?.evidenceFreshness, 'fresh', 'historical batch must also emit a fresh validator attestation slice');
+    assertDeepEqual(freshAttestation?.details?.validationPasses, ['git diff --check'], 'fresh attestation slice must preserve reusable validator passes');
+    const closeEvidenceGate = verifyTaskEvidence({
+        cwd: repo,
+        taskId: 'TASK-HIST',
+        gate: 'close',
+        taskDocument: JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-HIST.json'), 'utf8')),
+        taskDeclaredFiles: ['src/task-owned.ts'],
+        frameworkTask: false
+    });
+    assertEqual(closeEvidenceGate.ok, true, 'fresh attestation slice must satisfy close evidence without rerunning validators');
     const genericEvidenceResult = await runEvidence([
         'add',
         '--cwd', repo,
