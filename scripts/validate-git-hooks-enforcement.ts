@@ -193,6 +193,23 @@ try {
   const governedCommit = runGit(repo, ['commit', '--no-verify', '-m', 'governed docs change']);
   assert(governedCommit.status === 0, 'governed commit must succeed after explicit hook validation');
 
+  writeFileSync(path.join(repo, 'foreign-residue.txt'), 'foreign governance residue\n', 'utf8');
+  runGit(repo, ['add', 'foreign-residue.txt']);
+  writeHistoricalRestorePacket(repo, 'TASK-HOOK-FOREIGN-0001');
+  const foreignResidueHook = parsePayload(runCli(repo, ['hook', 'pre-commit', '--json'], { allowFailure: true }));
+  assert(foreignResidueHook.ok === false, 'pre-commit must fail closed on foreign governance residue');
+  const hookBlockingFindings = foreignResidueHook.evidence?.blockingFindings ?? [];
+  assert(hookBlockingFindings.some((entry: any) => entry.code === 'ATM_HOOK_GENERATED_RESIDUE_BLOCKED'), 'foreign governance residue must use the dedicated hook blocked code');
+  const hookResiduePaths = hookBlockingFindings.map((entry: any) => String(entry.file ?? entry.path ?? ''));
+  assert(hookResiduePaths.includes('.atm/history/evidence/TASK-HOOK-FOREIGN-0001.closure-packet.json'), 'hook residue diagnostics must report the foreign closure packet');
+  assert(hookResiduePaths.some((entry: string) => entry.startsWith('.atm/history/task-events/TASK-HOOK-FOREIGN-0001/')), 'hook residue diagnostics must report the foreign task-event residue');
+  runGit(repo, ['reset', '--', 'foreign-residue.txt']);
+  rmSync(path.join(repo, 'foreign-residue.txt'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-HOOK-FOREIGN-0001.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-HOOK-FOREIGN-0001.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-HOOK-FOREIGN-0001.closure-packet.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'task-events', 'TASK-HOOK-FOREIGN-0001'), { recursive: true, force: true });
+
   writeFileSync(path.join(repo, 'packages', 'core', 'src', 'index.ts'), 'export const foreignStagedCritical = true;\n', 'utf8');
   runGit(repo, ['add', 'packages/core/src/index.ts']);
   writeFileSync(path.join(repo, 'docs', 'pathspec-rescue.md'), 'pathspec rescue\n', 'utf8');
@@ -386,6 +403,9 @@ try {
   });
   assert(restoreHook.status === 0, 'pre-commit hook must accept a complete done historical ledger restore packet without a fake legacy session');
   runGit(closureRepo, ['reset', '--mixed', 'HEAD']);
+  for (const restoreHookFile of restoreHookFiles) {
+    rmSync(path.join(closureRepo, restoreHookFile), { recursive: true, force: true });
+  }
 
   const reconcileIdentity = parsePayload(runCli(closureRepo, ['identity', 'set', '--cwd', closureRepo, '--actor', 'fixture-agent', '--git-name', 'Fixture Agent', '--git-email', 'fixture-agent@example.com', '--json']));
   assert(reconcileIdentity.ok === true, 'reconcile close-commit-window hook fixture identity must be configurable');

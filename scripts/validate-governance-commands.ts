@@ -610,6 +610,22 @@ try {
   assert(existsSync(unknownResidueSnapshot), 'manual-review residue must remain on disk for operator inspection');
   rmSync(unknownResidueSnapshot, { force: true });
 
+  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "foreign-governance-residue";\n', 'utf8');
+  const foreignCloseResidue = writeHistoricalRestorePacket(repo, 'TASK-FOREIGN-RESIDUE-0001');
+  const foreignGovernanceResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: foreign governance residue', '--auto-stage', '--json']);
+  assert(foreignGovernanceResidueCommit.exitCode === 1, 'git commit must fail closed on foreign close residue history artifacts');
+  assert(foreignGovernanceResidueCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED', 'foreign close residue must use the dedicated blocked code');
+  const blockedResiduePaths = (foreignGovernanceResidueCommit.parsed.messages?.[0]?.data?.commitBundle?.blockedResidue ?? []).map((entry: any) => String(entry.path ?? ''));
+  assert(blockedResiduePaths.includes('.atm/history/evidence/TASK-FOREIGN-RESIDUE-0001.closure-packet.json'), 'foreign close residue must report the foreign closure packet');
+  assert(blockedResiduePaths.some((entry: string) => entry.startsWith('.atm/history/task-events/TASK-FOREIGN-RESIDUE-0001/')), 'foreign close residue must report the foreign transition event');
+  assert(existsSync(path.join(repo, foreignCloseResidue[2]!)), 'foreign closure packet residue must remain on disk for explicit cleanup');
+  assert(existsSync(path.join(repo, foreignCloseResidue[3]!)), 'foreign task-event residue must remain on disk for explicit cleanup');
+  assert(runGit(repo, ['restore', '--staged', '--worktree', '--source=HEAD', '--', stagingScopedFile]).exitCode === 0, 'foreign governance residue fixture must restore staged deliverable state after fail-closed validation');
+  rmSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-FOREIGN-RESIDUE-0001.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-FOREIGN-RESIDUE-0001.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-FOREIGN-RESIDUE-0001.closure-packet.json'), { force: true });
+  rmSync(path.join(repo, '.atm', 'history', 'task-events', 'TASK-FOREIGN-RESIDUE-0001'), { recursive: true, force: true });
+
   const governedFile = path.join(repo, 'notes', 'governance.txt');
   mkdirSync(path.dirname(governedFile), { recursive: true });
   writeFileSync(governedFile, 'governance fixture\n', 'utf8');
