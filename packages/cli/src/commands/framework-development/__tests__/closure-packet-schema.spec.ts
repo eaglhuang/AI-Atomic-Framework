@@ -106,6 +106,7 @@ try {
   writeFileSync(
     path.join(auditRoot, 'docs', 'governance', 'atm-bug-and-optimization-backlog.md'),
     '# ATM Bug and Optimization Backlog\n\n'
+      + 'status: **all completed**\n\n'
       + '| ID | Evidence |\n| --- | --- |\n'
       + '| ATM-BUG-TEST | Reproduced with `node atm.mjs next --claim --prompt "[SKL batch execution prompt omitted for audit safety]" --json`. |\n'
   );
@@ -114,14 +115,14 @@ try {
     '# Closeout\n\nstatus: **all completed**\n'
   );
   writeFileSync(
-    path.join(auditRoot, 'docs', 'governance', 'completion-notes.md'),
+    path.join(auditRoot, 'docs', 'governance', 'completion-report.md'),
     '# Governance Notes\n\nstatus: **all completed**\n'
   );
   const audit = auditTasks(auditRoot);
   const completionFindings = audit.findings.filter((entry) => entry.code === 'ATM_TASK_AUDIT_COMPLETION_REPORT_UNVERIFIED');
   assert.deepEqual(
     completionFindings.map((entry) => entry.path),
-    ['docs/closeout-report.md']
+    ['docs/closeout-report.md', 'docs/governance/completion-report.md']
   );
 } finally {
   rmSync(auditRoot, { recursive: true, force: true });
