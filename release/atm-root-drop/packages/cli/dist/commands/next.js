@@ -12,6 +12,7 @@ import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { resolveActorId } from './actor-registry.js';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.js';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.js';
+import { describeBuildReleaseHygienePolicy } from '../../../../scripts/build-release-hygiene.ts';
 import { classifyTaskDelivery } from './task-intent.js';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/dist/broker/lifecycle.js';
 import { abandonTaskQueue, buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, writeTaskDirectionLock } from './task-direction.js';
@@ -230,6 +231,7 @@ function withRunnerMode(result, cwd) {
     return result;
 }
 function describeRunnerMode(cwd) {
+    const releaseHygienePolicy = describeBuildReleaseHygienePolicy();
     const root = path.resolve(cwd);
     const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
     const entrypoint = entrypointPath ? normalizeRelativePath(root, entrypointPath) : null;
@@ -241,14 +243,14 @@ function describeRunnerMode(cwd) {
         normalGovernanceCommand: 'node atm.mjs ...',
         sourceFirstCommand: 'node atm.dev.mjs ...',
         sourceFirstOnlyWhen: 'explicit source-first framework validation is requested for unbuilt source changes',
-        syncCommand: 'npm run build',
+        syncCommand: releaseHygienePolicy.runnerSyncCommand,
         frozenRunnerSources: [
             'release/atm-onefile/atm.mjs',
             'packages/cli/dist/atm.js'
         ],
         guidance: mode === 'source-first' || mode === 'source-import'
-            ? 'Use this only for explicit source-first framework validation. Run npm run build before release-like validation through node atm.mjs.'
-            : 'Use node atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run npm run build and rerun the frozen entrypoint.'
+            ? `Use this only for explicit source-first framework validation. Run ${releaseHygienePolicy.runnerSyncCommand} before release-like validation through node atm.mjs.`
+            : `Use node atm.mjs for normal governance routing. If ATM_RUNNER_SYNC_REQUIRED appears, run ${releaseHygienePolicy.runnerSyncCommand} and rerun the frozen entrypoint.`
     };
 }
 function classifyRunnerMode(entrypoint) {
@@ -1069,6 +1071,7 @@ function buildPromptScopedNextResult(input) {
     }
     if (promptScope.status === 'not-found') {
         const planningRootMissing = input.importedTaskQueue.planningRootMissing ?? null;
+        const nonPlaybookHints = buildNonPlaybookRouteHints(input.cwd, input.taskIntent?.userPrompt ?? '');
         const nextAction = {
             status: planningRootMissing ? 'planning-root-missing' : 'task-scope-not-found',
             command: planningRootMissing?.requiredCommand ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
@@ -1077,7 +1080,8 @@ function buildPromptScopedNextResult(input) {
             candidates: [],
             planningRootMissing,
             allowedCommands: allowedGuidanceBootstrapCommands(),
-            blockedCommands: blockedMutationCommands()
+            blockedCommands: blockedMutationCommands(),
+            ...nonPlaybookHints
         };
         return makeResult({
             ok: false,
@@ -1662,7 +1666,8 @@ function buildPromptGuidanceNextResult(input) {
         recommendedChannel: null,
         riskLevel: 'medium',
         allowedCommands: allowedGuidanceBootstrapCommands(),
-        blockedCommands: blockedMutationCommands()
+        blockedCommands: blockedMutationCommands(),
+        ...buildNonPlaybookRouteHints(input.cwd, prompt)
     };
     const userNotice = buildFirstUseUserNotice(nextAction);
     return makeResult({
@@ -2812,6 +2817,95 @@ function listPendingGitFiles(cwd) {
     const { stagedOrTracked, untracked } = listPendingGitFilesByKind(cwd);
     return uniqueSorted([...stagedOrTracked, ...untracked]);
 }
+function listIgnoredArtifactCandidates(cwd) {
+    const artifactRoots = ['artifacts', 'reports', 'atomic_workbench/evidence', 'atomic_workbench/reports'];
+    const result = spawnSync('git', ['ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '--', ...artifactRoots], {
+        cwd,
+        encoding: 'utf8'
+    });
+    if (result.status !== 0)
+        return [];
+    return uniqueSorted(result.stdout
+        .split(/\r?\n/)
+        .map((entry) => normalizeOptionalTaskPath(entry))
+        .filter((entry) => Boolean(entry)));
+}
+function isPromptGeneratedArtifactPath(filePath) {
+    const normalized = normalizeOptionalTaskPath(filePath)?.replace(/\\/g, '/') ?? '';
+    if (!normalized)
+        return false;
+    return normalized.startsWith('artifacts/')
+        || normalized.startsWith('reports/')
+        || normalized.startsWith('atomic_workbench/evidence/')
+        || normalized.startsWith('atomic_workbench/reports/');
+}
+function buildPromptWorktreeHint(cwd, prompt) {
+    const { stagedOrTracked, untracked } = listPendingGitFilesByKind(cwd);
+    const ignoredArtifacts = listIgnoredArtifactCandidates(cwd);
+    const promptPathHints = extractPathLikeStringsFromText(prompt);
+    const promptMatchedFiles = new Set();
+    const atmManagedFiles = new Set();
+    const generatedArtifactFiles = new Set();
+    const releaseMirrorFiles = new Set();
+    const unrelatedTrackedFiles = new Set();
+    const unrelatedUntrackedFiles = new Set();
+    const matchesPromptHint = (filePath) => promptPathHints.some((hint) => filePath === hint
+        || filePath.startsWith(`${hint}/`)
+        || hint.startsWith(`${filePath}/`));
+    const classify = (filePath, tracked) => {
+        if (matchesPromptHint(filePath)) {
+            promptMatchedFiles.add(filePath);
+            return;
+        }
+        if (filePath.startsWith('.atm/')) {
+            atmManagedFiles.add(filePath);
+            return;
+        }
+        if (filePath.startsWith('release/')) {
+            releaseMirrorFiles.add(filePath);
+            return;
+        }
+        if (isPromptGeneratedArtifactPath(filePath)) {
+            generatedArtifactFiles.add(filePath);
+            return;
+        }
+        (tracked ? unrelatedTrackedFiles : unrelatedUntrackedFiles).add(filePath);
+    };
+    stagedOrTracked.forEach((filePath) => classify(filePath, true));
+    untracked.forEach((filePath) => classify(filePath, false));
+    return {
+        schemaId: 'atm.promptWorktreeHint.v1',
+        promptPathHints,
+        promptMatchedFiles: uniqueSorted([...promptMatchedFiles]),
+        atmManagedFiles: uniqueSorted([...atmManagedFiles]),
+        generatedArtifactFiles: uniqueSorted([...generatedArtifactFiles]),
+        releaseMirrorFiles: uniqueSorted([...releaseMirrorFiles]),
+        unrelatedTrackedFiles: uniqueSorted([...unrelatedTrackedFiles]),
+        unrelatedUntrackedFiles: uniqueSorted([...unrelatedUntrackedFiles]),
+        ignoredArtifactCount: ignoredArtifacts.length,
+        note: 'No task scope is active yet. Prompt-matched files are only hints; every other dirty bucket stays advisory until ATM selects a governed route or task.'
+    };
+}
+function buildIgnoredArtifactForceAddHints(cwd) {
+    return listIgnoredArtifactCandidates(cwd).map((filePath) => ({
+        path: filePath,
+        requiredCommand: `git add -f -- ${quoteCliValue(filePath)}`,
+        reason: 'This path is currently hidden by .gitignore; use force-add only if it is the intended deliverable for the selected route.'
+    }));
+}
+function buildNonPlaybookRouteHints(cwd, prompt) {
+    return {
+        playbookState: 'absent',
+        structuredOutputHint: {
+            schemaId: 'atm.nextStructuredOutputHint.v1',
+            hasPlaybook: false,
+            treatCliJsonAs: 'structured-tool-guidance',
+            followNextActionField: 'evidence.nextAction.command'
+        },
+        ignoredArtifactForceAddHints: buildIgnoredArtifactForceAddHints(cwd),
+        promptWorktreeHint: buildPromptWorktreeHint(cwd, prompt)
+    };
+}
 function listTaskCardFiles(cwd) {
     const output = new Set();
     for (const filePath of listRootLevelTaskCardFiles(cwd)) {
@@ -3636,6 +3730,31 @@ function buildNextMessages(nextAction, userNotice, integrationBootstrap, runtime
                 playbookChannel: 'normal'
             }));
         }
+    }
+    else if (nextAction.playbookState === 'absent') {
+        messages.push(message('info', 'ATM_NEXT_PLAYBOOK_ABSENT', 'This route has no channel playbook. Treat the CLI JSON as structured ATM guidance and follow evidence.nextAction.command as the single next action before mutating files.', nextAction.structuredOutputHint ?? {
+            schemaId: 'atm.nextStructuredOutputHint.v1',
+            hasPlaybook: false,
+            treatCliJsonAs: 'structured-tool-guidance',
+            followNextActionField: 'evidence.nextAction.command'
+        }));
+    }
+    if ((nextAction.ignoredArtifactForceAddHints?.length ?? 0) > 0) {
+        messages.push(message('warning', 'ATM_NEXT_IGNORED_ARTIFACT_FORCE_ADD_HINT', 'ATM found ignored artifact paths in the current worktree. If one of them is the intended deliverable for the selected route, force-add it explicitly instead of assuming normal git add will see it.', {
+            schemaId: 'atm.ignoredArtifactForceAddHints.v1',
+            hints: nextAction.ignoredArtifactForceAddHints
+        }));
+    }
+    const promptWorktreeHint = nextAction.promptWorktreeHint;
+    if (promptWorktreeHint
+        && (promptWorktreeHint.promptMatchedFiles.length > 0
+            || promptWorktreeHint.atmManagedFiles.length > 0
+            || promptWorktreeHint.generatedArtifactFiles.length > 0
+            || promptWorktreeHint.releaseMirrorFiles.length > 0
+            || promptWorktreeHint.unrelatedTrackedFiles.length > 0
+            || promptWorktreeHint.unrelatedUntrackedFiles.length > 0
+            || promptWorktreeHint.ignoredArtifactCount > 0)) {
+        messages.push(message('info', 'ATM_NEXT_WORKTREE_SCOPE_HINT', 'ATM classified current dirty files before task selection so you can distinguish prompt-matched hints from unrelated or generated residue.', promptWorktreeHint));
     }
     const deliveryPrinciple = nextAction.deliveryPrinciple
         ?? (nextAction.selectedTask || nextAction.selectedTasks ? buildTaskDeliveryPrinciple({ channel: nextAction.selectedTasks ? 'batch' : 'normal' }) : null);

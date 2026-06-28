@@ -1451,9 +1451,6 @@ function createSanitizedGitEnv(extra: Record<string, string> = {}): NodeJS.Proce
   for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
     delete env[key];
   }
-  if (!('GIT_INDEX_FILE' in extra)) {
-    delete env.GIT_INDEX_FILE;
-  }
   return env;
 }
 

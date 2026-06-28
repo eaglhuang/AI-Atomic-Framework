@@ -146,6 +146,18 @@ try {
   assert(chineseCandidateGuide.parsed.evidence?.routeIntent === 'legacy-candidate-ranking', 'Chinese candidate guide must route to candidate ranking');
   assert(String(chineseCandidateGuide.parsed.evidence?.nextCommand ?? '').includes('candidates rank'), 'Chinese candidate guide must recommend candidates rank');
 
+  const evidenceFollowupStart = await runAtmJsonPortable([
+    'start',
+    '--cwd',
+    adaptedRepo,
+    '--goal',
+    'backfill cross-agent review signature evidence artifact',
+    '--json'
+  ], root);
+  assert(evidenceFollowupStart.exitCode === 0, 'evidence/artifact follow-up start must exit 0');
+  assert(evidenceFollowupStart.parsed.evidence?.routeDecision?.recommendedRoute === 'docs-first', 'evidence/artifact follow-up start must not fall back to create-atom');
+  assert(String(evidenceFollowupStart.parsed.evidence?.routeDecision?.nextCommand ?? '').includes('guide overview'), 'evidence/artifact follow-up start must recommend docs-first guidance');
+
   const chineseStart = await runAtmJsonPortable([
     'start',
     '--cwd',

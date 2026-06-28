@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { runBatch } from '../packages/cli/src/commands/batch.ts';
 import { runNext } from '../packages/cli/src/commands/next.ts';
 import { runQuickfix } from '../packages/cli/src/commands/quickfix.ts';
@@ -12,6 +13,12 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
   }
+}
+
+function runGit(cwd: string, args: readonly string[]) {
+  const result = spawnSync('git', [...args], { cwd, encoding: 'utf8' });
+  assert(result.status === 0, `git ${args.join(' ')} must succeed\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
+  return result;
 }
 
 function assertDecisionTrail(action: any, expectedStatus: string) {
@@ -35,7 +42,7 @@ function assertRunnerMode(result: any) {
   assert(result?.evidence?.runnerMode?.schemaId === 'atm.runnerMode.v1', 'next evidence must expose runnerMode');
   assert(runnerMode.normalGovernanceCommand === 'node atm.mjs ...', 'runner mode must point normal governance to node atm.mjs');
   assert(runnerMode.sourceFirstCommand === 'node atm.dev.mjs ...', 'runner mode must point source validation to node atm.dev.mjs');
-  assert(runnerMode.syncCommand === 'npm run build', 'runner mode must preserve npm run build as the frozen sync command');
+  assert(runnerMode.syncCommand === 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build', 'runner mode must expose the retained frozen-runner sync command');
   assert(['frozen', 'source-first', 'source-import'].includes(runnerMode.mode), 'runner mode must classify known ATM entrypoints');
   assert(String(runnerMode.sourceFirstOnlyWhen).includes('explicit source-first framework validation'), 'runner mode must restrict source-first guidance to explicit validation');
 }
@@ -103,6 +110,17 @@ async function main() {
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0046-validator-baseline-noise-diagnostics.task.md'), 'TASK-AAO-0046', 'AAO validator noise diagnostics', {
       relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
     });
+
+    mkdirSync(path.join(tempRoot, 'release'), { recursive: true });
+    mkdirSync(path.join(tempRoot, 'notes'), { recursive: true });
+    writeFileSync(path.join(tempRoot, 'release', 'fixture.txt'), 'baseline release mirror\n', 'utf8');
+    writeFileSync(path.join(tempRoot, 'notes', 'unrelated.txt'), 'baseline unrelated file\n', 'utf8');
+    writeFileSync(path.join(tempRoot, '.gitignore'), 'artifacts/\n', 'utf8');
+    runGit(tempRoot, ['init']);
+    runGit(tempRoot, ['config', 'user.name', 'prompt-scope-validator']);
+    runGit(tempRoot, ['config', 'user.email', 'prompt-scope-validator@example.com']);
+    runGit(tempRoot, ['add', '.']);
+    runGit(tempRoot, ['commit', '-m', 'validator fixture baseline']);
 
     const exact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
@@ -599,8 +617,29 @@ scopePaths:
     const ambiguousTrail = assertDecisionTrail(ambiguous.evidence.nextAction as any, 'task-selection-required');
     assert(ambiguousTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'blocked'), 'ambiguous route decisionTrail must record selection requirement');
 
+    writeFileSync(path.join(tempRoot, 'release', 'fixture.txt'), 'dirty release mirror\n', 'utf8');
+    writeFileSync(path.join(tempRoot, 'notes', 'unrelated.txt'), 'dirty unrelated tracked file\n', 'utf8');
+    mkdirSync(path.join(tempRoot, 'atomic_workbench', 'evidence'), { recursive: true });
+    writeFileSync(path.join(tempRoot, 'atomic_workbench', 'evidence', 'route-hint.json'), '{"ok":true}\n', 'utf8');
+    mkdirSync(path.join(tempRoot, '.atm', 'runtime'), { recursive: true });
+    writeFileSync(path.join(tempRoot, '.atm', 'runtime', 'prompt-hint.json'), '{"runtime":true}\n', 'utf8');
+    mkdirSync(path.join(tempRoot, 'artifacts', 'generated', 'cross-agent-review-signature', '20260628'), { recursive: true });
+    writeFileSync(path.join(tempRoot, 'artifacts', 'generated', 'cross-agent-review-signature', '20260628', 'signature.json'), '{"signature":true}\n', 'utf8');
     const nonTaskPrompt = await runNext(['--cwd', tempRoot, '--prompt', 'Please show onboarding guidance']);
     assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'non-task prompt must route to prompt-scoped guidance');
+    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PLAYBOOK_ABSENT'), 'non-task prompt must state when no playbook exists');
+    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_IGNORED_ARTIFACT_FORCE_ADD_HINT'), 'non-task prompt must surface ignored artifact force-add hints');
+    assert(nonTaskPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_WORKTREE_SCOPE_HINT'), 'non-task prompt must surface dirty worktree classification hints');
+    const nonTaskNextAction = (nonTaskPrompt.evidence.nextAction as any) ?? {};
+    assert(nonTaskNextAction.playbookState === 'absent', 'non-task prompt must mark playbookState=absent');
+    assert(nonTaskNextAction.structuredOutputHint?.hasPlaybook === false, 'non-task prompt must expose structuredOutputHint.hasPlaybook=false');
+    assert(nonTaskNextAction.structuredOutputHint?.followNextActionField === 'evidence.nextAction.command', 'non-task prompt must point agents at evidence.nextAction.command');
+    assert((nonTaskNextAction.ignoredArtifactForceAddHints ?? []).some((entry: any) => String(entry.path).startsWith('artifacts/')), 'non-task prompt must hint ignored artifact force-add paths');
+    assert((nonTaskNextAction.promptWorktreeHint?.releaseMirrorFiles ?? []).includes('release/fixture.txt'), 'non-task prompt must classify release mirror dirty files');
+    assert((nonTaskNextAction.promptWorktreeHint?.unrelatedTrackedFiles ?? []).includes('notes/unrelated.txt'), 'non-task prompt must classify unrelated tracked dirty files');
+    assert((nonTaskNextAction.promptWorktreeHint?.generatedArtifactFiles ?? []).includes('atomic_workbench/evidence/route-hint.json'), 'non-task prompt must classify generated artifact dirty files');
+    assert((nonTaskNextAction.promptWorktreeHint?.atmManagedFiles ?? []).includes('.atm/runtime/prompt-hint.json'), 'non-task prompt must classify ATM-managed dirty files');
+    assert(nonTaskNextAction.promptWorktreeHint?.ignoredArtifactCount >= 1, 'non-task prompt must count ignored artifact candidates');
 
     const noPrompt = await runNext(['--cwd', tempRoot]);
     assert(noPrompt.ok === false, 'next without prompt must not proceed when non-bootstrap tasks exist');

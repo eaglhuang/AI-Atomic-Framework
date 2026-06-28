@@ -46,6 +46,21 @@ function runGit(cwd: string, args: string[]) {
   };
 }
 
+function sleepMs(ms: number) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function sampleGitStatusForPathUntilClear(cwd: string, filePath: string, attempts = 20, delayMs = 100) {
+  const samples: string[] = [];
+  for (let index = 0; index < attempts; index += 1) {
+    const sample = runGit(cwd, ['status', '--short', '--', filePath]).stdout;
+    samples.push(sample);
+    if (!sample) break;
+    sleepMs(delayMs);
+  }
+  return samples;
+}
+
 function sha256(buffer: Buffer | string) {
   return `sha256:${createHash('sha256').update(buffer).digest('hex')}`;
 }
@@ -390,6 +405,87 @@ try {
   assert(runGit(repo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'fixture actor registry must be stageable');
   assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: register fixture actor']).exitCode === 0, 'fixture actor registry commit must succeed');
 
+  const evidenceOnlyRepo = path.join(tempRoot, 'evidence-only-followup');
+  mkdirSync(evidenceOnlyRepo, { recursive: true });
+  assert(runGit(evidenceOnlyRepo, ['init']).exitCode === 0, 'evidence-only fixture git init must succeed');
+  assert(runGit(evidenceOnlyRepo, ['config', 'user.name', 'bootstrap']).exitCode === 0, 'evidence-only fixture git user.name must be configured');
+  assert(runGit(evidenceOnlyRepo, ['config', 'user.email', 'bootstrap@example.com']).exitCode === 0, 'evidence-only fixture git user.email must be configured');
+  const evidenceOnlyBootstrap = runAtm(['bootstrap', '--cwd', evidenceOnlyRepo, '--task', 'Bootstrap evidence-only follow-up fixture', '--json']);
+  assert(evidenceOnlyBootstrap.exitCode === 0, 'evidence-only fixture bootstrap must exit 0');
+  assert(evidenceOnlyBootstrap.parsed.ok === true, 'evidence-only fixture bootstrap must report ok=true');
+  assert(runGit(evidenceOnlyRepo, ['add', '.']).exitCode === 0, 'evidence-only fixture bootstrap files must be stageable');
+  assert(runGit(evidenceOnlyRepo, ['commit', '-m', 'chore: bootstrap evidence-only fixture']).exitCode === 0, 'evidence-only fixture bootstrap commit must succeed');
+  const evidenceOnlyRegisterActor = runAtm([
+    'actor',
+    'register',
+    '--cwd',
+    evidenceOnlyRepo,
+    '--id',
+    'fixture-agent',
+    '--kind',
+    'ai-agent',
+    '--name',
+    'Fixture Agent',
+    '--git-name',
+    'fixture-agent',
+    '--git-email',
+    'fixture-agent@example.com',
+    '--json'
+  ]);
+  assert(evidenceOnlyRegisterActor.exitCode === 0, 'evidence-only fixture actor register must exit 0');
+  assert(evidenceOnlyRegisterActor.parsed.ok === true, 'evidence-only fixture actor register must report ok=true');
+  assert(runGit(evidenceOnlyRepo, ['config', 'user.name', 'fixture-agent']).exitCode === 0, 'evidence-only fixture git user.name must match the registered actor');
+  assert(runGit(evidenceOnlyRepo, ['config', 'user.email', 'fixture-agent@example.com']).exitCode === 0, 'evidence-only fixture git user.email must match the registered actor');
+  assert(runGit(evidenceOnlyRepo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'evidence-only fixture actor registry must be stageable');
+  assert(runGit(evidenceOnlyRepo, ['commit', '--no-verify', '-m', 'chore: register evidence-only fixture actor']).exitCode === 0, 'evidence-only fixture actor registry commit must succeed');
+  const headBeforeBackfill = runGit(evidenceOnlyRepo, ['rev-parse', 'HEAD']).stdout;
+  assert(Boolean(headBeforeBackfill), 'evidence-only follow-up fixture must start from an existing HEAD commit');
+  const gitHeadBackfill = runAtm([
+    'evidence',
+    'git-head-backfill',
+    '--cwd',
+    evidenceOnlyRepo,
+    '--actor',
+    'fixture-agent',
+    '--reason',
+    'evidence-only follow-up residue regression',
+    '--json'
+  ]);
+  assert(gitHeadBackfill.exitCode === 0, 'git-head backfill fixture must exit 0');
+  assert(gitHeadBackfill.parsed.ok === true, 'git-head backfill fixture must report ok=true');
+  assert(runGit(evidenceOnlyRepo, ['diff', '--cached', '--name-only']).stdout.includes('.atm/history/evidence/git-head.jsonl'), 'git-head backfill fixture must stage git-head.jsonl');
+  const evidenceOnlyCommit = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    evidenceOnlyRepo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'chore(evidence): fixture git-head backfill follow-up',
+    '--json'
+  ]);
+  assert(evidenceOnlyCommit.exitCode === 0, 'evidence-only follow-up commit must exit 0');
+  assert(evidenceOnlyCommit.parsed.ok === true, 'evidence-only follow-up commit must report ok=true');
+  const evidenceOnlyCommitSha = String(evidenceOnlyCommit.parsed.evidence?.commitSha ?? '');
+  assert(Boolean(evidenceOnlyCommitSha), 'evidence-only follow-up commit must return a commit sha');
+  const evidenceOnlyChangedPaths = runGit(evidenceOnlyRepo, ['diff-tree', '--no-commit-id', '--name-only', '-r', evidenceOnlyCommitSha]).stdout
+    .split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  assert(
+    evidenceOnlyChangedPaths.length === 1 && evidenceOnlyChangedPaths[0] === '.atm/history/evidence/git-head.jsonl',
+    `evidence-only follow-up commit must only touch git-head.jsonl (got ${evidenceOnlyChangedPaths.join(', ')})`
+  );
+  const evidenceOnlyStatusSamples = sampleGitStatusForPathUntilClear(evidenceOnlyRepo, '.atm/history/evidence/git-head.jsonl');
+  assert(evidenceOnlyStatusSamples[evidenceOnlyStatusSamples.length - 1] === '', 'evidence-only follow-up commit git-head path must settle back to clean');
+  const transientDirtySamples = evidenceOnlyStatusSamples.filter((entry) => entry);
+  assert(
+    transientDirtySamples.every((entry) =>
+      entry.split(/\r?\n/).every((line) => line.includes('.atm/history/evidence/git-head.jsonl'))),
+    `evidence-only follow-up commit must not report unrelated dirty paths while git-head settles (samples: ${transientDirtySamples.join(' | ')})`
+  );
+  const coveredHeadRecord = readFileSync(path.join(evidenceOnlyRepo, '.atm', 'history', 'evidence', 'git-head.jsonl'), 'utf8');
+  assert(coveredHeadRecord.includes(headBeforeBackfill), 'git-head backfill evidence must continue to reference the covered pre-follow-up HEAD commit');
+
   const explicitIdentityPrepare = runAtm([
     'git',
     'prepare',
@@ -462,10 +558,13 @@ try {
   const outsideScopedFile = path.join(repo, 'notes', 'outside-scope-staging.txt');
   mkdirSync(path.dirname(outsideScopedFile), { recursive: true });
   writeFileSync(outsideScopedFile, 'outside scope\n', 'utf8');
+  assert(runGit(repo, ['add', 'notes/outside-scope-staging.txt']).exitCode === 0, 'mixed-scope diagnostics outside file must stage');
   const mixedScopedCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: mixed scope dirty tree', '--json']);
   assert(mixedScopedCommit.exitCode === 1, 'git commit with mixed-scope dirty files must exit 1');
   assert(mixedScopedCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS', 'git commit must fail closed for mixed-scope dirty trees');
-  assert(!mixedScopedCommit.parsed.messages?.[0]?.data?.requiredCommand, 'mixed-scope dirty tree must not fabricate a staging command');
+  assert(!mixedScopedCommit.parsed.messages?.[0]?.data?.requiredCommand, 'mixed-scope dirty tree must not fabricate a generic staging command');
+  const deferForeignStagedCommand = String(mixedScopedCommit.parsed.messages?.[0]?.data?.deferForeignStagedCommand ?? '');
+  assert(deferForeignStagedCommand.includes('--defer-foreign-staged'), 'mixed-scope dirty tree must recommend defer-foreign-staged remediation');
   rmSync(outsideScopedFile, { force: true });
   assert(runGit(repo, ['add', stagingScopedFile]).exitCode === 0, 'staging diagnostics scoped file must stage');
   const stagedScopedCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable', '--json']);

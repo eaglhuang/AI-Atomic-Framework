@@ -1,5 +1,105 @@
 # Changelog
 
+## [Unreleased] - 2026-06-28
+
+Post-paper mainline changes landed after `v0.9.0-alpha.1`.
+
+This section records adopter-visible behavior, release-surface fixes,
+new benchmark/evidence tracks, and the first shipped ATM skill growth
+bridge after the paper-aligned public release.
+
+### Added - skill/tool bridge and benchmark tracks
+
+- **Tool bridge result contract v1** plus follow-up operator bridge
+  fields for structured CLI-to-skill handoff (`feat(cli): add tool
+  bridge result contract v1`, TASK-SKL-0003 / 0004 follow-up delivery).
+- **SKL runtime pilot and growth observability** with tool-first
+  mirrors, schema artifacts, and frozen-runner lesson linking
+  (`47bc59982`, `772331930`, `7599e5580`).
+- **ATM AdmissionBench refresh** with rebuilt v0.2 source chain and
+  published v0.1 / v0.2 evidence bundles (`2088a791c`, `9a0c03e59`,
+  `ab8753b7d`).
+- **ATM OperationalBench** public overhead benchmark and supplementary
+  evidence publication (`85f2b2f92`, `5294c1bf9`, `f117997c9`).
+- **Structured artifact admission evidence track** plus fast-path
+  verification and containment evidence (`014ab0fb3`, `7a88af7d3`).
+
+### Changed - release and governance hardening
+
+- **Framework claim preflight in CI and release lanes** so required
+  framework governance gates fail earlier and more clearly
+  (`ee59316fc`).
+- **Sandbox self-hosting template tracking** for the Claude Code agent
+  pack (`a7928f4ad`).
+- **Paper quick-verify instructions** added to the public docs
+  (`a823febb4`).
+
+### Fixed - CLI, hook, evidence, and release behavior
+
+- **Completion report detector narrowing** so ordinary governance
+  backlog prose stops being treated like closeout evidence
+  (`efdb2373f`, `ae654da87`).
+- **Repo-local broker evidence path defaults** parameterized and
+  guarded by regression coverage (`28d474ee1`, `545c50aa5`).
+- **CLI onboarding validation fixture isolation** so `validate:cli`
+  no longer depends on polluted onboarding state (`abf028541`).
+- **Repo-selection environment sanitization** across wrapper and hook
+  lanes (`cd32407a9`).
+- **Actor identity and skill integration hardening** including
+  explicit governed actor enforcement, `identity clear`, per-actor
+  identity resolution, editor/provider mismatch checks, non-critical
+  git-head scope narrowing, pre-push worktree-local git-head evidence
+  visibility, shared validator fixture contracts, and validator
+  duration budget reporting (`c589f1250`, with commit-level
+  git-head backfill in `f57dbfe0b`).
+
+### Daily log
+
+#### 2026-06-28
+
+- Added paper quick-verify docs and isolated `validate:cli` onboarding
+  fixture resolution.
+- Sanitized repo-selection environment handling across ATM wrapper and
+  hook paths.
+- Merged the paper evidence fast path into `main`.
+- Shipped the identity / hook / validator / skill-template repair lane:
+  explicit actor governance, `identity clear`, per-actor identity
+  lookup, editor mismatch checks, pre-push worktree-local git-head
+  evidence visibility, non-critical git-head scope narrowing, shared
+  validator fixture contracts, and validator duration budget reporting.
+- Published fast-path verification and containment evidence and synced
+  backlog / handoff governance records for the repair lane.
+
+#### 2026-06-27
+
+- Added ATM OperationalBench public benchmark plus supplementary
+  evidence bundles.
+- Parameterized repo-local broker evidence path defaults and added
+  regression coverage.
+- Narrowed completion-report markdown detection to reduce false
+  governance blocks.
+- Integrated the SKL team-growth line into the framework main route.
+- Added structured artifact admission evidence and synchronized the
+  release-side completion detector narrowing.
+
+#### 2026-06-25
+
+- Added CI framework-claim preflight for required release gates.
+- Built and published ATM AdmissionBench v0.1 / v0.2 source and
+  evidence chains.
+- Fixed auto-matrix workflow YAML quoting and refreshed git-head
+  evidence around the release rerun lane.
+- Tracked Claude Code sandbox self-host templates for self-hosted
+  agent-pack installs.
+
+#### 2026-06-24
+
+- Completed the SKL tool-first bridge fields and runtime pilot.
+- Recorded SKL governance artifacts, closure evidence, and mirrored
+  runtime/schema outputs.
+- Linked the frozen-runner build lesson back into SKL runtime evidence
+  so the skill-growth layer captures the dogfood path.
+
 ## [0.9.0] — 2026-06-23 (paper-aligned first public release)
 
 First public release accompanying the arXiv preprint

@@ -7,6 +7,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 const onefileEntrypoint = path.join(root, 'release', 'atm-onefile', 'atm.mjs');
 const distEntrypoint = path.join(root, 'packages', 'cli', 'dist', 'atm.js');
+const runnerSyncCommand = 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build';
 
 if (existsSync(onefileEntrypoint)) {
   warnIfStableRunnerIsStale(root, onefileEntrypoint, process.argv.slice(2));
@@ -21,7 +22,7 @@ if (existsSync(onefileEntrypoint)) {
 if (!existsSync(distEntrypoint)) {
   console.error([
     'ATM stable runner is not built.',
-    'Run `npm run build` to refresh the frozen runner, or use `node atm.dev.mjs ...` for source-first framework development.'
+    `Run \`${runnerSyncCommand}\` to refresh the frozen runner, or use \`node atm.dev.mjs ...\` for source-first framework development.`
   ].join('\n'));
   process.exit(1);
 }
@@ -38,7 +39,7 @@ function warnIfStableRunnerIsStale(rootDir, runnerPath, cliArgs) {
   if (!newestSourceMtime || !runnerMtime || newestSourceMtime <= runnerMtime) return;
   console.error([
     'ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files.',
-    'Run `npm run build` before using the frozen runner, or use `node atm.dev.mjs ...` for source-first framework validation.'
+    `Run \`${runnerSyncCommand}\` before using the frozen runner, or use \`node atm.dev.mjs ...\` for source-first framework validation.`
   ].join('\n'));
 }
 

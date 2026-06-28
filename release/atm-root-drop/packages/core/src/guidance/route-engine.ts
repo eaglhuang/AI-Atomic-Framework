@@ -20,6 +20,13 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
   const lowerGoal = goal.toLowerCase();
   const evidence = input.evidence ?? {};
   const releaseBlockers = input.orientation.releaseBlockers;
+  const evidenceFollowupGoal = (
+    /\b(backfill|follow[- ]up|repair record|repair lane|signature)\b/.test(lowerGoal)
+    && /\b(evidence|artifact|git-head|review)\b/.test(lowerGoal)
+  ) || (
+    /\bcross-agent review\b/.test(lowerGoal)
+    && /\b(evidence|signature)\b/.test(lowerGoal)
+  );
 
   if (/import task plan|open task cards|load roadmap|task plan import|bulk task import|匯入任務|匯入計畫|匯入路線圖|從計畫.*?開卡|批次開卡|批次匯入任務/.test(lowerGoal)) {
     return buildDecision({
@@ -110,6 +117,17 @@ export function decideGuidanceRoute(input: RouteEngineInput): RouteDecision {
       requiredEvidence: ['hash-diff report', 'non-regression report', 'quality-comparison report', 'registry-candidate report'],
       blockedBy: releaseBlockers,
       nextCommand: 'node atm.mjs upgrade --propose --dry-run --json'
+    });
+  }
+
+  if (evidenceFollowupGoal) {
+    return buildDecision({
+      route: 'docs-first',
+      confidence: 0.84,
+      reasons: ['The goal looks like evidence/artifact follow-up work, so ATM should clarify route, scope, and evidence before defaulting to new atom birth.'],
+      requiredEvidence: ['current worktree classification', 'intended artifact/evidence command', 'follow-up validator or attestation evidence'],
+      blockedBy: releaseBlockers,
+      nextCommand: 'node atm.mjs guide overview --json'
     });
   }
 

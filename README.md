@@ -303,7 +303,7 @@ npm test
 Build and refresh distribution artifacts:
 
 ```bash
-npm run build
+ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build
 ```
 
 Run release-entry smoke checks:

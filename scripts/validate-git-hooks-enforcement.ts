@@ -189,6 +189,18 @@ try {
   const governedCommit = runGit(repo, ['commit', '--no-verify', '-m', 'governed docs change']);
   assert(governedCommit.status === 0, 'governed commit must succeed after explicit hook validation');
 
+  writeFileSync(path.join(repo, 'packages', 'core', 'src', 'index.ts'), 'export const foreignStagedCritical = true;\n', 'utf8');
+  runGit(repo, ['add', 'packages/core/src/index.ts']);
+  writeFileSync(path.join(repo, 'docs', 'pathspec-rescue.md'), 'pathspec rescue\n', 'utf8');
+  runGit(repo, ['add', 'docs/pathspec-rescue.md']);
+  const pathspecCommit = runGit(repo, ['commit', '-m', 'docs: pathspec rescue', '--', 'docs/pathspec-rescue.md'], { allowFailure: true });
+  assert(pathspecCommit.status === 0, `native pathspec commit must succeed without validating unrelated staged index entries\nstdout:\n${pathspecCommit.stdout || ''}\nstderr:\n${pathspecCommit.stderr || ''}`);
+  const pathspecTouched = String(runGit(repo, ['show', '--pretty=', '--name-only', 'HEAD']).stdout || '').trim().split(/\r?\n/).filter(Boolean);
+  assert(pathspecTouched.length === 1 && pathspecTouched[0] === 'docs/pathspec-rescue.md', `native pathspec commit must only land the requested pathspec surface (got ${pathspecTouched.join(', ')})`);
+  const remainingStaged = String(runGit(repo, ['diff', '--cached', '--name-only']).stdout || '').trim().split(/\r?\n/).filter(Boolean);
+  assert(remainingStaged.includes('packages/core/src/index.ts'), 'native pathspec commit must preserve unrelated staged files in the real index');
+  assert(!remainingStaged.includes('docs/pathspec-rescue.md'), 'native pathspec commit must not leave the committed pathspec file staged');
+
   const governedDoctor = parsePayload(runCli(repo, ['doctor', '--json']));
   assert(governedDoctor.ok === true, 'doctor must report ok=true after non-critical docs commit without git-head evidence');
   assert(governedDoctor.evidence?.checks?.some((entry: any) => entry.name === 'git-head-evidence' && entry.details?.status === 'not-required-non-critical-head'), 'doctor must classify docs-only HEAD evidence as not required');

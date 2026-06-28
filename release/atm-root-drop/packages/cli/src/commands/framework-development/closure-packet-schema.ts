@@ -20,6 +20,7 @@ import {
   type TaskLedgerPolicy
 } from '../task-ledger.ts';
 import { isAtmCriticalNonDocSurface, isDocOnlyPath } from './path-classification.ts';
+import { describeBuildReleaseHygienePolicy } from '../../../../../scripts/build-release-hygiene.ts';
 
 export type FrameworkMode = 'inactive' | 'suspected' | 'required' | 'cross-repo-target-required';
 export type ClosureAuthority = 'local' | 'target_repo' | 'none';
@@ -1591,7 +1592,8 @@ export function isRunnerSyncRequired(cwd: string): boolean {
 }
 
 export function runnerStaleWarningMessage(): string {
-  return 'ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files. Run `npm run build` before using the frozen runner, or use `node atm.dev.mjs ...` for source-first framework validation.';
+  const releaseHygienePolicy = describeBuildReleaseHygienePolicy();
+  return `ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files. Run \`${releaseHygienePolicy.runnerSyncCommand}\` before using the frozen runner, or use \`node atm.dev.mjs ...\` for source-first framework validation.`;
 }
 
 export function assertRunnerFreshForWriteAction(input: {
@@ -1599,6 +1601,7 @@ export function assertRunnerFreshForWriteAction(input: {
   readonly action: AtmTasksWriteAction;
   readonly allowStaleRunner: boolean;
 }): { readonly warning: string | null } {
+  const releaseHygienePolicy = describeBuildReleaseHygienePolicy();
   if (!isRunnerSyncRequired(input.cwd)) return { warning: null };
   if (input.allowStaleRunner) {
     return { warning: runnerStaleWarningMessage() };
@@ -1607,9 +1610,9 @@ export function assertRunnerFreshForWriteAction(input: {
     exitCode: 1,
     details: {
       action: input.action,
-      syncCommand: 'npm run build',
+      syncCommand: releaseHygienePolicy.runnerSyncCommand,
       sourceFirstCommand: 'node atm.dev.mjs ...',
-      remediation: 'Run npm run build before write actions through node atm.mjs, or pass --allow-stale-runner only for disaster recovery.'
+      remediation: `Run ${releaseHygienePolicy.runnerSyncCommand} before write actions through node atm.mjs, or pass --allow-stale-runner only for disaster recovery.`
     }
   });
 }
