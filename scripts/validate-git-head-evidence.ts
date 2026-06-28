@@ -228,6 +228,21 @@ try {
     if (originalGitPrefix === undefined) delete process.env.GIT_PREFIX;
     else process.env.GIT_PREFIX = originalGitPrefix;
   }
+
+  const bareMismatchRepo = path.join(tempRoot, 'bare-mismatch');
+  initGitRepo(bareMismatchRepo);
+  bootstrap(bareMismatchRepo);
+  writeFileSync(path.join(bareMismatchRepo, 'README.md'), '# Bare mismatch\n', 'utf8');
+  commitAll(bareMismatchRepo, 'initial');
+  runGit(bareMismatchRepo, ['config', '--local', 'core.bare', 'true']);
+  const bareMismatch = runAtmDoctor(bareMismatchRepo);
+  assert(bareMismatch.exitCode === 1, 'doctor must fail when a checked-out repo is misconfigured as bare');
+  assert(bareMismatch.parsed.ok === false, 'doctor must report ok=false for bare/worktree mismatch');
+  assert(bareMismatch.parsed.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_WORKTREE_BARE_MISMATCH'), 'doctor must emit a dedicated bare/worktree mismatch message');
+  assert(gitCheck(bareMismatch)?.details?.status === 'bare-worktree-mismatch', 'git-head-evidence must classify bare/worktree mismatch explicitly');
+  const readinessCheck = bareMismatch.parsed.evidence?.checks?.find((entry: any) => entry.name === 'git-worktree-readiness');
+  assert(readinessCheck?.ok === false, 'doctor git-worktree-readiness check must fail for bare/worktree mismatch');
+  assert(readinessCheck?.details?.recommendedFixCommand === 'git config --local core.bare false', 'doctor must recommend the local core.bare repair command');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -120,6 +120,18 @@ try {
   const frameworkGuard = runFrameworkDevelopmentGuard(frameworkRepo, ['packages/core/src/index.ts']);
   assert(frameworkGuard.ok === false, 'framework-development guard must fail without an active framework claim');
 
+  execFileSync('git', ['config', '--local', 'core.bare', 'true'], { cwd: frameworkRepo });
+  const bareMismatchStatus = createFrameworkModeStatus({ cwd: frameworkRepo, files: ['packages/core/src/index.ts'] });
+  assert(bareMismatchStatus.blockers.includes('git-worktree-readiness-failed'), 'framework-mode status must report git worktree readiness blocker for bare/worktree mismatch');
+  assert(bareMismatchStatus.gitWorktreeReadiness.status === 'bare-worktree-mismatch', 'framework-mode status must surface the bare/worktree mismatch classification');
+  try {
+    await runFrameworkMode(['claim', '--cwd', frameworkRepo, '--actor', 'test-agent', '--files', 'packages/core/src/index.ts', '--reason', 'bare mismatch regression', '--json']);
+    fail('framework-mode claim should fail closed when git worktree readiness is broken');
+  } catch (error) {
+    assert((error as any).code === 'ATM_GIT_WORKTREE_READY_REQUIRED', 'framework-mode claim must fail with ATM_GIT_WORKTREE_READY_REQUIRED for bare/worktree mismatch');
+  }
+  execFileSync('git', ['config', '--local', 'core.bare', 'false'], { cwd: frameworkRepo });
+
   const preToolBlock = runIntegrationHookInvocationInProcess(['pre-tool', '--cwd', frameworkRepo, '--editor', 'copilot', '--files', 'packages/core/src/index.ts']);
   assert(preToolBlock.ok === false, 'pre-tool hook must block critical framework edits without an active claim');
   assert(preToolBlock.messages.some((entry) => entry.code === 'ATM_INTEGRATION_PRE_TOOL_FRAMEWORK_CLAIM_REQUIRED'), 'pre-tool block must report the framework claim requirement');

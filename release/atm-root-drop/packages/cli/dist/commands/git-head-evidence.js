@@ -3,6 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { hasAtmCriticalNonDocSurface } from './framework-development/path-classification.js';
+import { inspectGitWorktreeReadiness } from './git-worktree-readiness.js';
 export const gitHeadEvidencePaths = {
     legacyJson: '.atm/history/evidence/git-head.json',
     jsonl: '.atm/history/evidence/git-head.jsonl'
@@ -10,6 +11,15 @@ export const gitHeadEvidencePaths = {
 export const gitHeadEvidencePath = gitHeadEvidencePaths.jsonl;
 export function createGitHeadEvidenceCheck(cwd, runtime) {
     const workTree = readGitWorkTree(cwd);
+    if (workTree.status === 'bare-worktree-mismatch') {
+        return createGitEvidenceDetails('bare-worktree-mismatch', {
+            workTreeRoot: workTree.root,
+            gitDir: workTree.gitDir,
+            localConfigLikely: workTree.localConfigLikely,
+            reason: workTree.reason,
+            recommendedFixCommand: workTree.recommendedFixCommand
+        }, false);
+    }
     if (!workTree.ok) {
         return createGitEvidenceDetails('not-git', {
             reason: workTree.reason
@@ -101,14 +111,29 @@ function hasAtmRuntime(cwd, runtime) {
         || existsSync(path.join(cwd, '.atm', 'runtime', 'current-task.json'));
 }
 function readGitWorkTree(cwd) {
-    const inside = runGit(cwd, ['rev-parse', '--is-inside-work-tree']);
-    if (!inside.ok || inside.stdout.trim() !== 'true') {
-        return { ok: false, reason: inside.stderr || inside.stdout || 'not a git worktree' };
+    const readiness = inspectGitWorktreeReadiness(cwd);
+    if (readiness.status === 'bare-worktree-mismatch') {
+        return {
+            ok: false,
+            status: readiness.status,
+            root: readiness.worktreeRoot,
+            gitDir: readiness.gitDir,
+            localConfigLikely: readiness.localConfigLikely,
+            reason: readiness.reason,
+            recommendedFixCommand: readiness.recommendedFixCommand
+        };
     }
-    const root = runGit(cwd, ['rev-parse', '--show-toplevel']);
+    if (readiness.status !== 'ready') {
+        return { ok: false, status: readiness.status, reason: readiness.reason || 'not a git worktree' };
+    }
     return {
         ok: true,
-        root: root.ok ? toPortablePath(root.stdout.trim()) : toPortablePath(cwd)
+        status: 'ready',
+        root: readiness.worktreeRoot ?? toPortablePath(cwd),
+        gitDir: readiness.gitDir,
+        localConfigLikely: readiness.localConfigLikely,
+        reason: readiness.reason,
+        recommendedFixCommand: readiness.recommendedFixCommand
     };
 }
 function readParentCommitShas(cwd) {

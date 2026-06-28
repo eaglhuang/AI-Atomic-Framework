@@ -7,6 +7,7 @@ import { runnerAffectingPatterns } from '../../../../core/dist/broker/atm-core-s
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom, resolveValue } from '../shared.js';
 import { createGitHeadEvidenceCheck, gitHeadEvidencePath, gitHeadEvidencePaths } from '../git-head-evidence.js';
+import { inspectGitWorktreeReadiness } from '../git-worktree-readiness.js';
 import { bootstrapTaskId, detectGovernanceRuntime } from '../governance-runtime.js';
 import { listActorWorkSessions } from '../actor-session.js';
 import { readActiveTaskDirectionLocks } from '../task-direction.js';
@@ -228,6 +229,7 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
         throw new CliError('ATM_CLI_USAGE', 'framework-mode claim requires --files <csv> for the intended framework edit scope.', { exitCode: 2 });
     }
     const root = path.resolve(cwd);
+    assertFrameworkGitWorktreeReady(root);
     const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, linkedTaskId);
     const staleLock = classifyFrameworkStaleLock(root, actorId, { currentTaskId });
     if (staleLock) {
@@ -493,6 +495,7 @@ export function createFrameworkModeStatus(input) {
     const cwd = path.resolve(input.cwd);
     const generatedAt = new Date().toISOString();
     const repoIdentity = detectFrameworkRepoIdentity(cwd);
+    const gitWorktreeReadiness = inspectGitWorktreeReadiness(cwd);
     const declaredFiles = (input.files ?? []).map((entry) => normalizeRelativePath(entry)).filter(Boolean);
     const changedFiles = declaredFiles.length > 0 ? uniqueSorted(declaredFiles) : readChangedFiles(cwd);
     const adopterInfrastructureSyncOnly = !repoIdentity.isFrameworkRepo && isAdopterInfrastructureSyncCommit(changedFiles);
@@ -537,6 +540,9 @@ export function createFrameworkModeStatus(input) {
     if ((mode === 'required' || mode === 'cross-repo-target-required') && pinnedRunner.status !== 'available') {
         blockers.push('pinned-runner-missing');
     }
+    if (!gitWorktreeReadiness.ok) {
+        blockers.push('git-worktree-readiness-failed');
+    }
     const blockingStaleLocks = staleLocks.filter((entry) => entry.kind !== 'possibly-stale' || entry.currentTaskId !== null);
     if (mode === 'required' && blockingStaleLocks.length > 0) {
         blockers.push('framework-stale-lock-cleanup-required');
@@ -575,9 +581,20 @@ export function createFrameworkModeStatus(input) {
         activeLocks,
         staleLocks,
         pinnedRunner,
+        gitWorktreeReadiness,
         blockers,
         warnings
     };
+}
+function assertFrameworkGitWorktreeReady(cwd) {
+    const readiness = inspectGitWorktreeReadiness(cwd);
+    if (readiness.ok) {
+        return;
+    }
+    throw new CliError('ATM_GIT_WORKTREE_READY_REQUIRED', 'Git local config marks this checked-out repository as bare, so framework-mode cannot safely continue until the local worktree setting is repaired.', {
+        exitCode: 1,
+        details: readiness
+    });
 }
 export function detectFrameworkRepoIdentity(repositoryRoot) {
     const root = path.resolve(repositoryRoot);

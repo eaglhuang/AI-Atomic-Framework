@@ -6,6 +6,7 @@ import { checkStartupKnownBadVersion } from '../startup-known-bad.js';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from '../startup-integrity.js';
 import { createATMVersionSummary } from './atm-chart.js';
 import { detectFrameworkRepoIdentity, detectFrameworkStaleLocks } from './framework-development.js';
+import { inspectGitWorktreeReadiness } from './git-worktree-readiness.js';
 import { createGitHeadEvidenceCheck } from './git-head-evidence.js';
 import { atmLayoutVersion, bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.js';
 import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.js';
@@ -61,6 +62,7 @@ export async function runDoctor(argv) {
     const integrationBootstrap = inspectIntegrationBootstrap(root);
     const integrationInstallHint = describeIntegrationInstallHint(integrationBootstrap);
     const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(root);
+    const gitWorktreeReadiness = inspectGitWorktreeReadiness(root);
     const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
     const versionSummary = createATMVersionSummary(root);
     const versionWarnings = createVersionSummaryMessages(versionSummary);
@@ -109,6 +111,7 @@ export async function runDoctor(argv) {
         createCheck('framework-integration-hooks', frameworkHookReadiness.ok || cleanCheckoutFrameworkHookContractOk, { ...frameworkHookReadiness, cleanCheckoutFrameworkHookContractOk }),
         ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
         ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
+        createCheck('git-worktree-readiness', gitWorktreeReadiness.ok, gitWorktreeReadiness),
         gitHeadEvidenceCheck
     ];
     const ok = checks.every((check) => check.ok);
@@ -126,15 +129,17 @@ export async function runDoctor(argv) {
                         ? 'Reinstall the ATM CLI package from a trusted release or inspect release/integrity.json and compatibility-matrix.json for tampering.'
                         : failedChecks.includes('known-bad-version')
                             ? `Install ATM CLI ${knownBadStatus?.match?.replacementVersion ?? 'replacement version'} and avoid write-oriented commands with the current version.`
-                            : failedChecks.includes('git-head-evidence')
-                                ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
-                                : failedChecks.includes('integration-adapters')
-                                    ? integrationDriftRemediation.recommendedAction
-                                    : failedChecks.includes('framework-integration-hooks')
-                                        ? 'Run node atm.mjs integration hooks install <editor-id> --json, then node atm.mjs git-hooks verify --framework-required --json.'
-                                        : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
-                                            ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
-                                            : 'npm run validate:full';
+                            : failedChecks.includes('git-worktree-readiness')
+                                ? gitWorktreeReadiness.recommendedFixCommand ?? 'Repair the local Git worktree readiness before continuing.'
+                                : failedChecks.includes('git-head-evidence')
+                                    ? 'Record ATM evidence for the current HEAD or review whether work bypassed ATM.'
+                                    : failedChecks.includes('integration-adapters')
+                                        ? integrationDriftRemediation.recommendedAction
+                                        : failedChecks.includes('framework-integration-hooks')
+                                            ? 'Run node atm.mjs integration hooks install <editor-id> --json, then node atm.mjs git-hooks verify --framework-required --json.'
+                                            : runtime.layoutVersion !== atmLayoutVersion || runtime.migrationNeeded
+                                                ? 'node atm.mjs bootstrap --cwd . --force --task "Bootstrap ATM in this repository"'
+                                                : 'npm run validate:full';
     const messages = [
         ...versionWarnings,
         ...(integrationInstallHint
@@ -185,16 +190,24 @@ export async function runDoctor(argv) {
                                         reasonSummary: knownBadStatus?.match?.reasonSummary ?? null,
                                         severity: knownBadStatus?.match?.severity ?? null
                                     })]
-                                : failedChecks.includes('git-head-evidence')
-                                    ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
-                                    : failedChecks.includes('integration-adapters')
-                                        ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', {
-                                                failedChecks,
-                                                remediation: integrationDriftRemediation
-                                            })]
-                                        : failedChecks.includes('framework-integration-hooks')
-                                            ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
-                                            : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
+                                : failedChecks.includes('git-worktree-readiness')
+                                    ? [message('error', 'ATM_DOCTOR_GIT_WORKTREE_BARE_MISMATCH', 'Git local config marks this checked-out repository as bare, so worktree-backed ATM commands will fail until the local setting is repaired.', {
+                                            failedChecks,
+                                            status: gitWorktreeReadiness.status,
+                                            worktreeRoot: gitWorktreeReadiness.worktreeRoot,
+                                            gitDir: gitWorktreeReadiness.gitDir,
+                                            recommendedFixCommand: gitWorktreeReadiness.recommendedFixCommand
+                                        })]
+                                    : failedChecks.includes('git-head-evidence')
+                                        ? [message('error', 'ATM_DOCTOR_GIT_EVIDENCE_MISSING', 'Latest Git commit has no matching ATM evidence; work may have bypassed ATM.', { failedChecks })]
+                                        : failedChecks.includes('integration-adapters')
+                                            ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', {
+                                                    failedChecks,
+                                                    remediation: integrationDriftRemediation
+                                                })]
+                                            : failedChecks.includes('framework-integration-hooks')
+                                                ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
+                                                : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
     ];
     // Report stale framework locks without deleting runtime state automatically.
     const staleLocks = detectFrameworkStaleLocks(root);
@@ -232,6 +245,7 @@ export async function runDoctor(argv) {
             integrationBootstrap,
             integrationDriftRemediation: integrationDriftRemediation.failedAdapters.length > 0 ? integrationDriftRemediation : undefined,
             frameworkHookReadiness,
+            gitWorktreeReadiness,
             runtimeAdapterReadiness,
             trustIntegrity: trustMode ? trustIntegrity : undefined,
             knownBadStatus: knownBadMode ? knownBadStatus : undefined,

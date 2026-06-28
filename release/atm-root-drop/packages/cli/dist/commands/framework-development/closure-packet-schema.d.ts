@@ -1,3 +1,4 @@
+import { type GitWorktreeReadinessReport } from '../git-worktree-readiness.ts';
 import { type TaskLedgerMode, type TaskLedgerPolicy } from '../task-ledger.ts';
 export type FrameworkMode = 'inactive' | 'suspected' | 'required' | 'cross-repo-target-required';
 export type ClosureAuthority = 'local' | 'target_repo' | 'none';
@@ -48,6 +49,7 @@ export interface FrameworkModeStatusReport {
     readonly activeLocks: readonly string[];
     readonly staleLocks: readonly FrameworkStaleLockInfo[];
     readonly pinnedRunner: PinnedRunnerStatus;
+    readonly gitWorktreeReadiness: GitWorktreeReadinessReport;
     readonly blockers: readonly string[];
     readonly warnings: readonly string[];
 }
