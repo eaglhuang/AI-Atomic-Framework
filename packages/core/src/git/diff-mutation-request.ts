@@ -1,7 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import type { MutationRequest } from '../broker/types.ts';
-import { brokerAdapterMigration } from '../broker/types.ts';
+import { brokerAdapterMigration, type MutationRequest } from '../broker/types.ts';
 
 export interface GitDiffMutationRequestOptions {
   readonly cwd: string;

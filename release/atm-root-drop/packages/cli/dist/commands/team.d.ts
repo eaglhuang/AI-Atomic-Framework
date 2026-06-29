@@ -1,6 +1,6 @@
 import { type TeamClosureAttestationEvidence, type TeamClosureReviewerIndependenceEvidence } from './evidence.ts';
 import { type TeamKnowledgeSummary } from './team-knowledge.ts';
-import type { TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
+import { type TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import { type TeamWorkerAdapterContract } from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
 import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 type TeamRecipeAgent = {

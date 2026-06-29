@@ -5,8 +5,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { operationalBenchScenarios, operationalBenchProfiles } from './lib/admission-bench/operational-scenarios.ts';
-import { operationalBenchSpanNames } from './lib/admission-bench/operational-types.ts';
-import type { OperationalBenchResultRow } from './lib/admission-bench/operational-types.ts';
+import { operationalBenchSpanNames, type OperationalBenchResultRow } from './lib/admission-bench/operational-types.ts';
 import { createValidator } from './lib/validator-harness.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

@@ -3,8 +3,7 @@ import path from 'node:path';
 import type { TaskClaimRecord } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/src/index.ts';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.ts';
-import { CliError } from '../shared.ts';
-import { resolveValue } from '../shared.ts';
+import { CliError, resolveValue } from '../shared.ts';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.ts';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.ts';
 

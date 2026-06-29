@@ -1,6 +1,5 @@
-import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
-import type { ActiveWriteIntent, ProposalAdmissionEvidence, WriteIntent } from './types.ts';
-import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
+import { type VirtualAtomInUseRegistryDocument } from './registry.ts';
+import type { ActiveWriteIntent, BrokerDecision, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope, MergeVerdict, MutationRequest, ProposalAdmissionEvidence, WriteIntent } from './types.ts';
 export declare const DEFAULT_TEAM_STEWARD_ID = "neutral-write-steward";
 export declare const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = ".atm/runtime/write-broker.registry.json";
 export type TeamBrokerChosenLane = 'direct-brokered' | 'deterministic-composer' | 'neutral-steward' | 'serial' | 'blocked';

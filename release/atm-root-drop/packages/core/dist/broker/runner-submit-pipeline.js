@@ -1,3 +1,8 @@
+// TASK-MAO-0016: runner submit-patch pipeline. Receives an ATM-core-annotated
+// patch envelope (TASK-MAO-0015), checks it against the runner ref store
+// (TASK-MAO-0014), and emits a submit decision. The actual rebuild happens in
+// the Runner Sync Steward (TASK-MAO-0013); this pipeline is the admission /
+// freeze / route layer that decides whether the patch may be applied at all.
 import { validateAtmCorePatchEnvelope } from './patch-envelope-atm-core.js';
 import { resolveRunnerRef } from './runner-ref-store.js';
 export function submitRunnerPatch(input) {

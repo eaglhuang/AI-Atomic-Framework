@@ -3,18 +3,21 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { calculateBrokerDecision } from './decision.ts';
-import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry } from './registry.ts';
+import { buildVirtualAtomInUseRegistry, cleanupStale, loadRegistry, type VirtualAtomInUseRegistryDocument } from './registry.ts';
 import { readGitHeadCommit } from './steward.ts';
-import type { BrokerDecision, MergeVerdict, MutationRequest, BrokerOperationRunRecord, BrokerOperationRunRecordEnvelope } from './types.ts';
 import type {
   ActiveWriteIntent,
+  BrokerDecision,
+  BrokerOperationRunRecord,
+  BrokerOperationRunRecordEnvelope,
+  MergeVerdict,
+  MutationRequest,
   ProposalAdmissionBoundedRegion,
   ProposalAdmissionEvidence,
   ProposalAdmissionRequest,
   WriteIntent,
   WriteIntentAtomRef
 } from './types.ts';
-import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 
 export const DEFAULT_TEAM_STEWARD_ID = 'neutral-write-steward';
 export const DEFAULT_BROKER_REGISTRY_RELATIVE_PATH = '.atm/runtime/write-broker.registry.json';

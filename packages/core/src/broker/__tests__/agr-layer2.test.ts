@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
-import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from '../types.ts';
+import type { ActiveWriteIntent, LineRange, WriteBrokerRegistryDocument, WriteIntent } from '../types.ts';
 import { calculateBrokerDecision } from '../decision.ts';
 import { shouldTriggerLayer2, type Layer2TriggerDecision } from '../policy.ts';
-import { type LineRange } from '../types.ts';
 import type { Layer2Conflict } from '../agr.ts';
 
 type Layer2OverlapConflict = Layer2Conflict;

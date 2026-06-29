@@ -1,4 +1,4 @@
-import type { StewardApplyEvidence } from './apply-evidence.ts';
+import { type StewardApplyEvidence } from './apply-evidence.ts';
 import type { VirtualAtomInUseRegistryDocument } from './registry.ts';
 import type { TeamBrokerRuntimeActivationHandshakeEvidence } from './team-lane.ts';
 import type { DecompositionRequest, MergePlan, PatchProposal } from './types.ts';

@@ -7,7 +7,6 @@
  * Direct dependencies on internal helpers of tasks.ts should be avoided, and
  * any evolution of this surface must be validated against the tasks-command-surface-invariant.
  */
-import { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, prepareTaskForClaim, runTasksRosterUpdate } from '../tasks.ts';
-import type { TaskClaimDependencyBlocker, TaskClaimPreparationResult, TaskClaimPreparationStep, TaskResidueBucket, TaskResidueClassification } from '../tasks.ts';
+import { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, prepareTaskForClaim, runTasksRosterUpdate, type TaskClaimDependencyBlocker, type TaskClaimPreparationResult, type TaskClaimPreparationStep, type TaskResidueBucket, type TaskResidueClassification } from '../tasks.ts';
 export { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, prepareTaskForClaim, runTasksRosterUpdate };
 export type { TaskClaimDependencyBlocker, TaskClaimPreparationResult, TaskClaimPreparationStep, TaskResidueBucket, TaskResidueClassification };

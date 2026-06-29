@@ -1,6 +1,5 @@
 import type { AtomMapCuratorPatchDraftItem } from '../../core/src/upgrade/map-curator.ts';
-import type { HumanReviewQueueRecord } from './queue.ts';
-import { createHumanReviewQueueRecord } from './queue.ts';
+import { createHumanReviewQueueRecord, type HumanReviewQueueRecord } from './queue.ts';
 
 export interface AtomMapPatchReviewProposalSnapshot extends Readonly<Record<string, unknown>> {
   readonly schemaId: 'atm.upgradeProposal';

@@ -60,3 +60,19 @@ tracked governance residue created by setup commands.
   `npm run typecheck`.
 - Durable rule: disposable worktrees must not contain filesystem links that
   point back into mutable directories of the main worktree.
+
+## 2026-06-29 - Treat all-adapter parity drift as one snapshot problem first
+
+- Trigger: `doctor` or `integration verify` starts reporting several installed
+  adapters as `stale` right after a framework skill/template change.
+- Symptom: the agent sees Claude/Cursor/Copilot/Gemini entries fail parity and
+  may chase each one as an isolated bug, even though they are all simply behind
+  the same source snapshot.
+- Correct ATM route: first test the "old template generation" hypothesis. If
+  the affected adapters are just behind the current integration source
+  snapshot, refresh the installed adapter set in one governed sync pass, then
+  rerun `doctor`.
+- Recovery: only stop the bulk sync path when there is evidence of local custom
+  edits, adapter-specific install failure, or source snapshot corruption.
+- Durable rule: multi-adapter stale parity is usually a shared snapshot drift,
+  not six separate product incidents.

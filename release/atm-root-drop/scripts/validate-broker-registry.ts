@@ -7,9 +7,7 @@ import {
   saveRegistry,
   registerIntent,
   releaseTask,
-  cleanupStale
-} from '../packages/core/src/index.ts';
-import type {
+  cleanupStale,
   WriteIntent,
   WriteBrokerRegistryDocument
 } from '../packages/core/src/index.ts';

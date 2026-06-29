@@ -14,10 +14,14 @@ import {
   validatePatchEnvelope
 } from '../../packages/core/src/broker/patch-envelope.ts';
 import { planStewardApply } from '../../packages/core/src/broker/steward.ts';
-import type { BrokerArbitrationVerdict } from '../../packages/core/src/broker/types.ts';
-import type { MergePlan, PatchProposal, WriteBrokerRegistryDocument, WriteIntent } from '../../packages/core/src/broker/types.ts';
-import type { RouteContext, RouteContextState } from '../../packages/core/src/routing/route-context.ts';
-import { validateRouteContext } from '../../packages/core/src/routing/route-context.ts';
+import {
+  type BrokerArbitrationVerdict,
+  type MergePlan,
+  type PatchProposal,
+  type WriteBrokerRegistryDocument,
+  type WriteIntent
+} from '../../packages/core/src/broker/types.ts';
+import { validateRouteContext, type RouteContext, type RouteContextState } from '../../packages/core/src/routing/route-context.ts';
 
 export type MaoParallelScenarioKind = 'conflict-matrix' | 'route-lifecycle' | 'steward-plan' | 'capsule-drift';
 

@@ -1,7 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { CliError, makeResult, message, parseArgsForCommand, readJsonFile } from './shared.ts';
-import { defineCommandSpec } from './shared.ts';
+import { CliError, defineCommandSpec, makeResult, message, parseArgsForCommand, readJsonFile } from './shared.ts';
 
 type KnowledgeMetadata = {
   repo?: string;

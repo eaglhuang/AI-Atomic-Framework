@@ -2,8 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.js';
-import { CliError } from '../shared.js';
-import { resolveValue } from '../shared.js';
+import { CliError, resolveValue } from '../shared.js';
 import { diagnoseTaskDirectionLockAllowedFiles } from '../task-direction.js';
 import { isClaimExpired, parseClaimRecord } from './task-ledger-readers.js';
 const CLOSEOUT_OWNER_RULE = 'Only the active lifecycle owner (claim.actorId with a valid lease and work session) may mutate deliverables or run taskflow close --write. Other agents remain read-only until handoff, release, or governed repair-claim clears stale drift.';

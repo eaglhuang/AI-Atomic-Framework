@@ -7,10 +7,10 @@ import {
   applyStewardPlan,
   readGitHeadCommit,
   checkStewardPermission,
-  arbitrateStewardRequest
+  arbitrateStewardRequest,
+  type StewardIdentity
 } from '../steward.ts';
 import { createHandoffPatchEnvelope, validatePatchEnvelope } from '../index.ts';
-import type { StewardIdentity } from '../steward.ts';
 import type { MergePlan, PatchProposal } from '../types.ts';
 
 const tempFilePath = 'temp-steward-test-file.txt';

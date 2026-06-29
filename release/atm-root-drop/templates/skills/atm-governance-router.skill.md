@@ -260,6 +260,10 @@ Then continue the user's original request with the fallback sources.
   command runs with exit codes and output hashes.
 - Do not move heavy checks (build/lint/network) into hooks; hooks should only
   call thin ATM guard commands.
+- Do not treat multi-adapter `stale` parity as six unrelated incidents by
+  default. When several installed adapters are only behind the same current
+  template snapshot, refresh them as one governed parity batch and re-run
+  `doctor` before continuing implementation.
 - Do not link or junction a disposable worktree's `node_modules` back to the
   main repo. In npm workspace repos, cleanup can follow reparse points and
   remove tracked `packages/*` or `examples/*` files from the main worktree.

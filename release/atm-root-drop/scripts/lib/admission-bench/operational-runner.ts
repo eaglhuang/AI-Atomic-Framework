@@ -6,8 +6,8 @@ import { performance } from 'node:perf_hooks';
 import { calculateBrokerDecision } from '../../../packages/core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../packages/core/src/broker/compose.ts';
 import { applyStewardPlan, planStewardApply } from '../../../packages/core/src/broker/steward.ts';
-import { brokerAdapterMigration } from '../../../packages/core/src/broker/types.ts';
-import type {
+import {
+  brokerAdapterMigration,
   ActiveWriteIntent,
   MutationRequest,
   PatchProposal,

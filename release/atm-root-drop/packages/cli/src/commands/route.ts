@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import type { RouteClaimIntent, RouteContext, RouteContextState, RouteResourceSet } from '../../../core/src/routing/index.ts';
-import { applyStewardPlan } from '../../../core/src/broker/steward.ts';
+import { applyStewardPlan, type StewardIdentity } from '../../../core/src/broker/steward.ts';
 import {
   acknowledgeFreeze,
   createFreezeSignal,
@@ -10,17 +10,19 @@ import {
   resumeFreeze,
   resolveFreezeSnapshotDefaults
 } from '../../../core/src/broker/freeze.ts';
-import type { PatchEnvelope } from '../../../core/src/broker/patch-envelope.ts';
 import {
   comparePatchEnvelopes,
   createHandoffPatchEnvelope,
   summarizePatchEnvelope,
-  validatePatchEnvelope
+  validatePatchEnvelope,
+  type PatchEnvelope
 } from '../../../core/src/broker/patch-envelope.ts';
-import type { RouteFreezeRuntimeRecord } from '../../../core/src/broker/types.ts';
-import { createRouteFreezeRuntimeRecord } from '../../../core/src/broker/types.ts';
-import type { StewardIdentity } from '../../../core/src/broker/steward.ts';
-import type { MergePlan, PatchProposal } from '../../../core/src/broker/types.ts';
+import {
+  createRouteFreezeRuntimeRecord,
+  type MergePlan,
+  type PatchProposal,
+  type RouteFreezeRuntimeRecord
+} from '../../../core/src/broker/types.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
 type RouteLifecycleAction = 'open' | 'status' | 'list' | 'pause' | 'resume' | 'abandon' | 'handoff';

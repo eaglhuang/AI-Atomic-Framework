@@ -1,15 +1,18 @@
 import assert from 'node:assert/strict';
-import type {
-  AtomCandidate,
-  AtomCandidateDiscoveryRequest,
-  AtomizationPlan,
-  AtomizationPlanRequest,
-  AtomizationPlanStep,
-  AtomizationPlanningAdapter,
-  EnclosingUnit,
-  VirtualAtom
+import {
+  isAtomCandidate,
+  isAtomizationPlan,
+  isEnclosingUnit,
+  isVirtualAtom,
+  type AtomCandidate,
+  type AtomCandidateDiscoveryRequest,
+  type AtomizationPlan,
+  type AtomizationPlanRequest,
+  type AtomizationPlanStep,
+  type AtomizationPlanningAdapter,
+  type EnclosingUnit,
+  type VirtualAtom
 } from '../src/atomization-planning.ts';
-import { isAtomCandidate, isAtomizationPlan, isEnclosingUnit, isVirtualAtom } from '../src/atomization-planning.ts';
 
 const candidate: AtomCandidate = {
   candidateId: 'demo:function:loadRows:deadbeef',

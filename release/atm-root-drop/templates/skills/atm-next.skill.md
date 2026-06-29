@@ -62,6 +62,27 @@ preparation checklist before implementation:
 3. If the route is on a protected or shared branch, run `node atm.mjs doctor --json` before the first governed write so readiness blockers surface early.
 4. Use `governanceReadiness.upstreamRef` when present and run `node atm.mjs hook pre-push --base <upstream-ref> --head HEAD --json` proactively before the final push, or earlier once the branch is ahead, so git-head evidence and branch-queue blockers show up before the real push.
 5. Treat `queueRetryCodes` as a shared-branch retry contract, not as an unexpected raw Git failure.
+6. If `doctor`, `integration verify`, or `integration list` reports other installed adapters as `stale`, first decide whether they are merely behind the current template generation. If they are old-template parity drift rather than local hand edits, refresh the installed adapter set together instead of selectively ignoring them.
+
+When adapter parity is stale across multiple installed editors:
+
+1. Confirm the repo is on the intended template/source snapshot.
+2. If the stale adapters are simply behind the current snapshot, refresh all installed adapters in one pass instead of treating each editor as an unrelated incident.
+3. Re-run `doctor` after the refresh and only continue once the shared parity state is green again.
+4. Treat hand-edited adapter customizations as a separate decision; do not overwrite them silently under a parity-only assumption.
+
+Typical framework-repo repair route:
+
+```bash
+node atm.dev.mjs doctor --json
+node atm.dev.mjs integration add claude-code --force --json
+node atm.dev.mjs integration add codex --force --json
+node atm.dev.mjs integration add copilot --force --json
+node atm.dev.mjs integration add cursor --force --json
+node atm.dev.mjs integration add gemini --force --json
+node atm.dev.mjs integration add antigravity --force --json
+node atm.dev.mjs doctor --json
+```
 
 For normal task-card work, keep this order fixed:
 

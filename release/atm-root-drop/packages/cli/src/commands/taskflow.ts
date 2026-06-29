@@ -25,7 +25,7 @@ import {
   type PlanningCardCloseback
 } from './taskflow/closeback-orchestration.ts';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from './evidence.ts';
-import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
+import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, relativePathFrom } from './shared.ts';
 import {
   buildDelegationContract,
   buildTaskflowOpenDiagnostics,
@@ -45,7 +45,6 @@ import {
   preflightBlockersToWriteReadinessBlockers
 } from './taskflow/close-preflight.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
-import { quoteCliValue, relativePathFrom } from './shared.ts';
 import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.ts';
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.ts';
 import {

@@ -3,8 +3,7 @@
 // (TASK-MAO-0014), and emits a submit decision. The actual rebuild happens in
 // the Runner Sync Steward (TASK-MAO-0013); this pipeline is the admission /
 // freeze / route layer that decides whether the patch may be applied at all.
-import type { AtmCorePatchEnvelope } from './patch-envelope-atm-core.ts';
-import { validateAtmCorePatchEnvelope } from './patch-envelope-atm-core.ts';
+import { validateAtmCorePatchEnvelope, type AtmCorePatchEnvelope } from './patch-envelope-atm-core.ts';
 import { resolveRunnerRef, type RunnerRefStore } from './runner-ref-store.ts';
 
 export type RunnerSubmitVerdict =

@@ -15,15 +15,12 @@ import {
   generateTaskCard,
   loadTaskDocumentOrThrow,
   prepareTaskForClaim,
-  runTasksRosterUpdate
-} from '../tasks.ts';
-
-import type {
-  TaskClaimDependencyBlocker,
-  TaskClaimPreparationResult,
-  TaskClaimPreparationStep,
-  TaskResidueBucket,
-  TaskResidueClassification
+  runTasksRosterUpdate,
+  type TaskClaimDependencyBlocker,
+  type TaskClaimPreparationResult,
+  type TaskClaimPreparationStep,
+  type TaskResidueBucket,
+  type TaskResidueClassification
 } from '../tasks.ts';
 
 export {

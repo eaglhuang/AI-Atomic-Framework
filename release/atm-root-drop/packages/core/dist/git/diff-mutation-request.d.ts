@@ -1,4 +1,4 @@
-import type { MutationRequest } from '../broker/types.ts';
+import { type MutationRequest } from '../broker/types.ts';
 export interface GitDiffMutationRequestOptions {
     readonly cwd: string;
     readonly actorId: string;

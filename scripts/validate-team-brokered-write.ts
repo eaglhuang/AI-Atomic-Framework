@@ -15,10 +15,12 @@ import {
   evaluateTeamBrokerLane,
   loadRegistry,
   registerIntent,
-  saveRegistry
+  saveRegistry,
+  calculateBrokerDecision,
+  composeBrokerProposals,
+  type WriteBrokerRegistryDocument,
+  type WriteIntent
 } from '../packages/core/src/broker/index.ts';
-import { calculateBrokerDecision, composeBrokerProposals } from '../packages/core/src/broker/index.ts';
-import type { WriteBrokerRegistryDocument, WriteIntent } from '../packages/core/src/broker/types.ts';
 import { runBroker } from '../packages/cli/src/commands/broker.ts';
 import { runTeam } from '../packages/cli/src/commands/team.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';

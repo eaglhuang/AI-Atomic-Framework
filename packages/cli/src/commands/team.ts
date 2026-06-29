@@ -24,9 +24,9 @@ import { runTeamWave } from './team-wave.ts';
 import {
   buildTeamBrokerEvidence,
   brokerLaneToFindings,
-  evaluateTeamBrokerLane
+  evaluateTeamBrokerLane,
+  type TeamBrokerLaneEvidence
 } from '../../../core/src/broker/team-lane.ts';
-import type { TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import {
   resolveNodejsTeamWorkerAdapter,
   type TeamWorkerAdapterContract

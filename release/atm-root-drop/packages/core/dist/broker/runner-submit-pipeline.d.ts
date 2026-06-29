@@ -1,4 +1,4 @@
-import type { AtmCorePatchEnvelope } from './patch-envelope-atm-core.ts';
+import { type AtmCorePatchEnvelope } from './patch-envelope-atm-core.ts';
 import { type RunnerRefStore } from './runner-ref-store.ts';
 export type RunnerSubmitVerdict = 'accept' | 'reject-malformed' | 'reject-conflict' | 'reject-stale-base' | 'freeze-await-rebase';
 export interface RunnerSubmitDecision {

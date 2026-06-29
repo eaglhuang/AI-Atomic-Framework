@@ -35,16 +35,38 @@ function writeJson(filePath: string, value: unknown) {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-async function runAtm(args: string[], cwd = root) {
+interface BrokerProposalCommandEvidence {
+  readonly proposal?: { readonly proposalId?: string } | null;
+  readonly proposals?: readonly { readonly proposalId?: string }[] | null;
+  readonly validation?: { readonly ok?: boolean } | null;
+}
+
+interface BrokerCommandParsedResult {
+  readonly ok?: boolean;
+  readonly error?: string;
+  readonly evidence?: BrokerProposalCommandEvidence;
+}
+
+interface BrokerCommandRunResult {
+  readonly exitCode: number;
+  readonly parsed: BrokerCommandParsedResult;
+  readonly stdout: string;
+  readonly stderr: string;
+}
+
+async function runAtm(args: string[], cwd = root): Promise<BrokerCommandRunResult> {
   const normalizedArgs = args.filter((arg) => arg !== 'broker' && arg !== '--json');
   try {
     const parsed = await runBroker([...normalizedArgs, '--cwd', cwd]);
     return { exitCode: 0, parsed, stdout: '', stderr: '' };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const messageText = error instanceof Error ? error.message : String(error);
+    const exitCode = typeof error === 'object' && error && 'exitCode' in error && typeof (error as { exitCode?: unknown }).exitCode === 'number'
+      ? (error as { exitCode: number }).exitCode
+      : 1;
     return {
-      exitCode: typeof error?.exitCode === 'number' ? error.exitCode : 1,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      parsed: { ok: false, error: String(error?.message ?? error), evidence: {} as any },
+      exitCode,
+      parsed: { ok: false, error: messageText, evidence: {} },
       stdout: '',
       stderr: ''
     };
