@@ -3,6 +3,7 @@ import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { detectHistoricalDeliveryCommit } from '../tasks/historical-delivery.ts';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers, type HistoricalClosePreflightSummary } from './historical-close-preflight.ts';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { resolveTaskflowDeclaredFiles } from './task-scope.ts';
 import { quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
@@ -47,31 +48,7 @@ function taskflowPathMatches(filePath: string, declaredPath: string): boolean {
 }
 
 function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { repoRoot: string | null; relativePath: string | null; reason: string | null } {
-  if (!planningMirrorPath) {
-    return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
-  }
-  const absolutePath = path.isAbsolute(planningMirrorPath)
-    ? path.resolve(planningMirrorPath)
-    : path.resolve(cwd, planningMirrorPath);
-  const probe = existsSync(absolutePath) && statSync(absolutePath).isDirectory() ? absolutePath : path.dirname(absolutePath);
-  let repoRoot: string | null = null;
-  try {
-    repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd: probe,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
-    }).trim() || null;
-  } catch {
-    repoRoot = null;
-  }
-  if (!repoRoot) {
-    return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
-  }
-  return {
-    repoRoot: path.resolve(repoRoot),
-    relativePath: path.relative(repoRoot, absolutePath).replace(/\\/g, '/'),
-    reason: null
-  };
+  return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 
 export function extractTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): string[] {

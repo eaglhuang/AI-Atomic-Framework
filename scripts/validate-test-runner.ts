@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAtomicSpecFile } from '../packages/core/src/spec/parse-spec.ts';
-import { runAtomicTestRunner, validateAtomicTestReportDocument } from '../packages/core/src/manager/test-runner.ts';
+import { runAtomicTestRunner, runAtomicTestRunnerExtended, validateAtomicTestReportDocument } from '../packages/core/src/manager/test-runner.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -27,12 +27,33 @@ function readJson(relativePath: any) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
+function copyDirectory(sourceDir: string, targetDir: string) {
+  mkdirSync(targetDir, { recursive: true });
+  for (const entry of readdirSync(sourceDir)) {
+    const sourcePath = path.join(sourceDir, entry);
+    const targetPath = path.join(targetDir, entry);
+    if (statSync(sourcePath).isDirectory()) {
+      copyDirectory(sourcePath, targetPath);
+    } else {
+      mkdirSync(path.dirname(targetPath), { recursive: true });
+      copyFileSync(sourcePath, targetPath);
+    }
+  }
+}
+
 function stageFixtureFiles(tempRoot: any) {
   const relativePaths = [
     fixture.passCase.specPath,
     fixture.passCase.commandPath,
     fixture.failCase.specPath,
-    fixture.failCase.commandPath
+    fixture.failCase.commandPath,
+    fixture.pluginCase.specPath,
+    fixture.pluginCase.configPath,
+    fixture.pluginCase.pluginPath,
+    fixture.gatePassCase.specPath,
+    fixture.gatePassCase.configPath,
+    fixture.gateFailCase.specPath,
+    fixture.gateFailCase.configPath
   ];
 
   for (const relativePath of relativePaths) {
@@ -41,6 +62,11 @@ function stageFixtureFiles(tempRoot: any) {
     mkdirSync(path.dirname(targetPath), { recursive: true });
     copyFileSync(sourcePath, targetPath);
   }
+
+  copyDirectory(
+    path.join(root, 'tests', 'test-runner-fixtures', 'gates'),
+    path.join(tempRoot, 'tests', 'test-runner-fixtures', 'gates')
+  );
 }
 
 function assertProtectedFilesStayNeutral() {
@@ -52,7 +78,14 @@ function assertProtectedFilesStayNeutral() {
     fixture.passCase.specPath,
     fixture.failCase.specPath,
     fixture.passCase.commandPath,
-    fixture.failCase.commandPath
+    fixture.failCase.commandPath,
+    fixture.pluginCase.specPath,
+    fixture.pluginCase.configPath,
+    fixture.pluginCase.pluginPath,
+    fixture.gatePassCase.specPath,
+    fixture.gatePassCase.configPath,
+    fixture.gateFailCase.specPath,
+    fixture.gateFailCase.configPath
   ];
   const bannedTerms = [
     ['3K', 'Life'].join(''),
@@ -117,6 +150,34 @@ try {
   check(failResult.report.metrics?.coverage === null, 'fail fixture metrics coverage must default to null when not provided');
   check(failResult.report.metrics?.edgeCaseCount === 0, 'fail fixture metrics edgeCaseCount must default to zero');
   check(validateAtomicTestReportDocument(failResult.report).ok === true, 'fail fixture report must still validate against schema');
+
+  const pluginParsed = parseAtomicSpecFile(fixture.pluginCase.specPath, { cwd: tempRoot });
+  check(pluginParsed.ok === true, 'plugin fixture spec must parse before running tests');
+  const pluginResult = await runAtomicTestRunnerExtended(pluginParsed.normalizedModel!, {
+    repositoryRoot: tempRoot
+  });
+  check(pluginResult.ok === true, 'plugin fixture must succeed');
+  check(pluginResult.commandResults[0]?.command === fixture.pluginCase.expectedCommand, 'plugin fixture must preserve plugin-provided command');
+  check(pluginResult.pluginRuns?.[0]?.pluginId === 'fixture-plugin', 'plugin fixture must report plugin identity');
+
+  const gatePassParsed = parseAtomicSpecFile(fixture.gatePassCase.specPath, { cwd: tempRoot });
+  check(gatePassParsed.ok === true, 'gate pass fixture spec must parse before running tests');
+  const gatePassResult = await runAtomicTestRunnerExtended(gatePassParsed.normalizedModel!, {
+    repositoryRoot: tempRoot
+  });
+  check(gatePassResult.ok === true, 'gate pass fixture must succeed');
+  check(gatePassResult.gateResults.every((entry: any) => entry.status === 'passed'), 'gate pass fixture must report all gates passed');
+
+  const gateFailParsed = parseAtomicSpecFile(fixture.gateFailCase.specPath, { cwd: tempRoot });
+  check(gateFailParsed.ok === true, 'gate fail fixture spec must parse before running tests');
+  const gateFailResult = await runAtomicTestRunnerExtended(gateFailParsed.normalizedModel!, {
+    repositoryRoot: tempRoot
+  });
+  check(gateFailResult.ok === false, 'gate fail fixture must fail overall result');
+  for (const gateId of ['immutability', 'side-effects', 'consumer-contract']) {
+    check(gateFailResult.gateResults.some((entry: any) => entry.gateId === gateId && entry.status === 'failed'),
+      `gate fail fixture must report ${gateId} as failed`);
+  }
 
   assertProtectedFilesStayNeutral();
 } finally {

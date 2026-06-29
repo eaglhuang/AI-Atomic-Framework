@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T11-22-31-655Z-scope-amendment-f3d3a0a2f22e",
+  "taskId": "TASK-AAO-0048",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0048.json",
+  "taskSha256": "sha256:b07c7ab6bd4c11abdde0f7ad934cc6a3dda1ec86639c4ec2999de069134ba0ff",
+  "createdAt": "2026-06-29T11:22:31.655Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0048 --actor codex-gpt-5.4-mini --add \"docs/ADAPTER_GUIDE.md,packages/cli/src/commands/command-specs/test.spec.ts,packages/cli/src/commands/shared.ts,packages/cli/src/commands/taskflow/commit-bundle-assembly.ts,packages/cli/src/commands/tasks.ts,packages/cli/src/commands/test.ts,packages/core/src/manager/test-runner.ts,packages/plugin-sdk/src/index.ts,packages/plugin-sdk/src/test-runner.ts,schemas/test-report.schema.json,scripts/validate-plugin-sdk.ts,scripts/validate-task-ledger-governance.ts,scripts/validate-test-runner.ts,tests/test-runner.fixture.json,tests/test-runner-fixtures/**\" --class linked-surface --phase during-implementation --reason \"TASK-AAO-0048 now includes the SDK export, CLI entry, sidecar config discovery, plugin fixture, and close/test governance validators required to prove plugin-backed atom health extension works end-to-end without hard-coded host assumptions.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-AAO-0048 now includes the SDK export, CLI entry, sidecar config discovery, plugin fixture, and close/test governance validators required to prove plugin-backed atom health extension works end-to-end without hard-coded host assumptions."
+  }
+}

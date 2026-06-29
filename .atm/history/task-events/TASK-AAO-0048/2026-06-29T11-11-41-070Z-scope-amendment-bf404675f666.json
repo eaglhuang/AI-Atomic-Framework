@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T11-11-41-070Z-scope-amendment-bf404675f666",
+  "taskId": "TASK-AAO-0048",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0048.json",
+  "taskSha256": "sha256:0e7ab319dc2020dacf294e5d1fc8125d537528fb8763c96cc81c6db7838bad10",
+  "createdAt": "2026-06-29T11:11:41.070Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0048 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/taskflow/commit-bundle-assembly.ts,packages/cli/src/commands/tasks.ts,scripts/validate-task-ledger-governance.ts\" --class linked-surface --phase during-implementation --reason \"TASK-AAO-0048 depends on a governable close/test lane that can actually close historical delivery work and surface close-window evidence. The preview-bundle close contract and ledger validator are part of the same testability substrate, not unrelated repo drift.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-AAO-0048 depends on a governable close/test lane that can actually close historical delivery work and surface close-window evidence. The preview-bundle close contract and ledger validator are part of the same testability substrate, not unrelated repo drift."
+  }
+}

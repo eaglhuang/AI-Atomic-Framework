@@ -19,6 +19,7 @@ const requiredFiles = [
   'packages/plugin-sdk/src/language-adapter.ts',
   'packages/plugin-sdk/src/lifecycle.ts',
   'packages/plugin-sdk/src/police.ts',
+  'packages/plugin-sdk/src/test-runner.ts',
   'packages/core/src/police/family.ts',
   'packages/plugin-sdk/src/project-adapter.ts',
   'docs/ADAPTER_GUIDE.md',
@@ -75,7 +76,10 @@ if (!process.exitCode) {
     'EvidenceStore',
     'PoliceFinding',
     'PoliceFamilyGateReport',
-    'EvidenceRef'
+    'EvidenceRef',
+    'TestRunnerPlugin',
+    'AtomicTestRunnerConfig',
+    'AtomicHealthGateId'
   ]) {
     if (!indexSource.includes(exportName)) {
       fail(`packages/plugin-sdk/src/index.ts must export ${exportName}`);
@@ -253,3 +257,16 @@ if (!process.exitCode) {
 if (!process.exitCode) {
   console.log(`[plugin-sdk:${mode}] ok (adapter, language, capability, lifecycle, governance store, and behavior SDK contracts verified)`);
 }
+  const testRunnerSource = readText('packages/plugin-sdk/src/test-runner.ts');
+  for (const phrase of [
+    'type AtomicHealthGateId',
+    'interface TestRunnerPlugin',
+    'interface TestRunnerPluginContext',
+    'interface TestRunnerPluginPlan',
+    'interface AtomicTestRunnerConfig',
+    'interface AtomicDefaultGateConfig'
+  ]) {
+    if (!testRunnerSource.includes(phrase)) {
+      fail(`test-runner.ts missing ${phrase}`);
+    }
+  }

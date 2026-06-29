@@ -45,6 +45,16 @@ The SDK defines interface-only stores for tasks, locks, document indexes, shards
 
 `InjectorPlugin` is for host integration. It declares capabilities, lifecycle hooks, and an `inject` method that receives the host context without making the core framework depend on a host implementation.
 
+## Test Runner Plugins
+
+`packages/plugin-sdk/src/test-runner.ts` defines the alpha0 `TestRunnerPlugin` contract and the companion `AtomicTestRunnerConfig` sidecar model. The current integration path is intentionally light-weight:
+
+- keep the atom spec focused on the atom itself;
+- put plugin wiring and default gate fixtures in a sibling `*.test-runner.json` file;
+- let `node atm.mjs test --spec <atom-spec>` auto-discover that sidecar and merge it with legacy `validation.commands`.
+
+Use plugins when the host repository already owns unit, integration, golden, or domain validators and ATM should only orchestrate them and normalize the evidence envelope. Use `defaultGates` when the host wants ATM's built-in immutability, side-effect, or consumer-contract fixture vocabulary without writing a custom plugin first.
+
 ## Evolution Interfaces
 
 `VersionResolver`, `QualityMetricsComparator`, and `UpgradeProposalAdapter` live in the Plugin SDK interface layer. They are advisory for alpha0 gates unless a task explicitly makes them blocking.

@@ -657,7 +657,7 @@ const ALLOWED_FLAGS_MAP: Record<string, string[]> = {
   quickfix: ['--actor', '--prompt', '--files', '--reason'],
   init: ['--spec', '--dry-run', '--adopt', '--integration', '--task'],
   bootstrap: ['--spec', '--task'],
-  test: ['--atom', '--map', '--equivalence-fixtures', '--fingerprint-check', '--edge-contracts', '--propagate'],
+  test: ['--atom', '--spec', '--map', '--equivalence-fixtures', '--fingerprint-check', '--edge-contracts', '--propagate'],
   welcome: ['--dry-run'],
   status: [],
   validate: ['--spec'],
@@ -797,7 +797,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--spec') {
-      if (!['spec', 'init', 'bootstrap', 'validate'].includes(commandName)) {
+      if (!['spec', 'init', 'bootstrap', 'validate', 'test'].includes(commandName)) {
         throw createUsageError(commandName, `${commandName} does not support option --spec`, { invalidFlags: ['--spec'] });
       }
       options.spec = requireOptionValue(argv, index, '--spec', commandName);

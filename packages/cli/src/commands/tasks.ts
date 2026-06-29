@@ -3324,6 +3324,7 @@ async function runTasksClose(argv: string[]) {
       closurePacketPath,
       transitionPath,
       closeCommitWindowPath: closeCommitWindowPathFromClose,
+      closeCommitWindowAllowedFiles: closeArtifactFiles,
       deliverableGate: deliverableGate as unknown as Record<string, unknown> | null,
       cleanedTeamRuns,
       // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework

@@ -7,6 +7,7 @@ import { detectHistoricalDeliveryCommit, inspectHistoricalDelivery } from '../ta
 import type { TaskflowClosebackPlan } from './closeback-orchestration.ts';
 import { evaluateTaskflowBranchCommitQueueGate, type TaskflowBranchCommitQueueGate } from './branch-commit-queue-gate.ts';
 import { evaluateTaskflowBrokerConflictGate, type TaskflowBrokerConflictGate } from './broker-gate.ts';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { quoteCliValue } from '../shared.ts';
 
 export interface TaskflowCloseKnownBlocker {
@@ -44,28 +45,11 @@ function readTaskflowClaimContext(taskDocument: Record<string, unknown>) {
 }
 
 function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { repoRoot: string | null; relativePath: string | null } {
-  if (!planningMirrorPath) {
-    return { repoRoot: null, relativePath: null };
-  }
-  const absolutePath = path.isAbsolute(planningMirrorPath)
-    ? path.resolve(planningMirrorPath)
-    : path.resolve(cwd, planningMirrorPath);
-  const probe = existsSync(absolutePath) && statSync(absolutePath).isDirectory() ? absolutePath : path.dirname(absolutePath);
-  let repoRoot: string | null = null;
-  try {
-    repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd: probe,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe']
-    }).trim() || null;
-  } catch {
-    repoRoot = null;
-  }
-  if (!repoRoot) {
-    return { repoRoot: null, relativePath: null };
-  }
-  const relativePath = absolutePath.slice(path.resolve(repoRoot).length + 1).replace(/\\/g, '/');
-  return { repoRoot: path.resolve(repoRoot), relativePath };
+  const resolved = resolvePlanningPathFromStored(cwd, planningMirrorPath);
+  return {
+    repoRoot: resolved.repoRoot,
+    relativePath: resolved.relativePath
+  };
 }
 
 export function buildTaskflowCloseWriteReadinessHint(input: {

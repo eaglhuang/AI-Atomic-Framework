@@ -1,0 +1,29 @@
+{
+  "schemaId": "atm.testRunnerConfig",
+  "specVersion": "0.1.0",
+  "legacyValidation": {
+    "includeCommands": false
+  },
+  "defaultGates": {
+    "immutability": {
+      "beforePath": "tests/test-runner-fixtures/gates/immutability-fail-before.json",
+      "afterPath": "tests/test-runner-fixtures/gates/immutability-fail-after.json"
+    },
+    "sideEffects": {
+      "beforeDir": "tests/test-runner-fixtures/gates/side-effects-fail-before",
+      "afterDir": "tests/test-runner-fixtures/gates/side-effects-fail-after",
+      "expectedChanged": ["target.txt"],
+      "forbiddenChanged": ["blocked.txt"]
+    },
+    "consumerContract": {
+      "cases": [
+        {
+          "name": "json-equality-fail",
+          "actualPath": "tests/test-runner-fixtures/gates/consumer-fail-actual.json",
+          "expectedPath": "tests/test-runner-fixtures/gates/consumer-fail-expected.json",
+          "comparator": "json-deep-equal"
+        }
+      ]
+    }
+  }
+}

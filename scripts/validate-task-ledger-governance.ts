@@ -1031,6 +1031,13 @@ try {
   assert(historicalEvidenceWorktree.trackedDirtyFiles.includes(`.atm/history/evidence/${historicalEvidenceTaskId}.json`), 'historical evidence fixture must leave same-task evidence dirty before close');
   const historicalEvidenceClose = await runTasks(['close', '--cwd', historicalEvidenceRepo, '--task', historicalEvidenceTaskId, '--actor', 'validator', '--status', 'done', '--historical-delivery', historicalEvidenceDeliveryCommit]);
   assert(historicalEvidenceClose.ok === true, 'historical-delivery close must accept same-task fresh evidence dirtiness when delivery already landed');
+  const historicalCloseAllowedFiles = Array.isArray(historicalEvidenceClose.evidence?.closeCommitWindowAllowedFiles)
+    ? historicalEvidenceClose.evidence.closeCommitWindowAllowedFiles as string[]
+    : [];
+  assert(historicalCloseAllowedFiles.length > 0, 'historical-delivery close must expose closeCommitWindowAllowedFiles');
+  assert(historicalCloseAllowedFiles.includes(`.atm/history/tasks/${historicalEvidenceTaskId}.json`), 'historical-delivery close must expose task ledger file in close commit window');
+  assert(historicalCloseAllowedFiles.includes(`.atm/history/evidence/${historicalEvidenceTaskId}.json`), 'historical-delivery close must expose evidence file in close commit window');
+  assert(historicalCloseAllowedFiles.includes(`.atm/history/evidence/${historicalEvidenceTaskId}.closure-packet.json`), 'historical-delivery close must expose closure packet in close commit window');
   const historicalEvidenceClosedTask = readJson(historicalEvidenceTaskPath);
   assert(historicalEvidenceClosedTask.status === 'done', 'historical evidence fixture task must transition to done');
   assert(typeof historicalEvidenceClosedTask.lastTransitionId === 'string' && historicalEvidenceClosedTask.lastTransitionId.includes('-close-'), 'historical evidence fixture must write a close transition');

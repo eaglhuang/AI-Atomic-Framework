@@ -3,6 +3,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildPlanningMirrorClosebackExpectation, classifyPlanningMirrorPreEdit } from '../tasks/planning-mirror-close-diagnostics.ts';
 import { appendTaskTransitionEvent, createTaskTransitionId } from '../task-ledger.ts';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { CliError } from '../shared.ts';
 export {
   assertClosebackPlanningPathReady,
@@ -51,21 +52,7 @@ function normalizeRepoRelativePath(repoRoot: string, filePath: string): string {
 }
 
 function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { repoRoot: string | null; relativePath: string | null; reason: string | null } {
-  if (!planningMirrorPath) {
-    return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
-  }
-  const absolutePath = path.isAbsolute(planningMirrorPath)
-    ? path.resolve(planningMirrorPath)
-    : path.resolve(cwd, planningMirrorPath);
-  const repoRoot = readGitRoot(absolutePath);
-  if (!repoRoot) {
-    return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
-  }
-  return {
-    repoRoot,
-    relativePath: normalizeRepoRelativePath(repoRoot, absolutePath),
-    reason: null
-  };
+  return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 
 function quoteYamlString(value: string): string {
