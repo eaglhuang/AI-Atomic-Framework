@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, rmSync, statSync, utimesSync } from 'node:fs';
 import path from 'node:path';
 import {
   createContinuationRunReport,
@@ -25,6 +25,7 @@ const repoCopyEntries = [
   'package.json',
   'package-lock.json',
   'packages',
+  'release',
   'schemas',
   'scripts',
   'templates',
@@ -131,6 +132,20 @@ function copyRepositorySubset(sourceRoot: any, targetRoot: any) {
     if (existsSync(source)) {
       cpSync(source, path.join(targetRoot, entry), { recursive: true });
     }
+  }
+  refreshCopiedFrozenRunnerArtifacts(targetRoot);
+}
+
+function refreshCopiedFrozenRunnerArtifacts(targetRoot: string) {
+  const refreshTargets = [
+    path.join(targetRoot, 'release', 'atm-onefile', 'atm.mjs'),
+    path.join(targetRoot, 'packages', 'cli', 'dist', 'atm.js')
+  ];
+  const refreshAt = new Date(Date.now() + 2000);
+  for (const filePath of refreshTargets) {
+    if (!existsSync(filePath)) continue;
+    const stats = statSync(filePath);
+    utimesSync(filePath, stats.atime, refreshAt);
   }
 }
 

@@ -37,6 +37,14 @@ The contract is also what powers adapter-aware governance hints and integration
 tests. New language adapters should ship fixture-backed validation proving that
 their three selectors stay aligned with runtime readiness reporting.
 
+For repository documentation, do not leave this contract implicit inside only a
+package README. When a language adapter is added, update the `docs/` contract
+pages that describe adapter boundaries so future agents can discover:
+
+- the exact `fast` / `default` / `all` commands;
+- whether touched-scope warnings must be cleaned together with errors;
+- which integration or validator suite proves the adapter contract in CI.
+
 If a new language adapter is added as an npm workspace package, treat lockfile
 sync as part of the same change. `package.json`, `package-lock.json`, and the
 workspace package metadata must land together so `npm ci` keeps working in CI;

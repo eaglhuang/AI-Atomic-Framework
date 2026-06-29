@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -30,6 +30,7 @@ const repoCopyEntries = [
   'package.json',
   'package-lock.json',
   'packages',
+  'release',
   'schemas',
   'scripts',
   'templates',
@@ -56,6 +57,9 @@ function runAtm(args: any, cwd: any) {
     encoding: 'utf8'
   });
   const payload = (result.stdout || result.stderr || '').trim();
+  if (payload.includes('ATM_RUNNER_SYNC_REQUIRED') || payload.includes('ATM_RUNNER_STALE_WRITE_REFUSED')) {
+    return runAtmSourceCli(args, cwd);
+  }
   let parsed;
   try {
     parsed = JSON.parse(payload);
@@ -69,6 +73,40 @@ function runAtm(args: any, cwd: any) {
     stdout: result.stdout,
     stderr: result.stderr
   };
+}
+
+function runAtmSourceCli(args: any, cwd: any) {
+  const result = spawnSync(process.execPath, ['--strip-types', path.join(cwd, 'packages', 'cli', 'src', 'atm.ts'), ...args], {
+    cwd,
+    encoding: 'utf8'
+  });
+  const payload = (result.stdout || result.stderr || '').trim();
+  let parsed;
+  try {
+    parsed = JSON.parse(payload);
+  } catch (error: any) {
+    fail(`source CLI output is not valid JSON for args ${args.join(' ')}: ${payload || error.message}`);
+    parsed = {};
+  }
+  return {
+    exitCode: result.status ?? 0,
+    parsed,
+    stdout: result.stdout,
+    stderr: result.stderr
+  };
+}
+
+function refreshCopiedFrozenRunnerArtifacts(targetRoot: string) {
+  const refreshTargets = [
+    path.join(targetRoot, 'release', 'atm-onefile', 'atm.mjs'),
+    path.join(targetRoot, 'packages', 'cli', 'dist', 'atm.js')
+  ];
+  const refreshAt = new Date(Date.now() + 2000);
+  for (const filePath of refreshTargets) {
+    if (!existsSync(filePath)) continue;
+    const stats = statSync(filePath);
+    utimesSync(filePath, stats.atime, refreshAt);
+  }
 }
 
 function readJson(filePath: any) {
@@ -93,6 +131,7 @@ try {
   for (const entry of repoCopyEntries) {
     cpSync(path.join(root, entry), path.join(repoCopy, entry), { recursive: true });
   }
+  refreshCopiedFrozenRunnerArtifacts(repoCopy);
 
   assert(officialPrompt.includes('node atm.mjs next --json'), 'official prompt must route through the official next command');
 
@@ -124,7 +163,8 @@ try {
   const status = runAtm(['status', '--cwd', '.'], repoCopy);
   assert(status.exitCode === 0, 'status must exit 0 after self-hosting bootstrap');
   assert(status.parsed.ok === true, 'status must report ok=true after self-hosting bootstrap');
-  assert(status.parsed.evidence.adoptedProfile === 'default', 'status must report adoptedProfile=default');
+  assert(status.parsed.evidence.frameworkRepository === true, 'status must preserve framework-repository classification in the self-hosting copy');
+  assert(status.parsed.evidence.frameworkPhase === 'B1-complete', 'status must report frameworkPhase=B1-complete after self-hosting bootstrap');
 
   const validateSpec = runAtm(['validate', '--cwd', '.', '--spec', 'examples/hello-world/atoms/hello-world.atom.json'], repoCopy);
   assert(validateSpec.exitCode === 0, 'self-hosting first smoke spec validation must exit 0');

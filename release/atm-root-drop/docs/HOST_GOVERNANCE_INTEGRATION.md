@@ -255,6 +255,12 @@ closeout, handoff, or commit without assuming everything is JavaScript lint.
 This keeps the orchestration layer neutral while still letting each language
 declare the cheapest meaningful static pass and the stricter full static lane.
 
+That host-side orchestration should also treat warnings as first-class hygiene
+inside touched scope, not only hard errors. The adapter contract declares which
+static surfaces belong to each language, while host governance decides when to
+run `fast` by default (for example doctor / next / pre-commit) and when to
+expand to `default` or `all`.
+
 This is the strongest option when the host already routes important writes
 through ATM-aware tooling. It is also the most expensive, because the host must
 maintain that adapter boundary over time.

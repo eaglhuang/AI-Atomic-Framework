@@ -60,15 +60,12 @@ const internalCommandNames = Object.values(commandSpecs)
   .sort((left: any, right: any) => left.localeCompare(right));
 const runnerCommandNames = Object.keys(cliCommandRunners).sort((left, right) => left.localeCompare(right));
 const allSpecCommandNames = Object.keys(commandSpecs).sort((left, right) => left.localeCompare(right));
-const aao0063TaskFixtureCandidates = [
-  path.resolve(root, '../3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md'),
-  process.env.USERPROFILE
-    ? path.join(process.env.USERPROFILE, '3KLife', 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', 'TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.task.md')
-    : null
-].filter((candidate): candidate is string => Boolean(candidate));
-const aao0063TaskFixturePath = aao0063TaskFixtureCandidates.find((candidate) => existsSync(candidate));
+const aao0063TaskFixturePath = path.join(
+  root,
+  'scripts/fixtures/tasks/TASK-AAO-0063-evidence-required-command-quoting-validator-auto-link.fixture.md'
+);
 
-assert(aao0063TaskFixturePath, 'missing TASK-AAO-0063 task fixture path for validate-cli regression tests');
+assert(existsSync(aao0063TaskFixturePath), 'missing TASK-AAO-0063 task fixture path for validate-cli regression tests');
 
 function fail(message: any) {
   console.error(`[cli:${mode}] ${message}`);

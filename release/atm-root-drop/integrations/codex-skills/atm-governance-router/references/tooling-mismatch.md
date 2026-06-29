@@ -95,20 +95,3 @@ tracked governance residue created by setup commands.
 - Durable rule: when a quality behavior can be expressed at the skill layer,
   teach it there first so every adapter learns the expectation before the hard
   enforcement arrives.
-
-## 2026-06-29 - New workspace packages must ship with a lockfile sync
-
-- Trigger: an agent adds a new npm workspace package such as a language adapter
-  and local commands keep working because existing `node_modules` already happen
-  to contain the dependency graph.
-- Symptom: GitHub Actions fails immediately at `npm ci` with a message that
-  `package.json` and `package-lock.json` are out of sync, often naming the new
-  workspace package as missing from the lock file.
-- Correct ATM route: treat `package-lock.json` as part of the workspace surface.
-  After adding or renaming a workspace package, run `npm install`, verify
-  `npm ci`, then continue with typecheck/lint/validators.
-- Recovery: do not chase fake registry or network causes first. If `npm ci`
-  points at a missing workspace package, sync the lockfile locally and recommit
-  the package metadata plus lockfile together.
-- Durable rule: workspace topology changes are incomplete until the lockfile has
-  been regenerated and `npm ci` has been re-proven.

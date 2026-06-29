@@ -118,7 +118,7 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
 
   async function runAtmJsonPortable(args: string[], cwd = root): Promise<AtmJsonExecutionResult> {
     const primary = runAtmJsonAttempt(args, cwd, 'atm.mjs');
-    if (!shouldFallbackToSourceCli(primary.exitCode, primary.payload)) {
+    if (!shouldFallbackToPortableSourceCli(primary.exitCode, primary.payload)) {
       return finalizeAtmJsonResult(primary, args);
     }
     return await runAtmJsonInProcess(args, cwd);
@@ -169,6 +169,12 @@ export function createValidator(name: string, options: { argv?: string[]; defaul
     if (exitCode === 0) return false;
     return /spawnSync .*node(?:\.exe)? (?:EPERM|EACCES)/i.test(payload)
       || /Error:\s+spawnSync .*node(?:\.exe)? (?:EPERM|EACCES)/i.test(payload);
+  }
+
+  function shouldFallbackToPortableSourceCli(exitCode: number, payload: string): boolean {
+    if (shouldFallbackToSourceCli(exitCode, payload)) return true;
+    return payload.includes('ATM_RUNNER_SYNC_REQUIRED')
+      || payload.includes('ATM_RUNNER_STALE_WRITE_REFUSED');
   }
 
   async function runAtmJsonInProcess(args: string[], cwd: string): Promise<AtmJsonExecutionResult> {

@@ -34,3 +34,5 @@ When a new adapter is introduced, its migration note should cover:
 - which warnings/errors are expected to be cleaned in touched scope;
 - which validator or integration fixture proves runtime readiness and adapter
   selectors still agree.
+- which `docs/` contract pages were updated so agent-facing guidance stays in
+  parity with the implementation.
