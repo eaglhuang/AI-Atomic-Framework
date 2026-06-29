@@ -3,6 +3,155 @@
     "fastValidatorBudgetMs": 10000,
     "slowValidatorBudgetMs": 90000
   },
+  "selectionFamilies": [
+    {
+      "id": "docs-governance",
+      "label": "Docs governance",
+      "description": "Charter, terminology, neutrality, and other documentation-facing governance checks.",
+      "matchTags": ["docs", "charter", "dispatch", "terminology", "neutrality"]
+    },
+    {
+      "id": "schema-contract",
+      "label": "Schema and contracts",
+      "description": "Schema sync, package skeleton, and contract-level validation surfaces.",
+      "matchTags": ["schema", "contract", "boundary", "spec", "template"]
+    },
+    {
+      "id": "cli-taskflow",
+      "label": "CLI and taskflow",
+      "description": "CLI route, taskflow, queue, and branch governance checks.",
+      "matchTags": ["cli", "taskflow", "queue"]
+    },
+    {
+      "id": "framework-governance",
+      "label": "Framework governance",
+      "description": "Framework claims, hooks, and framework-mode governance checks.",
+      "matchTags": ["framework", "git", "bootstrap"]
+    },
+    {
+      "id": "integration-parity",
+      "label": "Integration parity",
+      "description": "Adapter parity, generated skill templates, and editor integration checks.",
+      "matchTags": ["integration", "adapter", "static-check"]
+    },
+    {
+      "id": "language-adapters",
+      "label": "Language adapters",
+      "description": "Language adapter static contract and language-specific runtime coverage.",
+      "matchTags": ["language", "python", "csharp"]
+    },
+    {
+      "id": "broker-team",
+      "label": "Broker and team agents",
+      "description": "Broker lifecycle, AGR, queue-drain, and team broker write governance.",
+      "matchTags": ["broker", "agr", "bench"]
+    },
+    {
+      "id": "release-trust",
+      "label": "Release and version trust",
+      "description": "Release bundle, trust, compatibility, skew, and versioning checks.",
+      "matchTags": ["release", "version", "self-host", "security", "golden"]
+    },
+    {
+      "id": "registry-maps",
+      "label": "Registry and maps",
+      "description": "Registry, seed, map, generator provenance, and police-family coverage.",
+      "matchTags": ["registry", "seed", "map", "generator", "police", "police-family", "upgrade", "rollback", "review", "polymorph"]
+    },
+    {
+      "id": "evidence-experience",
+      "label": "Evidence and experience loops",
+      "description": "Evidence detector, conversation evolution, metrics, and experience feedback loops.",
+      "matchTags": ["evidence", "evolution", "conversation", "metrics", "experience", "feedback", "confidence", "telemetry"]
+    },
+    {
+      "id": "plugin-surfaces",
+      "label": "Plugin surfaces",
+      "description": "Plugin SDKs and replaceable governance bundle contracts.",
+      "matchTags": ["plugin", "governance"]
+    },
+    {
+      "id": "test-governance",
+      "label": "Test governance",
+      "description": "Unified test catalog, validator facade, test runner, and performance-selection checks.",
+      "matchTags": ["test-governance", "validator-facade", "test-runner"]
+    },
+    {
+      "id": "examples-fixtures",
+      "label": "Examples and fixtures",
+      "description": "Examples, migrations, regression fixtures, and sentinel coverage.",
+      "matchTags": ["examples", "fixtures", "regression", "sentinel", "migration", "guard"]
+    }
+  ],
+  "focusRules": [
+    {
+      "patterns": [
+        "scripts/validate-bootstrap.ts",
+        "templates/root-drop/**",
+        "examples/agent-bootstrap/**",
+        "packages/cli/src/commands/bootstrap*.ts"
+      ],
+      "validators": [
+        "validate-bootstrap"
+      ]
+    },
+    {
+      "patterns": [
+        "integrations/**",
+        "templates/skills/**",
+        "packages/integrations-core/**",
+        "packages/integration-claude-code/**",
+        "packages/integration-codex/**",
+        "packages/integration-copilot/**",
+        "packages/integration-cursor/**",
+        "packages/integration-gemini/**",
+        "docs/ANTIGRAVITY_INTEGRATION.md",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "validators": [
+        "validate-integration-adapter",
+        "validate-skill-templates"
+      ]
+    },
+    {
+      "patterns": [
+        "packages/core/src/guidance/**",
+        "packages/cli/src/commands/guide.ts",
+        "packages/cli/src/commands/orient.ts",
+        "packages/cli/src/commands/start.ts",
+        "packages/cli/src/commands/explain.ts",
+        "tests/guidance-fixtures/**",
+        "scripts/validate-guidance.ts",
+        "scripts/validate-guide.ts"
+      ],
+      "validators": [
+        "validate-guidance",
+        "validate-guide"
+      ]
+    },
+    {
+      "patterns": [
+        "scripts/run-validators.ts",
+        "scripts/lib/test-catalog.ts",
+        "scripts/test-catalog.config.json",
+        "scripts/validate-test-facade.ts",
+        "scripts/validators.config.json"
+      ],
+      "validators": [
+        "validate-test-facade"
+      ]
+    },
+    {
+      "patterns": [
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/framework-development/**",
+        "scripts/validate-git-head-evidence.ts"
+      ],
+      "validators": [
+        "validate-git-head-evidence"
+      ]
+    }
+  ],
   "profiles": {
     "test": {
       "mode": "test",
@@ -125,6 +274,7 @@
         "validate-admission-failure-reason",
         "validate-operational-bench",
         "validate-queue-drain-smoke",
+        "validate-test-facade",
         "validate-broker-recovery",
         "validate-team-brokered-write"
       ]
@@ -223,6 +373,7 @@
     { "name": "validate-review-advisory", "entry": "scripts/validate-review-advisory.ts", "tags": ["review"], "slow": false },
     { "name": "validate-polymorph-template", "entry": "scripts/validate-polymorph-template.ts", "tags": ["polymorph"], "slow": false },
     { "name": "validate-test-runner", "entry": "scripts/validate-test-runner.ts", "tags": ["test-runner"], "slow": false },
+    { "name": "validate-test-facade", "entry": "scripts/validate-test-facade.ts", "tags": ["validator-facade", "test-governance"], "slow": false },
     { "name": "validate-registry-core", "entry": "scripts/validate-registry-core.ts", "tags": ["registry"], "slow": false },
     { "name": "validate-status-machine", "entry": "scripts/validate-status-machine.ts", "tags": ["registry"], "slow": false },
     { "name": "validate-registry-index", "entry": "scripts/validate-registry-index.ts", "tags": ["registry"], "slow": false },

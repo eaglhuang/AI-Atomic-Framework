@@ -57,4 +57,9 @@ node atm.mjs doctor --json
 node atm.mjs next --json
 ```
 
-Use `npm run validate:quick` for the lightest smoke lane, `npm run validate:standard` for the broad standard suite before push or CI when you need wider governance confidence, and `npm run validate:full` for the heaviest release-grade sweep.
+Use `npm run validate:quick` for the lightest smoke lane. When you want `quick` to follow the files you actually touched, run `npm run validate:quick:changed`. Use `npm run validate:standard` for the broader governance suite before push or CI when you need wider confidence, and `npm run validate:full` for the heaviest release-grade sweep.
+
+The validator runner now reads the unified test catalog and reports two extra machine-readable views:
+
+- `selection`: which catalog-backed validator families were actually selected for this run, including `catalogSchemaId` and `duplicateDedupeKeys`.
+- `performance.familyHotspots`, `performance.slowestEntries`, and `performance.optimizationCandidates`: which families or individual entries dominate runtime or exceed budget, so slow lanes can be narrowed or consolidated instead of silently growing forever.
