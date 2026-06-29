@@ -42,6 +42,12 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "docs/DEPRECATIONS.md",
+      "atom_id": "atm.task-lifecycle-map",
+      "capability": "Canonical deprecation ledger for low-level task lifecycle surfaces, including reserve/promote migration timing and next --claim replacement guidance (TASK-AAO-0029).",
+      "coverage_status": "active"
+    },
+    {
       "path_pattern": "docs/governance/team-agents/minimal-task-crew.md",
       "atom_id": "atm.team-agents-map",
       "capability": "Minimal task crew briefing contract for team plan results, including required and optional roles, allowed files, do-not-touch paths, expected reports, and stop conditions",
@@ -268,7 +274,7 @@
     {
       "path_pattern": "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "atom_id": "atm.task-direction-map",
-      "capability": "tasks command surface specification including scope add sub-command with --add csv option and claim auto-intent surface documentation (TASK-AAO-0010, TASK-MAO-0055).",
+      "capability": "tasks command surface specification including scope add sub-command with --add csv option, claim auto-intent surface documentation, and deprecated reserve/promote guard wording with explicit maintainer override guidance (TASK-AAO-0010, TASK-AAO-0029, TASK-MAO-0055).",
       "coverage_status": "active"
     },
     {
@@ -515,7 +521,7 @@
     {
       "path_pattern": "packages/cli/src/commands/tasks.ts",
       "atom_id": "atm.task-ledger-governance-map",
-      "capability": "tasks import/reconcile and claim lifecycle governance; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; claim auto-intent resolves write vs closeout-only from in-scope dirty files and deliverables already in HEAD; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
+      "capability": "tasks import/reconcile and claim lifecycle governance; import preserves nested evidence/rollback and target_repo/planning_repo/closure_authority; claim auto-intent resolves write vs closeout-only from in-scope dirty files and deliverables already in HEAD; reserve/promote are deprecated by default and redirect AI-facing flows to next --claim unless the explicit maintainer override is used; reconcile supports historical done task reconcile / reopen closure sync, evaluates deliverables gate on historical commits, syncs ledger done status without claim, aligns closure-packet attestation contract, and integrates planning-only warnings",
       "coverage_status": "active"
     },
     {

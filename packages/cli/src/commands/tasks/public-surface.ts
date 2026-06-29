@@ -14,11 +14,14 @@ import {
   buildResidueDiagnosisEvidence,
   generateTaskCard,
   loadTaskDocumentOrThrow,
+  prepareTaskForClaim,
   runTasksRosterUpdate
 } from '../tasks.ts';
 
 import type {
   TaskClaimDependencyBlocker,
+  TaskClaimPreparationResult,
+  TaskClaimPreparationStep,
   TaskResidueBucket,
   TaskResidueClassification
 } from '../tasks.ts';
@@ -29,11 +32,14 @@ export {
   buildResidueDiagnosisEvidence,
   generateTaskCard,
   loadTaskDocumentOrThrow,
+  prepareTaskForClaim,
   runTasksRosterUpdate
 };
 
 export type {
   TaskClaimDependencyBlocker,
+  TaskClaimPreparationResult,
+  TaskClaimPreparationStep,
   TaskResidueBucket,
   TaskResidueClassification
 };
