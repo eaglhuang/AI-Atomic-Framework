@@ -67,7 +67,7 @@ function readText(absolutePath: string) {
 }
 
 function runAtm(args: any, cwd: any) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
+  const result = spawnSync(process.execPath, [path.join(root, 'atm.dev.mjs'), ...args], {
     cwd,
     encoding: 'utf8',
     env: pinnedRunnerSource
@@ -102,6 +102,7 @@ function assertReadmeEntry(hostRepo: string) {
 function assertPinnedRunner(hostRepo: string) {
   const runnerPath = path.join(hostRepo, 'atm.mjs');
   const metadataPath = path.join(hostRepo, '.atm', 'runtime', 'pinned-runner.json');
+  const onefileCacheRoot = path.join(hostRepo, '.atm', 'runtime', 'onefile-cache');
   assert(existsSync(runnerPath), 'bootstrap must install root atm.mjs pinned runner');
   assert(existsSync(metadataPath), 'bootstrap must write pinned runner metadata');
   const metadata = readJson(metadataPath);
@@ -112,7 +113,11 @@ function assertPinnedRunner(hostRepo: string) {
 
   const result = spawnSync(process.execPath, [runnerPath, 'next', '--cwd', hostRepo, '--json'], {
     cwd: hostRepo,
-    encoding: 'utf8'
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      ATM_ONEFILE_CACHE_ROOT: onefileCacheRoot
+    }
   });
   const payload = (result.stdout || result.stderr || '').trim();
   let parsed: any = {};
@@ -126,8 +131,8 @@ function assertPinnedRunner(hostRepo: string) {
 }
 
 function assertFirstUseNotice(nextResult: any) {
-  const userNotice = nextResult.parsed.evidence?.userNotice;
-  const nextAction = nextResult.parsed.evidence?.nextAction;
+  const userNotice = nextResult.parsed.userNotice ?? nextResult.parsed.evidence?.userNotice;
+  const nextAction = nextResult.parsed.nextAction ?? nextResult.parsed.evidence?.nextAction;
   assert(userNotice?.schemaVersion === 'atm.userNotice.v0.1', 'next must emit first-use userNotice schema');
   assert(userNotice.id === 'atm.first-use.governance-available', 'next must emit stable first-use notice id');
   assert(userNotice.displayPolicy === 'show-on-first-contact', 'first-use notice must be marked for first-contact display');
@@ -277,9 +282,10 @@ try {
   assertReadmeEntry(hostRepo);
   assertPinnedRunner(hostRepo);
   const firstNext = runAtm(['next', '--cwd', hostRepo], hostRepo);
+  const firstNextAction = firstNext.parsed.nextAction ?? firstNext.parsed.evidence?.nextAction;
   assert(firstNext.exitCode === 1, 'next before ATMChart render must exit with non-ready status');
-  assert(firstNext.parsed.evidence.nextAction.status === 'needs-onboarding-refresh', 'next before ATMChart render must request onboarding refresh');
-  assert(firstNext.parsed.evidence.nextAction.afterNextAction.includes('original request'), 'onboarding refresh next action must tell agents to resume the original request');
+  assert(firstNextAction?.status === 'needs-onboarding-refresh', 'next before ATMChart render must request onboarding refresh');
+  assert(firstNextAction?.afterNextAction?.includes('original request'), 'onboarding refresh next action must tell agents to resume the original request');
   assertFirstUseNotice(firstNext);
 
   const profile = readFileSync(path.join(hostRepo, '.atm', 'runtime', 'profile', 'default.md'), 'utf8');

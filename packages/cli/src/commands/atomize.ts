@@ -12,7 +12,7 @@ type AtomizeOptions = {
   passthroughArgs: string[];
 };
 
-export async function runAtomize(argv: any) {
+export async function runAtomize(argv: string[]) {
   const options = parseAtomizeArgs(argv);
 
   if (!options.subcommand) {
@@ -83,16 +83,18 @@ async function runAtomizationRegistrationTool(options: AtomizeOptions) {
       ],
       evidence: parsed
     });
-  } catch (err: any) {
-    const stderr = typeof err?.stderr === 'string' ? err.stderr.trim() : '';
+  } catch (err: unknown) {
+    const error = err as Record<string, unknown> | null;
+    const stderr = typeof error?.stderr === 'string' ? error.stderr.trim() : '';
     const payload = stderr.startsWith('{') ? stderr : '';
     const details = payload ? JSON.parse(payload) : null;
+    const errorMessage = err instanceof Error ? err.message : String(err);
     return makeResult({
       ok: false,
       command: `atomize ${subcommand}`,
       cwd: options.cwd,
       messages: [
-        message('error', 'ATM_ATOMIZE_REGISTRATION_TOOL_FAILED', `Atomize ${subcommand} failed: ${details?.error ?? err.message}`, {
+        message('error', 'ATM_ATOMIZE_REGISTRATION_TOOL_FAILED', `Atomize ${subcommand} failed: ${details?.error ?? errorMessage}`, {
           usage: details?.usage ?? null
         })
       ],
@@ -154,14 +156,15 @@ async function runAtomizeInventory(options: AtomizeOptions) {
         full_report: result.report
       }
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     return makeResult({
       ok: false,
       command: 'atomize inventory',
       cwd: options.cwd,
       messages: [
-        message('error', 'ATM_ATOMIZE_INVENTORY_FAILED', `Atomization inventory failed: ${err.message}`, {
-          stack: err.stack
+        message('error', 'ATM_ATOMIZE_INVENTORY_FAILED', `Atomization inventory failed: ${error.message}`, {
+          stack: error.stack
         })
       ]
     });
@@ -231,14 +234,15 @@ async function runAtomizeScore(options: AtomizeOptions) {
         full_report: result.report
       }
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     return makeResult({
       ok: false,
       command: 'atomize score',
       cwd: options.cwd,
       messages: [
-        message('error', 'ATM_ATOMIZE_SCORE_FAILED', `Atomization score calculation failed: ${err.message}`, {
-          stack: err.stack
+        message('error', 'ATM_ATOMIZE_SCORE_FAILED', `Atomization score calculation failed: ${error.message}`, {
+          stack: error.stack
         })
       ]
     });
@@ -293,21 +297,22 @@ async function runAtomizeBackfill(options: AtomizeOptions) {
         proposalSample: (result.report?.proposals ?? []).slice(0, 5)
       }
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
     return makeResult({
       ok: false,
       command: 'atomize backfill',
       cwd: options.cwd,
       messages: [
-        message('error', 'ATM_ATOMIZE_BACKFILL_FAILED', `Atomize backfill failed: ${err.message}`, {
-          stack: err.stack
+        message('error', 'ATM_ATOMIZE_BACKFILL_FAILED', `Atomize backfill failed: ${error.message}`, {
+          stack: error.stack
         })
       ]
     });
   }
 }
 
-function parseAtomizeArgs(argv: any) {
+function parseAtomizeArgs(argv: string[]) {
   const state: AtomizeOptions = {
     cwd: process.cwd(),
     subcommand: null,
@@ -362,7 +367,7 @@ function parseAtomizeArgs(argv: any) {
   return state;
 }
 
-function requireValue(argv: any, index: number, flag: string): string {
+function requireValue(argv: string[], index: number, flag: string): string {
   const value = argv[index + 1];
   if (!value || value.startsWith('-')) {
     throw new CliError('ATM_CLI_MISSING_VALUE', `Flag ${flag} requires a value.`);

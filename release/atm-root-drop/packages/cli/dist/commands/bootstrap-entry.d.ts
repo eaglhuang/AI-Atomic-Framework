@@ -1,4 +1,4 @@
-export declare function runBootstrap(argv: any): Promise<{
+export declare function runBootstrap(argv: string[]): Promise<{
     command: string;
     evidence: {
         pinnedRunner: any;

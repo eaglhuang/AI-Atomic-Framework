@@ -173,7 +173,7 @@ function writePayload(payload, json) {
         process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
         return;
     }
-    const message = payload.messages[0]?.text ?? 'create-atm complete.';
+    const message = payload.messages?.[0]?.text ?? 'create-atm complete.';
     process.stdout.write(`[create-atm] ${message}\n`);
 }
 const isDirectRun = process.argv[1]

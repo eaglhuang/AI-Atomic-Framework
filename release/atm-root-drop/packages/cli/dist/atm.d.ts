@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-export declare const cliCommandRunners: Record<string, (argv: any) => any>;
+import type { CommandResult } from './commands/shared.ts';
+export declare const cliCommandRunners: Record<string, (argv: string[]) => Promise<CommandResult> | CommandResult>;
 export declare function runCli(argv?: string[], io?: {
     stdout: NodeJS.WriteStream & {
         fd: 1;

@@ -8,7 +8,6 @@ export function loadNeutralityPolicy(options = {}) {
     const policyPath = path.resolve(repositoryRoot, options.policyPath ?? defaultNeutralityPolicyRelativePath);
     const parsed = JSON.parse(readFileSync(policyPath, 'utf8'));
     return {
-        ...parsed,
         policyPath: toPosixPath(path.relative(repositoryRoot, policyPath)),
         protectedFiles: Array.isArray(parsed.protectedFiles) ? parsed.protectedFiles : [],
         protectedScopes: Array.isArray(parsed.protectedScopes) ? parsed.protectedScopes : [],
@@ -121,7 +120,7 @@ function matchesScope(relativePath, scope) {
     const normalizedPath = toPosixPath(relativePath);
     const includeMatch = scope.pathPrefix
         ? normalizedPath.startsWith(scope.pathPrefix)
-        : normalizedPath === scope.path || normalizedPath.startsWith(`${scope.path}/`);
+        : (scope.path ? (normalizedPath === scope.path || normalizedPath.startsWith(`${scope.path}/`)) : false);
     if (!includeMatch) {
         return false;
     }

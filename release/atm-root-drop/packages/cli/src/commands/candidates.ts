@@ -114,7 +114,7 @@ export async function runCandidates(argv: string[]) {
               message('info', 'ATM_CANDIDATES_RANK_CACHED', 'Candidate ranking returned from cache.', {
                 cached: true,
                 cacheAge: Math.floor((Date.now() - new Date(hit.cachedAt).getTime()) / 1000) + 's',
-                candidates: (hit.result as any)?.candidateRanking?.length ?? 0
+                candidates: (hit.result as { candidateRanking?: unknown[] })?.candidateRanking?.length ?? 0
               })
             ],
             evidence: { report: hit.result, cached: true, cachedAt: hit.cachedAt }

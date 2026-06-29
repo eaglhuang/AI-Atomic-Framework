@@ -1,1 +1,1 @@
-export declare function runAtomize(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runAtomize(argv: string[]): Promise<import("./shared.ts").CommandResult>;

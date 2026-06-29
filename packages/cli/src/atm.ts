@@ -62,13 +62,14 @@ import { runTaskflow } from './commands/taskflow.ts';
 import { runTaskView } from './commands/task-view.ts';
 import { getCommandSpec, listCommandSpecs } from './commands/command-specs.ts';
 import { applyOutputProjectionFlagsFromArgv, CliError, enrichCommandResult, makeHelpResult, makeResult, message, readFrameworkVersion, writeResult } from './commands/shared.ts';
+import type { CommandResult } from './commands/shared.ts';
 import { checkStartupKnownBadVersion, isKnownBadReadOnlyCommand } from './startup-known-bad.ts';
 import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-integrity.ts';
 import { runIdentity } from './commands/identity.ts';
 import { runBroker } from './commands/broker.ts';
 import { runRoute } from './commands/route.ts';
 
-export const cliCommandRunners: Record<string, (argv: any) => any> = {
+export const cliCommandRunners: Record<string, (argv: string[]) => Promise<CommandResult> | CommandResult> = {
   atomize: runAtomize,
   'atm-chart': runATMChart,
   baseline: runBaseline,
@@ -153,7 +154,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   }
 
   if (commandName === 'help') {
-    const targetCommand = commandArgs.find((arg: any) => !arg.startsWith('-'));
+    const targetCommand = commandArgs.find((arg) => !arg.startsWith('-'));
     if (!targetCommand) {
       const result = enrichCommandResult(createGlobalHelpResult(process.cwd()));
       writeResult(result, io.stdout, outputFormat);
@@ -265,7 +266,7 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   }
 }
 
-function createGlobalHelpResult(cwd: any) {
+function createGlobalHelpResult(cwd: string) {
   const commands = listCommandSpecs()
     .map((spec) => ({ command: spec.name, summary: spec.summary }))
     .sort((left, right) => left.command.localeCompare(right.command));
@@ -281,7 +282,7 @@ function createGlobalHelpResult(cwd: any) {
   });
 }
 
-function createVersionResult(cwd: any) {
+function createVersionResult(cwd: string) {
   const version = readFrameworkVersion();
   return makeResult({
     ok: true,
@@ -294,11 +295,11 @@ function createVersionResult(cwd: any) {
   });
 }
 
-function stripFormatFlags(argv: any) {
-  return argv.filter((arg: any) => arg !== '--json' && arg !== '--pretty');
+function stripFormatFlags(argv: string[]) {
+  return argv.filter((arg) => arg !== '--json' && arg !== '--pretty');
 }
 
-function selectOutputFormat(argv: any, io: any) {
+function selectOutputFormat(argv: string[], io: { stdout?: { isTTY?: boolean } | null; stderr?: unknown }) {
   if (argv.includes('--json')) {
     return 'json';
   }

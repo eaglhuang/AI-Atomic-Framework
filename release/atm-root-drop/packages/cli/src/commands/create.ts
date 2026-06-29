@@ -2,7 +2,7 @@ import path from 'node:path';
 import { generateAtom } from '../../../core/src/manager/atom-generator.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
-export function runCreate(argv: any) {
+export function runCreate(argv: string[]) {
   const { options } = parseCreateOptions(argv);
   const result = generateAtom({
     bucket: options.bucket,
@@ -48,7 +48,7 @@ type CreateOptions = {
   dryRun: boolean;
 };
 
-function parseCreateOptions(argv: any) {
+function parseCreateOptions(argv: string[]) {
   const options: CreateOptions = {
     cwd: process.cwd(),
     bucket: null,
@@ -113,7 +113,7 @@ function parseCreateOptions(argv: any) {
   };
 }
 
-function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+function requireOptionValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `create requires a value for ${optionName}`, { exitCode: 2 });

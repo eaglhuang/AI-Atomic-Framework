@@ -68,15 +68,17 @@ async function runAtomizationRegistrationTool(options) {
         });
     }
     catch (err) {
-        const stderr = typeof err?.stderr === 'string' ? err.stderr.trim() : '';
+        const error = err;
+        const stderr = typeof error?.stderr === 'string' ? error.stderr.trim() : '';
         const payload = stderr.startsWith('{') ? stderr : '';
         const details = payload ? JSON.parse(payload) : null;
+        const errorMessage = err instanceof Error ? err.message : String(err);
         return makeResult({
             ok: false,
             command: `atomize ${subcommand}`,
             cwd: options.cwd,
             messages: [
-                message('error', 'ATM_ATOMIZE_REGISTRATION_TOOL_FAILED', `Atomize ${subcommand} failed: ${details?.error ?? err.message}`, {
+                message('error', 'ATM_ATOMIZE_REGISTRATION_TOOL_FAILED', `Atomize ${subcommand} failed: ${details?.error ?? errorMessage}`, {
                     usage: details?.usage ?? null
                 })
             ],
@@ -135,13 +137,14 @@ async function runAtomizeInventory(options) {
         });
     }
     catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
         return makeResult({
             ok: false,
             command: 'atomize inventory',
             cwd: options.cwd,
             messages: [
-                message('error', 'ATM_ATOMIZE_INVENTORY_FAILED', `Atomization inventory failed: ${err.message}`, {
-                    stack: err.stack
+                message('error', 'ATM_ATOMIZE_INVENTORY_FAILED', `Atomization inventory failed: ${error.message}`, {
+                    stack: error.stack
                 })
             ]
         });
@@ -208,13 +211,14 @@ async function runAtomizeScore(options) {
         });
     }
     catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
         return makeResult({
             ok: false,
             command: 'atomize score',
             cwd: options.cwd,
             messages: [
-                message('error', 'ATM_ATOMIZE_SCORE_FAILED', `Atomization score calculation failed: ${err.message}`, {
-                    stack: err.stack
+                message('error', 'ATM_ATOMIZE_SCORE_FAILED', `Atomization score calculation failed: ${error.message}`, {
+                    stack: error.stack
                 })
             ]
         });
@@ -266,13 +270,14 @@ async function runAtomizeBackfill(options) {
         });
     }
     catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
         return makeResult({
             ok: false,
             command: 'atomize backfill',
             cwd: options.cwd,
             messages: [
-                message('error', 'ATM_ATOMIZE_BACKFILL_FAILED', `Atomize backfill failed: ${err.message}`, {
-                    stack: err.stack
+                message('error', 'ATM_ATOMIZE_BACKFILL_FAILED', `Atomize backfill failed: ${error.message}`, {
+                    stack: error.stack
                 })
             ]
         });

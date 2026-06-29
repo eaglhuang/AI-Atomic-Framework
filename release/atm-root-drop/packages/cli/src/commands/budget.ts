@@ -4,7 +4,7 @@ import { CliError, makeResult, message, resolveValue } from './shared.ts';
 
 type BudgetOptions = {
   cwd: string;
-  action: 'check' | null;
+  action: string | null;
   taskId: string | null;
   budgetId: string | null;
   estimatedTokens: number | null;
@@ -12,7 +12,7 @@ type BudgetOptions = {
   requestedSummary: string | null;
 };
 
-export async function runBudget(argv: any) {
+export async function runBudget(argv: string[]) {
   const options = parseBudgetArgs(argv);
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
   const guard = adapter.stores.contextBudgetGuard;
@@ -44,7 +44,7 @@ export async function runBudget(argv: any) {
   });
 }
 
-function parseBudgetArgs(argv: any) {
+function parseBudgetArgs(argv: string[]) {
   const state: BudgetOptions = {
     cwd: process.cwd(),
     action: null,
@@ -116,7 +116,7 @@ function parseBudgetArgs(argv: any) {
   };
 }
 
-function requireValue(argv: any, optionIndex: any, optionName: any) {
+function requireValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `budget requires a value for ${optionName}`, { exitCode: 2 });

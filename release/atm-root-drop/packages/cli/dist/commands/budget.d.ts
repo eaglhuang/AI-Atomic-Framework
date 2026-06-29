@@ -1,1 +1,1 @@
-export declare function runBudget(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runBudget(argv: string[]): Promise<import("./shared.ts").CommandResult>;

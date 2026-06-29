@@ -75,11 +75,26 @@ const renderedRequiredMarkers = [
   '.atm/history/evidence/BOOTSTRAP-0001.json'
 ];
 
+export interface AgentProfile {
+  id: string;
+  label: string;
+  executionMode: string;
+  workflow: string;
+}
+
+export interface AgentsMdVerificationResult {
+  ok: boolean;
+  mode: string;
+  path: string | null;
+  checked: string[];
+  issues: string[];
+}
+
 export function listSupportedAgentIds() {
   return supportedAgentProfiles.map((profile) => profile.id);
 }
 
-export function resolveAgentProfile(agentId: any) {
+export function resolveAgentProfile(agentId: unknown) {
   if (typeof agentId !== 'string') {
     return null;
   }
@@ -87,7 +102,7 @@ export function resolveAgentProfile(agentId: any) {
   return supportedAgentProfiles.find((profile) => profile.id === normalizedId) ?? null;
 }
 
-export function verifyAgentsMarkdown(cwd: any) {
+export function verifyAgentsMarkdown(cwd: string): AgentsMdVerificationResult {
   const renderedPath = path.join(cwd, 'AGENTS.md');
   const templatePath = path.join(cwd, 'templates', 'root-drop', 'AGENTS.md');
   const useRendered = existsSync(renderedPath);
@@ -106,7 +121,7 @@ export function verifyAgentsMarkdown(cwd: any) {
 
   const content = readFileSync(filePath, 'utf8');
   const requiredMarkers = useRendered ? renderedRequiredMarkers : templateRequiredMarkers;
-  const issues = [];
+  const issues: string[] = [];
 
   for (const marker of requiredMarkers) {
     if (!content.includes(marker)) {
@@ -129,7 +144,7 @@ export function verifyAgentsMarkdown(cwd: any) {
   };
 }
 
-export function createAgentConfidenceEvidence(profile: any, criteria: any, agentsMdVerification: any) {
+export function createAgentConfidenceEvidence(profile: AgentProfile, criteria: Record<string, boolean>, agentsMdVerification: AgentsMdVerificationResult) {
   const failedCriteria = Object.entries(criteria)
     .filter(([, value]) => value !== true)
     .map(([key]) => key);

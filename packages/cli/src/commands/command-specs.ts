@@ -70,7 +70,7 @@ import taskViewSpec from './command-specs/task-view.spec.ts';
 import brokerSpec from './command-specs/broker.spec.ts';
 import routeSpec from './command-specs/route.spec.ts';
 
-function withVisibility(spec: any, visibility: 'public' | 'internal' = 'public') {
+function withVisibility<T extends Record<string, unknown>>(spec: T, visibility: 'public' | 'internal' = 'public') {
   return Object.freeze({
     ...spec,
     visibility
@@ -150,5 +150,5 @@ export function getCommandSpec(commandName: string) {
 }
 
 export function listCommandSpecs(options: { includeInternal?: boolean } = {}) {
-  return Object.values(commandSpecs).filter((spec: any) => options.includeInternal || spec.visibility !== 'internal');
+  return Object.values(commandSpecs).filter((spec) => options.includeInternal || (spec as { visibility?: string }).visibility !== 'internal');
 }

@@ -15,7 +15,16 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
-    'atom-capsule': any;
+    'atom-capsule': Readonly<Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
+    }> & {
+        visibility: "public" | "internal";
+    }>;
     'atom-ref': Readonly<{
         name: string;
         summary: string;
@@ -104,7 +113,16 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
-    daemon: any;
+    daemon: Readonly<Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
+    }> & {
+        visibility: "public" | "internal";
+    }>;
     doctor: Readonly<{
         name: string;
         summary: string;
@@ -113,7 +131,16 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
-    do: any;
+    do: Readonly<Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
+    }> & {
+        visibility: "public" | "internal";
+    }>;
     emergency: Readonly<{
         name: string;
         summary: string;
@@ -194,7 +221,16 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
-    'health-report': any;
+    'health-report': Readonly<Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
+    }> & {
+        visibility: "public" | "internal";
+    }>;
     hook: Readonly<{
         name: string;
         summary: string;
@@ -243,7 +279,16 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
-    'map-capsule': any;
+    'map-capsule': Readonly<Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
+    }> & {
+        visibility: "public" | "internal";
+    }>;
     migrate: Readonly<{
         name: string;
         summary: string;
@@ -284,7 +329,16 @@ export declare const commandSpecs: Readonly<{
         examples: any[];
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
-    rescue: any;
+    rescue: Readonly<Readonly<{
+        name: string;
+        summary: string;
+        positional: any[];
+        options: any[];
+        examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
+    }> & {
+        visibility: "public" | "internal";
+    }>;
     registry: Readonly<{
         name: string;
         summary: string;
@@ -462,7 +516,30 @@ export declare const commandSpecs: Readonly<{
         help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
 }>;
-export declare function getCommandSpec(commandName: string): any;
+export declare function getCommandSpec(commandName: string): Readonly<{
+    name: string;
+    summary: string;
+    positional: any[];
+    options: any[];
+    examples: any[];
+    help: import("./help.ts").CommandHelpMetadata | undefined;
+}> | null;
 export declare function listCommandSpecs(options?: {
     includeInternal?: boolean;
-}): any[];
+}): (Readonly<{
+    name: string;
+    summary: string;
+    positional: any[];
+    options: any[];
+    examples: any[];
+    help: import("./help.ts").CommandHelpMetadata | undefined;
+}> | Readonly<Readonly<{
+    name: string;
+    summary: string;
+    positional: any[];
+    options: any[];
+    examples: any[];
+    help: import("./help.ts").CommandHelpMetadata | undefined;
+}> & {
+    visibility: "public" | "internal";
+}>)[];

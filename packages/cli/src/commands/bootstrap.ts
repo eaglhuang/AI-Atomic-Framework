@@ -12,10 +12,10 @@ export {
   createSelfHostingAlphaPrompt
 };
 
-export function adoptDefaultBootstrap(cwd: any, options = {}) {
+export function adoptDefaultBootstrap(cwd: string, options = {}) {
   return adoptLocalGovernanceBundle(cwd, options);
 }
 
-export function installDefaultRootDropScripts(cwd: any, options = {}) {
+export function installDefaultRootDropScripts(cwd: string, options = {}) {
   return installRootDropScripts(cwd, options);
 }

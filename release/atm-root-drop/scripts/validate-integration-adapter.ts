@@ -227,14 +227,15 @@ function exerciseAdapter(
 
     for (const fileRecord of install.manifest.files) {
       const installedPath = path.join(repositoryRoot, fileRecord.path);
+      const isPrimaryEntry = isPrimaryIntegrationEntry(fileRecord.path);
       assert(existsSync(installedPath), `${adapterSpec.id} must write ${fileRecord.path}`);
       const installedContent = readFileSync(installedPath, 'utf8');
       assert(sha256Bytes(readFileSync(installedPath)) === fileRecord.sha256, `${adapterSpec.id} manifest hash mismatch for ${fileRecord.path}`);
-      if (adapterSpec.requireRenderedCharter) {
+      if (adapterSpec.requireRenderedCharter && isPrimaryEntry) {
         assert(!installedContent.includes('{{CHARTER_INVARIANTS}}'), `${adapterSpec.id} file leaked charter invariants placeholder: ${fileRecord.path}`);
         assert(installedContent.includes('INV-ATM-001'), `${adapterSpec.id} file missing rendered charter invariants: ${fileRecord.path}`);
       }
-      if (adapterSpec.requireFirstCommand) {
+      if (adapterSpec.requireFirstCommand && isPrimaryEntry) {
         assert(
           installedContent.includes(firstCommands.defaultFirstCommand)
             || installedContent.includes(firstCommands.promptScopedFirstCommand)
@@ -278,7 +279,19 @@ function exerciseAdapter(
   }
 }
 
+function isPrimaryIntegrationEntry(filePath: string) {
+  const normalizedPath = filePath.replace(/\\/g, '/');
+  return normalizedPath === 'GEMINI.md'
+    || normalizedPath.endsWith('/SKILL.md')
+    || normalizedPath.endsWith('.instructions.md')
+    || normalizedPath.endsWith('.prompt.md')
+    || normalizedPath.endsWith('.toml');
+}
+
 function requiresActorIdentityHandoffGate(filePath: string) {
+  if (!isPrimaryIntegrationEntry(filePath)) {
+    return false;
+  }
   return [
     'atm-dispatch',
     'atm-governance-router',

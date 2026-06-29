@@ -4,34 +4,35 @@ export declare const supportedAgentProfiles: {
     executionMode: string;
     workflow: string;
 }[];
+export interface AgentProfile {
+    id: string;
+    label: string;
+    executionMode: string;
+    workflow: string;
+}
+export interface AgentsMdVerificationResult {
+    ok: boolean;
+    mode: string;
+    path: string | null;
+    checked: string[];
+    issues: string[];
+}
 export declare function listSupportedAgentIds(): string[];
-export declare function resolveAgentProfile(agentId: any): {
+export declare function resolveAgentProfile(agentId: unknown): {
     id: string;
     label: string;
     executionMode: string;
     workflow: string;
 } | null;
-export declare function verifyAgentsMarkdown(cwd: any): {
-    ok: boolean;
-    mode: string;
-    path: null;
-    checked: never[];
-    issues: string[];
-} | {
-    ok: boolean;
-    mode: string;
-    path: string;
-    checked: string[];
-    issues: string[];
-};
-export declare function createAgentConfidenceEvidence(profile: any, criteria: any, agentsMdVerification: any): {
+export declare function verifyAgentsMarkdown(cwd: string): AgentsMdVerificationResult;
+export declare function createAgentConfidenceEvidence(profile: AgentProfile, criteria: Record<string, boolean>, agentsMdVerification: AgentsMdVerificationResult): {
     advisory: boolean;
     blockingRelease: boolean;
-    agentId: any;
-    agentLabel: any;
-    executionMode: any;
-    workflow: any;
+    agentId: string;
+    agentLabel: string;
+    executionMode: string;
+    workflow: string;
     confidenceReady: boolean;
     blockers: string[];
-    agentsMd: any;
+    agentsMd: AgentsMdVerificationResult;
 };

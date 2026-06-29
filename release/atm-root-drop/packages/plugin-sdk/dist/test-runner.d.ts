@@ -17,7 +17,7 @@ export interface TestRunnerPluginContext {
     repositoryRoot: string;
     specPath: string | null;
     atomId: string;
-    normalizedModel: any;
+    normalizedModel: unknown;
     pluginOptions?: Record<string, unknown>;
 }
 export interface TestRunnerPluginPlan {
