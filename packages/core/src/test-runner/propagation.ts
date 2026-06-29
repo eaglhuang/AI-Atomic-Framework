@@ -10,14 +10,54 @@ export const defaultPropagationReportMigration = Object.freeze({
   notes: 'Initial propagation report contract.'
 });
 
-export function shouldPropagateBehavior(behavior: any) {
+// ─── Domain types ──────────────────────────────────────────────────────────
+
+interface DiscoverMapsOptions {
+  repositoryRoot?: string;
+  registryDocument?: RegistryDocument | null;
+  registryPath?: string;
+}
+
+interface RunPropagationOptions extends DiscoverMapsOptions {
+  behavior?: string | null;
+  now?: string;
+  writeReport?: boolean;
+}
+
+interface MapMember {
+  atomId?: string;
+}
+
+interface RegistryEntry {
+  schemaId?: string;
+  mapId?: string;
+  members?: MapMember[];
+}
+
+interface RegistryDocument {
+  entries?: RegistryEntry[];
+}
+
+interface PerMapStatus {
+  mapId: string;
+  ok: boolean;
+  exitCode: number;
+  durationMs: number;
+  resolutionMode: 'legacy' | 'canonical';
+  reportPath: string;
+  stdout?: string;
+  stderr?: string;
+  warnings: string[];
+}
+
+export function shouldPropagateBehavior(behavior: string | null | undefined): boolean {
   if (typeof behavior !== 'string') {
     return false;
   }
   return propagationTriggerBehaviors.includes(behavior.trim().toLowerCase());
 }
 
-export function discoverMapsForAtom(atomId: any, options: any) {
+export function discoverMapsForAtom(atomId: string, options: DiscoverMapsOptions | null | undefined): string[] {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const discovered = new Set<string>();
@@ -30,7 +70,7 @@ export function discoverMapsForAtom(atomId: any, options: any) {
   return [...discovered].sort((left, right) => left.localeCompare(right));
 }
 
-export function runPropagationIntegration(atomId: any, options: any) {
+export function runPropagationIntegration(atomId: string, options: RunPropagationOptions | null | undefined) {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const requestedBehavior = normalizedOptions.behavior ?? null;
@@ -43,8 +83,8 @@ export function runPropagationIntegration(atomId: any, options: any) {
       behavior: requestedBehavior,
       skipped: true,
       discoveredMaps: maps,
-      perMapStatus: [],
-      failedDownstream: [],
+      perMapStatus: [] as PerMapStatus[],
+      failedDownstream: [] as string[],
       propagationDuration: 0,
       metrics: createTestReportMetrics({ latency: 0, total: 0, failed: 0 }),
       summary: {
@@ -87,7 +127,31 @@ export function runPropagationIntegration(atomId: any, options: any) {
   };
 }
 
-export function createPropagationReport(propagation: any, options: any = {}) {
+interface PropagationInput {
+  atomId?: string;
+  behavior?: string | null;
+  discoveredMaps?: string[];
+  perMapStatus?: Array<Partial<PerMapStatus>>;
+  failedDownstream?: string[];
+  propagationDuration?: number;
+  metrics?: unknown;
+  ok?: boolean;
+  summary?: {
+    total?: number;
+    passed?: number;
+    failed?: number;
+    durationMs?: number;
+  };
+}
+
+interface CreatePropagationReportOptions {
+  atomId?: string;
+  behaviorId?: string | null;
+  reportId?: string;
+  generatedAt?: string;
+}
+
+export function createPropagationReport(propagation: PropagationInput | null | undefined, options: CreatePropagationReportOptions = {}) {
   const atomId = String(options.atomId ?? propagation?.atomId ?? '').trim();
   const reportIdBase = atomId.toLowerCase();
   const behaviorId = normalizeBehaviorId(options.behaviorId ?? propagation?.behavior ?? null);
@@ -103,7 +167,7 @@ export function createPropagationReport(propagation: any, options: any = {}) {
     discoveredMaps: normalizeStringSet(propagation?.discoveredMaps),
     perMapStatus: normalizePerMapStatus(propagation?.perMapStatus),
     failedDownstream: normalizeStringSet(propagation?.failedDownstream),
-    propagationDuration: Number.isInteger(propagation?.propagationDuration) ? propagation.propagationDuration : 0,
+    propagationDuration: Number.isInteger(propagation?.propagationDuration) ? propagation!.propagationDuration! : 0,
     metrics: propagation?.metrics ?? createTestReportMetrics({ latency: 0, total: 0, failed: 0 }),
     summary: {
       total: Number(propagation?.summary?.total ?? 0),
@@ -115,7 +179,7 @@ export function createPropagationReport(propagation: any, options: any = {}) {
   };
 }
 
-export function validatePropagationReport(report: any, options: { atomId?: string; mapId?: string } = {}) {
+export function validatePropagationReport(report: Record<string, unknown> | null | undefined, options: { atomId?: string; mapId?: string } = {}): { ok: boolean; issues: string[] } {
   const issues: string[] = [];
   if (report?.schemaId !== 'atm.propagationReport') {
     issues.push('propagation report schemaId must be atm.propagationReport.');
@@ -123,14 +187,14 @@ export function validatePropagationReport(report: any, options: { atomId?: strin
   if (report?.passed !== true) {
     issues.push('propagation report must pass.');
   }
-  if (Array.isArray(report?.failedDownstream) && report.failedDownstream.length > 0) {
+  if (Array.isArray(report?.failedDownstream) && (report!.failedDownstream as string[]).length > 0) {
     issues.push('propagation report still has failing downstream maps.');
   }
   if (typeof options.atomId === 'string' && options.atomId.length > 0 && report?.atomId !== options.atomId) {
     issues.push(`propagation report atomId ${String(report?.atomId ?? 'unknown')} does not match ${options.atomId}.`);
   }
   if (typeof options.mapId === 'string' && options.mapId.length > 0) {
-    const discoveredMaps = normalizeStringSet(report?.discoveredMaps);
+    const discoveredMaps = normalizeStringSet(report?.discoveredMaps as string[] | undefined);
     if (!discoveredMaps.includes(options.mapId)) {
       issues.push(`propagation report does not cover target map ${options.mapId}.`);
     }
@@ -141,21 +205,21 @@ export function validatePropagationReport(report: any, options: { atomId?: strin
   };
 }
 
-function discoverMapsFromRegistry(atomId: any, options: any) {
+function discoverMapsFromRegistry(atomId: string, options: DiscoverMapsOptions): string[] {
   const normalizedOptions = options || {};
   const registryDocument = normalizedOptions.registryDocument ?? readRegistryDocument(path.resolve(normalizedOptions.repositoryRoot ?? process.cwd(), normalizedOptions.registryPath ?? 'atomic-registry.json'));
-  const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
+  const entries = Array.isArray(registryDocument?.entries) ? registryDocument!.entries! : [];
   return entries
-    .filter((entry: any) => entry?.schemaId === 'atm.atomicMap')
-    .filter((entry: any) => Array.isArray(entry?.members) && entry.members.some((member: any) => String(member?.atomId || '').trim() === atomId))
-    .map((entry: any) => String(entry.mapId || '').trim())
+    .filter((entry) => entry?.schemaId === 'atm.atomicMap')
+    .filter((entry) => Array.isArray(entry?.members) && entry.members!.some((member) => String(member?.atomId || '').trim() === atomId))
+    .map((entry) => String(entry.mapId || '').trim())
     .filter(Boolean);
 }
 
-function discoverMapsFromFilesystem(atomId: any, options: any) {
+function discoverMapsFromFilesystem(atomId: string, options: { repositoryRoot?: string }): string[] {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
-  const discovered = [];
+  const discovered: string[] = [];
   const canonicalMapsRoot = path.join(repositoryRoot, 'atomic_workbench', 'maps');
   if (existsSync(canonicalMapsRoot)) {
     const canonicalDirectories = readdirSync(canonicalMapsRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory());
@@ -183,14 +247,14 @@ function discoverMapsFromFilesystem(atomId: any, options: any) {
   return [...new Set(discovered)];
 }
 
-function tryReadMapIdForAtom(specPath: any, atomId: any) {
+function tryReadMapIdForAtom(specPath: string, atomId: string): string | null {
   if (!existsSync(specPath)) {
     return null;
   }
   try {
-    const specDocument = JSON.parse(readFileSync(specPath, 'utf8'));
+    const specDocument = JSON.parse(readFileSync(specPath, 'utf8')) as { members?: MapMember[]; mapId?: string };
     const hasAtom = Array.isArray(specDocument?.members)
-      && specDocument.members.some((member: any) => String(member?.atomId || '').trim() === atomId);
+      && specDocument.members.some((member) => String(member?.atomId || '').trim() === atomId);
     if (!hasAtom) {
       return null;
     }
@@ -200,19 +264,19 @@ function tryReadMapIdForAtom(specPath: any, atomId: any) {
   }
 }
 
-function readRegistryDocument(registryPath: any) {
+function readRegistryDocument(registryPath: string): RegistryDocument {
   if (!existsSync(registryPath)) {
     return { entries: [] };
   }
-  return JSON.parse(readFileSync(registryPath, 'utf8'));
+  return JSON.parse(readFileSync(registryPath, 'utf8')) as RegistryDocument;
 }
 
-function normalizePerMapStatus(values: any) {
+function normalizePerMapStatus(values: Array<Partial<PerMapStatus>> | null | undefined): PerMapStatus[] {
   return (Array.isArray(values) ? values : []).map((entry) => ({
     mapId: String(entry?.mapId ?? '').trim(),
     ok: entry?.ok === true,
-    exitCode: Number.isInteger(entry?.exitCode) ? entry.exitCode : 1,
-    durationMs: Number.isInteger(entry?.durationMs) ? entry.durationMs : 0,
+    exitCode: Number.isInteger(entry?.exitCode) ? entry.exitCode! : 1,
+    durationMs: Number.isInteger(entry?.durationMs) ? entry.durationMs! : 0,
     resolutionMode: entry?.resolutionMode === 'legacy' ? 'legacy' : 'canonical',
     reportPath: String(entry?.reportPath ?? '').trim(),
     ...(typeof entry?.stdout === 'string' ? { stdout: entry.stdout } : {}),
@@ -221,13 +285,13 @@ function normalizePerMapStatus(values: any) {
   }));
 }
 
-function normalizeStringSet(values: any) {
+function normalizeStringSet(values: string[] | null | undefined): string[] {
   return [...new Set((Array.isArray(values) ? values : [])
     .map((value) => String(value ?? '').trim())
     .filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
 
-function normalizeBehaviorId(value: any) {
+function normalizeBehaviorId(value: string | null | undefined): string | null {
   const normalized = String(value ?? '').trim();
   return /^behavior\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/.test(normalized) ? normalized : null;
 }

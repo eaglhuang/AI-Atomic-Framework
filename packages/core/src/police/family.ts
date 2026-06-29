@@ -125,7 +125,7 @@ export interface CorePoliceFacadeInput {
 export interface DedupPoliceInput {
   readonly registryDocument?: unknown;
   readonly registryIndex?: ReturnType<typeof createRegistryIndex>;
-  readonly qualityComparisonReport?: any;
+  readonly qualityComparisonReport?: Record<string, unknown>;
   readonly polymorphContext?: {
     readonly groupId?: string;
     readonly instanceAtomIds?: readonly string[];
@@ -139,19 +139,19 @@ export interface DemandPoliceInput {
 }
 
 export interface QualityPoliceInput {
-  readonly qualityComparisonReport?: any;
-  readonly qualityComparisonInput?: any;
+  readonly qualityComparisonReport?: Record<string, unknown>;
+  readonly qualityComparisonInput?: Record<string, unknown>;
 }
 
 export interface MapIntegrationPoliceInput {
   readonly curatorReport?: AtomMapCuratorReport;
   readonly curatorInput?: AtomMapCuratorInput;
-  readonly qualityComparisonReport?: any;
+  readonly qualityComparisonReport?: Record<string, unknown>;
 }
 
 export interface AtomizationPoliceInput {
   readonly legacyRoutePlan?: LegacyRoutePlan;
-  readonly dryRunResult?: any;
+  readonly dryRunResult?: Record<string, unknown>;
 }
 
 export interface DecompositionPoliceInput {
@@ -564,8 +564,8 @@ export function buildDecompositionSuppressionKey(entry: SourceInventoryEntry): s
 }
 
 export function buildCorePoliceFamilies(input: {
-  readonly policeReport?: any;
-  readonly lifecycleReport?: any;
+  readonly policeReport?: Record<string, unknown>;
+  readonly lifecycleReport?: Record<string, unknown>;
 }): PoliceFamilyReport[] {
   const families: PoliceFamilyReport[] = [
     makePoliceFamilyReport({
@@ -576,19 +576,19 @@ export function buildCorePoliceFamilies(input: {
       sourceValidator: 'schema-validator'
     })
   ];
-  const coreFindings = (input.policeReport?.violations ?? []).map((violation: any, index: number) => {
+  const coreFindings = ((input.policeReport?.violations ?? []) as Record<string, unknown>[]).map((violation, index: number) => {
     const family = classifyViolationFamily(String(violation.code ?? 'core'));
     return makePoliceFinding({
       findingId: `police.${family}.${sanitizeId(violation.code)}.${index}`,
       policeFamily: family,
       severity: violation.severity === 'error' ? 'error' : 'warning',
       trigger: String(violation.code ?? 'police-violation'),
-      scope: violation.path ?? violation.atomId,
+      scope: (violation.path ?? violation.atomId) as string | undefined,
       action: violation.severity === 'error' ? 'hard-fail' : 'request-human-review',
       routeHint: family === 'registry-consistency' ? 'registry.review' : 'atm.police.core',
       readModel: 'runPoliceChecks.violations',
       message: String(violation.message ?? violation.code ?? 'Police violation detected.'),
-      evidenceRefs: violation.path ? [makeEvidenceRef(violation.path, 'police-artifact')] : undefined,
+      evidenceRefs: violation.path ? [makeEvidenceRef(String(violation.path), 'police-artifact')] : undefined,
       metadata: {
         violation
       }
@@ -607,22 +607,22 @@ export function buildCorePoliceFamilies(input: {
   }
 
   const lifecycleFindings = input.lifecycleReport?.hardFail
-    ? (input.lifecycleReport.findings ?? [])
-      .filter((finding: any) => finding.action === 'hard-fail' || finding.action === 'quarantine')
-      .map((finding: any, index: number) => makePoliceFinding({
+    ? ((input.lifecycleReport.findings ?? []) as Record<string, unknown>[])
+      .filter((finding) => finding.action === 'hard-fail' || finding.action === 'quarantine')
+      .map((finding, index: number) => makePoliceFinding({
         findingId: `police.lifecycle.${sanitizeId(finding.trigger)}.${index}`,
         policeFamily: 'lifecycle',
         severity: finding.severity === 'error' ? 'error' : 'warning',
-        trigger: finding.trigger,
-        scope: finding.scope,
+        trigger: String(finding.trigger ?? ''),
+        scope: finding.scope as string | undefined,
         action: finding.action === 'quarantine' ? 'quarantine' : 'hard-fail',
         routeHint: 'lifecycle-police',
         readModel: 'LifecyclePoliceFinding',
-        message: finding.message,
-        evidenceRefs: (finding.callerIds ?? []).map((callerId: string) => makeEvidenceRef(callerId, 'read-model')),
+        message: String(finding.message ?? ''),
+        evidenceRefs: ((finding.callerIds ?? []) as string[]).map((callerId) => makeEvidenceRef(callerId, 'read-model')),
         metadata: {
           lifecycleFinding: finding,
-          writer: input.lifecycleReport?.quarantineWriteGuard?.writer ?? null
+          writer: (input.lifecycleReport?.quarantineWriteGuard as Record<string, unknown> | undefined)?.writer ?? null
         }
       }))
     : [];
@@ -726,8 +726,8 @@ export function runDedupPolice(input: DedupPoliceInput = {}): PoliceFamilyReport
         continue;
       }
       seenGroups.add(fingerprint);
-      const exactHits = index.findBySemanticFingerprint(fingerprint).filter((candidate: any) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
-      const prefixHits = index.findByFingerprintPrefix(semanticFingerprintPrefix(fingerprint)).filter((candidate: any) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
+      const exactHits = index.findBySemanticFingerprint(fingerprint).filter((candidate) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
+      const prefixHits = index.findByFingerprintPrefix(semanticFingerprintPrefix(fingerprint)).filter((candidate) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
       const uniqueHits = uniqueNodeRefs([...exactHits, ...prefixHits]);
       if (uniqueHits.length < 2) {
         continue;
@@ -737,15 +737,15 @@ export function runDedupPolice(input: DedupPoliceInput = {}): PoliceFamilyReport
         policeFamily: 'dedup',
         severity: 'advisory',
         trigger: 'semantic-fingerprint-overlap',
-        scope: uniqueHits.map((hit: any) => hit.canonicalId).join(','),
+        scope: uniqueHits.map((hit) => hit.canonicalId).join(','),
         action: 'needs-review',
         routeHint: 'behavior.dedup-merge',
         readModel: 'RegistryIndex.semanticFingerprintPrefix',
-        message: `Semantic fingerprint overlap detected for ${uniqueHits.map((hit: any) => hit.canonicalId).join(', ')}.`,
+        message: `Semantic fingerprint overlap detected for ${uniqueHits.map((hit) => hit.canonicalId).join(', ')}.`,
         evidenceRefs: [makeEvidenceRef('fingerprint-snapshot', 'police-artifact')],
         metadata: {
           matchMode: exactHits.length > 1 ? 'exact' : 'prefix',
-          candidates: uniqueHits.map((hit: any) => ({
+          candidates: uniqueHits.map((hit) => ({
             canonicalId: hit.canonicalId,
             nodeKind: hit.nodeKind,
             semanticFingerprint: hit.entry?.semanticFingerprint ?? hit.entry?.mapSemanticFingerprint ?? null
@@ -1172,7 +1172,7 @@ export function buildDecompositionPlanHintDraft(finding: PoliceFinding): {
   if (finding.policeFamily !== 'decomposition' || finding.trigger !== 'oversized-source-surface') {
     return { ok: false, errors: ['finding-not-decomposition-oversized-source-surface'] };
   }
-  const hint = (finding.metadata as any)?.decompositionPlanHint;
+  const hint = (finding.metadata as Record<string, unknown> | undefined)?.decompositionPlanHint as Record<string, unknown> | undefined;
   const errors: string[] = [];
   if (!hint?.legacyUris || hint.legacyUris.length === 0) {
     errors.push('missing-replacement-legacyUris');
@@ -1725,7 +1725,7 @@ export function runNoiseControlGate(input: NoiseControlGateInput = {}): SharedGa
   let admitted = 0;
 
   for (const finding of input.findings ?? []) {
-    const key = (finding.metadata as any)?.suppressionKey;
+    const key = (finding.metadata as Record<string, unknown> | undefined)?.suppressionKey;
     const isHighSeverity = finding.severity === 'block' || finding.severity === 'error';
 
     if (typeof key === 'string' && suppressed.has(key)) {
@@ -1738,7 +1738,7 @@ export function runNoiseControlGate(input: NoiseControlGateInput = {}): SharedGa
       filteredOut.push(finding);
       continue;
     }
-    const confidence = Number((finding.metadata as any)?.confidence ?? 1);
+    const confidence = Number((finding.metadata as Record<string, unknown> | undefined)?.confidence ?? 1);
     if (Number.isFinite(confidence) && confidence < confidenceThreshold && !isHighSeverity) {
       suppressedCount += 1;
       filteredOut.push(finding);
@@ -1921,22 +1921,22 @@ export function renderQualityPoliceMarkdown(input: QualityPoliceInput): string {
   return report ? renderQualityReportMarkdown(report) : '# Quality Comparison Report\n\nNo quality comparison report was provided.\n';
 }
 
-function uniqueNodeRefs(input: readonly any[]): any[] {
+function uniqueNodeRefs(input: readonly { urn?: string; canonicalId?: string; nodeKind?: string; entry?: Record<string, unknown> }[]): { urn?: string; canonicalId: string; nodeKind?: string; entry?: Record<string, unknown> }[] {
   const seen = new Set<string>();
-  const result: any[] = [];
+  const result: { urn?: string; canonicalId: string; nodeKind?: string; entry?: Record<string, unknown> }[] = [];
   for (const item of input) {
     const key = item?.urn ?? item?.canonicalId;
     if (!key || seen.has(key)) {
       continue;
     }
     seen.add(key);
-    result.push(item);
+    result.push(item as { urn?: string; canonicalId: string; nodeKind?: string; entry?: Record<string, unknown> });
   }
   return result;
 }
 
-function isPolymorphIgnored(nodeRef: any, ignoredAtomIds: ReadonlySet<string>, ignoredGroupId: string | null): boolean {
-  const atomId = nodeRef?.canonicalId ?? nodeRef?.entry?.atomId;
+function isPolymorphIgnored(nodeRef: { canonicalId?: string; entry?: Record<string, unknown> } | undefined, ignoredAtomIds: ReadonlySet<string>, ignoredGroupId: string | null): boolean {
+  const atomId = nodeRef?.canonicalId ?? (nodeRef?.entry?.atomId as string | undefined);
   if (atomId && ignoredAtomIds.has(atomId)) {
     return true;
   }
