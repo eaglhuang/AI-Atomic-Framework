@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -14,11 +14,13 @@ const requiredTemplateIds = [
   'atm-task-intent-resolver',
   'atm-orient',
   'atm-governance-router',
+  'atm-dispatch',
   'atm-create',
   'atm-lock',
   'atm-evidence',
   'atm-upgrade-scan',
   'atm-handoff',
+  'mailbox-worker-execution',
   'atm-internal-build-sync',
   'atm-atom-map-refactor'
 ];
@@ -36,6 +38,15 @@ function assert(condition: unknown, message: string) {
 
 function hasForbiddenPlanningHint(content: string): boolean {
   return /spec-kit|MRP|\/specify|\/plan\b|(?:^|\s)\/tasks\b/i.test(content);
+}
+
+function isPrimaryCompiledEntry(relativePath: string): boolean {
+  const normalizedPath = relativePath.replace(/\\/g, '/');
+  return normalizedPath === 'GEMINI.md'
+    || normalizedPath.endsWith('/SKILL.md')
+    || normalizedPath.endsWith('.instructions.md')
+    || normalizedPath.endsWith('.prompt.md')
+    || normalizedPath.endsWith('.toml');
 }
 
 function readJson(relativePath: string) {
@@ -104,30 +115,49 @@ const codexFiles = packageModule.compileSkillTemplatesForAdapter('codex', templa
 const copilotFiles = packageModule.compileSkillTemplatesForAdapter('copilot', templates, { repositoryRoot: root });
 const cursorFiles = packageModule.compileSkillTemplatesForAdapter('cursor', templates, { repositoryRoot: root });
 const geminiFiles = packageModule.compileSkillTemplatesForAdapter('gemini', templates, { repositoryRoot: root });
+const companionFileCount = requiredTemplateIds.reduce((total, templateId) => total + countCompanionFiles(path.join(root, 'templates', 'skills', `${templateId}.files`)), 0);
+const skillAdapterCompiledCount = templates.length + companionFileCount;
 
-assert(claudeFiles.length === 11, 'Claude compiler output must contain eleven files');
-assert(codexFiles.length === 11, 'Codex compiler output must contain eleven files');
-assert(copilotFiles.length === 22, 'Copilot compiler output must contain twenty-two scoped instruction and prompt files');
-assert(cursorFiles.length === 11, 'Cursor compiler output must contain eleven files');
-assert(geminiFiles.length === 11, 'Gemini compiler output must contain eleven files');
+assert(claudeFiles.length === skillAdapterCompiledCount, 'Claude compiler output must contain one primary file per template plus all companion files');
+assert(codexFiles.length === skillAdapterCompiledCount, 'Codex compiler output must contain one primary file per template plus all companion files');
+assert(copilotFiles.length === templates.length * 2, 'Copilot compiler output must contain one instruction and one prompt per template');
+assert(cursorFiles.length === skillAdapterCompiledCount, 'Cursor compiler output must contain one primary file per template plus all companion files');
+assert(geminiFiles.length === templates.length, 'Gemini compiler output must contain one command file per template');
 
 for (const compiledFile of [...claudeFiles, ...codexFiles, ...copilotFiles, ...cursorFiles, ...geminiFiles]) {
-  assert(
-    compiledFile.content.includes(packageModule.atmFirstCommand)
-      || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand)
-      || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand.replaceAll('"', '\\"'))
-      || compiledFile.content.includes(packageModule.atmIntentScopedFirstCommand),
-    `${compiledFile.relativePath} missing first command`
-  );
+  const isPrimaryEntry = isPrimaryCompiledEntry(compiledFile.relativePath);
+  if (isPrimaryEntry) {
+    assert(
+      compiledFile.content.includes(packageModule.atmFirstCommand)
+        || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand)
+        || compiledFile.content.includes(packageModule.atmPromptScopedFirstCommand.replaceAll('"', '\\"'))
+        || compiledFile.content.includes(packageModule.atmIntentScopedFirstCommand),
+      `${compiledFile.relativePath} missing first command`
+    );
+    assert(compiledFile.content.includes(renderedCharter.text), `${compiledFile.relativePath} missing rendered charter invariants`);
+  }
   assert(!compiledFile.content.includes(packageModule.charterInvariantsPlaceholder), `${compiledFile.relativePath} must not leak charter placeholder after compile`);
-  assert(compiledFile.content.includes(renderedCharter.text), `${compiledFile.relativePath} missing rendered charter invariants`);
   assert(!hasForbiddenPlanningHint(compiledFile.content), `${compiledFile.relativePath} must not bake planning hints into compiled output`);
 }
 
-assert(claudeFiles.every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Claude output must carry charter injection frontmatter');
-assert(codexFiles.every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Codex output must carry charter injection frontmatter');
-assert(geminiFiles.every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field');
+assert(claudeFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Claude output must carry charter injection frontmatter on primary entries');
+assert(codexFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Codex output must carry charter injection frontmatter on primary entries');
+assert(geminiFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field on primary entries');
 
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (11 source templates, schema, and 5 adapter compilers)`);
+  console.log(`[skill-templates:${mode}] ok (${templates.length} source templates, schema, and 5 adapter compilers)`);
+}
+
+function countCompanionFiles(directoryPath: string): number {
+  if (!existsSync(directoryPath)) {
+    return 0;
+  }
+  const entries = readdirSync(directoryPath, { withFileTypes: true });
+  return entries.reduce((total, entry) => {
+    const absolutePath = path.join(directoryPath, entry.name);
+    if (entry.isDirectory()) {
+      return total + countCompanionFiles(absolutePath);
+    }
+    return entry.isFile() ? total + 1 : total;
+  }, 0);
 }

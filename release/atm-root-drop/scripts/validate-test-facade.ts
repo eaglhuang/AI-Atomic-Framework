@@ -45,7 +45,6 @@ for (const relativePath of ['scripts/run-validators.ts', 'scripts/validators.con
 
 const config = JSON.parse(readFileSync(path.join(root, 'scripts/validators.config.json'), 'utf8'));
 check(Boolean(config?.profiles?.standard), 'validators.config.json must define standard profile');
-check(Boolean(config?.profiles?.['standard-fast']), 'validators.config.json must define standard-fast profile');
 check(Number.isInteger(config?.performanceDefaults?.fastValidatorBudgetMs), 'validators.config.json must define a shared fast validator duration budget');
 check(Number.isInteger(config?.performanceDefaults?.slowValidatorBudgetMs), 'validators.config.json must define a shared slow validator duration budget');
 
@@ -76,13 +75,6 @@ check(parallel.exitCode === 0, 'run-validators parallel run must exit 0');
 check(parallel.parsed.parallel === true, 'parallel run must report parallel=true');
 check(parallel.parsed.total > 0, 'parallel run must execute at least one validator');
 
-const standardFast = runFacade(['standard-fast', '--filter', 'validate-product-charter']);
-check(standardFast.exitCode === 0, 'run-validators standard-fast smoke must exit 0');
-check(standardFast.parsed.profile === 'standard-fast', 'run-validators standard-fast smoke must report profile=standard-fast');
-check(standardFast.parsed.total === 1, 'run-validators standard-fast smoke filter must reduce to one validator');
-check(standardFast.parsed.failed === 0, 'run-validators standard-fast smoke must pass the filtered validator');
-check(standardFast.parsed.parallel === true, 'run-validators standard-fast must enable profile-default parallel execution');
-
 const perfTemp = mkdtempSync(path.join(os.tmpdir(), 'atm-validator-performance-'));
 try {
   const baselinePath = path.join(perfTemp, 'baseline.json');
@@ -108,5 +100,5 @@ try {
 }
 
 if (!process.exitCode) {
-  console.log(`[test-facade:${mode}] ok (profile, filter, parallel, legacy, and standard-fast behaviors verified)`);
+  console.log(`[test-facade:${mode}] ok (profile, filter, parallel, and legacy behaviors verified)`);
 }

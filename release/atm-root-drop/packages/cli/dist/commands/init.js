@@ -3,7 +3,7 @@ import { CliError, configPathFor, ensureAtmDirectory, makeResult, message, parse
 import { adoptDefaultBootstrap, installDefaultRootDropScripts } from './bootstrap.js';
 import { installIntegrationAdapter } from './integration.js';
 export async function runInit(argv) {
-    const { options } = parseOptions(argv, 'init');
+    const { options } = parseOptions([...argv], 'init');
     const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
     if (options.adopt && options.adopt !== 'default') {
         throw new CliError('ATM_CLI_USAGE', `init does not support adopt profile ${options.adopt}`, { exitCode: 2 });
@@ -187,7 +187,7 @@ function createDefaultConfig(options) {
         }
     };
     if (shouldAdoptDefault) {
-        config.adoption = {
+        config['adoption'] = {
             profile: 'default',
             taskPath: '.atm/history/tasks/BOOTSTRAP-0001.json',
             lockPath: '.atm/runtime/locks/BOOTSTRAP-0001.lock.json',

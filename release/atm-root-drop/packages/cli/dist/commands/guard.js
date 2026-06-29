@@ -195,8 +195,9 @@ function runAtomizationCoverageGuard(cwd, files) {
         stdout = execSync(cmd, { encoding: 'utf8' });
     }
     catch (err) {
-        stdout = err.stdout?.toString() ?? '';
-        exitCode = err.status ?? 1;
+        const error = err;
+        stdout = error.stdout?.toString() ?? '';
+        exitCode = error.status ?? 1;
     }
     let report = {};
     try {

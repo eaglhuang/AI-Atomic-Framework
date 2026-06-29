@@ -75,10 +75,21 @@ export function createV1AtmPaths(taskId = bootstrapTaskId) {
   };
 }
 
-export function detectGovernanceRuntime(cwd: any, taskId = bootstrapTaskId) {
+interface RuntimeJsonRecord {
+  readonly workItemId?: string;
+  readonly taskId?: string;
+  readonly id?: string;
+  readonly title?: string;
+  readonly status?: string;
+  readonly released?: boolean | string;
+  readonly lockedBy?: string;
+  readonly owner?: string;
+}
+
+export function detectGovernanceRuntime(cwd: string, taskId = bootstrapTaskId) {
   const configPath = path.join(cwd, '.atm', 'config.json');
   const config = existsSync(configPath)
-    ? JSON.parse(readFileSync(configPath, 'utf8'))
+    ? JSON.parse(readFileSync(configPath, 'utf8')) as Record<string, unknown>
     : null;
   const explicitVersion = Number(config?.layoutVersion ?? 0);
   const hasV2 = existsSync(path.join(cwd, '.atm', 'runtime')) || existsSync(path.join(cwd, '.atm', 'history')) || existsSync(path.join(cwd, '.atm', 'catalog'));
@@ -120,7 +131,13 @@ export function detectGovernanceRuntime(cwd: any, taskId = bootstrapTaskId) {
   };
 }
 
-export function createCurrentTaskRecord(task: any, options: {
+export function createCurrentTaskRecord(task: {
+  readonly workItemId?: string;
+  readonly id?: string;
+  readonly taskId?: string;
+  readonly title?: string;
+  readonly status?: string;
+}, options: {
   updatedAt?: string;
   lockPath?: string | null;
   evidencePath?: string | null;
@@ -137,26 +154,26 @@ export function createCurrentTaskRecord(task: any, options: {
   };
 }
 
-export function relativePathFrom(cwd: any, absolutePath: any) {
+export function relativePathFrom(cwd: string, absolutePath: string) {
   return path.relative(cwd, absolutePath).replace(/\\/g, '/');
 }
 
-export function sanitizeBudgetFileId(budgetId: any) {
+export function sanitizeBudgetFileId(budgetId: unknown) {
   return String(budgetId || 'context-budget').replace(/\\/g, '/').replace(/[/:]+/g, '-');
 }
 
-function readJsonIfExists(filePath: any) {
+function readJsonIfExists(filePath: string | null | undefined): RuntimeJsonRecord | null {
   if (!filePath || !existsSync(filePath)) {
     return null;
   }
   try {
-    return JSON.parse(readFileSync(filePath, 'utf8'));
+    return JSON.parse(readFileSync(filePath, 'utf8')) as RuntimeJsonRecord;
   } catch {
     return null;
   }
 }
 
-function inferCurrentTaskId(cwd: any, layoutVersion: any) {
+function inferCurrentTaskId(cwd: string, layoutVersion: number) {
   const taskDirectory = path.join(cwd, layoutVersion === atmLayoutVersion ? '.atm/history/tasks' : '.atm/tasks');
   if (!existsSync(taskDirectory)) {
     return null;
@@ -167,7 +184,7 @@ function inferCurrentTaskId(cwd: any, layoutVersion: any) {
   return candidates.length > 0 ? candidates[0].replace(/\.json$/, '') : null;
 }
 
-function readActiveLock(cwd: any, layoutVersion: any, currentTaskId: any) {
+function readActiveLock(cwd: string, layoutVersion: number, currentTaskId: string | null) {
   const lockDirectory = path.join(cwd, layoutVersion === atmLayoutVersion ? '.atm/runtime/locks' : '.atm/locks');
   if (!existsSync(lockDirectory)) {
     return null;
@@ -196,7 +213,7 @@ function readActiveLock(cwd: any, layoutVersion: any, currentTaskId: any) {
   return null;
 }
 
-function findLatestTimestamp(directoryPath: any) {
+function findLatestTimestamp(directoryPath: string) {
   if (!existsSync(directoryPath)) {
     return null;
   }

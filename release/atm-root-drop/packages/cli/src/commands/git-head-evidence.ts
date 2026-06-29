@@ -11,7 +11,19 @@ export const gitHeadEvidencePaths = {
 };
 export const gitHeadEvidencePath = gitHeadEvidencePaths.jsonl;
 
-export function createGitHeadEvidenceCheck(cwd: any, runtime: any) {
+export interface GitDetails {
+  commitSha: string | null;
+  treeSha: string | null;
+  parentCommitShas: string[];
+}
+
+export interface EvidenceRecord {
+  path: string;
+  index: number;
+  git: GitDetails;
+}
+
+export function createGitHeadEvidenceCheck(cwd: string, runtime: unknown) {
   const workTree = readGitWorkTree(cwd);
   if (workTree.status === 'bare-worktree-mismatch') {
     return createGitEvidenceDetails('bare-worktree-mismatch', {
@@ -47,10 +59,10 @@ export function createGitHeadEvidenceCheck(cwd: any, runtime: any) {
   const treeSha = readGitScalar(cwd, ['rev-parse', `${commitSha}^{tree}`]);
   const governedTreeSha = readGovernedHeadTreeSha(cwd, commitSha, gitHeadEvidencePath) ?? treeSha;
   const evidenceRecords = readEvidenceRecords(cwd, runtime);
-  const commitMatch = evidenceRecords.find((entry: any) => entry.git.commitSha === commitSha);
+  const commitMatch = evidenceRecords.find((entry) => entry.git.commitSha === commitSha);
   const treeMatch = commitMatch
     ? null
-    : evidenceRecords.find((entry: any) => {
+    : evidenceRecords.find((entry) => {
       const evidenceTreeSha = entry.git.treeSha;
       return Boolean(evidenceTreeSha)
         && (evidenceTreeSha === governedTreeSha || evidenceTreeSha === treeSha)
@@ -103,7 +115,7 @@ export function createGitHeadEvidenceCheck(cwd: any, runtime: any) {
   }, ok);
 }
 
-function createGitEvidenceDetails(status: any, details: any, ok = true) {
+function createGitEvidenceDetails(status: string, details: Record<string, unknown>, ok = true) {
   return {
     name: 'git-head-evidence',
     ok,
@@ -114,13 +126,13 @@ function createGitEvidenceDetails(status: any, details: any, ok = true) {
   };
 }
 
-function hasAtmRuntime(cwd: any, runtime: any) {
-  return Boolean(runtime?.config)
+function hasAtmRuntime(cwd: string, runtime: unknown) {
+  return Boolean((runtime as { config?: unknown })?.config)
     || existsSync(path.join(cwd, '.atm', 'config.json'))
     || existsSync(path.join(cwd, '.atm', 'runtime', 'current-task.json'));
 }
 
-function readGitWorkTree(cwd: any) {
+function readGitWorkTree(cwd: string) {
   const readiness = inspectGitWorktreeReadiness(cwd);
   if (readiness.status === 'bare-worktree-mismatch') {
     return {
@@ -147,7 +159,7 @@ function readGitWorkTree(cwd: any) {
   };
 }
 
-function readParentCommitShas(cwd: any) {
+function readParentCommitShas(cwd: string) {
   const result = runGit(cwd, ['rev-list', '--parents', '-n', '1', 'HEAD']);
   if (!result.ok) {
     return [];
@@ -155,12 +167,12 @@ function readParentCommitShas(cwd: any) {
   return result.stdout.trim().split(/\s+/).slice(1).filter(Boolean);
 }
 
-function readGitScalar(cwd: any, args: any) {
+function readGitScalar(cwd: string, args: readonly string[]) {
   const result = runGit(cwd, args);
   return result.ok ? result.stdout.trim() : null;
 }
 
-function readGovernedHeadTreeSha(cwd: any, commitSha: any, evidencePath: any) {
+function readGovernedHeadTreeSha(cwd: string, commitSha: string, evidencePath: string) {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-git-head-'));
   const tempIndex = path.join(tempDir, 'index');
   try {
@@ -182,7 +194,12 @@ function readGovernedHeadTreeSha(cwd: any, commitSha: any, evidencePath: any) {
   }
 }
 
-function findEvidenceOnlyParentMatch(cwd: any, commitSha: any, parentCommitShas: any, evidenceRecords: any) {
+function findEvidenceOnlyParentMatch(
+  cwd: string,
+  commitSha: string,
+  parentCommitShas: readonly string[],
+  evidenceRecords: readonly EvidenceRecord[]
+) {
   if (!Array.isArray(parentCommitShas) || parentCommitShas.length !== 1) {
     return null;
   }
@@ -190,7 +207,7 @@ function findEvidenceOnlyParentMatch(cwd: any, commitSha: any, parentCommitShas:
     return null;
   }
   const parentCommitSha = parentCommitShas[0];
-  const parentCommitMatch = evidenceRecords.find((entry: any) => entry.git.commitSha === parentCommitSha);
+  const parentCommitMatch = evidenceRecords.find((entry) => entry.git.commitSha === parentCommitSha);
   if (parentCommitMatch) {
     return {
       record: parentCommitMatch,
@@ -202,10 +219,10 @@ function findEvidenceOnlyParentMatch(cwd: any, commitSha: any, parentCommitShas:
   const parentTreeSha = readGitScalar(cwd, ['rev-parse', `${parentCommitSha}^{tree}`]);
   const parentGovernedTreeSha = readGovernedHeadTreeSha(cwd, parentCommitSha, gitHeadEvidencePath) ?? parentTreeSha;
   const parentParents = readParentCommitShasForCommit(cwd, parentCommitSha);
-  const parentTreeMatch = evidenceRecords.find((entry: any) => {
+  const parentTreeMatch = evidenceRecords.find((entry) => {
     const evidenceTreeSha = entry.git.treeSha;
     return Boolean(evidenceTreeSha)
-      && (evidenceTreeSha === parentGovernedTreeSha || evidenceTreeSha === parentTreeSha)
+      && (evidenceTreeSha === parentGovernedTreeSha || (parentTreeSha && evidenceTreeSha === parentTreeSha))
       && sameStringSet(entry.git.parentCommitShas, parentParents);
   });
   return parentTreeMatch
@@ -217,12 +234,12 @@ function findEvidenceOnlyParentMatch(cwd: any, commitSha: any, parentCommitShas:
     : null;
 }
 
-function isEvidenceOnlyCommit(cwd: any, commitSha: any) {
+function isEvidenceOnlyCommit(cwd: string, commitSha: string) {
   const changedPaths = readCommitChangedPaths(cwd, commitSha);
   return changedPaths.length > 0 && changedPaths.every((entry) => entry === gitHeadEvidencePaths.legacyJson || entry === gitHeadEvidencePaths.jsonl);
 }
 
-function readCommitChangedPaths(cwd: any, commitSha: any) {
+function readCommitChangedPaths(cwd: string, commitSha: string): string[] {
   const result = runGit(cwd, ['diff-tree', '--no-commit-id', '--name-only', '-r', commitSha]);
   if (!result.ok) {
     return [];
@@ -230,7 +247,7 @@ function readCommitChangedPaths(cwd: any, commitSha: any) {
   return result.stdout.split(/\r?\n/).map((entry) => toPortablePath(entry.trim())).filter(Boolean);
 }
 
-function readParentCommitShasForCommit(cwd: any, commitSha: any) {
+function readParentCommitShasForCommit(cwd: string, commitSha: string) {
   const result = runGit(cwd, ['rev-list', '--parents', '-n', '1', commitSha]);
   if (!result.ok) {
     return [];
@@ -238,56 +255,61 @@ function readParentCommitShasForCommit(cwd: any, commitSha: any) {
   return result.stdout.trim().split(/\s+/).slice(1).filter(Boolean);
 }
 
-function readEvidenceRecords(cwd: any, runtime: any) {
-  const evidenceRoot = runtime?.layoutVersion === 1
+function readEvidenceRecords(cwd: string, runtime: unknown): EvidenceRecord[] {
+  const evidenceRoot = (runtime as { layoutVersion?: unknown })?.layoutVersion === 1
     ? path.join(cwd, '.atm', 'evidence')
     : path.join(cwd, '.atm', 'history', 'evidence');
   if (!existsSync(evidenceRoot)) {
     return [];
   }
-  return listJsonFiles(evidenceRoot).flatMap((filePath: any) => {
+  return listJsonFiles(evidenceRoot).flatMap((filePath: string) => {
     const isJsonl = filePath.endsWith('.jsonl');
     const records = isJsonl
       ? readJsonlObjects(filePath).flatMap(extractEvidenceRecords)
       : extractEvidenceRecords(readJsonIfPossible(filePath));
-    return records.map((record: any, index: any) => ({
-      path: toPortablePath(path.relative(cwd, filePath)),
-      index,
-      git: normalizeGitDetails(record?.details?.git)
-    })).filter((entry: any) => entry.git !== null);
+    return records.map((record: unknown, index: number) => {
+      const rec = record as { details?: { git?: unknown } };
+      return {
+        path: toPortablePath(path.relative(cwd, filePath)),
+        index,
+        git: normalizeGitDetails(rec?.details?.git)
+      };
+    }).filter((entry): entry is EvidenceRecord => entry.git !== null);
   });
 }
 
-function extractEvidenceRecords(value: any) {
+function extractEvidenceRecords(value: unknown): unknown[] {
   if (Array.isArray(value)) {
-    return value.filter((entry) => entry && typeof entry === 'object');
+    return value.filter((entry): entry is unknown => entry && typeof entry === 'object');
   }
   if (!value || typeof value !== 'object') {
     return [];
   }
-  if (Array.isArray(value.evidence)) {
-    return value.evidence.filter((entry: any) => entry && typeof entry === 'object');
+  const val = value as { evidence?: unknown; evidenceKind?: unknown; details?: unknown };
+  if (Array.isArray(val.evidence)) {
+    return val.evidence.filter((entry): entry is unknown => entry && typeof entry === 'object');
   }
-  if (value.evidenceKind || value.details) {
+  if (val.evidenceKind || val.details) {
     return [value];
   }
   return [];
 }
 
-function normalizeGitDetails(value: any) {
+function normalizeGitDetails(value: unknown): GitDetails | null {
   if (!value || typeof value !== 'object') {
     return null;
   }
+  const val = value as { commitSha?: unknown; treeSha?: unknown; parentCommitShas?: unknown };
   return {
-    commitSha: typeof value.commitSha === 'string' ? value.commitSha.trim() : null,
-    treeSha: typeof value.treeSha === 'string' ? value.treeSha.trim() : null,
-    parentCommitShas: Array.isArray(value.parentCommitShas)
-      ? value.parentCommitShas.map((entry: any) => String(entry).trim()).filter(Boolean)
+    commitSha: typeof val.commitSha === 'string' ? val.commitSha.trim() : null,
+    treeSha: typeof val.treeSha === 'string' ? val.treeSha.trim() : null,
+    parentCommitShas: Array.isArray(val.parentCommitShas)
+      ? val.parentCommitShas.map((entry: unknown) => String(entry).trim()).filter(Boolean)
       : []
   };
 }
 
-function listJsonFiles(directoryPath: any): string[] {
+function listJsonFiles(directoryPath: string): string[] {
   return readdirSync(directoryPath, { withFileTypes: true }).flatMap((entry) => {
     const absolutePath = path.join(directoryPath, entry.name);
     if (entry.isDirectory()) {
@@ -297,7 +319,7 @@ function listJsonFiles(directoryPath: any): string[] {
   });
 }
 
-function readJsonIfPossible(filePath: any) {
+function readJsonIfPossible(filePath: string): unknown {
   try {
     return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch {
@@ -305,7 +327,7 @@ function readJsonIfPossible(filePath: any) {
   }
 }
 
-function readJsonlObjects(filePath: string): any[] {
+function readJsonlObjects(filePath: string): unknown[] {
   try {
     const content = readFileSync(filePath, 'utf8');
     return content
@@ -318,12 +340,12 @@ function readJsonlObjects(filePath: string): any[] {
   }
 }
 
-function sameStringSet(left: any, right: any) {
-  const normalize = (values: any) => [...new Set((values ?? []).map((value: any) => String(value).trim()).filter(Boolean))].sort();
+function sameStringSet(left: readonly string[], right: readonly string[]) {
+  const normalize = (values: readonly string[]) => [...new Set((values ?? []).map((value: string) => String(value).trim()).filter(Boolean))].sort();
   return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
 }
 
-function runGit(cwd: any, args: any, env = {}) {
+function runGit(cwd: string, args: readonly string[], env: NodeJS.ProcessEnv = {}) {
   const result = spawnSync('git', args, {
     cwd,
     env: createSanitizedGitEnv(env),
@@ -350,6 +372,6 @@ function createSanitizedGitEnv(extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv
   return env;
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string | null | undefined) {
   return String(value || '').replace(/\\/g, '/');
 }

@@ -3,8 +3,20 @@ export declare const gitHeadEvidencePaths: {
     jsonl: string;
 };
 export declare const gitHeadEvidencePath: string;
-export declare function createGitHeadEvidenceCheck(cwd: any, runtime: any): {
+export interface GitDetails {
+    commitSha: string | null;
+    treeSha: string | null;
+    parentCommitShas: string[];
+}
+export interface EvidenceRecord {
+    path: string;
+    index: number;
+    git: GitDetails;
+}
+export declare function createGitHeadEvidenceCheck(cwd: string, runtime: unknown): {
     name: string;
     ok: boolean;
-    details: any;
+    details: {
+        status: string;
+    };
 };

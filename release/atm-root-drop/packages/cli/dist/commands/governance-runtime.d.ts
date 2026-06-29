@@ -63,8 +63,8 @@ export declare function createV1AtmPaths(taskId?: string): {
     selfHostReportPath: string;
     selfHostBudgetReportPath: string;
 };
-export declare function detectGovernanceRuntime(cwd: any, taskId?: string): {
-    config: any;
+export declare function detectGovernanceRuntime(cwd: string, taskId?: string): {
+    config: Record<string, unknown> | null;
     configPath: string;
     layoutVersion: number;
     migrationNeeded: boolean;
@@ -132,29 +132,35 @@ export declare function detectGovernanceRuntime(cwd: any, taskId?: string): {
         selfHostReportPath: string;
         selfHostBudgetReportPath: string;
     };
-    currentTaskId: any;
+    currentTaskId: string | null;
     activeLock: {
-        taskId: any;
-        owner: any;
+        taskId: string;
+        owner: string | null;
         path: string;
     } | null;
     lastEvidenceAt: string | null;
     lastHandoffAt: string | null;
     missingPaths: string[];
 };
-export declare function createCurrentTaskRecord(task: any, options?: {
+export declare function createCurrentTaskRecord(task: {
+    readonly workItemId?: string;
+    readonly id?: string;
+    readonly taskId?: string;
+    readonly title?: string;
+    readonly status?: string;
+}, options?: {
     updatedAt?: string;
     lockPath?: string | null;
     evidencePath?: string | null;
     summaryPath?: string | null;
 }): {
-    workItemId: any;
-    title: any;
-    status: any;
+    workItemId: string;
+    title: string | null;
+    status: string | null;
     updatedAt: string;
     lockPath: string | null;
     evidencePath: string | null;
     summaryPath: string | null;
 };
-export declare function relativePathFrom(cwd: any, absolutePath: any): string;
-export declare function sanitizeBudgetFileId(budgetId: any): string;
+export declare function relativePathFrom(cwd: string, absolutePath: string): string;
+export declare function sanitizeBudgetFileId(budgetId: unknown): string;

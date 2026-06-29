@@ -3,9 +3,9 @@ import path from 'node:path';
 
 const repeatedDigitDigestPattern = /sha256:([0-9a-f])\1{63}/i;
 
-export function runHashPlaceholderAudit(options: any = {}) {
+export function runHashPlaceholderAudit(options: { root?: string } = {}) {
   const root = path.resolve(options.root ?? process.cwd());
-  const findings: any[] = [];
+  const findings: { file: string; issue: string }[] = [];
   const files = [
     path.join(root, 'atomic-registry.json'),
     ...listJsonFiles(path.join(root, 'specs')),
@@ -24,9 +24,9 @@ export function runHashPlaceholderAudit(options: any = {}) {
   return { ok: findings.length === 0, checked: files.filter(existsSync).map((filePath) => relative(root, filePath)), findings };
 }
 
-function listJsonFiles(directory: any) {
+function listJsonFiles(directory: string): string[] {
   if (!existsSync(directory)) return [];
-  const results: any[] = [];
+  const results: string[] = [];
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) results.push(...listJsonFiles(fullPath));
@@ -35,9 +35,9 @@ function listJsonFiles(directory: any) {
   return results;
 }
 
-function listExampleAtomSpecs(examplesRoot: any) {
+function listExampleAtomSpecs(examplesRoot: string): string[] {
   if (!existsSync(examplesRoot)) return [];
-  const results: any[] = [];
+  const results: string[] = [];
   for (const entry of readdirSync(examplesRoot, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     results.push(...listJsonFiles(path.join(examplesRoot, entry.name, 'atoms')));
@@ -45,11 +45,11 @@ function listExampleAtomSpecs(examplesRoot: any) {
   return results;
 }
 
-function isAllowedPlaceholderPath(relativePath: any) {
+function isAllowedPlaceholderPath(relativePath: string): boolean {
   const normalized = relativePath.replace(/\\/g, '/');
   return normalized.startsWith('fixtures/') || normalized.startsWith('tests/');
 }
 
-function relative(root: any, filePath: any) {
+function relative(root: string, filePath: string): string {
   return path.relative(root, filePath).replace(/\\/g, '/');
 }

@@ -217,12 +217,16 @@ function runAtmStep(name: string, atmExecution: AtmExecutionPlan, args: readonly
   };
 }
 
-function writePayload(payload: any, json: boolean): void {
+interface CreateAtmPayload {
+  readonly messages?: ReadonlyArray<{ readonly text?: string }> | null;
+}
+
+function writePayload(payload: CreateAtmPayload, json: boolean): void {
   if (json) {
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
     return;
   }
-  const message = payload.messages[0]?.text ?? 'create-atm complete.';
+  const message = payload.messages?.[0]?.text ?? 'create-atm complete.';
   process.stdout.write(`[create-atm] ${message}\n`);
 }
 

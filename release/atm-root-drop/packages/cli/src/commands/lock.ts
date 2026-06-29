@@ -3,7 +3,7 @@ import type { WorkItemRef } from '@ai-atomic-framework/core';
 import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/src/index.ts';
 import { CliError, makeResult, message, resolveValue } from './shared.ts';
 
-export async function runLock(argv: any) {
+export async function runLock(argv: string[]) {
   const options = parseLockArgs(argv);
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: options.cwd });
   const existingTask = await resolveValue(adapter.stores.taskStore.getTask(options.taskId));
@@ -72,13 +72,13 @@ function extractErrorDetails(error: unknown): Record<string, unknown> {
   return details as Record<string, unknown>;
 }
 
-function parseLockArgs(argv: any) {
+function parseLockArgs(argv: string[]) {
   const state = {
     cwd: process.cwd(),
-    action: null,
-    taskId: null,
+    action: null as string | null,
+    taskId: null as string | null,
     owner: 'atm-agent',
-    files: []
+    files: [] as string[]
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -99,7 +99,7 @@ function parseLockArgs(argv: any) {
       continue;
     }
     if (arg === '--files') {
-      state.files = requireValue(argv, index, '--files').split(',').map((entry: any) => entry.trim()).filter(Boolean);
+      state.files = requireValue(argv, index, '--files').split(',').map((entry: string) => entry.trim()).filter(Boolean);
       index += 1;
       continue;
     }
@@ -131,7 +131,7 @@ function parseLockArgs(argv: any) {
   };
 }
 
-function requireValue(argv: any, optionIndex: any, optionName: any) {
+function requireValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `lock requires a value for ${optionName}`, { exitCode: 2 });

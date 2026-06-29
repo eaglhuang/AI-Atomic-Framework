@@ -29,14 +29,34 @@ const legacyBehaviorPackageNames = [
   'plugin-police-lifecycle'
 ];
 
-export async function runDoctor(argv: any) {
+interface DoctorOptions {
+  cwd: string;
+  ciProfile?: string;
+  skipChecks?: unknown[];
+  [key: string]: unknown;
+}
+
+interface DoctorCheck {
+  name: string;
+  ok: boolean;
+  details: Record<string, unknown> | null;
+}
+
+interface PackageJson {
+  name?: string;
+  packageManager?: string;
+  scripts?: Record<string, string>;
+  [key: string]: unknown;
+}
+
+export async function runDoctor(argv: readonly string[]) {
   const trustMode = Array.isArray(argv) && argv.includes('--trust');
   const knownBadMode = Array.isArray(argv) && argv.includes('--known-bad');
   const doctorModeFlags = new Set(['--trust', '--known-bad']);
-  const { options } = parseOptions((trustMode || knownBadMode) ? argv.filter((arg: string) => !doctorModeFlags.has(arg)) : argv, 'doctor');
+  const { options } = parseOptions((trustMode || knownBadMode) ? argv.filter((arg: string) => !doctorModeFlags.has(arg)) : [...argv], 'doctor') as { options: DoctorOptions };
   const root = options.cwd;
   const doctorPolicy = resolveDoctorPolicy(options);
-  const rootPackage = readJsonIfExists(path.join(root, 'package.json')) ?? {};
+  const rootPackage = (readJsonIfExists(path.join(root, 'package.json')) as PackageJson) ?? {};
   const repoIdentity = detectFrameworkRepoIdentity(root);
   const frameworkContractExpected = isFrameworkContractExpected(repoIdentity);
   const packageDirs = listPackageDirs(root);
@@ -48,9 +68,9 @@ export async function runDoctor(argv: any) {
   const stableOnefileRunnerAvailable = existsSync(path.join(root, 'release', 'atm-onefile', 'atm.mjs'));
   const hasTsNoCheck = listFiles(path.join(root, 'packages'))
     .concat(listFiles(path.join(root, 'scripts')))
-    .filter((filePath: any) => /\.(ts|js|mjs)$/.test(filePath))
-    .filter((filePath: any) => !filePath.endsWith(path.join('packages', 'cli', 'src', 'commands', 'doctor.ts')))
-    .some((filePath: any) => /^\s*\/\/\s*@ts-nocheck\b/m.test(readFileSync(filePath, 'utf8')));
+    .filter((filePath: string) => /\.(ts|js|mjs)$/.test(filePath))
+    .filter((filePath: string) => !filePath.endsWith(path.join('packages', 'cli', 'src', 'commands', 'doctor.ts')))
+    .some((filePath: string) => /^\s*\/\/\s*@ts-nocheck\b/m.test(readFileSync(filePath, 'utf8')));
   const missingDist = packageDirs
     .map((packageDir) => ({ packageDir, js: path.join(root, packageDir, 'dist', 'index.js'), dts: path.join(root, packageDir, 'dist', 'index.d.ts') }))
     .filter((entry) => !existsSync(entry.js) || !existsSync(entry.dts))
@@ -92,10 +112,10 @@ export async function runDoctor(argv: any) {
       validateStandard: rootPackage.scripts?.['validate:standard'] ?? null,
       validateFull: rootPackage.scripts?.['validate:full'] ?? null
     }),
-    createCheck('typescript-build-config', !frameworkContractExpected || (existsSync(path.join(root, 'tsconfig.json')) && existsSync(path.join(root, 'tsconfig.build.json')) && rootPackage.scripts?.build?.includes('tsc')), {
+    createCheck('typescript-build-config', !frameworkContractExpected || (existsSync(path.join(root, 'tsconfig.json')) && existsSync(path.join(root, 'tsconfig.build.json')) && rootPackage.scripts?.build?.includes('tsc') === true), {
       tsconfig: existsSync(path.join(root, 'tsconfig.json')), buildConfig: existsSync(path.join(root, 'tsconfig.build.json')), buildScript: rootPackage.scripts?.build ?? null
     }),
-    createCheck('eslint-lint-config', !frameworkContractExpected || (existsSync(path.join(root, 'eslint.config.mjs')) && rootPackage.scripts?.lint?.includes('eslint')), {
+    createCheck('eslint-lint-config', !frameworkContractExpected || (existsSync(path.join(root, 'eslint.config.mjs')) && rootPackage.scripts?.lint?.includes('eslint') === true), {
       eslintConfig: existsSync(path.join(root, 'eslint.config.mjs')), lintScript: rootPackage.scripts?.lint ?? null
     }),
     createCheck('package-surface', !frameworkContractExpected || (existsSync(path.join(root, 'packages/plugin-behavior-pack')) && legacyPackages.length === 0), { behaviorPack: existsSync(path.join(root, 'packages/plugin-behavior-pack')), legacyPackages }),
@@ -301,7 +321,7 @@ export async function runDoctor(argv: any) {
   });
 }
 
-function resolveDoctorPolicy(options: any) {
+function resolveDoctorPolicy(options: DoctorOptions) {
   const supportedProfiles = new Set(['dependency-pr']);
   const supportedSkipChecks = new Set(['git-head-evidence']);
   const ciProfile = typeof options.ciProfile === 'string' && options.ciProfile.trim()
@@ -347,10 +367,14 @@ function resolveDoctorPolicy(options: any) {
   };
 }
 
-function applyDoctorPolicyToCheck(check: any, policy: ReturnType<typeof resolveDoctorPolicy>) {
-  if (!policy.skipChecks.includes(check?.name)) {
+function applyDoctorPolicyToCheck(check: DoctorCheck, policy: ReturnType<typeof resolveDoctorPolicy>): DoctorCheck {
+  if (!policy.skipChecks.includes(check.name)) {
     return check;
   }
+  const originalDetails = check.details;
+  const originalStatus = (originalDetails && typeof originalDetails === 'object' && 'status' in originalDetails)
+    ? (originalDetails as Record<string, unknown>).status
+    : null;
   return {
     ...check,
     ok: true,
@@ -359,22 +383,26 @@ function applyDoctorPolicyToCheck(check: any, policy: ReturnType<typeof resolveD
       skippedBy: policy.ciProfile ? 'ci-profile' : 'skip-check',
       ciProfile: policy.ciProfile,
       reason: policy.skipReason,
-      originalStatus: check?.details?.status ?? null,
-      originalOk: check?.ok === true,
-      originalDetails: check?.details ?? null
+      originalStatus: originalStatus ?? null,
+      originalOk: check.ok === true,
+      originalDetails: originalDetails ?? null
     }
   };
 }
 
-function downgradeAdopterGitHeadEvidenceCheck(check: any, repoIdentity: any) {
-  if (repoIdentity?.isFrameworkRepo || check?.ok || check?.details?.status !== 'missing') {
+function downgradeAdopterGitHeadEvidenceCheck(check: DoctorCheck, repoIdentity: { isFrameworkRepo: boolean }): DoctorCheck {
+  const details = check.details;
+  const status = (details && typeof details === 'object' && 'status' in details)
+    ? (details as Record<string, unknown>).status
+    : null;
+  if (repoIdentity.isFrameworkRepo || check.ok || status !== 'missing') {
     return check;
   }
   return {
     ...check,
     ok: true,
     details: {
-      ...check.details,
+      ...(details as Record<string, unknown>),
       enforcement: 'warning',
       downgradedToWarning: true,
       strictInFrameworkRepo: true
@@ -382,7 +410,7 @@ function downgradeAdopterGitHeadEvidenceCheck(check: any, repoIdentity: any) {
   };
 }
 
-function checkOnboardingLifecycle(root: any, runtime: any) {
+function checkOnboardingLifecycle(root: string, runtime: ReturnType<typeof detectGovernanceRuntime>) {
   const configPresent = existsSync(path.join(root, '.atm', 'config.json'));
   const atmChartPath = path.join(root, '.atm', 'memory', 'atm-chart.md');
   const welcomeLineagePath = path.join(root, '.atm', 'runtime', 'welcome.lineage.json');
@@ -447,16 +475,16 @@ function checkOnboardingLifecycle(root: any, runtime: any) {
   };
 }
 
-function createVersionSummaryMessages(versionSummary: any) {
+function createVersionSummaryMessages(versionSummary: ReturnType<typeof createATMVersionSummary>) {
   const messages = [];
   for (const warning of versionSummary.compatibilityMatrix?.warnings ?? []) {
     messages.push(message('warning', warning.code, warning.text, {
-      lastUpdated: warning.lastUpdated ?? null,
-      matrixSource: versionSummary.compatibilityMatrix?.source ?? null
+      lastUpdated: warning.lastUpdated ?? undefined,
+      matrixSource: versionSummary.compatibilityMatrix?.source ?? undefined
     }));
   }
   if (versionSummary.downgrade?.detected === true) {
-    messages.push(message('warning', 'ATM_FRAMEWORK_DOWNGRADE_DETECTED', versionSummary.downgrade.reason, {
+    messages.push(message('warning', 'ATM_FRAMEWORK_DOWNGRADE_DETECTED', versionSummary.downgrade.reason ?? '', {
       currentFrameworkVersion: versionSummary.downgrade.currentFrameworkVersion,
       lastSeenFrameworkVersion: versionSummary.downgrade.lastSeenFrameworkVersion,
       readOnlyDiagnostic: true,
@@ -466,7 +494,7 @@ function createVersionSummaryMessages(versionSummary: any) {
   return messages;
 }
 
-function readATMChartFrontmatter(filePath: string): Record<string, any> | null {
+function readATMChartFrontmatter(filePath: string): Record<string, unknown> | null {
   try {
     const content = readFileSync(filePath, 'utf8');
     const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -481,17 +509,23 @@ function readATMChartFrontmatter(filePath: string): Record<string, any> | null {
         const separatorIndex = line.indexOf(':');
         const key = line.slice(0, separatorIndex).trim();
         const value = line.slice(separatorIndex + 1).trim();
-        return [key, value.startsWith('{') ? JSON.parse(value) : value];
+        return [key, value.startsWith('{') ? (JSON.parse(value) as unknown) : value];
       }));
   } catch {
     return null;
   }
 }
 
-function createCheck(name: any, ok: any, details: any) { return { name, ok: ok === true, details }; }
+function createCheck(name: string, ok: boolean, details: unknown): DoctorCheck {
+  return {
+    name,
+    ok: ok === true,
+    details: (details && typeof details === 'object' ? (details as Record<string, unknown>) : null)
+  };
+}
 
-function createIntegrationDriftRemediation(integrationHealth: any) {
-  const failedAdapters = (integrationHealth?.failed ?? []).map((entry: any) => {
+function createIntegrationDriftRemediation(integrationHealth: Awaited<ReturnType<typeof checkIntegrationHealth>>) {
+  const failedAdapters = (integrationHealth?.failed ?? []).map((entry) => {
     const adapterId = typeof entry.adapterId === 'string' && entry.adapterId.length > 0 ? entry.adapterId : null;
     return {
       adapterId,
@@ -503,7 +537,7 @@ function createIntegrationDriftRemediation(integrationHealth: any) {
       removeCommand: adapterId ? `node atm.mjs integration remove ${adapterId} --json` : null
     };
   });
-  const first = failedAdapters.find((entry: any) => entry.adapterId) ?? null;
+  const first = failedAdapters.find((entry) => entry.adapterId) ?? null;
   return {
     schemaId: 'atm.integrationDriftRemediation.v1',
     failedAdapters,
@@ -513,15 +547,20 @@ function createIntegrationDriftRemediation(integrationHealth: any) {
   };
 }
 
-function readJsonIfExists(filePath: any): Record<string, any> | null { return existsSync(filePath) ? JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any> : null; }
+function readJsonIfExists(filePath: string): Record<string, unknown> | null {
+  return existsSync(filePath) ? (JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>) : null;
+}
 
-function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFrameworkRepo: boolean }, gitHeadEvidenceCheck: any) {
+function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFrameworkRepo: boolean }, gitHeadEvidenceCheck: DoctorCheck) {
   const branch = runGitScalar(root, ['branch', '--show-current']);
   const upstream = branch ? runGitScalar(root, ['rev-parse', '--abbrev-ref', `${branch}@{upstream}`]) : null;
   const aheadCount = upstream ? Number.parseInt(runGitScalar(root, ['rev-list', '--count', `${upstream}..HEAD`]) ?? '0', 10) || 0 : 0;
   const protectedBranchPatterns = ['main', 'master', 'trunk', 'release/*'];
   const protectedBranchTarget = branch ? isProtectedFrameworkBranchTarget(branch) : false;
-  const latestGitHeadStatus = gitHeadEvidenceCheck?.details?.status ?? null;
+  const details = gitHeadEvidenceCheck.details;
+  const latestGitHeadStatus = (details && typeof details === 'object' && 'status' in details)
+    ? (details as Record<string, unknown>).status
+    : null;
   const actorRegistryState = inspectTrackedActorRegistryState(root);
   const requiresProtectedPushReadiness = repoIdentity.isFrameworkRepo && protectedBranchTarget && aheadCount > 0;
   const protectedPushReadiness = !repoIdentity.isFrameworkRepo
@@ -546,8 +585,8 @@ function createGovernanceEntryReadinessCheck(root: string, repoIdentity: { isFra
     protectedBranchTarget,
     requiresProtectedPushReadiness,
     protectedPushReadiness,
-    latestGitHeadStatus,
-    actorRegistryState,
+    latestGitHeadStatus: latestGitHeadStatus as string | null,
+    actorRegistryState: actorRegistryState as unknown as Record<string, unknown>,
     queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
     branchQueueSummary: 'Governed framework commits may serialize through the branch commit queue and retry on safe HEAD drift instead of surfacing raw Git races.',
     recommendedAction: actorRegistryState.blocking
@@ -580,7 +619,7 @@ function createBacklogSyncCheck(root: string, repoIdentity: { isFrameworkRepo: b
   return createCheck('backlog-sync', suspiciousRows.length === 0, {
     schemaId: 'atm.backlogSyncCheck.v1',
     backlogPath: relativePathFrom(root, backlogPath),
-    suspiciousRows,
+    suspiciousRows: suspiciousRows as unknown as Record<string, unknown>[],
     recommendedAction: suspiciousRows.length > 0
       ? 'Update the backlog status to match current source reality, or land the missing validator/documentation closeout referenced by the row.'
       : 'Backlog open rows appear consistent with current source reality.'
@@ -622,13 +661,13 @@ function hasRequiredScripts(scripts: Record<string, string> = {}) {
 function isFrameworkContractExpected(repoIdentity: { isFrameworkRepo: boolean }) {
   return repoIdentity.isFrameworkRepo === true;
 }
-function listPackageDirs(root: any): string[] {
+function listPackageDirs(root: string): string[] {
   const packagesRoot = path.join(root, 'packages');
   if (!existsSync(packagesRoot)) return [];
   return readdirSync(packagesRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => `packages/${entry.name}`).filter((packageDir) => existsSync(path.join(root, packageDir, 'package.json')));
 }
-function packageDirLabel(root: any, packageDir: any) { return readJsonIfExists(path.join(root, packageDir, 'package.json'))?.name ?? packageDir; }
-function listFiles(directory: any): string[] {
+function packageDirLabel(root: string, packageDir: string): string { return (readJsonIfExists(path.join(root, packageDir, 'package.json'))?.name as string | undefined) ?? packageDir; }
+function listFiles(directory: string): string[] {
   if (!existsSync(directory)) return [];
   const entries = readdirSync(directory, { withFileTypes: true });
   return entries.flatMap((entry) => {
@@ -640,7 +679,7 @@ function listFiles(directory: any): string[] {
   });
 }
 
-function checkCharterIntegrity(root: any): { ok: boolean; charterPath: string; charterInvariantsPath: string; charterPresent: boolean; invariantsPresent: boolean; invariantsParseable: boolean; hashField: string | null } {
+function checkCharterIntegrity(root: string): { ok: boolean; charterPath: string; charterInvariantsPath: string; charterPresent: boolean; invariantsPresent: boolean; invariantsParseable: boolean; hashField: string | null } {
   const charterPath = path.join(root, '.atm', 'charter', 'atomic-charter.md');
   const invariantsPath = path.join(root, '.atm', 'charter', 'charter-invariants.json');
   const charterPresent = existsSync(charterPath);

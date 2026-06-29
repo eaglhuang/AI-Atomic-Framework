@@ -84,7 +84,7 @@ export async function checkIntegrationHealth(repositoryRoot: string) {
   return {
     ok: manifestReports.every((report) => report.ok),
     manifestDir: '.atm/integrations',
-    installed: manifestReports.filter((report) => report.adapterId).map((report) => report.adapterId),
+    installed: manifestReports.filter((report) => report.adapterId).map((report) => report.adapterId as string),
     manifests: manifestReports,
     failed: manifestReports.filter((report) => !report.ok)
   };
@@ -651,7 +651,17 @@ function compareManifestParity(installed: InstallManifest, expected: InstallMani
   };
 }
 
-function createManifestHealthReport(input: any) {
+interface ManifestHealthReportInput {
+  ok: boolean;
+  status: string;
+  manifestPath: string;
+  adapterId: string | null;
+  findings: readonly unknown[];
+  driftedFiles: readonly string[];
+  staleFields?: readonly string[];
+}
+
+function createManifestHealthReport(input: ManifestHealthReportInput) {
   return {
     ok: input.ok === true,
     status: input.status,

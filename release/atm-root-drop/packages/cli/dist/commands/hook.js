@@ -1410,10 +1410,11 @@ function inspectCommitGitHeadEvidence(cwd, commitSha, criticalChangedFiles, head
     const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
     const parentCommitShas = readParentCommitShas(cwd, commitSha);
     const candidates = records.flatMap((record) => {
-        const git = normalizeGitDetails(record?.details?.git);
+        const rec = record;
+        const git = normalizeGitDetails(rec?.details?.git);
         if (!git)
             return [];
-        const commandRuns = normalizeCommandRuns(record?.commandRuns ?? record?.details?.commandRuns);
+        const commandRuns = normalizeCommandRuns(rec?.commandRuns ?? rec?.details?.commandRuns);
         const validationPasses = inferValidationPassesFromCommandRuns(commandRuns);
         return [{ git, commandRuns, validationPasses }];
     });

@@ -1330,8 +1330,8 @@ function runGitCommit(options: ParsedGitOptions) {
         })
       });
     }
-    const stderr = error instanceof Error && 'stderr' in error ? String((error as any).stderr ?? '') : '';
-    const stdout = error instanceof Error && 'stdout' in error ? String((error as any).stdout ?? '') : '';
+    const stderr = error instanceof Error && 'stderr' in error ? String((error as { stderr?: unknown }).stderr ?? '') : '';
+    const stdout = error instanceof Error && 'stdout' in error ? String((error as { stdout?: unknown }).stdout ?? '') : '';
     if (isHeadRaceCommitFailure(stderr)) {
       throw new CliError('ATM_GIT_COMMIT_BRANCH_QUEUE_RACE', 'Another governed commit advanced HEAD during this commit attempt. Retry through the ATM commit lane after the active writer finishes.', {
         exitCode: 1,

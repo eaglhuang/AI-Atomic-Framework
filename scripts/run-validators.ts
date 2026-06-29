@@ -23,6 +23,7 @@ const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000;
 
 const parsedCli = parseCliArgs(process.argv.slice(2));
 const profileConfig = resolveProfileConfig(parsedCli.profile);
+const parallel = resolveParallelSetting(parsedCli, profileConfig);
 const selectedNames = applyFilters(resolveProfileValidatorNames(parsedCli.profile), parsedCli.filters);
 const baselineSummary = parsedCli.baselinePath ? readBaselineSummary(parsedCli.baselinePath) : null;
 const performanceBaselineSummary = parsedCli.performanceBaselinePath ? readBaselineSummary(parsedCli.performanceBaselinePath) : null;
@@ -40,7 +41,7 @@ if (selectedValidators.length === 0) {
     profile: parsedCli.profile,
     mode: profileConfig.mode,
     filters: parsedCli.filters,
-    parallel: parsedCli.parallel,
+    parallel,
     legacy: parsedCli.legacy,
     cache: parsedCli.cache,
     skipSlow: parsedCli.skipSlow,
@@ -62,7 +63,7 @@ if (selectedValidators.length === 0) {
 }
 
 const startedAt = Date.now();
-const results = parsedCli.parallel && !parsedCli.legacy
+const results = parallel
   ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, { json: parsedCli.json, cache: parsedCli.cache })))
     .then((items) => items.map((item) => markResultAgainstBaseline(item, baselineFingerprints)))
   : await runValidatorsSequential(selectedValidators, profileConfig.mode, {
@@ -76,7 +77,7 @@ const summary = createSummary({
   profile: parsedCli.profile,
   mode: profileConfig.mode,
   filters: parsedCli.filters,
-  parallel: parsedCli.parallel && !parsedCli.legacy,
+  parallel,
   legacy: parsedCli.legacy,
   cache: parsedCli.cache,
   skipSlow: parsedCli.skipSlow,
@@ -109,6 +110,7 @@ function parseCliArgs(argv: any) {
     performanceOutputPath: string | null;
     fastValidatorBudgetMs: number | null;
     slowValidatorBudgetMs: number | null;
+    serial: boolean;
   } = {
     filters: [],
     parallel: false,
@@ -120,7 +122,8 @@ function parseCliArgs(argv: any) {
     performanceBaselinePath: null,
     performanceOutputPath: null,
     fastValidatorBudgetMs: null,
-    slowValidatorBudgetMs: null
+    slowValidatorBudgetMs: null,
+    serial: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -137,6 +140,10 @@ function parseCliArgs(argv: any) {
     }
     if (arg === '--parallel') {
       options.parallel = true;
+      continue;
+    }
+    if (arg === '--serial') {
+      options.serial = true;
       continue;
     }
     if (arg === '--json') {
@@ -213,6 +220,16 @@ function resolveProfileConfig(profileName: any) {
     throw new Error(`Unknown validator profile: ${profileName}`);
   }
   return profile;
+}
+
+function resolveParallelSetting(parsedCli: any, profileConfig: any): boolean {
+  if (parsedCli.legacy) {
+    return false;
+  }
+  if (parsedCli.serial) {
+    return false;
+  }
+  return parsedCli.parallel || profileConfig.parallelByDefault === true;
 }
 
 function parsePositiveIntegerOption(value: unknown, flag: string): number {

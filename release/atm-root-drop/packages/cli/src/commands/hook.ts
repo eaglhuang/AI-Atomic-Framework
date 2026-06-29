@@ -1686,7 +1686,7 @@ function findFutureCommitEvidenceMatchInWorktree(cwd: string, treeSha: string | 
   if (!treeSha) return null;
   const records = readGitHeadEvidenceRecordsFromWorktree(cwd);
   for (const record of records) {
-    const git = normalizeGitDetails(record?.details?.git);
+    const git = normalizeGitDetails((record as { details?: { git?: unknown } })?.details?.git);
     if (!git) continue;
     if (git.treeSha === treeSha && sameStringSet(git.parentCommitShas, parentCommitShas)) {
       return git;
@@ -1714,7 +1714,7 @@ function readStagedTreeWithoutEvidence(cwd: string): string | null {
   }
 }
 
-function readGitHeadEvidenceRecordsAtRef(cwd: string, ref: string): readonly any[] {
+function readGitHeadEvidenceRecordsAtRef(cwd: string, ref: string): readonly unknown[] {
   const jsonlText = runGitScalar(cwd, ['show', `${ref}:${gitHeadEvidencePaths.jsonl}`]);
   if (jsonlText) {
     return jsonlText
@@ -1734,7 +1734,7 @@ function readGitHeadEvidenceRecordsAtRef(cwd: string, ref: string): readonly any
   return extractEvidenceRecords(evidence);
 }
 
-function readGitHeadEvidenceRecordsFromWorktree(cwd: string): readonly any[] {
+function readGitHeadEvidenceRecordsFromWorktree(cwd: string): readonly unknown[] {
   const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
   if (existsSync(evidenceAbsolute)) {
     const text = readFileSync(evidenceAbsolute, 'utf8');
@@ -1765,9 +1765,10 @@ function inspectCommitGitHeadEvidence(cwd: string, commitSha: string, criticalCh
   const governedTreeSha = readCommitTreeWithoutEvidence(cwd, commitSha);
   const parentCommitShas = readParentCommitShas(cwd, commitSha);
   const candidates = records.flatMap((record) => {
-    const git = normalizeGitDetails(record?.details?.git);
+    const rec = record as { commandRuns?: unknown; details?: { git?: unknown; commandRuns?: unknown } };
+    const git = normalizeGitDetails(rec?.details?.git);
     if (!git) return [];
-    const commandRuns = normalizeCommandRuns(record?.commandRuns ?? record?.details?.commandRuns);
+    const commandRuns = normalizeCommandRuns(rec?.commandRuns ?? rec?.details?.commandRuns);
     const validationPasses = inferValidationPassesFromCommandRuns(commandRuns);
     return [{ git, commandRuns, validationPasses }];
   });
@@ -2247,7 +2248,7 @@ function isTextFile(filePath: string): boolean {
     || path.basename(filePath).includes('README');
 }
 
-function extractEvidenceRecords(value: unknown): readonly any[] {
+function extractEvidenceRecords(value: unknown): readonly unknown[] {
   if (Array.isArray(value)) return value.filter((entry) => entry && typeof entry === 'object');
   if (!value || typeof value !== 'object') return [];
   const candidate = value as Record<string, unknown>;

@@ -59,7 +59,7 @@ export class AtmMarkdownTaskSourcePlugin implements ExternalTaskSourcePlugin {
       });
     }
 
-    const contextMap = frontData.contextMap as any;
+    const contextMap = frontData.contextMap as Record<string, unknown> | undefined;
     if (!contextMap || !Array.isArray(contextMap.primary) || contextMap.primary.length === 0) {
       diagnostics.push({
         code: 'ATM_VALIDATION_MISSING_PRIMARY_CONTEXT',

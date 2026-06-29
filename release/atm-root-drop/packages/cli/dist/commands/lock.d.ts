@@ -1,1 +1,1 @@
-export declare function runLock(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runLock(argv: string[]): Promise<import("./shared.ts").CommandResult>;

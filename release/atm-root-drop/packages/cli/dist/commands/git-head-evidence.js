@@ -191,7 +191,7 @@ function findEvidenceOnlyParentMatch(cwd, commitSha, parentCommitShas, evidenceR
     const parentTreeMatch = evidenceRecords.find((entry) => {
         const evidenceTreeSha = entry.git.treeSha;
         return Boolean(evidenceTreeSha)
-            && (evidenceTreeSha === parentGovernedTreeSha || evidenceTreeSha === parentTreeSha)
+            && (evidenceTreeSha === parentGovernedTreeSha || (parentTreeSha && evidenceTreeSha === parentTreeSha))
             && sameStringSet(entry.git.parentCommitShas, parentParents);
     });
     return parentTreeMatch
@@ -232,11 +232,14 @@ function readEvidenceRecords(cwd, runtime) {
         const records = isJsonl
             ? readJsonlObjects(filePath).flatMap(extractEvidenceRecords)
             : extractEvidenceRecords(readJsonIfPossible(filePath));
-        return records.map((record, index) => ({
-            path: toPortablePath(path.relative(cwd, filePath)),
-            index,
-            git: normalizeGitDetails(record?.details?.git)
-        })).filter((entry) => entry.git !== null);
+        return records.map((record, index) => {
+            const rec = record;
+            return {
+                path: toPortablePath(path.relative(cwd, filePath)),
+                index,
+                git: normalizeGitDetails(rec?.details?.git)
+            };
+        }).filter((entry) => entry.git !== null);
     });
 }
 function extractEvidenceRecords(value) {
@@ -246,10 +249,11 @@ function extractEvidenceRecords(value) {
     if (!value || typeof value !== 'object') {
         return [];
     }
-    if (Array.isArray(value.evidence)) {
-        return value.evidence.filter((entry) => entry && typeof entry === 'object');
+    const val = value;
+    if (Array.isArray(val.evidence)) {
+        return val.evidence.filter((entry) => entry && typeof entry === 'object');
     }
-    if (value.evidenceKind || value.details) {
+    if (val.evidenceKind || val.details) {
         return [value];
     }
     return [];
@@ -258,11 +262,12 @@ function normalizeGitDetails(value) {
     if (!value || typeof value !== 'object') {
         return null;
     }
+    const val = value;
     return {
-        commitSha: typeof value.commitSha === 'string' ? value.commitSha.trim() : null,
-        treeSha: typeof value.treeSha === 'string' ? value.treeSha.trim() : null,
-        parentCommitShas: Array.isArray(value.parentCommitShas)
-            ? value.parentCommitShas.map((entry) => String(entry).trim()).filter(Boolean)
+        commitSha: typeof val.commitSha === 'string' ? val.commitSha.trim() : null,
+        treeSha: typeof val.treeSha === 'string' ? val.treeSha.trim() : null,
+        parentCommitShas: Array.isArray(val.parentCommitShas)
+            ? val.parentCommitShas.map((entry) => String(entry).trim()).filter(Boolean)
             : []
     };
 }

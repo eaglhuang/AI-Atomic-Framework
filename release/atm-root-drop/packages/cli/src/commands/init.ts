@@ -4,8 +4,17 @@ import { adoptDefaultBootstrap, installDefaultRootDropScripts } from './bootstra
 import type { LocalGovernanceBootstrapResult } from '../../../plugin-governance-local/src/index.ts';
 import { installIntegrationAdapter } from './integration.ts';
 
-export async function runInit(argv: any) {
-  const { options } = parseOptions(argv, 'init');
+interface InitOptions {
+  cwd: string;
+  adopt?: string;
+  integration?: string;
+  dryRun?: boolean;
+  force?: boolean;
+  task?: string;
+}
+
+export async function runInit(argv: readonly string[]) {
+  const { options } = parseOptions([...argv], 'init') as { options: InitOptions };
   const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
   if (options.adopt && options.adopt !== 'default') {
     throw new CliError('ATM_CLI_USAGE', `init does not support adopt profile ${options.adopt}`, { exitCode: 2 });
@@ -128,7 +137,7 @@ export async function runInit(argv: any) {
   });
 }
 
-function createDryRunResult(options: any) {
+function createDryRunResult(options: InitOptions) {
   const configPath = configPathFor(options.cwd);
   const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
   return makeResult({
@@ -173,9 +182,9 @@ function expectedRootDropScriptPaths() {
   ]);
 }
 
-function createDefaultConfig(options: any) {
+function createDefaultConfig(options: InitOptions) {
   const shouldAdoptDefault = options.adopt === 'default' || typeof options.integration === 'string';
-  const config: Record<string, any> = {
+  const config: Record<string, unknown> = {
     schemaVersion: 'atm.config.v0.1',
     layoutVersion: 2,
     frameworkVersion: readFrameworkVersion(),
@@ -220,7 +229,7 @@ function createDefaultConfig(options: any) {
   };
 
   if (shouldAdoptDefault) {
-    config.adoption = {
+    config['adoption'] = {
       profile: 'default',
       taskPath: '.atm/history/tasks/BOOTSTRAP-0001.json',
       lockPath: '.atm/runtime/locks/BOOTSTRAP-0001.lock.json',

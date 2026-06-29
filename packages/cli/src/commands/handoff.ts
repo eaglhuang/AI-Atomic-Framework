@@ -4,7 +4,7 @@ import type { ArtifactRecord, EvidenceRecord, ScopeLockRecord, WorkItemRef } fro
 import { detectGovernanceRuntime } from './governance-runtime.ts';
 import { CliError, makeResult, message, resolveValue } from './shared.ts';
 
-export async function runHandoff(argv: any) {
+export async function runHandoff(argv: string[]) {
   const options = parseHandoffArgs(argv);
   const runtime = detectGovernanceRuntime(options.cwd);
   const taskId = options.taskId ?? runtime.currentTaskId;
@@ -68,11 +68,11 @@ export async function runHandoff(argv: any) {
   });
 }
 
-function parseHandoffArgs(argv: any) {
+function parseHandoffArgs(argv: string[]) {
   const state = {
     cwd: process.cwd(),
-    taskId: null,
-    subcommand: null
+    taskId: null as string | null,
+    subcommand: null as string | null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -109,7 +109,7 @@ function parseHandoffArgs(argv: any) {
   };
 }
 
-function requireValue(argv: any, optionIndex: any, optionName: any) {
+function requireValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `handoff requires a value for ${optionName}`, { exitCode: 2 });

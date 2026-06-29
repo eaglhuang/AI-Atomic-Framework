@@ -210,17 +210,23 @@ function runAtomizationCoverageGuard(cwd: string, files: readonly string[]) {
     });
   }
   const newPaths = files.length > 0 ? `--new-paths "${files.join(',')}"` : '';
+  interface AtomizationCoverageReport {
+    readonly schemaId?: string;
+    readonly violations?: readonly unknown[];
+  }
+
   const cmd = `node --strip-types "${scriptPath}" --mode guard --repo "${cwd}" ${newPaths}`.trim();
   let stdout = '';
   let exitCode = 0;
   try {
     stdout = execSync(cmd, { encoding: 'utf8' });
-  } catch (err: any) {
-    stdout = err.stdout?.toString() ?? '';
-    exitCode = err.status ?? 1;
+  } catch (err) {
+    const error = err as Error & { stdout?: string | Buffer; status?: number };
+    stdout = error.stdout?.toString() ?? '';
+    exitCode = error.status ?? 1;
   }
-  let report: any = {};
-  try { report = JSON.parse(stdout); } catch {}
+  let report: AtomizationCoverageReport = {};
+  try { report = JSON.parse(stdout) as AtomizationCoverageReport; } catch {}
   const violations = report.violations ?? [];
   return makeResult({
     ok: exitCode === 0,

@@ -34,24 +34,24 @@ export interface InstallIntegrationOptions {
 export declare function checkIntegrationHealth(repositoryRoot: string): Promise<{
     ok: boolean;
     manifestDir: string;
-    installed: any[];
+    installed: string[];
     manifests: {
         ok: boolean;
-        status: any;
-        manifestPath: any;
-        adapterId: any;
-        findings: any;
-        driftedFiles: any;
-        staleFields: any;
+        status: string;
+        manifestPath: string;
+        adapterId: string | null;
+        findings: readonly unknown[];
+        driftedFiles: readonly string[];
+        staleFields: any[];
     }[];
     failed: {
         ok: boolean;
-        status: any;
-        manifestPath: any;
-        adapterId: any;
-        findings: any;
-        driftedFiles: any;
-        staleFields: any;
+        status: string;
+        manifestPath: string;
+        adapterId: string | null;
+        findings: readonly unknown[];
+        driftedFiles: readonly string[];
+        staleFields: any[];
     }[];
 }>;
 export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
