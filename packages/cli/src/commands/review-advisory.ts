@@ -14,7 +14,23 @@ import {
 } from '../../../plugin-review-advisory/src/index.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 
-export function runReviewAdvisory(argv: any) {
+interface ReviewAdvisoryOptions {
+  cwd: string;
+  mode: AdvisoryProviderMode;
+  stubProfile: 'pass' | 'warn' | 'unavailable';
+  outputPath: string;
+  reportId: string;
+  targetKind: ReviewAdvisoryTarget['kind'];
+  targetId: string;
+  sourcePaths: string[];
+  providerResponse: string;
+  providerCommand: string;
+  machineFindings: string;
+  queuePath: string;
+  proposalId: string;
+}
+
+export function runReviewAdvisory(argv: string[]) {
   const { options } = parseReviewAdvisoryOptions(argv);
   const reportId = options.reportId || `review-advisory.${Date.now()}`;
   const target: ReviewAdvisoryTarget = {
@@ -104,7 +120,7 @@ export function runReviewAdvisory(argv: any) {
   });
 }
 
-function parseReviewAdvisoryOptions(argv: any) {
+function parseReviewAdvisoryOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),
     mode: 'stub' as AdvisoryProviderMode,
@@ -214,7 +230,7 @@ function parseReviewAdvisoryOptions(argv: any) {
   };
 }
 
-function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+function requireOptionValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `review-advisory requires a value for ${optionName}`, { exitCode: 2 });
@@ -222,7 +238,7 @@ function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
   return value;
 }
 
-function readProviderPayloadFromFile(providerResponsePath: any) {
+function readProviderPayloadFromFile(providerResponsePath: string) {
   if (!providerResponsePath) {
     return { ok: false, reason: 'agent-bridge-response-missing' };
   }
@@ -237,7 +253,7 @@ function readProviderPayloadFromFile(providerResponsePath: any) {
   }
 }
 
-function runExternalProvider(providerCommand: any) {
+function runExternalProvider(providerCommand: string) {
   if (!providerCommand) {
     return { ok: false, reason: 'external-cli-command-missing' };
   }
@@ -263,7 +279,7 @@ function runExternalProvider(providerCommand: any) {
   }
 }
 
-function readMachineFindings(machineFindingsPath: any) {
+function readMachineFindings(machineFindingsPath: string) {
   const resolved = path.resolve(machineFindingsPath);
   if (!existsSync(resolved)) {
     return [];
@@ -288,7 +304,7 @@ function readMachineFindings(machineFindingsPath: any) {
   }
 }
 
-function attachQueueSupplemental(report: ReviewAdvisoryReport, options: any): ReviewAdvisoryReport {
+function attachQueueSupplemental(report: ReviewAdvisoryReport, options: ReviewAdvisoryOptions): ReviewAdvisoryReport {
   if (!options.proposalId) {
     return report;
   }
@@ -309,9 +325,14 @@ function attachQueueSupplemental(report: ReviewAdvisoryReport, options: any): Re
   }
 
   try {
-    const queue = JSON.parse(readFileSync(queuePath, 'utf8'));
-    const entries = Array.isArray(queue?.entries) ? queue.entries : [];
-    const matched = entries.find((entry: any) => entry && entry.proposalId === options.proposalId);
+    const queue = JSON.parse(readFileSync(queuePath, 'utf8')) as Record<string, unknown> | null;
+    const entries = queue && Array.isArray(queue.entries) ? (queue.entries as unknown[]) : [];
+    const matched = entries.find((entry: unknown): entry is { proposalId: string; status?: string } => 
+      typeof entry === 'object' && 
+      entry !== null && 
+      'proposalId' in entry && 
+      (entry as { proposalId: string }).proposalId === options.proposalId
+    );
 
     return {
       ...report,
@@ -340,13 +361,13 @@ function attachQueueSupplemental(report: ReviewAdvisoryReport, options: any): Re
   }
 }
 
-function resolvePath(cwd: any, maybeRelativePath: any) {
+function resolvePath(cwd: string, maybeRelativePath: string) {
   return path.isAbsolute(maybeRelativePath)
     ? maybeRelativePath
     : path.resolve(cwd, maybeRelativePath);
 }
 
-function writeJson(filePath: any, value: any) {
+function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
