@@ -37,6 +37,11 @@ The contract is also what powers adapter-aware governance hints and integration
 tests. New language adapters should ship fixture-backed validation proving that
 their three selectors stay aligned with runtime readiness reporting.
 
+If a new language adapter is added as an npm workspace package, treat lockfile
+sync as part of the same change. `package.json`, `package-lock.json`, and the
+workspace package metadata must land together so `npm ci` keeps working in CI;
+do not rely on local `node_modules` state to hide a missing lockfile update.
+
 When an adapter adopts a map-managed atom, it should use `node atm.mjs registry lineage backfill` to backfill `members[].versionLineage` on the owning map record from real lineage evidence. That lineage contract lets `registry-diff` and onefile smoke checks resolve adopter-owned atoms even when there is no standalone atom entry, while keeping dry-run patches and apply-mode evidence gates deterministic.
 
 ## Atomization Planning (Optional)
