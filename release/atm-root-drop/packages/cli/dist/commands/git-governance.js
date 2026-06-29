@@ -95,7 +95,7 @@ function isGovernedLedgerBoundaryPathForGitCommit(filePath) {
         || /^\.atm\/history\/evidence\/[^/]+\.(?:closure-packet|bundle-manifest)\.json$/.test(normalized);
 }
 function ensureGovernedGitHeadEvidenceStagedForCommit(cwd, actorId) {
-    const treeSha = readCurrentIndexTreeWithoutEvidence(cwd);
+    const treeSha = readIndexTreeWithoutEvidence(cwd);
     if (!treeSha)
         return null;
     const parentCommitShas = readCurrentHeadParentCommitShas(cwd);
@@ -136,6 +136,59 @@ function ensureGovernedGitHeadEvidenceStagedForCommit(cwd, actorId) {
         appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
     }
     runGitCommand(cwd, ['add', '--', gitHeadEvidencePath], ['ignore', 'pipe', 'pipe']);
+    return {
+        evidencePath: gitHeadEvidencePath,
+        treeSha,
+        parentCommitShas
+    };
+}
+function ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, commitFiles, env) {
+    if (!shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)) {
+        return null;
+    }
+    const treeSha = readIndexTreeWithoutEvidence(cwd, env);
+    if (!treeSha)
+        return null;
+    const parentCommitShas = readCurrentHeadParentCommitShas(cwd);
+    const generatedAt = new Date().toISOString();
+    const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+    mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+    if (!hasMatchingWorktreeGitHeadEvidence(cwd, treeSha, parentCommitShas)) {
+        const payload = {
+            schemaVersion: 'atm.gitHeadEvidence.v0.1',
+            evidence: [
+                {
+                    evidenceKind: 'validation',
+                    evidenceType: 'commit',
+                    summary: 'Governed git commit wrapper prepared git-head evidence for the staged task-scoped commit tree.',
+                    artifactPaths: [],
+                    createdAt: generatedAt,
+                    producedBy: actorId,
+                    evidenceFreshness: 'fresh',
+                    commandRuns: [],
+                    details: {
+                        actorId,
+                        kind: 'commit',
+                        freshness: 'fresh',
+                        git: {
+                            treeSha,
+                            parentCommitShas,
+                            stagedPathCount: commitFiles.length,
+                            evidencePath: gitHeadEvidencePath,
+                            generatedAt
+                        },
+                        preparedBy: {
+                            mode: 'governed-git-commit-wrapper',
+                            scope: 'task-scoped'
+                        }
+                    }
+                }
+            ]
+        };
+        appendGitHeadEvidenceJsonl(evidenceAbsolute, payload);
+    }
+    runGitCommand(cwd, ['add', '--', gitHeadEvidencePath], ['ignore', 'pipe', 'pipe']);
+    runGitCommandWithEnv(cwd, ['add', '--', gitHeadEvidencePath], env, ['ignore', 'pipe', 'pipe']);
     return {
         evidencePath: gitHeadEvidencePath,
         treeSha,
@@ -210,15 +263,23 @@ function readCurrentHeadParentCommitShas(cwd) {
         return [];
     }
 }
-function readCurrentIndexTreeWithoutEvidence(cwd) {
+function readIndexTreeWithoutEvidence(cwd, env) {
     const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-governed-commit-index-'));
     const tempIndex = path.join(tempDir, 'index');
     try {
-        const gitIndexPath = runGitCommand(cwd, ['rev-parse', '--git-path', 'index']).trim();
-        if (gitIndexPath) {
-            const absoluteIndex = path.resolve(cwd, gitIndexPath);
+        if (env?.GIT_INDEX_FILE) {
+            const absoluteIndex = path.resolve(env.GIT_INDEX_FILE);
             if (existsSync(absoluteIndex)) {
                 writeFileSync(tempIndex, readFileSync(absoluteIndex));
+            }
+        }
+        else {
+            const gitIndexPath = runGitCommand(cwd, ['rev-parse', '--git-path', 'index']).trim();
+            if (gitIndexPath) {
+                const absoluteIndex = path.resolve(cwd, gitIndexPath);
+                if (existsSync(absoluteIndex)) {
+                    writeFileSync(tempIndex, readFileSync(absoluteIndex));
+                }
             }
         }
         runGitCommandWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', gitHeadEvidencePaths.legacyJson, gitHeadEvidencePaths.jsonl], {
@@ -1057,7 +1118,7 @@ function runGitCommit(options) {
                 env
             });
             if (bundleFiles.length > 0) {
-                withTaskScopedCommitIndex(options.cwd, bundleFiles, (scopedEnv) => {
+                withTaskScopedCommitIndex(options.cwd, bundleFiles, actorId, (scopedEnv) => {
                     runCommit({
                         ...commitEnv,
                         ...scopedEnv
@@ -1771,7 +1832,7 @@ function cleanupDeferredForeignStagedSnapshot(cwd, snapshotPath) {
         // best-effort runtime residue cleanup
     }
 }
-function withTaskScopedCommitIndex(cwd, files, run) {
+function withTaskScopedCommitIndex(cwd, files, actorId, run) {
     const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
     if (normalizedFiles.length === 0) {
         return run({ ...process.env });
@@ -1785,6 +1846,9 @@ function withTaskScopedCommitIndex(cwd, files, run) {
     try {
         runGitCommandWithEnv(cwd, ['read-tree', 'HEAD'], env, ['ignore', 'pipe', 'pipe']);
         stageTaskScopedBundleFiles(cwd, normalizedFiles, env);
+        if (actorId) {
+            ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, normalizedFiles, env);
+        }
         return run(env);
     }
     finally {
@@ -1852,6 +1916,9 @@ export function resolveTaskScopedCommitBundle(input) {
         ...inScopeStagedDeletions,
         ...stageCandidates
     ]);
+    const commitFilesWithGovernanceEvidence = shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)
+        ? uniqueSorted([...commitFiles, gitHeadEvidencePath])
+        : commitFiles;
     let blockedCode = null;
     let blockedSummary = null;
     if (blockedResidue.length > 0) {
@@ -1878,7 +1945,7 @@ export function resolveTaskScopedCommitBundle(input) {
         ok: blockedCode === null,
         apply: input.apply,
         stageFiles: input.apply && input.autoStage ? stageCandidates : inScopeUnstagedDirty,
-        commitFiles,
+        commitFiles: commitFilesWithGovernanceEvidence,
         skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
         unexpectedStagedTasks,
         outOfScopeStagedFiles: uniqueSorted([...outOfScopeStagedFiles, ...outOfScopeStagedDeletions]),
@@ -1982,6 +2049,9 @@ function isIgnorableCommitStagingSideEffect(filePath, taskId) {
     const normalized = normalizeRelativePath(filePath).toLowerCase();
     const normalizedTaskId = taskId.toLowerCase();
     if (normalized.startsWith('.atm/runtime/')) {
+        return true;
+    }
+    if (normalized === gitHeadEvidencePaths.legacyJson || normalized === gitHeadEvidencePaths.jsonl) {
         return true;
     }
     if (normalized === `.atm/history/tasks/${normalizedTaskId}.json`) {

@@ -168,6 +168,7 @@ try {
   assert.equal((importCommit.evidence as any).branchCommitQueue?.retryableRaceCode, 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE');
   assert.equal((importCommit.evidence as any).branchCommitQueue?.headShaAtCommitStart, (importCommit.evidence as any).branchCommitQueue?.headShaAtAcquire);
   assertBranchCommitQueueSchema((importCommit.evidence as any).branchCommitQueue, 'import commit branch queue evidence');
+  assert.equal(runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']).includes('.atm/history/evidence/git-head.jsonl'), true, 'task-scoped ledger-boundary commit must include git-head evidence in the same commit');
 
   const unstagedCommit = expectCliError(
     runAtmGit([
@@ -342,7 +343,7 @@ try {
     '--json'
   ]);
   assert.equal(safeResidueCommit.ok, true);
-  assert.equal(existsSync(gitHeadResiduePath), false, 'safe generated residue must be auto-cleaned before commit');
+  assert.equal(readFileSync(gitHeadResiduePath, 'utf8').includes('{"fixture":true}'), false, 'safe generated git-head residue must be replaced before commit completes');
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-blocked";\n', 'utf8');
   const foreignResiduePath = path.join(tempDir, '.atm/runtime/snapshots/foreign-staged-TASK-OTHER-9999-1781880000000.json');
@@ -395,7 +396,7 @@ try {
     '--json'
   ]);
   assert.equal(runtimeNoiseCommit.ok, true);
-  assert.equal(existsSync(runtimeSnapshotPath), true, 'runtime snapshots outside the task bundle should be ignored, not committed');
+  assert.equal(runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']).includes('.atm/runtime/snapshots/close-window-foreign-staged-TASK-OTHER-9999-1781880000001.json'), false, 'runtime snapshots outside the task bundle must not be committed');
   assert.equal(existsSync(teamRunPath), true, 'foreign team-run runtime records must not block the current task commit');
   assert.equal(existsSync(transientScratchPath), true, 'atm scratch json residue should be ignored by task-scoped commit gating');
   assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(scopedFile), true);
