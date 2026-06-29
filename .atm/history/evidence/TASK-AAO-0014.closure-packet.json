@@ -1,0 +1,136 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0014",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0e9641b40a4603a85bd9e74ac97953d4832c0a01",
+  "governedTreeSha": "885b54011c33e0eb1bd18709122bf1b6f4e536e7",
+  "targetCommitDelta": {
+    "currentCommitSha": "0e9641b40a4603a85bd9e74ac97953d4832c0a01",
+    "parentCommitShas": [
+      "0e9641b40a4603a85bd9e74ac97953d4832c0a01"
+    ],
+    "governedTreeSha": "885b54011c33e0eb1bd18709122bf1b6f4e536e7",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0002.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0002.json",
+      ".atm/history/evidence/TASK-AAO-0014.json",
+      ".atm/history/evidence/TASK-AAO-0016.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0016.json",
+      ".atm/history/evidence/TASK-AAO-0028.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0028.json",
+      ".atm/history/evidence/TASK-AAO-0034.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0034.json",
+      ".atm/history/task-events/TASK-AAO-0002/2026-06-29T05-12-04-060Z-close-ecd3ee2c53f6.json",
+      ".atm/history/task-events/TASK-AAO-0014/2026-06-29T03-13-49-894Z-import-b07a19931ed2.json",
+      ".atm/history/task-events/TASK-AAO-0016/2026-06-29T05-08-30-118Z-close-2cd776ba2e84.json",
+      ".atm/history/task-events/TASK-AAO-0028/2026-06-29T05-08-32-336Z-close-e6dd67211c34.json",
+      ".atm/history/task-events/TASK-AAO-0034/2026-06-29T05-08-32-257Z-close-d08525d29315.json",
+      ".atm/history/tasks/TASK-AAO-0002.json",
+      ".atm/history/tasks/TASK-AAO-0014.json",
+      ".atm/history/tasks/TASK-AAO-0016.json",
+      ".atm/history/tasks/TASK-AAO-0028.json",
+      ".atm/history/tasks/TASK-AAO-0034.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/batch-playbook.md",
+      "packages/cli/src/commands/next.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show 98f150e548c2959bf8dfc55cf690860e6b9caa73",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:81cafd3114ad1ff5cca8e9d1d38adc04ea1ad170aa9adeaad046fd4f3d865d0d",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-29T05:12:15.051Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "atm-agent-first-operability/tasks/TASK-AAO-0014-state-aware-batch-playbook.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/batch-playbook.md",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/next.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/next.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0014.json",
+  "closedAt": "2026-06-29T05:12:15.052Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "98f150e548c2959bf8dfc55cf690860e6b9caa73",
+    "reconciledAt": "2026-06-29T05:12:12.849Z",
+    "reconciledByActor": "codex-gpt-5.4-mini",
+    "reason": "Historical reconcile sync against commit 98f150e548c2959bf8dfc55cf690860e6b9caa73"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "98f150e548c2959bf8dfc55cf690860e6b9caa73",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/batch-playbook.md",
+      "packages/cli/src/commands/next.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "waiverReason": "Historical source delivery also included validate-prompt-scoped-next support while the primary deliverables match TASK-AAO-0014."
+  },
+  "teamSummary": null
+}

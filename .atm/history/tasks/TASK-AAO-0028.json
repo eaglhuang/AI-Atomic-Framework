@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0028",
+  "title": "batch playbook 文件化",
+  "status": "done",
+  "milestone": "M9",
+  "dependencies": [
+    "TASK-AAO-0014"
+  ],
+  "acceptance": [
+    "五種編輯器 integration 都引用相同 batch playbook。",
+    "模板包含 command sequence。",
+    "verify 能檢測 entry drift。"
+  ],
+  "deliverables": [
+    "docs/governance/batch-playbook.md",
+    "templates/agent-pack/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/batch-playbook.md",
+    "templates/**",
+    ".agents/skills/**",
+    "packages/cli/src/commands/integration*.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atm.mjs integration verify codex --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "手改 .atm/runtime/**",
+    "把 .atm/history/** 當作功能交付物",
+    "修改 unrelated 3KLife dirty files"
+  ],
+  "nonGoals": [
+    "不在本卡完成整個 AAO 計畫",
+    "不建立第二套 task lifecycle",
+    "不繞過 ATM evidence gate"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾該任務 commit；若有新增產物或 validator，連同 atomization map 更新一起 revert。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This card uses the AAO task-card contract: explicit scope, explicit deliverables, command-backed evidence, rollback, and atomization impact.",
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0028-batch-playbook-docs.task.md",
+    "sectionTitle": "TASK-AAO-0028",
+    "headingLine": 48,
+    "hash": "9989bb49fdd1ed43"
+  },
+  "importedAt": "2026-06-29T03:15:37.042Z",
+  "lastTransitionId": "2026-06-29T05-08-32-336Z-close-e6dd67211c34",
+  "lastTransitionAt": "2026-06-29T05:08:32.336Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "closedAt": "2026-06-29T05:08:32.333Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 5de839fe4b02001137cc5acfdd8efed27b9a09de",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0028.closure-packet.json"
+}

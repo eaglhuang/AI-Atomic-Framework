@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T05-08-32-336Z-close-e6dd67211c34",
+  "taskId": "TASK-AAO-0028",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "done",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0028.json",
+  "taskSha256": "sha256:329210c0e526c8c459edd5bb56a198af18a39aa0570bad5260f57cdeaa2bcac1",
+  "createdAt": "2026-06-29T05:08:32.336Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-AAO-0028 --actor codex-gpt-5.4-mini --delivery-commit 5de839fe4 --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0028.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-29T05:08:32.326Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/**",
+        "atm-agent-first-operability/tasks/TASK-AAO-0028-batch-playbook-docs.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/batch-playbook.md",
+        "packages/cli/src/commands/integration*.ts",
+        "templates/**",
+        "templates/agent-pack/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/integration*.ts",
+        "templates/**",
+        "templates/agent-pack/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

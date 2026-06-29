@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-1def2aa0fbf4",
+  "recordedAt": "2026-06-29T05:12:11.619Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": "TASK-AAO-0014",
+  "surface": "tasks reconcile",
+  "command": "node atm.mjs tasks reconcile --task TASK-AAO-0014 --actor codex-gpt-5.4-mini --delivery-commit 98f150e54 --json",
+  "flags": [
+    "--waiver-out-of-scope-delivery"
+  ],
+  "permission": "backend.tasks.reconcile",
+  "leaseId": "EMG-TASK-AAO-0014-78409fec5f",
+  "reason": "Historical source delivery also included validate-prompt-scoped-next support while the primary deliverables match TASK-AAO-0014.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reconcile"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-06-29T05-12-11-617Z-EMG-TASK-AAO-0014-78409fec5f.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

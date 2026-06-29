@@ -1,0 +1,40 @@
+{
+  "taskId": "TASK-AAO-0028",
+  "updatedAt": "2026-06-29T05:08:26.959Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-AAO-0028 against commit 5de839fe4b02001137cc5acfdd8efed27b9a09de.",
+      "artifactPaths": [
+        ".agents/skills/**",
+        "atm-agent-first-operability/tasks/TASK-AAO-0028-batch-playbook-docs.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/batch-playbook.md",
+        "packages/cli/src/commands/integration*.ts",
+        "templates/**",
+        "templates/agent-pack/**"
+      ],
+      "producedBy": "codex-gpt-5.4-mini",
+      "createdAt": "2026-06-29T05:08:26.959Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 5de839fe4b02001137cc5acfdd8efed27b9a09de",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:0345b76ce8c5f0416ef88b4409df2b12e38ab9c7bdae141249b3b301000111e3",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "5de839fe4b02001137cc5acfdd8efed27b9a09de"
+      }
+    }
+  ]
+}

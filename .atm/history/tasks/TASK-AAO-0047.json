@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0047",
+  "title": "P0 throughput acceleration bundle",
+  "status": "done",
+  "milestone": "M16",
+  "dependencies": [
+    "TASK-AAO-0024",
+    "TASK-AAO-0027",
+    "TASK-AAO-0034",
+    "TASK-AAO-0037",
+    "TASK-AAO-0040",
+    "TASK-AAO-0046"
+  ],
+  "acceptance": [
+    "`batch current --compact` or equivalent returns only batchId, currentTaskId, allowedFiles, validators, pending commit window, and requiredCommand.",
+    "`next --claim` never claims the next task while the active batch current head has checkpoint debt.",
+    "A stale frozen runner produces `ATM_RUNNER_SYNC_REQUIRED` with `npm run build` / sync guidance, not a generic hook failure or `--no-verify` path.",
+    "Sandbox git/temp EPERM is classified as environment diagnostic with a concrete rerun/elevated/temp-root command.",
+    "Baseline unrelated validator failures are separated from current-task failures in hook/validator output.",
+    "`validate:cli` fast surface path remains under a few seconds and full validate remains materially faster than the prior 56 second baseline.",
+    "Regression evidence covers checkpoint commit window, active batch claim idempotency, compact batch output, and sandbox diagnostic paths."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/hook.ts",
+    "scripts/run-validators.ts",
+    "scripts/validate-cli.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/work-channels.ts",
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "packages/cli/src/commands/command-specs/next.spec.ts",
+    "scripts/run-validators.ts",
+    "scripts/validate-cli.ts",
+    "scripts/validate-task-direction-governance.ts",
+    "scripts/validate-prompt-scoped-next.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "package.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-cli.ts --mode surface",
+    "node --strip-types scripts/validate-task-direction-governance.ts --mode validate",
+    "node --strip-types scripts/validate-prompt-scoped-next.ts"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Weakening checkpoint, evidence, or protected-state gates",
+    "Changing unrelated task card lifecycle semantics",
+    "Manual edits to .atm/runtime/**"
+  ],
+  "nonGoals": [
+    "General-purpose parallel execution before non-overlap proof exists",
+    "Suppressing real validator failures"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the bundle commit and rebuild the frozen runner from the previous release state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.aao-throughput-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "This bundle exists so AAO can unblock current dogfood quickly. Longer-term subagent / parallel execution remains gated by TASK-AAO-0045 non-overlap policy.",
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0047-p0-throughput-acceleration-bundle.task.md",
+    "sectionTitle": "TASK-AAO-0047",
+    "headingLine": 67,
+    "hash": "c126b367cf403b23"
+  },
+  "importedAt": "2026-06-29T03:01:41.919Z",
+  "lastTransitionId": "2026-06-29T05-08-32-337Z-close-eab0b6f5c7a9",
+  "lastTransitionAt": "2026-06-29T05:08:32.337Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "closedAt": "2026-06-29T05:08:32.334Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit 11ec634cba54aa3c3cb1ebbee497e2809247493b",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0047.closure-packet.json"
+}

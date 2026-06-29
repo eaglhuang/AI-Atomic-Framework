@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0035",
+  "title": "Command surface consolidation 與 help examples",
+  "status": "planned",
+  "milestone": "M11",
+  "dependencies": [
+    "TASK-AAO-0002",
+    "TASK-AAO-0014",
+    "TASK-AAO-0029",
+    "TASK-AAO-0034"
+  ],
+  "acceptance": [
+    "help spec 必須完整列 usage、required flags、examples、common mistakes、related command。",
+    "agent-facing help 要優先展示短路徑 playbook，不把 low-level lifecycle 當主流程。",
+    "低階命令標為 maintainer/internal/deprecated guidance，但不破壞既有相容性。",
+    "`node atm.mjs <command> --help` 對主要命令都能回可操作範例。",
+    "command surface 文件與 command-specs 由 validator 防 drift。"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/command-specs/**",
+    "packages/cli/src/commands/help.ts",
+    "README.md",
+    "docs/governance/command-surface.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/command-specs/**",
+    "packages/cli/src/commands/command-specs.ts",
+    "packages/cli/src/commands/help.ts",
+    "packages/cli/src/commands/next.ts",
+    "README.md",
+    "docs/DEPRECATIONS.md",
+    "docs/governance/command-surface.md",
+    "templates/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "手改 .atm/runtime/**",
+    "把 .atm/history/** 當作功能交付物",
+    "修改 unrelated 3KLife dirty files"
+  ],
+  "nonGoals": [
+    "不在本卡完成整個 AAO 計畫",
+    "不建立第二套 task lifecycle",
+    "不繞過 ATM evidence gate"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "回滾該任務 commit；若有新增產物或 validator，連同 atomization map 更新一起 revert。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "這張卡處理的是易用性與認知負擔，不是放寬治理。硬 gate 留著，但入口要少、help 要清楚。",
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0035-command-surface-consolidation-help-examples.task.md",
+    "sectionTitle": "TASK-AAO-0035",
+    "headingLine": 56,
+    "hash": "a02b9576bd02e2fe"
+  },
+  "importedAt": "2026-06-29T03:02:16.860Z",
+  "lastTransitionId": "2026-06-29T03-02-16-868Z-import-35a2ac425ff4",
+  "lastTransitionAt": "2026-06-29T03:02:16.868Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

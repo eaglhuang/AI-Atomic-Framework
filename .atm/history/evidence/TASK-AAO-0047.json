@@ -1,0 +1,48 @@
+{
+  "taskId": "TASK-AAO-0047",
+  "updatedAt": "2026-06-29T05:08:26.966Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Historical reconcile sync completed for TASK-AAO-0047 against commit 11ec634cba54aa3c3cb1ebbee497e2809247493b.",
+      "artifactPaths": [
+        "atm-agent-first-operability/tasks/TASK-AAO-0047-p0-throughput-acceleration-bundle.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "package.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/command-specs/next.spec.ts",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/work-channels.ts",
+        "scripts/run-validators.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-task-direction-governance.ts"
+      ],
+      "producedBy": "codex-gpt-5.4-mini",
+      "createdAt": "2026-06-29T05:08:26.966Z",
+      "evidenceFreshness": "fresh",
+      "validationPasses": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ],
+      "commandRuns": [
+        {
+          "command": "git show 11ec634cba54aa3c3cb1ebbee497e2809247493b",
+          "cwd": ".",
+          "exitCode": 0,
+          "stdoutSha256": "sha256:dbf6a5b01a9dc8e39bca8701f1a951d7a0d1f3fa67f9dbfe04bc5606cad01293",
+          "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38"
+        }
+      ],
+      "details": {
+        "action": "reconcile",
+        "deliveryCommit": "11ec634cba54aa3c3cb1ebbee497e2809247493b"
+      }
+    }
+  ]
+}

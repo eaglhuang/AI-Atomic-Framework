@@ -1,0 +1,123 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0015",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0e9641b40a4603a85bd9e74ac97953d4832c0a01",
+  "governedTreeSha": "f46164ac5db4eb046e751d7f4254e7a0fa4988b8",
+  "targetCommitDelta": {
+    "currentCommitSha": "0e9641b40a4603a85bd9e74ac97953d4832c0a01",
+    "parentCommitShas": [
+      "0e9641b40a4603a85bd9e74ac97953d4832c0a01"
+    ],
+    "governedTreeSha": "f46164ac5db4eb046e751d7f4254e7a0fa4988b8",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0015.json",
+      ".atm/history/task-events/TASK-AAO-0015/2026-06-29T03-02-16-135Z-import-525172ea9a65.json",
+      ".atm/history/tasks/TASK-AAO-0015.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/evidence.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show acc904b55fc419810d918779c17325dd2b1e2754",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c3788571bfaadff27eff196db1ca819ba36a4387474d0dc7d80ba3ec498616e",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-29T05:08:30.122Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "atm-agent-first-operability/tasks/TASK-AAO-0015-evidence-validator-catalog.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/tasks.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/tasks.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0015.json",
+  "closedAt": "2026-06-29T05:08:30.122Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "acc904b55fc419810d918779c17325dd2b1e2754",
+    "reconciledAt": "2026-06-29T05:08:23.575Z",
+    "reconciledByActor": "codex-gpt-5.4-mini",
+    "reason": "Historical reconcile sync against commit acc904b55fc419810d918779c17325dd2b1e2754"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "acc904b55fc419810d918779c17325dd2b1e2754",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/command-specs/evidence.spec.ts",
+      "packages/cli/src/commands/evidence.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0015.json",
+      ".atm/history/task-events/TASK-AAO-0015/2026-05-27T13-20-17-573Z-reserve-af77943d8adf.json",
+      ".atm/history/task-events/TASK-AAO-0015/2026-05-27T13-20-17-576Z-promote-06f2fcb6f58a.json",
+      ".atm/history/task-events/TASK-AAO-0015/2026-05-27T13-20-17-586Z-claim-957b4456ac84.json",
+      ".atm/history/tasks/TASK-AAO-0015.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

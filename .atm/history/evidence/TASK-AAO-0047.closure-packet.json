@@ -1,0 +1,144 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0047",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0e9641b40a4603a85bd9e74ac97953d4832c0a01",
+  "governedTreeSha": "f83471d93bf9884a9af6709dba3c2c15e6cf5d40",
+  "targetCommitDelta": {
+    "currentCommitSha": "0e9641b40a4603a85bd9e74ac97953d4832c0a01",
+    "parentCommitShas": [
+      "0e9641b40a4603a85bd9e74ac97953d4832c0a01"
+    ],
+    "governedTreeSha": "f83471d93bf9884a9af6709dba3c2c15e6cf5d40",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0047.json",
+      ".atm/history/task-events/TASK-AAO-0047/2026-06-29T03-01-41-928Z-import-679336ee8203.json",
+      ".atm/history/tasks/TASK-AAO-0047.json",
+      "package.json",
+      "scripts/validate-task-direction-governance.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show 11ec634cba54aa3c3cb1ebbee497e2809247493b",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dbf6a5b01a9dc8e39bca8701f1a951d7a0d1f3fa67f9dbfe04bc5606cad01293",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-29T05:08:32.326Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "atm-agent-first-operability/tasks/TASK-AAO-0047-p0-throughput-acceleration-bundle.task.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "package.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-task-direction-governance.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/command-specs/batch.spec.ts",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/work-channels.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-task-direction-governance.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0047.json",
+  "closedAt": "2026-06-29T05:08:32.327Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "11ec634cba54aa3c3cb1ebbee497e2809247493b",
+    "reconciledAt": "2026-06-29T05:08:26.968Z",
+    "reconciledByActor": "codex-gpt-5.4-mini",
+    "reason": "Historical reconcile sync against commit 11ec634cba54aa3c3cb1ebbee497e2809247493b"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "11ec634cba54aa3c3cb1ebbee497e2809247493b",
+    "taskMatchedFiles": [
+      "package.json",
+      "scripts/validate-task-direction-governance.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0047.closure-packet.json",
+      ".atm/history/evidence/TASK-AAO-0047.json",
+      ".atm/history/task-events/TASK-AAO-0047/2026-05-26T12-56-19-087Z-import-def3e84a36da.json",
+      ".atm/history/task-events/TASK-AAO-0047/2026-05-26T12-56-24-500Z-reserve-e1a2f65a9662.json",
+      ".atm/history/task-events/TASK-AAO-0047/2026-05-26T12-56-24-504Z-promote-261eef4c9c1d.json",
+      ".atm/history/task-events/TASK-AAO-0047/2026-05-26T12-56-24-508Z-claim-b59bd938ea87.json",
+      ".atm/history/task-events/TASK-AAO-0047/2026-05-26T13-05-05-446Z-close-81ad5d7d969b.json",
+      ".atm/history/tasks/TASK-AAO-0047.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
