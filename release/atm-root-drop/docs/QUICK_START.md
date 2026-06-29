@@ -57,4 +57,4 @@ node atm.mjs doctor --json
 node atm.mjs next --json
 ```
 
-Use `npm run validate:quick`, `npm run validate:standard`, or `npm run validate:full` when you need broader governance coverage than the smoke test.
+Use `npm run validate:quick` for the lightest smoke lane, `npm run validate:standard:fast` for the default fast governance lane, `npm run validate:standard` for the broad standard suite, and `npm run validate:full` for the heaviest release-grade sweep.
