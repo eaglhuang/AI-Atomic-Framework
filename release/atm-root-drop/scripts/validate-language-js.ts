@@ -82,6 +82,14 @@ try {
   assert(profile.testCommand === 'npm run test', 'profile must expose test command');
   assert(profile.typecheckCommand === 'npm run typecheck', 'profile must expose typecheck command');
   assert(profile.lintCommand === 'npm run lint', 'profile must expose lint command');
+  const fastStaticCheck = adapter.getFastStaticCheck(profile);
+  assert(fastStaticCheck.tier === 'fast', 'fast static check must report tier=fast');
+  assert(fastStaticCheck.commands[0] === 'npm run typecheck', 'fast static check must prefer typecheck for JS/TS');
+  const defaultStaticCheck = adapter.getDefaultStaticCheck(profile);
+  assert(defaultStaticCheck.commands.includes('npm run typecheck') && defaultStaticCheck.commands.includes('npm run lint'), 'default static check must include typecheck and lint');
+  const allStaticCheck = adapter.getAllStaticCheck(profile);
+  assert(allStaticCheck.tier === 'all', 'all static check must report tier=all');
+  assert(allStaticCheck.commands.includes('npm run typecheck') && allStaticCheck.commands.includes('npm run lint'), 'all static check must include the full declared JS/TS static set');
 
   const validReport = adapter.validateComputeAtom(fixture.validComputeAtom, profile);
   assertReportShape(validReport, 'valid compute atom');

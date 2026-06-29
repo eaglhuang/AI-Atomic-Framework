@@ -23,7 +23,8 @@ const requiredFiles = [
   'packages/core/src/police/family.ts',
   'packages/plugin-sdk/src/project-adapter.ts',
   'docs/ADAPTER_GUIDE.md',
-  'docs/LIFECYCLE.md'
+  'docs/LIFECYCLE.md',
+  'docs/HOST_GOVERNANCE_INTEGRATION.md'
 ];
 
 function fail(message: any) {
@@ -186,7 +187,7 @@ if (!process.exitCode) {
   }
 
   const adapterGuide = readText('docs/ADAPTER_GUIDE.md');
-  for (const phrase of ['ProjectAdapter', 'LanguageAdapter', 'InjectorPlugin', 'VersionResolver', 'compatibility.lifecycleMode', 'ContextBudgetGuard']) {
+  for (const phrase of ['ProjectAdapter', 'LanguageAdapter', 'InjectorPlugin', 'VersionResolver', 'compatibility.lifecycleMode', 'ContextBudgetGuard', 'getFastStaticCheck', 'getDefaultStaticCheck', 'getAllStaticCheck']) {
     if (!adapterGuide.includes(phrase)) {
       fail(`docs/ADAPTER_GUIDE.md missing ${phrase}`);
     }
@@ -201,11 +202,49 @@ if (!process.exitCode) {
   if (!languageJsSource.includes('LanguageAdapter as SdkLanguageAdapter') || !languageJsSource.includes('SdkLanguageAdapter<Profile, Request, Report>')) {
     fail('language-js must align its LanguageAdapter interface with Plugin SDK LanguageAdapter');
   }
+  const languageCSharpSource = readText('packages/language-csharp/src/index.ts');
+  if (!languageCSharpSource.includes('LanguageAdapter as SdkLanguageAdapter') || !languageCSharpSource.includes('SdkLanguageAdapter<Profile, Request, Report>')) {
+    fail('language-csharp must align its LanguageAdapter interface with Plugin SDK LanguageAdapter');
+  }
+
+  const languageAdapterSource = readText('packages/plugin-sdk/src/language-adapter.ts');
+  for (const phrase of [
+    'type LanguageAdapterStaticCheckTier',
+    'interface LanguageAdapterStaticCheckPlan',
+    'getFastStaticCheck(profile: Profile)',
+    'getDefaultStaticCheck(profile: Profile)',
+    'getAllStaticCheck(profile: Profile)'
+  ]) {
+    if (!languageAdapterSource.includes(phrase)) {
+      fail(`language-adapter.ts missing ${phrase}`);
+    }
+  }
 
   const lifecycleGuide = readText('docs/LIFECYCLE.md');
-  for (const phrase of ['Breaking Change Policy', 'stable adapter contract', 'compatibility.lifecycleMode']) {
+  for (const phrase of ['Breaking Change Policy', 'stable adapter contract', 'compatibility.lifecycleMode', 'getFastStaticCheck(profile)', 'getDefaultStaticCheck(profile)', 'getAllStaticCheck(profile)']) {
     if (!lifecycleGuide.includes(phrase)) {
       fail(`docs/LIFECYCLE.md missing ${phrase}`);
+    }
+  }
+
+  const hostGovernanceGuide = readText('docs/HOST_GOVERNANCE_INTEGRATION.md');
+  for (const phrase of ['adapter-aware static gate', 'fast/default/all static-check selectors', 'getFastStaticCheck(profile)', 'getDefaultStaticCheck(profile)', 'getAllStaticCheck(profile)']) {
+    if (!hostGovernanceGuide.includes(phrase)) {
+      fail(`docs/HOST_GOVERNANCE_INTEGRATION.md missing ${phrase}`);
+    }
+  }
+
+  const testRunnerSource = readText('packages/plugin-sdk/src/test-runner.ts');
+  for (const phrase of [
+    'type AtomicHealthGateId',
+    'interface TestRunnerPlugin',
+    'interface TestRunnerPluginContext',
+    'interface TestRunnerPluginPlan',
+    'interface AtomicTestRunnerConfig',
+    'interface AtomicDefaultGateConfig'
+  ]) {
+    if (!testRunnerSource.includes(phrase)) {
+      fail(`test-runner.ts missing ${phrase}`);
     }
   }
 
@@ -257,16 +296,3 @@ if (!process.exitCode) {
 if (!process.exitCode) {
   console.log(`[plugin-sdk:${mode}] ok (adapter, language, capability, lifecycle, governance store, and behavior SDK contracts verified)`);
 }
-  const testRunnerSource = readText('packages/plugin-sdk/src/test-runner.ts');
-  for (const phrase of [
-    'type AtomicHealthGateId',
-    'interface TestRunnerPlugin',
-    'interface TestRunnerPluginContext',
-    'interface TestRunnerPluginPlan',
-    'interface AtomicTestRunnerConfig',
-    'interface AtomicDefaultGateConfig'
-  ]) {
-    if (!testRunnerSource.includes(phrase)) {
-      fail(`test-runner.ts missing ${phrase}`);
-    }
-  }

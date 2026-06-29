@@ -283,6 +283,8 @@ try {
   assert(pythonRuntimeReadiness.pythonLanguageAdapterAvailable === true, 'bundled @ai-atomic-framework/language-python adapter must be detected');
   assert(pythonRuntimeReadiness.needsRuntimeAdapterHint === false, 'Python-only repo must no longer require runtime adapter selection when language-python is bundled');
   assert(pythonRuntimeReadiness.atomBirthApplyDeferred === false, 'atom birth/apply must no longer be deferred for Python-only repos once language-python is bundled');
+  assert(pythonRuntimeReadiness.staticCheckHints.some((entry) => entry.adapterPackage === '@ai-atomic-framework/language-python' && entry.fastStaticCheck.tier === 'fast'),
+    'Python-only runtime readiness must surface Python static check hints');
   const pythonOnlyRoute = decideGuidanceRoute({
     goal: 'rank the messiest Python pipeline scripts',
     orientation: pythonOnlyOrientation,
@@ -341,9 +343,11 @@ try {
   assert(!csharpOnlyOrientation.releaseBlockers.includes('package-json-missing'), 'C#-only repo must not treat missing package.json as release blocker');
   const csharpRuntimeReadiness = inspectRuntimeAdapterReadiness(csharpOnlyRepo);
   assert(csharpRuntimeReadiness.languageOnlyHost === true, 'C#-only repo must report languageOnlyHost=true');
-  assert(csharpRuntimeReadiness.needsRuntimeAdapterHint === true, 'C#-only repo must surface missing language adapter as advisory hint');
-  assert(csharpRuntimeReadiness.missingLanguageAdapters.includes('C#'), 'C#-only repo must name C# as missing language adapter');
-  assert(csharpRuntimeReadiness.atomBirthApplyDeferred === true, 'C#-only repo must defer atom birth/apply until language adapter selection');
+  assert(csharpRuntimeReadiness.needsRuntimeAdapterHint === false, 'C#-only repo must clear the missing language adapter hint once language-csharp is bundled');
+  assert(!csharpRuntimeReadiness.missingLanguageAdapters.includes('C#'), 'C#-only repo must no longer name C# as missing language adapter');
+  assert(csharpRuntimeReadiness.atomBirthApplyDeferred === false, 'C#-only repo must no longer defer atom birth/apply once language-csharp is bundled');
+  assert(csharpRuntimeReadiness.staticCheckHints.some((entry) => entry.adapterPackage === '@ai-atomic-framework/language-csharp' && entry.fastStaticCheck.commands.includes('dotnet build --no-restore')),
+    'C#-only runtime readiness must surface C# static check hints');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

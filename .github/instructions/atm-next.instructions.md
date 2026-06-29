@@ -65,6 +65,14 @@ preparation checklist before implementation:
 5. Treat `queueRetryCodes` as a shared-branch retry contract, not as an unexpected raw Git failure.
 6. If `doctor`, `integration verify`, or `integration list` reports other installed adapters as `stale`, first decide whether they are merely behind the current template generation. If they are old-template parity drift rather than local hand edits, refresh the installed adapter set together instead of selectively ignoring them.
 
+During implementation, treat obvious static hygiene as part of finishing the
+same lane, not as optional follow-up polish:
+
+1. If you touch code and immediately see syntax, import, type, or adapter-native static-check failures in the same area, fix them before calling the task done.
+2. If touched or staged files introduce new warnings, clear those warnings in the same lane whenever the fix is local and low-risk.
+3. Do not widen into repo-wide warning cleanup unless the route explicitly asks for it; prefer touched-scope cleanup plus a later governed backlog item for historical debt.
+4. Treat this as the default operator habit even before a lower hook or validator makes it mandatory.
+
 When adapter parity is stale across multiple installed editors:
 
 1. Confirm the repo is on the intended template/source snapshot.

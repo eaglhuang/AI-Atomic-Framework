@@ -1,3 +1,11 @@
+import type { LanguageAdapterStaticCheckPlan } from '../../../plugin-sdk/src/language-adapter.ts';
+export interface RuntimeLanguageAdapterStaticCheckHint {
+    readonly language: string;
+    readonly adapterPackage: string;
+    readonly fastStaticCheck: LanguageAdapterStaticCheckPlan;
+    readonly defaultStaticCheck: LanguageAdapterStaticCheckPlan;
+    readonly allStaticCheck: LanguageAdapterStaticCheckPlan;
+}
 export interface RuntimeAdapterReadinessSummary {
     readonly pythonOnlyHost: boolean;
     readonly languageOnlyHost: boolean;
@@ -12,5 +20,6 @@ export interface RuntimeAdapterReadinessSummary {
     readonly missingCapability: string | null;
     readonly suggestedAction: string | null;
     readonly explanation: string | null;
+    readonly staticCheckHints: readonly RuntimeLanguageAdapterStaticCheckHint[];
 }
 export declare function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeAdapterReadinessSummary;

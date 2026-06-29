@@ -20,3 +20,17 @@ Evidence-driven proposal drafts must be traceable to evidence inputs and should 
 Changes to exported Plugin SDK interfaces are breaking when they remove fields, rename fields, tighten required fields, or move lifecycle meaning out of `compatibility.lifecycleMode`.
 
 Breaking adapter contract changes require a documented migration note, updated validators, and fixture coverage before they can be used by core or CLI workflows. Advisory evolution interfaces such as `VersionResolver`, `QualityMetricsComparator`, and `UpgradeProposalAdapter` may be introduced as optional contracts before becoming mandatory.
+
+Language adapters are also responsible for adapter-native static-check
+declaration. New language adapters must implement
+`getFastStaticCheck(profile)`, `getDefaultStaticCheck(profile)`, and
+`getAllStaticCheck(profile)` so higher ATM layers can request a fast/default/all
+static pass without hardcoding one language's toolchain into the product.
+
+Those selectors are a required compatibility surface, not optional guidance.
+When a new adapter is introduced, its migration note should cover:
+
+- what each tier runs and why;
+- which warnings/errors are expected to be cleaned in touched scope;
+- which validator or integration fixture proves runtime readiness and adapter
+  selectors still agree.

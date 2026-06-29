@@ -10,6 +10,20 @@ export interface LanguageProjectProfile {
     readonly packageManager?: string;
     readonly commands?: Readonly<Record<string, string>>;
 }
+export type LanguageAdapterStaticCheckTier = 'fast' | 'default' | 'all';
+export type LanguageAdapterStaticCheckSource = 'declared-script' | 'package-manager-default' | 'adapter-composed' | 'unavailable';
+export type LanguageAdapterStaticCheckKind = 'syntax' | 'imports' | 'typecheck' | 'lint' | 'format' | 'build';
+export type LanguageAdapterStaticCheckScope = 'repository';
+export type LanguageAdapterStaticCheckCost = 'fast' | 'medium' | 'slow';
+export interface LanguageAdapterStaticCheckPlan {
+    readonly tier: LanguageAdapterStaticCheckTier;
+    readonly commands: readonly string[];
+    readonly source: LanguageAdapterStaticCheckSource;
+    readonly scope: LanguageAdapterStaticCheckScope;
+    readonly estimatedCost: LanguageAdapterStaticCheckCost;
+    readonly kinds: readonly LanguageAdapterStaticCheckKind[];
+    readonly guidance: string;
+}
 export type LanguageAdapterCanonicalizationPolicy = 'declaration-name' | 'entrypoint-name';
 export type LanguageAdapterAliasResolutionStance = 'not-supported' | 'syntactic-only' | 'semantic';
 export type LanguageAdapterDecoratorResolutionStance = 'not-supported' | 'syntactic-only' | 'semantic';
@@ -47,5 +61,8 @@ export interface LanguageAdapter<Profile = LanguageProjectProfile, Request = Lan
     readonly languageIds: readonly string[];
     readonly manifest: LanguageAdapterManifest;
     detectProjectProfile(repositoryRoot: string): Promise<Profile> | Profile;
+    getFastStaticCheck(profile: Profile): Promise<LanguageAdapterStaticCheckPlan> | LanguageAdapterStaticCheckPlan;
+    getDefaultStaticCheck(profile: Profile): Promise<LanguageAdapterStaticCheckPlan> | LanguageAdapterStaticCheckPlan;
+    getAllStaticCheck(profile: Profile): Promise<LanguageAdapterStaticCheckPlan> | LanguageAdapterStaticCheckPlan;
     validateComputeAtom(request: Request): Promise<Report> | Report;
 }

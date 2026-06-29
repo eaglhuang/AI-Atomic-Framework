@@ -1,5 +1,5 @@
 import type { AtomCandidate, AtomCandidateDiscoveryRequest, AtomizationPlanningAdapter } from '@ai-atomic-framework/plugin-sdk';
-import type { JavaScriptLanguageAdapter, JavaScriptLanguageAdapterManifest, JavaScriptImportRecord, JavaScriptProjectProfile, JavaScriptSourceFile, JavaScriptValidationReport, TestCommandRunnerContract } from './index.ts';
+import type { JavaScriptLanguageAdapter, JavaScriptLanguageAdapterManifest, JavaScriptImportRecord, JavaScriptImportPolicy, JavaScriptProjectProfile, JavaScriptSourceFile, JavaScriptStaticCheckPlan, JavaScriptValidationReport, LanguageAdapterValidationRequest, TestCommandRunnerContract } from './index.ts';
 export declare const defaultJavaScriptImportPolicy: Readonly<{
     forbiddenSpecifiers: string[];
     allowedSpecifiers: string[];
@@ -10,10 +10,7 @@ export declare function createJavaScriptLanguageAdapter(policyOverrides?: Partia
     allowedSpecifiers: string[];
 }>): JavaScriptLanguageAdapter;
 export declare function detectProjectProfile(repositoryRoot: string): JavaScriptProjectProfile;
-export declare function validateComputeAtom(request: any, profile?: JavaScriptProjectProfile, basePolicy?: Readonly<{
-    forbiddenSpecifiers: string[];
-    allowedSpecifiers: string[];
-}>): JavaScriptValidationReport;
+export declare function validateComputeAtom(request: LanguageAdapterValidationRequest, profile?: JavaScriptProjectProfile, basePolicy?: JavaScriptImportPolicy): JavaScriptValidationReport;
 export declare function discoverJavaScriptAtomCandidates(request: AtomCandidateDiscoveryRequest): readonly AtomCandidate[];
 /**
  * Optional SDK capability for the JS/TS adapter. `planAtomize` is
@@ -23,3 +20,6 @@ export declare function discoverJavaScriptAtomCandidates(request: AtomCandidateD
 export declare function createJavaScriptAtomizationPlanningAdapter(): AtomizationPlanningAdapter;
 export declare function scanImports(sourceFile: JavaScriptSourceFile): readonly JavaScriptImportRecord[];
 export declare function createCommandRunnerContract(profile: JavaScriptProjectProfile): TestCommandRunnerContract;
+export declare function createFastJavaScriptStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+export declare function createDefaultJavaScriptStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+export declare function createAllJavaScriptStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;

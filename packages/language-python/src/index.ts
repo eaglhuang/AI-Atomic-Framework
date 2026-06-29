@@ -1,7 +1,8 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
 import type {
   LanguageAdapter as SdkLanguageAdapter,
-  LanguageAdapterManifest as SdkLanguageAdapterManifest
+  LanguageAdapterManifest as SdkLanguageAdapterManifest,
+  LanguageAdapterStaticCheckPlan as SdkLanguageAdapterStaticCheckPlan
 } from '@ai-atomic-framework/plugin-sdk';
 
 export const pythonLanguageAdapterPackage = {
@@ -123,6 +124,7 @@ export interface PythonValidationCommand {
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
 
 export type PythonLanguageAdapterManifest = SdkLanguageAdapterManifest;
+export type PythonStaticCheckPlan = SdkLanguageAdapterStaticCheckPlan;
 
 export interface PythonLanguageAdapter
   extends LanguageAdapter<PythonProjectProfile, PythonLanguageAdapterValidationRequest, PythonLanguageAdapterValidationReport> {
@@ -131,6 +133,9 @@ export interface PythonLanguageAdapter
   readonly manifest: PythonLanguageAdapterManifest;
   readonly supportsAtomizeDryRun: true;
   readonly supportsInfectDryRun: true;
+  getFastStaticCheck(profile: PythonProjectProfile): PythonStaticCheckPlan;
+  getDefaultStaticCheck(profile: PythonProjectProfile): PythonStaticCheckPlan;
+  getAllStaticCheck(profile: PythonProjectProfile): PythonStaticCheckPlan;
 }
 
 export const defaultPythonImportPolicy: PythonImportPolicy = {
@@ -158,5 +163,8 @@ export {
   scanPythonEntrypoints,
   planPythonAtomize,
   validatePythonComputeAtom,
+  createAllPythonStaticCheck,
+  createDefaultPythonStaticCheck,
+  createFastPythonStaticCheck,
   createPythonCommandRunnerContract
 } from './language-python-adapter.ts';

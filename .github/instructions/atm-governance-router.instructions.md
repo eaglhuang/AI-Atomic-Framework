@@ -104,6 +104,14 @@ task status to `done`, do not bulk-close task cards, and do not treat static
 task, run `guard framework-development`, `tasks audit`, `doctor`, and the
 required validators before closing with `tasks close`.
 
+Before you consider implementation "finished", do one local static-hygiene
+pass on the code you actually touched:
+
+1. Fix syntax, import, and type errors that appear in the touched scope immediately instead of deferring them to CI or another agent.
+2. Treat adapter-native static warnings in touched or staged files as part of the same delivery when the repair is straightforward and low-risk.
+3. Do not use this rule to justify repo-wide cleanup drift; keep the cleanup narrow unless the route explicitly broadens scope.
+4. Prefer lifting this habit into the operator workflow first, then let hooks and validators harden it later.
+
 For ordinary task-card delivery, the lifecycle remains:
 
 ```text
@@ -261,6 +269,10 @@ Then continue the user's original request with the fallback sources.
   command runs with exit codes and output hashes.
 - Do not move heavy checks (build/lint/network) into hooks; hooks should only
   call thin ATM guard commands.
+- Do not normalize a habit where agents leave fresh syntax, type, lint, or
+  adapter-native warnings behind in files they just touched. Narrow-scope
+  static cleanup is part of finishing the delivery, even before the lower
+  governance gates become stricter.
 - Do not treat multi-adapter `stale` parity as six unrelated incidents by
   default. When several installed adapters are only behind the same current
   template snapshot, refresh them as one governed parity batch and re-run

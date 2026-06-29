@@ -76,3 +76,22 @@ tracked governance residue created by setup commands.
   edits, adapter-specific install failure, or source snapshot corruption.
 - Durable rule: multi-adapter stale parity is usually a shared snapshot drift,
   not six separate product incidents.
+
+## 2026-06-29 - Teach static hygiene as an upper-layer habit before hard gates
+
+- Trigger: the repo wants fewer "CI caught it later" moments for syntax,
+  imports, type failures, or new warnings, but the lower adapter-aware gates are
+  not fully implemented yet.
+- Symptom: the agent treats warnings or obvious local static failures as
+  someone else's cleanup problem because only bottom-layer validators are seen
+  as authoritative.
+- Correct ATM route: first teach the habit in the router and next-entry skills.
+  If touched files show obvious static failures or fresh warnings, clear them in
+  the same lane whenever the fix is local and low-risk. Then tighten the lower
+  `doctor` / `next` / hook gates later.
+- Recovery: if historical repo-wide warning debt is large, keep the rule narrow
+  to touched or staged scope and record the remaining backlog explicitly instead
+  of silently widening the task.
+- Durable rule: when a quality behavior can be expressed at the skill layer,
+  teach it there first so every adapter learns the expectation before the hard
+  enforcement arrives.

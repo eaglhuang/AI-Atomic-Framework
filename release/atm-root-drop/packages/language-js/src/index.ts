@@ -1,7 +1,8 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
 import type {
   LanguageAdapter as SdkLanguageAdapter,
-  LanguageAdapterManifest as SdkLanguageAdapterManifest
+  LanguageAdapterManifest as SdkLanguageAdapterManifest,
+  LanguageAdapterStaticCheckPlan as SdkLanguageAdapterStaticCheckPlan
 } from '@ai-atomic-framework/plugin-sdk';
 
 export const languageJsPackage = {
@@ -64,6 +65,7 @@ export interface JavaScriptValidationCommand {
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
 
 export type JavaScriptLanguageAdapterManifest = SdkLanguageAdapterManifest;
+export type JavaScriptStaticCheckPlan = SdkLanguageAdapterStaticCheckPlan;
 
 export interface JavaScriptValidationReport {
   readonly ok: boolean;
@@ -80,6 +82,9 @@ export interface JavaScriptLanguageAdapter extends LanguageAdapter<JavaScriptPro
   readonly manifest: JavaScriptLanguageAdapterManifest;
   scanImports(sourceFile: JavaScriptSourceFile): readonly JavaScriptImportRecord[];
   createCommandRunnerContract(profile: JavaScriptProjectProfile): TestCommandRunnerContract;
+  getFastStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+  getDefaultStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+  getAllStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
 }
 
 export const defaultJavaScriptImportPolicy: JavaScriptImportPolicy = {
@@ -102,5 +107,8 @@ export {
   detectProjectProfile,
   validateComputeAtom,
   scanImports,
-  createCommandRunnerContract
+  createAllJavaScriptStaticCheck,
+  createCommandRunnerContract,
+  createDefaultJavaScriptStaticCheck,
+  createFastJavaScriptStaticCheck
 } from './language-js-adapter.ts';

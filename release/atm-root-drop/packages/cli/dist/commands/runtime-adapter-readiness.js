@@ -2,6 +2,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { probeProject } from '../../../core/dist/guidance/index.js';
+import { createJavaScriptLanguageAdapter, detectProjectProfile as detectJavaScriptProjectProfile } from '../../../language-js/dist/index.js';
+import { createPythonLanguageAdapter, detectPythonProjectProfile } from '../../../language-python/dist/index.js';
+import { createCSharpLanguageAdapter, detectCSharpProjectProfile } from '../../../language-csharp/dist/index.js';
 export function inspectRuntimeAdapterReadiness(repositoryRoot) {
     const orientation = probeProject(repositoryRoot);
     const pythonOnlyHost = orientation.detectedLanguages.includes('Python')
@@ -14,7 +17,12 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot) {
     const bundledProjectAdapters = listBundledPackageNames((packageDirName) => packageDirName.startsWith('adapter-') || packageDirName === 'plugin-governance-local');
     const pythonLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /python/i.test(packageName))
         || hasLocalLanguagePythonPackage();
+    const csharpLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /csharp/i.test(packageName));
     const missingLanguageAdapters = orientation.detectedLanguages.filter((language) => !hasBundledLanguageAdapter(language, bundledLanguageAdapters));
+    const staticCheckHints = collectStaticCheckHints(repositoryRoot, orientation.detectedLanguages, {
+        pythonLanguageAdapterAvailable,
+        csharpLanguageAdapterAvailable
+    });
     if (!languageOnlyHost) {
         return {
             pythonOnlyHost: false,
@@ -29,7 +37,8 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot) {
             atomBirthApplyDeferred: false,
             missingCapability: null,
             suggestedAction: null,
-            explanation: null
+            explanation: null,
+            staticCheckHints
         };
     }
     return {
@@ -49,7 +58,8 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot) {
             : 'The bundled language adapter can drive source inventory and dry-run atomize/infect plans. Atom apply still requires evidence and review gates.',
         explanation: missingLanguageAdapters.length > 0
             ? 'A non-JavaScript host language was detected without a matching bundled language adapter. This is an expected adapter gap, not host-repo corruption; discovery routes stay available while apply routes remain deferred.'
-            : 'A non-JavaScript host language was detected and a matching bundled language adapter is available. Candidate ranking, dry-run atomize/infect, and source inventory are supported; apply still flows through review and police gates.'
+            : 'A non-JavaScript host language was detected and a matching bundled language adapter is available. Candidate ranking, dry-run atomize/infect, and source inventory are supported; apply still flows through review and police gates.',
+        staticCheckHints
     };
 }
 function hasLocalLanguagePythonPackage() {
@@ -100,4 +110,41 @@ function readPackageName(packageJsonPath) {
     catch {
         return null;
     }
+}
+function collectStaticCheckHints(repositoryRoot, detectedLanguages, availability) {
+    const hints = [];
+    if (detectedLanguages.includes('JavaScript') || detectedLanguages.includes('TypeScript')) {
+        const adapter = createJavaScriptLanguageAdapter();
+        const profile = detectJavaScriptProjectProfile(repositoryRoot);
+        hints.push({
+            language: 'JavaScript/TypeScript',
+            adapterPackage: '@ai-atomic-framework/language-js',
+            fastStaticCheck: adapter.getFastStaticCheck(profile),
+            defaultStaticCheck: adapter.getDefaultStaticCheck(profile),
+            allStaticCheck: adapter.getAllStaticCheck(profile)
+        });
+    }
+    if (detectedLanguages.includes('Python') && availability.pythonLanguageAdapterAvailable) {
+        const adapter = createPythonLanguageAdapter();
+        const profile = detectPythonProjectProfile(repositoryRoot);
+        hints.push({
+            language: 'Python',
+            adapterPackage: '@ai-atomic-framework/language-python',
+            fastStaticCheck: adapter.getFastStaticCheck(profile),
+            defaultStaticCheck: adapter.getDefaultStaticCheck(profile),
+            allStaticCheck: adapter.getAllStaticCheck(profile)
+        });
+    }
+    if (detectedLanguages.includes('C#') && availability.csharpLanguageAdapterAvailable) {
+        const adapter = createCSharpLanguageAdapter();
+        const profile = detectCSharpProjectProfile(repositoryRoot);
+        hints.push({
+            language: 'C#',
+            adapterPackage: '@ai-atomic-framework/language-csharp',
+            fastStaticCheck: adapter.getFastStaticCheck(profile),
+            defaultStaticCheck: adapter.getDefaultStaticCheck(profile),
+            allStaticCheck: adapter.getAllStaticCheck(profile)
+        });
+    }
+    return hints;
 }

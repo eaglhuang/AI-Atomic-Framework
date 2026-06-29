@@ -23,6 +23,9 @@ export function createJavaScriptLanguageAdapter(policyOverrides = {}) {
         languageIds: ['javascript', 'typescript'],
         manifest: defaultJavaScriptLanguageAdapterManifest,
         detectProjectProfile,
+        getFastStaticCheck: createFastJavaScriptStaticCheck,
+        getDefaultStaticCheck: createDefaultJavaScriptStaticCheck,
+        getAllStaticCheck: createAllJavaScriptStaticCheck,
         scanImports,
         validateComputeAtom: (request, profile = createUnknownProfile()) => validateComputeAtom(request, profile, defaultPolicy),
         createCommandRunnerContract
@@ -33,7 +36,7 @@ export function detectProjectProfile(repositoryRoot) {
     const packageJson = existsSync(packageJsonPath)
         ? JSON.parse(readFileSync(packageJsonPath, 'utf8'))
         : {};
-    const scripts = packageJson.scripts || {};
+    const scripts = packageJson.scripts ?? {};
     return {
         packageManager: detectPackageManager(repositoryRoot),
         testCommand: scripts.test ? createPackageManagerCommand(repositoryRoot, 'test') : null,
@@ -279,6 +282,54 @@ export function createCommandRunnerContract(profile) {
         commands
     };
 }
+export function createFastJavaScriptStaticCheck(profile) {
+    const commands = profile.typecheckCommand
+        ? [profile.typecheckCommand]
+        : profile.lintCommand
+            ? [profile.lintCommand]
+            : [];
+    return createStaticCheckPlan('fast', commands, commands.length > 0
+        ? {
+            source: profile.typecheckCommand ? 'declared-script' : 'declared-script',
+            kinds: profile.typecheckCommand ? ['syntax', 'imports', 'typecheck'] : ['syntax', 'imports', 'lint'],
+            guidance: profile.typecheckCommand
+                ? 'Run the fastest JS/TS static gate first: typecheck catches syntax, import, and type drift quickly.'
+                : 'Run lint as the fastest available JS/TS static gate because no typecheck command is declared.'
+        }
+        : {
+            source: 'unavailable',
+            kinds: [],
+            guidance: 'No JS/TS fast static command is declared yet. Add typecheck or lint so ATM can gate touched-scope static hygiene early.'
+        });
+}
+export function createDefaultJavaScriptStaticCheck(profile) {
+    const commands = unique([profile.typecheckCommand, profile.lintCommand].filter(Boolean));
+    return createStaticCheckPlan('default', commands, commands.length > 0
+        ? {
+            source: 'adapter-composed',
+            kinds: ['syntax', 'imports', 'typecheck', 'lint'],
+            guidance: 'Default JS/TS static pass should cover both typecheck and lint before moving to heavier validation.'
+        }
+        : {
+            source: 'unavailable',
+            kinds: [],
+            guidance: 'No JS/TS default static commands are declared yet. Add typecheck and lint scripts so ATM can offer a normal static path.'
+        });
+}
+export function createAllJavaScriptStaticCheck(profile) {
+    const commands = unique([profile.typecheckCommand, profile.lintCommand].filter(Boolean));
+    return createStaticCheckPlan('all', commands, commands.length > 0
+        ? {
+            source: 'adapter-composed',
+            kinds: ['syntax', 'imports', 'typecheck', 'lint'],
+            guidance: 'JS/TS all-static currently runs the full declared static set. Keep test/build in later validation lanes, not in the static contract.'
+        }
+        : {
+            source: 'unavailable',
+            kinds: [],
+            guidance: 'No JS/TS all-static commands are declared yet. Add static scripts before expecting adapter-aware governance hints.'
+        });
+}
 function createPackageManagerCommand(repositoryRoot, scriptName) {
     const manager = detectPackageManager(repositoryRoot);
     if (manager === 'pnpm') {
@@ -314,6 +365,17 @@ function createUnknownProfile() {
         lintCommand: null
     };
 }
+function createStaticCheckPlan(tier, commands, input) {
+    return {
+        tier,
+        commands,
+        source: input.source,
+        scope: 'repository',
+        estimatedCost: tier === 'fast' ? 'fast' : tier === 'default' ? 'medium' : 'slow',
+        kinds: input.kinds,
+        guidance: input.guidance
+    };
+}
 function createCommand(commandKind, command, required) {
     return command
         ? { commandKind, command, required }
@@ -324,7 +386,7 @@ function createMessage(level, code, text, filePath, line) {
     if (filePath) {
         message.filePath = filePath;
     }
-    if (line) {
+    if (typeof line === 'number') {
         message.line = line;
     }
     return message;

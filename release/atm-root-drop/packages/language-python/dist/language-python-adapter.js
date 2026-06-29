@@ -24,6 +24,9 @@ export function createPythonLanguageAdapter(policyOverrides = {}) {
         async detectProjectProfile(repositoryRoot) {
             return detectPythonProjectProfile(repositoryRoot);
         },
+        getFastStaticCheck: createFastPythonStaticCheck,
+        getDefaultStaticCheck: createDefaultPythonStaticCheck,
+        getAllStaticCheck: createAllPythonStaticCheck,
         async validateComputeAtom(request) {
             return validatePythonComputeAtom(request, detectPythonProjectProfile(process.cwd()), basePolicy);
         }
@@ -388,6 +391,54 @@ export function createPythonCommandRunnerContract(profile) {
         commands
     };
 }
+export function createFastPythonStaticCheck(profile) {
+    const commands = profile.typecheckCommand
+        ? [profile.typecheckCommand]
+        : profile.lintCommand
+            ? [profile.lintCommand]
+            : [];
+    return createStaticCheckPlan('fast', commands, commands.length > 0
+        ? {
+            source: 'adapter-composed',
+            kinds: profile.typecheckCommand ? ['syntax', 'typecheck'] : ['syntax', 'lint'],
+            guidance: profile.typecheckCommand
+                ? 'Run Python typecheck first when available; it is the fastest broad static signal for touched Python edits.'
+                : 'Run Python lint as the fastest available static gate because no typecheck command is declared.'
+        }
+        : {
+            source: 'unavailable',
+            kinds: [],
+            guidance: 'No Python fast static command is declared yet. Add typecheck or lint tooling so ATM can gate touched Python changes early.'
+        });
+}
+export function createDefaultPythonStaticCheck(profile) {
+    const commands = [...new Set([profile.typecheckCommand, profile.lintCommand].filter(Boolean))];
+    return createStaticCheckPlan('default', commands, commands.length > 0
+        ? {
+            source: 'adapter-composed',
+            kinds: ['syntax', 'typecheck', 'lint'],
+            guidance: 'Default Python static pass should cover both typecheck and lint before slower execution validators.'
+        }
+        : {
+            source: 'unavailable',
+            kinds: [],
+            guidance: 'No Python default static commands are declared yet. Add typecheck and lint commands so ATM can offer a normal static lane.'
+        });
+}
+export function createAllPythonStaticCheck(profile) {
+    const commands = [...new Set([profile.typecheckCommand, profile.lintCommand].filter(Boolean))];
+    return createStaticCheckPlan('all', commands, commands.length > 0
+        ? {
+            source: 'adapter-composed',
+            kinds: ['syntax', 'typecheck', 'lint'],
+            guidance: 'Python all-static currently runs the full declared static set. Keep runtime tests outside this static contract.'
+        }
+        : {
+            source: 'unavailable',
+            kinds: [],
+            guidance: 'No Python all-static commands are declared yet. Add static tooling before expecting adapter-aware governance hints.'
+        });
+}
 function collectDeclaredScripts(repositoryRoot, hints) {
     if (!hints.hasPyprojectToml)
         return [];
@@ -508,4 +559,15 @@ function mergePolicy(base, overrides) {
 }
 function normalizePath(filePath) {
     return filePath.replace(/\\/g, '/');
+}
+function createStaticCheckPlan(tier, commands, input) {
+    return {
+        tier,
+        commands,
+        source: input.source,
+        scope: 'repository',
+        estimatedCost: tier === 'fast' ? 'fast' : tier === 'default' ? 'medium' : 'slow',
+        kinds: input.kinds,
+        guidance: input.guidance
+    };
 }

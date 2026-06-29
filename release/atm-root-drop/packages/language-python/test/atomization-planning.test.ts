@@ -142,6 +142,10 @@ async function testPlanAtomize() {
     reExportAliasBehavior: 'not-supported',
     decoratorResolutionStance: 'not-supported'
   });
+  const profile = await languageAdapter.detectProjectProfile(path.resolve(fixturesDir, '..', '..', '..'));
+  assert.equal(languageAdapter.getFastStaticCheck(profile).tier, 'fast');
+  assert.equal(languageAdapter.getDefaultStaticCheck(profile).tier, 'default');
+  assert.equal(languageAdapter.getAllStaticCheck(profile).tier, 'all');
   console.log('ok: planAtomize dry-run wraps legacy planPythonAtomize');
 }
 

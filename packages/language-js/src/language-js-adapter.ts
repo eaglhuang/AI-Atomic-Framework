@@ -12,9 +12,14 @@ import type {
   JavaScriptLanguageAdapter,
   JavaScriptLanguageAdapterManifest,
   JavaScriptImportRecord,
+  JavaScriptImportPolicy,
   JavaScriptProjectProfile,
   JavaScriptSourceFile,
+  JavaScriptStaticCheckPlan,
+  JavaScriptValidationCommand,
+  JavaScriptValidationMessage,
   JavaScriptValidationReport,
+  LanguageAdapterValidationRequest,
   TestCommandRunnerContract
 } from './index.ts';
 
@@ -44,8 +49,14 @@ export function createJavaScriptLanguageAdapter(
     languageIds: ['javascript', 'typescript'],
     manifest: defaultJavaScriptLanguageAdapterManifest,
     detectProjectProfile,
+    getFastStaticCheck: createFastJavaScriptStaticCheck,
+    getDefaultStaticCheck: createDefaultJavaScriptStaticCheck,
+    getAllStaticCheck: createAllJavaScriptStaticCheck,
     scanImports,
-    validateComputeAtom: (request: any, profile = createUnknownProfile()) => validateComputeAtom(request, profile, defaultPolicy),
+    validateComputeAtom: (
+      request: LanguageAdapterValidationRequest,
+      profile = createUnknownProfile()
+    ) => validateComputeAtom(request, profile, defaultPolicy),
     createCommandRunnerContract
   };
 }
@@ -53,9 +64,11 @@ export function createJavaScriptLanguageAdapter(
 export function detectProjectProfile(repositoryRoot: string): JavaScriptProjectProfile {
   const packageJsonPath = path.join(repositoryRoot, 'package.json');
   const packageJson = existsSync(packageJsonPath)
-    ? JSON.parse(readFileSync(packageJsonPath, 'utf8'))
+    ? JSON.parse(readFileSync(packageJsonPath, 'utf8')) as {
+      readonly scripts?: Partial<Record<'test' | 'typecheck' | 'lint', string>>;
+    }
     : {};
-  const scripts = packageJson.scripts || {};
+  const scripts = packageJson.scripts ?? {};
   return {
     packageManager: detectPackageManager(repositoryRoot) as JavaScriptProjectProfile['packageManager'],
     testCommand: scripts.test ? createPackageManagerCommand(repositoryRoot, 'test') : null,
@@ -65,14 +78,14 @@ export function detectProjectProfile(repositoryRoot: string): JavaScriptProjectP
 }
 
 export function validateComputeAtom(
-  request: any,
+  request: LanguageAdapterValidationRequest,
   profile: JavaScriptProjectProfile = createUnknownProfile(),
-  basePolicy = defaultJavaScriptImportPolicy
+  basePolicy: JavaScriptImportPolicy = defaultJavaScriptImportPolicy
 ): JavaScriptValidationReport {
   const policy = mergePolicy(basePolicy, request.importPolicy);
-  const imports = request.sourceFiles.flatMap((sourceFile: any) => scanImports(sourceFile));
-  const messages: any[] = [];
-  const entrypointFile = request.sourceFiles.find((sourceFile: any) => normalizePath(sourceFile.filePath) === normalizePath(request.entrypoint));
+  const imports = request.sourceFiles.flatMap((sourceFile) => scanImports(sourceFile));
+  const messages: JavaScriptValidationMessage[] = [];
+  const entrypointFile = request.sourceFiles.find((sourceFile) => normalizePath(sourceFile.filePath) === normalizePath(request.entrypoint));
 
   if (!entrypointFile) {
     messages.push(createMessage('error', 'ATM_JS_ENTRYPOINT_MISSING', 'Entrypoint source file was not provided.', request.entrypoint));
@@ -103,7 +116,7 @@ export function validateComputeAtom(
         summary: ok
           ? `Language adapter validated compute atom ${request.atomId}.`
           : `Language adapter rejected compute atom ${request.atomId}.`,
-        artifactPaths: request.sourceFiles.map((sourceFile: any) => sourceFile.filePath)
+        artifactPaths: request.sourceFiles.map((sourceFile) => sourceFile.filePath)
       }
     ]
   };
@@ -346,6 +359,57 @@ export function createCommandRunnerContract(profile: JavaScriptProjectProfile): 
   };
 }
 
+export function createFastJavaScriptStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan {
+  const commands = profile.typecheckCommand
+    ? [profile.typecheckCommand]
+    : profile.lintCommand
+      ? [profile.lintCommand]
+      : [];
+  return createStaticCheckPlan('fast', commands, commands.length > 0
+    ? {
+      source: profile.typecheckCommand ? 'declared-script' : 'declared-script',
+      kinds: profile.typecheckCommand ? ['syntax', 'imports', 'typecheck'] : ['syntax', 'imports', 'lint'],
+      guidance: profile.typecheckCommand
+        ? 'Run the fastest JS/TS static gate first: typecheck catches syntax, import, and type drift quickly.'
+        : 'Run lint as the fastest available JS/TS static gate because no typecheck command is declared.'
+    }
+    : {
+      source: 'unavailable',
+      kinds: [],
+      guidance: 'No JS/TS fast static command is declared yet. Add typecheck or lint so ATM can gate touched-scope static hygiene early.'
+    });
+}
+
+export function createDefaultJavaScriptStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan {
+  const commands = unique([profile.typecheckCommand, profile.lintCommand].filter(Boolean) as string[]);
+  return createStaticCheckPlan('default', commands, commands.length > 0
+    ? {
+      source: 'adapter-composed',
+      kinds: ['syntax', 'imports', 'typecheck', 'lint'],
+      guidance: 'Default JS/TS static pass should cover both typecheck and lint before moving to heavier validation.'
+    }
+    : {
+      source: 'unavailable',
+      kinds: [],
+      guidance: 'No JS/TS default static commands are declared yet. Add typecheck and lint scripts so ATM can offer a normal static path.'
+    });
+}
+
+export function createAllJavaScriptStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan {
+  const commands = unique([profile.typecheckCommand, profile.lintCommand].filter(Boolean) as string[]);
+  return createStaticCheckPlan('all', commands, commands.length > 0
+    ? {
+      source: 'adapter-composed',
+      kinds: ['syntax', 'imports', 'typecheck', 'lint'],
+      guidance: 'JS/TS all-static currently runs the full declared static set. Keep test/build in later validation lanes, not in the static contract.'
+    }
+    : {
+      source: 'unavailable',
+      kinds: [],
+      guidance: 'No JS/TS all-static commands are declared yet. Add static scripts before expecting adapter-aware governance hints.'
+    });
+}
+
 function createPackageManagerCommand(repositoryRoot: string, scriptName: string) {
   const manager = detectPackageManager(repositoryRoot);
   if (manager === 'pnpm') {
@@ -370,7 +434,7 @@ function detectPackageManager(repositoryRoot: string): JavaScriptProjectProfile[
   return 'unknown';
 }
 
-function hasEntrypointExport(sourceText: any) {
+function hasEntrypointExport(sourceText: string) {
   return /\bexport\s+(?:async\s+)?function\s+run\s*\(/.test(sourceText)
     || /\bexport\s+default\s+(?:async\s+)?function\b/.test(sourceText)
     || /\bexport\s+default\s+(?:async\s+)?\(/.test(sourceText);
@@ -385,34 +449,66 @@ function createUnknownProfile(): JavaScriptProjectProfile {
   };
 }
 
-function createCommand(commandKind: any, command: any, required: any) {
+function createStaticCheckPlan(
+  tier: JavaScriptStaticCheckPlan['tier'],
+  commands: readonly string[],
+  input: {
+    readonly source: JavaScriptStaticCheckPlan['source'];
+    readonly kinds: JavaScriptStaticCheckPlan['kinds'];
+    readonly guidance: string;
+  }
+): JavaScriptStaticCheckPlan {
+  return {
+    tier,
+    commands,
+    source: input.source,
+    scope: 'repository',
+    estimatedCost: tier === 'fast' ? 'fast' : tier === 'default' ? 'medium' : 'slow',
+    kinds: input.kinds,
+    guidance: input.guidance
+  };
+}
+
+function createCommand(
+  commandKind: JavaScriptValidationCommand['commandKind'],
+  command: string | null,
+  required: boolean
+): JavaScriptValidationCommand | null {
   return command
     ? { commandKind, command, required }
     : null;
 }
 
-function createMessage(level: any, code: any, text: any, filePath?: any, line?: any) {
-  const message: any = { level, code, text };
+function createMessage(
+  level: JavaScriptValidationMessage['level'],
+  code: string,
+  text: string,
+  filePath?: string,
+  line?: number
+): JavaScriptValidationMessage {
+  const message: JavaScriptValidationMessage = { level, code, text };
   if (filePath) {
-    message.filePath = filePath;
+    (message as JavaScriptValidationMessage & { filePath?: string }).filePath = filePath;
   }
-  if (line) {
-    message.line = line;
+  if (typeof line === 'number') {
+    (message as JavaScriptValidationMessage & { line?: number }).line = line;
   }
   return message;
 }
 
-function mergePolicy(...policies: any[]): Readonly<{ forbiddenSpecifiers: string[]; allowedSpecifiers: string[] }> {
+function mergePolicy(
+  ...policies: ReadonlyArray<Partial<JavaScriptImportPolicy> | undefined>
+): Readonly<{ forbiddenSpecifiers: string[]; allowedSpecifiers: string[] }> {
   return Object.freeze({
     forbiddenSpecifiers: unique(policies.flatMap((policy) => policy?.forbiddenSpecifiers || [])),
     allowedSpecifiers: unique(policies.flatMap((policy) => policy?.allowedSpecifiers || []))
   });
 }
 
-function unique(values: any): string[] {
-  return Array.from(new Set((values ?? []).map((value: any) => String(value))));
+function unique(values: readonly string[] | undefined): string[] {
+  return Array.from(new Set((values ?? []).map((value) => String(value))));
 }
 
-function normalizePath(filePath: any) {
+function normalizePath(filePath: string) {
   return filePath.replace(/\\/g, '/');
 }

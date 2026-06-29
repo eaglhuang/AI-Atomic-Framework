@@ -243,6 +243,18 @@ Hooks and CI are host-side gates. A stronger option is to implement a custom
 lock presence, evidence persistence, or policy acknowledgements before
 host-specific mutation steps are allowed to proceed.
 
+Language adapters now provide an adapter-aware static gate contract through the
+mandatory fast/default/all static-check selectors:
+
+- `getFastStaticCheck(profile)`
+- `getDefaultStaticCheck(profile)`
+- `getAllStaticCheck(profile)`
+
+Hosts can use that contract to trigger an adapter-aware static gate before
+closeout, handoff, or commit without assuming everything is JavaScript lint.
+This keeps the orchestration layer neutral while still letting each language
+declare the cheapest meaningful static pass and the stricter full static lane.
+
 This is the strongest option when the host already routes important writes
 through ATM-aware tooling. It is also the most expensive, because the host must
 maintain that adapter boundary over time.

@@ -159,6 +159,18 @@ const adapter = createPythonLanguageAdapter();
 if (adapter.adapterName !== '@ai-atomic-framework/language-python' || !adapter.supportsAtomizeDryRun) {
   fail('createPythonLanguageAdapter must report the expected adapter name and supportsAtomizeDryRun=true.');
 }
+const adapterFastStaticCheck = adapter.getFastStaticCheck(profile);
+if (adapterFastStaticCheck.tier !== 'fast' || adapterFastStaticCheck.commands[0] !== 'poetry run mypy .') {
+  fail(`Python fast static check must prefer poetry run mypy . (got ${adapterFastStaticCheck.commands.join(', ')}).`);
+}
+const adapterDefaultStaticCheck = adapter.getDefaultStaticCheck(profile);
+if (!adapterDefaultStaticCheck.commands.includes('poetry run mypy .') || !adapterDefaultStaticCheck.commands.includes('poetry run ruff check .')) {
+  fail('Python default static check must include both mypy and ruff.');
+}
+const adapterAllStaticCheck = adapter.getAllStaticCheck(profile);
+if (adapterAllStaticCheck.tier !== 'all' || !adapterAllStaticCheck.commands.includes('poetry run mypy .') || !adapterAllStaticCheck.commands.includes('poetry run ruff check .')) {
+  fail('Python all static check must include the full declared static set.');
+}
 
 const readiness = inspectRuntimeAdapterReadiness(adopterRoot!);
 if (!readiness.pythonOnlyHost) {

@@ -13,4 +13,4 @@ export const languageJsRuntime = {
     supportsDelegatedTestCommands: true,
     resultFormat: 'JavaScriptValidationReport'
 };
-export { defaultJavaScriptLanguageAdapterManifest, createJavaScriptLanguageAdapter, createJavaScriptAtomizationPlanningAdapter, discoverJavaScriptAtomCandidates, detectProjectProfile, validateComputeAtom, scanImports, createCommandRunnerContract } from './language-js-adapter.js';
+export { defaultJavaScriptLanguageAdapterManifest, createJavaScriptLanguageAdapter, createJavaScriptAtomizationPlanningAdapter, discoverJavaScriptAtomCandidates, detectProjectProfile, validateComputeAtom, scanImports, createAllJavaScriptStaticCheck, createCommandRunnerContract, createDefaultJavaScriptStaticCheck, createFastJavaScriptStaticCheck } from './language-js-adapter.js';

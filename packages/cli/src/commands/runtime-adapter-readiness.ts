@@ -2,6 +2,27 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { probeProject } from '../../../core/src/guidance/index.ts';
+import {
+  createJavaScriptLanguageAdapter,
+  detectProjectProfile as detectJavaScriptProjectProfile
+} from '../../../language-js/src/index.ts';
+import {
+  createPythonLanguageAdapter,
+  detectPythonProjectProfile
+} from '../../../language-python/src/index.ts';
+import {
+  createCSharpLanguageAdapter,
+  detectCSharpProjectProfile
+} from '../../../language-csharp/src/index.ts';
+import type { LanguageAdapterStaticCheckPlan } from '../../../plugin-sdk/src/language-adapter.ts';
+
+export interface RuntimeLanguageAdapterStaticCheckHint {
+  readonly language: string;
+  readonly adapterPackage: string;
+  readonly fastStaticCheck: LanguageAdapterStaticCheckPlan;
+  readonly defaultStaticCheck: LanguageAdapterStaticCheckPlan;
+  readonly allStaticCheck: LanguageAdapterStaticCheckPlan;
+}
 
 export interface RuntimeAdapterReadinessSummary {
   readonly pythonOnlyHost: boolean;
@@ -17,6 +38,7 @@ export interface RuntimeAdapterReadinessSummary {
   readonly missingCapability: string | null;
   readonly suggestedAction: string | null;
   readonly explanation: string | null;
+  readonly staticCheckHints: readonly RuntimeLanguageAdapterStaticCheckHint[];
 }
 
 export function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeAdapterReadinessSummary {
@@ -34,9 +56,14 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeA
   const pythonLanguageAdapterAvailable =
     bundledLanguageAdapters.some((packageName) => /python/i.test(packageName))
     || hasLocalLanguagePythonPackage();
+  const csharpLanguageAdapterAvailable = bundledLanguageAdapters.some((packageName) => /csharp/i.test(packageName));
   const missingLanguageAdapters = orientation.detectedLanguages.filter((language) =>
     !hasBundledLanguageAdapter(language, bundledLanguageAdapters)
   );
+  const staticCheckHints = collectStaticCheckHints(repositoryRoot, orientation.detectedLanguages, {
+    pythonLanguageAdapterAvailable,
+    csharpLanguageAdapterAvailable
+  });
 
   if (!languageOnlyHost) {
     return {
@@ -52,7 +79,8 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeA
       atomBirthApplyDeferred: false,
       missingCapability: null,
       suggestedAction: null,
-      explanation: null
+      explanation: null,
+      staticCheckHints
     };
   }
 
@@ -74,6 +102,8 @@ export function inspectRuntimeAdapterReadiness(repositoryRoot: string): RuntimeA
     explanation: missingLanguageAdapters.length > 0
       ? 'A non-JavaScript host language was detected without a matching bundled language adapter. This is an expected adapter gap, not host-repo corruption; discovery routes stay available while apply routes remain deferred.'
       : 'A non-JavaScript host language was detected and a matching bundled language adapter is available. Candidate ranking, dry-run atomize/infect, and source inventory are supported; apply still flows through review and police gates.'
+    ,
+    staticCheckHints
   };
 }
 
@@ -126,4 +156,49 @@ function readPackageName(packageJsonPath: string): string | null {
   } catch {
     return null;
   }
+}
+
+function collectStaticCheckHints(
+  repositoryRoot: string,
+  detectedLanguages: readonly string[],
+  availability: {
+    readonly pythonLanguageAdapterAvailable: boolean;
+    readonly csharpLanguageAdapterAvailable: boolean;
+  }
+): readonly RuntimeLanguageAdapterStaticCheckHint[] {
+  const hints: RuntimeLanguageAdapterStaticCheckHint[] = [];
+  if (detectedLanguages.includes('JavaScript') || detectedLanguages.includes('TypeScript')) {
+    const adapter = createJavaScriptLanguageAdapter();
+    const profile = detectJavaScriptProjectProfile(repositoryRoot);
+    hints.push({
+      language: 'JavaScript/TypeScript',
+      adapterPackage: '@ai-atomic-framework/language-js',
+      fastStaticCheck: adapter.getFastStaticCheck(profile),
+      defaultStaticCheck: adapter.getDefaultStaticCheck(profile),
+      allStaticCheck: adapter.getAllStaticCheck(profile)
+    });
+  }
+  if (detectedLanguages.includes('Python') && availability.pythonLanguageAdapterAvailable) {
+    const adapter = createPythonLanguageAdapter();
+    const profile = detectPythonProjectProfile(repositoryRoot);
+    hints.push({
+      language: 'Python',
+      adapterPackage: '@ai-atomic-framework/language-python',
+      fastStaticCheck: adapter.getFastStaticCheck(profile),
+      defaultStaticCheck: adapter.getDefaultStaticCheck(profile),
+      allStaticCheck: adapter.getAllStaticCheck(profile)
+    });
+  }
+  if (detectedLanguages.includes('C#') && availability.csharpLanguageAdapterAvailable) {
+    const adapter = createCSharpLanguageAdapter();
+    const profile = detectCSharpProjectProfile(repositoryRoot);
+    hints.push({
+      language: 'C#',
+      adapterPackage: '@ai-atomic-framework/language-csharp',
+      fastStaticCheck: adapter.getFastStaticCheck(profile),
+      defaultStaticCheck: adapter.getDefaultStaticCheck(profile),
+      allStaticCheck: adapter.getAllStaticCheck(profile)
+    });
+  }
+  return hints;
 }

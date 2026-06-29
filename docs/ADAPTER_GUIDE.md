@@ -16,6 +16,27 @@ For legacy strangler flows, `ProjectAdapter` also owns `resolveLegacyUri`, `runA
 
 `LanguageAdapter` is the language-facing boundary. It detects a project profile and validates compute atoms from source files plus policy. Language-specific packages may add richer request and report types, but should remain assignable to the SDK shape.
 
+Every language adapter must also implement three static-check selectors:
+
+- `getFastStaticCheck(profile)`
+- `getDefaultStaticCheck(profile)`
+- `getAllStaticCheck(profile)`
+
+These methods return a `LanguageAdapterStaticCheckPlan` with ordered commands,
+their origin, estimated cost, and the check kinds they cover. Use this
+contract when ATM needs an adapter-native "quick static pass" instead of
+guessing from repository files or hardcoding ESLint-only behavior in the CLI.
+
+The intent is product-wide parity, not one-off language exceptions:
+
+- `fast` should be the cheapest broad signal that catches touched-scope syntax/import/type drift early.
+- `default` should be the normal pre-next / pre-close static lane that most governed work can afford to run routinely.
+- `all` should stay static-only, but may combine the adapter's full declared static surfaces when a stricter sweep is needed.
+
+The contract is also what powers adapter-aware governance hints and integration
+tests. New language adapters should ship fixture-backed validation proving that
+their three selectors stay aligned with runtime readiness reporting.
+
 When an adapter adopts a map-managed atom, it should use `node atm.mjs registry lineage backfill` to backfill `members[].versionLineage` on the owning map record from real lineage evidence. That lineage contract lets `registry-diff` and onefile smoke checks resolve adopter-owned atoms even when there is no standalone atom entry, while keeping dry-run patches and apply-mode evidence gates deterministic.
 
 ## Atomization Planning (Optional)

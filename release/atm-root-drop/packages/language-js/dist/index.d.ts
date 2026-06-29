@@ -1,5 +1,5 @@
 import type { EvidenceRecord } from '@ai-atomic-framework/core';
-import type { LanguageAdapter as SdkLanguageAdapter, LanguageAdapterManifest as SdkLanguageAdapterManifest } from '@ai-atomic-framework/plugin-sdk';
+import type { LanguageAdapter as SdkLanguageAdapter, LanguageAdapterManifest as SdkLanguageAdapterManifest, LanguageAdapterStaticCheckPlan as SdkLanguageAdapterStaticCheckPlan } from '@ai-atomic-framework/plugin-sdk';
 export declare const languageJsPackage: {
     readonly packageName: "@ai-atomic-framework/language-js";
     readonly packageRole: "javascript-typescript-language-adapter";
@@ -50,6 +50,7 @@ export interface JavaScriptValidationCommand {
 }
 export type LanguageAdapter<Profile, Request, Report> = SdkLanguageAdapter<Profile, Request, Report>;
 export type JavaScriptLanguageAdapterManifest = SdkLanguageAdapterManifest;
+export type JavaScriptStaticCheckPlan = SdkLanguageAdapterStaticCheckPlan;
 export interface JavaScriptValidationReport {
     readonly ok: boolean;
     readonly profile: JavaScriptProjectProfile;
@@ -64,6 +65,9 @@ export interface JavaScriptLanguageAdapter extends LanguageAdapter<JavaScriptPro
     readonly manifest: JavaScriptLanguageAdapterManifest;
     scanImports(sourceFile: JavaScriptSourceFile): readonly JavaScriptImportRecord[];
     createCommandRunnerContract(profile: JavaScriptProjectProfile): TestCommandRunnerContract;
+    getFastStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+    getDefaultStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
+    getAllStaticCheck(profile: JavaScriptProjectProfile): JavaScriptStaticCheckPlan;
 }
 export declare const defaultJavaScriptImportPolicy: JavaScriptImportPolicy;
 export declare const languageJsRuntime: {
@@ -73,4 +77,4 @@ export declare const languageJsRuntime: {
     readonly supportsDelegatedTestCommands: true;
     readonly resultFormat: "JavaScriptValidationReport";
 };
-export { defaultJavaScriptLanguageAdapterManifest, createJavaScriptLanguageAdapter, createJavaScriptAtomizationPlanningAdapter, discoverJavaScriptAtomCandidates, detectProjectProfile, validateComputeAtom, scanImports, createCommandRunnerContract } from './language-js-adapter.ts';
+export { defaultJavaScriptLanguageAdapterManifest, createJavaScriptLanguageAdapter, createJavaScriptAtomizationPlanningAdapter, discoverJavaScriptAtomCandidates, detectProjectProfile, validateComputeAtom, scanImports, createAllJavaScriptStaticCheck, createCommandRunnerContract, createDefaultJavaScriptStaticCheck, createFastJavaScriptStaticCheck } from './language-js-adapter.ts';
