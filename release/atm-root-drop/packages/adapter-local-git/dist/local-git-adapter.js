@@ -3,15 +3,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseLegacyUri } from '../../core/dist/registry/urn.js';
 import { scanNeutralityText } from '../../plugin-rule-guard/dist/neutrality-scanner.js';
+import { defaultLocalGitAdapterConfig } from './index.js';
 const frameworkRepositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../');
-export const defaultLocalGitAdapterConfig = Object.freeze({
-    registryPath: '.atm/registry',
-    reportsPath: '.atm/history/reports',
-    dryRun: false,
-    lockMode: 'noop',
-    gateMode: 'noop',
-    docMode: 'noop'
-});
+export { defaultLocalGitAdapterConfig };
 export function createLocalGitAdapter(configOverrides = {}) {
     const defaultConfig = mergeConfig(configOverrides);
     return {
@@ -69,7 +63,7 @@ export function scaffoldLocalRepository(context, baseConfig = defaultLocalGitAda
         operation: 'scaffold',
         context,
         config,
-        mode: config.dryRun ? 'dry-run' : 'filesystem',
+        mode: (config.dryRun ? 'dry-run' : 'filesystem'),
         noop: false,
         messages: [
             config.dryRun
@@ -97,7 +91,7 @@ export function writeRegistryEntry(context, baseConfig, entry) {
         operation: 'registry',
         context,
         config,
-        mode: config.dryRun ? 'dry-run' : 'filesystem',
+        mode: (config.dryRun ? 'dry-run' : 'filesystem'),
         noop: false,
         messages: [
             config.dryRun
@@ -123,11 +117,12 @@ export function resolveLegacyUri(context, baseConfig, legacyUri) {
     const absolutePath = parsed.relativePath
         ? resolvePath(context.repositoryRoot, parsed.relativePath)
         : path.resolve(context.repositoryRoot);
+    const configAlias = config.repositoryAlias;
     return {
         ...parsed,
         absolutePath,
         exists: existsSync(absolutePath),
-        repositoryAlias: parsed.repositoryAlias || config.repositoryAlias || path.basename(context.repositoryRoot)
+        repositoryAlias: parsed.repositoryAlias || (typeof configAlias === 'string' ? configAlias : undefined) || path.basename(context.repositoryRoot)
     };
 }
 export function runDryRunAdapter(behaviorId, context, baseConfig, request) {

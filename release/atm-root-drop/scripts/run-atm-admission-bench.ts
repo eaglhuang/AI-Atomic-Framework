@@ -39,7 +39,6 @@ function parseArgs(argv: readonly string[]): Args {
     else if (arg === '--out') out = take();
     else if (arg.startsWith('--out=')) out = arg.slice('--out='.length);
     else if (arg === '--help' || arg === '-h') {
-      // eslint-disable-next-line no-console
       console.log('Usage: run-atm-admission-bench.ts [--profile smoke|paper] [--track all|policy|ablation|adversarial|forwarding|field|report] [--mode smoke|export-blind] [--seed N] [--out DIR]');
       process.exit(0);
     } else {
@@ -65,7 +64,6 @@ function main(): void {
       ? path.resolve(root, args.out)
       : path.resolve(root, `artifacts/generated/atm-admission-bench/${args.seed}-paper`);
     const summary = runPaperProfile({ root, seed: args.seed, track: args.track, outDir });
-    // eslint-disable-next-line no-console
     console.log(JSON.stringify({
       profile: 'paper',
       track: args.track,
@@ -89,7 +87,6 @@ function main(): void {
       ? `artifacts/generated/atm-admission-bench/${args.seed}`
       : `artifacts/blind-bench/${args.seed}`);
   const summary = runAdmissionBench({ root, seed: args.seed, mode: args.mode, outDir });
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify({
     profile: 'smoke',
     mode: args.mode,

@@ -238,16 +238,20 @@ const adapter = createLocalGitAdapter({ dryRun: true });
 const adapterContext = {
   repositoryRoot: root,
   actor: 'police-family-validator',
-  lifecycleMode: 'evolution',
+  lifecycleMode: 'evolution' as const,
   config: { dryRun: true }
 };
 const dryRunPass = adapter.runAtomizeAdapter(adapterContext, {
+  behaviorId: 'behavior.atomize',
   legacySource: 'legacy://framework/src/legacy-atomization.ts#L1',
+  dryRun: true,
   inlineSource: 'function safeLeaf(){ return 42; }',
   patchFiles: []
 });
 const dryRunNeutralityFail = adapter.runAtomizeAdapter(adapterContext, {
+  behaviorId: 'behavior.atomize',
   legacySource: 'legacy://framework/src/legacy-atomization.ts#L2',
+  dryRun: true,
   inlineSource: `function privateLeaf(){ return '${privateTerm}'; }`,
   patchFiles: []
 });

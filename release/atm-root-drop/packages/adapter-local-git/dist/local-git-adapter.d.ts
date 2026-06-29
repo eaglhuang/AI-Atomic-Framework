@@ -1,32 +1,18 @@
-export declare const defaultLocalGitAdapterConfig: Readonly<{
-    registryPath: ".atm/registry";
-    reportsPath: ".atm/history/reports";
-    dryRun: false;
-    lockMode: "noop";
-    gateMode: "noop";
-    docMode: "noop";
-}>;
-export declare function createLocalGitAdapter(configOverrides?: {}): {
-    adapterName: string;
-    defaultConfig: any;
-    resolveRegistryPath: (context: any) => string;
-    resolveLegacyUri: (context: any, legacyUri: any) => {
-        absolutePath: string;
-        exists: boolean;
-        repositoryAlias: any;
-        uri: string;
-        scheme: string;
-        relativePath: string;
-        fragment: string;
-        lineStart: number | null;
-        lineEnd: number | null;
-    };
-    scaffold: (context: any) => any;
-    lockScope: (context: any, workItem: any, files: any) => any;
-    runGate: (context: any, workItem: any) => any;
-    writeDocRecord: (context: any, workItem: any, summary: any) => any;
-    runAtomizeAdapter: (context: any, request: any) => any;
-    runInfectAdapter: (context: any, request: any) => any;
+import type { WorkItemRef } from '@ai-atomic-framework/core';
+import type { AtomizeAdapterRequest, InfectAdapterRequest, ProjectAdapterLegacyUriResolution } from '@ai-atomic-framework/plugin-sdk';
+import { defaultLocalGitAdapterConfig, type LocalGitAdapterContext, type LocalGitAdapterConfig, type LocalGitAdapterResult, type LocalGitRegistryEntry } from './index.ts';
+export { defaultLocalGitAdapterConfig };
+export declare function createLocalGitAdapter(configOverrides?: Partial<LocalGitAdapterConfig>): {
+    adapterName: "@ai-atomic-framework/adapter-local-git";
+    defaultConfig: LocalGitAdapterConfig;
+    resolveRegistryPath: (context: LocalGitAdapterContext) => string;
+    resolveLegacyUri: (context: LocalGitAdapterContext, legacyUri: string) => ProjectAdapterLegacyUriResolution;
+    scaffold: (context: LocalGitAdapterContext) => LocalGitAdapterResult;
+    lockScope: (context: LocalGitAdapterContext, workItem: WorkItemRef, files: readonly string[]) => LocalGitAdapterResult;
+    runGate: (context: LocalGitAdapterContext, workItem: WorkItemRef) => LocalGitAdapterResult;
+    writeDocRecord: (context: LocalGitAdapterContext, workItem: WorkItemRef, summary: string) => LocalGitAdapterResult;
+    runAtomizeAdapter: (context: LocalGitAdapterContext, request: AtomizeAdapterRequest) => LocalGitAdapterResult;
+    runInfectAdapter: (context: LocalGitAdapterContext, request: InfectAdapterRequest) => LocalGitAdapterResult;
     listHostGates: () => never[];
     listNoTouchZones: () => never[];
     resolveMutationPolicy: () => {
@@ -36,8 +22,8 @@ export declare function createLocalGitAdapter(configOverrides?: {}): {
         allowUnguidedInDev: boolean;
         allowUnguidedInCI: boolean;
     };
-    writeRegistryEntry: (context: any, entry: any) => any;
-    readRegistryEntry: (context: any, entryId: any) => any;
+    writeRegistryEntry: (context: LocalGitAdapterContext, entry: LocalGitRegistryEntry) => LocalGitAdapterResult;
+    readRegistryEntry: (context: LocalGitAdapterContext, entryId: string) => LocalGitRegistryEntry | null;
 };
 export declare function createNeutralMutationPolicy(): {
     requireSession: boolean;
@@ -46,33 +32,9 @@ export declare function createNeutralMutationPolicy(): {
     allowUnguidedInDev: boolean;
     allowUnguidedInCI: boolean;
 };
-export declare function scaffoldLocalRepository(context: any, baseConfig?: Readonly<{
-    registryPath: ".atm/registry";
-    reportsPath: ".atm/history/reports";
-    dryRun: false;
-    lockMode: "noop";
-    gateMode: "noop";
-    docMode: "noop";
-}>): any;
-export declare function resolveRegistryPath(repositoryRoot: any, config?: Readonly<{
-    registryPath: ".atm/registry";
-    reportsPath: ".atm/history/reports";
-    dryRun: false;
-    lockMode: "noop";
-    gateMode: "noop";
-    docMode: "noop";
-}>): string;
-export declare function writeRegistryEntry(context: any, baseConfig: any, entry: any): any;
-export declare function readRegistryEntry(context: any, baseConfig: any, entryId: any): any;
-export declare function resolveLegacyUri(context: any, baseConfig: any, legacyUri: any): {
-    absolutePath: string;
-    exists: boolean;
-    repositoryAlias: any;
-    uri: string;
-    scheme: string;
-    relativePath: string;
-    fragment: string;
-    lineStart: number | null;
-    lineEnd: number | null;
-};
-export declare function runDryRunAdapter(behaviorId: any, context: any, baseConfig: any, request: any): any;
+export declare function scaffoldLocalRepository(context: LocalGitAdapterContext, baseConfig?: LocalGitAdapterConfig): LocalGitAdapterResult;
+export declare function resolveRegistryPath(repositoryRoot: string, config?: LocalGitAdapterConfig): string;
+export declare function writeRegistryEntry(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, entry: LocalGitRegistryEntry): LocalGitAdapterResult;
+export declare function readRegistryEntry(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, entryId: string): LocalGitRegistryEntry | null;
+export declare function resolveLegacyUri(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, legacyUri: string): ProjectAdapterLegacyUriResolution;
+export declare function runDryRunAdapter(behaviorId: string, context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, request: AtomizeAdapterRequest | InfectAdapterRequest): LocalGitAdapterResult;

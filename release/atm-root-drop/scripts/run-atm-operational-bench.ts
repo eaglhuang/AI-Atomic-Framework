@@ -27,7 +27,6 @@ function parseArgs(argv: readonly string[]): Args {
     else if (arg === '--out') out = take();
     else if (arg.startsWith('--out=')) out = arg.slice('--out='.length);
     else if (arg === '--help' || arg === '-h') {
-      // eslint-disable-next-line no-console
       console.log('Usage: run-atm-operational-bench.ts [--profile smoke|paper|extended] [--seed N] [--out DIR]');
       process.exit(0);
     } else {
@@ -55,7 +54,6 @@ const args = parseArgs(process.argv.slice(2));
 const outDir = args.out ? path.resolve(root, args.out) : defaultOutDir(args.profile, args.seed);
 const summary = runOperationalBench({ root, seed: args.seed, profile: args.profile, outDir });
 
-// eslint-disable-next-line no-console
 console.log(JSON.stringify({
   bench: summary.benchName,
   profile: summary.profile,

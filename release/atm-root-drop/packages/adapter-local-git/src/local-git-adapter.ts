@@ -2,49 +2,58 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { ArtifactRecord, EvidenceRecord, ScopeLockRecord, WorkItemRef } from '@ai-atomic-framework/core';
+import type {
+  AtomizeAdapterRequest,
+  InfectAdapterRequest,
+  ProjectAdapterLegacyUriResolution
+} from '@ai-atomic-framework/plugin-sdk';
+
 import { parseLegacyUri } from '../../core/src/registry/urn.ts';
 import { scanNeutralityText } from '../../plugin-rule-guard/src/neutrality-scanner.ts';
+import {
+  defaultLocalGitAdapterConfig,
+  type LocalGitAdapterContext,
+  type LocalGitAdapterConfig,
+  type LocalGitAdapterResult,
+  type LocalGitRegistryEntry,
+  type LocalGitAdapterMode,
+  type LocalGitAdapterOperation
+} from './index.ts';
 
 const frameworkRepositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../');
 
-export const defaultLocalGitAdapterConfig = Object.freeze({
-  registryPath: '.atm/registry',
-  reportsPath: '.atm/history/reports',
-  dryRun: false,
-  lockMode: 'noop',
-  gateMode: 'noop',
-  docMode: 'noop'
-});
+export { defaultLocalGitAdapterConfig };
 
-export function createLocalGitAdapter(configOverrides = {}) {
+export function createLocalGitAdapter(configOverrides: Partial<LocalGitAdapterConfig> = {}) {
   const defaultConfig = mergeConfig(configOverrides);
   return {
-    adapterName: '@ai-atomic-framework/adapter-local-git',
+    adapterName: '@ai-atomic-framework/adapter-local-git' as const,
     defaultConfig,
-    resolveRegistryPath: (context: any) => resolveRegistryPath(context.repositoryRoot, mergeConfig(defaultConfig, context.config)),
-    resolveLegacyUri: (context: any, legacyUri: any) => resolveLegacyUri(context, defaultConfig, legacyUri),
-    scaffold: (context: any) => scaffoldLocalRepository(context, defaultConfig),
-    lockScope: (context: any, workItem: any, files: any) => createNoopOperationResult('lock', context, defaultConfig, {
+    resolveRegistryPath: (context: LocalGitAdapterContext) => resolveRegistryPath(context.repositoryRoot, mergeConfig(defaultConfig, context.config)),
+    resolveLegacyUri: (context: LocalGitAdapterContext, legacyUri: string) => resolveLegacyUri(context, defaultConfig, legacyUri),
+    scaffold: (context: LocalGitAdapterContext) => scaffoldLocalRepository(context, defaultConfig),
+    lockScope: (context: LocalGitAdapterContext, workItem: WorkItemRef, files: readonly string[]) => createNoopOperationResult('lock', context, defaultConfig, {
       workItem,
       lockRecords: [createNoopLockRecord(context, workItem, files)],
       message: 'Scope lock recorded as a local no-op; no host lock service was required.'
     }),
-    runGate: (context: any, workItem: any) => createNoopOperationResult('gate', context, defaultConfig, {
+    runGate: (context: LocalGitAdapterContext, workItem: WorkItemRef) => createNoopOperationResult('gate', context, defaultConfig, {
       workItem,
       message: 'Gate operation completed as a no-op; project validators may be attached by a host adapter.'
     }),
-    writeDocRecord: (context: any, workItem: any, summary: any) => createNoopOperationResult('doc', context, defaultConfig, {
+    writeDocRecord: (context: LocalGitAdapterContext, workItem: WorkItemRef, summary: string) => createNoopOperationResult('doc', context, defaultConfig, {
       workItem,
       message: 'Doc operation completed as a no-op; no external documentation system was required.',
       extraEvidence: summary ? [createEvidence('handoff', summary, [])] : []
     }),
-    runAtomizeAdapter: (context: any, request: any) => runDryRunAdapter('behavior.atomize', context, defaultConfig, request),
-    runInfectAdapter: (context: any, request: any) => runDryRunAdapter('behavior.infect', context, defaultConfig, request),
+    runAtomizeAdapter: (context: LocalGitAdapterContext, request: AtomizeAdapterRequest) => runDryRunAdapter('behavior.atomize', context, defaultConfig, request),
+    runInfectAdapter: (context: LocalGitAdapterContext, request: InfectAdapterRequest) => runDryRunAdapter('behavior.infect', context, defaultConfig, request),
     listHostGates: () => [],
     listNoTouchZones: () => [],
     resolveMutationPolicy: () => createNeutralMutationPolicy(),
-    writeRegistryEntry: (context: any, entry: any) => writeRegistryEntry(context, defaultConfig, entry),
-    readRegistryEntry: (context: any, entryId: any) => readRegistryEntry(context, defaultConfig, entryId)
+    writeRegistryEntry: (context: LocalGitAdapterContext, entry: LocalGitRegistryEntry) => writeRegistryEntry(context, defaultConfig, entry),
+    readRegistryEntry: (context: LocalGitAdapterContext, entryId: string) => readRegistryEntry(context, defaultConfig, entryId)
   };
 }
 
@@ -58,7 +67,7 @@ export function createNeutralMutationPolicy() {
   };
 }
 
-export function scaffoldLocalRepository(context: any, baseConfig = defaultLocalGitAdapterConfig) {
+export function scaffoldLocalRepository(context: LocalGitAdapterContext, baseConfig = defaultLocalGitAdapterConfig) {
   const config = mergeConfig(baseConfig, context.config);
   const registryPath = resolveRegistryPath(context.repositoryRoot, config);
   const reportsPath = resolvePath(context.repositoryRoot, config.reportsPath);
@@ -77,7 +86,7 @@ export function scaffoldLocalRepository(context: any, baseConfig = defaultLocalG
     operation: 'scaffold',
     context,
     config,
-    mode: config.dryRun ? 'dry-run' : 'filesystem',
+    mode: (config.dryRun ? 'dry-run' : 'filesystem') as LocalGitAdapterMode,
     noop: false,
     messages: [
       config.dryRun
@@ -89,11 +98,11 @@ export function scaffoldLocalRepository(context: any, baseConfig = defaultLocalG
   });
 }
 
-export function resolveRegistryPath(repositoryRoot: any, config = defaultLocalGitAdapterConfig) {
+export function resolveRegistryPath(repositoryRoot: string, config = defaultLocalGitAdapterConfig) {
   return resolvePath(repositoryRoot, config.registryPath);
 }
 
-export function writeRegistryEntry(context: any, baseConfig: any, entry: any) {
+export function writeRegistryEntry(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, entry: LocalGitRegistryEntry) {
   const config = mergeConfig(baseConfig, context.config);
   const registryPath = resolveRegistryPath(context.repositoryRoot, config);
   const entryPath = path.join(registryPath, `${safeRegistryId(entry.id)}.json`);
@@ -109,7 +118,7 @@ export function writeRegistryEntry(context: any, baseConfig: any, entry: any) {
     operation: 'registry',
     context,
     config,
-    mode: config.dryRun ? 'dry-run' : 'filesystem',
+    mode: (config.dryRun ? 'dry-run' : 'filesystem') as LocalGitAdapterMode,
     noop: false,
     messages: [
       config.dryRun
@@ -121,31 +130,32 @@ export function writeRegistryEntry(context: any, baseConfig: any, entry: any) {
   });
 }
 
-export function readRegistryEntry(context: any, baseConfig: any, entryId: any) {
+export function readRegistryEntry(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, entryId: string) {
   const config = mergeConfig(baseConfig, context.config);
   const registryPath = resolveRegistryPath(context.repositoryRoot, config);
   const entryPath = path.join(registryPath, `${safeRegistryId(entryId)}.json`);
   if (!existsSync(entryPath)) {
     return null;
   }
-  return JSON.parse(readFileSync(entryPath, 'utf8'));
+  return JSON.parse(readFileSync(entryPath, 'utf8')) as LocalGitRegistryEntry;
 }
 
-export function resolveLegacyUri(context: any, baseConfig: any, legacyUri: any) {
+export function resolveLegacyUri(context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, legacyUri: string) {
   const config = mergeConfig(baseConfig, context.config);
   const parsed = parseLegacyUri(legacyUri);
   const absolutePath = parsed.relativePath
     ? resolvePath(context.repositoryRoot, parsed.relativePath)
     : path.resolve(context.repositoryRoot);
+  const configAlias = (config as unknown as Record<string, unknown>).repositoryAlias;
   return {
     ...parsed,
     absolutePath,
     exists: existsSync(absolutePath),
-    repositoryAlias: parsed.repositoryAlias || config.repositoryAlias || path.basename(context.repositoryRoot)
-  };
+    repositoryAlias: parsed.repositoryAlias || (typeof configAlias === 'string' ? configAlias : undefined) || path.basename(context.repositoryRoot)
+  } as ProjectAdapterLegacyUriResolution;
 }
 
-export function runDryRunAdapter(behaviorId: any, context: any, baseConfig: any, request: any) {
+export function runDryRunAdapter(behaviorId: string, context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, request: AtomizeAdapterRequest | InfectAdapterRequest) {
   const config = mergeConfig(baseConfig, context.config);
   const resolvedLegacyUri = resolveLegacyUri(context, config, request.legacySource);
   const inlineSource = resolveInlineSource(request, resolvedLegacyUri);
@@ -161,9 +171,9 @@ export function runDryRunAdapter(behaviorId: any, context: any, baseConfig: any,
     dryRun: true,
     applyToHostProject: false,
     hostMutationAllowed: false,
-    patchMode: 'dry-run',
+    patchMode: 'dry-run' as const,
     proposalSource: 'ATM-2-0020',
-    decompositionDecision: 'atom-extract',
+    decompositionDecision: 'atom-extract' as const,
     patchFiles: [...(request.patchFiles || [])]
   };
 
@@ -205,7 +215,7 @@ export function runDryRunAdapter(behaviorId: any, context: any, baseConfig: any,
   });
 }
 
-function createNoopOperationResult(operation: any, context: any, baseConfig: any, details: any) {
+function createNoopOperationResult(operation: LocalGitAdapterOperation, context: LocalGitAdapterContext, baseConfig: LocalGitAdapterConfig, details: { message: string; workItem?: WorkItemRef; extraEvidence?: readonly EvidenceRecord[]; lockRecords?: ScopeLockRecord[] }) {
   const config = mergeConfig(baseConfig, context.config);
   const artifactPaths: string[] = [];
   const evidence = [
@@ -226,7 +236,22 @@ function createNoopOperationResult(operation: any, context: any, baseConfig: any
   });
 }
 
-function createResult({ ok, operation, context, config, mode, dryRunOverride, noop, messages, evidence, lockRecords = [], artifacts = [], extra = {} }: any) {
+interface CreateResultOptions {
+  ok: boolean;
+  operation: LocalGitAdapterOperation;
+  context: LocalGitAdapterContext;
+  config: LocalGitAdapterConfig;
+  mode: LocalGitAdapterMode;
+  dryRunOverride?: boolean;
+  noop: boolean;
+  messages: readonly string[];
+  evidence: readonly EvidenceRecord[];
+  lockRecords?: readonly ScopeLockRecord[];
+  artifacts?: readonly ArtifactRecord[];
+  extra?: Record<string, unknown>;
+}
+
+function createResult({ ok, operation, context, config, mode, dryRunOverride, noop, messages, evidence, lockRecords = [], artifacts = [], extra = {} }: CreateResultOptions): LocalGitAdapterResult {
   return {
     adapterName: '@ai-atomic-framework/adapter-local-git',
     lifecycleMode: context.lifecycleMode || 'evolution',
@@ -244,7 +269,7 @@ function createResult({ ok, operation, context, config, mode, dryRunOverride, no
   };
 }
 
-function createNoopLockRecord(context: any, workItem: any, files: any) {
+function createNoopLockRecord(context: LocalGitAdapterContext, workItem: WorkItemRef, files: readonly string[]): ScopeLockRecord {
   return {
     workItemId: workItem.workItemId,
     lockedBy: context.actor || 'local-git-adapter',
@@ -253,15 +278,15 @@ function createNoopLockRecord(context: any, workItem: any, files: any) {
   };
 }
 
-function createEvidence(evidenceKind: any, summary: any, artifactPaths: any) {
+function createEvidence(evidenceKind: 'validation' | 'metric' | 'review' | 'handoff', summary: string, artifactPaths: readonly string[]): EvidenceRecord {
   return { evidenceKind, summary, artifactPaths };
 }
 
-function createArtifact(artifactPath: any, artifactKind: any, producedBy: any) {
+function createArtifact(artifactPath: string, artifactKind: 'snapshot' | 'log' | 'report' | 'file', producedBy: string): ArtifactRecord {
   return { artifactPath, artifactKind, producedBy };
 }
 
-function resolveInlineSource(request: any, resolvedLegacyUri: any) {
+function resolveInlineSource(request: AtomizeAdapterRequest | InfectAdapterRequest, resolvedLegacyUri: ProjectAdapterLegacyUriResolution): string {
   if (typeof request.inlineSource === 'string') {
     return request.inlineSource;
   }
@@ -271,21 +296,21 @@ function resolveInlineSource(request: any, resolvedLegacyUri: any) {
   return '';
 }
 
-function mergeConfig(...configs: any[]) {
+function mergeConfig(...configs: Array<Partial<LocalGitAdapterConfig> | undefined>): LocalGitAdapterConfig {
   return Object.freeze(Object.assign({}, defaultLocalGitAdapterConfig, ...configs));
 }
 
-function resolvePath(repositoryRoot: any, candidatePath: any) {
+function resolvePath(repositoryRoot: string, candidatePath: string): string {
   return path.isAbsolute(candidatePath)
     ? path.normalize(candidatePath)
     : path.resolve(repositoryRoot, candidatePath);
 }
 
-function relativePath(repositoryRoot: any, targetPath: any) {
+function relativePath(repositoryRoot: string, targetPath: string): string {
   const relative = path.relative(repositoryRoot, targetPath).replace(/\\/g, '/');
   return relative || '.';
 }
 
-function safeRegistryId(entryId: any) {
+function safeRegistryId(entryId: string): string {
   return String(entryId).replace(/[^a-zA-Z0-9_.-]/g, '_');
 }

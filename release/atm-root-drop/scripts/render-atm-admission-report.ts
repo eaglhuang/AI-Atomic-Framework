@@ -16,7 +16,6 @@ function parseArgs(argv: readonly string[]): Args {
     else if (arg === '--dir') dir = argv[++i];
     else if (arg.startsWith('--dir=')) dir = arg.slice('--dir='.length);
     else if (arg === '--help' || arg === '-h') {
-      // eslint-disable-next-line no-console
       console.log('Usage: render-atm-admission-report.ts [--seed N] [--dir DIR]');
       process.exit(0);
     } else {
@@ -32,5 +31,4 @@ const targetDir = args.dir
   ? path.resolve(root, args.dir)
   : path.resolve(root, `artifacts/generated/atm-admission-bench/${args.seed}-paper`);
 renderFromArtifactDir(targetDir);
-// eslint-disable-next-line no-console
 console.log(JSON.stringify({ rendered: path.relative(root, path.join(targetDir, 'paper-tables.md')).replace(/\\/g, '/') }, null, 2));

@@ -6,7 +6,7 @@
 
 - Scenario count: 8
 - Catch rate: 100% (7/7 unsafe scenarios caught)
-- Average latency: 1183675 ns per scenario (deterministic local harness)
+- Average latency: 1300525 ns per scenario (deterministic local harness)
 - Ship-safe: yes
 
 ## False-safe regressions
@@ -19,11 +19,11 @@
 
 ## Per-scenario latency (ns)
 
-- capsule-cid-drift-freeze: 75000
-- cid-conflict-blocked: 48200
-- manual-override-collision: 638000
-- orphan-lock-cleanup: 218400
-- parallel-safe-disjoint: 954400
-- physical-overlap-steward: 80900
-- read-write-dependency-freeze: 7410100
-- shared-surface-blocked: 44400
+- capsule-cid-drift-freeze: 78600
+- cid-conflict-blocked: 47100
+- manual-override-collision: 769500
+- orphan-lock-cleanup: 229300
+- parallel-safe-disjoint: 1026100
+- physical-overlap-steward: 83600
+- read-write-dependency-freeze: 8127700
+- shared-surface-blocked: 42300
