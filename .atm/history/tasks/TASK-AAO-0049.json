@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0049",
+  "title": "Default atom health test gates",
+  "status": "done",
+  "milestone": "M17",
+  "dependencies": [
+    "TASK-AAO-0048",
+    "TASK-AAO-0015",
+    "TASK-AAO-0016",
+    "TASK-AAO-0023"
+  ],
+  "acceptance": [
+    "ATM can represent the three gates in test configuration and reports.",
+    "At least one fixture proves each gate can detect a real failure.",
+    "Gates can be enabled by atom capability, policy, or plugin support.",
+    "Existing adopters are not forced to write all fixtures immediately.",
+    "Documentation explains that these gates reduce common regression risk but do not replace complete project tests."
+  ],
+  "deliverables": [
+    "A default atom health check catalog covering input immutability, side effects, and consumer contract fixtures.",
+    "Fixture format and runner support for positive and negative examples.",
+    "Report schema fields that identify which health gates ran, skipped, failed, or were not applicable.",
+    "Documentation explaining when each gate should be enabled."
+  ],
+  "scopePaths": [
+    "packages/core/src/manager/test-runner.ts",
+    "packages/core/src/test-runner/**",
+    "packages/cli/src/commands/test.ts",
+    "packages/cli/src/commands/command-specs/test.spec.ts",
+    "schemas/test-report.schema.json",
+    "schemas/governance/**",
+    "fixtures/**",
+    "tests/**",
+    "scripts/validate-test-runner.ts",
+    "scripts/validate-schemas.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "docs/ADAPTER_GUIDE.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:test-runner",
+    "npm run validate:schemas",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Making these checks mandatory for every atom type on day one.",
+    "Replacing project-specific unit, integration, end-to-end, or performance tests.",
+    "Automatically inferring every business invariant from schemas alone."
+  ],
+  "nonGoals": [
+    "Treating schema equality as complete proof of semantic correctness.",
+    "Blocking adoption in repositories that have not yet authored fixtures."
+  ],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "IMPORT_BODY_SECTION_IGNORED",
+      "severity": "warning",
+      "message": "Front-matter `deliverables` key is present; body section deliverables were ignored in favour of front-matter values.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "Recommendation: include these three checks in ATM's default basic test vocabulary, but enable them by atom type and policy. They are too valuable to leave unnamed, but too context-sensitive to force blindly.",
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0049-default-atom-health-test-gates.task.md",
+    "sectionTitle": "TASK-AAO-0049",
+    "headingLine": 61,
+    "hash": "996facd12f80f5c1"
+  },
+  "importedAt": "2026-06-29T11:10:58.996Z",
+  "lastTransitionId": "2026-06-29T12-05-06-420Z-close-88f185a7ae6b",
+  "lastTransitionAt": "2026-06-29T12:05:06.420Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-29T11:58:51.514Z",
+  "promotedAt": "2026-06-29T11:58:51.516Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-0b2bcf96c932",
+    "claimedAt": "2026-06-29T11:58:51.520Z",
+    "heartbeatAt": "2026-06-29T12:05:06.418Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0049.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ADAPTER_GUIDE.md",
+      "fixtures/**",
+      "packages/cli/src/commands/command-specs/test.spec.ts",
+      "packages/cli/src/commands/test.ts",
+      "packages/core/src/manager/test-runner.ts",
+      "packages/core/src/test-runner/**",
+      "schemas/governance/**",
+      "schemas/test-report.schema.json",
+      "scripts/validate-schemas.ts",
+      "scripts/validate-test-runner.ts",
+      "tests/**"
+    ],
+    "state": "released",
+    "reason": "TASK-AAO-0049 deliverables landed in shared TASK-AAO-0048 historical delivery commit because the default health gates, fixture coverage, and report schema shipped together with linked governance/test-runner surfaces; 0049 consumes the in-scope subset and accepts the extra linked-source context as shared delivery."
+  },
+  "startedAt": "2026-06-29T11:58:51.520Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260629115851-codex-gpt-5.4-mini-TASK-AAO-0049-5376aff0dd",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0049",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0049.*",
+      ".atm/history/task-events/TASK-AAO-0049/**",
+      ".atm/history/tasks/TASK-AAO-0049.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/ADAPTER_GUIDE.md",
+      "fixtures/**",
+      "packages/cli/src/commands/command-specs/test.spec.ts",
+      "packages/cli/src/commands/test.ts",
+      "packages/core/src/manager/test-runner.ts",
+      "packages/core/src/test-runner/**",
+      "schemas/governance/**",
+      "schemas/test-report.schema.json",
+      "scripts/validate-schemas.ts",
+      "scripts/validate-test-runner.ts",
+      "tests/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "03f4d78f6aca9803fea7f9b86457e05ef150f7d604f52b47afa2d7859ee22631",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-29T11:58:51.804Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-29T12:05:06.418Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260629115851-codex-gpt-5.4-mini-TASK-AAO-0049-5376aff0dd",
+  "closeReason": "TASK-AAO-0049 deliverables landed in shared TASK-AAO-0048 historical delivery commit because the default health gates, fixture coverage, and report schema shipped together with linked governance/test-runner surfaces; 0049 consumes the in-scope subset and accepts the extra linked-source context as shared delivery.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0049.closure-packet.json"
+}

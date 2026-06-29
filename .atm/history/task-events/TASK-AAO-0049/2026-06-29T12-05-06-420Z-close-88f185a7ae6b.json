@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T12-05-06-420Z-close-88f185a7ae6b",
+  "taskId": "TASK-AAO-0049",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260629115851-codex-gpt-5.4-mini-TASK-AAO-0049-5376aff0dd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0049.json",
+  "taskSha256": "sha256:833559db73a440cb64dcd90f2a71b4866cd51cee09397561fe3b7132756e3b5b",
+  "createdAt": "2026-06-29T12:05:06.420Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0049 --actor codex-gpt-5.4-mini --status done --historical-delivery 3a60f13e5c9d3e906243290033f8fa844fb292ae",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260629115851-codex-gpt-5.4-mini-TASK-AAO-0049-5376aff0dd",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0049.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas",
+      "validate:test-runner"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-29T12:05:06.415Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0049.*",
+        ".atm/history/task-events/TASK-AAO-0049/**",
+        ".atm/history/tasks/TASK-AAO-0049.json",
+        "A default atom health check catalog covering input immutability, side effects, and consumer contract fixtures.",
+        "atm-agent-first-operability/tasks/TASK-AAO-0049-default-atom-health-test-gates.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/ADAPTER_GUIDE.md",
+        "Documentation explaining when each gate should be enabled.",
+        "Fixture format and runner support for positive and negative examples.",
+        "fixtures/**",
+        "packages/cli/src/commands/command-specs/test.spec.ts",
+        "packages/cli/src/commands/test.ts",
+        "packages/core/src/manager/test-runner.ts",
+        "packages/core/src/test-runner/**",
+        "Report schema fields that identify which health gates ran, skipped, failed, or were not applicable.",
+        "schemas/governance/**",
+        "schemas/test-report.schema.json",
+        "scripts/validate-schemas.ts",
+        "scripts/validate-test-runner.ts",
+        "tests/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/test.spec.ts",
+        "packages/cli/src/commands/test.ts",
+        "packages/core/src/manager/test-runner.ts",
+        "packages/core/src/test-runner/**",
+        "schemas/governance/**",
+        "schemas/test-report.schema.json",
+        "scripts/validate-schemas.ts",
+        "scripts/validate-test-runner.ts",
+        "tests/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
