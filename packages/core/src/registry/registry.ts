@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { isRegistryEntryStatus, isRegistryGovernanceTier, registryGovernanceTiers } from './status-machine.ts';
 import { createSourceHashSnapshot, normalizeSourcePathList } from '../hash-lock/hash-lock.ts';
-import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
+import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint, type SemanticFingerprintPortRecord } from './semantic-fingerprint.ts';
 import { migrateRegistryStatus } from './status-migration.ts';
 import { resolveAtomWorkbenchPath } from '../manager/atom-space.ts';
 import { writeRegistryCatalogFile } from './registry-catalog.ts';
@@ -25,11 +25,11 @@ interface NormalizedModel {
   source: { specPath: string; schemaPath?: string };
   hashLock: Record<string, unknown>;
   governance?: { semanticFingerprint?: unknown };
-  ports?: { inputs?: unknown[]; outputs?: unknown[] };
+  ports?: { inputs?: SemanticFingerprintPortRecord[]; outputs?: SemanticFingerprintPortRecord[] };
   execution: {
     language?: { primary?: string | null };
     validation?: { evidenceRequired?: boolean };
-    performanceBudget?: unknown;
+    performanceBudget?: Readonly<Record<string, unknown>> | null;
     compatibility: {
       coreVersion: string;
       registryVersion: string;
@@ -226,7 +226,7 @@ export function writeRegistryArtifacts(registryDocument: Record<string, unknown>
       title: options.catalogTitle,
       sourceOfTruthLabel: options.sourceOfTruthLabel
     });
-    result.catalogPath = catalogResult.catalogPath;
+    result.catalogPath = catalogResult.catalogPath ?? null;
   }
 
   return result;
