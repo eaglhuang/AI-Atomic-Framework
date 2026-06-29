@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync 
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
 import { quoteForShell, detectAutoLinkedValidator } from '../packages/cli/src/commands/evidence.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
@@ -880,6 +881,42 @@ try {
   assert(integrationDriftRemediation.failedAdapters[0].verifyCommand === 'node atm.mjs integration verify cursor --json', 'doctor integration drift remediation must report exact verify command');
   assert(integrationDriftRemediation.failedAdapters[0].reinstallCommand === 'node atm.mjs integration add cursor --force --json', 'doctor integration drift remediation must report exact reinstall command');
   assert(integrationDriftRemediation.failedAdapters[0].removeCommand === 'node atm.mjs integration remove cursor --json', 'doctor integration drift remediation must report exact remove command');
+
+  const staleIntegrationRepo = path.join(tempRoot, 'stale-integration-repo');
+  mkdirSync(staleIntegrationRepo, { recursive: true });
+  const staleClaudeAdd = await runAtm(['integration', 'add', 'claude-code', '--cwd', staleIntegrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], staleIntegrationRepo);
+  assert(staleClaudeAdd.exitCode === 0, 'stale parity fixture must install claude-code');
+  const staleCodexAdd = await runAtm(['integration', 'add', 'codex', '--cwd', staleIntegrationRepo, '--actor', 'validate-cli', '--at', '2026-01-01T00:00:00.000Z'], staleIntegrationRepo);
+  assert(staleCodexAdd.exitCode === 0, 'stale parity fixture must install codex');
+  const staleSkillPath = path.join(staleIntegrationRepo, '.claude/skills/atm-next/SKILL.md');
+  const staleSkillContent = `${readFileSync(staleSkillPath, 'utf8')}\n# stale parity fixture\n`;
+  writeFileSync(staleSkillPath, staleSkillContent, 'utf8');
+  const staleManifestPath = path.join(staleIntegrationRepo, '.atm/integrations/claude-code.manifest.json');
+  const staleManifest = JSON.parse(readFileSync(staleManifestPath, 'utf8'));
+  const staleManifestFile = staleManifest.files.find((entry: any) => entry.path === '.claude/skills/atm-next/SKILL.md');
+  assert(staleManifestFile, 'stale parity fixture must find claude-code atm-next record');
+  staleManifestFile.sha256 = `sha256:${createHash('sha256').update(staleSkillContent).digest('hex')}`;
+  staleManifestFile.sizeBytes = Buffer.byteLength(staleSkillContent, 'utf8');
+  writeJson(staleManifestPath, staleManifest);
+
+  const staleIntegrationVerify = await runAtm(['integration', 'verify', 'claude-code', '--cwd', staleIntegrationRepo], staleIntegrationRepo);
+  assert(staleIntegrationVerify.exitCode === 1, 'integration verify must fail when manifest is self-consistent but stale against current source');
+  assertReadable(staleIntegrationVerify, 'integration');
+  assert(staleIntegrationVerify.parsed.ok === false, 'integration verify must report ok=false for stale parity fixture');
+  assert(staleIntegrationVerify.parsed.evidence.status === 'stale', 'integration verify must classify source parity mismatch as stale');
+  assert(staleIntegrationVerify.parsed.evidence.driftedFiles.includes('.claude/skills/atm-next/SKILL.md'), 'integration verify stale parity fixture must report changed file');
+  assertMessageCode(staleIntegrationVerify, 'ATM_INTEGRATION_VERIFY_STALE');
+
+  const staleIntegrationDoctor = await runAtm(['doctor', '--cwd', staleIntegrationRepo], staleIntegrationRepo);
+  assert(staleIntegrationDoctor.exitCode === 1, 'doctor must fail when installed adapters lose parity with current source snapshot');
+  assertReadable(staleIntegrationDoctor, 'doctor');
+  const staleIntegrationCheck = staleIntegrationDoctor.parsed.evidence.checks.find((check: any) => check.name === 'integration-adapters');
+  assert(staleIntegrationCheck.ok === false, 'doctor integration-adapters check must fail for stale parity fixture');
+  const staleFailedAdapter = staleIntegrationCheck.details.failed.find((entry: any) => entry.adapterId === 'claude-code');
+  assert(staleFailedAdapter?.status === 'stale', 'doctor integration-adapters check must classify stale source parity explicitly');
+  assert(staleFailedAdapter?.driftedFiles.includes('.claude/skills/atm-next/SKILL.md'), 'doctor stale parity fixture must report stale file path');
+  const staleRemediation = staleIntegrationDoctor.parsed.evidence.integrationDriftRemediation;
+  assert(staleRemediation.failedAdapters.some((entry: any) => entry.adapterId === 'claude-code' && entry.reinstallCommand === 'node atm.mjs integration add claude-code --force --json'), 'doctor stale parity remediation must keep precise reinstall command');
 
   const validSpecPath = path.join(root, fixture.validAtomicSpec);
   const validateSpec = await runAtm(['validate', '--spec', validSpecPath], blankRepo);

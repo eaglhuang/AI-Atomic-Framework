@@ -42,6 +42,7 @@ export declare function checkIntegrationHealth(repositoryRoot: string): Promise<
         adapterId: any;
         findings: any;
         driftedFiles: any;
+        staleFields: any;
     }[];
     failed: {
         ok: boolean;
@@ -50,6 +51,7 @@ export declare function checkIntegrationHealth(repositoryRoot: string): Promise<
         adapterId: any;
         findings: any;
         driftedFiles: any;
+        staleFields: any;
     }[];
 }>;
 export declare function inspectIntegrationBootstrap(repositoryRoot: string): {

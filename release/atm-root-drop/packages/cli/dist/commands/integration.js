@@ -280,8 +280,7 @@ export async function runIntegration(argv) {
     if (action === 'verify') {
         const adapter = createIntegrationAdapter(requireAdapterId(adapterId, action));
         const manifestPath = manifestPathForIntegration(adapter.id);
-        const manifest = readIntegrationManifest(cwd, adapter.id);
-        const verifyReport = await resolveValue(adapter.verify(createIntegrationContext(cwd, adapter, {}), manifest));
+        const verifyReport = await verifyInstalledManifest(cwd, manifestPath, adapter);
         const hookVerifyReport = adapter.id === 'copilot' || adapter.id === 'claude-code'
             ? (await loadIntegrationHooks()).verifyEditorIntegrationHooks(cwd, adapter.id)
             : null;
@@ -293,14 +292,18 @@ export async function runIntegration(argv) {
             messages: [
                 ok
                     ? message('info', 'ATM_INTEGRATION_VERIFY_OK', `Integration adapter ${adapter.id} matches its manifest.`)
-                    : message('error', 'ATM_INTEGRATION_VERIFY_DRIFT', `Integration adapter ${adapter.id} has manifest drift.`)
+                    : message('error', verifyReport.status === 'stale' ? 'ATM_INTEGRATION_VERIFY_STALE' : 'ATM_INTEGRATION_VERIFY_DRIFT', verifyReport.status === 'stale'
+                        ? `Integration adapter ${adapter.id} is behind the current integration source snapshot.`
+                        : `Integration adapter ${adapter.id} has manifest drift.`)
             ],
             evidence: {
                 action,
                 adapter: describeAdapter(adapter, cwd),
                 manifestPath,
+                status: verifyReport.status,
                 findings: verifyReport.findings,
                 driftedFiles: verifyReport.driftedFiles,
+                staleFields: verifyReport.staleFields,
                 hookVerifyReport
             }
         });
@@ -505,15 +508,88 @@ async function verifyManifestFile(repositoryRoot, entryName) {
         });
     }
     const adapter = createIntegrationAdapter(manifest.adapterId);
+    return verifyInstalledManifest(repositoryRoot, manifestPath, adapter, manifest);
+}
+async function verifyInstalledManifest(repositoryRoot, manifestPath, adapter, preloadedManifest) {
+    const manifest = preloadedManifest ?? readIntegrationManifest(repositoryRoot, adapter.id);
     const verifyReport = await resolveValue(adapter.verify(createIntegrationContext(repositoryRoot, adapter, {}), manifest));
+    if (!verifyReport.ok) {
+        return createManifestHealthReport({
+            ok: false,
+            status: 'drift',
+            manifestPath,
+            adapterId: adapter.id,
+            findings: verifyReport.findings,
+            driftedFiles: verifyReport.driftedFiles,
+            staleFields: []
+        });
+    }
+    const dryRunInstall = await resolveValue(adapter.install(createIntegrationContext(repositoryRoot, adapter, { dryRun: true })));
+    const parity = compareManifestParity(manifest, dryRunInstall.manifest);
+    if (!parity.ok) {
+        return createManifestHealthReport({
+            ok: false,
+            status: 'stale',
+            manifestPath,
+            adapterId: adapter.id,
+            findings: [
+                ...verifyReport.findings,
+                {
+                    level: 'error',
+                    code: 'source-parity-mismatch',
+                    path: manifestPath,
+                    message: 'Installed manifest is self-consistent but does not match the current integration source snapshot.'
+                }
+            ],
+            driftedFiles: parity.changedFiles,
+            staleFields: parity.changedFields
+        });
+    }
     return createManifestHealthReport({
-        ok: verifyReport.ok,
-        status: verifyReport.ok ? 'ok' : 'drift',
+        ok: true,
+        status: 'ok',
         manifestPath,
         adapterId: adapter.id,
         findings: verifyReport.findings,
-        driftedFiles: verifyReport.driftedFiles
+        driftedFiles: [],
+        staleFields: []
     });
+}
+function compareManifestParity(installed, expected) {
+    const changedFiles = new Set();
+    const changedFields = [];
+    if (installed.adapterVersion !== expected.adapterVersion) {
+        changedFields.push('adapterVersion');
+    }
+    if (installed.targetDir !== expected.targetDir) {
+        changedFields.push('targetDir');
+    }
+    const installedMetadata = JSON.stringify(installed.metadata ?? {});
+    const expectedMetadata = JSON.stringify(expected.metadata ?? {});
+    if (installedMetadata !== expectedMetadata) {
+        changedFields.push('metadata');
+    }
+    const installedFiles = new Map(installed.files.map((entry) => [entry.path, entry]));
+    const expectedFiles = new Map(expected.files.map((entry) => [entry.path, entry]));
+    for (const filePath of new Set([...installedFiles.keys(), ...expectedFiles.keys()])) {
+        const installedFile = installedFiles.get(filePath) ?? null;
+        const expectedFile = expectedFiles.get(filePath) ?? null;
+        if (!installedFile || !expectedFile) {
+            changedFiles.add(filePath);
+            continue;
+        }
+        if (installedFile.sha256 !== expectedFile.sha256
+            || installedFile.sizeBytes !== expectedFile.sizeBytes
+            || installedFile.source !== expectedFile.source
+            || installedFile.fileFormat !== expectedFile.fileFormat) {
+            changedFiles.add(filePath);
+        }
+    }
+    return {
+        ok: changedFields.length === 0 && changedFiles.size === 0,
+        changedFields,
+        changedFiles: [...changedFiles].sort((left, right) => left.localeCompare(right))
+    };
 }
 function createManifestHealthReport(input) {
     return {
@@ -522,7 +598,8 @@ function createManifestHealthReport(input) {
         manifestPath: input.manifestPath,
         adapterId: input.adapterId,
         findings: input.findings,
-        driftedFiles: input.driftedFiles
+        driftedFiles: input.driftedFiles,
+        staleFields: Array.isArray(input.staleFields) ? input.staleFields : []
     };
 }
 function readIntegrationManifest(repositoryRoot, adapterId) {
