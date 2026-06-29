@@ -37,6 +37,15 @@ function listExistingFilesRecursively(root, relativeDirectory) {
     }
     return files;
 }
+function listCurrentTaskGovernanceFiles(root, taskId) {
+    const taskFiles = [
+        `.atm/history/tasks/${taskId}.json`,
+        `.atm/history/evidence/${taskId}.json`,
+        `.atm/history/evidence/${taskId}.closure-packet.json`
+    ].filter((filePath) => existsSync(path.join(root, filePath)));
+    const taskEvents = listExistingFilesRecursively(root, `.atm/history/task-events/${taskId}`);
+    return uniqueSorted([...taskFiles, ...taskEvents]);
+}
 function tryGitScalar(cwd, args) {
     try {
         return execFileSync('git', [...args], {
@@ -403,6 +412,7 @@ export function buildTaskflowCommitBundle(input) {
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
     const backendGovernanceFiles = input.backendResult
         ? [
+            ...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId),
             ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
             ...extractBackendStageFiles(input.backendResult)
         ]

@@ -50,6 +50,24 @@ writeJson(path.join(targetRepo, '.atm/history/evidence/TASK-BUNDLE-0001.closure-
     schemaId: 'atm.closurePacket.v1',
     taskId: 'TASK-BUNDLE-0001'
 });
+writeJson(path.join(targetRepo, '.atm/history/evidence/TASK-BUNDLE-0001.json'), {
+    schemaId: 'atm.taskEvidence.v1',
+    taskId: 'TASK-BUNDLE-0001'
+});
+writeJson(path.join(targetRepo, '.atm/history/task-events/TASK-BUNDLE-0001/import.json'), {
+    schemaId: 'atm.taskTransition.v1',
+    taskId: 'TASK-BUNDLE-0001',
+    transitionId: 'import-1',
+    action: 'import',
+    command: 'node atm.mjs tasks import --from docs/tasks/TASK-BUNDLE-0001.task.md --write --json'
+});
+writeJson(path.join(targetRepo, '.atm/history/task-events/TASK-BUNDLE-0001/claim.json'), {
+    schemaId: 'atm.taskTransition.v1',
+    taskId: 'TASK-BUNDLE-0001',
+    transitionId: 'claim-1',
+    action: 'claim',
+    command: 'node atm.mjs next --claim --task TASK-BUNDLE-0001 --actor validator --json'
+});
 const backendBundle = buildTaskflowCommitBundle({
     cwd: targetRepo,
     taskId: 'TASK-BUNDLE-0001',
@@ -67,6 +85,9 @@ const backendBundle = buildTaskflowCommitBundle({
     }
 });
 assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/tasks/TASK-BUNDLE-0001.json'), 'post-close bundle must stage task governance files once backend close artifacts exist');
+assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/evidence/TASK-BUNDLE-0001.json'), 'post-close bundle must stage same-task evidence bundle');
+assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/task-events/TASK-BUNDLE-0001/import.json'), 'post-close bundle must stage pre-close import history for the same task');
+assert.ok(backendBundle.targetRepo.stageFiles.includes('.atm/history/task-events/TASK-BUNDLE-0001/claim.json'), 'post-close bundle must stage pre-close claim history for the same task');
 const autoCommitTaskId = 'TASK-BUNDLE-0002';
 const autoTargetRepo = path.join(tempRoot, 'target-auto');
 const autoPlanningRepo = path.join(tempRoot, 'planning-auto');
