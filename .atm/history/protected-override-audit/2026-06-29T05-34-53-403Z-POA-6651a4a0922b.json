@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-6651a4a0922b",
+  "recordedAt": "2026-06-29T05:34:53.403Z",
+  "actorId": "codex-gpt-5.4-mini",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5.4-mini --message \"chore(governance): reconcile AAO emergency closeout bundle\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-2d36148313",
+  "reason": "Commit previously approved multi-task AAO reconcile bundle plus TASK-AAO-0029 stale governance-state repair through the audited hook-bypass lane.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-06-29T05-34-53-401Z-EMG-GLOBAL-2d36148313.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
