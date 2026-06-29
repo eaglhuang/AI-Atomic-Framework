@@ -154,11 +154,20 @@ try {
   const pluginParsed = parseAtomicSpecFile(fixture.pluginCase.specPath, { cwd: tempRoot });
   check(pluginParsed.ok === true, 'plugin fixture spec must parse before running tests');
   const pluginResult = await runAtomicTestRunnerExtended(pluginParsed.normalizedModel!, {
-    repositoryRoot: tempRoot
+    repositoryRoot: tempRoot,
+    profile: 'quick',
+    suite: 'host-integration'
   });
   check(pluginResult.ok === true, 'plugin fixture must succeed');
   check(pluginResult.commandResults[0]?.command === fixture.pluginCase.expectedCommand, 'plugin fixture must preserve plugin-provided command');
+  check(pluginResult.runnerContract.profile === 'quick', 'plugin fixture runner contract must preserve requested profile');
+  check(pluginResult.runnerContract.suite === 'host-integration', 'plugin fixture runner contract must preserve requested suite');
+  check(pluginResult.commandResults[0]?.key === 'integration.host.fixture.pass', 'plugin fixture must preserve catalog-style command key');
+  check(pluginResult.commandResults[0]?.family === 'host-integration', 'plugin fixture must preserve catalog-style command family');
+  check(pluginResult.commandResults[0]?.dedupeKeys?.[0] === 'integration:host:fixture', 'plugin fixture must preserve command dedupe key');
   check(pluginResult.pluginRuns?.[0]?.pluginId === 'fixture-plugin', 'plugin fixture must report plugin identity');
+  check(pluginResult.pluginRuns?.[0]?.requestedProfile === 'quick', 'plugin fixture must report requested profile');
+  check(pluginResult.pluginRuns?.[0]?.requestedSuite === 'host-integration', 'plugin fixture must report requested suite');
 
   const gatePassParsed = parseAtomicSpecFile(fixture.gatePassCase.specPath, { cwd: tempRoot });
   check(gatePassParsed.ok === true, 'gate pass fixture spec must parse before running tests');

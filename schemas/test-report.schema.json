@@ -177,6 +177,12 @@
         "evidenceRequired": {
           "type": "boolean"
         },
+        "profile": {
+          "enum": ["quick", "standard", "full"]
+        },
+        "suite": {
+          "type": ["string", "null"]
+        },
         "commands": {
           "type": "array",
           "items": {
@@ -218,6 +224,28 @@
         },
         "suite": {
           "type": ["string", "null"]
+        },
+        "key": {
+          "type": ["string", "null"]
+        },
+        "family": {
+          "type": ["string", "null"]
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "enum": ["quick", "standard", "full"]
+          }
+        },
+        "dedupeKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "costBudgetMs": {
+          "type": ["integer", "null"],
+          "minimum": 0
         },
         "summary": {
           "type": ["string", "null"]
@@ -265,6 +293,28 @@
         },
         "suite": {
           "type": ["string", "null"]
+        },
+        "key": {
+          "type": ["string", "null"]
+        },
+        "family": {
+          "type": ["string", "null"]
+        },
+        "tiers": {
+          "type": "array",
+          "items": {
+            "enum": ["quick", "standard", "full"]
+          }
+        },
+        "dedupeKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "costBudgetMs": {
+          "type": ["integer", "null"],
+          "minimum": 0
         },
         "summary": {
           "type": ["string", "null"]

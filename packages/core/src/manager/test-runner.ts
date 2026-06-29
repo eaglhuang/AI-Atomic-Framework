@@ -13,6 +13,7 @@ import type {
   TestRunnerCommand,
   TestRunnerOutcomeStatus,
   TestRunnerPlugin,
+  TestRunnerProfile,
   TestRunnerPluginReference
 } from '../../../plugin-sdk/src/test-runner.ts';
 
@@ -134,7 +135,9 @@ export async function runAtomicTestRunnerExtended(normalizedModel: any, options:
   const contractData = await createExtendedRunnerContract(normalizedModel, {
     repositoryRoot,
     runnerConfig,
-    plugins
+    plugins,
+    profile: normalizeRunnerProfile(options.profile),
+    suite: normalizeSuiteOption(options.suite)
   });
   const executeCommand = options.executeCommand ?? defaultExecuteCommand;
   const commandResults = contractData.commands.map((commandContract: any) => {
@@ -350,6 +353,8 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
   repositoryRoot: string;
   runnerConfig?: AtomicTestRunnerConfig | null;
   plugins?: TestRunnerPlugin[];
+  profile?: TestRunnerProfile;
+  suite?: string | null;
 }) {
   const includeLegacyCommands = options.runnerConfig?.legacyValidation?.includeCommands !== false;
   const legacyCommands = includeLegacyCommands
@@ -362,7 +367,9 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
       repositoryRoot: options.repositoryRoot,
       specPath: normalizedModel.source?.specPath ?? null,
       atomId: normalizedModel.identity.atomId,
-      normalizedModel
+      normalizedModel,
+      profile: options.profile,
+      suite: options.suite
     });
     const supported = typeof support === 'boolean'
       ? support
@@ -382,9 +389,15 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
       repositoryRoot: options.repositoryRoot,
       specPath: normalizedModel.source?.specPath ?? null,
       atomId: normalizedModel.identity.atomId,
-      normalizedModel
+      normalizedModel,
+      profile: options.profile,
+      suite: options.suite,
+      pluginOptions: (options.runnerConfig?.plugins ?? []).find((reference) => reference.pluginId === plugin.pluginId)?.options
     });
-    const commands = (plan.commands ?? []).map((entry) => ({
+    const commands = filterPluginCommands(plan.commands ?? [], {
+      profile: options.profile,
+      suite: options.suite
+    }).map((entry) => ({
       ...entry,
       required: entry.required !== false
     }));
@@ -393,6 +406,11 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
       status: commands.length > 0 ? 'planned' : 'not_applicable',
       commandCount: commands.length,
       suites: plan.suites ?? [],
+      requestedProfile: options.profile ?? null,
+      requestedSuite: options.suite ?? null,
+      family: plan.family ?? null,
+      dedupeKeys: plan.dedupeKeys ?? [],
+      costBudgetMs: plan.costBudgetMs ?? null,
       evidenceSummary: plan.evidenceSummary ?? null
     });
     pluginCommands.push(...commands);
@@ -404,11 +422,39 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
     runnerContract: {
       executionMode: 'delegated',
       evidenceRequired: normalizedModel.execution.validation.evidenceRequired === true,
+      profile: options.profile ?? 'standard',
+      suite: options.suite ?? null,
       commands: [...legacyCommands, ...pluginCommands],
       plugins: pluginRuns,
       gates: describeConfiguredGates(options.runnerConfig?.defaultGates ?? null)
     }
   };
+}
+
+function filterPluginCommands(commands: TestRunnerCommand[], options: { profile?: TestRunnerProfile; suite?: string | null }) {
+  return commands.filter((command) => {
+    if (options.profile && Array.isArray(command.tiers) && command.tiers.length > 0 && !command.tiers.includes(options.profile)) {
+      return false;
+    }
+    if (options.suite) {
+      const suite = String(command.suite ?? command.family ?? command.key ?? '');
+      if (suite !== options.suite) return false;
+    }
+    return true;
+  });
+}
+
+function normalizeRunnerProfile(value: unknown): TestRunnerProfile {
+  const text = String(value ?? '').toLowerCase();
+  if (text === 'quick' || text === 'standard' || text === 'full') {
+    return text;
+  }
+  return 'standard';
+}
+
+function normalizeSuiteOption(value: unknown): string | null {
+  const text = String(value ?? '').trim();
+  return text || null;
 }
 
 async function loadConfiguredPlugins(references: TestRunnerPluginReference[], configPath: string | null) {
