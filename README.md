@@ -15,13 +15,13 @@
 [![Evidence First](https://img.shields.io/badge/Evidence-First-ef4444.svg)](#safety-model)
 [![Agent Ready](https://img.shields.io/badge/Agent-Ready-8b5cf6.svg)](#for-ai-agents)
 
-ATM helps people and AI agents work in the same repo without making a mess.
+ATM helps people and AI agents work in the same repo without turning coordination into guesswork.
 
-It tells the agent what to do next, keeps changes inside the right scope, and leaves clear proof of what changed and what passed.
+It gives agents a friendly governed entrypoint: an agent-native skill or integration reads the user's intent, calls ATM functions or wrappers, and lets the CLI execute deterministic routing, scope, evidence, and handoff commands. Humans can still use the CLI directly, but agents no longer need to improvise the workflow from memory.
 
-It is not another chat agent or workflow app. It is the safety layer around AI-assisted engineering.
+It is not another chat agent or workflow app. It is the safety layer around AI-assisted engineering: skill-guided for agents, function-mediated for tools, and CLI-backed for durable evidence.
 
-> For AI agents: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json`. Use `node atm.mjs next --json` only when there is no user prompt.
+> For AI agents: read this README, use the repo-local ATM skill or integration when available, then route the user request to `node atm.mjs next --prompt "<current user prompt>" --json`. Use `node atm.mjs next --json` only when there is no user prompt.
 
 Captain/dispatch entry gate: if the user asks for Captain, Coordinator,
 dispatch, task cards, sidecars, subagents, delegation, condition review, or
@@ -51,7 +51,8 @@ ATM is not just an atom runner. It is the route, scope, evidence, close, and han
 
 | Capability | What it provides |
 | --- | --- |
-| Deterministic routing | `atm next` recommends the official next action for a real user request. |
+| Skill-guided entry | Repo-local skills and agent entry files translate natural requests into the governed ATM route. |
+| Deterministic routing | `atm next` recommends the official next action for a real user request, including the playbook to follow before editing or committing. |
 | Scope control | Locks file, package, or capability scope before mutation. |
 | Evidence-first validation | `evidence run` turns guards, tests, reports, and logs into durable command-backed evidence instead of terminal noise. |
 | First-touch onboarding | `atm welcome`, ATMChart, and agent integrations make the local route discoverable. |
@@ -61,9 +62,47 @@ ATM is not just an atom runner. It is the route, scope, evidence, close, and han
 
 ## 60-Second Start
 
-> New to ATM? Start with [docs/ATM_NEW_USER_WORKFLOW.md](docs/ATM_NEW_USER_WORKFLOW.md) for the 7-step normal workflow before diving into the bootstrap routes below.
+> New to ATM? The shortest path is now skill-first: install or open an ATM-enabled repository, tell the agent what you want, and let its repo-local skill call ATM before edits begin. The CLI remains the evidence-backed execution layer under that friendly surface.
 
-### Quick Verify for the Paper Evidence
+### 30-second agent path
+
+In an ATM-enabled repository, give the agent one instruction:
+
+```text
+Read the repository entry guidance, then route this request through ATM before editing.
+```
+
+The agent integration should call the repo-local skill, the skill should call ATM's function or command wrapper, and the wrapper should end at:
+
+```bash
+node atm.mjs next --prompt "<current user prompt>" --json
+```
+
+Read `evidence.nextAction.playbook`, follow the returned scope, run the focused validator, and preserve the evidence before committing.
+
+### 60-second human path
+
+If you are driving ATM yourself:
+
+```bash
+git clone https://github.com/eaglhuang/AI-Atomic-Framework
+cd AI-Atomic-Framework
+npm install
+node atm.mjs welcome --json
+node atm.mjs next --prompt "inspect this repository and suggest the next safe action" --json
+```
+
+For a downstream project starter:
+
+```bash
+npx create-atm test-app --agent claude-code
+cd test-app
+node atm.mjs welcome --json
+```
+
+`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the selected agent integration. Omit `--agent` to initialize only the governed ATM project and rule chart.
+
+### Quick verify for the paper evidence
 
 ```bash
 git clone https://github.com/eaglhuang/AI-Atomic-Framework
@@ -73,14 +112,6 @@ npm install
 npm test -- broker/decision
 npm run bench:admission:paper -- --seed 20260625
 ```
-
-### Start a new governed project
-
-```bash
-npx create-atm test-app --agent claude-code
-```
-
-`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the selected agent integration. Omit `--agent` to initialize only the governed ATM project and rule chart.
 
 ### Add ATM to an existing repository
 
@@ -92,24 +123,24 @@ Use one official distribution:
 | `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
 | npm `create-atm` | You want the lowest-friction starter route. |
 
-The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route user-requested governed work.
+The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let the local skill or integration call `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested governed work.
 
 The release-bundle root-drop bootstrap workflow keeps that entry route portable for repositories that prefer a checked-in distribution over an npm starter.
 
-### Give the agent one instruction
+### Give the agent one fallback instruction
 
 ```text
 Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
 ```
 
-The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
+The skill-first path is preferred when an integration exists. This fallback instruction keeps the same governance route visible for agents, shells, and editors that do not yet expose the friendly skill wrapper.
 
 ## For AI Agents
 
 When you enter an ATM repository for user-requested work:
 
 1. Read the repository entry guidance.
-2. Run `node atm.mjs next --prompt "<current user prompt>" --json`.
+2. Use the repo-local skill or integration when available; it should call ATM's wrapper and end at `node atm.mjs next --prompt "<current user prompt>" --json`.
 3. Read `evidence.nextAction.playbook` before editing, closing, or committing.
 4. Edit only within the allowed scope returned by ATM.
 5. Run the smallest relevant validators and preserve the resulting evidence.
@@ -125,7 +156,9 @@ Important details for this framework repository:
 
 ```mermaid
 flowchart LR
-    Goal["Human or agent goal"] --> Next["atm next --prompt"]
+    Goal["Human or agent goal"] --> Skill["agent skill / integration"]
+    Skill --> Wrapper["ATM function or command wrapper"]
+    Wrapper --> Next["atm next --prompt"]
     Next --> Ready{"ATM ready?"}
     Ready -- "not yet" --> Bootstrap["bootstrap / init / welcome"]
     Ready -- "yes" --> Lock["lock scope"]
