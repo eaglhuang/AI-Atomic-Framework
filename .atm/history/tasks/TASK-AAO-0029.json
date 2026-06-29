@@ -2,16 +2,16 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0029",
   "title": "Low-level task lifecycle deprecation",
-  "status": "planned",
+  "status": "done",
   "milestone": "M9",
   "dependencies": [
     "TASK-AAO-0014",
     "TASK-AAO-0028"
   ],
   "acceptance": [
-    "help/spec 標示 low-level lifecycle intended audience。",
-    "README/integrations 不再推薦手動 loop。",
-    "maintainer escape hatch 保留。"
+    "help/spec must explain the intended audience for low-level lifecycle surfaces",
+    "README and integrations must route AI-facing claim flow through next --claim",
+    "maintainer-only legacy override remains available with explicit audit trace"
   ],
   "deliverables": [
     "docs/DEPRECATIONS.md",
@@ -23,7 +23,8 @@
     "packages/cli/src/commands/command-specs/tasks.spec.ts",
     "docs/DEPRECATIONS.md",
     "README.md",
-    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "scripts/validate-governance-commands.ts"
   ],
   "validators": [
     "npm run typecheck",
@@ -32,21 +33,28 @@
   "planningRepo": "3KLife",
   "targetRepo": "AI-Atomic-Framework",
   "closureAuthority": "target_repo",
-  "planningReadOnlyPaths": [],
-  "planningMirrorPaths": [],
+  "planningReadOnlyPaths": [
+    "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0029-task-lifecycle-deprecation.task.md"
+  ],
+  "planningMirrorPaths": [
+    "docs/ai_atomic_framework/",
+    "docs/ai_atomic_framework/atm-agent-first-operability/",
+    "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+    "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0029-task-lifecycle-deprecation.task.md"
+  ],
   "outOfScope": [
-    "手改 .atm/runtime/**",
-    "把 .atm/history/** 當作功能交付物",
-    "修改 unrelated 3KLife dirty files"
+    "hand-edit .atm/runtime/**",
+    "treating .atm/history/** as the feature deliverable",
+    "editing unrelated 3KLife dirty files"
   ],
   "nonGoals": [
-    "不在本卡完成整個 AAO 計畫",
-    "不建立第二套 task lifecycle",
-    "不繞過 ATM evidence gate"
+    "finishing unrelated AAO cards",
+    "removing task lifecycle internals entirely",
+    "weakening ATM evidence gates"
   ],
   "evidenceRequired": "command-backed",
   "rollbackStrategy": "revert-commit",
-  "rollbackNotes": "回滾該任務 commit；若有新增產物或 validator，連同 atomization map 更新一起 revert。",
+  "rollbackNotes": "Revert the task commit, restore validator expectations, and keep the atomization map aligned with the reverted command surface.",
   "atomizationImpact": {
     "ownerAtomOrMap": null,
     "atomCid": null,
@@ -70,7 +78,77 @@
     "hash": "5a75d65999df5dcc"
   },
   "importedAt": "2026-06-29T03:13:49.905Z",
-  "lastTransitionId": "2026-06-29T05-34-09-112Z-repair-claim-f9bcc772c5d6",
-  "lastTransitionAt": "2026-06-29T05:34:09.112Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-06-29T08-35-06-977Z-close-3d1912bfbeb6",
+  "lastTransitionAt": "2026-06-29T08:35:06.977Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-06-29T07:56:29.027Z",
+  "promotedAt": "2026-06-29T07:56:29.327Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-4ebeb60713f9",
+    "claimedAt": "2026-06-29T07:56:46.863Z",
+    "heartbeatAt": "2026-06-29T08:35:06.975Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-0029.*",
+      ".atm/history/task-events/TASK-AAO-0029/**",
+      ".atm/history/tasks/TASK-AAO-0029.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/DEPRECATIONS.md",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "README.md",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-06-29T07:56:46.863Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260629075646-codex-gpt-5.4-mini-TASK-AAO-0029-a3ba54c06e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0029",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0029.*",
+      ".atm/history/task-events/TASK-AAO-0029/**",
+      ".atm/history/tasks/TASK-AAO-0029.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/DEPRECATIONS.md",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/public-surface.ts",
+      "README.md",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0029-task-lifecycle-deprecation.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0029-task-lifecycle-deprecation.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "c92a34fc60bf0ef2b49e466e2441bec67d746f8b670816fc86465e89c7885ad8",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-06-29T07:56:47.415Z",
+    "status": "active"
+  },
+  "closedAt": "2026-06-29T08:35:06.975Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260629075646-codex-gpt-5.4-mini-TASK-AAO-0029-a3ba54c06e",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0029.closure-packet.json"
 }

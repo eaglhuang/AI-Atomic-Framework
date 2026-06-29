@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T08-35-06-977Z-close-3d1912bfbeb6",
+  "taskId": "TASK-AAO-0029",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260629075646-codex-gpt-5.4-mini-TASK-AAO-0029-a3ba54c06e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0029.json",
+  "taskSha256": "sha256:5bc9f96fad247109877974c6f124a2ab25eb83d6d4d418412e3bd79ce1399a7f",
+  "createdAt": "2026-06-29T08:35:06.977Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0029 --actor codex-gpt-5.4-mini --status done --historical-delivery fdd1d36675bf5daf2bb6520de471256b861fff51",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260629075646-codex-gpt-5.4-mini-TASK-AAO-0029-a3ba54c06e",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0029.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-commands",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-29T08:35:06.972Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0029.*",
+        ".atm/history/task-events/TASK-AAO-0029/**",
+        ".atm/history/tasks/TASK-AAO-0029.json",
+        "atm-agent-first-operability/tasks/TASK-AAO-0029-task-lifecycle-deprecation.task.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/DEPRECATIONS.md",
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/public-surface.ts",
+        "README.md",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/tasks.spec.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/public-surface.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
