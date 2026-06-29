@@ -80,6 +80,18 @@
             "$ref": "#/$defs/commandResult"
           }
     },
+    "pluginRuns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pluginRun"
+      }
+    },
+    "gateResults": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gateResult"
+      }
+    },
     "summary": {
       "type": "object",
       "additionalProperties": false,
@@ -170,6 +182,18 @@
           "items": {
             "$ref": "#/$defs/commandContract"
           }
+        },
+        "plugins": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pluginRun"
+          }
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/gateContract"
+          }
         }
       }
     },
@@ -191,6 +215,12 @@
         },
         "required": {
           "type": "boolean"
+        },
+        "suite": {
+          "type": ["string", "null"]
+        },
+        "summary": {
+          "type": ["string", "null"]
         }
       }
     },
@@ -232,6 +262,58 @@
         },
         "signal": {
           "type": ["string", "null"]
+        },
+        "suite": {
+          "type": ["string", "null"]
+        },
+        "summary": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "pluginRun": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["pluginId", "status"],
+      "properties": {
+        "pluginId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": ["planned", "skipped", "not_applicable"]
+        }
+      }
+    },
+    "gateContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gateId", "blocking"],
+      "properties": {
+        "gateId": {
+          "enum": ["immutability", "side-effects", "consumer-contract"]
+        },
+        "blocking": {
+          "type": "boolean"
+        }
+      }
+    },
+    "gateResult": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["gateId", "status", "blocking", "summary"],
+      "properties": {
+        "gateId": {
+          "enum": ["immutability", "side-effects", "consumer-contract"]
+        },
+        "status": {
+          "enum": ["passed", "failed", "skipped", "not_applicable"]
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
         }
       }
     },

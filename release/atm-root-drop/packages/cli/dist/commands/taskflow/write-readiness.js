@@ -1,11 +1,9 @@
-import { execFileSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
-import path from 'node:path';
 import { resolveActorWorkSession } from '../actor-session.js';
 import { evaluateTaskDoneCloseAdmission } from '../tasks/lifecycle-state.js';
 import { detectHistoricalDeliveryCommit, inspectHistoricalDelivery } from '../tasks/historical-delivery.js';
 import { evaluateTaskflowBranchCommitQueueGate } from './branch-commit-queue-gate.js';
 import { evaluateTaskflowBrokerConflictGate } from './broker-gate.js';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
 function normalizeTaskflowLifecycleStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
@@ -23,29 +21,11 @@ function readTaskflowClaimContext(taskDocument) {
     };
 }
 function resolvePlanningPath(cwd, planningMirrorPath) {
-    if (!planningMirrorPath) {
-        return { repoRoot: null, relativePath: null };
-    }
-    const absolutePath = path.isAbsolute(planningMirrorPath)
-        ? path.resolve(planningMirrorPath)
-        : path.resolve(cwd, planningMirrorPath);
-    const probe = existsSync(absolutePath) && statSync(absolutePath).isDirectory() ? absolutePath : path.dirname(absolutePath);
-    let repoRoot = null;
-    try {
-        repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-            cwd: probe,
-            encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'pipe']
-        }).trim() || null;
-    }
-    catch {
-        repoRoot = null;
-    }
-    if (!repoRoot) {
-        return { repoRoot: null, relativePath: null };
-    }
-    const relativePath = absolutePath.slice(path.resolve(repoRoot).length + 1).replace(/\\/g, '/');
-    return { repoRoot: path.resolve(repoRoot), relativePath };
+    const resolved = resolvePlanningPathFromStored(cwd, planningMirrorPath);
+    return {
+        repoRoot: resolved.repoRoot,
+        relativePath: resolved.relativePath
+    };
 }
 export function buildTaskflowCloseWriteReadinessHint(input) {
     const blockers = [];

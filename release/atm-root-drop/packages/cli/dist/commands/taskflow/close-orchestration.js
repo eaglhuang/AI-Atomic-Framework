@@ -7,6 +7,7 @@ import { CliError, relativePathFrom } from '../shared.js';
 import { releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js';
 import { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestPathForTask, evidenceBundleManifestRelativePath, readEvidenceBundleManifest } from '../evidence.js';
 import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory } from '../tasks/historical-delivery.js';
+import { resolveStoredPlanningPath } from '../planning-repo-root.js';
 function buildTasksCloseCommand(input) {
     const parts = [
         'node atm.mjs tasks close',
@@ -274,9 +275,7 @@ function readTaskDocumentRelatedPlanPath(taskDocument) {
     return typeof relatedPlan === 'string' && relatedPlan.trim() ? relatedPlan.trim() : null;
 }
 function tryResolvePlanningCandidate(candidatePath, normalizedTaskId, cwd) {
-    const absolutePath = path.isAbsolute(candidatePath)
-        ? path.resolve(candidatePath)
-        : path.resolve(cwd, candidatePath);
+    const absolutePath = resolveStoredPlanningPath(cwd, candidatePath).absolutePath;
     if (!existsSync(absolutePath))
         return null;
     const metadata = readPlanningCardMetadata(absolutePath);
@@ -335,9 +334,7 @@ export function resolveClosebackPlanningPath(input) {
     let directPlanPathMissingMessage = null;
     const directPlanPath = readTaskDocumentSourcePlanPath(input.taskDocument);
     if (directPlanPath) {
-        const absolutePath = path.isAbsolute(directPlanPath)
-            ? path.resolve(directPlanPath)
-            : path.resolve(input.cwd, directPlanPath);
+        const absolutePath = resolveStoredPlanningPath(input.cwd, directPlanPath).absolutePath;
         if (!existsSync(absolutePath)) {
             directPlanPathMissingMessage = `Planning card path from source.planPath does not exist: ${directPlanPath}.`;
         }

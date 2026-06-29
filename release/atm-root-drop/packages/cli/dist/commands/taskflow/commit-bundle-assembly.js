@@ -8,9 +8,11 @@ import { buildTaskflowCommitMessage } from './commit-messages.js';
 import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-delivery.js';
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.js';
 import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.js';
+import { validateStrictPathHeuristic } from '../tasks/task-import-validators.js';
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.js';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
 import { runAtmGit } from '../git-governance.js';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { CliError, quoteCliValue } from '../shared.js';
 import { isPathAllowedByScope } from '../work-channels.js';
 function uniqueSorted(values) {
@@ -95,10 +97,12 @@ function isCanonicalTaskflowDeliverableCandidate(value) {
         return false;
     if (/[\\/]$/.test(normalized))
         return false;
+    if (validateStrictPathHeuristic(normalized))
+        return false;
     return true;
 }
 function extractTaskflowDeliverables(taskDocument) {
-    const explicit = extractTaskStringList(taskDocument, 'deliverables');
+    const explicit = uniqueSorted(extractTaskStringList(taskDocument, 'deliverables').filter(isCanonicalTaskflowDeliverableCandidate));
     if (explicit.length > 0)
         return explicit;
     const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
@@ -294,21 +298,7 @@ function resolveExistingHistoricalBatchStageFile(cwd, batchRef) {
     return normalizeRepoRelativePath(cwd, batchPath);
 }
 function resolvePlanningPath(cwd, planningMirrorPath) {
-    if (!planningMirrorPath) {
-        return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
-    }
-    const absolutePath = path.isAbsolute(planningMirrorPath)
-        ? path.resolve(planningMirrorPath)
-        : path.resolve(cwd, planningMirrorPath);
-    const repoRoot = readGitRoot(absolutePath);
-    if (!repoRoot) {
-        return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
-    }
-    return {
-        repoRoot,
-        relativePath: normalizeRepoRelativePath(repoRoot, absolutePath),
-        reason: null
-    };
+    return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 export function isDeferrableGovernanceDirtyFile(filePath) {
     const normalized = filePath.replace(/\\/g, '/').toLowerCase();
@@ -410,13 +400,11 @@ export function buildTaskflowCommitBundle(input) {
     }
     const targetDeliveryFiles = [];
     const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
-    const backendGovernanceFiles = input.backendResult
-        ? [
-            ...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId),
-            ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
-            ...extractBackendStageFiles(input.backendResult)
-        ]
-        : [];
+    const backendGovernanceFiles = [
+        ...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId),
+        ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
+        ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : [])
+    ];
     const targetGovernanceFiles = uniqueSorted([
         ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
         ...backendGovernanceFiles

@@ -1,7 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
-import path from 'node:path';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { resolveTaskflowDeclaredFiles } from './task-scope.js';
 import { quoteCliValue } from '../shared.js';
 import { isPathAllowedByScope } from '../work-channels.js';
@@ -31,32 +30,7 @@ function taskflowPathMatches(filePath, declaredPath) {
     return isPathAllowedByScope(filePath, [declaredPath]);
 }
 function resolvePlanningPath(cwd, planningMirrorPath) {
-    if (!planningMirrorPath) {
-        return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
-    }
-    const absolutePath = path.isAbsolute(planningMirrorPath)
-        ? path.resolve(planningMirrorPath)
-        : path.resolve(cwd, planningMirrorPath);
-    const probe = existsSync(absolutePath) && statSync(absolutePath).isDirectory() ? absolutePath : path.dirname(absolutePath);
-    let repoRoot = null;
-    try {
-        repoRoot = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-            cwd: probe,
-            encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'pipe']
-        }).trim() || null;
-    }
-    catch {
-        repoRoot = null;
-    }
-    if (!repoRoot) {
-        return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
-    }
-    return {
-        repoRoot: path.resolve(repoRoot),
-        relativePath: path.relative(repoRoot, absolutePath).replace(/\\/g, '/'),
-        reason: null
-    };
+    return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 export function extractTaskflowDeclaredFiles(cwd, taskId, taskDocument) {
     const runtimeResolved = [...resolveTaskflowDeclaredFiles(cwd, taskId, taskDocument)];

@@ -29,6 +29,7 @@ import {
   type DirectoryDeliverableExpansion,
   type DirectoryDeliverableManifestEntry
 } from '../tasks/historical-delivery.ts';
+import { resolveStoredPlanningPath } from '../planning-repo-root.ts';
 
 export type ClosebackPlanningPathRoute =
   | 'source-plan-path'
@@ -441,9 +442,7 @@ function readTaskDocumentRelatedPlanPath(taskDocument: Record<string, unknown>):
 }
 
 function tryResolvePlanningCandidate(candidatePath: string, normalizedTaskId: string, cwd: string) {
-  const absolutePath = path.isAbsolute(candidatePath)
-    ? path.resolve(candidatePath)
-    : path.resolve(cwd, candidatePath);
+  const absolutePath = resolveStoredPlanningPath(cwd, candidatePath).absolutePath;
   if (!existsSync(absolutePath)) return null;
   const metadata = readPlanningCardMetadata(absolutePath);
   if (metadata.taskId && metadata.taskId !== normalizedTaskId) return null;
@@ -517,9 +516,7 @@ export function resolveClosebackPlanningPath(input: {
 
   const directPlanPath = readTaskDocumentSourcePlanPath(input.taskDocument);
   if (directPlanPath) {
-    const absolutePath = path.isAbsolute(directPlanPath)
-      ? path.resolve(directPlanPath)
-      : path.resolve(input.cwd, directPlanPath);
+    const absolutePath = resolveStoredPlanningPath(input.cwd, directPlanPath).absolutePath;
     if (!existsSync(absolutePath)) {
       directPlanPathMissingMessage = `Planning card path from source.planPath does not exist: ${directPlanPath}.`;
     } else {

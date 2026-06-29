@@ -1547,6 +1547,80 @@ assert.equal(taskDirectionFallbackDryRun.ok, true, 'task-direction fallback must
 assert.equal(taskDirectionFallbackDryRun.evidence.closebackPathResolution.route, 'task-direction-fallback');
 assert.equal(taskDirectionFallbackDryRun.evidence.closebackPlan.closebackPathResolution?.route, 'task-direction-fallback');
 
+const externalStoredPathFixture = await makeProfileFallbackCloseFixture('external-stored-path');
+writeJson(path.join(externalStoredPathFixture.targetRepo, '.atm/config.json'), {
+  schemaVersion: 'atm.config.v0.1',
+  layoutVersion: 2,
+  paths: {
+    tasks: '.atm/history/tasks',
+    taskEvents: '.atm/history/task-events'
+  },
+  taskLedger: {
+    enabled: true,
+    mode: 'auto',
+    mirrorExternalTasks: true,
+    requireCliTransitions: true,
+    provider: 'atm-local',
+    planningRoots: ['../planning/docs/ai_atomic_framework']
+  }
+});
+const externalStoredPlanPath = path.join(
+  externalStoredPathFixture.planningRepo,
+  'docs',
+  'ai_atomic_framework',
+  'atm-agent-first-operability',
+  'tasks',
+  `${externalStoredPathFixture.taskId}.task.md`
+);
+mkdirSync(path.dirname(externalStoredPlanPath), { recursive: true });
+writeText(externalStoredPlanPath, [
+  '---',
+  `task_id: ${externalStoredPathFixture.taskId}`,
+  'title: "External stored path close fixture"',
+  'status: running',
+  '---',
+  `# ${externalStoredPathFixture.taskId}`,
+  ''
+].join('\n'));
+const externalStoredTaskPath = path.join(externalStoredPathFixture.targetRepo, '.atm/history/tasks', `${externalStoredPathFixture.taskId}.json`);
+writeJson(externalStoredTaskPath, {
+  ...JSON.parse(readFileSync(externalStoredTaskPath, 'utf8')),
+  source: {
+    planPath: `atm-agent-first-operability/tasks/${externalStoredPathFixture.taskId}.task.md`,
+    sectionTitle: externalStoredPathFixture.taskId,
+    headingLine: 1,
+    hash: 'external-stored-path'
+  },
+  claim: {
+    actorId: 'validator',
+    leaseId: 'lease-external-stored',
+    state: 'active',
+    files: [
+      `atm-agent-first-operability/tasks/${externalStoredPathFixture.taskId}.task.md`,
+      'src/deliver.txt'
+    ]
+  },
+  taskDirectionLock: {
+    allowedFiles: ['src/deliver.txt'],
+    planningReadOnlyPaths: [`atm-agent-first-operability/tasks/${externalStoredPathFixture.taskId}.task.md`],
+    planningMirrorPaths: [`atm-agent-first-operability/tasks/${externalStoredPathFixture.taskId}.task.md`]
+  }
+});
+const externalStoredPathDryRun = await runTaskflow([
+  'close',
+  '--cwd', externalStoredPathFixture.targetRepo,
+  '--task', externalStoredPathFixture.taskId,
+  '--actor', 'validator',
+  '--historical-delivery', externalStoredPathFixture.deliveryCommit,
+  '--json'
+]) as any;
+assert.equal(externalStoredPathDryRun.ok, true, 'stored external planning paths must resolve without profile fallback');
+assert.equal(externalStoredPathDryRun.evidence.closebackPathResolution.route, 'source-plan-path');
+assert.equal(externalStoredPathDryRun.evidence.closebackPlan.closebackPathResolution?.route, 'source-plan-path');
+assert.ok(externalStoredPathDryRun.evidence.governedCommitBundle.planningRepo.stageFiles.includes(
+  `docs/ai_atomic_framework/atm-agent-first-operability/tasks/${externalStoredPathFixture.taskId}.task.md`
+));
+
 const profileFallbackAmbiguousFixture = await makeProfileFallbackCloseFixture('ambiguous');
 const ambiguousTaskPath = path.join(profileFallbackAmbiguousFixture.targetRepo, '.atm/history/tasks', `${profileFallbackAmbiguousFixture.taskId}.json`);
 writeJson(ambiguousTaskPath, {

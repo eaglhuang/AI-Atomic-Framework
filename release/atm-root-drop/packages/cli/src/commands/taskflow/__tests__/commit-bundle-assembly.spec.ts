@@ -51,7 +51,7 @@ const bundle = buildTaskflowCommitBundle({
 assert.equal(bundle.targetRepo.commitMessage, 'chore(taskflow): close TASK-BUNDLE-0001 target governance bundle');
 assert.equal(bundle.planningRepo.commitMessage, 'docs(taskflow): close TASK-BUNDLE-0001 planning bundle');
 assert.ok(bundle.targetDeliveryFiles.includes('src/app.ts'));
-assert.ok(!bundle.targetRepo.stageFiles.includes('.atm/history/tasks/TASK-BUNDLE-0001.json'), 'pre-close bundle must not stage current-task governance files before backend close artifacts exist');
+assert.ok(bundle.targetRepo.stageFiles.includes('.atm/history/tasks/TASK-BUNDLE-0001.json'), 'pre-close bundle must stage current-task governance files so historical close can carry the active task ledger state');
 
 writeJson(path.join(targetRepo, '.atm/history/evidence/TASK-BUNDLE-0001.closure-packet.json'), {
   schemaId: 'atm.closurePacket.v1',
@@ -279,5 +279,94 @@ const amendedBundle = buildTaskflowCommitBundle({
 });
 assert.equal(amendedBundle.failClosed, false, 'runtime-amended deliverables should not force historical lane fail-close');
 assert.ok(amendedBundle.targetDeliveryFiles.includes('packages/cli/src/runtime-scope.ts'), 'claim-expanded runtime file must be treated as deliverable');
+
+const externalTaskId = 'TASK-BUNDLE-0005';
+const externalTargetRepo = path.join(tempRoot, 'target-external');
+const externalPlanningRepo = path.join(tempRoot, 'planning-external');
+initGitRepo(externalTargetRepo);
+initGitRepo(externalPlanningRepo);
+writeJson(path.join(externalTargetRepo, '.atm/config.json'), {
+  schemaVersion: 'atm.config.v0.1',
+  taskLedger: {
+    planningRoots: ['../planning-external/docs/ai_atomic_framework']
+  }
+});
+const externalPlanPath = path.join(externalPlanningRepo, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', `${externalTaskId}.task.md`);
+writeText(externalPlanPath, `---\ntask_id: ${externalTaskId}\nstatus: running\n---\n# ${externalTaskId}\n`);
+writeJson(path.join(externalTargetRepo, '.atm/history/tasks', `${externalTaskId}.json`), {
+  workItemId: externalTaskId,
+  title: `${externalTaskId} fixture`,
+  status: 'running',
+  claim: {
+    actorId: 'validator',
+    leaseId: 'lease-bundle-0005',
+    state: 'active',
+    files: [
+      'atm-agent-first-operability/tasks/TASK-BUNDLE-0005.task.md',
+      'src/runtime.txt'
+    ]
+  },
+  taskDirectionLock: {
+    allowedFiles: ['src/runtime.txt'],
+    planningReadOnlyPaths: ['atm-agent-first-operability/tasks/TASK-BUNDLE-0005.task.md'],
+    planningMirrorPaths: ['atm-agent-first-operability/tasks/TASK-BUNDLE-0005.task.md']
+  },
+  deliverables: ['src/runtime.txt'],
+  scopePaths: ['src/runtime.txt'],
+  source: { planPath: 'atm-agent-first-operability/tasks/TASK-BUNDLE-0005.task.md' }
+});
+writeText(path.join(externalTargetRepo, 'src/runtime.txt'), 'external planning root\n');
+const externalBundle = buildTaskflowCommitBundle({
+  cwd: externalTargetRepo,
+  taskId: externalTaskId,
+  actorId: 'validator',
+  commitMode: 'dry-run',
+  planningMirrorPath: 'atm-agent-first-operability/tasks/TASK-BUNDLE-0005.task.md',
+  rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+assert.equal(externalBundle.failClosed, false, 'stored external planning paths must not poison target deliverables');
+assert.ok(externalBundle.targetDeliveryFiles.includes('src/runtime.txt'));
+assert.ok(externalBundle.planningRepo.stageFiles.includes('docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-BUNDLE-0005.task.md'));
+
+const proseTaskId = 'TASK-BUNDLE-0006';
+const proseTargetRepo = path.join(tempRoot, 'target-prose');
+const prosePlanningRepo = path.join(tempRoot, 'planning-prose');
+initGitRepo(proseTargetRepo);
+initGitRepo(prosePlanningRepo);
+const prosePlanPath = path.join(prosePlanningRepo, 'docs/tasks/TASK-BUNDLE-0006.task.md');
+writeText(prosePlanPath, `---\ntask_id: ${proseTaskId}\nstatus: running\n---\n# ${proseTaskId}\n`);
+writeJson(path.join(proseTargetRepo, '.atm/history/tasks/TASK-BUNDLE-0006.json'), {
+  workItemId: proseTaskId,
+  title: `${proseTaskId} fixture`,
+  status: 'running',
+  claim: {
+    actorId: 'validator',
+    leaseId: 'lease-bundle-0006',
+    state: 'active',
+    files: ['src/runtime.txt']
+  },
+  taskDirectionLock: {
+    allowedFiles: ['src/runtime.txt']
+  },
+  deliverables: [
+    'Documentation explaining how adopter repositories extend atom health checks without forking ATM core.',
+    'src/runtime.txt'
+  ],
+  scopePaths: ['src/runtime.txt'],
+  source: { planPath: prosePlanPath }
+});
+writeText(path.join(proseTargetRepo, 'src/runtime.txt'), 'prose deliverable fallback\n');
+const proseBundle = buildTaskflowCommitBundle({
+  cwd: proseTargetRepo,
+  taskId: proseTaskId,
+  actorId: 'validator',
+  commitMode: 'dry-run',
+  planningMirrorPath: prosePlanPath,
+  rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+assert.equal(proseBundle.failClosed, false, 'sentence-style deliverables must not fail close when canonical file deliverables still exist');
+assert.ok(proseBundle.targetDeliveryFiles.includes('src/runtime.txt'));
 
 console.log('ok: commit bundle assembly spec passed');

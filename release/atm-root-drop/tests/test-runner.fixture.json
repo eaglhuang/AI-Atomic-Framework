@@ -15,10 +15,26 @@
     "expectedStderrSnippet": "FAIL fixture completed.",
     "customReportPath": "custom-reports/fail-runner-report.json"
   },
+  "pluginCase": {
+    "specPath": "tests/test-runner-fixtures/plugin.atom.json",
+    "configPath": "tests/test-runner-fixtures/plugin.test-runner.json",
+    "pluginPath": "tests/test-runner-fixtures/fixture-plugin.ts",
+    "expectedCommand": "node --strip-types tests/test-runner-fixtures/pass-command.ts"
+  },
+  "gatePassCase": {
+    "specPath": "tests/test-runner-fixtures/gates-pass.atom.json",
+    "configPath": "tests/test-runner-fixtures/gates-pass.test-runner.json"
+  },
+  "gateFailCase": {
+    "specPath": "tests/test-runner-fixtures/gates-fail.atom.json",
+    "configPath": "tests/test-runner-fixtures/gates-fail.test-runner.json"
+  },
   "acceptance": [
     "pass fixture writes default per-atom test report under the workbench folder",
     "fail fixture preserves a non-zero exit code and writes a schema-valid report",
     "runner contract stays delegated and preserves project-owned commands exactly",
-    "runner implementation does not hard-code a specific third-party test framework"
+    "runner implementation does not hard-code a specific third-party test framework",
+    "plugin fixture proves host-provided test plans can extend ATM without forking core",
+    "default gate fixtures prove immutability, side effects, and consumer contract checks can pass and fail"
   ]
 }

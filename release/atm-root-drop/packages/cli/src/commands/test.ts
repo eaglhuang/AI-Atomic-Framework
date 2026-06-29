@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseAtomicSpecFile } from '../../../core/src/spec/parse-spec.ts';
-import { runAtomicTestRunner } from '../../../core/src/manager/test-runner.ts';
+import { runAtomicTestRunnerExtended } from '../../../core/src/manager/test-runner.ts';
 import { runMapEquivalence } from '../../../core/src/equivalence/run-map-equivalence.ts';
 import { runMapIntegrationTest } from '../../../core/src/test-runner/map-integration.ts';
 import { createPropagationReport, runPropagationIntegration } from '../../../core/src/test-runner/propagation.ts';
@@ -265,7 +265,7 @@ async function executeMapRunner(callback: any) {
   }
 }
 
-function runSpecTest(cwd: any, specPath: any) {
+async function runSpecTest(cwd: any, specPath: any) {
   const parsed = parseAtomicSpecFile(specPath, { cwd });
   if (!parsed.ok) {
     return makeResult({
@@ -280,7 +280,7 @@ function runSpecTest(cwd: any, specPath: any) {
     });
   }
 
-  const testRun = runAtomicTestRunner(parsed.normalizedModel!, { repositoryRoot: cwd });
+  const testRun = await runAtomicTestRunnerExtended(parsed.normalizedModel!, { repositoryRoot: cwd });
   return makeResult({
     ok: testRun.ok,
     command: 'test',
@@ -294,13 +294,16 @@ function runSpecTest(cwd: any, specPath: any) {
       atomId: testRun.atomId,
       specPath: relativePathFrom(cwd, path.resolve(cwd, specPath)),
       reportPath: relativePathFrom(cwd, testRun.reportPath),
+      runnerConfigPath: testRun.runnerConfigPath,
       exitCode: testRun.exitCode,
       commands: testRun.commandResults.map((entry: any) => ({
         commandId: entry.commandId,
         command: entry.command,
         ok: entry.ok,
         exitCode: entry.exitCode
-      }))
+      })),
+      plugins: testRun.pluginRuns ?? [],
+      gates: testRun.gateResults ?? []
     }
   });
 }

@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.atomicSpec",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Plugin-backed fixture for atomic test runner validation."
+  },
+  "id": "ATM-FIXTURE-0007",
+  "logicalName": "atom.plugin-runner",
+  "title": "Plugin Runner Atom",
+  "description": "Plugin fixture proving ATM can load external test plans without forking core.",
+  "language": {
+    "primary": "javascript",
+    "sourceExtensions": [".js"],
+    "tooling": ["node"]
+  },
+  "runtime": {
+    "kind": "node",
+    "versionRange": ">=20",
+    "environment": "any"
+  },
+  "adapterRequirements": {
+    "projectAdapter": "local-fs-git",
+    "storage": "git",
+    "capabilities": ["filesystem", "git", "test-runner", "evidence-store"]
+  },
+  "compatibility": {
+    "coreVersion": "0.1.0",
+    "registryVersion": "0.1.0",
+    "pluginApiVersion": "0.1.0",
+    "languageAdapter": "language-js"
+  },
+  "hashLock": {
+    "algorithm": "sha256",
+    "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "canonicalization": "json-stable-v1"
+  },
+  "dependencyPolicy": {
+    "external": "workspace-only",
+    "hostCoupling": "adapter-only"
+  },
+  "inputs": [
+    {
+      "name": "goal",
+      "kind": "text",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "report",
+      "kind": "artifact",
+      "required": true
+    }
+  ],
+  "validation": {
+    "commands": [],
+    "evidenceRequired": true
+  },
+  "performanceBudget": {
+    "hotPath": false,
+    "inputMutation": "forbidden",
+    "maxDurationMs": 1000
+  },
+  "tags": ["alpha0", "test-runner", "plugin"]
+}

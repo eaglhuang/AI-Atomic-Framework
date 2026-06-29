@@ -8,9 +8,11 @@ import { buildTaskflowCommitMessage } from './commit-messages.ts';
 import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-delivery.ts';
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.ts';
 import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.ts';
+import { validateStrictPathHeuristic } from '../tasks/task-import-validators.ts';
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.ts';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
 import { runAtmGit } from '../git-governance.ts';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { CliError, quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
 
@@ -168,11 +170,12 @@ function isCanonicalTaskflowDeliverableCandidate(value: string): boolean {
   if (!normalized) return false;
   if (normalized.startsWith('.atm/')) return false;
   if (/[\\/]$/.test(normalized)) return false;
+  if (validateStrictPathHeuristic(normalized)) return false;
   return true;
 }
 
 function extractTaskflowDeliverables(taskDocument: Record<string, unknown>): string[] {
-  const explicit = extractTaskStringList(taskDocument, 'deliverables');
+  const explicit = uniqueSorted(extractTaskStringList(taskDocument, 'deliverables').filter(isCanonicalTaskflowDeliverableCandidate));
   if (explicit.length > 0) return explicit;
   const scopePaths = extractTaskStringList(taskDocument, 'scopePaths');
   return uniqueSorted(scopePaths.filter(isCanonicalTaskflowDeliverableCandidate));
@@ -381,21 +384,7 @@ function resolveExistingHistoricalBatchStageFile(cwd: string, batchRef?: string 
 }
 
 function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { repoRoot: string | null; relativePath: string | null; reason: string | null } {
-  if (!planningMirrorPath) {
-    return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
-  }
-  const absolutePath = path.isAbsolute(planningMirrorPath)
-    ? path.resolve(planningMirrorPath)
-    : path.resolve(cwd, planningMirrorPath);
-  const repoRoot = readGitRoot(absolutePath);
-  if (!repoRoot) {
-    return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
-  }
-  return {
-    repoRoot,
-    relativePath: normalizeRepoRelativePath(repoRoot, absolutePath),
-    reason: null
-  };
+  return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 
 export function isDeferrableGovernanceDirtyFile(filePath: string): boolean {
@@ -515,13 +504,11 @@ export function buildTaskflowCommitBundle(input: {
 
   const targetDeliveryFiles: string[] = [];
   const historicalBatchStageFile = resolveExistingHistoricalBatchStageFile(targetRepoRoot, input.historicalBatchRef);
-  const backendGovernanceFiles = input.backendResult
-    ? [
-      ...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId),
-      ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
-      ...extractBackendStageFiles(input.backendResult)
-    ]
-    : [];
+  const backendGovernanceFiles = [
+    ...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId),
+    ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
+    ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : [])
+  ];
   const targetGovernanceFiles = uniqueSorted([
     ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
     ...backendGovernanceFiles

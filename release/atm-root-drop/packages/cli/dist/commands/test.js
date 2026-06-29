@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseAtomicSpecFile } from '../../../core/dist/spec/parse-spec.js';
-import { runAtomicTestRunner } from '../../../core/dist/manager/test-runner.js';
+import { runAtomicTestRunnerExtended } from '../../../core/dist/manager/test-runner.js';
 import { runMapEquivalence } from '../../../core/dist/equivalence/run-map-equivalence.js';
 import { runMapIntegrationTest } from '../../../core/dist/test-runner/map-integration.js';
 import { createPropagationReport, runPropagationIntegration } from '../../../core/dist/test-runner/propagation.js';
@@ -245,7 +245,7 @@ async function executeMapRunner(callback) {
         throw error;
     }
 }
-function runSpecTest(cwd, specPath) {
+async function runSpecTest(cwd, specPath) {
     const parsed = parseAtomicSpecFile(specPath, { cwd });
     if (!parsed.ok) {
         return makeResult({
@@ -259,7 +259,7 @@ function runSpecTest(cwd, specPath) {
             }
         });
     }
-    const testRun = runAtomicTestRunner(parsed.normalizedModel, { repositoryRoot: cwd });
+    const testRun = await runAtomicTestRunnerExtended(parsed.normalizedModel, { repositoryRoot: cwd });
     return makeResult({
         ok: testRun.ok,
         command: 'test',
@@ -273,13 +273,16 @@ function runSpecTest(cwd, specPath) {
             atomId: testRun.atomId,
             specPath: relativePathFrom(cwd, path.resolve(cwd, specPath)),
             reportPath: relativePathFrom(cwd, testRun.reportPath),
+            runnerConfigPath: testRun.runnerConfigPath,
             exitCode: testRun.exitCode,
             commands: testRun.commandResults.map((entry) => ({
                 commandId: entry.commandId,
                 command: entry.command,
                 ok: entry.ok,
                 exitCode: entry.exitCode
-            }))
+            })),
+            plugins: testRun.pluginRuns ?? [],
+            gates: testRun.gateResults ?? []
         }
     });
 }

@@ -2831,6 +2831,7 @@ async function runTasksClose(argv) {
                 closurePacketPath,
                 transitionPath,
                 closeCommitWindowPath: closeCommitWindowPathFromClose,
+                closeCommitWindowAllowedFiles: closeArtifactFiles,
                 deliverableGate: deliverableGate,
                 cleanedTeamRuns,
                 // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
@@ -3059,7 +3060,6 @@ async function runTasksScopeAdd(argv) {
             mergedAllowed
         });
         writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
-        writeTaskDocument(taskPath, taskDocument);
         if (preconditionResolution.resolvedBy === 'claim-first') {
             appendTaskTransitionEvent({
                 cwd: options.cwd,
@@ -3082,13 +3082,10 @@ async function runTasksScopeAdd(argv) {
             amendmentPhase: options.amendmentPhase,
             reason: options.reason
         });
-        appendTaskTransitionEvent({
+        persistScopeAmendmentTransition({
             cwd: options.cwd,
             taskId: options.taskId,
-            action: 'scope-amendment',
             actorId,
-            fromStatus: String(taskDocument.status ?? 'running'),
-            toStatus: String(taskDocument.status ?? 'running'),
             taskPath,
             taskDocument,
             command: commandLine,
@@ -3211,7 +3208,6 @@ function runTasksScopeRepair(argv) {
             mergedAllowed
         });
         writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
-        writeTaskDocument(taskPath, taskDocument);
         const commandLine = buildScopeAmendmentCommand({
             mode: 'repair',
             taskId: options.taskId,
@@ -3220,13 +3216,10 @@ function runTasksScopeRepair(argv) {
             reason: options.reason,
             emergencyApproval: options.emergencyApproval
         });
-        appendTaskTransitionEvent({
+        persistScopeAmendmentTransition({
             cwd: options.cwd,
             taskId: options.taskId,
-            action: 'scope-amendment',
             actorId,
-            fromStatus: String(taskDocument.status ?? 'running'),
-            toStatus: String(taskDocument.status ?? 'running'),
             taskPath,
             taskDocument,
             command: commandLine,
@@ -4904,6 +4897,38 @@ function syncScopeAmendmentRuntimeLock(input) {
         allowedFiles: [...input.mergedAllowed]
     };
     input.outerLock.files = [...input.mergedAllowed];
+}
+function persistScopeAmendmentTransition(input) {
+    const createdAt = new Date().toISOString();
+    const transitionSeedDocument = {
+        ...input.taskDocument,
+        lastTransitionId: 'pending-scope-amendment',
+        lastTransitionAt: createdAt
+    };
+    const transitionId = createTaskTransitionId({
+        createdAt,
+        taskId: input.taskId,
+        action: 'scope-amendment',
+        taskDocument: transitionSeedDocument
+    });
+    input.taskDocument.lastTransitionId = transitionId;
+    input.taskDocument.lastTransitionAt = createdAt;
+    input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
+    appendTaskTransitionEvent({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        action: 'scope-amendment',
+        actorId: input.actorId,
+        fromStatus: String(input.taskDocument.status ?? 'running'),
+        toStatus: String(input.taskDocument.status ?? 'running'),
+        taskPath: input.taskPath,
+        taskDocument: input.taskDocument,
+        command: input.command,
+        createdAt,
+        transitionId,
+        amendmentMetadata: input.amendmentMetadata
+    });
+    writeTaskDocument(input.taskPath, input.taskDocument);
 }
 function readLegacyLedgerTaskFiles(cwd) {
     const root = path.resolve(cwd);

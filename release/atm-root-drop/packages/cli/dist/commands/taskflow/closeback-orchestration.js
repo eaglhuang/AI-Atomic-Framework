@@ -3,6 +3,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildPlanningMirrorClosebackExpectation, classifyPlanningMirrorPreEdit } from '../tasks/planning-mirror-close-diagnostics.js';
 import { appendTaskTransitionEvent, createTaskTransitionId } from '../task-ledger.js';
+import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { CliError } from '../shared.js';
 export { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, listOptionalEvidenceBundleGovernanceArtifacts, resolveCloseWriteSupport, resolveClosebackPlanningPath } from './close-orchestration.js';
 function tryGitScalar(cwd, args) {
@@ -27,21 +28,7 @@ function normalizeRepoRelativePath(repoRoot, filePath) {
     return path.relative(repoRoot, resolved).replace(/\\/g, '/');
 }
 function resolvePlanningPath(cwd, planningMirrorPath) {
-    if (!planningMirrorPath) {
-        return { repoRoot: null, relativePath: null, reason: 'planning mirror path is unavailable' };
-    }
-    const absolutePath = path.isAbsolute(planningMirrorPath)
-        ? path.resolve(planningMirrorPath)
-        : path.resolve(cwd, planningMirrorPath);
-    const repoRoot = readGitRoot(absolutePath);
-    if (!repoRoot) {
-        return { repoRoot: null, relativePath: null, reason: `no git repository found for planning path ${planningMirrorPath}` };
-    }
-    return {
-        repoRoot,
-        relativePath: normalizeRepoRelativePath(repoRoot, absolutePath),
-        reason: null
-    };
+    return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 function quoteYamlString(value) {
     return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;

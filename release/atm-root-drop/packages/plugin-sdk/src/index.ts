@@ -88,6 +88,23 @@ export type {
   GeneratedExternalTaskCard
 } from './external-task-source';
 export type {
+  AtomicConsumerContractCase,
+  AtomicConsumerContractGateConfig,
+  AtomicDefaultGateConfig,
+  AtomicHealthGateId,
+  AtomicImmutabilityGateConfig,
+  AtomicSideEffectGateConfig,
+  AtomicTestRunnerConfig,
+  TestRunnerCommand,
+  TestRunnerCommandKind,
+  TestRunnerOutcomeStatus,
+  TestRunnerPlugin,
+  TestRunnerPluginContext,
+  TestRunnerPluginPlan,
+  TestRunnerPluginReference,
+  TestRunnerPluginSupport
+} from './test-runner';
+export type {
   ArtifactStore,
   ContextBudgetDecision,
   ContextBudgetEvaluationInput,
