@@ -7,5 +7,5 @@
  * Direct dependencies on internal helpers of tasks.ts should be avoided, and
  * any evolution of this surface must be validated against the tasks-command-surface-invariant.
  */
-import { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasksRosterUpdate } from '../tasks.js';
-export { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasksRosterUpdate };
+import { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, prepareTaskForClaim, runTasksRosterUpdate } from '../tasks.js';
+export { runTasks, findTaskClaimDependencyBlockers, buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, prepareTaskForClaim, runTasksRosterUpdate };

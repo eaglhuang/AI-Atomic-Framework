@@ -12,7 +12,7 @@ import {
 } from '../../../core/src/guidance/index.ts';
 import { getCommandSpec, listCommandSpecs } from './command-specs.ts';
 import { glossaryEntries } from './glossary-data.ts';
-import { CliError, makeResult, message } from './shared.ts';
+import { CliError, makeHelpResult, makeResult, message } from './shared.ts';
 
 const supportedGuideIntents = ['overview', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
 const supportedLearnIntents: readonly GuidanceIntent[] = ['legacy-atomization', 'legacy-candidate-ranking', 'task-plan-import'];
@@ -441,16 +441,11 @@ function buildCommandHelpGuide(commandName: any) {
       }
     });
   }
+  const helpResult = makeHelpResult(spec);
   return {
     intent: 'help',
     command: spec.name,
-    usage: {
-      command: spec.name,
-      summary: spec.summary,
-      positional: spec.positional ?? [],
-      options: spec.options ?? [],
-      examples: spec.examples ?? []
-    }
+    usage: helpResult.evidence.usage
   };
 }
 

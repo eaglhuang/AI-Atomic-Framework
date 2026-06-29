@@ -52,5 +52,27 @@ export default defineCommandSpec({
         'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validator-command "npm run validate:cli" --dry-run --json',
         'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json',
         'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123 --actor codex-main --validator-command "npm test" --allow-unmatched --approved-by captain --approval-reason "diagnostic backfill" --write --json'
-    ]
+    ],
+    help: {
+        audience: 'agent',
+        requiredFlagSets: [
+            { when: 'Recording governed evidence for one task', flags: ['--task', '--actor'] },
+            { when: 'Running a command-backed validator', flags: ['run', '--command'] },
+            { when: 'Writing a diagnostic historical batch with unmatched tasks', flags: ['--allow-unmatched', '--approved-by', '--approval-reason'] }
+        ],
+        relatedCommands: [
+            'node atm.mjs evidence validators --list --task TASK-ABC-0001 --json',
+            'node atm.mjs taskflow pre-close --task TASK-ABC-0001 --actor <actor-id> --json',
+            'node atm.mjs tasks status --task TASK-ABC-0001 --residue --json'
+        ],
+        commonMistakes: [
+            'Manually typing validator names when evidence run can auto-link a declared validator from the command.',
+            'Using raw evidence add as a substitute for fresh command-backed validation when the task requires validators.',
+            'Writing historical-batch evidence without checking whether the matched commits actually cover the task deliverables.'
+        ],
+        playbookNotes: [
+            'evidence validators --list is the fastest way to see what a task still needs before closeout.',
+            'Use --recent-run when a matching cached command run already exists and you only need to re-link it into the current evidence update.'
+        ]
+    }
 });

@@ -18,5 +18,19 @@ export default defineCommandSpec({
         'node atm.mjs test --atom hello-world --json',
         'node atm.mjs test --map ATM-MAP-0001 --json',
         'node atm.mjs test --map ATM-MAP-0001 --equivalence-fixtures fixtures/equivalence/checkout-mini.json --json'
-    ]
+    ],
+    help: {
+        audience: 'general',
+        requiredFlagSets: [
+            { when: 'Running equivalence fixtures', flags: ['--map', '--equivalence-fixtures'] }
+        ],
+        relatedCommands: [
+            'node atm.mjs evidence run --task TASK-ABC-0001 --actor <actor-id> --command "node atm.mjs test --map ATM-MAP-0001 --json" --json',
+            'node atm.mjs validate --json'
+        ],
+        commonMistakes: [
+            'Passing --equivalence-fixtures without also selecting a map id.',
+            'Treating test output as durable close evidence without recording it through evidence run when governance requires it.'
+        ]
+    }
 });

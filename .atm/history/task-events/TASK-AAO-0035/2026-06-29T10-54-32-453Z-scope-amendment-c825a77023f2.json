@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T10-54-32-453Z-scope-amendment-c825a77023f2",
+  "taskId": "TASK-AAO-0035",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0035.json",
+  "taskSha256": "sha256:c65bda67a78e68cf7b437a564519a0e6462462df7278a3c9882d17421fe49dc2",
+  "createdAt": "2026-06-29T10:54:32.453Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0035 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/tasks.ts,scripts/validate-governance-commands.ts,tests/cli/git-commit-task-scoped-staging.test.ts\" --class linked-surface --phase during-implementation --reason \"While converging TASK-AAO-0035, the governed closeout lane exposed task-scoped staging and governance-validator drift that directly blocked the help-surface delivery from landing. These files are part of the same closeout contract, not an unrelated feature branch.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "While converging TASK-AAO-0035, the governed closeout lane exposed task-scoped staging and governance-validator drift that directly blocked the help-surface delivery from landing. These files are part of the same closeout contract, not an unrelated feature branch."
+  }
+}

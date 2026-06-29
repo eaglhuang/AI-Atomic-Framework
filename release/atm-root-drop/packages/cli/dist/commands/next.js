@@ -21,7 +21,7 @@ import { buildTeamRecommendation } from './team.js';
 import { buildTeamKnowledgeSummary } from './team-knowledge.js';
 import { decideActiveBatchClaimTask } from './next-active-batch.js';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.js';
-import { runTasks, findTaskClaimDependencyBlockers } from './tasks/public-surface.js';
+import { runTasks, findTaskClaimDependencyBlockers, prepareTaskForClaim } from './tasks/public-surface.js';
 import { taskPathFor } from './tasks/task-file-io-helpers.js';
 import { parseMarkdownFrontmatter, normalizeTaskRouteStatus, normalizeSearchText, normalizeTaskIntent, normalizeOptionalTaskPath, readStringArray, splitListValue } from './next/intent-normalizers.js';
 import { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards } from './next/route-predicates.js';
@@ -2139,44 +2139,29 @@ function hasPromptScopedWorkItems(importedTaskQueue) {
     return importedTaskQueue.tasks.some((task) => task.workItemId !== bootstrapTaskId);
 }
 async function prepareImportedTaskForClaim(input) {
-    const steps = [];
     const normalizedStatus = normalizeTaskRouteStatus(input.task.status);
-    if (normalizedStatus === 'planned' || normalizedStatus === 'open') {
-        const reserveResult = await runTasks([
-            'reserve',
-            '--cwd',
-            input.cwd,
-            '--task',
-            input.task.workItemId,
-            '--actor',
-            input.actorId,
-            '--json'
-        ]);
-        steps.push({
-            action: 'reserve',
-            evidence: reserveResult.evidence
-        });
-    }
-    if (normalizedStatus === 'planned' || normalizedStatus === 'open' || normalizedStatus === 'reserved') {
-        const promoteResult = await runTasks([
-            'promote',
-            '--cwd',
-            input.cwd,
-            '--task',
-            input.task.workItemId,
-            '--actor',
-            input.actorId,
-            '--json'
-        ]);
-        steps.push({
-            action: 'promote',
-            evidence: promoteResult.evidence
-        });
-    }
+    const prepared = prepareTaskForClaim({
+        cwd: input.cwd,
+        taskId: input.task.workItemId,
+        actorId: input.actorId,
+        status: input.task.status,
+        title: input.task.title,
+        transitionCommand: `node atm.mjs next --claim --task ${input.task.workItemId} --actor ${input.actorId} --auto-intent --json`
+    });
     return {
         taskId: input.task.workItemId,
         originalStatus: normalizedStatus,
-        steps
+        steps: prepared.steps.map((step) => ({
+            action: step.action,
+            evidence: {
+                action: step.action,
+                taskId: input.task.workItemId,
+                actorId: input.actorId,
+                status: step.status,
+                transitionPath: step.transitionPath,
+                importEvidencePath: step.importEvidencePath ?? null
+            }
+        }))
     };
 }
 export function resolvePromptScopedTaskContext(cwd, input) {

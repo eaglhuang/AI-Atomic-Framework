@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-29T10-53-37-829Z-scope-amendment-d21ae522ce33",
+  "taskId": "TASK-AAO-0035",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0035.json",
+  "taskSha256": "sha256:0cff697c57063a459b4d87f1cad7f3a14268d342f20d895b6128cbfdfd4c2407",
+  "createdAt": "2026-06-29T10:53:37.829Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0035 --actor codex-gpt-5.4-mini --add \"packages/cli/src/commands/guide.ts,.agents/skills/atm-governance-router/**,.agents/skills/atm-next/**,integrations/codex-skills/atm-governance-router/**,integrations/codex-skills/atm-next/**,release/atm-onefile/**,release/atm-root-drop/**,.atm/catalog/registry/actors.json,.atm/history/evidence/git-head.jsonl\" --class linked-surface --phase during-implementation --reason \"TASK-AAO-0035 help surface now spans guide help parity, adapter skill guidance, and release mirror bundles; governing only root command-spec files leaves the actual user-facing help contract drifting across entrypoints.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-AAO-0035 help surface now spans guide help parity, adapter skill guidance, and release mirror bundles; governing only root command-spec files leaves the actual user-facing help contract drifting across entrypoints."
+  }
+}

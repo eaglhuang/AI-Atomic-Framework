@@ -9,9 +9,9 @@ import {
 
 export default defineCommandSpec({
   name: 'tasks',
-  summary: 'Backend and generator surfaces for task plans, runtime ledger, queues, and claim lifecycle. taskflow open/close is the official operator lane and the normal entry for governed work; the tasks subcommands below are backend/generator surfaces that should be invoked through taskflow when possible. taskflow close --write owns the exclusive close-window staged-index lock during governed staging; do not stage competing governance bundles while that lock is active. tasks new is the low-level template generator (no governed lifecycle, no runtime import). tasks import is the runtime synchronization surface that loads a planning markdown into the target ledger (taskflow open --write calls this internally). tasks close, tasks reconcile, tasks repair-closure, tasks repair-claim, tasks import --write --force, tasks reset, and tasks lock cleanup are protected backend surfaces and emergency mutations when used directly; prefer taskflow close for normal closeback. tasks repair-claim is diagnose-first: default mode reports stale, dangling, expired, or conflicting claim drift without mutation; pass --write --reason only when no valid active lease or session blocks repair. When historical delivery needs to be reconstructed across multiple commits, evidence historical-batch authors the close-ready task slice and tasks close consumes that slice as a backend surface. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
+  summary: 'Backend and generator surfaces for task plans, runtime ledger, queues, and claim lifecycle. taskflow open/close is the official operator lane and the normal entry for governed work; the tasks subcommands below are backend/generator surfaces that should be invoked through taskflow when possible. tasks reserve/promote are deprecated low-level lifecycle surfaces rejected by default for AI-facing flows; use next --claim instead, and reach for --maintainer-override-legacy-lifecycle only when a maintainer intentionally needs the legacy path. taskflow close --write owns the exclusive close-window staged-index lock during governed staging; do not stage competing governance bundles while that lock is active. tasks new is the low-level template generator (no governed lifecycle, no runtime import). tasks import is the runtime synchronization surface that loads a planning markdown into the target ledger (taskflow open --write calls this internally). tasks close, tasks reconcile, tasks repair-closure, tasks repair-claim, tasks import --write --force, tasks reset, and tasks lock cleanup are protected backend surfaces and emergency mutations when used directly; prefer taskflow close for normal closeback. tasks repair-claim is diagnose-first: default mode reports stale, dangling, expired, or conflicting claim drift without mutation; pass --write --reason only when no valid active lease or session blocks repair. When historical delivery needs to be reconstructed across multiple commits, evidence historical-batch authors the close-ready task slice and tasks close consumes that slice as a backend surface. tasks import preserves task-card machine fields with high fidelity: scopePaths, deliverables, validators, target_repo, planning_repo, closure_authority, planningMirrorPaths, planningReadOnlyPaths, outOfScope, nonGoals, nested evidence.required, rollback.strategy, rollback.notes, atomizationImpact, compact dispatchPattern / conditionReview / mailboxAssignee dispatch metadata, and emits importDiagnostics for legacy aliases (allowed_files, blocked_by, upstream_repo).',
   positional: [
-    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | roster | new', required: true }
+    { name: 'action', summary: 'create | import | mirror | verify | scope | audit | queue | parallel | lock | migrate-legacy-ledger | reserve (deprecated) | promote (deprecated) | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | roster | new', required: true }
   ],
   options: [
     commonCwdOption,
@@ -36,7 +36,8 @@ export default defineCommandSpec({
     { flag: '--claim-intent', value: 'mode', summary: 'Claim mode for tasks claim: write (default) or closeout-only/no-more-mutation.' },
     { flag: '--closeout-only', summary: 'Alias for --claim-intent closeout-only when claiming for non-mutating closeback work.' },
     { flag: '--no-more-mutation', summary: 'Alias for --claim-intent closeout-only; keep for closeback-only intent surface.' },
-    { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry.' },
+    { flag: '--title', value: 'text', summary: 'Optional title for tasks reserve when creating a manual task entry through the maintainer-only legacy override.' },
+    { flag: '--maintainer-override-legacy-lifecycle', summary: 'Explicit maintainer-only escape hatch for deprecated tasks reserve/promote. Normal AI-facing flows must use next --claim instead.' },
     { flag: '--provider', value: 'id', summary: 'External provider id for tasks mirror.' },
     { flag: '--origin-task', value: 'id', summary: 'External task id for tasks mirror.' },
     { flag: '--origin-url', value: 'url', summary: 'External task URL for tasks mirror.' },
@@ -91,8 +92,9 @@ export default defineCommandSpec({
     'node atm.mjs tasks lock cleanup --all-stale --actor codex-main --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --dry-run --json',
     'node atm.mjs tasks migrate-legacy-ledger --actor codex-main --apply --json',
-    'node atm.mjs tasks reserve --task ATM-GOV-0101 --actor codex-main --title "Actor model" --json',
-    'node atm.mjs tasks promote --task ATM-GOV-0101 --actor codex-main --json',
+    'node atm.mjs next --claim --actor codex-main --task ATM-GOV-0101 --auto-intent --json',
+    'node atm.mjs tasks reserve --task ATM-GOV-0101 --actor codex-main --title "Actor model" --maintainer-override-legacy-lifecycle --json',
+    'node atm.mjs tasks promote --task ATM-GOV-0101 --actor codex-main --maintainer-override-legacy-lifecycle --json',
     'node atm.mjs tasks reset --task ATM-GOV-0101 --actor codex-main --to open --reason "rollback cleanup" --json',
     'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --json',
     'node atm.mjs tasks claim --task ATM-GOV-0101 --actor codex-main --files packages/core/src/index.ts --auto-intent --json',
@@ -115,5 +117,34 @@ export default defineCommandSpec({
     'node atm.mjs tasks finalize diagnose --task TASK-AAO-0137 --json',
     'node atm.mjs tasks roster update --index docs/tasks/README.md --from docs/tasks/TASK-ADOPTER-0001.task.md --dry-run --json',
     'node atm.mjs tasks roster update --index docs/tasks/README.md --from docs/tasks/TASK-ADOPTER-0001.task.md --json'
-  ]
+  ],
+  help: {
+    audience: 'mixed',
+    requiredFlagSets: [
+      { when: 'Checking one task status or residue', flags: ['--task'] },
+      { when: 'Protected backend close or reconcile', flags: ['--task', '--actor'] },
+      { when: 'Emergency scope repair or protected backend mutation', flags: ['--task', '--actor', '--emergency-approval'] }
+    ],
+    relatedCommands: [
+      'node atm.mjs next --claim --task TASK-ABC-0001 --actor <actor-id> --auto-intent --json',
+      'node atm.mjs taskflow close --task TASK-ABC-0001 --actor <actor-id> --dry-run --json',
+      'node atm.mjs evidence validators --list --task TASK-ABC-0001 --json'
+    ],
+    commonMistakes: [
+      'Using tasks reserve/promote as a normal AI-facing lifecycle; next --claim is the default route.',
+      'Treating tasks close or tasks reconcile as the first operator lane instead of taskflow close.',
+      'Writing force/import/reset style backend mutations before checking whether the task already has an active claim or a cleaner prompt-scoped route.'
+    ],
+    playbookNotes: [
+      'Use tasks status, show, audit, queue, and scope as read-only or repair surfaces around the main next/taskflow workflow.',
+      'tasks repair-claim is diagnose-first; add --write only after the diagnosis proves no valid active lease still owns the task.'
+    ],
+    maintainerNotes: [
+      'Protected backend surfaces remain available for maintainers and emergency reconcile work, but they must preserve evidence and lifecycle metadata.',
+      'tasks new is only the low-level template generator; it does not import or claim governed work by itself.'
+    ],
+    deprecatedGuidance: [
+      'tasks reserve/promote are deprecated low-level lifecycle surfaces. Use --maintainer-override-legacy-lifecycle only for an intentional maintainer recovery path.'
+    ]
+  }
 });

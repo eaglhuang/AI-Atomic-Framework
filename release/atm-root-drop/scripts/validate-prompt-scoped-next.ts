@@ -490,6 +490,22 @@ target_repo: AI-Atomic-Framework
     assert(runningAllowedFiles.includes('docs/sanguo.md'), 'direction lock allowedFiles must preserve real task paths');
     assert(!runningAllowedFiles.some((entry: string) => entry.includes('human gate')), 'direction lock allowedFiles must not include natural-language acceptance text');
 
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-PLANNED-0001.json'), 'TASK-PLANNED-0001', 'Planned route should auto-prepare', 'docs/planned-route.md', {
+      status: 'planned'
+    });
+    const plannedClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'TASK-PLANNED-0001']);
+    assert(plannedClaim.ok === true, 'next --claim must auto-prepare planned tasks before claiming');
+    assert(!(plannedClaim.messages ?? []).some((entry) => entry.code === 'ATM_LIFECYCLE_LEGACY_LOCK'), 'planned next --claim must not surface legacy lifecycle warnings');
+    const plannedPreparation = (plannedClaim.evidence.claimPreparation as any) ?? {};
+    assert(Array.isArray(plannedPreparation.steps) && plannedPreparation.steps.length === 2, 'planned next --claim must report reserve+promote preparation steps');
+    assert(plannedPreparation.steps[0]?.action === 'reserve', 'planned next --claim must reserve before claim');
+    assert(plannedPreparation.steps[1]?.action === 'promote', 'planned next --claim must promote before claim');
+    assert((plannedClaim.evidence.taskDirectionLock as any)?.taskId === 'TASK-PLANNED-0001', 'planned next --claim must write a direction lock for the selected task');
+    const plannedAllowedFiles = (plannedClaim.evidence.taskDirectionLock as any)?.allowedFiles ?? [];
+    assert(plannedAllowedFiles.includes('docs/planned-route.md'), 'planned next --claim direction lock must preserve task scope files');
+    const plannedTaskAfterClaim = JSON.parse(readFileSync(path.join(ledgerTaskDir, 'TASK-PLANNED-0001.json'), 'utf8'));
+    assert(plannedTaskAfterClaim.status === 'running', 'planned next --claim must leave the task in running state');
+
     writeLedgerTask(path.join(ledgerTaskDir, 'TASK-DEP-0001.json'), 'TASK-DEP-0001', 'Unfinished dependency', 'docs/dep.md', {
       status: 'planned'
     });

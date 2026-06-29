@@ -228,6 +228,7 @@ try {
     ['ATM-GOV-0112', 'Closeout-only claim intent surface test', ['notes/closeout-intent.txt']],
     ['ATM-GOV-0113', 'Closeout-only claim intent alias test', ['notes/closeout-intent-alias.txt']],
     ['ATM-GOV-0114', 'Closeout-only no-more-mutation alias test', ['notes/no-more-mutation.txt']],
+    ['ATM-GOV-0115', 'Scope amendment transition parity test', ['notes/scope-amendment.txt']],
     ['ATM-GOV-RECONCILE', 'Reconcile close window regression', ['src/reconcile-close-window.ts']],
     ['ATM-GOV-STAGING-0141', 'Task-scoped staging diagnostics', ['src/task-scoped-staging.ts']]
   ] as const;
@@ -393,6 +394,29 @@ try {
   assert(taskAfterHandoff.status === 'open', 'tasks handoff must reopen the task for the recipient');
   assert(taskAfterHandoff.claim?.state === 'handoff', 'tasks handoff must persist handoff claim state');
   assert(taskAfterHandoff.claim?.handoffTo === 'review-agent', 'tasks handoff must record handoff target');
+
+  const scopeClaim = runAtm(['next', '--cwd', repo, '--claim', '--task', 'ATM-GOV-0115', '--actor', 'fixture-agent', '--auto-intent', '--json']);
+  assert(scopeClaim.exitCode === 0, 'scope-amendment fixture next --claim must exit 0');
+  assert(scopeClaim.parsed.ok === true, 'scope-amendment fixture next --claim must report ok=true');
+  const scopeAdd = runAtm([
+    'tasks', 'scope', 'add',
+    '--cwd', repo,
+    '--task', 'ATM-GOV-0115',
+    '--actor', 'fixture-agent',
+    '--add', 'notes/scope-amendment-extra.txt',
+    '--json'
+  ]);
+  assert(scopeAdd.exitCode === 0, 'tasks scope add must exit 0');
+  assert(scopeAdd.parsed.ok === true, 'tasks scope add must report ok=true');
+  const scopeTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0115.json');
+  const scopeTaskDocument = JSON.parse(readFileSync(scopeTaskPath, 'utf8'));
+  const scopeTransitionId = String(scopeTaskDocument.lastTransitionId ?? '');
+  assert(scopeTransitionId.includes('scope-amendment'), 'tasks scope add must persist a scope-amendment lastTransitionId');
+  const scopeEventPath = path.join(repo, '.atm', 'history', 'task-events', 'ATM-GOV-0115', `${scopeTransitionId}.json`);
+  assert(existsSync(scopeEventPath), 'tasks scope add must write a matching scope-amendment event');
+  const scopeEvent = JSON.parse(readFileSync(scopeEventPath, 'utf8'));
+  assert(scopeEvent.action === 'scope-amendment', 'tasks scope add must persist a scope-amendment event action');
+  assert(scopeEvent.taskSha256 === sha256(readFileSync(scopeTaskPath)), 'scope-amendment event sha must match the persisted task document');
 
   const takeoverReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--title', 'Takeover test', '--json']);
   assert(takeoverReserve.exitCode === 0, 'takeover tasks reserve must exit 0');

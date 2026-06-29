@@ -62,7 +62,12 @@ import { buildTeamRecommendation, type TeamRecommendation } from './team.ts';
 import { buildTeamKnowledgeSummary } from './team-knowledge.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
-import { runTasks, findTaskClaimDependencyBlockers, type TaskClaimDependencyBlocker } from './tasks/public-surface.ts';
+import {
+  runTasks,
+  findTaskClaimDependencyBlockers,
+  prepareTaskForClaim,
+  type TaskClaimDependencyBlocker
+} from './tasks/public-surface.ts';
 import { taskPathFor } from './tasks/task-file-io-helpers.ts';
 import {
   parseMarkdownFrontmatter,
@@ -2480,44 +2485,29 @@ async function prepareImportedTaskForClaim(input: {
   readonly task: ImportedTaskSummary;
   readonly actorId: string;
 }) {
-  const steps: Array<{ readonly action: 'reserve' | 'promote'; readonly evidence: unknown }> = [];
   const normalizedStatus = normalizeTaskRouteStatus(input.task.status);
-  if (normalizedStatus === 'planned' || normalizedStatus === 'open') {
-    const reserveResult = await runTasks([
-      'reserve',
-      '--cwd',
-      input.cwd,
-      '--task',
-      input.task.workItemId,
-      '--actor',
-      input.actorId,
-      '--json'
-    ]);
-    steps.push({
-      action: 'reserve',
-      evidence: reserveResult.evidence
-    });
-  }
-  if (normalizedStatus === 'planned' || normalizedStatus === 'open' || normalizedStatus === 'reserved') {
-    const promoteResult = await runTasks([
-      'promote',
-      '--cwd',
-      input.cwd,
-      '--task',
-      input.task.workItemId,
-      '--actor',
-      input.actorId,
-      '--json'
-    ]);
-    steps.push({
-      action: 'promote',
-      evidence: promoteResult.evidence
-    });
-  }
+  const prepared = prepareTaskForClaim({
+    cwd: input.cwd,
+    taskId: input.task.workItemId,
+    actorId: input.actorId,
+    status: input.task.status,
+    title: input.task.title,
+    transitionCommand: `node atm.mjs next --claim --task ${input.task.workItemId} --actor ${input.actorId} --auto-intent --json`
+  });
   return {
     taskId: input.task.workItemId,
     originalStatus: normalizedStatus,
-    steps
+    steps: prepared.steps.map((step) => ({
+      action: step.action,
+      evidence: {
+        action: step.action,
+        taskId: input.task.workItemId,
+        actorId: input.actorId,
+        status: step.status,
+        transitionPath: step.transitionPath,
+        importEvidencePath: step.importEvidencePath ?? null
+      }
+    }))
   };
 }
 

@@ -39,3 +39,24 @@ tracked governance residue created by setup commands.
   explicitly restore it before continuing
 - Durable rule: early identity preparation is correct, but it can surface a
   tracked actor-registry diff that must be handled intentionally
+
+## 2026-06-29 - Do not junction a scratch worktree to the main repo node_modules
+
+- Trigger: an agent creates a temporary Git worktree for an isolated repair and
+  tries to save time by linking or junctioning that worktree's `node_modules`
+  to the main repository's `node_modules`.
+- Symptom: removing the scratch worktree can follow reparse points or workspace
+  package links and delete tracked files under the main repo's `packages/*` or
+  `examples/*`, leaving hundreds of `delete mode` entries and a broken
+  `atm.dev.mjs` entrypoint.
+- Correct ATM route: never share `node_modules` into a disposable worktree with
+  junctions or symlinks. Use the main worktree, install dependencies inside the
+  scratch worktree, or run read-only validation from the main repo while keeping
+  the scratch tree independent.
+- Recovery: before continuing implementation, run `git ls-files -d`; if it is
+  non-zero after a scratch-worktree cleanup, restore only missing tracked files
+  with `git restore --worktree --pathspec-from-file=-`, reinstall dependencies
+  from `package-lock.json`, then rerun a small validator such as
+  `npm run typecheck`.
+- Durable rule: disposable worktrees must not contain filesystem links that
+  point back into mutable directories of the main worktree.

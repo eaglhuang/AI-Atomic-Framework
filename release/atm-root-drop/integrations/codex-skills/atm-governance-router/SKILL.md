@@ -264,6 +264,9 @@ Then continue the user's original request with the fallback sources.
   command runs with exit codes and output hashes.
 - Do not move heavy checks (build/lint/network) into hooks; hooks should only
   call thin ATM guard commands.
+- Do not link or junction a disposable worktree's `node_modules` back to the
+  main repo. In npm workspace repos, cleanup can follow reparse points and
+  remove tracked `packages/*` or `examples/*` files from the main worktree.
 - Do not treat task-card import as atom birth; task-card import uses `tasks
   import`, while atom birth uses `create` or a governed atomize flow.
 - Do not acquire runtime locks during import-only task-plan operations.

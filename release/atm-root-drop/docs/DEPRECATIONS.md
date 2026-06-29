@@ -8,7 +8,7 @@ This dashboard lists deprecated ATM APIs, commands, schema fields, and release s
 
 | Surface | Tier | Deprecated at | Deprecated in | Removal target | Earliest removal date | Required minor lag | Replacement | Status |
 | --- | --- | --- | --- | --- | --- | ---: | --- | --- |
-| None | n/a | n/a | n/a | n/a | n/a | 0 | n/a | active baseline |
+| `tasks reserve` / `tasks promote` | CLI command surface | 2026-06-29 | v0.9.0-alpha.1 | Remove the default AI-facing path after adopters complete `next --claim` migration | 2026-09-29 | 2 | `node atm.mjs next --claim --task <id> --actor <id> --auto-intent --json` | Deprecated by default; only the explicit `--maintainer-override-legacy-lifecycle` escape hatch remains |
 
 ## Release Workflow
 

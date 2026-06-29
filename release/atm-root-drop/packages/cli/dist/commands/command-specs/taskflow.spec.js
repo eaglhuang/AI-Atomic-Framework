@@ -44,6 +44,32 @@ export default defineCommandSpec({
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --dry-run --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --historical-batch hist-batch-2026-06-16T10-00-00-000Z --write --json',
         'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-staged --write --json',
-        'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-state --write --json',
-    ]
+        'node atm.mjs taskflow close --task TASK-ADOPTER-0001 --actor codex-main --defer-foreign-state --write --json'
+    ],
+    help: {
+        audience: 'agent',
+        requiredFlagSets: [
+            { when: 'Pre-close or close one task', flags: ['--task'] },
+            { when: 'taskflow close --write', flags: ['--task', '--actor', '--write'] },
+            { when: 'Waiving mixed historical delivery', flags: ['--waiver-out-of-scope-delivery', '--reason'] }
+        ],
+        relatedCommands: [
+            'node atm.mjs task-view --task TASK-ABC-0001 --json',
+            'node atm.mjs evidence run --task TASK-ABC-0001 --actor <actor-id> --command "<validator>" --json',
+            'node atm.mjs next --claim --task TASK-ABC-0001 --actor <actor-id> --auto-intent --json'
+        ],
+        commonMistakes: [
+            'Jumping straight to --write without reading pre-close or dry-run readiness first.',
+            'Staging competing governance files while taskflow close --write owns the close-window staged-index lock.',
+            'Using direct tasks close/reconcile as a shortcut for the normal operator lane.'
+        ],
+        playbookNotes: [
+            'Use taskflow pre-close as the first read-only checkpoint before historical close --write.',
+            'When validators are missing, taskflow close --auto-evidence can run the declared validators through evidence run before backend close.',
+            'Use task-view when you need a single-task close checklist without mutating runtime state.'
+        ],
+        maintainerNotes: [
+            'Directory-style deliverables expand into explicit file manifests during closeback validation, so scope drift is visible before commit.'
+        ]
+    }
 });

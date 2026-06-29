@@ -329,6 +329,50 @@ try {
   assert.equal(deferredCommit.ok, true);
   assert.equal(existsSync(path.join(tempDir, bundle.deferredForeignStagedSnapshot!)), false, 'git commit must auto-clean deferred foreign staged snapshots after use');
 
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer-governance";\n', 'utf8');
+  const foreignBundleManifest = `.atm/history/evidence/${foreignTaskId}.bundle-manifest.json`;
+  const foreignClosurePacket = `.atm/history/evidence/${foreignTaskId}.closure-packet.json`;
+  const foreignTaskEvent = `.atm/history/task-events/${foreignTaskId}/2026-06-29T08-35-06-977Z-close-fixture.json`;
+  writeJson(path.join(tempDir, foreignBundleManifest), { taskId: foreignTaskId, taskEventPaths: [foreignTaskEvent] });
+  writeJson(path.join(tempDir, foreignClosurePacket), { taskId: foreignTaskId, closedAt: '2026-06-29T08:35:06.975Z' });
+  writeJson(path.join(tempDir, foreignTaskEvent), { taskId: foreignTaskId, action: 'close' });
+  runGit(tempDir, ['add', foreignBundleManifest, foreignClosurePacket, foreignTaskEvent]);
+  const deferredGovernanceBundle = resolveTaskScopedCommitBundle({
+    cwd: tempDir,
+    taskId,
+    taskDocument,
+    apply: false,
+    autoStage: false,
+    deferForeignStaged: true,
+    message: 'feat: defer foreign governance staged',
+    actorId: 'fixture-agent',
+    trailers: [`ATM-Actor: fixture-agent`, `ATM-Task: ${taskId}`]
+  });
+  assert.equal(deferredGovernanceBundle.ok, true);
+  assert.equal(deferredGovernanceBundle.deferredForeignStagedSnapshot, null, 'dry-run must not mutate the index or create a deferred snapshot');
+  const deferredGovernanceCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: defer foreign governance staged',
+    '--auto-stage',
+    '--defer-foreign-staged',
+    '--json'
+  ]);
+  assert.equal(deferredGovernanceCommit.ok, true, 'deferred foreign governance residue must not re-block apply-mode commit');
+  const deferredGovernanceHead = runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.equal(deferredGovernanceHead.includes(foreignBundleManifest), false, 'foreign governance bundle must stay out of the current commit');
+  assert.equal(deferredGovernanceHead.includes(foreignClosurePacket), false, 'foreign closure packet must stay out of the current commit');
+  assert.equal(deferredGovernanceHead.includes(foreignTaskEvent), false, 'foreign close event must stay out of the current commit');
+  assert.equal(existsSync(path.join(tempDir, foreignBundleManifest)), true, 'deferred foreign governance files must remain available for the owning task');
+  assert.equal(existsSync(path.join(tempDir, foreignClosurePacket)), true, 'deferred foreign closure packet must remain available for the owning task');
+  assert.equal(existsSync(path.join(tempDir, foreignTaskEvent)), true, 'deferred foreign task event must remain available for the owning task');
+  rmSync(path.join(tempDir, foreignBundleManifest), { force: true });
+  rmSync(path.join(tempDir, foreignClosurePacket), { force: true });
+  rmSync(path.join(tempDir, foreignTaskEvent), { force: true });
+
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-safe";\n', 'utf8');
   const gitHeadResiduePath = path.join(tempDir, '.atm/history/evidence/git-head.jsonl');
   writeFileSync(gitHeadResiduePath, '{"fixture":true}\n', 'utf8');

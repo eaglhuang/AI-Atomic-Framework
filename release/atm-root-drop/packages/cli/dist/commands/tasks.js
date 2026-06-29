@@ -1749,6 +1749,104 @@ async function runTasksMirror(argv) {
         }
     });
 }
+export function prepareTaskForClaim(input) {
+    const taskPath = taskPathFor(input.cwd, input.taskId);
+    const originalStatus = normalizeTaskStatus(input.status);
+    const transitionCommand = input.transitionCommand?.trim() || `node atm.mjs next --claim --task ${input.taskId} --actor ${input.actorId} --auto-intent --json`;
+    const stopAfterAction = input.stopAfterAction ?? 'all';
+    const steps = [];
+    let importEvidencePath = null;
+    const importedAt = new Date().toISOString();
+    if (!existsSync(taskPath)) {
+        const imported = importPlanningTaskForReservation({
+            cwd: input.cwd,
+            taskId: input.taskId,
+            importedAt
+        });
+        importEvidencePath = imported.evidencePath;
+    }
+    const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    const currentStatus = normalizeTaskStatus(taskDocument.status);
+    if (currentStatus === 'planned' || currentStatus === 'open') {
+        const reserveAt = new Date().toISOString();
+        const previousStatus = String(taskDocument.status ?? '');
+        taskDocument.status = 'reserved';
+        taskDocument.owner = input.actorId;
+        taskDocument.reservedAt = reserveAt;
+        if (!taskDocument.title || String(taskDocument.title).trim().length === 0) {
+            taskDocument.title = input.title ?? input.taskId;
+        }
+        const transitionPath = writeTaskDocumentWithTransition({
+            cwd: input.cwd,
+            taskPath,
+            taskId: input.taskId,
+            taskDocument,
+            action: 'reserve',
+            actorId: input.actorId,
+            previousStatus,
+            command: transitionCommand
+        });
+        steps.push({
+            action: 'reserve',
+            status: 'reserved',
+            transitionPath,
+            importEvidencePath
+        });
+        if (stopAfterAction === 'reserve') {
+            return {
+                taskId: input.taskId,
+                originalStatus,
+                finalStatus: normalizeTaskStatus(taskDocument.status),
+                steps
+            };
+        }
+    }
+    const owner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
+    if ((currentStatus === 'planned' || currentStatus === 'open' || currentStatus === 'reserved')
+        && owner
+        && owner !== input.actorId) {
+        throw new CliError('ATM_TASKS_PROMOTE_OWNER_MISMATCH', `Task ${input.taskId} is reserved by ${owner}, not ${input.actorId}.`, {
+            exitCode: 1,
+            details: { taskId: input.taskId, owner, actorId: input.actorId }
+        });
+    }
+    if (currentStatus === 'planned' || currentStatus === 'open' || currentStatus === 'reserved') {
+        const promotionAdmission = evaluateTaskPromotionAdmission({
+            taskId: input.taskId,
+            status: taskDocument.status
+        });
+        if (!promotionAdmission.ok) {
+            throw new CliError(promotionAdmission.code, promotionAdmission.message, {
+                exitCode: 1,
+                details: promotionAdmission.details
+            });
+        }
+        taskDocument.status = 'ready';
+        taskDocument.owner = input.actorId;
+        taskDocument.promotedAt = new Date().toISOString();
+        const transitionPath = writeTaskDocumentWithTransition({
+            cwd: input.cwd,
+            taskPath,
+            taskId: input.taskId,
+            taskDocument,
+            action: 'promote',
+            actorId: input.actorId,
+            previousStatus: 'reserved',
+            command: transitionCommand
+        });
+        steps.push({
+            action: 'promote',
+            status: 'ready',
+            transitionPath
+        });
+    }
+    return {
+        taskId: input.taskId,
+        originalStatus,
+        finalStatus: normalizeTaskStatus(taskDocument.status),
+        steps
+    };
+}
 async function runTasksReservation(action, argv) {
     const options = parseReservationOptions(action, argv);
     assertLocalTaskLedgerEnabled(options.cwd, action);
@@ -1757,98 +1855,132 @@ async function runTasksReservation(action, argv) {
         throw new CliError('ATM_ACTOR_ID_MISSING', `tasks ${action} requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
     }
     const actorId = resolvedActor.actorId;
-    const taskPath = taskPathFor(options.cwd, options.taskId);
-    const nowIso = new Date().toISOString();
-    let importEvidencePath = null;
-    if (!existsSync(taskPath)) {
-        const imported = importPlanningTaskForReservation({
-            cwd: options.cwd,
-            taskId: options.taskId,
-            importedAt: nowIso
-        });
-        importEvidencePath = imported.evidencePath;
-    }
-    const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
-    if (action === 'reserve') {
-        const previousStatus = String(taskDocument.status ?? '');
-        taskDocument.status = 'reserved';
-        taskDocument.owner = actorId;
-        taskDocument.reservedAt = nowIso;
-        if (!taskDocument.title || String(taskDocument.title).trim().length === 0) {
-            taskDocument.title = options.title ?? options.taskId;
-        }
-        const transitionPath = writeTaskDocumentWithTransition({
-            cwd: options.cwd,
-            taskPath,
-            taskId: options.taskId,
-            taskDocument,
-            action,
-            actorId,
-            previousStatus
-        });
+    const nextClaimCommand = `node atm.mjs next --claim --task ${options.taskId} --actor ${actorId} --auto-intent --json`;
+    const legacyOverrideCommand = [
+        'node atm.mjs tasks',
+        action,
+        `--task ${options.taskId}`,
+        `--actor ${actorId}`,
+        action === 'reserve' && options.title ? `--title "${options.title}"` : null,
+        '--maintainer-override-legacy-lifecycle',
+        '--json'
+    ].filter(Boolean).join(' ');
+    if (options.maintainerOverrideLegacyLifecycle !== true) {
         return makeResult({
-            ok: true,
+            ok: false,
             command: 'tasks',
             cwd: options.cwd,
-            messages: [message('info', 'ATM_TASKS_RESERVED', `Task ${options.taskId} reserved by ${actorId}.`, {
+            messages: [
+                message('warn', 'ATM_LIFECYCLE_LEGACY_LOCK', `tasks ${action} is a deprecated low-level lifecycle surface. It is rejected by default because it bypasses the normal next/taskflow claim lane.`, {
                     taskId: options.taskId,
-                    actorId
-                })],
+                    actorId,
+                    action,
+                    requiredCommand: nextClaimCommand,
+                    maintainerOverrideCommand: legacyOverrideCommand
+                }),
+                message('error', 'ATM_TASK_LEGACY_LIFECYCLE_DEPRECATED', `Use next --claim instead of tasks ${action} for AI-facing governed work.`, {
+                    taskId: options.taskId,
+                    actorId,
+                    action,
+                    requiredCommand: nextClaimCommand,
+                    maintainerOverrideCommand: legacyOverrideCommand
+                })
+            ],
             evidence: {
                 action,
                 taskId: options.taskId,
                 actorId,
-                status: taskDocument.status,
-                taskPath: relativePathFrom(options.cwd, taskPath),
-                transitionPath,
-                importEvidencePath
+                deprecatedLifecycle: true,
+                requiredCommand: nextClaimCommand,
+                maintainerOverrideCommand: legacyOverrideCommand,
+                warningCode: 'ATM_LIFECYCLE_LEGACY_LOCK'
             }
         });
     }
-    const currentOwner = typeof taskDocument.owner === 'string' ? taskDocument.owner : null;
-    if (currentOwner && currentOwner !== actorId) {
-        throw new CliError('ATM_TASKS_PROMOTE_OWNER_MISMATCH', `Task ${options.taskId} is reserved by ${currentOwner}, not ${actorId}.`, {
-            exitCode: 1,
-            details: { taskId: options.taskId, owner: currentOwner, actorId }
-        });
-    }
-    const promotionAdmission = evaluateTaskPromotionAdmission({
-        taskId: options.taskId,
-        status: taskDocument.status
-    });
-    if (!promotionAdmission.ok) {
-        throw new CliError(promotionAdmission.code, promotionAdmission.message, {
-            exitCode: 1,
-            details: promotionAdmission.details
-        });
-    }
-    taskDocument.status = 'ready';
-    taskDocument.owner = actorId;
-    taskDocument.promotedAt = nowIso;
-    const transitionPath = writeTaskDocumentWithTransition({
+    const preparation = prepareTaskForClaim({
         cwd: options.cwd,
-        taskPath,
         taskId: options.taskId,
-        taskDocument,
-        action,
         actorId,
-        previousStatus: 'reserved'
+        status: existsSync(taskPathFor(options.cwd, options.taskId))
+            ? JSON.parse(readFileSync(taskPathFor(options.cwd, options.taskId), 'utf8')).status
+            : 'planned',
+        title: options.title ?? options.taskId,
+        transitionCommand: legacyOverrideCommand,
+        stopAfterAction: action
     });
+    const selectedStep = action === 'reserve'
+        ? preparation.steps.find((step) => step.action === 'reserve') ?? null
+        : preparation.steps.find((step) => step.action === 'promote') ?? null;
+    if (!selectedStep) {
+        throw new CliError('ATM_TASK_LEGACY_LIFECYCLE_NOOP', `tasks ${action} could not advance ${options.taskId} from status ${preparation.originalStatus}.`, {
+            exitCode: 1,
+            details: {
+                taskId: options.taskId,
+                action,
+                originalStatus: preparation.originalStatus,
+                finalStatus: preparation.finalStatus
+            }
+        });
+    }
+    if (action === 'reserve') {
+        return makeResult({
+            ok: true,
+            command: 'tasks',
+            cwd: options.cwd,
+            messages: [
+                message('warn', 'ATM_LIFECYCLE_LEGACY_LOCK', `Maintainer override accepted for tasks ${action}. This legacy lifecycle path is deprecated and should not be used for normal AI routing.`, {
+                    taskId: options.taskId,
+                    actorId,
+                    action,
+                    requiredCommand: nextClaimCommand,
+                    command: legacyOverrideCommand
+                }),
+                message('info', 'ATM_TASKS_RESERVED', `Task ${options.taskId} reserved by ${actorId}.`, {
+                    taskId: options.taskId,
+                    actorId
+                })
+            ],
+            evidence: {
+                action,
+                taskId: options.taskId,
+                actorId,
+                status: selectedStep.status,
+                taskPath: relativePathFrom(options.cwd, taskPathFor(options.cwd, options.taskId)),
+                transitionPath: selectedStep.transitionPath,
+                importEvidencePath: selectedStep.importEvidencePath ?? null,
+                deprecatedLifecycle: true,
+                requiredCommand: nextClaimCommand,
+                legacyOverrideCommand
+            }
+        });
+    }
     return makeResult({
         ok: true,
         command: 'tasks',
         cwd: options.cwd,
-        messages: [message('info', 'ATM_TASKS_PROMOTED', `Task ${options.taskId} promoted to ready by ${actorId}.`, {
+        messages: [
+            message('warn', 'ATM_LIFECYCLE_LEGACY_LOCK', `Maintainer override accepted for tasks ${action}. This legacy lifecycle path is deprecated and should not be used for normal AI routing.`, {
+                taskId: options.taskId,
+                actorId,
+                action,
+                requiredCommand: nextClaimCommand,
+                command: legacyOverrideCommand
+            }),
+            message('info', 'ATM_TASKS_PROMOTED', `Task ${options.taskId} promoted to ready by ${actorId}.`, {
                 taskId: options.taskId,
                 actorId
-            })],
+            })
+        ],
         evidence: {
             action,
             taskId: options.taskId,
             actorId,
-            status: taskDocument.status,
-            taskPath: relativePathFrom(options.cwd, taskPath),
-            transitionPath
+            status: selectedStep.status,
+            taskPath: relativePathFrom(options.cwd, taskPathFor(options.cwd, options.taskId)),
+            transitionPath: selectedStep.transitionPath,
+            deprecatedLifecycle: true,
+            requiredCommand: nextClaimCommand,
+            legacyOverrideCommand
         }
     });
 }
@@ -2821,6 +2953,14 @@ async function resolveScopeAmendmentClaimFirst(input) {
         return precondition;
     }
     const taskDocument = readJsonRecord(taskPathFor(input.cwd, input.taskId));
+    prepareTaskForClaim({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        status: taskDocument.status,
+        title: typeof taskDocument.title === 'string' ? taskDocument.title : input.taskId,
+        transitionCommand: `node atm.mjs next --claim --task ${input.taskId} --actor ${input.actorId} --auto-intent --json`
+    });
     const files = extractTaskCloseDeclaredFiles(taskDocument, input.cwd, input.taskId);
     await runTasksClaimLifecycle('claim', [
         '--cwd', input.cwd,
@@ -4290,7 +4430,8 @@ function parseReservationOptions(action, argv) {
         cwd: process.cwd(),
         taskId: '',
         actorId: null,
-        title: null
+        title: null,
+        maintainerOverrideLegacyLifecycle: false
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -4312,6 +4453,10 @@ function parseReservationOptions(action, argv) {
         if (arg === '--title') {
             options.title = requireValue(argv, index, '--title');
             index += 1;
+            continue;
+        }
+        if (arg === '--maintainer-override-legacy-lifecycle') {
+            options.maintainerOverrideLegacyLifecycle = true;
             continue;
         }
         if (arg === '--json' || arg === '--pretty') {

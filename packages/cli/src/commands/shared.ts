@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { normalizeCommandHelpMetadata } from './help.ts';
 import { projectFields, projectSummary } from './output-projection.ts';
 
 let outputJsonPath: string | null = null;
@@ -413,7 +414,8 @@ export function defineCommandSpec(spec: any) {
     summary: String(spec?.summary || '').trim(),
     positional: normalizeSpecArray(spec?.positional),
     options: normalizeSpecArray(spec?.options),
-    examples: normalizeSpecArray(spec?.examples)
+    examples: normalizeSpecArray(spec?.examples),
+    help: normalizeCommandHelpMetadata(spec?.help)
   });
 }
 
@@ -560,7 +562,8 @@ export function makeHelpResult(spec: any, cwd = process.cwd()) {
     summary: spec.summary,
     positional: spec.positional ?? [],
     options: spec.options ?? [],
-    examples: spec.examples ?? []
+    examples: spec.examples ?? [],
+    ...(spec.help ? { help: spec.help } : {})
   };
   return makeResult({
     ok: true,

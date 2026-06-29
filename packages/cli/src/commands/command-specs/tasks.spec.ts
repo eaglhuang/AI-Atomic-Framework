@@ -117,5 +117,34 @@ export default defineCommandSpec({
     'node atm.mjs tasks finalize diagnose --task TASK-AAO-0137 --json',
     'node atm.mjs tasks roster update --index docs/tasks/README.md --from docs/tasks/TASK-ADOPTER-0001.task.md --dry-run --json',
     'node atm.mjs tasks roster update --index docs/tasks/README.md --from docs/tasks/TASK-ADOPTER-0001.task.md --json'
-  ]
+  ],
+  help: {
+    audience: 'mixed',
+    requiredFlagSets: [
+      { when: 'Checking one task status or residue', flags: ['--task'] },
+      { when: 'Protected backend close or reconcile', flags: ['--task', '--actor'] },
+      { when: 'Emergency scope repair or protected backend mutation', flags: ['--task', '--actor', '--emergency-approval'] }
+    ],
+    relatedCommands: [
+      'node atm.mjs next --claim --task TASK-ABC-0001 --actor <actor-id> --auto-intent --json',
+      'node atm.mjs taskflow close --task TASK-ABC-0001 --actor <actor-id> --dry-run --json',
+      'node atm.mjs evidence validators --list --task TASK-ABC-0001 --json'
+    ],
+    commonMistakes: [
+      'Using tasks reserve/promote as a normal AI-facing lifecycle; next --claim is the default route.',
+      'Treating tasks close or tasks reconcile as the first operator lane instead of taskflow close.',
+      'Writing force/import/reset style backend mutations before checking whether the task already has an active claim or a cleaner prompt-scoped route.'
+    ],
+    playbookNotes: [
+      'Use tasks status, show, audit, queue, and scope as read-only or repair surfaces around the main next/taskflow workflow.',
+      'tasks repair-claim is diagnose-first; add --write only after the diagnosis proves no valid active lease still owns the task.'
+    ],
+    maintainerNotes: [
+      'Protected backend surfaces remain available for maintainers and emergency reconcile work, but they must preserve evidence and lifecycle metadata.',
+      'tasks new is only the low-level template generator; it does not import or claim governed work by itself.'
+    ],
+    deprecatedGuidance: [
+      'tasks reserve/promote are deprecated low-level lifecycle surfaces. Use --maintainer-override-legacy-lifecycle only for an intentional maintainer recovery path.'
+    ]
+  }
 });

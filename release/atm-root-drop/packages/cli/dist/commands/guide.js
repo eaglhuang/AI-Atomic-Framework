@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { classifyGuidanceIntent, loadHostIntentLexicon, probeProject, recordGuidanceIntentPhrase } from '../../../core/dist/guidance/index.js';
 import { getCommandSpec, listCommandSpecs } from './command-specs.js';
 import { glossaryEntries } from './glossary-data.js';
-import { CliError, makeResult, message } from './shared.js';
+import { CliError, makeHelpResult, makeResult, message } from './shared.js';
 const supportedGuideIntents = ['overview', 'create-atom', 'create-map', 'bootstrap', 'glossary', 'help', 'learn', 'install-skill'];
 const supportedLearnIntents = ['legacy-atomization', 'legacy-candidate-ranking', 'task-plan-import'];
 const supportedLearnStatuses = ['suggested', 'active-host', 'promoted-framework'];
@@ -411,16 +411,11 @@ function buildCommandHelpGuide(commandName) {
             }
         });
     }
+    const helpResult = makeHelpResult(spec);
     return {
         intent: 'help',
         command: spec.name,
-        usage: {
-            command: spec.name,
-            summary: spec.summary,
-            positional: spec.positional ?? [],
-            options: spec.options ?? [],
-            examples: spec.examples ?? []
-        }
+        usage: helpResult.evidence.usage
     };
 }
 function buildGuide(parsed) {

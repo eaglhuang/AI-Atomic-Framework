@@ -5,6 +5,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'agent-pack': Readonly<{
         name: string;
@@ -12,6 +13,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'atom-capsule': any;
     'atom-ref': Readonly<{
@@ -20,6 +22,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     atomize: Readonly<{
         name: string;
@@ -27,6 +30,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'atm-chart': Readonly<{
         name: string;
@@ -34,6 +38,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     baseline: Readonly<{
         name: string;
@@ -41,6 +46,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     batch: Readonly<{
         name: string;
@@ -48,6 +54,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     bootstrap: Readonly<{
         name: string;
@@ -55,6 +62,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     budget: Readonly<{
         name: string;
@@ -62,6 +70,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     cache: Readonly<{
         name: string;
@@ -69,6 +78,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     candidates: Readonly<{
         name: string;
@@ -76,6 +86,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     create: Readonly<{
         name: string;
@@ -83,6 +94,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'create-map': Readonly<{
         name: string;
@@ -90,6 +102,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     daemon: any;
     doctor: Readonly<{
@@ -98,6 +111,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     do: any;
     emergency: Readonly<{
@@ -106,6 +120,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     experience: Readonly<{
         name: string;
@@ -113,6 +128,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     explain: Readonly<{
         name: string;
@@ -120,6 +136,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     evidence: Readonly<{
         name: string;
@@ -127,6 +144,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'framework-mode': Readonly<{
         name: string;
@@ -134,6 +152,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     git: Readonly<{
         name: string;
@@ -141,6 +160,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'git-hooks': Readonly<{
         name: string;
@@ -148,6 +168,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     guide: Readonly<{
         name: string;
@@ -155,6 +176,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     guard: Readonly<{
         name: string;
@@ -162,6 +184,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     handoff: Readonly<{
         name: string;
@@ -169,6 +192,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'health-report': any;
     hook: Readonly<{
@@ -177,6 +201,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     identity: Readonly<{
         name: string;
@@ -184,6 +209,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     init: Readonly<{
         name: string;
@@ -191,6 +217,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'internal-release': Readonly<{
         name: string;
@@ -198,6 +225,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     integration: Readonly<{
         name: string;
@@ -205,6 +233,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     lock: Readonly<{
         name: string;
@@ -212,6 +241,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'map-capsule': any;
     migrate: Readonly<{
@@ -220,6 +250,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     next: Readonly<{
         name: string;
@@ -227,6 +258,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     orient: Readonly<{
         name: string;
@@ -234,6 +266,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     police: Readonly<{
         name: string;
@@ -241,6 +274,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     quickfix: Readonly<{
         name: string;
@@ -248,6 +282,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     rescue: any;
     registry: Readonly<{
@@ -256,6 +291,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'registry-diff': Readonly<{
         name: string;
@@ -263,6 +299,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'replacement-lane': Readonly<{
         name: string;
@@ -270,6 +307,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     review: Readonly<{
         name: string;
@@ -277,6 +315,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'review-advisory': Readonly<{
         name: string;
@@ -284,6 +323,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     rollback: Readonly<{
         name: string;
@@ -291,6 +331,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'self-host-alpha': Readonly<{
         name: string;
@@ -298,6 +339,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     spec: Readonly<{
         name: string;
@@ -305,6 +347,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     start: Readonly<{
         name: string;
@@ -312,6 +355,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     status: Readonly<{
         name: string;
@@ -319,6 +363,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     tasks: Readonly<{
         name: string;
@@ -326,6 +371,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     test: Readonly<{
         name: string;
@@ -333,6 +379,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     telemetry: Readonly<{
         name: string;
@@ -340,6 +387,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     team: Readonly<{
         name: string;
@@ -347,6 +395,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     upgrade: Readonly<{
         name: string;
@@ -354,6 +403,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     validate: Readonly<{
         name: string;
@@ -361,6 +411,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     welcome: Readonly<{
         name: string;
@@ -368,6 +419,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     verify: Readonly<{
         name: string;
@@ -375,6 +427,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     taskflow: Readonly<{
         name: string;
@@ -382,6 +435,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     'task-view': Readonly<{
         name: string;
@@ -389,6 +443,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     broker: Readonly<{
         name: string;
@@ -396,6 +451,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
     route: Readonly<{
         name: string;
@@ -403,6 +459,7 @@ export declare const commandSpecs: Readonly<{
         positional: any[];
         options: any[];
         examples: any[];
+        help: import("./help.ts").CommandHelpMetadata | undefined;
     }>;
 }>;
 export declare function getCommandSpec(commandName: string): any;

@@ -145,6 +145,27 @@ export declare function loadTaskDocumentOrThrow(cwd: string, taskId: string): {
     taskDocument: Record<string, unknown>;
 };
 export declare function buildResidueDiagnosisEvidence(cwd: string, taskId: string, taskDocument: Record<string, unknown>): import("./tasks/residue-diagnostics.ts").TaskResidueDiagnosisEvidence;
+export interface TaskClaimPreparationStep {
+    readonly action: 'reserve' | 'promote';
+    readonly status: 'reserved' | 'ready';
+    readonly transitionPath: string;
+    readonly importEvidencePath?: string | null;
+}
+export interface TaskClaimPreparationResult {
+    readonly taskId: string;
+    readonly originalStatus: string;
+    readonly finalStatus: string;
+    readonly steps: readonly TaskClaimPreparationStep[];
+}
+export declare function prepareTaskForClaim(input: {
+    readonly cwd: string;
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly status: unknown;
+    readonly title?: string | null;
+    readonly transitionCommand?: string | null;
+    readonly stopAfterAction?: 'reserve' | 'promote' | 'all';
+}): TaskClaimPreparationResult;
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
 export { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
 export type { TaskClaimDependencyBlocker } from './tasks/dependency-gates.ts';

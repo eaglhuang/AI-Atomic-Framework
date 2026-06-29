@@ -172,5 +172,8 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
   loop over low-level `tasks` commands.
 - If an `ATM_USER_NOTICE` message or `evidence.userNotice` is present, show it to the user in natural language before executing the returned next action.
 - After an onboarding or refresh command succeeds, return to the user original request and continue the actual work.
+- Do not link or junction a disposable worktree's `node_modules` back to the
+  main repo. In npm workspace repos, cleanup can follow reparse points and
+  remove tracked `packages/*` or `examples/*` files from the main worktree.
 - Treat `ATM_ACTOR_ID` as the default actor identity variable. `AGENT_IDENTITY`
   is legacy-compatible only.

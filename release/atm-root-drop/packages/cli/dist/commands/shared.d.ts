@@ -120,6 +120,7 @@ export declare function defineCommandSpec(spec: any): Readonly<{
     positional: any[];
     options: any[];
     examples: any[];
+    help: import("./help.ts").CommandHelpMetadata | undefined;
 }>;
 type ParsedCommandArgs = {
     options: Record<string, unknown>;

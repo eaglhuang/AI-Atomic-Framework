@@ -9,9 +9,10 @@ ATM documentation. The source of truth for command names, visibility, summaries,
 options, and examples remains `packages/cli/src/commands/command-specs.ts` and
 the per-command specs under `packages/cli/src/commands/command-specs/`.
 
-This seed intentionally does not define help examples, common mistakes, UX
-guidance, or low-level lifecycle positioning. Those belong to the command-spec
-help surface and later command-surface consolidation work.
+This seed intentionally keeps the top-level command list narrow. Richer help
+facets such as examples, required-flag sets, related commands, common
+mistakes, playbook notes, maintainer notes, and deprecated guidance belong to
+the command-spec help surface returned by `node atm.mjs <command> --help`.
 
 ## Drift Guard
 

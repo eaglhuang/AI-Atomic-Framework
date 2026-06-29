@@ -349,6 +349,8 @@ assert(tasksUsageText.includes('--emergency-approval'), 'tasks --help must docum
 assert(tasksUsageText.includes('taskflow open/close'), 'tasks --help must identify taskflow as the official operator lane');
 assert(tasksUsageText.includes('low-level template generator'), 'tasks --help must label tasks new as a low-level template generator surface');
 assert(tasksUsageText.includes('runtime synchronization surface'), 'tasks --help must label tasks import as the runtime synchronization (backend) surface');
+assert(tasksHelp.parsed.evidence?.usage?.help?.deprecatedGuidance?.length > 0, 'tasks --help must expose deprecated guidance for legacy lifecycle surfaces');
+assert(tasksHelp.parsed.evidence?.usage?.help?.maintainerNotes?.length > 0, 'tasks --help must expose maintainer/backend guidance');
 
 const taskflowHelp = await runAtm(['taskflow', '--help'], root);
 const taskflowUsageText = JSON.stringify(taskflowHelp.parsed.evidence?.usage ?? {});
@@ -356,6 +358,13 @@ assert(taskflowUsageText.includes('Official operator lane'), 'taskflow --help mu
 assert(taskflowUsageText.includes('writeReadinessHint'), 'taskflow --help must reference the writeReadinessHint surface for dry-run --write readiness');
 assert(taskflowUsageText.includes('low-level template generator surface'), 'taskflow --help must label tasks new as a low-level template generator surface');
 assert(taskflowUsageText.includes('runtime synchronization surface'), 'taskflow --help must label tasks import as a runtime synchronization (backend) surface');
+assert(taskflowHelp.parsed.evidence?.usage?.help?.commonMistakes?.length > 0, 'taskflow --help must expose common operator mistakes');
+assert(taskflowHelp.parsed.evidence?.usage?.help?.requiredFlagSets?.length > 0, 'taskflow --help must expose required flag sets for closeback lanes');
+
+const nextHelpRich = await runAtm(['next', '--help'], root);
+assert(nextHelpRich.parsed.evidence?.usage?.help?.audience === 'agent', 'next --help must identify its agent-facing audience');
+assert(nextHelpRich.parsed.evidence?.usage?.help?.relatedCommands?.some((entry: string) => entry.includes('task-view')), 'next --help must expose related command guidance');
+assert(nextHelpRich.parsed.evidence?.usage?.help?.commonMistakes?.length > 0, 'next --help must expose routing mistakes');
 
 const teamHelp = await runAtm(['team', '--help'], root);
 const teamUsageText = JSON.stringify(teamHelp.parsed.evidence?.usage ?? {});

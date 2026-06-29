@@ -198,6 +198,11 @@ The Default Governance Bundle is the official default experience, but it is not 
 | `node atm.mjs test --help` | Run atom smoke, spec, map integration, equivalence, or propagation tests. |
 | `node atm.mjs handoff --help` | Write continuation summaries for governed work. |
 
+Per-command help is command-spec driven. `node atm.mjs <command> --help` returns
+the command summary, options, examples, and any richer guidance that the spec
+declares, including required-flag sets, related commands, common mistakes, and
+playbook-oriented notes when a command needs them.
+
 For all available commands, run:
 
 ```bash
