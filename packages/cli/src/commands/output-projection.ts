@@ -5,7 +5,7 @@ export function resolveSummaryFields(): string[] {
 }
 
 export function projectFields(result: CommandResult, fields: string[]): CommandResult {
-  const projectedEvidence: Record<string, any> = {};
+  const projectedEvidence: Record<string, unknown> = {};
   if (result.evidence) {
     for (const field of fields) {
       const trimmed = field.trim();
@@ -14,7 +14,7 @@ export function projectFields(result: CommandResult, fields: string[]): CommandR
       }
     }
   }
-  const resultAny = result as any;
+  const resultAny = result as Record<string, unknown>;
   return {
     ok: result.ok,
     command: result.command,
@@ -34,7 +34,7 @@ export function projectSummary(result: CommandResult): CommandResult {
     const nextAction = projected.evidence.nextAction;
     if (nextAction && typeof nextAction === 'object') {
       projected.evidence.nextAction = {
-        code: (nextAction as Record<string, any>).code ?? null
+        code: (nextAction as Record<string, unknown>).code ?? null
       };
     }
   }

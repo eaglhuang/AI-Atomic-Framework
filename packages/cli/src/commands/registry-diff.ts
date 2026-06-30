@@ -10,7 +10,7 @@ import {
 } from '../../../core/src/registry/diff.ts';
 import { makeResult, message } from './shared.ts';
 
-function parseArgs(args: any) {
+function parseArgs(args: string[]) {
   const parsed = {
     atomId: null,
     fromVersion: null,
@@ -42,7 +42,7 @@ function parseArgs(args: any) {
   return parsed;
 }
 
-export function runRegistryDiff(args: any) {
+export function runRegistryDiff(args: string[]) {
   const cwd = process.cwd();
   const parsed = parseArgs(args);
 
@@ -69,12 +69,12 @@ export function runRegistryDiff(args: any) {
   let registryDoc;
   try {
     registryDoc = loadRegistryDocument(parsed.registryPath);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return makeResult({
       ok: false,
       command: 'registry-diff',
       cwd,
-      messages: [message('error', 'ATM_DIFF_REGISTRY_NOT_FOUND', error.message)],
+      messages: [message('error', 'ATM_DIFF_REGISTRY_NOT_FOUND', error instanceof Error ? error.message : String(error))],
       evidence: {}
     });
   }
@@ -111,12 +111,12 @@ export function runRegistryDiff(args: any) {
       toVersion: parsed.toVersion,
       driftReason: parsed.driftReason
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return makeResult({
       ok: false,
       command: 'registry-diff',
       cwd,
-      messages: [message('error', 'ATM_DIFF_COMPUTE_FAILED', error.message)],
+      messages: [message('error', 'ATM_DIFF_COMPUTE_FAILED', error instanceof Error ? error.message : String(error))],
       evidence: {
         atomId: parsed.atomId,
         fromVersion: parsed.fromVersion,

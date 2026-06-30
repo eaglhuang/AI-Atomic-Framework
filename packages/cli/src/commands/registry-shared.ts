@@ -77,7 +77,7 @@ export function readRegistryDocument() {
   return readJsonFile(registryFilePath, 'ATM_REGISTRY_NOT_FOUND');
 }
 
-export function validateRegistryDocumentAgainstSchema(cwd: any, registryPath = registryFilePath, options: {
+export function validateRegistryDocumentAgainstSchema(cwd: string, registryPath = registryFilePath, options: {
   commandName?: string;
   successCode?: string;
   successText?: string;
@@ -89,7 +89,7 @@ export function validateRegistryDocumentAgainstSchema(cwd: any, registryPath = r
   const validation = validateRegistryDocumentFile(registryPath, { schemaPath: registrySchemaPath });
   const messages = validation.ok
     ? [message('info', successCode, successText)]
-    : (validation.promptReport?.issues ?? []).map((issue: any) => message('error', issue.code ?? 'ATM_REGISTRY_SCHEMA_ERROR', issue.text ?? 'Registry schema validation failed.', { path: issue.path ?? '/' }));
+    : (validation.promptReport?.issues ?? []).map((issue) => message('error', String(issue.code ?? 'ATM_REGISTRY_SCHEMA_ERROR'), String(issue.text ?? 'Registry schema validation failed.'), { path: String(issue.path ?? '/') }));
 
   return makeResult({
     ok: validation.ok === true,
@@ -107,7 +107,7 @@ export function validateRegistryDocumentAgainstSchema(cwd: any, registryPath = r
 
 export function evaluateSeedSelfVerification(registry = readRegistryDocument()) {
   const expected = computeSeedRegistrySnapshot();
-  const entry = registry.entries?.find((candidate: any) => candidate.atomId === expected.entry.atomId);
+  const entry = registry.entries?.find((candidate: Record<string, unknown>) => candidate.atomId === expected.entry.atomId);
   if (!entry) {
     return {
       ok: false,
