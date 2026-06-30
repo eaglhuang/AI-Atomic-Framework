@@ -785,7 +785,7 @@ export async function runBatch(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 });
 }
 
-function buildBatchSelector(options: Record<string, any>) {
+function buildBatchSelector(options: Record<string, unknown>) {
   const selector: { batchId?: string; scopeKey?: string } = {};
   if (typeof options.batch === 'string' && options.batch.trim()) selector.batchId = options.batch.trim();
   if (typeof options.scope === 'string' && options.scope.trim()) selector.scopeKey = options.scope.trim();
@@ -907,9 +907,9 @@ function toCompactBatchCandidate(batchRun: { readonly batchId: string; readonly 
 
 function buildCompactBatchStatus(
   cwd: string,
-  batchRun: any,
-  taskQueue: any,
-  consistency: any,
+  batchRun: Record<string, unknown> | null | undefined,
+  taskQueue: Record<string, unknown> | null | undefined,
+  consistency: Record<string, unknown>,
   activeBatchCount: number,
   pendingCommitWindow: ReturnType<typeof buildPendingCheckpointCommitWindow>
 ) {
@@ -1000,7 +1000,7 @@ function buildCompactBatchStatus(
   };
 }
 
-export function buildPendingCheckpointCommitWindow(cwd: string, batchRun: any, taskQueue: any) {
+export function buildPendingCheckpointCommitWindow(cwd: string, batchRun: Record<string, unknown> | null | undefined, taskQueue: Record<string, unknown> | null | undefined) {
   if (!batchRun?.batchId || !Array.isArray(batchRun.taskIds)) return null;
   const gitChanges = readGitChangedFiles(cwd);
   const changedFiles = gitChanges.files;
@@ -1155,7 +1155,7 @@ function normalizeGitStatusPath(value: string) {
   return normalizeRelativePath(renamed.replace(/^"|"$/g, ''));
 }
 
-function readJson(cwd: string, relativePath: string): any {
+function readJson(cwd: string, relativePath: string): unknown {
   const filePath = path.join(cwd, normalizeRelativePath(relativePath));
   if (!existsSync(filePath)) return null;
   try {
@@ -1177,7 +1177,7 @@ function uniqueStrings(values: readonly string[]) {
   return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
 
-function buildCompactProgress(batchRun: any, taskQueue: any) {
+function buildCompactProgress(batchRun: Record<string, unknown> | null | undefined, taskQueue: Record<string, unknown> | null | undefined) {
   const currentIndex = batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null;
   const totalTasks = batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0;
   const ordinal = typeof currentIndex === 'number' && totalTasks > 0
