@@ -32,19 +32,25 @@ export const VALID_DECOMPOSITION_DECISIONS = [
   'atomize'
 ];
 
-export function deriveDecompositionDecision({ behaviorId, targetKind }: any) {
+interface BehaviorInput {
+  behaviorId?: string;
+  targetKind?: string;
+  decompositionDecision?: string;
+}
+
+export function deriveDecompositionDecision({ behaviorId, targetKind }: BehaviorInput): string {
   if (targetKind === 'map') {
     return 'map-bump';
   }
-  return DECISION_BY_BEHAVIOR.get(behaviorId) ?? 'atom-bump';
+  return DECISION_BY_BEHAVIOR.get(behaviorId ?? '') ?? 'atom-bump';
 }
 
-export function resolveReviewTemplate(decompositionDecision: any) {
+export function resolveReviewTemplate(decompositionDecision: string): string {
   return REVIEW_TEMPLATE_BY_DECISION[decompositionDecision] ?? 'review.template.general';
 }
 
-export function validateDecisionBehaviorPair({ behaviorId, decompositionDecision }: any) {
-  const strictBehaviorId = STRICT_DECISION_BEHAVIOR.get(decompositionDecision);
+export function validateDecisionBehaviorPair({ behaviorId, decompositionDecision }: BehaviorInput): void {
+  const strictBehaviorId = STRICT_DECISION_BEHAVIOR.get(decompositionDecision ?? '');
   if (strictBehaviorId && behaviorId !== strictBehaviorId) {
     throw new Error(`decompositionDecision ${decompositionDecision} must pair with ${strictBehaviorId}.`);
   }

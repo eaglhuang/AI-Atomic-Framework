@@ -1,4 +1,16 @@
-export function createTestReportMetrics(input: any) {
+interface MetricsInput {
+  total?: number;
+  totalCount?: number;
+  failed?: number;
+  failedCount?: number;
+  latency?: number;
+  durationMs?: number;
+  propagationDuration?: number;
+  coverage?: number | null;
+  edgeCaseCount?: number;
+}
+
+export function createTestReportMetrics(input: MetricsInput | null | undefined) {
   const normalizedInput = input || {};
   const total = normalizeNonNegativeInteger(normalizedInput.total ?? normalizedInput.totalCount);
   const failed = normalizeNonNegativeInteger(normalizedInput.failed ?? normalizedInput.failedCount);
@@ -12,7 +24,7 @@ export function createTestReportMetrics(input: any) {
   };
 }
 
-function normalizeCoverage(value: any) {
+function normalizeCoverage(value: number | null | undefined): number | null {
   if (value == null) {
     return null;
   }
@@ -28,7 +40,7 @@ function normalizeCoverage(value: any) {
   return value;
 }
 
-function normalizeNonNegativeInteger(value: any) {
+function normalizeNonNegativeInteger(value: number | null | undefined): number {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0) {
     return value;
   }

@@ -10,7 +10,14 @@
  * preserved byte-for-byte.
  */
 
-export function gateFailureSummary(gateName: any, report: any) {
+interface QualityReport {
+  regressedMetrics?: string[];
+  mapImpactScope?: {
+    propagationStatus?: Array<{ integrationTestPassed?: boolean; mapId?: string }>;
+  };
+}
+
+export function gateFailureSummary(gateName: string, report: QualityReport | null | undefined): string {
   switch (gateName) {
     case 'nonRegression':
       return 'baseline fixtures failed';
@@ -23,13 +30,13 @@ export function gateFailureSummary(gateName: any, report: any) {
   }
 }
 
-export function qualityComparisonFailureReason(report: any) {
-  if (Array.isArray(report?.regressedMetrics) && report.regressedMetrics.length > 0) {
-    return `regressed metrics: ${report.regressedMetrics.join(', ')}`;
+export function qualityComparisonFailureReason(report: QualityReport | null | undefined): string {
+  if (Array.isArray(report?.regressedMetrics) && report!.regressedMetrics!.length > 0) {
+    return `regressed metrics: ${report!.regressedMetrics!.join(', ')}`;
   }
-  const failedMaps = report?.mapImpactScope?.propagationStatus?.filter((entry: any) => entry.integrationTestPassed === false) ?? [];
+  const failedMaps = report?.mapImpactScope?.propagationStatus?.filter((entry) => entry.integrationTestPassed === false) ?? [];
   if (failedMaps.length > 0) {
-    return `failed map integrations: ${failedMaps.map((entry: any) => entry.mapId).join(', ')}`;
+    return `failed map integrations: ${failedMaps.map((entry) => entry.mapId).join(', ')}`;
   }
   return 'quality metrics failed';
 }
