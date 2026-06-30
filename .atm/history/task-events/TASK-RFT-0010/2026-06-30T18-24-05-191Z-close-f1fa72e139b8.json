@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-06-30T18-24-05-191Z-close-f1fa72e139b8",
+  "taskId": "TASK-RFT-0010",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260630181934-claude-code-opus-4-7-TASK-RFT-0010-758c0cc049",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0010.json",
+  "taskSha256": "sha256:150fab545806232d3e02bb5b4193d3b3567769835aaed619c4a5cf6af4f87c19",
+  "createdAt": "2026-06-30T18:24:05.191Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0010 --actor claude-code-opus-4-7 --status done --historical-delivery 6965e11ea45be563ac0a09b9fbbffe0b09f7a49c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260630181934-claude-code-opus-4-7-TASK-RFT-0010-758c0cc049",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0010.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:tasks-atomic-map"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-06-30T18:24:05.184Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0010.*",
+        ".atm/history/task-events/TASK-RFT-0010/**",
+        ".atm/history/tasks/TASK-RFT-0010.json",
+        "docs/reports/tasks-command-atomic-map.md",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+        "packages/cli/src/commands/tasks/close-governance.ts",
+        "packages/cli/src/commands/tasks/import-verify.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/status-triangulation.ts",
+        "rft-hardening/tasks/TASK-RFT-0010-tasks-ts-thin-facade-recovery.task.md",
+        "scripts/validate-tasks-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+        "packages/cli/src/commands/tasks/close-governance.ts",
+        "packages/cli/src/commands/tasks/import-verify.ts",
+        "packages/cli/src/commands/tasks/result-contracts.ts",
+        "packages/cli/src/commands/tasks/status-triangulation.ts",
+        "scripts/validate-tasks-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

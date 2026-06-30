@@ -1,0 +1,217 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0010",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9288d84f2349e19e7569f76905b771dad8547dbd",
+  "governedTreeSha": "1cd19d46b5f01b9e63442b50cd600ca3b39fc594",
+  "targetCommitDelta": {
+    "currentCommitSha": "9288d84f2349e19e7569f76905b771dad8547dbd",
+    "parentCommitShas": [
+      "9288d84f2349e19e7569f76905b771dad8547dbd"
+    ],
+    "governedTreeSha": "1cd19d46b5f01b9e63442b50cd600ca3b39fc594",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0010.json",
+      ".atm/history/task-events/TASK-RFT-0010/2026-06-30T18-16-15-692Z-import-ebeac42ebf97.json",
+      ".atm/history/task-events/TASK-RFT-0010/2026-06-30T18-19-18-637Z-import-aac7a346ea81.json",
+      ".atm/history/task-events/TASK-RFT-0010/2026-06-30T18-19-34-006Z-reserve-aa59eac33acc.json",
+      ".atm/history/task-events/TASK-RFT-0010/2026-06-30T18-19-34-008Z-promote-03db0d7a584c.json",
+      ".atm/history/task-events/TASK-RFT-0010/2026-06-30T18-19-38-913Z-claim-5e1ba4494a9b.json",
+      ".atm/history/tasks/TASK-RFT-0010.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "packages/cli/src/commands/tasks/close-governance.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "scripts/validate-tasks-atomic-map.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0240f3be311269cbe7df585c1584dee93810e02ebd899e1b3a8d797d0ea4088f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8b3b1eeee2881a569f5209876dee26a5fe7bd4b64e089f1895e8e790011ff49d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d7e49cec32e63563dd0209bc460dde9a738c8a10f2ecf4d00b2e3bb4463f5386",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3bddd7f8a822a0e41065d0694a64883afd3c6c48f52d3b950b7508692b903f0a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:tasks-atomic-map",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dd24b7e6164efc22535d777e7c1409f9758ba793f58807161a0c4f70c702fcf0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:tasks-atomic-map"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-06-30T18:24:05.184Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0010.*",
+      ".atm/history/task-events/TASK-RFT-0010/**",
+      ".atm/history/tasks/TASK-RFT-0010.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "packages/cli/src/commands/tasks/close-governance.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "rft-hardening/tasks/TASK-RFT-0010-tasks-ts-thin-facade-recovery.task.md",
+      "scripts/validate-tasks-atomic-map.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "packages/cli/src/commands/tasks/close-governance.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "scripts/validate-tasks-atomic-map.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0010.json",
+  "closedAt": "2026-06-30T18:24:05.185Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "sessionId": "session-20260630181934-claude-code-opus-4-7-TASK-RFT-0010-758c0cc049",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6965e11ea45be563ac0a09b9fbbffe0b09f7a49c",
+    "taskMatchedFiles": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "packages/cli/src/commands/tasks/close-governance.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "scripts/validate-tasks-atomic-map.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

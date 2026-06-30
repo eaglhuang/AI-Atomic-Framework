@@ -1,0 +1,138 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0010",
+  "updatedAt": "2026-06-30T18:23:56.349Z",
+  "updatedBy": "claude-code-opus-4-7",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:tasks-atomic-map"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-06-30T18:21:16.387Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0240f3be311269cbe7df585c1584dee93810e02ebd899e1b3a8d797d0ea4088f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts"
+      ],
+      "generatedAt": "2026-06-30T18:21:17.836Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8b3b1eeee2881a569f5209876dee26a5fe7bd4b64e089f1895e8e790011ff49d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts"
+      ],
+      "generatedAt": "2026-06-30T18:21:19.631Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d7e49cec32e63563dd0209bc460dde9a738c8a10f2ecf4d00b2e3bb4463f5386",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts"
+      ],
+      "generatedAt": "2026-06-30T18:21:20.223Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3bddd7f8a822a0e41065d0694a64883afd3c6c48f52d3b950b7508692b903f0a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts"
+      ],
+      "generatedAt": "2026-06-30T18:21:20.908Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-06-30T18:21:29.163Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-06-30T18:23:06.186Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-06-30T18:23:55.309Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:tasks-atomic-map",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dd24b7e6164efc22535d777e7c1409f9758ba793f58807161a0c4f70c702fcf0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:tasks-atomic-map"
+      ],
+      "generatedAt": "2026-06-30T18:23:56.599Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
