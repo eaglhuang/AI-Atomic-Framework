@@ -235,16 +235,16 @@ function normalizeExternalTasks(value: unknown): readonly ExternalTaskReference[
   });
 }
 
-function readJsonIfExists(filePath: string): Record<string, any> | null {
+function readJsonIfExists(filePath: string): Record<string, unknown> | null {
   if (!existsSync(filePath)) return null;
   try {
-    return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any>;
+    return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
   } catch {
     return null;
   }
 }
 
-function isPlainObject(value: unknown): value is Record<string, any> {
+function isPlainObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 

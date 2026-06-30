@@ -109,7 +109,7 @@ export function runRegistryDiff(args: string[]) {
       entry,
       fromVersion: parsed.fromVersion,
       toVersion: parsed.toVersion,
-      driftReason: parsed.driftReason
+      driftReason: parsed.driftReason ?? undefined
     });
   } catch (error: unknown) {
     return makeResult({

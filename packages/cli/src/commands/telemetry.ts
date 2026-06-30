@@ -1,10 +1,10 @@
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
-import { makeResult, message, parseArgsForCommand } from './shared.ts';
+import { CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.ts';
 
 export async function runTelemetry(argv: string[]) {
-  const spec = getCommandSpec('telemetry');
+  const spec = getCommandSpec('telemetry') as CommandSpec;
   const parsed = parseArgsForCommand(spec, argv);
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
   const endpoint = typeof parsed.options.endpoint === 'string' ? String(parsed.options.endpoint) : null;

@@ -16,7 +16,7 @@ const supportedReportSchemas: Record<string, string> = {
 };
 const supportSchemaPaths = ['schemas/test-report/metrics.schema.json'];
 
-export function validateAtomicSpecFileAgainstSchema(cwd: any, specOption: any, options: {
+export function validateAtomicSpecFileAgainstSchema(cwd: string, specOption: string, options: {
   commandName?: string;
   successCode?: string;
   successText?: string;
@@ -26,16 +26,17 @@ export function validateAtomicSpecFileAgainstSchema(cwd: any, specOption: any, o
   const successText = options.successText ?? 'Atomic spec validated against JSON Schema.';
   const specPath = path.resolve(cwd, specOption);
   const relativeSpecPath = relativePathFrom(cwd, specPath);
-  const document = readJsonFile(specPath, 'ATM_SPEC_NOT_FOUND') as Record<string, any>;
-  if (supportedReportSchemas[document?.schemaId]) {
+  const document = readJsonFile(specPath, 'ATM_SPEC_NOT_FOUND') as Record<string, unknown>;
+  const schemaId = typeof document?.schemaId === 'string' ? document.schemaId : '';
+  if (supportedReportSchemas[schemaId]) {
     return validateSupportedReportAgainstSchema(document, {
       commandName,
       cwd,
-      schemaRelativePath: supportedReportSchemas[document.schemaId],
+      schemaRelativePath: supportedReportSchemas[schemaId],
       specPath,
       relativeSpecPath,
       successCode,
-      successText: document?.schemaId === 'atm.atomicMap'
+      successText: schemaId === 'atm.atomicMap'
         ? 'Atomic map validated against JSON Schema.'
         : 'Report validated against JSON Schema.'
     });
@@ -45,7 +46,7 @@ export function validateAtomicSpecFileAgainstSchema(cwd: any, specOption: any, o
   const messages = parsed.ok
     ? [message('info', successCode, successText)]
     : (parsed.promptReport.issues.length > 0
-        ? parsed.promptReport.issues.map((issue: any) => message('error', issue.code, issue.text, { path: issue.path, prompt: issue.prompt }))
+        ? (parsed.promptReport.issues as Array<{ code?: string; text?: string; path?: string; prompt?: string }>).map((issue) => message('error', String(issue.code), String(issue.text), { path: issue.path ?? '/', prompt: String(issue.prompt ?? '') }))
         : [message('error', parsed.promptReport.code, parsed.promptReport.summary)]);
 
   return makeResult({
@@ -64,7 +65,7 @@ export function validateAtomicSpecFileAgainstSchema(cwd: any, specOption: any, o
   });
 }
 
-function validateSupportedReportAgainstSchema(document: any, options: {
+function validateSupportedReportAgainstSchema(document: Record<string, unknown>, options: {
   commandName: string;
   cwd: string;
   schemaRelativePath: string;
@@ -81,14 +82,14 @@ function validateSupportedReportAgainstSchema(document: any, options: {
   }
   const schemaPath = path.join(frameworkRoot, options.schemaRelativePath);
   const validate = ajv.compile(readJsonFile(schemaPath));
-  const report = document as Record<string, any>;
+  const report = document as Record<string, unknown>;
   const ok = validate(document) === true;
   const messages = ok
     ? [message('info', options.successCode, options.successText)]
-    : (validate.errors || []).map((error: any) => message('error', 'ATM_SCHEMA_VALIDATION_ERROR', `${error.instancePath || '/'} ${error.message}`, {
+    : ((validate.errors || []) as Array<{ instancePath?: string; message?: string; keyword?: string; params?: unknown }>).map((error) => message('error', 'ATM_SCHEMA_VALIDATION_ERROR', `${error.instancePath || '/'} ${error.message}`, {
         path: error.instancePath || '/',
-        keyword: error.keyword,
-        params: error.params
+        keyword: error.keyword ?? '',
+        params: (error.params ?? {}) as Record<string, unknown>
       }));
 
   return makeResult({
