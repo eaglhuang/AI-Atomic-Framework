@@ -7,7 +7,7 @@
  */
 import path from 'node:path';
 import { existsSync } from 'node:fs';
-import { EvolutionScanInputReport, scanEvidencePatternReports } from '../../../../core/src/upgrade/evolution-draft.ts';
+import { type EvolutionScanInputReport, scanEvidencePatternReports } from '../../../../core/src/upgrade/evolution-draft.ts';
 import { CliError, makeResult, message, readJsonFile } from '../shared.ts';
 import { collectJsonFiles } from './path-helpers.ts';
 import { loadExplicitInputDocuments } from './proposal.ts';

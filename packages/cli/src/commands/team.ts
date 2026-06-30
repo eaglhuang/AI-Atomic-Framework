@@ -636,7 +636,7 @@ export async function runTeam(argv: string[]) {
     return runTeamKnowledge(argv.slice(1), cwd);
   }
 
-  const spec = getCommandSpec('team');
+  const spec = getCommandSpec('team')!;
   const parsed = parseArgsForCommand(spec, argv);
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));

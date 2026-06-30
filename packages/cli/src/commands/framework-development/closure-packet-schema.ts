@@ -1525,7 +1525,7 @@ function readLatestClosurePacketTeamSummary(cwd: string, taskId: string): Closur
         ? { run, absolutePath }
         : null;
     })
-    .filter((entry): entry is { run: Record<string, any>; absolutePath: string } => Boolean(entry))
+    .filter((entry): entry is { run: Record<string, unknown>; absolutePath: string } => Boolean(entry))
     .sort((left, right) => readTeamRunTimestamp(right.run).localeCompare(readTeamRunTimestamp(left.run)));
 
   const latest = candidates[0];
@@ -1539,17 +1539,17 @@ function readLatestClosurePacketTeamSummary(cwd: string, taskId: string): Closur
       kind: 'team-run',
       teamRunPath: normalizeRelativePath(relativePathFrom(cwd, latest.absolutePath))
     },
-    teamRunId: String(run.teamRunId ?? path.basename(latest.absolutePath, '.json')),
-    captainDecision: run.captainDecision ?? readNestedRecordValue(run, ['teamPlan', 'captainDecision']) ?? readNestedRecordValue(teamSummary, ['captainDecision']) ?? null,
-    agentReports: normalizeUnknownArray(run.agentReports ?? run.agent_reports ?? readNestedRecordValue(teamSummary, ['agentReports'])),
-    patrolFindings: normalizeUnknownArray(run.patrolFindings ?? run.patrol_findings ?? readNestedRecordValue(teamSummary, ['patrolFindings'])),
-    evidenceCuratorSummary: run.evidenceCuratorSummary ?? run.evidence_curator_summary ?? readNestedRecordValue(teamSummary, ['evidenceCuratorSummary']) ?? null,
+    teamRunId: String((run as { teamRunId?: unknown }).teamRunId ?? path.basename(latest.absolutePath, '.json')),
+    captainDecision: (run as { captainDecision?: unknown }).captainDecision ?? readNestedRecordValue(run, ['teamPlan', 'captainDecision']) ?? readNestedRecordValue(teamSummary, ['captainDecision']) ?? null,
+    agentReports: normalizeUnknownArray((run as { agentReports?: unknown; agent_reports?: unknown }).agentReports ?? (run as { agentReports?: unknown; agent_reports?: unknown }).agent_reports ?? readNestedRecordValue(teamSummary, ['agentReports'])),
+    patrolFindings: normalizeUnknownArray((run as { patrolFindings?: unknown; patrol_findings?: unknown }).patrolFindings ?? (run as { patrolFindings?: unknown; patrol_findings?: unknown }).patrol_findings ?? readNestedRecordValue(teamSummary, ['patrolFindings'])),
+    evidenceCuratorSummary: (run as { evidenceCuratorSummary?: unknown; evidence_curator_summary?: unknown }).evidenceCuratorSummary ?? (run as { evidenceCuratorSummary?: unknown; evidence_curator_summary?: unknown }).evidence_curator_summary ?? readNestedRecordValue(teamSummary, ['evidenceCuratorSummary']) ?? null,
     teamSummary
   };
 }
 
-function readTeamRunTimestamp(run: Record<string, any>): string {
-  return normalizeOptionalString(run.updatedAt) ?? normalizeOptionalString(run.createdAt) ?? '';
+function readTeamRunTimestamp(run: Record<string, unknown>): string {
+  return normalizeOptionalString((run as { updatedAt?: unknown }).updatedAt) ?? normalizeOptionalString((run as { createdAt?: unknown }).createdAt) ?? '';
 }
 
 function isRecordValue(value: unknown): value is Record<string, unknown> {
@@ -1929,13 +1929,13 @@ export function repairClosurePacketForTask(input: {
   let parsed = readJsonIfExists(packetAbsolutePath) as ClosurePacket | null;
 
   const taskDocPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-  const taskDocument = readJsonIfExists(taskDocPath) as Record<string, any> | null;
-  if (parsed && taskDocument && taskDocument.status !== 'done') {
-    throw new CliError('ATM_REPAIR_CLOSURE_NOT_CLOSE', `Task ${taskId} has an existing closure packet but its ledger status is '${taskDocument.status}' (not done). Use taskflow close to finalize this task.`, {
+  const taskDocument = readJsonIfExists(taskDocPath) as Record<string, unknown> | null;
+  if (parsed && taskDocument && (taskDocument as { status?: unknown }).status !== 'done') {
+    throw new CliError('ATM_REPAIR_CLOSURE_NOT_CLOSE', `Task ${taskId} has an existing closure packet but its ledger status is '${(taskDocument as { status?: unknown }).status}' (not done). Use taskflow close to finalize this task.`, {
       exitCode: 1,
       details: {
         taskId,
-        ledgerStatus: taskDocument.status,
+        ledgerStatus: (taskDocument as { status?: unknown }).status,
         remediation: 'Run taskflow close to perform closeback finalization instead of repairing.'
       }
     });
@@ -1959,7 +1959,7 @@ export function repairClosurePacketForTask(input: {
       const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`);
       const eventDoc = readJsonIfExists(eventPath);
       if (eventDoc && eventDoc.closure && typeof eventDoc.closure === 'object' && eventDoc.closure.schemaId === 'atm.taskClosureTransition.v1') {
-        const closureInfo = eventDoc.closure as Record<string, any>;
+        const closureInfo = eventDoc.closure as Record<string, unknown>;
         const headDetails = readGitHeadDetails(cwd);
         const targetCommit = readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'tasks', `${taskId}.json`))
           || readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`))
@@ -1990,10 +1990,10 @@ export function repairClosurePacketForTask(input: {
             },
             closedByCommand: 'atm tasks close',
             commandRuns: [],
-            validationPasses: closureInfo.validationPasses ?? [],
-            evidenceFreshness: closureInfo.evidenceFreshness ?? 'fresh',
-            requiredGates: closureInfo.requiredGates ?? [],
-            requiredGatesSnapshot: closureInfo.requiredGatesSnapshot ?? null,
+            validationPasses: (closureInfo as { validationPasses?: unknown }).validationPasses as unknown[] ?? [],
+            evidenceFreshness: (closureInfo as { evidenceFreshness?: unknown }).evidenceFreshness as string ?? 'fresh',
+            requiredGates: (closureInfo as { requiredGates?: unknown }).requiredGates as unknown[] ?? [],
+            requiredGatesSnapshot: (closureInfo as { requiredGatesSnapshot?: unknown }).requiredGatesSnapshot ?? null,
             evidencePath: `.atm/history/evidence/${taskId}.json`,
             closedAt: (eventDoc.createdAt as string) ?? new Date().toISOString(),
             closedByActor: (eventDoc.actorId as string) ?? 'unknown',
@@ -2953,10 +2953,10 @@ function readRepairCommitChangedFiles(cwd: string, commitSha: string): readonly 
   return uniqueSorted(runGitLines(cwd, args).map(normalizeRelativePath).filter(Boolean));
 }
 
-function readJsonIfExists(filePath: string): Record<string, any> | null {
+function readJsonIfExists(filePath: string): Record<string, unknown> | null {
   if (!existsSync(filePath)) return null;
   try {
-    return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, any>;
+    return JSON.parse(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
   } catch {
     return null;
   }
@@ -3105,10 +3105,10 @@ function readClosureEvidenceContext(cwd: string, taskId: string): {
   };
 }
 
-function flattenEvidenceRecords(value: Record<string, any> | null): readonly Record<string, unknown>[] {
+function flattenEvidenceRecords(value: Record<string, unknown> | null): readonly Record<string, unknown>[] {
   if (!value) return [];
-  if (Array.isArray(value.evidence)) {
-    return value.evidence.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry));
+  if (Array.isArray((value as { evidence?: unknown }).evidence)) {
+    return (value as { evidence: Record<string, unknown>[] }).evidence.filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry));
   }
   return [value];
 }
@@ -3116,7 +3116,7 @@ function flattenEvidenceRecords(value: Record<string, any> | null): readonly Rec
 function extractEvidenceCommandRuns(record: Record<string, unknown>, cwd: string): readonly ClosurePacketCommandRun[] {
   const runs = [
     ...readCommandRunArray(record.commandRuns),
-    ...readCommandRunArray(isObjectRecord(record.details) ? record.details.commandRuns : undefined)
+    ...readCommandRunArray(isObjectRecord(record.details) ? (record.details as { commandRuns?: unknown }).commandRuns : undefined)
   ];
   return runs.map((run) => ({
     command: String(run.command),
@@ -3194,7 +3194,7 @@ function dedupeCommandRuns(runs: readonly ClosurePacketCommandRun[]) {
   return output;
 }
 
-function isObjectRecord(value: unknown): value is Record<string, any> {
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
 

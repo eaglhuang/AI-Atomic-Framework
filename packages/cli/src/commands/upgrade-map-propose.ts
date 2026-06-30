@@ -42,10 +42,10 @@ export function runUpgradeMapPropose(options: UpgradeMapProposeOptions) {
       mapId: options.target.mapId
     },
     fork: options.fork ?? null,
-    mapImpactScope: options.mapImpactScope ?? null,
+    mapImpactScope: options.mapImpactScope as unknown as { affectedMapIds?: string[]; propagationStatus?: unknown[] } | null,
     proposalId: options.proposalId ?? null,
-    proposedBy: options.proposedBy ?? null,
-    proposedAt: options.proposedAt ?? null,
+    proposedBy: options.proposedBy ?? undefined,
+    proposedAt: options.proposedAt ?? undefined,
     migration: options.migration ?? null,
     requestedReplacementMode: options.requestedReplacementMode ?? null,
     contextBudgetGate: options.contextBudgetGate ?? null,

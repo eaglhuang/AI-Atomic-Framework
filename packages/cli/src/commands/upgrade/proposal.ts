@@ -27,11 +27,41 @@ import {
 } from '../../../../plugin-human-review/src/index.ts';
 import { CliError, makeResult, message, readJsonFile, resolveValue, writeJsonFile } from '../shared.ts';
 import { collectJsonFiles, requireOptionValue, resolveRepositoryPath } from './path-helpers.ts';
+interface UpgradeCommandOptions {
+  cwd: string;
+  propose: boolean;
+  scan: boolean;
+  dryRun: boolean;
+  atomId: string | null;
+  fromVersion: string | null;
+  toVersion: string | null;
+  behaviorId: string;
+  decompositionDecision: string | null;
+  inputPaths: string[];
+  target: { kind: 'atom' | 'map'; mapId?: string };
+  fork: { sourceAtomId?: string; newAtomId?: string } | null;
+  mapImpactScope: { affectedMapIds?: string[]; propagationStatus?: unknown[] } | null;
+  legacyTarget: string | null;
+  guidanceSession: string | null;
+  requestedReplacementMode: string | null;
+  equivalenceReport: string | null;
+  polymorphImpactReport: string | null;
+  propagationReport: string | null;
+  reviewAdvisory: string | null;
+  humanReview: string | null;
+  rollbackProof: string | null;
+  retirementProof: string | null;
+  proposalId: string | null;
+  proposedBy: string;
+  proposedAt: string | null;
+  migration: Record<string, unknown> | null;
+}
 
+export type ParsedUpgradeCommandOptions = Omit<UpgradeCommandOptions, 'proposedAt'> & { proposedAt: string };
 // ─── Option parsing ────────────────────────────────────────────────────────
 
-export function parseUpgradeOptions(argv: any) {
-  const options: any = {
+export function parseUpgradeOptions(argv: readonly string[]): ParsedUpgradeCommandOptions {
+  const options: UpgradeCommandOptions = {
     cwd: process.cwd(),
     propose: false,
     scan: false,
@@ -43,7 +73,7 @@ export function parseUpgradeOptions(argv: any) {
     decompositionDecision: null,
     inputPaths: [],
     target: { kind: 'atom' },
-    fork: null,
+    fork: null as { sourceAtomId?: string; newAtomId?: string } | null,
     mapImpactScope: null,
     legacyTarget: null,
     guidanceSession: null,
@@ -57,7 +87,7 @@ export function parseUpgradeOptions(argv: any) {
     retirementProof: null,
     proposalId: null,
     proposedBy: 'ATM CLI',
-    proposedAt: null,
+    proposedAt: null as string | null,
     migration: null
   };
 
@@ -250,7 +280,7 @@ export function parseUpgradeOptions(argv: any) {
 
 // ─── Guided legacy dry-run proposal ───────────────────────────────────────
 
-export function isGuidedLegacyDryRun(options: any) {
+export function isGuidedLegacyDryRun(options: ParsedUpgradeCommandOptions) {
   return options.propose === true
     && options.dryRun === true
     && typeof options.legacyTarget === 'string'
@@ -258,7 +288,7 @@ export function isGuidedLegacyDryRun(options: any) {
     && ['behavior.atomize', 'behavior.infect', 'behavior.split'].includes(options.behaviorId);
 }
 
-export function runGuidedLegacyDryRunProposal(options: any) {
+export function runGuidedLegacyDryRunProposal(options: ParsedUpgradeCommandOptions) {
   const behaviorName = String(options.behaviorId).replace(/^behavior\./, '');
   const proposalId = options.proposalId
     ?? `guided-legacy-${behaviorName}-${sanitizeUpgradeBudgetId(options.guidanceSession).toLowerCase()}`;
@@ -317,19 +347,19 @@ export function runGuidedLegacyDryRunProposal(options: any) {
 
 // ─── Input document discovery ──────────────────────────────────────────────
 
-export function loadExplicitInputDocuments(cwd: any, inputPaths: any) {
-  return inputPaths.map((inputPath: any) => {
+export function loadExplicitInputDocuments(cwd: string, inputPaths: string[]) {
+  return inputPaths.map((inputPath: string) => {
     const resolvedPath = path.isAbsolute(inputPath) ? inputPath : path.resolve(cwd, inputPath);
     const rawDocument = readJsonFile(resolvedPath, 'ATM_UPGRADE_INPUT_NOT_FOUND');
     const document = normalizeUpgradeInputDocument(rawDocument);
     return {
       path: path.relative(cwd, resolvedPath).replace(/\\/g, '/'),
-      document
+      document: (document ?? {}) as Record<string, unknown>
     };
   });
 }
 
-export function discoverInputDocuments(cwd: any) {
+export function discoverInputDocuments(cwd: string) {
   const reportsRoot = path.join(cwd, '.atm', 'history', 'reports');
   if (!existsSync(reportsRoot)) {
     throw new CliError('ATM_UPGRADE_INPUTS_NOT_FOUND', 'Upgrade requires input reports. Provide --input paths or stage reports under .atm/history/reports.', {
@@ -338,15 +368,15 @@ export function discoverInputDocuments(cwd: any) {
     });
   }
 
-  const discoveredFiles = collectJsonFiles(reportsRoot).sort((left: any, right: any) => left.localeCompare(right));
-  const discoveredDocuments = discoveredFiles.map((filePath: any) => ({
+  const discoveredFiles = collectJsonFiles(reportsRoot).sort((left, right) => left.localeCompare(right));
+  const discoveredDocuments = discoveredFiles.map((filePath) => ({
     path: path.relative(cwd, filePath).replace(/\\/g, '/'),
-    document: readJsonFile(filePath, 'ATM_UPGRADE_INPUT_NOT_FOUND')
+    document: (readJsonFile(filePath, 'ATM_UPGRADE_INPUT_NOT_FOUND') ?? {}) as Record<string, unknown> & { schemaId: string }
   }));
 
   const inputDocuments = [];
   for (const kind of ['hash-diff', 'execution-evidence', 'non-regression', 'quality-comparison', 'registry-candidate']) {
-    const match = discoveredDocuments.find((entry: any) => inferInputKind(entry.document.schemaId) === kind);
+    const match = discoveredDocuments.find((entry) => inferInputKind(entry.document.schemaId) === kind);
     if (match) {
       inputDocuments.push(match);
     }
@@ -364,9 +394,12 @@ export function discoverInputDocuments(cwd: any) {
 
 // ─── Context budget evaluation ─────────────────────────────────────────────
 
-export async function evaluateUpgradeContextBudget(options: any, inputDocuments: any) {
-  const hashDiffInput = inputDocuments.find((entry: any) => inferInputKind(entry.document.schemaId) === 'hash-diff');
-  const qualityComparisonInput = inputDocuments.find((entry: any) => inferInputKind(entry.document.schemaId) === 'quality-comparison');
+export async function evaluateUpgradeContextBudget(
+  options: ParsedUpgradeCommandOptions,
+  inputDocuments: Array<{ path: string; document: Record<string, unknown> }>
+) {
+  const hashDiffInput = inputDocuments.find((entry) => inferInputKind(entry.document.schemaId as string | null | undefined) === 'hash-diff');
+  const qualityComparisonInput = inputDocuments.find((entry) => inferInputKind(entry.document.schemaId as string | null | undefined) === 'quality-comparison');
   if (!qualityComparisonInput) {
     return {
       gate: null,
@@ -381,8 +414,8 @@ export async function evaluateUpgradeContextBudget(options: any, inputDocuments:
     };
   }
 
-  const atomId = options.atomId ?? hashDiffInput?.document?.atomId ?? qualityComparisonInput.document.atomId ?? 'ATM-UPGRADE-0000';
-  const toVersion = options.toVersion ?? hashDiffInput?.document?.toVersion ?? qualityComparisonInput.document.toVersion ?? 'pending';
+  const atomId = options.atomId ?? (hashDiffInput?.document?.atomId as string | undefined) ?? (qualityComparisonInput.document.atomId as string | undefined) ?? 'ATM-UPGRADE-0000';
+  const toVersion = options.toVersion ?? (hashDiffInput?.document?.toVersion as string | undefined) ?? (qualityComparisonInput.document.toVersion as string | undefined) ?? 'pending';
   const budgetId = `upgrade/${atomId}/${toVersion}`;
   const fallbackReportPath = `.atm/history/reports/context-budget/${sanitizeUpgradeBudgetId(budgetId)}.json`;
   const estimatedTokens = estimateContextBudgetTokens(
@@ -397,8 +430,8 @@ export async function evaluateUpgradeContextBudget(options: any, inputDocuments:
     inlineArtifacts: 1,
     requestedSummary: 'Review the stored context summary and linked reports instead of replaying the full quality comparison inline.'
   };
-  const evaluation = governanceEnabled
-    ? await resolveValue((createLocalGovernanceAdapter({ repositoryRoot: options.cwd }).stores.contextBudgetGuard as any).evaluateBudget(evaluationInput))
+  const evaluation: { decision: 'pass' | 'summarize-before-continue' | 'hard-stop'; reason: string; reportPath: string; summaryPath?: string | null } = governanceEnabled
+    ? await resolveValue((createLocalGovernanceAdapter({ repositoryRoot: options.cwd }).stores.contextBudgetGuard as unknown as { evaluateBudget: (input: unknown) => Promise<{ decision: 'pass' | 'summarize-before-continue' | 'hard-stop'; reason: string; reportPath: string; summaryPath?: string | null }> }).evaluateBudget(evaluationInput))
     : evaluateContextBudgetInline(readUpgradeContextBudgetPolicy(options.cwd), evaluationInput, new Date().toISOString(), fallbackReportPath);
   const gate = {
     passed: evaluation.decision === 'pass',
@@ -409,7 +442,13 @@ export async function evaluateUpgradeContextBudget(options: any, inputDocuments:
       : `blocked (${evaluation.reason})`
   };
   const persisted = governanceEnabled && evaluation.decision !== 'pass'
-    ? await materializeUpgradeHardStop(options.cwd, atomId, qualityComparisonInput.path, evaluation, options.proposedAt ?? new Date().toISOString())
+    ? await materializeUpgradeHardStop(
+        options.cwd,
+        atomId,
+        qualityComparisonInput!.path as string,
+        evaluation as { decision: 'pass' | 'summarize-before-continue' | 'hard-stop'; reportPath: string; summaryPath?: string | null },
+        options.proposedAt ?? new Date().toISOString()
+      )
     : {
         continuationReportPath: null,
         contextSummaryPath: null,
@@ -453,23 +492,25 @@ function enqueueGuidedLegacyProposal(cwd: string, proposal: Record<string, unkno
   };
 }
 
-function normalizeUpgradeInputDocument(document: any) {
-  if (document && typeof document === 'object' && !Array.isArray(document) && document.expectedReport && !document.schemaId) {
-    return document.expectedReport;
+function normalizeUpgradeInputDocument(document: Record<string, unknown> | null | undefined) {
+  if (!document) return document;
+  const docObj = document as { expectedReport?: unknown; evidence?: { propagationReport?: unknown; report?: unknown; decisionLog?: unknown }; schemaId?: string };
+  if (docObj.expectedReport && !docObj.schemaId) {
+    return docObj.expectedReport;
   }
-  if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.propagationReport && !document.schemaId) {
-    return document.evidence.propagationReport;
+  if (docObj.evidence?.propagationReport && !docObj.schemaId) {
+    return docObj.evidence.propagationReport;
   }
-  if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.report && !document.schemaId) {
-    return document.evidence.report;
+  if (docObj.evidence?.report && !docObj.schemaId) {
+    return docObj.evidence.report;
   }
-  if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.decisionLog && !document.schemaId) {
-    return document.evidence.decisionLog;
+  if (docObj.evidence?.decisionLog && !docObj.schemaId) {
+    return docObj.evidence.decisionLog;
   }
   return document;
 }
 
-function inferInputKind(schemaId: any) {
+export function inferInputKind(schemaId: string | null | undefined) {
   switch (schemaId) {
     case 'atm.hashDiffReport':
       return 'hash-diff';
@@ -495,7 +536,13 @@ function inferInputKind(schemaId: any) {
   }
 }
 
-async function materializeUpgradeHardStop(cwd: any, atomId: any, qualityReportPath: any, evaluation: any, generatedAt: any) {
+async function materializeUpgradeHardStop(
+  cwd: string,
+  atomId: string,
+  qualityReportPath: string,
+  evaluation: { decision: 'pass' | 'summarize-before-continue' | 'hard-stop'; reportPath: string; summaryPath?: string | null },
+  generatedAt: string
+) {
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: cwd });
   const runReportStore = adapter.stores.runReportStore;
   const contextSummaryStore = adapter.stores.contextSummaryStore;
@@ -554,7 +601,7 @@ async function materializeUpgradeHardStop(cwd: any, atomId: any, qualityReportPa
   };
 }
 
-function readUpgradeContextBudgetPolicy(cwd: any) {
+function readUpgradeContextBudgetPolicy(cwd: string) {
   const policyPath = path.join(cwd, '.atm', 'runtime', 'budget', 'default-policy.json');
   if (!existsSync(policyPath)) {
     return {
@@ -569,10 +616,15 @@ function readUpgradeContextBudgetPolicy(cwd: any) {
   return readJsonFile(policyPath, 'ATM_UPGRADE_CONTEXT_POLICY_NOT_FOUND');
 }
 
-function evaluateContextBudgetInline(policy: any, input: any, generatedAt: any, reportPath: any) {
+function evaluateContextBudgetInline(
+  policy: { hardStopTokens: number; summarizeTokens: number; warningTokens: number; maxInlineArtifacts: number },
+  input: { estimatedTokens: number; inlineArtifacts: number; budgetId: string },
+  generatedAt: string,
+  reportPath: string
+): { decision: 'pass' | 'summarize-before-continue' | 'hard-stop'; estimatedTokens: number; inlineArtifacts: number; generatedAt: string; reason: string; reportPath: string; summaryPath?: string } {
   const estimatedTokens = Math.max(0, Number(input.estimatedTokens || 0));
   const inlineArtifacts = Math.max(0, Number(input.inlineArtifacts || 0));
-  let decision = 'pass';
+  let decision: 'pass' | 'summarize-before-continue' | 'hard-stop' = 'pass';
   let reason = `Estimated ${estimatedTokens} tokens is within the current context budget policy.`;
 
   if (estimatedTokens >= policy.hardStopTokens) {
@@ -599,6 +651,6 @@ function evaluateContextBudgetInline(policy: any, input: any, generatedAt: any, 
   };
 }
 
-function sanitizeUpgradeBudgetId(value: any) {
+function sanitizeUpgradeBudgetId(value: string | null | undefined) {
   return String(value || 'context-budget').replace(/\\/g, '/').replace(/[/:]+/g, '-');
 }

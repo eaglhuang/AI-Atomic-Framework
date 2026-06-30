@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { getCommandSpec } from './command-specs.ts';
-import { CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
+import { type CommandSpec, makeResult, message, parseArgsForCommand } from './shared.ts';
 import { readTelemetryState, setTelemetryEnabled, telemetryConfigRelativePath } from '../telemetry/index.ts';
 
 export async function runTelemetry(argv: string[]) {

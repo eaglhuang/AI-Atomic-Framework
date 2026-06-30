@@ -15,6 +15,7 @@ import { runUpgradeScan } from './upgrade/scan.ts';
 import {
   discoverInputDocuments,
   evaluateUpgradeContextBudget,
+  inferInputKind,
   isGuidedLegacyDryRun,
   loadExplicitInputDocuments,
   parseUpgradeOptions,
@@ -73,13 +74,24 @@ export async function runUpgrade(argv: string[]) {
     rollbackProof: options.rollbackProof,
     retirementProof: options.retirementProof,
     contextBudgetGate: contextBudget.gate,
-    inputs: inputDocuments
+    inputs: inputDocuments.map((entry) => ({
+      kind: inferInputKind(entry.document.schemaId as string | null | undefined) ?? 'unknown',
+      path: entry.path,
+      document: entry.document
+    }))
   };
 
   const proposal = options.target.kind === 'map'
-    ? runUpgradeMapPropose(proposerOptions)
+    ? runUpgradeMapPropose({
+      ...proposerOptions,
+      target: proposerOptions.target as { kind: 'map'; mapId: string },
+      fork: proposerOptions.fork as { sourceAtomId: string; newAtomId: string } | null,
+      mapImpactScope: proposerOptions.mapImpactScope as unknown as string | null,
+      migration: proposerOptions.migration as { strategy: string; fromVersion?: string | null; notes?: string } | null
+    })
     : proposeAtomicUpgrade({
       ...proposerOptions,
+      fork: proposerOptions.fork as { sourceAtomId: string; newAtomId: string } | null,
       repositoryRoot: options.cwd
     });
 

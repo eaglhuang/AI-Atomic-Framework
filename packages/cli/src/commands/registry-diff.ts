@@ -12,11 +12,11 @@ import { makeResult, message } from './shared.ts';
 
 function parseArgs(args: string[]) {
   const parsed = {
-    atomId: null,
-    fromVersion: null,
-    toVersion: null,
-    registryPath: null,
-    driftReason: null,
+    atomId: null as string | null,
+    fromVersion: null as string | null,
+    toVersion: null as string | null,
+    registryPath: null as string | null,
+    driftReason: null as string | null,
     json: false
   };
 
@@ -103,14 +103,17 @@ export function runRegistryDiff(args: string[]) {
   }
 
   const entry = resolution.entry;
-  let report;
+  let report: { driftSummary: { totalChanged: number; changedFields: string[] } };
   try {
     report = computeHashDiffReport({
-      entry,
+      entry: {
+        ...entry,
+        versions: [...entry.versions]
+      },
       fromVersion: parsed.fromVersion,
       toVersion: parsed.toVersion,
       driftReason: parsed.driftReason ?? undefined
-    });
+    }) as { driftSummary: { totalChanged: number; changedFields: string[] } };
   } catch (error: unknown) {
     return makeResult({
       ok: false,

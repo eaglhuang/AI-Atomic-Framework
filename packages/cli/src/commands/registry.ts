@@ -536,7 +536,10 @@ function computeRegistryDiff(registryDocument: any, input: { atomId: string; fro
     return { ok: false as const, resolution };
   }
   const report = computeHashDiffReport({
-    entry: resolution.entry,
+    entry: {
+      ...resolution.entry,
+      versions: [...resolution.entry.versions]
+    },
     fromVersion: input.fromVersion,
     toVersion: input.toVersion,
     driftReason: 'Registry lineage backfill closeout.'
