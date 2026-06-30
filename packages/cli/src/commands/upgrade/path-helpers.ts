@@ -47,7 +47,7 @@ export function normalizeRepositoryRelativePath(filePath: string) {
   return normalizedPath;
 }
 
-export function requireOptionValue(argv: string[], optionIndex: number, optionName: string) {
+export function requireOptionValue(argv: readonly string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `upgrade requires a value for ${optionName}`, { exitCode: 2 });

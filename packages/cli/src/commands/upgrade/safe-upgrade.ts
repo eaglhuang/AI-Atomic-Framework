@@ -18,6 +18,16 @@ import {
 } from './path-helpers.ts';
 import { parseCanaryPercent, resolveCanarySelection, shouldApplyUpgradeFile } from './canary.ts';
 
+interface SafeUpgradeOptions {
+  action: 'plan' | 'apply' | 'rollback';
+  cwd: string;
+  out: string | null;
+  fromPlan: string | null;
+  backup: string | null;
+  canaryPercent: number | null;
+  allowUnknownChart: boolean;
+}
+
 // ─── Action detection ──────────────────────────────────────────────────────
 
 export function firstSafeUpgradeAction(argv: readonly string[]) {
@@ -36,7 +46,7 @@ export function firstSafeUpgradeAction(argv: readonly string[]) {
 }
 
 export function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' | 'apply' | 'rollback') {
-  const options: any = {
+  const options: SafeUpgradeOptions = {
     action,
     cwd: process.cwd(),
     out: null,
@@ -98,7 +108,7 @@ export function parseSafeUpgradeOptions(argv: readonly string[], action: 'plan' 
 
 // ─── Plan ─────────────────────────────────────────────────────────────────
 
-export function runSafeUpgradePlan(options: any) {
+export function runSafeUpgradePlan(options: SafeUpgradeOptions) {
   const versionSummary = createATMVersionSummary(options.cwd);
   if (versionSummary.compatibility.code === 'unknown-chart-version' && options.allowUnknownChart !== true) {
     throw new CliError('ATM_UPGRADE_UNKNOWN_CHART_REQUIRES_OVERRIDE', 'ATMChart version is unknown. Safe upgrade plan is read-only but still requires --allow-unknown-chart before preparing write-oriented follow-up steps.', {
@@ -158,7 +168,7 @@ export function runSafeUpgradePlan(options: any) {
 
 // ─── Apply ────────────────────────────────────────────────────────────────
 
-export async function runSafeUpgradeApply(options: any) {
+export async function runSafeUpgradeApply(options: SafeUpgradeOptions) {
   if (typeof options.fromPlan !== 'string') {
     throw new CliError('ATM_CLI_USAGE', 'upgrade apply requires --from-plan <plan.json>', { exitCode: 2 });
   }
@@ -168,7 +178,7 @@ export async function runSafeUpgradeApply(options: any) {
     throw new CliError('ATM_UPGRADE_PLAN_INVALID', 'Safe upgrade apply requires an atm.safeUpgradePlan document.', { exitCode: 2 });
   }
   const cwd = path.resolve(String(plan.cwd ?? options.cwd));
-  const willModify = Array.isArray(plan.willModify) ? plan.willModify.map((entry: any) => normalizeRepositoryRelativePath(String(entry))) : [];
+  const willModify = Array.isArray(plan.willModify) ? (plan.willModify as unknown[]).map((entry) => normalizeRepositoryRelativePath(String(entry))) : [];
   const canary = resolveCanarySelection(options.canaryPercent, willModify);
   const backupRoot = resolveRepositoryPath(cwd, String(plan.backupPath));
   const backupManifestPath = path.join(backupRoot, 'backup-manifest.json');
@@ -240,7 +250,7 @@ export async function runSafeUpgradeApply(options: any) {
 
 // ─── Rollback ─────────────────────────────────────────────────────────────
 
-export function runSafeUpgradeRollback(options: any) {
+export function runSafeUpgradeRollback(options: SafeUpgradeOptions) {
   if (typeof options.backup !== 'string') {
     throw new CliError('ATM_CLI_USAGE', 'upgrade rollback requires --backup <backup-dir>', { exitCode: 2 });
   }
@@ -287,17 +297,17 @@ export function runSafeUpgradeRollback(options: any) {
 // ─── File collection ───────────────────────────────────────────────────────
 
 export function collectSafeUpgradeFiles(cwd: string) {
-  const records = new Map<string, any>();
+  const records = new Map<string, Record<string, unknown>>();
   addBackupRecord(records, cwd, '.atm/memory/atm-chart.md', { role: 'atm-chart' });
   addManifestFiles(records, cwd, '.atm/agent-pack', 'agent-pack-manifest');
   addManifestFiles(records, cwd, '.atm/integrations', 'integration-manifest');
   addBackupRecord(records, cwd, '.atm/runtime/compatibility-matrix.snapshot.json', { role: 'compatibility-matrix-snapshot' });
-  return [...records.values()].sort((left, right) => left.path.localeCompare(right.path));
+  return [...records.values()].sort((left, right) => String(left.path).localeCompare(String(right.path)));
 }
 
 // ─── Private helpers ───────────────────────────────────────────────────────
 
-function addManifestFiles(records: Map<string, any>, cwd: string, manifestDir: string, role: string) {
+function addManifestFiles(records: Map<string, Record<string, unknown>>, cwd: string, manifestDir: string, role: string) {
   const absoluteManifestDir = resolveRepositoryPath(cwd, manifestDir);
   if (!existsSync(absoluteManifestDir)) return;
   for (const entryName of readdirSync(absoluteManifestDir).filter((entry) => entry.endsWith('.manifest.json')).sort((left, right) => left.localeCompare(right))) {
@@ -314,25 +324,25 @@ function addManifestFiles(records: Map<string, any>, cwd: string, manifestDir: s
   }
 }
 
-function extractManagedFilesFromManifest(manifest: any) {
-  if (Array.isArray(manifest?.renderedManifest?.renderedFiles)) {
-    return manifest.renderedManifest.renderedFiles.map((entry: any) => ({
-      path: entry.path,
-      expectedHash: entry.contentHash,
+function extractManagedFilesFromManifest(manifest: Record<string, unknown> | null | undefined) {
+  if (manifest && 'renderedManifest' in manifest && manifest.renderedManifest && typeof manifest.renderedManifest === 'object' && 'renderedFiles' in manifest.renderedManifest && Array.isArray(manifest.renderedManifest.renderedFiles)) {
+    return manifest.renderedManifest.renderedFiles.map((entry) => ({
+      path: String((entry as Record<string, unknown>).path),
+      expectedHash: String((entry as Record<string, unknown>).contentHash),
       hashFormat: 'hex'
     }));
   }
-  if (Array.isArray(manifest?.files)) {
-    return manifest.files.map((entry: any) => ({
-      path: entry.path,
-      expectedHash: entry.sha256,
+  if (manifest && 'files' in manifest && Array.isArray(manifest.files)) {
+    return manifest.files.map((entry) => ({
+      path: String((entry as Record<string, unknown>).path),
+      expectedHash: String((entry as Record<string, unknown>).sha256),
       hashFormat: 'prefixed'
     }));
   }
   return [];
 }
 
-function addBackupRecord(records: Map<string, any>, cwd: string, filePath: string, details: Record<string, unknown>) {
+function addBackupRecord(records: Map<string, Record<string, unknown>>, cwd: string, filePath: string, details: Record<string, unknown>) {
   const relativeFilePath = normalizeRepositoryRelativePath(filePath);
   const absolutePath = resolveRepositoryPath(cwd, relativeFilePath);
   const exists = existsSync(absolutePath);
@@ -349,10 +359,10 @@ function addBackupRecord(records: Map<string, any>, cwd: string, filePath: strin
   });
 }
 
-function backupSafeUpgradeFiles(cwd: string, backupRoot: string, backupFiles: readonly any[]) {
+function backupSafeUpgradeFiles(cwd: string, backupRoot: string, backupFiles: readonly Record<string, unknown>[]) {
   const backedUpFiles = [];
   for (const fileRecord of backupFiles) {
-    const relativeFilePath = normalizeRepositoryRelativePath(fileRecord.path);
+    const relativeFilePath = normalizeRepositoryRelativePath(String(fileRecord.path));
     const sourcePath = resolveRepositoryPath(cwd, relativeFilePath);
     const backupFilePath = path.join(backupRoot, 'files', relativeFilePath);
     if (!existsSync(sourcePath)) {
