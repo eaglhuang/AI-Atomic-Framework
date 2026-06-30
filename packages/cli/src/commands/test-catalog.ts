@@ -44,6 +44,43 @@ export interface TaskTestPlan {
   integrationTests?: TaskTestCapabilityPlan;
 }
 
+interface TestCatalogConfigProfile {
+  extends?: string;
+  validators?: unknown;
+}
+
+interface TestCatalogConfigFamily {
+  id?: string;
+  matchTags?: unknown;
+}
+
+interface TestCatalogConfigFocusRule {
+  patterns?: unknown;
+  validators?: unknown;
+}
+
+interface TestCatalogConfigValidator {
+  name?: string;
+  entry?: string;
+  tags?: unknown;
+  slow?: boolean;
+  performanceBudgetMs?: number | null;
+}
+
+interface TestCatalogConfig {
+  schemaId?: string;
+  specVersion?: string;
+  entries?: unknown;
+  validators?: TestCatalogConfigValidator[];
+  profiles?: Record<string, TestCatalogConfigProfile | undefined>;
+  focusRules?: TestCatalogConfigFocusRule[];
+  selectionFamilies?: TestCatalogConfigFamily[];
+  performanceDefaults?: {
+    slowValidatorBudgetMs?: number;
+    fastValidatorBudgetMs?: number;
+  };
+}
+
 export interface SelectTestEntriesOptions {
   catalog: TestCatalog;
   capability?: TestCapability;
@@ -63,10 +100,10 @@ const tierRank: Record<TestTier, number> = {
   full: 3
 };
 
-export function readTestCatalog(repositoryRoot: string, options: { validatorsConfig?: any } = {}): TestCatalog {
+export function readTestCatalog(repositoryRoot: string, options: { validatorsConfig?: TestCatalogConfig } = {}): TestCatalog {
   const catalogPath = path.join(repositoryRoot, 'scripts', 'test-catalog.config.json');
-  const baseCatalog = existsSync(catalogPath)
-    ? JSON.parse(readFileSync(catalogPath, 'utf8'))
+  const baseCatalog: TestCatalogConfig = existsSync(catalogPath)
+    ? JSON.parse(readFileSync(catalogPath, 'utf8')) as TestCatalogConfig
     : { schemaId: 'atm.testCatalog.v1', specVersion: '0.1.0', entries: [] };
   const configuredEntries = normalizeEntries(baseCatalog.entries ?? []);
   const projectedValidators = options.validatorsConfig
@@ -80,9 +117,12 @@ export function readTestCatalog(repositoryRoot: string, options: { validatorsCon
   };
 }
 
-export function resolveTestPlanForTask(task: any, changedFiles: string[] = [], repoKind = 'framework-repository'): TaskTestPlan {
-  const explicitPlan = isRecord(task?.testPlan) ? task.testPlan : {};
-  const legacyValidators = Array.isArray(task?.validators) ? task.validators.map(String) : [];
+export function resolveTestPlanForTask(task: unknown, changedFiles: string[] = [], repoKind = 'framework-repository'): TaskTestPlan {
+  const taskRecord = isRecord(task) ? task : {};
+  const explicitPlan = isRecord(taskRecord.testPlan) ? taskRecord.testPlan : {};
+  const legacyValidators = Array.isArray(taskRecord.validators) ? taskRecord.validators.map(String) : [];
+  const validatorsPlan = isRecord(explicitPlan.validators) ? explicitPlan.validators : {};
+  const integrationTestsPlan = isRecord(explicitPlan.integrationTests) ? explicitPlan.integrationTests : {};
   const languageStaticRequired = changedFiles.some((filePath) => matchesAny(filePath, [
     '**/*.ts',
     '**/*.tsx',
@@ -92,20 +132,20 @@ export function resolveTestPlanForTask(task: any, changedFiles: string[] = [], r
     '**/*.cs'
   ]));
   const validators = {
-    defaultTier: normalizeTier(explicitPlan?.validators?.defaultTier) ?? 'quick',
-    requiredKeys: normalizeStringList(explicitPlan?.validators?.requiredKeys),
+    defaultTier: normalizeTier(validatorsPlan.defaultTier) ?? 'quick',
+    requiredKeys: normalizeStringList(validatorsPlan.requiredKeys),
     requiredFamilies: [
-      ...normalizeStringList(explicitPlan?.validators?.requiredFamilies),
+      ...normalizeStringList(validatorsPlan.requiredFamilies),
       ...(languageStaticRequired ? ['language-static'] : []),
       ...legacyValidators
     ],
-    allowedScopes: normalizeScopes(explicitPlan?.validators?.allowedScopes, repoKind)
+    allowedScopes: normalizeScopes(validatorsPlan.allowedScopes, repoKind)
   };
   const integrationTests = {
-    defaultTier: normalizeTier(explicitPlan?.integrationTests?.defaultTier) ?? 'quick',
-    requiredKeys: normalizeStringList(explicitPlan?.integrationTests?.requiredKeys),
-    requiredFamilies: normalizeStringList(explicitPlan?.integrationTests?.requiredFamilies),
-    allowedScopes: normalizeScopes(explicitPlan?.integrationTests?.allowedScopes, repoKind)
+    defaultTier: normalizeTier(integrationTestsPlan.defaultTier) ?? 'quick',
+    requiredKeys: normalizeStringList(integrationTestsPlan.requiredKeys),
+    requiredFamilies: normalizeStringList(integrationTestsPlan.requiredFamilies),
+    allowedScopes: normalizeScopes(integrationTestsPlan.allowedScopes, repoKind)
   };
   return {
     schemaId: 'atm.taskTestPlan.v1',
@@ -165,13 +205,13 @@ export function resolveLanguageStaticEntries(changedFiles: string[], adapters: T
   });
 }
 
-export function projectValidatorsFromConfig(config: any): TestCatalogEntry[] {
+export function projectValidatorsFromConfig(config: TestCatalogConfig): TestCatalogEntry[] {
   const validatorNamesByProfile = new Map<string, Set<string>>();
   for (const profileName of ['quick', 'standard', 'full']) {
     validatorNamesByProfile.set(profileName, new Set(resolveProfileValidatorNamesFromConfig(config, profileName)));
   }
   const focusTriggersByValidator = collectFocusTriggersByValidator(config);
-  return (config.validators ?? []).map((validator: any) => {
+  return (config.validators ?? []).map((validator) => {
     const tags = normalizeStringList(validator.tags);
     const family = resolveFamilyForValidator(tags, config.selectionFamilies ?? []);
     const tiers = resolveValidatorTiers(String(validator.name), validatorNamesByProfile);
@@ -264,14 +304,15 @@ function resolveValidatorTiers(name: string, namesByProfile: Map<string, Set<str
   return ['standard'];
 }
 
-function resolveProfileValidatorNamesFromConfig(config: any, profileName: string): string[] {
+function resolveProfileValidatorNamesFromConfig(config: TestCatalogConfig, profileName: string): string[] {
   const profile = config.profiles?.[profileName];
   if (!profile) return [];
   const inherited = profile.extends ? resolveProfileValidatorNamesFromConfig(config, profile.extends) : [];
-  return [...new Set([...inherited, ...(profile.validators ?? []).map(String)])];
+  const profileValidators = Array.isArray(profile.validators) ? profile.validators.map(String) : [];
+  return [...new Set([...inherited, ...profileValidators])];
 }
 
-function collectFocusTriggersByValidator(config: any): Map<string, string[]> {
+function collectFocusTriggersByValidator(config: TestCatalogConfig): Map<string, string[]> {
   const result = new Map<string, string[]>();
   for (const rule of config.focusRules ?? []) {
     const patterns = normalizeStringList(rule.patterns);
@@ -282,7 +323,7 @@ function collectFocusTriggersByValidator(config: any): Map<string, string[]> {
   return result;
 }
 
-function resolveFamilyForValidator(tags: string[], families: any[]): string {
+function resolveFamilyForValidator(tags: string[], families: TestCatalogConfigFamily[]): string {
   for (const family of families) {
     const matchTags = normalizeStringList(family.matchTags).map((entry) => entry.toLowerCase());
     if (tags.some((tag) => matchTags.includes(tag.toLowerCase()))) {
@@ -359,6 +400,6 @@ function toPortablePath(value: string): string {
   return String(value || '').replace(/\\/g, '/');
 }
 
-function isRecord(value: unknown): value is Record<string, any> {
+function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }
