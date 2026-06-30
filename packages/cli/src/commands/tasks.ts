@@ -7817,7 +7817,7 @@ async function runTasksNew(argv: string[]): Promise<CommandResult> {
   const spec = (await import('./command-specs/tasks.spec.ts')).default;
   const parsed = parseArgsForCommand(spec, ['new', ...argv]);
 
-  const options = parsed.options as any;
+  const options = parsed.options as Record<string, unknown>;
   const cwd = (options.cwd as string) || process.cwd();
 
   const template = (options.template as string) || 'aao-l2-split';

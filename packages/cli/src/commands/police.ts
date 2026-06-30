@@ -6,7 +6,7 @@ import {
 } from '../../../core/src/police/family.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 
-export async function runPolice(argv: any) {
+export async function runPolice(argv: string[]) {
   const options = parsePoliceOptions(argv);
   const action = options.action ?? 'run';
   if (action !== 'run') {

@@ -1,7 +1,7 @@
 import { CliError, parseOptions } from './shared.ts';
 import { validateAtomicSpecFileAgainstSchema } from './spec-shared.ts';
 
-export function runSpec(argv: any) {
+export function runSpec(argv: string[]) {
   const { options } = parseOptions(argv, 'spec');
   if (!options.validate) {
     throw new CliError('ATM_CLI_USAGE', 'spec requires --validate <path>', { exitCode: 2 });
