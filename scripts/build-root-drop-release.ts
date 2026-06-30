@@ -1,12 +1,16 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  assertRootLauncherSafeForReleaseBuild,
+  assertStableLauncherTemplatePresent,
+  resolveStableLauncherTemplatePath
+} from './launcher-entrypoint-guards.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const defaultReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
 const deterministicGeneratedAt = '1970-01-01T00:00:00.000Z';
 const releaseEntries = [
-  'atm.mjs',
   'CHANGELOG.md',
   'compatibility-matrix.json',
   'compatibility-matrix.legacy.json',
@@ -36,6 +40,8 @@ const releaseEntries = [
 export function buildRootDropRelease(options: any = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? repoRoot);
   const releaseRoot = path.resolve(options.releaseRoot ?? defaultReleaseRoot);
+  assertStableLauncherTemplatePresent(repositoryRoot);
+  assertRootLauncherSafeForReleaseBuild(repositoryRoot);
   rmSync(releaseRoot, { recursive: true, force: true });
   mkdirSync(releaseRoot, { recursive: true });
 
@@ -46,6 +52,12 @@ export function buildRootDropRelease(options: any = {}) {
     }
     cpSync(sourcePath, path.join(releaseRoot, relativePath), { recursive: true });
   }
+  const stableLauncherTemplatePath = resolveStableLauncherTemplatePath(repositoryRoot);
+  writeFileSync(
+    path.join(releaseRoot, 'atm.mjs'),
+    readFileSync(stableLauncherTemplatePath, 'utf8'),
+    'utf8'
+  );
 
   const bundleReadmePath = path.join(releaseRoot, 'README.root-drop.md');
   const bundleReadme = [
@@ -71,7 +83,7 @@ export function buildRootDropRelease(options: any = {}) {
     generatedAt: resolveReleaseGeneratedAt(),
     releaseRoot: 'release/atm-root-drop',
     entrypoint: 'atm.mjs',
-    entries: [...releaseEntries],
+    entries: ['atm.mjs', ...releaseEntries],
     generatedFiles,
     stagingContract: {
       schemaId: 'atm.generatedArtifactStaging.v1',

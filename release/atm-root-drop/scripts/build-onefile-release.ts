@@ -5,6 +5,7 @@ import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { finalizeBuildReleaseHygiene } from './build-release-hygiene.ts';
+import { assertPayloadLauncherIsNotNested } from './launcher-entrypoint-guards.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const rootDropReleaseRoot = path.join(repoRoot, 'release', 'atm-root-drop');
@@ -20,6 +21,7 @@ export function buildOnefileRelease(options: any = {}) {
   if (!existsSync(rootDropRoot)) {
     buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot });
   }
+  assertPayloadLauncherIsNotNested(path.join(rootDropRoot, 'atm.mjs'));
 
   const payloadFiles = collectPayloadFiles(rootDropRoot);
   const payload = {
