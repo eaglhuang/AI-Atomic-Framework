@@ -22,7 +22,59 @@ export const INPUT_KIND_PRIORITY = new Map([
   ['retirement-proof', 11]
 ]);
 
-export function inferInputKind(kindOrSchemaId: any) {
+type InputKind =
+  | 'hash-diff'
+  | 'execution-evidence'
+  | 'non-regression'
+  | 'quality-comparison'
+  | 'registry-candidate'
+  | 'map-equivalence'
+  | 'polymorph-impact'
+  | 'propagation-report'
+  | 'review-advisory'
+  | 'human-review'
+  | 'rollback-proof'
+  | 'retirement-proof';
+
+interface InputDocument {
+  schemaId?: string;
+  expectedReport?: Record<string, unknown>;
+  evidence?: {
+    propagationReport?: Record<string, unknown>;
+    report?: Record<string, unknown>;
+    decisionLog?: Record<string, unknown>;
+  };
+  reportId?: string;
+  proofId?: string;
+  evidenceId?: string;
+  [key: string]: unknown;
+}
+
+interface RawInput {
+  kind?: string;
+  document?: Record<string, unknown>;
+  report?: Record<string, unknown>;
+  value?: Record<string, unknown>;
+  path?: string;
+  reportPath?: string;
+  evidencePath?: string;
+}
+
+interface NormalizedInput {
+  kind: InputKind;
+  path: string;
+  document: InputDocument;
+}
+
+interface InputRef {
+  kind: InputKind;
+  path: string;
+  schemaId: string;
+  summary: string;
+  reportId?: string;
+}
+
+export function inferInputKind(kindOrSchemaId: string): InputKind {
   switch (kindOrSchemaId) {
     case 'hash-diff':
     case 'atm.hashDiffReport':
@@ -66,7 +118,7 @@ export function inferInputKind(kindOrSchemaId: any) {
   }
 }
 
-export function unwrapKnownInputDocument(document: any) {
+export function unwrapKnownInputDocument(document: Record<string, unknown> | null | undefined): Record<string, unknown> | null | undefined {
   if (!document || typeof document !== 'object' || Array.isArray(document)) {
     return document;
   }
@@ -85,7 +137,7 @@ export function unwrapKnownInputDocument(document: any) {
   return document;
 }
 
-export function resolveInputSchemaId(kind: any, document: any) {
+export function resolveInputSchemaId(kind: InputKind, document: InputDocument): string {
   if (typeof document?.schemaId === 'string' && document.schemaId.length > 0) {
     return document.schemaId;
   }
@@ -95,7 +147,7 @@ export function resolveInputSchemaId(kind: any, document: any) {
   return String(kind);
 }
 
-export function createInputSummary(kind: any) {
+export function createInputSummary(kind: InputKind): string {
   switch (kind) {
     case 'hash-diff':
       return 'hash-diff input';
@@ -126,7 +178,7 @@ export function createInputSummary(kind: any) {
   }
 }
 
-export function normalizeInputDocument(input: any) {
+export function normalizeInputDocument(input: RawInput): NormalizedInput {
   if (!input || typeof input !== 'object') {
     throw new Error('Upgrade proposal inputs must be objects.');
   }
@@ -136,7 +188,7 @@ export function normalizeInputDocument(input: any) {
     throw new Error('Upgrade proposal inputs require a document payload.');
   }
 
-  const inferredKind = inferInputKind(input.kind ?? document.schemaId);
+  const inferredKind = inferInputKind((input.kind ?? (document as InputDocument).schemaId) as string);
   const path = input.path ?? input.reportPath ?? input.evidencePath ?? null;
   if (!path) {
     throw new Error(`Upgrade proposal input ${inferredKind} requires a path.`);
@@ -145,15 +197,15 @@ export function normalizeInputDocument(input: any) {
   return {
     kind: inferredKind,
     path,
-    document
+    document: document as InputDocument
   };
 }
 
-export function findInput(inputs: any, expectedKind: any) {
-  return inputs.find((entry: any) => entry.kind === expectedKind) ?? null;
+export function findInput(inputs: NormalizedInput[], expectedKind: InputKind): NormalizedInput | null {
+  return inputs.find((entry) => entry.kind === expectedKind) ?? null;
 }
 
-export function requireInput(inputs: any, expectedKind: any) {
+export function requireInput(inputs: NormalizedInput[], expectedKind: InputKind): NormalizedInput {
   const input = findInput(inputs, expectedKind);
   if (!input) {
     throw new Error(`Upgrade proposal requires a ${expectedKind} input document.`);
@@ -161,7 +213,7 @@ export function requireInput(inputs: any, expectedKind: any) {
   return input;
 }
 
-export function buildInputRefs(inputs: any) {
+export function buildInputRefs(inputs: NormalizedInput[]): InputRef[] {
   return [...inputs]
     .sort((left, right) => {
       const leftPriority = INPUT_KIND_PRIORITY.get(left.kind) ?? 99;
@@ -172,18 +224,18 @@ export function buildInputRefs(inputs: any) {
       return left.path.localeCompare(right.path);
     })
     .map((input) => {
-      const ref: any = {
+      const ref: InputRef = {
         kind: input.kind,
         path: input.path,
-          schemaId: resolveInputSchemaId(input.kind, input.document),
+        schemaId: resolveInputSchemaId(input.kind, input.document),
         summary: createInputSummary(input.kind)
       };
       if (typeof input.document.reportId === 'string' && input.document.reportId.length > 0) {
         ref.reportId = input.document.reportId;
-        } else if (typeof input.document.proofId === 'string' && input.document.proofId.length > 0) {
-          ref.reportId = input.document.proofId;
-        } else if (typeof input.document.evidenceId === 'string' && input.document.evidenceId.length > 0) {
-          ref.reportId = input.document.evidenceId;
+      } else if (typeof input.document.proofId === 'string' && input.document.proofId.length > 0) {
+        ref.reportId = input.document.proofId;
+      } else if (typeof input.document.evidenceId === 'string' && input.document.evidenceId.length > 0) {
+        ref.reportId = input.document.evidenceId;
       }
       return ref;
     });

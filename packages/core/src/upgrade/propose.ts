@@ -42,7 +42,26 @@ const VALID_BEHAVIOR_IDS = [
 
 const VALID_REPLACEMENT_MODES = ['draft', 'shadow', 'canary', 'active', 'legacy-retired'];
 
-export function proposeAtomicUpgrade(request: any) {
+interface ProposalRequest {
+  inputs: object[];
+  atomId?: string | null;
+  fromVersion?: string | null;
+  toVersion?: string | null;
+  behaviorId?: string | null;
+  decompositionDecision?: string | null;
+  target?: { kind?: string; mapId?: string } | null;
+  fork?: { sourceAtomId?: string; newAtomId?: string } | null;
+  mapImpactScope?: { affectedMapIds?: string[]; propagationStatus?: unknown[] } | null;
+  proposedBy?: string;
+  proposedAt?: string;
+  proposalId?: string | null;
+  migration?: { strategy?: string; fromVersion?: string | null; notes?: string } | null;
+  requestedReplacementMode?: string | null;
+  repositoryRoot?: string;
+  contextBudgetGate?: object | null;
+}
+
+export function proposeAtomicUpgrade(request: ProposalRequest) {
   const normalizedRequest = normalizeRequest(request);
   const hashDiffInput = requireInput(normalizedRequest.inputs, 'hash-diff');
   const hashDiffReport = hashDiffInput.document;
@@ -211,7 +230,7 @@ export function proposeAtomicUpgrade(request: any) {
         }
       : undefined);
 
-  const proposal: any = {
+  const proposal: Record<string, unknown> = {
     schemaId: 'atm.upgradeProposal',
     specVersion: '0.1.0',
     migration: normalizeMigration(normalizedRequest.migration),
@@ -285,7 +304,7 @@ export function proposeAtomicUpgrade(request: any) {
   return proposal;
 }
 
-function normalizeRequest(request: any = {}) {
+function normalizeRequest(request: ProposalRequest) {
   if (!Array.isArray(request.inputs) || request.inputs.length === 0) {
     throw new Error('Upgrade proposal requires at least one input document.');
   }
@@ -310,7 +329,7 @@ function normalizeRequest(request: any = {}) {
   };
 }
 
-function normalizeTarget(target: any) {
+function normalizeTarget(target: { kind?: string; mapId?: string } | null | undefined) {
   if (!target || typeof target !== 'object') {
     return { kind: 'atom' as const };
   }
@@ -327,7 +346,7 @@ function normalizeTarget(target: any) {
   return normalized;
 }
 
-function normalizeRequestedReplacementMode(value: any, target: any) {
+function normalizeRequestedReplacementMode(value: string | null | undefined, target: { kind: string; mapId?: string }) {
   if (value == null) {
     return null;
   }
@@ -351,7 +370,7 @@ function buildRequiredJustification({
   humanReviewGate,
   rollbackProofGate,
   retirementProofGate
-}: any) {
+}: Record<string, { passed?: boolean } | string | null | undefined>) {
   if (requestedReplacementMode === 'active') {
     const requiredGateNames = [];
     const requiredEvidenceKinds = [];
@@ -425,7 +444,7 @@ function buildActiveReplacementRationale(requiredGateNames: readonly string[]) {
   return 'Map promotion to active requires all replacement evidence gates to pass before review can proceed.';
 }
 
-function createProposalId(atomId: any, fromVersion: any, toVersion: any, target: any, behaviorId: any) {
+function createProposalId(atomId: string, fromVersion: string, toVersion: string, target: { kind: string; mapId?: string }, behaviorId: string): string {
   const safeAtomId = String(atomId).toLowerCase();
   const targetSuffix = target.kind === 'map'
     ? `.map-${String(target.mapId ?? 'unknown').toLowerCase()}`
@@ -434,7 +453,7 @@ function createProposalId(atomId: any, fromVersion: any, toVersion: any, target:
   return `proposal.${safeAtomId}.from-${fromVersion}.to-${toVersion}${targetSuffix}${behaviorSuffix}`;
 }
 
-function normalizeMigration(migration: any) {
+function normalizeMigration(migration: { strategy?: string; fromVersion?: string | null; notes?: string } | null | undefined) {
   return {
     strategy: migration?.strategy ?? 'none',
     fromVersion: migration?.fromVersion ?? null,
