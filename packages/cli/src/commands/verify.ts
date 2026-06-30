@@ -5,7 +5,7 @@ import { defaultNeutralityPolicyRelativePath, scanNeutralityRepository } from '.
 import { checkGuardJustification } from '../../../plugin-rule-guard/src/rule-justification.ts';
 import { existsSync, readFileSync } from 'node:fs';
 
-export function runVerify(argv: any) {
+export function runVerify(argv: string[]) {
   const { options } = parseOptions(argv, 'verify');
   const selectedModes = [options.self, options.neutrality, options.agentsMd, options.guards].filter((value) => value === true).length;
   if (selectedModes !== 1) {
@@ -27,7 +27,7 @@ export function runVerify(argv: any) {
   return runSelfVerify(options.cwd);
 }
 
-function runSelfVerify(cwd: any) {
+function runSelfVerify(cwd: string) {
   const schemaResult = validateRegistryDocumentAgainstSchema(cwd, registryFilePath, {
     commandName: 'verify',
     successCode: 'ATM_VERIFY_REGISTRY_SCHEMA_OK',
@@ -61,7 +61,7 @@ function runSelfVerify(cwd: any) {
   });
 }
 
-function runNeutralityVerify(cwd: any) {
+function runNeutralityVerify(cwd: string) {
   const report = scanNeutralityRepository({
     repositoryRoot: cwd,
     policyPath: defaultNeutralityPolicyRelativePath
@@ -88,7 +88,7 @@ function runNeutralityVerify(cwd: any) {
   });
 }
 
-function runAgentsMdVerify(cwd: any) {
+function runAgentsMdVerify(cwd: string) {
   const verification = verifyAgentsMarkdown(cwd);
   return makeResult({
     ok: verification.ok,
@@ -110,7 +110,7 @@ function runAgentsMdVerify(cwd: any) {
   });
 }
 
-function runGuardsVerify(cwd: any, evidencePath: string | undefined) {
+function runGuardsVerify(cwd: string, evidencePath: string | undefined) {
   if (!evidencePath) {
     throw new CliError('ATM_CLI_USAGE', 'verify --guards requires --evidence <path>', { exitCode: 2 });
   }
@@ -126,7 +126,7 @@ function runGuardsVerify(cwd: any, evidencePath: string | undefined) {
     });
   }
 
-  let evidenceDoc: any;
+  let evidenceDoc: Record<string, unknown>;
   try {
     evidenceDoc = JSON.parse(readFileSync(absoluteEvidencePath, 'utf8'));
   } catch {
