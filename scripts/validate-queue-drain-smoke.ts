@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createValidator } from './lib/validator-harness.ts';
@@ -7,6 +8,21 @@ const harness = createValidator('queue-drain-smoke', {
   argv: process.argv.slice(2),
   defaultMode: 'validate'
 });
+
+function resolveHeadCommitTimestamp(root: string): string {
+  const result = spawnSync('git', ['show', '-s', '--format=%cI', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  if (result.status !== 0) {
+    throw new Error(`failed to resolve HEAD commit timestamp: ${(result.stderr || result.stdout).trim()}`);
+  }
+  const timestamp = result.stdout.trim();
+  if (!timestamp) {
+    throw new Error('failed to resolve HEAD commit timestamp: empty output');
+  }
+  return timestamp;
+}
 
 const artifactDir = harness.repoPath('artifacts', 'queue-drain-smoke', '20260628');
 const sizes = [5, 10, 20, 50];
@@ -24,7 +40,7 @@ mkdirSync(artifactDir, { recursive: true });
 
 const summary = {
   schemaId: 'atm.queueDrainSmokeSummary.v1',
-  generatedAt: new Date().toISOString(),
+  generatedAt: resolveHeadCommitTimestamp(harness.root),
   sizes,
   preservedIntentTotal: rows.reduce((sum, row) => sum + row.preservedIntents, 0),
   lostIntentTotal: rows.reduce((sum, row) => sum + row.lostIntents, 0),

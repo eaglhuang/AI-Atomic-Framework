@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { calculateBrokerDecision } from '../packages/core/src/broker/decision.ts';
 import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from '../packages/core/src/broker/types.ts';
 import { createValidator } from './lib/validator-harness.ts';
@@ -9,6 +10,21 @@ const harness = createValidator('admission-failure-reason', {
   argv: process.argv.slice(2),
   defaultMode: 'validate'
 });
+
+function resolveHeadCommitTimestamp(root: string): string {
+  const result = spawnSync('git', ['show', '-s', '--format=%cI', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  if (result.status !== 0) {
+    throw new Error(`failed to resolve HEAD commit timestamp: ${(result.stderr || result.stdout).trim()}`);
+  }
+  const timestamp = result.stdout.trim();
+  if (!timestamp) {
+    throw new Error('failed to resolve HEAD commit timestamp: empty output');
+  }
+  return timestamp;
+}
 
 const artifactDir = harness.repoPath('artifacts', 'generated', 'admission-failure-reason', '20260628');
 
@@ -111,7 +127,7 @@ mkdirSync(artifactDir, { recursive: true });
 
 const summary = {
   schemaId: 'atm.admissionFailureReasonSummary.v1',
-  generatedAt: new Date().toISOString(),
+  generatedAt: resolveHeadCommitTimestamp(harness.root),
   cases: cases.map((entry) => ({
     id: entry.id,
     verdict: entry.decision.verdict,
