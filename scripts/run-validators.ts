@@ -29,6 +29,7 @@ const validatorMap = new Map(config.validators.map((entry: any) => [entry.name, 
 const selectionFamilies = Array.isArray(config.selectionFamilies) ? config.selectionFamilies : [];
 const DEFAULT_FAST_VALIDATOR_BUDGET_MS = 10_000;
 const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000;
+const VALIDATOR_RUNS_ROOT = path.join(root, '.atm', 'runtime', 'validator-runs');
 
 const parsedCli = parseCliArgs(process.argv.slice(2));
 const profileConfig = resolveProfileConfig(parsedCli.profile);
@@ -68,6 +69,14 @@ const selectedValidators = selectedNames.map((name: any) => {
     catalogCostBudgetMs: catalogEntry.costBudgetMs
   } : validator;
 }).filter((validator: any) => parsedCli.skipSlow ? validator.slow !== true : true);
+const runContext = initializeRunContext({
+  parsedCli,
+  profileConfig,
+  selectedValidators,
+  focusPaths: resolvedFocusPaths,
+  baseValidatorCount: baseProfileValidatorNames.length,
+  focusReducedValidatorCount: focusedProfileValidatorNames.length
+});
 
 if (selectedValidators.length === 0) {
   const summary = createSummary({
@@ -97,8 +106,10 @@ if (selectedValidators.length === 0) {
     },
     baselineFingerprintCount: baselineFingerprints.size,
     startedAt: Date.now(),
-    results: []
+    results: [],
+    runContext
   });
+  persistRunSummary(runContext, summary, 'completed');
   writePerformanceOutputIfRequested(summary, parsedCli.performanceOutputPath);
   emitSummary(summary, parsedCli.json);
   process.exitCode = 0;
@@ -107,13 +118,46 @@ if (selectedValidators.length === 0) {
 
 const startedAt = Date.now();
 const results = parallel
-  ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, { json: parsedCli.json, cache: parsedCli.cache })))
+  ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, {
+      json: parsedCli.json,
+      cache: parsedCli.cache,
+      runContext
+    })))
     .then((items) => items.map((item) => markResultAgainstBaseline(item, baselineFingerprints)))
   : await runValidatorsSequential(selectedValidators, profileConfig.mode, {
       json: parsedCli.json,
       cache: parsedCli.cache,
       stopOnFailure: parsedCli.legacy,
-      baselineFingerprints
+      baselineFingerprints,
+      runContext,
+      summaryInput: {
+        profile: parsedCli.profile,
+        mode: profileConfig.mode,
+        filters: parsedCli.filters,
+        focusPaths: resolvedFocusPaths,
+        focusMode: parsedCli.focusChanged ? 'changed' : (resolvedFocusPaths.length > 0 ? 'paths' : 'none'),
+        baseValidatorCount: baseProfileValidatorNames.length,
+        focusReducedValidatorCount: focusedProfileValidatorNames.length,
+        parallel,
+        legacy: parsedCli.legacy,
+        cache: parsedCli.cache,
+        skipSlow: parsedCli.skipSlow,
+        baselinePath: parsedCli.baselinePath,
+        performanceBaselinePath: parsedCli.performanceBaselinePath,
+        performanceBaselineSummary,
+        performanceBudgetOverrides: {
+          fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
+          slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
+        },
+        catalog: {
+          schemaId: testCatalog.schemaId,
+          sourcePath: testCatalog.sourcePath,
+          capability: 'validator',
+          duplicateDedupeKeys
+        },
+        baselineFingerprintCount: baselineFingerprints.size,
+        startedAt
+      }
     });
 
 const summary = createSummary({
@@ -143,8 +187,10 @@ const summary = createSummary({
   },
   baselineFingerprintCount: baselineFingerprints.size,
   startedAt,
-  results
+  results,
+  runContext
 });
+persistRunSummary(runContext, summary, 'completed');
 writePerformanceOutputIfRequested(summary, parsedCli.performanceOutputPath);
 emitSummary(summary, parsedCli.json);
 process.exitCode = summary.failed > 0 ? 1 : 0;
@@ -166,6 +212,8 @@ function parseCliArgs(argv: any) {
     serial: boolean;
     focusPaths: string[];
     focusChanged: boolean;
+    runId: string | null;
+    resume: string | null;
   } = {
     filters: [],
     parallel: false,
@@ -180,7 +228,9 @@ function parseCliArgs(argv: any) {
     slowValidatorBudgetMs: null,
     serial: false,
     focusPaths: [],
-    focusChanged: false
+    focusChanged: false,
+    runId: null,
+    resume: null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -280,6 +330,24 @@ function parseCliArgs(argv: any) {
     }
     if (arg === '--slow-validator-budget-ms') {
       options.slowValidatorBudgetMs = parsePositiveIntegerOption(argv[index + 1], '--slow-validator-budget-ms');
+      index += 1;
+      continue;
+    }
+    if (arg === '--run-id') {
+      const valueText = String(argv[index + 1] ?? '').trim();
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--run-id requires a value');
+      }
+      options.runId = valueText;
+      index += 1;
+      continue;
+    }
+    if (arg === '--resume') {
+      const valueText = String(argv[index + 1] ?? '').trim();
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--resume requires a run id');
+      }
+      options.resume = valueText;
       index += 1;
       continue;
     }
@@ -411,12 +479,205 @@ function applyFilters(validatorNames: any, filters: any) {
   });
 }
 
+function initializeRunContext({ parsedCli, profileConfig, selectedValidators, focusPaths, baseValidatorCount, focusReducedValidatorCount }: any) {
+  if (!parsedCli.runId && !parsedCli.resume) {
+    return null;
+  }
+  const runId = parsedCli.resume ?? parsedCli.runId ?? createValidatorRunId();
+  const runDir = path.join(VALIDATOR_RUNS_ROOT, runId);
+  mkdirSync(runDir, { recursive: true });
+  const manifestPath = path.join(runDir, 'manifest.json');
+  const summaryPath = path.join(runDir, 'summary.partial.json');
+  const receiptsDir = path.join(runDir, 'receipts');
+  mkdirSync(receiptsDir, { recursive: true });
+  const previousManifest = existsSync(manifestPath) ? readJsonFile(manifestPath) : null;
+  const previousAttempts = Array.isArray(previousManifest?.attempts) ? previousManifest.attempts : [];
+  const attempt = previousAttempts.length + 1;
+  const headCommit = readGitHead();
+  const selectionFingerprint = buildSelectionFingerprint({
+    profile: parsedCli.profile,
+    mode: profileConfig.mode,
+    filters: parsedCli.filters,
+    focusPaths,
+    validatorNames: selectedValidators.map((entry: any) => String(entry.name))
+  });
+  const validatorFingerprints = Object.fromEntries(selectedValidators.map((validator: any) => {
+    const validatorPath = path.join(root, validator.entry);
+    const command = `node --strip-types ${normalizeCommandPath(validator.entry)} --mode ${profileConfig.mode}`;
+    return [validator.name, buildValidatorRunFingerprint({
+      validator,
+      mode: profileConfig.mode,
+      command,
+      validatorPath,
+      profile: parsedCli.profile,
+      selectionFingerprint,
+      headCommit
+    })];
+  }));
+  const receiptReuseAllowed = parsedCli.resume
+    ? isResumeCompatible(previousManifest, {
+        profile: parsedCli.profile,
+        mode: profileConfig.mode,
+        selectionFingerprint,
+        headCommit
+      })
+    : false;
+  const manifest = {
+    schemaId: 'atm.validatorRunManifest.v1',
+    runId,
+    profile: parsedCli.profile,
+    mode: profileConfig.mode,
+    parallel: resolveParallelSetting(parsedCli, profileConfig),
+    cache: parsedCli.cache,
+    focusPaths,
+    filters: parsedCli.filters,
+    focusMode: parsedCli.focusChanged ? 'changed' : (focusPaths.length > 0 ? 'paths' : 'none'),
+    baseValidatorCount,
+    focusReducedValidatorCount,
+    startedAt: previousManifest?.startedAt ?? new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    selectionFingerprint,
+    headCommit,
+    receiptReuseAllowed,
+    attempt,
+    attempts: [
+      ...previousAttempts,
+      {
+        attempt,
+        startedAt: new Date().toISOString(),
+        resumedFrom: parsedCli.resume ?? null
+      }
+    ],
+    validators: selectedValidators.map((validator: any) => ({
+      name: validator.name,
+      entry: validator.entry,
+      fingerprint: validatorFingerprints[validator.name]
+    }))
+  };
+  writeJsonFile(manifestPath, manifest);
+  for (const validator of selectedValidators) {
+    ensureValidatorReceipt({
+      receiptsDir,
+      validatorName: validator.name,
+      fingerprint: validatorFingerprints[validator.name],
+      attempt
+    });
+  }
+  return {
+    enabled: true,
+    runId,
+    resumed: Boolean(parsedCli.resume),
+    attempt,
+    runDir,
+    manifestPath,
+    summaryPath,
+    receiptsDir,
+    selectionFingerprint,
+    headCommit,
+    validatorFingerprints,
+    receiptReuseAllowed
+  };
+}
+
+function createValidatorRunId(): string {
+  return `run-${new Date().toISOString().replace(/[:.]/g, '-').replace('Z', 'Z')}-${process.pid}`;
+}
+
+function buildSelectionFingerprint({ profile, mode, filters, focusPaths, validatorNames }: any): string {
+  const fingerprint = {
+    schemaId: 'atm.validatorSelectionFingerprint.v1',
+    profile,
+    mode,
+    filters: Array.isArray(filters) ? [...filters] : [],
+    focusPaths: Array.isArray(focusPaths) ? [...focusPaths] : [],
+    validatorNames: Array.isArray(validatorNames) ? [...validatorNames] : []
+  };
+  return sha256Json(fingerprint);
+}
+
+function buildValidatorRunFingerprint({ validator, mode, command, validatorPath, profile, selectionFingerprint, headCommit }: any): string {
+  const fingerprint = {
+    schemaId: 'atm.validatorRunFingerprint.v1',
+    validator: validator.name,
+    entry: validator.entry,
+    mode,
+    profile,
+    command,
+    selectionFingerprint,
+    headCommit,
+    sourceMtimeMs: safeMtimeMs(validatorPath)
+  };
+  return sha256Json(fingerprint);
+}
+
+function isResumeCompatible(previousManifest: any, current: any): boolean {
+  if (!previousManifest) {
+    return false;
+  }
+  return previousManifest.profile === current.profile
+    && previousManifest.mode === current.mode
+    && previousManifest.selectionFingerprint === current.selectionFingerprint
+    && previousManifest.headCommit === current.headCommit;
+}
+
+function ensureValidatorReceipt({ receiptsDir, validatorName, fingerprint, attempt }: any): void {
+  const receiptPath = path.join(receiptsDir, `${validatorName}.json`);
+  if (existsSync(receiptPath)) {
+    return;
+  }
+  writeJsonFile(receiptPath, {
+    schemaId: 'atm.validatorRunReceipt.v1',
+    validatorName,
+    status: 'pending',
+    fingerprint,
+    attempts: [],
+    lastAttempt: attempt,
+    updatedAt: new Date().toISOString()
+  });
+}
+
+function readValidatorReceipt(runContext: any, validatorName: string): any | null {
+  if (!runContext) return null;
+  const receiptPath = path.join(runContext.receiptsDir, `${validatorName}.json`);
+  return existsSync(receiptPath) ? readJsonFile(receiptPath) : null;
+}
+
+function writeValidatorReceipt(runContext: any, validatorName: string, receipt: any): void {
+  if (!runContext) return;
+  const receiptPath = path.join(runContext.receiptsDir, `${validatorName}.json`);
+  writeJsonFile(receiptPath, receipt);
+}
+
+function shouldReuseReceipt({ runContext, validator }: any): any | null {
+  if (!runContext?.resumed || runContext.receiptReuseAllowed !== true) {
+    return null;
+  }
+  const receipt = readValidatorReceipt(runContext, validator.name);
+  if (!receipt || receipt.status !== 'passed') {
+    return null;
+  }
+  const result = receipt.result;
+  if (!result || result.ok !== true) {
+    return null;
+  }
+  return {
+    ...result,
+    resumedFromReceipt: true,
+    durationMs: 0,
+    envelope: {
+      ...result.envelope,
+      durationMs: 0
+    }
+  };
+}
+
 async function runValidatorsSequential(validators: any, mode: any, options: any) {
   const results: any[] = [];
   for (const validator of validators) {
     const rawResult = await runValidator(validator, mode, options);
     const result = markResultAgainstBaseline(rawResult, options.baselineFingerprints ?? new Set());
     results.push(result);
+    persistPartialSummary(options, results, 'running');
     if (options.stopOnFailure && result.ok !== true) {
       break;
     }
@@ -430,9 +691,55 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
     const validatorPath = path.join(root, validator.entry);
     const command = `node --strip-types ${normalizeCommandPath(validator.entry)} --mode ${mode}`;
     const cacheKey = buildValidatorCacheKey(validator, mode, command, validatorPath);
+    const resumed = shouldReuseReceipt({ runContext: options.runContext, validator });
+    if (resumed) {
+      resolve(resumed);
+      return;
+    }
+    const runFingerprint = options.runContext?.validatorFingerprints?.[validator.name] ?? null;
+    if (options.runContext) {
+      const receipt = readValidatorReceipt(options.runContext, validator.name) ?? {
+        schemaId: 'atm.validatorRunReceipt.v1',
+        validatorName: validator.name,
+        attempts: []
+      };
+      writeValidatorReceipt(options.runContext, validator.name, {
+        ...receipt,
+        validatorName: validator.name,
+        fingerprint: runFingerprint,
+        status: 'running',
+        lastAttempt: options.runContext.attempt,
+        updatedAt: new Date().toISOString(),
+        attempts: [
+          ...(Array.isArray(receipt.attempts) ? receipt.attempts : []),
+          {
+            attempt: options.runContext.attempt,
+            startedAt: new Date().toISOString(),
+            status: 'running'
+          }
+        ]
+      });
+    }
     if (options.cache) {
       const cached = readValidatorCache(cacheKey);
       if (cached) {
+        if (options.runContext) {
+          persistValidatorReceiptResult({
+            runContext: options.runContext,
+            validatorName: validator.name,
+            fingerprint: runFingerprint,
+            result: {
+              ...cached,
+              cached: true,
+              durationMs: 0,
+              envelope: {
+                ...cached.envelope,
+                durationMs: 0
+              }
+            },
+            status: 'passed'
+          });
+        }
         resolve({
           ...cached,
           cached: true,
@@ -531,6 +838,15 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
         blockingFindings: envelope.blockingFindings,
         envelope
       };
+      if (options.runContext) {
+        persistValidatorReceiptResult({
+          runContext: options.runContext,
+          validatorName: validator.name,
+          fingerprint: runFingerprint,
+          result,
+          status: result.ok === true ? 'passed' : 'failed'
+        });
+      }
       if (options.cache && result.ok === true) {
         writeValidatorCache(cacheKey, result);
       }
@@ -539,7 +855,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
   });
 }
 
-function createSummary({ profile, mode, filters, focusPaths, focusMode, baseValidatorCount, focusReducedValidatorCount, parallel, legacy, cache, skipSlow, baselinePath, performanceBaselinePath, performanceBaselineSummary, performanceBudgetOverrides, catalog, baselineFingerprintCount, startedAt, results }: any) {
+function createSummary({ profile, mode, filters, focusPaths, focusMode, baseValidatorCount, focusReducedValidatorCount, parallel, legacy, cache, skipSlow, baselinePath, performanceBaselinePath, performanceBaselineSummary, performanceBudgetOverrides, catalog, baselineFingerprintCount, startedAt, results, runContext }: any) {
   const durationMs = Date.now() - startedAt;
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
@@ -585,10 +901,23 @@ function createSummary({ profile, mode, filters, focusPaths, focusMode, baseVali
     legacy,
     cache,
     skipSlow,
+    run: runContext ? {
+      schemaId: 'atm.validatorRunCheckpoint.v1',
+      enabled: true,
+      runId: runContext.runId,
+      resumed: runContext.resumed === true,
+      attempt: runContext.attempt,
+      runDir: path.relative(root, runContext.runDir).replace(/\\/g, '/'),
+      summaryPath: path.relative(root, runContext.summaryPath).replace(/\\/g, '/')
+    } : {
+      schemaId: 'atm.validatorRunCheckpoint.v1',
+      enabled: false
+    },
     baselinePath: baselinePath ?? null,
     performanceBaselinePath: performanceBaselinePath ?? null,
     baselineFingerprintCount: baselineFingerprintCount ?? 0,
     cached: results.filter((entry: any) => entry.cached === true).length,
+    resumed: results.filter((entry: any) => entry.resumedFromReceipt === true).length,
     selection,
     performance,
     requiredCommand: firstRequiredCommand(envelopes),
@@ -748,6 +1077,94 @@ function writePerformanceOutputIfRequested(summary: any, outputPath: string | nu
   const resolved = path.resolve(root, outputPath);
   mkdirSync(path.dirname(resolved), { recursive: true });
   writeFileSync(resolved, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+}
+
+function persistPartialSummary(options: any, results: any[], phase: 'running' | 'completed'): void {
+  if (!options?.runContext || !options?.summaryInput) {
+    return;
+  }
+  const summary = createSummary({
+    ...options.summaryInput,
+    results,
+    runContext: options.runContext
+  });
+  persistRunSummary(options.runContext, summary, phase);
+}
+
+function persistRunSummary(runContext: any, summary: any, phase: 'running' | 'completed'): void {
+  if (!runContext) return;
+  writeJsonFile(runContext.summaryPath, {
+    ...summary,
+    phase,
+    updatedAt: new Date().toISOString()
+  });
+  const manifest = readJsonFile(runContext.manifestPath);
+  writeJsonFile(runContext.manifestPath, {
+    ...manifest,
+    updatedAt: new Date().toISOString(),
+    latestPhase: phase,
+    latestSummaryPath: path.relative(root, runContext.summaryPath).replace(/\\/g, '/')
+  });
+}
+
+function persistValidatorReceiptResult({ runContext, validatorName, fingerprint, result, status }: any): void {
+  if (!runContext) return;
+  const receipt = readValidatorReceipt(runContext, validatorName) ?? {
+    schemaId: 'atm.validatorRunReceipt.v1',
+    validatorName,
+    attempts: []
+  };
+  const attempts = Array.isArray(receipt.attempts) ? [...receipt.attempts] : [];
+  if (attempts.length > 0 && attempts[attempts.length - 1]?.attempt === runContext.attempt) {
+    attempts[attempts.length - 1] = {
+      ...attempts[attempts.length - 1],
+      finishedAt: new Date().toISOString(),
+      status
+    };
+  } else {
+    attempts.push({
+      attempt: runContext.attempt,
+      startedAt: new Date().toISOString(),
+      finishedAt: new Date().toISOString(),
+      status
+    });
+  }
+  writeValidatorReceipt(runContext, validatorName, {
+    ...receipt,
+    validatorName,
+    fingerprint,
+    status,
+    lastAttempt: runContext.attempt,
+    updatedAt: new Date().toISOString(),
+    attempts,
+    result
+  });
+}
+
+function readJsonFile(filePath: string): any {
+  return JSON.parse(readFileSync(filePath, 'utf8').replace(/^\uFEFF/, ''));
+}
+
+function writeJsonFile(filePath: string, value: unknown): void {
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function sha256Json(value: unknown): string {
+  return crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
+
+function readGitHead(): string | null {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+    env: createSanitizedGitEnv()
+  });
+  if (result.status !== 0) {
+    return null;
+  }
+  const head = String(result.stdout ?? '').trim();
+  return head || null;
 }
 
 function createPerformanceReport({ profile, durationMs, results, profileConfig, performanceBudgetOverrides, performanceBaselineSummary, duplicateDedupeKeys }: any) {
