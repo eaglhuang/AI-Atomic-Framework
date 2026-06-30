@@ -23,6 +23,22 @@ export interface FrameworkStaleLockInfo {
     readonly releaseCommand: string | null;
     readonly detail: string;
 }
+export interface FrameworkLockAutoReconcileEvidence {
+    readonly schemaId: 'atm.frameworkLockAutoReconcile.v1';
+    readonly actorId: string;
+    readonly staleLock: FrameworkStaleLockInfo;
+    readonly releasedAt: string;
+    readonly releaseResult: unknown;
+    readonly reclaimTaskId: string;
+    readonly scopedFiles: readonly string[];
+    readonly reason: string | null;
+    readonly outcome: 'reclaimed' | 'released-but-reclaim-failed';
+    readonly claimFailure?: {
+        readonly code: string;
+        readonly message: string;
+    } | null;
+    readonly auditPath: string;
+}
 export interface FrameworkRepoIdentity {
     readonly isFrameworkRepo: boolean;
     readonly score: number;

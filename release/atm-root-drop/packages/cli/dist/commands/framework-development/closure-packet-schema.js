@@ -284,6 +284,16 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
     const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, linkedTaskId);
     const staleLock = classifyFrameworkStaleLock(root, actorId, { currentTaskId });
     if (staleLock) {
+        if (canAutoReconcileCompletedSelfTempLock(staleLock, actorId)) {
+            return await runFrameworkTempClaimWithAutoReconcile({
+                root,
+                actorId,
+                scopedFiles,
+                reason,
+                currentTaskId,
+                staleLock
+            });
+        }
         const details = isFrameworkStaleLockReleasable(staleLock)
             ? {
                 ...staleLock,
@@ -343,6 +353,101 @@ export async function runFrameworkTempClaim(cwd, actor, files, reason, linkedTas
             reason: reason ?? null,
             linkedTaskId: resolvedLinkedTaskId,
             files: scopedFiles,
+            lock
+        }
+    });
+}
+async function runFrameworkTempClaimWithAutoReconcile(input) {
+    const adapter = createLocalGovernanceAdapter({ repositoryRoot: input.root });
+    const releaseResult = await resolveValue(adapter.stores.lockStore.releaseLock(input.staleLock.lockTaskId, input.actorId));
+    const taskId = frameworkTempTaskId(input.actorId);
+    const task = {
+        workItemId: taskId,
+        title: input.reason?.trim() || 'Temporary ATM framework-development claim',
+        status: 'running'
+    };
+    let lock;
+    let autoReconcileEvidence = null;
+    try {
+        lock = await resolveValue(adapter.stores.lockStore.acquireLock(task, input.scopedFiles, input.actorId));
+        autoReconcileEvidence = writeFrameworkLockAutoReconcileEvidence(input.root, {
+            actorId: input.actorId,
+            staleLock: input.staleLock,
+            releasedAt: new Date().toISOString(),
+            releaseResult,
+            reclaimTaskId: taskId,
+            scopedFiles: input.scopedFiles,
+            reason: input.reason ?? null,
+            outcome: 'reclaimed',
+            claimFailure: null
+        });
+    }
+    catch (error) {
+        const code = error instanceof CliError ? error.code : 'ATM_FRAMEWORK_TEMP_CLAIM_REACQUIRE_FAILED';
+        const messageText = error instanceof Error ? error.message : String(error);
+        autoReconcileEvidence = writeFrameworkLockAutoReconcileEvidence(input.root, {
+            actorId: input.actorId,
+            staleLock: input.staleLock,
+            releasedAt: new Date().toISOString(),
+            releaseResult,
+            reclaimTaskId: taskId,
+            scopedFiles: input.scopedFiles,
+            reason: input.reason ?? null,
+            outcome: 'released-but-reclaim-failed',
+            claimFailure: {
+                code,
+                message: messageText
+            }
+        });
+        throw error;
+    }
+    const resolvedLinkedTaskId = input.currentTaskId;
+    if (resolvedLinkedTaskId) {
+        try {
+            const lockPath = path.join(input.root, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+            const existing = readJsonIfExists(lockPath);
+            if (existing) {
+                writeFileSync(lockPath, `${JSON.stringify({ ...existing, linkedTaskId: resolvedLinkedTaskId }, null, 2)}\n`, 'utf8');
+            }
+        }
+        catch {
+            // Missing link metadata only reduces future classification precision.
+        }
+    }
+    const stagedFiles = runGitLines(input.root, ['diff', '--cached', '--name-only']).map((f) => normalizeRelativePath(f)).filter(Boolean);
+    const stagedResidues = stagedFiles.filter(f => !input.scopedFiles.includes(f));
+    const claimMessages = [
+        message('info', 'ATM_FRAMEWORK_STALE_SELF_LOCK_AUTO_RELEASED', 'ATM automatically released the same-actor stale-completed framework temp lock before reclaiming scope.', {
+            actorId: input.actorId,
+            staleLockTaskId: input.staleLock.lockTaskId,
+            linkedTaskId: input.staleLock.linkedTaskId,
+            auditPath: autoReconcileEvidence.auditPath
+        }),
+        message('info', 'ATM_FRAMEWORK_TEMP_CLAIM_ACQUIRED', 'Temporary framework-development runtime lock acquired.', {
+            taskId,
+            actorId: input.actorId,
+            files: input.scopedFiles,
+            ...(resolvedLinkedTaskId ? { linkedTaskId: resolvedLinkedTaskId } : {})
+        })
+    ];
+    if (stagedResidues.length > 0) {
+        claimMessages.push(message('warn', 'ATM_FRAMEWORK_STAGED_RESIDUE_DETECTED', `Warning: Staged residue detected outside claimed scope: ${stagedResidues.join(', ')}. Please adopt, stash, or widen the scope.`, {
+            stagedResidues
+        }));
+    }
+    return makeResult({
+        ok: true,
+        command: 'framework-mode',
+        cwd: input.root,
+        messages: claimMessages,
+        evidence: {
+            action: 'claim',
+            taskId,
+            actorId: input.actorId,
+            reason: input.reason ?? null,
+            linkedTaskId: resolvedLinkedTaskId,
+            files: input.scopedFiles,
+            autoReconcile: autoReconcileEvidence,
             lock
         }
     });
@@ -487,8 +592,25 @@ export function buildFrameworkStaleCleanupCommand(staleLock, files = [], reason 
         return staleLock.requiredCommand;
     return `${staleLock.releaseCommand} && ${buildFrameworkTempClaimCommand(files, reason, staleLock.actorId)}`;
 }
+function canAutoReconcileCompletedSelfTempLock(staleLock, actorId) {
+    return staleLock.kind === 'stale-completed'
+        && staleLock.actorId === actorId
+        && staleLock.lockTaskId === frameworkTempTaskId(actorId)
+        && staleLock.linkedTaskId !== null;
+}
 export function isFrameworkStaleLockReleasable(staleLock) {
     return staleLock.kind === 'stale-completed' || staleLock.kind === 'stale-ttl-expired';
+}
+function writeFrameworkLockAutoReconcileEvidence(root, input) {
+    const auditPath = path.join(root, '.atm', 'history', 'evidence', 'framework-lock-auto-reconcile.jsonl');
+    const record = {
+        schemaId: 'atm.frameworkLockAutoReconcile.v1',
+        ...input,
+        auditPath: relativePathFrom(root, auditPath)
+    };
+    mkdirSync(path.dirname(auditPath), { recursive: true });
+    appendFileSync(auditPath, `${JSON.stringify(record)}\n`, 'utf8');
+    return record;
 }
 export function runFrameworkDevelopmentGuard(cwd, files = [], targetRepo = null) {
     const report = createFrameworkModeStatus({ cwd, files, targetRepo });

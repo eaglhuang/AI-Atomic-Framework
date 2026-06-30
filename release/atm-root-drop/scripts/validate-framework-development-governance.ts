@@ -478,6 +478,36 @@ try {
   const releaseStatus = await runFrameworkMode(['release', '--cwd', frameworkRepo, '--actor', 'test-agent', '--json']);
   assert(releaseStatus.ok === true, 'framework-mode release command must report ok=true');
 
+  const staleCompletedTaskId = 'TASK-FRAMEWORK-STALE-0001';
+  writeJson(path.join(frameworkRepo, '.atm', 'history', 'tasks', `${staleCompletedTaskId}.json`), {
+    schemaId: 'atm.workItem.v0.2',
+    workItemId: staleCompletedTaskId,
+    title: 'Framework stale completed lock demo',
+    status: 'done',
+    closedAt: new Date().toISOString()
+  });
+  writeJson(path.join(frameworkRepo, '.atm', 'runtime', 'locks', 'ATM-FRAMEWORK-TEMP-test-agent.lock.json'), {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: 'ATM-FRAMEWORK-TEMP-test-agent',
+    lockedBy: 'test-agent',
+    lockedAt: new Date().toISOString(),
+    actorId: 'test-agent',
+    leaseId: 'lease-framework-stale-demo',
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 86400,
+    files: ['packages/core/src/index.ts'],
+    linkedTaskId: staleCompletedTaskId
+  });
+  const autoReconcileClaim = await runFrameworkMode(['claim', '--cwd', frameworkRepo, '--actor', 'test-agent', '--files', 'packages/core/src/index.ts', '--reason', 'auto-reconcile stale completed self lock', '--json']);
+  assert(autoReconcileClaim.ok === true, 'framework-mode claim must auto-reconcile same-actor stale-completed temp lock');
+  const autoReconcileEvidence = (autoReconcileClaim.evidence as any).autoReconcile;
+  assert(autoReconcileEvidence?.schemaId === 'atm.frameworkLockAutoReconcile.v1', 'framework-mode auto-reconcile must emit persisted audit evidence');
+  assert(autoReconcileEvidence?.outcome === 'reclaimed', 'framework-mode auto-reconcile evidence must record reclaimed outcome');
+  assert(String(autoReconcileEvidence?.auditPath ?? '').includes('framework-lock-auto-reconcile.jsonl'), 'framework-mode auto-reconcile evidence must name the audit log path');
+  const postAutoRelease = await runFrameworkMode(['release', '--cwd', frameworkRepo, '--actor', 'test-agent', '--json']);
+  assert(postAutoRelease.ok === true, 'framework-mode release must still succeed after auto-reconcile reclaim');
+
   if (!process.exitCode) {
     console.log(`[framework-development-governance:${mode}] ok (framework mode detector, task audit, cross-repo closure, and closure packet verified)`);
   }

@@ -103,6 +103,9 @@ export function evaluateDeprecationPolicy(input: any) {
       failures.push({ code: 'DEPRECATION_ENTRY_INVALID', message: `${entry.surface}: dates and versions must be parseable` });
       continue;
     }
+    if (!shouldEnforceRemovalGate(entry.status)) {
+      continue;
+    }
     const elapsedDays = Math.floor((asOf.getTime() - deprecatedAt.getTime()) / 86_400_000);
     const elapsedMinor = (removalTarget.major - deprecatedIn.major) * 1000 + (removalTarget.minor - deprecatedIn.minor);
     if (elapsedDays < tier.days) {
@@ -176,8 +179,19 @@ function parseDate(value: string) {
 }
 
 function parseSemver(value: string) {
-  const match = String(value ?? '').match(/^(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?$/);
+  const match = String(value ?? '').match(/^v?(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?$/);
   return match ? { major: Number(match[1]), minor: Number(match[2]), patch: Number(match[3]) } : null;
+}
+
+function shouldEnforceRemovalGate(status: unknown): boolean {
+  const normalized = String(status ?? '').trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+  return normalized === 'removal-ready'
+    || normalized === 'removal-blocked'
+    || normalized.startsWith('removal-')
+    || normalized === 'scheduled-removal';
 }
 
 function readJson(relativePath: string) {

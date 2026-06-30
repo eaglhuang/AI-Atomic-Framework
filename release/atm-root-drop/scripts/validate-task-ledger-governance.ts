@@ -1216,11 +1216,33 @@ try {
 
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
   assert(resetCreate.ok === true, 'reset fixture task create must succeed');
-  await runTasks(['reserve', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator']);
+  const reservedBeforeRelease = await runTasks([
+    'reserve',
+    '--cwd',
+    resetRepo,
+    '--task',
+    'TASK-RESET-0001',
+    '--actor',
+    'validator',
+    '--maintainer-override-legacy-lifecycle'
+  ]);
+  assert(reservedBeforeRelease.ok === true, 'reserved fixture task must reserve successfully before reserved release');
+  assert((reservedBeforeRelease as any).evidence?.status === 'reserved', 'reserved fixture reserve evidence must report reserved status');
   await expectTaskError(['release', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator'], 'ATM_TASK_CLAIM_MISSING');
   const reservedRelease = await runTasks(['release', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--reserved-ok', '--reason', 'rollback cleanup']);
   assert(reservedRelease.ok === true, 'reserved task without claim must release with --reserved-ok');
-  await runTasks(['reserve', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator']);
+  const reservedBeforeReset = await runTasks([
+    'reserve',
+    '--cwd',
+    resetRepo,
+    '--task',
+    'TASK-RESET-0001',
+    '--actor',
+    'validator',
+    '--maintainer-override-legacy-lifecycle'
+  ]);
+  assert(reservedBeforeReset.ok === true, 'reserved fixture task must reserve successfully before reset');
+  assert((reservedBeforeReset as any).evidence?.status === 'reserved', 'reserved fixture reset evidence must report reserved status');
   const resetOpen = await runTasks(['reset', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--to', 'open', '--reason', 'rollback cleanup']);
   assert(resetOpen.ok === true, 'reserved task must reset back to open');
 
@@ -1393,17 +1415,12 @@ try {
   assert(staleLockInfo!.lockPath.endsWith(`${staleLockTaskId}.lock.json`), 'stale lock must report the lock path');
   assert(staleLockInfo!.actorId === staleLockActorId, 'stale lock must report actor id');
   assert(staleLockInfo!.requiredCommand.includes('framework-mode release'), 'stale lock requiredCommand must include framework-mode release');
-  let staleClaimErrorCode: string | null = null;
-  let staleClaimRequiredCommand = '';
-  try {
-    await runFrameworkTempClaim(fidelityRepo, staleLockActorId, ['packages/cli/src/commands/hook.ts'], 'new task claim');
-    staleClaimErrorCode = null;
-  } catch (error: any) {
-    staleClaimErrorCode = error?.code ?? null;
-    staleClaimRequiredCommand = String(error?.details?.requiredCommand ?? '');
-  }
-  assert(staleClaimErrorCode === 'ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED', `framework-mode claim must throw ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED for stale lock, got ${staleClaimErrorCode}`);
-  assert(staleClaimRequiredCommand.includes('framework-mode release') && staleClaimRequiredCommand.includes('framework-mode claim'), 'stale lock claim error must include release-then-claim guidance');
+  const staleClaimResult = await runFrameworkTempClaim(fidelityRepo, staleLockActorId, ['packages/cli/src/commands/hook.ts'], 'new task claim');
+  assert(staleClaimResult.ok === true, 'framework-mode claim must auto-reconcile same-actor stale-completed temp locks');
+  const staleClaimEvidence = (staleClaimResult as any).evidence?.autoReconcile;
+  assert(staleClaimEvidence?.schemaId === 'atm.frameworkLockAutoReconcile.v1', 'auto-reconcile claim must emit framework lock auto-reconcile evidence');
+  assert(staleClaimEvidence?.outcome === 'reclaimed', 'auto-reconcile evidence must record reclaimed outcome');
+  assert(String(staleClaimEvidence?.auditPath ?? '').includes('framework-lock-auto-reconcile.jsonl'), 'auto-reconcile evidence must report persisted audit path');
   rmSync(staleLockPath, { force: true });
 
   // Regression: TASK-AAO-0055 historical done task reconcile / reopen closure sync

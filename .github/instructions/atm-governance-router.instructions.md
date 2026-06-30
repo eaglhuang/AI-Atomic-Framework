@@ -87,7 +87,7 @@ Turn `evidence.nextAction.governanceReadiness` into an immediate preparation
 checklist before implementation:
 
 1. Resolve actor identity now, not at commit time.
-2. If framework claim is required, inspect `node atm.mjs framework-mode status --json` and acquire the returned `framework-mode claim` before editing framework-critical files.
+2. If framework claim is required, inspect `node atm.mjs framework-mode status --json` and acquire the returned `framework-mode claim` before editing framework-critical files. If the same actor left behind a stale-completed temporary framework lock, retry `framework-mode claim` directly and let ATM auto-reconcile it; do not invent a skill-side lock override.
 3. If the route is on a protected or shared branch, run `node atm.mjs doctor --json` before the first governed write so readiness blockers surface early.
 4. Use `governanceReadiness.upstreamRef` when present and run `node atm.mjs hook pre-push --base <upstream-ref> --head HEAD --json` proactively before the final push, or earlier once the branch is ahead, so git-head evidence and branch-queue blockers show up before the real push.
 5. Treat `queueRetryCodes` as a shared-branch retry contract, not as an unexpected raw Git failure.

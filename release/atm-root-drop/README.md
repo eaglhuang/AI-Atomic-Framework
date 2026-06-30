@@ -20,8 +20,11 @@ ATM is the governance layer for AI-assisted engineering. It keeps AI work from d
 The best part is that humans do not need to drive the machinery. In an ATM-enabled repository, an AI agent can learn the repo-local ATM skill, route the request through the governed workflow, coordinate with other agents, and leave behind proof that explains what changed and why.
 
 ATM is not another chat agent or workflow app. It is the operating contract for the multi-agent era: a way for people and agents to produce stable, reviewable software together instead of relying on prompt memory, ad hoc conventions, or merge-time cleanup.
+ATM is not just an atom runner. It is the route, scope, evidence, close, and handoff contract around AI-assisted work.
 
 > For AI agents: use the repo-local ATM skill or integration when available. The skill should translate the user's request into the governed ATM route and preserve the returned playbook, scope, validation, and evidence.
+
+Captain/dispatch entry gate: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. State `Skill used: atm-dispatch` and the chosen `Delegation mode`. Internal sidecar is the default; External dispatch is opt-in; external write is forbidden unless the user explicitly grants write authority and scope.
 
 ## Why ATM Exists
 
