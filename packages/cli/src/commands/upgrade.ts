@@ -21,7 +21,7 @@ import {
   runGuidedLegacyDryRunProposal
 } from './upgrade/proposal.ts';
 
-export async function runUpgrade(argv: any) {
+export async function runUpgrade(argv: string[]) {
   const experimentalAction = firstExperimentalUpgradeAction(argv);
   if (experimentalAction === 'experimental-api') {
     return runUpgradeExperimentalApi(argv);
@@ -83,32 +83,41 @@ export async function runUpgrade(argv: any) {
       repositoryRoot: options.cwd
     });
 
+  const proposalObj = proposal as Record<string, unknown> & {
+    status: string;
+    proposalId: string;
+    automatedGates: { blockedGateNames: string[] };
+    target: Record<string, unknown>;
+    behaviorId: string;
+    inputs: Array<{ kind: string }>;
+  };
+
   return makeResult({
     ok: true,
     command: 'upgrade',
     cwd: options.cwd,
     messages: [
-      proposal.status === 'blocked'
+      proposalObj.status === 'blocked'
         ? message('warning', 'ATM_UPGRADE_PROPOSAL_BLOCKED', 'Upgrade proposal blocked by automated gates.', {
-          proposalId: proposal.proposalId,
-          blockedGateNames: proposal.automatedGates.blockedGateNames
+          proposalId: proposalObj.proposalId,
+          blockedGateNames: proposalObj.automatedGates.blockedGateNames
         })
         : message('info', 'ATM_UPGRADE_PROPOSAL_READY', 'Upgrade proposal prepared and ready for review.', {
-          proposalId: proposal.proposalId
+          proposalId: proposalObj.proposalId
         })
     ],
     evidence: {
-      proposal,
-      proposalId: proposal.proposalId,
-      status: proposal.status,
-      blockedGateNames: proposal.automatedGates.blockedGateNames,
+      proposal: proposalObj,
+      proposalId: proposalObj.proposalId,
+      status: proposalObj.status,
+      blockedGateNames: proposalObj.automatedGates.blockedGateNames,
       contextBudget,
       dryRun: options.dryRun,
-      target: proposal.target,
-      nextActionHint: buildUpgradeNextActionHint(options.cwd, proposal),
-      behaviorId: proposal.behaviorId,
-      inputCount: proposal.inputs.length,
-      inputKinds: proposal.inputs.map((entry: any) => entry.kind)
+      target: proposalObj.target,
+      nextActionHint: buildUpgradeNextActionHint(options.cwd, proposalObj as unknown as Record<string, unknown>),
+      behaviorId: proposalObj.behaviorId,
+      inputCount: proposalObj.inputs.length,
+      inputKinds: proposalObj.inputs.map((entry) => entry.kind)
     }
   });
 }

@@ -12,14 +12,25 @@
  */
 import { quoteCliValue } from '../shared.ts';
 
-export function buildUpgradeNextActionHint(cwd: string, proposal: any) {
-  if (proposal?.target?.kind !== 'map') {
+interface ProposalLike {
+  target?: { kind?: string; mapId?: string } | null;
+  status?: string;
+  requiredJustification?: {
+    requiredEvidenceKinds?: string[];
+    requiredCliOptions?: string[];
+    rationale?: string;
+  } | null;
+}
+
+export function buildUpgradeNextActionHint(cwd: string, proposal: Record<string, unknown>) {
+  const proposalObj = proposal as unknown as ProposalLike;
+  if (proposalObj?.target?.kind !== 'map') {
     return null;
   }
 
-  const mapId = proposal.target.mapId;
-  const requiredJustification = proposal.requiredJustification;
-  if (proposal.status === 'blocked' && requiredJustification) {
+  const mapId = proposalObj.target.mapId;
+  const requiredJustification = proposalObj.requiredJustification;
+  if (proposalObj.status === 'blocked' && requiredJustification) {
     if (requiredJustification.requiredEvidenceKinds?.length === 1 && requiredJustification.requiredEvidenceKinds?.includes('map-equivalence')) {
       return {
         status: 'blocked',

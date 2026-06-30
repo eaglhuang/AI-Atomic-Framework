@@ -47,7 +47,7 @@ export function normalizeRepositoryRelativePath(filePath: string) {
   return normalizedPath;
 }
 
-export function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+export function requireOptionValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `upgrade requires a value for ${optionName}`, { exitCode: 2 });
@@ -55,7 +55,7 @@ export function requireOptionValue(argv: any, optionIndex: any, optionName: any)
   return value;
 }
 
-export function collectJsonFiles(rootDir: any): string[] {
+export function collectJsonFiles(rootDir: string): string[] {
   const entries = [];
   for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
     const entryPath = path.join(rootDir, entry.name);
