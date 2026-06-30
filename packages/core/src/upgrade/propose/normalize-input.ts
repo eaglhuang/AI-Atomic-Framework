@@ -63,7 +63,7 @@ interface RawInput {
 interface NormalizedInput {
   kind: InputKind;
   path: string;
-  document: InputDocument;
+  document: Record<string, unknown>;
 }
 
 interface InputRef {
@@ -120,19 +120,22 @@ export function inferInputKind(kindOrSchemaId: string): InputKind {
 
 export function unwrapKnownInputDocument(document: Record<string, unknown> | null | undefined): Record<string, unknown> | null | undefined {
   if (!document || typeof document !== 'object' || Array.isArray(document)) {
-    return document;
+    return document as Record<string, unknown> | null | undefined;
   }
   if (document.expectedReport && !document.schemaId) {
-    return document.expectedReport;
+    return document.expectedReport as Record<string, unknown>;
   }
-  if (document.evidence?.propagationReport && !document.schemaId) {
-    return document.evidence.propagationReport;
-  }
-  if (document.evidence?.report && !document.schemaId) {
-    return document.evidence.report;
-  }
-  if (document.evidence?.decisionLog && !document.schemaId) {
-    return document.evidence.decisionLog;
+  if (document.evidence && typeof document.evidence === 'object' && !Array.isArray(document.evidence)) {
+    const evidence = document.evidence as Record<string, unknown>;
+    if (evidence.propagationReport && !document.schemaId) {
+      return evidence.propagationReport as Record<string, unknown>;
+    }
+    if (evidence.report && !document.schemaId) {
+      return evidence.report as Record<string, unknown>;
+    }
+    if (evidence.decisionLog && !document.schemaId) {
+      return evidence.decisionLog as Record<string, unknown>;
+    }
   }
   return document;
 }

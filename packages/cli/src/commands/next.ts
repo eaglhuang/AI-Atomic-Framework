@@ -685,7 +685,7 @@ async function claimNextImportedTask(input: {
       reason: promptText,
       allowedFiles: quickfixScope
     });
-    const nextAction = {
+    const nextAction: NextActionLike = {
       status: 'ready',
       command: 'Apply the quickfix within the allowed files and commit normally.',
       reason: `claimed ATM quickfix lock for ${resolvedActor.actorId}`,
@@ -703,7 +703,7 @@ async function claimNextImportedTask(input: {
       command: 'next',
       cwd: input.cwd,
       messages: buildNextMessages(
-        nextAction as any,
+        nextAction,
         null,
         input.integrationBootstrap,
         input.runtimeAdapterReadiness,
@@ -928,7 +928,7 @@ async function claimNextImportedTask(input: {
       }
     });
   }
-  let parallelAdvisory: any = undefined;
+  let parallelAdvisory: Record<string, unknown> | undefined = undefined;
   // Parallel preflight check
   const parallelStartedAt = Date.now();
   try {
@@ -1106,8 +1106,9 @@ async function claimNextImportedTask(input: {
     ]);
   claimLatencyPhases.push({ phase: shouldReuseActiveClaim ? 'renew-claim' : 'tasks-claim', durationMs: Date.now() - claimCommandStartedAt });
   if (shouldReuseActiveClaim && claimResult.ok && claimResult.evidence) {
-    (claimResult.evidence as any).reusedActiveClaim = true;
-    (claimResult.evidence as any).claimIntent = activeClaimIntent;
+    const evidence = claimResult.evidence as Record<string, unknown> & { reusedActiveClaim?: boolean; claimIntent?: string | null };
+    evidence.reusedActiveClaim = true;
+    evidence.claimIntent = activeClaimIntent;
   }
   const activeQueue = importedTaskQueue.promptScope?.status === 'queue'
     ? promptScopeRuntime?.queue ?? findActiveTaskQueueForIntent(input.cwd, input.taskIntent, { taskId: claimableTask.workItemId }) ?? createOrRefreshTaskQueue({
@@ -1202,7 +1203,7 @@ async function claimNextImportedTask(input: {
     targetFiles: directionLock.allowedFiles,
     ttlSeconds: 1800
   });
-  const nextActionBase = {
+  const nextActionBase: NextActionLike = {
     status: 'ready',
     command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
     reason: `claimed imported work item ${claimableTask.workItemId} for ${resolvedActor.actorId}`,
@@ -1271,13 +1272,13 @@ async function claimNextImportedTask(input: {
     }),
     parallelAdvisory
   });
-  const userNotice = buildFirstUseUserNotice(nextAction as any);
+  const userNotice = buildFirstUseUserNotice(nextAction);
   return makeResult({
     ok: true,
     command: 'next',
     cwd: input.cwd,
     messages: buildNextMessages(
-      nextAction as any,
+      nextAction,
       userNotice,
       input.integrationBootstrap,
       input.runtimeAdapterReadiness,
@@ -1354,8 +1355,8 @@ function buildPromptScopedNextResult(input: {
   readonly cwd: string;
   readonly taskIntent: TaskIntent | null;
   readonly importedTaskQueue: ImportedTaskQueue;
-  readonly integrationBootstrap: unknown;
-  readonly runtimeAdapterReadiness: unknown;
+  readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
+  readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
   const promptScope = input.importedTaskQueue.promptScope;
   if (!promptScope) return null;
@@ -1377,8 +1378,8 @@ function buildPromptScopedNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_TASK_NO_WORK', 'The prompt points at a known task scope, but no open imported work remains for it.', {
           taskIntent: input.taskIntent,
           diagnostics: promptScope.diagnostics
@@ -1414,8 +1415,8 @@ function buildPromptScopedNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         planningRootMissing
           ? message('error', 'ATM_PLANNING_ROOT_MISSING', planningRootMissing.detail, planningRootMissing)
           : message('error', 'ATM_NEXT_TASK_SCOPE_NOT_FOUND', 'The prompt looks task-scoped, but ATM could not find a matching task.', {
@@ -1447,8 +1448,8 @@ function buildPromptScopedNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('error', 'ATM_NEXT_TASK_SELECTION_REQUIRED', 'The prompt matches multiple task cards; choose a task id or plan scope before continuing.', {
           candidateCount: selectedTasks.length,
           candidates: selectedTasks.slice(0, 12).map(toTaskCandidateView)
@@ -1506,8 +1507,8 @@ function buildPromptScopedNextResult(input: {
         messages: buildNextMessages(
           nextAction,
           null,
-          input.integrationBootstrap as any,
-          input.runtimeAdapterReadiness as any,
+          input.integrationBootstrap,
+          input.runtimeAdapterReadiness,
           message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'ATM detected an inconsistent active batch. Repair the runtime before continuing.', {
             batchId: activeBatch?.batchId ?? null,
             reason: consistency.reason,
@@ -1594,8 +1595,8 @@ function buildPromptScopedNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM resolved the prompt to a scoped task queue.', {
           queueSize: selectedTasks.length,
           queueId: activeBatchQueue?.queueId ?? null,
@@ -1649,10 +1650,10 @@ function buildPromptScopedNextResult(input: {
       command: 'next',
       cwd: input.cwd,
       messages: buildNextMessages(
-        nextAction as any,
+        nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED', 'ATM detected a planning-only task; deliverables live in another repo. Sync the ledger mirror instead of running a delivery playbook here.', {
           task: toTaskCandidateView(mirrorSyncTask),
           classification: deliveryClassification,
@@ -1675,7 +1676,7 @@ function buildPromptScopedNextResult(input: {
     && (ledgerStatus?.toLowerCase() !== 'done' || !selectedTask.closedAt || !selectedTask.closurePacket);
 
   if (isHistoricalDoneStale) {
-    const nextAction = {
+    const nextAction: NextActionLike = {
       status: 'task-reconcile-suggested',
       command: `node atm.mjs tasks reconcile --task ${selectedTask.workItemId} --actor <id> --delivery-commit <historicalCommitSha> --json`,
       reason: `task ${selectedTask.workItemId} is marked as done in the planning card but the target ledger is not closed yet; reconcile it using the historical sync channel`,
@@ -1706,10 +1707,10 @@ function buildPromptScopedNextResult(input: {
       command: 'next',
       cwd: input.cwd,
       messages: buildNextMessages(
-        nextAction as any,
+        nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_TASK_RECONCILE_SUGGESTED', `Task ${selectedTask.workItemId} is done in planning but ledger is open. Reconcile with historical sync.`, {
           task: toTaskCandidateView(selectedTask),
           requiredCommand: nextAction.requiredCommand
@@ -1726,7 +1727,7 @@ function buildPromptScopedNextResult(input: {
     });
   }
   if (isClosedTaskStatus(selectedTask.status) && input.taskIntent?.requestedAction !== 'redo' && input.taskIntent?.requestedAction !== 'reopen') {
-    const nextAction = {
+    const nextAction: NextActionLike = {
       status: 'task-already-closed',
       command: 'node atm.mjs next --prompt "<current user prompt>" --json',
       reason: `task ${selectedTask.workItemId} is already ${normalizeTaskRouteStatus(selectedTask.status)}; do not edit planning task cards to simulate closure`,
@@ -1759,8 +1760,8 @@ function buildPromptScopedNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_TASK_ALREADY_CLOSED', 'ATM found the task, and it is already closed in the task ledger.', {
           task: toTaskCandidateView(selectedTask),
           closure: nextAction.closure,
@@ -1782,7 +1783,7 @@ function buildPromptScopedNextResult(input: {
     const activeQueue = findActiveTaskQueue(input.cwd, activeBatch.sourcePrompt, { batchId: activeBatch.batchId }) ?? findActiveTaskQueue(input.cwd, null, { batchId: activeBatch.batchId });
     const consistency = inspectBatchRunConsistency(activeBatch, activeQueue);
     if (!consistency.ok) {
-      const nextAction = {
+      const nextAction: NextActionLike = {
         status: 'batch-state-repair-required',
         command: `node atm.mjs batch repair --actor <id> --batch ${activeBatch.batchId} --json`,
         reason: 'active batch runtime is inconsistent; repair it before claiming, editing, closing, or committing',
@@ -1798,8 +1799,8 @@ function buildPromptScopedNextResult(input: {
         messages: buildNextMessages(
           nextAction,
           null,
-          input.integrationBootstrap as any,
-          input.runtimeAdapterReadiness as any,
+          input.integrationBootstrap,
+          input.runtimeAdapterReadiness,
           message('error', 'ATM_BATCH_STATE_REPAIR_REQUIRED', 'ATM detected an inconsistent active batch. Repair the runtime before continuing.', {
             batchId: activeBatch.batchId,
             reason: consistency.reason,
@@ -1836,7 +1837,7 @@ function buildPromptScopedNextResult(input: {
       currentIndex: activeBatch.currentIndex,
       queueHeadTaskId
     };
-    const nextAction = embedTeamRecommendation({
+    const nextAction: NextActionLike = embedTeamRecommendation({
       status: 'task-batch-context-active',
       command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(activeBatch.sourcePrompt)} --auto-intent --json`,
       reason: `task ${selectedTask.workItemId} belongs to active batch ${activeBatch.batchId}; continue through the current batch queue head`,
@@ -1888,8 +1889,8 @@ function buildPromptScopedNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_TASK_QUEUE_READY', 'ATM kept this task inside the active batch context.', {
           queueSize: activeBatch.taskIds.length,
           queueId: activeQueue?.queueId ?? activeBatch.batchId,
@@ -1921,7 +1922,7 @@ function buildPromptScopedNextResult(input: {
     ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --auto-intent --json`
     : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --auto-intent --json`;
   const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --auto-intent --json`;
-  const nextAction = embedTeamRecommendation({
+  const nextAction: NextActionLike = embedTeamRecommendation({
     status: 'task-route-ready',
     command: normalClaimCommand,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
@@ -1964,8 +1965,8 @@ function buildPromptScopedNextResult(input: {
     messages: buildNextMessages(
       nextAction,
       null,
-      input.integrationBootstrap as any,
-      input.runtimeAdapterReadiness as any,
+      input.integrationBootstrap,
+      input.runtimeAdapterReadiness,
       message('info', 'ATM_NEXT_TASK_ROUTE_READY', 'ATM resolved the prompt to one task route.', {
         task: toTaskCandidateView(selectedTask),
         requiredCommand: nextAction.requiredCommand
@@ -1986,14 +1987,14 @@ function buildPromptScopedNextResult(input: {
 function buildPromptGuidanceNextResult(input: {
   readonly cwd: string;
   readonly taskIntent: TaskIntent | null;
-  readonly integrationBootstrap: unknown;
-  readonly runtimeAdapterReadiness: unknown;
+  readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
+  readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
   const prompt = input.taskIntent?.userPrompt?.trim();
   if (!prompt || input.taskIntent?.taskScopeMentioned === true) return null;
   const quickfixScope = resolveQuickfixScope(prompt);
   if (isQuickfixPrompt(prompt) && quickfixScope.length > 0) {
-    const nextAction = {
+    const nextAction: NextActionLike = {
       status: 'quickfix-ready',
       command: `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(prompt)} --json`,
       reason: 'the prompt looks like a small targeted fix with path-like scope, so ATM can use the fast quickfix channel',
@@ -2016,10 +2017,10 @@ function buildPromptGuidanceNextResult(input: {
       command: 'next',
       cwd: input.cwd,
       messages: buildNextMessages(
-        nextAction as any,
+        nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_QUICKFIX_ROUTE_READY', 'ATM routed this prompt to the fast quickfix channel.', {
           requiredCommand: nextAction.command,
           allowedFiles: quickfixScope
@@ -2037,7 +2038,7 @@ function buildPromptGuidanceNextResult(input: {
   const frameworkStatus = createFrameworkModeStatus({ cwd: input.cwd });
   if (frameworkStatus.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(prompt)) {
     const claimCommand = buildFrameworkTempClaimCommand([], prompt);
-    const nextAction = {
+    const nextAction: NextActionLike = {
       status: 'framework-temp-claim-required',
       command: claimCommand,
       reason: 'the prompt appears to be ATM framework maintenance without a human task card, so use a temporary runtime claim before editing critical framework files',
@@ -2069,8 +2070,8 @@ function buildPromptGuidanceNextResult(input: {
       messages: buildNextMessages(
         nextAction,
         null,
-        input.integrationBootstrap as any,
-        input.runtimeAdapterReadiness as any,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
         message('info', 'ATM_NEXT_FRAMEWORK_TEMP_CLAIM_REQUIRED', 'ATM detected framework maintenance without a scoped task; acquire a temporary framework runtime claim before editing.', {
           requiredCommand: claimCommand
         })
@@ -2086,7 +2087,7 @@ function buildPromptGuidanceNextResult(input: {
       }
     });
   }
-  const nextAction = {
+  const nextAction: NextActionLike = {
     status: 'prompt-guidance-required',
     command: `node atm.mjs guide --goal ${quoteCliValue(prompt)} --cwd . --json`,
     reason: 'the user supplied a prompt that is not task-scoped, so ATM routes guidance from that prompt instead of reusing stale global guidance',
@@ -2100,7 +2101,7 @@ function buildPromptGuidanceNextResult(input: {
     blockedCommands: blockedMutationCommands(),
     ...buildNonPlaybookRouteHints(input.cwd, prompt)
   };
-  const userNotice = buildFirstUseUserNotice(nextAction as any);
+  const userNotice = buildFirstUseUserNotice(nextAction);
   return makeResult({
     ok: true,
     command: 'next',
@@ -2108,8 +2109,8 @@ function buildPromptGuidanceNextResult(input: {
     messages: buildNextMessages(
       nextAction,
       userNotice,
-      input.integrationBootstrap as any,
-      input.runtimeAdapterReadiness as any,
+      input.integrationBootstrap,
+      input.runtimeAdapterReadiness,
       message('info', 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED', 'ATM routed next-action guidance from the current prompt instead of stale global state.', {
         command: nextAction.command
       })
@@ -2129,11 +2130,11 @@ function buildPromptRequiredNextResult(input: {
   readonly cwd: string;
   readonly claimRequested: boolean;
   readonly importedTaskQueue: ImportedTaskQueue;
-  readonly integrationBootstrap: unknown;
-  readonly runtimeAdapterReadiness: unknown;
+  readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
+  readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
   const candidatePreview = input.importedTaskQueue.tasks.slice(0, 12).map(toTaskCandidateView);
-  const nextAction = {
+  const nextAction: NextActionLike = {
     status: 'prompt-required',
     command: 'node atm.mjs next --prompt "<current user prompt>" --json',
     reason: 'task cards exist, but no current user prompt was provided; ATM will not choose a global task or batch by accident',
@@ -2156,10 +2157,10 @@ function buildPromptRequiredNextResult(input: {
     command: 'next',
     cwd: input.cwd,
     messages: buildNextMessages(
-      nextAction as any,
+      nextAction,
       null,
-      input.integrationBootstrap as any,
-      input.runtimeAdapterReadiness as any,
+      input.integrationBootstrap,
+      input.runtimeAdapterReadiness,
       message(
         'error',
         input.claimRequested ? 'ATM_NEXT_CLAIM_PROMPT_REQUIRED' : 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING',
@@ -3939,7 +3940,7 @@ function buildTaskDeliveryPrinciple(input: { readonly channel: 'normal' | 'batch
 function buildMirrorSyncNextAction(input: {
   readonly task: ImportedTaskSummary;
   readonly classification: TaskDeliveryClassification;
-}) {
+}): NextActionLike {
   const sourcePath = input.task.sourcePlanPath ?? '<source-task-card-path>';
   const hasActiveClaim = typeof input.task.activeClaimActorId === 'string' && input.task.activeClaimActorId.length > 0;
   const importCommand = `node atm.mjs tasks import --from ${quoteCliValue(sourcePath)} --write --force --json`;

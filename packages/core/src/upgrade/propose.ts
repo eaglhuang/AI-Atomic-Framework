@@ -64,7 +64,14 @@ interface ProposalRequest {
 export function proposeAtomicUpgrade(request: ProposalRequest) {
   const normalizedRequest = normalizeRequest(request);
   const hashDiffInput = requireInput(normalizedRequest.inputs, 'hash-diff');
-  const hashDiffReport = hashDiffInput.document;
+  const hashDiffReport = hashDiffInput.document as Record<string, unknown> & {
+    fromVersion?: string;
+    toVersion?: string;
+    atomId?: string;
+    behaviorId?: string;
+    target?: { kind?: string; mapId?: string } | null;
+    requestedReplacementMode?: string | null;
+  };
 
   const fromVersion = normalizedRequest.fromVersion ?? hashDiffReport.fromVersion;
   const toVersion = normalizedRequest.toVersion ?? hashDiffReport.toVersion;
@@ -94,7 +101,7 @@ export function proposeAtomicUpgrade(request: ProposalRequest) {
     throw new Error(`Unsupported behaviorId: ${behaviorId}`);
   }
 
-  const target: { kind: 'atom' | 'map'; mapId?: string } = normalizeTarget(normalizedRequest.target);
+  const target = normalizeTarget(normalizedRequest.target);
   const requestedReplacementMode = normalizeRequestedReplacementMode(normalizedRequest.requestedReplacementMode, target);
   const decompositionDecision = normalizedRequest.decompositionDecision ?? deriveDecompositionDecision({
     behaviorId,
@@ -119,13 +126,13 @@ export function proposeAtomicUpgrade(request: ProposalRequest) {
   const mapProposalContext = target.kind === 'map'
     ? buildMapProposalContext({
       repositoryRoot: normalizedRequest.repositoryRoot,
-      mapId: target.mapId,
-      atomId,
-      fromVersion,
-      toVersion
+      mapId: target.mapId!,
+      atomId: atomId!,
+      fromVersion: fromVersion!,
+      toVersion: toVersion!
     })
     : null;
-  const proposalId = normalizedRequest.proposalId ?? createProposalId(atomId, fromVersion, toVersion, target, behaviorId);
+  const proposalId = normalizedRequest.proposalId ?? createProposalId(atomId!, fromVersion!, toVersion!, target, behaviorId);
 
   const inputs = buildInputRefs(normalizedRequest.inputs);
   const nonRegressionInput = requireInput(normalizedRequest.inputs, 'non-regression');
@@ -135,35 +142,35 @@ export function proposeAtomicUpgrade(request: ProposalRequest) {
   const nonRegressionGate = buildGateResult('nonRegression', nonRegressionInput.document, nonRegressionInput.path, 'baseline fixtures passed');
   const qualityComparisonGate = buildQualityComparisonGate(qualityComparisonInput.document, qualityComparisonInput.path);
   const registryCandidateGate = buildRegistryCandidateGate(registryCandidateInput.document, registryCandidateInput.path);
-  const mapEquivalenceGate = buildMapEquivalenceGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'map-equivalence'));
+  const mapEquivalenceGate = buildMapEquivalenceGate(target, requestedReplacementMode!, findInput(normalizedRequest.inputs, 'map-equivalence'));
   const polymorphImpactGate = buildPolymorphImpactGate(
     target,
-    requestedReplacementMode,
+    requestedReplacementMode!,
     normalizedRequest.repositoryRoot,
-    toVersion,
+    toVersion!,
     findInput(normalizedRequest.inputs, 'polymorph-impact')
   );
   const propagationReportGate = buildPropagationReportGate(
     target,
-    requestedReplacementMode,
-    atomId,
+    requestedReplacementMode!,
+    atomId!,
     findInput(normalizedRequest.inputs, 'propagation-report')
   );
   const reviewAdvisoryGate = buildReviewAdvisoryGate(
     target,
-    requestedReplacementMode,
-    proposalId,
+    requestedReplacementMode!,
+    proposalId!,
     findInput(normalizedRequest.inputs, 'review-advisory')
   );
   const humanReviewGate = buildHumanReviewGate(
     target,
-    requestedReplacementMode,
-    proposalId,
-    atomId,
+    requestedReplacementMode!,
+    proposalId!,
+    atomId!,
     findInput(normalizedRequest.inputs, 'human-review')
   );
-  const rollbackProofGate = buildRollbackProofGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'rollback-proof'));
-  const retirementProofGate = buildRetirementProofGate(target, requestedReplacementMode, findInput(normalizedRequest.inputs, 'retirement-proof'));
+  const rollbackProofGate = buildRollbackProofGate(target, requestedReplacementMode!, findInput(normalizedRequest.inputs, 'rollback-proof'));
+  const retirementProofGate = buildRetirementProofGate(target, requestedReplacementMode!, findInput(normalizedRequest.inputs, 'retirement-proof'));
   const legacyRetirementSatisfied = requestedReplacementMode !== 'legacy-retired'
     || target.kind !== 'map'
     || rollbackProofGate?.passed === true
@@ -283,19 +290,19 @@ export function proposeAtomicUpgrade(request: ProposalRequest) {
 
   if (decompositionDecision === 'atom-extract') {
     proposal.fork = {
-      sourceAtomId: normalizedRequest.fork.sourceAtomId,
-      newAtomId: normalizedRequest.fork.newAtomId
+      sourceAtomId: normalizedRequest.fork!.sourceAtomId,
+      newAtomId: normalizedRequest.fork!.newAtomId
     };
     proposal.extractPlan = {
       preservedSourceAtom: {
-        atomId: normalizedRequest.fork.sourceAtomId,
-        retainedAtVersion: fromVersion,
+        atomId: normalizedRequest.fork!.sourceAtomId,
+        retainedAtVersion: fromVersion!,
         retentionMode: 'legacy-preserved'
       },
       newAtomSpecStub: {
-        atomId: normalizedRequest.fork.newAtomId,
-        seededFromAtomId: normalizedRequest.fork.sourceAtomId,
-        initialVersion: toVersion,
+        atomId: normalizedRequest.fork!.newAtomId,
+        seededFromAtomId: normalizedRequest.fork!.sourceAtomId,
+        initialVersion: toVersion!,
         lifecycleMode: 'evolution'
       }
     };
@@ -329,9 +336,9 @@ function normalizeRequest(request: ProposalRequest) {
   };
 }
 
-function normalizeTarget(target: { kind?: string; mapId?: string } | null | undefined) {
+function normalizeTarget(target: { kind?: string; mapId?: string } | null | undefined): { kind: 'atom' | 'map'; mapId: string } {
   if (!target || typeof target !== 'object') {
-    return { kind: 'atom' as const };
+    return { kind: 'atom' as const, mapId: '' };
   }
 
   const kind = target.kind ?? 'atom';
@@ -339,14 +346,14 @@ function normalizeTarget(target: { kind?: string; mapId?: string } | null | unde
     throw new Error(`Unsupported target.kind: ${kind}`);
   }
 
-  const normalized: { kind: 'atom' | 'map'; mapId?: string } = { kind };
+  const normalized: { kind: 'atom' | 'map'; mapId: string } = { kind, mapId: '' };
   if (typeof target.mapId === 'string' && target.mapId.length > 0) {
     normalized.mapId = target.mapId;
   }
   return normalized;
 }
 
-function normalizeRequestedReplacementMode(value: string | null | undefined, target: { kind: string; mapId?: string }) {
+function normalizeRequestedReplacementMode(value: string | null | undefined, target: { kind: string; mapId: string }) {
   if (value == null) {
     return null;
   }
@@ -370,7 +377,16 @@ function buildRequiredJustification({
   humanReviewGate,
   rollbackProofGate,
   retirementProofGate
-}: Record<string, { passed?: boolean } | string | null | undefined>) {
+}: {
+  requestedReplacementMode?: string | null;
+  mapEquivalenceGate?: { passed?: boolean } | null;
+  polymorphImpactGate?: { passed?: boolean } | null;
+  propagationReportGate?: { passed?: boolean } | null;
+  reviewAdvisoryGate?: { passed?: boolean } | null;
+  humanReviewGate?: { passed?: boolean } | null;
+  rollbackProofGate?: { passed?: boolean } | null;
+  retirementProofGate?: { passed?: boolean } | null;
+}) {
   if (requestedReplacementMode === 'active') {
     const requiredGateNames = [];
     const requiredEvidenceKinds = [];
@@ -444,7 +460,7 @@ function buildActiveReplacementRationale(requiredGateNames: readonly string[]) {
   return 'Map promotion to active requires all replacement evidence gates to pass before review can proceed.';
 }
 
-function createProposalId(atomId: string, fromVersion: string, toVersion: string, target: { kind: string; mapId?: string }, behaviorId: string): string {
+function createProposalId(atomId: string, fromVersion: string, toVersion: string, target: { kind: string; mapId: string }, behaviorId: string): string {
   const safeAtomId = String(atomId).toLowerCase();
   const targetSuffix = target.kind === 'map'
     ? `.map-${String(target.mapId ?? 'unknown').toLowerCase()}`
