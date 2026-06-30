@@ -80,6 +80,52 @@ This report does not change production command behavior. It exists to define the
 - TASK-CID-0058 requires the report to mention `packages/cli/src/commands/tasks/command-dispatch.ts` so future map checks keep the dispatch atom visible.
 - TASK-CID-0062 requires the report to mention `packages/cli/src/commands/tasks/dependency-gates.ts` and `packages/cli/src/commands/tasks/surface-invariants.ts` so future map checks keep the governance invariant owner modules visible.
 
+## TASK-RFT-0010 Update
+
+TASK-RFT-0010 split the residual mass inside `packages/cli/src/commands/tasks.ts`
+into four owner modules using the four-layer pattern (Facade / Policy Objects /
+Strategy Maps / Result Contract Objects). Logic is moved verbatim; the public
+JSON contracts (`atm.taskImportManifest`, `atm.taskVerifyReport`,
+`atm.taskLegacyLedgerMigrationReport`, `atm.taskDeliverableGate.v1`) are
+unchanged.
+
+### Four-Layer Map (post TASK-RFT-0010)
+
+| Layer | Module | Atom | Responsibility |
+| --- | --- | --- | --- |
+| Facade | `packages/cli/src/commands/tasks.ts` | `tasks.command.dispatch` | argv parse, action fan-out, re-export of public types and command runners |
+| Policy Object | `packages/cli/src/commands/tasks/close-governance.ts` | `tasks.close.governance` | close authority, closure-packet trust, blocker-code classification, stale-runner override audit, failed-emergency-use audit |
+| Strategy Map | `packages/cli/src/commands/tasks/status-triangulation.ts` | `tasks.status.triangulation` | live-ledger vs planning-truth comparison, parity-override strategy, residue/recovery route selection |
+| Result Contract Object | `packages/cli/src/commands/tasks/import-verify.ts` | `tasks.ledger.import.verify` | import / verify / migration envelope builders, diagnostic normalization, finding sort |
+| Result Contract Object (shared) | `packages/cli/src/commands/tasks/result-contracts.ts` | `tasks.command.result-contracts` | typed contracts for import / verify / migration / deliverable-gate; pinned schemaIds; additive-tolerance helper |
+
+### Specs
+
+| Owner module | Spec |
+| --- | --- |
+| `packages/cli/src/commands/tasks/close-governance.ts` | `packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts` |
+| `packages/cli/src/commands/tasks/status-triangulation.ts` | `packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts` |
+| `packages/cli/src/commands/tasks/import-verify.ts` | `packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts` |
+| `packages/cli/src/commands/tasks/result-contracts.ts` | `packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts` |
+
+### Before/After Line Counts (TASK-RFT-0010)
+
+- `packages/cli/src/commands/tasks.ts`: **7896 → 7484** (-412 lines)
+- New `packages/cli/src/commands/tasks/result-contracts.ts`: **229 lines**
+- New `packages/cli/src/commands/tasks/status-triangulation.ts`: **270 lines**
+- New `packages/cli/src/commands/tasks/close-governance.ts`: **278 lines**
+- New `packages/cli/src/commands/tasks/import-verify.ts`: **220 lines**
+
+`tasks.ts` continues to host the `runTasksClose`, `runTasksStatus`,
+`runTasksReconcile`, `runTasksImport`, `runTasksVerify`, and
+`runTasksMigrateLegacyLedger` orchestrators. The new owner modules supply the
+policy/strategy/contract decisions those orchestrators previously made inline,
+and `tasks.ts` thin-aliases the in-file call sites (`buildTaskStatusTriangulation`,
+`recordStaleRunnerOverride`, `recordFailedEmergencyUseAttempt`,
+`isCliErrorWithCode`) plus re-exports the public types (`TaskImport*`,
+`TaskVerify*`, `TaskLegacyLedger*`, `TaskDeliverableGateReport`) so callers
+see no surface change.
+
 ## Report Summary
 
 - This map is intentionally read-only.
