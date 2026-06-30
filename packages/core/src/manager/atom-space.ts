@@ -5,7 +5,26 @@ export const defaultAtomSpecFileName = 'atom.spec.json';
 export const defaultAtomTestFileName = 'atom.test.ts';
 export const defaultTestReportFileName = 'atom.test.report.json';
 
-export function createAtomSpaceLayout(normalizedModel: any, options: any = {}) {
+interface AtomIdentityRecord {
+  atomId: string;
+}
+
+interface AtomSpaceModel {
+  identity: AtomIdentityRecord;
+}
+
+interface AtomSpaceOptions {
+  repositoryRoot?: string;
+  workbenchPath?: string;
+  workbenchRoot?: string;
+  specFileName?: string;
+  testFileName?: string;
+  reportFileName?: string;
+  reportPath?: string;
+  [key: string]: unknown;
+}
+
+export function createAtomSpaceLayout(normalizedModel: AtomSpaceModel, options: AtomSpaceOptions = {}) {
   const workbenchPath = resolveAtomWorkbenchPath(normalizedModel, options);
 
   return {
@@ -18,7 +37,7 @@ export function createAtomSpaceLayout(normalizedModel: any, options: any = {}) {
   };
 }
 
-export function resolveAtomWorkbenchPath(normalizedModel: any, options: any = {}) {
+export function resolveAtomWorkbenchPath(normalizedModel: AtomSpaceModel, options: AtomSpaceOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   if (options.workbenchPath) {
     return path.resolve(repositoryRoot, options.workbenchPath);
@@ -28,7 +47,7 @@ export function resolveAtomWorkbenchPath(normalizedModel: any, options: any = {}
   return path.resolve(repositoryRoot, workbenchRoot, resolveCanonicalAtomFolderName(normalizedModel.identity.atomId));
 }
 
-export function resolveAtomicTestReportPath(normalizedModel: any, options: any = {}) {
+export function resolveAtomicTestReportPath(normalizedModel: AtomSpaceModel, options: AtomSpaceOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   if (options.reportPath) {
     return path.resolve(repositoryRoot, options.reportPath);
@@ -37,7 +56,7 @@ export function resolveAtomicTestReportPath(normalizedModel: any, options: any =
   return createAtomSpaceLayout(normalizedModel, options).reportPath;
 }
 
-export function resolveCanonicalAtomFolderName(atomId: any) {
+export function resolveCanonicalAtomFolderName(atomId: unknown) {
   const folderName = String(atomId ?? '').trim();
   if (!folderName) {
     throw new Error('Atomic ID is required to resolve the canonical atom folder.');

@@ -91,10 +91,10 @@ try {
   const first = generateAtomicMap(baseRequest, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(first.ok, true);
   assert.equal(first.mapId, 'ATM-MAP-0001');
-  assert.equal(first.allocation.sequence, 1);
-  assert.equal(existsSync(path.join(tempRoot, first.specPath)), true);
-  assert.equal(existsSync(path.join(tempRoot, first.testPath)), true);
-  assert.equal(existsSync(path.join(tempRoot, first.reportPath)), true);
+  assert.equal(first.allocation!.sequence, 1);
+  assert.equal(existsSync(path.join(tempRoot, first.specPath!)), true);
+  assert.equal(existsSync(path.join(tempRoot, first.testPath!)), true);
+  assert.equal(existsSync(path.join(tempRoot, first.reportPath!)), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic-registry.json')), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic_workbench/registry-catalog.md')), true);
 
@@ -159,19 +159,19 @@ try {
     }
   }, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(replacementMap.ok, true);
-  assert.equal(replacementMap.registryEntry.specVersion, '0.2.0');
-  assert.equal(replacementMap.registryEntry.members[0].role, 'entry-adapter');
-  assert.equal(replacementMap.registryEntry.edges[0].edgeKind, 'data-flow');
-  assert.deepEqual(replacementMap.registryEntry.replacement.legacyUris, ['legacy://samples/checkout-mini']);
+  assert.equal(replacementMap.registryEntry!.specVersion, '0.2.0');
+  assert.equal(replacementMap.registryEntry!.members![0].role, 'entry-adapter');
+  assert.equal(replacementMap.registryEntry!.edges![0].edgeKind, 'data-flow');
+  assert.deepEqual(replacementMap.registryEntry!.replacement!.legacyUris, ['legacy://samples/checkout-mini']);
 
   const invalid = generateAtomicMap({ members: [], edges: [], entrypoints: [], qualityTargets: {} }, { repositoryRoot: tempRoot });
   assert.equal(invalid.ok, false);
-  assert.equal(invalid.error.code, 'ATM_MAP_GENERATOR_REQUEST_INVALID');
+  assert.equal(invalid.error!.code, 'ATM_MAP_GENERATOR_REQUEST_INVALID');
 
   writeFileSync(path.join(tempRoot, 'atomic-registry.json'), '{bad json', 'utf8');
   const invalidRegistry = generateAtomicMap(baseRequest, { repositoryRoot: tempRoot });
   assert.equal(invalidRegistry.ok, false);
-  assert.equal(invalidRegistry.error.code, 'ATM_REGISTRY_INVALID');
+  assert.equal(invalidRegistry.error!.code, 'ATM_REGISTRY_INVALID');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

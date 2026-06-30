@@ -11,6 +11,7 @@ import { gateFailureSummary, qualityComparisonFailureReason } from './failure-re
 import { analyzePolymorphImpact } from '../../polymorph/impact.ts';
 import { validateRollbackProof } from '../../registry/rollback-proof.ts';
 import { validateRetirementProof } from '../../registry/retirement-proof.ts';
+import type { RollbackProof } from '../../registry/rollback-types.ts';
 import { validatePropagationReport } from '../../test-runner/propagation.ts';
 
 // ─── Shared types ──────────────────────────────────────────────────────────
@@ -401,8 +402,12 @@ export function buildRetirementProofGate(target: GateTarget, requestedReplacemen
 // ─── Safe validators（private helpers）────────────────────────────────────
 
 function safeValidateRollbackProof(document: Record<string, unknown> | null | undefined): { ok: boolean; issues: string[] } {
+  if (!document) {
+    return { ok: false, issues: ['rollback-proof-missing'] };
+  }
   try {
-    return validateRollbackProof(document);
+    const result = validateRollbackProof(document as unknown as RollbackProof);
+    return { ok: result.ok, issues: [...result.issues] };
   } catch (error) {
     return {
       ok: false,
@@ -412,8 +417,12 @@ function safeValidateRollbackProof(document: Record<string, unknown> | null | un
 }
 
 function safeValidateRetirementProof(document: Record<string, unknown> | null | undefined): { ok: boolean; issues: string[] } {
+  if (!document) {
+    return { ok: false, issues: ['retirement-proof-missing'] };
+  }
   try {
-    return validateRetirementProof(document);
+    const result = validateRetirementProof(document);
+    return { ok: result.ok, issues: [...result.issues] };
   } catch (error) {
     return {
       ok: false,

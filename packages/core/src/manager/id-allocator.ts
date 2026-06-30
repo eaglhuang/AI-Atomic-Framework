@@ -16,7 +16,22 @@ export class AtomIdAllocationError extends Error {
   }
 }
 
-export function normalizeAtomBucket(bucket: any) {
+interface AtomRegistryEntryLike {
+  atomId?: string;
+  id?: string;
+}
+
+interface AtomRegistryDocumentLike {
+  entries?: unknown[];
+}
+
+interface AllocateAtomIdOptions {
+  repositoryRoot?: string;
+  registryPath?: string;
+  registryDocument?: AtomRegistryDocumentLike | null;
+}
+
+export function normalizeAtomBucket(bucket: unknown) {
   if (typeof bucket !== 'string') {
     throw new AtomIdAllocationError('ATM_BUCKET_REQUIRED', 'Atom ID bucket must be a string.', { bucket });
   }
@@ -29,7 +44,7 @@ export function normalizeAtomBucket(bucket: any) {
   return normalizedBucket;
 }
 
-export function parseAtomId(atomId: any) {
+export function parseAtomId(atomId: unknown) {
   const match = String(atomId || '').trim().match(atomIdPattern);
   if (!match) {
     return null;
@@ -41,14 +56,15 @@ export function parseAtomId(atomId: any) {
   };
 }
 
-export function allocateAtomId(bucket: any, options: any = {}) {
+export function allocateAtomId(bucket: unknown, options: AllocateAtomIdOptions = {}) {
   const normalizedBucket = normalizeAtomBucket(bucket);
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const registryPath = path.resolve(repositoryRoot, options.registryPath ?? 'atomic-registry.json');
   const registryDocument = options.registryDocument ?? readRegistryDocument(registryPath);
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-  const maxSequence = entries.reduce((currentMax: any, entry: any) => {
-    const parsed = parseAtomId(entry?.atomId ?? entry?.id);
+  const maxSequence = entries.reduce((currentMax: number, entry: unknown) => {
+    const registryEntry = entry as AtomRegistryEntryLike;
+    const parsed = parseAtomId(registryEntry?.atomId ?? registryEntry?.id);
     if (!parsed || parsed.bucket !== normalizedBucket) {
       return currentMax;
     }
@@ -65,7 +81,7 @@ export function allocateAtomId(bucket: any, options: any = {}) {
   };
 }
 
-function readRegistryDocument(registryPath: any) {
+function readRegistryDocument(registryPath: string): AtomRegistryDocumentLike {
   if (!existsSync(registryPath)) {
     return { entries: [] };
   }
@@ -80,7 +96,7 @@ function readRegistryDocument(registryPath: any) {
   }
 }
 
-function toProjectPath(repositoryRoot: any, filePath: any) {
+function toProjectPath(repositoryRoot: string, filePath: string) {
   const relativePath = path.relative(repositoryRoot, filePath).replace(/\\/g, '/');
   if (!relativePath || relativePath.startsWith('..')) {
     return toPortablePath(filePath);
@@ -88,6 +104,6 @@ function toProjectPath(repositoryRoot: any, filePath: any) {
   return relativePath;
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string) {
   return String(value).replace(/\\/g, '/');
 }

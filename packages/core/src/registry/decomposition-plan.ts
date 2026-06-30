@@ -14,7 +14,36 @@ const migrationStrategies = new Set(['none', 'additive', 'breaking']);
 
 export const defaultDecompositionPlanSchemaPath = path.join(frameworkRoot, 'schemas', 'governance', 'decomposition-plan.schema.json');
 
-export function readDecompositionPlan(planPath: string, options: any = {}) {
+interface DecompositionPlanOptions {
+  readonly cwd?: string;
+  readonly schemaPath?: string;
+}
+
+interface DecompositionPlanIssue {
+  readonly path: string;
+  readonly keyword: string;
+  readonly message: string;
+  readonly params: Record<string, unknown>;
+}
+
+interface DecompositionPlanRecord {
+  readonly qualityTargets?: unknown;
+  readonly proposedMembers?: unknown;
+  readonly proposedEdges?: unknown;
+  readonly proposedMapId?: unknown;
+  readonly mapVersion?: unknown;
+  readonly entrypoints?: unknown;
+  readonly legacyUris?: unknown;
+  readonly notes?: unknown;
+}
+
+function asRecord<T extends object>(value: unknown): T | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as T
+    : null;
+}
+
+export function readDecompositionPlan(planPath: string, options: DecompositionPlanOptions = {}) {
   const cwd = path.resolve(options.cwd ?? process.cwd());
   const absolutePlanPath = path.resolve(cwd, planPath);
   if (!existsSync(absolutePlanPath)) {
@@ -51,7 +80,7 @@ export function readDecompositionPlan(planPath: string, options: any = {}) {
   };
 }
 
-export function validateDecompositionPlanDocument(document: unknown, options: any = {}) {
+export function validateDecompositionPlanDocument(document: unknown, options: DecompositionPlanOptions = {}) {
   const schemaPath = path.resolve(options.schemaPath ?? defaultDecompositionPlanSchemaPath);
   const issues = collectDecompositionPlanIssues(document);
   const ok = issues.length === 0;
@@ -65,30 +94,31 @@ export function validateDecompositionPlanDocument(document: unknown, options: an
   };
 }
 
-export function createAtomicMapRequestFromDecompositionPlan(plan: any) {
-  const qualityTargets = normalizeQualityTargets(plan?.qualityTargets);
-  const members: RegistryMapMemberRecord[] = Array.isArray(plan.proposedMembers)
-    ? plan.proposedMembers.map((entry: RegistryMapMemberRecord) => ({ ...entry }))
+export function createAtomicMapRequestFromDecompositionPlan(plan: unknown) {
+  const planRecord = asRecord<DecompositionPlanRecord>(plan) ?? {};
+  const qualityTargets = normalizeQualityTargets(planRecord.qualityTargets);
+  const members: RegistryMapMemberRecord[] = Array.isArray(planRecord.proposedMembers)
+    ? planRecord.proposedMembers.map((entry) => ({ ...(entry as RegistryMapMemberRecord) }))
     : [];
-  const edges: RegistryMapEdgeRecord[] = Array.isArray(plan.proposedEdges)
-    ? plan.proposedEdges.map((entry: RegistryMapEdgeRecord) => ({ ...entry }))
+  const edges: RegistryMapEdgeRecord[] = Array.isArray(planRecord.proposedEdges)
+    ? planRecord.proposedEdges.map((entry) => ({ ...(entry as RegistryMapEdgeRecord) }))
     : [];
   return {
-    mapId: String(plan.proposedMapId || '').trim(),
+    mapId: String(planRecord.proposedMapId || '').trim(),
     request: {
-      mapVersion: String(plan.mapVersion || '0.1.0').trim(),
+      mapVersion: String(planRecord.mapVersion || '0.1.0').trim(),
       specVersion: '0.2.0',
       members,
       edges,
-      entrypoints: Array.isArray(plan.entrypoints) ? [...plan.entrypoints] : [],
+      entrypoints: Array.isArray(planRecord.entrypoints) ? [...planRecord.entrypoints] : [],
       qualityTargets,
       replacement: {
-        legacyUris: Array.isArray(plan.legacyUris) ? [...plan.legacyUris] : [],
+        legacyUris: Array.isArray(planRecord.legacyUris) ? [...planRecord.legacyUris] : [],
         mode: 'draft',
         evidenceRefs: []
       }
     },
-    defaultsUsed: plan?.qualityTargets ? [] : ['qualityTargets']
+    defaultsUsed: planRecord.qualityTargets ? [] : ['qualityTargets']
   };
 }
 
@@ -110,12 +140,7 @@ function readJson(filePath: string) {
 }
 
 function collectDecompositionPlanIssues(document: unknown) {
-  const issues: Array<{
-    path: string;
-    keyword: string;
-    message: string;
-    params: Record<string, unknown>;
-  }> = [];
+  const issues: DecompositionPlanIssue[] = [];
 
   if (!document || typeof document !== 'object' || Array.isArray(document)) {
     issues.push(issue('/', 'type', 'Document must be an object.'));
@@ -156,7 +181,7 @@ function collectDecompositionPlanIssues(document: unknown) {
   return issues;
 }
 
-function validateMigration(value: unknown, issues: Array<any>) {
+function validateMigration(value: unknown, issues: DecompositionPlanIssue[]) {
   const path = '/migration';
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     issues.push(issue(path, 'type', 'migration must be an object.'));
@@ -175,7 +200,7 @@ function validateMigration(value: unknown, issues: Array<any>) {
   }
 }
 
-function validateMembers(value: unknown, issues: Array<any>) {
+function validateMembers(value: unknown, issues: DecompositionPlanIssue[]) {
   const path = '/proposedMembers';
   if (!Array.isArray(value) || value.length === 0) {
     issues.push(issue(path, 'minItems', 'proposedMembers must be a non-empty array.'));
@@ -199,7 +224,7 @@ function validateMembers(value: unknown, issues: Array<any>) {
   });
 }
 
-function validateEdges(value: unknown, issues: Array<any>) {
+function validateEdges(value: unknown, issues: DecompositionPlanIssue[]) {
   const path = '/proposedEdges';
   if (!Array.isArray(value)) {
     issues.push(issue(path, 'type', 'proposedEdges must be an array.'));
@@ -224,7 +249,7 @@ function validateEdges(value: unknown, issues: Array<any>) {
   });
 }
 
-function validateEntrypoints(entrypointsValue: unknown, membersValue: unknown, issues: Array<any>) {
+function validateEntrypoints(entrypointsValue: unknown, membersValue: unknown, issues: DecompositionPlanIssue[]) {
   const path = '/entrypoints';
   if (!Array.isArray(entrypointsValue) || entrypointsValue.length === 0) {
     issues.push(issue(path, 'minItems', 'entrypoints must be a non-empty array.'));
@@ -256,7 +281,7 @@ function validateEntrypoints(entrypointsValue: unknown, membersValue: unknown, i
   });
 }
 
-function validateQualityTargets(value: unknown, issues: Array<any>) {
+function validateQualityTargets(value: unknown, issues: DecompositionPlanIssue[]) {
   const path = '/qualityTargets';
   if (value === undefined || value === null) {
     return;
@@ -284,7 +309,7 @@ function validateStringArray(
   value: unknown,
   path: string,
   options: { minItems: number; unique: boolean; nonEmpty: boolean },
-  issues: Array<any>
+  issues: DecompositionPlanIssue[]
 ) {
   if (!Array.isArray(value) || value.length < options.minItems) {
     issues.push(issue(path, 'minItems', `${path.slice(1)} must be an array with at least ${options.minItems} item(s).`));
@@ -310,26 +335,26 @@ function validateStringArray(
   });
 }
 
-function validateExactString(value: unknown, path: string, keyword: string, expected: string, issues: Array<any>) {
+function validateExactString(value: unknown, path: string, keyword: string, expected: string, issues: DecompositionPlanIssue[]) {
   if (value !== expected) {
     issues.push(issue(path, keyword, `${path.slice(1)} must equal ${expected}.`, { expected }));
   }
 }
 
-function validatePatternString(value: unknown, path: string, pattern: RegExp, message: string, issues: Array<any>) {
+function validatePatternString(value: unknown, path: string, pattern: RegExp, message: string, issues: DecompositionPlanIssue[]) {
   if (typeof value !== 'string' || !pattern.test(value.trim())) {
     issues.push(issue(path, 'pattern', message));
   }
 }
 
-function validateOptionalPatternString(value: unknown, path: string, pattern: RegExp, message: string, issues: Array<any>) {
+function validateOptionalPatternString(value: unknown, path: string, pattern: RegExp, message: string, issues: DecompositionPlanIssue[]) {
   if (value === undefined || value === null) {
     return;
   }
   validatePatternString(value, path, pattern, message, issues);
 }
 
-function validateOptionalDateTimeString(value: unknown, path: string, issues: Array<any>) {
+function validateOptionalDateTimeString(value: unknown, path: string, issues: DecompositionPlanIssue[]) {
   if (value === undefined || value === null) {
     return;
   }
@@ -338,7 +363,7 @@ function validateOptionalDateTimeString(value: unknown, path: string, issues: Ar
   }
 }
 
-function validateNonEmptyString(value: unknown, path: string, message: string, issues: Array<any>) {
+function validateNonEmptyString(value: unknown, path: string, message: string, issues: DecompositionPlanIssue[]) {
   if (typeof value !== 'string' || value.trim().length === 0) {
     issues.push(issue(path, 'minLength', message));
   }
@@ -347,7 +372,7 @@ function validateNonEmptyString(value: unknown, path: string, message: string, i
 function validateNoAdditionalProperties(
   record: Record<string, unknown>,
   allowedKeys: readonly string[],
-  issues: Array<any>,
+  issues: DecompositionPlanIssue[],
   path: string
 ) {
   const allowed = new Set(allowedKeys);
@@ -358,7 +383,7 @@ function validateNoAdditionalProperties(
   }
 }
 
-function issue(path: string, keyword: string, message: string, params: Record<string, unknown> = {}) {
+function issue(path: string, keyword: string, message: string, params: Record<string, unknown> = {}): DecompositionPlanIssue {
   return { path, keyword, message, params };
 }
 

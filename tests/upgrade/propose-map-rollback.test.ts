@@ -29,13 +29,15 @@ try {
     proposedAt,
     inputs: createBaseInputs()
   });
+  const blockedGates = blockedProposal.automatedGates as any;
+  const blockedJustification = blockedProposal.requiredJustification as any;
   validateProposal(blockedProposal, validate, 'core blocked legacy-retired proposal');
   assert.equal(blockedProposal.status, 'blocked');
-  assert.equal(blockedProposal.automatedGates.rollbackProof.passed, false);
-  assert.equal(blockedProposal.automatedGates.blockedGateNames.includes('rollbackProof'), true);
-  assert.equal(blockedProposal.automatedGates.blockedGateNames.includes('retirementProof'), true);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredEvidenceKinds, ['rollback-proof', 'retirement-proof']);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredCliOptions, ['--rollback-proof', '--retirement-proof']);
+  assert.equal(blockedGates.rollbackProof.passed, false);
+  assert.equal(blockedGates.blockedGateNames.includes('rollbackProof'), true);
+  assert.equal(blockedGates.blockedGateNames.includes('retirementProof'), true);
+  assert.deepEqual(blockedJustification.requiredEvidenceKinds, ['rollback-proof', 'retirement-proof']);
+  assert.deepEqual(blockedJustification.requiredCliOptions, ['--rollback-proof', '--retirement-proof']);
 
   const readyProposal = proposeAtomicUpgrade({
     atomId: 'ATM-CORE-0001',
@@ -54,11 +56,13 @@ try {
       }
     ]
   });
+  const readyGates = readyProposal.automatedGates as any;
+  const readyInputs = readyProposal.inputs as any;
   validateProposal(readyProposal, validate, 'core legacy-retired proposal with rollback proof');
   assert.equal(readyProposal.status, 'pending');
-  assert.equal(readyProposal.automatedGates.rollbackProof.passed, true);
+  assert.equal(readyGates.rollbackProof.passed, true);
   assert.equal(readyProposal.requestedReplacementMode, 'legacy-retired');
-  assert.equal(readyProposal.inputs.some((entry: any) => entry.kind === 'rollback-proof'), true);
+  assert.equal(readyInputs.some((entry: any) => entry.kind === 'rollback-proof'), true);
 
   const cliBlocked = runUpgradeCli({ mapId, replacementMode: 'legacy-retired' });
   assert.equal(cliBlocked.exitCode, 0);

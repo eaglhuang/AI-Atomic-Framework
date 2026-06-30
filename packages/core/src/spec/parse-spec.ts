@@ -10,7 +10,239 @@ const require = createRequire(import.meta.url);
 
 export const defaultAtomicSpecSchemaPath = path.join(repoRoot, 'schemas', 'atomic-spec.schema.json');
 
-export function parseAtomicSpecFile(specOption: any, options: any = {}) {
+interface ParseAtomicSpecOptions {
+  readonly cwd?: string;
+  readonly specPath?: string;
+  readonly schemaPath?: string;
+}
+
+interface PromptIssue {
+  readonly code: string;
+  readonly keyword: string;
+  readonly path: string;
+  readonly text: string;
+  readonly prompt: string;
+}
+
+interface FailureOptions {
+  readonly code: string;
+  readonly specPath: string | null;
+  readonly schemaPath: string | null;
+  readonly summary: string;
+  readonly issues: readonly PromptIssue[];
+}
+
+interface ParsePromptReport {
+  readonly code: string;
+  readonly summary: string;
+  readonly issues: PromptIssue[];
+}
+
+interface ParseAtomicSpecSuccess {
+  readonly ok: true;
+  readonly specPath: string | null;
+  readonly schemaPath: string;
+  readonly normalizedModel: NormalizedAtomicSpecModel;
+  readonly promptReport: ParsePromptReport;
+}
+
+interface ParseAtomicSpecFailure {
+  readonly ok: false;
+  readonly specPath: string | null;
+  readonly schemaPath: string | null;
+  readonly normalizedModel: null;
+  readonly promptReport: ParsePromptReport;
+}
+
+interface JsonReadSuccess {
+  readonly ok: true;
+  readonly document: unknown;
+}
+
+interface JsonReadFailure {
+  readonly ok: false;
+  readonly issue: PromptIssue;
+}
+
+interface AtomicSpecPortRecord {
+  readonly name: string;
+  readonly kind: string;
+  readonly required: boolean;
+}
+
+interface AtomicSpecDocument {
+  readonly id: string;
+  readonly schemaId: string;
+  readonly specVersion: string;
+  readonly title: string;
+  readonly description?: string;
+  readonly logicalName?: string | null;
+  readonly tags?: readonly string[];
+  readonly migration: {
+    readonly strategy: string;
+    readonly fromVersion?: string | null;
+    readonly notes: string;
+  };
+  readonly language: {
+    readonly primary: string;
+    readonly sourceExtensions?: readonly string[];
+    readonly tooling?: readonly string[];
+  };
+  readonly runtime: {
+    readonly kind: string;
+    readonly versionRange: string;
+    readonly environment: string;
+  };
+  readonly adapterRequirements: {
+    readonly projectAdapter: string;
+    readonly storage: string;
+    readonly capabilities?: readonly string[];
+  };
+  readonly compatibility: {
+    readonly coreVersion: string;
+    readonly registryVersion: string;
+    readonly pluginApiVersion?: string | null;
+    readonly languageAdapter?: string | null;
+    readonly lifecycleMode?: string | null;
+  };
+  readonly dependencyPolicy?: {
+    readonly external?: string;
+    readonly hostCoupling?: string;
+  };
+  readonly validation?: {
+    readonly commands?: readonly string[];
+    readonly evidenceRequired?: boolean;
+  };
+  readonly performanceBudget?: {
+    readonly hotPath?: boolean;
+    readonly inputMutation?: string;
+    readonly maxDurationMs?: number;
+  };
+  readonly semanticFingerprint?: unknown;
+  readonly lineage?: {
+    readonly bornBy?: string;
+    readonly parentRefs?: readonly string[];
+    readonly bornAt?: string;
+  } | null;
+  readonly ttl?: {
+    readonly expiresAt?: string;
+  } | null;
+  readonly deployScope?: string;
+  readonly mutabilityPolicy?: string;
+  readonly pendingSfCalculation?: boolean;
+  readonly hashLock: {
+    readonly algorithm: string;
+    readonly digest: string;
+    readonly canonicalization: string;
+  };
+  readonly inputs?: readonly AtomicSpecPortRecord[];
+  readonly outputs?: readonly AtomicSpecPortRecord[];
+}
+
+interface NormalizedAtomicSpecModel {
+  readonly source: {
+    readonly specPath: string | null;
+    readonly schemaPath: string;
+  };
+  readonly schema: {
+    readonly schemaId: string;
+    readonly specVersion: string;
+    readonly migration: {
+      readonly strategy: string;
+      readonly fromVersion: string | null;
+      readonly notes: string;
+    };
+  };
+  readonly identity: {
+    readonly atomId: string;
+    readonly logicalName?: string;
+    readonly title: string;
+    readonly description: string;
+    readonly tags: string[];
+  };
+  readonly execution: {
+    readonly language: {
+      readonly primary: string;
+      readonly sourceExtensions: string[];
+      readonly tooling: string[];
+    };
+    readonly runtime: {
+      readonly kind: string;
+      readonly versionRange: string;
+      readonly environment: string;
+    };
+    readonly adapterRequirements: {
+      readonly projectAdapter: string;
+      readonly storage: string;
+      readonly capabilities: string[];
+    };
+    readonly compatibility: {
+      readonly coreVersion: string;
+      readonly registryVersion: string;
+      readonly pluginApiVersion: string;
+      readonly languageAdapter: string;
+      readonly lifecycleMode: string;
+    };
+    readonly dependencyPolicy: {
+      readonly external: string;
+      readonly hostCoupling: string;
+    };
+    readonly validation: {
+      readonly commands: string[];
+      readonly evidenceRequired: boolean;
+    };
+    readonly performanceBudget: {
+      readonly hotPath: boolean;
+      readonly inputMutation: string;
+      readonly maxDurationMs: number | null;
+    };
+  };
+  readonly governance: {
+    readonly semanticFingerprint: unknown;
+    readonly lineage: {
+      readonly bornBy?: string;
+      readonly parentRefs: string[];
+      readonly bornAt?: string;
+    } | null;
+    readonly ttl: {
+      readonly expiresAt: string | null;
+    } | null;
+    readonly deployScope: string | null;
+    readonly mutabilityPolicy: string | null;
+    readonly pendingSfCalculation: boolean;
+  };
+  readonly hashLock: {
+    readonly algorithm: string;
+    readonly digest: string;
+    readonly canonicalization: string;
+  };
+  readonly ports: {
+    readonly inputs: AtomicSpecPortRecord[];
+    readonly outputs: AtomicSpecPortRecord[];
+  };
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((entry): entry is string => typeof entry === 'string')
+    : [];
+}
+
+function asAtomicSpecDocument(value: unknown): AtomicSpecDocument {
+  return value as AtomicSpecDocument;
+}
+
+export function parseAtomicSpecFile(specOption: string, options: ParseAtomicSpecOptions = {}): ParseAtomicSpecSuccess | ParseAtomicSpecFailure {
   const cwd = path.resolve(options.cwd ?? process.cwd());
   const specPath = path.resolve(cwd, specOption);
   const schemaPath = path.resolve(options.schemaPath ?? defaultAtomicSpecSchemaPath);
@@ -53,7 +285,7 @@ export function parseAtomicSpecFile(specOption: any, options: any = {}) {
   });
 }
 
-export function parseAtomicSpecDocument(specDocument: any, options: any = {}) {
+export function parseAtomicSpecDocument(specDocument: unknown, options: ParseAtomicSpecOptions = {}): ParseAtomicSpecSuccess | ParseAtomicSpecFailure {
   const specPath = options.specPath ? path.resolve(options.specPath) : null;
   const schemaPath = path.resolve(options.schemaPath ?? defaultAtomicSpecSchemaPath);
 
@@ -123,7 +355,7 @@ export function parseAtomicSpecDocument(specDocument: any, options: any = {}) {
   const validate = ajv.compile(schemaDocument.document);
   const valid = validate(specDocument);
   if (!valid) {
-    const issues = (validate.errors || []).map((error: any) => translateAjvIssue(error));
+    const issues = (validate.errors || []).map((error: unknown) => translateAjvIssue(error));
     return createFailure({
       code: 'ATM_SPEC_PARSE_INVALID',
       specPath,
@@ -133,22 +365,28 @@ export function parseAtomicSpecDocument(specDocument: any, options: any = {}) {
     });
   }
 
+  const normalizedSpecDocument = asAtomicSpecDocument(specDocument);
   return {
     ok: true,
     specPath: specPath ? toPortablePath(specPath) : null,
     schemaPath: toPortablePath(schemaPath),
-    normalizedModel: normalizeAtomicSpecModel(specDocument, { specPath, schemaPath }),
+    normalizedModel: normalizeAtomicSpecModel(normalizedSpecDocument, { specPath: specPath ?? undefined, schemaPath }),
     promptReport: {
       code: 'ATM_SPEC_PARSE_OK',
-      summary: `Atomic spec ${specDocument.id} parsed successfully.`,
+      summary: `Atomic spec ${normalizedSpecDocument.id} parsed successfully.`,
       issues: []
     }
   };
 }
 
-export function normalizeAtomicSpecModel(specDocument: any, options: any = {}) {
+export function normalizeAtomicSpecModel(specDocument: AtomicSpecDocument, options: ParseAtomicSpecOptions = {}): NormalizedAtomicSpecModel {
   const specPath = options.specPath ? toPortablePath(path.resolve(options.specPath)) : null;
   const schemaPath = toPortablePath(path.resolve(options.schemaPath ?? defaultAtomicSpecSchemaPath));
+  const performanceBudget = specDocument.performanceBudget;
+  const maxDurationMs = performanceBudget?.maxDurationMs;
+  const normalizedMaxDurationMs = typeof maxDurationMs === 'number' && Number.isInteger(maxDurationMs)
+    ? maxDurationMs
+    : null;
 
   return {
     source: {
@@ -166,7 +404,7 @@ export function normalizeAtomicSpecModel(specDocument: any, options: any = {}) {
     },
     identity: {
       atomId: specDocument.id,
-      logicalName: specDocument.logicalName ?? null,
+      logicalName: normalizeOptionalText(specDocument.logicalName) ?? undefined,
       title: specDocument.title,
       description: specDocument.description ?? '',
       tags: normalizeStringList(specDocument.tags ?? [])
@@ -190,9 +428,9 @@ export function normalizeAtomicSpecModel(specDocument: any, options: any = {}) {
       compatibility: {
         coreVersion: specDocument.compatibility.coreVersion,
         registryVersion: specDocument.compatibility.registryVersion,
-        pluginApiVersion: specDocument.compatibility.pluginApiVersion ?? null,
-        languageAdapter: specDocument.compatibility.languageAdapter ?? null,
-        lifecycleMode: specDocument.compatibility.lifecycleMode ?? null
+        pluginApiVersion: normalizeOptionalText(specDocument.compatibility.pluginApiVersion) ?? '',
+        languageAdapter: normalizeOptionalText(specDocument.compatibility.languageAdapter) ?? '',
+        lifecycleMode: normalizeOptionalText(specDocument.compatibility.lifecycleMode) ?? ''
       },
       dependencyPolicy: {
         external: specDocument.dependencyPolicy?.external ?? 'none',
@@ -203,11 +441,9 @@ export function normalizeAtomicSpecModel(specDocument: any, options: any = {}) {
         evidenceRequired: specDocument.validation?.evidenceRequired === true
       },
       performanceBudget: {
-        hotPath: specDocument.performanceBudget?.hotPath === true,
-        inputMutation: specDocument.performanceBudget?.inputMutation ?? 'forbidden',
-        maxDurationMs: Number.isInteger(specDocument.performanceBudget?.maxDurationMs)
-          ? specDocument.performanceBudget.maxDurationMs
-          : null
+        hotPath: performanceBudget?.hotPath === true,
+        inputMutation: performanceBudget?.inputMutation ?? 'forbidden',
+        maxDurationMs: normalizedMaxDurationMs
       }
     },
     governance: {
@@ -232,7 +468,7 @@ export function normalizeAtomicSpecModel(specDocument: any, options: any = {}) {
   };
 }
 
-function readJsonDocument(filePath: any) {
+function readJsonDocument(filePath: string): JsonReadSuccess | JsonReadFailure {
   try {
     return {
       ok: true,
@@ -252,53 +488,52 @@ function readJsonDocument(filePath: any) {
   }
 }
 
-function normalizePorts(ports: any) {
-  return ports.map((port: any) => ({
+function normalizePorts(ports: readonly AtomicSpecPortRecord[]) {
+  return ports.map((port) => ({
     name: port.name,
     kind: port.kind,
     required: port.required === true
   }));
 }
 
-function normalizeLineage(lineage: any) {
-  if (!lineage || typeof lineage !== 'object' || Array.isArray(lineage)) {
+function normalizeLineage(lineage: AtomicSpecDocument['lineage']) {
+  const record = asRecord(lineage);
+  if (!record) {
     return null;
   }
 
-  const parentRefs = Array.isArray(lineage.parentRefs)
-    ? normalizeStringList(lineage.parentRefs)
+  const parentRefs = Array.isArray(record.parentRefs)
+    ? normalizeStringList(record.parentRefs)
     : [];
 
   return {
-    bornBy: normalizeOptionalText(lineage.bornBy),
+    bornBy: normalizeOptionalText(record.bornBy) ?? undefined,
     parentRefs,
-    bornAt: normalizeOptionalText(lineage.bornAt)
+    bornAt: normalizeOptionalText(record.bornAt) ?? undefined
   };
 }
 
-function normalizeTtl(ttl: any) {
-  if (!ttl || typeof ttl !== 'object' || Array.isArray(ttl)) {
+function normalizeTtl(ttl: AtomicSpecDocument['ttl']) {
+  const record = asRecord(ttl);
+  if (!record) {
     return null;
   }
 
   return {
-    expiresAt: normalizeOptionalText(ttl.expiresAt)
+    expiresAt: normalizeOptionalText(record.expiresAt)
   };
 }
 
-function normalizeOptionalText(value: any) {
-  if (typeof value !== 'string') {
-    return null;
-  }
-  const text = value.trim();
+function normalizeOptionalText(value: unknown) {
+  const text = asString(value)?.trim() ?? '';
   return text.length > 0 ? text : null;
 }
 
-function normalizeStringList(values: any) {
-  return [...new Set(values)].sort();
+function normalizeStringList(values: unknown) {
+  return [...new Set(asStringArray(values))].sort();
 }
 
-function createFailure({ code, specPath, schemaPath, summary, issues }: any) {
+function createFailure({ code, specPath, schemaPath, summary, issues }: FailureOptions): ParseAtomicSpecFailure {
   return {
     ok: false,
     specPath: specPath ? toPortablePath(specPath) : null,
@@ -307,16 +542,19 @@ function createFailure({ code, specPath, schemaPath, summary, issues }: any) {
     promptReport: {
       code,
       summary,
-      issues
+      issues: [...issues]
     }
   };
 }
 
-function translateAjvIssue(error: any) {
-  const instancePath = error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
+function translateAjvIssue(error: unknown): PromptIssue {
+  const issue = asRecord(error);
+  const instancePathValue = asString(issue?.instancePath);
+  const instancePath = instancePathValue && instancePathValue.length > 0 ? instancePathValue : '/';
+  const params = asRecord(issue?.params);
 
-  if (error.keyword === 'required') {
-    const missingProperty = error.params?.missingProperty;
+  if (issue?.keyword === 'required') {
+    const missingProperty = asString(params?.missingProperty) ?? '[unknown]';
     const missingPath = instancePath === '/'
       ? `/${missingProperty}`
       : `${instancePath}/${missingProperty}`;
@@ -329,18 +567,21 @@ function translateAjvIssue(error: any) {
     };
   }
 
-  if (error.keyword === 'const') {
+  if (issue?.keyword === 'const') {
+    const allowedValue = String(params?.allowedValue ?? '[unknown]');
     return {
       code: 'ATM_SPEC_CONST_MISMATCH',
       keyword: 'const',
       path: instancePath,
-      text: `${instancePath} must be ${error.params?.allowedValue}.`,
-      prompt: `Set "${instancePath}" to "${error.params?.allowedValue}".`
+      text: `${instancePath} must be ${allowedValue}.`,
+      prompt: `Set "${instancePath}" to "${allowedValue}".`
     };
   }
 
-  if (error.keyword === 'enum') {
-    const allowedValues = (error.params?.allowedValues || []).join(', ');
+  if (issue?.keyword === 'enum') {
+    const allowedValues = Array.isArray(params?.allowedValues)
+      ? params.allowedValues.map((value) => String(value)).join(', ')
+      : '';
     return {
       code: 'ATM_SPEC_ENUM_MISMATCH',
       keyword: 'enum',
@@ -350,7 +591,7 @@ function translateAjvIssue(error: any) {
     };
   }
 
-  if (error.keyword === 'pattern') {
+  if (issue?.keyword === 'pattern') {
     return {
       code: patternCodeFor(instancePath),
       keyword: 'pattern',
@@ -360,18 +601,19 @@ function translateAjvIssue(error: any) {
     };
   }
 
-  if (error.keyword === 'type') {
+  if (issue?.keyword === 'type') {
+    const typeName = String(params?.type ?? '[unknown]');
     return {
       code: 'ATM_SPEC_TYPE_MISMATCH',
       keyword: 'type',
       path: instancePath,
-      text: `${instancePath} must be of type ${error.params?.type}.`,
-      prompt: `Change "${instancePath}" to type ${error.params?.type}.`
+      text: `${instancePath} must be of type ${typeName}.`,
+      prompt: `Change "${instancePath}" to type ${typeName}.`
     };
   }
 
-  if (error.keyword === 'additionalProperties') {
-    const additionalProperty = error.params?.additionalProperty;
+  if (issue?.keyword === 'additionalProperties') {
+    const additionalProperty = asString(params?.additionalProperty) ?? '[unknown]';
     const additionalPath = instancePath === '/'
       ? `/${additionalProperty}`
       : `${instancePath}/${additionalProperty}`;
@@ -386,14 +628,14 @@ function translateAjvIssue(error: any) {
 
   return {
     code: 'ATM_SPEC_SCHEMA_ERROR',
-    keyword: error.keyword,
+    keyword: asString(issue?.keyword) ?? 'schema',
     path: instancePath,
-    text: `${instancePath} ${error.message}.`,
-    prompt: `Fix the schema error at "${instancePath}": ${error.message}.`
+    text: `${instancePath} ${asString(issue?.message) ?? 'schema validation failed'}.`,
+    prompt: `Fix the schema error at "${instancePath}": ${asString(issue?.message) ?? 'schema validation failed'}.`
   };
 }
 
-function patternCodeFor(instancePath: any) {
+function patternCodeFor(instancePath: string) {
   if (instancePath.endsWith('/id')) {
     return 'ATM_SPEC_ID_PATTERN';
   }
@@ -406,6 +648,6 @@ function patternCodeFor(instancePath: any) {
   return 'ATM_SPEC_PATTERN_MISMATCH';
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string) {
   return value.replace(/\\/g, '/');
 }

@@ -14,7 +14,7 @@ export function projectFields(result: CommandResult, fields: string[]): CommandR
       }
     }
   }
-  const resultAny = result as Record<string, unknown>;
+  const resultAny = result as unknown as Record<string, unknown>;
   return {
     ok: result.ok,
     command: result.command,

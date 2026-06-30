@@ -46,12 +46,14 @@ try {
   });
   validateProposal(blockedActiveProposal, validate, 'core blocked active proposal');
   assert.equal(blockedActiveProposal.status, 'blocked');
-  assert.equal(blockedActiveProposal.automatedGates.mapEquivalence.passed, true);
-  assert.equal(blockedActiveProposal.automatedGates.propagationReport.passed, false);
-  assert.equal(blockedActiveProposal.automatedGates.reviewAdvisory.passed, false);
-  assert.equal(blockedActiveProposal.automatedGates.humanReview.passed, false);
-  assert.deepEqual(blockedActiveProposal.requiredJustification.requiredEvidenceKinds, ['propagation-report', 'review-advisory', 'human-review']);
-  assert.deepEqual(blockedActiveProposal.requiredJustification.requiredCliOptions, ['--propagation-report', '--review-advisory', '--human-review']);
+  const blockedActiveGates = blockedActiveProposal.automatedGates as any;
+  const blockedActiveJustification = blockedActiveProposal.requiredJustification as any;
+  assert.equal(blockedActiveGates.mapEquivalence.passed, true);
+  assert.equal(blockedActiveGates.propagationReport.passed, false);
+  assert.equal(blockedActiveGates.reviewAdvisory.passed, false);
+  assert.equal(blockedActiveGates.humanReview.passed, false);
+  assert.deepEqual(blockedActiveJustification.requiredEvidenceKinds, ['propagation-report', 'review-advisory', 'human-review']);
+  assert.deepEqual(blockedActiveJustification.requiredCliOptions, ['--propagation-report', '--review-advisory', '--human-review']);
 
   const readyActiveProposal = proposeAtomicUpgrade({
     atomId,
@@ -71,9 +73,10 @@ try {
   });
   validateProposal(readyActiveProposal, validate, 'core ready active proposal');
   assert.equal(readyActiveProposal.status, 'pending');
-  assert.equal(readyActiveProposal.automatedGates.propagationReport.passed, true);
-  assert.equal(readyActiveProposal.automatedGates.reviewAdvisory.passed, true);
-  assert.equal(readyActiveProposal.automatedGates.humanReview.passed, true);
+  const readyActiveGates = readyActiveProposal.automatedGates as any;
+  assert.equal(readyActiveGates.propagationReport.passed, true);
+  assert.equal(readyActiveGates.reviewAdvisory.passed, true);
+  assert.equal(readyActiveGates.humanReview.passed, true);
 
   const blockedRetirementProposal = proposeAtomicUpgrade({
     atomId,
@@ -87,9 +90,11 @@ try {
   });
   validateProposal(blockedRetirementProposal, validate, 'core blocked legacy-retired proposal');
   assert.equal(blockedRetirementProposal.status, 'blocked');
-  assert.deepEqual(blockedRetirementProposal.requiredJustification.requiredEvidenceKinds, ['rollback-proof', 'retirement-proof']);
-  assert.equal(blockedRetirementProposal.automatedGates.blockedGateNames.includes('rollbackProof'), true);
-  assert.equal(blockedRetirementProposal.automatedGates.blockedGateNames.includes('retirementProof'), true);
+  const blockedRetirementJustification = blockedRetirementProposal.requiredJustification as any;
+  const blockedRetirementGates = blockedRetirementProposal.automatedGates as any;
+  assert.deepEqual(blockedRetirementJustification.requiredEvidenceKinds, ['rollback-proof', 'retirement-proof']);
+  assert.equal(blockedRetirementGates.blockedGateNames.includes('rollbackProof'), true);
+  assert.equal(blockedRetirementGates.blockedGateNames.includes('retirementProof'), true);
 
   const readyRetirementProposal = proposeAtomicUpgrade({
     atomId,
@@ -106,8 +111,9 @@ try {
   });
   validateProposal(readyRetirementProposal, validate, 'core ready legacy-retired proposal with retirement proof');
   assert.equal(readyRetirementProposal.status, 'pending');
-  assert.equal(readyRetirementProposal.automatedGates.retirementProof.passed, true);
-  assert.equal('rollbackProof' in readyRetirementProposal.automatedGates, false);
+  const readyRetirementGates = readyRetirementProposal.automatedGates as any;
+  assert.equal(readyRetirementGates.retirementProof.passed, true);
+  assert.equal('rollbackProof' in readyRetirementGates, false);
 
   const help = runAtm(['upgrade', '--help', '--json']);
   assert.equal(help.exitCode, 0);

@@ -55,12 +55,35 @@ interface RegistryDocument {
 interface RegistryEntry {
   atomId?: string;
   logicalName?: string;
+  schemaId?: string;
+  specVersion?: string;
+  mapVersion?: string;
+  evidence?: readonly string[];
+  members?: readonly unknown[];
+  edges?: readonly unknown[];
+  replacement?: unknown;
   location?: {
     workbenchPath?: string;
     specPath?: string;
+    codePaths?: string[];
     testPaths?: string[];
+    reportPath?: string | null;
   };
   specPath?: string;
+  selfVerification?: {
+    sourcePaths?: {
+      spec?: string;
+      code?: readonly string[];
+    };
+  };
+}
+
+interface AtomIdAllocationRecord {
+  atomId: string;
+  bucket: string;
+  sequence: number;
+  source: string;
+  reservation: string | null;
 }
 
 interface GenerateAtomOptions {
@@ -96,7 +119,7 @@ interface GenerateAtomResult {
   registryEntry?: RegistryEntry | null;
   registryPath?: string | null;
   catalogPath?: string | null;
-  allocation?: unknown | null;
+  allocation?: AtomIdAllocationRecord | null;
   scaffold?: unknown | null;
   testRun?: unknown | null;
   idempotent?: boolean;
@@ -177,6 +200,10 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
       dryRun,
       overwriteExisting: options.overwriteExisting === true
     }));
+    const normalizedModel = parsed.normalizedModel;
+    if (!normalizedModel) {
+      throw createGeneratorError('ATM_GENERATOR_SPEC_INVALID', 'Generated atomic spec did not produce a normalized model.', { parseResult: parsed });
+    }
 
     if (!dryRun) {
       mkdirSync(path.dirname(specAbsolutePath), { recursive: true });
@@ -210,7 +237,7 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
       });
     }
 
-    const testRun = recordPhase(phases, 'test', () => runAtomicTestRunner(parsed.normalizedModel, {
+    const testRun = recordPhase(phases, 'test', () => runAtomicTestRunner(normalizedModel, {
       repositoryRoot,
       now: options.now
     }));
@@ -218,7 +245,7 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
       throw createGeneratorError('ATM_GENERATOR_TEST_FAILED', 'Generated atom validation command failed.', { testRun });
     }
 
-    const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicRegistryEntry(parsed.normalizedModel, {
+    const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicRegistryEntry(normalizedModel, {
       repositoryRoot,
       atomVersion: options.atomVersion ?? '0.1.0',
       status: options.status ?? 'active',
@@ -227,7 +254,7 @@ export function generateAtom(request: unknown, options: GenerateAtomOptions = {}
       testPaths: options.testPaths ?? [paths.testPath],
       testReport: testRun.report,
       logicalName: normalizedRequest.logicalName,
-      semanticFingerprint: parsed.normalizedModel.governance?.semanticFingerprint ?? null,
+      semanticFingerprint: normalizedModel.governance?.semanticFingerprint ?? null,
       evidence: ['generator-provenance:generated', paths.sourcePath, ...(options.evidence ?? [])],
       legacyPlanningId: options.legacyPlanningId ?? null
     }));
@@ -441,14 +468,14 @@ function allocateGeneratorAtomId(request: NormalizedRequest, options: AllocateAt
       sequence: parsed.sequence,
       source: 'preassigned',
       reservation: options.force === true ? 'force-existing' : 'preassigned'
-    };
+    } satisfies AtomIdAllocationRecord;
   }
 
   return allocateAtomId(request.bucket, {
     repositoryRoot: options.repositoryRoot,
     registryPath: options.registryPath,
     registryDocument: options.registryDocument
-  });
+  }) as AtomIdAllocationRecord;
 }
 
 function upsertRegistryEntry(registryDocument: RegistryDocument, registryEntry: RegistryEntry, options: { generatedAt?: string } = {}): RegistryDocument {
@@ -538,7 +565,7 @@ function createSuccess<T extends Record<string, unknown>>(result: T): GenerateAt
     ok: true,
     phases: [],
     ...result
-  } as GenerateAtomResult;
+  } as unknown as GenerateAtomResult;
 }
 
 function createFailure(error: unknown, phases: PhaseRecord[]): GenerateAtomResult {

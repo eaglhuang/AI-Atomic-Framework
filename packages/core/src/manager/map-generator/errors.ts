@@ -12,7 +12,7 @@ export type GeneratorError = Error & {
   details: Record<string, unknown>;
 };
 
-export function createGeneratorError(code: any, text: any, details: Record<string, unknown> = {}): GeneratorError {
+export function createGeneratorError(code: string, text: string, details: Record<string, unknown> = {}): GeneratorError {
   const error = new Error(text) as GeneratorError;
   error.name = 'AtomicMapGeneratorError';
   error.code = code;

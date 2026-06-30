@@ -4,7 +4,67 @@ export const defaultAgentPromptWorkbenchRoot = 'atomic_workbench/atoms';
 export const defaultAgentPromptSpecFileName = 'atom.spec.json';
 export const defaultAgentPromptTestFileName = 'atom.test.ts';
 
-export function buildAgentPrompt(normalizedModel: any, options: any) {
+interface PromptPortRecord {
+  name: string;
+  kind: string;
+  required?: boolean;
+}
+
+interface AgentPromptModel {
+  identity: {
+    atomId: string;
+    logicalName?: string;
+    title?: string;
+    description?: string;
+  };
+  execution: {
+    compatibility?: { lifecycleMode?: string };
+    validation?: { commands?: string[]; evidenceRequired?: boolean };
+    language?: { primary?: string };
+    runtime?: { kind?: string; versionRange?: string };
+    dependencyPolicy?: { hostCoupling?: string; external?: string };
+    performanceBudget?: { inputMutation?: string };
+  };
+  ports?: {
+    inputs?: PromptPortRecord[];
+    outputs?: PromptPortRecord[];
+  };
+}
+
+interface AgentPromptOptions {
+  workbenchPath?: string;
+  workbenchRoot?: string;
+  promptFileName?: string;
+  specFileName?: string;
+  testFileName?: string;
+}
+
+interface AgentPromptDocument {
+  schemaId: string;
+  specVersion: string;
+  atomId: string;
+  title: string;
+  lifecycleMode: string;
+  promptPath: string;
+  frontmatter: {
+    forbiddenRules: string[];
+    allowedFiles: string[];
+    evidenceContract: {
+      evidenceRequired: boolean;
+      requiredOutputs: string[];
+      validationCommands: string[];
+    };
+  };
+  sections: {
+    goal: string;
+    context: string;
+    inputs: PromptPortRecord[];
+    outputs: PromptPortRecord[];
+    instructions: string[];
+  };
+}
+
+export function buildAgentPrompt(normalizedModel: AgentPromptModel, options: AgentPromptOptions) {
   const normalizedOptions = options || {};
   const document = createAgentPromptDocument(normalizedModel, normalizedOptions);
 
@@ -17,7 +77,7 @@ export function buildAgentPrompt(normalizedModel: any, options: any) {
   };
 }
 
-export function createAgentPromptDocument(normalizedModel: any, options: any) {
+export function createAgentPromptDocument(normalizedModel: AgentPromptModel, options: AgentPromptOptions) {
   const normalizedOptions = options || {};
   const atomId = normalizedModel?.identity?.atomId;
   const logicalName = normalizedModel?.identity?.logicalName;
@@ -39,8 +99,8 @@ export function createAgentPromptDocument(normalizedModel: any, options: any) {
   const validationCommands = unique(normalizedModel.execution?.validation?.commands ?? []);
   const requiredOutputs = unique(
     (normalizedModel.ports?.outputs ?? [])
-      .filter((port: any) => port.kind === 'evidence' || port.required === true)
-      .map((port: any) => port.name)
+      .filter((port) => port.kind === 'evidence' || port.required === true)
+      .map((port) => port.name)
   );
 
   const document = {
@@ -79,7 +139,7 @@ export function createAgentPromptDocument(normalizedModel: any, options: any) {
   };
 }
 
-export function serializeAgentPromptMarkdown(document: any) {
+export function serializeAgentPromptMarkdown(document: AgentPromptDocument) {
   const lines = [
     '---',
     `schemaId: ${quoteYaml(document.schemaId)}`,
@@ -131,14 +191,14 @@ export function serializeAgentPromptMarkdown(document: any) {
   }
   lines.push('');
   lines.push('## Instructions');
-  document.sections.instructions.forEach((instruction: any, index: any) => {
+  document.sections.instructions.forEach((instruction, index) => {
     lines.push(`${index + 1}. ${instruction}`);
   });
 
   return `${lines.join('\n')}\n`;
 }
 
-function createForbiddenRules(normalizedModel: any, lifecycleMode: any) {
+function createForbiddenRules(normalizedModel: AgentPromptModel, lifecycleMode: string) {
   const rules = [];
   const hostCoupling = normalizedModel.execution?.dependencyPolicy?.hostCoupling ?? 'forbidden';
   if (hostCoupling === 'adapter-only') {
@@ -168,7 +228,7 @@ function createForbiddenRules(normalizedModel: any, lifecycleMode: any) {
   return unique(rules);
 }
 
-function createInstructionList(normalizedModel: any) {
+function createInstructionList(normalizedModel: AgentPromptModel) {
   const instructions = [
     `Use ${quoteInline(normalizedModel.execution?.language?.primary ?? 'unknown')} with ${quoteInline(`${normalizedModel.execution?.runtime?.kind ?? 'runtime'} ${normalizedModel.execution?.runtime?.versionRange ?? ''}`.trim())} as the primary execution target.`,
     'Keep edits inside the allowed files listed in the frontmatter.'
@@ -185,7 +245,7 @@ function createInstructionList(normalizedModel: any) {
   return instructions;
 }
 
-function clonePort(port: any) {
+function clonePort(port: PromptPortRecord): PromptPortRecord {
   return {
     name: port.name,
     kind: port.kind,
@@ -193,26 +253,26 @@ function clonePort(port: any) {
   };
 }
 
-function renderPort(port: any) {
+function renderPort(port: PromptPortRecord) {
   return `\`${port.name}\` (\`${port.kind}\`, ${port.required ? 'required' : 'optional'})`;
 }
 
-function quoteInline(value: any) {
+function quoteInline(value: unknown) {
   return `\`${String(value)}\``;
 }
 
-function quoteYaml(value: any) {
+function quoteYaml(value: unknown) {
   return JSON.stringify(String(value));
 }
 
-function unique(values: any) {
-  return [...new Set(values.map((value: any) => String(value)))];
+function unique(values: unknown[]) {
+  return [...new Set(values.map((value) => String(value)))];
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: unknown) {
   return String(value).replace(/\\/g, '/');
 }
 
-function trimSlashes(value: any) {
+function trimSlashes(value: string) {
   return value.replace(/\/+$/g, '');
 }

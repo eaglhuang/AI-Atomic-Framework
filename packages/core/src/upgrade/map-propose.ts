@@ -47,7 +47,7 @@ export function buildMapProposalContext({ repositoryRoot, mapId, atomId, fromVer
     throw new Error(`map-propose could not find canonical map spec at ${mapSpecPath}.`);
   }
 
-  const mapSpec = parseJsonFile(absoluteMapSpecPath, mapSpecPath);
+  const mapSpec = parseJsonFile<MapSpec>(absoluteMapSpecPath, mapSpecPath);
   if (mapSpec.mapId !== canonicalMapId) {
     throw new Error(`map-propose mapId mismatch: expected ${canonicalMapId} but received ${mapSpec.mapId}.`);
   }
@@ -115,7 +115,7 @@ function resolveMapGeneratorProvenance(repositoryRoot: string, mapId: string, ma
     return inferProvenanceFromSpec(mapSpec);
   }
 
-  const registry = parseJsonFile(registryPath, 'atomic-registry.json');
+  const registry = parseJsonFile<Registry>(registryPath, 'atomic-registry.json');
   const entries = Array.isArray(registry?.entries) ? registry.entries! : [];
   const mapEntry = entries.find((entry) => entry?.schemaId === 'atm.atomicMap' && entry?.mapId === mapId);
   if (!mapEntry) {

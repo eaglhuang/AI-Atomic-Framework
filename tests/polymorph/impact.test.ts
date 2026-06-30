@@ -67,10 +67,12 @@ try {
   });
   assert.equal(upgradeValidator(blockedProposal), true, JSON.stringify(upgradeValidator.errors));
   assert.equal(blockedProposal.status, 'blocked');
-  assert.equal(blockedProposal.automatedGates.polymorphImpact.passed, false);
-  assert.equal(blockedProposal.automatedGates.blockedGateNames.includes('polymorphImpact'), true);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredEvidenceKinds, ['polymorph-impact']);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredCliOptions, ['--polymorph-impact-report']);
+  const blockedGates = blockedProposal.automatedGates as any;
+  const blockedJustification = blockedProposal.requiredJustification as any;
+  assert.equal(blockedGates.polymorphImpact.passed, false);
+  assert.equal(blockedGates.blockedGateNames.includes('polymorphImpact'), true);
+  assert.deepEqual(blockedJustification.requiredEvidenceKinds, ['polymorph-impact']);
+  assert.deepEqual(blockedJustification.requiredCliOptions, ['--polymorph-impact-report']);
 
   const readyProposal = proposeAtomicUpgrade({
     atomId: targetAtomId,
@@ -88,8 +90,8 @@ try {
   });
   assert.equal(upgradeValidator(readyProposal), true, JSON.stringify(upgradeValidator.errors));
   assert.equal(readyProposal.status, 'pending');
-  assert.equal(readyProposal.automatedGates.polymorphImpact.passed, true);
-  assert.equal(readyProposal.inputs.some((entry: any) => entry.kind === 'polymorph-impact'), true);
+  assert.equal((readyProposal.automatedGates as any).polymorphImpact.passed, true);
+  assert.equal(((readyProposal as any).inputs as any[]).some((entry: any) => entry.kind === 'polymorph-impact'), true);
 
   const help = runAtm(['upgrade', '--help', '--json']);
   assert.equal(help.exitCode, 0, help.raw);

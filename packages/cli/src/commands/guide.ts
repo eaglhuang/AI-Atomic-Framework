@@ -468,7 +468,7 @@ function buildGuide(parsed: ReturnType<typeof parseGuideArgs>) {
     case 'install-skill':
       return buildInstallSkillGuide(parsed.cwd, parsed.target, parsed.skillsRoot, parsed.force);
     case 'help':
-      return buildCommandHelpGuide(parsed.topic);
+      return buildCommandHelpGuide(parsed.topic ?? '');
     default:
       throw new CliError('ATM_CLI_USAGE', `Unknown guide intent: ${parsed.intent}`, {
         exitCode: 2,

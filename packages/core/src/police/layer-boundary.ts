@@ -1,10 +1,67 @@
 import { normalizeImports } from './forbidden-import-scanner.ts';
 
-export function validateLayerBoundary(importGraph: any[] = [], policyDocument: any, options: any = {}) {
-  const rules = new Map<string, Set<string>>((policyDocument.rules ?? []).map((rule: any) => [rule.fromLayer, new Set<string>(rule.allowedToLayers ?? [])]));
-  const violations: any[] = [];
-  for (const entry of importGraph) {
+interface LayerBoundaryRuleRecord {
+  readonly fromLayer?: string;
+  readonly allowedToLayers?: unknown[];
+}
+
+interface LayerBoundaryPolicyDocument {
+  readonly rules?: unknown[];
+}
+
+interface LayerBoundaryEntry {
+  readonly file?: string;
+  readonly fromLayer?: string;
+  readonly imports?: unknown[];
+}
+
+interface LayerBoundaryOptions {
+  readonly checkId?: string;
+  readonly description?: string;
+}
+
+function asRuleRecord(value: unknown): LayerBoundaryRuleRecord | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as LayerBoundaryRuleRecord
+    : null;
+}
+
+function asLayerBoundaryEntry(value: unknown): LayerBoundaryEntry | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as LayerBoundaryEntry
+    : null;
+}
+
+function asPolicyDocument(value: unknown): LayerBoundaryPolicyDocument | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as LayerBoundaryPolicyDocument
+    : null;
+}
+
+export function validateLayerBoundary(importGraph: unknown[] = [], policyDocument: unknown, options: LayerBoundaryOptions = {}) {
+  const policy = asPolicyDocument(policyDocument);
+  const rules = new Map<string, Set<string>>(
+    (policy?.rules ?? [])
+      .map((rule) => asRuleRecord(rule))
+      .filter((rule): rule is LayerBoundaryRuleRecord => typeof rule?.fromLayer === 'string')
+      .map((rule) => [rule.fromLayer as string, new Set<string>((rule.allowedToLayers ?? []).filter((entry): entry is string => typeof entry === 'string'))])
+  );
+  const violations: Array<{ code: string; severity: string; message: string; path: string }> = [];
+  for (const rawEntry of importGraph) {
+    const entry = asLayerBoundaryEntry(rawEntry);
+    if (!entry) {
+      continue;
+    }
     const fromLayer = entry.fromLayer;
+    if (typeof fromLayer !== 'string' || fromLayer.length === 0) {
+      violations.push({
+        code: 'ATM_POLICE_LAYER_UNKNOWN',
+        severity: 'error',
+        message: `${entry.file ?? 'source'} uses unknown layer ${String(fromLayer ?? '')}`,
+        path: entry.file ?? ''
+      });
+      continue;
+    }
     const allowed = rules.get(fromLayer);
     if (!allowed) {
       violations.push({
@@ -40,7 +97,7 @@ export function validateLayerBoundary(importGraph: any[] = [], policyDocument: a
   };
 }
 
-export function classifyImportLayer(source: any) {
+export function classifyImportLayer(source: unknown) {
   const value = String(source ?? '');
   if (value.startsWith('.') || value.startsWith('/')) {
     return 'relative';

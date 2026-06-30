@@ -4,6 +4,32 @@ import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 
+interface AjvErrorRecord {
+  readonly instancePath?: string;
+  readonly message?: string;
+  readonly params?: {
+    readonly missingProperty?: string;
+  };
+}
+
+interface SchemaValidatorOptions {
+  readonly ajv?: {
+    compile: (schema: unknown) => {
+      (document: unknown): boolean;
+      errors?: unknown[];
+    };
+  };
+  readonly checkId?: string;
+  readonly description?: string;
+  readonly repositoryRoot?: string;
+}
+
+interface SchemaValidationResult {
+  readonly ok: boolean;
+  readonly errors: string[];
+  readonly checkId?: string;
+}
+
 export function createSchemaValidator() {
   let Ajv2020, addFormats;
   try {
@@ -21,7 +47,7 @@ export function createSchemaValidator() {
   return ajv;
 }
 
-export function validateJsonDocument(document: any, schema: any, options: any = {}) {
+export function validateJsonDocument(document: unknown, schema: unknown, options: SchemaValidatorOptions = {}) {
   const ajv = options.ajv ?? createSchemaValidator();
   const validate = ajv.compile(schema);
   const ok = validate(document) === true;
@@ -32,7 +58,7 @@ export function validateJsonDocument(document: any, schema: any, options: any = 
   };
 }
 
-export function validateJsonFile(documentPath: any, schemaPath: any, options: any = {}) {
+export function validateJsonFile(documentPath: string, schemaPath: string, options: SchemaValidatorOptions = {}) {
   const resolvedDocumentPath = path.resolve(options.repositoryRoot ?? process.cwd(), documentPath);
   const resolvedSchemaPath = path.resolve(options.repositoryRoot ?? process.cwd(), schemaPath);
   if (!existsSync(resolvedDocumentPath)) {
@@ -56,15 +82,15 @@ export function validateJsonFile(documentPath: any, schemaPath: any, options: an
   }
 }
 
-export function createSchemaCheckResult(validations: any, options: any = {}) {
-  const errors = validations.flatMap((validation: any) => validation.errors ?? []);
+export function createSchemaCheckResult(validations: SchemaValidationResult[], options: SchemaValidatorOptions = {}) {
+  const errors = validations.flatMap((validation) => validation.errors ?? []);
   return {
     checkId: options.checkId ?? 'schema-validator',
     kind: 'schema',
     required: true,
     description: options.description ?? 'Validate police documents against JSON Schema.',
     ok: errors.length === 0,
-    violations: errors.map((message: any) => ({
+    violations: errors.map((message) => ({
       code: 'ATM_SCHEMA_INVALID',
       severity: 'error',
       message
@@ -72,7 +98,7 @@ export function createSchemaCheckResult(validations: any, options: any = {}) {
   };
 }
 
-function createFileFailure(code: any, filePath: any, message: any) {
+function createFileFailure(code: string, filePath: string, message: string) {
   return {
     ok: false,
     errors: [`${message} ${toPortablePath(filePath)}`],
@@ -80,14 +106,15 @@ function createFileFailure(code: any, filePath: any, message: any) {
   };
 }
 
-function formatAjvErrors(errors: any) {
-  return (errors ?? []).map((error: any) => {
-    const location = error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
-    const detail = error.params?.missingProperty ? ` missing ${error.params.missingProperty}` : '';
-    return `${location} ${error.message ?? 'is invalid'}${detail}`;
+function formatAjvErrors(errors: unknown[] | undefined) {
+  return (errors ?? []).map((error) => {
+    const errorRecord = (error && typeof error === 'object' && !Array.isArray(error) ? error : {}) as AjvErrorRecord;
+    const location = errorRecord.instancePath && errorRecord.instancePath.length > 0 ? errorRecord.instancePath : '/';
+    const detail = errorRecord.params?.missingProperty ? ` missing ${errorRecord.params.missingProperty}` : '';
+    return `${location} ${errorRecord.message ?? 'is invalid'}${detail}`;
   });
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string) {
   return String(value).replace(/\\/g, '/');
 }

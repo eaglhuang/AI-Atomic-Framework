@@ -30,10 +30,12 @@ try {
   });
   validateProposal(blockedProposal, validate, 'core blocked active proposal');
   assert.equal(blockedProposal.status, 'blocked');
-  assert.equal(blockedProposal.automatedGates.mapEquivalence.passed, false);
-  assert.equal(blockedProposal.automatedGates.blockedGateNames.includes('mapEquivalence'), true);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredEvidenceKinds, ['map-equivalence']);
-  assert.deepEqual(blockedProposal.requiredJustification.requiredCliOptions, ['--equivalence-report']);
+  const blockedGates = blockedProposal.automatedGates as any;
+  const blockedJustification = blockedProposal.requiredJustification as any;
+  assert.equal(blockedGates.mapEquivalence.passed, false);
+  assert.equal(blockedGates.blockedGateNames.includes('mapEquivalence'), true);
+  assert.deepEqual(blockedJustification.requiredEvidenceKinds, ['map-equivalence']);
+  assert.deepEqual(blockedJustification.requiredCliOptions, ['--equivalence-report']);
 
   const readyProposal = proposeAtomicUpgrade({
     atomId: 'ATM-CORE-0001',
@@ -54,9 +56,9 @@ try {
   });
   validateProposal(readyProposal, validate, 'core active proposal with equivalence');
   assert.equal(readyProposal.status, 'pending');
-  assert.equal(readyProposal.automatedGates.mapEquivalence.passed, true);
-  assert.equal(readyProposal.requestedReplacementMode, 'active');
-  assert.equal(readyProposal.inputs.some((entry: any) => entry.kind === 'map-equivalence'), true);
+  assert.equal((readyProposal.automatedGates as any).mapEquivalence.passed, true);
+  assert.equal((readyProposal as any).requestedReplacementMode, 'active');
+  assert.equal(((readyProposal as any).inputs as any[]).some((entry: any) => entry.kind === 'map-equivalence'), true);
 
   const help = runAtm(['upgrade', '--help', '--json']);
   assert.equal(help.exitCode, 0);

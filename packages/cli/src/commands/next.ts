@@ -209,7 +209,7 @@ export async function runNext(argv: string[]) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
     const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
     const nextAction = legacyPlan ? enrichWithLegacyPlan(options.cwd, baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
-    const userNotice = buildFirstUseUserNotice(nextAction);
+    const userNotice = buildFirstUseUserNotice(nextAction as Parameters<typeof buildFirstUseUserNotice>[0]);
     return withRunnerMode(makeResult({
       ok: nextAction.status !== 'blocked',
       command: 'next',
@@ -345,16 +345,34 @@ function extractClaimIntentFlag(argv: readonly string[]): { argv: string[]; clai
 
 function withRunnerMode<T extends { evidence?: Record<string, unknown>; messages?: unknown[] }>(result: T, cwd: string): T {
   const runnerMode = describeRunnerMode(cwd);
-  if (result.evidence && typeof result.evidence === 'object') {
-    result.evidence.runnerMode = runnerMode;
-    if (result.evidence.nextAction && typeof result.evidence.nextAction === 'object' && !Array.isArray(result.evidence.nextAction)) {
-      result.evidence.nextAction.runnerMode = runnerMode;
+  const evidenceRecord = result.evidence && typeof result.evidence === 'object'
+    ? result.evidence as Record<string, unknown>
+    : null;
+  if (evidenceRecord) {
+    evidenceRecord.runnerMode = runnerMode;
+    const nextActionRecord = evidenceRecord.nextAction && typeof evidenceRecord.nextAction === 'object' && !Array.isArray(evidenceRecord.nextAction)
+      ? evidenceRecord.nextAction as Record<string, unknown>
+      : null;
+    if (nextActionRecord) {
+      nextActionRecord.runnerMode = runnerMode;
     }
   }
-  const planningRootWarnings = result.evidence?.importedTaskQueue?.planningRootWarnings as readonly PlanningRootWarning[] | undefined;
+  const importedTaskQueue = evidenceRecord?.importedTaskQueue && typeof evidenceRecord.importedTaskQueue === 'object' && !Array.isArray(evidenceRecord.importedTaskQueue)
+    ? evidenceRecord.importedTaskQueue as Record<string, unknown>
+    : null;
+  const planningRootWarnings = importedTaskQueue?.planningRootWarnings as readonly PlanningRootWarning[] | undefined;
   if (Array.isArray(planningRootWarnings) && Array.isArray(result.messages)) {
     for (const warning of planningRootWarnings) {
-      if (result.messages.some((entry) => entry?.code === warning.code && entry?.data?.siblingRepoDirs?.join(',') === warning.siblingRepoDirs.join(','))) {
+      if (result.messages.some((entry) => {
+        const record = entry && typeof entry === 'object' && !Array.isArray(entry)
+          ? entry as Record<string, unknown>
+          : null;
+        const data = record?.data && typeof record.data === 'object' && !Array.isArray(record.data)
+          ? record.data as Record<string, unknown>
+          : null;
+        const siblingRepoDirs = Array.isArray(data?.siblingRepoDirs) ? data.siblingRepoDirs as string[] : [];
+        return record?.code === warning.code && siblingRepoDirs.join(',') === warning.siblingRepoDirs.join(',');
+      })) {
         continue;
       }
       result.messages.unshift(message('warning', warning.code, warning.detail, {
@@ -362,7 +380,12 @@ function withRunnerMode<T extends { evidence?: Record<string, unknown>; messages
       }));
     }
   }
-  if (Array.isArray(result.messages) && !result.messages.some((entry) => entry?.code === 'ATM_RUNNER_MODE')) {
+  if (Array.isArray(result.messages) && !result.messages.some((entry) => {
+    const record = entry && typeof entry === 'object' && !Array.isArray(entry)
+      ? entry as Record<string, unknown>
+      : null;
+    return record?.code === 'ATM_RUNNER_MODE';
+  })) {
     result.messages.push(message('info', 'ATM_RUNNER_MODE', `ATM next is running in ${runnerMode.mode} mode.`, runnerMode));
   }
   return result;
@@ -598,8 +621,8 @@ function decideNextAction(runtime: Record<string, unknown>, failedCheckName: str
 function buildCrossRepoFrameworkNextResult(input: {
   readonly cwd: string;
   readonly frameworkStatus: ReturnType<typeof createFrameworkModeStatus>;
-  readonly integrationBootstrap: unknown;
-  readonly runtimeAdapterReadiness: unknown;
+  readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
+  readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
   readonly importedTaskQueue: ImportedTaskQueue | null;
 }) {
   const targetRepo = input.frameworkStatus.targetRepo ?? '<target-repo>';
@@ -619,16 +642,16 @@ function buildCrossRepoFrameworkNextResult(input: {
       'closing framework target tasks from the planning repository'
     ]
   };
-  const userNotice = buildFirstUseUserNotice(nextAction as Record<string, unknown>);
+  const userNotice = buildFirstUseUserNotice(nextAction as Parameters<typeof buildFirstUseUserNotice>[0]);
   return makeResult({
     ok: false,
     command: 'next',
     cwd: input.cwd,
     messages: buildNextMessages(
-      nextAction as Record<string, unknown>,
+      nextAction as NextActionLike,
       userNotice,
-      input.integrationBootstrap as Record<string, unknown>,
-      input.runtimeAdapterReadiness as Record<string, unknown>,
+      input.integrationBootstrap,
+      input.runtimeAdapterReadiness,
       message('error', 'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED', 'ATM framework work was detected from task metadata; switch to the target framework repo before mutating or closing work.', {
         targetRepo,
         closureAuthority: input.frameworkStatus.closureAuthority
@@ -3899,12 +3922,12 @@ function mapStatusToSlashCommandId(status: string): string {
   return 'atm-next';
 }
 
-function buildAgentPackHint(status: string, command: string, reason: string) {
+function buildAgentPackHint(status: string, command?: string | null, reason?: string | null) {
   return {
     slashCommandId: mapStatusToSlashCommandId(status),
     route: status,
-    command,
-    reason
+    command: command ?? '',
+    reason: reason ?? ''
   };
 }
 
@@ -4240,12 +4263,45 @@ type NextActionLike = {
   batchId?: string | null;
   taskDirectionLock?: { readonly taskId?: string; readonly schemaId?: string };
   deliveryPrinciple?: ReturnType<typeof buildTaskDeliveryPrinciple>;
-  playbook?: ReturnType<typeof buildChannelPlaybook>;
+  playbook?: {
+    readonly channel: string;
+    readonly [key: string]: unknown;
+  };
   teamRecommendation?: TeamRecommendation | null;
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
   missingEvidence?: readonly string[];
-  closure?: { readonly closurePacketPath?: string | null };
+  requiredCommand?: string | null;
+  closure?: {
+    readonly taskId?: string;
+    readonly status?: string;
+    readonly closedAt?: string | null;
+    readonly closedByActor?: string | null;
+    readonly lastTransitionId?: string | null;
+    readonly lastTransitionAt?: string | null;
+    readonly closurePacketPath?: string | null;
+  };
+  planningStatusSync?: {
+    readonly authority?: string;
+    readonly instruction?: string;
+  };
+  claimIntent?: string | null;
+  quickfixLock?: unknown;
+  allowedFiles?: readonly string[];
+  candidateCount?: number;
+  candidates?: readonly unknown[];
+  batchInstruction?: unknown;
+  batchRun?: unknown;
+  scopeKey?: string | null;
+  sessionId?: string | null;
+  actorSession?: unknown;
+  scopeDiagnostic?: unknown;
+  ignoredUntrackedFiles?: readonly string[];
+  planningContext?: unknown;
+  targetWork?: unknown;
+  taskContext?: unknown;
+  deliveryClassification?: TaskDeliveryClassification;
+  mirrorSync?: unknown;
   decisionTrail?: NextDecisionTrailEntry[];
   playbookState?: 'present' | 'absent';
   structuredOutputHint?: {

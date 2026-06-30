@@ -1958,8 +1958,11 @@ export function repairClosurePacketForTask(input: {
     if (lastTransitionId) {
       const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`);
       const eventDoc = readJsonIfExists(eventPath);
-      if (eventDoc && eventDoc.closure && typeof eventDoc.closure === 'object' && eventDoc.closure.schemaId === 'atm.taskClosureTransition.v1') {
-        const closureInfo = eventDoc.closure as Record<string, unknown>;
+      const closureRecord = eventDoc?.closure && typeof eventDoc.closure === 'object' && !Array.isArray(eventDoc.closure)
+        ? eventDoc.closure as Record<string, unknown>
+        : null;
+      if (closureRecord?.schemaId === 'atm.taskClosureTransition.v1') {
+        const closureInfo = closureRecord;
         const headDetails = readGitHeadDetails(cwd);
         const targetCommit = readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'tasks', `${taskId}.json`))
           || readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`))
@@ -1990,14 +1993,29 @@ export function repairClosurePacketForTask(input: {
             },
             closedByCommand: 'atm tasks close',
             commandRuns: [],
-            validationPasses: (closureInfo as { validationPasses?: unknown }).validationPasses as unknown[] ?? [],
-            evidenceFreshness: (closureInfo as { evidenceFreshness?: unknown }).evidenceFreshness as string ?? 'fresh',
-            requiredGates: (closureInfo as { requiredGates?: unknown }).requiredGates as unknown[] ?? [],
-            requiredGatesSnapshot: (closureInfo as { requiredGatesSnapshot?: unknown }).requiredGatesSnapshot ?? null,
+            validationPasses: Array.isArray(closureInfo.validationPasses)
+              ? closureInfo.validationPasses.filter((entry): entry is string => typeof entry === 'string')
+              : [],
+            evidenceFreshness: closureInfo.evidenceFreshness === 'draft' || closureInfo.evidenceFreshness === 'historical-reference'
+              ? closureInfo.evidenceFreshness
+              : 'fresh',
+            requiredGates: Array.isArray(closureInfo.requiredGates)
+              ? closureInfo.requiredGates.filter((entry): entry is string => typeof entry === 'string')
+              : [],
+            requiredGatesSnapshot: closureInfo.requiredGatesSnapshot && typeof closureInfo.requiredGatesSnapshot === 'object' && !Array.isArray(closureInfo.requiredGatesSnapshot)
+              ? closureInfo.requiredGatesSnapshot as ClosurePacketRequiredGatesSnapshot
+              : createRequiredGatesSnapshot({
+                cwd,
+                changedFiles,
+                frameworkStatus: repoStatus,
+                requiredGates: Array.isArray(closureInfo.requiredGates)
+                  ? closureInfo.requiredGates.filter((entry): entry is string => typeof entry === 'string')
+                  : []
+              }),
             evidencePath: `.atm/history/evidence/${taskId}.json`,
-            closedAt: (eventDoc.createdAt as string) ?? new Date().toISOString(),
-            closedByActor: (eventDoc.actorId as string) ?? 'unknown',
-            sessionId: (eventDoc.sessionId as string) || null,
+            closedAt: (eventDoc?.createdAt as string) ?? new Date().toISOString(),
+            closedByActor: (eventDoc?.actorId as string) ?? 'unknown',
+            sessionId: (eventDoc?.sessionId as string) || null,
             attestation: null,
             historicalDeliveryProvenance: null,
             recoveredFromMissingPacket: true

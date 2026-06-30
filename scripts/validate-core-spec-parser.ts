@@ -70,6 +70,9 @@ for (const invalidCase of fixture.invalidCases) {
   check(result.ok === false, `${invalidCase.name} must fail parsing`);
   const issue = result.promptReport.issues.find((entry: any) => entry.code === invalidCase.expectedCode);
   check(Boolean(issue), `${invalidCase.name} must contain issue code ${invalidCase.expectedCode}`);
+  if (!issue) {
+    continue;
+  }
   check(matchesExpectedIssuePath(issue.path, invalidCase.expectedPath), `${invalidCase.name} must point to ${invalidCase.expectedPath}`);
   check(issue.prompt.includes(invalidCase.expectedPromptSnippet), `${invalidCase.name} must provide prompt hint for ${invalidCase.expectedPromptSnippet}`);
 }
@@ -80,7 +83,7 @@ try {
   copyFileSync(path.join(root, fixture.hostAgnosticCase.specPath), tempSpecPath);
   const hostAgnosticResult = parseAtomicSpecFile('minimal-valid.atom.json', { cwd: tempRoot });
   check(hostAgnosticResult.ok === true, 'parser must work in a temp repo without host-specific config');
-  check(hostAgnosticResult.normalizedModel?.source.specPath.endsWith('/minimal-valid.atom.json') === true, 'parser must resolve spec path from explicit cwd without reading host config');
+  check((hostAgnosticResult.normalizedModel?.source.specPath ?? '').endsWith('/minimal-valid.atom.json') === true, 'parser must resolve spec path from explicit cwd without reading host config');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

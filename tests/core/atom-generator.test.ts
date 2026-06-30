@@ -40,10 +40,10 @@ try {
   }, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(first.ok, true);
   assert.equal(first.atomId, 'ATM-CORE-0001');
-  assert.equal(first.allocation.sequence, 1);
-  assert.equal(existsSync(path.join(tempRoot, first.specPath)), true);
-  assert.equal(existsSync(path.join(tempRoot, first.sourcePath)), true);
-  assert.equal(existsSync(path.join(tempRoot, first.testPath)), true);
+  assert.equal(first.allocation!.sequence, 1);
+  assert.equal(existsSync(path.join(tempRoot, first.specPath!)), true);
+  assert.equal(existsSync(path.join(tempRoot, first.sourcePath!)), true);
+  assert.equal(existsSync(path.join(tempRoot, first.testPath!)), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic-registry.json')), true);
   assert.equal(existsSync(path.join(tempRoot, 'atomic_workbench/registry-catalog.md')), true);
 
@@ -53,7 +53,7 @@ try {
   assert.deepEqual(registry.entries[0].location.codePaths, [first.sourcePath]);
   assert.notEqual(registry.entries[0].selfVerification.sourcePaths.code[0], registry.entries[0].selfVerification.sourcePaths.spec);
 
-  const sourceSelfCheck = spawnSync(process.execPath, [path.join(tempRoot, first.sourcePath), '--self-check'], {
+  const sourceSelfCheck = spawnSync(process.execPath, [path.join(tempRoot, first.sourcePath!), '--self-check'], {
     cwd: tempRoot,
     encoding: 'utf8'
   });
@@ -80,7 +80,7 @@ try {
 
   const invalidBucket = generateAtom({ bucket: '', title: 'Bad', description: 'Bad.' }, { repositoryRoot: tempRoot });
   assert.equal(invalidBucket.ok, false);
-  assert.equal(invalidBucket.error.code, 'ATM_BUCKET_INVALID');
+  assert.equal(invalidBucket.error!.code, 'ATM_BUCKET_INVALID');
 
   writeFileSync(path.join(tempRoot, 'atomic-registry.json'), '{bad json', 'utf8');
   const invalidRegistry = generateAtom({
@@ -90,7 +90,7 @@ try {
     logicalName: 'atom.core-broken-registry'
   }, { repositoryRoot: tempRoot });
   assert.equal(invalidRegistry.ok, false);
-  assert.equal(invalidRegistry.error.code, 'ATM_REGISTRY_INVALID');
+  assert.equal(invalidRegistry.error!.code, 'ATM_REGISTRY_INVALID');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

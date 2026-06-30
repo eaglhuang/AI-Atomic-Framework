@@ -9,9 +9,26 @@ export { classifyImportLayer, validateLayerBoundary } from './layer-boundary.ts'
 export { evaluatePromotionGate, validateRegistryConsistency } from './registry-consistency.ts';
 export { createSchemaCheckResult, createSchemaValidator, validateJsonDocument, validateJsonFile } from './schema-validator.ts';
 
-export function runPoliceChecks(options: any = {}) {
+interface PoliceChecksOptions {
+  readonly lifecycleMode?: string;
+  readonly mapFixture?: unknown;
+  readonly layerPolicy?: unknown;
+  readonly importGraph?: unknown[];
+  readonly forbiddenPatterns?: unknown[];
+  readonly registryGate?: Record<string, unknown>;
+}
+
+type PoliceCheckResult =
+  | ReturnType<typeof validateDependencyGraph>
+  | ReturnType<typeof validateLayerBoundary>
+  | ReturnType<typeof validateForbiddenImports>
+  | ReturnType<typeof validateRegistryConsistency>;
+
+type RegistryConsistencyCheck = ReturnType<typeof validateRegistryConsistency>;
+
+export function runPoliceChecks(options: PoliceChecksOptions = {}) {
   const lifecycleMode = options.lifecycleMode ?? 'birth';
-  const checks: any[] = [];
+  const checks: PoliceCheckResult[] = [];
   if (options.mapFixture) {
     checks.push(validateDependencyGraph(options.mapFixture));
   }
@@ -25,7 +42,7 @@ export function runPoliceChecks(options: any = {}) {
     checks.push(validateRegistryConsistency({ lifecycleMode, ...options.registryGate }));
   }
   const violations = checks.flatMap((check) => check.violations ?? []);
-  const registryCheck = checks.find((check) => check.checkId === 'registry-consistency');
+  const registryCheck = checks.find((check): check is RegistryConsistencyCheck => check.checkId === 'registry-consistency');
   const canPromote = lifecycleMode === 'evolution'
     ? registryCheck?.canPromote === true && violations.length === 0
     : violations.length === 0;

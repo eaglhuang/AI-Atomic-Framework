@@ -14,7 +14,27 @@
 import { parseMapId } from '../map-id-allocator.ts';
 import { createGeneratorError } from './errors.ts';
 
-export function normalizeAtomId(value: any, fieldName: any) {
+interface AtomicMapMemberInput {
+  role?: string;
+}
+
+interface AtomicMapEdgeInput {
+  edgeKind?: string;
+}
+
+interface AtomicMapReplacementInput {
+  legacyUris?: string[];
+  mode?: string;
+  evidenceRefs?: string[];
+}
+
+interface InferSpecVersionInput {
+  members: AtomicMapMemberInput[];
+  edges: AtomicMapEdgeInput[];
+  replacement?: AtomicMapReplacementInput | null;
+}
+
+export function normalizeAtomId(value: unknown, fieldName: string) {
   const atomId = String(value || '').trim();
   if (!/^ATM-[A-Z][A-Z0-9]*-\d{4}$/.test(atomId)) {
     throw createGeneratorError('ATM_MAP_GENERATOR_ATOM_ID_INVALID', `${fieldName} must match ATM-{BUCKET}-{NNNN}.`, {
@@ -25,7 +45,7 @@ export function normalizeAtomId(value: any, fieldName: any) {
   return atomId;
 }
 
-export function normalizeMapId(value: any) {
+export function normalizeMapId(value: unknown) {
   const parsed = parseMapId(value);
   if (!parsed) {
     throw createGeneratorError('ATM_MAP_GENERATOR_MAP_ID_INVALID', 'mapId must match ATM-MAP-{NNNN}.', { mapId: value });
@@ -33,7 +53,7 @@ export function normalizeMapId(value: any) {
   return parsed.mapId;
 }
 
-export function normalizeSemver(value: any, fieldName: any) {
+export function normalizeSemver(value: unknown, fieldName: string) {
   const version = String(value || '').trim();
   if (!/^\d+\.\d+\.\d+$/.test(version)) {
     throw createGeneratorError('ATM_MAP_GENERATOR_VERSION_INVALID', `${fieldName} must match semver x.y.z.`, {
@@ -44,14 +64,14 @@ export function normalizeSemver(value: any, fieldName: any) {
   return version;
 }
 
-export function normalizeRequiredText(value: any, fieldName: any) {
+export function normalizeRequiredText(value: unknown, fieldName: string) {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw createGeneratorError('ATM_MAP_GENERATOR_REQUEST_INVALID', `Atomic map generator requires ${fieldName}.`, { fieldName });
   }
   return value.trim();
 }
 
-export function normalizeSpecVersion(value: any) {
+export function normalizeSpecVersion(value: unknown) {
   const specVersion = String(value || '').trim();
   if (!['0.1.0', '0.2.0'].includes(specVersion)) {
     throw createGeneratorError('ATM_MAP_GENERATOR_SPEC_VERSION_INVALID', 'Atomic map specVersion must be 0.1.0 or 0.2.0.', { specVersion: value });
@@ -59,18 +79,18 @@ export function normalizeSpecVersion(value: any) {
   return specVersion;
 }
 
-export function inferSpecVersion(input: any) {
-  const hasMemberRoles = input.members.some((member: any) => Boolean(member.role));
-  const hasEdgeKinds = input.edges.some((edge: any) => Boolean(edge.edgeKind));
+export function inferSpecVersion(input: InferSpecVersionInput) {
+  const hasMemberRoles = input.members.some((member) => Boolean(member.role));
+  const hasEdgeKinds = input.edges.some((edge) => Boolean(edge.edgeKind));
   return hasMemberRoles || hasEdgeKinds || input.replacement ? '0.2.0' : '0.1.0';
 }
 
-export function assertSpecVersionSupportsMapSurface(specVersion: any, input: any) {
+export function assertSpecVersionSupportsMapSurface(specVersion: string, input: InferSpecVersionInput) {
   if (specVersion !== '0.1.0') {
     return;
   }
-  const hasMemberRoles = input.members.some((member: any) => Boolean(member.role));
-  const hasEdgeKinds = input.edges.some((edge: any) => Boolean(edge.edgeKind));
+  const hasMemberRoles = input.members.some((member) => Boolean(member.role));
+  const hasEdgeKinds = input.edges.some((edge) => Boolean(edge.edgeKind));
   if (hasMemberRoles || hasEdgeKinds || input.replacement) {
     throw createGeneratorError('ATM_MAP_GENERATOR_SPEC_VERSION_INVALID', 'Atomic map replacement surface fields require specVersion 0.2.0.', { specVersion });
   }

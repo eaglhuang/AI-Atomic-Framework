@@ -27,6 +27,12 @@ function readJson(relativePath: any) {
   return JSON.parse(readFileSync(path.join(root, relativePath), 'utf8'));
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
 function copyDirectory(sourceDir: string, targetDir: string) {
   mkdirSync(targetDir, { recursive: true });
   for (const entry of readdirSync(sourceDir)) {
@@ -122,9 +128,11 @@ try {
   check(passResult.reportPath.endsWith(fixture.passCase.expectedReportPath), 'pass fixture must default report path under atom workbench folder');
   check(path.basename(path.dirname(passResult.reportPath)) === passParsed.normalizedModel!.identity.atomId, 'pass fixture report folder must equal the Atomic ID exactly');
   check(existsSync(path.join(tempRoot, fixture.passCase.expectedReportPath)), 'pass fixture report file must be written');
-  check(passResult.report.runnerContract.executionMode === 'delegated', 'runner contract must stay delegated');
-  check(passResult.report.results[0]?.command === fixture.passCase.expectedCommand, 'pass fixture command must be preserved exactly');
-  check(passResult.report.results[0]?.stdout.includes(fixture.passCase.expectedStdoutSnippet), 'pass fixture stdout evidence missing');
+  const passRunnerContract = asRecord(passResult.report.runnerContract);
+  const passFirstResult = asRecord(passResult.report.results[0]);
+  check(passRunnerContract.executionMode === 'delegated', 'runner contract must stay delegated');
+  check(passFirstResult.command === fixture.passCase.expectedCommand, 'pass fixture command must be preserved exactly');
+  check(String(passFirstResult.stdout ?? '').includes(fixture.passCase.expectedStdoutSnippet), 'pass fixture stdout evidence missing');
   check(passResult.report.metrics?.latency === passResult.report.summary.durationMs, 'pass fixture metrics latency must mirror summary duration');
   check(passResult.report.metrics?.errorRate === 0, 'pass fixture metrics must report zero error rate');
   check(passResult.report.metrics?.coverage === null, 'pass fixture metrics coverage must default to null when not provided');
@@ -140,9 +148,10 @@ try {
   });
   check(failResult.ok === false, 'fail fixture must fail overall result');
   check(failResult.exitCode === fixture.failCase.expectedExitCode, 'fail fixture must preserve non-zero exit code');
-  check(failResult.report.results[0]?.exitCode === fixture.failCase.expectedExitCode, 'fail fixture command result must preserve non-zero exit code');
+  const failFirstResult = asRecord(failResult.report.results[0]);
+  check(failFirstResult.exitCode === fixture.failCase.expectedExitCode, 'fail fixture command result must preserve non-zero exit code');
   check(failResult.report.summary.failed === 1, 'fail fixture must count one failed command');
-  check(failResult.report.results[0]?.stderr.includes(fixture.failCase.expectedStderrSnippet), 'fail fixture stderr evidence missing');
+  check(String(failFirstResult.stderr ?? '').includes(fixture.failCase.expectedStderrSnippet), 'fail fixture stderr evidence missing');
   check(failResult.reportPath.endsWith(fixture.failCase.customReportPath), 'custom report path must be honored');
   check(existsSync(path.join(tempRoot, fixture.failCase.customReportPath)), 'custom report path file must be written');
   check(failResult.report.metrics?.latency === failResult.report.summary.durationMs, 'fail fixture metrics latency must mirror summary duration');
@@ -162,9 +171,10 @@ try {
   check(pluginResult.commandResults[0]?.command === fixture.pluginCase.expectedCommand, 'plugin fixture must preserve plugin-provided command');
   check(pluginResult.runnerContract.profile === 'quick', 'plugin fixture runner contract must preserve requested profile');
   check(pluginResult.runnerContract.suite === 'host-integration', 'plugin fixture runner contract must preserve requested suite');
-  check(pluginResult.commandResults[0]?.key === 'integration.host.fixture.pass', 'plugin fixture must preserve catalog-style command key');
-  check(pluginResult.commandResults[0]?.family === 'host-integration', 'plugin fixture must preserve catalog-style command family');
-  check(pluginResult.commandResults[0]?.dedupeKeys?.[0] === 'integration:host:fixture', 'plugin fixture must preserve command dedupe key');
+  const pluginFirstResult = asRecord(pluginResult.commandResults[0]);
+  check(pluginFirstResult.key === 'integration.host.fixture.pass', 'plugin fixture must preserve catalog-style command key');
+  check(pluginFirstResult.family === 'host-integration', 'plugin fixture must preserve catalog-style command family');
+  check(Array.isArray(pluginFirstResult.dedupeKeys) && pluginFirstResult.dedupeKeys[0] === 'integration:host:fixture', 'plugin fixture must preserve command dedupe key');
   check(pluginResult.pluginRuns?.[0]?.pluginId === 'fixture-plugin', 'plugin fixture must report plugin identity');
   check(pluginResult.pluginRuns?.[0]?.requestedProfile === 'quick', 'plugin fixture must report requested profile');
   check(pluginResult.pluginRuns?.[0]?.requestedSuite === 'host-integration', 'plugin fixture must report requested suite');

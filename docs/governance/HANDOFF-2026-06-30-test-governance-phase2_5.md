@@ -174,3 +174,29 @@ For The Next Commit” section and keep the rest of the dirty tree out of scope.
 The planning-repo document was already updated to add Phase 2.5 and the unified
 test catalog direction. The framework work in this handoff is intended to match
 that roadmap, not to create a separate design line.
+
+## Governance Friction To Carry Forward
+
+This round also reconfirmed a separate ATM governance flaw that should not be
+normalized just because we found a way to recover from it.
+
+Protected `main` push can still discover missing commit-range `git-head`
+evidence after several local commits already exist. The current repair lane can
+devolve into:
+
+- backfilling a fresh `HEAD` record
+- appending historical commit-range records into
+  `.atm/history/evidence/git-head.jsonl`
+- landing a dedicated evidence-only commit just to satisfy push protection
+
+That is an acceptable transitional repair path, but it is a poor steady-state
+workflow. Earlier commit `0164921fb` already showed the same anti-pattern, and
+the 2026-06-30 push recovery repeated it across a five-commit range before the
+evidence-only closeout commit `e226e7e32`.
+
+The next owner should treat this as product/governance debt, not as operator
+muscle-memory to preserve. If commit-range `git-head` evidence is required,
+ATM should surface and/or auto-generate it much earlier in the normal
+lifecycle. If it is not required for some commit classes, the scope should be
+narrowed so ordinary work does not fall into historical backfill archaeology at
+push time.

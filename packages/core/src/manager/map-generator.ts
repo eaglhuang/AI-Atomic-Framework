@@ -5,6 +5,7 @@ import { computeSha256ForContent } from '../hash-lock/hash-lock.ts';
 import { createAtomicMapSemanticFingerprint, normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.ts';
 import { createAtomicMapRegistryEntry } from '../registry/map-registry.ts';
 import { createRegistryDocument, validateRegistryDocumentFile, writeRegistryArtifacts } from '../registry/registry.ts';
+import type { AtomicMapReplacementRecord, MapRegistryEntryRecord, RegistryMapEdgeRecord, RegistryMapMemberRecord } from '../index.ts';
 import { allocateMapId, MapIdAllocationError, parseMapId } from './map-id-allocator.ts';
 import { createGeneratorError, type GeneratorError } from './map-generator/errors.ts';
 import {
@@ -54,8 +55,8 @@ interface NormalizedRequest {
   qualityTargets: Record<string, string | number | boolean>;
   mapVersion: string;
   specVersion?: string;
-  replacement: MapReplacement | null;
-  pendingSfCalculation: boolean;
+  replacement?: MapReplacement | null;
+  pendingSfCalculation?: boolean;
 }
 
 interface MapPaths {
@@ -91,7 +92,7 @@ export interface GenerateAtomicMapResult {
   registryEntry?: RegistryEntry | null;
   registryPath?: string | null;
   catalogPath?: string | null;
-  allocation?: unknown | null;
+  allocation?: MapIdAllocationRecord | null;
   testRun?: unknown | null;
   idempotent?: boolean;
   dryRun?: boolean;
@@ -109,12 +110,27 @@ interface PhaseRecord {
 
 interface RegistryEntry {
   mapId: string;
+  schemaId?: string;
+  specVersion?: string;
+  mapVersion?: string;
+  members?: readonly RegistryMapMemberRecord[];
+  edges?: readonly RegistryMapEdgeRecord[];
+  replacement?: AtomicMapReplacementRecord;
+  evidence?: readonly string[];
   location?: {
     workbenchPath?: string;
     specPath?: string;
     testPaths?: string[];
     reportPath?: string;
   };
+}
+
+interface MapIdAllocationRecord {
+  mapId: string;
+  bucket: string;
+  sequence: number;
+  source: string;
+  reservation: string | null;
 }
 
 interface RegistryDocument {
@@ -170,7 +186,7 @@ export function generateAtomicMap(request: unknown, options: GenerateAtomicMapOp
       registryPath,
       registryDocument,
       existingEntry,
-      mapId: options.mapId,
+      mapId: options.mapId ?? undefined,
       force: options.force === true
     }));
     const paths = createMapPaths(allocation.mapId);
@@ -231,7 +247,7 @@ export function generateAtomicMap(request: unknown, options: GenerateAtomicMapOp
       governanceTier: options.governanceTier ?? 'standard',
       location: createMapLocation(paths),
       evidence: createGeneratedMapEvidence(paths)
-    }));
+    })) as MapRegistryEntryRecord;
     const updatedRegistryDocument = upsertRegistryEntry(registryDocument, registryEntry as unknown as RegistryEntry, {
       generatedAt: options.now ?? new Date().toISOString()
     });
@@ -426,12 +442,15 @@ function readRegistryDocument(registryAbsolutePath: string, options: GenerateAto
 
 function findExistingEntry(registryDocument: RegistryDocument, request: NormalizedRequest): RegistryEntry | null {
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-  const mapHash = computeAtomicMapHash(request);
+  const mapHash = computeAtomicMapHash({
+    ...request,
+    replacement: request.replacement ?? null
+  });
   const semanticFingerprint = request.pendingSfCalculation === true
     ? null
     : createAtomicMapSemanticFingerprint(request);
   return (entries as RegistryEntry[]).find((entry) => {
-    const e = entry as Record<string, unknown>;
+    const e = entry as unknown as Record<string, unknown>;
     return e?.schemaId === 'atm.atomicMap'
       && e?.mapHash === mapHash
       && normalizeSemanticFingerprint((e?.semanticFingerprint ?? e?.mapSemanticFingerprint ?? null) as unknown) === semanticFingerprint
@@ -453,14 +472,14 @@ function allocateGeneratorMapId(request: NormalizedRequest, options: AllocateOpt
       sequence: parsed.sequence,
       source: 'preassigned',
       reservation: options.force === true ? 'force-existing' : 'preassigned'
-    };
+    } satisfies MapIdAllocationRecord;
   }
 
   return allocateMapId({
     repositoryRoot: options.repositoryRoot,
     registryPath: options.registryPath,
     registryDocument: options.registryDocument
-  });
+  }) as MapIdAllocationRecord;
 }
 
 function upsertRegistryEntry(registryDocument: RegistryDocument, registryEntry: RegistryEntry, options: { generatedAt?: string } = {}): RegistryDocument {
@@ -647,7 +666,7 @@ function createSuccess<T extends Record<string, unknown>>(result: T): GenerateAt
     ok: true,
     phases: [],
     ...result
-  } as GenerateAtomicMapResult;
+  } as unknown as GenerateAtomicMapResult;
 }
 
 function createFailure(error: unknown, phases: PhaseRecord[]): GenerateAtomicMapResult {

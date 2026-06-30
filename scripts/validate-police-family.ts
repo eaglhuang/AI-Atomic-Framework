@@ -92,7 +92,7 @@ function buildCoreFamilies(options: {
   const lifecycleReport = runLifecyclePolice(options.lifecycleInput);
   return buildCorePoliceFamilies({
     policeReport,
-    lifecycleReport
+    lifecycleReport: lifecycleReport as unknown as Record<string, unknown>
   });
 }
 
@@ -286,15 +286,15 @@ const atomizationPlan = await buildLegacyRoutePlan({
 });
 const atomizationPassFamily = runAtomizationPolice({
   legacyRoutePlan: atomizationPlan,
-  dryRunResult: dryRunPass
+  dryRunResult: dryRunPass as unknown as Record<string, unknown>
 });
 const atomizationNeutralityFailFamily = runAtomizationPolice({
   legacyRoutePlan: atomizationPlan,
-  dryRunResult: dryRunNeutralityFail
+  dryRunResult: dryRunNeutralityFail as unknown as Record<string, unknown>
 });
 const atomizationHostMutationFamily = runAtomizationPolice({
   legacyRoutePlan: atomizationPlan,
-  dryRunResult: dryRunHostMutationAttempt
+  dryRunResult: dryRunHostMutationAttempt as unknown as Record<string, unknown>
 });
 
 check(atomizationPassFamily.sourceValidator === 'runAtomizationPolice', 'Atomization Police must be a named scanner');
@@ -327,7 +327,7 @@ const positiveGateReport = await runPoliceFamilyGate({
   },
   atomization: {
     legacyRoutePlan: atomizationPlan,
-    dryRunResult: dryRunPass
+    dryRunResult: dryRunPass as unknown as Record<string, unknown>
   },
   decomposition: {
     inventory: buildSourceInventoryReport({

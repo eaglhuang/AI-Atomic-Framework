@@ -15,7 +15,21 @@ export class MapIdAllocationError extends Error {
   }
 }
 
-export function parseMapId(mapId: any) {
+interface MapRegistryEntryLike {
+  mapId?: string;
+}
+
+interface MapRegistryDocumentLike {
+  entries?: unknown[];
+}
+
+interface AllocateMapIdOptions {
+  repositoryRoot?: string;
+  registryPath?: string;
+  registryDocument?: MapRegistryDocumentLike | null;
+}
+
+export function parseMapId(mapId: unknown) {
   const match = String(mapId || '').trim().match(mapIdPattern);
   if (!match) {
     return null;
@@ -28,13 +42,14 @@ export function parseMapId(mapId: any) {
   };
 }
 
-export function allocateMapId(options: any = {}) {
+export function allocateMapId(options: AllocateMapIdOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const registryPath = path.resolve(repositoryRoot, options.registryPath ?? 'atomic-registry.json');
   const registryDocument = options.registryDocument ?? readRegistryDocument(registryPath);
   const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-  const maxSequence = entries.reduce((currentMax: any, entry: any) => {
-    const parsed = parseMapId(entry?.mapId);
+  const maxSequence = entries.reduce((currentMax: number, entry: unknown) => {
+    const registryEntry = entry as MapRegistryEntryLike;
+    const parsed = parseMapId(registryEntry?.mapId);
     if (!parsed) {
       return currentMax;
     }
@@ -51,7 +66,7 @@ export function allocateMapId(options: any = {}) {
   };
 }
 
-function readRegistryDocument(registryPath: any) {
+function readRegistryDocument(registryPath: string): MapRegistryDocumentLike {
   if (!existsSync(registryPath)) {
     return { entries: [] };
   }
@@ -66,7 +81,7 @@ function readRegistryDocument(registryPath: any) {
   }
 }
 
-function toProjectPath(repositoryRoot: any, filePath: any) {
+function toProjectPath(repositoryRoot: string, filePath: string) {
   const relativePath = path.relative(repositoryRoot, filePath).replace(/\\/g, '/');
   if (!relativePath || relativePath.startsWith('..')) {
     return toPortablePath(filePath);
@@ -74,6 +89,6 @@ function toProjectPath(repositoryRoot: any, filePath: any) {
   return relativePath;
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string) {
   return String(value).replace(/\\/g, '/');
 }

@@ -24,7 +24,83 @@ import {
 
 export * from './execution-constants.ts';
 
-export function createExecuteAgentTaskEffectContract(options: any) {
+interface ExecuteAgentTaskModel {
+  identity?: { atomId?: string };
+  execution?: {
+    compatibility?: { lifecycleMode?: string };
+    validation?: { commands?: string[] };
+  };
+}
+
+interface PromptDocumentRecord {
+  promptPath: string;
+  allowedFiles: string[];
+  validationCommands: string[];
+}
+
+interface EffectContractRecord {
+  nodeKind: string;
+  nodeName: string;
+  defaultMode: string;
+  applyFlag: string;
+  proposalDelegatedTo: string;
+}
+
+interface ProposedChangeRecord {
+  filePath: string;
+  description: string;
+}
+
+interface AgentOutcomeRecord {
+  ok: boolean;
+  summary: string;
+  logLines: string[];
+  proposedChanges: ProposedChangeRecord[];
+  touchedFiles: string[];
+  artifactPath: string;
+  logPath: string;
+}
+
+interface ApplyOutcomeRecord {
+  ok: boolean;
+  appliedChanges: boolean;
+  touchedFiles: string[];
+  summary: string;
+}
+
+interface ArtifactTargetsRecord {
+  workbenchPath: string;
+  snapshotPath: string;
+  logPath: string;
+  evidencePath: string;
+  reportsDirPath: string;
+}
+
+interface ExecuteAgentTaskOptions {
+  repositoryRoot?: string;
+  now?: string;
+  applyChanges?: boolean;
+  proposalDelegatedTo?: string;
+  promptDocument?: unknown;
+  prompt?: unknown;
+  workbenchPath?: string;
+  workbenchRoot?: string;
+  snapshotFileName?: string;
+  logFileName?: string;
+  evidenceFileName?: string;
+  reportDirName?: string;
+  agentExecutor?: (context: Record<string, unknown>) => unknown;
+  applyExecution?: (context: Record<string, unknown>) => unknown;
+  runValidationPass?: (context: Record<string, unknown>) => unknown;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+export function createExecuteAgentTaskEffectContract(options: ExecuteAgentTaskOptions = {}): EffectContractRecord {
   const normalizedOptions = options || {};
   return {
     nodeKind: executeAgentTaskNodeKind,
@@ -35,7 +111,7 @@ export function createExecuteAgentTaskEffectContract(options: any) {
   };
 }
 
-export function executeAgentTask(normalizedModel: any, options: any) {
+export function executeAgentTask(normalizedModel: ExecuteAgentTaskModel, options: ExecuteAgentTaskOptions = {}) {
   const normalizedOptions = options || {};
   const atomId = normalizedModel?.identity?.atomId;
   if (!atomId) {
@@ -176,7 +252,7 @@ export function executeAgentTask(normalizedModel: any, options: any) {
   };
 }
 
-function defaultAgentExecutor(context: any) {
+function defaultAgentExecutor(context: { promptDocument: PromptDocumentRecord; executionMode: string; [key: string]: unknown }) {
   const targetFile = context.promptDocument.allowedFiles[context.promptDocument.allowedFiles.length - 1] || context.promptDocument.promptPath;
   return {
     ok: true,
@@ -204,14 +280,20 @@ function defaultApplyExecution() {
   };
 }
 
-function normalizeAgentOutcome(rawOutcome: any, fallback: any) {
-  const proposedChanges = normalizeProposedChanges(rawOutcome?.proposedChanges, fallback.defaultTouchedFile);
-  const summary = String(rawOutcome?.summary || (fallback.executionMode === 'dry-run'
+function normalizeAgentOutcome(rawOutcome: unknown, fallback: {
+  executionMode: string;
+  defaultTouchedFile: string;
+  artifactPath: string;
+  logPath: string;
+}): AgentOutcomeRecord {
+  const outcome = asRecord(rawOutcome);
+  const proposedChanges = normalizeProposedChanges(outcome?.proposedChanges, fallback.defaultTouchedFile);
+  const summary = String(outcome?.summary || (fallback.executionMode === 'dry-run'
     ? 'Dry-run captured a candidate patch without mutating the host project.'
     : 'Apply mode prepared a candidate patch for the host project.'));
-  const logLines = normalizeLogLines(rawOutcome?.logLines, fallback.executionMode);
+  const logLines = normalizeLogLines(outcome?.logLines, fallback.executionMode);
   return {
-    ok: rawOutcome?.ok !== false,
+    ok: outcome?.ok !== false,
     summary,
     logLines,
     proposedChanges,
@@ -221,37 +303,42 @@ function normalizeAgentOutcome(rawOutcome: any, fallback: any) {
   };
 }
 
-function normalizeApplyOutcome(rawOutcome: any) {
+function normalizeApplyOutcome(rawOutcome: unknown): ApplyOutcomeRecord {
+  const outcome = asRecord(rawOutcome);
   return {
-    ok: rawOutcome?.ok !== false,
-    appliedChanges: rawOutcome?.appliedChanges === true,
-    touchedFiles: uniqueStrings(Array.isArray(rawOutcome?.touchedFiles) ? rawOutcome.touchedFiles : []),
-    summary: String(rawOutcome?.summary || (rawOutcome?.appliedChanges === true
+    ok: outcome?.ok !== false,
+    appliedChanges: outcome?.appliedChanges === true,
+    touchedFiles: uniqueStrings(Array.isArray(outcome?.touchedFiles) ? outcome.touchedFiles : []),
+    summary: String(outcome?.summary || (outcome?.appliedChanges === true
       ? 'Apply mode executed the host mutation callback.'
       : 'Apply mode requested without a host mutation callback.'))
   };
 }
 
-function normalizePromptDocument(normalizedModel: any, promptDocument: any) {
+function normalizePromptDocument(normalizedModel: ExecuteAgentTaskModel, promptDocument: unknown): PromptDocumentRecord {
   const atomId = normalizedModel?.identity?.atomId;
-  const promptPath = toPortablePath(promptDocument?.promptPath || `${defaultExecutionWorkbenchRoot}/${atomId}/prompt.md`);
-  const frontmatter = promptDocument?.frontmatter || {};
-  const evidenceContract = frontmatter.evidenceContract || {};
+  const prompt = asRecord(promptDocument);
+  const frontmatter = asRecord(prompt?.frontmatter);
+  const evidenceContract = asRecord(frontmatter?.evidenceContract);
+  const promptPath = toPortablePath(prompt?.promptPath || `${defaultExecutionWorkbenchRoot}/${atomId}/prompt.md`);
   return {
     promptPath,
-    allowedFiles: uniqueStrings(frontmatter.allowedFiles || [promptPath]),
-    validationCommands: uniqueStrings(evidenceContract.validationCommands || normalizedModel?.execution?.validation?.commands || [])
+    allowedFiles: uniqueStrings(frontmatter?.allowedFiles || [promptPath]),
+    validationCommands: uniqueStrings(evidenceContract?.validationCommands || normalizedModel?.execution?.validation?.commands || [])
   };
 }
 
-function normalizeProposedChanges(proposedChanges: any, fallbackFilePath: any) {
+function normalizeProposedChanges(proposedChanges: unknown, fallbackFilePath: string): ProposedChangeRecord[] {
   const normalized = Array.isArray(proposedChanges)
     ? proposedChanges
       .filter((entry) => entry && typeof entry === 'object')
-      .map((entry) => ({
-        filePath: toPortablePath(entry.filePath || fallbackFilePath),
-        description: String(entry.description || 'Candidate change staged for review.')
-      }))
+      .map((entry) => {
+        const record = entry as Record<string, unknown>;
+        return {
+          filePath: toPortablePath(record.filePath || fallbackFilePath),
+          description: String(record.description || 'Candidate change staged for review.')
+        };
+      })
       .filter((entry) => entry.filePath)
     : [];
   if (normalized.length > 0) {
@@ -268,7 +355,7 @@ function normalizeProposedChanges(proposedChanges: any, fallbackFilePath: any) {
   ];
 }
 
-function normalizeLogLines(logLines: any, executionMode: any) {
+function normalizeLogLines(logLines: unknown, executionMode: string): string[] {
   if (Array.isArray(logLines) && logLines.length > 0) {
     return logLines.map((line) => String(line));
   }
@@ -277,7 +364,7 @@ function normalizeLogLines(logLines: any, executionMode: any) {
     : 'APPLY: prepared candidate patch'];
 }
 
-function resolveArtifactTargets(repositoryRoot: any, workbenchPath: any, options: any) {
+function resolveArtifactTargets(repositoryRoot: string, workbenchPath: string, options: ExecuteAgentTaskOptions): ArtifactTargetsRecord {
   const snapshotPath = toPortablePath(path.relative(repositoryRoot, path.join(workbenchPath, options.snapshotFileName || defaultExecutionSnapshotFileName)));
   const logPath = toPortablePath(path.relative(repositoryRoot, path.join(workbenchPath, options.logFileName || defaultExecutionLogFileName)));
   const evidencePath = toPortablePath(path.relative(repositoryRoot, path.join(workbenchPath, options.evidenceFileName || defaultExecutionEvidenceFileName)));
@@ -291,15 +378,15 @@ function resolveArtifactTargets(repositoryRoot: any, workbenchPath: any, options
   };
 }
 
-function resolveWorkbenchPath(normalizedModel: any, repositoryRoot: any, options: any) {
+function resolveWorkbenchPath(normalizedModel: ExecuteAgentTaskModel, repositoryRoot: string, options: ExecuteAgentTaskOptions) {
   if (options.workbenchPath) {
     return path.resolve(repositoryRoot, options.workbenchPath);
   }
   const workbenchRoot = options.workbenchRoot || defaultExecutionWorkbenchRoot;
-  return path.resolve(repositoryRoot, workbenchRoot, resolveCanonicalAtomFolderName(normalizedModel.identity.atomId));
+  return path.resolve(repositoryRoot, workbenchRoot, resolveCanonicalAtomFolderName(normalizedModel.identity?.atomId));
 }
 
-function resolveCanonicalAtomFolderName(atomId: any) {
+function resolveCanonicalAtomFolderName(atomId: unknown) {
   const folderName = String(atomId || '').trim();
   if (!folderName) {
     throw new Error('Atomic ID is required to resolve the canonical atom folder.');
@@ -310,23 +397,24 @@ function resolveCanonicalAtomFolderName(atomId: any) {
   return folderName;
 }
 
-function normalizeLifecycleMode(value: any) {
+function normalizeLifecycleMode(value: unknown) {
   return String(value || '').trim() === 'evolution' ? 'evolution' : 'birth';
 }
 
-function writeJson(filePath: any, value: any) {
+function writeJson(filePath: string, value: unknown) {
   writeText(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function writeText(filePath: any, content: any) {
+function writeText(filePath: string, content: string) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, content, 'utf8');
 }
 
-function uniqueStrings(values: any): string[] {
-  return Array.from(new Set<string>((values || []).map((value: any) => toPortablePath(String(value))).filter(Boolean)));
+function uniqueStrings(values: unknown): string[] {
+  const normalizedValues = Array.isArray(values) ? values : [];
+  return Array.from(new Set<string>(normalizedValues.map((value) => toPortablePath(String(value))).filter(Boolean)));
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: unknown) {
   return String(value || '').replace(/\\/g, '/');
 }

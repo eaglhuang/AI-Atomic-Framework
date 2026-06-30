@@ -109,22 +109,22 @@ function parseCreateMapOptions(argv: string[]) {
       continue;
     }
     if (arg === '--members') {
-      options.members = parseJsonOption(requireOptionValue(argv, index, '--members'), '--members');
+      options.members = parseJsonOption<unknown[] | null>(requireOptionValue(argv, index, '--members'), '--members');
       index += 1;
       continue;
     }
     if (arg === '--edges') {
-      options.edges = parseJsonOption(requireOptionValue(argv, index, '--edges'), '--edges');
+      options.edges = parseJsonOption<unknown[]>(requireOptionValue(argv, index, '--edges'), '--edges');
       index += 1;
       continue;
     }
     if (arg === '--entrypoints') {
-      options.entrypoints = parseJsonOption(requireOptionValue(argv, index, '--entrypoints'), '--entrypoints');
+      options.entrypoints = parseJsonOption<unknown[] | null>(requireOptionValue(argv, index, '--entrypoints'), '--entrypoints');
       index += 1;
       continue;
     }
     if (arg === '--quality-targets') {
-      options.qualityTargets = parseJsonOption(requireOptionValue(argv, index, '--quality-targets'), '--quality-targets');
+      options.qualityTargets = parseJsonOption<Record<string, unknown> | null>(requireOptionValue(argv, index, '--quality-targets'), '--quality-targets');
       index += 1;
       continue;
     }
@@ -175,9 +175,9 @@ function requireOptionValue(argv: string[], optionIndex: number, optionName: str
   return value;
 }
 
-function parseJsonOption(rawValue: string, optionName: string): unknown {
+function parseJsonOption<T>(rawValue: string, optionName: string): T {
   try {
-    return JSON.parse(rawValue);
+    return JSON.parse(rawValue) as T;
   } catch (error) {
     throw new CliError('ATM_JSON_INVALID', `Invalid JSON for ${optionName}.`, {
       exitCode: 2,

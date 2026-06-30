@@ -20,8 +20,9 @@ try {
     now: '2026-01-01T00:00:00.000Z'
   });
   assert.equal(created.ok, true);
+  const createdMapId = created.mapId!;
 
-  const canonical = runMapIntegrationTest(created.mapId, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
+  const canonical = runMapIntegrationTest(createdMapId, { repositoryRoot: tempRoot, now: '2026-01-01T00:00:00.000Z' });
   assert.equal(canonical.ok, true);
   assert.equal(canonical.resolutionMode, 'canonical');
   assert.equal(existsSync(path.join(tempRoot, canonical.reportPath)), true);
@@ -51,7 +52,7 @@ try {
   writeCanonicalFixtureMap(tempRoot, failFixture, false);
 
   const discovered = discoverMapsForAtom('ATM-FIXTURE-0001', { repositoryRoot: tempRoot });
-  assert.equal(discovered.includes(created.mapId), true);
+  assert.equal(discovered.includes(createdMapId), true);
   assert.equal(discovered.includes(passFixture.mapId), true);
   assert.equal(discovered.includes(failFixture.mapId), true);
 

@@ -22,7 +22,7 @@ export const defaultRegistryOwner = Object.freeze({
 interface NormalizedModel {
   identity: { atomId: string; logicalName?: string };
   schema: { schemaId: string; specVersion: string };
-  source: { specPath: string; schemaPath?: string };
+  source: { specPath: string | null; schemaPath?: string };
   hashLock: Record<string, unknown>;
   governance?: { semanticFingerprint?: unknown };
   ports?: { inputs?: SemanticFingerprintPortRecord[]; outputs?: SemanticFingerprintPortRecord[] };
@@ -122,7 +122,7 @@ export function createAtomicRegistryEntry(normalizedModel: NormalizedModel, opti
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const selfVerification = createSourceHashSnapshot({
     repositoryRoot,
-    specPath: options.specPath ?? normalizedModel.source.specPath,
+    specPath: options.specPath ?? normalizedModel.source.specPath ?? undefined,
     codePaths: options.codePaths,
     testPaths: options.testPaths,
     legacyPlanningId: options.legacyPlanningId ?? null
@@ -505,7 +505,7 @@ function createCompatibilityRecord(normalizedModel: NormalizedModel): Record<str
 
 function deriveReportPath(repositoryRoot: string, reportPath: string | null, testReport: RegistryEntryOptions['testReport']): string | null {
   const explicitPath = reportPath ?? testReport?.artifacts?.find((artifact: { artifactKind: string; artifactPath: string }) => artifact.artifactKind === 'report')?.artifactPath ?? null;
-  return explicitPath ? normalizeProjectPath(repositoryRoot, explicitPath) : null;
+  return explicitPath ? (normalizeProjectPath(repositoryRoot, explicitPath) ?? null) : null;
 }
 
 interface DeriveWorkbenchPathOptions {
@@ -520,7 +520,7 @@ function deriveWorkbenchPath(normalizedModel: NormalizedModel, options: DeriveWo
     : options.reportPath
       ? path.dirname(resolveProjectPath(options.repositoryRoot, options.reportPath))
       : resolveAtomWorkbenchPath(normalizedModel, { repositoryRoot: options.repositoryRoot });
-  return candidate ? normalizeProjectPath(options.repositoryRoot, candidate) : null;
+  return candidate ? (normalizeProjectPath(options.repositoryRoot, candidate) ?? null) : null;
 }
 
 function normalizeMigration(migration: RegistryDocumentOptions['migration']): { strategy: string; fromVersion: string | null; notes: string } {

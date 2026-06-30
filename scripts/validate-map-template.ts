@@ -32,7 +32,7 @@ try {
   assert.equal(dryRun.specPath, 'atomic_workbench/maps/ATM-MAP-0001/map.spec.json');
   assert.equal(dryRun.testPath, 'atomic_workbench/maps/ATM-MAP-0001/map.integration.test.ts');
   assert.equal(dryRun.reportPath, 'atomic_workbench/maps/ATM-MAP-0001/map.test.report.json');
-  assert.equal(existsSync(path.join(tempRoot, dryRun.workbenchPath)), false);
+  assert.equal(existsSync(path.join(tempRoot, dryRun.workbenchPath!)), false);
 
   const generated = generateAtomicMap(request, {
     repositoryRoot: tempRoot,
@@ -40,17 +40,17 @@ try {
   });
   assert.equal(generated.ok, true);
   assert.equal(generated.idempotent, false);
-  assert.equal(existsSync(path.join(tempRoot, generated.specPath)), true);
-  assert.equal(existsSync(path.join(tempRoot, generated.testPath)), true);
-  assert.equal(existsSync(path.join(tempRoot, generated.reportPath)), true);
+  assert.equal(existsSync(path.join(tempRoot, generated.specPath!)), true);
+  assert.equal(existsSync(path.join(tempRoot, generated.testPath!)), true);
+  assert.equal(existsSync(path.join(tempRoot, generated.reportPath!)), true);
 
-  const spec = JSON.parse(readFileSync(path.join(tempRoot, generated.specPath), 'utf8'));
+  const spec = JSON.parse(readFileSync(path.join(tempRoot, generated.specPath!), 'utf8'));
   assert.equal(spec.mapId, 'ATM-MAP-0001');
 
-  const testSource = readFileSync(path.join(tempRoot, generated.testPath), 'utf8');
+  const testSource = readFileSync(path.join(tempRoot, generated.testPath!), 'utf8');
   assert.equal(testSource.includes("new URL('./map.spec.json', import.meta.url)"), true);
 
-  const report = JSON.parse(readFileSync(path.join(tempRoot, generated.reportPath), 'utf8'));
+  const report = JSON.parse(readFileSync(path.join(tempRoot, generated.reportPath!), 'utf8'));
   assert.equal(report.ok, true);
   assert.deepEqual(report.command, [process.execPath, 'atomic_workbench/maps/ATM-MAP-0001/map.integration.test.ts']);
 

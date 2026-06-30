@@ -56,9 +56,14 @@ function isUserModified(relFile: string, cwd: string): boolean {
   return (result.stdout || '').trim().length > 0;
 }
 
+function readOptionalStringOption(options: Record<string, unknown>, key: string): string | undefined {
+  const value = options[key];
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+}
+
 function runPlan(options: Record<string, unknown>, cwd: string): object {
-  const fromVersion: string | undefined = options.from;
-  const toVersion: string | undefined = options.to;
+  const fromVersion = readOptionalStringOption(options, 'from');
+  const toVersion = readOptionalStringOption(options, 'to');
   if (!fromVersion || !toVersion) {
     throw new CliError('ATM_CLI_USAGE', 'migrate plan requires --from <version> and --to <version>', { exitCode: 2 });
   }
@@ -87,8 +92,8 @@ function runPlan(options: Record<string, unknown>, cwd: string): object {
 }
 
 function runApply(options: Record<string, unknown>, cwd: string): object {
-  const fromVersion: string | undefined = options.from;
-  const toVersion: string | undefined = options.to;
+  const fromVersion = readOptionalStringOption(options, 'from');
+  const toVersion = readOptionalStringOption(options, 'to');
   if (!fromVersion || !toVersion) {
     throw new CliError('ATM_CLI_USAGE', 'migrate apply requires --from <version> and --to <version>', { exitCode: 2 });
   }
@@ -123,7 +128,7 @@ function runApply(options: Record<string, unknown>, cwd: string): object {
 }
 
 function runVerify(options: Record<string, unknown>, cwd: string, root: string): object {
-  const fixturePath: string | undefined = options.fixture;
+  const fixturePath = readOptionalStringOption(options, 'fixture');
   if (fixturePath) {
     let fixtureAbs = path.isAbsolute(fixturePath) ? fixturePath : path.resolve(root, fixturePath);
     if (!existsSync(path.join(fixtureAbs, 'before')) || !existsSync(path.join(fixtureAbs, 'after'))) {

@@ -24,9 +24,46 @@ interface ImpactedMapRecord {
   readonly matchedMembers: TemplateHitRecord[];
 }
 
-export function analyzePolymorphImpact(options: any) {
+interface PolymorphImpactOptions {
+  readonly repositoryRoot?: string;
+  readonly mapId?: string;
+  readonly targetMapId?: string;
+  readonly toVersion?: string;
+  readonly nextVersion?: string;
+  readonly generatedAt?: string;
+  readonly reportId?: string;
+  readonly requestedReplacementMode?: string;
+  readonly atomId?: string;
+}
+
+interface RegistryEntryRecord {
+  readonly schemaId?: string;
+  readonly mapId?: string;
+  readonly members?: unknown[];
+  readonly atomId?: string;
+  readonly location?: {
+    readonly specPath?: string;
+  };
+  readonly specPath?: string;
+}
+
+interface PolymorphSpecDocument {
+  readonly mapId?: string;
+  readonly members?: unknown[];
+  readonly entries?: unknown[];
+  readonly polymorphicTemplateRef?: unknown;
+  readonly polymorphGroupId?: unknown;
+}
+
+function asRecord<T extends object>(value: unknown): T | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as T
+    : null;
+}
+
+export function analyzePolymorphImpact(options: PolymorphImpactOptions) {
   const repositoryRoot = path.resolve(options?.repositoryRoot ?? process.cwd());
-  const targetMapId = normalizeMapId(options?.mapId ?? options?.targetMapId);
+  const targetMapId = normalizeMapId(options?.mapId ?? options?.targetMapId ?? '');
   const toVersion = normalizeSemver(options?.toVersion ?? options?.nextVersion ?? '');
   const targetMap = readTargetMap(repositoryRoot, targetMapId);
   const registry = readRegistry(repositoryRoot);
@@ -38,8 +75,8 @@ export function analyzePolymorphImpact(options: any) {
     .sort()
     .map((templateId) => {
       const instances = impactedMaps.flatMap((impact) => impact.matchedMembers
-        .filter((member: any) => member.templateId === templateId)
-        .map((member: any) => ({
+        .filter((member) => member.templateId === templateId)
+        .map((member) => ({
           mapId: impact.mapId,
           atomId: member.atomId,
           templateId: member.templateId,
@@ -64,7 +101,7 @@ export function analyzePolymorphImpact(options: any) {
   };
 }
 
-export function createPolymorphImpactReport(options: any) {
+export function createPolymorphImpactReport(options: PolymorphImpactOptions) {
   const analysis = analyzePolymorphImpact(options);
   const generatedAt = String(options?.generatedAt ?? new Date().toISOString()).trim();
   const artifactPath = `atomic_workbench/maps/${analysis.targetMapId}/polymorph-impact-report.json`;
@@ -139,7 +176,7 @@ function readRegistry(repositoryRoot: string) {
   };
 }
 
-function collectTemplateHits(repositoryRoot: string, registryEntries: any[], members: any[], specCache: Map<string, PolymorphMetadataRecord | null>): TemplateHitRecord[] {
+function collectTemplateHits(repositoryRoot: string, registryEntries: unknown[], members: unknown[], specCache: Map<string, PolymorphMetadataRecord | null>): TemplateHitRecord[] {
   return normalizeMembers(members)
     .map((member) => {
       const metadata = resolveAtomPolymorphMetadata(repositoryRoot, registryEntries, member.atomId, specCache);
@@ -159,7 +196,7 @@ function collectTemplateHits(repositoryRoot: string, registryEntries: any[], mem
 
 function collectImpactedMaps(
   repositoryRoot: string,
-  registryEntries: any[],
+  registryEntries: unknown[],
   targetMapId: string,
   templateHits: TemplateHitRecord[],
   specCache: Map<string, PolymorphMetadataRecord | null>
@@ -170,9 +207,10 @@ function collectImpactedMaps(
   }
 
   return registryEntries
-    .filter((entry) => entry?.schemaId === 'atm.atomicMap' && typeof entry?.mapId === 'string' && entry.mapId !== targetMapId)
+    .map((entry) => asRecord<RegistryEntryRecord>(entry))
+    .filter((entry): entry is RegistryEntryRecord => entry?.schemaId === 'atm.atomicMap' && typeof entry.mapId === 'string' && entry.mapId !== targetMapId)
     .map((entry) => {
-      const matchedMembers = normalizeMembers(entry.members)
+      const matchedMembers = normalizeMembers(entry.members ?? [])
         .map((member) => {
           const metadata = resolveAtomPolymorphMetadata(repositoryRoot, registryEntries, member.atomId, specCache);
           if (!metadata || !targetTemplateIds.has(metadata.templateId)) {
@@ -191,7 +229,7 @@ function collectImpactedMaps(
       }
       return {
         mapId: String(entry.mapId).trim(),
-        templateIds: [...new Set(matchedMembers.map((member: any) => member.templateId))].sort(),
+        templateIds: [...new Set(matchedMembers.map((member) => member.templateId))].sort(),
         matchedMembers
       };
     })
@@ -201,7 +239,7 @@ function collectImpactedMaps(
 
 function resolveAtomPolymorphMetadata(
   repositoryRoot: string,
-  registryEntries: any[],
+  registryEntries: unknown[],
   atomId: string,
   specCache: Map<string, PolymorphMetadataRecord | null>
 ): PolymorphMetadataRecord | null {
@@ -209,7 +247,9 @@ function resolveAtomPolymorphMetadata(
     return specCache.get(atomId) ?? null;
   }
 
-  const entry = registryEntries.find((candidate) => candidate?.atomId === atomId);
+  const entry = registryEntries
+    .map((candidate) => asRecord<RegistryEntryRecord>(candidate))
+    .find((candidate) => candidate?.atomId === atomId);
   const specPath = String(entry?.location?.specPath ?? entry?.specPath ?? '').trim();
   if (!specPath) {
     specCache.set(atomId, null);
@@ -232,21 +272,24 @@ function resolveAtomPolymorphMetadata(
   return metadata;
 }
 
-function normalizeMembers(members: any[]): NormalizedMemberRecord[] {
+function normalizeMembers(members: unknown[]): NormalizedMemberRecord[] {
   return (Array.isArray(members) ? members : [])
-    .map((member) => ({
-      atomId: String(member?.atomId ?? '').trim(),
-      version: String(member?.version ?? '').trim()
-    }))
+    .map((member) => {
+      const record = asRecord<{ atomId?: unknown; version?: unknown }>(member);
+      return {
+        atomId: String(record?.atomId ?? '').trim(),
+        version: String(record?.version ?? '').trim()
+      };
+    })
     .filter((member) => member.atomId.length > 0 && /^\d+\.\d+\.\d+$/.test(member.version));
 }
 
-function normalizePolyId(value: any) {
+function normalizePolyId(value: unknown) {
   const normalized = String(value ?? '').trim();
   return /^ATM-POLY-\d{4}$/.test(normalized) ? normalized : null;
 }
 
-function normalizeSemver(value: any) {
+function normalizeSemver(value: unknown) {
   const normalized = String(value ?? '').trim();
   if (!/^\d+\.\d+\.\d+$/.test(normalized)) {
     throw new Error(`polymorph-impact requires a semver toVersion; received ${normalized || '[empty]'}.`);

@@ -68,7 +68,7 @@ import { runIdentity } from './commands/identity.ts';
 import { runBroker } from './commands/broker.ts';
 import { runRoute } from './commands/route.ts';
 
-export const cliCommandRunners: Record<string, (argv: string[]) => Promise<CommandResult> | CommandResult> = {
+export const cliCommandRunners: Record<string, (argv: string[]) => Promise<CommandResult | object> | CommandResult | object> = {
   atomize: runAtomize,
   'atm-chart': runATMChart,
   baseline: runBaseline,
@@ -246,7 +246,8 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
   }
 
   try {
-    const result = enrichCommandResult(await runner(commandArgs));
+    const rawResult = await runner(commandArgs);
+    const result = enrichCommandResult(rawResult as CommandResult);
     writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
     return result.exitCode;
   } catch (error) {

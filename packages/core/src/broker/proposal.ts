@@ -10,7 +10,7 @@ import type { PatchProposal } from './types.ts';
 // 使用動態 require 載入 ajv，與 schema-validator.ts 保持一致，
 // 讓 broker proposal 在 one-file release cache 環境下也能正確解析。
 const _require = createRequire(import.meta.url);
-function loadAjv(): { Ajv2020: any } {
+function loadAjv(): { Ajv2020: unknown } {
   try {
     return { Ajv2020: _require('ajv/dist/2020.js') };
   } catch {
@@ -260,7 +260,9 @@ function hashFileContents(filePath: string): string {
 function getBrokerProposalSchemaValidator(): ValidateFunction<PatchProposal> {
   if (!proposalSchemaValidator) {
     const { Ajv2020 } = loadAjv();
-    const AjvConstructor = Ajv2020.default ?? Ajv2020;
+    const AjvConstructor = ((Ajv2020 as { default?: unknown }).default ?? Ajv2020) as new (
+      options: Record<string, unknown>
+    ) => { compile: (schema: object) => ValidateFunction<PatchProposal> };
     const ajv = new AjvConstructor({ allErrors: true, strict: false });
     const schema = JSON.parse(readFileSync(schemaPath, 'utf8')) as object;
     proposalSchemaValidator = ajv.compile(schema) as ValidateFunction<PatchProposal>;

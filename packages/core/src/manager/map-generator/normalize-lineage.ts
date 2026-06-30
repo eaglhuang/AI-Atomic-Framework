@@ -16,7 +16,14 @@ const memberRoles = new Set(['entry-adapter', 'domain-step', 'validator', 'side-
 const edgeKinds = new Set(['data-flow', 'control-flow', 'event-flow', 'validation', 'fallback', 'side-effect', 'rollback']);
 const replacementModes = new Set(['draft', 'shadow', 'canary', 'active', 'legacy-retired']);
 
-export function normalizeOptionalMemberRole(value: any) {
+interface ReplacementInput {
+  legacyUris?: unknown;
+  mode?: unknown;
+  evidenceRefs?: unknown;
+  [key: string]: unknown;
+}
+
+export function normalizeOptionalMemberRole(value: unknown) {
   if (value == null || String(value).trim() === '') {
     return {};
   }
@@ -27,7 +34,7 @@ export function normalizeOptionalMemberRole(value: any) {
   return { role };
 }
 
-export function normalizeOptionalEdgeKind(value: any) {
+export function normalizeOptionalEdgeKind(value: unknown) {
   if (value == null || String(value).trim() === '') {
     return {};
   }
@@ -38,20 +45,21 @@ export function normalizeOptionalEdgeKind(value: any) {
   return { edgeKind };
 }
 
-export function normalizeReplacement(replacement: any) {
+export function normalizeReplacement(replacement: unknown) {
   if (replacement == null) {
     return null;
   }
   if (typeof replacement !== 'object' || Array.isArray(replacement)) {
     throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement must be an object.', { fieldName: 'replacement' });
   }
-  const legacyUris = normalizeLegacyUris(replacement.legacyUris);
-  const mode = normalizeReplacementMode(replacement.mode ?? 'draft');
-  const evidenceRefs = normalizeEvidenceRefs(replacement.evidenceRefs ?? []);
+  const replacementRecord = replacement as ReplacementInput;
+  const legacyUris = normalizeLegacyUris(replacementRecord.legacyUris);
+  const mode = normalizeReplacementMode(replacementRecord.mode ?? 'draft');
+  const evidenceRefs = normalizeEvidenceRefs(replacementRecord.evidenceRefs ?? []);
   return { legacyUris, mode, evidenceRefs };
 }
 
-export function normalizeLegacyUris(values: any) {
+export function normalizeLegacyUris(values: unknown) {
   if (!Array.isArray(values) || values.length === 0) {
     throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.legacyUris must contain at least one legacy:// URI.', { fieldName: 'replacement.legacyUris' });
   }
@@ -65,7 +73,7 @@ export function normalizeLegacyUris(values: any) {
     .sort((left, right) => left.localeCompare(right));
 }
 
-export function normalizeReplacementMode(value: any) {
+export function normalizeReplacementMode(value: unknown) {
   const mode = String(value || '').trim();
   if (!replacementModes.has(mode)) {
     throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.mode is not a valid rollout mode.', { mode: value });
@@ -73,7 +81,7 @@ export function normalizeReplacementMode(value: any) {
   return mode;
 }
 
-export function normalizeEvidenceRefs(values: any) {
+export function normalizeEvidenceRefs(values: unknown) {
   if (!Array.isArray(values)) {
     throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement.evidenceRefs must be an array.', { fieldName: 'replacement.evidenceRefs' });
   }
