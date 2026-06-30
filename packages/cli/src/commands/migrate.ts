@@ -51,12 +51,12 @@ function collectFiles(dir: string, base = dir): string[] {
 }
 
 function isUserModified(relFile: string, cwd: string): boolean {
-  const result = spawnSync('git', ['status', '--short', '--', relFile], { cwd, encoding: 'utf8' } as any);
+  const result = spawnSync('git', ['status', '--short', '--', relFile], { cwd, encoding: 'utf8' });
   if (result.status !== 0) return false;
   return (result.stdout || '').trim().length > 0;
 }
 
-function runPlan(options: any, cwd: string): object {
+function runPlan(options: Record<string, unknown>, cwd: string): object {
   const fromVersion: string | undefined = options.from;
   const toVersion: string | undefined = options.to;
   if (!fromVersion || !toVersion) {
@@ -86,7 +86,7 @@ function runPlan(options: any, cwd: string): object {
   return makeResult({ ok: true, command: 'migrate', cwd, messages: [], evidence: { fromVersion, toVersion, status: 'ready', codemods: entry.codemods, affectedFiles, userModifiedFiles, guide: entry.guide, description: entry.description } });
 }
 
-function runApply(options: any, cwd: string): object {
+function runApply(options: Record<string, unknown>, cwd: string): object {
   const fromVersion: string | undefined = options.from;
   const toVersion: string | undefined = options.to;
   if (!fromVersion || !toVersion) {
@@ -122,7 +122,7 @@ function runApply(options: any, cwd: string): object {
   return makeResult({ ok: true, command: 'migrate', cwd, messages: [], evidence: { fromVersion, toVersion, status: 'applied', codemods: entry.codemods, modifiedFiles, backupPath: backupDir } });
 }
 
-function runVerify(options: any, cwd: string, root: string): object {
+function runVerify(options: Record<string, unknown>, cwd: string, root: string): object {
   const fixturePath: string | undefined = options.fixture;
   if (fixturePath) {
     let fixtureAbs = path.isAbsolute(fixturePath) ? fixturePath : path.resolve(root, fixturePath);
@@ -167,7 +167,7 @@ function runVerify(options: any, cwd: string, root: string): object {
   return makeResult({ ok: true, command: 'migrate', cwd, messages: [message('info', 'ATM_MIGRATE_WORKSPACE_VERIFY', 'Workspace version verification requires --from / --to flags; use migrate plan instead.')], evidence: { status: 'workspace-verify-not-implemented' } });
 }
 
-export async function runMigrate(argv: any): Promise<any> {
+export async function runMigrate(argv: string[]): Promise<object> {
   const spec = getCommandSpec('migrate');
   if (!spec) {
     throw new CliError('ATM_CLI_HELP_NOT_FOUND', 'No help spec found for migrate.', { exitCode: 2 });
@@ -179,13 +179,13 @@ export async function runMigrate(argv: any): Promise<any> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
   const [action = 'plan'] = parsed.positional;
-  const options = parsed.options as any;
+  const options = parsed.options as Record<string, unknown>;
   try {
     if (action === 'plan') return runPlan(options, cwd);
     if (action === 'apply') return runApply(options, cwd);
     if (action === 'verify') return runVerify(options, cwd, root);
     throw new CliError('ATM_CLI_USAGE', `Unknown migrate action: ${action}. Expected plan | apply | verify`, { exitCode: 2 });
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof CliError) {
       return makeResult({ ok: false, command: 'migrate', cwd, messages: [message('error', err.code ?? 'ATM_MIGRATE_ERROR', err.message)], evidence: { status: 'error' } });
     }

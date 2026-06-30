@@ -182,9 +182,9 @@ function normalizeExtractionInput(rawInput: unknown, fromTaskOverride: string) {
   const evidence = Array.isArray(inputRecord.evidence) ? inputRecord.evidence : [];
   return {
     sourceTaskId,
-    evidence: evidence as any,
+    evidence: evidence as unknown[],
     contextSummary: typeof inputRecord.contextSummary === 'string' || typeof inputRecord.contextSummary === 'object'
-      ? inputRecord.contextSummary as any
+      ? inputRecord.contextSummary as string | Record<string, unknown>
       : undefined,
     diffSummary: typeof inputRecord.diffSummary === 'string' ? inputRecord.diffSummary : undefined,
     proposedName: typeof inputRecord.proposedName === 'string' ? inputRecord.proposedName : undefined,

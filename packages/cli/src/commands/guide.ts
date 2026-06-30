@@ -34,7 +34,7 @@ const commandTemplates = Object.freeze({
   ]
 });
 
-function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+function requireOptionValue(argv: string[], optionIndex: number, optionName: string): string {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `guide requires a value for ${optionName}`, { exitCode: 2 });
@@ -431,7 +431,7 @@ function buildInstallSkillGuide(cwd: string, target: 'host' | 'codex', skillsRoo
   };
 }
 
-function buildCommandHelpGuide(commandName: any) {
+function buildCommandHelpGuide(commandName: string) {
   const spec = getCommandSpec(commandName);
   if (!spec) {
     throw new CliError('ATM_CLI_USAGE', `Unknown guide help command: ${commandName}`, {
@@ -477,7 +477,7 @@ function buildGuide(parsed: ReturnType<typeof parseGuideArgs>) {
   }
 }
 
-export function runGuide(argv: any) {
+export function runGuide(argv: string[]) {
   const parsed = parseGuideArgs(argv);
   const guide = buildGuide(parsed);
   return makeResult({
