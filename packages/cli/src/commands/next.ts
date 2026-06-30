@@ -120,7 +120,7 @@ import {
   type PlanningRootWarning
 } from './next/planning-root-preference.ts';
 
-export async function runNext(argv: any) {
+export async function runNext(argv: string[]) {
   // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
   // the shared option parser so the rest of the surface stays unchanged.
   const claimIntentExtraction = extractClaimIntentFlag(Array.isArray(argv) ? argv : []);
@@ -309,8 +309,8 @@ export interface ClaimReadinessReport {
   readonly primaryBlocker: ClaimReadinessDiagnostic | null;
 }
 
-function extractClaimIntentFlag(argv: readonly any[]): { argv: any[]; claimIntent: NextClaimIntent | null; autoIntent: boolean } {
-  const remaining: any[] = [];
+function extractClaimIntentFlag(argv: readonly string[]): { argv: string[]; claimIntent: NextClaimIntent | null; autoIntent: boolean } {
+  const remaining: string[] = [];
   let claimIntent: NextClaimIntent | null = null;
   let autoIntent = true;
   for (let index = 0; index < argv.length; index += 1) {
@@ -343,7 +343,7 @@ function extractClaimIntentFlag(argv: readonly any[]): { argv: any[]; claimInten
   return { argv: remaining, claimIntent, autoIntent };
 }
 
-function withRunnerMode<T extends { evidence?: any; messages?: any[] }>(result: T, cwd: string): T {
+function withRunnerMode<T extends { evidence?: Record<string, unknown>; messages?: unknown[] }>(result: T, cwd: string): T {
   const runnerMode = describeRunnerMode(cwd);
   if (result.evidence && typeof result.evidence === 'object') {
     result.evidence.runnerMode = runnerMode;
@@ -511,7 +511,7 @@ export function diagnoseClaimReadinessForTasks(
   };
 }
 
-function decideNextAction(runtime: any, failedCheckName: any, importedTaskQueue: ImportedTaskQueue) {
+function decideNextAction(runtime: Record<string, unknown>, failedCheckName: string | null | undefined, importedTaskQueue: ImportedTaskQueue) {
   if (runtime.migrationNeeded || runtime.hasV1 && runtime.hasV2 === false) {
     return {
       status: 'needs-bootstrap',
@@ -619,16 +619,16 @@ function buildCrossRepoFrameworkNextResult(input: {
       'closing framework target tasks from the planning repository'
     ]
   };
-  const userNotice = buildFirstUseUserNotice(nextAction as any);
+  const userNotice = buildFirstUseUserNotice(nextAction as Record<string, unknown>);
   return makeResult({
     ok: false,
     command: 'next',
     cwd: input.cwd,
     messages: buildNextMessages(
-      nextAction as any,
+      nextAction as Record<string, unknown>,
       userNotice,
-      input.integrationBootstrap as any,
-      input.runtimeAdapterReadiness as any,
+      input.integrationBootstrap as Record<string, unknown>,
+      input.runtimeAdapterReadiness as Record<string, unknown>,
       message('error', 'ATM_NEXT_FRAMEWORK_TARGET_REPO_REQUIRED', 'ATM framework work was detected from task metadata; switch to the target framework repo before mutating or closing work.', {
         targetRepo,
         closureAuthority: input.frameworkStatus.closureAuthority
