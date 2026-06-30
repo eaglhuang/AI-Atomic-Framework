@@ -14,7 +14,7 @@ import { runValidate } from './validate.ts';
 const helloWorldSpecPath = path.join('examples', 'hello-world', 'atoms', 'hello-world.atom.json');
 const helloWorldSourcePath = path.join('examples', 'hello-world', 'src', 'hello-world.atom.ts');
 
-export async function runHelloWorldSmoke(cwd: any) {
+export async function runHelloWorldSmoke(cwd: string) {
   const specPath = path.join(cwd, helloWorldSpecPath);
   const sourcePath = path.join(cwd, helloWorldSourcePath);
   const checks = [];
@@ -44,7 +44,7 @@ export async function runHelloWorldSmoke(cwd: any) {
   };
 }
 
-export async function runTestAsync(argv: any) {
+export async function runTestAsync(argv: string[]) {
   const { options } = parseOptions(argv, 'test');
   const selectedModes = [options.spec, options.map, options.propagate, options.atom].filter(Boolean);
   if (selectedModes.length > 1) {
@@ -115,7 +115,7 @@ async function runEdgeContractTest(cwd: string, mapId: string) {
   });
 }
 
-async function runMapTest(cwd: any, mapId: any, equivalenceFixtures?: any, fingerprintCheck?: boolean) {
+async function runMapTest(cwd: string, mapId: string, equivalenceFixtures?: string | null, fingerprintCheck?: boolean) {
   if (fingerprintCheck) {
     const mapSpecPath = path.join(cwd, 'atomic_workbench', 'maps', mapId, 'map.spec.json');
     const lineageLogPath = path.join(cwd, 'atomic_workbench', 'maps', mapId, 'lineage-log.json');
@@ -221,7 +221,7 @@ function buildMapEquivalenceNextActionHint(cwd: string, mapId: string, reportPat
   };
 }
 
-async function runPropagateTest(cwd: any, atomId: any) {
+async function runPropagateTest(cwd: string, atomId: string) {
   const propagation = await executeMapRunner(() => runPropagationIntegration(atomId, { repositoryRoot: cwd }));
   const propagationReport = createPropagationReport(propagation, { atomId });
   const infoCode = propagation.ok ? 'ATM_TEST_PROPAGATE_OK' : 'ATM_TEST_PROPAGATE_FAILED';
@@ -248,7 +248,7 @@ async function runPropagateTest(cwd: any, atomId: any) {
   });
 }
 
-async function executeMapRunner(callback: any) {
+async function executeMapRunner<T>(callback: () => Promise<T> | T): Promise<T> {
   try {
     return await callback();
   } catch (error) {
@@ -265,7 +265,7 @@ async function executeMapRunner(callback: any) {
   }
 }
 
-async function runSpecTest(cwd: any, specPath: any, profile = 'standard', suite: string | null = null) {
+async function runSpecTest(cwd: string, specPath: string, profile = 'standard', suite: string | null = null) {
   const parsed = parseAtomicSpecFile(specPath, { cwd });
   if (!parsed.ok) {
     return makeResult({
@@ -298,7 +298,7 @@ async function runSpecTest(cwd: any, specPath: any, profile = 'standard', suite:
       reportPath: relativePathFrom(cwd, testRun.reportPath),
       runnerConfigPath: testRun.runnerConfigPath,
       exitCode: testRun.exitCode,
-      commands: testRun.commandResults.map((entry: any) => ({
+      commands: (testRun.commandResults as Array<{ commandId: string; command: string; ok: boolean; exitCode: number }>).map((entry) => ({
         commandId: entry.commandId,
         command: entry.command,
         ok: entry.ok,
