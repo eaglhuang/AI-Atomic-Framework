@@ -74,11 +74,13 @@ function run() {
     assert(report.atomId === fixture.input.registryEntry.atomId, `${fixture.name}: wrong atomId`);
     assert(report.fromVersion === fixture.input.fromVersion, `${fixture.name}: wrong fromVersion`);
     assert(report.toVersion === fixture.input.toVersion, `${fixture.name}: wrong toVersion`);
-    assert(report.driftSummary.totalChanged === fixture.expected.totalChanged,
-      `${fixture.name}: expected totalChanged=${fixture.expected.totalChanged}, got ${report.driftSummary.totalChanged}`);
-    assert(JSON.stringify(report.driftSummary.changedFields.sort()) === JSON.stringify(fixture.expected.changedFields.sort()),
+    const driftSummary = report.driftSummary as { totalChanged: number; changedFields: string[]; driftReason?: string };
+    assert(driftSummary.totalChanged === fixture.expected.totalChanged,
+      `${fixture.name}: expected totalChanged=${fixture.expected.totalChanged}, got ${driftSummary.totalChanged}`);
+    assert(JSON.stringify(driftSummary.changedFields.sort()) === JSON.stringify(fixture.expected.changedFields.sort()),
       `${fixture.name}: changedFields mismatch`);
-    assert(report.driftSummary.driftReason?.length > 0, `${fixture.name}: driftReason should not be empty`);
+    assert(typeof driftSummary.driftReason === 'string' && driftSummary.driftReason.length > 0,
+      `${fixture.name}: driftReason should not be empty`);
     assert(report.lineageContinuity === fixture.expected.lineageContinuity,
       `${fixture.name}: lineageContinuity mismatch`);
     passedPositive++;
@@ -148,7 +150,7 @@ function run() {
     assert(resolution.entry.versions.length === 2, 'adopter lineage fixture must preserve version history');
 
     const report: any = computeHashDiffReport({
-      entry: resolution.entry,
+      entry: resolution.entry as any,
       fromVersion: adopterLineageFixture.fromVersion,
       toVersion: adopterLineageFixture.toVersion
     });
@@ -169,7 +171,7 @@ function run() {
     assert(cliSuccess.ok === true, 'registry-diff must succeed when member lineage is present');
     assert(cliSuccess.evidence?.sourceKind === 'member-version-lineage', 'registry-diff must report member-version-lineage sourceKind');
     assert(cliSuccess.evidence?.totalChanged === 3, 'registry-diff must preserve computed change count');
-    assert(cliSuccess.evidence?.report?.driftSummary?.totalChanged === 3, 'registry-diff must embed the diff report');
+    assert((cliSuccess.evidence?.report?.driftSummary as { totalChanged?: number } | undefined)?.totalChanged === 3, 'registry-diff must embed the diff report');
 
     const cliFailure: any = runRegistryDiff([
       adopterLineageFixture.atomId,

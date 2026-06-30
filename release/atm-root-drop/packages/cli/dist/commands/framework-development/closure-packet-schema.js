@@ -1558,8 +1558,11 @@ export function repairClosurePacketForTask(input) {
         if (lastTransitionId) {
             const eventPath = path.join(cwd, '.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`);
             const eventDoc = readJsonIfExists(eventPath);
-            if (eventDoc && eventDoc.closure && typeof eventDoc.closure === 'object' && eventDoc.closure.schemaId === 'atm.taskClosureTransition.v1') {
-                const closureInfo = eventDoc.closure;
+            const closureRecord = eventDoc?.closure && typeof eventDoc.closure === 'object' && !Array.isArray(eventDoc.closure)
+                ? eventDoc.closure
+                : null;
+            if (closureRecord?.schemaId === 'atm.taskClosureTransition.v1') {
+                const closureInfo = closureRecord;
                 const headDetails = readGitHeadDetails(cwd);
                 const targetCommit = readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'tasks', `${taskId}.json`))
                     || readLatestCommitChangingPath(cwd, path.join('.atm', 'history', 'task-events', taskId, `${lastTransitionId}.json`))
@@ -1588,14 +1591,29 @@ export function repairClosurePacketForTask(input) {
                         },
                         closedByCommand: 'atm tasks close',
                         commandRuns: [],
-                        validationPasses: closureInfo.validationPasses ?? [],
-                        evidenceFreshness: closureInfo.evidenceFreshness ?? 'fresh',
-                        requiredGates: closureInfo.requiredGates ?? [],
-                        requiredGatesSnapshot: closureInfo.requiredGatesSnapshot ?? null,
+                        validationPasses: Array.isArray(closureInfo.validationPasses)
+                            ? closureInfo.validationPasses.filter((entry) => typeof entry === 'string')
+                            : [],
+                        evidenceFreshness: closureInfo.evidenceFreshness === 'draft' || closureInfo.evidenceFreshness === 'historical-reference'
+                            ? closureInfo.evidenceFreshness
+                            : 'fresh',
+                        requiredGates: Array.isArray(closureInfo.requiredGates)
+                            ? closureInfo.requiredGates.filter((entry) => typeof entry === 'string')
+                            : [],
+                        requiredGatesSnapshot: closureInfo.requiredGatesSnapshot && typeof closureInfo.requiredGatesSnapshot === 'object' && !Array.isArray(closureInfo.requiredGatesSnapshot)
+                            ? closureInfo.requiredGatesSnapshot
+                            : createRequiredGatesSnapshot({
+                                cwd,
+                                changedFiles,
+                                frameworkStatus: repoStatus,
+                                requiredGates: Array.isArray(closureInfo.requiredGates)
+                                    ? closureInfo.requiredGates.filter((entry) => typeof entry === 'string')
+                                    : []
+                            }),
                         evidencePath: `.atm/history/evidence/${taskId}.json`,
-                        closedAt: eventDoc.createdAt ?? new Date().toISOString(),
-                        closedByActor: eventDoc.actorId ?? 'unknown',
-                        sessionId: eventDoc.sessionId || null,
+                        closedAt: eventDoc?.createdAt ?? new Date().toISOString(),
+                        closedByActor: eventDoc?.actorId ?? 'unknown',
+                        sessionId: eventDoc?.sessionId || null,
                         attestation: null,
                         historicalDeliveryProvenance: null,
                         recoveredFromMissingPacket: true

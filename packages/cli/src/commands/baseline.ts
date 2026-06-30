@@ -253,7 +253,7 @@ function writeFrameworkCommitRangeBaseline(root: string, name: string, commitSha
     commitSha,
     acceptedHistoryThroughCommitSha: commitSha,
     strictEvidenceRequiredAfterCommitSha: commitSha,
-    rationale: 'Framework commit-range guard accepts critical history through this baseline and enforces per-commit git-head evidence only for newer framework commits.'
+    rationale: 'Framework commit-range guard accepts critical history through this baseline. Per-critical-commit git-head evidence is diagnostic only; same-commit governed provenance and closeout-boundary evidence remain strict.'
   };
   writeFileSync(absolutePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
   return {

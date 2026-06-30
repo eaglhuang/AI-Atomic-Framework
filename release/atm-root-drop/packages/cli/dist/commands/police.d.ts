@@ -1,1 +1,1 @@
-export declare function runPolice(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runPolice(argv: string[]): Promise<import("./shared.ts").CommandResult>;

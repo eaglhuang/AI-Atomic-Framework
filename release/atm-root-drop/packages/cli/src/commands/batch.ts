@@ -5,7 +5,14 @@ import { CliError, makeResult, message, parseOptions } from './shared.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { runNext } from './next.ts';
 import { runTasks } from './tasks.ts';
-import { abandonTaskQueue, advanceTaskQueueHead, findActiveTaskQueue, partitionTaskScope, restoreTaskQueueHead } from './task-direction.ts';
+import {
+  abandonTaskQueue,
+  advanceTaskQueueHead,
+  findActiveTaskQueue,
+  partitionTaskScope,
+  restoreTaskQueueHead,
+  type TaskQueueRecord
+} from './task-direction.ts';
 import {
   activeBatchSelectionStatus,
   inspectBatchRunConsistency,
@@ -16,6 +23,7 @@ import {
   repairBatchRunFromQueue,
   updateBatchRun,
   writeBatchTaskAuditEvent,
+  type BatchRunRecord,
   type BatchSkippedTaskRecord
 } from './work-channels.ts';
 
@@ -785,7 +793,7 @@ export async function runBatch(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 });
 }
 
-function buildBatchSelector(options: Record<string, any>) {
+function buildBatchSelector(options: Record<string, unknown>) {
   const selector: { batchId?: string; scopeKey?: string } = {};
   if (typeof options.batch === 'string' && options.batch.trim()) selector.batchId = options.batch.trim();
   if (typeof options.scope === 'string' && options.scope.trim()) selector.scopeKey = options.scope.trim();
@@ -907,9 +915,9 @@ function toCompactBatchCandidate(batchRun: { readonly batchId: string; readonly 
 
 function buildCompactBatchStatus(
   cwd: string,
-  batchRun: any,
-  taskQueue: any,
-  consistency: any,
+  batchRun: BatchRunRecord | null | undefined,
+  taskQueue: TaskQueueRecord | null | undefined,
+  consistency: { readonly ok: boolean; readonly [key: string]: unknown },
   activeBatchCount: number,
   pendingCommitWindow: ReturnType<typeof buildPendingCheckpointCommitWindow>
 ) {
@@ -1000,7 +1008,7 @@ function buildCompactBatchStatus(
   };
 }
 
-export function buildPendingCheckpointCommitWindow(cwd: string, batchRun: any, taskQueue: any) {
+export function buildPendingCheckpointCommitWindow(cwd: string, batchRun: BatchRunRecord | null | undefined, taskQueue: TaskQueueRecord | null | undefined) {
   if (!batchRun?.batchId || !Array.isArray(batchRun.taskIds)) return null;
   const gitChanges = readGitChangedFiles(cwd);
   const changedFiles = gitChanges.files;
@@ -1009,13 +1017,13 @@ export function buildPendingCheckpointCommitWindow(cwd: string, batchRun: any, t
     const taskFile = `.atm/history/tasks/${taskId}.json`;
     const relatedFiles = changedFiles.filter((file) => isTaskCheckpointRelatedFile(file, taskId));
     if (gitChanges.available && !relatedFiles.includes(taskFile)) continue;
-    const task = readJson(cwd, taskFile);
+    const task = readJsonRecord(cwd, taskFile);
     if (task?.status !== 'done') continue;
     const lastTransitionId = typeof task.lastTransitionId === 'string' ? task.lastTransitionId : '';
     const eventFile = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`;
     if (!lastTransitionId) continue;
     if (gitChanges.available && !changedFiles.includes(eventFile)) continue;
-    const event = readJson(cwd, eventFile);
+    const event = readJsonRecord(cwd, eventFile);
     const closure = event?.closure as { schemaId?: unknown; batchId?: unknown } | undefined;
     const checkpointClosure = typeof event?.command === 'string'
       && event.command.startsWith('node atm.mjs tasks close')
@@ -1155,7 +1163,7 @@ function normalizeGitStatusPath(value: string) {
   return normalizeRelativePath(renamed.replace(/^"|"$/g, ''));
 }
 
-function readJson(cwd: string, relativePath: string): any {
+function readJson(cwd: string, relativePath: string): unknown {
   const filePath = path.join(cwd, normalizeRelativePath(relativePath));
   if (!existsSync(filePath)) return null;
   try {
@@ -1163,6 +1171,12 @@ function readJson(cwd: string, relativePath: string): any {
   } catch {
     return null;
   }
+}
+
+function readJsonRecord(cwd: string, relativePath: string): Record<string, unknown> | null {
+  const parsed = readJson(cwd, relativePath);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+  return parsed as Record<string, unknown>;
 }
 
 function quoteShellArg(value: string) {
@@ -1177,7 +1191,7 @@ function uniqueStrings(values: readonly string[]) {
   return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
 }
 
-function buildCompactProgress(batchRun: any, taskQueue: any) {
+function buildCompactProgress(batchRun: BatchRunRecord | null | undefined, taskQueue: TaskQueueRecord | null | undefined) {
   const currentIndex = batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null;
   const totalTasks = batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0;
   const ordinal = typeof currentIndex === 'number' && totalTasks > 0
@@ -1194,7 +1208,7 @@ function buildCompactProgress(batchRun: any, taskQueue: any) {
   };
 }
 
-function buildBatchAuditSummary(batchRun: { readonly currentTaskId?: string | null; readonly skippedTasks?: readonly { readonly taskId: string; readonly reason: string }[] | null; readonly hold?: { readonly status?: string } | null; readonly status?: string | null } | null) {
+function buildBatchAuditSummary(batchRun: { readonly currentTaskId?: string | null; readonly skippedTasks?: readonly { readonly taskId: string; readonly reason: string }[] | null; readonly hold?: { readonly status?: string } | null; readonly status?: string | null } | null | undefined) {
   const skippedTasks = Array.isArray(batchRun?.skippedTasks) ? batchRun!.skippedTasks! : [];
   return {
     schemaId: 'atm.batchAuditSummary.v1',

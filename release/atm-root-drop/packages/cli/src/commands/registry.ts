@@ -6,7 +6,7 @@ import {
 } from '../../../core/src/registry/diff.ts';
 import { validateRegistryDocument } from '../../../core/src/registry/registry.ts';
 import { validatePropagationReport } from '../../../core/src/test-runner/propagation.ts';
-import { validateHumanReviewDecisionLog } from '../../../plugin-human-review/src/index.ts';
+import { type HumanReviewDecisionLog, validateHumanReviewDecisionLog } from '../../../plugin-human-review/src/index.ts';
 import { getCommandSpec } from './command-specs.ts';
 import { CliError, makeResult, message, parseArgsForCommand } from './shared.ts';
 
@@ -143,8 +143,8 @@ function runRegistryLineageBackfill(options: Record<string, unknown>) {
     ...target.entry,
     lineageLogRef: lineageLogProjectPath,
     evidence: normalizeEvidenceRefs([...(Array.isArray(target.entry.evidence) ? target.entry.evidence : []), ...evidenceRefs]),
-    members: target.entry.members.map((member: any, index: number) => index === target.memberIndex
-      ? { ...member, versionLineage: lineageResult.lineage }
+    members: (target.entry as { members: unknown[] }).members.map((member: unknown, index: number) => index === target.memberIndex
+      ? { ...(member as Record<string, unknown>), versionLineage: lineageResult.lineage }
       : member)
   };
 
@@ -280,15 +280,15 @@ function requireOption(options: Record<string, unknown>, key: string, flag: stri
   return value;
 }
 
-function findMapMemberTarget(registryDocument: any, mapId: string, atomId: string) {
-  const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-  const entryIndex = entries.findIndex((entry: any) => entry?.schemaId === 'atm.atomicMap' && String(entry?.mapId ?? '').trim() === mapId);
+function findMapMemberTarget(registryDocument: Record<string, unknown> | null | undefined, mapId: string, atomId: string) {
+  const entries = registryDocument && Array.isArray(registryDocument.entries) ? registryDocument.entries : [];
+  const entryIndex = entries.findIndex((entry: unknown) => isObject(entry) && (entry as Record<string, unknown>).schemaId === 'atm.atomicMap' && String((entry as Record<string, unknown>).mapId ?? '').trim() === mapId);
   if (entryIndex === -1) {
     return { ok: false as const, code: 'ATM_REGISTRY_LINEAGE_MAP_NOT_FOUND', message: `Map ${mapId} was not found in the registry.` };
   }
-  const entry = entries[entryIndex];
+  const entry = entries[entryIndex] as Record<string, unknown> & { members?: unknown[] };
   const memberIndex = Array.isArray(entry.members)
-    ? entry.members.findIndex((member: any) => String(member?.atomId ?? '').trim() === atomId)
+    ? entry.members.findIndex((member: unknown) => isObject(member) && String((member as Record<string, unknown>).atomId ?? '').trim() === atomId)
     : -1;
   if (memberIndex === -1) {
     return { ok: false as const, code: 'ATM_REGISTRY_LINEAGE_MEMBER_NOT_FOUND', message: `Atom ${atomId} was not found in map ${mapId}.` };
@@ -297,12 +297,12 @@ function findMapMemberTarget(registryDocument: any, mapId: string, atomId: strin
     ok: true as const,
     entry,
     entryIndex,
-    member: entry.members[memberIndex],
+    member: (entry.members as unknown[])[memberIndex] as Record<string, unknown>,
     memberIndex
   };
 }
 
-function normalizeVersionLineage(lineageLog: any, options: {
+function normalizeVersionLineage(lineageLog: Record<string, unknown> | null | undefined, options: {
   atomId: string;
   mapId: string;
   fromVersion: string;
@@ -325,8 +325,8 @@ function normalizeVersionLineage(lineageLog: any, options: {
     issues.push(`versionLineage.currentVersion must equal --to ${options.toVersion}.`);
   }
 
-  const versions = Array.isArray(lineage.versions)
-    ? lineage.versions.map((version: any) => normalizeVersionRecord(version)).sort(compareVersionRecords)
+  const versions = lineage && Array.isArray((lineage as { versions?: unknown }).versions)
+    ? ((lineage as { versions: unknown[] }).versions).map((version: unknown) => normalizeVersionRecord(version as Record<string, unknown> | null | undefined)).sort(compareVersionRecords)
     : [];
   if (versions.length === 0) {
     issues.push('versionLineage.versions must contain at least one version record.');
@@ -342,7 +342,7 @@ function normalizeVersionLineage(lineageLog: any, options: {
     if (!hashPattern.test(version.specHash)) issues.push(`version ${version.version || '<unknown>'} has invalid specHash.`);
     if (!hashPattern.test(version.codeHash)) issues.push(`version ${version.version || '<unknown>'} has invalid codeHash.`);
     if (!hashPattern.test(version.testHash)) issues.push(`version ${version.version || '<unknown>'} has invalid testHash.`);
-    if (!isIsoDate(version.timestamp)) issues.push(`version ${version.version || '<unknown>'} has invalid timestamp.`);
+    if (version.timestamp && !isIsoDate(version.timestamp)) issues.push(`version ${version.version || '<unknown>'} has invalid timestamp.`);
   }
 
   if (issues.length > 0) {
@@ -354,8 +354,8 @@ function normalizeVersionLineage(lineageLog: any, options: {
     lineage: {
       currentVersion: options.toVersion,
       versions,
-      sourceRef: String(lineage.sourceRef ?? options.sourceRef).trim() || options.sourceRef,
-      advisory: String(lineage.advisory ?? 'Backfilled from adopter lineage evidence.').trim(),
+      sourceRef: String((lineage as { sourceRef?: unknown })?.sourceRef ?? options.sourceRef).trim() || options.sourceRef,
+      advisory: String((lineage as { advisory?: unknown })?.advisory ?? 'Backfilled from adopter lineage evidence.').trim(),
       updatedAt: options.timestamp
     }
   };
@@ -364,7 +364,7 @@ function normalizeVersionLineage(lineageLog: any, options: {
 function validateEvidenceSet(cwd: string, input: {
   atomId: string;
   mapId: string;
-  lineageLog: any;
+  lineageLog: Record<string, unknown> | null | undefined;
   lineageLogPath: string;
   equivalencePath: string | null;
   propagationPath: string | null;
@@ -391,9 +391,9 @@ function validateEvidenceSet(cwd: string, input: {
   return validations;
 }
 
-function validateLineageLog(lineageLog: any, lineageLogPath: string, mapId: string): EvidenceValidation {
+function validateLineageLog(lineageLog: Record<string, unknown> | null | undefined, lineageLogPath: string, mapId: string): EvidenceValidation {
   const issues: string[] = [];
-  if (lineageLog?.schemaId !== 'atm.mapLineageLog') {
+  if ((lineageLog as { schemaId?: unknown })?.schemaId !== 'atm.mapLineageLog') {
     issues.push('lineage log schemaId must be atm.mapLineageLog.');
   }
   if (!lineageLogMatchesMap(lineageLog, mapId)) {
@@ -402,71 +402,77 @@ function validateLineageLog(lineageLog: any, lineageLogPath: string, mapId: stri
   return { ok: issues.length === 0, kind: 'lineage-log', path: lineageLogPath, issues };
 }
 
-function validateMapEquivalence(report: any, reportPath: string, mapId: string): EvidenceValidation {
+function validateMapEquivalence(report: Record<string, unknown> | null | undefined, reportPath: string, mapId: string): EvidenceValidation {
   const issues: string[] = [];
-  if (report?.schemaId !== 'atm.mapEquivalenceReport') {
+  if ((report as { schemaId?: unknown })?.schemaId !== 'atm.mapEquivalenceReport') {
     issues.push('equivalence report schemaId must be atm.mapEquivalenceReport.');
   }
-  if (report?.passed !== true) {
+  if ((report as { passed?: unknown })?.passed !== true) {
     issues.push('equivalence report must pass.');
   }
-  if (String(report?.mapId ?? '').trim() !== mapId) {
+  if (String((report as { mapId?: unknown })?.mapId ?? '').trim() !== mapId) {
     issues.push(`equivalence report mapId must match ${mapId}.`);
   }
   return { ok: issues.length === 0, kind: 'equivalence', path: reportPath, issues };
 }
 
-function validatePropagation(report: any, reportPath: string, atomId: string, mapId: string): EvidenceValidation {
+function validatePropagation(report: Record<string, unknown> | null | undefined, reportPath: string, atomId: string, mapId: string): EvidenceValidation {
   const validation = validatePropagationReport(report, { atomId, mapId });
   return { ok: validation.ok, kind: 'propagation', path: reportPath, issues: validation.issues };
 }
 
-function validateReviewAdvisory(report: any, reportPath: string, mapId: string): EvidenceValidation {
+function validateReviewAdvisory(report: Record<string, unknown> | null | undefined, reportPath: string, mapId: string): EvidenceValidation {
   const issues: string[] = [];
-  if (report?.schemaVersion !== '1.0.0') {
+  if ((report as { schemaVersion?: unknown })?.schemaVersion !== '1.0.0') {
     issues.push('review advisory schemaVersion must be 1.0.0.');
   }
-  if (!['ok', 'warn'].includes(String(report?.status ?? ''))) {
+  if (!['ok', 'warn'].includes(String((report as { status?: unknown })?.status ?? ''))) {
     issues.push('review advisory status must be ok or warn.');
   }
-  if (report?.advisoryUnavailable === true) {
+  if ((report as { advisoryUnavailable?: unknown })?.advisoryUnavailable === true) {
     issues.push('review advisory must not be advisory-unavailable.');
   }
-  if (report?.target?.kind === 'map' && report.target.id && String(report.target.id).trim() !== mapId) {
+  if ((report as { target?: { kind?: unknown; id?: unknown } })?.target?.kind === 'map' && (report as { target?: { id?: unknown } }).target?.id && String((report as { target?: { id?: unknown } }).target?.id).trim() !== mapId) {
     issues.push(`review advisory map target must match ${mapId}.`);
   }
   return { ok: issues.length === 0, kind: 'review-advisory', path: reportPath, issues };
 }
 
-function validateHumanReview(report: any, reportPath: string, atomId: string, mapId: string): EvidenceValidation {
+function validateHumanReview(report: Record<string, unknown> | null | undefined, reportPath: string, atomId: string, mapId: string): EvidenceValidation {
   const issues: string[] = [];
-  try {
-    const validation = validateHumanReviewDecisionLog(report);
-    issues.push(...validation.issues);
-  } catch (error) {
-    issues.push(`human review decision validation failed: ${error instanceof Error ? error.message : String(error)}`);
+  if (!report) {
+    issues.push('human review report is missing.');
+  } else {
+    try {
+      const validation = validateHumanReviewDecisionLog(report as unknown as HumanReviewDecisionLog); // 這裡轉成 HumanReviewDecisionLog 型別
+      issues.push(...validation.issues);
+    } catch (error) {
+      issues.push(`human review decision validation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
-  if (report?.schemaId !== 'atm.humanReviewDecision') {
+  if ((report as { schemaId?: unknown })?.schemaId !== 'atm.humanReviewDecision') {
     issues.push('human review schemaId must be atm.humanReviewDecision.');
   }
-  if (report?.decision !== 'approve') {
+  if ((report as { decision?: unknown })?.decision !== 'approve') {
     issues.push('human review decision must be approve.');
   }
-  if (String(report?.atomId ?? '').trim() !== atomId) {
+  if (String((report as { atomId?: unknown })?.atomId ?? '').trim() !== atomId) {
     issues.push(`human review atomId must match ${atomId}.`);
   }
-  if (String(report?.queueRecord?.fromVersion ?? '').trim() && String(report.queueRecord.fromVersion).trim() === String(report?.queueRecord?.toVersion ?? '').trim()) {
+  const fromVersion = String((report as { queueRecord?: { fromVersion?: unknown } })?.queueRecord?.fromVersion ?? '').trim();
+  const toVersion = String((report as { queueRecord?: { toVersion?: unknown } })?.queueRecord?.toVersion ?? '').trim();
+  if (fromVersion && fromVersion === toVersion) {
     issues.push('human review queueRecord must carry a version transition.');
   }
-  const reviewedMapId = String(report?.queueRecord?.proposal?.target?.mapId ?? report?.queueRecord?.proposal?.reviewedMapId ?? '').trim();
+  const reviewedMapId = String((report as { queueRecord?: { proposal?: { target?: { mapId?: unknown } } } })?.queueRecord?.proposal?.target?.mapId ?? (report as { queueRecord?: { proposal?: { reviewedMapId?: unknown } } })?.queueRecord?.proposal?.reviewedMapId ?? '').trim();
   if (reviewedMapId && reviewedMapId !== mapId) {
     issues.push(`human review map target must match ${mapId}.`);
   }
   return { ok: issues.length === 0, kind: 'human-review', path: reportPath, issues };
 }
 
-function prepareMapSpecPatch(cwd: string, entry: any, atomId: string, versionLineage: any, lineageLogRef: string) {
-  const specProjectPath = String(entry?.location?.specPath ?? '').trim();
+function prepareMapSpecPatch(cwd: string, entry: Record<string, unknown> | null | undefined, atomId: string, versionLineage: Record<string, unknown> | null | undefined, lineageLogRef: string) {
+  const specProjectPath = String((entry as { location?: { specPath?: unknown } })?.location?.specPath ?? '').trim();
   if (!specProjectPath) {
     return {
       absolutePath: '',
@@ -492,7 +498,7 @@ function prepareMapSpecPatch(cwd: string, entry: any, atomId: string, versionLin
   }
   const document = readJsonFile(absolutePath, 'ATM_REGISTRY_LINEAGE_MAP_SPEC_NOT_FOUND');
   const memberIndex = Array.isArray(document?.members)
-    ? document.members.findIndex((member: any) => String(member?.atomId ?? '').trim() === atomId)
+    ? document.members.findIndex((member: unknown) => isObject(member) && String((member as Record<string, unknown>)?.atomId ?? '').trim() === atomId)
     : -1;
   if (memberIndex === -1) {
     return {
@@ -508,7 +514,7 @@ function prepareMapSpecPatch(cwd: string, entry: any, atomId: string, versionLin
   const nextDocument = {
     ...document,
     lineageLogRef,
-    members: document.members.map((member: any, index: number) => index === memberIndex
+    members: document.members.map((member: Record<string, unknown>, index: number) => index === memberIndex
       ? { ...member, versionLineage }
       : member)
   };
@@ -530,13 +536,16 @@ function prepareMapSpecPatch(cwd: string, entry: any, atomId: string, versionLin
   };
 }
 
-function computeRegistryDiff(registryDocument: any, input: { atomId: string; fromVersion: string; toVersion: string; timestamp: string }) {
+function computeRegistryDiff(registryDocument: Record<string, unknown> | null | undefined, input: { atomId: string; fromVersion: string; toVersion: string; timestamp: string }) {
   const resolution = resolveRegistryDiffTarget(registryDocument, input.atomId);
   if (!resolution.ok) {
     return { ok: false as const, resolution };
   }
   const report = computeHashDiffReport({
-    entry: resolution.entry,
+    entry: {
+      ...resolution.entry,
+      versions: [...resolution.entry.versions]
+    },
     fromVersion: input.fromVersion,
     toVersion: input.toVersion,
     driftReason: 'Registry lineage backfill closeout.'
@@ -545,13 +554,13 @@ function computeRegistryDiff(registryDocument: any, input: { atomId: string; fro
   return { ok: true as const, resolution, report };
 }
 
-function appendBackfillRecord(lineageLog: any, record: Record<string, unknown>) {
+function appendBackfillRecord(lineageLog: Record<string, unknown> | null | undefined, record: Record<string, unknown>) {
   const recordId = buildBackfillRecordId(record.atomId, record.fromVersion, record.toVersion);
-  const existing = Array.isArray(lineageLog.versionBackfills) ? lineageLog.versionBackfills : [];
+  const existing = lineageLog && Array.isArray(lineageLog.versionBackfills) ? lineageLog.versionBackfills : [];
   const nextRecords = [
-    ...existing.filter((entry: any) => String(entry?.backfillId ?? '') !== recordId),
+    ...existing.filter((entry: unknown) => isObject(entry) && String((entry as Record<string, unknown>)?.backfillId ?? '') !== recordId),
     { backfillId: recordId, ...record }
-  ].sort((left: any, right: any) => String(left.backfillId).localeCompare(String(right.backfillId)));
+  ].sort((left: unknown, right: unknown) => String((left as Record<string, unknown>).backfillId).localeCompare(String((right as Record<string, unknown>).backfillId)));
   return {
     ...lineageLog,
     versionBackfills: nextRecords
@@ -573,22 +582,22 @@ function createCloseoutReport(input: Record<string, unknown>) {
   };
 }
 
-function extractLineageCandidate(lineageLog: any, atomId: string) {
-  if (isObject(lineageLog?.versionLineage)) return lineageLog.versionLineage;
-  if (isObject(lineageLog?.memberVersionLineage)) return lineageLog.memberVersionLineage;
-  if (isObject(lineageLog?.versionLineages?.[atomId])) return lineageLog.versionLineages[atomId];
-  const member = Array.isArray(lineageLog?.members)
-    ? lineageLog.members.find((entry: any) => String(entry?.atomId ?? '').trim() === atomId)
+function extractLineageCandidate(lineageLog: Record<string, unknown> | null | undefined, atomId: string) {
+  if (lineageLog && isObject(lineageLog.versionLineage)) return lineageLog.versionLineage;
+  if (lineageLog && isObject(lineageLog.memberVersionLineage)) return lineageLog.memberVersionLineage;
+  if (lineageLog && isObject((lineageLog.versionLineages as Record<string, unknown>)?.[atomId])) return (lineageLog.versionLineages as Record<string, unknown>)[atomId];
+  const member = lineageLog && Array.isArray(lineageLog.members)
+    ? lineageLog.members.find((entry: unknown) => isObject(entry) && String((entry as Record<string, unknown>)?.atomId ?? '').trim() === atomId)
     : null;
-  if (isObject(member?.versionLineage)) return member.versionLineage;
-  const backfill = Array.isArray(lineageLog?.versionBackfills)
-    ? lineageLog.versionBackfills.find((entry: any) => String(entry?.atomId ?? '').trim() === atomId && isObject(entry?.versionLineage))
+  if (member && isObject((member as Record<string, unknown>).versionLineage)) return (member as Record<string, unknown>).versionLineage;
+  const backfill = lineageLog && Array.isArray(lineageLog.versionBackfills)
+    ? lineageLog.versionBackfills.find((entry: unknown) => isObject(entry) && String((entry as Record<string, unknown>)?.atomId ?? '').trim() === atomId && isObject((entry as Record<string, unknown>)?.versionLineage))
     : null;
-  return backfill?.versionLineage ?? null;
+  return (backfill as Record<string, unknown> | null)?.versionLineage ?? null;
 }
 
-function normalizeVersionRecord(version: any) {
-  const normalized: any = {
+function normalizeVersionRecord(version: Record<string, unknown> | null | undefined) {
+  const normalized: { version: string; specHash: string; codeHash: string; testHash: string; timestamp: string; semanticFingerprint?: string | null } = {
     version: String(version?.version ?? '').trim(),
     specHash: String(version?.specHash ?? '').trim(),
     codeHash: String(version?.codeHash ?? '').trim(),
@@ -603,7 +612,7 @@ function normalizeVersionRecord(version: any) {
   return normalized;
 }
 
-function compareVersionRecords(left: any, right: any) {
+function compareVersionRecords(left: { version: string }, right: { version: string }) {
   return compareVersionStrings(left.version, right.version);
 }
 
@@ -617,17 +626,17 @@ function compareVersionStrings(left: string, right: string) {
   return left.localeCompare(right);
 }
 
-function lineageLogMatchesMap(lineageLog: any, mapId: string) {
-  return [lineageLog?.canonicalMapId, lineageLog?.mapId, lineageLog?.target?.mapId]
+function lineageLogMatchesMap(lineageLog: Record<string, unknown> | null | undefined, mapId: string) {
+  return [lineageLog?.canonicalMapId, lineageLog?.mapId, (lineageLog?.target as { mapId?: unknown })?.mapId]
     .map((value) => String(value ?? '').trim())
     .filter(Boolean)
     .includes(mapId);
 }
 
-function resolveBackfillTimestamp(optionAt: unknown, lineageLog: any, atomId: string) {
+function resolveBackfillTimestamp(optionAt: unknown, lineageLog: Record<string, unknown> | null | undefined, atomId: string) {
   const candidates = [
     optionAt,
-    extractLineageCandidate(lineageLog, atomId)?.updatedAt,
+    (extractLineageCandidate(lineageLog, atomId) as Record<string, unknown> | null)?.updatedAt,
     lineageLog?.updatedAt,
     lineageLog?.generatedAt
   ];

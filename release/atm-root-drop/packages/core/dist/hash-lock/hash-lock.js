@@ -21,7 +21,7 @@ export function computeSha256ForFiles(filePaths) {
     }
     return `sha256:${hash.digest('hex')}`;
 }
-export function createSourceHashSnapshot(options = {}) {
+export function createSourceHashSnapshot(options) {
     const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
     const specPath = resolveInputPath(repositoryRoot, options.specPath);
     const codePaths = normalizeInputPaths(repositoryRoot, options.codePaths);

@@ -117,14 +117,15 @@ try {
 
   const parsed = parseAtomicSpecFile(fixture.specPath, { cwd: tempRoot });
   check(parsed.ok === true, 'registry fixture spec must parse before building registry entry');
+  const normalizedModel = parsed.normalizedModel!;
 
-  const testRun = runAtomicTestRunner(parsed.normalizedModel, {
+  const testRun = runAtomicTestRunner(normalizedModel, {
     repositoryRoot: tempRoot,
     now: fixture.generatedAt
   });
   check(testRun.ok === true, 'registry fixture test runner must succeed before registry build');
 
-  const entry = createAtomicRegistryEntry(parsed.normalizedModel, {
+  const entry = createAtomicRegistryEntry(normalizedModel, {
     repositoryRoot: tempRoot,
     atomVersion: fixture.expectedAtomVersion,
     status: fixture.expectedStatus,
@@ -149,8 +150,9 @@ try {
     sharding: fixture.sharding
   });
   check(document.registryId === fixture.expectedRegistryId, 'registry document id mismatch');
-  check(document.sharding?.strategy === fixture.sharding.strategy, 'registry document must preserve sharding strategy');
-  check(document.sharding?.partPaths[0] === fixture.sharding.partPaths[0], 'registry document must preserve shard path metadata');
+  const sharding = document.sharding as { strategy?: string; partPaths?: string[] } | undefined;
+  check(sharding?.strategy === fixture.sharding.strategy, 'registry document must preserve sharding strategy');
+  check(sharding?.partPaths?.[0] === fixture.sharding.partPaths[0], 'registry document must preserve shard path metadata');
   check(validateRegistryDocument(document).ok === true, 'registry document must validate against JSON Schema');
   assertNoWorkbenchAliasDrift(tempRoot, document, 'fixture atomic_workbench/atoms');
 

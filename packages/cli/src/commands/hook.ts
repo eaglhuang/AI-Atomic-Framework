@@ -384,7 +384,7 @@ export function runCommitRangeGuard(argv: string[]) {
           head: options.head,
           criticalCommitCount: report.criticalCommits.length
         })
-        : message('error', 'ATM_GUARD_COMMIT_RANGE_FAILED', 'Commit range guard found commits that bypassed ATM evidence or task closure gates.', {
+        : message('error', 'ATM_GUARD_COMMIT_RANGE_FAILED', 'Commit range guard found high-risk closeout or task governance findings.', {
           base: options.base,
           head: options.head,
           findings: report.findings
@@ -1150,12 +1150,12 @@ function runPrePushHook(cwd: string, base: string | null, head: string | null) {
     });
   }
   const report = createCommitRangeGuardReport(root, baseInfo.base, resolvedHead);
-  const enforcement = createPrePushEnforcementDecision(root, pushRefs, baseInfo, report.head);
+  const enforcement = createPrePushEnforcementDecision(root, pushRefs, baseInfo, report.head, report.findings.length > 0);
   const hardFailure = enforcement.hardEnforcement && report.findings.length > 0 && !enforcement.safeModeActive;
   const warnOnly = report.findings.length > 0 && !hardFailure;
-  const safeModeMissingMetadata = enforcement.safeModeRequested && !enforcement.safeModeActive;
+  const safeModeMissingMetadata = enforcement.safeModeRequested && report.findings.length > 0 && !enforcement.safeModeActive;
   const evidenceMissingDiagnostic = report.evidenceMissingDiagnostic
-    ? [message('info', 'ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC', 'ATM pre-push git-head evidence-missing commits after the accepted baseline.', report.evidenceMissingDiagnostic)]
+    ? [message('info', 'ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC', 'ATM pre-push found critical commits without git-head evidence after the accepted baseline. This is diagnostic only; same-commit governed provenance and closeout-boundary evidence remain the strict checks.', report.evidenceMissingDiagnostic)]
     : [];
   return makeResult({
     ok: !hardFailure && !safeModeMissingMetadata,
@@ -1232,6 +1232,10 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
   const enforcedCriticalCommits = legacyBaseline
     ? criticalCommits.filter((entry) => !isAcceptedByLegacyBaseline(entry.commitSha))
     : criticalCommits;
+  // Git-head records are still valuable for same-commit provenance and
+  // closeout/repair checks, but missing records on ordinary historical critical
+  // commits are diagnostic only. Do not reintroduce a per-critical-commit push
+  // gate here.
   const evidenceMatches = criticalCommits.map((entry) => inspectCommitGitHeadEvidence(root, entry.commitSha, entry.criticalChangedFiles, head));
   const closurePacketInspections = enforcedCriticalCommits.flatMap((entry) => {
     const match = evidenceMatches.find((candidate) => candidate.commitSha === entry.commitSha);
@@ -1251,13 +1255,6 @@ function createCommitRangeGuardReport(cwd: string, base: string, head: string) {
     : null;
   const taskAudit = auditTasks(root);
   const findings = [
-    ...missingEvidenceMatches
-      .map((entry) => ({
-        level: 'error' as const,
-        code: 'ATM_COMMIT_RANGE_GIT_HEAD_EVIDENCE_MISSING',
-        commitSha: entry.commitSha,
-        detail: `Critical framework commit ${entry.commitSha} has no matching git-head evidence.`
-      })),
     ...closurePacketInspections.flatMap((entry) => legacyBaseline && isAcceptedByLegacyBaseline(entry.commitSha) ? [] : entry.findings.map((finding) => ({
       level: 'error' as const,
       code: finding.code,
@@ -1299,7 +1296,8 @@ function createPrePushEnforcementDecision(
   cwd: string,
   pushRefs: readonly PrePushRefUpdate[],
   baseInfo: PushBaseResolution,
-  headRef: string
+  headRef: string,
+  hasBlockingFindings: boolean
 ): PrePushEnforcementDecision {
   const pushedBranches = uniqueSorted(pushRefs.map((entry) => entry.remoteBranch).filter((entry): entry is string => Boolean(entry)));
   const targetBranches = pushedBranches.length > 0
@@ -1313,7 +1311,11 @@ function createPrePushEnforcementDecision(
   const safeModeRequested = isTruthyEnv(process.env.ATM_FRAMEWORK_PUSH_GUARD_SAFE_MODE);
   const safeModeActor = normalizeOptionalText(process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY);
   const safeModeReason = normalizeOptionalText(process.env.ATM_FRAMEWORK_PUSH_GUARD_REASON);
-  const safeModeActive = safeModeRequested && hardEnforcement && Boolean(safeModeActor) && Boolean(safeModeReason);
+  const safeModeActive = safeModeRequested
+    && hardEnforcement
+    && hasBlockingFindings
+    && Boolean(safeModeActor)
+    && Boolean(safeModeReason);
   const safeModeReportPath = safeModeActive
     ? writePrePushSafeModeReport(cwd, {
       targetBranches,

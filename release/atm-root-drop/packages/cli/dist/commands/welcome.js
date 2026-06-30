@@ -12,6 +12,9 @@ import { listExperimentalApis } from '../../../agent-pack-sdk/dist/experimental/
 const defaultWelcomeLineageRelativePath = path.join('.atm', 'runtime', 'welcome.lineage.json');
 export async function runWelcome(argv) {
     const spec = getCommandSpec('welcome');
+    if (!spec) {
+        throw new CliError('ATM_CLI_HELP_NOT_FOUND', 'No help spec found for welcome.', { exitCode: 2 });
+    }
     const parsed = parseArgsForCommand(spec, argv);
     const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
     const dryRun = parsed.options.dryRun === true;

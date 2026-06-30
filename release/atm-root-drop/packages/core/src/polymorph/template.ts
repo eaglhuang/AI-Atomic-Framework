@@ -1,7 +1,36 @@
-export function createLazyInstantiationContract(template: any, dimensionSpec: any) {
-  const templateId = String(template?.templateId || '').trim();
-  const dimensionSpecId = String(dimensionSpec?.dimensionSpecId || '').trim();
-  const variantKey = String(dimensionSpec?.variantKey || 'default').trim() || 'default';
+interface TemplateRecord {
+  readonly templateId?: string;
+  readonly templateAtomId?: string;
+}
+
+interface DimensionSpecRecord {
+  readonly dimensionSpecId?: string;
+  readonly variantKey?: string;
+}
+
+interface TemplateUpgradeOptions {
+  readonly templateId?: string;
+  readonly toVersion?: string;
+  readonly instances?: unknown[];
+}
+
+interface TemplateInstanceRecord {
+  readonly mapId?: string;
+  readonly [key: string]: unknown;
+}
+
+function asRecord<T extends object>(value: unknown): T | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as T
+    : null;
+}
+
+export function createLazyInstantiationContract(template: unknown, dimensionSpec: unknown) {
+  const templateRecord = asRecord<TemplateRecord>(template);
+  const dimensionSpecRecord = asRecord<DimensionSpecRecord>(dimensionSpec);
+  const templateId = String(templateRecord?.templateId || '').trim();
+  const dimensionSpecId = String(dimensionSpecRecord?.dimensionSpecId || '').trim();
+  const variantKey = String(dimensionSpecRecord?.variantKey || 'default').trim() || 'default';
 
   if (!templateId) {
     throw new Error('polymorphic template requires templateId');
@@ -18,14 +47,15 @@ export function createLazyInstantiationContract(template: any, dimensionSpec: an
     materializedInRegistry: false,
     instantiateOn: 'runtime',
     instanceStatus: 'validated',
-    runtimeInstanceId: `${String(template?.templateAtomId || 'ATM-TEMPLATE-0000')}@${variantKey}`
+    runtimeInstanceId: `${String(templateRecord?.templateAtomId || 'ATM-TEMPLATE-0000')}@${variantKey}`
   };
 }
 
-export function propagateTemplateUpgrade(options: any) {
-  const templateId = String(options?.templateId || '').trim();
-  const toVersion = String(options?.toVersion || '').trim();
-  const instances = Array.isArray(options?.instances) ? options.instances : [];
+export function propagateTemplateUpgrade(options: unknown) {
+  const optionRecord = asRecord<TemplateUpgradeOptions>(options);
+  const templateId = String(optionRecord?.templateId || '').trim();
+  const toVersion = String(optionRecord?.toVersion || '').trim();
+  const instances = Array.isArray(optionRecord?.instances) ? optionRecord.instances : [];
 
   if (!templateId) {
     throw new Error('propagateTemplateUpgrade requires templateId');
@@ -34,12 +64,15 @@ export function propagateTemplateUpgrade(options: any) {
     throw new Error('propagateTemplateUpgrade requires toVersion');
   }
 
-  const propagatedInstances = instances.map((instance: any) => ({
-    ...instance,
+  const propagatedInstances = instances.map((instance) => {
+    const instanceRecord = asRecord<TemplateInstanceRecord>(instance) ?? {};
+    return {
+      ...instanceRecord,
     inheritedTemplateVersion: toVersion,
     inheritedBy: 'behavior.evolve',
     needsRegistryWrite: false
-  }));
+    };
+  });
 
   return {
     templateId,

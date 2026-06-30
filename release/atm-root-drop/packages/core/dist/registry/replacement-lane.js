@@ -13,6 +13,11 @@ export const ReplacementMode = Object.freeze({
     Active: 'active',
     LegacyRetired: 'legacy-retired'
 });
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 const orderedReplacementModes = [
     ReplacementMode.Draft,
     ReplacementMode.Shadow,
@@ -286,7 +291,7 @@ function loadEvidenceDocuments(repositoryRoot, evidenceRefs) {
             return {
                 path: evidenceRef,
                 absolutePath,
-                document: readJson(absolutePath),
+                document: asRecord(readJson(absolutePath)),
                 error: null
             };
         }
@@ -319,18 +324,19 @@ function findPropagationEvidence(mapId, evidenceDocuments) {
 function findReviewAdvisoryEvidence(mapId, evidenceDocuments) {
     const match = evidenceDocuments.find((entry) => {
         const document = entry.document;
-        if (!document || typeof document !== 'object') {
+        const record = asRecord(document);
+        if (!record) {
             return false;
         }
-        const advisoryTarget = document.target ?? null;
+        const advisoryTarget = asRecord(record.target) ?? null;
         const targetMatches = advisoryTarget == null
             || advisoryTarget.kind === 'proposal'
             || advisoryTarget.id == null
             || advisoryTarget.id === mapId;
         return targetMatches
-            && document.advisoryUnavailable !== true
-            && (document.status === 'ok' || document.status === 'warn')
-            && typeof document.reportId === 'string';
+            && record.advisoryUnavailable !== true
+            && (record.status === 'ok' || record.status === 'warn')
+            && typeof record.reportId === 'string';
     });
     return {
         passed: Boolean(match),
@@ -340,13 +346,19 @@ function findReviewAdvisoryEvidence(mapId, evidenceDocuments) {
 function findHumanReviewEvidence(mapId, evidenceDocuments) {
     const match = evidenceDocuments.find((entry) => {
         const document = entry.document;
-        if (!document || typeof document !== 'object') {
+        const record = asRecord(document);
+        if (!record) {
             return false;
         }
-        const reviewedMapId = document.queueRecord?.proposal?.target?.mapId ?? document.proposal?.target?.mapId ?? null;
-        return document.schemaId === 'atm.humanReviewDecision'
-            && document.decision === 'approve'
-            && document.queueRecord?.status === 'approved'
+        const queueRecord = asRecord(record.queueRecord);
+        const queueProposal = asRecord(queueRecord?.proposal);
+        const queueTarget = asRecord(queueProposal?.target);
+        const proposal = asRecord(record.proposal);
+        const proposalTarget = asRecord(proposal?.target);
+        const reviewedMapId = queueTarget?.mapId ?? proposalTarget?.mapId ?? null;
+        return record.schemaId === 'atm.humanReviewDecision'
+            && record.decision === 'approve'
+            && queueRecord?.status === 'approved'
             && (reviewedMapId == null || reviewedMapId === mapId);
     });
     return {
@@ -370,7 +382,11 @@ function findRetirementProofEvidence(mapId, evidenceDocuments) {
 }
 function safeValidatePropagationEvidence(document, mapId) {
     try {
-        return validatePropagationReport(document, { mapId });
+        const result = validatePropagationReport(asRecord(document), { mapId });
+        return {
+            ok: result.ok,
+            issues: result.issues ? [...result.issues] : undefined
+        };
     }
     catch (error) {
         return {
@@ -380,11 +396,16 @@ function safeValidatePropagationEvidence(document, mapId) {
     }
 }
 function safeValidateRollbackEvidence(document, mapId) {
+    const record = asRecord(document);
     try {
-        if (document?.schemaId !== 'atm.rollbackProof' || document?.targetKind !== 'map' || document?.mapId !== mapId || document?.verificationStatus !== 'passed') {
+        if (record?.schemaId !== 'atm.rollbackProof' || record?.targetKind !== 'map' || record?.mapId !== mapId || record?.verificationStatus !== 'passed') {
             return { ok: false, issues: ['rollback proof does not match target map or did not pass'] };
         }
-        return validateRollbackProof(document);
+        const result = validateRollbackProof(record);
+        return {
+            ok: result.ok,
+            issues: [...result.issues]
+        };
     }
     catch (error) {
         return {
@@ -394,11 +415,16 @@ function safeValidateRollbackEvidence(document, mapId) {
     }
 }
 function safeValidateRetirementEvidence(document, mapId) {
+    const record = asRecord(document);
     try {
-        if (document?.schemaId !== 'atm.retirementProof' || document?.mapId !== mapId || document?.verificationStatus !== 'passed') {
+        if (record?.schemaId !== 'atm.retirementProof' || record?.mapId !== mapId || record?.verificationStatus !== 'passed') {
             return { ok: false, issues: ['retirement proof does not match target map or did not pass'] };
         }
-        return validateRetirementProof(document);
+        const result = validateRetirementProof(record);
+        return {
+            ok: result.ok,
+            issues: [...result.issues]
+        };
     }
     catch (error) {
         return {

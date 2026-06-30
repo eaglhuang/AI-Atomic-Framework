@@ -74,7 +74,7 @@ function resolveMapGeneratorProvenance(repositoryRoot, mapId, mapSpec) {
     const evidence = Array.isArray(mapEntry.evidence) ? mapEntry.evidence : [];
     const marker = evidence.find((value) => typeof value === 'string' && value.startsWith('generator-provenance:'));
     if (marker) {
-        return marker.slice('generator-provenance:'.length);
+        return String(marker).slice('generator-provenance:'.length);
     }
     return inferProvenanceFromSpec(mapSpec);
 }

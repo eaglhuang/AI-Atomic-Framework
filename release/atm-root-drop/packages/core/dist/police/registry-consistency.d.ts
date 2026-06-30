@@ -1,5 +1,13 @@
-export declare function evaluatePromotionGate(options?: any): {
-    lifecycleMode: any;
+interface PromotionGateOptions {
+    readonly lifecycleMode?: string;
+    readonly nonRegression?: unknown;
+    readonly qualityComparison?: unknown;
+    readonly registryCandidate?: unknown;
+    readonly checkId?: string;
+    readonly description?: string;
+}
+export declare function evaluatePromotionGate(options?: PromotionGateOptions): {
+    lifecycleMode: string;
     canPromote: boolean;
     reports: {
         nonRegression: {
@@ -9,7 +17,7 @@ export declare function evaluatePromotionGate(options?: any): {
         } | {
             required: boolean;
             passed: boolean;
-            reportId: any;
+            reportId: string | null;
         };
         qualityComparison: {
             required: boolean;
@@ -18,7 +26,7 @@ export declare function evaluatePromotionGate(options?: any): {
         } | {
             required: boolean;
             passed: boolean;
-            reportId: any;
+            reportId: string | null;
         };
         registryCandidate: {
             required: boolean;
@@ -27,16 +35,16 @@ export declare function evaluatePromotionGate(options?: any): {
         } | {
             required: boolean;
             passed: boolean;
-            reportId: any;
+            reportId: string | null;
         };
     };
     failed: string[];
 };
-export declare function validateRegistryConsistency(options?: any): {
-    checkId: any;
+export declare function validateRegistryConsistency(options?: PromotionGateOptions): {
+    checkId: string;
     kind: string;
     required: boolean;
-    description: any;
+    description: string;
     ok: boolean;
     canPromote: boolean;
     violations: {
@@ -45,7 +53,7 @@ export declare function validateRegistryConsistency(options?: any): {
         message: string;
     }[];
     gate: {
-        lifecycleMode: any;
+        lifecycleMode: string;
         canPromote: boolean;
         reports: {
             nonRegression: {
@@ -55,7 +63,7 @@ export declare function validateRegistryConsistency(options?: any): {
             } | {
                 required: boolean;
                 passed: boolean;
-                reportId: any;
+                reportId: string | null;
             };
             qualityComparison: {
                 required: boolean;
@@ -64,7 +72,7 @@ export declare function validateRegistryConsistency(options?: any): {
             } | {
                 required: boolean;
                 passed: boolean;
-                reportId: any;
+                reportId: string | null;
             };
             registryCandidate: {
                 required: boolean;
@@ -73,9 +81,10 @@ export declare function validateRegistryConsistency(options?: any): {
             } | {
                 required: boolean;
                 passed: boolean;
-                reportId: any;
+                reportId: string | null;
             };
         };
         failed: string[];
     };
 };
+export {};

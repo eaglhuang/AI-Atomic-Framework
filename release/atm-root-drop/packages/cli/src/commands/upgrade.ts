@@ -15,13 +15,14 @@ import { runUpgradeScan } from './upgrade/scan.ts';
 import {
   discoverInputDocuments,
   evaluateUpgradeContextBudget,
+  inferInputKind,
   isGuidedLegacyDryRun,
   loadExplicitInputDocuments,
   parseUpgradeOptions,
   runGuidedLegacyDryRunProposal
 } from './upgrade/proposal.ts';
 
-export async function runUpgrade(argv: any) {
+export async function runUpgrade(argv: string[]) {
   const experimentalAction = firstExperimentalUpgradeAction(argv);
   if (experimentalAction === 'experimental-api') {
     return runUpgradeExperimentalApi(argv);
@@ -73,42 +74,62 @@ export async function runUpgrade(argv: any) {
     rollbackProof: options.rollbackProof,
     retirementProof: options.retirementProof,
     contextBudgetGate: contextBudget.gate,
-    inputs: inputDocuments
+    inputs: inputDocuments.map((entry) => ({
+      kind: inferInputKind(entry.document.schemaId as string | null | undefined) ?? 'unknown',
+      path: entry.path,
+      document: entry.document
+    }))
   };
 
   const proposal = options.target.kind === 'map'
-    ? runUpgradeMapPropose(proposerOptions)
+    ? runUpgradeMapPropose({
+      ...proposerOptions,
+      target: proposerOptions.target as { kind: 'map'; mapId: string },
+      fork: proposerOptions.fork as { sourceAtomId: string; newAtomId: string } | null,
+      mapImpactScope: proposerOptions.mapImpactScope as unknown as string | null,
+      migration: proposerOptions.migration as { strategy: string; fromVersion?: string | null; notes?: string } | null
+    })
     : proposeAtomicUpgrade({
       ...proposerOptions,
+      fork: proposerOptions.fork as { sourceAtomId: string; newAtomId: string } | null,
       repositoryRoot: options.cwd
     });
+
+  const proposalObj = proposal as Record<string, unknown> & {
+    status: string;
+    proposalId: string;
+    automatedGates: { blockedGateNames: string[] };
+    target: Record<string, unknown>;
+    behaviorId: string;
+    inputs: Array<{ kind: string }>;
+  };
 
   return makeResult({
     ok: true,
     command: 'upgrade',
     cwd: options.cwd,
     messages: [
-      proposal.status === 'blocked'
+      proposalObj.status === 'blocked'
         ? message('warning', 'ATM_UPGRADE_PROPOSAL_BLOCKED', 'Upgrade proposal blocked by automated gates.', {
-          proposalId: proposal.proposalId,
-          blockedGateNames: proposal.automatedGates.blockedGateNames
+          proposalId: proposalObj.proposalId,
+          blockedGateNames: proposalObj.automatedGates.blockedGateNames
         })
         : message('info', 'ATM_UPGRADE_PROPOSAL_READY', 'Upgrade proposal prepared and ready for review.', {
-          proposalId: proposal.proposalId
+          proposalId: proposalObj.proposalId
         })
     ],
     evidence: {
-      proposal,
-      proposalId: proposal.proposalId,
-      status: proposal.status,
-      blockedGateNames: proposal.automatedGates.blockedGateNames,
+      proposal: proposalObj,
+      proposalId: proposalObj.proposalId,
+      status: proposalObj.status,
+      blockedGateNames: proposalObj.automatedGates.blockedGateNames,
       contextBudget,
       dryRun: options.dryRun,
-      target: proposal.target,
-      nextActionHint: buildUpgradeNextActionHint(options.cwd, proposal),
-      behaviorId: proposal.behaviorId,
-      inputCount: proposal.inputs.length,
-      inputKinds: proposal.inputs.map((entry: any) => entry.kind)
+      target: proposalObj.target,
+      nextActionHint: buildUpgradeNextActionHint(options.cwd, proposalObj as unknown as Record<string, unknown>),
+      behaviorId: proposalObj.behaviorId,
+      inputCount: proposalObj.inputs.length,
+      inputKinds: proposalObj.inputs.map((entry) => entry.kind)
     }
   });
 }

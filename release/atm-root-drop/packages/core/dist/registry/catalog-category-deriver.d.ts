@@ -1,1 +1,1 @@
-export declare function deriveRegistryCatalogCategory(entry: any, specDocument?: any): string;
+export declare function deriveRegistryCatalogCategory(entry: unknown, specDocument?: unknown): string;

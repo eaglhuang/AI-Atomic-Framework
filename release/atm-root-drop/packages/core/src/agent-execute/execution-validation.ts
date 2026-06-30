@@ -1,19 +1,59 @@
 import { spawnSync } from 'node:child_process';
 
-export function normalizeValidationPassOutcome(rawOutcome: any, pass: any) {
-  const ok = rawOutcome?.ok !== false;
-  const exitCode = normalizeExitCode(rawOutcome?.exitCode, ok ? 0 : 1);
-  const summary = String(rawOutcome?.summary || `${pass.label} validated delegated commands.`);
-  const reportPath = toPortablePath(rawOutcome?.reportPath || pass.reportPath);
-  const reportDocument = rawOutcome?.reportDocument && typeof rawOutcome.reportDocument === 'object'
-    ? rawOutcome.reportDocument
+interface ValidationPassPlanRecord {
+  passId: string;
+  fixtureSet: string;
+  label: string;
+  reportPath: string;
+}
+
+interface ValidationResultRecord {
+  commandId: string;
+  command: string;
+  exitCode: number;
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
+  signal: string | null;
+}
+
+interface RawValidationOutcome {
+  ok?: boolean;
+  exitCode?: number;
+  summary?: string;
+  reportPath?: string;
+  reportDocument?: unknown;
+  results?: unknown[];
+}
+
+interface ValidationPassContext {
+  repositoryRoot: string;
+  validationCommands: string[];
+  pass: ValidationPassPlanRecord;
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
+export function normalizeValidationPassOutcome(rawOutcome: RawValidationOutcome | unknown, pass: ValidationPassPlanRecord) {
+  const outcome = asRecord(rawOutcome) as RawValidationOutcome | null;
+  const ok = outcome?.ok !== false;
+  const exitCode = normalizeExitCode(outcome?.exitCode, ok ? 0 : 1);
+  const summary = String(outcome?.summary || `${pass.label} validated delegated commands.`);
+  const reportPath = toPortablePath(outcome?.reportPath || pass.reportPath);
+  const reportDocument = asRecord(outcome?.reportDocument)
+    ? outcome?.reportDocument
     : {
       passId: pass.passId,
       fixtureSet: pass.fixtureSet,
       ok,
       exitCode,
       summary,
-      results: Array.isArray(rawOutcome?.results) ? rawOutcome.results : []
+      results: Array.isArray(outcome?.results) ? outcome.results : []
     };
 
   return {
@@ -30,7 +70,7 @@ export function normalizeValidationPassOutcome(rawOutcome: any, pass: any) {
   };
 }
 
-export function createValidationPassPlan(lifecycleMode: any, reportsDirPath: any) {
+export function createValidationPassPlan(lifecycleMode: string, reportsDirPath: string) {
   if (lifecycleMode === 'evolution') {
     return [
       createValidationPass('baseline-fixtures-x-new-code', 'baseline', 'Baseline fixtures validated against the candidate code.', reportsDirPath),
@@ -42,8 +82,8 @@ export function createValidationPassPlan(lifecycleMode: any, reportsDirPath: any
   ];
 }
 
-export function defaultRunValidationPass(context: any) {
-  const results = context.validationCommands.map((command: any, index: any) => {
+export function defaultRunValidationPass(context: ValidationPassContext) {
+  const results: ValidationResultRecord[] = context.validationCommands.map((command, index) => {
     const startedAt = Date.now();
     const processResult = spawnSync(command, {
       cwd: context.repositoryRoot,
@@ -63,8 +103,8 @@ export function defaultRunValidationPass(context: any) {
     };
   });
 
-  const exitCode = results.find((entry: any) => entry.exitCode !== 0)?.exitCode ?? 0;
-  const ok = results.every((entry: any) => entry.ok === true);
+  const exitCode = results.find((entry) => entry.exitCode !== 0)?.exitCode ?? 0;
+  const ok = results.every((entry) => entry.ok === true);
   return {
     ok,
     exitCode,
@@ -75,7 +115,7 @@ export function defaultRunValidationPass(context: any) {
   };
 }
 
-function createValidationPass(passId: any, fixtureSet: any, label: any, reportsDirPath: any) {
+function createValidationPass(passId: string, fixtureSet: string, label: string, reportsDirPath: string): ValidationPassPlanRecord {
   return {
     passId,
     fixtureSet,
@@ -84,17 +124,17 @@ function createValidationPass(passId: any, fixtureSet: any, label: any, reportsD
   };
 }
 
-function normalizeExitCode(value: any, fallback: any) {
+function normalizeExitCode(value: unknown, fallback: number) {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0) {
     return value;
   }
   return fallback;
 }
 
-function normalizeText(value: any) {
+function normalizeText(value: unknown) {
   return String(value || '');
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: unknown) {
   return String(value || '').replace(/\\/g, '/');
 }

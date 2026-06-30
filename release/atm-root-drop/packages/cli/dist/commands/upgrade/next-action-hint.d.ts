@@ -1,19 +1,19 @@
-export declare function buildUpgradeNextActionHint(cwd: string, proposal: any): {
+export declare function buildUpgradeNextActionHint(cwd: string, proposal: Record<string, unknown>): {
     status: string;
     route: string;
-    reason: any;
+    reason: string | undefined;
     command: string;
     commandTemplate: boolean;
-    requiredEvidenceKinds: any;
-    requiredCliOptions: any;
+    requiredEvidenceKinds: string[];
+    requiredCliOptions: string[] | undefined;
     missingInputs: string[];
 } | {
     status: string;
     route: string;
-    reason: any;
+    reason: string | undefined;
     command: string;
-    requiredEvidenceKinds: any;
-    requiredCliOptions: any;
+    requiredEvidenceKinds: string[] | undefined;
+    requiredCliOptions: string[] | undefined;
     commandTemplate?: undefined;
     missingInputs?: undefined;
 } | null;

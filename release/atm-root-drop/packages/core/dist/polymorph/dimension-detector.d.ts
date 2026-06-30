@@ -1,9 +1,9 @@
-export declare function detectPolymorphicDimensions(leftSpec: any, rightSpec: any): {
+export declare function detectPolymorphicDimensions(leftSpec: unknown, rightSpec: unknown): {
     explainable: boolean;
     differences: {
         dimension: string;
-        left: any;
-        right: any;
+        left: {} | null;
+        right: {} | null;
     }[];
     staticContractStable: boolean;
     matchedDimensions: string[];

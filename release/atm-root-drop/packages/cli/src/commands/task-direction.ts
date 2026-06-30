@@ -30,6 +30,7 @@ export interface TaskScopePartition {
 }
 
 export interface TaskQueueRecord {
+  readonly [key: string]: unknown;
   readonly schemaId: 'atm.taskQueue.v1';
   readonly specVersion: '0.1.0';
   readonly queueId: string;

@@ -5,6 +5,31 @@ const urnPattern = /^urn:atm:([a-z][a-z0-9-]*):([^@\s]+)(?:@(\d+\.\d+\.\d+))?$/;
 const legacyUriPattern = /^legacy:\/\/([^#\s]+)(?:#(L\d+(?:-L?\d+)?))?$/;
 const supportedNodeKinds = new Set(['atom', 'map', 'police', 'behavior']);
 
+type AtmNodeKind = 'atom' | 'map' | 'police' | 'behavior';
+
+interface AtmUrnInputRecord {
+  readonly nodeKind?: unknown;
+  readonly kind?: unknown;
+  readonly canonicalId?: unknown;
+  readonly atomId?: unknown;
+  readonly mapId?: unknown;
+  readonly version?: unknown;
+  readonly atomVersion?: unknown;
+  readonly mapVersion?: unknown;
+  readonly currentVersion?: unknown;
+}
+
+interface NormalizeAtmNodeRefOptions {
+  readonly nodeKind?: unknown;
+  readonly version?: unknown;
+}
+
+function asUrnInputRecord(value: unknown): AtmUrnInputRecord | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as AtmUrnInputRecord
+    : null;
+}
+
 export class AtmUrnError extends Error {
   declare code: string;
   declare details: Record<string, unknown>;
@@ -17,7 +42,7 @@ export class AtmUrnError extends Error {
   }
 }
 
-export function inferAtmNodeKind(canonicalId: any) {
+export function inferAtmNodeKind(canonicalId: unknown): AtmNodeKind {
   const normalizedId = normalizeCanonicalId(canonicalId);
   if (mapIdPattern.test(normalizedId)) {
     return 'map';
@@ -34,15 +59,16 @@ export function inferAtmNodeKind(canonicalId: any) {
   return 'atom';
 }
 
-export function formatAtmUrn(input: any) {
-  const nodeKind = normalizeNodeKind(input?.nodeKind ?? input?.kind ?? inferAtmNodeKind(input?.canonicalId ?? input?.atomId ?? input?.mapId));
-  const canonicalId = normalizeCanonicalId(input?.canonicalId ?? input?.atomId ?? input?.mapId);
-  const version = normalizeOptionalVersion(input?.version ?? input?.atomVersion ?? input?.mapVersion ?? input?.currentVersion ?? null);
+export function formatAtmUrn(input: unknown) {
+  const record = asUrnInputRecord(input);
+  const nodeKind = normalizeNodeKind(record?.nodeKind ?? record?.kind ?? inferAtmNodeKind(record?.canonicalId ?? record?.atomId ?? record?.mapId));
+  const canonicalId = normalizeCanonicalId(record?.canonicalId ?? record?.atomId ?? record?.mapId);
+  const version = normalizeOptionalVersion(record?.version ?? record?.atomVersion ?? record?.mapVersion ?? record?.currentVersion ?? null);
   assertCanonicalIdMatchesKind(canonicalId, nodeKind);
   return `urn:atm:${nodeKind}:${canonicalId}${version ? `@${version}` : ''}`;
 }
 
-export function parseAtmUrn(value: any) {
+export function parseAtmUrn(value: unknown) {
   const text = String(value || '').trim();
   const match = text.match(urnPattern);
   if (!match) {
@@ -60,7 +86,7 @@ export function parseAtmUrn(value: any) {
   };
 }
 
-export function normalizeAtmNodeRef(value: any, options: any = {}) {
+export function normalizeAtmNodeRef(value: unknown, options: NormalizeAtmNodeRefOptions = {}) {
   if (typeof value === 'string') {
     const text = value.trim();
     if (text.startsWith('urn:atm:')) {
@@ -78,9 +104,10 @@ export function normalizeAtmNodeRef(value: any, options: any = {}) {
     };
   }
 
-  const canonicalId = value?.canonicalId ?? value?.atomId ?? value?.mapId;
-  const nodeKind = value?.nodeKind ?? value?.kind ?? inferAtmNodeKind(canonicalId);
-  const version = value?.version ?? value?.atomVersion ?? value?.mapVersion ?? value?.currentVersion ?? null;
+  const record = asUrnInputRecord(value);
+  const canonicalId = record?.canonicalId ?? record?.atomId ?? record?.mapId;
+  const nodeKind = record?.nodeKind ?? record?.kind ?? inferAtmNodeKind(canonicalId);
+  const version = record?.version ?? record?.atomVersion ?? record?.mapVersion ?? record?.currentVersion ?? null;
   const normalizedKind = normalizeNodeKind(nodeKind);
   const normalizedId = normalizeCanonicalId(canonicalId);
   const normalizedVersion = normalizeOptionalVersion(version);
@@ -93,7 +120,7 @@ export function normalizeAtmNodeRef(value: any, options: any = {}) {
   };
 }
 
-export function isAtmUrn(value: any) {
+export function isAtmUrn(value: unknown) {
   try {
     parseAtmUrn(value);
     return true;
@@ -102,15 +129,15 @@ export function isAtmUrn(value: any) {
   }
 }
 
-function normalizeNodeKind(value: any) {
+function normalizeNodeKind(value: unknown): AtmNodeKind {
   const nodeKind = String(value || '').trim().toLowerCase();
   if (!supportedNodeKinds.has(nodeKind)) {
     throw new AtmUrnError('ATM_NODE_KIND_INVALID', 'ATM node kind is unsupported.', { nodeKind: value });
   }
-  return nodeKind;
+  return nodeKind as AtmNodeKind;
 }
 
-function normalizeCanonicalId(value: any) {
+function normalizeCanonicalId(value: unknown) {
   const canonicalId = String(value || '').trim().toUpperCase();
   if (!canonicalId) {
     throw new AtmUrnError('ATM_CANONICAL_ID_REQUIRED', 'Canonical ATM ID is required.');
@@ -118,7 +145,7 @@ function normalizeCanonicalId(value: any) {
   return canonicalId;
 }
 
-function normalizeOptionalVersion(value: any) {
+function normalizeOptionalVersion(value: unknown) {
   if (value === null || value === undefined || value === '') {
     return null;
   }
@@ -129,7 +156,7 @@ function normalizeOptionalVersion(value: any) {
   return version;
 }
 
-function assertCanonicalIdMatchesKind(canonicalId: any, nodeKind: any) {
+function assertCanonicalIdMatchesKind(canonicalId: string, nodeKind: AtmNodeKind) {
   if (nodeKind === 'map') {
     if (!mapIdPattern.test(canonicalId)) {
       throw new AtmUrnError('ATM_MAP_ID_INVALID', 'ATM map URN must use ATM-MAP-0000 canonical IDs.', { canonicalId });
@@ -141,7 +168,7 @@ function assertCanonicalIdMatchesKind(canonicalId: any, nodeKind: any) {
   }
 }
 
-export function parseLegacyUri(value: any) {
+export function parseLegacyUri(value: unknown) {
   const text = String(value || '').trim();
   const match = text.match(legacyUriPattern);
   if (!match) {
@@ -179,7 +206,7 @@ export function parseLegacyUri(value: any) {
   };
 }
 
-export function isLegacyUri(value: any) {
+export function isLegacyUri(value: unknown) {
   try {
     parseLegacyUri(value);
     return true;

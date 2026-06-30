@@ -186,7 +186,7 @@ function hashFileContents(filePath) {
 function getBrokerProposalSchemaValidator() {
     if (!proposalSchemaValidator) {
         const { Ajv2020 } = loadAjv();
-        const AjvConstructor = Ajv2020.default ?? Ajv2020;
+        const AjvConstructor = (Ajv2020.default ?? Ajv2020);
         const ajv = new AjvConstructor({ allErrors: true, strict: false });
         const schema = JSON.parse(readFileSync(schemaPath, 'utf8'));
         proposalSchemaValidator = ajv.compile(schema);

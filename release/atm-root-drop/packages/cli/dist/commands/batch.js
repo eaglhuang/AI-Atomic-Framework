@@ -975,7 +975,7 @@ export function buildPendingCheckpointCommitWindow(cwd, batchRun, taskQueue) {
         const relatedFiles = changedFiles.filter((file) => isTaskCheckpointRelatedFile(file, taskId));
         if (gitChanges.available && !relatedFiles.includes(taskFile))
             continue;
-        const task = readJson(cwd, taskFile);
+        const task = readJsonRecord(cwd, taskFile);
         if (task?.status !== 'done')
             continue;
         const lastTransitionId = typeof task.lastTransitionId === 'string' ? task.lastTransitionId : '';
@@ -984,7 +984,7 @@ export function buildPendingCheckpointCommitWindow(cwd, batchRun, taskQueue) {
             continue;
         if (gitChanges.available && !changedFiles.includes(eventFile))
             continue;
-        const event = readJson(cwd, eventFile);
+        const event = readJsonRecord(cwd, eventFile);
         const closure = event?.closure;
         const checkpointClosure = typeof event?.command === 'string'
             && event.command.startsWith('node atm.mjs tasks close')
@@ -1135,6 +1135,12 @@ function readJson(cwd, relativePath) {
     catch {
         return null;
     }
+}
+function readJsonRecord(cwd, relativePath) {
+    const parsed = readJson(cwd, relativePath);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+        return null;
+    return parsed;
 }
 function quoteShellArg(value) {
     return `"${value.replace(/"/g, '\\"')}"`;

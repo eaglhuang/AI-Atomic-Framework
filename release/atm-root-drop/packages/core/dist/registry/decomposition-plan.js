@@ -10,6 +10,11 @@ const memberRoles = new Set(['entry-adapter', 'domain-step', 'validator', 'side-
 const edgeKinds = new Set(['data-flow', 'control-flow', 'event-flow', 'validation', 'fallback', 'side-effect', 'rollback']);
 const migrationStrategies = new Set(['none', 'additive', 'breaking']);
 export const defaultDecompositionPlanSchemaPath = path.join(frameworkRoot, 'schemas', 'governance', 'decomposition-plan.schema.json');
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function readDecompositionPlan(planPath, options = {}) {
     const cwd = path.resolve(options.cwd ?? process.cwd());
     const absolutePlanPath = path.resolve(cwd, planPath);
@@ -57,29 +62,30 @@ export function validateDecompositionPlanDocument(document, options = {}) {
     };
 }
 export function createAtomicMapRequestFromDecompositionPlan(plan) {
-    const qualityTargets = normalizeQualityTargets(plan?.qualityTargets);
-    const members = Array.isArray(plan.proposedMembers)
-        ? plan.proposedMembers.map((entry) => ({ ...entry }))
+    const planRecord = asRecord(plan) ?? {};
+    const qualityTargets = normalizeQualityTargets(planRecord.qualityTargets);
+    const members = Array.isArray(planRecord.proposedMembers)
+        ? planRecord.proposedMembers.map((entry) => ({ ...entry }))
         : [];
-    const edges = Array.isArray(plan.proposedEdges)
-        ? plan.proposedEdges.map((entry) => ({ ...entry }))
+    const edges = Array.isArray(planRecord.proposedEdges)
+        ? planRecord.proposedEdges.map((entry) => ({ ...entry }))
         : [];
     return {
-        mapId: String(plan.proposedMapId || '').trim(),
+        mapId: String(planRecord.proposedMapId || '').trim(),
         request: {
-            mapVersion: String(plan.mapVersion || '0.1.0').trim(),
+            mapVersion: String(planRecord.mapVersion || '0.1.0').trim(),
             specVersion: '0.2.0',
             members,
             edges,
-            entrypoints: Array.isArray(plan.entrypoints) ? [...plan.entrypoints] : [],
+            entrypoints: Array.isArray(planRecord.entrypoints) ? [...planRecord.entrypoints] : [],
             qualityTargets,
             replacement: {
-                legacyUris: Array.isArray(plan.legacyUris) ? [...plan.legacyUris] : [],
+                legacyUris: Array.isArray(planRecord.legacyUris) ? [...planRecord.legacyUris] : [],
                 mode: 'draft',
                 evidenceRefs: []
             }
         },
-        defaultsUsed: plan?.qualityTargets ? [] : ['qualityTargets']
+        defaultsUsed: planRecord.qualityTargets ? [] : ['qualityTargets']
     };
 }
 function normalizeQualityTargets(value) {

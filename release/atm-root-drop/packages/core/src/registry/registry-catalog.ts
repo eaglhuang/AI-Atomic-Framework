@@ -4,7 +4,63 @@ import { deriveRegistryCatalogCategory } from './catalog-category-deriver.ts';
 
 export const defaultRegistryCatalogRelativePath = 'atomic_workbench/registry-catalog.md';
 
-export function resolveRegistryCatalogPath(options: any = {}) {
+// ─── Domain types ──────────────────────────────────────────────────────────
+
+interface CatalogOptions {
+  repositoryRoot?: string;
+  catalogPath?: string;
+  specRepositoryRoot?: string;
+  title?: string;
+  sourceOfTruthLabel?: string;
+}
+
+interface RegistryEntry {
+  schemaId?: string;
+  atomId?: string;
+  mapId?: string;
+  logicalName?: string;
+  status?: string;
+  evidence?: string[];
+  location?: {
+    specPath?: string;
+    workbenchPath?: string;
+  };
+  specPath?: string;
+  members?: unknown[];
+  entrypoints?: string[];
+  lineageLogRef?: string;
+}
+
+interface SpecDocument {
+  title?: string;
+  description?: string;
+  logicalName?: string;
+}
+
+interface AtomCatalogRow {
+  entryId: string;
+  logicalName: string;
+  functionSummary: string;
+  derivedCategory: string;
+  provenance: string;
+  status: string;
+  specPath: string;
+}
+
+interface MapCatalogRow {
+  mapId: string;
+  memberCount: number;
+  status: string;
+  workbenchPath: string;
+  notes: string;
+}
+
+interface RegistryDocument {
+  entries?: RegistryEntry[];
+  registryId?: string;
+}
+
+export function resolveRegistryCatalogPath(options: CatalogOptions = {}): string {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const catalogPath = options.catalogPath ?? defaultRegistryCatalogRelativePath;
   return path.isAbsolute(catalogPath)
@@ -12,15 +68,15 @@ export function resolveRegistryCatalogPath(options: any = {}) {
     : path.resolve(repositoryRoot, catalogPath);
 }
 
-export function createRegistryCatalogRows(registryDocument: any, options: any = {}) {
+export function createRegistryCatalogRows(registryDocument: RegistryDocument | null | undefined, options: CatalogOptions = {}): AtomCatalogRow[] {
   return createRegistryCatalogProjection(registryDocument, options).atoms;
 }
 
-export function createRegistryCatalogProjection(registryDocument: any, options: any = {}) {
+export function createRegistryCatalogProjection(registryDocument: RegistryDocument | null | undefined, options: CatalogOptions = {}): { atoms: AtomCatalogRow[]; maps: MapCatalogRow[] } {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const specRepositoryRoot = path.resolve(options.specRepositoryRoot ?? repositoryRoot);
-  const specCache = new Map();
-  const entries = Array.isArray(registryDocument?.entries) ? [...registryDocument.entries] : [];
+  const specCache = new Map<string, SpecDocument>();
+  const entries = Array.isArray(registryDocument?.entries) ? [...registryDocument!.entries!] : [];
   const sortedEntries = entries
     .sort((left, right) => resolveEntryId(left).localeCompare(resolveEntryId(right)))
     .map((entry) => ({
@@ -28,8 +84,8 @@ export function createRegistryCatalogProjection(registryDocument: any, options: 
       specDocument: readSpecDocument(specRepositoryRoot, entry, specCache)
     }));
 
-  const atoms = [];
-  const maps = [];
+  const atoms: AtomCatalogRow[] = [];
+  const maps: MapCatalogRow[] = [];
   for (const item of sortedEntries) {
     if (item.entry?.schemaId === 'atm.atomicMap') {
       maps.push(createMapCatalogRow(item.entry));
@@ -41,7 +97,7 @@ export function createRegistryCatalogProjection(registryDocument: any, options: 
   return { atoms, maps };
 }
 
-export function renderRegistryCatalogMarkdown(registryDocument: any, options: any = {}) {
+export function renderRegistryCatalogMarkdown(registryDocument: RegistryDocument | null | undefined, options: CatalogOptions = {}): string {
   const title = String(options.title || 'Atomic Registry Catalog').trim();
   const sourceOfTruthLabel = String(options.sourceOfTruthLabel || 'atomic-registry.json').trim();
   const registryId = String(registryDocument?.registryId || 'registry.atoms').trim();
@@ -86,7 +142,7 @@ export function renderRegistryCatalogMarkdown(registryDocument: any, options: an
   return `${lines.join('\n')}\n`;
 }
 
-export function writeRegistryCatalogFile(registryDocument: any, options: any = {}) {
+export function writeRegistryCatalogFile(registryDocument: RegistryDocument | null | undefined, options: CatalogOptions = {}): { catalogPath: string; markdown: string } {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const catalogPath = resolveRegistryCatalogPath({
     repositoryRoot,
@@ -105,7 +161,7 @@ export function writeRegistryCatalogFile(registryDocument: any, options: any = {
   };
 }
 
-function createAtomCatalogRow(entry: any, specDocument: any) {
+function createAtomCatalogRow(entry: RegistryEntry, specDocument: SpecDocument): AtomCatalogRow {
   const title = normalizeInlineText(specDocument?.title);
   const description = normalizeInlineText(specDocument?.description);
   const specPath = resolveCatalogSpecPath(entry);
@@ -120,7 +176,7 @@ function createAtomCatalogRow(entry: any, specDocument: any) {
   };
 }
 
-function createMapCatalogRow(entry: any) {
+function createMapCatalogRow(entry: RegistryEntry): MapCatalogRow {
   const provenance = deriveGeneratorProvenance(entry);
   return {
     mapId: String(entry?.mapId || '').trim(),
@@ -134,36 +190,40 @@ function createMapCatalogRow(entry: any) {
   };
 }
 
-function readSpecDocument(repositoryRoot: any, entry: any, specCache: any) {
+function readSpecDocument(repositoryRoot: string, entry: RegistryEntry, specCache: Map<string, SpecDocument>): SpecDocument {
   const specPath = resolveCatalogSpecPath(entry);
   if (!specPath) {
     return {};
   }
   if (specCache.has(specPath)) {
-    return specCache.get(specPath);
+    return specCache.get(specPath)!;
   }
   const resolvedPath = path.isAbsolute(specPath)
     ? path.normalize(specPath)
     : path.resolve(repositoryRoot, specPath);
-  const document = JSON.parse(readFileSync(resolvedPath, 'utf8'));
-  specCache.set(specPath, document);
-  return document;
+  try {
+    const document = JSON.parse(readFileSync(resolvedPath, 'utf8')) as SpecDocument;
+    specCache.set(specPath, document);
+    return document;
+  } catch {
+    return {};
+  }
 }
 
-function normalizeInlineText(value: any) {
+function normalizeInlineText(value: string | null | undefined): string {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
-function deriveGeneratorProvenance(entry: any) {
-  const marker = (entry?.evidence ?? []).find((value: any) => typeof value === 'string' && value.startsWith('generator-provenance:'));
-  return marker ? marker.slice('generator-provenance:'.length) : 'unmarked';
+function deriveGeneratorProvenance(entry: RegistryEntry): string {
+  const marker = (entry?.evidence ?? []).find((value) => typeof value === 'string' && value.startsWith('generator-provenance:'));
+  return marker ? String(marker).slice('generator-provenance:'.length) : 'unmarked';
 }
 
-function resolveEntryId(entry: any) {
+function resolveEntryId(entry: RegistryEntry): string {
   return String(entry?.atomId || entry?.mapId || '').trim();
 }
 
-function resolveCatalogSpecPath(entry: any) {
+function resolveCatalogSpecPath(entry: RegistryEntry): string {
   const explicitSpecPath = String(entry?.location?.specPath || entry?.specPath || '').trim();
   if (explicitSpecPath) {
     return explicitSpecPath;
@@ -172,7 +232,7 @@ function resolveCatalogSpecPath(entry: any) {
   return mapId ? `atomic_workbench/maps/${mapId}/map.spec.json` : '';
 }
 
-function resolveMapWorkbenchPath(entry: any) {
+function resolveMapWorkbenchPath(entry: RegistryEntry): string {
   const explicitWorkbenchPath = String(entry?.location?.workbenchPath || '').trim();
   if (explicitWorkbenchPath) {
     return explicitWorkbenchPath;
@@ -181,7 +241,7 @@ function resolveMapWorkbenchPath(entry: any) {
   return mapId ? `atomic_workbench/maps/${mapId}` : '';
 }
 
-function createFallbackFunctionSummary(entry: any) {
+function createFallbackFunctionSummary(entry: RegistryEntry): string {
   if (entry?.schemaId !== 'atm.atomicMap') {
     return '';
   }
@@ -191,11 +251,11 @@ function createFallbackFunctionSummary(entry: any) {
     : 'Atomic Map entry';
 }
 
-function escapeMarkdownCell(value: any) {
+function escapeMarkdownCell(value: string): string {
   return normalizeInlineText(value).replace(/\|/g, '\\|');
 }
 
-function toProjectPath(repositoryRoot: any, filePath: any) {
+function toProjectPath(repositoryRoot: string, filePath: string): string {
   const relative = path.relative(repositoryRoot, filePath).replace(/\\/g, '/');
   if (!relative || relative.startsWith('..')) {
     return filePath.replace(/\\/g, '/');

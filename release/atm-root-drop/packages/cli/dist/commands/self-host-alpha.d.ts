@@ -1,4 +1,4 @@
-export declare function runSelfHostAlphaAsync(argv: any): Promise<{
+export declare function runSelfHostAlphaAsync(argv: string[]): Promise<{
     criteria1: boolean;
     criteria2: boolean;
     criteria3: boolean;

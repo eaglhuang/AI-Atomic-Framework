@@ -1,5 +1,11 @@
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 function normalizeStringArray(values) {
-    return Array.from(new Set((values || []).filter(Boolean).map((value) => String(value).trim()).filter(Boolean)));
+    const entries = Array.isArray(values) ? values : [];
+    return Array.from(new Set(entries.filter(Boolean).map((value) => String(value).trim()).filter(Boolean)));
 }
 function normalizePathList(value) {
     if (!value) {
@@ -22,12 +28,14 @@ function extractPluginFamily(atomId, codePaths) {
     return '';
 }
 export function deriveRegistryCatalogCategory(entry, specDocument = {}) {
-    if (entry?.schemaId === 'atm.atomicMap') {
+    const entryRecord = asRecord(entry);
+    const specRecord = asRecord(specDocument) ?? {};
+    if (entryRecord?.schemaId === 'atm.atomicMap') {
         return 'map';
     }
-    const atomId = String(entry?.atomId || specDocument?.id || '').trim();
-    const tags = normalizeStringArray(specDocument?.tags);
-    const codePaths = normalizePathList(entry?.location?.codePaths || entry?.selfVerification?.sourcePaths?.code);
+    const atomId = String(entryRecord?.atomId || specRecord.id || '').trim();
+    const tags = normalizeStringArray(specRecord.tags);
+    const codePaths = normalizePathList(entryRecord?.location?.codePaths || entryRecord?.selfVerification?.sourcePaths?.code);
     if (atomId === 'ATM-CORE-0001' || (tags.includes('seed') && codePaths.includes('packages/core/seed.js'))) {
         return 'core / seed / self-descriptor';
     }

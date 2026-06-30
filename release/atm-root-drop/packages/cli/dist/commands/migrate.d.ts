@@ -1,1 +1,1 @@
-export declare function runMigrate(argv: any): Promise<any>;
+export declare function runMigrate(argv: string[]): Promise<object>;

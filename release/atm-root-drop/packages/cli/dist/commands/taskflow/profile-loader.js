@@ -208,12 +208,12 @@ export function loadProfile(profilePath) {
     if (!fs.existsSync(resolvedPath)) {
         throw new CliError('ATM_TASKFLOW_PROFILE_NOT_FOUND', `Taskflow profile not found at path: ${profilePath}`, { exitCode: 1 });
     }
-    let raw;
+    let raw = null;
     try {
         raw = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
     }
     catch (err) {
-        throw new CliError('ATM_TASKFLOW_PROFILE_PARSE_FAILED', `Failed to parse taskflow profile: ${err.message}`, { exitCode: 1 });
+        throw new CliError('ATM_TASKFLOW_PROFILE_PARSE_FAILED', `Failed to parse taskflow profile: ${err instanceof Error ? err.message : String(err)}`, { exitCode: 1 });
     }
     if (!raw || typeof raw !== 'object') {
         throw new CliError('ATM_TASKFLOW_PROFILE_SCHEMA_INVALID', 'Taskflow profile must be a valid JSON object.', { exitCode: 1 });

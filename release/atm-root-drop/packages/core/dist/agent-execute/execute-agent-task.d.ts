@@ -1,14 +1,45 @@
 export * from './execution-constants.ts';
-export declare function createExecuteAgentTaskEffectContract(options: any): {
+interface ExecuteAgentTaskModel {
+    identity?: {
+        atomId?: string;
+    };
+    execution?: {
+        compatibility?: {
+            lifecycleMode?: string;
+        };
+        validation?: {
+            commands?: string[];
+        };
+    };
+}
+interface EffectContractRecord {
     nodeKind: string;
     nodeName: string;
     defaultMode: string;
     applyFlag: string;
     proposalDelegatedTo: string;
-};
-export declare function executeAgentTask(normalizedModel: any, options: any): {
+}
+interface ExecuteAgentTaskOptions {
+    repositoryRoot?: string;
+    now?: string;
+    applyChanges?: boolean;
+    proposalDelegatedTo?: string;
+    promptDocument?: unknown;
+    prompt?: unknown;
+    workbenchPath?: string;
+    workbenchRoot?: string;
+    snapshotFileName?: string;
+    logFileName?: string;
+    evidenceFileName?: string;
+    reportDirName?: string;
+    agentExecutor?: (context: Record<string, unknown>) => unknown;
+    applyExecution?: (context: Record<string, unknown>) => unknown;
+    runValidationPass?: (context: Record<string, unknown>) => unknown;
+}
+export declare function createExecuteAgentTaskEffectContract(options?: ExecuteAgentTaskOptions): EffectContractRecord;
+export declare function executeAgentTask(normalizedModel: ExecuteAgentTaskModel, options?: ExecuteAgentTaskOptions): {
     ok: boolean;
-    atomId: any;
+    atomId: string;
     lifecycleMode: string;
     executionMode: string;
     promptPath: string;
@@ -16,10 +47,10 @@ export declare function executeAgentTask(normalizedModel: any, options: any): {
     logPath: string;
     evidencePath: string;
     validationPasses: {
-        passId: any;
-        fixtureSet: any;
+        passId: string;
+        fixtureSet: string;
         ok: boolean;
-        exitCode: any;
+        exitCode: number;
         reportPath: string;
         summary: string;
     }[];
@@ -31,46 +62,50 @@ export declare function executeAgentTask(normalizedModel: any, options: any): {
             fromVersion: null;
             notes: "Initial ExecuteAgentTask effect node evidence contract.";
         }>;
-        atomId: any;
-        lifecycleMode: any;
-        executionMode: any;
-        ok: any;
-        generatedAt: any;
-        evidencePath: any;
-        effectNode: any;
+        atomId: string;
+        lifecycleMode: string;
+        executionMode: string;
+        ok: boolean;
+        generatedAt: string;
+        evidencePath: string;
+        effectNode: unknown;
         prompt: {
-            promptPath: any;
-            allowedFiles: any;
-            validationCommands: any;
+            promptPath: string;
+            allowedFiles: string[];
+            validationCommands: string[];
         };
         agentRun: {
-            proposedChangeCount: any;
+            proposedChangeCount: number;
             appliedChanges: boolean;
             hostProjectMutated: boolean;
-            touchedFiles: any;
-            appliedTouchedFiles: any;
-            summary: any;
-            artifactPath: any;
-            logPath: any;
+            touchedFiles: string[];
+            appliedTouchedFiles: string[];
+            summary: string;
+            artifactPath: string;
+            logPath: string;
         };
-        validationPasses: any;
+        validationPasses: import("./execution-documents.ts").ValidationPassRecord[];
         logSummary: {
-            lineCount: any;
-            preview: any;
-            warningCount: any;
-            errorCount: any;
+            lineCount: number;
+            preview: string[];
+            warningCount: number;
+            errorCount: number;
         };
-        artifacts: any[];
+        artifacts: {
+            artifactPath: string;
+            artifactKind: string;
+            producedBy: string;
+        }[];
     };
     snapshotDocument: {
-        atomId: any;
-        lifecycleMode: any;
-        executionMode: any;
-        generatedAt: any;
-        promptPath: any;
-        summary: any;
-        proposedChanges: any;
-        validationPasses: any;
-        effectNode: any;
+        atomId: string;
+        lifecycleMode: string;
+        executionMode: string;
+        generatedAt: string;
+        promptPath: string;
+        summary: string;
+        proposedChanges: unknown[];
+        validationPasses: import("./execution-documents.ts").ValidationPassRecord[];
+        effectNode: unknown;
     };
 };

@@ -2,7 +2,7 @@ export interface RetirementProofValidationResult {
     readonly ok: boolean;
     readonly issues: readonly string[];
 }
-export declare function validateRetirementProof(proof: any): RetirementProofValidationResult;
+export declare function validateRetirementProof(proof: unknown): RetirementProofValidationResult;
 export declare function createRetirementProof(options: {
     readonly mapId: string;
     readonly verifiedAt: string;

@@ -29,6 +29,7 @@ export interface TaskImportRecord {
     readonly deliverables: readonly string[];
     readonly scopePaths?: readonly string[];
     readonly validators?: readonly string[];
+    readonly testPlan?: Record<string, unknown>;
     readonly planningRepo?: string | null;
     readonly targetRepo?: string | null;
     readonly closureAuthority?: string | null;

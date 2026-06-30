@@ -1,4 +1,25 @@
-export function evaluatePromotionGate(options: any = {}) {
+interface GateReportRecord {
+  readonly required?: boolean;
+  readonly passed?: boolean;
+  readonly reportId?: string | null;
+}
+
+interface PromotionGateOptions {
+  readonly lifecycleMode?: string;
+  readonly nonRegression?: unknown;
+  readonly qualityComparison?: unknown;
+  readonly registryCandidate?: unknown;
+  readonly checkId?: string;
+  readonly description?: string;
+}
+
+function asGateReportRecord(value: unknown): GateReportRecord | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as GateReportRecord
+    : null;
+}
+
+export function evaluatePromotionGate(options: PromotionGateOptions = {}) {
   const lifecycleMode = options.lifecycleMode ?? 'birth';
   const reports = {
     nonRegression: normalizeGateReport(options.nonRegression),
@@ -17,7 +38,7 @@ export function evaluatePromotionGate(options: any = {}) {
   };
 }
 
-export function validateRegistryConsistency(options: any = {}) {
+export function validateRegistryConsistency(options: PromotionGateOptions = {}) {
   const gate = evaluatePromotionGate(options);
   const violations = gate.failed.map((name) => ({
     code: 'ATM_POLICE_PROMOTE_BLOCKED',
@@ -36,13 +57,14 @@ export function validateRegistryConsistency(options: any = {}) {
   };
 }
 
-function normalizeGateReport(report: any) {
-  if (!report) {
+function normalizeGateReport(report: unknown) {
+  const record = asGateReportRecord(report);
+  if (!record) {
     return { required: true, passed: false };
   }
   return {
-    required: report.required !== false,
-    passed: report.passed === true,
-    reportId: report.reportId ?? null
+    required: record.required !== false,
+    passed: record.passed === true,
+    reportId: record.reportId ?? null
   };
 }

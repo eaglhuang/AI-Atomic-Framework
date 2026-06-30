@@ -1,3 +1,8 @@
+function asGateReportRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function evaluatePromotionGate(options = {}) {
     const lifecycleMode = options.lifecycleMode ?? 'birth';
     const reports = {
@@ -35,12 +40,13 @@ export function validateRegistryConsistency(options = {}) {
     };
 }
 function normalizeGateReport(report) {
-    if (!report) {
+    const record = asGateReportRecord(report);
+    if (!record) {
         return { required: true, passed: false };
     }
     return {
-        required: report.required !== false,
-        passed: report.passed === true,
-        reportId: report.reportId ?? null
+        required: record.required !== false,
+        passed: record.passed === true,
+        reportId: record.reportId ?? null
     };
 }

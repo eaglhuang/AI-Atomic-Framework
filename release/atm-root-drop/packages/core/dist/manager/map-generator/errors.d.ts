@@ -10,4 +10,4 @@ export type GeneratorError = Error & {
     code: string;
     details: Record<string, unknown>;
 };
-export declare function createGeneratorError(code: any, text: any, details?: Record<string, unknown>): GeneratorError;
+export declare function createGeneratorError(code: string, text: string, details?: Record<string, unknown>): GeneratorError;

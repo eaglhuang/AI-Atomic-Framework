@@ -32,13 +32,13 @@ export function deriveDecompositionDecision({ behaviorId, targetKind }) {
     if (targetKind === 'map') {
         return 'map-bump';
     }
-    return DECISION_BY_BEHAVIOR.get(behaviorId) ?? 'atom-bump';
+    return DECISION_BY_BEHAVIOR.get(behaviorId ?? '') ?? 'atom-bump';
 }
 export function resolveReviewTemplate(decompositionDecision) {
     return REVIEW_TEMPLATE_BY_DECISION[decompositionDecision] ?? 'review.template.general';
 }
 export function validateDecisionBehaviorPair({ behaviorId, decompositionDecision }) {
-    const strictBehaviorId = STRICT_DECISION_BEHAVIOR.get(decompositionDecision);
+    const strictBehaviorId = STRICT_DECISION_BEHAVIOR.get(decompositionDecision ?? '');
     if (strictBehaviorId && behaviorId !== strictBehaviorId) {
         throw new Error(`decompositionDecision ${decompositionDecision} must pair with ${strictBehaviorId}.`);
     }

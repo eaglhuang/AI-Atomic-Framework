@@ -43,6 +43,12 @@ export interface RescueReport {
   findings: RescueFinding[];
 }
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null;
+}
+
 export function runRescuePolice(repositoryRoot: string): RescueReport {
   const findings: RescueFinding[] = [];
 
@@ -85,7 +91,11 @@ function checkRegistrySourceFiles(repositoryRoot: string): RescueFinding {
     const missing: string[] = [];
     for (const [atomId, entry] of Object.entries(entries)) {
       const e = entry as Record<string, unknown>;
-      const codePaths = (e.selfVerification as any)?.sourcePaths?.code ?? [];
+      const selfVerification = asRecord(e.selfVerification);
+      const sourcePaths = asRecord(selfVerification?.sourcePaths);
+      const codePaths = Array.isArray(sourcePaths?.code)
+        ? sourcePaths.code.filter((value): value is string => typeof value === 'string')
+        : [];
       for (const codePath of codePaths) {
         const fullPath = path.resolve(repositoryRoot, codePath);
         if (!existsSync(fullPath)) {

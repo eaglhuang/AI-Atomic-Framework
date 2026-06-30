@@ -3,19 +3,66 @@ export declare const defaultMapEquivalenceReportMigration: Readonly<{
     fromVersion: null;
     notes: "Initial alpha0 map equivalence report.";
 }>;
+type MetricDirection = 'higher-is-better' | 'lower-is-better' | 'informational';
+interface KnownDivergenceRecord {
+    readonly caseId: string;
+    readonly reason: string;
+    readonly justification: string;
+    readonly reviewer: string;
+    readonly reviewRef: string;
+}
+interface CaseMetricRecord {
+    readonly name: string;
+    readonly baseline: number;
+    readonly current: number;
+    readonly delta: number;
+    readonly direction: MetricDirection;
+    readonly passed: boolean;
+    readonly tolerance?: number;
+}
+interface ReportCaseRecord {
+    readonly caseId: string;
+    readonly input: unknown;
+    readonly expected: unknown;
+    readonly actual: unknown;
+    readonly metric: CaseMetricRecord;
+    readonly evidenceRefs: string[];
+    readonly passed: boolean;
+    readonly knownDivergence: boolean;
+}
+interface MapEquivalenceOptions {
+    readonly now?: string;
+    readonly writeReport?: boolean;
+    readonly repositoryRoot?: string;
+}
+interface MapEquivalenceReportInput {
+    readonly repositoryRoot?: string;
+    readonly mapId: string;
+    readonly fixtureSetId: string;
+    readonly generatedAt?: string;
+    readonly legacyUris?: readonly string[];
+    readonly fixturePath: string;
+    readonly reportPath: string;
+    readonly specPath: string;
+    readonly knownDivergences?: readonly KnownDivergenceRecord[];
+    readonly documentedKnownDivergenceIds?: readonly string[];
+    readonly failedCaseIds?: readonly string[];
+    readonly cases?: readonly ReportCaseRecord[];
+    readonly durationMs?: number;
+}
 export declare function resolveMapEquivalencePaths(mapId: string): {
     workbenchPath: string;
     specPath: string;
     testPath: string;
     reportPath: string;
 };
-export declare function runMapEquivalence(mapId: string, fixturePath: string, options?: any): Promise<{
+export declare function runMapEquivalence(mapId: string, fixturePath: string, options?: MapEquivalenceOptions): Promise<{
     ok: boolean;
     mapId: string;
     reportPath: string;
     fixturePath: string;
     legacyUris: string[];
-    resolutionMode: string;
+    resolutionMode: "canonical" | "legacy";
     warnings: string[];
     acceptedKnownDivergenceIds: string[];
     failedCaseIds: string[];
@@ -33,19 +80,19 @@ export declare function runMapEquivalence(mapId: string, fixturePath: string, op
             edgeCaseCount: number;
         };
         artifacts: {
-            artifactPath: any;
+            artifactPath: string;
             artifactKind: string;
             producedBy: string;
         }[];
         evidence: {
             evidenceKind: string;
             signalScope: string;
-            atomMapId: any;
+            atomMapId: string;
             summary: string;
-            artifactPaths: any[];
+            artifactPaths: string[];
         }[];
         passed: boolean;
-        knownDivergences?: any[] | undefined;
+        knownDivergences?: KnownDivergenceRecord[] | undefined;
         schemaId: string;
         specVersion: string;
         migration: Readonly<{
@@ -54,18 +101,18 @@ export declare function runMapEquivalence(mapId: string, fixturePath: string, op
             notes: "Initial alpha0 map equivalence report.";
         }>;
         reportId: string;
-        generatedAt: any;
-        mapId: any;
-        legacyUris: any[];
+        generatedAt: string;
+        mapId: string;
+        legacyUris: string[];
         fixtures: {
             fixtureId: string;
-            path: any;
+            path: string;
             description: string;
         }[];
-        cases: any[];
+        cases: ReportCaseRecord[];
     };
 }>;
-export declare function createMapEquivalenceReport(input: any): {
+export declare function createMapEquivalenceReport(input: MapEquivalenceReportInput): {
     summary: {
         totalCases: number;
         passedCases: number;
@@ -79,19 +126,19 @@ export declare function createMapEquivalenceReport(input: any): {
         edgeCaseCount: number;
     };
     artifacts: {
-        artifactPath: any;
+        artifactPath: string;
         artifactKind: string;
         producedBy: string;
     }[];
     evidence: {
         evidenceKind: string;
         signalScope: string;
-        atomMapId: any;
+        atomMapId: string;
         summary: string;
-        artifactPaths: any[];
+        artifactPaths: string[];
     }[];
     passed: boolean;
-    knownDivergences?: any[] | undefined;
+    knownDivergences?: KnownDivergenceRecord[] | undefined;
     schemaId: string;
     specVersion: string;
     migration: Readonly<{
@@ -100,13 +147,14 @@ export declare function createMapEquivalenceReport(input: any): {
         notes: "Initial alpha0 map equivalence report.";
     }>;
     reportId: string;
-    generatedAt: any;
-    mapId: any;
-    legacyUris: any[];
+    generatedAt: string;
+    mapId: string;
+    legacyUris: string[];
     fixtures: {
         fixtureId: string;
-        path: any;
+        path: string;
         description: string;
     }[];
-    cases: any[];
+    cases: ReportCaseRecord[];
 };
+export {};

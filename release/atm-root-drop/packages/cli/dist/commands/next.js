@@ -208,16 +208,34 @@ function extractClaimIntentFlag(argv) {
 }
 function withRunnerMode(result, cwd) {
     const runnerMode = describeRunnerMode(cwd);
-    if (result.evidence && typeof result.evidence === 'object') {
-        result.evidence.runnerMode = runnerMode;
-        if (result.evidence.nextAction && typeof result.evidence.nextAction === 'object' && !Array.isArray(result.evidence.nextAction)) {
-            result.evidence.nextAction.runnerMode = runnerMode;
+    const evidenceRecord = result.evidence && typeof result.evidence === 'object'
+        ? result.evidence
+        : null;
+    if (evidenceRecord) {
+        evidenceRecord.runnerMode = runnerMode;
+        const nextActionRecord = evidenceRecord.nextAction && typeof evidenceRecord.nextAction === 'object' && !Array.isArray(evidenceRecord.nextAction)
+            ? evidenceRecord.nextAction
+            : null;
+        if (nextActionRecord) {
+            nextActionRecord.runnerMode = runnerMode;
         }
     }
-    const planningRootWarnings = result.evidence?.importedTaskQueue?.planningRootWarnings;
+    const importedTaskQueue = evidenceRecord?.importedTaskQueue && typeof evidenceRecord.importedTaskQueue === 'object' && !Array.isArray(evidenceRecord.importedTaskQueue)
+        ? evidenceRecord.importedTaskQueue
+        : null;
+    const planningRootWarnings = importedTaskQueue?.planningRootWarnings;
     if (Array.isArray(planningRootWarnings) && Array.isArray(result.messages)) {
         for (const warning of planningRootWarnings) {
-            if (result.messages.some((entry) => entry?.code === warning.code && entry?.data?.siblingRepoDirs?.join(',') === warning.siblingRepoDirs.join(','))) {
+            if (result.messages.some((entry) => {
+                const record = entry && typeof entry === 'object' && !Array.isArray(entry)
+                    ? entry
+                    : null;
+                const data = record?.data && typeof record.data === 'object' && !Array.isArray(record.data)
+                    ? record.data
+                    : null;
+                const siblingRepoDirs = Array.isArray(data?.siblingRepoDirs) ? data.siblingRepoDirs : [];
+                return record?.code === warning.code && siblingRepoDirs.join(',') === warning.siblingRepoDirs.join(',');
+            })) {
                 continue;
             }
             result.messages.unshift(message('warning', warning.code, warning.detail, {
@@ -225,7 +243,12 @@ function withRunnerMode(result, cwd) {
             }));
         }
     }
-    if (Array.isArray(result.messages) && !result.messages.some((entry) => entry?.code === 'ATM_RUNNER_MODE')) {
+    if (Array.isArray(result.messages) && !result.messages.some((entry) => {
+        const record = entry && typeof entry === 'object' && !Array.isArray(entry)
+            ? entry
+            : null;
+        return record?.code === 'ATM_RUNNER_MODE';
+    })) {
         result.messages.push(message('info', 'ATM_RUNNER_MODE', `ATM next is running in ${runnerMode.mode} mode.`, runnerMode));
     }
     return result;
@@ -929,8 +952,9 @@ async function claimNextImportedTask(input) {
         ]);
     claimLatencyPhases.push({ phase: shouldReuseActiveClaim ? 'renew-claim' : 'tasks-claim', durationMs: Date.now() - claimCommandStartedAt });
     if (shouldReuseActiveClaim && claimResult.ok && claimResult.evidence) {
-        claimResult.evidence.reusedActiveClaim = true;
-        claimResult.evidence.claimIntent = activeClaimIntent;
+        const evidence = claimResult.evidence;
+        evidence.reusedActiveClaim = true;
+        evidence.claimIntent = activeClaimIntent;
     }
     const activeQueue = importedTaskQueue.promptScope?.status === 'queue'
         ? promptScopeRuntime?.queue ?? findActiveTaskQueueForIntent(input.cwd, input.taskIntent, { taskId: claimableTask.workItemId }) ?? createOrRefreshTaskQueue({
@@ -3416,8 +3440,8 @@ function buildAgentPackHint(status, command, reason) {
     return {
         slashCommandId: mapStatusToSlashCommandId(status),
         route: status,
-        command,
-        reason
+        command: command ?? '',
+        reason: reason ?? ''
     };
 }
 function buildTaskflowCloseOperatorCommands(taskId, actor) {
@@ -3551,7 +3575,7 @@ function buildChannelPlaybook(input) {
                 `Run: ${defaultClaimCommand}`,
                 'Edit only the allowed files returned by ATM.',
                 'Run the smallest relevant validator for the touched file.',
-                'Commit only the real non-.atm diff and any required git-head evidence.'
+                'Commit only the real non-.atm diff and same-commit governed provenance staged by the ATM git wrapper.'
             ],
             doNot: [
                 'Do not edit .atm/history/**.',
@@ -3934,7 +3958,7 @@ function buildGovernanceReadinessHint(cwd, input) {
             ? ['Stay on the queue head and expect batch checkpoint before commit.']
             : []),
         ...(protectedBranchTarget
-            ? ['Do not wait until push to discover protected-branch evidence or branch-queue blockers; rerun doctor and hook pre-push proactively.']
+            ? ['Do not wait until push to discover branch-queue or closeout-boundary blockers; rerun doctor and hook pre-push proactively.']
             : [])
     ];
     return {
@@ -3947,8 +3971,12 @@ function buildGovernanceReadinessHint(cwd, input) {
         frameworkClaimRequired: Boolean(input.frameworkClaimRequired),
         earlyPreparation,
         queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
+        perCriticalCommitGitHeadEvidence: {
+            enforcement: 'disabled',
+            retainedStrictBoundaries: ['same-commit governed provenance', 'closure packet', 'evidence-only repair', 'task closeout']
+        },
         protectedPushHint: protectedBranchTarget
-            ? 'Protected framework branches enforce commit-range git-head evidence and may serialize final commit mutation through the branch queue.'
+            ? 'Protected framework branches no longer require per-critical-commit git-head evidence; same-commit governed provenance and high-risk closeout evidence remain strict.'
             : null
     };
 }

@@ -7,6 +7,22 @@ import { normalizeSemanticFingerprint } from '../registry/semantic-fingerprint.j
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const require = createRequire(import.meta.url);
 export const defaultAtomicSpecSchemaPath = path.join(repoRoot, 'schemas', 'atomic-spec.schema.json');
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
+function asString(value) {
+    return typeof value === 'string' ? value : null;
+}
+function asStringArray(value) {
+    return Array.isArray(value)
+        ? value.filter((entry) => typeof entry === 'string')
+        : [];
+}
+function asAtomicSpecDocument(value) {
+    return value;
+}
 export function parseAtomicSpecFile(specOption, options = {}) {
     const cwd = path.resolve(options.cwd ?? process.cwd());
     const specPath = path.resolve(cwd, specOption);
@@ -123,14 +139,15 @@ export function parseAtomicSpecDocument(specDocument, options = {}) {
             issues
         });
     }
+    const normalizedSpecDocument = asAtomicSpecDocument(specDocument);
     return {
         ok: true,
         specPath: specPath ? toPortablePath(specPath) : null,
         schemaPath: toPortablePath(schemaPath),
-        normalizedModel: normalizeAtomicSpecModel(specDocument, { specPath, schemaPath }),
+        normalizedModel: normalizeAtomicSpecModel(normalizedSpecDocument, { specPath: specPath ?? undefined, schemaPath }),
         promptReport: {
             code: 'ATM_SPEC_PARSE_OK',
-            summary: `Atomic spec ${specDocument.id} parsed successfully.`,
+            summary: `Atomic spec ${normalizedSpecDocument.id} parsed successfully.`,
             issues: []
         }
     };
@@ -138,6 +155,11 @@ export function parseAtomicSpecDocument(specDocument, options = {}) {
 export function normalizeAtomicSpecModel(specDocument, options = {}) {
     const specPath = options.specPath ? toPortablePath(path.resolve(options.specPath)) : null;
     const schemaPath = toPortablePath(path.resolve(options.schemaPath ?? defaultAtomicSpecSchemaPath));
+    const performanceBudget = specDocument.performanceBudget;
+    const maxDurationMs = performanceBudget?.maxDurationMs;
+    const normalizedMaxDurationMs = typeof maxDurationMs === 'number' && Number.isInteger(maxDurationMs)
+        ? maxDurationMs
+        : null;
     return {
         source: {
             specPath,
@@ -154,7 +176,7 @@ export function normalizeAtomicSpecModel(specDocument, options = {}) {
         },
         identity: {
             atomId: specDocument.id,
-            logicalName: specDocument.logicalName ?? null,
+            logicalName: normalizeOptionalText(specDocument.logicalName) ?? undefined,
             title: specDocument.title,
             description: specDocument.description ?? '',
             tags: normalizeStringList(specDocument.tags ?? [])
@@ -178,9 +200,9 @@ export function normalizeAtomicSpecModel(specDocument, options = {}) {
             compatibility: {
                 coreVersion: specDocument.compatibility.coreVersion,
                 registryVersion: specDocument.compatibility.registryVersion,
-                pluginApiVersion: specDocument.compatibility.pluginApiVersion ?? null,
-                languageAdapter: specDocument.compatibility.languageAdapter ?? null,
-                lifecycleMode: specDocument.compatibility.lifecycleMode ?? null
+                pluginApiVersion: normalizeOptionalText(specDocument.compatibility.pluginApiVersion) ?? '',
+                languageAdapter: normalizeOptionalText(specDocument.compatibility.languageAdapter) ?? '',
+                lifecycleMode: normalizeOptionalText(specDocument.compatibility.lifecycleMode) ?? ''
             },
             dependencyPolicy: {
                 external: specDocument.dependencyPolicy?.external ?? 'none',
@@ -191,11 +213,9 @@ export function normalizeAtomicSpecModel(specDocument, options = {}) {
                 evidenceRequired: specDocument.validation?.evidenceRequired === true
             },
             performanceBudget: {
-                hotPath: specDocument.performanceBudget?.hotPath === true,
-                inputMutation: specDocument.performanceBudget?.inputMutation ?? 'forbidden',
-                maxDurationMs: Number.isInteger(specDocument.performanceBudget?.maxDurationMs)
-                    ? specDocument.performanceBudget.maxDurationMs
-                    : null
+                hotPath: performanceBudget?.hotPath === true,
+                inputMutation: performanceBudget?.inputMutation ?? 'forbidden',
+                maxDurationMs: normalizedMaxDurationMs
             }
         },
         governance: {
@@ -245,35 +265,34 @@ function normalizePorts(ports) {
     }));
 }
 function normalizeLineage(lineage) {
-    if (!lineage || typeof lineage !== 'object' || Array.isArray(lineage)) {
+    const record = asRecord(lineage);
+    if (!record) {
         return null;
     }
-    const parentRefs = Array.isArray(lineage.parentRefs)
-        ? normalizeStringList(lineage.parentRefs)
+    const parentRefs = Array.isArray(record.parentRefs)
+        ? normalizeStringList(record.parentRefs)
         : [];
     return {
-        bornBy: normalizeOptionalText(lineage.bornBy),
+        bornBy: normalizeOptionalText(record.bornBy) ?? undefined,
         parentRefs,
-        bornAt: normalizeOptionalText(lineage.bornAt)
+        bornAt: normalizeOptionalText(record.bornAt) ?? undefined
     };
 }
 function normalizeTtl(ttl) {
-    if (!ttl || typeof ttl !== 'object' || Array.isArray(ttl)) {
+    const record = asRecord(ttl);
+    if (!record) {
         return null;
     }
     return {
-        expiresAt: normalizeOptionalText(ttl.expiresAt)
+        expiresAt: normalizeOptionalText(record.expiresAt)
     };
 }
 function normalizeOptionalText(value) {
-    if (typeof value !== 'string') {
-        return null;
-    }
-    const text = value.trim();
+    const text = asString(value)?.trim() ?? '';
     return text.length > 0 ? text : null;
 }
 function normalizeStringList(values) {
-    return [...new Set(values)].sort();
+    return [...new Set(asStringArray(values))].sort();
 }
 function createFailure({ code, specPath, schemaPath, summary, issues }) {
     return {
@@ -284,14 +303,17 @@ function createFailure({ code, specPath, schemaPath, summary, issues }) {
         promptReport: {
             code,
             summary,
-            issues
+            issues: [...issues]
         }
     };
 }
 function translateAjvIssue(error) {
-    const instancePath = error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
-    if (error.keyword === 'required') {
-        const missingProperty = error.params?.missingProperty;
+    const issue = asRecord(error);
+    const instancePathValue = asString(issue?.instancePath);
+    const instancePath = instancePathValue && instancePathValue.length > 0 ? instancePathValue : '/';
+    const params = asRecord(issue?.params);
+    if (issue?.keyword === 'required') {
+        const missingProperty = asString(params?.missingProperty) ?? '[unknown]';
         const missingPath = instancePath === '/'
             ? `/${missingProperty}`
             : `${instancePath}/${missingProperty}`;
@@ -303,17 +325,20 @@ function translateAjvIssue(error) {
             prompt: `Add required field "${missingProperty}" at "${instancePath}".`
         };
     }
-    if (error.keyword === 'const') {
+    if (issue?.keyword === 'const') {
+        const allowedValue = String(params?.allowedValue ?? '[unknown]');
         return {
             code: 'ATM_SPEC_CONST_MISMATCH',
             keyword: 'const',
             path: instancePath,
-            text: `${instancePath} must be ${error.params?.allowedValue}.`,
-            prompt: `Set "${instancePath}" to "${error.params?.allowedValue}".`
+            text: `${instancePath} must be ${allowedValue}.`,
+            prompt: `Set "${instancePath}" to "${allowedValue}".`
         };
     }
-    if (error.keyword === 'enum') {
-        const allowedValues = (error.params?.allowedValues || []).join(', ');
+    if (issue?.keyword === 'enum') {
+        const allowedValues = Array.isArray(params?.allowedValues)
+            ? params.allowedValues.map((value) => String(value)).join(', ')
+            : '';
         return {
             code: 'ATM_SPEC_ENUM_MISMATCH',
             keyword: 'enum',
@@ -322,7 +347,7 @@ function translateAjvIssue(error) {
             prompt: `Change "${instancePath}" to one of: ${allowedValues}.`
         };
     }
-    if (error.keyword === 'pattern') {
+    if (issue?.keyword === 'pattern') {
         return {
             code: patternCodeFor(instancePath),
             keyword: 'pattern',
@@ -331,17 +356,18 @@ function translateAjvIssue(error) {
             prompt: `Rewrite "${instancePath}" so it matches the required pattern.`
         };
     }
-    if (error.keyword === 'type') {
+    if (issue?.keyword === 'type') {
+        const typeName = String(params?.type ?? '[unknown]');
         return {
             code: 'ATM_SPEC_TYPE_MISMATCH',
             keyword: 'type',
             path: instancePath,
-            text: `${instancePath} must be of type ${error.params?.type}.`,
-            prompt: `Change "${instancePath}" to type ${error.params?.type}.`
+            text: `${instancePath} must be of type ${typeName}.`,
+            prompt: `Change "${instancePath}" to type ${typeName}.`
         };
     }
-    if (error.keyword === 'additionalProperties') {
-        const additionalProperty = error.params?.additionalProperty;
+    if (issue?.keyword === 'additionalProperties') {
+        const additionalProperty = asString(params?.additionalProperty) ?? '[unknown]';
         const additionalPath = instancePath === '/'
             ? `/${additionalProperty}`
             : `${instancePath}/${additionalProperty}`;
@@ -355,10 +381,10 @@ function translateAjvIssue(error) {
     }
     return {
         code: 'ATM_SPEC_SCHEMA_ERROR',
-        keyword: error.keyword,
+        keyword: asString(issue?.keyword) ?? 'schema',
         path: instancePath,
-        text: `${instancePath} ${error.message}.`,
-        prompt: `Fix the schema error at "${instancePath}": ${error.message}.`
+        text: `${instancePath} ${asString(issue?.message) ?? 'schema validation failed'}.`,
+        prompt: `Fix the schema error at "${instancePath}": ${asString(issue?.message) ?? 'schema validation failed'}.`
     };
 }
 function patternCodeFor(instancePath) {

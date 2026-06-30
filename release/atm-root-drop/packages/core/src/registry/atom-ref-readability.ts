@@ -47,6 +47,53 @@ interface AtomCatalogEntry {
   readonly entrypoints: readonly string[];
 }
 
+interface RegistryLocationRecord {
+  readonly codePaths?: unknown;
+  readonly specPath?: unknown;
+  readonly reportPath?: unknown;
+}
+
+interface RegistrySelfVerificationRecord {
+  readonly sourcePaths?: {
+    readonly code?: unknown;
+  };
+}
+
+interface RegistryEntryRecord {
+  readonly atomId?: unknown;
+  readonly mapId?: unknown;
+  readonly logicalName?: unknown;
+  readonly purpose?: unknown;
+  readonly location?: RegistryLocationRecord;
+  readonly selfVerification?: RegistrySelfVerificationRecord;
+}
+
+interface RegistryDocumentRecord {
+  readonly entries?: unknown;
+}
+
+interface MapSpecMemberRecord {
+  readonly atomId?: unknown;
+}
+
+interface MapSpecQualityTargetsRecord {
+  readonly pilotName?: unknown;
+  readonly equivalenceFixtures?: unknown;
+}
+
+interface MapSpecReplacementRecord {
+  readonly legacyUris?: unknown;
+}
+
+interface MapSpecRecord {
+  readonly description?: unknown;
+  readonly logicalName?: unknown;
+  readonly members?: unknown;
+  readonly entrypoints?: unknown;
+  readonly qualityTargets?: MapSpecQualityTargetsRecord;
+  readonly replacement?: MapSpecReplacementRecord;
+}
+
 interface AtomCallsite {
   readonly file: string;
   readonly line: number;
@@ -62,6 +109,12 @@ export interface AtomCallsiteViolation extends AtomCallsite {
 export interface AtomCallsiteRewrite extends AtomCallsite {
   readonly from: string;
   readonly to: string;
+}
+
+function asRecord<T extends object>(value: unknown): T | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as T
+    : null;
 }
 
 const atomIdPattern = /^ATM-[A-Z0-9]+-\d{4}$/;
@@ -128,7 +181,7 @@ function inspectRepo(repoPath: string, apply: boolean, generatedAt: string, opti
     };
   }
 
-  const registry = readJson(registryPath);
+  const registry = asRecord<RegistryDocumentRecord>(readJson(registryPath));
   const catalog = buildCatalog(repoPath, registry);
   const callsites = scanCallsites(repoPath);
   const generatedRefNames = new Set(catalog.map((entry) => entry.refName));
@@ -152,7 +205,11 @@ function inspectRepo(repoPath: string, apply: boolean, generatedAt: string, opti
 
   const atomCount = catalog.filter((entry) => entry.kind === 'atom' && atomIdPattern.test(entry.id)).length;
   const mapCount = catalog.filter((entry) => entry.kind === 'map').length;
-  const registryAtomIds = new Set((registry.entries ?? []).map((entry: any) => String(entry.atomId ?? '')).filter(Boolean));
+  const registryAtomIds = new Set(
+    (Array.isArray(registry?.entries) ? registry.entries : [])
+      .map((entry) => String(asRecord<RegistryEntryRecord>(entry)?.atomId ?? ''))
+      .filter(Boolean)
+  );
   const memberAtomCount = catalog.filter((entry) => entry.kind === 'atom' && !registryAtomIds.has(entry.id)).length;
 
   return {
@@ -172,29 +229,34 @@ function inspectRepo(repoPath: string, apply: boolean, generatedAt: string, opti
   };
 }
 
-function buildCatalog(repoPath: string, registry: any): AtomCatalogEntry[] {
+function buildCatalog(repoPath: string, registry: unknown): AtomCatalogEntry[] {
   const entries: AtomCatalogEntry[] = [];
   const registryAtomIds = new Set<string>();
-  for (const entry of registry.entries ?? []) {
-    const atomId = typeof entry.atomId === 'string' ? entry.atomId : null;
+  const registryRecord = asRecord<RegistryDocumentRecord>(registry);
+  const registryEntries = Array.isArray(registryRecord?.entries)
+    ? registryRecord.entries
+    : [];
+  for (const rawEntry of registryEntries) {
+    const entry = asRecord<RegistryEntryRecord>(rawEntry);
+    const atomId = typeof entry?.atomId === 'string' ? entry.atomId : null;
     if (atomId) {
       registryAtomIds.add(atomId);
       entries.push({
         kind: 'atom',
         id: atomId,
-        refName: ensureUniqueRefName(curatedRefName(repoPath, atomId, 'atom') ?? deriveRefName(entry.logicalName ?? entry.purpose ?? atomId, 'atom'), entries),
-        logicalName: normalizeLogicalName(entry.logicalName, atomId, 'atom'),
-        purpose: normalizePurpose(entry.purpose, atomId, entry.location?.codePaths, 'atom'),
-        sourcePaths: normalizeSourcePaths(entry.location?.codePaths ?? entry.selfVerification?.sourcePaths?.code ?? []),
+        refName: ensureUniqueRefName(curatedRefName(repoPath, atomId, 'atom') ?? deriveRefName(String(entry?.logicalName ?? entry?.purpose ?? atomId), 'atom'), entries),
+        logicalName: normalizeLogicalName(entry?.logicalName, atomId, 'atom'),
+        purpose: normalizePurpose(entry?.purpose, atomId, entry?.location?.codePaths, 'atom'),
+        sourcePaths: normalizeSourcePaths(entry?.location?.codePaths ?? entry?.selfVerification?.sourcePaths?.code ?? []),
         members: [],
         entrypoints: []
       });
       continue;
     }
 
-    const mapId = typeof entry.mapId === 'string' ? entry.mapId : null;
+    const mapId = typeof entry?.mapId === 'string' ? entry.mapId : null;
     if (mapId) {
-      const mapSpec = readMapSpec(repoPath, mapId, entry.location?.specPath);
+      const mapSpec = readMapSpec(repoPath, mapId, entry?.location?.specPath);
       entries.push(mapCatalogEntry(repoPath, mapId, entry, mapSpec, entries));
     }
   }
@@ -223,12 +285,18 @@ function buildCatalog(repoPath: string, registry: any): AtomCatalogEntry[] {
   return entries.sort((left, right) => `${left.kind}:${left.id}`.localeCompare(`${right.kind}:${right.id}`));
 }
 
-function mapCatalogEntry(repoPath: string, mapId: string, entry: any, mapSpec: any, existing: readonly AtomCatalogEntry[]): AtomCatalogEntry {
+function mapCatalogEntry(
+  repoPath: string,
+  mapId: string,
+  entry: RegistryEntryRecord | null,
+  mapSpec: MapSpecRecord,
+  existing: readonly AtomCatalogEntry[]
+): AtomCatalogEntry {
   const logicalName = normalizeLogicalName(selectMapSemanticHint(entry, mapSpec), mapId, 'map');
   const sourcePaths = normalizeSourcePaths([
-    entry.location?.specPath,
+    entry?.location?.specPath,
     `atomic_workbench/maps/${mapId}/map.spec.json`,
-    entry.location?.reportPath,
+    entry?.location?.reportPath,
     `atomic_workbench/maps/${mapId}/map.test.report.json`
   ]);
   return {
@@ -236,14 +304,18 @@ function mapCatalogEntry(repoPath: string, mapId: string, entry: any, mapSpec: a
     id: mapId,
     refName: ensureUniqueRefName(curatedRefName(repoPath, mapId, 'map') ?? deriveRefName(logicalName, 'map'), existing),
     logicalName,
-    purpose: normalizePurpose(entry.purpose ?? mapSpec.description ?? mapSpec.qualityTargets?.pilotName, mapId, sourcePaths, 'map'),
+    purpose: normalizePurpose(entry?.purpose ?? mapSpec.description ?? mapSpec.qualityTargets?.pilotName, mapId, sourcePaths, 'map'),
     sourcePaths,
-    members: normalizeStringArray(mapSpec.members?.map((member: any) => member.atomId)),
+    members: normalizeStringArray(
+      Array.isArray(mapSpec.members)
+        ? mapSpec.members.map((member) => asRecord<MapSpecMemberRecord>(member)?.atomId)
+        : []
+    ),
     entrypoints: normalizeStringArray(mapSpec.entrypoints)
   };
 }
 
-function readMapSpec(repoPath: string, mapId: string, configuredPath: unknown): any {
+function readMapSpec(repoPath: string, mapId: string, configuredPath: unknown): MapSpecRecord {
   const candidates = [
     typeof configuredPath === 'string' ? configuredPath : '',
     `atomic_workbench/maps/${mapId}/map.spec.json`
@@ -251,7 +323,7 @@ function readMapSpec(repoPath: string, mapId: string, configuredPath: unknown): 
   for (const candidate of candidates) {
     const absolutePath = path.resolve(repoPath, candidate);
     if (existsSync(absolutePath)) {
-      return readJson(absolutePath);
+      return asRecord<MapSpecRecord>(readJson(absolutePath)) ?? {};
     }
   }
   return {};
@@ -612,12 +684,14 @@ function readableRefOverrides(repoPath: string): Record<string, string> {
   }
 }
 
-function selectMapSemanticHint(entry: any, mapSpec: any): unknown {
-  return entry.logicalName
-    ?? mapSpec.logicalName
-    ?? mapSpec.qualityTargets?.pilotName
-    ?? mapSpec.qualityTargets?.equivalenceFixtures
-    ?? mapSpec.replacement?.legacyUris?.[0];
+function selectMapSemanticHint(entry: unknown, mapSpec: unknown): unknown {
+  const entryRecord = asRecord<RegistryEntryRecord>(entry);
+  const mapSpecRecord = asRecord<MapSpecRecord>(mapSpec);
+  return entryRecord?.logicalName
+    ?? mapSpecRecord?.logicalName
+    ?? mapSpecRecord?.qualityTargets?.pilotName
+    ?? mapSpecRecord?.qualityTargets?.equivalenceFixtures
+    ?? (Array.isArray(mapSpecRecord?.replacement?.legacyUris) ? mapSpecRecord.replacement.legacyUris[0] : undefined);
 }
 
 function deriveRefName(value: string, kind: 'atom' | 'map'): string {
@@ -708,7 +782,7 @@ function lineNumberAt(text: string, offset: number): number {
   return line;
 }
 
-function readJson(filePath: string): any {
+function readJson(filePath: string): unknown {
   return JSON.parse(readFileSync(filePath, 'utf8'));
 }
 

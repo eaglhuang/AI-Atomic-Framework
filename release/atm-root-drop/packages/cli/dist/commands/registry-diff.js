@@ -69,7 +69,7 @@ export function runRegistryDiff(args) {
             ok: false,
             command: 'registry-diff',
             cwd,
-            messages: [message('error', 'ATM_DIFF_REGISTRY_NOT_FOUND', error.message)],
+            messages: [message('error', 'ATM_DIFF_REGISTRY_NOT_FOUND', error instanceof Error ? error.message : String(error))],
             evidence: {}
         });
     }
@@ -99,10 +99,13 @@ export function runRegistryDiff(args) {
     let report;
     try {
         report = computeHashDiffReport({
-            entry,
+            entry: {
+                ...entry,
+                versions: [...entry.versions]
+            },
             fromVersion: parsed.fromVersion,
             toVersion: parsed.toVersion,
-            driftReason: parsed.driftReason
+            driftReason: parsed.driftReason ?? undefined
         });
     }
     catch (error) {
@@ -110,7 +113,7 @@ export function runRegistryDiff(args) {
             ok: false,
             command: 'registry-diff',
             cwd,
-            messages: [message('error', 'ATM_DIFF_COMPUTE_FAILED', error.message)],
+            messages: [message('error', 'ATM_DIFF_COMPUTE_FAILED', error instanceof Error ? error.message : String(error))],
             evidence: {
                 atomId: parsed.atomId,
                 fromVersion: parsed.fromVersion,

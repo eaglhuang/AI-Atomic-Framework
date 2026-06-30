@@ -1,24 +1,49 @@
-export declare function normalizeValidationPassOutcome(rawOutcome: any, pass: any): {
+interface ValidationPassPlanRecord {
+    passId: string;
+    fixtureSet: string;
+    label: string;
     reportPath: string;
-    reportDocument: any;
+}
+interface ValidationResultRecord {
+    commandId: string;
+    command: string;
+    exitCode: number;
+    ok: boolean;
+    stdout: string;
+    stderr: string;
+    durationMs: number;
+    signal: string | null;
+}
+interface RawValidationOutcome {
+    ok?: boolean;
+    exitCode?: number;
+    summary?: string;
+    reportPath?: string;
+    reportDocument?: unknown;
+    results?: unknown[];
+}
+interface ValidationPassContext {
+    repositoryRoot: string;
+    validationCommands: string[];
+    pass: ValidationPassPlanRecord;
+}
+export declare function normalizeValidationPassOutcome(rawOutcome: RawValidationOutcome | unknown, pass: ValidationPassPlanRecord): {
+    reportPath: string;
+    reportDocument: unknown;
     record: {
-        passId: any;
-        fixtureSet: any;
+        passId: string;
+        fixtureSet: string;
         ok: boolean;
-        exitCode: any;
+        exitCode: number;
         reportPath: string;
         summary: string;
     };
 };
-export declare function createValidationPassPlan(lifecycleMode: any, reportsDirPath: any): {
-    passId: any;
-    fixtureSet: any;
-    label: any;
-    reportPath: string;
-}[];
-export declare function defaultRunValidationPass(context: any): {
-    ok: any;
-    exitCode: any;
+export declare function createValidationPassPlan(lifecycleMode: string, reportsDirPath: string): ValidationPassPlanRecord[];
+export declare function defaultRunValidationPass(context: ValidationPassContext): {
+    ok: boolean;
+    exitCode: number;
     summary: string;
-    results: any;
+    results: ValidationResultRecord[];
 };
+export {};

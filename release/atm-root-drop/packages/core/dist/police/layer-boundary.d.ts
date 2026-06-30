@@ -1,9 +1,19 @@
-export declare function validateLayerBoundary(importGraph: any[] | undefined, policyDocument: any, options?: any): {
-    checkId: any;
+interface LayerBoundaryOptions {
+    readonly checkId?: string;
+    readonly description?: string;
+}
+export declare function validateLayerBoundary(importGraph: unknown[] | undefined, policyDocument: unknown, options?: LayerBoundaryOptions): {
+    checkId: string;
     kind: string;
     required: boolean;
-    description: any;
+    description: string;
     ok: boolean;
-    violations: any[];
+    violations: {
+        code: string;
+        severity: string;
+        message: string;
+        path: string;
+    }[];
 };
-export declare function classifyImportLayer(source: any): "effect" | "core" | "adapter" | "external" | "plugin" | "relative" | "compute";
+export declare function classifyImportLayer(source: unknown): "effect" | "core" | "adapter" | "external" | "plugin" | "relative" | "compute";
+export {};

@@ -60,7 +60,7 @@ export interface CorePoliceFacadeInput {
 export interface DedupPoliceInput {
     readonly registryDocument?: unknown;
     readonly registryIndex?: ReturnType<typeof createRegistryIndex>;
-    readonly qualityComparisonReport?: any;
+    readonly qualityComparisonReport?: Record<string, unknown>;
     readonly polymorphContext?: {
         readonly groupId?: string;
         readonly instanceAtomIds?: readonly string[];
@@ -72,17 +72,17 @@ export interface DemandPoliceInput {
     readonly demandThreshold?: number;
 }
 export interface QualityPoliceInput {
-    readonly qualityComparisonReport?: any;
-    readonly qualityComparisonInput?: any;
+    readonly qualityComparisonReport?: Record<string, unknown>;
+    readonly qualityComparisonInput?: Record<string, unknown>;
 }
 export interface MapIntegrationPoliceInput {
     readonly curatorReport?: AtomMapCuratorReport;
     readonly curatorInput?: AtomMapCuratorInput;
-    readonly qualityComparisonReport?: any;
+    readonly qualityComparisonReport?: Record<string, unknown>;
 }
 export interface AtomizationPoliceInput {
     readonly legacyRoutePlan?: LegacyRoutePlan;
-    readonly dryRunResult?: any;
+    readonly dryRunResult?: Record<string, unknown>;
 }
 export interface DecompositionPoliceInput {
     readonly inventory?: SourceInventoryReport;
@@ -303,8 +303,8 @@ export declare const DEFAULT_POLICE_DAILY_CAP = 50;
 export declare function buildEvolutionSuppressionKey(entry: EvolutionEvidencePatternEntry): string;
 export declare function buildDecompositionSuppressionKey(entry: SourceInventoryEntry): string;
 export declare function buildCorePoliceFamilies(input: {
-    readonly policeReport?: any;
-    readonly lifecycleReport?: any;
+    readonly policeReport?: Record<string, unknown>;
+    readonly lifecycleReport?: Record<string, unknown>;
 }): PoliceFamilyReport[];
 export declare function makeEvidenceRef(refId: string, refKind: EvidenceRef['refKind'], evidenceType?: EvidenceRef['evidenceType']): EvidenceRef;
 export declare function makePoliceFinding(input: Omit<PoliceFinding, 'mode'> & Partial<Pick<PoliceFinding, 'mode'>>): PoliceFinding;

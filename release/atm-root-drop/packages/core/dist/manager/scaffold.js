@@ -7,6 +7,9 @@ export const defaultAtomSpecTemplatePath = path.join(repoRoot, 'templates', 'ato
 export const defaultAtomTestTemplatePath = path.join(repoRoot, 'templates', 'atom.test.template.ts');
 export { defaultAtomWorkbenchRoot, defaultAtomSpecFileName, defaultAtomTestFileName, resolveAtomWorkbenchPath };
 export function scaffoldAtomWorkbench(normalizedModel, options = {}) {
+    if (!normalizedModel) {
+        throw new Error('Normalized model is required.');
+    }
     const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
     const atomSpace = createAtomSpaceLayout(normalizedModel, {
         repositoryRoot,
@@ -126,7 +129,7 @@ function createTemplateMap(normalizedModel, options) {
 }
 function renderTemplate(templatePath, values) {
     const template = stripTemplateHeader(readFileSync(templatePath, 'utf8'));
-    return `${template.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (match, key) => {
+    return `${template.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (_match, key) => {
         if (!Object.hasOwn(values, key)) {
             throw new Error(`Unknown scaffold template token: ${key}`);
         }

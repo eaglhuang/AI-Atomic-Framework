@@ -3,6 +3,11 @@ import path from 'node:path';
 import { loadCapsuleRegistry, getRepoRegistryPath } from '../registry/capsule-registry.js';
 import { loadMapRegistry } from '../registry/map-capsule-registry.js';
 import { verifyPayloadHash } from '../registry/atom-capsule.js';
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function runRescuePolice(repositoryRoot) {
     const findings = [];
     findings.push(checkRegistrySourceFiles(repositoryRoot)); // INV-RESCUE-001
@@ -41,7 +46,11 @@ function checkRegistrySourceFiles(repositoryRoot) {
         const missing = [];
         for (const [atomId, entry] of Object.entries(entries)) {
             const e = entry;
-            const codePaths = e.selfVerification?.sourcePaths?.code ?? [];
+            const selfVerification = asRecord(e.selfVerification);
+            const sourcePaths = asRecord(selfVerification?.sourcePaths);
+            const codePaths = Array.isArray(sourcePaths?.code)
+                ? sourcePaths.code.filter((value) => typeof value === 'string')
+                : [];
             for (const codePath of codePaths) {
                 const fullPath = path.resolve(repositoryRoot, codePath);
                 if (!existsSync(fullPath)) {

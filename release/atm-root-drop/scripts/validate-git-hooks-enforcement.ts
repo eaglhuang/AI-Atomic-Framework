@@ -262,15 +262,19 @@ try {
 
   const bypassDoctor = runCli(repo, ['doctor', '--json'], { allowFailure: true });
   const bypassDoctorPayload = parsePayload(bypassDoctor);
-  assert(bypassDoctor.status === 1, 'doctor must fail after bypass commit');
-  assert(bypassDoctorPayload.ok === false, 'doctor must report ok=false after bypass commit');
-  assert(bypassDoctorPayload.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_MISSING'), 'doctor must emit ATM_DOCTOR_GIT_EVIDENCE_MISSING after bypass commit');
+  assert(bypassDoctor.status === 0, 'doctor must stay green after a critical bypass commit with only historical git-head evidence gaps');
+  assert(bypassDoctorPayload.ok === true, 'doctor must report ok=true when only per-critical historical git-head evidence is missing');
+  assert(bypassDoctorPayload.messages.some((entry: any) => entry.code === 'ATM_DOCTOR_GIT_EVIDENCE_WARNING'), 'doctor must downgrade missing latest git-head evidence to a warning');
   assert(bypassDoctorPayload.evidence?.checks?.some((entry: any) => entry.name === 'governance-entry-readiness'), 'doctor must keep governance-entry-readiness visible after bypass commit');
+  const bypassReadiness = bypassDoctorPayload.evidence?.checks?.find((entry: any) => entry.name === 'governance-entry-readiness');
+  assert(bypassReadiness?.ok === true, 'governance-entry-readiness must not fail on historical per-critical git-head evidence gaps');
+  assert(bypassReadiness?.details?.perCriticalCommitGitHeadEvidence?.enforcement === 'disabled', 'governance-entry-readiness must advertise disabled per-critical git-head enforcement');
 
   const commitRange = runCli(repo, ['guard', 'commit-range', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
   const commitRangePayload = parsePayload(commitRange);
-  assert(commitRange.status === 1, 'commit-range guard must fail for critical bypass commit');
-  assert(commitRangePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_FAILED'), 'commit-range guard must emit ATM_GUARD_COMMIT_RANGE_FAILED');
+  assert(commitRange.status === 0, 'commit-range guard must not fail solely because a historical critical commit lacks git-head evidence');
+  assert(commitRangePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_OK'), 'commit-range guard must stay green when only historical git-head evidence is missing');
+  assert((commitRangePayload.evidence?.report?.evidenceMissingDiagnostic?.count ?? 0) >= 1, 'commit-range guard must still report missing git-head evidence as diagnostic metadata');
 
   const backfillResult = runCli(repo, ['evidence', 'git-head-backfill', '--actor', 'hook-validator', '--reason', 'pre-push worktree evidence regression', '--json']);
   const backfillPayload = parsePayload(backfillResult);
@@ -424,8 +428,9 @@ try {
   runGit(legacyBaselineRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'post-baseline bypass without evidence']);
   const postBaselineRange = runCli(legacyBaselineRepo, ['guard', 'commit-range', '--base', legacyInitialSha, '--head', 'HEAD', '--json'], { allowFailure: true });
   const postBaselinePayload = parsePayload(postBaselineRange);
-  assert(postBaselineRange.status === 1, 'commit-range guard must still fail for critical commits that happen after the framework baseline cut');
-  assert(postBaselinePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_FAILED'), 'post-baseline bypass must still emit ATM_GUARD_COMMIT_RANGE_FAILED');
+  assert(postBaselineRange.status === 0, 'commit-range guard must not fail for post-baseline critical commits that only lack historical git-head evidence');
+  assert(postBaselinePayload.messages.some((entry: any) => entry.code === 'ATM_GUARD_COMMIT_RANGE_OK'), 'post-baseline bypass must now stay green at the guard surface');
+  assert((postBaselinePayload.evidence?.report?.evidenceMissingDiagnostic?.count ?? 0) >= 1, 'post-baseline bypass must still expose missing git-head evidence as diagnostic metadata');
 
   const warnOnlyRepo = path.join(tempRoot, 'warn-only-feature-branch');
   mkdirSync(warnOnlyRepo, { recursive: true });
@@ -444,8 +449,9 @@ try {
   runGit(warnOnlyRepo, ['-c', `core.hooksPath=${noHooksDir}`, 'commit', '-m', 'feature bypass without evidence']);
   const warnOnlyHook = runCli(warnOnlyRepo, ['hook', 'pre-push', '--base', 'HEAD~1', '--head', 'HEAD', '--json'], { allowFailure: true });
   const warnOnlyPayload = parsePayload(warnOnlyHook);
-  assert(warnOnlyHook.status === 0, 'pre-push hook must downgrade framework findings to warnings on non-protected feature branches');
-  assert(warnOnlyPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_WARN_ONLY_NON_PROTECTED'), 'pre-push hook must emit warn-only code for non-protected branches');
+  assert(warnOnlyHook.status === 0, 'pre-push hook must stay green on non-protected feature branches when the only gap is historical git-head evidence');
+  assert(warnOnlyPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_OK'), 'pre-push hook must report ok for non-protected branches when findings are diagnostic only');
+  assert(warnOnlyPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC'), 'non-protected feature branch push must still surface historical git-head evidence diagnostics');
 
   const protectedLocalToFeatureRemoteRepo = path.join(tempRoot, 'protected-local-to-feature-remote');
   mkdirSync(protectedLocalToFeatureRemoteRepo, { recursive: true });
@@ -471,7 +477,8 @@ try {
   );
   const protectedLocalFeaturePushPayload = parsePayload(protectedLocalFeaturePush);
   assert(protectedLocalFeaturePush.status === 0, 'pre-push hook must not hard-block a protected local branch when the actual remote target is a non-protected branch');
-  assert(protectedLocalFeaturePushPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_WARN_ONLY_NON_PROTECTED'), 'protected local to feature remote push must be warn-only');
+  assert(protectedLocalFeaturePushPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_OK'), 'protected local to feature remote push must stay green when historical git-head gaps are diagnostic only');
+  assert(protectedLocalFeaturePushPayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC'), 'protected local to feature remote push must still surface historical git-head diagnostics');
   assert((protectedLocalFeaturePushPayload.evidence?.enforcement?.hardProtectedBranchTargets ?? []).length === 0, 'pre-push enforcement must derive protected targets from remote push refs before falling back to current branch');
 
   const safeModeRepo = path.join(tempRoot, 'safe-mode-protected-branch');
@@ -501,9 +508,10 @@ try {
     }
   );
   const safeModePayload = parsePayload(safeModeHook);
-  assert(safeModeHook.status === 0, 'pre-push hook safe mode must allow protected-branch bypasses when maintainer metadata is present');
-  assert(safeModePayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_SAFE_MODE_BYPASS'), 'safe mode must emit a dedicated bypass warning code');
-  assert(typeof safeModePayload.evidence?.enforcement?.safeModeReportPath === 'string' && safeModePayload.evidence.enforcement.safeModeReportPath.length > 0, 'safe mode must record a traceable local report path');
+  assert(safeModeHook.status === 0, 'pre-push hook must stay green on protected branches when the only gap is historical git-head evidence, even if safe mode metadata is present');
+  assert(safeModePayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_OK'), 'protected branch historical git-head gaps must no longer require a safe-mode bypass');
+  assert(safeModePayload.messages.some((entry: any) => entry.code === 'ATM_HOOK_PRE_PUSH_GIT_HEAD_EVIDENCE_MISSING_DIAGNOSTIC'), 'protected branch historical git-head gaps must still surface diagnostics');
+  assert(safeModePayload.evidence?.enforcement?.safeModeActive === false, 'safe mode must remain inactive when no blocking findings exist');
 
   const closureRepo = path.join(tempRoot, 'closure-cross-check');
   mkdirSync(closureRepo, { recursive: true });
@@ -539,8 +547,8 @@ try {
   const reconcileIdentity = parsePayload(runCli(closureRepo, ['identity', 'set', '--cwd', closureRepo, '--actor', 'fixture-agent', '--git-name', 'Fixture Agent', '--git-email', 'fixture-agent@example.com', '--json']));
   assert(reconcileIdentity.ok === true, 'reconcile close-commit-window hook fixture identity must be configurable');
   const reconcileHookTaskId = 'TASK-X-RECONCILE';
-  assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile hook close window regression', '--json'])).ok === true, 'reconcile hook reserve must report ok=true');
-  assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--json'])).ok === true, 'reconcile hook promote must report ok=true');
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile hook close window regression', '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, 'reconcile hook reserve must report ok=true');
+  assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, 'reconcile hook promote must report ok=true');
   writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'reconcile-close-window.ts'), 'export const reconcileCloseWindow = true;\n', 'utf8');
   assert(parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--files', 'packages/core/src/reconcile-close-window.ts', '--json'])).ok === true, 'reconcile hook claim must report ok=true');
   runGit(closureRepo, ['add', 'packages/core/src/reconcile-close-window.ts']);
@@ -602,8 +610,8 @@ try {
   const sameFileTaskA = 'TASK-X-SAME-A';
   const sameFileTaskB = 'TASK-X-SAME-B';
   for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
-    assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--title', `Same-file claim fixture ${sameFileTaskId}`, '--json'])).ok === true, `${sameFileTaskId} reserve must report ok=true`);
-    assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--json'])).ok === true, `${sameFileTaskId} promote must report ok=true`);
+    assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--title', `Same-file claim fixture ${sameFileTaskId}`, '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, `${sameFileTaskId} reserve must report ok=true`);
+    assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, `${sameFileTaskId} promote must report ok=true`);
   }
   writeFileSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), '# shared fixture\n', 'utf8');
   writeFileSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), '# a only fixture\n', 'utf8');

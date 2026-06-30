@@ -1,287 +1,191 @@
 export declare const defaultAtomicSpecSchemaPath: string;
-export declare function parseAtomicSpecFile(specOption: any, options?: any): {
-    ok: boolean;
-    specPath: any;
-    schemaPath: any;
-    normalizedModel: null;
-    promptReport: {
-        code: any;
-        summary: any;
-        issues: any;
+interface ParseAtomicSpecOptions {
+    readonly cwd?: string;
+    readonly specPath?: string;
+    readonly schemaPath?: string;
+}
+interface PromptIssue {
+    readonly code: string;
+    readonly keyword: string;
+    readonly path: string;
+    readonly text: string;
+    readonly prompt: string;
+}
+interface ParsePromptReport {
+    readonly code: string;
+    readonly summary: string;
+    readonly issues: PromptIssue[];
+}
+interface ParseAtomicSpecSuccess {
+    readonly ok: true;
+    readonly specPath: string | null;
+    readonly schemaPath: string;
+    readonly normalizedModel: NormalizedAtomicSpecModel;
+    readonly promptReport: ParsePromptReport;
+}
+interface ParseAtomicSpecFailure {
+    readonly ok: false;
+    readonly specPath: string | null;
+    readonly schemaPath: string | null;
+    readonly normalizedModel: null;
+    readonly promptReport: ParsePromptReport;
+}
+interface AtomicSpecPortRecord {
+    readonly name: string;
+    readonly kind: string;
+    readonly required: boolean;
+}
+interface AtomicSpecDocument {
+    readonly id: string;
+    readonly schemaId: string;
+    readonly specVersion: string;
+    readonly title: string;
+    readonly description?: string;
+    readonly logicalName?: string | null;
+    readonly tags?: readonly string[];
+    readonly migration: {
+        readonly strategy: string;
+        readonly fromVersion?: string | null;
+        readonly notes: string;
     };
-} | {
-    ok: boolean;
-    specPath: any;
-    schemaPath: any;
-    normalizedModel: {
-        source: {
-            specPath: any;
-            schemaPath: any;
-        };
-        schema: {
-            schemaId: any;
-            specVersion: any;
-            migration: {
-                strategy: any;
-                fromVersion: any;
-                notes: any;
-            };
-        };
-        identity: {
-            atomId: any;
-            logicalName: any;
-            title: any;
-            description: any;
-            tags: unknown[];
-        };
-        execution: {
-            language: {
-                primary: any;
-                sourceExtensions: unknown[];
-                tooling: unknown[];
-            };
-            runtime: {
-                kind: any;
-                versionRange: any;
-                environment: any;
-            };
-            adapterRequirements: {
-                projectAdapter: any;
-                storage: any;
-                capabilities: unknown[];
-            };
-            compatibility: {
-                coreVersion: any;
-                registryVersion: any;
-                pluginApiVersion: any;
-                languageAdapter: any;
-                lifecycleMode: any;
-            };
-            dependencyPolicy: {
-                external: any;
-                hostCoupling: any;
-            };
-            validation: {
-                commands: any[];
-                evidenceRequired: boolean;
-            };
-            performanceBudget: {
-                hotPath: boolean;
-                inputMutation: any;
-                maxDurationMs: any;
-            };
-        };
-        governance: {
-            semanticFingerprint: string | null;
-            lineage: {
-                bornBy: string | null;
-                parentRefs: unknown[];
-                bornAt: string | null;
-            } | null;
-            ttl: {
-                expiresAt: string | null;
-            } | null;
-            deployScope: string | null;
-            mutabilityPolicy: string | null;
-            pendingSfCalculation: boolean;
-        };
-        hashLock: {
-            algorithm: any;
-            digest: any;
-            canonicalization: any;
-        };
-        ports: {
-            inputs: any;
-            outputs: any;
-        };
+    readonly language: {
+        readonly primary: string;
+        readonly sourceExtensions?: readonly string[];
+        readonly tooling?: readonly string[];
     };
-    promptReport: {
-        code: string;
-        summary: string;
-        issues: never[];
+    readonly runtime: {
+        readonly kind: string;
+        readonly versionRange: string;
+        readonly environment: string;
     };
-};
-export declare function parseAtomicSpecDocument(specDocument: any, options?: any): {
-    ok: boolean;
-    specPath: any;
-    schemaPath: any;
-    normalizedModel: null;
-    promptReport: {
-        code: any;
-        summary: any;
-        issues: any;
+    readonly adapterRequirements: {
+        readonly projectAdapter: string;
+        readonly storage: string;
+        readonly capabilities?: readonly string[];
     };
-} | {
-    ok: boolean;
-    specPath: any;
-    schemaPath: any;
-    normalizedModel: {
-        source: {
-            specPath: any;
-            schemaPath: any;
-        };
-        schema: {
-            schemaId: any;
-            specVersion: any;
-            migration: {
-                strategy: any;
-                fromVersion: any;
-                notes: any;
-            };
-        };
-        identity: {
-            atomId: any;
-            logicalName: any;
-            title: any;
-            description: any;
-            tags: unknown[];
-        };
-        execution: {
-            language: {
-                primary: any;
-                sourceExtensions: unknown[];
-                tooling: unknown[];
-            };
-            runtime: {
-                kind: any;
-                versionRange: any;
-                environment: any;
-            };
-            adapterRequirements: {
-                projectAdapter: any;
-                storage: any;
-                capabilities: unknown[];
-            };
-            compatibility: {
-                coreVersion: any;
-                registryVersion: any;
-                pluginApiVersion: any;
-                languageAdapter: any;
-                lifecycleMode: any;
-            };
-            dependencyPolicy: {
-                external: any;
-                hostCoupling: any;
-            };
-            validation: {
-                commands: any[];
-                evidenceRequired: boolean;
-            };
-            performanceBudget: {
-                hotPath: boolean;
-                inputMutation: any;
-                maxDurationMs: any;
-            };
-        };
-        governance: {
-            semanticFingerprint: string | null;
-            lineage: {
-                bornBy: string | null;
-                parentRefs: unknown[];
-                bornAt: string | null;
-            } | null;
-            ttl: {
-                expiresAt: string | null;
-            } | null;
-            deployScope: string | null;
-            mutabilityPolicy: string | null;
-            pendingSfCalculation: boolean;
-        };
-        hashLock: {
-            algorithm: any;
-            digest: any;
-            canonicalization: any;
-        };
-        ports: {
-            inputs: any;
-            outputs: any;
+    readonly compatibility: {
+        readonly coreVersion: string;
+        readonly registryVersion: string;
+        readonly pluginApiVersion?: string | null;
+        readonly languageAdapter?: string | null;
+        readonly lifecycleMode?: string | null;
+    };
+    readonly dependencyPolicy?: {
+        readonly external?: string;
+        readonly hostCoupling?: string;
+    };
+    readonly validation?: {
+        readonly commands?: readonly string[];
+        readonly evidenceRequired?: boolean;
+    };
+    readonly performanceBudget?: {
+        readonly hotPath?: boolean;
+        readonly inputMutation?: string;
+        readonly maxDurationMs?: number;
+    };
+    readonly semanticFingerprint?: unknown;
+    readonly lineage?: {
+        readonly bornBy?: string;
+        readonly parentRefs?: readonly string[];
+        readonly bornAt?: string;
+    } | null;
+    readonly ttl?: {
+        readonly expiresAt?: string;
+    } | null;
+    readonly deployScope?: string;
+    readonly mutabilityPolicy?: string;
+    readonly pendingSfCalculation?: boolean;
+    readonly hashLock: {
+        readonly algorithm: string;
+        readonly digest: string;
+        readonly canonicalization: string;
+    };
+    readonly inputs?: readonly AtomicSpecPortRecord[];
+    readonly outputs?: readonly AtomicSpecPortRecord[];
+}
+interface NormalizedAtomicSpecModel {
+    readonly source: {
+        readonly specPath: string | null;
+        readonly schemaPath: string;
+    };
+    readonly schema: {
+        readonly schemaId: string;
+        readonly specVersion: string;
+        readonly migration: {
+            readonly strategy: string;
+            readonly fromVersion: string | null;
+            readonly notes: string;
         };
     };
-    promptReport: {
-        code: string;
-        summary: string;
-        issues: never[];
+    readonly identity: {
+        readonly atomId: string;
+        readonly logicalName?: string;
+        readonly title: string;
+        readonly description: string;
+        readonly tags: string[];
     };
-};
-export declare function normalizeAtomicSpecModel(specDocument: any, options?: any): {
-    source: {
-        specPath: any;
-        schemaPath: any;
-    };
-    schema: {
-        schemaId: any;
-        specVersion: any;
-        migration: {
-            strategy: any;
-            fromVersion: any;
-            notes: any;
+    readonly execution: {
+        readonly language: {
+            readonly primary: string;
+            readonly sourceExtensions: string[];
+            readonly tooling: string[];
         };
-    };
-    identity: {
-        atomId: any;
-        logicalName: any;
-        title: any;
-        description: any;
-        tags: unknown[];
-    };
-    execution: {
-        language: {
-            primary: any;
-            sourceExtensions: unknown[];
-            tooling: unknown[];
+        readonly runtime: {
+            readonly kind: string;
+            readonly versionRange: string;
+            readonly environment: string;
         };
-        runtime: {
-            kind: any;
-            versionRange: any;
-            environment: any;
+        readonly adapterRequirements: {
+            readonly projectAdapter: string;
+            readonly storage: string;
+            readonly capabilities: string[];
         };
-        adapterRequirements: {
-            projectAdapter: any;
-            storage: any;
-            capabilities: unknown[];
+        readonly compatibility: {
+            readonly coreVersion: string;
+            readonly registryVersion: string;
+            readonly pluginApiVersion: string;
+            readonly languageAdapter: string;
+            readonly lifecycleMode: string;
         };
-        compatibility: {
-            coreVersion: any;
-            registryVersion: any;
-            pluginApiVersion: any;
-            languageAdapter: any;
-            lifecycleMode: any;
+        readonly dependencyPolicy: {
+            readonly external: string;
+            readonly hostCoupling: string;
         };
-        dependencyPolicy: {
-            external: any;
-            hostCoupling: any;
+        readonly validation: {
+            readonly commands: string[];
+            readonly evidenceRequired: boolean;
         };
-        validation: {
-            commands: any[];
-            evidenceRequired: boolean;
-        };
-        performanceBudget: {
-            hotPath: boolean;
-            inputMutation: any;
-            maxDurationMs: any;
+        readonly performanceBudget: {
+            readonly hotPath: boolean;
+            readonly inputMutation: string;
+            readonly maxDurationMs: number | null;
         };
     };
-    governance: {
-        semanticFingerprint: string | null;
-        lineage: {
-            bornBy: string | null;
-            parentRefs: unknown[];
-            bornAt: string | null;
+    readonly governance: {
+        readonly semanticFingerprint: unknown;
+        readonly lineage: {
+            readonly bornBy?: string;
+            readonly parentRefs: string[];
+            readonly bornAt?: string;
         } | null;
-        ttl: {
-            expiresAt: string | null;
+        readonly ttl: {
+            readonly expiresAt: string | null;
         } | null;
-        deployScope: string | null;
-        mutabilityPolicy: string | null;
-        pendingSfCalculation: boolean;
+        readonly deployScope: string | null;
+        readonly mutabilityPolicy: string | null;
+        readonly pendingSfCalculation: boolean;
     };
-    hashLock: {
-        algorithm: any;
-        digest: any;
-        canonicalization: any;
+    readonly hashLock: {
+        readonly algorithm: string;
+        readonly digest: string;
+        readonly canonicalization: string;
     };
-    ports: {
-        inputs: any;
-        outputs: any;
+    readonly ports: {
+        readonly inputs: AtomicSpecPortRecord[];
+        readonly outputs: AtomicSpecPortRecord[];
     };
-};
+}
+export declare function parseAtomicSpecFile(specOption: string, options?: ParseAtomicSpecOptions): ParseAtomicSpecSuccess | ParseAtomicSpecFailure;
+export declare function parseAtomicSpecDocument(specDocument: unknown, options?: ParseAtomicSpecOptions): ParseAtomicSpecSuccess | ParseAtomicSpecFailure;
+export declare function normalizeAtomicSpecModel(specDocument: AtomicSpecDocument, options?: ParseAtomicSpecOptions): NormalizedAtomicSpecModel;
+export {};

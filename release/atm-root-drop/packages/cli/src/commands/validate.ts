@@ -30,7 +30,7 @@ export interface TaskRunnerArbitration {
   readonly preferredRunnerKind: 'dev-source' | 'frozen-runner';
 }
 
-export function runValidate(argv: any) {
+export function runValidate(argv: string[]) {
   if (argv.includes('taxonomy')) {
     const repo = valueAfter(argv, '--repo') ?? valueAfter(argv, '--cwd') ?? process.cwd();
     const taskId = valueAfter(argv, '--task');
@@ -69,7 +69,7 @@ export function runValidate(argv: any) {
   return validateRepositoryConfig(options.cwd);
 }
 
-function valueAfter(argv: any, flag: string): string | null {
+function valueAfter(argv: string[], flag: string): string | null {
   const index = argv.indexOf(flag);
   if (index === -1) {
     return null;
@@ -167,9 +167,10 @@ function validateAtomizationCoverage(cwd: string) {
     let exitCode = 0;
     try {
       stdout = execSync(cmd, { encoding: 'utf8' });
-    } catch (err: any) {
-      stdout = err.stdout?.toString() ?? '';
-      exitCode = err.status ?? 1;
+    } catch (err: unknown) {
+      const errorObj = err as Record<string, unknown> & { stdout?: Buffer | string; status?: number };
+      stdout = errorObj.stdout?.toString() ?? '';
+      exitCode = errorObj.status ?? 1;
     }
     const report = stdout ? JSON.parse(stdout) : { ok: false, violations: [{ detail: 'no output' }] };
     const violations = report.violations ?? [];
@@ -186,21 +187,22 @@ function validateAtomizationCoverage(cwd: string) {
         report
       }
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as Record<string, unknown> & { message?: string };
     return makeResult({
       ok: false,
       command: 'validate',
       cwd,
       messages: [
         message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED',
-          `Atomization coverage validation failed: ${err.message}`, {})
+          `Atomization coverage validation failed: ${errorObj.message}`, {})
       ],
-      evidence: { validation: 'atomization-coverage', error: err.message }
+      evidence: { validation: 'atomization-coverage', error: errorObj.message }
     });
   }
 }
 
-function validateRepositoryConfig(cwd: any) {
+function validateRepositoryConfig(cwd: string) {
   const configPath = configPathFor(cwd);
   if (!existsSync(configPath)) {
     return makeResult({
@@ -241,7 +243,7 @@ function validateRepositoryConfig(cwd: any) {
   });
 }
 
-function validateAtomicSpecFile(cwd: any, specOption: any) {
+function validateAtomicSpecFile(cwd: string, specOption: string) {
   const specPath = path.resolve(cwd, specOption);
   if (!existsSync(specPath)) {
     return makeResult({
@@ -277,8 +279,8 @@ function validateAtomicSpecFile(cwd: any, specOption: any) {
   });
 }
 
-function validateAtomicSpecShape(spec: any) {
-  const errors = [];
+function validateAtomicSpecShape(spec: Record<string, unknown> | null | undefined) {
+  const errors: Array<{ code: string; path: string; text: string }> = [];
   if (!spec || typeof spec !== 'object' || Array.isArray(spec)) {
     return [{ code: 'ATM_SPEC_INVALID_OBJECT', path: '/', text: 'Atomic spec must be a JSON object.' }];
   }
@@ -289,48 +291,56 @@ function validateAtomicSpecShape(spec: any) {
     }
   }
 
+  const migration = spec.migration as Record<string, unknown> | undefined;
+  const language = spec.language as Record<string, unknown> | undefined;
+  const runtime = spec.runtime as Record<string, unknown> | undefined;
+  const adapterRequirements = spec.adapterRequirements as Record<string, unknown> | undefined;
+  const compatibility = spec.compatibility as Record<string, unknown> | undefined;
+  const hashLock = spec.hashLock as Record<string, unknown> | undefined;
+  const dependencyPolicy = spec.dependencyPolicy as Record<string, unknown> | undefined;
+
   requireConst(errors, spec.schemaId, 'atm.atomicSpec', '/schemaId');
   requireConst(errors, spec.specVersion, '0.1.0', '/specVersion');
   requireStringPattern(errors, spec.id, /^ATM-[A-Z][A-Z0-9]*-\d{4}$/, '/id', 'ATM_SPEC_ID_PATTERN');
   requireNonEmptyString(errors, spec.title, '/title');
-  requireEnum(errors, spec.migration?.strategy, ['none', 'additive', 'breaking'], '/migration/strategy');
-  requireEnum(errors, spec.language?.primary, ['language-neutral', 'javascript', 'typescript', 'json', 'markdown', 'shell', 'other'], '/language/primary');
-  requireEnum(errors, spec.runtime?.kind, ['language-neutral', 'node', 'browser', 'deno', 'shell', 'custom'], '/runtime/kind');
-  requireEnum(errors, spec.runtime?.environment, ['local', 'ci', 'sandbox', 'any'], '/runtime/environment');
-  requireEnum(errors, spec.adapterRequirements?.storage, ['local-fs', 'git', 'host-adapter', 'none'], '/adapterRequirements/storage');
-  requireStringPattern(errors, spec.compatibility?.coreVersion, /^\d+\.\d+\.\d+$/, '/compatibility/coreVersion', 'ATM_SPEC_VERSION_PATTERN');
-  requireStringPattern(errors, spec.compatibility?.registryVersion, /^\d+\.\d+\.\d+$/, '/compatibility/registryVersion', 'ATM_SPEC_VERSION_PATTERN');
-  requireConst(errors, spec.hashLock?.algorithm, 'sha256', '/hashLock/algorithm');
-  requireStringPattern(errors, spec.hashLock?.digest, /^sha256:[a-f0-9]{64}$/, '/hashLock/digest', 'ATM_SPEC_HASH_PATTERN');
-  requireEnum(errors, spec.hashLock?.canonicalization, ['json-stable-v1', 'text-normalized-v1'], '/hashLock/canonicalization');
+  requireEnum(errors, migration?.strategy, ['none', 'additive', 'breaking'], '/migration/strategy');
+  requireEnum(errors, language?.primary, ['language-neutral', 'javascript', 'typescript', 'json', 'markdown', 'shell', 'other'], '/language/primary');
+  requireEnum(errors, runtime?.kind, ['language-neutral', 'node', 'browser', 'deno', 'shell', 'custom'], '/runtime/kind');
+  requireEnum(errors, runtime?.environment, ['local', 'ci', 'sandbox', 'any'], '/runtime/environment');
+  requireEnum(errors, adapterRequirements?.storage, ['local-fs', 'git', 'host-adapter', 'none'], '/adapterRequirements/storage');
+  requireStringPattern(errors, compatibility?.coreVersion, /^\d+\.\d+\.\d+$/, '/compatibility/coreVersion', 'ATM_SPEC_VERSION_PATTERN');
+  requireStringPattern(errors, compatibility?.registryVersion, /^\d+\.\d+\.\d+$/, '/compatibility/registryVersion', 'ATM_SPEC_VERSION_PATTERN');
+  requireConst(errors, hashLock?.algorithm, 'sha256', '/hashLock/algorithm');
+  requireStringPattern(errors, hashLock?.digest, /^sha256:[a-f0-9]{64}$/, '/hashLock/digest', 'ATM_SPEC_HASH_PATTERN');
+  requireEnum(errors, hashLock?.canonicalization, ['json-stable-v1', 'text-normalized-v1'], '/hashLock/canonicalization');
 
-  if (spec.dependencyPolicy) {
-    requireEnum(errors, spec.dependencyPolicy.external, ['none', 'workspace-only', 'declared'], '/dependencyPolicy/external');
-    requireEnum(errors, spec.dependencyPolicy.hostCoupling, ['forbidden', 'adapter-only', 'allowed'], '/dependencyPolicy/hostCoupling');
+  if (dependencyPolicy) {
+    requireEnum(errors, dependencyPolicy.external, ['none', 'workspace-only', 'declared'], '/dependencyPolicy/external');
+    requireEnum(errors, dependencyPolicy.hostCoupling, ['forbidden', 'adapter-only', 'allowed'], '/dependencyPolicy/hostCoupling');
   }
 
   return errors;
 }
 
-function requireConst(errors: any, value: any, expected: any, checkPath: any) {
+function requireConst(errors: Array<{ code: string; path: string; text: string }>, value: unknown, expected: unknown, checkPath: string) {
   if (value !== expected) {
     errors.push({ code: 'ATM_SPEC_CONST_MISMATCH', path: checkPath, text: `${checkPath} must be ${expected}.` });
   }
 }
 
-function requireEnum(errors: any, value: any, allowed: any, checkPath: any) {
-  if (!allowed.includes(value)) {
+function requireEnum(errors: Array<{ code: string; path: string; text: string }>, value: unknown, allowed: readonly string[], checkPath: string) {
+  if (typeof value !== 'string' || !allowed.includes(value)) {
     errors.push({ code: 'ATM_SPEC_ENUM_MISMATCH', path: checkPath, text: `${checkPath} must be one of: ${allowed.join(', ')}.` });
   }
 }
 
-function requireNonEmptyString(errors: any, value: any, checkPath: any) {
+function requireNonEmptyString(errors: Array<{ code: string; path: string; text: string }>, value: unknown, checkPath: string) {
   if (typeof value !== 'string' || value.length === 0) {
     errors.push({ code: 'ATM_SPEC_STRING_REQUIRED', path: checkPath, text: `${checkPath} must be a non-empty string.` });
   }
 }
 
-function requireStringPattern(errors: any, value: any, pattern: any, checkPath: any, code: any) {
+function requireStringPattern(errors: Array<{ code: string; path: string; text: string }>, value: unknown, pattern: RegExp, checkPath: string, code: string) {
   if (typeof value !== 'string' || !pattern.test(value)) {
     errors.push({ code, path: checkPath, text: `${checkPath} does not match the required pattern.` });
   }

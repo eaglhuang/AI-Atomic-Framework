@@ -143,12 +143,12 @@ export function buildCorePoliceFamilies(input) {
             policeFamily: family,
             severity: violation.severity === 'error' ? 'error' : 'warning',
             trigger: String(violation.code ?? 'police-violation'),
-            scope: violation.path ?? violation.atomId,
+            scope: (violation.path ?? violation.atomId),
             action: violation.severity === 'error' ? 'hard-fail' : 'request-human-review',
             routeHint: family === 'registry-consistency' ? 'registry.review' : 'atm.police.core',
             readModel: 'runPoliceChecks.violations',
             message: String(violation.message ?? violation.code ?? 'Police violation detected.'),
-            evidenceRefs: violation.path ? [makeEvidenceRef(violation.path, 'police-artifact')] : undefined,
+            evidenceRefs: violation.path ? [makeEvidenceRef(String(violation.path), 'police-artifact')] : undefined,
             metadata: {
                 violation
             }
@@ -171,12 +171,12 @@ export function buildCorePoliceFamilies(input) {
             findingId: `police.lifecycle.${sanitizeId(finding.trigger)}.${index}`,
             policeFamily: 'lifecycle',
             severity: finding.severity === 'error' ? 'error' : 'warning',
-            trigger: finding.trigger,
+            trigger: String(finding.trigger ?? ''),
             scope: finding.scope,
             action: finding.action === 'quarantine' ? 'quarantine' : 'hard-fail',
             routeHint: 'lifecycle-police',
             readModel: 'LifecyclePoliceFinding',
-            message: finding.message,
+            message: String(finding.message ?? ''),
             evidenceRefs: (finding.callerIds ?? []).map((callerId) => makeEvidenceRef(callerId, 'read-model')),
             metadata: {
                 lifecycleFinding: finding,
@@ -266,8 +266,12 @@ export function runDedupPolice(input = {}) {
                 continue;
             }
             seenGroups.add(fingerprint);
-            const exactHits = index.findBySemanticFingerprint(fingerprint).filter((candidate) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
-            const prefixHits = index.findByFingerprintPrefix(semanticFingerprintPrefix(fingerprint)).filter((candidate) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
+            const exactHits = index.findBySemanticFingerprint(fingerprint)
+                .map(toComparableNodeRef)
+                .filter((candidate) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
+            const prefixHits = index.findByFingerprintPrefix(semanticFingerprintPrefix(fingerprint))
+                .map(toComparableNodeRef)
+                .filter((candidate) => !isPolymorphIgnored(candidate, ignoredAtomIds, ignoredGroupId));
             const uniqueHits = uniqueNodeRefs([...exactHits, ...prefixHits]);
             if (uniqueHits.length < 2) {
                 continue;
@@ -294,7 +298,10 @@ export function runDedupPolice(input = {}) {
             }));
         }
     }
-    for (const candidate of input.qualityComparisonReport?.dedupCandidates ?? []) {
+    const dedupCandidates = Array.isArray(input.qualityComparisonReport?.dedupCandidates)
+        ? input.qualityComparisonReport.dedupCandidates
+        : [];
+    for (const candidate of dedupCandidates) {
         if (candidate?.polymorphGroupId && candidate.polymorphGroupId === ignoredGroupId) {
             continue;
         }
@@ -364,7 +371,7 @@ export async function runDemandPolice(input = {}) {
     });
 }
 export function runQualityPolice(input = {}) {
-    const report = input.qualityComparisonReport ?? (input.qualityComparisonInput ? compareQualityMetrics(input.qualityComparisonInput) : null);
+    const report = (input.qualityComparisonReport ?? (input.qualityComparisonInput ? compareQualityMetrics(input.qualityComparisonInput) : null));
     const findings = [];
     if (!report) {
         return makePoliceFamilyReport({
@@ -485,7 +492,11 @@ export function runMapIntegrationPolice(input = {}) {
             }
         }));
     }
-    for (const status of input.qualityComparisonReport?.mapImpactScope?.propagationStatus ?? []) {
+    const mapImpactScope = input.qualityComparisonReport?.mapImpactScope;
+    const propagationStatus = mapImpactScope && typeof mapImpactScope === 'object' && !Array.isArray(mapImpactScope) && Array.isArray(mapImpactScope.propagationStatus)
+        ? mapImpactScope.propagationStatus
+        : [];
+    for (const status of propagationStatus) {
         if (status.integrationTestPassed !== false) {
             continue;
         }
@@ -536,8 +547,12 @@ export function runAtomizationPolice(input = {}) {
         }));
     }
     if (input.dryRunResult) {
-        const dryRunPatch = input.dryRunResult.extra?.dryRunPatch ?? input.dryRunResult.dryRunPatch;
-        const neutrality = input.dryRunResult.extra?.neutrality ?? input.dryRunResult.neutrality;
+        const dryRunResult = input.dryRunResult;
+        const dryRunExtra = dryRunResult.extra && typeof dryRunResult.extra === 'object' && !Array.isArray(dryRunResult.extra)
+            ? dryRunResult.extra
+            : null;
+        const dryRunPatch = (dryRunExtra?.dryRunPatch ?? dryRunResult.dryRunPatch);
+        const neutrality = (dryRunExtra?.neutrality ?? dryRunResult.neutrality);
         const contractFailures = [];
         if (!dryRunPatch) {
             contractFailures.push('missing-dry-run-patch');
@@ -552,7 +567,7 @@ export function runAtomizationPolice(input = {}) {
             if (dryRunPatch.patchMode !== 'dry-run')
                 contractFailures.push('patchMode-must-be-dry-run');
         }
-        if (input.dryRunResult.ok === false) {
+        if (dryRunResult.ok === false) {
             contractFailures.push('adapter-result-not-ok');
         }
         if ((neutrality?.violationCount ?? 0) > 0 || neutrality?.ok === false) {
@@ -564,7 +579,7 @@ export function runAtomizationPolice(input = {}) {
                 policeFamily: 'atomization',
                 severity: 'block',
                 trigger: 'dry-run-proposal-guard',
-                scope: dryRunPatch?.contractId ?? 'atomization-dry-run',
+                scope: typeof dryRunPatch?.contractId === 'string' ? dryRunPatch.contractId : 'atomization-dry-run',
                 action: 'request-human-review',
                 routeHint: 'behavior.atomize',
                 readModel: 'ProjectAdapterDryRunPatchContract',
@@ -684,6 +699,9 @@ export function buildDecompositionPlanHintDraft(finding) {
     if (errors.length > 0) {
         return { ok: false, errors };
     }
+    const legacyUris = hint?.legacyUris ?? [];
+    const proposedMembers = (hint?.proposedMembers ?? []).filter((entry) => typeof entry === 'string');
+    const entrypoints = hint?.entrypoints ?? [];
     return {
         ok: true,
         errors: [],
@@ -691,9 +709,9 @@ export function buildDecompositionPlanHintDraft(finding) {
             schemaId: 'atm.decompositionPlanDraft',
             specVersion: '0.1.0',
             mode: 'draft',
-            legacyUris: [...hint.legacyUris],
-            proposedMembers: [...(hint.proposedMembers ?? [])],
-            entrypoints: [...hint.entrypoints]
+            legacyUris: [...legacyUris],
+            proposedMembers: [...proposedMembers],
+            entrypoints: [...entrypoints]
         }
     };
 }
@@ -1382,7 +1400,7 @@ export function renderPoliceFamilyGateMarkdown(report) {
     return lines.join('\n');
 }
 export function renderQualityPoliceMarkdown(input) {
-    const report = input.qualityComparisonReport ?? (input.qualityComparisonInput ? compareQualityMetrics(input.qualityComparisonInput) : null);
+    const report = (input.qualityComparisonReport ?? (input.qualityComparisonInput ? compareQualityMetrics(input.qualityComparisonInput) : null));
     return report ? renderQualityReportMarkdown(report) : '# Quality Comparison Report\n\nNo quality comparison report was provided.\n';
 }
 function uniqueNodeRefs(input) {
@@ -1397,6 +1415,17 @@ function uniqueNodeRefs(input) {
         result.push(item);
     }
     return result;
+}
+function toComparableNodeRef(candidate) {
+    const entry = candidate.entry && typeof candidate.entry === 'object' && !Array.isArray(candidate.entry)
+        ? candidate.entry
+        : undefined;
+    return {
+        urn: candidate.urn,
+        canonicalId: candidate.canonicalId,
+        nodeKind: candidate.nodeKind,
+        entry
+    };
 }
 function isPolymorphIgnored(nodeRef, ignoredAtomIds, ignoredGroupId) {
     const atomId = nodeRef?.canonicalId ?? nodeRef?.entry?.atomId;

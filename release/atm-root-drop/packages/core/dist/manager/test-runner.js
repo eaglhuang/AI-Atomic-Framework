@@ -36,6 +36,9 @@ export function loadAtomicTestRunnerConfig(configPath) {
     return JSON.parse(readFileSync(absolutePath, 'utf8'));
 }
 export function createAtomicTestRunnerContract(normalizedModel) {
+    if (!normalizedModel) {
+        throw new Error('Normalized model is required.');
+    }
     const commands = normalizedModel.execution.validation.commands.map((command, index) => ({
         commandId: `validation-${index + 1}`,
         commandKind: classifyValidationCommandKind(command, index),
@@ -49,6 +52,9 @@ export function createAtomicTestRunnerContract(normalizedModel) {
     };
 }
 export function runAtomicTestRunner(normalizedModel, options = {}) {
+    if (!normalizedModel) {
+        throw new Error('Normalized model is required.');
+    }
     const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
     const reportPath = resolveAtomicTestReportPath(normalizedModel, {
         repositoryRoot,
@@ -101,6 +107,9 @@ export function runAtomicTestRunner(normalizedModel, options = {}) {
     };
 }
 export async function runAtomicTestRunnerExtended(normalizedModel, options = {}) {
+    if (!normalizedModel) {
+        throw new Error('Normalized model is required.');
+    }
     const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
     const configPath = options.runnerConfigPath
         ? path.resolve(options.runnerConfigPath)
@@ -117,7 +126,9 @@ export async function runAtomicTestRunnerExtended(normalizedModel, options = {})
     const contractData = await createExtendedRunnerContract(normalizedModel, {
         repositoryRoot,
         runnerConfig,
-        plugins
+        plugins,
+        profile: normalizeRunnerProfile(options.profile),
+        suite: normalizeSuiteOption(options.suite)
     });
     const executeCommand = options.executeCommand ?? defaultExecuteCommand;
     const commandResults = contractData.commands.map((commandContract) => {
@@ -205,7 +216,7 @@ export function createAtomicTestReport(normalizedModel, options = {}) {
         },
         validation: {
             evidenceRequired: runnerContract.evidenceRequired === true,
-            commandCount: runnerContract.commands.length
+            commandCount: Array.isArray(runnerContract.commands) ? runnerContract.commands.length : 0
         },
         runnerContract,
         results,
@@ -277,10 +288,10 @@ export function validateAtomicTestReportDocument(reportDocument, options = {}) {
     if (!valid) {
         return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_INVALID', (validate.errors || []).map((error) => ({
             code: 'ATM_TEST_REPORT_INVALID',
-            keyword: error.keyword,
-            path: error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/',
-            text: error.message ?? 'Invalid test report document.',
-            prompt: `Fix the test report field at ${error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/'} (${error.keyword}).`
+            keyword: String(error.keyword ?? ''),
+            path: typeof error.instancePath === 'string' && error.instancePath.length > 0 ? error.instancePath : '/',
+            text: typeof error.message === 'string' ? error.message : 'Invalid test report document.',
+            prompt: `Fix the test report field at ${typeof error.instancePath === 'string' && error.instancePath.length > 0 ? error.instancePath : '/'} (${String(error.keyword ?? '')}).`
         })));
     }
     return {
@@ -288,7 +299,7 @@ export function validateAtomicTestReportDocument(reportDocument, options = {}) {
         schemaPath: toPortablePath(schemaPath),
         promptReport: {
             code: 'ATM_TEST_REPORT_OK',
-            summary: `Atomic test report ${reportDocument.atomId} validated successfully.`,
+            summary: `Atomic test report ${String(reportDocument.atomId ?? '')} validated successfully.`,
             issues: []
         }
     };
@@ -332,7 +343,9 @@ async function createExtendedRunnerContract(normalizedModel, options) {
             repositoryRoot: options.repositoryRoot,
             specPath: normalizedModel.source?.specPath ?? null,
             atomId: normalizedModel.identity.atomId,
-            normalizedModel
+            normalizedModel,
+            profile: options.profile,
+            suite: options.suite
         });
         const supported = typeof support === 'boolean'
             ? support
@@ -352,9 +365,15 @@ async function createExtendedRunnerContract(normalizedModel, options) {
             repositoryRoot: options.repositoryRoot,
             specPath: normalizedModel.source?.specPath ?? null,
             atomId: normalizedModel.identity.atomId,
-            normalizedModel
+            normalizedModel,
+            profile: options.profile,
+            suite: options.suite,
+            pluginOptions: (options.runnerConfig?.plugins ?? []).find((reference) => reference.pluginId === plugin.pluginId)?.options
         });
-        const commands = (plan.commands ?? []).map((entry) => ({
+        const commands = filterPluginCommands(plan.commands ?? [], {
+            profile: options.profile,
+            suite: options.suite
+        }).map((entry) => ({
             ...entry,
             required: entry.required !== false
         }));
@@ -363,6 +382,11 @@ async function createExtendedRunnerContract(normalizedModel, options) {
             status: commands.length > 0 ? 'planned' : 'not_applicable',
             commandCount: commands.length,
             suites: plan.suites ?? [],
+            requestedProfile: options.profile ?? null,
+            requestedSuite: options.suite ?? null,
+            family: plan.family ?? null,
+            dedupeKeys: plan.dedupeKeys ?? [],
+            costBudgetMs: plan.costBudgetMs ?? null,
             evidenceSummary: plan.evidenceSummary ?? null
         });
         pluginCommands.push(...commands);
@@ -373,11 +397,37 @@ async function createExtendedRunnerContract(normalizedModel, options) {
         runnerContract: {
             executionMode: 'delegated',
             evidenceRequired: normalizedModel.execution.validation.evidenceRequired === true,
+            profile: options.profile ?? 'standard',
+            suite: options.suite ?? null,
             commands: [...legacyCommands, ...pluginCommands],
             plugins: pluginRuns,
             gates: describeConfiguredGates(options.runnerConfig?.defaultGates ?? null)
         }
     };
+}
+function filterPluginCommands(commands, options) {
+    return commands.filter((command) => {
+        if (options.profile && Array.isArray(command.tiers) && command.tiers.length > 0 && !command.tiers.includes(options.profile)) {
+            return false;
+        }
+        if (options.suite) {
+            const suite = String(command.suite ?? command.family ?? command.key ?? '');
+            if (suite !== options.suite)
+                return false;
+        }
+        return true;
+    });
+}
+function normalizeRunnerProfile(value) {
+    const text = String(value ?? '').toLowerCase();
+    if (text === 'quick' || text === 'standard' || text === 'full') {
+        return text;
+    }
+    return 'standard';
+}
+function normalizeSuiteOption(value) {
+    const text = String(value ?? '').trim();
+    return text || null;
 }
 async function loadConfiguredPlugins(references, configPath) {
     const plugins = [];
@@ -538,10 +588,10 @@ function createValidationFailure(schemaPath, code, issues) {
     };
 }
 function normalizeExitCode(value) {
-    return Number.isInteger(value) ? value : 1;
+    return typeof value === 'number' && Number.isInteger(value) ? value : 1;
 }
 function normalizeDuration(value) {
-    return Number.isInteger(value) && value >= 0 ? value : 0;
+    return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : 0;
 }
 function normalizeText(value) {
     return typeof value === 'string' ? value : '';

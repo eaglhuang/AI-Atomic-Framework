@@ -74,11 +74,13 @@ export default defineCommandSpec({
     commonMistakes: [
       'Manually typing validator names when evidence run can auto-link a declared validator from the command.',
       'Using raw evidence add as a substitute for fresh command-backed validation when the task requires validators.',
-      'Writing historical-batch evidence without checking whether the matched commits actually cover the task deliverables.'
+      'Writing historical-batch evidence without checking whether the matched commits actually cover the task deliverables.',
+      'Treating git-head-backfill as a protected-push requirement instead of a repair/diagnostic tool for legacy HEAD evidence.'
     ],
     playbookNotes: [
       'evidence validators --list is the fastest way to see what a task still needs before closeout.',
-      'Use --recent-run when a matching cached command run already exists and you only need to re-link it into the current evidence update.'
+      'Use --recent-run when a matching cached command run already exists and you only need to re-link it into the current evidence update.',
+      'git-head-backfill is retained for repair and audit trails; same-commit governed provenance should normally come from node atm.mjs git commit instead of a follow-up backfill.'
     ]
   }
 });

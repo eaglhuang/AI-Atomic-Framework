@@ -23,8 +23,8 @@ export interface AtmUserNotice {
 
 export interface NextActionLike {
   readonly status: string;
-  readonly command: string;
-  readonly reason: string;
+  readonly command?: string;
+  readonly reason?: string;
 }
 
 const firstUseStatuses = new Set([
@@ -59,8 +59,8 @@ export function buildFirstUseUserNotice(nextAction: NextActionLike): AtmUserNoti
       {
         label: 'Continue the current ATM route',
         kind: 'command',
-        value: nextAction.command,
-        reason: nextAction.reason
+        value: nextAction.command ?? 'node atm.mjs next --cwd . --json',
+        reason: nextAction.reason ?? 'Continue the current governed ATM route.'
       },
       {
         label: 'List starter ATM features',

@@ -1,7 +1,14 @@
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function createLazyInstantiationContract(template, dimensionSpec) {
-    const templateId = String(template?.templateId || '').trim();
-    const dimensionSpecId = String(dimensionSpec?.dimensionSpecId || '').trim();
-    const variantKey = String(dimensionSpec?.variantKey || 'default').trim() || 'default';
+    const templateRecord = asRecord(template);
+    const dimensionSpecRecord = asRecord(dimensionSpec);
+    const templateId = String(templateRecord?.templateId || '').trim();
+    const dimensionSpecId = String(dimensionSpecRecord?.dimensionSpecId || '').trim();
+    const variantKey = String(dimensionSpecRecord?.variantKey || 'default').trim() || 'default';
     if (!templateId) {
         throw new Error('polymorphic template requires templateId');
     }
@@ -16,25 +23,29 @@ export function createLazyInstantiationContract(template, dimensionSpec) {
         materializedInRegistry: false,
         instantiateOn: 'runtime',
         instanceStatus: 'validated',
-        runtimeInstanceId: `${String(template?.templateAtomId || 'ATM-TEMPLATE-0000')}@${variantKey}`
+        runtimeInstanceId: `${String(templateRecord?.templateAtomId || 'ATM-TEMPLATE-0000')}@${variantKey}`
     };
 }
 export function propagateTemplateUpgrade(options) {
-    const templateId = String(options?.templateId || '').trim();
-    const toVersion = String(options?.toVersion || '').trim();
-    const instances = Array.isArray(options?.instances) ? options.instances : [];
+    const optionRecord = asRecord(options);
+    const templateId = String(optionRecord?.templateId || '').trim();
+    const toVersion = String(optionRecord?.toVersion || '').trim();
+    const instances = Array.isArray(optionRecord?.instances) ? optionRecord.instances : [];
     if (!templateId) {
         throw new Error('propagateTemplateUpgrade requires templateId');
     }
     if (!toVersion) {
         throw new Error('propagateTemplateUpgrade requires toVersion');
     }
-    const propagatedInstances = instances.map((instance) => ({
-        ...instance,
-        inheritedTemplateVersion: toVersion,
-        inheritedBy: 'behavior.evolve',
-        needsRegistryWrite: false
-    }));
+    const propagatedInstances = instances.map((instance) => {
+        const instanceRecord = asRecord(instance) ?? {};
+        return {
+            ...instanceRecord,
+            inheritedTemplateVersion: toVersion,
+            inheritedBy: 'behavior.evolve',
+            needsRegistryWrite: false
+        };
+    });
     return {
         templateId,
         toVersion,

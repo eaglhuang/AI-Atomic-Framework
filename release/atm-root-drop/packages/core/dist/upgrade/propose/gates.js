@@ -48,7 +48,10 @@ export function buildGateResult(gateName, report, reportPath, successSummary) {
 // ─── Specific gate builders ────────────────────────────────────────────────
 export function buildQualityComparisonGate(report, reportPath) {
     const passed = report?.passed === true && report?.regressed !== true;
-    const mapPropagationPassed = report?.mapImpactScope?.propagationStatus?.every((entry) => entry.integrationTestPassed !== false) ?? true;
+    const propagationStatus = report?.mapImpactScope?.propagationStatus;
+    const mapPropagationPassed = Array.isArray(propagationStatus)
+        ? propagationStatus.every((entry) => entry.integrationTestPassed !== false)
+        : true;
     return {
         passed: passed && mapPropagationPassed,
         reportId: report?.reportId ?? 'quality-comparison.missing',
@@ -119,7 +122,8 @@ export function buildPolymorphImpactGate(target, requestedReplacementMode, repos
     const schemaValid = input.document?.schemaId === 'atm.polymorphImpactReport';
     const mapMatches = input.document?.targetMapId === target.mapId;
     const versionMatches = input.document?.toVersion === analysis.toVersion;
-    const templateSetMatches = sameStringSet((Array.isArray(input.document?.templateHits) ? input.document.templateHits : []).map((entry) => String(entry?.templateId ?? '').trim()).filter(Boolean), analysis.templateHits.map((entry) => entry.templateId));
+    const rawTemplateHits = Array.isArray(input.document?.templateHits) ? input.document.templateHits : [];
+    const templateSetMatches = sameStringSet(rawTemplateHits.map((entry) => String(entry?.templateId ?? '').trim()).filter(Boolean), analysis.templateHits.map((entry) => entry.templateId));
     const impactedSetMatches = sameStringSet(input.document?.impactedMapIds, analysis.impactedMapIds);
     const passed = schemaValid
         && mapMatches
@@ -226,7 +230,8 @@ export function buildReviewAdvisoryGate(target, requestedReplacementMode, propos
             summary: 'blocked (active replacement requires a review advisory report)'
         };
     }
-    const advisoryTargetId = typeof input.document?.target?.id === 'string' ? input.document.target.id : null;
+    const advisoryTarget = input.document?.target;
+    const advisoryTargetId = typeof advisoryTarget?.id === 'string' ? advisoryTarget.id : null;
     const status = String(input.document?.status ?? '').trim();
     const targetMatches = advisoryTargetId == null || advisoryTargetId === proposalId || advisoryTargetId === target.mapId;
     const passed = targetMatches
@@ -258,20 +263,26 @@ export function buildHumanReviewGate(target, requestedReplacementMode, proposalI
             summary: 'blocked (active replacement requires an approved human review decision)'
         };
     }
-    const schemaValid = input.document?.schemaId === 'atm.humanReviewDecision';
-    const proposalMatches = input.document?.proposalId === proposalId || input.document?.queueRecord?.proposalId === proposalId;
-    const atomMatches = input.document?.atomId === atomId || input.document?.queueRecord?.atomId === atomId;
-    const reviewedMapId = input.document?.queueRecord?.proposal?.target?.mapId ?? input.document?.proposal?.target?.mapId ?? null;
+    const doc = input.document;
+    const queueRecord = doc?.queueRecord;
+    const schemaValid = doc?.schemaId === 'atm.humanReviewDecision';
+    const proposalMatches = doc?.proposalId === proposalId || queueRecord?.proposalId === proposalId;
+    const atomMatches = doc?.atomId === atomId || queueRecord?.atomId === atomId;
+    const queueProposal = queueRecord?.proposal;
+    const queueProposalTarget = queueProposal?.target;
+    const docProposal = doc?.proposal;
+    const docProposalTarget = docProposal?.target;
+    const reviewedMapId = (queueProposalTarget?.mapId ?? docProposalTarget?.mapId ?? null);
     const mapMatches = reviewedMapId == null || reviewedMapId === target.mapId;
-    const decisionApproved = input.document?.decision === 'approve';
-    const queueApproved = input.document?.queueRecord?.status === 'approved';
+    const decisionApproved = doc?.decision === 'approve';
+    const queueApproved = queueRecord?.status === 'approved';
     const passed = schemaValid && proposalMatches && atomMatches && mapMatches && decisionApproved && queueApproved;
     const reason = !schemaValid
         ? 'human review decision schemaId must be atm.humanReviewDecision'
         : !proposalMatches
-            ? `human review proposalId ${String(input.document?.proposalId ?? input.document?.queueRecord?.proposalId ?? 'unknown')} does not match ${proposalId}`
+            ? `human review proposalId ${String(doc?.proposalId ?? queueRecord?.proposalId ?? 'unknown')} does not match ${proposalId}`
             : !atomMatches
-                ? `human review atomId ${String(input.document?.atomId ?? input.document?.queueRecord?.atomId ?? 'unknown')} does not match ${atomId}`
+                ? `human review atomId ${String(doc?.atomId ?? queueRecord?.atomId ?? 'unknown')} does not match ${atomId}`
                 : !mapMatches
                     ? `human review target map ${String(reviewedMapId ?? 'unknown')} does not match ${target.mapId}`
                     : !decisionApproved || !queueApproved
@@ -279,7 +290,7 @@ export function buildHumanReviewGate(target, requestedReplacementMode, proposalI
                         : 'human review validation failed';
     return {
         passed,
-        reportId: input.document?.evidenceId ?? input.document?.proposalId ?? 'human-review.missing',
+        reportId: doc?.evidenceId ?? doc?.proposalId ?? 'human-review.missing',
         reportPath: input.path,
         summary: passed
             ? 'pass (human review approved active replacement)'
@@ -325,8 +336,12 @@ export function buildRetirementProofGate(target, requestedReplacementMode, input
 }
 // ─── Safe validators（private helpers）────────────────────────────────────
 function safeValidateRollbackProof(document) {
+    if (!document) {
+        return { ok: false, issues: ['rollback-proof-missing'] };
+    }
     try {
-        return validateRollbackProof(document);
+        const result = validateRollbackProof(document);
+        return { ok: result.ok, issues: [...result.issues] };
     }
     catch (error) {
         return {
@@ -336,8 +351,12 @@ function safeValidateRollbackProof(document) {
     }
 }
 function safeValidateRetirementProof(document) {
+    if (!document) {
+        return { ok: false, issues: ['retirement-proof-missing'] };
+    }
     try {
-        return validateRetirementProof(document);
+        const result = validateRetirementProof(document);
+        return { ok: result.ok, issues: [...result.issues] };
     }
     catch (error) {
         return {

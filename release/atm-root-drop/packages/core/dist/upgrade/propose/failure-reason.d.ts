@@ -9,5 +9,15 @@
  * proposal JSON (invariant I2) and surface in CLI output. Behavior
  * preserved byte-for-byte.
  */
-export declare function gateFailureSummary(gateName: any, report: any): string;
-export declare function qualityComparisonFailureReason(report: any): string;
+interface QualityReport {
+    regressedMetrics?: string[];
+    mapImpactScope?: {
+        propagationStatus?: Array<{
+            integrationTestPassed?: boolean;
+            mapId?: string;
+        }>;
+    };
+}
+export declare function gateFailureSummary(gateName: string, report: QualityReport | null | undefined): string;
+export declare function qualityComparisonFailureReason(report: QualityReport | null | undefined): string;
+export {};

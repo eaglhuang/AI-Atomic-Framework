@@ -13,6 +13,7 @@ import type {
   TestRunnerCommand,
   TestRunnerOutcomeStatus,
   TestRunnerPlugin,
+  TestRunnerProfile,
   TestRunnerPluginReference
 } from '../../../plugin-sdk/src/test-runner.ts';
 
@@ -47,8 +48,87 @@ export function loadAtomicTestRunnerConfig(configPath: string | null) {
   return JSON.parse(readFileSync(absolutePath, 'utf8')) as AtomicTestRunnerConfig;
 }
 
-export function createAtomicTestRunnerContract(normalizedModel: any) {
-  const commands = normalizedModel.execution.validation.commands.map((command: any, index: any) => ({
+interface TestRunnerModel {
+  identity: { atomId: string };
+  source: { specPath?: string | null };
+  execution: {
+    validation: {
+      commands: string[];
+      evidenceRequired?: boolean;
+    };
+  };
+  hashLock: {
+    algorithm: string;
+    digest: string;
+    canonicalization: string;
+  };
+}
+
+interface ExecuteCommandOutcome {
+  exitCode?: number;
+  durationMs?: number;
+  stdout?: string;
+  stderr?: string;
+  signal?: string | null;
+}
+
+interface BasicRunnerOptions {
+  repositoryRoot?: string;
+  reportPath?: string;
+  workbenchPath?: string;
+  workbenchRoot?: string;
+  now?: string;
+  schemaPath?: string;
+  writeReport?: boolean;
+  executeCommand?: (command: string, context: Record<string, unknown>) => ExecuteCommandOutcome;
+  runnerConfigPath?: string;
+  runnerConfig?: AtomicTestRunnerConfig | null;
+  profile?: unknown;
+  suite?: unknown;
+  [key: string]: unknown;
+}
+
+interface AtomicTestReportEntry extends Record<string, unknown> {
+  ok?: boolean;
+  exitCode?: unknown;
+  durationMs?: unknown;
+  status?: string;
+  blocking?: boolean;
+  key?: string | null;
+  family?: string | null;
+  dedupeKeys?: string[] | null;
+}
+
+interface CommandResultRecord extends AtomicTestReportEntry {
+  commandId: string;
+  commandKind: string;
+  command: string;
+  required?: boolean;
+  stdout: string;
+  stderr: string;
+  signal: string | null;
+}
+
+interface AtomicTestReportOptions {
+  results?: AtomicTestReportEntry[];
+  runnerContract?: {
+    evidenceRequired?: boolean;
+    commands?: unknown[];
+    [key: string]: unknown;
+  };
+  pluginRuns?: Array<Record<string, unknown>>;
+  gateResults?: AtomicTestReportEntry[];
+  reportPath?: string;
+  generatedAt?: string;
+  repositoryRoot?: string;
+  [key: string]: unknown;
+}
+
+export function createAtomicTestRunnerContract(normalizedModel: TestRunnerModel | null) {
+  if (!normalizedModel) {
+    throw new Error('Normalized model is required.');
+  }
+  const commands = normalizedModel.execution.validation.commands.map((command, index) => ({
     commandId: `validation-${index + 1}`,
     commandKind: classifyValidationCommandKind(command, index),
     command,
@@ -62,7 +142,10 @@ export function createAtomicTestRunnerContract(normalizedModel: any) {
   };
 }
 
-export function runAtomicTestRunner(normalizedModel: any, options: any = {}) {
+export function runAtomicTestRunner(normalizedModel: TestRunnerModel | null, options: BasicRunnerOptions = {}) {
+  if (!normalizedModel) {
+    throw new Error('Normalized model is required.');
+  }
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const reportPath = resolveAtomicTestReportPath(normalizedModel, {
     repositoryRoot,
@@ -73,7 +156,7 @@ export function runAtomicTestRunner(normalizedModel: any, options: any = {}) {
   const runnerContract = createAtomicTestRunnerContract(normalizedModel);
   const executeCommand = options.executeCommand ?? defaultExecuteCommand;
   const generatedAt = options.now ?? new Date().toISOString();
-  const results = runnerContract.commands.map((commandContract: any) => {
+  const results: CommandResultRecord[] = runnerContract.commands.map((commandContract) => {
     const outcome = executeCommand(commandContract.command, {
       repositoryRoot,
       atomId: normalizedModel.identity.atomId,
@@ -117,7 +200,10 @@ export function runAtomicTestRunner(normalizedModel: any, options: any = {}) {
   };
 }
 
-export async function runAtomicTestRunnerExtended(normalizedModel: any, options: any = {}) {
+export async function runAtomicTestRunnerExtended(normalizedModel: TestRunnerModel | null, options: BasicRunnerOptions = {}) {
+  if (!normalizedModel) {
+    throw new Error('Normalized model is required.');
+  }
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const configPath = options.runnerConfigPath
     ? path.resolve(options.runnerConfigPath)
@@ -134,10 +220,12 @@ export async function runAtomicTestRunnerExtended(normalizedModel: any, options:
   const contractData = await createExtendedRunnerContract(normalizedModel, {
     repositoryRoot,
     runnerConfig,
-    plugins
+    plugins,
+    profile: normalizeRunnerProfile(options.profile),
+    suite: normalizeSuiteOption(options.suite)
   });
   const executeCommand = options.executeCommand ?? defaultExecuteCommand;
-  const commandResults = contractData.commands.map((commandContract: any) => {
+  const commandResults: CommandResultRecord[] = contractData.commands.map((commandContract) => {
     const outcome = executeCommand(commandContract.command, {
       repositoryRoot,
       atomId: normalizedModel.identity.atomId,
@@ -189,7 +277,7 @@ export async function runAtomicTestRunnerExtended(normalizedModel: any, options:
   };
 }
 
-export function createAtomicTestReport(normalizedModel: any, options: any = {}) {
+export function createAtomicTestReport(normalizedModel: TestRunnerModel, options: AtomicTestReportOptions = {}) {
   const results = [...(options.results ?? [])];
   const runnerContract = options.runnerContract ?? createAtomicTestRunnerContract(normalizedModel);
   const pluginRuns = [...(options.pluginRuns ?? [])];
@@ -226,7 +314,7 @@ export function createAtomicTestReport(normalizedModel: any, options: any = {}) 
     },
     validation: {
       evidenceRequired: runnerContract.evidenceRequired === true,
-      commandCount: runnerContract.commands.length
+      commandCount: Array.isArray(runnerContract.commands) ? runnerContract.commands.length : 0
     },
     runnerContract,
     results,
@@ -262,7 +350,7 @@ export function createAtomicTestReport(normalizedModel: any, options: any = {}) 
   };
 }
 
-export function validateAtomicTestReportDocument(reportDocument: any, options: any = {}) {
+export function validateAtomicTestReportDocument(reportDocument: Record<string, unknown>, options: { schemaPath?: string } = {}) {
   const schemaPath = path.resolve(options.schemaPath ?? defaultTestReportSchemaPath);
   let ajv;
   try {
@@ -296,12 +384,12 @@ export function validateAtomicTestReportDocument(reportDocument: any, options: a
   const validate = ajv.compile(schemaDocument);
   const valid = validate(reportDocument);
   if (!valid) {
-    return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_INVALID', (validate.errors || []).map((error: any) => ({
+    return createValidationFailure(schemaPath, 'ATM_TEST_REPORT_INVALID', (validate.errors || []).map((error: Record<string, unknown>) => ({
       code: 'ATM_TEST_REPORT_INVALID',
-      keyword: error.keyword,
-      path: error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/',
-      text: error.message ?? 'Invalid test report document.',
-      prompt: `Fix the test report field at ${error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/'} (${error.keyword}).`
+      keyword: String(error.keyword ?? ''),
+      path: typeof error.instancePath === 'string' && error.instancePath.length > 0 ? error.instancePath : '/',
+      text: typeof error.message === 'string' ? error.message : 'Invalid test report document.',
+      prompt: `Fix the test report field at ${typeof error.instancePath === 'string' && error.instancePath.length > 0 ? error.instancePath : '/'} (${String(error.keyword ?? '')}).`
     })));
   }
 
@@ -310,13 +398,13 @@ export function validateAtomicTestReportDocument(reportDocument: any, options: a
     schemaPath: toPortablePath(schemaPath),
     promptReport: {
       code: 'ATM_TEST_REPORT_OK',
-      summary: `Atomic test report ${reportDocument.atomId} validated successfully.`,
+      summary: `Atomic test report ${String(reportDocument.atomId ?? '')} validated successfully.`,
       issues: []
     }
   };
 }
 
-function defaultExecuteCommand(command: any, context: any) {
+function defaultExecuteCommand(command: string, context: { repositoryRoot: string; [key: string]: unknown }) {
   const startedAt = Date.now();
   const result = spawnSync(command, {
     cwd: context.repositoryRoot,
@@ -333,7 +421,7 @@ function defaultExecuteCommand(command: any, context: any) {
   };
 }
 
-function classifyValidationCommandKind(command: any, index: any) {
+function classifyValidationCommandKind(command: string, index: number) {
   if (/\b(?:type-?check|tsc|pyright|mypy|cargo check)\b/i.test(command)) {
     return 'typecheck';
   }
@@ -346,10 +434,12 @@ function classifyValidationCommandKind(command: any, index: any) {
   return 'custom';
 }
 
-async function createExtendedRunnerContract(normalizedModel: any, options: {
+async function createExtendedRunnerContract(normalizedModel: TestRunnerModel, options: {
   repositoryRoot: string;
   runnerConfig?: AtomicTestRunnerConfig | null;
   plugins?: TestRunnerPlugin[];
+  profile?: TestRunnerProfile;
+  suite?: string | null;
 }) {
   const includeLegacyCommands = options.runnerConfig?.legacyValidation?.includeCommands !== false;
   const legacyCommands = includeLegacyCommands
@@ -362,7 +452,9 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
       repositoryRoot: options.repositoryRoot,
       specPath: normalizedModel.source?.specPath ?? null,
       atomId: normalizedModel.identity.atomId,
-      normalizedModel
+      normalizedModel,
+      profile: options.profile,
+      suite: options.suite
     });
     const supported = typeof support === 'boolean'
       ? support
@@ -382,9 +474,15 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
       repositoryRoot: options.repositoryRoot,
       specPath: normalizedModel.source?.specPath ?? null,
       atomId: normalizedModel.identity.atomId,
-      normalizedModel
+      normalizedModel,
+      profile: options.profile,
+      suite: options.suite,
+      pluginOptions: (options.runnerConfig?.plugins ?? []).find((reference) => reference.pluginId === plugin.pluginId)?.options
     });
-    const commands = (plan.commands ?? []).map((entry) => ({
+    const commands = filterPluginCommands(plan.commands ?? [], {
+      profile: options.profile,
+      suite: options.suite
+    }).map((entry) => ({
       ...entry,
       required: entry.required !== false
     }));
@@ -393,6 +491,11 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
       status: commands.length > 0 ? 'planned' : 'not_applicable',
       commandCount: commands.length,
       suites: plan.suites ?? [],
+      requestedProfile: options.profile ?? null,
+      requestedSuite: options.suite ?? null,
+      family: plan.family ?? null,
+      dedupeKeys: plan.dedupeKeys ?? [],
+      costBudgetMs: plan.costBudgetMs ?? null,
       evidenceSummary: plan.evidenceSummary ?? null
     });
     pluginCommands.push(...commands);
@@ -404,11 +507,39 @@ async function createExtendedRunnerContract(normalizedModel: any, options: {
     runnerContract: {
       executionMode: 'delegated',
       evidenceRequired: normalizedModel.execution.validation.evidenceRequired === true,
+      profile: options.profile ?? 'standard',
+      suite: options.suite ?? null,
       commands: [...legacyCommands, ...pluginCommands],
       plugins: pluginRuns,
       gates: describeConfiguredGates(options.runnerConfig?.defaultGates ?? null)
     }
   };
+}
+
+function filterPluginCommands(commands: TestRunnerCommand[], options: { profile?: TestRunnerProfile; suite?: string | null }) {
+  return commands.filter((command) => {
+    if (options.profile && Array.isArray(command.tiers) && command.tiers.length > 0 && !command.tiers.includes(options.profile)) {
+      return false;
+    }
+    if (options.suite) {
+      const suite = String(command.suite ?? command.family ?? command.key ?? '');
+      if (suite !== options.suite) return false;
+    }
+    return true;
+  });
+}
+
+function normalizeRunnerProfile(value: unknown): TestRunnerProfile {
+  const text = String(value ?? '').toLowerCase();
+  if (text === 'quick' || text === 'standard' || text === 'full') {
+    return text;
+  }
+  return 'standard';
+}
+
+function normalizeSuiteOption(value: unknown): string | null {
+  const text = String(value ?? '').trim();
+  return text || null;
 }
 
 async function loadConfiguredPlugins(references: TestRunnerPluginReference[], configPath: string | null) {
@@ -563,7 +694,7 @@ function readComparableFile(filePath: string) {
     : null;
 }
 
-function createValidationFailure(schemaPath: any, code: any, issues: any) {
+function createValidationFailure(schemaPath: string, code: string, issues: unknown[]) {
   return {
     ok: false,
     schemaPath: toPortablePath(schemaPath),
@@ -575,18 +706,18 @@ function createValidationFailure(schemaPath: any, code: any, issues: any) {
   };
 }
 
-function normalizeExitCode(value: any) {
-  return Number.isInteger(value) ? value : 1;
+function normalizeExitCode(value: unknown): number {
+  return typeof value === 'number' && Number.isInteger(value) ? value : 1;
 }
 
-function normalizeDuration(value: any) {
-  return Number.isInteger(value) && value >= 0 ? value : 0;
+function normalizeDuration(value: unknown): number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : 0;
 }
 
-function normalizeText(value: any) {
+function normalizeText(value: unknown) {
   return typeof value === 'string' ? value : '';
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string) {
   return value.replace(/\\/g, '/');
 }

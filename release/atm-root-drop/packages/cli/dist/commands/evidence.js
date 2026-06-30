@@ -9,6 +9,7 @@ import { createFrameworkModeStatus } from './framework-development.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
 import { gitHeadEvidencePath } from './git-head-evidence.js';
 import { resolveTaskRunnerArbitration } from './validate.js';
+import { readTestCatalog, resolveTestPlanForTask, selectTestEntries } from '../../../../scripts/lib/test-catalog.ts';
 import { generateDiffEvidence, mergeDiffEvidenceWithExisting, validateDiffEvidence } from '../../../core/dist/evidence/diff-evidence.js';
 import { inspectHistoricalDelivery, pathMatchesTaskScope } from './tasks/historical-delivery.js';
 export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';
@@ -557,13 +558,133 @@ function canAutoRunDeclaredValidator(gate, command, taskDeclared) {
         return true;
     return false;
 }
-function buildAutoEvidenceRequiredCommand(taskId, actorId, command, validator, runnerKind) {
+function canAutoRunCatalogEntry(entry, label, taskDeclared) {
+    if (!entry.command)
+        return false;
+    if (entry.capability === 'integration-test') {
+        return !validatorRequiresOperatorApproval(label, entry.command);
+    }
+    return canAutoRunDeclaredValidator(label, entry.command, taskDeclared);
+}
+function resolveCatalogLinkedValidators(entry) {
+    if (entry.capability !== 'validator')
+        return [];
+    if (entry.validatorName && entry.validatorName.trim().length > 0) {
+        return [canonicalizeValidatorIdentity(entry.validatorName.trim())];
+    }
+    const autoLinked = entry.command ? detectAutoLinkedValidator(entry.command) : null;
+    return autoLinked ? [autoLinked] : [];
+}
+function buildAutoEvidenceRequiredCommand(taskId, actorId, command, validator, runnerKind, validators = []) {
     const escapedCommand = quoteForShell(command);
-    if (detectAutoLinkedValidator(command)) {
+    const linkedValidators = validators.filter(Boolean);
+    if (linkedValidators.length === 0 && detectAutoLinkedValidator(command)) {
         return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --runner-kind ${runnerKind} --json`;
     }
-    const escapedGate = quoteForShell(validator);
+    const escapedGate = quoteForShell((linkedValidators.length > 0 ? linkedValidators : [validator]).join(','));
     return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --validators ${escapedGate} --runner-kind ${runnerKind} --json`;
+}
+function readCommandRunProofCommands(cwd, taskId) {
+    const commands = new Set();
+    const manifest = readEvidenceBundleManifest(cwd, taskId);
+    for (const run of manifest?.commandRuns ?? []) {
+        const command = typeof run.command === 'string' ? normalizeValidatorToken(run.command) : '';
+        if (command)
+            commands.add(command);
+    }
+    const bundle = readEvidenceBundle(cwd, taskId);
+    for (const record of bundle.evidence) {
+        if (!isRecord(record.details) || !Array.isArray(record.details.commandRuns))
+            continue;
+        for (const run of record.details.commandRuns) {
+            const normalized = normalizeCommandRunInput(run, 'bundle-command-run');
+            if (normalized.exitCode !== 0)
+                continue;
+            const command = normalizeValidatorToken(normalized.command);
+            if (command)
+                commands.add(command);
+        }
+    }
+    return commands;
+}
+function readCatalogSelectedEntries(cwd, taskId) {
+    const taskDocument = readTaskDocument(cwd, taskId);
+    if (!taskDocument)
+        return [];
+    const changedFiles = extractTaskDeclaredFiles(taskDocument);
+    const taskPlan = resolveTestPlanForTask(taskDocument, changedFiles);
+    const catalog = readTestCatalog(cwd);
+    const validatorSelection = selectTestEntries({
+        catalog,
+        capability: 'validator',
+        taskPlan,
+        changedFiles
+    });
+    const integrationSelection = selectTestEntries({
+        catalog,
+        capability: 'integration-test',
+        taskPlan,
+        changedFiles
+    });
+    return [...validatorSelection.entries, ...integrationSelection.entries];
+}
+function buildCatalogAutoEvidenceEntries(input) {
+    const selectedEntries = readCatalogSelectedEntries(input.cwd, input.taskId);
+    if (selectedEntries.length === 0)
+        return [];
+    const commandProofs = readCommandRunProofCommands(input.cwd, input.taskId);
+    const legacyCommands = new Set(input.legacyReport.validators
+        .map((entry) => normalizeValidatorToken(entry.expectedCommand))
+        .filter(Boolean));
+    const legacyNames = new Set(input.legacyReport.validators
+        .map((entry) => canonicalizeValidatorIdentity(entry.name))
+        .filter(Boolean));
+    const planEntries = [];
+    for (const entry of selectedEntries) {
+        const command = typeof entry.command === 'string' && entry.command.trim().length > 0 ? entry.command.trim() : null;
+        const label = entry.validatorName?.trim() || entry.key;
+        const normalizedLabel = canonicalizeValidatorIdentity(label);
+        const normalizedCommand = normalizeValidatorToken(command ?? '');
+        if (entry.capability === 'validator' && (legacyCommands.has(normalizedCommand) || legacyNames.has(normalizedLabel))) {
+            continue;
+        }
+        const linkedValidators = resolveCatalogLinkedValidators(entry);
+        const evidenceState = command && commandProofs.has(normalizedCommand) ? 'pass' : 'absent';
+        const requiredCommand = command && evidenceState !== 'pass'
+            ? buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, label, input.runnerKind, linkedValidators)
+            : null;
+        const base = {
+            validator: label,
+            capability: entry.capability,
+            catalogKey: entry.key,
+            command,
+            evidenceState,
+            requiredCommand,
+            linkedValidators
+        };
+        if (evidenceState === 'pass') {
+            planEntries.push({
+                ...base,
+                disposition: 'already-satisfied',
+                reason: 'Catalog-selected command already has command-backed evidence.'
+            });
+            continue;
+        }
+        if (!command || !canAutoRunCatalogEntry(entry, label, input.taskDeclared)) {
+            planEntries.push({
+                ...base,
+                disposition: 'requires-approval',
+                reason: 'Catalog-selected test requires explicit operator approval or still contains unresolved placeholders.'
+            });
+            continue;
+        }
+        planEntries.push({
+            ...base,
+            disposition: 'to-run',
+            reason: 'Catalog-selected test is missing command-backed evidence and can be auto-run.'
+        });
+    }
+    return planEntries;
 }
 export function buildAutoEvidencePlan(input) {
     const resolvedCwd = path.resolve(input.cwd);
@@ -581,9 +702,12 @@ export function buildAutoEvidencePlan(input) {
             : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name, runnerArbitration.preferredRunnerKind);
         const base = {
             validator: entry.name,
+            capability: 'validator',
+            catalogKey: null,
             command,
             evidenceState: entry.evidenceState,
-            requiredCommand
+            requiredCommand,
+            linkedValidators: [entry.name]
         };
         if (entry.evidenceState === 'pass') {
             alreadySatisfied.push({
@@ -614,6 +738,28 @@ export function buildAutoEvidencePlan(input) {
             disposition: 'to-run',
             reason: 'Declared closure-required validator is missing fresh command-backed evidence and can be auto-run.'
         });
+    }
+    for (const entry of buildCatalogAutoEvidenceEntries({
+        cwd: resolvedCwd,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        runnerKind: runnerArbitration.preferredRunnerKind,
+        legacyReport: report,
+        taskDeclared
+    })) {
+        if (entry.disposition === 'already-satisfied') {
+            alreadySatisfied.push(entry);
+            continue;
+        }
+        if (entry.disposition === 'requires-approval') {
+            requiresApproval.push(entry);
+            continue;
+        }
+        if (entry.disposition === 'skipped-out-of-scope') {
+            skippedOutOfScope.push(entry);
+            continue;
+        }
+        toRun.push(entry);
     }
     const remediationCommand = toRun[0]?.requiredCommand
         ?? requiresApproval[0]?.requiredCommand
@@ -646,6 +792,7 @@ export function executeAutoEvidencePlan(input) {
                 '--actor', input.actorId,
                 '--command', entry.command,
                 '--runner-kind', runnerArbitration.preferredRunnerKind,
+                ...(entry.linkedValidators.length > 0 ? ['--validators', entry.linkedValidators.join(',')] : []),
                 '--json'
             ]);
             runs.push({ validator: entry.validator, command: entry.command, ok: true });
@@ -2193,7 +2340,7 @@ function readGovernedCommitTreeWithoutEvidence(cwd, commitSha) {
         });
         if (!readTree.ok)
             return null;
-        runGitCommand(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json'], {
+        runGitCommand(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json', '.atm/history/evidence/git-head.jsonl'], {
             GIT_INDEX_FILE: tempIndex
         });
         const writeTree = runGitCommand(cwd, ['write-tree'], {

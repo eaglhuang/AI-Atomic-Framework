@@ -167,7 +167,8 @@ function addMemberVersions(index, atomIdIndex, members) {
         if (versions.length === 0) {
             continue;
         }
-        const currentVersion = String(lineage?.currentVersion ?? member?.version ?? versions[versions.length - 1]?.version ?? '').trim();
+        const lastVersion = versions[versions.length - 1]?.version ?? '';
+        const currentVersion = String(lineage?.currentVersion ?? member?.version ?? lastVersion).trim();
         const record = index.get(atomId) ?? { current: null, versions: new Set() };
         if (currentVersion) {
             record.current = currentVersion;

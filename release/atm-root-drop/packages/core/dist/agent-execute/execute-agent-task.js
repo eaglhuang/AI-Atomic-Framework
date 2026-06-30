@@ -4,7 +4,12 @@ import { defaultExecutionEvidenceFileName, defaultExecutionLogFileName, defaultE
 import { createExecutionEvidenceDocument, createExecutionSnapshotDocument, createLogLines } from './execution-documents.js';
 import { createValidationPassPlan, defaultRunValidationPass, normalizeValidationPassOutcome } from './execution-validation.js';
 export * from './execution-constants.js';
-export function createExecuteAgentTaskEffectContract(options) {
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
+export function createExecuteAgentTaskEffectContract(options = {}) {
     const normalizedOptions = options || {};
     return {
         nodeKind: executeAgentTaskNodeKind,
@@ -14,7 +19,7 @@ export function createExecuteAgentTaskEffectContract(options) {
         proposalDelegatedTo: String(normalizedOptions.proposalDelegatedTo || defaultProposalDelegatedTo)
     };
 }
-export function executeAgentTask(normalizedModel, options) {
+export function executeAgentTask(normalizedModel, options = {}) {
     const normalizedOptions = options || {};
     const atomId = normalizedModel?.identity?.atomId;
     if (!atomId) {
@@ -168,13 +173,14 @@ function defaultApplyExecution() {
     };
 }
 function normalizeAgentOutcome(rawOutcome, fallback) {
-    const proposedChanges = normalizeProposedChanges(rawOutcome?.proposedChanges, fallback.defaultTouchedFile);
-    const summary = String(rawOutcome?.summary || (fallback.executionMode === 'dry-run'
+    const outcome = asRecord(rawOutcome);
+    const proposedChanges = normalizeProposedChanges(outcome?.proposedChanges, fallback.defaultTouchedFile);
+    const summary = String(outcome?.summary || (fallback.executionMode === 'dry-run'
         ? 'Dry-run captured a candidate patch without mutating the host project.'
         : 'Apply mode prepared a candidate patch for the host project.'));
-    const logLines = normalizeLogLines(rawOutcome?.logLines, fallback.executionMode);
+    const logLines = normalizeLogLines(outcome?.logLines, fallback.executionMode);
     return {
-        ok: rawOutcome?.ok !== false,
+        ok: outcome?.ok !== false,
         summary,
         logLines,
         proposedChanges,
@@ -184,34 +190,39 @@ function normalizeAgentOutcome(rawOutcome, fallback) {
     };
 }
 function normalizeApplyOutcome(rawOutcome) {
+    const outcome = asRecord(rawOutcome);
     return {
-        ok: rawOutcome?.ok !== false,
-        appliedChanges: rawOutcome?.appliedChanges === true,
-        touchedFiles: uniqueStrings(Array.isArray(rawOutcome?.touchedFiles) ? rawOutcome.touchedFiles : []),
-        summary: String(rawOutcome?.summary || (rawOutcome?.appliedChanges === true
+        ok: outcome?.ok !== false,
+        appliedChanges: outcome?.appliedChanges === true,
+        touchedFiles: uniqueStrings(Array.isArray(outcome?.touchedFiles) ? outcome.touchedFiles : []),
+        summary: String(outcome?.summary || (outcome?.appliedChanges === true
             ? 'Apply mode executed the host mutation callback.'
             : 'Apply mode requested without a host mutation callback.'))
     };
 }
 function normalizePromptDocument(normalizedModel, promptDocument) {
     const atomId = normalizedModel?.identity?.atomId;
-    const promptPath = toPortablePath(promptDocument?.promptPath || `${defaultExecutionWorkbenchRoot}/${atomId}/prompt.md`);
-    const frontmatter = promptDocument?.frontmatter || {};
-    const evidenceContract = frontmatter.evidenceContract || {};
+    const prompt = asRecord(promptDocument);
+    const frontmatter = asRecord(prompt?.frontmatter);
+    const evidenceContract = asRecord(frontmatter?.evidenceContract);
+    const promptPath = toPortablePath(prompt?.promptPath || `${defaultExecutionWorkbenchRoot}/${atomId}/prompt.md`);
     return {
         promptPath,
-        allowedFiles: uniqueStrings(frontmatter.allowedFiles || [promptPath]),
-        validationCommands: uniqueStrings(evidenceContract.validationCommands || normalizedModel?.execution?.validation?.commands || [])
+        allowedFiles: uniqueStrings(frontmatter?.allowedFiles || [promptPath]),
+        validationCommands: uniqueStrings(evidenceContract?.validationCommands || normalizedModel?.execution?.validation?.commands || [])
     };
 }
 function normalizeProposedChanges(proposedChanges, fallbackFilePath) {
     const normalized = Array.isArray(proposedChanges)
         ? proposedChanges
             .filter((entry) => entry && typeof entry === 'object')
-            .map((entry) => ({
-            filePath: toPortablePath(entry.filePath || fallbackFilePath),
-            description: String(entry.description || 'Candidate change staged for review.')
-        }))
+            .map((entry) => {
+            const record = entry;
+            return {
+                filePath: toPortablePath(record.filePath || fallbackFilePath),
+                description: String(record.description || 'Candidate change staged for review.')
+            };
+        })
             .filter((entry) => entry.filePath)
         : [];
     if (normalized.length > 0) {
@@ -253,7 +264,7 @@ function resolveWorkbenchPath(normalizedModel, repositoryRoot, options) {
         return path.resolve(repositoryRoot, options.workbenchPath);
     }
     const workbenchRoot = options.workbenchRoot || defaultExecutionWorkbenchRoot;
-    return path.resolve(repositoryRoot, workbenchRoot, resolveCanonicalAtomFolderName(normalizedModel.identity.atomId));
+    return path.resolve(repositoryRoot, workbenchRoot, resolveCanonicalAtomFolderName(normalizedModel.identity?.atomId));
 }
 function resolveCanonicalAtomFolderName(atomId) {
     const folderName = String(atomId || '').trim();
@@ -276,7 +287,8 @@ function writeText(filePath, content) {
     writeFileSync(filePath, content, 'utf8');
 }
 function uniqueStrings(values) {
-    return Array.from(new Set((values || []).map((value) => toPortablePath(String(value))).filter(Boolean)));
+    const normalizedValues = Array.isArray(values) ? values : [];
+    return Array.from(new Set(normalizedValues.map((value) => toPortablePath(String(value))).filter(Boolean)));
 }
 function toPortablePath(value) {
     return String(value || '').replace(/\\/g, '/');

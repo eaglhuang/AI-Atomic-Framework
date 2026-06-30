@@ -279,8 +279,11 @@ function attachQueueSupplemental(report, options) {
     }
     try {
         const queue = JSON.parse(readFileSync(queuePath, 'utf8'));
-        const entries = Array.isArray(queue?.entries) ? queue.entries : [];
-        const matched = entries.find((entry) => entry && entry.proposalId === options.proposalId);
+        const entries = queue && Array.isArray(queue.entries) ? queue.entries : [];
+        const matched = entries.find((entry) => typeof entry === 'object' &&
+            entry !== null &&
+            'proposalId' in entry &&
+            entry.proposalId === options.proposalId);
         return {
             ...report,
             supplementalContext: {

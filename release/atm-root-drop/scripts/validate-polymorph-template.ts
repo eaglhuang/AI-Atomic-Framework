@@ -94,8 +94,8 @@ check(detectorResult.matchedDimensions.includes('language'), 'dimension detector
 const dedupFixture = readJson('fixtures/polymorph/dedup-polymorph-ignore-pass.json');
 const dedupReport = compareQualityMetrics(dedupFixture);
 check(Array.isArray(dedupReport.dedupCandidates), 'dedup report must contain dedupCandidates array');
-check(dedupReport.dedupCandidates.length === 1, 'polymorph instance candidate must be filtered out from dedup candidates');
+check((dedupReport.dedupCandidates ?? []).length === 1, 'polymorph instance candidate must be filtered out from dedup candidates');
 check(Array.isArray(dedupReport.dedupIgnoredAsPolymorph), 'dedup report must include dedupIgnoredAsPolymorph');
-check(dedupReport.dedupIgnoredAsPolymorph.length === 1, 'dedup report must track ignored polymorph candidate count');
+check((dedupReport.dedupIgnoredAsPolymorph ?? []).length === 1, 'dedup report must track ignored polymorph candidate count');
 
 console.log('[polymorph-template:' + mode + '] ok (template schema, dimension schema, lazy instantiation, detector, and dedup integration verified)');

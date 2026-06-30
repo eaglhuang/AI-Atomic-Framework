@@ -68,9 +68,9 @@ export function proposeAtomicUpgrade(request) {
         ? buildMapProposalContext({
             repositoryRoot: normalizedRequest.repositoryRoot,
             mapId: target.mapId,
-            atomId,
-            fromVersion,
-            toVersion
+            atomId: atomId,
+            fromVersion: fromVersion,
+            toVersion: toVersion
         })
         : null;
     const proposalId = normalizedRequest.proposalId ?? createProposalId(atomId, fromVersion, toVersion, target, behaviorId);
@@ -219,7 +219,7 @@ export function proposeAtomicUpgrade(request) {
     }
     return proposal;
 }
-function normalizeRequest(request = {}) {
+function normalizeRequest(request) {
     if (!Array.isArray(request.inputs) || request.inputs.length === 0) {
         throw new Error('Upgrade proposal requires at least one input document.');
     }
@@ -244,13 +244,13 @@ function normalizeRequest(request = {}) {
 }
 function normalizeTarget(target) {
     if (!target || typeof target !== 'object') {
-        return { kind: 'atom' };
+        return { kind: 'atom', mapId: '' };
     }
     const kind = target.kind ?? 'atom';
     if (kind !== 'atom' && kind !== 'map') {
         throw new Error(`Unsupported target.kind: ${kind}`);
     }
-    const normalized = { kind };
+    const normalized = { kind, mapId: '' };
     if (typeof target.mapId === 'string' && target.mapId.length > 0) {
         normalized.mapId = target.mapId;
     }

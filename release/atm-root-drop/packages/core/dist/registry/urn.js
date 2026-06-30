@@ -4,6 +4,11 @@ const semverPattern = /^\d+\.\d+\.\d+$/;
 const urnPattern = /^urn:atm:([a-z][a-z0-9-]*):([^@\s]+)(?:@(\d+\.\d+\.\d+))?$/;
 const legacyUriPattern = /^legacy:\/\/([^#\s]+)(?:#(L\d+(?:-L?\d+)?))?$/;
 const supportedNodeKinds = new Set(['atom', 'map', 'police', 'behavior']);
+function asUrnInputRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export class AtmUrnError extends Error {
     constructor(code, message, details = {}) {
         super(message);
@@ -29,9 +34,10 @@ export function inferAtmNodeKind(canonicalId) {
     return 'atom';
 }
 export function formatAtmUrn(input) {
-    const nodeKind = normalizeNodeKind(input?.nodeKind ?? input?.kind ?? inferAtmNodeKind(input?.canonicalId ?? input?.atomId ?? input?.mapId));
-    const canonicalId = normalizeCanonicalId(input?.canonicalId ?? input?.atomId ?? input?.mapId);
-    const version = normalizeOptionalVersion(input?.version ?? input?.atomVersion ?? input?.mapVersion ?? input?.currentVersion ?? null);
+    const record = asUrnInputRecord(input);
+    const nodeKind = normalizeNodeKind(record?.nodeKind ?? record?.kind ?? inferAtmNodeKind(record?.canonicalId ?? record?.atomId ?? record?.mapId));
+    const canonicalId = normalizeCanonicalId(record?.canonicalId ?? record?.atomId ?? record?.mapId);
+    const version = normalizeOptionalVersion(record?.version ?? record?.atomVersion ?? record?.mapVersion ?? record?.currentVersion ?? null);
     assertCanonicalIdMatchesKind(canonicalId, nodeKind);
     return `urn:atm:${nodeKind}:${canonicalId}${version ? `@${version}` : ''}`;
 }
@@ -69,9 +75,10 @@ export function normalizeAtmNodeRef(value, options = {}) {
             version
         };
     }
-    const canonicalId = value?.canonicalId ?? value?.atomId ?? value?.mapId;
-    const nodeKind = value?.nodeKind ?? value?.kind ?? inferAtmNodeKind(canonicalId);
-    const version = value?.version ?? value?.atomVersion ?? value?.mapVersion ?? value?.currentVersion ?? null;
+    const record = asUrnInputRecord(value);
+    const canonicalId = record?.canonicalId ?? record?.atomId ?? record?.mapId;
+    const nodeKind = record?.nodeKind ?? record?.kind ?? inferAtmNodeKind(canonicalId);
+    const version = record?.version ?? record?.atomVersion ?? record?.mapVersion ?? record?.currentVersion ?? null;
     const normalizedKind = normalizeNodeKind(nodeKind);
     const normalizedId = normalizeCanonicalId(canonicalId);
     const normalizedVersion = normalizeOptionalVersion(version);

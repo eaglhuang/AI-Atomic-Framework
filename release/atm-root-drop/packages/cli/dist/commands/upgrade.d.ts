@@ -1,1 +1,1 @@
-export declare function runUpgrade(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runUpgrade(argv: string[]): Promise<import("./shared.ts").CommandResult>;

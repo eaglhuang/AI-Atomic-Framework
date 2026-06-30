@@ -5,6 +5,7 @@ import { resolveCanonicalMapPaths } from '../test-runner/map-integration.ts';
 import { createAtomicMapRegistryEntry, isAtomicMapRegistryEntry } from './map-registry.ts';
 import { validateRetirementProof } from './retirement-proof.ts';
 import { validateRollbackProof } from './rollback-proof.ts';
+import type { RollbackProof } from './rollback-types.ts';
 import { validateRegistryDocumentFile, writeRegistryArtifacts } from './registry.ts';
 
 export const ReplacementMode = Object.freeze({
@@ -26,6 +27,83 @@ interface ReplacementTransitionInput {
   readonly repositoryRoot: string;
 }
 
+interface ReplacementLaneEvidenceInput {
+  readonly evidenceRefs?: unknown;
+  readonly reason?: unknown;
+}
+
+interface ReplacementLaneOptions {
+  readonly repositoryRoot?: string;
+  readonly now?: unknown;
+  readonly actor?: unknown;
+}
+
+interface ReplacementLaneTargetEntryLike {
+  readonly mapId?: string;
+}
+
+interface EvidenceDocumentRecord {
+  readonly schemaId?: string;
+  readonly mapId?: string;
+  readonly passed?: boolean;
+  readonly targetKind?: string;
+  readonly verificationStatus?: string;
+  readonly status?: string;
+  readonly reportId?: string;
+  readonly decision?: string;
+  readonly advisoryUnavailable?: boolean;
+  readonly target?: {
+    readonly kind?: string;
+    readonly id?: string | null;
+  } | null;
+  readonly queueRecord?: {
+    readonly status?: string;
+    readonly proposal?: {
+      readonly target?: {
+        readonly mapId?: string | null;
+      } | null;
+    } | null;
+  } | null;
+  readonly proposal?: {
+    readonly target?: {
+      readonly mapId?: string | null;
+    } | null;
+  } | null;
+  readonly transitions?: unknown[];
+  readonly canonicalMapId?: string;
+  readonly generatedAt?: string;
+  readonly specVersion?: string;
+}
+
+interface LoadedEvidenceDocument {
+  readonly path: string;
+  readonly absolutePath: string;
+  readonly document: Record<string, unknown> | null;
+  readonly error: string | null;
+}
+
+interface EvidenceCheckResult {
+  readonly passed: boolean;
+  readonly path: string | null;
+}
+
+interface ReplacementLaneValidationResult {
+  readonly ok: boolean;
+  readonly issues?: string[];
+}
+
+interface TransitionAppendInput {
+  readonly mapId: string;
+  readonly generatedAt: string;
+  readonly transitionRecord: Record<string, unknown>;
+}
+
+function asRecord<T extends object>(value: unknown): T | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as T
+    : null;
+}
+
 const orderedReplacementModes: readonly ReplacementModeValue[] = [
   ReplacementMode.Draft,
   ReplacementMode.Shadow,
@@ -41,7 +119,7 @@ const evidenceRequirementByTarget: Readonly<Record<ReplacementModeWithEvidence, 
   [ReplacementMode.LegacyRetired]: 'rollback proof or retirement proof'
 });
 
-export function transitionReplacementMode(mapId: string, to: string, evidence: any = {}, options: any = {}) {
+export function transitionReplacementMode(mapId: string, to: string, evidence: ReplacementLaneEvidenceInput = {}, options: ReplacementLaneOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const now = normalizeTimestamp(options.now ?? new Date().toISOString());
   const actor = normalizeActor(options.actor ?? process.env.AGENT_IDENTITY ?? 'ATM replacement lane');
@@ -100,7 +178,7 @@ export function transitionReplacementMode(mapId: string, to: string, evidence: a
   const updatedRegistry = {
     ...target.registryDocument,
     generatedAt: now,
-    entries: target.registryDocument.entries.map((entry: any) => isAtomicMapRegistryEntry(entry) && entry.mapId === target.mapId
+    entries: target.registryDocument.entries.map((entry: unknown) => isAtomicMapRegistryEntry(entry) && entry.mapId === target.mapId
       ? updatedRegistryEntry
       : entry)
   };
@@ -176,7 +254,7 @@ function loadReplacementLaneTarget(repositoryRoot: string, mapId: string) {
 
   const registryDocument = readJson(registryAbsolutePath);
   const registryEntry = Array.isArray(registryDocument?.entries)
-    ? registryDocument.entries.find((entry: any) => isAtomicMapRegistryEntry(entry) && entry.mapId === canonicalMapId)
+    ? registryDocument.entries.find((entry: unknown) => isAtomicMapRegistryEntry(entry) && entry.mapId === canonicalMapId)
     : null;
   if (!registryEntry) {
     throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', 'Replacement lane requires a matching map entry in atomic-registry.json.', {
@@ -305,7 +383,7 @@ function validateLegacyRetiredEvidence(input: ReplacementTransitionInput & { rea
   });
 }
 
-function loadEvidenceDocuments(repositoryRoot: string, evidenceRefs: readonly string[]) {
+function loadEvidenceDocuments(repositoryRoot: string, evidenceRefs: readonly string[]): LoadedEvidenceDocument[] {
   return evidenceRefs.map((evidenceRef) => {
     const absolutePath = path.isAbsolute(evidenceRef) ? evidenceRef : path.join(repositoryRoot, evidenceRef);
     if (!existsSync(absolutePath)) {
@@ -320,7 +398,7 @@ function loadEvidenceDocuments(repositoryRoot: string, evidenceRefs: readonly st
       return {
         path: evidenceRef,
         absolutePath,
-        document: readJson(absolutePath),
+        document: asRecord<Record<string, unknown>>(readJson(absolutePath)),
         error: null
       };
     } catch (error) {
@@ -334,7 +412,7 @@ function loadEvidenceDocuments(repositoryRoot: string, evidenceRefs: readonly st
   });
 }
 
-function findMapEquivalenceEvidence(mapId: string, evidenceDocuments: any[]) {
+function findMapEquivalenceEvidence(mapId: string, evidenceDocuments: LoadedEvidenceDocument[]): EvidenceCheckResult {
   const match = evidenceDocuments.find((entry) => entry.document?.schemaId === 'atm.mapEquivalenceReport'
     && entry.document?.mapId === mapId
     && entry.document?.passed === true);
@@ -344,7 +422,7 @@ function findMapEquivalenceEvidence(mapId: string, evidenceDocuments: any[]) {
   };
 }
 
-function findPropagationEvidence(mapId: string, evidenceDocuments: any[]) {
+function findPropagationEvidence(mapId: string, evidenceDocuments: LoadedEvidenceDocument[]): EvidenceCheckResult {
   const match = evidenceDocuments.find((entry) => safeValidatePropagationEvidence(entry.document, mapId).ok === true);
   return {
     passed: Boolean(match),
@@ -352,21 +430,22 @@ function findPropagationEvidence(mapId: string, evidenceDocuments: any[]) {
   };
 }
 
-function findReviewAdvisoryEvidence(mapId: string, evidenceDocuments: any[]) {
+function findReviewAdvisoryEvidence(mapId: string, evidenceDocuments: LoadedEvidenceDocument[]): EvidenceCheckResult {
   const match = evidenceDocuments.find((entry) => {
     const document = entry.document;
-    if (!document || typeof document !== 'object') {
+    const record = asRecord<EvidenceDocumentRecord>(document);
+    if (!record) {
       return false;
     }
-    const advisoryTarget = document.target ?? null;
+    const advisoryTarget = asRecord<NonNullable<EvidenceDocumentRecord['target']>>(record.target) ?? null;
     const targetMatches = advisoryTarget == null
       || advisoryTarget.kind === 'proposal'
       || advisoryTarget.id == null
       || advisoryTarget.id === mapId;
     return targetMatches
-      && document.advisoryUnavailable !== true
-      && (document.status === 'ok' || document.status === 'warn')
-      && typeof document.reportId === 'string';
+      && record.advisoryUnavailable !== true
+      && (record.status === 'ok' || record.status === 'warn')
+      && typeof record.reportId === 'string';
   });
   return {
     passed: Boolean(match),
@@ -374,16 +453,22 @@ function findReviewAdvisoryEvidence(mapId: string, evidenceDocuments: any[]) {
   };
 }
 
-function findHumanReviewEvidence(mapId: string, evidenceDocuments: any[]) {
+function findHumanReviewEvidence(mapId: string, evidenceDocuments: LoadedEvidenceDocument[]): EvidenceCheckResult {
   const match = evidenceDocuments.find((entry) => {
     const document = entry.document;
-    if (!document || typeof document !== 'object') {
+    const record = asRecord<EvidenceDocumentRecord>(document);
+    if (!record) {
       return false;
     }
-    const reviewedMapId = document.queueRecord?.proposal?.target?.mapId ?? document.proposal?.target?.mapId ?? null;
-    return document.schemaId === 'atm.humanReviewDecision'
-      && document.decision === 'approve'
-      && document.queueRecord?.status === 'approved'
+    const queueRecord = asRecord<NonNullable<EvidenceDocumentRecord['queueRecord']>>(record.queueRecord);
+    const queueProposal = asRecord<NonNullable<NonNullable<EvidenceDocumentRecord['queueRecord']>['proposal']>>(queueRecord?.proposal);
+    const queueTarget = asRecord<NonNullable<NonNullable<NonNullable<EvidenceDocumentRecord['queueRecord']>['proposal']>['target']>>(queueProposal?.target);
+    const proposal = asRecord<NonNullable<EvidenceDocumentRecord['proposal']>>(record.proposal);
+    const proposalTarget = asRecord<NonNullable<NonNullable<EvidenceDocumentRecord['proposal']>['target']>>(proposal?.target);
+    const reviewedMapId = queueTarget?.mapId ?? proposalTarget?.mapId ?? null;
+    return record.schemaId === 'atm.humanReviewDecision'
+      && record.decision === 'approve'
+      && queueRecord?.status === 'approved'
       && (reviewedMapId == null || reviewedMapId === mapId);
   });
   return {
@@ -392,7 +477,7 @@ function findHumanReviewEvidence(mapId: string, evidenceDocuments: any[]) {
   };
 }
 
-function findRollbackProofEvidence(mapId: string, evidenceDocuments: any[]) {
+function findRollbackProofEvidence(mapId: string, evidenceDocuments: LoadedEvidenceDocument[]): EvidenceCheckResult {
   const match = evidenceDocuments.find((entry) => safeValidateRollbackEvidence(entry.document, mapId).ok === true);
   return {
     passed: Boolean(match),
@@ -400,7 +485,7 @@ function findRollbackProofEvidence(mapId: string, evidenceDocuments: any[]) {
   };
 }
 
-function findRetirementProofEvidence(mapId: string, evidenceDocuments: any[]) {
+function findRetirementProofEvidence(mapId: string, evidenceDocuments: LoadedEvidenceDocument[]): EvidenceCheckResult {
   const match = evidenceDocuments.find((entry) => safeValidateRetirementEvidence(entry.document, mapId).ok === true);
   return {
     passed: Boolean(match),
@@ -408,9 +493,13 @@ function findRetirementProofEvidence(mapId: string, evidenceDocuments: any[]) {
   };
 }
 
-function safeValidatePropagationEvidence(document: any, mapId: string) {
+function safeValidatePropagationEvidence(document: unknown, mapId: string): ReplacementLaneValidationResult {
   try {
-    return validatePropagationReport(document, { mapId });
+    const result = validatePropagationReport(asRecord<Record<string, unknown>>(document), { mapId });
+    return {
+      ok: result.ok,
+      issues: result.issues ? [...result.issues] : undefined
+    };
   } catch (error) {
     return {
       ok: false,
@@ -419,12 +508,17 @@ function safeValidatePropagationEvidence(document: any, mapId: string) {
   }
 }
 
-function safeValidateRollbackEvidence(document: any, mapId: string) {
+function safeValidateRollbackEvidence(document: unknown, mapId: string): ReplacementLaneValidationResult {
+  const record = asRecord<Record<string, unknown>>(document);
   try {
-    if (document?.schemaId !== 'atm.rollbackProof' || document?.targetKind !== 'map' || document?.mapId !== mapId || document?.verificationStatus !== 'passed') {
+    if (record?.schemaId !== 'atm.rollbackProof' || record?.targetKind !== 'map' || record?.mapId !== mapId || record?.verificationStatus !== 'passed') {
       return { ok: false, issues: ['rollback proof does not match target map or did not pass'] };
     }
-    return validateRollbackProof(document);
+    const result = validateRollbackProof(record as unknown as RollbackProof);
+    return {
+      ok: result.ok,
+      issues: [...result.issues]
+    };
   } catch (error) {
     return {
       ok: false,
@@ -433,12 +527,17 @@ function safeValidateRollbackEvidence(document: any, mapId: string) {
   }
 }
 
-function safeValidateRetirementEvidence(document: any, mapId: string) {
+function safeValidateRetirementEvidence(document: unknown, mapId: string): ReplacementLaneValidationResult {
+  const record = asRecord<Record<string, unknown>>(document);
   try {
-    if (document?.schemaId !== 'atm.retirementProof' || document?.mapId !== mapId || document?.verificationStatus !== 'passed') {
+    if (record?.schemaId !== 'atm.retirementProof' || record?.mapId !== mapId || record?.verificationStatus !== 'passed') {
       return { ok: false, issues: ['retirement proof does not match target map or did not pass'] };
     }
-    return validateRetirementProof(document);
+    const result = validateRetirementProof(record);
+    return {
+      ok: result.ok,
+      issues: [...result.issues]
+    };
   } catch (error) {
     return {
       ok: false,
@@ -480,9 +579,9 @@ function buildReplacementLaneNextActionHint(input: ReplacementTransitionInput, r
   };
 }
 
-function appendTransitionRecord(existingLog: any, input: any) {
+function appendTransitionRecord(existingLog: unknown, input: TransitionAppendInput) {
   const currentLog = existingLog && typeof existingLog === 'object' && !Array.isArray(existingLog)
-    ? existingLog
+    ? existingLog as EvidenceDocumentRecord & Record<string, unknown>
     : {};
   const transitions = Array.isArray(currentLog.transitions) ? [...currentLog.transitions] : [];
   transitions.push(input.transitionRecord);
@@ -514,28 +613,28 @@ function requiresEvidence(mode: ReplacementModeValue): mode is ReplacementModeWi
   return mode !== ReplacementMode.Draft;
 }
 
-function normalizeEvidenceRefs(value: any) {
+function normalizeEvidenceRefs(value: unknown) {
   if (!Array.isArray(value)) {
     return [];
   }
   return [...new Set(value.map((entry) => String(entry || '').trim()).filter(Boolean))];
 }
 
-function mergeStringArrays(...groups: any[]) {
+function mergeStringArrays(...groups: unknown[]) {
   return [...new Set(groups.flatMap((group) => Array.isArray(group) ? group : []).map((entry) => String(entry || '').trim()).filter(Boolean))];
 }
 
-function normalizeReason(value: any, fallback: string) {
+function normalizeReason(value: unknown, fallback: string) {
   const text = String(value || '').trim();
   return text || fallback;
 }
 
-function normalizeActor(value: any) {
+function normalizeActor(value: unknown) {
   const actor = String(value || '').trim();
   return actor || 'ATM replacement lane';
 }
 
-function normalizeTimestamp(value: any) {
+function normalizeTimestamp(value: unknown) {
   const timestamp = String(value || '').trim();
   if (!timestamp) {
     throw createReplacementLaneError('ATM_REPLACEMENT_TRANSITION_INVALID', 'Transition timestamp is required.', {});
@@ -566,7 +665,7 @@ function readJson(filePath: string) {
   return JSON.parse(readFileSync(filePath, 'utf8'));
 }
 
-function writeJson(filePath: string, value: any) {
+function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }

@@ -5,7 +5,7 @@ import { applyRegistryRollback, validateRollbackProof } from '../../../core/src/
 import type { RollbackTargetKind } from '../../../core/src/registry/rollback-types.ts';
 import { CliError, makeResult, message, relativePathFrom, resolveValue } from './shared.ts';
 
-export async function runRollback(argv: any) {
+export async function runRollback(argv: string[]) {
   const options = parseRollbackOptions(argv);
   const registryPath = resolvePath(options.cwd, options.registryPath);
   const proofPath = resolvePath(options.cwd, options.proofPath);
@@ -134,7 +134,7 @@ export async function runRollback(argv: any) {
   });
 }
 
-function parseRollbackOptions(argv: any) {
+function parseRollbackOptions(argv: string[]) {
   const options: {
     cwd: string;
     mode: 'plan' | 'apply' | null;
@@ -268,7 +268,7 @@ function parseRollbackOptions(argv: any) {
   };
 }
 
-function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+function requireOptionValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `rollback requires a value for ${optionName}`, { exitCode: 2 });
@@ -276,13 +276,13 @@ function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
   return value;
 }
 
-function resolvePath(cwd: any, maybeRelativePath: any) {
+function resolvePath(cwd: string, maybeRelativePath: string) {
   return path.isAbsolute(maybeRelativePath)
     ? maybeRelativePath
     : path.resolve(cwd, maybeRelativePath);
 }
 
-function readJsonFile(filePath: any) {
+function readJsonFile(filePath: string) {
   try {
     return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch (error) {
@@ -295,7 +295,7 @@ function readJsonFile(filePath: any) {
   }
 }
 
-function writeJsonFile(filePath: any, value: any) {
+function writeJsonFile(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }

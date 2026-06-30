@@ -636,7 +636,7 @@ export async function runTeam(argv: string[]) {
     return runTeamKnowledge(argv.slice(1), cwd);
   }
 
-  const spec = getCommandSpec('team');
+  const spec = getCommandSpec('team')!;
   const parsed = parseArgsForCommand(spec, argv);
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
@@ -1571,20 +1571,20 @@ function loadTeamRecipes(cwd: string): { recipes: TeamRecipe[]; sources: unknown
   };
 }
 
-function normalizeRecipe(value: any): TeamRecipe {
-  if (value?.schemaId !== 'atm.teamRecipe.v1') {
+function normalizeRecipe(value: Record<string, unknown> | null | undefined): TeamRecipe {
+  if ((value as { schemaId?: unknown })?.schemaId !== 'atm.teamRecipe.v1') {
     throw new CliError('ATM_TEAM_RECIPE_INVALID', 'Team recipe JSON must use schemaId atm.teamRecipe.v1.', { exitCode: 2 });
   }
-  const recipeId = String(value.recipeId ?? '').trim();
+  const recipeId = String((value as { recipeId?: unknown })?.recipeId ?? '').trim();
   if (!recipeId) {
     throw new CliError('ATM_TEAM_RECIPE_INVALID', 'Team recipe JSON requires recipeId.', { exitCode: 2 });
   }
-  const agents: TeamRecipeAgent[] = Array.isArray(value.agents) ? value.agents.map((entry: any) => ({
-    agentId: String(entry?.agentId ?? '').trim(),
-    role: String(entry?.role ?? '').trim(),
-    profile: entry?.profile ? String(entry.profile).trim() : undefined,
-    language: entry?.language ? String(entry.language).trim() : undefined,
-    permissions: Array.isArray(entry?.permissions) ? entry.permissions.map((permission: unknown) => String(permission).trim()).filter(Boolean) : []
+  const agents: TeamRecipeAgent[] = Array.isArray((value as { agents?: unknown })?.agents) ? ((value as { agents: unknown[] }).agents).map((entry: unknown) => ({
+    agentId: String((entry as Record<string, unknown> | null)?.agentId ?? '').trim(),
+    role: String((entry as Record<string, unknown> | null)?.role ?? '').trim(),
+    profile: (entry as Record<string, unknown> | null)?.profile ? String((entry as Record<string, unknown>).profile).trim() : undefined,
+    language: (entry as Record<string, unknown> | null)?.language ? String((entry as Record<string, unknown>).language).trim() : undefined,
+    permissions: Array.isArray((entry as Record<string, unknown> | null)?.permissions) ? ((entry as Record<string, unknown>).permissions as unknown[]).map((permission: unknown) => String(permission).trim()).filter(Boolean) : []
   })) : [];
   if (agents.length === 0 || agents.some((agent: TeamRecipeAgent) => !agent.agentId || !agent.role)) {
     throw new CliError('ATM_TEAM_RECIPE_INVALID', `Team recipe ${recipeId} requires agents with agentId and role.`, { exitCode: 2 });
@@ -1592,8 +1592,8 @@ function normalizeRecipe(value: any): TeamRecipe {
   return {
     schemaId: 'atm.teamRecipe.v1',
     recipeId,
-    appliesTo: Array.isArray(value.appliesTo) ? value.appliesTo.map(String) : undefined,
-    language: value.language ? String(value.language) : undefined,
+    appliesTo: Array.isArray((value as { appliesTo?: unknown })?.appliesTo) ? ((value as { appliesTo: unknown[] }).appliesTo).map(String) : undefined,
+    language: (value as { language?: unknown })?.language ? String((value as { language: unknown }).language) : undefined,
     agents
   };
 }
@@ -1601,7 +1601,7 @@ function normalizeRecipe(value: any): TeamRecipe {
 function selectRecipe(input: {
   recipes: { recipes: TeamRecipe[]; sources: unknown[] };
   requestedRecipeId: string;
-  task: any;
+  task: Record<string, unknown> | null | undefined;
 }) {
   if (input.requestedRecipeId) {
     const recipe = input.recipes.recipes.find((entry) => entry.recipeId === input.requestedRecipeId);
@@ -1619,7 +1619,7 @@ function selectRecipe(input: {
     ?? input.recipes.recipes[0];
 }
 
-function inferTaskLanguage(task: any) {
+function inferTaskLanguage(task: Record<string, unknown> | null | undefined) {
   const paths = collectTaskPathHints(task);
   if (paths.some((entry) => entry.endsWith('.py') || entry.includes('pipelines/'))) return 'python';
   if (paths.some((entry) => entry.endsWith('.cs'))) return 'csharp';
@@ -1642,7 +1642,7 @@ export function planTeamBrokerLane(input: {
   cwd: string;
   taskId: string;
   actorId: string;
-  task: any;
+  task: Record<string, unknown> | null | undefined;
   writePaths: string[];
 }) {
   const brokerLaneResult = evaluateTeamBrokerLane(input);
@@ -1992,14 +1992,14 @@ function isUnsafeTeamLeasePath(rawPath: string, normalizedPath: string, repoRoot
     || normalizedPath.startsWith('../');
 }
 
-function deriveAllowedWriteScope(task: any, repoRoot?: string) {
-  const explicitAllowed = normalizeTaskPathArray(task.targetAllowedFiles, repoRoot);
+function deriveAllowedWriteScope(task: Record<string, unknown> | null | undefined, repoRoot?: string) {
+  const explicitAllowed = normalizeTaskPathArray((task as { targetAllowedFiles?: unknown })?.targetAllowedFiles, repoRoot);
   if (explicitAllowed.length > 0) {
     return uniqueStrings(explicitAllowed);
   }
   return normalizeTaskWriteScope([
-    ...normalizeTaskPathArray(task.deliverables, repoRoot),
-    ...normalizeTaskPathArray(task.scopePaths, repoRoot)
+    ...normalizeTaskPathArray((task as { deliverables?: unknown })?.deliverables, repoRoot),
+    ...normalizeTaskPathArray((task as { scopePaths?: unknown })?.scopePaths, repoRoot)
   ], repoRoot);
 }
 
@@ -2033,7 +2033,7 @@ function buildSuggestedPermissionLeases(recipe: TeamRecipe, writePaths: string[]
 }
 
 export function buildTeamPlan(input: {
-  task: any;
+  task: Record<string, unknown> | null | undefined;
   recipe: TeamRecipe;
   writePaths: string[];
   validation: { ok: boolean; findings: PermissionFinding[] };
@@ -2264,7 +2264,7 @@ export function buildTeamRuntimePilot(input: {
 }
 
 function buildCaptainDecision(
-  task: any,
+  task: Record<string, unknown> | null | undefined,
   writePaths: string[],
   validation: { ok: boolean; findings: PermissionFinding[] },
   brokerLane: TeamBrokerLaneEvidence,
@@ -2313,7 +2313,7 @@ function buildCaptainDecision(
   };
 }
 
-export function selectTeamImplementer(task: any, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector {
+export function selectTeamImplementer(task: Record<string, unknown> | null | undefined, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector {
   const deterministicHints = collectImplementerHints(task, writePaths);
   const implementers = recipe.agents
     .filter((agent) => isImplementerAgent(agent))
@@ -2420,7 +2420,7 @@ function buildSelectorResult(
   };
 }
 
-function collectImplementerHints(task: any, writePaths: string[]) {
+function collectImplementerHints(task: Record<string, unknown> | null | undefined, writePaths: string[]) {
   const scopePaths = uniqueStrings([
     ...normalizeTaskPathArray(task?.scopePaths),
     ...normalizeTaskPathArray(task?.targetAllowedFiles),
@@ -2488,7 +2488,7 @@ function inferSelectorLanguage(agent: TeamRecipeAgent) {
 }
 
 export function assessLieutenantEscalation(
-  task: any,
+  task: Record<string, unknown> | null | undefined,
   writePaths: string[],
   validation: { ok: boolean; findings: PermissionFinding[] },
   brokerLane: TeamBrokerLaneEvidence,
@@ -2583,7 +2583,7 @@ export function assessLieutenantEscalation(
 }
 
 function decideTeamSizing(
-  task: any,
+  task: Record<string, unknown> | null | undefined,
   writePaths: string[],
   validation: { ok: boolean; findings: PermissionFinding[] },
   brokerLane: TeamBrokerLaneEvidence
@@ -2649,7 +2649,7 @@ function decideTeamSizing(
 }
 
 export function buildMinimalTaskCrewBriefingContract(
-  task: any,
+  task: Record<string, unknown> | null | undefined,
   writePaths: string[],
   validation: { ok: boolean; findings: PermissionFinding[] },
   brokerLane: TeamBrokerLaneEvidence
@@ -2765,19 +2765,20 @@ export function buildMinimalTaskCrewBriefingContract(
   };
 }
 
-export function buildAtomizationChecklist(task: any, writePaths: string[]) {
+export function buildAtomizationChecklist(task: Record<string, unknown> | null | undefined, writePaths: string[]) {
   const taskId = String(task?.workItemId ?? task?.taskId ?? 'unknown-task');
-  const primaryAtom: string = String(task?.atomizationImpact?.ownerAtomOrMap ?? task?.atomizationImpact?.owner_atom_or_map ?? 'atm.team-agents-map');
+  const atomizationImpact = (task as { atomizationImpact?: Record<string, unknown> })?.atomizationImpact;
+  const primaryAtom: string = String(atomizationImpact?.ownerAtomOrMap ?? atomizationImpact?.owner_atom_or_map ?? 'atm.team-agents-map');
   const taskAtomSet = getTaskScopedAtoms(taskId);
   const relatedAtoms = uniqueStrings([
     primaryAtom,
     ...taskAtomSet,
-    ...normalizeStringArray(task?.atomizationImpact?.mapUpdates ?? task?.atomizationImpact?.map_updates).flatMap(normalizeAtomReference),
+    ...normalizeStringArray(atomizationImpact?.mapUpdates ?? atomizationImpact?.map_updates).flatMap(normalizeAtomReference),
     ...inferRelatedAtoms(writePaths)
   ]);
   const commandSurface = uniqueStrings([
-    ...normalizeStringArray(task?.scopePaths),
-    ...normalizeStringArray(task?.deliverables)
+    ...normalizeStringArray((task as { scopePaths?: unknown })?.scopePaths),
+    ...normalizeStringArray((task as { deliverables?: unknown })?.deliverables)
   ]);
   const largeScriptRisk = evaluateLargeScriptRisk(writePaths);
   const mapUpdateNeed = relatedAtoms.some((entry) => entry.includes('atom-map') || entry.includes('map'))
@@ -2851,7 +2852,7 @@ export function writeTeamRun(input: {
   cwd: string;
   actorId: string;
   taskId: string;
-  task: any;
+  task: Record<string, unknown> | null | undefined;
   recipe: TeamRecipe;
   teamPlan: ReturnType<typeof buildTeamPlan>;
   validation: { ok: boolean; findings: PermissionFinding[] };
@@ -2909,7 +2910,7 @@ export function writeTeamRun(input: {
     teamSummary: {
       decision: input.teamPlan.captainDecision.reason,
       implementationSummary: `${input.runtimeContract.selectionReason}; closure remains governed by command-backed evidence.`,
-      validators: normalizeStringArray(input.task.validators),
+      validators: normalizeStringArray((input.task as { validators?: unknown })?.validators),
       evidence: [],
       brokerGovernance: buildTeamBrokerGovernanceSummary(input.runtimeContract),
       risk: input.teamPlan.captainDecision.escalationRequired ? 'medium' : 'low',
@@ -2947,7 +2948,7 @@ export function buildTeamStatusResult(input: {
 }) {
   const runs = input.requestedTeamRunId
     ? [readTeamRun(input.cwd, input.requestedTeamRunId)]
-    : listTeamRuns(input.cwd).filter((run: any) => run.status === 'active');
+    : listTeamRuns(input.cwd).filter((run: unknown) => typeof run === 'object' && run !== null && (run as Record<string, unknown>).status === 'active');
   return makeResult({
     ok: true,
     command: 'team',
@@ -3123,8 +3124,8 @@ function listTeamRuns(cwd: string) {
 
 function findLatestTeamRunForTask(cwd: string, taskId: string) {
   const runs = listTeamRuns(cwd)
-    .filter((run: any) => run.taskId === taskId)
-    .sort((left: any, right: any) => String(right.updatedAt ?? right.createdAt ?? '').localeCompare(String(left.updatedAt ?? left.createdAt ?? '')));
+    .filter((run: unknown) => typeof run === 'object' && run !== null && (run as Record<string, unknown>).taskId === taskId)
+    .sort((left: unknown, right: unknown) => String((right as Record<string, unknown>).updatedAt ?? (right as Record<string, unknown>).createdAt ?? '').localeCompare(String((left as Record<string, unknown>).updatedAt ?? (left as Record<string, unknown>).createdAt ?? '')));
   return runs[0] ?? null;
 }
 
@@ -3150,34 +3151,98 @@ function normalizeTeamPatrolMode(value: unknown): TeamPatrolMode {
   });
 }
 
-function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode: TeamPatrolMode }): TeamPatrolFinding[] {
+interface PatrolRun {
+  teamRunId?: string;
+  executionMode?: string;
+  agentsSpawned?: boolean;
+  brokerSubagent?: {
+    enabled?: boolean;
+    schemaId?: string;
+    decisionSurface?: string;
+    stewardId?: string;
+    evidenceRequired?: unknown;
+    authorityBoundary?: {
+      fileWrite?: boolean;
+      gitWrite?: boolean;
+      taskLifecycle?: boolean;
+      selfClose?: boolean;
+    };
+  };
+  runtimeContract?: {
+    brokerSubagent?: {
+      enabled?: boolean;
+      schemaId?: string;
+      decisionSurface?: string;
+      stewardId?: string;
+      evidenceRequired?: unknown;
+      authorityBoundary?: {
+        fileWrite?: boolean;
+        gitWrite?: boolean;
+        taskLifecycle?: boolean;
+        selfClose?: boolean;
+      };
+    };
+    commitLane?: {
+      serializedBy?: string;
+      ownerRole?: string;
+      workerGitWrite?: boolean;
+    };
+    artifactHandoff?: {
+      findings?: Array<{ blocking?: boolean; summary?: string; role?: string; agentId?: string; artifact?: string }>;
+    };
+  };
+  commitLane?: {
+    serializedBy?: string;
+    ownerRole?: string;
+    workerGitWrite?: boolean;
+  };
+  artifactHandoff?: {
+    findings?: Array<{ blocking?: boolean; summary?: string; role?: string; agentId?: string; artifact?: string }>;
+  };
+  reworkRoute?: {
+    status?: string;
+    retryBudgetRemaining?: number;
+    retryBudget?: {
+      remaining?: number;
+    };
+  };
+  reworkStatus?: string;
+  retryBudget?: {
+    status?: string;
+    exhausted?: boolean;
+  };
+}
+
+function buildTeamRunPatrolFindings(teamRun: Record<string, unknown> | null | undefined, input: { taskId: string; mode: TeamPatrolMode }): TeamPatrolFinding[] {
   const findings: TeamPatrolFinding[] = [];
-  if (teamRun.executionMode !== 'manual-team') {
+  if (!teamRun) return findings;
+  const run = teamRun as PatrolRun;
+  if (run.executionMode !== 'manual-team') {
     findings.push(teamPatrolFinding({
       level: 'warning',
       code: 'ATM_TEAM_PATROL_RUNTIME_MODE_UNEXPECTED',
       category: 'runtime-mode',
-      summary: `Team run ${teamRun.teamRunId} is not in manual-team execution mode.`,
-      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
-      details: { executionMode: teamRun.executionMode ?? null }
+      summary: `Team run ${run.teamRunId} is not in manual-team execution mode.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
+      details: { executionMode: run.executionMode ?? null }
     }));
   }
-  if (teamRun.agentsSpawned === true) {
+  if (run.agentsSpawned === true) {
     findings.push(teamPatrolFinding({
       level: 'warning',
       code: 'ATM_TEAM_PATROL_AGENTS_SPAWNED',
       category: 'runtime-mode',
-      summary: `Team run ${teamRun.teamRunId} reports spawned agents; coordinator should verify advisory role boundaries.`,
-      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`
+      summary: `Team run ${run.teamRunId} reports spawned agents; coordinator should verify advisory role boundaries.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`
     }));
   }
-  const brokerSubagent = teamRun.brokerSubagent ?? teamRun.runtimeContract?.brokerSubagent ?? null;
+  const brokerSubagent = run.brokerSubagent ?? run.runtimeContract?.brokerSubagent ?? null;
   if (!brokerSubagent || brokerSubagent.enabled !== true) {
     findings.push(teamPatrolFinding({
       level: 'blocker',
       code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_MISSING',
       category: 'broker-governance',
-      summary: `Team run ${teamRun.teamRunId} does not expose an enabled broker subagent contract.`,
+      summary: `Team run ${run.teamRunId} does not expose an enabled broker subagent contract.`,
       suggestedCommand: `node atm.mjs team start --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
       details: { schemaId: brokerSubagent?.schemaId ?? null, enabled: brokerSubagent?.enabled ?? null }
     }));
@@ -3187,8 +3252,8 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
         level: 'warning',
         code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_DRIFT',
         category: 'broker-governance',
-        summary: `Team run ${teamRun.teamRunId} broker subagent contract does not match the expected broker lane steward.`,
-        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        summary: `Team run ${run.teamRunId} broker subagent contract does not match the expected broker lane steward.`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
         details: {
           decisionSurface: brokerSubagent.decisionSurface ?? null,
           stewardId: brokerSubagent.stewardId ?? null
@@ -3207,8 +3272,8 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
         level: 'blocker',
         code: 'ATM_TEAM_PATROL_BROKER_EVIDENCE_GATE_DRIFT',
         category: 'broker-governance',
-        summary: `Team run ${teamRun.teamRunId} broker subagent evidence gates are incomplete.`,
-        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        summary: `Team run ${run.teamRunId} broker subagent evidence gates are incomplete.`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
         details: {
           evidenceRequired,
           expectedEvidenceRequired,
@@ -3222,13 +3287,13 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
         level: 'blocker',
         code: 'ATM_TEAM_PATROL_BROKER_SUBAGENT_AUTHORITY_DRIFT',
         category: 'broker-governance',
-        summary: `Team run ${teamRun.teamRunId} broker subagent authority boundary is too broad.`,
-        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        summary: `Team run ${run.teamRunId} broker subagent authority boundary is too broad.`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
         details: { authorityBoundary: boundary }
       }));
     }
   }
-  const commitLane = teamRun.commitLane ?? teamRun.runtimeContract?.commitLane ?? null;
+  const commitLane = run.commitLane ?? run.runtimeContract?.commitLane ?? null;
   if (commitLane && (
     commitLane.serializedBy !== 'branch-commit-queue'
     || commitLane.ownerRole !== 'coordinator'
@@ -3238,8 +3303,8 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       level: 'blocker',
       code: 'ATM_TEAM_PATROL_COMMIT_LANE_DRIFT',
       category: 'broker-governance',
-      summary: `Team run ${teamRun.teamRunId} commit lane no longer enforces coordinator-owned serialized commits.`,
-      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      summary: `Team run ${run.teamRunId} commit lane no longer enforces coordinator-owned serialized commits.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
       details: {
         serializedBy: commitLane.serializedBy ?? null,
         ownerRole: commitLane.ownerRole ?? null,
@@ -3247,10 +3312,10 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       }
     }));
   }
-  const artifactFindings = Array.isArray(teamRun.artifactHandoff?.findings)
-    ? teamRun.artifactHandoff.findings
-    : Array.isArray(teamRun.runtimeContract?.artifactHandoff?.findings)
-      ? teamRun.runtimeContract.artifactHandoff.findings
+  const artifactFindings = Array.isArray(run.artifactHandoff?.findings)
+    ? run.artifactHandoff.findings
+    : Array.isArray(run.runtimeContract?.artifactHandoff?.findings)
+      ? run.runtimeContract.artifactHandoff.findings
       : [];
   for (const artifactFinding of artifactFindings) {
     if (artifactFinding?.blocking === true) {
@@ -3259,7 +3324,7 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
         code: 'ATM_TEAM_PATROL_ARTIFACT_HANDOFF_BLOCKED',
         category: 'artifact-gap',
         summary: String(artifactFinding.summary ?? 'Team role artifact handoff has a missing required artifact.'),
-        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+        suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
         details: {
           role: artifactFinding.role ?? null,
           agentId: artifactFinding.agentId ?? null,
@@ -3274,19 +3339,19 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       level: 'blocker',
       code: 'ATM_TEAM_PATROL_RETRY_BUDGET_EXHAUSTED',
       category: 'retry-budget',
-      summary: `Team run ${teamRun.teamRunId} has no retry budget remaining.`,
-      suggestedCommand: `node atm.mjs team patrol --task ${quoteCliValue(input.taskId)} --mode close-preflight --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      summary: `Team run ${run.teamRunId} has no retry budget remaining.`,
+      suggestedCommand: `node atm.mjs team patrol --task ${quoteCliValue(input.taskId)} --mode close-preflight --team ${quoteCliValue(String(run.teamRunId))} --json`,
       details: { retryBudgetRemaining: remaining }
     }));
   }
-  const reworkStatus = String(teamRun.reworkRoute?.status ?? teamRun.reworkStatus ?? '').trim();
+  const reworkStatus = String(run.reworkRoute?.status ?? run.reworkStatus ?? '').trim();
   if (['needs-rework', 'blocked', 'stale'].includes(reworkStatus)) {
     findings.push(teamPatrolFinding({
       level: reworkStatus === 'blocked' ? 'blocker' : 'warning',
       code: 'ATM_TEAM_PATROL_REWORK_ROUTE_ATTENTION',
       category: 'rework-state',
-      summary: `Team run ${teamRun.teamRunId} rework route is ${reworkStatus}.`,
-      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(teamRun.teamRunId))} --json`,
+      summary: `Team run ${run.teamRunId} rework route is ${reworkStatus}.`,
+      suggestedCommand: `node atm.mjs team status --team ${quoteCliValue(String(run.teamRunId))} --json`,
       details: { reworkStatus }
     }));
   }
@@ -3295,7 +3360,7 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
       level: 'info',
       code: 'ATM_TEAM_PATROL_REWORK_ROUTE_READY_FOR_CLOSE',
       category: 'rework-state',
-      summary: `Team run ${teamRun.teamRunId} rework route is ready-for-close.`,
+      summary: `Team run ${run.teamRunId} rework route is ready-for-close.`,
       suggestedCommand: `node atm.mjs taskflow pre-close --task ${quoteCliValue(input.taskId)} --actor <actor> --json`,
       details: { reworkStatus }
     }));
@@ -3303,14 +3368,15 @@ function buildTeamRunPatrolFindings(teamRun: any, input: { taskId: string; mode:
   return findings;
 }
 
-function extractRetryBudgetRemaining(teamRun: any): number | null {
-  const retryBudget = teamRun.retryBudget ?? teamRun.runtimeContract?.retryBudget;
-  if (retryBudget?.status === 'escalation-required' || retryBudget?.exhausted === true) {
+function extractRetryBudgetRemaining(teamRun: Record<string, unknown> | null | undefined): number | null {
+  const run = teamRun as PatrolRun | null | undefined;
+  const retryBudget = run?.retryBudget ?? run?.runtimeContract?.brokerSubagent ?? null; // 使用 brokerSubagent 的 retryBudget 或者是對應的 fallback
+  if ((retryBudget as { status?: unknown })?.status === 'escalation-required' || (retryBudget as { exhausted?: unknown })?.exhausted === true) {
     return 0;
   }
   const candidates = [
-    teamRun.reworkRoute?.retryBudgetRemaining,
-    teamRun.reworkRoute?.retryBudget?.remaining
+    run?.reworkRoute?.retryBudgetRemaining,
+    run?.reworkRoute?.retryBudget?.remaining
   ];
   for (const candidate of candidates) {
     if (typeof candidate === 'number' && Number.isFinite(candidate)) {
@@ -3352,33 +3418,95 @@ function buildTeamPatrolFollowUp(taskId: string, mode: TeamPatrolMode, findings:
   return [`node atm.mjs team plan --task ${quoteCliValue(taskId)} --json`];
 }
 
-function compactTeamRun(run: any) {
-  const brokerGovernance = run.teamSummary?.brokerGovernance ?? null;
+interface CompactRunInput {
+  teamRunId?: unknown;
+  taskId?: unknown;
+  recipeId?: unknown;
+  actorId?: unknown;
+  status?: unknown;
+  roles?: unknown[];
+  agents?: unknown[];
+  leases?: unknown[];
+  permissionLeases?: unknown[];
+  brokerSubagent?: {
+    enabled?: boolean;
+    decisionSurface?: unknown;
+    stewardId?: unknown;
+    evidenceRequired?: unknown;
+  };
+  runtimeContract?: {
+    brokerSubagent?: {
+      enabled?: boolean;
+      decisionSurface?: unknown;
+      stewardId?: unknown;
+      evidenceRequired?: unknown;
+    };
+    commitLane?: {
+      serializedBy?: unknown;
+      ownerRole?: unknown;
+    };
+    workerAdapter?: {
+      authorityBoundary?: {
+        gitWrite?: boolean;
+        taskLifecycle?: boolean;
+        selfClose?: boolean;
+      };
+    };
+  };
+  teamSummary?: {
+    brokerGovernance?: {
+      schemaId?: unknown;
+      brokerEvidenceRequired?: unknown;
+      commitLaneSerializedBy?: unknown;
+      commitLaneOwnerRole?: unknown;
+      workerGitWrite?: boolean;
+      workerTaskLifecycle?: boolean;
+      workerSelfClose?: boolean;
+    };
+  };
+  runtimePilot?: {
+    selectedRoles?: unknown;
+  };
+  agentsSpawned?: boolean;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+}
+
+function compactTeamRun(run: Record<string, unknown> | null | undefined) {
+  if (!run) return {};
+  const r = run as CompactRunInput;
+  const brokerGovernance = r.teamSummary?.brokerGovernance ?? null;
+  const roles = r.roles;
+  const agents = r.agents;
+  const leases = r.leases;
+  const permissionLeases = r.permissionLeases;
+  const brokerSubagent = r.brokerSubagent;
+  const runtimeContract = r.runtimeContract;
   return {
-    teamRunId: run.teamRunId,
-    taskId: run.taskId,
-    recipeId: run.recipeId,
-    actorId: run.actorId,
-    status: run.status,
-    roleCount: Array.isArray(run.roles) ? run.roles.length : Array.isArray(run.agents) ? run.agents.length : 0,
-    leaseCount: Array.isArray(run.leases) ? run.leases.length : Array.isArray(run.permissionLeases) ? run.permissionLeases.length : 0,
-    brokerSubagentEnabled: run.brokerSubagent?.enabled === true || run.runtimeContract?.brokerSubagent?.enabled === true,
-    brokerDecisionSurface: run.brokerSubagent?.decisionSurface ?? run.runtimeContract?.brokerSubagent?.decisionSurface ?? null,
-    brokerStewardId: run.brokerSubagent?.stewardId ?? run.runtimeContract?.brokerSubagent?.stewardId ?? null,
+    teamRunId: r.teamRunId,
+    taskId: r.taskId,
+    recipeId: r.recipeId,
+    actorId: r.actorId,
+    status: r.status,
+    roleCount: Array.isArray(roles) ? roles.length : Array.isArray(agents) ? agents.length : 0,
+    leaseCount: Array.isArray(leases) ? leases.length : Array.isArray(permissionLeases) ? permissionLeases.length : 0,
+    brokerSubagentEnabled: brokerSubagent?.enabled === true || runtimeContract?.brokerSubagent?.enabled === true,
+    brokerDecisionSurface: brokerSubagent?.decisionSurface ?? runtimeContract?.brokerSubagent?.decisionSurface ?? null,
+    brokerStewardId: brokerSubagent?.stewardId ?? runtimeContract?.brokerSubagent?.stewardId ?? null,
     brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
-    runtimePilotMode: run.runtimePilot?.pilotMode ?? null,
-    runtimePilotRoles: normalizeStringArray(run.runtimePilot?.selectedRoles),
+    runtimePilotMode: (run as { runtimePilot?: { pilotMode?: unknown } })?.runtimePilot?.pilotMode ?? null,
+    runtimePilotRoles: normalizeStringArray(r.runtimePilot?.selectedRoles),
     brokerEvidenceRequired: normalizeStringArray(
-      brokerGovernance?.brokerEvidenceRequired ?? run.brokerSubagent?.evidenceRequired ?? run.runtimeContract?.brokerSubagent?.evidenceRequired
+      brokerGovernance?.brokerEvidenceRequired ?? brokerSubagent?.evidenceRequired ?? runtimeContract?.brokerSubagent?.evidenceRequired
     ),
-    commitLaneSerializedBy: brokerGovernance?.commitLaneSerializedBy ?? run.runtimeContract?.commitLane?.serializedBy ?? null,
-    commitLaneOwnerRole: brokerGovernance?.commitLaneOwnerRole ?? run.runtimeContract?.commitLane?.ownerRole ?? null,
-    workerGitWrite: brokerGovernance?.workerGitWrite ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.gitWrite ?? null,
-    workerTaskLifecycle: brokerGovernance?.workerTaskLifecycle ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.taskLifecycle ?? null,
-    workerSelfClose: brokerGovernance?.workerSelfClose ?? run.runtimeContract?.workerAdapter?.authorityBoundary?.selfClose ?? null,
-    agentsSpawned: run.agentsSpawned === true,
-    createdAt: run.createdAt ?? null,
-    updatedAt: run.updatedAt ?? null
+    commitLaneSerializedBy: brokerGovernance?.commitLaneSerializedBy ?? runtimeContract?.commitLane?.serializedBy ?? null,
+    commitLaneOwnerRole: brokerGovernance?.commitLaneOwnerRole ?? runtimeContract?.commitLane?.ownerRole ?? null,
+    workerGitWrite: brokerGovernance?.workerGitWrite ?? runtimeContract?.workerAdapter?.authorityBoundary?.gitWrite ?? null,
+    workerTaskLifecycle: brokerGovernance?.workerTaskLifecycle ?? runtimeContract?.workerAdapter?.authorityBoundary?.taskLifecycle ?? null,
+    workerSelfClose: brokerGovernance?.workerSelfClose ?? runtimeContract?.workerAdapter?.authorityBoundary?.selfClose ?? null,
+    agentsSpawned: r.agentsSpawned === true,
+    createdAt: r.createdAt ?? null,
+    updatedAt: r.updatedAt ?? null
   };
 }
 
@@ -3394,13 +3522,13 @@ function createTeamRunId(taskId: string, actorId: string, createdAt: string) {
   return `team-${digest}`;
 }
 
-function summarizeTask(taskId: string, task: any) {
+function summarizeTask(taskId: string, task: Record<string, unknown> | null | undefined) {
   return {
     taskId,
-    title: task.title ?? task.workItemId ?? taskId,
-    status: task.status ?? null,
-    targetRepo: task.targetRepo ?? null,
-    sourcePlanPath: task.source?.planPath ?? task.sourcePlanPath ?? null
+    title: (task as { title?: unknown })?.title ?? (task as { workItemId?: unknown })?.workItemId ?? taskId,
+    status: (task as { status?: unknown })?.status ?? null,
+    targetRepo: (task as { targetRepo?: unknown })?.targetRepo ?? null,
+    sourcePlanPath: (task as { source?: { planPath?: unknown } })?.source?.planPath ?? (task as { sourcePlanPath?: unknown })?.sourcePlanPath ?? null
   };
 }
 
@@ -3445,22 +3573,22 @@ function normalizeTeamBrokerPilotFindings(
   }));
 }
 
-function deriveWritePaths(task: any, repoRoot?: string) {
+function deriveWritePaths(task: Record<string, unknown> | null | undefined, repoRoot?: string) {
   const candidates = [
-    ...normalizeTaskPathArray(task.targetAllowedFiles, repoRoot),
-    ...normalizeTaskPathArray(task.deliverables, repoRoot),
-    ...normalizeTaskPathArray(task.scopePaths, repoRoot)
+    ...normalizeTaskPathArray((task as { targetAllowedFiles?: unknown })?.targetAllowedFiles, repoRoot),
+    ...normalizeTaskPathArray((task as { deliverables?: unknown })?.deliverables, repoRoot),
+    ...normalizeTaskPathArray((task as { scopePaths?: unknown })?.scopePaths, repoRoot)
   ];
   return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
     return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
   }));
 }
 
-function collectTaskPathHints(task: any) {
+function collectTaskPathHints(task: Record<string, unknown> | null | undefined) {
   return uniqueStrings([
-    ...normalizeTaskPathArray(task?.targetAllowedFiles),
-    ...normalizeTaskPathArray(task?.deliverables),
-    ...normalizeTaskPathArray(task?.scopePaths)
+    ...normalizeTaskPathArray((task as { targetAllowedFiles?: unknown })?.targetAllowedFiles),
+    ...normalizeTaskPathArray((task as { deliverables?: unknown })?.deliverables),
+    ...normalizeTaskPathArray((task as { scopePaths?: unknown })?.scopePaths)
   ]);
 }
 

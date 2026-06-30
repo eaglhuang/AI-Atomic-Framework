@@ -78,14 +78,15 @@ try {
 
   const parsed = parseAtomicSpecFile(fixture.specPath, { cwd: tempRoot });
   check(parsed.ok === true, 'registry catalog fixture spec must parse successfully');
+  const normalizedModel = parsed.normalizedModel!;
 
-  const testRun = runAtomicTestRunner(parsed.normalizedModel, {
+  const testRun = runAtomicTestRunner(normalizedModel, {
     repositoryRoot: tempRoot,
     now: fixture.generatedAt
   });
   check(testRun.ok === true, 'registry catalog fixture test runner must succeed');
 
-  const entry = createAtomicRegistryEntry(parsed.normalizedModel, {
+  const entry = createAtomicRegistryEntry(normalizedModel, {
     repositoryRoot: tempRoot,
     atomVersion: fixture.expectedAtomVersion,
     status: fixture.expectedStatus,

@@ -3,24 +3,40 @@ export interface RetirementProofValidationResult {
   readonly issues: readonly string[];
 }
 
-export function validateRetirementProof(proof: any): RetirementProofValidationResult {
+interface RetirementProofRecord {
+  readonly fromMode?: string;
+  readonly toMode?: string;
+  readonly callerRiskCleared?: boolean;
+  readonly entrypointRiskCleared?: boolean;
+  readonly unresolvedCallers?: unknown;
+  readonly unresolvedEntrypoints?: unknown;
+}
+
+function asRetirementProofRecord(value: unknown): RetirementProofRecord | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as RetirementProofRecord
+    : null;
+}
+
+export function validateRetirementProof(proof: unknown): RetirementProofValidationResult {
+  const record = asRetirementProofRecord(proof);
   const issues: string[] = [];
-  if (proof?.fromMode !== 'active') {
+  if (record?.fromMode !== 'active') {
     issues.push('retirement proof must start from active mode.');
   }
-  if (proof?.toMode !== 'legacy-retired') {
+  if (record?.toMode !== 'legacy-retired') {
     issues.push('retirement proof must target legacy-retired mode.');
   }
-  if (proof?.callerRiskCleared !== true) {
+  if (record?.callerRiskCleared !== true) {
     issues.push('caller risk must be cleared.');
   }
-  if (proof?.entrypointRiskCleared !== true) {
+  if (record?.entrypointRiskCleared !== true) {
     issues.push('entrypoint risk must be cleared.');
   }
-  if (Array.isArray(proof?.unresolvedCallers) && proof.unresolvedCallers.length > 0) {
+  if (Array.isArray(record?.unresolvedCallers) && record.unresolvedCallers.length > 0) {
     issues.push('retirement proof still has unresolved callers.');
   }
-  if (Array.isArray(proof?.unresolvedEntrypoints) && proof.unresolvedEntrypoints.length > 0) {
+  if (Array.isArray(record?.unresolvedEntrypoints) && record.unresolvedEntrypoints.length > 0) {
     issues.push('retirement proof still has unresolved entrypoints.');
   }
 

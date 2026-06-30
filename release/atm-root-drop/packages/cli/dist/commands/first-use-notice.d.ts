@@ -21,7 +21,7 @@ export interface AtmUserNotice {
 }
 export interface NextActionLike {
     readonly status: string;
-    readonly command: string;
-    readonly reason: string;
+    readonly command?: string;
+    readonly reason?: string;
 }
 export declare function buildFirstUseUserNotice(nextAction: NextActionLike): AtmUserNotice | null;

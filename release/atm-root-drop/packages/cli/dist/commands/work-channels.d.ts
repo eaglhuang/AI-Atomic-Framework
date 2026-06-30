@@ -1,5 +1,6 @@
 import type { TaskDirectionTask, TaskQueueRecord } from './task-direction.ts';
 export interface QuickfixLock {
+    readonly [key: string]: unknown;
     readonly schemaId: 'atm.quickfixLock.v1';
     readonly specVersion: '0.1.0';
     readonly actorId: string;
@@ -13,6 +14,7 @@ export interface QuickfixLock {
     readonly status: 'active' | 'released';
 }
 export interface BatchRunRecord {
+    readonly [key: string]: unknown;
     readonly schemaId: 'atm.batchRun.v1';
     readonly specVersion: '0.1.0';
     readonly batchId: string;
@@ -34,6 +36,7 @@ export interface BatchRunRecord {
     readonly updatedAt: string;
 }
 export interface BatchRunHold {
+    readonly [key: string]: unknown;
     readonly schemaId: 'atm.batchHold.v1';
     readonly status: 'held';
     readonly afterTaskId: string;
@@ -43,6 +46,7 @@ export interface BatchRunHold {
     readonly resumeCommand: string;
 }
 export interface BatchSkippedTaskRecord {
+    readonly [key: string]: unknown;
     readonly schemaId: 'atm.batchSkippedTask.v1';
     readonly taskId: string;
     readonly reason: string;

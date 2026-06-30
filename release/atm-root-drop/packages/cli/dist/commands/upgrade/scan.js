@@ -27,8 +27,8 @@ export async function runUpgradeScan(options) {
             path: entry.path,
             document: entry.document
         })),
-        proposedBy: options.proposedBy,
-        proposedAt: options.proposedAt,
+        proposedBy: options.proposedBy ?? undefined,
+        proposedAt: options.proposedAt ?? undefined,
         dryRun: true
     });
     const proposalDrafts = scanReport.proposalDrafts;

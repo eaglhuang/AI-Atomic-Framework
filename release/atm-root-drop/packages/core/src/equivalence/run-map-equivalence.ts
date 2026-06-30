@@ -50,6 +50,57 @@ interface ReportCaseRecord {
   readonly knownDivergence: boolean;
 }
 
+interface MapEquivalenceOptions {
+  readonly now?: string;
+  readonly writeReport?: boolean;
+  readonly repositoryRoot?: string;
+}
+
+interface ExecutorDescriptorRecord {
+  readonly modulePath?: unknown;
+  readonly exportName?: unknown;
+}
+
+interface FixtureSetRecord {
+  readonly mapId?: unknown;
+  readonly cases?: unknown;
+  readonly mapExecutor?: unknown;
+  readonly legacyExecutor?: unknown;
+  readonly knownDivergences?: unknown;
+  readonly fixtureSetId?: unknown;
+}
+
+interface MapEquivalenceExecutionContext {
+  readonly mapId: string;
+  readonly legacyUris: string[];
+  readonly caseId: string;
+  readonly fixtureSetId: string;
+}
+
+interface MapEquivalenceReportInput {
+  readonly repositoryRoot?: string;
+  readonly mapId: string;
+  readonly fixtureSetId: string;
+  readonly generatedAt?: string;
+  readonly legacyUris?: readonly string[];
+  readonly fixturePath: string;
+  readonly reportPath: string;
+  readonly specPath: string;
+  readonly knownDivergences?: readonly KnownDivergenceRecord[];
+  readonly documentedKnownDivergenceIds?: readonly string[];
+  readonly failedCaseIds?: readonly string[];
+  readonly cases?: readonly ReportCaseRecord[];
+  readonly durationMs?: number;
+}
+
+type EquivalenceExecutor = (input: unknown, context: MapEquivalenceExecutionContext) => unknown | Promise<unknown>;
+
+function asRecord<T extends object>(value: unknown): T | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as T
+    : null;
+}
+
 export function resolveMapEquivalencePaths(mapId: string) {
   const canonical = resolveCanonicalMapPaths(mapId);
   return {
@@ -60,7 +111,7 @@ export function resolveMapEquivalencePaths(mapId: string) {
   };
 }
 
-export async function runMapEquivalence(mapId: string, fixturePath: string, options: any = {}) {
+export async function runMapEquivalence(mapId: string, fixturePath: string, options: MapEquivalenceOptions = {}) {
   const target = resolveMapIntegrationTarget(mapId, options);
   const repositoryRoot = target.repositoryRoot;
   const specAbsolutePath = path.join(repositoryRoot, target.specPath);
@@ -81,7 +132,7 @@ export async function runMapEquivalence(mapId: string, fixturePath: string, opti
     });
   }
 
-  const fixtureSet = readJson(fixtureAbsolutePath);
+  const fixtureSet = asRecord<FixtureSetRecord>(readJson(fixtureAbsolutePath));
   if (fixtureSet?.mapId && String(fixtureSet.mapId).trim() !== mapId) {
     throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_MAP_MISMATCH', 'Fixture set mapId does not match the requested map.', {
       expectedMapId: mapId,
@@ -168,9 +219,10 @@ export async function runMapEquivalence(mapId: string, fixturePath: string, opti
   };
 }
 
-export function createMapEquivalenceReport(input: any) {
+export function createMapEquivalenceReport(input: MapEquivalenceReportInput) {
   const cases = [...(input.cases ?? [])];
   const documentedKnownDivergenceIds = new Set(input.documentedKnownDivergenceIds ?? []);
+  const knownDivergences = input.knownDivergences ?? [];
   const totalCases = cases.length;
   const passedCases = cases.filter((entry) => entry.passed === true).length;
   const failedCases = cases.filter((entry) => entry.passed !== true).length;
@@ -194,7 +246,7 @@ export function createMapEquivalenceReport(input: any) {
       }
     ],
     cases,
-    ...(input.knownDivergences?.length > 0 ? { knownDivergences: [...input.knownDivergences] } : {}),
+    ...(knownDivergences.length > 0 ? { knownDivergences: [...knownDivergences] } : {}),
     summary: {
       totalCases,
       passedCases,
@@ -242,14 +294,15 @@ export function createMapEquivalenceReport(input: any) {
   };
 }
 
-async function loadExecutor(repositoryRoot: string, descriptor: any, fieldName: string) {
-  const modulePath = String(descriptor?.modulePath || '').trim();
+async function loadExecutor(repositoryRoot: string, descriptor: unknown, fieldName: string): Promise<EquivalenceExecutor> {
+  const descriptorRecord = asRecord<ExecutorDescriptorRecord>(descriptor);
+  const modulePath = String(descriptorRecord?.modulePath ?? '').trim();
   if (!modulePath) {
     throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', `${fieldName}.modulePath is required.`, {
       fieldName
     });
   }
-  const exportName = String(descriptor?.exportName || 'run').trim();
+  const exportName = String(descriptorRecord?.exportName ?? 'run').trim();
   const absoluteModulePath = path.resolve(repositoryRoot, modulePath);
   if (!existsSync(absoluteModulePath)) {
     throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_EXECUTOR_NOT_FOUND', `${fieldName} module was not found.`, {
@@ -266,10 +319,16 @@ async function loadExecutor(repositoryRoot: string, descriptor: any, fieldName: 
       exportName
     });
   }
-  return executor;
+  return executor as EquivalenceExecutor;
 }
 
-async function invokeExecutor(executor: any, input: any, context: any, fieldName: string, caseId: string) {
+async function invokeExecutor(
+  executor: EquivalenceExecutor,
+  input: unknown,
+  context: MapEquivalenceExecutionContext,
+  fieldName: string,
+  caseId: string
+) {
   try {
     return await executor(input, context);
   } catch (error) {
@@ -281,12 +340,13 @@ async function invokeExecutor(executor: any, input: any, context: any, fieldName
   }
 }
 
-function normalizeFixtureCases(value: any): FixtureCaseRecord[] {
+function normalizeFixtureCases(value: unknown): FixtureCaseRecord[] {
   if (!Array.isArray(value) || value.length === 0) {
     throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', 'Fixture set must define at least one case.', {});
   }
   return value.map((entry, index) => {
-    const caseId = String(entry?.caseId || '').trim();
+    const record = asRecord<FixtureCaseRecord>(entry);
+    const caseId = String(record?.caseId ?? '').trim();
     if (!caseId) {
       throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', `Fixture case at index ${index} is missing caseId.`, {
         index
@@ -294,15 +354,15 @@ function normalizeFixtureCases(value: any): FixtureCaseRecord[] {
     }
     return {
       caseId,
-      input: entry?.input ?? null,
-      metric: entry?.metric ?? null,
-      evidenceRefs: entry?.evidenceRefs,
-      knownDivergence: entry?.knownDivergence === true
+      input: record?.input ?? null,
+      metric: record?.metric ?? null,
+      evidenceRefs: record?.evidenceRefs,
+      knownDivergence: record?.knownDivergence === true
     };
   });
 }
 
-function normalizeKnownDivergences(value: any): KnownDivergenceRecord[] {
+function normalizeKnownDivergences(value: unknown): KnownDivergenceRecord[] {
   if (value == null) {
     return [];
   }
@@ -310,12 +370,13 @@ function normalizeKnownDivergences(value: any): KnownDivergenceRecord[] {
     throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', 'knownDivergences must be an array when provided.', {});
   }
   return value.map((entry, index) => {
+    const record = asRecord<KnownDivergenceRecord>(entry);
     const normalized = {
-      caseId: String(entry?.caseId || '').trim(),
-      reason: String(entry?.reason || '').trim(),
-      justification: String(entry?.justification || '').trim(),
-      reviewer: String(entry?.reviewer || '').trim(),
-      reviewRef: String(entry?.reviewRef || '').trim()
+      caseId: String(record?.caseId ?? '').trim(),
+      reason: String(record?.reason ?? '').trim(),
+      justification: String(record?.justification ?? '').trim(),
+      reviewer: String(record?.reviewer ?? '').trim(),
+      reviewRef: String(record?.reviewRef ?? '').trim()
     };
     for (const [fieldName, fieldValue] of Object.entries(normalized)) {
       if (!fieldValue) {
@@ -329,29 +390,30 @@ function normalizeKnownDivergences(value: any): KnownDivergenceRecord[] {
   });
 }
 
-function createCaseMetric(metric: any, passed: boolean): CaseMetricRecord {
-  const baseline = typeof metric?.baseline === 'number' ? metric.baseline : 1;
-  const current = typeof metric?.current === 'number'
-    ? metric.current
+function createCaseMetric(metric: unknown, passed: boolean): CaseMetricRecord {
+  const metricRecord = asRecord<Partial<CaseMetricRecord>>(metric);
+  const baseline = typeof metricRecord?.baseline === 'number' ? metricRecord.baseline : 1;
+  const current = typeof metricRecord?.current === 'number'
+    ? metricRecord.current
     : (passed ? baseline : 0);
   const output: CaseMetricRecord = {
-    name: String(metric?.name || 'semanticMatch').trim(),
+    name: String(metricRecord?.name ?? 'semanticMatch').trim(),
     baseline,
     current,
     delta: current - baseline,
-    direction: normalizeMetricDirection(metric?.direction),
+    direction: normalizeMetricDirection(metricRecord?.direction),
     passed
   };
-  if (typeof metric?.tolerance === 'number' && metric.tolerance >= 0) {
+  if (typeof metricRecord?.tolerance === 'number' && metricRecord.tolerance >= 0) {
     return {
       ...output,
-      tolerance: metric.tolerance
+      tolerance: metricRecord.tolerance
     };
   }
   return output;
 }
 
-function normalizeEvidenceRefs(value: any, caseId: string): string[] {
+function normalizeEvidenceRefs(value: unknown, caseId: string): string[] {
   if (!Array.isArray(value) || value.length === 0) {
     return [`equivalence-fixture:${caseId}`];
   }
@@ -359,23 +421,23 @@ function normalizeEvidenceRefs(value: any, caseId: string): string[] {
   return normalized.length > 0 ? normalized : [`equivalence-fixture:${caseId}`];
 }
 
-function normalizeMetricDirection(value: any): MetricDirection {
-  const direction = String(value || 'higher-is-better').trim();
+function normalizeMetricDirection(value: unknown): MetricDirection {
+  const direction = String(value ?? 'higher-is-better').trim();
   if (direction === 'higher-is-better' || direction === 'lower-is-better' || direction === 'informational') {
     return direction;
   }
   return 'higher-is-better';
 }
 
-function normalizeLegacyUris(value: any): string[] {
+function normalizeLegacyUris(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
   }
   return value.map((entry) => String(entry || '').trim()).filter(Boolean);
 }
 
-function normalizeFixtureSetId(value: any, fallbackSource: string) {
-  const explicit = String(value || '').trim();
+function normalizeFixtureSetId(value: unknown, fallbackSource: string) {
+  const explicit = String(value ?? '').trim();
   if (explicit) {
     return explicit;
   }

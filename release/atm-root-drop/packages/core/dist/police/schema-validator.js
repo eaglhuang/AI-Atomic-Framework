@@ -73,9 +73,10 @@ function createFileFailure(code, filePath, message) {
 }
 function formatAjvErrors(errors) {
     return (errors ?? []).map((error) => {
-        const location = error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/';
-        const detail = error.params?.missingProperty ? ` missing ${error.params.missingProperty}` : '';
-        return `${location} ${error.message ?? 'is invalid'}${detail}`;
+        const errorRecord = (error && typeof error === 'object' && !Array.isArray(error) ? error : {});
+        const location = errorRecord.instancePath && errorRecord.instancePath.length > 0 ? errorRecord.instancePath : '/';
+        const detail = errorRecord.params?.missingProperty ? ` missing ${errorRecord.params.missingProperty}` : '';
+        return `${location} ${errorRecord.message ?? 'is invalid'}${detail}`;
     });
 }
 function toPortablePath(value) {

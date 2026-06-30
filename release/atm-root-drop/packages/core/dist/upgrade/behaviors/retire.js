@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 function loadRegistry(repositoryRoot) {
@@ -23,7 +23,6 @@ function findDownstreamRefs(repositoryRoot, atomId) {
     const mapsDir = path.join(repositoryRoot, 'atomic_workbench', 'maps');
     if (existsSync(mapsDir)) {
         try {
-            const { readdirSync } = require_fs();
             for (const mapId of readdirSync(mapsDir)) {
                 const specPath = path.join(mapsDir, mapId, 'map.spec.json');
                 if (!existsSync(specPath))
@@ -58,10 +57,6 @@ function findDownstreamRefs(repositoryRoot, atomId) {
         catch { /* skip */ }
     }
     return refs;
-}
-function require_fs() {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('node:fs');
 }
 function getAtomCurrentStage(repositoryRoot, atomId) {
     const registry = loadRegistry(repositoryRoot);
@@ -163,7 +158,6 @@ export function applyRetire(repositoryRoot, atomId, targetStage, proof) {
     const lineageLogPath = path.join(repositoryRoot, '.atm', 'history', 'atom-retirement-lineage.jsonl');
     mkdirSync(path.dirname(lineageLogPath), { recursive: true });
     const line = JSON.stringify(lineageEvent) + '\n';
-    const { appendFileSync } = require_fs();
     appendFileSync(lineageLogPath, line, 'utf-8');
     return {
         ok: true,

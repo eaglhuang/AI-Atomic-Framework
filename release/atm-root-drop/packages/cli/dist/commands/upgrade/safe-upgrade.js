@@ -268,7 +268,7 @@ export function collectSafeUpgradeFiles(cwd) {
     addManifestFiles(records, cwd, '.atm/agent-pack', 'agent-pack-manifest');
     addManifestFiles(records, cwd, '.atm/integrations', 'integration-manifest');
     addBackupRecord(records, cwd, '.atm/runtime/compatibility-matrix.snapshot.json', { role: 'compatibility-matrix-snapshot' });
-    return [...records.values()].sort((left, right) => left.path.localeCompare(right.path));
+    return [...records.values()].sort((left, right) => String(left.path).localeCompare(String(right.path)));
 }
 // ─── Private helpers ───────────────────────────────────────────────────────
 function addManifestFiles(records, cwd, manifestDir, role) {
@@ -289,17 +289,17 @@ function addManifestFiles(records, cwd, manifestDir, role) {
     }
 }
 function extractManagedFilesFromManifest(manifest) {
-    if (Array.isArray(manifest?.renderedManifest?.renderedFiles)) {
+    if (manifest && 'renderedManifest' in manifest && manifest.renderedManifest && typeof manifest.renderedManifest === 'object' && 'renderedFiles' in manifest.renderedManifest && Array.isArray(manifest.renderedManifest.renderedFiles)) {
         return manifest.renderedManifest.renderedFiles.map((entry) => ({
-            path: entry.path,
-            expectedHash: entry.contentHash,
+            path: String(entry.path),
+            expectedHash: String(entry.contentHash),
             hashFormat: 'hex'
         }));
     }
-    if (Array.isArray(manifest?.files)) {
+    if (manifest && 'files' in manifest && Array.isArray(manifest.files)) {
         return manifest.files.map((entry) => ({
-            path: entry.path,
-            expectedHash: entry.sha256,
+            path: String(entry.path),
+            expectedHash: String(entry.sha256),
             hashFormat: 'prefixed'
         }));
     }
@@ -324,7 +324,7 @@ function addBackupRecord(records, cwd, filePath, details) {
 function backupSafeUpgradeFiles(cwd, backupRoot, backupFiles) {
     const backedUpFiles = [];
     for (const fileRecord of backupFiles) {
-        const relativeFilePath = normalizeRepositoryRelativePath(fileRecord.path);
+        const relativeFilePath = normalizeRepositoryRelativePath(String(fileRecord.path));
         const sourcePath = resolveRepositoryPath(cwd, relativeFilePath);
         const backupFilePath = path.join(backupRoot, 'files', relativeFilePath);
         if (!existsSync(sourcePath)) {

@@ -38,7 +38,8 @@ export function allocateAtomId(bucket, options = {}) {
     const registryDocument = options.registryDocument ?? readRegistryDocument(registryPath);
     const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
     const maxSequence = entries.reduce((currentMax, entry) => {
-        const parsed = parseAtomId(entry?.atomId ?? entry?.id);
+        const registryEntry = entry;
+        const parsed = parseAtomId(registryEntry?.atomId ?? registryEntry?.id);
         if (!parsed || parsed.bucket !== normalizedBucket) {
             return currentMax;
         }

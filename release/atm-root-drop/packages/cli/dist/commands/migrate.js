@@ -34,9 +34,13 @@ function isUserModified(relFile, cwd) {
         return false;
     return (result.stdout || '').trim().length > 0;
 }
+function readOptionalStringOption(options, key) {
+    const value = options[key];
+    return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+}
 function runPlan(options, cwd) {
-    const fromVersion = options.from;
-    const toVersion = options.to;
+    const fromVersion = readOptionalStringOption(options, 'from');
+    const toVersion = readOptionalStringOption(options, 'to');
     if (!fromVersion || !toVersion) {
         throw new CliError('ATM_CLI_USAGE', 'migrate plan requires --from <version> and --to <version>', { exitCode: 2 });
     }
@@ -70,8 +74,8 @@ function runPlan(options, cwd) {
     return makeResult({ ok: true, command: 'migrate', cwd, messages: [], evidence: { fromVersion, toVersion, status: 'ready', codemods: entry.codemods, affectedFiles, userModifiedFiles, guide: entry.guide, description: entry.description } });
 }
 function runApply(options, cwd) {
-    const fromVersion = options.from;
-    const toVersion = options.to;
+    const fromVersion = readOptionalStringOption(options, 'from');
+    const toVersion = readOptionalStringOption(options, 'to');
     if (!fromVersion || !toVersion) {
         throw new CliError('ATM_CLI_USAGE', 'migrate apply requires --from <version> and --to <version>', { exitCode: 2 });
     }
@@ -110,7 +114,7 @@ function runApply(options, cwd) {
     return makeResult({ ok: true, command: 'migrate', cwd, messages: [], evidence: { fromVersion, toVersion, status: 'applied', codemods: entry.codemods, modifiedFiles, backupPath: backupDir } });
 }
 function runVerify(options, cwd, root) {
-    const fixturePath = options.fixture;
+    const fixturePath = readOptionalStringOption(options, 'fixture');
     if (fixturePath) {
         let fixtureAbs = path.isAbsolute(fixturePath) ? fixturePath : path.resolve(root, fixturePath);
         if (!existsSync(path.join(fixtureAbs, 'before')) || !existsSync(path.join(fixtureAbs, 'after'))) {

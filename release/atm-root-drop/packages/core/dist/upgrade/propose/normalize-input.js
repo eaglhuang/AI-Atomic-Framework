@@ -70,14 +70,17 @@ export function unwrapKnownInputDocument(document) {
     if (document.expectedReport && !document.schemaId) {
         return document.expectedReport;
     }
-    if (document.evidence?.propagationReport && !document.schemaId) {
-        return document.evidence.propagationReport;
-    }
-    if (document.evidence?.report && !document.schemaId) {
-        return document.evidence.report;
-    }
-    if (document.evidence?.decisionLog && !document.schemaId) {
-        return document.evidence.decisionLog;
+    if (document.evidence && typeof document.evidence === 'object' && !Array.isArray(document.evidence)) {
+        const evidence = document.evidence;
+        if (evidence.propagationReport && !document.schemaId) {
+            return evidence.propagationReport;
+        }
+        if (evidence.report && !document.schemaId) {
+            return evidence.report;
+        }
+        if (evidence.decisionLog && !document.schemaId) {
+            return evidence.decisionLog;
+        }
     }
     return document;
 }
@@ -128,7 +131,7 @@ export function normalizeInputDocument(input) {
     if (!document || typeof document !== 'object') {
         throw new Error('Upgrade proposal inputs require a document payload.');
     }
-    const inferredKind = inferInputKind(input.kind ?? document.schemaId);
+    const inferredKind = inferInputKind((input.kind ?? document.schemaId));
     const path = input.path ?? input.reportPath ?? input.evidencePath ?? null;
     if (!path) {
         throw new Error(`Upgrade proposal input ${inferredKind} requires a path.`);
@@ -136,7 +139,7 @@ export function normalizeInputDocument(input) {
     return {
         kind: inferredKind,
         path,
-        document
+        document: document
     };
 }
 export function findInput(inputs, expectedKind) {

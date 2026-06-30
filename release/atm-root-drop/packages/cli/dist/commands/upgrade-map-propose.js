@@ -3,23 +3,23 @@ import { proposeAtomicUpgrade } from '../../../core/dist/upgrade/propose.js';
 import { readJsonFile, relativePathFrom } from './shared.js';
 export function runUpgradeMapPropose(options) {
     return proposeAtomicUpgrade({
-        atomId: options.atomId,
-        fromVersion: options.fromVersion,
-        toVersion: options.toVersion,
-        behaviorId: options.behaviorId,
-        decompositionDecision: options.decompositionDecision,
+        atomId: options.atomId ?? null,
+        fromVersion: options.fromVersion ?? null,
+        toVersion: options.toVersion ?? null,
+        behaviorId: options.behaviorId ?? null,
+        decompositionDecision: options.decompositionDecision ?? null,
         target: {
             kind: 'map',
             mapId: options.target.mapId
         },
-        fork: options.fork,
+        fork: options.fork ?? null,
         mapImpactScope: options.mapImpactScope,
-        proposalId: options.proposalId,
-        proposedBy: options.proposedBy,
-        proposedAt: options.proposedAt,
-        migration: options.migration,
-        requestedReplacementMode: options.requestedReplacementMode,
-        contextBudgetGate: options.contextBudgetGate,
+        proposalId: options.proposalId ?? null,
+        proposedBy: options.proposedBy ?? undefined,
+        proposedAt: options.proposedAt ?? undefined,
+        migration: options.migration ?? null,
+        requestedReplacementMode: options.requestedReplacementMode ?? null,
+        contextBudgetGate: options.contextBudgetGate ?? null,
         repositoryRoot: options.cwd,
         inputs: buildMapProposalInputs(options)
     });

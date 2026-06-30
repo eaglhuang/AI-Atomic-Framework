@@ -26,7 +26,8 @@ export function allocateMapId(options = {}) {
     const registryDocument = options.registryDocument ?? readRegistryDocument(registryPath);
     const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
     const maxSequence = entries.reduce((currentMax, entry) => {
-        const parsed = parseMapId(entry?.mapId);
+        const registryEntry = entry;
+        const parsed = parseMapId(registryEntry?.mapId);
         if (!parsed) {
             return currentMax;
         }

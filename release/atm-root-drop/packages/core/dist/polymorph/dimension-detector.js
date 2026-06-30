@@ -26,12 +26,13 @@ export function detectPolymorphicDimensions(leftSpec, rightSpec) {
 }
 function sanitizeSpec(spec) {
     const candidate = spec && typeof spec === 'object' ? spec : {};
+    const candidateRecord = candidate;
     return {
-        dimensionValues: candidate.dimensionValues && typeof candidate.dimensionValues === 'object'
-            ? candidate.dimensionValues
+        dimensionValues: candidateRecord.dimensionValues && typeof candidateRecord.dimensionValues === 'object'
+            ? candidateRecord.dimensionValues
             : {},
-        staticContract: candidate.staticContract && typeof candidate.staticContract === 'object'
-            ? candidate.staticContract
+        staticContract: candidateRecord.staticContract && typeof candidateRecord.staticContract === 'object'
+            ? candidateRecord.staticContract
             : {}
     };
 }

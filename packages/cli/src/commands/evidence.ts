@@ -2774,7 +2774,7 @@ function readGovernedCommitTreeWithoutEvidence(cwd: string, commitSha: string) {
       GIT_INDEX_FILE: tempIndex
     });
     if (!readTree.ok) return null;
-    runGitCommand(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json'], {
+    runGitCommand(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json', '.atm/history/evidence/git-head.jsonl'], {
       GIT_INDEX_FILE: tempIndex
     });
     const writeTree = runGitCommand(cwd, ['write-tree'], {

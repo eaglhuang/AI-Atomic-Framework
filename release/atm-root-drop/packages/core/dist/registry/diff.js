@@ -57,7 +57,7 @@ export function resolveRegistryDiffTarget(registryDoc, atomId) {
                     atomId: normalizedAtomId,
                     versions: lineageVersions,
                     sourceKind: 'member-version-lineage',
-                    sourceRef: member.versionLineage?.sourceRef ?? entry.lineageLogRef ?? undefined,
+                    sourceRef: member?.versionLineage?.sourceRef ?? entry.lineageLogRef ?? undefined,
                     registryEntry: entry,
                     memberIndex,
                     mapId: entry.mapId ?? entry.id ?? undefined

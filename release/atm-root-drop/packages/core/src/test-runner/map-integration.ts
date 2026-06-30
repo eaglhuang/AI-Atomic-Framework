@@ -9,7 +9,50 @@ export const defaultMapIntegrationReportMigration = Object.freeze({
   notes: 'Initial alpha0 map integration report.'
 });
 
-export function resolveCanonicalMapPaths(mapId: any) {
+interface MapIntegrationOptions {
+  repositoryRoot?: string;
+  now?: string;
+  writeReport?: boolean;
+}
+
+interface MapTarget {
+  mapId: string;
+  repositoryRoot: string;
+  resolutionMode: 'canonical' | 'legacy';
+  workbenchPath: string;
+  specPath: string;
+  testPath: string;
+  reportPath: string;
+  warnings: string[];
+}
+
+interface MapStatus {
+  mapId: string;
+  ok: boolean;
+  exitCode: number;
+  durationMs: number;
+  resolutionMode: 'canonical' | 'legacy';
+  reportPath: string;
+  stdout: string;
+  stderr: string;
+  warnings: string[];
+}
+
+interface CreateMapIntegrationReportInput {
+  mapId: string;
+  repositoryRoot?: string;
+  generatedAt?: string;
+  specPath?: string | null;
+  testPath?: string | null;
+  reportPath?: string | null;
+  resolutionMode?: string;
+  warnings?: string[];
+  perMapStatus?: MapStatus[];
+  failedDownstream?: string[];
+  propagationDuration?: number;
+}
+
+export function resolveCanonicalMapPaths(mapId: string) {
   const workbenchPath = `atomic_workbench/maps/${mapId}`;
   return {
     workbenchPath,
@@ -19,7 +62,7 @@ export function resolveCanonicalMapPaths(mapId: any) {
   };
 }
 
-export function resolveMapIntegrationTarget(mapId: any, options: any) {
+export function resolveMapIntegrationTarget(mapId: string, options: MapIntegrationOptions | null | undefined): MapTarget {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const canonical = resolveCanonicalMapPaths(mapId);
@@ -58,7 +101,7 @@ export function resolveMapIntegrationTarget(mapId: any, options: any) {
   });
 }
 
-export function runMapIntegrationTest(mapId: any, options: any) {
+export function runMapIntegrationTest(mapId: string, options: MapIntegrationOptions | null | undefined) {
   const normalizedOptions = options || {};
   const target = resolveMapIntegrationTarget(mapId, normalizedOptions);
   const generatedAt = normalizedOptions.now ?? new Date().toISOString();
@@ -110,13 +153,13 @@ export function runMapIntegrationTest(mapId: any, options: any) {
   };
 }
 
-export function createMapIntegrationReport(input: any) {
+export function createMapIntegrationReport(input: CreateMapIntegrationReportInput) {
   const perMapStatus = [...(input.perMapStatus ?? [])];
   const failedDownstream = [...(input.failedDownstream ?? [])];
   const total = perMapStatus.length;
   const passed = perMapStatus.filter((entry) => entry.ok === true).length;
   const failed = perMapStatus.filter((entry) => entry.ok !== true).length;
-  const propagationDuration = Number.isInteger(input.propagationDuration) ? input.propagationDuration : 0;
+  const propagationDuration = Number.isInteger(input.propagationDuration) ? input.propagationDuration! : 0;
   const exitCode = perMapStatus.find((entry) => entry.exitCode !== 0)?.exitCode ?? (total > 0 ? 0 : 1);
   const ok = failed === 0;
 
@@ -161,7 +204,7 @@ export function createMapIntegrationReport(input: any) {
   };
 }
 
-function resolveLegacyMapTarget(mapId: any, options: any) {
+function resolveLegacyMapTarget(mapId: string, options: { repositoryRoot?: string }): { workbenchPath: string; specPath: string; testPath: string } | null {
   const normalizedOptions = options || {};
   const repositoryRoot = path.resolve(normalizedOptions.repositoryRoot ?? process.cwd());
   const atomsRoot = path.join(repositoryRoot, 'atomic_workbench', 'atoms');
@@ -179,7 +222,7 @@ function resolveLegacyMapTarget(mapId: any, options: any) {
     }
 
     try {
-      const specDocument = JSON.parse(readFileSync(legacySpecPath, 'utf8'));
+      const specDocument = JSON.parse(readFileSync(legacySpecPath, 'utf8')) as { mapId?: string };
       if (String(specDocument?.mapId || '').trim() !== mapId) {
         continue;
       }
@@ -196,7 +239,7 @@ function resolveLegacyMapTarget(mapId: any, options: any) {
   return null;
 }
 
-function createMapRunnerError(code: any, message: any, details: Record<string, unknown> = {}) {
+function createMapRunnerError(code: string, message: string, details: Record<string, unknown> = {}) {
   const error = new Error(message) as Error & { code: string; details: Record<string, unknown> };
   error.name = 'MapIntegrationRunnerError';
   error.code = code;
@@ -204,10 +247,10 @@ function createMapRunnerError(code: any, message: any, details: Record<string, u
   return error;
 }
 
-function normalizeText(value: any) {
+function normalizeText(value: string | null | undefined): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string): string {
   return String(value || '').replace(/\\/g, '/');
 }

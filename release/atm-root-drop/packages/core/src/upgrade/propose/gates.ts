@@ -11,11 +11,42 @@ import { gateFailureSummary, qualityComparisonFailureReason } from './failure-re
 import { analyzePolymorphImpact } from '../../polymorph/impact.ts';
 import { validateRollbackProof } from '../../registry/rollback-proof.ts';
 import { validateRetirementProof } from '../../registry/retirement-proof.ts';
+import type { RollbackProof } from '../../registry/rollback-types.ts';
 import { validatePropagationReport } from '../../test-runner/propagation.ts';
+
+// ─── Shared types ──────────────────────────────────────────────────────────
+
+/** Normalised gate result returned by all gate builders */
+export interface GateResult {
+  passed: boolean;
+  reportId: string;
+  reportPath: string;
+  summary: string;
+}
+
+/** Raw gate object supplied by callers before normalisation */
+interface RawGate {
+  passed?: unknown;
+  reportId?: unknown;
+  reportPath?: unknown;
+  summary?: unknown;
+}
+
+/** Target descriptor passed to gate builders */
+interface GateTarget {
+  kind: string;
+  mapId: string;
+}
+
+/** Generic report-file input holding a parsed document and its file path */
+interface ReportInput {
+  document: Record<string, unknown> | null | undefined;
+  path: string;
+}
 
 // ─── Gate result normalizer ────────────────────────────────────────────────
 
-export function normalizeGateResult(gate: any, gateName: any) {
+export function normalizeGateResult(gate: RawGate | null | undefined, gateName: string): GateResult | null {
   if (gate == null) {
     return null;
   }
@@ -41,11 +72,11 @@ export function normalizeGateResult(gate: any, gateName: any) {
 
 // ─── Base gate builder ─────────────────────────────────────────────────────
 
-export function buildGateResult(gateName: any, report: any, reportPath: any, successSummary: any) {
+export function buildGateResult(gateName: string, report: Record<string, unknown> | null | undefined, reportPath: string, successSummary: string): GateResult {
   const passed = report?.passed === true;
   return {
     passed,
-    reportId: report?.reportId ?? `${gateName}.missing`,
+    reportId: (report?.reportId as string | undefined) ?? `${gateName}.missing`,
     reportPath,
     summary: passed ? `pass (${successSummary})` : `blocked (${gateFailureSummary(gateName, report)})`
   };
@@ -53,12 +84,15 @@ export function buildGateResult(gateName: any, report: any, reportPath: any, suc
 
 // ─── Specific gate builders ────────────────────────────────────────────────
 
-export function buildQualityComparisonGate(report: any, reportPath: any) {
+export function buildQualityComparisonGate(report: Record<string, unknown> | null | undefined, reportPath: string): GateResult {
   const passed = report?.passed === true && report?.regressed !== true;
-  const mapPropagationPassed = report?.mapImpactScope?.propagationStatus?.every((entry: any) => entry.integrationTestPassed !== false) ?? true;
+  const propagationStatus = (report?.mapImpactScope as Record<string, unknown> | undefined)?.propagationStatus;
+  const mapPropagationPassed = Array.isArray(propagationStatus)
+    ? propagationStatus.every((entry: unknown) => (entry as Record<string, unknown>).integrationTestPassed !== false)
+    : true;
   return {
     passed: passed && mapPropagationPassed,
-    reportId: report?.reportId ?? 'quality-comparison.missing',
+    reportId: (report?.reportId as string | undefined) ?? 'quality-comparison.missing',
     reportPath,
     summary: passed && mapPropagationPassed
       ? 'pass (quality metrics improved; map propagation passed)'
@@ -66,17 +100,17 @@ export function buildQualityComparisonGate(report: any, reportPath: any) {
   };
 }
 
-export function buildRegistryCandidateGate(report: any, reportPath: any) {
+export function buildRegistryCandidateGate(report: Record<string, unknown> | null | undefined, reportPath: string): GateResult {
   const passed = report?.passed === true && report?.canPromote === true;
   return {
     passed,
-    reportId: report?.reportId ?? 'registry-candidate.missing',
+    reportId: (report?.reportId as string | undefined) ?? 'registry-candidate.missing',
     reportPath,
     summary: passed ? 'pass (candidate can promote)' : 'blocked (candidate cannot promote)'
   };
 }
 
-export function buildMapEquivalenceGate(target: any, requestedReplacementMode: any, input: any) {
+export function buildMapEquivalenceGate(target: GateTarget, requestedReplacementMode: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
     return null;
   }
@@ -100,7 +134,7 @@ export function buildMapEquivalenceGate(target: any, requestedReplacementMode: a
 
   return {
     passed,
-    reportId: input.document?.reportId ?? 'map-equivalence.missing',
+    reportId: (input.document?.reportId as string | undefined) ?? 'map-equivalence.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (map equivalence passed for active replacement)'
@@ -108,7 +142,7 @@ export function buildMapEquivalenceGate(target: any, requestedReplacementMode: a
   };
 }
 
-export function buildPolymorphImpactGate(target: any, requestedReplacementMode: any, repositoryRoot: any, toVersion: any, input: any) {
+export function buildPolymorphImpactGate(target: GateTarget, requestedReplacementMode: string, repositoryRoot: string, toVersion: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
     return null;
   }
@@ -134,11 +168,12 @@ export function buildPolymorphImpactGate(target: any, requestedReplacementMode: 
   const schemaValid = input.document?.schemaId === 'atm.polymorphImpactReport';
   const mapMatches = input.document?.targetMapId === target.mapId;
   const versionMatches = input.document?.toVersion === analysis.toVersion;
+  const rawTemplateHits = Array.isArray(input.document?.templateHits) ? input.document!.templateHits : [];
   const templateSetMatches = sameStringSet(
-    (Array.isArray(input.document?.templateHits) ? input.document.templateHits : []).map((entry: any) => String(entry?.templateId ?? '').trim()).filter(Boolean),
-    analysis.templateHits.map((entry: any) => entry.templateId)
+    (rawTemplateHits as unknown[]).map((entry: unknown) => String((entry as Record<string, unknown>)?.templateId ?? '').trim()).filter(Boolean),
+    analysis.templateHits.map((entry: { templateId: string }) => entry.templateId)
   );
-  const impactedSetMatches = sameStringSet(input.document?.impactedMapIds, analysis.impactedMapIds);
+  const impactedSetMatches = sameStringSet(input.document?.impactedMapIds as string[] | undefined, analysis.impactedMapIds);
   const passed = schemaValid
     && mapMatches
     && versionMatches
@@ -159,7 +194,7 @@ export function buildPolymorphImpactGate(target: any, requestedReplacementMode: 
 
   return {
     passed,
-    reportId: input.document?.reportId ?? 'polymorph-impact.missing',
+    reportId: (input.document?.reportId as string | undefined) ?? 'polymorph-impact.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (polymorph impact verified for active replacement)'
@@ -167,7 +202,7 @@ export function buildPolymorphImpactGate(target: any, requestedReplacementMode: 
   };
 }
 
-export function buildRollbackProofGate(target: any, requestedReplacementMode: any, input: any) {
+export function buildRollbackProofGate(target: GateTarget, requestedReplacementMode: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'legacy-retired') {
     return null;
   }
@@ -185,7 +220,7 @@ export function buildRollbackProofGate(target: any, requestedReplacementMode: an
   const mapMatches = input.document?.mapId === target.mapId;
   const validation = schemaValid && targetKindValid && mapMatches
     ? safeValidateRollbackProof(input.document)
-    : { ok: false, issues: [] };
+    : { ok: false, issues: [] as string[] };
   const passed = schemaValid
     && targetKindValid
     && mapMatches
@@ -203,7 +238,7 @@ export function buildRollbackProofGate(target: any, requestedReplacementMode: an
 
   return {
     passed,
-    reportId: input.document?.proofId ?? 'rollback-proof.missing',
+    reportId: (input.document?.proofId as string | undefined) ?? 'rollback-proof.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (rollback proof verified for legacy-retired replacement)'
@@ -211,7 +246,7 @@ export function buildRollbackProofGate(target: any, requestedReplacementMode: an
   };
 }
 
-export function buildPropagationReportGate(target: any, requestedReplacementMode: any, atomId: any, input: any) {
+export function buildPropagationReportGate(target: GateTarget, requestedReplacementMode: string, atomId: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
     return null;
   }
@@ -231,7 +266,7 @@ export function buildPropagationReportGate(target: any, requestedReplacementMode
   const passed = validation.ok;
   return {
     passed,
-    reportId: input.document?.reportId ?? 'propagation-report.missing',
+    reportId: (input.document?.reportId as string | undefined) ?? 'propagation-report.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (propagation report verified downstream map coverage for active replacement)'
@@ -239,7 +274,7 @@ export function buildPropagationReportGate(target: any, requestedReplacementMode
   };
 }
 
-export function buildReviewAdvisoryGate(target: any, requestedReplacementMode: any, proposalId: any, input: any) {
+export function buildReviewAdvisoryGate(target: GateTarget, requestedReplacementMode: string, proposalId: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
     return null;
   }
@@ -252,7 +287,8 @@ export function buildReviewAdvisoryGate(target: any, requestedReplacementMode: a
     };
   }
 
-  const advisoryTargetId = typeof input.document?.target?.id === 'string' ? input.document.target.id : null;
+  const advisoryTarget = input.document?.target as Record<string, unknown> | undefined;
+  const advisoryTargetId = typeof advisoryTarget?.id === 'string' ? advisoryTarget.id : null;
   const status = String(input.document?.status ?? '').trim();
   const targetMatches = advisoryTargetId == null || advisoryTargetId === proposalId || advisoryTargetId === target.mapId;
   const passed = targetMatches
@@ -266,7 +302,7 @@ export function buildReviewAdvisoryGate(target: any, requestedReplacementMode: a
 
   return {
     passed,
-    reportId: input.document?.reportId ?? 'review-advisory.missing',
+    reportId: (input.document?.reportId as string | undefined) ?? 'review-advisory.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (review advisory completed for active replacement)'
@@ -274,7 +310,7 @@ export function buildReviewAdvisoryGate(target: any, requestedReplacementMode: a
   };
 }
 
-export function buildHumanReviewGate(target: any, requestedReplacementMode: any, proposalId: any, atomId: any, input: any) {
+export function buildHumanReviewGate(target: GateTarget, requestedReplacementMode: string, proposalId: string, atomId: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'active') {
     return null;
   }
@@ -287,20 +323,26 @@ export function buildHumanReviewGate(target: any, requestedReplacementMode: any,
     };
   }
 
-  const schemaValid = input.document?.schemaId === 'atm.humanReviewDecision';
-  const proposalMatches = input.document?.proposalId === proposalId || input.document?.queueRecord?.proposalId === proposalId;
-  const atomMatches = input.document?.atomId === atomId || input.document?.queueRecord?.atomId === atomId;
-  const reviewedMapId = input.document?.queueRecord?.proposal?.target?.mapId ?? input.document?.proposal?.target?.mapId ?? null;
+  const doc = input.document;
+  const queueRecord = doc?.queueRecord as Record<string, unknown> | undefined;
+  const schemaValid = doc?.schemaId === 'atm.humanReviewDecision';
+  const proposalMatches = doc?.proposalId === proposalId || queueRecord?.proposalId === proposalId;
+  const atomMatches = doc?.atomId === atomId || queueRecord?.atomId === atomId;
+  const queueProposal = queueRecord?.proposal as Record<string, unknown> | undefined;
+  const queueProposalTarget = queueProposal?.target as Record<string, unknown> | undefined;
+  const docProposal = doc?.proposal as Record<string, unknown> | undefined;
+  const docProposalTarget = docProposal?.target as Record<string, unknown> | undefined;
+  const reviewedMapId = (queueProposalTarget?.mapId ?? docProposalTarget?.mapId ?? null) as string | null;
   const mapMatches = reviewedMapId == null || reviewedMapId === target.mapId;
-  const decisionApproved = input.document?.decision === 'approve';
-  const queueApproved = input.document?.queueRecord?.status === 'approved';
+  const decisionApproved = doc?.decision === 'approve';
+  const queueApproved = queueRecord?.status === 'approved';
   const passed = schemaValid && proposalMatches && atomMatches && mapMatches && decisionApproved && queueApproved;
   const reason = !schemaValid
     ? 'human review decision schemaId must be atm.humanReviewDecision'
     : !proposalMatches
-      ? `human review proposalId ${String(input.document?.proposalId ?? input.document?.queueRecord?.proposalId ?? 'unknown')} does not match ${proposalId}`
+      ? `human review proposalId ${String(doc?.proposalId ?? queueRecord?.proposalId ?? 'unknown')} does not match ${proposalId}`
       : !atomMatches
-        ? `human review atomId ${String(input.document?.atomId ?? input.document?.queueRecord?.atomId ?? 'unknown')} does not match ${atomId}`
+        ? `human review atomId ${String(doc?.atomId ?? queueRecord?.atomId ?? 'unknown')} does not match ${atomId}`
         : !mapMatches
           ? `human review target map ${String(reviewedMapId ?? 'unknown')} does not match ${target.mapId}`
           : !decisionApproved || !queueApproved
@@ -309,7 +351,7 @@ export function buildHumanReviewGate(target: any, requestedReplacementMode: any,
 
   return {
     passed,
-    reportId: input.document?.evidenceId ?? input.document?.proposalId ?? 'human-review.missing',
+    reportId: (doc?.evidenceId as string | undefined) ?? (doc?.proposalId as string | undefined) ?? 'human-review.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (human review approved active replacement)'
@@ -317,7 +359,7 @@ export function buildHumanReviewGate(target: any, requestedReplacementMode: any,
   };
 }
 
-export function buildRetirementProofGate(target: any, requestedReplacementMode: any, input: any) {
+export function buildRetirementProofGate(target: GateTarget, requestedReplacementMode: string, input: ReportInput | null | undefined): GateResult | null {
   if (target.kind !== 'map' || requestedReplacementMode !== 'legacy-retired') {
     return null;
   }
@@ -334,7 +376,7 @@ export function buildRetirementProofGate(target: any, requestedReplacementMode: 
   const mapMatches = input.document?.mapId === target.mapId;
   const validation = schemaValid && mapMatches
     ? safeValidateRetirementProof(input.document)
-    : { ok: false, issues: [] };
+    : { ok: false, issues: [] as string[] };
   const passed = schemaValid
     && mapMatches
     && input.document?.verificationStatus === 'passed'
@@ -349,7 +391,7 @@ export function buildRetirementProofGate(target: any, requestedReplacementMode: 
 
   return {
     passed,
-    reportId: input.document?.proofId ?? 'retirement-proof.missing',
+    reportId: (input.document?.proofId as string | undefined) ?? 'retirement-proof.missing',
     reportPath: input.path,
     summary: passed
       ? 'pass (retirement proof cleared caller and entrypoint risk for legacy-retired replacement)'
@@ -359,9 +401,13 @@ export function buildRetirementProofGate(target: any, requestedReplacementMode: 
 
 // ─── Safe validators（private helpers）────────────────────────────────────
 
-function safeValidateRollbackProof(document: any) {
+function safeValidateRollbackProof(document: Record<string, unknown> | null | undefined): { ok: boolean; issues: string[] } {
+  if (!document) {
+    return { ok: false, issues: ['rollback-proof-missing'] };
+  }
   try {
-    return validateRollbackProof(document);
+    const result = validateRollbackProof(document as unknown as RollbackProof);
+    return { ok: result.ok, issues: [...result.issues] };
   } catch (error) {
     return {
       ok: false,
@@ -370,9 +416,13 @@ function safeValidateRollbackProof(document: any) {
   }
 }
 
-function safeValidateRetirementProof(document: any) {
+function safeValidateRetirementProof(document: Record<string, unknown> | null | undefined): { ok: boolean; issues: string[] } {
+  if (!document) {
+    return { ok: false, issues: ['retirement-proof-missing'] };
+  }
   try {
-    return validateRetirementProof(document);
+    const result = validateRetirementProof(document);
+    return { ok: result.ok, issues: [...result.issues] };
   } catch (error) {
     return {
       ok: false,
@@ -381,7 +431,7 @@ function safeValidateRetirementProof(document: any) {
   }
 }
 
-function safeValidatePropagationReport(document: any, options: any) {
+function safeValidatePropagationReport(document: Record<string, unknown> | null | undefined, options: { atomId: string; mapId: string }): { ok: boolean; issues: string[] } {
   try {
     return validatePropagationReport(document, options);
   } catch (error) {
@@ -394,7 +444,7 @@ function safeValidatePropagationReport(document: any, options: any) {
 
 // ─── String set utilities（used by buildPolymorphImpactGate）──────────────
 
-function sameStringSet(left: any, right: any) {
+function sameStringSet(left: string[] | undefined, right: string[] | undefined): boolean {
   const leftValues = normalizeStringSet(left);
   const rightValues = normalizeStringSet(right);
   if (leftValues.length !== rightValues.length) {
@@ -403,7 +453,7 @@ function sameStringSet(left: any, right: any) {
   return leftValues.every((value, index) => value === rightValues[index]);
 }
 
-function normalizeStringSet(values: any) {
+function normalizeStringSet(values: string[] | null | undefined): string[] {
   return [...new Set((Array.isArray(values) ? values : [])
     .map((value) => String(value ?? '').trim())
     .filter(Boolean))].sort();

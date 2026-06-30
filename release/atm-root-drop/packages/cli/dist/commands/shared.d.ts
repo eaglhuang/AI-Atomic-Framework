@@ -114,14 +114,37 @@ export declare function makeResult({ ok, command, cwd, mode, messages, evidence 
     messages?: CommandMessage[];
     evidence?: unknown;
 }): CommandResult;
-export declare function defineCommandSpec(spec: any): Readonly<{
-    name: string;
-    summary: string;
-    positional: any[];
-    options: any[];
-    examples: any[];
-    help: import("./help.ts").CommandHelpMetadata | undefined;
-}>;
+export interface CommandOption {
+    readonly flag: string;
+    readonly value?: boolean;
+    readonly repeatable?: boolean;
+    readonly description?: string;
+    readonly required?: boolean;
+    readonly alias?: string;
+}
+export interface CommandSpecPositional {
+    readonly name: string;
+    readonly required?: boolean;
+    readonly description?: string;
+}
+export interface CommandSpecExample {
+    readonly description?: string;
+    readonly command?: string;
+}
+export interface CommandSpecHelpMetadata {
+    readonly header?: string;
+    readonly footer?: string;
+}
+export interface CommandSpec {
+    readonly name: string;
+    readonly summary: string;
+    readonly positional?: readonly CommandSpecPositional[];
+    readonly options?: readonly CommandOption[];
+    readonly examples?: readonly CommandSpecExample[];
+    readonly help?: CommandSpecHelpMetadata;
+    readonly [key: string]: unknown;
+}
+export declare function defineCommandSpec(spec: unknown): CommandSpec;
 type ParsedCommandArgs = {
     options: Record<string, unknown>;
     positional: string[];
@@ -130,10 +153,10 @@ type ParsedCommandArgs = {
     summary: boolean;
     fields: string[] | null;
 };
-export declare function parseArgsForCommand(spec: any, argv?: string[], options?: {
+export declare function parseArgsForCommand(spec: CommandSpec, argv?: string[], options?: {
     allowUnknown?: boolean;
 }): ParsedCommandArgs;
-export declare function makeHelpResult(spec: any, cwd?: string): CommandResult;
+export declare function makeHelpResult(spec: CommandSpec, cwd?: string): CommandResult;
 export declare function writeResult(result: CommandResult, stream: {
     write(s: string): void;
 }, outputFormat?: string, projectionOptions?: {
@@ -171,6 +194,8 @@ export declare function parseOptions(argv: string[], commandName: string): {
         fingerprintCheck?: boolean;
         edgeContracts?: boolean;
         propagate?: string;
+        profile?: string;
+        suite?: string;
         agent?: string;
         prompt?: string;
         intent?: string;

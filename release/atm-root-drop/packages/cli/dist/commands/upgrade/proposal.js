@@ -301,7 +301,7 @@ export function loadExplicitInputDocuments(cwd, inputPaths) {
         const document = normalizeUpgradeInputDocument(rawDocument);
         return {
             path: path.relative(cwd, resolvedPath).replace(/\\/g, '/'),
-            document
+            document: (document ?? {})
         };
     });
 }
@@ -316,7 +316,7 @@ export function discoverInputDocuments(cwd) {
     const discoveredFiles = collectJsonFiles(reportsRoot).sort((left, right) => left.localeCompare(right));
     const discoveredDocuments = discoveredFiles.map((filePath) => ({
         path: path.relative(cwd, filePath).replace(/\\/g, '/'),
-        document: readJsonFile(filePath, 'ATM_UPGRADE_INPUT_NOT_FOUND')
+        document: (readJsonFile(filePath, 'ATM_UPGRADE_INPUT_NOT_FOUND') ?? {})
     }));
     const inputDocuments = [];
     for (const kind of ['hash-diff', 'execution-evidence', 'non-regression', 'quality-comparison', 'registry-candidate']) {
@@ -416,21 +416,24 @@ function enqueueGuidedLegacyProposal(cwd, proposal) {
     };
 }
 function normalizeUpgradeInputDocument(document) {
-    if (document && typeof document === 'object' && !Array.isArray(document) && document.expectedReport && !document.schemaId) {
-        return document.expectedReport;
+    if (!document)
+        return document;
+    const docObj = document;
+    if (docObj.expectedReport && !docObj.schemaId) {
+        return docObj.expectedReport;
     }
-    if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.propagationReport && !document.schemaId) {
-        return document.evidence.propagationReport;
+    if (docObj.evidence?.propagationReport && !docObj.schemaId) {
+        return docObj.evidence.propagationReport;
     }
-    if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.report && !document.schemaId) {
-        return document.evidence.report;
+    if (docObj.evidence?.report && !docObj.schemaId) {
+        return docObj.evidence.report;
     }
-    if (document && typeof document === 'object' && !Array.isArray(document) && document.evidence?.decisionLog && !document.schemaId) {
-        return document.evidence.decisionLog;
+    if (docObj.evidence?.decisionLog && !docObj.schemaId) {
+        return docObj.evidence.decisionLog;
     }
     return document;
 }
-function inferInputKind(schemaId) {
+export function inferInputKind(schemaId) {
     switch (schemaId) {
         case 'atm.hashDiffReport':
             return 'hash-diff';

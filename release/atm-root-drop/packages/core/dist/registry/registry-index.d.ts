@@ -4,41 +4,85 @@ export declare class RegistryIndexError extends Error {
     details: Record<string, unknown>;
     constructor(code: string, message: string, details?: Record<string, unknown>);
 }
-export declare function createRegistryIndex(registryDocument: any, options?: any): Readonly<{
-    registryId: any;
-    size: number;
-    diagnostics: any[];
-    atomIdIndex: Map<any, any>;
-    mapIdIndex: Map<any, any>;
-    logicalNameIndex: Map<any, any>;
-    fingerprintIndex: Map<any, any>;
-    versionIndex: Map<any, any>;
-    nodeRefs: any[];
-    getByCanonicalId(canonicalId: any): any;
-    getByUrn(urn: any): any;
-    findByLogicalName(logicalName: any): any;
-    findBySemanticFingerprint(fingerprint: any): any;
-    findByFingerprintPrefix(prefix: any): any;
-    getVersions(canonicalId: any): {
-        current: any;
-        versions: any[];
+interface RegistryEntry {
+    atomId?: string;
+    id?: string;
+    mapId?: string;
+    mapVersion?: string;
+    atomVersion?: string;
+    currentVersion?: string;
+    logicalName?: string;
+    semanticFingerprint?: string | null;
+    mapSemanticFingerprint?: string | null;
+    versions?: Array<{
+        version?: string;
+    }>;
+    members?: RegistryMember[];
+    schemaId?: string;
+}
+interface RegistryMember {
+    atomId?: string;
+    version?: string;
+    versionLineage?: {
+        currentVersion?: string;
+        versions?: Array<{
+            version?: string;
+        }>;
     };
-    toJSON(): {
-        registryId: any;
-        size: number;
-        atomIds: any[];
-        mapIds: any[];
-        logicalNames: any[];
-        fingerprintKeys: any[];
-        versionKeys: any[];
-        diagnostics: any[];
-    };
-}>;
-export declare function createNodeRef(entry: any): Readonly<{
-    nodeKind: string;
+}
+interface NodeRef {
+    nodeKind: 'atom' | 'map';
     canonicalId: string;
     version: string | null;
     urn: string;
-    entry: any;
-}> | null;
+    entry: RegistryEntry;
+}
+interface DiagnosticRecord {
+    code: string;
+    severity: string;
+    entry: RegistryEntry;
+}
+interface VersionRecord {
+    current: string | null;
+    versions: Set<string>;
+}
+interface CreateRegistryIndexOptions {
+    allowDuplicates?: boolean;
+    repositoryRoot?: string;
+}
+interface RegistryDocument {
+    entries?: RegistryEntry[];
+    registryId?: string;
+}
+export declare function createRegistryIndex(registryDocument: RegistryDocument | null | undefined, options?: CreateRegistryIndexOptions): Readonly<{
+    registryId: string | null;
+    size: number;
+    diagnostics: DiagnosticRecord[];
+    atomIdIndex: Map<string, NodeRef>;
+    mapIdIndex: Map<string, NodeRef>;
+    logicalNameIndex: Map<string, NodeRef[]>;
+    fingerprintIndex: Map<string, NodeRef[]>;
+    versionIndex: Map<string, VersionRecord>;
+    nodeRefs: NodeRef[];
+    getByCanonicalId(canonicalId: string): NodeRef | null;
+    getByUrn(urn: string): NodeRef | null;
+    findByLogicalName(logicalName: string): NodeRef[];
+    findBySemanticFingerprint(fingerprint: string): NodeRef[];
+    findByFingerprintPrefix(prefix: string): NodeRef[];
+    getVersions(canonicalId: string): {
+        current: string | null;
+        versions: string[];
+    };
+    toJSON(): {
+        registryId: string | null;
+        size: number;
+        atomIds: string[];
+        mapIds: string[];
+        logicalNames: string[];
+        fingerprintKeys: string[];
+        versionKeys: string[];
+        diagnostics: DiagnosticRecord[];
+    };
+}>;
+export declare function createNodeRef(entry: RegistryEntry | null | undefined): NodeRef | null;
 export { normalizeSemanticFingerprint, semanticFingerprintPrefix };

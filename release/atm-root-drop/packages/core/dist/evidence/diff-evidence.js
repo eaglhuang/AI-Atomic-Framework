@@ -156,7 +156,15 @@ function buildAtomSourceMap(repositoryRoot) {
             const registry = JSON.parse(readFileSync(registryPath, 'utf-8'));
             for (const [atomId, entry] of Object.entries(registry.entries ?? {})) {
                 const e = entry;
-                const codePaths = e.selfVerification?.sourcePaths?.code ?? [];
+                const selfVerification = e.selfVerification && typeof e.selfVerification === 'object'
+                    ? e.selfVerification
+                    : null;
+                const sourcePaths = selfVerification?.sourcePaths && typeof selfVerification.sourcePaths === 'object'
+                    ? selfVerification.sourcePaths
+                    : null;
+                const codePaths = Array.isArray(sourcePaths?.code)
+                    ? sourcePaths.code.filter((value) => typeof value === 'string')
+                    : [];
                 if (codePaths.length > 0) {
                     map[atomId] = codePaths;
                 }

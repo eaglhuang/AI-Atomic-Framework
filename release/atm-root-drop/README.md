@@ -1,7 +1,7 @@
 # AI-Atomic-Framework
 
 [![Release v0.9.0-alpha.1](https://img.shields.io/badge/Release-v0.9.0--alpha.1-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0-alpha.1)
-[![Paper](https://img.shields.io/badge/Paper-arXiv%20preprint-b91c1c.svg)](CITATION.cff)
+[![Paper](https://img.shields.io/badge/Paper-Landing%20Page-b91c1c.svg)](https://eaglhuang.github.io/AI-learning-notes/atm_pre_write_admission_paper_en.html)
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-0f172a.svg)](LICENSE)
 [![Node 24](https://img.shields.io/badge/Node-24-1f6feb.svg)](package.json)
@@ -15,55 +15,85 @@
 [![Evidence First](https://img.shields.io/badge/Evidence-First-ef4444.svg)](#safety-model)
 [![Agent Ready](https://img.shields.io/badge/Agent-Ready-8b5cf6.svg)](#for-ai-agents)
 
-ATM helps people and AI agents work in the same repo without making a mess.
+ATM is the governance layer for AI-assisted engineering. It keeps AI work from drifting into hallucinated scope by turning a human goal into one bounded production chain: task intent, scope, admission, implementation, validation, evidence, and handoff.
 
-It tells the agent what to do next, keeps changes inside the right scope, and leaves clear proof of what changed and what passed.
+The best part is that humans do not need to drive the machinery. In an ATM-enabled repository, an AI agent can learn the repo-local ATM skill, route the request through the governed workflow, coordinate with other agents, and leave behind proof that explains what changed and why.
 
-It is not another chat agent or workflow app. It is the safety layer around AI-assisted engineering.
+ATM is not another chat agent or workflow app. It is the operating contract for the multi-agent era: a way for people and agents to produce stable, reviewable software together instead of relying on prompt memory, ad hoc conventions, or merge-time cleanup.
 
-> For AI agents: read this README, then run `node atm.mjs next --prompt "<current user prompt>" --json`. Use `node atm.mjs next --json` only when there is no user prompt.
-
-Captain/dispatch entry gate: if the user asks for Captain, Coordinator,
-dispatch, task cards, sidecars, subagents, delegation, condition review, or
-closeout work, first route the request through `ai-role-router` when available,
-then through `atm-dispatch` before drafting instructions, delegating work, or
-reviewing another agent. State `Skill used: atm-dispatch` and the chosen
-`Delegation mode`. Internal sidecar is the default for review, preflight,
-grep, checklist, planning-only checks, and post-report verification. External
-dispatch is opt-in, and external write is forbidden unless the user explicitly
-grants write authority and scope.
+> For AI agents: use the repo-local ATM skill or integration when available. The skill should translate the user's request into the governed ATM route and preserve the returned playbook, scope, validation, and evidence.
 
 ## Why ATM Exists
 
-AI-assisted engineering breaks down in predictable ways when the working rules stay implicit:
+AI-assisted engineering breaks down when agents work from loose conversation instead of a shared production path:
 
-- an agent edits before understanding local constraints;
-- a large request gets handled without a scoped work boundary;
-- validations run, but nobody can tell later what actually passed;
-- review sees the final diff, but not the evidence or decision trail;
-- handoff depends on chat history instead of durable project artifacts.
+- an agent starts editing before it understands the real task boundary;
+- the request expands until no one can tell which outcome is being delivered;
+- validation happens, but the evidence is scattered across terminal output;
+- a review sees the final diff without the decision trail that produced it;
+- the next agent inherits chat history instead of durable project context.
 
-ATM gives repositories a shared operating contract for those moments. The goal is simple: an agent should be able to enter a repository, ask ATM what the next safe action is, do the work inside a declared boundary, and leave reviewable proof behind.
+ATM makes the task the center of gravity. It narrows the work before mutation, keeps the agent inside an explicit scope, requires validation before closure, and records the evidence needed to debug, audit, or resume the work later.
 
-ATM is not just an atom runner. It is the route, scope, evidence, close, and handoff contract around AI-assisted work.
+That matters more as teams move from one AI helper to many cooperating agents. ATM gives those agents a shared route for deciding what can happen in parallel, what needs serialization, and what must fail closed before it damages the shared repo.
 
 ## What You Get
 
 | Capability | What it provides |
 | --- | --- |
-| Deterministic routing | `atm next` recommends the official next action for a real user request. |
-| Scope control | Locks file, package, or capability scope before mutation. |
-| Evidence-first validation | `evidence run` turns guards, tests, reports, and logs into durable command-backed evidence instead of terminal noise. |
-| First-touch onboarding | `atm welcome`, ATMChart, and agent integrations make the local route discoverable. |
-| Portable contracts | Core contracts stay neutral across languages, repositories, and agent environments. |
-| Replaceable governance bundle | Tasks, rules, artifacts, evidence, and adapters can be swapped without forking core semantics. |
-| Atom behaviors | Work can split, merge, compose, evolve, expire, or absorb legacy code through governed behavior plugins. |
+| Agent-native entry | Repo-local skills and integrations teach an AI agent how to use ATM without making the human learn the CLI first. |
+| Drift control | User intent is converted into scoped work before mutation, reducing hallucinated scope and accidental contribution creep. |
+| Task-to-evidence chain | Each governed request can carry intent, scope, validation, artifacts, closure, and handoff in one reviewable path. |
+| Multi-agent coordination | Admission and locking rules help agents decide what can run in parallel, what must serialize, and what should fail closed. |
+| Durable recovery | Evidence and handoff artifacts make it possible to resume, audit, or debug a task without reconstructing chat history. |
+| Portable governance | Core contracts stay neutral across languages, repositories, editors, and agent environments. |
+| Replaceable bundle | Tasks, rules, artifacts, evidence, and adapters can evolve without forking core ATM semantics. |
 
 ## 60-Second Start
 
-> New to ATM? Start with [docs/ATM_NEW_USER_WORKFLOW.md](docs/ATM_NEW_USER_WORKFLOW.md) for the 7-step normal workflow before diving into the bootstrap routes below.
+The fastest way to start is to let the AI use ATM for you.
 
-### Quick Verify for the Paper Evidence
+### Case: give an agent one bounded task
+
+Open an ATM-enabled repository in an agent-capable editor such as Codex, Claude Code, Cursor, Copilot, Gemini, or Antigravity. Then say:
+
+```text
+Use ATM governance for this request: add a small login form validation fix and leave reviewable evidence.
+```
+
+Within the first minute, the ATM-aware agent should:
+
+1. Read the repository entry guidance and load the repo-local ATM skill or integration.
+2. Convert your request into a governed route with a playbook, scope, and validation expectation.
+3. Edit only inside the admitted boundary.
+4. Run the focused validator.
+5. Report the changed files and the evidence path so the work can be reviewed or resumed.
+
+The human experience should feel like ordinary delegation: describe the outcome, let the agent route through ATM, and review the evidence it leaves behind.
+
+### Case: start a new ATM-enabled repo
+
+Ask an agent:
+
+```text
+Create a new ATM-enabled repository named test-app for my editor, then show me the first governed request I can try.
+```
+
+The agent can use the starter behind the scenes, install the selected agent integration, and make the local ATM skill visible. If you want the underlying command, it is:
+
+```bash
+npx create-atm test-app --agent codex
+```
+
+After that, the first useful test is still human-sized:
+
+```text
+Use ATM governance to inspect this repo and suggest the next safe improvement.
+```
+
+ATM remains CLI-backed for evidence and automation, but the intended first touch is AI-led: the agent learns the governance route, then uses the CLI as the durable execution layer.
+
+### Quick verify for the paper evidence
 
 ```bash
 git clone https://github.com/eaglhuang/AI-Atomic-Framework
@@ -73,14 +103,6 @@ npm install
 npm test -- broker/decision
 npm run bench:admission:paper -- --seed 20260625
 ```
-
-### Start a new governed project
-
-```bash
-npx create-atm test-app --agent claude-code
-```
-
-`create-atm` creates the project directory, runs the official ATM bootstrap, renders the ATMChart rule summary, and installs the selected agent integration. Omit `--agent` to initialize only the governed ATM project and rule chart.
 
 ### Add ATM to an existing repository
 
@@ -92,24 +114,24 @@ Use one official distribution:
 | `release/atm-onefile/atm.mjs` | You want a single-file embedded runtime. |
 | npm `create-atm` | You want the lowest-friction starter route. |
 
-The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let `node atm.mjs next --prompt "<current user prompt>" --json` route user-requested governed work.
+The bootstrap pattern is consistent: place an official ATM distribution in the target repository, make the ATM entry route visible to agents, and let the local skill or integration call `node atm.mjs next --prompt "<current user prompt>" --json` for user-requested governed work.
 
 The release-bundle root-drop bootstrap workflow keeps that entry route portable for repositories that prefer a checked-in distribution over an npm starter.
 
-### Give the agent one instruction
+### Give the agent one fallback instruction
 
 ```text
 Read README.md if present, then run "node atm.mjs next --prompt \"<current user prompt>\" --json" from the repository root before task work. If the result includes `ATM_USER_NOTICE` or `evidence.userNotice`, show it to the user before executing the returned command.
 ```
 
-The first `next` call will route to bootstrap or orientation when the repository is not ready yet. After that, governed work keeps returning through `next`.
+The skill-first path is preferred when an integration exists. This fallback instruction keeps the same governance route visible for agents, shells, and editors that do not yet expose the friendly skill wrapper.
 
 ## For AI Agents
 
 When you enter an ATM repository for user-requested work:
 
 1. Read the repository entry guidance.
-2. Run `node atm.mjs next --prompt "<current user prompt>" --json`.
+2. Use the repo-local skill or integration when available; it should call ATM's wrapper and end at `node atm.mjs next --prompt "<current user prompt>" --json`.
 3. Read `evidence.nextAction.playbook` before editing, closing, or committing.
 4. Edit only within the allowed scope returned by ATM.
 5. Run the smallest relevant validators and preserve the resulting evidence.
@@ -121,11 +143,15 @@ Important details for this framework repository:
 - If ATM recommends `batch`, deliver only the queue head, run `node atm.mjs batch checkpoint --actor <id> --json`, and commit only after checkpoint succeeds.
 - README files, generated agent entry files, shell wrappers, and integrations should guide an agent back to `node atm.mjs next --prompt "<current user prompt>" --json`; they should not create a second task model, approval workflow, or rule authority.
 
+Role-routing note: if the user asks for Captain, Coordinator, dispatch, task cards, sidecars, subagents, delegation, condition review, or closeout work, route the request through `ai-role-router` when available, then through `atm-dispatch` before drafting instructions, delegating work, or reviewing another agent. Internal sidecar review is the default; external dispatch is opt-in, and external write requires explicit user authority and scope.
+
 ## How It Works
 
 ```mermaid
 flowchart LR
-    Goal["Human or agent goal"] --> Next["atm next --prompt"]
+    Goal["Human or agent goal"] --> Skill["agent skill / integration"]
+    Skill --> Wrapper["ATM function or command wrapper"]
+    Wrapper --> Next["atm next --prompt"]
     Next --> Ready{"ATM ready?"}
     Ready -- "not yet" --> Bootstrap["bootstrap / init / welcome"]
     Ready -- "yes" --> Lock["lock scope"]

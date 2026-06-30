@@ -29,6 +29,7 @@ const repoCopyEntries = [
     'tsconfig.json',
     'turbo.json'
 ];
+// ─── Entry point ──────────────────────────────────────────────────────────
 export async function runSelfHostAlphaAsync(argv) {
     const { options } = parseOptions(argv, 'self-host-alpha');
     if (!options.verify) {

@@ -11,18 +11,26 @@ const DEFAULT_METRIC_CONFIG = {
     latency: { direction: 'lower-is-better', tolerance: 50 },
     edgeCaseCount: { direction: 'higher-is-better', tolerance: 0 }
 };
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function compareQualityMetrics(options) {
-    const { atomId, fromVersion, toVersion, baselineMetrics, currentMetrics, metricConfig = {}, mapImpactScope = null, dedupCandidates = null, polymorphContext = null } = options;
+    const normalizedOptions = options;
+    const { atomId, fromVersion, toVersion, baselineMetrics, currentMetrics, metricConfig = {}, mapImpactScope = null, dedupCandidates = null, polymorphContext = null } = normalizedOptions;
+    const normalizedBaselineMetrics = baselineMetrics ?? {};
+    const normalizedCurrentMetrics = currentMetrics ?? {};
     const mergedConfig = { ...DEFAULT_METRIC_CONFIG, ...metricConfig };
     const allMetricNames = new Set([
-        ...Object.keys(baselineMetrics),
-        ...Object.keys(currentMetrics)
+        ...Object.keys(normalizedBaselineMetrics),
+        ...Object.keys(normalizedCurrentMetrics)
     ]);
     const metricDeltas = [];
     const regressedMetrics = [];
     for (const name of allMetricNames) {
-        const baseline = baselineMetrics[name] ?? 0;
-        const current = currentMetrics[name] ?? 0;
+        const baseline = normalizedBaselineMetrics[name] ?? 0;
+        const current = normalizedCurrentMetrics[name] ?? 0;
         const delta = current - baseline;
         const config = mergedConfig[name] ?? { direction: 'informational', tolerance: 0 };
         let passed = true;
@@ -40,7 +48,7 @@ export function compareQualityMetrics(options) {
             baseline,
             current,
             delta,
-            direction: config.direction,
+            direction: config.direction ?? 'informational',
             tolerance: config.tolerance ?? 0,
             passed
         });
@@ -59,9 +67,9 @@ export function compareQualityMetrics(options) {
         reportId: `police.quality-compare.${String(atomId).toLowerCase()}.${fromVersion}-to-${toVersion}`,
         generatedAt: new Date().toISOString(),
         lifecycleMode: 'evolution',
-        atomId,
-        fromVersion,
-        toVersion,
+        atomId: atomId ?? '',
+        fromVersion: fromVersion ?? '',
+        toVersion: toVersion ?? '',
         metrics: metricDeltas,
         regressed,
         passed,
@@ -82,74 +90,75 @@ export function compareQualityMetrics(options) {
     return report;
 }
 export function renderQualityReportMarkdown(report) {
+    const qualityReport = report;
     const lines = [];
     lines.push('# Quality Comparison Report');
     lines.push('');
-    lines.push(`- **Atom**: ${report.atomId}`);
-    lines.push(`- **From**: ${report.fromVersion} -> **To**: ${report.toVersion}`);
-    lines.push(`- **Generated**: ${report.generatedAt}`);
-    lines.push(`- **Result**: ${report.passed ? 'PASSED' : 'FAILED'}`);
+    lines.push(`- **Atom**: ${qualityReport.atomId}`);
+    lines.push(`- **From**: ${qualityReport.fromVersion} -> **To**: ${qualityReport.toVersion}`);
+    lines.push(`- **Generated**: ${qualityReport.generatedAt}`);
+    lines.push(`- **Result**: ${qualityReport.passed ? 'PASSED' : 'FAILED'}`);
     lines.push('');
     lines.push('## Metrics');
     lines.push('');
     lines.push('| Metric | Baseline | Current | Delta | Direction | Tolerance | Result |');
     lines.push('|--------|----------|---------|-------|-----------|-----------|--------|');
-    for (const metric of report.metrics) {
+    for (const metric of qualityReport.metrics) {
         const result = metric.passed ? 'PASS' : 'FAIL';
         const deltaStr = metric.delta >= 0 ? `+${metric.delta}` : `${metric.delta}`;
         lines.push(`| ${metric.name} | ${metric.baseline} | ${metric.current} | ${deltaStr} | ${metric.direction} | ${metric.tolerance ?? 0} | ${result} |`);
     }
     lines.push('');
-    if (report.mapImpactScope) {
+    if (qualityReport.mapImpactScope) {
         lines.push('## Map Impact Scope');
         lines.push('');
-        if (report.mapImpactScope.affectedMapIds.length === 0) {
+        if (qualityReport.mapImpactScope.affectedMapIds.length === 0) {
             lines.push('No maps affected.');
         }
         else {
-            lines.push(`Affected maps: ${report.mapImpactScope.affectedMapIds.join(', ')}`);
+            lines.push(`Affected maps: ${qualityReport.mapImpactScope.affectedMapIds.join(', ')}`);
             lines.push('');
             lines.push('| Map ID | Integration Test | Message |');
             lines.push('|--------|-----------------|---------|');
-            for (const propagation of report.mapImpactScope.propagationStatus) {
+            for (const propagation of qualityReport.mapImpactScope.propagationStatus) {
                 const status = propagation.integrationTestPassed ? 'PASS' : 'FAIL';
                 lines.push(`| ${propagation.mapId} | ${status} | ${propagation.message ?? '-'} |`);
             }
         }
         lines.push('');
     }
-    if (report.dedupCandidates && report.dedupCandidates.length > 0) {
+    if (qualityReport.dedupCandidates && qualityReport.dedupCandidates.length > 0) {
         lines.push('## Dedup Candidates (Advisory)');
         lines.push('');
         lines.push('| Atom ID | Similarity | Semantic Fingerprint |');
         lines.push('|---------|-----------|---------------------|');
-        for (const candidate of report.dedupCandidates) {
-            lines.push(`| ${candidate.atomId} | ${(candidate.similarity * 100).toFixed(1)}% | ${candidate.semanticFingerprint ?? '-'} |`);
+        for (const candidate of qualityReport.dedupCandidates) {
+            lines.push(`| ${candidate.atomId} | ${((candidate.similarity ?? 0) * 100).toFixed(1)}% | ${candidate.semanticFingerprint ?? '-'} |`);
         }
         lines.push('');
     }
-    if (report.dedupIgnoredAsPolymorph && report.dedupIgnoredAsPolymorph.length > 0) {
+    if (qualityReport.dedupIgnoredAsPolymorph && qualityReport.dedupIgnoredAsPolymorph.length > 0) {
         lines.push('## Dedup Ignored As Polymorph');
         lines.push('');
         lines.push('| Atom ID | Reason |');
         lines.push('|---------|--------|');
-        for (const ignored of report.dedupIgnoredAsPolymorph) {
+        for (const ignored of qualityReport.dedupIgnoredAsPolymorph) {
             lines.push(`| ${ignored.atomId} | ${ignored.reason} |`);
         }
         lines.push('');
     }
     lines.push('## Conclusion');
     lines.push('');
-    if (report.passed) {
+    if (qualityReport.passed) {
         lines.push('All metrics within tolerance. Promote gate **passed**.');
     }
     else {
         const reasons = [];
-        if (report.regressed) {
-            reasons.push(`regressed metrics: ${report.regressedMetrics.join(', ')}`);
+        if (qualityReport.regressed) {
+            reasons.push(`regressed metrics: ${qualityReport.regressedMetrics.join(', ')}`);
         }
-        const mapFailed = report.mapImpactScope?.propagationStatus?.filter((propagation) => !propagation.integrationTestPassed);
-        if (mapFailed?.length > 0) {
+        const mapFailed = qualityReport.mapImpactScope?.propagationStatus?.filter((propagation) => !propagation.integrationTestPassed) ?? [];
+        if (mapFailed.length > 0) {
             reasons.push(`failed map integrations: ${mapFailed.map((propagation) => propagation.mapId).join(', ')}`);
         }
         lines.push(`Promote gate **FAILED**. Reasons: ${reasons.join('; ')}.`);
@@ -168,19 +177,20 @@ function filterPolymorphDedupCandidates(candidates, polymorphContext) {
     const kept = [];
     const ignored = [];
     for (const candidate of candidates) {
-        const atomId = String(candidate?.atomId || '');
-        const candidateGroupId = typeof candidate?.polymorphGroupId === 'string' ? candidate.polymorphGroupId : '';
+        const candidateRecord = asRecord(candidate) ?? {};
+        const atomId = String(candidateRecord.atomId || '');
+        const candidateGroupId = typeof candidateRecord.polymorphGroupId === 'string' ? candidateRecord.polymorphGroupId : '';
         const ignoredByInstance = instanceAtomIds.has(atomId);
         const ignoredByGroup = Boolean(groupId) && candidateGroupId === groupId;
         if (ignoredByInstance || ignoredByGroup) {
             ignored.push({
-                ...candidate,
+                ...candidateRecord,
                 ignoredAsPolymorph: true,
                 reason: ignoredByInstance ? 'instance-atom' : 'same-polymorph-group'
             });
         }
         else {
-            kept.push(candidate);
+            kept.push(candidateRecord);
         }
     }
     return { kept, ignored };

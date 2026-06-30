@@ -2,9 +2,14 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { normalizeMapId } from '../upgrade/map-propose.js';
 import { propagateTemplateUpgrade } from './template.js';
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function analyzePolymorphImpact(options) {
     const repositoryRoot = path.resolve(options?.repositoryRoot ?? process.cwd());
-    const targetMapId = normalizeMapId(options?.mapId ?? options?.targetMapId);
+    const targetMapId = normalizeMapId(options?.mapId ?? options?.targetMapId ?? '');
     const toVersion = normalizeSemver(options?.toVersion ?? options?.nextVersion ?? '');
     const targetMap = readTargetMap(repositoryRoot, targetMapId);
     const registry = readRegistry(repositoryRoot);
@@ -134,9 +139,10 @@ function collectImpactedMaps(repositoryRoot, registryEntries, targetMapId, templ
         return [];
     }
     return registryEntries
-        .filter((entry) => entry?.schemaId === 'atm.atomicMap' && typeof entry?.mapId === 'string' && entry.mapId !== targetMapId)
+        .map((entry) => asRecord(entry))
+        .filter((entry) => entry?.schemaId === 'atm.atomicMap' && typeof entry.mapId === 'string' && entry.mapId !== targetMapId)
         .map((entry) => {
-        const matchedMembers = normalizeMembers(entry.members)
+        const matchedMembers = normalizeMembers(entry.members ?? [])
             .map((member) => {
             const metadata = resolveAtomPolymorphMetadata(repositoryRoot, registryEntries, member.atomId, specCache);
             if (!metadata || !targetTemplateIds.has(metadata.templateId)) {
@@ -166,7 +172,9 @@ function resolveAtomPolymorphMetadata(repositoryRoot, registryEntries, atomId, s
     if (specCache.has(atomId)) {
         return specCache.get(atomId) ?? null;
     }
-    const entry = registryEntries.find((candidate) => candidate?.atomId === atomId);
+    const entry = registryEntries
+        .map((candidate) => asRecord(candidate))
+        .find((candidate) => candidate?.atomId === atomId);
     const specPath = String(entry?.location?.specPath ?? entry?.specPath ?? '').trim();
     if (!specPath) {
         specCache.set(atomId, null);
@@ -188,10 +196,13 @@ function resolveAtomPolymorphMetadata(repositoryRoot, registryEntries, atomId, s
 }
 function normalizeMembers(members) {
     return (Array.isArray(members) ? members : [])
-        .map((member) => ({
-        atomId: String(member?.atomId ?? '').trim(),
-        version: String(member?.version ?? '').trim()
-    }))
+        .map((member) => {
+        const record = asRecord(member);
+        return {
+            atomId: String(record?.atomId ?? '').trim(),
+            version: String(record?.version ?? '').trim()
+        };
+    })
         .filter((member) => member.atomId.length > 0 && /^\d+\.\d+\.\d+$/.test(member.version));
 }
 function normalizePolyId(value) {

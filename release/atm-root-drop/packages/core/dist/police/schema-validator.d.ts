@@ -1,23 +1,44 @@
+interface SchemaValidatorOptions {
+    readonly ajv?: {
+        compile: (schema: unknown) => {
+            (document: unknown): boolean;
+            errors?: unknown[];
+        };
+    };
+    readonly checkId?: string;
+    readonly description?: string;
+    readonly repositoryRoot?: string;
+}
+interface SchemaValidationResult {
+    readonly ok: boolean;
+    readonly errors: string[];
+    readonly checkId?: string;
+}
 export declare function createSchemaValidator(): any;
-export declare function validateJsonDocument(document: any, schema: any, options?: any): {
+export declare function validateJsonDocument(document: unknown, schema: unknown, options?: SchemaValidatorOptions): {
     ok: boolean;
-    errors: any;
-    checkId: any;
+    errors: string[];
+    checkId: string;
 };
-export declare function validateJsonFile(documentPath: any, schemaPath: any, options?: any): {
+export declare function validateJsonFile(documentPath: string, schemaPath: string, options?: SchemaValidatorOptions): {
     ok: boolean;
-    errors: any;
-    checkId: any;
+    errors: string[];
+    checkId: string;
 } | {
     ok: boolean;
     errors: string[];
-    code: any;
+    code: string;
 };
-export declare function createSchemaCheckResult(validations: any, options?: any): {
-    checkId: any;
+export declare function createSchemaCheckResult(validations: SchemaValidationResult[], options?: SchemaValidatorOptions): {
+    checkId: string;
     kind: string;
     required: boolean;
-    description: any;
+    description: string;
     ok: boolean;
-    violations: any;
+    violations: {
+        code: string;
+        severity: string;
+        message: string;
+    }[];
 };
+export {};

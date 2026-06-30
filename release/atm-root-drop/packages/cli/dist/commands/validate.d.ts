@@ -7,7 +7,7 @@ export interface TaskRunnerArbitration {
     readonly frozenFiles: readonly string[];
     readonly preferredRunnerKind: 'dev-source' | 'frozen-runner';
 }
-export declare function runValidate(argv: any): import("./shared.ts").CommandResult;
+export declare function runValidate(argv: string[]): import("./shared.ts").CommandResult;
 export declare function resolveTaskRunnerArbitration(cwd: string, taskId: string, candidateFiles?: readonly string[]): TaskRunnerArbitration;
 /**
  * TASK-MAO-0042: 依據 Validator Scope Taxonomy 分類 gate 的範疇

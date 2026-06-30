@@ -1,4 +1,4 @@
-export declare function createLazyInstantiationContract(template: any, dimensionSpec: any): {
+export declare function createLazyInstantiationContract(template: unknown, dimensionSpec: unknown): {
     templateId: string;
     dimensionSpecId: string;
     variantKey: string;
@@ -8,12 +8,17 @@ export declare function createLazyInstantiationContract(template: any, dimension
     instanceStatus: string;
     runtimeInstanceId: string;
 };
-export declare function propagateTemplateUpgrade(options: any): {
+export declare function propagateTemplateUpgrade(options: unknown): {
     templateId: string;
     toVersion: string;
-    propagatedCount: any;
+    propagatedCount: number;
     propagationMode: string;
-    propagatedInstances: any;
+    propagatedInstances: {
+        inheritedTemplateVersion: string;
+        inheritedBy: string;
+        needsRegistryWrite: boolean;
+        mapId?: string;
+    }[];
 };
 declare const _default: {
     createLazyInstantiationContract: typeof createLazyInstantiationContract;

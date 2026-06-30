@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 
-export function createTempWorkspace(prefix: any) {
+export function createTempWorkspace(prefix: string) {
   const baseRoot = resolveTempBaseRoot();
   mkdirSync(baseRoot, { recursive: true });
   const workspacePath = path.join(
@@ -14,7 +14,7 @@ export function createTempWorkspace(prefix: any) {
   return workspacePath;
 }
 
-export function initializeGitRepository(repositoryRoot: any) {
+export function initializeGitRepository(repositoryRoot: string) {
   const result = spawnSync('git', ['init', '-q'], {
     cwd: repositoryRoot,
     encoding: 'utf8'

@@ -337,13 +337,13 @@ export function loadProfile(profilePath: string): TaskflowProfileV1 {
     );
   }
 
-  let raw: any;
+  let raw: TaskflowProfileV1 | null = null;
   try {
-    raw = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
-  } catch (err: any) {
+    raw = JSON.parse(fs.readFileSync(resolvedPath, 'utf8')) as TaskflowProfileV1;
+  } catch (err: unknown) {
     throw new CliError(
       'ATM_TASKFLOW_PROFILE_PARSE_FAILED',
-      `Failed to parse taskflow profile: ${err.message}`,
+      `Failed to parse taskflow profile: ${err instanceof Error ? err.message : String(err)}`,
       { exitCode: 1 }
     );
   }

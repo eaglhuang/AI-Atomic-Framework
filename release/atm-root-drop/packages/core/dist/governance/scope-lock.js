@@ -2,20 +2,26 @@ const atomIdPattern = /^ATM-[A-Z][A-Z0-9]*-\d{4}$/;
 const mapIdPattern = /^ATM-MAP-\d{4}$/;
 const legacyUriPattern = /^[a-z][a-z0-9+.-]*:\/\/.+/;
 const validEdgeKinds = new Set(['data-flow', 'control-flow', 'event-flow', 'validation', 'fallback', 'side-effect', 'rollback']);
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function createScopeLockRecord(input) {
-    const files = normalizeStringArray(input?.files, 'files');
-    const selectors = normalizeSelectors(input?.selectors);
+    const record = asRecord(input);
+    const files = normalizeStringArray(record?.files, 'files');
+    const selectors = normalizeSelectors(record?.selectors);
     const inferredSpecVersion = selectors ? '0.2.0' : '0.1.0';
-    const specVersion = normalizeSpecVersion(input?.specVersion ?? inferredSpecVersion, Boolean(selectors));
+    const specVersion = normalizeSpecVersion(record?.specVersion ?? inferredSpecVersion, Boolean(selectors));
     return {
         schemaId: 'atm.governanceScopeLock',
         specVersion,
-        migration: normalizeMigration(input?.migration, specVersion),
-        workItemId: normalizePatternString(input?.workItemId, atomIdPattern, 'workItemId'),
-        lockedBy: normalizeNonEmptyString(input?.lockedBy, 'lockedBy'),
-        lockedAt: normalizeNonEmptyString(input?.lockedAt, 'lockedAt'),
+        migration: normalizeMigration(record?.migration, specVersion),
+        workItemId: normalizePatternString(record?.workItemId, atomIdPattern, 'workItemId'),
+        lockedBy: normalizeNonEmptyString(record?.lockedBy, 'lockedBy'),
+        lockedAt: normalizeNonEmptyString(record?.lockedAt, 'lockedAt'),
         files,
-        ...(typeof input?.reason === 'string' && input.reason.trim().length > 0 ? { reason: input.reason.trim() } : {}),
+        ...(typeof record?.reason === 'string' && record.reason.trim().length > 0 ? { reason: record.reason.trim() } : {}),
         ...(selectors ? { selectors } : {})
     };
 }
@@ -182,12 +188,16 @@ function normalizeSpecVersion(value, hasSelectors) {
     return specVersion;
 }
 function normalizeMigration(migration, specVersion) {
-    const strategy = typeof migration?.strategy === 'string' && migration.strategy.trim().length > 0
-        ? migration.strategy.trim()
+    const record = asRecord(migration);
+    const rawStrategy = typeof record?.strategy === 'string' && record.strategy.trim().length > 0
+        ? record.strategy.trim()
         : (specVersion === '0.2.0' ? 'additive' : 'none');
-    const fromVersion = migration?.fromVersion == null ? null : normalizeSemver(migration.fromVersion, 'migration.fromVersion');
-    const notes = typeof migration?.notes === 'string' && migration.notes.trim().length > 0
-        ? migration.notes.trim()
+    const strategy = rawStrategy === 'additive' || rawStrategy === 'none' || rawStrategy === 'breaking'
+        ? rawStrategy
+        : 'none';
+    const fromVersion = record?.fromVersion == null ? null : normalizeSemver(record.fromVersion, 'migration.fromVersion');
+    const notes = typeof record?.notes === 'string' && record.notes.trim().length > 0
+        ? record.notes.trim()
         : (specVersion === '0.2.0'
             ? 'Scope lock 0.2.0 adds map selectors while preserving 0.1.0 file locks.'
             : 'Scope lock baseline record.');
@@ -201,15 +211,16 @@ function normalizeSelectors(value) {
     if (value == null) {
         return null;
     }
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    const record = asRecord(value);
+    if (!record) {
         throw new Error('Scope lock selectors must be an object.');
     }
     const selectors = {
-        ...(value.mapId ? { mapId: normalizePatternString(value.mapId, mapIdPattern, 'selectors.mapId') } : {}),
-        ...(value.mapMembers ? { mapMembers: normalizeAtomIdArray(value.mapMembers, 'selectors.mapMembers') } : {}),
-        ...(value.mapEdges ? { mapEdges: normalizeEdgeSelectors(value.mapEdges) } : {}),
-        ...(value.mapEntrypoints ? { mapEntrypoints: normalizeAtomIdArray(value.mapEntrypoints, 'selectors.mapEntrypoints') } : {}),
-        ...(value.legacyUris ? { legacyUris: normalizeLegacyUris(value.legacyUris) } : {})
+        ...(record.mapId ? { mapId: normalizePatternString(record.mapId, mapIdPattern, 'selectors.mapId') } : {}),
+        ...(record.mapMembers ? { mapMembers: normalizeAtomIdArray(record.mapMembers, 'selectors.mapMembers') } : {}),
+        ...(record.mapEdges ? { mapEdges: normalizeEdgeSelectors(record.mapEdges) } : {}),
+        ...(record.mapEntrypoints ? { mapEntrypoints: normalizeAtomIdArray(record.mapEntrypoints, 'selectors.mapEntrypoints') } : {}),
+        ...(record.legacyUris ? { legacyUris: normalizeLegacyUris(record.legacyUris) } : {})
     };
     if (Object.keys(selectors).length === 0) {
         throw new Error('Scope lock selectors must declare at least one map selector.');
@@ -221,9 +232,10 @@ function normalizeEdgeSelectors(value) {
         throw new Error('selectors.mapEdges must be a non-empty array.');
     }
     return value.map((entry, index) => {
-        const from = normalizePatternString(entry?.from, atomIdPattern, `selectors.mapEdges[${index}].from`);
-        const to = normalizePatternString(entry?.to, atomIdPattern, `selectors.mapEdges[${index}].to`);
-        const edgeKind = entry?.edgeKind == null ? undefined : normalizeEdgeKind(entry.edgeKind, `selectors.mapEdges[${index}].edgeKind`);
+        const record = asRecord(entry);
+        const from = normalizePatternString(record?.from, atomIdPattern, `selectors.mapEdges[${index}].from`);
+        const to = normalizePatternString(record?.to, atomIdPattern, `selectors.mapEdges[${index}].to`);
+        const edgeKind = record?.edgeKind == null ? undefined : normalizeEdgeKind(record.edgeKind, `selectors.mapEdges[${index}].edgeKind`);
         return {
             from,
             to,

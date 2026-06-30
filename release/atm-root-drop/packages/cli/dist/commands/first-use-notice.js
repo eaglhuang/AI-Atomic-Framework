@@ -28,8 +28,8 @@ export function buildFirstUseUserNotice(nextAction) {
             {
                 label: 'Continue the current ATM route',
                 kind: 'command',
-                value: nextAction.command,
-                reason: nextAction.reason
+                value: nextAction.command ?? 'node atm.mjs next --cwd . --json',
+                reason: nextAction.reason ?? 'Continue the current governed ATM route.'
             },
             {
                 label: 'List starter ATM features',

@@ -1,1 +1,1 @@
-export declare function runSpec(argv: any): import("./shared.ts").CommandResult;
+export declare function runSpec(argv: string[]): import("./shared.ts").CommandResult;

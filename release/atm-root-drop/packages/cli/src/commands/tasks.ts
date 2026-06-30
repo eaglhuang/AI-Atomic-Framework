@@ -203,6 +203,7 @@ export interface TaskImportRecord {
   readonly deliverables: readonly string[];
   readonly scopePaths?: readonly string[];
   readonly validators?: readonly string[];
+  readonly testPlan?: Record<string, unknown>;
   readonly planningRepo?: string | null;
   readonly targetRepo?: string | null;
   readonly closureAuthority?: string | null;
@@ -6529,6 +6530,7 @@ function parseSingleCard(input: {
   const tags = parseYamlList(frontMatter.data.tags);
   const scopePaths = parseYamlList(frontMatter.data.scopePaths ?? frontMatter.data.scope_paths ?? frontMatter.data.allowed_files ?? frontMatter.data.allowedFiles ?? frontMatter.data.scope);
   const validators = parseYamlList(frontMatter.data.validators);
+  const testPlan = normalizeTaskTestPlan(frontMatter.data.testPlan ?? frontMatter.data.test_plan);
   const planningMirrorPaths = parseYamlList(frontMatter.data.planningMirrorPaths ?? frontMatter.data.planning_mirror_paths);
   const planningReadOnlyPaths = parseYamlList(frontMatter.data.planningReadOnlyPaths ?? frontMatter.data.planning_read_only_paths);
   const outOfScope = parseYamlList(frontMatter.data.outOfScope ?? frontMatter.data.out_of_scope ?? frontMatter.data.forbidden_files);
@@ -6679,6 +6681,7 @@ function parseSingleCard(input: {
     deliverables,
     scopePaths,
     validators,
+    ...(testPlan ? { testPlan } : {}),
     planningRepo: normalizeOptionalString(frontMatter.data.planning_repo ?? frontMatter.data.planningRepo),
     targetRepo: normalizeOptionalString(frontMatter.data.target_repo ?? frontMatter.data.targetRepo ?? frontMatter.data.upstream_repo ?? frontMatter.data.upstreamRepo),
     closureAuthority: normalizeOptionalString(frontMatter.data.closure_authority ?? frontMatter.data.closureAuthority),
@@ -6726,6 +6729,18 @@ function parseSingleCard(input: {
       hash: hashSection(input.planText)
     },
     importedAt: input.importedAt
+  };
+}
+
+function normalizeTaskTestPlan(value: unknown): Record<string, unknown> | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return undefined;
+  }
+  const record = value as Record<string, unknown>;
+  return {
+    schemaId: typeof record.schemaId === 'string' ? record.schemaId : 'atm.taskTestPlan.v1',
+    selectionMode: typeof record.selectionMode === 'string' ? record.selectionMode : 'task-scoped',
+    ...record
   };
 }
 
@@ -7314,6 +7329,7 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
   const tags = parseYamlList(frontData.tags);
   const scopePaths = parseYamlList(frontData.scopePaths ?? frontData.scope_paths ?? frontData.allowed_files ?? frontData.allowedFiles ?? frontData.scope);
   const validators = parseYamlList(frontData.validators);
+  const testPlan = normalizeTaskTestPlan(frontData.testPlan ?? frontData.test_plan);
   const planningMirrorPaths = parseYamlList(frontData.planningMirrorPaths ?? frontData.planning_mirror_paths);
   const planningReadOnlyPaths = parseYamlList(frontData.planningReadOnlyPaths ?? frontData.planning_read_only_paths);
   const outOfScope = parseYamlList(frontData.outOfScope ?? frontData.out_of_scope ?? frontData.forbidden_files);
@@ -7383,6 +7399,7 @@ function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt: strin
     deliverables,
     scopePaths,
     validators,
+    ...(testPlan ? { testPlan } : {}),
     planningRepo: normalizeOptionalString(frontData.planning_repo ?? frontData.planningRepo),
     targetRepo: normalizeOptionalString(frontData.target_repo ?? frontData.targetRepo ?? frontData.upstream_repo ?? frontData.upstreamRepo),
     closureAuthority: normalizeOptionalString(frontData.closure_authority ?? frontData.closureAuthority),
@@ -7800,7 +7817,7 @@ async function runTasksNew(argv: string[]): Promise<CommandResult> {
   const spec = (await import('./command-specs/tasks.spec.ts')).default;
   const parsed = parseArgsForCommand(spec, ['new', ...argv]);
 
-  const options = parsed.options as any;
+  const options = parsed.options as Record<string, unknown>;
   const cwd = (options.cwd as string) || process.cwd();
 
   const template = (options.template as string) || 'aao-l2-split';

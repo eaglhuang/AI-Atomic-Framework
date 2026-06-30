@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.ts';
 import { evaluateSeedGovernance, frameworkRepoRoot, registryFilePath, validateRegistryDocumentAgainstSchema } from './registry-shared.ts';
 
-export function runStatus(argv: any) {
+export function runStatus(argv: string[]) {
   const { options } = parseOptions(argv, 'status');
   const configPath = configPathFor(options.cwd);
   const frameworkRepository = (

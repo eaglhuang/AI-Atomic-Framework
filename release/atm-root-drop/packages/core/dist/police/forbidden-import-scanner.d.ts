@@ -1,10 +1,24 @@
-export declare function extractImportSources(sourceText: any): any[];
-export declare function validateForbiddenImports(importGraph?: any[], forbiddenPatterns?: any[], options?: any): {
-    checkId: any;
+interface ImportRecord {
+    readonly source?: string;
+    readonly toLayer?: string;
+}
+interface ForbiddenImportOptions {
+    readonly checkId?: string;
+    readonly description?: string;
+}
+export declare function extractImportSources(sourceText: string): string[];
+export declare function validateForbiddenImports(importGraph?: unknown[], forbiddenPatterns?: unknown[], options?: ForbiddenImportOptions): {
+    checkId: string;
     kind: string;
     required: boolean;
-    description: any;
+    description: string;
     ok: boolean;
-    violations: any[];
+    violations: {
+        code: string;
+        severity: string;
+        message: string;
+        path: string;
+    }[];
 };
-export declare function normalizeImports(imports?: any[]): any[];
+export declare function normalizeImports(imports?: unknown[]): ImportRecord[];
+export {};

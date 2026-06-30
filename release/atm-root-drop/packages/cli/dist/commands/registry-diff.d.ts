@@ -1,1 +1,1 @@
-export declare function runRegistryDiff(args: any): import("./shared.ts").CommandResult;
+export declare function runRegistryDiff(args: string[]): import("./shared.ts").CommandResult;

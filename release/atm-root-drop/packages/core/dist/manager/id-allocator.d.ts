@@ -3,16 +3,25 @@ export declare class AtomIdAllocationError extends Error {
     details: Record<string, unknown>;
     constructor(code: string, text: string, details?: Record<string, unknown>);
 }
-export declare function normalizeAtomBucket(bucket: any): string;
-export declare function parseAtomId(atomId: any): {
+interface AtomRegistryDocumentLike {
+    entries?: unknown[];
+}
+interface AllocateAtomIdOptions {
+    repositoryRoot?: string;
+    registryPath?: string;
+    registryDocument?: AtomRegistryDocumentLike | null;
+}
+export declare function normalizeAtomBucket(bucket: unknown): string;
+export declare function parseAtomId(atomId: unknown): {
     atomId: string;
     bucket: string;
     sequence: number;
 } | null;
-export declare function allocateAtomId(bucket: any, options?: any): {
+export declare function allocateAtomId(bucket: unknown, options?: AllocateAtomIdOptions): {
     atomId: string;
     bucket: string;
-    sequence: any;
+    sequence: number;
     source: string;
     reservation: null;
 };
+export {};

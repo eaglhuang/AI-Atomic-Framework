@@ -1,9 +1,2 @@
-declare const _default: Readonly<{
-    name: string;
-    summary: string;
-    positional: any[];
-    options: any[];
-    examples: any[];
-    help: import("../help.ts").CommandHelpMetadata | undefined;
-}>;
+declare const _default: import("../shared.ts").CommandSpec;
 export default _default;

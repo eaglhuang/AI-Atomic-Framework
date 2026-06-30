@@ -4,12 +4,56 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 
+// ─── Domain types ─────────────────────────────────────────────────────────
+
+interface VersionRecord {
+  version: string;
+  specHash: string;
+  codeHash: string;
+  testHash: string;
+  timestamp: string;
+  semanticFingerprint?: string | null;
+}
+
+interface VersionLineage {
+  versions?: VersionRecord[];
+  sourceRef?: string;
+  currentVersion?: string;
+}
+
+interface RegistryAtomEntry {
+  atomId?: string;
+  id?: string;
+  versions?: VersionRecord[];
+  versionLineage?: VersionLineage;
+  lineageLogRef?: string;
+  schemaId?: string;
+  members?: RegistryMapMember[];
+  mapId?: string;
+}
+
+interface RegistryMapMember {
+  atomId?: string;
+  versionLineage?: VersionLineage;
+}
+
+interface RegistryDocument {
+  entries?: RegistryAtomEntry[];
+}
+
+interface HashDiffReportOptions {
+  entry: RegistryAtomEntry;
+  fromVersion: string;
+  toVersion: string;
+  driftReason?: string;
+}
+
 export interface RegistryDiffResolvedEntry {
   readonly atomId: string;
-  readonly versions: readonly any[];
+  readonly versions: readonly VersionRecord[];
   readonly sourceKind: 'atom-entry' | 'member-version-lineage';
   readonly sourceRef?: string;
-  readonly registryEntry?: any;
+  readonly registryEntry?: RegistryAtomEntry;
   readonly memberIndex?: number;
   readonly mapId?: string;
 }
@@ -38,23 +82,23 @@ export interface RegistryDiffResolutionFailure {
 
 export type RegistryDiffResolution = RegistryDiffResolutionSuccess | RegistryDiffResolutionFailure;
 
-export function findRegistryEntry(registryDoc: any, atomId: any) {
+export function findRegistryEntry(registryDoc: RegistryDocument | null | undefined, atomId: string): RegistryAtomEntry | null {
   if (!registryDoc?.entries || !Array.isArray(registryDoc.entries)) {
     return null;
   }
   return registryDoc.entries.find(
-    (entry: any) => entry.atomId === atomId || entry.id === atomId
+    (entry) => entry.atomId === atomId || entry.id === atomId
   ) ?? null;
 }
 
-export function findVersionRecord(entry: any, version: any) {
+export function findVersionRecord(entry: RegistryAtomEntry | null | undefined, version: string): VersionRecord | null {
   if (!entry?.versions || !Array.isArray(entry.versions)) {
     return null;
   }
-  return entry.versions.find((v: any) => v.version === version) ?? null;
+  return entry.versions.find((v) => v.version === version) ?? null;
 }
 
-export function resolveRegistryDiffTarget(registryDoc: any, atomId: any): RegistryDiffResolution {
+export function resolveRegistryDiffTarget(registryDoc: RegistryDocument | null | undefined, atomId: string): RegistryDiffResolution {
   const normalizedAtomId = String(atomId ?? '').trim();
   const candidateMemberPaths: string[] = [];
   const candidateMapIds: string[] = [];
@@ -76,7 +120,7 @@ export function resolveRegistryDiffTarget(registryDoc: any, atomId: any): Regist
         atomId: normalizedAtomId,
         versions: atomEntryVersions,
         sourceKind: 'atom-entry',
-        sourceRef: atomEntry.lineageLogRef ?? atomEntry.versionLineage?.sourceRef ?? undefined,
+        sourceRef: atomEntry.lineageLogRef ?? (atomEntry.versionLineage as VersionLineage | undefined)?.sourceRef ?? undefined,
         registryEntry: atomEntry
       }
     };
@@ -89,7 +133,7 @@ export function resolveRegistryDiffTarget(registryDoc: any, atomId: any): Regist
       continue;
     }
 
-    const memberIndex = entry.members.findIndex((member: any) => member?.atomId === normalizedAtomId);
+    const memberIndex = entry.members.findIndex((member) => member?.atomId === normalizedAtomId);
     if (memberIndex === -1) {
       continue;
     }
@@ -104,7 +148,7 @@ export function resolveRegistryDiffTarget(registryDoc: any, atomId: any): Regist
           atomId: normalizedAtomId,
           versions: lineageVersions,
           sourceKind: 'member-version-lineage',
-          sourceRef: member.versionLineage?.sourceRef ?? entry.lineageLogRef ?? undefined,
+          sourceRef: member?.versionLineage?.sourceRef ?? entry.lineageLogRef ?? undefined,
           registryEntry: entry,
           memberIndex,
           mapId: entry.mapId ?? entry.id ?? undefined
@@ -141,7 +185,7 @@ export function resolveRegistryDiffTarget(registryDoc: any, atomId: any): Regist
   return buildAtomNotFoundResolution(normalizedAtomId, candidateMapIds, candidateMemberPaths);
 }
 
-export function computeHashDiffReport(options: any) {
+export function computeHashDiffReport(options: HashDiffReportOptions) {
   const { entry, fromVersion, toVersion, driftReason } = options;
   const atomId = entry.atomId ?? entry.id;
 
@@ -159,7 +203,7 @@ export function computeHashDiffReport(options: any) {
   const codeDelta = createHashDelta(fromRecord.codeHash, toRecord.codeHash);
   const testDelta = createHashDelta(fromRecord.testHash, toRecord.testHash);
 
-  const changedFields = [];
+  const changedFields: string[] = [];
   if (specDelta.changed) changedFields.push('specHash');
   if (codeDelta.changed) changedFields.push('codeHash');
   if (testDelta.changed) changedFields.push('testHash');
@@ -168,7 +212,7 @@ export function computeHashDiffReport(options: any) {
   const sfDelta = computeSemanticFingerprintDelta(fromRecord, toRecord);
   const resolvedDriftReason = driftReason ?? generateDefaultDriftReason(changedFields, fromVersion, toVersion);
 
-  const report: any = {
+  const report: Record<string, unknown> = {
     schemaId: 'atm.hashDiffReport',
     specVersion: '0.1.0',
     atomId,
@@ -196,7 +240,7 @@ export function computeHashDiffReport(options: any) {
   return report;
 }
 
-export function loadRegistryDocument(registryPath: any) {
+export function loadRegistryDocument(registryPath: string | null | undefined): RegistryDocument {
   const resolvedPath = registryPath
     ? path.resolve(registryPath)
     : path.join(repoRoot, 'atomic-registry.json');
@@ -205,37 +249,37 @@ export function loadRegistryDocument(registryPath: any) {
     throw new Error(`Registry file not found: ${resolvedPath}`);
   }
 
-  return JSON.parse(readFileSync(resolvedPath, 'utf8'));
+  return JSON.parse(readFileSync(resolvedPath, 'utf8')) as RegistryDocument;
 }
 
-function extractVersionHistory(entry: any) {
+function extractVersionHistory(entry: RegistryAtomEntry | null | undefined): VersionRecord[] {
   if (!entry || typeof entry !== 'object') {
     return [];
   }
 
   if (Array.isArray(entry.versions) && entry.versions.length > 0) {
-    return entry.versions.map((versionRecord: any) => normalizeVersionRecord(versionRecord)).filter((record: any) => record.version.length > 0);
+    return entry.versions.map((versionRecord) => normalizeVersionRecord(versionRecord)).filter((record) => record.version.length > 0);
   }
 
   if (entry.versionLineage && Array.isArray(entry.versionLineage.versions) && entry.versionLineage.versions.length > 0) {
-    return entry.versionLineage.versions.map((versionRecord: any) => normalizeVersionRecord(versionRecord)).filter((record: any) => record.version.length > 0);
+    return entry.versionLineage.versions.map((versionRecord) => normalizeVersionRecord(versionRecord)).filter((record) => record.version.length > 0);
   }
 
   return [];
 }
 
-function extractVersionLineageVersions(versionLineage: any) {
+function extractVersionLineageVersions(versionLineage: VersionLineage | null | undefined): VersionRecord[] {
   if (!versionLineage || typeof versionLineage !== 'object' || Array.isArray(versionLineage)) {
     return [];
   }
   if (!Array.isArray(versionLineage.versions) || versionLineage.versions.length === 0) {
     return [];
   }
-  return versionLineage.versions.map((versionRecord: any) => normalizeVersionRecord(versionRecord)).filter((record: any) => record.version.length > 0);
+  return versionLineage.versions.map((versionRecord) => normalizeVersionRecord(versionRecord)).filter((record) => record.version.length > 0);
 }
 
-function normalizeVersionRecord(versionRecord: any) {
-  const normalized: any = {
+function normalizeVersionRecord(versionRecord: Partial<VersionRecord> | null | undefined): VersionRecord {
+  const normalized: VersionRecord = {
     version: String(versionRecord?.version ?? '').trim(),
     specHash: String(versionRecord?.specHash ?? '').trim(),
     codeHash: String(versionRecord?.codeHash ?? '').trim(),
@@ -292,7 +336,7 @@ function buildLineageMissingResolution(atomId: string, candidateMapIds: readonly
   };
 }
 
-function createHashDelta(fromHash: any, toHash: any) {
+function createHashDelta(fromHash: string, toHash: string) {
   return {
     from: fromHash,
     to: toHash,
@@ -300,7 +344,7 @@ function createHashDelta(fromHash: any, toHash: any) {
   };
 }
 
-function checkLineageContinuity(entry: any, fromVersion: any, toVersion: any) {
+function checkLineageContinuity(entry: RegistryAtomEntry, fromVersion: string, toVersion: string): boolean {
   if (!entry.versions || entry.versions.length < 2) {
     return true;
   }
@@ -319,7 +363,7 @@ function checkLineageContinuity(entry: any, fromVersion: any, toVersion: any) {
   return true;
 }
 
-function computeSemanticFingerprintDelta(fromRecord: any, toRecord: any) {
+function computeSemanticFingerprintDelta(fromRecord: VersionRecord, toRecord: VersionRecord) {
   const fromSf = fromRecord.semanticFingerprint ?? null;
   const toSf = toRecord.semanticFingerprint ?? null;
 
@@ -334,7 +378,7 @@ function computeSemanticFingerprintDelta(fromRecord: any, toRecord: any) {
   };
 }
 
-function generateDefaultDriftReason(changedFields: any, fromVersion: any, toVersion: any) {
+function generateDefaultDriftReason(changedFields: string[], fromVersion: string, toVersion: string): string {
   if (changedFields.length === 0) {
     return `No hash changes detected between ${fromVersion} and ${toVersion}.`;
   }
@@ -342,7 +386,7 @@ function generateDefaultDriftReason(changedFields: any, fromVersion: any, toVers
   return `Hash drift detected in ${fieldList} between ${fromVersion} and ${toVersion}.`;
 }
 
-function compareSemver(a: any, b: any) {
+function compareSemver(a: string, b: string): number {
   const pa = String(a ?? '').split('.').map(Number);
   const pb = String(b ?? '').split('.').map(Number);
   for (let i = 0; i < 3; i++) {
@@ -351,6 +395,6 @@ function compareSemver(a: any, b: any) {
   return 0;
 }
 
-function buildMemberPath(mapId: string, memberIndex: number) {
+function buildMemberPath(mapId: string, memberIndex: number): string {
   return `${mapId}#members[${memberIndex}]`;
 }

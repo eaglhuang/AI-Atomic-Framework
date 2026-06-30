@@ -41,9 +41,10 @@ export function normalizeReplacement(replacement) {
     if (typeof replacement !== 'object' || Array.isArray(replacement)) {
         throw createGeneratorError('ATM_MAP_GENERATOR_REPLACEMENT_INVALID', 'replacement must be an object.', { fieldName: 'replacement' });
     }
-    const legacyUris = normalizeLegacyUris(replacement.legacyUris);
-    const mode = normalizeReplacementMode(replacement.mode ?? 'draft');
-    const evidenceRefs = normalizeEvidenceRefs(replacement.evidenceRefs ?? []);
+    const replacementRecord = replacement;
+    const legacyUris = normalizeLegacyUris(replacementRecord.legacyUris);
+    const mode = normalizeReplacementMode(replacementRecord.mode ?? 'draft');
+    const evidenceRefs = normalizeEvidenceRefs(replacementRecord.evidenceRefs ?? []);
     return { legacyUris, mode, evidenceRefs };
 }
 export function normalizeLegacyUris(values) {

@@ -1,14 +1,25 @@
+function asMemberRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
+function asEdgeRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function buildDependencyGraph(members = [], edges = []) {
     const graph = new Map();
     for (const member of members) {
-        const atomId = typeof member === 'string' ? member : member.atomId;
+        const atomId = typeof member === 'string' ? member : asMemberRecord(member)?.atomId;
         if (atomId) {
             graph.set(atomId, []);
         }
     }
     for (const edge of edges) {
-        const from = edge.from;
-        const to = edge.to;
+        const edgeRecord = asEdgeRecord(edge);
+        const from = edgeRecord?.from;
+        const to = edgeRecord?.to;
         if (!from || !to) {
             continue;
         }
@@ -18,7 +29,7 @@ export function buildDependencyGraph(members = [], edges = []) {
         if (!graph.has(to)) {
             graph.set(to, []);
         }
-        graph.get(from).push(to);
+        graph.get(from)?.push(to);
     }
     return graph;
 }
@@ -38,20 +49,31 @@ export function detectCycles(graph) {
         for (const target of graph.get(node) ?? []) {
             if (!indexByNode.has(target)) {
                 visit(target);
-                lowLinkByNode.set(node, Math.min(lowLinkByNode.get(node), lowLinkByNode.get(target)));
+                const currentLowLink = lowLinkByNode.get(node);
+                const targetLowLink = lowLinkByNode.get(target);
+                if (currentLowLink != null && targetLowLink != null) {
+                    lowLinkByNode.set(node, Math.min(currentLowLink, targetLowLink));
+                }
                 continue;
             }
             if (stacked.has(target)) {
-                lowLinkByNode.set(node, Math.min(lowLinkByNode.get(node), indexByNode.get(target)));
+                const currentLowLink = lowLinkByNode.get(node);
+                const targetIndex = indexByNode.get(target);
+                if (currentLowLink != null && targetIndex != null) {
+                    lowLinkByNode.set(node, Math.min(currentLowLink, targetIndex));
+                }
             }
         }
         if (lowLinkByNode.get(node) !== indexByNode.get(node)) {
             return;
         }
         const component = [];
-        let current = null;
+        let current;
         do {
             current = stack.pop();
+            if (!current) {
+                break;
+            }
             stacked.delete(current);
             component.push(current);
         } while (current !== node);

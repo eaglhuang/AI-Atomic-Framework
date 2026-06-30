@@ -12,12 +12,13 @@
  */
 import { quoteCliValue } from '../shared.js';
 export function buildUpgradeNextActionHint(cwd, proposal) {
-    if (proposal?.target?.kind !== 'map') {
+    const proposalObj = proposal;
+    if (proposalObj?.target?.kind !== 'map') {
         return null;
     }
-    const mapId = proposal.target.mapId;
-    const requiredJustification = proposal.requiredJustification;
-    if (proposal.status === 'blocked' && requiredJustification) {
+    const mapId = proposalObj.target.mapId;
+    const requiredJustification = proposalObj.requiredJustification;
+    if (proposalObj.status === 'blocked' && requiredJustification) {
         if (requiredJustification.requiredEvidenceKinds?.length === 1 && requiredJustification.requiredEvidenceKinds?.includes('map-equivalence')) {
             return {
                 status: 'blocked',

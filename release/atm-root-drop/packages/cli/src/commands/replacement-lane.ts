@@ -61,8 +61,8 @@ export async function runReplacementLane(argv: string[]) {
     });
   } catch (error) {
     if (error && typeof error === 'object' && 'code' in error) {
-      throw new CliError(String((error as any).code), error instanceof Error ? error.message : String(error), {
-        details: (error as any).details ?? {}
+      throw new CliError(String((error as Record<string, unknown>).code), error instanceof Error ? error.message : String(error), {
+        details: ((error as Record<string, unknown>).details as Record<string, unknown>) ?? {}
       });
     }
     throw error;

@@ -248,14 +248,14 @@ function requireOption(options, key, flag) {
     return value;
 }
 function findMapMemberTarget(registryDocument, mapId, atomId) {
-    const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-    const entryIndex = entries.findIndex((entry) => entry?.schemaId === 'atm.atomicMap' && String(entry?.mapId ?? '').trim() === mapId);
+    const entries = registryDocument && Array.isArray(registryDocument.entries) ? registryDocument.entries : [];
+    const entryIndex = entries.findIndex((entry) => isObject(entry) && entry.schemaId === 'atm.atomicMap' && String(entry.mapId ?? '').trim() === mapId);
     if (entryIndex === -1) {
         return { ok: false, code: 'ATM_REGISTRY_LINEAGE_MAP_NOT_FOUND', message: `Map ${mapId} was not found in the registry.` };
     }
     const entry = entries[entryIndex];
     const memberIndex = Array.isArray(entry.members)
-        ? entry.members.findIndex((member) => String(member?.atomId ?? '').trim() === atomId)
+        ? entry.members.findIndex((member) => isObject(member) && String(member.atomId ?? '').trim() === atomId)
         : -1;
     if (memberIndex === -1) {
         return { ok: false, code: 'ATM_REGISTRY_LINEAGE_MEMBER_NOT_FOUND', message: `Atom ${atomId} was not found in map ${mapId}.` };
@@ -281,8 +281,8 @@ function normalizeVersionLineage(lineageLog, options) {
     if (currentVersion !== options.toVersion) {
         issues.push(`versionLineage.currentVersion must equal --to ${options.toVersion}.`);
     }
-    const versions = Array.isArray(lineage.versions)
-        ? lineage.versions.map((version) => normalizeVersionRecord(version)).sort(compareVersionRecords)
+    const versions = lineage && Array.isArray(lineage.versions)
+        ? (lineage.versions).map((version) => normalizeVersionRecord(version)).sort(compareVersionRecords)
         : [];
     if (versions.length === 0) {
         issues.push('versionLineage.versions must contain at least one version record.');
@@ -302,7 +302,7 @@ function normalizeVersionLineage(lineageLog, options) {
             issues.push(`version ${version.version || '<unknown>'} has invalid codeHash.`);
         if (!hashPattern.test(version.testHash))
             issues.push(`version ${version.version || '<unknown>'} has invalid testHash.`);
-        if (!isIsoDate(version.timestamp))
+        if (version.timestamp && !isIsoDate(version.timestamp))
             issues.push(`version ${version.version || '<unknown>'} has invalid timestamp.`);
     }
     if (issues.length > 0) {
@@ -313,8 +313,8 @@ function normalizeVersionLineage(lineageLog, options) {
         lineage: {
             currentVersion: options.toVersion,
             versions,
-            sourceRef: String(lineage.sourceRef ?? options.sourceRef).trim() || options.sourceRef,
-            advisory: String(lineage.advisory ?? 'Backfilled from adopter lineage evidence.').trim(),
+            sourceRef: String(lineage?.sourceRef ?? options.sourceRef).trim() || options.sourceRef,
+            advisory: String(lineage?.advisory ?? 'Backfilled from adopter lineage evidence.').trim(),
             updatedAt: options.timestamp
         }
     };
@@ -375,19 +375,24 @@ function validateReviewAdvisory(report, reportPath, mapId) {
     if (report?.advisoryUnavailable === true) {
         issues.push('review advisory must not be advisory-unavailable.');
     }
-    if (report?.target?.kind === 'map' && report.target.id && String(report.target.id).trim() !== mapId) {
+    if (report?.target?.kind === 'map' && report.target?.id && String(report.target?.id).trim() !== mapId) {
         issues.push(`review advisory map target must match ${mapId}.`);
     }
     return { ok: issues.length === 0, kind: 'review-advisory', path: reportPath, issues };
 }
 function validateHumanReview(report, reportPath, atomId, mapId) {
     const issues = [];
-    try {
-        const validation = validateHumanReviewDecisionLog(report);
-        issues.push(...validation.issues);
+    if (!report) {
+        issues.push('human review report is missing.');
     }
-    catch (error) {
-        issues.push(`human review decision validation failed: ${error instanceof Error ? error.message : String(error)}`);
+    else {
+        try {
+            const validation = validateHumanReviewDecisionLog(report); // 這裡轉成 HumanReviewDecisionLog 型別
+            issues.push(...validation.issues);
+        }
+        catch (error) {
+            issues.push(`human review decision validation failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
     }
     if (report?.schemaId !== 'atm.humanReviewDecision') {
         issues.push('human review schemaId must be atm.humanReviewDecision.');
@@ -398,7 +403,9 @@ function validateHumanReview(report, reportPath, atomId, mapId) {
     if (String(report?.atomId ?? '').trim() !== atomId) {
         issues.push(`human review atomId must match ${atomId}.`);
     }
-    if (String(report?.queueRecord?.fromVersion ?? '').trim() && String(report.queueRecord.fromVersion).trim() === String(report?.queueRecord?.toVersion ?? '').trim()) {
+    const fromVersion = String(report?.queueRecord?.fromVersion ?? '').trim();
+    const toVersion = String(report?.queueRecord?.toVersion ?? '').trim();
+    if (fromVersion && fromVersion === toVersion) {
         issues.push('human review queueRecord must carry a version transition.');
     }
     const reviewedMapId = String(report?.queueRecord?.proposal?.target?.mapId ?? report?.queueRecord?.proposal?.reviewedMapId ?? '').trim();
@@ -434,7 +441,7 @@ function prepareMapSpecPatch(cwd, entry, atomId, versionLineage, lineageLogRef) 
     }
     const document = readJsonFile(absolutePath, 'ATM_REGISTRY_LINEAGE_MAP_SPEC_NOT_FOUND');
     const memberIndex = Array.isArray(document?.members)
-        ? document.members.findIndex((member) => String(member?.atomId ?? '').trim() === atomId)
+        ? document.members.findIndex((member) => isObject(member) && String(member?.atomId ?? '').trim() === atomId)
         : -1;
     if (memberIndex === -1) {
         return {
@@ -477,7 +484,10 @@ function computeRegistryDiff(registryDocument, input) {
         return { ok: false, resolution };
     }
     const report = computeHashDiffReport({
-        entry: resolution.entry,
+        entry: {
+            ...resolution.entry,
+            versions: [...resolution.entry.versions]
+        },
         fromVersion: input.fromVersion,
         toVersion: input.toVersion,
         driftReason: 'Registry lineage backfill closeout.'
@@ -487,9 +497,9 @@ function computeRegistryDiff(registryDocument, input) {
 }
 function appendBackfillRecord(lineageLog, record) {
     const recordId = buildBackfillRecordId(record.atomId, record.fromVersion, record.toVersion);
-    const existing = Array.isArray(lineageLog.versionBackfills) ? lineageLog.versionBackfills : [];
+    const existing = lineageLog && Array.isArray(lineageLog.versionBackfills) ? lineageLog.versionBackfills : [];
     const nextRecords = [
-        ...existing.filter((entry) => String(entry?.backfillId ?? '') !== recordId),
+        ...existing.filter((entry) => isObject(entry) && String(entry?.backfillId ?? '') !== recordId),
         { backfillId: recordId, ...record }
     ].sort((left, right) => String(left.backfillId).localeCompare(String(right.backfillId)));
     return {
@@ -512,19 +522,19 @@ function createCloseoutReport(input) {
     };
 }
 function extractLineageCandidate(lineageLog, atomId) {
-    if (isObject(lineageLog?.versionLineage))
+    if (lineageLog && isObject(lineageLog.versionLineage))
         return lineageLog.versionLineage;
-    if (isObject(lineageLog?.memberVersionLineage))
+    if (lineageLog && isObject(lineageLog.memberVersionLineage))
         return lineageLog.memberVersionLineage;
-    if (isObject(lineageLog?.versionLineages?.[atomId]))
+    if (lineageLog && isObject(lineageLog.versionLineages?.[atomId]))
         return lineageLog.versionLineages[atomId];
-    const member = Array.isArray(lineageLog?.members)
-        ? lineageLog.members.find((entry) => String(entry?.atomId ?? '').trim() === atomId)
+    const member = lineageLog && Array.isArray(lineageLog.members)
+        ? lineageLog.members.find((entry) => isObject(entry) && String(entry?.atomId ?? '').trim() === atomId)
         : null;
-    if (isObject(member?.versionLineage))
+    if (member && isObject(member.versionLineage))
         return member.versionLineage;
-    const backfill = Array.isArray(lineageLog?.versionBackfills)
-        ? lineageLog.versionBackfills.find((entry) => String(entry?.atomId ?? '').trim() === atomId && isObject(entry?.versionLineage))
+    const backfill = lineageLog && Array.isArray(lineageLog.versionBackfills)
+        ? lineageLog.versionBackfills.find((entry) => isObject(entry) && String(entry?.atomId ?? '').trim() === atomId && isObject(entry?.versionLineage))
         : null;
     return backfill?.versionLineage ?? null;
 }

@@ -6,7 +6,16 @@ export declare const ReplacementMode: Readonly<{
     LegacyRetired: "legacy-retired";
 }>;
 type ReplacementModeValue = typeof ReplacementMode[keyof typeof ReplacementMode];
-export declare function transitionReplacementMode(mapId: string, to: string, evidence?: any, options?: any): {
+interface ReplacementLaneEvidenceInput {
+    readonly evidenceRefs?: unknown;
+    readonly reason?: unknown;
+}
+interface ReplacementLaneOptions {
+    readonly repositoryRoot?: string;
+    readonly now?: unknown;
+    readonly actor?: unknown;
+}
+export declare function transitionReplacementMode(mapId: string, to: string, evidence?: ReplacementLaneEvidenceInput, options?: ReplacementLaneOptions): {
     ok: boolean;
     mapId: string;
     from: ReplacementModeValue;
@@ -29,6 +38,37 @@ export declare function transitionReplacementMode(mapId: string, to: string, evi
     };
     mapSpec: any;
     registryEntry: import("../index.ts").MapRegistryEntryRecord;
-    lineageLog: any;
+    lineageLog: {
+        canonicalMapId: string;
+        generatedAt: string;
+        transitions: unknown[];
+        schemaId: string;
+        mapId?: string;
+        passed?: boolean;
+        targetKind?: string;
+        verificationStatus?: string;
+        status?: string;
+        reportId?: string;
+        decision?: string;
+        advisoryUnavailable?: boolean;
+        target?: {
+            readonly kind?: string;
+            readonly id?: string | null;
+        } | null;
+        queueRecord?: {
+            readonly status?: string;
+            readonly proposal?: {
+                readonly target?: {
+                    readonly mapId?: string | null;
+                } | null;
+            } | null;
+        } | null;
+        proposal?: {
+            readonly target?: {
+                readonly mapId?: string | null;
+            } | null;
+        } | null;
+        specVersion: string;
+    };
 };
 export {};

@@ -2,31 +2,59 @@ import path from 'node:path';
 import { proposeAtomicUpgrade } from '../../../core/src/upgrade/propose.ts';
 import { readJsonFile, relativePathFrom } from './shared.ts';
 
-export function runUpgradeMapPropose(options: any) {
+interface UpgradeMapProposeOptions {
+  cwd: string;
+  atomId?: string | null;
+  fromVersion?: string | null;
+  toVersion?: string | null;
+  behaviorId?: string | null;
+  decompositionDecision?: string | null;
+  target: {
+    mapId: string;
+  };
+  fork?: { sourceAtomId: string; newAtomId: string } | null;
+  mapImpactScope?: string | null;
+  proposalId?: string | null;
+  proposedBy?: string | null;
+  proposedAt?: string | null;
+  migration?: { strategy: string; fromVersion?: string | null; notes?: string } | null;
+  requestedReplacementMode?: string | null;
+  contextBudgetGate?: object | null;
+  inputs?: Array<{ kind: string; path: string; document: Record<string, unknown> }> | null;
+  equivalenceReport?: string | null;
+  polymorphImpactReport?: string | null;
+  propagationReport?: string | null;
+  reviewAdvisory?: string | null;
+  humanReview?: string | null;
+  rollbackProof?: string | null;
+  retirementProof?: string | null;
+}
+
+export function runUpgradeMapPropose(options: UpgradeMapProposeOptions) {
   return proposeAtomicUpgrade({
-    atomId: options.atomId,
-    fromVersion: options.fromVersion,
-    toVersion: options.toVersion,
-    behaviorId: options.behaviorId,
-    decompositionDecision: options.decompositionDecision,
+    atomId: options.atomId ?? null,
+    fromVersion: options.fromVersion ?? null,
+    toVersion: options.toVersion ?? null,
+    behaviorId: options.behaviorId ?? null,
+    decompositionDecision: options.decompositionDecision ?? null,
     target: {
       kind: 'map',
       mapId: options.target.mapId
     },
-    fork: options.fork,
-    mapImpactScope: options.mapImpactScope,
-    proposalId: options.proposalId,
-    proposedBy: options.proposedBy,
-    proposedAt: options.proposedAt,
-    migration: options.migration,
-    requestedReplacementMode: options.requestedReplacementMode,
-    contextBudgetGate: options.contextBudgetGate,
+    fork: options.fork ?? null,
+    mapImpactScope: options.mapImpactScope as unknown as { affectedMapIds?: string[]; propagationStatus?: unknown[] } | null,
+    proposalId: options.proposalId ?? null,
+    proposedBy: options.proposedBy ?? undefined,
+    proposedAt: options.proposedAt ?? undefined,
+    migration: options.migration ?? null,
+    requestedReplacementMode: options.requestedReplacementMode ?? null,
+    contextBudgetGate: options.contextBudgetGate ?? null,
     repositoryRoot: options.cwd,
     inputs: buildMapProposalInputs(options)
   });
 }
 
-function buildMapProposalInputs(options: any) {
+function buildMapProposalInputs(options: UpgradeMapProposeOptions) {
   const inputs = [...(Array.isArray(options.inputs) ? options.inputs : [])];
   if (options.equivalenceReport) {
     inputs.push(loadSpecialInput(options.cwd, options.equivalenceReport, 'map-equivalence'));

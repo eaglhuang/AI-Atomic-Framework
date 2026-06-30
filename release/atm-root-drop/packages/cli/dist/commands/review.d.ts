@@ -1,1 +1,1 @@
-export declare function runReview(argv: any): import("./shared.ts").CommandResult;
+export declare function runReview(argv: string[]): import("./shared.ts").CommandResult;

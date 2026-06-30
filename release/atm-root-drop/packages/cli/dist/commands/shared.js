@@ -315,17 +315,18 @@ export function makeResult({ ok, command, cwd, mode = 'standalone', messages = [
     return { ok, command, mode, cwd, messages, evidence: evidence };
 }
 export function defineCommandSpec(spec) {
-    const name = String(spec?.name || '').trim();
+    const specRecord = spec;
+    const name = String(specRecord?.name || '').trim();
     if (!name) {
         throw new Error('Command spec requires a name.');
     }
     return Object.freeze({
         name,
-        summary: String(spec?.summary || '').trim(),
-        positional: normalizeSpecArray(spec?.positional),
-        options: normalizeSpecArray(spec?.options),
-        examples: normalizeSpecArray(spec?.examples),
-        help: normalizeCommandHelpMetadata(spec?.help)
+        summary: String(specRecord?.summary || '').trim(),
+        positional: normalizeSpecArray(specRecord?.positional),
+        options: normalizeSpecArray(specRecord?.options),
+        examples: normalizeSpecArray(specRecord?.examples),
+        help: normalizeCommandHelpMetadata(specRecord?.help)
     });
 }
 export function parseArgsForCommand(spec, argv = [], options = {}) {
@@ -338,7 +339,7 @@ export function parseArgsForCommand(spec, argv = [], options = {}) {
         fields: null
     };
     const allowUnknown = options.allowUnknown === true;
-    const optionMap = buildOptionMap(spec?.options ?? []);
+    const optionMap = buildOptionMap(spec.options ?? []);
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
         if (arg === '--help' || arg === '-h') {
@@ -363,8 +364,8 @@ export function parseArgsForCommand(spec, argv = [], options = {}) {
         if (arg === '--fields') {
             const value = argv[index + 1];
             if (!value || value.startsWith('--') || value === '-h') {
-                const allowedFlags = [...new Set([...(spec?.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json', '--summary', '--fields'])].sort();
-                throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for --fields`, {
+                const allowedFlags = [...new Set([...(spec.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json', '--summary', '--fields'])].sort();
+                throw new CliError('ATM_CLI_USAGE', `${spec.name || 'command'} requires a value for --fields`, {
                     exitCode: 2,
                     details: {
                         invalidFlags: [],
@@ -382,8 +383,8 @@ export function parseArgsForCommand(spec, argv = [], options = {}) {
         if (arg === '--output-json') {
             const value = argv[index + 1];
             if (!value || value.startsWith('--') || value === '-h') {
-                const allowedFlags = [...new Set([...(spec?.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
-                throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for --output-json`, {
+                const allowedFlags = [...new Set([...(spec.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
+                throw new CliError('ATM_CLI_USAGE', `${spec.name || 'command'} requires a value for --output-json`, {
                     exitCode: 2,
                     details: {
                         invalidFlags: [],
@@ -404,8 +405,8 @@ export function parseArgsForCommand(spec, argv = [], options = {}) {
                     state.positional.push(arg);
                     continue;
                 }
-                const allowedFlags = [...new Set([...(spec?.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
-                throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} does not support option ${arg}`, {
+                const allowedFlags = [...new Set([...(spec.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
+                throw new CliError('ATM_CLI_USAGE', `${spec.name || 'command'} does not support option ${arg}`, {
                     exitCode: 2,
                     details: {
                         invalidFlags: [arg],
@@ -419,8 +420,8 @@ export function parseArgsForCommand(spec, argv = [], options = {}) {
             if (optionSpec.value) {
                 const value = argv[index + 1];
                 if (!value || value.startsWith('--') || value === '-h') {
-                    const allowedFlags = [...new Set([...(spec?.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
-                    throw new CliError('ATM_CLI_USAGE', `${spec?.name || 'command'} requires a value for ${optionSpec.flag}`, {
+                    const allowedFlags = [...new Set([...(spec.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
+                    throw new CliError('ATM_CLI_USAGE', `${spec.name || 'command'} requires a value for ${optionSpec.flag}`, {
                         exitCode: 2,
                         details: {
                             invalidFlags: [],
@@ -538,7 +539,7 @@ const ALLOWED_FLAGS_MAP = {
     quickfix: ['--actor', '--prompt', '--files', '--reason'],
     init: ['--spec', '--dry-run', '--adopt', '--integration', '--task'],
     bootstrap: ['--spec', '--task'],
-    test: ['--atom', '--spec', '--map', '--equivalence-fixtures', '--fingerprint-check', '--edge-contracts', '--propagate'],
+    test: ['--atom', '--spec', '--profile', '--suite', '--map', '--equivalence-fixtures', '--fingerprint-check', '--edge-contracts', '--propagate'],
     welcome: ['--dry-run'],
     status: [],
     validate: ['--spec'],
@@ -587,6 +588,8 @@ export function parseOptions(argv, commandName) {
         atom: undefined,
         map: undefined,
         propagate: undefined,
+        profile: undefined,
+        suite: undefined,
         fingerprintCheck: false,
         edgeContracts: false,
         agent: undefined,
@@ -635,6 +638,22 @@ export function parseOptions(argv, commandName) {
                 throw createUsageError(commandName, `${commandName} does not support option --spec`, { invalidFlags: ['--spec'] });
             }
             options.spec = requireOptionValue(argv, index, '--spec', commandName);
+            index += 1;
+            continue;
+        }
+        if (arg === '--profile') {
+            if (commandName !== 'test') {
+                throw createUsageError(commandName, `${commandName} does not support option --profile`, { invalidFlags: ['--profile'] });
+            }
+            options.profile = requireOptionValue(argv, index, '--profile', commandName);
+            index += 1;
+            continue;
+        }
+        if (arg === '--suite') {
+            if (commandName !== 'test') {
+                throw createUsageError(commandName, `${commandName} does not support option --suite`, { invalidFlags: ['--suite'] });
+            }
+            options.suite = requireOptionValue(argv, index, '--suite', commandName);
             index += 1;
             continue;
         }

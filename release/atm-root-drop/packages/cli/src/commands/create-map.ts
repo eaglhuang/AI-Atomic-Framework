@@ -4,7 +4,7 @@ import { createAtomicMapRequestFromDecompositionPlan, readDecompositionPlan } fr
 import { validateAtomicSpecFileAgainstSchema } from './spec-shared.ts';
 import { CliError, makeResult, message, quoteCliValue, readJsonFile, relativePathFrom } from './shared.ts';
 
-export function runCreateMap(argv: any) {
+export function runCreateMap(argv: string[]) {
   const { options } = parseCreateMapOptions(argv);
   const input = resolveCreateMapInput(options);
   const result = generateAtomicMap(input.request, {
@@ -73,7 +73,7 @@ type CreateMapOptions = {
   dryRun: boolean;
 };
 
-function parseCreateMapOptions(argv: any) {
+function parseCreateMapOptions(argv: string[]) {
   const options: CreateMapOptions = {
     cwd: process.cwd(),
     mapVersion: '0.1.0',
@@ -109,22 +109,22 @@ function parseCreateMapOptions(argv: any) {
       continue;
     }
     if (arg === '--members') {
-      options.members = parseJsonOption(requireOptionValue(argv, index, '--members'), '--members');
+      options.members = parseJsonOption<unknown[] | null>(requireOptionValue(argv, index, '--members'), '--members');
       index += 1;
       continue;
     }
     if (arg === '--edges') {
-      options.edges = parseJsonOption(requireOptionValue(argv, index, '--edges'), '--edges');
+      options.edges = parseJsonOption<unknown[]>(requireOptionValue(argv, index, '--edges'), '--edges');
       index += 1;
       continue;
     }
     if (arg === '--entrypoints') {
-      options.entrypoints = parseJsonOption(requireOptionValue(argv, index, '--entrypoints'), '--entrypoints');
+      options.entrypoints = parseJsonOption<unknown[] | null>(requireOptionValue(argv, index, '--entrypoints'), '--entrypoints');
       index += 1;
       continue;
     }
     if (arg === '--quality-targets') {
-      options.qualityTargets = parseJsonOption(requireOptionValue(argv, index, '--quality-targets'), '--quality-targets');
+      options.qualityTargets = parseJsonOption<Record<string, unknown> | null>(requireOptionValue(argv, index, '--quality-targets'), '--quality-targets');
       index += 1;
       continue;
     }
@@ -167,7 +167,7 @@ function parseCreateMapOptions(argv: any) {
   };
 }
 
-function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+function requireOptionValue(argv: string[], optionIndex: number, optionName: string): string {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `create-map requires a value for ${optionName}`, { exitCode: 2 });
@@ -175,9 +175,9 @@ function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
   return value;
 }
 
-function parseJsonOption(rawValue: any, optionName: any) {
+function parseJsonOption<T>(rawValue: string, optionName: string): T {
   try {
-    return JSON.parse(rawValue);
+    return JSON.parse(rawValue) as T;
   } catch (error) {
     throw new CliError('ATM_JSON_INVALID', `Invalid JSON for ${optionName}.`, {
       exitCode: 2,
@@ -198,10 +198,10 @@ function resolveCreateMapInput(options: CreateMapOptions) {
     try {
       loaded = readDecompositionPlan(options.fromPlanPath, { cwd: options.cwd });
     } catch (error) {
-      if (error && typeof error === 'object' && 'code' in error && (error as any).code === 'ATM_DECOMP_PLAN_INVALID') {
+      if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'ATM_DECOMP_PLAN_INVALID') {
         throw new CliError('ATM_DECOMP_PLAN_INVALID', error instanceof Error ? error.message : String(error), {
           exitCode: 2,
-          details: (error as any).details ?? {}
+          details: (error as { details?: Record<string, unknown> }).details ?? {}
         });
       }
       throw error;
@@ -243,7 +243,7 @@ function loadCreateMapInputFromSpec(cwd: string, specPath: string) {
       }
     });
   }
-  const document = readJsonFile(absoluteSpecPath, 'ATM_MAP_SPEC_INVALID') as Record<string, any>;
+  const document = readJsonFile(absoluteSpecPath, 'ATM_MAP_SPEC_INVALID') as Record<string, unknown>;
   if (document?.schemaId !== 'atm.atomicMap') {
     throw new CliError('ATM_MAP_SPEC_INVALID', 'create-map --spec requires an atm.atomicMap document.', {
       exitCode: 2,

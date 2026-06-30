@@ -19,7 +19,7 @@ export function createAtomicRegistryEntry(normalizedModel, options = {}) {
     const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
     const selfVerification = createSourceHashSnapshot({
         repositoryRoot,
-        specPath: options.specPath ?? normalizedModel.source.specPath,
+        specPath: options.specPath ?? normalizedModel.source.specPath ?? undefined,
         codePaths: options.codePaths,
         testPaths: options.testPaths,
         legacyPlanningId: options.legacyPlanningId ?? null
@@ -113,7 +113,7 @@ export function writeRegistryArtifacts(registryDocument, options = {}) {
             title: options.catalogTitle,
             sourceOfTruthLabel: options.sourceOfTruthLabel
         });
-        result.catalogPath = catalogResult.catalogPath;
+        result.catalogPath = catalogResult.catalogPath ?? null;
     }
     return result;
 }
@@ -169,12 +169,12 @@ export function validateRegistryDocument(registryDocument, options = {}) {
         const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')));
         const valid = validate(registryDocument);
         if (!valid) {
-            return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', (validate.errors || []).map((error) => ({
+            return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', (validate.errors || []).map((err) => ({
                 code: 'ATM_REGISTRY_INVALID',
-                keyword: error.keyword,
-                path: error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/',
-                text: error.message ?? 'Invalid registry document.',
-                prompt: `Fix the registry document field at ${error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/'} (${error.keyword}).`
+                keyword: err.keyword,
+                path: err.instancePath && err.instancePath.length > 0 ? err.instancePath : '/',
+                text: err.message ?? 'Invalid registry document.',
+                prompt: `Fix the registry document field at ${err.instancePath && err.instancePath.length > 0 ? err.instancePath : '/'} (${err.keyword}).`
             })));
         }
         return {
@@ -361,7 +361,7 @@ function createCompatibilityRecord(normalizedModel) {
 }
 function deriveReportPath(repositoryRoot, reportPath, testReport) {
     const explicitPath = reportPath ?? testReport?.artifacts?.find((artifact) => artifact.artifactKind === 'report')?.artifactPath ?? null;
-    return explicitPath ? normalizeProjectPath(repositoryRoot, explicitPath) : null;
+    return explicitPath ? (normalizeProjectPath(repositoryRoot, explicitPath) ?? null) : null;
 }
 function deriveWorkbenchPath(normalizedModel, options) {
     const candidate = options.workbenchPath
@@ -369,7 +369,7 @@ function deriveWorkbenchPath(normalizedModel, options) {
         : options.reportPath
             ? path.dirname(resolveProjectPath(options.repositoryRoot, options.reportPath))
             : resolveAtomWorkbenchPath(normalizedModel, { repositoryRoot: options.repositoryRoot });
-    return candidate ? normalizeProjectPath(options.repositoryRoot, candidate) : null;
+    return candidate ? (normalizeProjectPath(options.repositoryRoot, candidate) ?? null) : null;
 }
 function normalizeMigration(migration) {
     return {
@@ -437,7 +437,8 @@ function normalizeValidatorMode(value) {
 function validateRegistryDocumentStructurally(registryDocument, options = {}) {
     const schemaPath = toPortablePath(options.schemaPath ?? defaultRegistrySchemaPath);
     const issues = [];
-    const registryId = typeof registryDocument?.registryId === 'string' ? registryDocument.registryId : '<unknown>';
+    const doc = registryDocument;
+    const registryId = typeof doc?.registryId === 'string' ? doc.registryId : '<unknown>';
     const issue = (pathValue, keyword, text) => {
         issues.push({
             code: 'ATM_REGISTRY_INVALID',
@@ -451,29 +452,30 @@ function validateRegistryDocumentStructurally(registryDocument, options = {}) {
         issue('/', 'type', 'Registry document must be an object.');
         return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', issues);
     }
-    if (registryDocument.schemaId !== 'atm.registry') {
+    if (doc.schemaId !== 'atm.registry') {
         issue('/schemaId', 'const', 'Registry document schemaId must equal atm.registry.');
     }
-    if (!isNonEmptyString(registryDocument.specVersion)) {
+    if (!isNonEmptyString(doc.specVersion)) {
         issue('/specVersion', 'type', 'Registry document specVersion must be a non-empty string.');
     }
-    if (!isNonEmptyString(registryDocument.registryId)) {
+    if (!isNonEmptyString(doc.registryId)) {
         issue('/registryId', 'type', 'Registry document registryId must be a non-empty string.');
     }
-    if (!isNonEmptyString(registryDocument.generatedAt)) {
+    if (!isNonEmptyString(doc.generatedAt)) {
         issue('/generatedAt', 'type', 'Registry document generatedAt must be a non-empty string.');
     }
-    if (!Array.isArray(registryDocument.entries)) {
+    if (!Array.isArray(doc.entries)) {
         issue('/entries', 'type', 'Registry document entries must be an array.');
     }
     else {
-        registryDocument.entries.forEach((entry, index) => validateRegistryEntryStructurally(entry, `/entries/${index}`, issue));
+        doc.entries.forEach((entry, index) => validateRegistryEntryStructurally(entry, `/entries/${index}`, issue));
     }
-    if (isPlainObject(registryDocument.sharding)) {
-        if (!['single-document', 'external-parts'].includes(String(registryDocument.sharding.strategy ?? '').trim())) {
+    if (isPlainObject(doc.sharding)) {
+        const sharding = doc.sharding;
+        if (!['single-document', 'external-parts'].includes(String(sharding.strategy ?? '').trim())) {
             issue('/sharding/strategy', 'enum', 'Registry sharding strategy must be single-document or external-parts.');
         }
-        if (!Array.isArray(registryDocument.sharding.partPaths)) {
+        if (!Array.isArray(sharding.partPaths)) {
             issue('/sharding/partPaths', 'type', 'Registry sharding partPaths must be an array.');
         }
     }
@@ -499,12 +501,13 @@ function validateRegistryEntryStructurally(entry, basePath, issue) {
         issue(basePath, 'type', 'Registry entry must be an object.');
         return;
     }
-    if (entry.schemaId === 'atm.atomicMap') {
-        validateAtomicMapRegistryEntryStructurally(entry, basePath, issue);
+    const e = entry;
+    if (e.schemaId === 'atm.atomicMap') {
+        validateAtomicMapRegistryEntryStructurally(e, basePath, issue);
         return;
     }
-    if (entry.schemaId === 'atm.atomicSpec') {
-        validateAtomicSpecRegistryEntryStructurally(entry, basePath, issue);
+    if (e.schemaId === 'atm.atomicSpec') {
+        validateAtomicSpecRegistryEntryStructurally(e, basePath, issue);
         return;
     }
     issue(`${basePath}/schemaId`, 'enum', 'Registry entry schemaId must be atm.atomicSpec or atm.atomicMap.');
@@ -528,9 +531,10 @@ function validateAtomicMapRegistryEntryStructurally(entry, basePath, issue) {
             issue(`${basePath}/replacement`, 'type', 'Atomic map replacement must be an object.');
         }
         else {
-            requireStringArray(entry.replacement.legacyUris, `${basePath}/replacement/legacyUris`, issue);
-            requireStringArray(entry.replacement.evidenceRefs, `${basePath}/replacement/evidenceRefs`, issue);
-            const mode = String(entry.replacement.mode ?? '').trim();
+            const replacement = entry.replacement;
+            requireStringArray(replacement.legacyUris, `${basePath}/replacement/legacyUris`, issue);
+            requireStringArray(replacement.evidenceRefs, `${basePath}/replacement/evidenceRefs`, issue);
+            const mode = String(replacement.mode ?? '').trim();
             if (!['draft', 'shadow', 'canary', 'active', 'legacy-retired'].includes(mode)) {
                 issue(`${basePath}/replacement/mode`, 'enum', 'Atomic map replacement mode must be draft, shadow, canary, active, or legacy-retired.');
             }
@@ -559,19 +563,21 @@ function validateAtomicSpecRegistryEntryStructurally(entry, basePath, issue) {
         issue(`${basePath}/selfVerification`, 'type', 'Atomic spec registry entry selfVerification must be an object.');
         return;
     }
-    requireString(entry.selfVerification.specHash, `${basePath}/selfVerification/specHash`, issue);
-    requireString(entry.selfVerification.codeHash, `${basePath}/selfVerification/codeHash`, issue);
-    requireString(entry.selfVerification.testHash, `${basePath}/selfVerification/testHash`, issue);
-    if (!isPlainObject(entry.selfVerification.sourcePaths)) {
+    const sv = entry.selfVerification;
+    requireString(sv.specHash, `${basePath}/selfVerification/specHash`, issue);
+    requireString(sv.codeHash, `${basePath}/selfVerification/codeHash`, issue);
+    requireString(sv.testHash, `${basePath}/selfVerification/testHash`, issue);
+    if (!isPlainObject(sv.sourcePaths)) {
         issue(`${basePath}/selfVerification/sourcePaths`, 'type', 'Atomic spec registry entry selfVerification.sourcePaths must be an object.');
     }
     else {
-        requireString(entry.selfVerification.sourcePaths.spec, `${basePath}/selfVerification/sourcePaths/spec`, issue);
-        const code = entry.selfVerification.sourcePaths.code;
+        const sourcePaths = sv.sourcePaths;
+        requireString(sourcePaths.spec, `${basePath}/selfVerification/sourcePaths/spec`, issue);
+        const code = sourcePaths.code;
         if (!(isNonEmptyString(code) || Array.isArray(code))) {
             issue(`${basePath}/selfVerification/sourcePaths/code`, 'type', 'Atomic spec registry entry selfVerification.sourcePaths.code must be a string or array.');
         }
-        requireStringArray(entry.selfVerification.sourcePaths.tests, `${basePath}/selfVerification/sourcePaths/tests`, issue);
+        requireStringArray(sourcePaths.tests, `${basePath}/selfVerification/sourcePaths/tests`, issue);
     }
 }
 function requireString(value, pathValue, issue) {
@@ -600,8 +606,9 @@ function requireMembers(value, pathValue, issue) {
             issue(`${pathValue}/${index}`, 'type', 'Atomic map member must be an object.');
             return;
         }
-        requireString(member.atomId, `${pathValue}/${index}/atomId`, issue);
-        requireString(member.version, `${pathValue}/${index}/version`, issue);
+        const m = member;
+        requireString(m.atomId, `${pathValue}/${index}/atomId`, issue);
+        requireString(m.version, `${pathValue}/${index}/version`, issue);
     });
 }
 function requireEdges(value, pathValue, issue) {
@@ -614,9 +621,10 @@ function requireEdges(value, pathValue, issue) {
             issue(`${pathValue}/${index}`, 'type', 'Atomic map edge must be an object.');
             return;
         }
-        requireString(edge.from, `${pathValue}/${index}/from`, issue);
-        requireString(edge.to, `${pathValue}/${index}/to`, issue);
-        requireString(edge.binding, `${pathValue}/${index}/binding`, issue);
+        const e = edge;
+        requireString(e.from, `${pathValue}/${index}/from`, issue);
+        requireString(e.to, `${pathValue}/${index}/to`, issue);
+        requireString(e.binding, `${pathValue}/${index}/binding`, issue);
     });
 }
 function requireQualityTargets(value, pathValue, issue) {
@@ -640,7 +648,8 @@ function requireGovernance(value, pathValue, issue) {
         issue(pathValue, 'type', 'Governance must be an object.');
         return;
     }
-    if (!isRegistryGovernanceTier(value.tier)) {
+    const gov = value;
+    if (!isRegistryGovernanceTier(gov.tier)) {
         issue(`${pathValue}/tier`, 'enum', `Governance tier must be one of ${registryGovernanceTiers.join(', ')}.`);
     }
 }
@@ -652,11 +661,12 @@ function requireOptionalLocation(value, pathValue, issue) {
         issue(pathValue, 'type', 'Location must be an object.');
         return;
     }
-    requireString(value.specPath, `${pathValue}/specPath`, issue);
-    if (!Array.isArray(value.codePaths)) {
+    const loc = value;
+    requireString(loc.specPath, `${pathValue}/specPath`, issue);
+    if (!Array.isArray(loc.codePaths)) {
         issue(`${pathValue}/codePaths`, 'type', 'Location codePaths must be an array.');
     }
-    if (!Array.isArray(value.testPaths)) {
+    if (!Array.isArray(loc.testPaths)) {
         issue(`${pathValue}/testPaths`, 'type', 'Location testPaths must be an array.');
     }
 }

@@ -1,1 +1,1 @@
-export declare function runGuide(argv: any): import("./shared.ts").CommandResult;
+export declare function runGuide(argv: string[]): import("./shared.ts").CommandResult;

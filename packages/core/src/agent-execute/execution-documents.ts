@@ -4,7 +4,7 @@ import {
   defaultExecutionProducer
 } from './execution-constants.ts';
 
-interface ValidationPassRecord {
+export interface ValidationPassRecord {
   reportPath: string;
 }
 

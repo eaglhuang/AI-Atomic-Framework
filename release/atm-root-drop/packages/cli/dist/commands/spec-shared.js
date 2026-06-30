@@ -21,15 +21,16 @@ export function validateAtomicSpecFileAgainstSchema(cwd, specOption, options = {
     const specPath = path.resolve(cwd, specOption);
     const relativeSpecPath = relativePathFrom(cwd, specPath);
     const document = readJsonFile(specPath, 'ATM_SPEC_NOT_FOUND');
-    if (supportedReportSchemas[document?.schemaId]) {
+    const schemaId = typeof document?.schemaId === 'string' ? document.schemaId : '';
+    if (supportedReportSchemas[schemaId]) {
         return validateSupportedReportAgainstSchema(document, {
             commandName,
             cwd,
-            schemaRelativePath: supportedReportSchemas[document.schemaId],
+            schemaRelativePath: supportedReportSchemas[schemaId],
             specPath,
             relativeSpecPath,
             successCode,
-            successText: document?.schemaId === 'atm.atomicMap'
+            successText: schemaId === 'atm.atomicMap'
                 ? 'Atomic map validated against JSON Schema.'
                 : 'Report validated against JSON Schema.'
         });
@@ -38,7 +39,7 @@ export function validateAtomicSpecFileAgainstSchema(cwd, specOption, options = {
     const messages = parsed.ok
         ? [message('info', successCode, successText)]
         : (parsed.promptReport.issues.length > 0
-            ? parsed.promptReport.issues.map((issue) => message('error', issue.code, issue.text, { path: issue.path, prompt: issue.prompt }))
+            ? parsed.promptReport.issues.map((issue) => message('error', String(issue.code), String(issue.text), { path: issue.path ?? '/', prompt: String(issue.prompt ?? '') }))
             : [message('error', parsed.promptReport.code, parsed.promptReport.summary)]);
     return makeResult({
         ok: parsed.ok === true,
@@ -70,8 +71,8 @@ function validateSupportedReportAgainstSchema(document, options) {
         ? [message('info', options.successCode, options.successText)]
         : (validate.errors || []).map((error) => message('error', 'ATM_SCHEMA_VALIDATION_ERROR', `${error.instancePath || '/'} ${error.message}`, {
             path: error.instancePath || '/',
-            keyword: error.keyword,
-            params: error.params
+            keyword: error.keyword ?? '',
+            params: (error.params ?? {})
         }));
     return makeResult({
         ok,

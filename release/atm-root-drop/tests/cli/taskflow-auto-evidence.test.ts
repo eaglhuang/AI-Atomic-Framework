@@ -27,7 +27,18 @@ try {
   runGit(tempDir, ['config', 'user.name', 'fixture-agent']);
   runGit(tempDir, ['config', 'user.email', 'fixture-agent@example.com']);
   writeFileSync(path.join(tempDir, 'README.md'), '# auto-evidence fixture\n', 'utf8');
+  writeJson(path.join(tempDir, 'package.json'), {
+    name: 'auto-evidence-fixture',
+    version: '0.0.0',
+    private: true,
+    scripts: {
+      typecheck: 'node -e "process.exit(0)"',
+      'validate:cli': 'node -e "process.exit(0)"',
+      'validate:git-head-evidence': 'node -e "process.exit(0)"'
+    }
+  });
   runGit(tempDir, ['add', 'README.md']);
+  runGit(tempDir, ['add', 'package.json']);
   runGit(tempDir, ['commit', '-m', 'init']);
 
   writeJson(path.join(tempDir, '.atm/config.json'), {
@@ -44,7 +55,6 @@ try {
     gitEmail: 'fixture-agent@example.com',
     updatedAt: '2026-06-18T00:00:00.000Z'
   });
-
   const passTaskId = 'TASK-AUTO-EVIDENCE-PASS';
   writeJson(path.join(tempDir, '.atm/history/tasks', `${passTaskId}.json`), {
     schemaVersion: 'atm.workItem.v0.2',
@@ -121,6 +131,57 @@ try {
   });
   assert.equal(approvalPlan.ok, true);
   assert.equal(approvalPlan.toRun.length, 0);
+
+  writeJson(path.join(tempDir, 'scripts/test-catalog.config.json'), {
+    schemaId: 'atm.testCatalog.v1',
+    specVersion: '0.1.0',
+    entries: [
+      {
+        key: 'integration.fixture.quick',
+        capability: 'integration-test',
+        family: 'fixture-integration',
+        source: 'fixture',
+        scope: 'task-local',
+        tiers: ['quick'],
+        command: 'git diff --check',
+        dedupeKeys: ['integration:fixture:git-diff-check']
+      }
+    ]
+  });
+
+  const integrationTaskId = 'TASK-AUTO-EVIDENCE-INTEGRATION';
+  writeJson(path.join(tempDir, '.atm/history/tasks', `${integrationTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: integrationTaskId,
+    title: 'auto evidence integration fixture',
+    status: 'running',
+    owner: 'fixture-agent',
+    testPlan: {
+      integrationTests: {
+        requiredKeys: ['integration.fixture.quick'],
+        defaultTier: 'quick'
+      }
+    }
+  });
+  writeJson(path.join(tempDir, '.atm/history/evidence', `${integrationTaskId}.json`), {
+    taskId: integrationTaskId,
+    updatedAt: '2026-06-18T00:00:00.000Z',
+    evidence: []
+  });
+
+  const integrationPlan = buildAutoEvidencePlan({
+    cwd: tempDir,
+    taskId: integrationTaskId,
+    actorId: 'fixture-agent'
+  });
+  assert.ok(integrationPlan.toRun.some((entry) => entry.catalogKey === 'integration.fixture.quick'));
+  const integrationExecution = executeAutoEvidencePlan({
+    cwd: tempDir,
+    taskId: integrationTaskId,
+    actorId: 'fixture-agent'
+  });
+  assert.equal(integrationExecution.ok, true, JSON.stringify(integrationExecution, null, 2));
+  assert.ok(integrationExecution.runs.some((run) => run.validator === 'integration.fixture.quick' && run.ok));
 } finally {
   if (existsSync(tempDir)) {
     rmSync(tempDir, { recursive: true, force: true });

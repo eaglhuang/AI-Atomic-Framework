@@ -1,4 +1,4 @@
-export declare function runHelloWorldSmoke(cwd: any): Promise<{
+export declare function runHelloWorldSmoke(cwd: string): Promise<{
     ok: boolean;
     checks: {
         name: string;
@@ -10,4 +10,4 @@ export declare function runHelloWorldSmoke(cwd: any): Promise<{
     sourcePath: string;
     smokeResult: any;
 }>;
-export declare function runTestAsync(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runTestAsync(argv: string[]): Promise<import("./shared.ts").CommandResult>;

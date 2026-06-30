@@ -1,9 +1,41 @@
 import { normalizeImports } from './forbidden-import-scanner.js';
+function asRuleRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
+function asLayerBoundaryEntry(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
+function asPolicyDocument(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function validateLayerBoundary(importGraph = [], policyDocument, options = {}) {
-    const rules = new Map((policyDocument.rules ?? []).map((rule) => [rule.fromLayer, new Set(rule.allowedToLayers ?? [])]));
+    const policy = asPolicyDocument(policyDocument);
+    const rules = new Map((policy?.rules ?? [])
+        .map((rule) => asRuleRecord(rule))
+        .filter((rule) => typeof rule?.fromLayer === 'string')
+        .map((rule) => [rule.fromLayer, new Set((rule.allowedToLayers ?? []).filter((entry) => typeof entry === 'string'))]));
     const violations = [];
-    for (const entry of importGraph) {
+    for (const rawEntry of importGraph) {
+        const entry = asLayerBoundaryEntry(rawEntry);
+        if (!entry) {
+            continue;
+        }
         const fromLayer = entry.fromLayer;
+        if (typeof fromLayer !== 'string' || fromLayer.length === 0) {
+            violations.push({
+                code: 'ATM_POLICE_LAYER_UNKNOWN',
+                severity: 'error',
+                message: `${entry.file ?? 'source'} uses unknown layer ${String(fromLayer ?? '')}`,
+                path: entry.file ?? ''
+            });
+            continue;
+        }
         const allowed = rules.get(fromLayer);
         if (!allowed) {
             violations.push({

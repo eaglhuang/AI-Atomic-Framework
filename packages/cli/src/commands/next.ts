@@ -4081,7 +4081,7 @@ function buildChannelPlaybook(input: {
         `Run: ${defaultClaimCommand}`,
         'Edit only the allowed files returned by ATM.',
         'Run the smallest relevant validator for the touched file.',
-        'Commit only the real non-.atm diff and any required git-head evidence.'
+        'Commit only the real non-.atm diff and same-commit governed provenance staged by the ATM git wrapper.'
       ],
       doNot: [
         'Do not edit .atm/history/**.',
@@ -4337,6 +4337,10 @@ type NextActionLike = {
     readonly frameworkClaimRequired: boolean;
     readonly earlyPreparation: readonly string[];
     readonly queueRetryCodes: readonly string[];
+    readonly perCriticalCommitGitHeadEvidence?: {
+      readonly enforcement: string;
+      readonly retainedStrictBoundaries: readonly string[];
+    };
     readonly protectedPushHint: string | null;
   };
 };
@@ -4640,7 +4644,7 @@ function buildGovernanceReadinessHint(cwd: string, input: {
       ? ['Stay on the queue head and expect batch checkpoint before commit.']
       : []),
     ...(protectedBranchTarget
-      ? ['Do not wait until push to discover protected-branch evidence or branch-queue blockers; rerun doctor and hook pre-push proactively.']
+      ? ['Do not wait until push to discover branch-queue or closeout-boundary blockers; rerun doctor and hook pre-push proactively.']
       : [])
   ];
   return {
@@ -4653,8 +4657,12 @@ function buildGovernanceReadinessHint(cwd: string, input: {
     frameworkClaimRequired: Boolean(input.frameworkClaimRequired),
     earlyPreparation,
     queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'] as const,
+    perCriticalCommitGitHeadEvidence: {
+      enforcement: 'disabled',
+      retainedStrictBoundaries: ['same-commit governed provenance', 'closure packet', 'evidence-only repair', 'task closeout']
+    },
     protectedPushHint: protectedBranchTarget
-      ? 'Protected framework branches enforce commit-range git-head evidence and may serialize final commit mutation through the branch queue.'
+      ? 'Protected framework branches no longer require per-critical-commit git-head evidence; same-commit governed provenance and high-risk closeout evidence remain strict.'
       : null
   };
 }

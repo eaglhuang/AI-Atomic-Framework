@@ -47,6 +47,9 @@ const payload: any = {
 };
 
 if (writeMode && !dryRun) {
+  if (!result.workbenchPath || !result.specPath || !result.testPath || !result.reportPath) {
+    throw new Error('backfill-map-generator-provenance requires generated map paths in write mode.');
+  }
   const workbenchAbsolutePath = path.join(root, result.workbenchPath);
   mkdirSync(workbenchAbsolutePath, { recursive: true });
 

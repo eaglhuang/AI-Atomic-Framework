@@ -13,15 +13,70 @@ export class RegistryIndexError extends Error {
   }
 }
 
-export function createRegistryIndex(registryDocument: any, options: any = {}) {
-  const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-  const atomIdIndex = new Map();
-  const mapIdIndex = new Map();
-  const logicalNameIndex = new Map();
-  const fingerprintIndex = new Map();
-  const versionIndex = new Map();
-  const nodeRefs: any[] = [];
-  const diagnostics: any[] = [];
+// ─── Domain types ──────────────────────────────────────────────────────────
+
+interface RegistryEntry {
+  atomId?: string;
+  id?: string;
+  mapId?: string;
+  mapVersion?: string;
+  atomVersion?: string;
+  currentVersion?: string;
+  logicalName?: string;
+  semanticFingerprint?: string | null;
+  mapSemanticFingerprint?: string | null;
+  versions?: Array<{ version?: string }>;
+  members?: RegistryMember[];
+  schemaId?: string;
+}
+
+interface RegistryMember {
+  atomId?: string;
+  version?: string;
+  versionLineage?: {
+    currentVersion?: string;
+    versions?: Array<{ version?: string }>;
+  };
+}
+
+interface NodeRef {
+  nodeKind: 'atom' | 'map';
+  canonicalId: string;
+  version: string | null;
+  urn: string;
+  entry: RegistryEntry;
+}
+
+interface DiagnosticRecord {
+  code: string;
+  severity: string;
+  entry: RegistryEntry;
+}
+
+interface VersionRecord {
+  current: string | null;
+  versions: Set<string>;
+}
+
+interface CreateRegistryIndexOptions {
+  allowDuplicates?: boolean;
+  repositoryRoot?: string;
+}
+
+interface RegistryDocument {
+  entries?: RegistryEntry[];
+  registryId?: string;
+}
+
+export function createRegistryIndex(registryDocument: RegistryDocument | null | undefined, options: CreateRegistryIndexOptions = {}) {
+  const entries = Array.isArray(registryDocument?.entries) ? registryDocument!.entries! : [];
+  const atomIdIndex = new Map<string, NodeRef>();
+  const mapIdIndex = new Map<string, NodeRef>();
+  const logicalNameIndex = new Map<string, NodeRef[]>();
+  const fingerprintIndex = new Map<string, NodeRef[]>();
+  const versionIndex = new Map<string, VersionRecord>();
+  const nodeRefs: NodeRef[] = [];
+  const diagnostics: DiagnosticRecord[] = [];
 
   for (const entry of entries) {
     const nodeRef = createNodeRef(entry);
@@ -60,29 +115,29 @@ export function createRegistryIndex(registryDocument: any, options: any = {}) {
     fingerprintIndex,
     versionIndex,
     nodeRefs,
-    getByCanonicalId(canonicalId: any) {
+    getByCanonicalId(canonicalId: string) {
       const normalized = normalizeAtmNodeRef(canonicalId);
       return normalized.nodeKind === 'map'
         ? mapIdIndex.get(normalized.canonicalId) ?? null
         : atomIdIndex.get(normalized.canonicalId) ?? null;
     },
-    getByUrn(urn: any) {
+    getByUrn(urn: string) {
       const normalized = normalizeAtmNodeRef(urn);
       return normalized.nodeKind === 'map'
         ? mapIdIndex.get(normalized.canonicalId) ?? null
         : atomIdIndex.get(normalized.canonicalId) ?? null;
     },
-    findByLogicalName(logicalName: any) {
+    findByLogicalName(logicalName: string) {
       return logicalNameIndex.get(String(logicalName || '').trim()) ?? [];
     },
-    findBySemanticFingerprint(fingerprint: any) {
+    findBySemanticFingerprint(fingerprint: string) {
       const normalized = normalizeSemanticFingerprint(fingerprint);
       return normalized ? fingerprintIndex.get(normalized) ?? [] : [];
     },
-    findByFingerprintPrefix(prefix: any) {
+    findByFingerprintPrefix(prefix: string) {
       return fingerprintIndex.get(String(prefix || '').trim().toLowerCase()) ?? [];
     },
-    getVersions(canonicalId: any) {
+    getVersions(canonicalId: string) {
       const normalized = normalizeAtmNodeRef(canonicalId);
       const record = versionIndex.get(normalized.canonicalId);
       if (!record) {
@@ -108,24 +163,24 @@ export function createRegistryIndex(registryDocument: any, options: any = {}) {
   });
 }
 
-export function createNodeRef(entry: any) {
+export function createNodeRef(entry: RegistryEntry | null | undefined): NodeRef | null {
   if (entry?.mapId) {
     return buildNodeRef('map', entry.mapId, entry.mapVersion ?? entry.currentVersion ?? null, entry);
   }
   const atomId = entry?.atomId ?? entry?.id;
   if (atomId) {
-    return buildNodeRef('atom', atomId, entry.atomVersion ?? entry.currentVersion ?? null, entry);
+    return buildNodeRef('atom', atomId, entry!.atomVersion ?? entry!.currentVersion ?? null, entry!);
   }
   return null;
 }
 
 export { normalizeSemanticFingerprint, semanticFingerprintPrefix };
 
-function buildNodeRef(nodeKind: any, canonicalId: any, version: any, entry: any) {
+function buildNodeRef(nodeKind: 'atom' | 'map', canonicalId: string, version: string | null | undefined, entry: RegistryEntry): NodeRef {
   const urn = formatAtmUrn({ nodeKind, canonicalId, version });
   const normalized = normalizeAtmNodeRef(urn);
   return Object.freeze({
-    nodeKind: normalized.nodeKind,
+    nodeKind: normalized.nodeKind as 'atom' | 'map',
     canonicalId: normalized.canonicalId,
     version: normalized.version,
     urn: normalized.urn,
@@ -133,7 +188,7 @@ function buildNodeRef(nodeKind: any, canonicalId: any, version: any, entry: any)
   });
 }
 
-function addUnique(index: any, key: any, value: any, options: any) {
+function addUnique(index: Map<string, NodeRef>, key: string, value: NodeRef, options: CreateRegistryIndexOptions): void {
   if (index.has(key)) {
     const message = `Duplicate registry canonical ID: ${key}`;
     if (options.allowDuplicates) {
@@ -144,7 +199,7 @@ function addUnique(index: any, key: any, value: any, options: any) {
   index.set(key, value);
 }
 
-function addToMultiMap(index: any, key: any, value: any) {
+function addToMultiMap(index: Map<string, NodeRef[]>, key: string, value: NodeRef): void {
   if (!key) {
     return;
   }
@@ -154,8 +209,8 @@ function addToMultiMap(index: any, key: any, value: any) {
   index.set(normalizedKey, current);
 }
 
-function addVersions(index: any, nodeRef: any, entry: any) {
-  const record = index.get(nodeRef.canonicalId) ?? { current: null, versions: new Set() };
+function addVersions(index: Map<string, VersionRecord>, nodeRef: NodeRef, entry: RegistryEntry): void {
+  const record = index.get(nodeRef.canonicalId) ?? { current: null, versions: new Set<string>() };
   if (nodeRef.version) {
     record.current = nodeRef.version;
     record.versions.add(nodeRef.version);
@@ -170,7 +225,7 @@ function addVersions(index: any, nodeRef: any, entry: any) {
   index.set(nodeRef.canonicalId, record);
 }
 
-function addMemberVersions(index: any, atomIdIndex: any, members: any) {
+function addMemberVersions(index: Map<string, VersionRecord>, atomIdIndex: Map<string, NodeRef>, members: RegistryMember[]): void {
   for (const member of members) {
     const atomId = String(member?.atomId ?? '').trim();
     if (!atomId || atomIdIndex.has(atomId)) {
@@ -178,8 +233,8 @@ function addMemberVersions(index: any, atomIdIndex: any, members: any) {
     }
 
     const lineage = member?.versionLineage;
-    const versions = Array.isArray(lineage?.versions) && lineage.versions.length > 0
-      ? lineage.versions
+    const versions = Array.isArray(lineage?.versions) && lineage!.versions!.length > 0
+      ? lineage!.versions!
       : member?.version
         ? [{ version: String(member.version).trim() }]
         : [];
@@ -187,8 +242,9 @@ function addMemberVersions(index: any, atomIdIndex: any, members: any) {
       continue;
     }
 
-    const currentVersion = String(lineage?.currentVersion ?? member?.version ?? versions[versions.length - 1]?.version ?? '').trim();
-    const record = index.get(atomId) ?? { current: null, versions: new Set() };
+    const lastVersion = versions[versions.length - 1]?.version ?? '';
+    const currentVersion = String(lineage?.currentVersion ?? member?.version ?? lastVersion).trim();
+    const record = index.get(atomId) ?? { current: null, versions: new Set<string>() };
     if (currentVersion) {
       record.current = currentVersion;
     }

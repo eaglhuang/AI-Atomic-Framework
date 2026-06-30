@@ -11,7 +11,18 @@ interface ImpactedMapRecord {
     readonly templateIds: string[];
     readonly matchedMembers: TemplateHitRecord[];
 }
-export declare function analyzePolymorphImpact(options: any): {
+interface PolymorphImpactOptions {
+    readonly repositoryRoot?: string;
+    readonly mapId?: string;
+    readonly targetMapId?: string;
+    readonly toVersion?: string;
+    readonly nextVersion?: string;
+    readonly generatedAt?: string;
+    readonly reportId?: string;
+    readonly requestedReplacementMode?: string;
+    readonly atomId?: string;
+}
+export declare function analyzePolymorphImpact(options: PolymorphImpactOptions): {
     targetMapId: string;
     toVersion: string;
     templateHits: TemplateHitRecord[];
@@ -20,13 +31,18 @@ export declare function analyzePolymorphImpact(options: any): {
     propagation: {
         templateId: string;
         toVersion: string;
-        propagatedCount: any;
+        propagatedCount: number;
         propagationMode: string;
-        propagatedInstances: any;
+        propagatedInstances: {
+            inheritedTemplateVersion: string;
+            inheritedBy: string;
+            needsRegistryWrite: boolean;
+            mapId?: string;
+        }[];
     }[];
     reportRequired: boolean;
 };
-export declare function createPolymorphImpactReport(options: any): {
+export declare function createPolymorphImpactReport(options: PolymorphImpactOptions): {
     toVersion: string;
     templateHits: TemplateHitRecord[];
     impactedMapIds: string[];
@@ -34,9 +50,14 @@ export declare function createPolymorphImpactReport(options: any): {
     propagation: {
         templateId: string;
         toVersion: string;
-        propagatedCount: any;
+        propagatedCount: number;
         propagationMode: string;
-        propagatedInstances: any;
+        propagatedInstances: {
+            inheritedTemplateVersion: string;
+            inheritedBy: string;
+            needsRegistryWrite: boolean;
+            mapId?: string;
+        }[];
     }[];
     artifacts: {
         artifactPath: string;
@@ -61,7 +82,7 @@ export declare function createPolymorphImpactReport(options: any): {
         fromVersion: null;
         notes: string;
     };
-    reportId: any;
+    reportId: string;
     generatedAt: string;
     targetMapId: string;
 };

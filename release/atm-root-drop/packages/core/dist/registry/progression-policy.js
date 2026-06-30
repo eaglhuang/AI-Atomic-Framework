@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 const DEFAULT_POLICY = {
     schemaId: 'atm.progressionPolicy',
@@ -75,7 +75,6 @@ function hasEvidenceDraft(repositoryRoot, mapId) {
     if (!existsSync(dir))
         return false;
     // Check for any evidence draft referencing this mapId
-    const { readdirSync } = require_fs();
     try {
         for (const f of readdirSync(dir)) {
             if (!f.endsWith('.json'))
@@ -91,16 +90,11 @@ function hasEvidenceDraft(repositoryRoot, mapId) {
     catch { /* skip */ }
     return false;
 }
-function require_fs() {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('node:fs');
-}
 function hasEdgeContractPass(repositoryRoot, mapId) {
     // Check .atm/history/reports for a passing edge contract report
     const reportsDir = path.join(repositoryRoot, '.atm', 'history', 'reports');
     if (!existsSync(reportsDir))
         return false;
-    const { readdirSync } = require_fs();
     try {
         for (const f of readdirSync(reportsDir)) {
             if (!f.endsWith('.json'))

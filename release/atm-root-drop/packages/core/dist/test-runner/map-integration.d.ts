@@ -3,34 +3,64 @@ export declare const defaultMapIntegrationReportMigration: Readonly<{
     fromVersion: null;
     notes: "Initial alpha0 map integration report.";
 }>;
-export declare function resolveCanonicalMapPaths(mapId: any): {
-    workbenchPath: string;
-    specPath: string;
-    testPath: string;
-    reportPath: string;
-};
-export declare function resolveMapIntegrationTarget(mapId: any, options: any): {
-    mapId: any;
+interface MapIntegrationOptions {
+    repositoryRoot?: string;
+    now?: string;
+    writeReport?: boolean;
+}
+interface MapTarget {
+    mapId: string;
     repositoryRoot: string;
-    resolutionMode: string;
+    resolutionMode: 'canonical' | 'legacy';
     workbenchPath: string;
     specPath: string;
     testPath: string;
     reportPath: string;
     warnings: string[];
-};
-export declare function runMapIntegrationTest(mapId: any, options: any): {
+}
+interface MapStatus {
+    mapId: string;
     ok: boolean;
-    mapId: any;
-    resolutionMode: string;
+    exitCode: number;
+    durationMs: number;
+    resolutionMode: 'canonical' | 'legacy';
+    reportPath: string;
+    stdout: string;
+    stderr: string;
+    warnings: string[];
+}
+interface CreateMapIntegrationReportInput {
+    mapId: string;
+    repositoryRoot?: string;
+    generatedAt?: string;
+    specPath?: string | null;
+    testPath?: string | null;
+    reportPath?: string | null;
+    resolutionMode?: string;
+    warnings?: string[];
+    perMapStatus?: MapStatus[];
+    failedDownstream?: string[];
+    propagationDuration?: number;
+}
+export declare function resolveCanonicalMapPaths(mapId: string): {
+    workbenchPath: string;
+    specPath: string;
+    testPath: string;
+    reportPath: string;
+};
+export declare function resolveMapIntegrationTarget(mapId: string, options: MapIntegrationOptions | null | undefined): MapTarget;
+export declare function runMapIntegrationTest(mapId: string, options: MapIntegrationOptions | null | undefined): {
+    ok: boolean;
+    mapId: string;
+    resolutionMode: "canonical" | "legacy";
     warnings: string[];
     reportPath: string;
     mapStatus: {
-        mapId: any;
+        mapId: string;
         ok: boolean;
         exitCode: number;
         durationMs: number;
-        resolutionMode: string;
+        resolutionMode: "canonical" | "legacy";
         reportPath: string;
         stdout: string;
         stderr: string;
@@ -44,19 +74,19 @@ export declare function runMapIntegrationTest(mapId: any, options: any): {
             fromVersion: null;
             notes: "Initial alpha0 map integration report.";
         }>;
-        mapId: any;
+        mapId: string;
         ok: boolean;
-        exitCode: any;
-        generatedAt: any;
+        exitCode: number;
+        generatedAt: string;
         repositoryRoot: string;
-        specPath: any;
-        testPath: any;
-        reportPath: any;
-        resolutionMode: any;
-        warnings: any[];
-        perMapStatus: any[];
-        failedDownstream: any[];
-        propagationDuration: any;
+        specPath: string | null;
+        testPath: string | null;
+        reportPath: string | null;
+        resolutionMode: string;
+        warnings: string[];
+        perMapStatus: MapStatus[];
+        failedDownstream: string[];
+        propagationDuration: number;
         metrics: {
             latency: number;
             errorRate: number;
@@ -64,18 +94,18 @@ export declare function runMapIntegrationTest(mapId: any, options: any): {
             edgeCaseCount: number;
         };
         artifacts: {
-            artifactPath: any;
+            artifactPath: string | null | undefined;
             artifactKind: string;
             producedBy: string;
         }[];
         evidence: {
             evidenceKind: string;
             summary: string;
-            artifactPaths: any[];
+            artifactPaths: (string | null | undefined)[];
         }[];
     };
 };
-export declare function createMapIntegrationReport(input: any): {
+export declare function createMapIntegrationReport(input: CreateMapIntegrationReportInput): {
     schemaId: string;
     specVersion: string;
     migration: Readonly<{
@@ -83,19 +113,19 @@ export declare function createMapIntegrationReport(input: any): {
         fromVersion: null;
         notes: "Initial alpha0 map integration report.";
     }>;
-    mapId: any;
+    mapId: string;
     ok: boolean;
-    exitCode: any;
-    generatedAt: any;
+    exitCode: number;
+    generatedAt: string;
     repositoryRoot: string;
-    specPath: any;
-    testPath: any;
-    reportPath: any;
-    resolutionMode: any;
-    warnings: any[];
-    perMapStatus: any[];
-    failedDownstream: any[];
-    propagationDuration: any;
+    specPath: string | null;
+    testPath: string | null;
+    reportPath: string | null;
+    resolutionMode: string;
+    warnings: string[];
+    perMapStatus: MapStatus[];
+    failedDownstream: string[];
+    propagationDuration: number;
     metrics: {
         latency: number;
         errorRate: number;
@@ -103,13 +133,14 @@ export declare function createMapIntegrationReport(input: any): {
         edgeCaseCount: number;
     };
     artifacts: {
-        artifactPath: any;
+        artifactPath: string | null | undefined;
         artifactKind: string;
         producedBy: string;
     }[];
     evidence: {
         evidenceKind: string;
         summary: string;
-        artifactPaths: any[];
+        artifactPaths: (string | null | undefined)[];
     }[];
 };
+export {};

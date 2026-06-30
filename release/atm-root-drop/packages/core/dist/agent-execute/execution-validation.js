@@ -1,18 +1,24 @@
 import { spawnSync } from 'node:child_process';
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function normalizeValidationPassOutcome(rawOutcome, pass) {
-    const ok = rawOutcome?.ok !== false;
-    const exitCode = normalizeExitCode(rawOutcome?.exitCode, ok ? 0 : 1);
-    const summary = String(rawOutcome?.summary || `${pass.label} validated delegated commands.`);
-    const reportPath = toPortablePath(rawOutcome?.reportPath || pass.reportPath);
-    const reportDocument = rawOutcome?.reportDocument && typeof rawOutcome.reportDocument === 'object'
-        ? rawOutcome.reportDocument
+    const outcome = asRecord(rawOutcome);
+    const ok = outcome?.ok !== false;
+    const exitCode = normalizeExitCode(outcome?.exitCode, ok ? 0 : 1);
+    const summary = String(outcome?.summary || `${pass.label} validated delegated commands.`);
+    const reportPath = toPortablePath(outcome?.reportPath || pass.reportPath);
+    const reportDocument = asRecord(outcome?.reportDocument)
+        ? outcome?.reportDocument
         : {
             passId: pass.passId,
             fixtureSet: pass.fixtureSet,
             ok,
             exitCode,
             summary,
-            results: Array.isArray(rawOutcome?.results) ? rawOutcome.results : []
+            results: Array.isArray(outcome?.results) ? outcome.results : []
         };
     return {
         reportPath,

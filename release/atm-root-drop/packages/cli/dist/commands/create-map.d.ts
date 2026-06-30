@@ -1,1 +1,1 @@
-export declare function runCreateMap(argv: any): import("./shared.ts").CommandResult;
+export declare function runCreateMap(argv: string[]): import("./shared.ts").CommandResult;

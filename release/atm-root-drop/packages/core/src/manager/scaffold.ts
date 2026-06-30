@@ -22,7 +22,96 @@ export {
   resolveAtomWorkbenchPath
 };
 
-export function scaffoldAtomWorkbench(normalizedModel: any, options: any = {}) {
+interface ScaffoldModel {
+  source?: {
+    specPath?: string | null;
+    schemaPath?: string;
+  };
+  identity: {
+    atomId: string;
+    title: string;
+    description: string;
+    tags: unknown[];
+  };
+  schema: {
+    schemaId: string;
+    specVersion: string;
+    migration: {
+      strategy: string;
+      fromVersion: string | null;
+      notes: string;
+    };
+  };
+  execution: {
+    language: {
+      primary: string;
+      sourceExtensions: unknown[];
+      tooling: unknown[];
+    };
+    runtime: {
+      kind: string;
+      versionRange: string;
+      environment: string;
+    };
+    adapterRequirements: {
+      projectAdapter: string;
+      storage: string;
+      capabilities: unknown[];
+    };
+    compatibility: {
+      coreVersion: string;
+      registryVersion: string;
+      pluginApiVersion: string;
+      languageAdapter: string;
+      lifecycleMode?: string;
+    };
+    dependencyPolicy: {
+      external: string;
+      hostCoupling: string;
+    };
+    validation: {
+      commands: unknown[];
+      evidenceRequired: boolean;
+    };
+    performanceBudget: {
+      hotPath: boolean;
+      inputMutation: string;
+      maxDurationMs: number | null;
+    };
+  };
+  hashLock: {
+    algorithm: string;
+    digest: string;
+    canonicalization: string;
+  };
+  ports: {
+    inputs: unknown[];
+    outputs: unknown[];
+  };
+}
+
+interface ScaffoldOptions {
+  repositoryRoot?: string;
+  workbenchPath?: string;
+  workbenchRoot?: string;
+  specFileName?: string;
+  testFileName?: string;
+  specTemplatePath?: string;
+  testTemplatePath?: string;
+  dryRun?: boolean;
+  overwriteExisting?: boolean;
+}
+
+interface TemplateOptions {
+  specPath: string;
+  testPath: string;
+  workbenchPath: string;
+}
+
+export function scaffoldAtomWorkbench(normalizedModel: ScaffoldModel | null, options: ScaffoldOptions = {}) {
+  if (!normalizedModel) {
+    throw new Error('Normalized model is required.');
+  }
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const atomSpace = createAtomSpaceLayout(normalizedModel, {
     repositoryRoot,
@@ -113,7 +202,7 @@ export function scaffoldAtomWorkbench(normalizedModel: any, options: any = {}) {
   return result;
 }
 
-function createTemplateMap(normalizedModel: any, options: any) {
+function createTemplateMap(normalizedModel: ScaffoldModel, options: TemplateOptions): Record<string, string> {
   return {
     atomId: normalizedModel.identity.atomId,
     atomIdJson: JSON.stringify(normalizedModel.identity.atomId),
@@ -157,9 +246,9 @@ function createTemplateMap(normalizedModel: any, options: any) {
   };
 }
 
-function renderTemplate(templatePath: any, values: any) {
+function renderTemplate(templatePath: string, values: Record<string, string>) {
   const template = stripTemplateHeader(readFileSync(templatePath, 'utf8'));
-  return `${template.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (match: any, key: any) => {
+  return `${template.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (_match: string, key: string) => {
     if (!Object.hasOwn(values, key)) {
       throw new Error(`Unknown scaffold template token: ${key}`);
     }
@@ -167,10 +256,10 @@ function renderTemplate(templatePath: any, values: any) {
   })}\n`;
 }
 
-function stripTemplateHeader(template: any) {
+function stripTemplateHeader(template: string) {
   return template.replace(/^\s*<!--\s*ATM TEMPLATE:[\s\S]*?-->\s*/i, '');
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string) {
   return value.replace(/\\/g, '/');
 }

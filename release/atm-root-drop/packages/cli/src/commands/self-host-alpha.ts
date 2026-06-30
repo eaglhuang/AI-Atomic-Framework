@@ -34,8 +34,30 @@ const repoCopyEntries = [
   'tsconfig.json',
   'turbo.json'
 ];
+interface BootstrapEvidence {
+  ok: boolean;
+  checks: Array<{ name: string; passed: boolean; path: string }>;
+  taskPath: string;
+  lockPath: string;
+  artifactDir: string;
+  evidencePath: string;
+  contextBudgetReportPath: string;
+  continuationReportPath: string;
+  contextSummaryPath: string;
+  contextSummaryMarkdownPath: string;
+}
 
-export async function runSelfHostAlphaAsync(argv: any) {
+interface HelloWorldSmokeResult {
+  ok: boolean;
+  checks: Array<{ name: string; passed: boolean }>;
+  passCount: number;
+  total: number;
+  specPath: string;
+  sourcePath: string;
+}
+
+// ─── Entry point ──────────────────────────────────────────────────────────
+export async function runSelfHostAlphaAsync(argv: string[]) {
   const { options } = parseOptions(argv, 'self-host-alpha');
   if (!options.verify) {
     throw new CliError('ATM_CLI_USAGE', 'self-host-alpha requires --verify', { exitCode: 2 });
@@ -126,7 +148,7 @@ export async function runSelfHostAlphaAsync(argv: any) {
   }
 }
 
-function copyRepositorySubset(sourceRoot: any, targetRoot: any) {
+function copyRepositorySubset(sourceRoot: string, targetRoot: string) {
   for (const entry of repoCopyEntries) {
     const source = path.join(sourceRoot, entry);
     if (existsSync(source)) {
@@ -149,9 +171,18 @@ function refreshCopiedFrozenRunnerArtifacts(targetRoot: string) {
   }
 }
 
-function evaluateBootstrapEvidence(cwd: any) {
+function evaluateBootstrapEvidence(cwd: string): BootstrapEvidence {
   const runtime = detectGovernanceRuntime(cwd, bootstrapTaskId);
-  const paths = runtime.paths as any;
+  const paths = runtime.paths as {
+    taskPath: string;
+    lockPath: string;
+    directories?: { historyArtifacts?: string };
+    evidencePath: string;
+    contextBudgetReportPath: string;
+    continuationReportPath: string;
+    contextSummaryPath: string;
+    contextSummaryMarkdownPath: string;
+  };
   const taskPath = path.join(cwd, paths.taskPath);
   const lockPath = path.join(cwd, paths.lockPath);
   const artifactDir = path.join(cwd, paths.directories?.historyArtifacts ?? '.atm/history/artifacts');
@@ -184,7 +215,14 @@ function evaluateBootstrapEvidence(cwd: any) {
   };
 }
 
-async function materializeSelfHostingArtifacts(cwd: any, bootstrapEvidence: any, helloWorld: any, neutrality: any, criteria: any, ok: any) {
+async function materializeSelfHostingArtifacts(
+  cwd: string,
+  bootstrapEvidence: BootstrapEvidence,
+  helloWorld: HelloWorldSmokeResult,
+  neutrality: { ok: boolean; evidence?: Record<string, unknown> | null },
+  criteria: Record<string, boolean>,
+  ok: boolean
+) {
   const adapter = createLocalGovernanceAdapter({ repositoryRoot: cwd });
   const runtime = detectGovernanceRuntime(cwd, bootstrapTaskId);
   const now = new Date().toISOString();
@@ -312,6 +350,6 @@ async function materializeSelfHostingArtifacts(cwd: any, bootstrapEvidence: any,
   };
 }
 
-function normalizePortablePath(value: any) {
+function normalizePortablePath(value: string | null | undefined) {
   return String(value || '').replace(/\\/g, '/');
 }

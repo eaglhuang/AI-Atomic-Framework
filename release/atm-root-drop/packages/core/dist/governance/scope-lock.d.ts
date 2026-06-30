@@ -30,8 +30,8 @@ export interface ScopeLeaseFencingResult {
     readonly ok: boolean;
     readonly findings: readonly ScopeLeaseFencingFinding[];
 }
-export declare function createScopeLockRecord(input: any): ScopeLockRecord;
-export declare function parseScopeLockRecord(document: any): ScopeLockRecord;
+export declare function createScopeLockRecord(input: unknown): ScopeLockRecord;
+export declare function parseScopeLockRecord(document: unknown): ScopeLockRecord;
 export declare function hasMapSelectors(scopeLock: ScopeLockRecord): boolean;
 export declare function validateScopeLeaseFencing(entries: readonly ScopeLeaseRegistryEntry[]): ScopeLeaseFencingResult;
 export declare function validateScopeLeaseEpoch(input: {

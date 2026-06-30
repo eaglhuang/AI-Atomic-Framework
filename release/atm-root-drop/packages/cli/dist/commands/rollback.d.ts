@@ -1,1 +1,1 @@
-export declare function runRollback(argv: any): Promise<import("./shared.ts").CommandResult>;
+export declare function runRollback(argv: string[]): Promise<import("./shared.ts").CommandResult>;

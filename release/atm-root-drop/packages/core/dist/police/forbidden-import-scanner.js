@@ -1,3 +1,13 @@
+function asImportRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
+function asImportGraphEntry(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function extractImportSources(sourceText) {
     const sources = [];
     const patterns = [
@@ -16,7 +26,11 @@ export function extractImportSources(sourceText) {
 }
 export function validateForbiddenImports(importGraph = [], forbiddenPatterns = [], options = {}) {
     const violations = [];
-    for (const entry of importGraph) {
+    for (const rawEntry of importGraph) {
+        const entry = asImportGraphEntry(rawEntry);
+        if (!entry) {
+            continue;
+        }
         const imports = normalizeImports(entry.imports);
         for (const imported of imports) {
             for (const pattern of forbiddenPatterns) {
@@ -41,15 +55,18 @@ export function validateForbiddenImports(importGraph = [], forbiddenPatterns = [
     };
 }
 export function normalizeImports(imports = []) {
-    return imports.map((entry) => typeof entry === 'string' ? { source: entry } : entry).filter((entry) => entry?.source);
+    return imports
+        .map((entry) => typeof entry === 'string' ? { source: entry } : asImportRecord(entry))
+        .filter((entry) => Boolean(entry?.source));
 }
 function matchesPattern(value, pattern) {
+    const normalizedValue = String(value ?? '');
     if (pattern instanceof RegExp) {
-        return pattern.test(value);
+        return pattern.test(normalizedValue);
     }
     const text = String(pattern ?? '');
     if (text.startsWith('/') && text.endsWith('/')) {
-        return new RegExp(text.slice(1, -1)).test(value);
+        return new RegExp(text.slice(1, -1)).test(normalizedValue);
     }
-    return value.includes(text);
+    return normalizedValue.includes(text);
 }

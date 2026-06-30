@@ -53,7 +53,7 @@ export async function runTestAsync(argv) {
         throw new CliError('ATM_CLI_USAGE', 'test option --edge-contracts must be paired with --map.', { exitCode: 2 });
     }
     if (options.spec) {
-        return runSpecTest(options.cwd, options.spec);
+        return runSpecTest(options.cwd, options.spec, normalizeTestProfile(options.profile), normalizeOptionalText(options.suite));
     }
     if (options.map) {
         if (options.edgeContracts) {
@@ -245,7 +245,7 @@ async function executeMapRunner(callback) {
         throw error;
     }
 }
-async function runSpecTest(cwd, specPath) {
+async function runSpecTest(cwd, specPath, profile = 'standard', suite = null) {
     const parsed = parseAtomicSpecFile(specPath, { cwd });
     if (!parsed.ok) {
         return makeResult({
@@ -259,7 +259,7 @@ async function runSpecTest(cwd, specPath) {
             }
         });
     }
-    const testRun = await runAtomicTestRunnerExtended(parsed.normalizedModel, { repositoryRoot: cwd });
+    const testRun = await runAtomicTestRunnerExtended(parsed.normalizedModel, { repositoryRoot: cwd, profile, suite });
     return makeResult({
         ok: testRun.ok,
         command: 'test',
@@ -271,6 +271,8 @@ async function runSpecTest(cwd, specPath) {
         ],
         evidence: {
             atomId: testRun.atomId,
+            profile,
+            suite,
             specPath: relativePathFrom(cwd, path.resolve(cwd, specPath)),
             reportPath: relativePathFrom(cwd, testRun.reportPath),
             runnerConfigPath: testRun.runnerConfigPath,
@@ -285,4 +287,15 @@ async function runSpecTest(cwd, specPath) {
             gates: testRun.gateResults ?? []
         }
     });
+}
+function normalizeTestProfile(value) {
+    const text = String(value ?? '').toLowerCase();
+    if (text === 'quick' || text === 'standard' || text === 'full') {
+        return text;
+    }
+    return 'standard';
+}
+function normalizeOptionalText(value) {
+    const text = String(value ?? '').trim();
+    return text || null;
 }

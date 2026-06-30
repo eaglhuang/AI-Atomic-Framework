@@ -44,7 +44,7 @@ export function generateAtomicMap(request, options = {}) {
             registryPath,
             registryDocument,
             existingEntry,
-            mapId: options.mapId,
+            mapId: options.mapId ?? undefined,
             force: options.force === true
         }));
         const paths = createMapPaths(allocation.mapId);
@@ -94,6 +94,7 @@ export function generateAtomicMap(request, options = {}) {
         if (!testRun.ok) {
             throw createGeneratorError('ATM_MAP_GENERATOR_TEST_FAILED', 'Generated map validation command failed.', { testRun });
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicMapRegistryEntry(specDocument, {
             schemaPath: 'schemas/registry/atomic-map.schema.json',
             status: options.status ?? 'draft',
@@ -173,27 +174,31 @@ function normalizeRequest(request) {
     if (!request || typeof request !== 'object' || Array.isArray(request)) {
         throw createGeneratorError('ATM_MAP_GENERATOR_REQUEST_INVALID', 'Atomic map generator request must be an object.');
     }
+    const req = request;
     return {
-        members: normalizeMembers(request.members),
-        edges: request.edges ?? [],
-        entrypoints: request.entrypoints,
-        qualityTargets: request.qualityTargets,
-        mapVersion: request.mapVersion ?? '0.1.0',
-        specVersion: request.specVersion,
-        replacement: normalizeReplacement(request.replacement),
-        pendingSfCalculation: request.pendingSfCalculation === true
+        members: normalizeMembers(req.members),
+        edges: req.edges ?? [],
+        entrypoints: req.entrypoints,
+        qualityTargets: req.qualityTargets,
+        mapVersion: req.mapVersion ?? '0.1.0',
+        specVersion: req.specVersion,
+        replacement: normalizeReplacement(req.replacement),
+        pendingSfCalculation: req.pendingSfCalculation === true
     };
 }
 function normalizeMembers(members) {
     if (!Array.isArray(members) || members.length === 0) {
         throw createGeneratorError('ATM_MAP_GENERATOR_REQUEST_INVALID', 'Atomic map generator requires at least one member.', { fieldName: 'members' });
     }
-    return members.map((member) => ({
-        atomId: normalizeAtomId(member?.atomId, 'members[].atomId'),
-        version: normalizeSemver(member?.version, 'members[].version'),
-        ...normalizeOptionalMemberRole(member?.role),
-        ...(member?.versionLineage ? { versionLineage: member.versionLineage } : {})
-    }));
+    return members.map((member) => {
+        const m = member;
+        return {
+            atomId: normalizeAtomId(m?.atomId, 'members[].atomId'),
+            version: normalizeSemver(m?.version, 'members[].version'),
+            ...normalizeOptionalMemberRole(m?.role),
+            ...(m?.versionLineage ? { versionLineage: m.versionLineage } : {})
+        };
+    });
 }
 function normalizeEdges(edges, memberIds) {
     if (edges == null) {
@@ -203,9 +208,10 @@ function normalizeEdges(edges, memberIds) {
         throw createGeneratorError('ATM_MAP_GENERATOR_REQUEST_INVALID', 'Atomic map generator edges must be an array.', { fieldName: 'edges' });
     }
     return edges.map((edge) => {
-        const from = normalizeAtomId(edge?.from, 'edges[].from');
-        const to = normalizeAtomId(edge?.to, 'edges[].to');
-        const binding = normalizeRequiredText(edge?.binding, 'edges[].binding');
+        const e = edge;
+        const from = normalizeAtomId(e?.from, 'edges[].from');
+        const to = normalizeAtomId(e?.to, 'edges[].to');
+        const binding = normalizeRequiredText(e?.binding, 'edges[].binding');
         if (!memberIds.has(from) || !memberIds.has(to)) {
             throw createGeneratorError('ATM_MAP_GENERATOR_EDGE_UNKNOWN_MEMBER', 'Edge endpoints must reference declared map members.', {
                 from,
@@ -216,7 +222,7 @@ function normalizeEdges(edges, memberIds) {
             from,
             to,
             binding,
-            ...normalizeOptionalEdgeKind(edge?.edgeKind)
+            ...normalizeOptionalEdgeKind(e?.edgeKind)
         };
     });
 }
@@ -275,15 +281,21 @@ function readRegistryDocument(registryAbsolutePath, options) {
 }
 function findExistingEntry(registryDocument, request) {
     const entries = Array.isArray(registryDocument?.entries) ? registryDocument.entries : [];
-    const mapHash = computeAtomicMapHash(request);
+    const mapHash = computeAtomicMapHash({
+        ...request,
+        replacement: request.replacement ?? null
+    });
     const semanticFingerprint = request.pendingSfCalculation === true
         ? null
         : createAtomicMapSemanticFingerprint(request);
-    return entries.find((entry) => entry?.schemaId === 'atm.atomicMap'
-        && entry?.mapHash === mapHash
-        && normalizeSemanticFingerprint(entry?.semanticFingerprint ?? entry?.mapSemanticFingerprint ?? null) === semanticFingerprint
-        && (request.pendingSfCalculation === true ? entry?.pendingSfCalculation === true : true)
-        && String(entry?.mapVersion || '').trim() === request.mapVersion) ?? null;
+    return entries.find((entry) => {
+        const e = entry;
+        return e?.schemaId === 'atm.atomicMap'
+            && e?.mapHash === mapHash
+            && normalizeSemanticFingerprint((e?.semanticFingerprint ?? e?.mapSemanticFingerprint ?? null)) === semanticFingerprint
+            && (request.pendingSfCalculation === true ? e?.pendingSfCalculation === true : true)
+            && String(e?.mapVersion || '').trim() === request.mapVersion;
+    }) ?? null;
 }
 function allocateGeneratorMapId(request, options) {
     const requestedMapId = options.mapId ?? (options.force === true ? options.existingEntry?.mapId : null);
@@ -450,6 +462,7 @@ function recordPhase(phases, phase, action) {
 function createSuccess(result) {
     return {
         ok: true,
+        phases: [],
         ...result
     };
 }

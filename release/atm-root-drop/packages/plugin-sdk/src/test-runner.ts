@@ -4,12 +4,19 @@ export type TestRunnerCommandKind = 'test' | 'typecheck' | 'lint' | 'custom';
 
 export type TestRunnerOutcomeStatus = 'passed' | 'failed' | 'skipped' | 'not_applicable';
 
+export type TestRunnerProfile = 'quick' | 'standard' | 'full';
+
 export interface TestRunnerCommand {
   commandId: string;
   commandKind: TestRunnerCommandKind;
   command: string;
   required?: boolean;
   suite?: string | null;
+  key?: string | null;
+  family?: string | null;
+  tiers?: TestRunnerProfile[];
+  dedupeKeys?: string[];
+  costBudgetMs?: number | null;
   summary?: string | null;
 }
 
@@ -23,12 +30,18 @@ export interface TestRunnerPluginContext {
   specPath: string | null;
   atomId: string;
   normalizedModel: unknown;
+  profile?: TestRunnerProfile;
+  suite?: string | null;
   pluginOptions?: Record<string, unknown>;
 }
 
 export interface TestRunnerPluginPlan {
   commands?: TestRunnerCommand[];
   suites?: string[];
+  profile?: TestRunnerProfile;
+  family?: string | null;
+  dedupeKeys?: string[];
+  costBudgetMs?: number | null;
   evidenceSummary?: string | null;
 }
 

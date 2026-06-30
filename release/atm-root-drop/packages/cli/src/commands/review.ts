@@ -4,6 +4,7 @@ import { createLocalGovernanceAdapter } from '../../../plugin-governance-local/s
 import { checkProgression, pauseProgression, readProgressionPolicy } from '../../../core/src/registry/progression-policy.ts';
 import { readShadowComparisonReport } from '../../../core/src/maps/shadow-comparator.ts';
 import {
+  type HumanReviewQueueRecord,
   computeDecisionSnapshotHash,
   createHumanReviewDecisionLog,
   createHumanReviewQueueDocument,
@@ -19,7 +20,7 @@ import {
 } from '../../../plugin-human-review/src/index.ts';
 import { CliError, makeResult, message, parseJsonText, relativePathFrom } from './shared.ts';
 
-export function runReview(argv: any) {
+export function runReview(argv: string[]) {
   const { options, positional } = parseReviewOptions(argv);
   const action = positional[0] ? String(positional[0]).trim().toLowerCase() : 'list';
   const proposalId = positional[1] ? String(positional[1]).trim() : '';
@@ -253,7 +254,7 @@ export function runReview(argv: any) {
   });
 }
 
-function runReviewList(cwd: any, queuePath: any, projectionPath: any) {
+function runReviewList(cwd: string, queuePath: string, projectionPath: string) {
   const queueDocument = loadHumanReviewQueueDocument(queuePath)
     ?? createHumanReviewQueueDocument([], { generatedAt: new Date().toISOString() });
   const queueValidation = validateHumanReviewQueueDocument(queueDocument);
@@ -284,7 +285,7 @@ function runReviewList(cwd: any, queuePath: any, projectionPath: any) {
   });
 }
 
-function buildApplyReadyPacket(queueRecord: any) {
+function buildApplyReadyPacket(queueRecord: HumanReviewQueueRecord) {
   const legacyTarget = typeof queueRecord.proposal?.legacyTarget === 'string' ? queueRecord.proposal.legacyTarget : null;
   const [targetFile, targetSymbol] = splitLegacyTarget(legacyTarget);
   const rollbackInstructions = Array.isArray(queueRecord.proposal?.rollbackInstructions)
@@ -321,7 +322,7 @@ function buildApplyReadyPacket(queueRecord: any) {
   };
 }
 
-function buildRolloutReadyPacket(cwd: string, queueRecord: any) {
+function buildRolloutReadyPacket(cwd: string, queueRecord: HumanReviewQueueRecord) {
   const applyReadyPacket = buildApplyReadyPacket(queueRecord);
   const actualPatchEvidence = loadActualPatchEvidence(cwd, queueRecord.proposalId);
   if (!actualPatchEvidence) {
@@ -374,7 +375,7 @@ function loadActualPatchEvidence(cwd: string, proposalId: string) {
         ...parsed
       }];
     })
-    .sort((left: any, right: any) => String(right.generatedAt ?? '').localeCompare(String(left.generatedAt ?? '')));
+    .sort((left: { generatedAt?: unknown }, right: { generatedAt?: unknown }) => String(right.generatedAt ?? '').localeCompare(String(left.generatedAt ?? '')));
   return matches[0] ?? null;
 }
 
@@ -400,7 +401,7 @@ function readJsonFileSafe(filePath: string) {
   }
 }
 
-function parseReviewOptions(argv: any) {
+function parseReviewOptions(argv: string[]) {
   const options: {
     cwd: string;
     queuePath: string;
@@ -486,7 +487,7 @@ function parseReviewOptions(argv: any) {
   };
 }
 
-function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
+function requireOptionValue(argv: string[], optionIndex: number, optionName: string) {
   const value = argv[optionIndex + 1];
   if (!value || value.startsWith('--')) {
     throw new CliError('ATM_CLI_USAGE', `review requires a value for ${optionName}`, { exitCode: 2 });
@@ -494,13 +495,13 @@ function requireOptionValue(argv: any, optionIndex: any, optionName: any) {
   return value;
 }
 
-function resolvePath(cwd: any, maybeRelativePath: any) {
+function resolvePath(cwd: string, maybeRelativePath: string) {
   return path.isAbsolute(maybeRelativePath)
     ? maybeRelativePath
     : path.resolve(cwd, maybeRelativePath);
 }
 
-function resolveExistingPath(cwd: any, primaryRelativePath: any, legacyRelativePath: any) {
+function resolveExistingPath(cwd: string, primaryRelativePath: string, legacyRelativePath: string) {
   const primaryPath = resolvePath(cwd, primaryRelativePath);
   if (existsSync(primaryPath)) {
     return primaryPath;
@@ -509,7 +510,7 @@ function resolveExistingPath(cwd: any, primaryRelativePath: any, legacyRelativeP
   return existsSync(legacyPath) ? legacyPath : primaryPath;
 }
 
-function readDecisionLogFile(filePath: any) {
+function readDecisionLogFile(filePath: string) {
   if (!existsSync(filePath)) {
     return [];
   }
@@ -521,12 +522,12 @@ function readDecisionLogFile(filePath: any) {
   }
 }
 
-function writeJsonFile(filePath: any, value: any) {
+function writeJsonFile(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-function writeTextFile(filePath: any, text: any) {
+function writeTextFile(filePath: string, text: string) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, text, 'utf8');
 }

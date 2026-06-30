@@ -27,21 +27,21 @@ export declare function computeSeedRegistrySnapshot(): {
         };
         evidence: string[];
         selfVerification: {
-            legacyPlanningId: any;
+            legacyPlanningId: string | null;
             specHash: string;
             codeHash: string;
             testHash: string;
             sourcePaths: {
-                spec: any;
-                code: any[];
-                tests: any[];
+                spec: string;
+                code: string[];
+                tests: string[];
             };
         };
     };
 };
-export declare function createSeedRegistryDocument(): any;
+export declare function createSeedRegistryDocument(): Record<string, unknown>;
 export declare function readRegistryDocument(): any;
-export declare function validateRegistryDocumentAgainstSchema(cwd: any, registryPath?: string, options?: {
+export declare function validateRegistryDocumentAgainstSchema(cwd: string, registryPath?: string, options?: {
     commandName?: string;
     successCode?: string;
     successText?: string;

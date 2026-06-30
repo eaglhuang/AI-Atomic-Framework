@@ -236,7 +236,8 @@ export async function runCli(argv = process.argv.slice(2), io = { stdout: proces
         return result.exitCode;
     }
     try {
-        const result = enrichCommandResult(await runner(commandArgs));
+        const rawResult = await runner(commandArgs);
+        const result = enrichCommandResult(rawResult);
         writeResult(result, result.ok ? io.stdout : io.stderr, outputFormat);
         return result.exitCode;
     }

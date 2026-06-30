@@ -152,11 +152,14 @@ export declare function computeMissingValidatorReport(cwd: string, taskId: strin
 export type AutoEvidenceDisposition = 'to-run' | 'already-satisfied' | 'skipped-out-of-scope' | 'requires-approval';
 export interface AutoEvidencePlanEntry {
     readonly validator: string;
+    readonly capability: 'validator' | 'integration-test';
+    readonly catalogKey: string | null;
     readonly disposition: AutoEvidenceDisposition;
     readonly command: string | null;
     readonly evidenceState: ValidatorEvidenceState;
     readonly reason: string;
     readonly requiredCommand: string | null;
+    readonly linkedValidators: readonly string[];
 }
 export interface AutoEvidencePlan {
     readonly schemaId: 'atm.autoEvidencePlan.v1';

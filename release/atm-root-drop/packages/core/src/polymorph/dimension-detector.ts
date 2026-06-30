@@ -1,6 +1,11 @@
 const DIMENSION_KEYS = ['parameter', 'type', 'language', 'quality', 'output-shape', 'behavior-variant'];
 
-export function detectPolymorphicDimensions(leftSpec: any, rightSpec: any) {
+interface SanitizedSpecRecord {
+  readonly dimensionValues: Record<string, unknown>;
+  readonly staticContract: Record<string, unknown>;
+}
+
+export function detectPolymorphicDimensions(leftSpec: unknown, rightSpec: unknown) {
   const left = sanitizeSpec(leftSpec);
   const right = sanitizeSpec(rightSpec);
 
@@ -30,14 +35,15 @@ export function detectPolymorphicDimensions(leftSpec: any, rightSpec: any) {
   };
 }
 
-function sanitizeSpec(spec: any) {
+function sanitizeSpec(spec: unknown): SanitizedSpecRecord {
   const candidate = spec && typeof spec === 'object' ? spec : {};
+  const candidateRecord = candidate as Record<string, unknown>;
   return {
-    dimensionValues: candidate.dimensionValues && typeof candidate.dimensionValues === 'object'
-      ? candidate.dimensionValues
+    dimensionValues: candidateRecord.dimensionValues && typeof candidateRecord.dimensionValues === 'object'
+      ? candidateRecord.dimensionValues as Record<string, unknown>
       : {},
-    staticContract: candidate.staticContract && typeof candidate.staticContract === 'object'
-      ? candidate.staticContract
+    staticContract: candidateRecord.staticContract && typeof candidateRecord.staticContract === 'object'
+      ? candidateRecord.staticContract as Record<string, unknown>
       : {}
   };
 }

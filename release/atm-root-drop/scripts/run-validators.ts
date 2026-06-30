@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   applyBaselineFailureSnapshot,
@@ -10,6 +10,14 @@ import {
   firstRequiredCommand,
   summarizeBlockingFindings
 } from './lib/validator-envelope.ts';
+import {
+  findDuplicateDedupeKeys,
+  normalizeTier,
+  readTestCatalog,
+  selectTestEntries,
+  type TestCatalogEntry,
+  type TestTier
+} from './lib/test-catalog.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const configPath = path.join(root, 'scripts', 'validators.config.json');
@@ -18,13 +26,29 @@ if (!existsSync(configPath)) {
 }
 const config: any = JSON.parse(readFileSync(configPath, 'utf8'));
 const validatorMap = new Map(config.validators.map((entry: any) => [entry.name, entry]));
+const selectionFamilies = Array.isArray(config.selectionFamilies) ? config.selectionFamilies : [];
 const DEFAULT_FAST_VALIDATOR_BUDGET_MS = 10_000;
 const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000;
 
 const parsedCli = parseCliArgs(process.argv.slice(2));
 const profileConfig = resolveProfileConfig(parsedCli.profile);
 const parallel = resolveParallelSetting(parsedCli, profileConfig);
-const selectedNames = applyFilters(resolveProfileValidatorNames(parsedCli.profile), parsedCli.filters);
+const resolvedFocusPaths = resolveFocusPaths(parsedCli.focusPaths, parsedCli.focusChanged);
+const testCatalog = readTestCatalog(root, { validatorsConfig: config });
+const baseCatalogSelection = resolveCatalogValidatorSelection(parsedCli.profile, []);
+const focusedCatalogSelection = resolveCatalogValidatorSelection(parsedCli.profile, resolvedFocusPaths);
+const baseProfileValidatorNames = baseCatalogSelection.names;
+const focusedProfileValidatorNames = focusedCatalogSelection.names;
+const selectedNames = applyFilters(focusedProfileValidatorNames, parsedCli.filters);
+const selectedCatalogEntryByValidatorName = new Map(
+  [...baseCatalogSelection.entries, ...focusedCatalogSelection.entries]
+    .filter((entry) => entry.validatorName)
+    .map((entry) => [String(entry.validatorName), entry])
+);
+const selectedCatalogEntries = selectedNames
+  .map((name: string) => selectedCatalogEntryByValidatorName.get(name))
+  .filter(Boolean) as TestCatalogEntry[];
+const duplicateDedupeKeys = findDuplicateDedupeKeys(selectedCatalogEntries);
 const baselineSummary = parsedCli.baselinePath ? readBaselineSummary(parsedCli.baselinePath) : null;
 const performanceBaselineSummary = parsedCli.performanceBaselinePath ? readBaselineSummary(parsedCli.performanceBaselinePath) : null;
 const baselineFingerprints = collectBaselineFindingFingerprints(baselineSummary);
@@ -33,7 +57,16 @@ const selectedValidators = selectedNames.map((name: any) => {
   if (!validator) {
     throw new Error(`Unknown validator in profile "${parsedCli.profile}": ${name}`);
   }
-  return validator;
+  const catalogEntry = selectedCatalogEntryByValidatorName.get(String(name));
+  return catalogEntry ? {
+    ...validator,
+    catalogKey: catalogEntry.key,
+    capability: catalogEntry.capability,
+    family: catalogEntry.family,
+    scope: catalogEntry.scope,
+    dedupeKeys: catalogEntry.dedupeKeys ?? [],
+    catalogCostBudgetMs: catalogEntry.costBudgetMs
+  } : validator;
 }).filter((validator: any) => parsedCli.skipSlow ? validator.slow !== true : true);
 
 if (selectedValidators.length === 0) {
@@ -41,6 +74,10 @@ if (selectedValidators.length === 0) {
     profile: parsedCli.profile,
     mode: profileConfig.mode,
     filters: parsedCli.filters,
+    focusPaths: resolvedFocusPaths,
+    focusMode: parsedCli.focusChanged ? 'changed' : (resolvedFocusPaths.length > 0 ? 'paths' : 'none'),
+    baseValidatorCount: baseProfileValidatorNames.length,
+    focusReducedValidatorCount: focusedProfileValidatorNames.length,
     parallel,
     legacy: parsedCli.legacy,
     cache: parsedCli.cache,
@@ -51,6 +88,12 @@ if (selectedValidators.length === 0) {
     performanceBudgetOverrides: {
       fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
       slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
+    },
+    catalog: {
+      schemaId: testCatalog.schemaId,
+      sourcePath: testCatalog.sourcePath,
+      capability: 'validator',
+      duplicateDedupeKeys
     },
     baselineFingerprintCount: baselineFingerprints.size,
     startedAt: Date.now(),
@@ -77,6 +120,10 @@ const summary = createSummary({
   profile: parsedCli.profile,
   mode: profileConfig.mode,
   filters: parsedCli.filters,
+  focusPaths: resolvedFocusPaths,
+  focusMode: parsedCli.focusChanged ? 'changed' : (resolvedFocusPaths.length > 0 ? 'paths' : 'none'),
+  baseValidatorCount: baseProfileValidatorNames.length,
+  focusReducedValidatorCount: focusedProfileValidatorNames.length,
   parallel,
   legacy: parsedCli.legacy,
   cache: parsedCli.cache,
@@ -87,6 +134,12 @@ const summary = createSummary({
   performanceBudgetOverrides: {
     fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
     slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
+  },
+  catalog: {
+    schemaId: testCatalog.schemaId,
+    sourcePath: testCatalog.sourcePath,
+    capability: 'validator',
+    duplicateDedupeKeys
   },
   baselineFingerprintCount: baselineFingerprints.size,
   startedAt,
@@ -111,6 +164,8 @@ function parseCliArgs(argv: any) {
     fastValidatorBudgetMs: number | null;
     slowValidatorBudgetMs: number | null;
     serial: boolean;
+    focusPaths: string[];
+    focusChanged: boolean;
   } = {
     filters: [],
     parallel: false,
@@ -123,7 +178,9 @@ function parseCliArgs(argv: any) {
     performanceOutputPath: null,
     fastValidatorBudgetMs: null,
     slowValidatorBudgetMs: null,
-    serial: false
+    serial: false,
+    focusPaths: [],
+    focusChanged: false
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -136,6 +193,30 @@ function parseCliArgs(argv: any) {
       }
       options.filters.push(...valueText.split(',').map((entry: any) => entry.trim()).filter(Boolean));
       index += 1;
+      continue;
+    }
+    if (arg === '--focus-path') {
+      const value = argv[index + 1];
+      const valueText = String(value ?? '');
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--focus-path requires a value');
+      }
+      options.focusPaths.push(valueText);
+      index += 1;
+      continue;
+    }
+    if (arg === '--focus-paths') {
+      const value = argv[index + 1];
+      const valueText = String(value ?? '');
+      if (!valueText || valueText.startsWith('--')) {
+        throw new Error('--focus-paths requires a value');
+      }
+      options.focusPaths.push(...valueText.split(',').map((entry: string) => entry.trim()).filter(Boolean));
+      index += 1;
+      continue;
+    }
+    if (arg === '--focus-changed') {
+      options.focusChanged = true;
       continue;
     }
     if (arg === '--parallel') {
@@ -248,6 +329,64 @@ function resolveProfileValidatorNames(profileName: any): string[] {
   const profile = resolveProfileConfig(profileName);
   const inherited: string[] = profile.extends ? resolveProfileValidatorNames(profile.extends) : [];
   return [...new Set([...inherited, ...(profile.validators ?? [])])];
+}
+
+function resolveFocusPaths(focusPaths: string[], focusChanged: boolean): string[] {
+  const explicit = Array.isArray(focusPaths) ? focusPaths.map(normalizeFocusPath).filter(Boolean) : [];
+  if (!focusChanged) {
+    return [...new Set(explicit)];
+  }
+  return [...new Set([...explicit, ...readChangedPaths()])];
+}
+
+function applyFocusRules(validatorNames: string[], focusPaths: string[]): string[] {
+  if (!Array.isArray(focusPaths) || focusPaths.length === 0) {
+    return validatorNames;
+  }
+  const normalizedPaths = focusPaths.map(normalizeFocusPath);
+  const matchedValidatorNames = new Set<string>();
+  for (const rule of config.focusRules ?? []) {
+    const patterns = Array.isArray(rule.patterns) ? rule.patterns : [];
+    const validators = Array.isArray(rule.validators) ? rule.validators : [];
+    if (patterns.some((pattern: string) => normalizedPaths.some((candidatePath) => focusPatternMatches(pattern, candidatePath)))) {
+      for (const validatorName of validators) {
+        matchedValidatorNames.add(String(validatorName));
+      }
+    }
+  }
+  if (matchedValidatorNames.size === 0) {
+    return validatorNames;
+  }
+  return validatorNames.filter((name) => matchedValidatorNames.has(name));
+}
+
+function resolveCatalogValidatorSelection(profileName: string, focusPaths: string[]): { names: string[]; entries: TestCatalogEntry[]; duplicateDedupeKeys: string[] } {
+  const tier = profileToCatalogTier(profileName);
+  if (!tier) {
+    const names = applyFocusRules(resolveProfileValidatorNames(profileName), focusPaths);
+    return { names, entries: [], duplicateDedupeKeys: [] };
+  }
+  const selection = selectTestEntries({
+    catalog: testCatalog,
+    capability: 'validator',
+    tier,
+    changedFiles: focusPaths
+  });
+  const executableEntries = selection.entries.filter((entry) => entry.validatorName && validatorMap.has(entry.validatorName));
+  if (focusPaths.length > 0 && executableEntries.length === 0) {
+    const fallbackNames = applyFocusRules(resolveProfileValidatorNames(profileName), focusPaths);
+    return { names: fallbackNames, entries: [], duplicateDedupeKeys: [] };
+  }
+  const names = [...new Set(executableEntries.map((entry) => String(entry.validatorName)))];
+  return {
+    names,
+    entries: executableEntries,
+    duplicateDedupeKeys: selection.duplicateDedupeKeys
+  };
+}
+
+function profileToCatalogTier(profileName: string): TestTier | null {
+  return normalizeTier(profileName);
 }
 
 function applyFilters(validatorNames: any, filters: any) {
@@ -375,6 +514,12 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
         tags: validator.tags ?? [],
         slow: validator.slow === true,
         performanceBudgetMs: Number.isFinite(validator.performanceBudgetMs) ? Number(validator.performanceBudgetMs) : null,
+        catalogKey: validator.catalogKey ?? null,
+        capability: validator.capability ?? 'validator',
+        family: validator.family ?? null,
+        scope: validator.scope ?? null,
+        dedupeKeys: validator.dedupeKeys ?? [],
+        catalogCostBudgetMs: Number.isFinite(validator.catalogCostBudgetMs) ? Number(validator.catalogCostBudgetMs) : null,
         mode,
         ok: exitCode === 0,
         exitCode,
@@ -394,7 +539,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
   });
 }
 
-function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSlow, baselinePath, performanceBaselinePath, performanceBaselineSummary, performanceBudgetOverrides, baselineFingerprintCount, startedAt, results }: any) {
+function createSummary({ profile, mode, filters, focusPaths, focusMode, baseValidatorCount, focusReducedValidatorCount, parallel, legacy, cache, skipSlow, baselinePath, performanceBaselinePath, performanceBaselineSummary, performanceBudgetOverrides, catalog, baselineFingerprintCount, startedAt, results }: any) {
   const durationMs = Date.now() - startedAt;
   const passed = results.filter((entry: any) => entry.ok === true).length;
   const failed = results.length - passed;
@@ -412,7 +557,16 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
     results,
     profileConfig,
     performanceBudgetOverrides,
-    performanceBaselineSummary
+    performanceBaselineSummary,
+    duplicateDedupeKeys: catalog?.duplicateDedupeKeys ?? []
+  });
+  const selection = createSelectionReport({
+    profile,
+    baseValidatorCount: baseValidatorCount ?? results.length,
+    focusReducedValidatorCount: focusReducedValidatorCount ?? results.length,
+    focusMode,
+    results,
+    catalog
   });
   return {
     schemaId: 'atm.validatorRunSummary.v1',
@@ -423,6 +577,10 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
     failed,
     durationMs,
     filters,
+    focusPaths: focusPaths ?? [],
+    focusMode: focusMode ?? 'none',
+    baseValidatorCount: baseValidatorCount ?? results.length,
+    focusReducedValidatorCount: focusReducedValidatorCount ?? results.length,
     parallel,
     legacy,
     cache,
@@ -431,6 +589,7 @@ function createSummary({ profile, mode, filters, parallel, legacy, cache, skipSl
     performanceBaselinePath: performanceBaselinePath ?? null,
     baselineFingerprintCount: baselineFingerprintCount ?? 0,
     cached: results.filter((entry: any) => entry.cached === true).length,
+    selection,
     performance,
     requiredCommand: firstRequiredCommand(envelopes),
     blockingFindings,
@@ -459,6 +618,61 @@ function emitSummary(summary: any, jsonMode: any) {
 
 function normalizeCommandPath(relativePath: string): string {
   return relativePath.split(path.sep).join('/');
+}
+
+function normalizeFocusPath(relativePath: string): string {
+  return String(relativePath || '').replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function focusPatternMatches(pattern: string, candidatePath: string): boolean {
+  const escaped = String(pattern || '')
+    .replace(/\\/g, '/')
+    .replace(/[|\\{}()[\]^$+?.]/g, '\\$&')
+    .replace(/\*\*/g, '::DOUBLE_STAR::')
+    .replace(/\*/g, '[^/]*')
+    .replace(/::DOUBLE_STAR::/g, '.*');
+  return new RegExp(`^${escaped}$`, 'i').test(candidatePath);
+}
+
+function readChangedPaths(): string[] {
+  const result = spawnSync('git', ['status', '--porcelain=v1', '--untracked-files=all'], {
+    cwd: root,
+    encoding: 'utf8',
+    env: createSanitizedGitEnv()
+  });
+  if (result.status !== 0) {
+    return [];
+  }
+  const changed = new Set<string>();
+  for (const rawLine of String(result.stdout ?? '').split(/\r?\n/)) {
+    if (!rawLine.trim()) continue;
+    const normalized = normalizePorcelainPath(rawLine);
+    if (normalized) {
+      changed.add(normalized);
+    }
+  }
+  return [...changed];
+}
+
+function normalizePorcelainPath(rawLine: string): string | null {
+  const line = String(rawLine || '');
+  if (line.length < 4) {
+    return null;
+  }
+  const payload = line.slice(3).trim();
+  if (!payload) {
+    return null;
+  }
+  const renameParts = payload.split(' -> ');
+  return normalizeFocusPath(renameParts[renameParts.length - 1]);
+}
+
+function createSanitizedGitEnv(): NodeJS.ProcessEnv {
+  const env = { ...process.env };
+  for (const key of ['GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
+    delete env[key];
+  }
+  return env;
 }
 
 function formatSpawnError(error: unknown): string {
@@ -536,7 +750,7 @@ function writePerformanceOutputIfRequested(summary: any, outputPath: string | nu
   writeFileSync(resolved, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
 }
 
-function createPerformanceReport({ profile, durationMs, results, profileConfig, performanceBudgetOverrides, performanceBaselineSummary }: any) {
+function createPerformanceReport({ profile, durationMs, results, profileConfig, performanceBudgetOverrides, performanceBaselineSummary, duplicateDedupeKeys }: any) {
   const budgetMs = Number.isFinite(profileConfig?.performanceBudgetMs) ? Number(profileConfig.performanceBudgetMs) : null;
   const performanceDefaults = resolvePerformanceDefaults();
   const fastValidatorBudgetMs = Number.isFinite(performanceBudgetOverrides?.fastValidatorBudgetMs)
@@ -555,6 +769,8 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
       overBudgetMs: Math.max(0, Number(entry.durationMs ?? 0) - resolveValidatorDurationBudget(entry, fastValidatorBudgetMs, slowValidatorBudgetMs)),
       cached: entry.cached === true,
       slow: entry.slow === true,
+      catalogKey: entry.catalogKey ?? null,
+      family: entry.family ?? null,
       command: entry.command
     }));
   const baselineByName = new Map(
@@ -563,14 +779,26 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
       : []
   );
   const warnings: any[] = [];
+  const optimizationCandidates: any[] = [];
   if (budgetMs !== null && durationMs > budgetMs) {
-    warnings.push({
+    const finding = {
       code: 'ATM_VALIDATOR_PROFILE_BUDGET_EXCEEDED',
       message: `profile ${profile} took ${durationMs}ms, over budget ${budgetMs}ms`,
       profile,
       durationMs,
       budgetMs,
       remediation: 'Inspect performance.slowestValidators and split or narrow heavyweight validators before adding more cases.'
+    };
+    warnings.push(finding);
+    optimizationCandidates.push({
+      kind: 'profile-budget',
+      profile,
+      severity: 'high',
+      durationMs,
+      budgetMs,
+      overBudgetMs: durationMs - budgetMs,
+      rationale: finding.message,
+      remediation: finding.remediation
     });
   }
   const budgetViolations = results
@@ -585,13 +813,25 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
         durationMs: durationMsValue,
         durationBudgetMs,
         overBudgetMs: durationMsValue - durationBudgetMs,
-        slow: entry.slow === true,
-        command: entry.command,
-        message: `${entry.name} took ${durationMsValue}ms, over budget ${durationBudgetMs}ms`,
+      slow: entry.slow === true,
+      key: entry.catalogKey ?? null,
+      family: entry.family ?? null,
+      command: entry.command,
+      message: `${entry.name} took ${durationMsValue}ms, over budget ${durationBudgetMs}ms`,
         remediation: 'Reduce fixture scope, split broad assertions, use focused regressions, or explicitly raise the validator budget with justification.'
       }];
     });
   warnings.push(...budgetViolations);
+  optimizationCandidates.push(...budgetViolations.map((entry: any) => ({
+    kind: 'validator-budget',
+    validatorName: entry.validatorName,
+    severity: entry.overBudgetMs >= 5_000 ? 'high' : 'medium',
+    durationMs: entry.durationMs,
+    durationBudgetMs: entry.durationBudgetMs,
+    overBudgetMs: entry.overBudgetMs,
+    rationale: entry.message,
+    remediation: entry.remediation
+  })));
   const regressions = results
     .filter((entry: any) => entry.cached !== true)
     .flatMap((entry: any) => {
@@ -614,6 +854,44 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
       }];
     });
   warnings.push(...regressions);
+  optimizationCandidates.push(...regressions.map((entry: any) => ({
+    kind: 'validator-regression',
+    validatorName: entry.validatorName,
+    severity: entry.deltaMs >= 5_000 ? 'high' : 'medium',
+    durationMs: entry.durationMs,
+    baselineDurationMs: entry.baselineDurationMs,
+    deltaMs: entry.deltaMs,
+    ratio: entry.ratio,
+    rationale: entry.message,
+    remediation: entry.remediation
+  })));
+  const familyHotspots = createFamilyHotspots(results, fastValidatorBudgetMs, slowValidatorBudgetMs);
+  const overweightFamilies = familyHotspots
+    .filter((entry: any) => entry.validatorCount >= 5 || entry.totalDurationShare >= 0.25)
+    .map((entry: any) => ({
+      code: 'ATM_VALIDATOR_FAMILY_OVERWEIGHT',
+      familyId: entry.familyId,
+      familyLabel: entry.familyLabel,
+      validatorCount: entry.validatorCount,
+      totalDurationMs: entry.totalDurationMs,
+      totalDurationShare: entry.totalDurationShare,
+      overBudgetValidators: entry.overBudgetValidators,
+      message: `${entry.familyLabel} owns ${entry.validatorCount} validators and ${Math.round(entry.totalDurationShare * 100)}% of profile runtime`,
+      remediation: 'Consider routing this family from task scope first, sharing one source inventory across sibling validators, or merging repeated assertions into a family runner.'
+    }));
+  warnings.push(...overweightFamilies);
+  optimizationCandidates.push(...overweightFamilies.map((entry: any) => ({
+    kind: 'family-overweight',
+    familyId: entry.familyId,
+    familyLabel: entry.familyLabel,
+    severity: entry.totalDurationShare >= 0.35 || entry.validatorCount >= 8 ? 'high' : 'medium',
+    validatorCount: entry.validatorCount,
+    totalDurationMs: entry.totalDurationMs,
+    totalDurationShare: entry.totalDurationShare,
+    overBudgetValidators: entry.overBudgetValidators,
+    rationale: entry.message,
+    remediation: entry.remediation
+  })));
   return {
     schemaId: 'atm.validatorPerformanceReport.v1',
     profile,
@@ -624,9 +902,124 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
     baselinePresent: performanceBaselineSummary !== null && performanceBaselineSummary !== undefined,
     warningCount: warnings.length,
     slowestValidators,
+    slowestEntries: slowestValidators,
+    familyHotspots,
+    duplicateDedupeKeys: Array.isArray(duplicateDedupeKeys) ? duplicateDedupeKeys : [],
     budgetViolations,
     regressions,
+    optimizationCandidates,
     warnings
+  };
+}
+
+function createSelectionReport({ profile, baseValidatorCount, focusReducedValidatorCount, focusMode, results, catalog }: any) {
+  const familySummary = summarizeFamilies(results);
+  const dominantFamilies = familySummary
+    .filter((entry: any) => entry.validatorCount > 0)
+    .sort((left: any, right: any) => right.validatorCount - left.validatorCount)
+    .slice(0, 5);
+  return {
+    schemaId: 'atm.validatorSelectionReport.v1',
+    catalogSchemaId: catalog?.schemaId ?? null,
+    catalogSourcePath: catalog?.sourcePath ?? null,
+    capability: catalog?.capability ?? 'validator',
+    profile,
+    totalCatalogValidators: Array.isArray(config.validators) ? config.validators.length : results.length,
+    baseProfileValidatorCount: baseValidatorCount,
+    selectedValidatorCount: results.length,
+    focusReducedValidatorCount,
+    focusMode: focusMode ?? 'none',
+    duplicateDedupeKeys: Array.isArray(catalog?.duplicateDedupeKeys) ? catalog.duplicateDedupeKeys : [],
+    familyCount: familySummary.length,
+    dominantFamilies,
+    families: familySummary
+  };
+}
+
+function createFamilyHotspots(results: any[], fastValidatorBudgetMs: number, slowValidatorBudgetMs: number) {
+  const totalDurationMs = Math.max(1, results.reduce((sum: number, entry: any) => sum + Number(entry.durationMs ?? 0), 0));
+  return summarizeFamilies(results)
+    .map((entry: any) => ({
+      ...entry,
+      averageDurationMs: entry.validatorCount > 0 ? Math.round(entry.totalDurationMs / entry.validatorCount) : 0,
+      totalDurationShare: Number((entry.totalDurationMs / totalDurationMs).toFixed(4)),
+      overBudgetValidators: entry.validators.filter((validator: any) => {
+        const budget = resolveValidatorDurationBudget(validator, fastValidatorBudgetMs, slowValidatorBudgetMs);
+        return Number(validator.durationMs ?? 0) > budget;
+      }).length
+    }))
+    .filter((entry: any) => entry.validatorCount > 0)
+    .sort((left: any, right: any) => {
+      if (right.totalDurationMs !== left.totalDurationMs) {
+        return right.totalDurationMs - left.totalDurationMs;
+      }
+      return right.validatorCount - left.validatorCount;
+    });
+}
+
+function summarizeFamilies(results: any[]): any[] {
+  const mappedResults = results.map((entry: any) => {
+    const family = resolveSelectionFamily(entry);
+    return {
+      ...entry,
+      familyId: family.id,
+      familyLabel: family.label,
+      familyDescription: family.description
+    };
+  });
+  const grouped = new Map<string, any>();
+  for (const entry of mappedResults) {
+    const bucket = grouped.get(entry.familyId) ?? {
+      familyId: entry.familyId,
+      familyLabel: entry.familyLabel,
+      description: entry.familyDescription,
+      validatorCount: 0,
+      totalDurationMs: 0,
+      validators: []
+    };
+    bucket.validatorCount += 1;
+    bucket.totalDurationMs += Number(entry.durationMs ?? 0);
+    bucket.validators.push({
+      name: entry.name,
+      durationMs: Number(entry.durationMs ?? 0),
+      slow: entry.slow === true,
+      cached: entry.cached === true,
+      tags: Array.isArray(entry.tags) ? entry.tags : []
+    });
+    grouped.set(entry.familyId, bucket);
+  }
+  return [...grouped.values()].sort((left: any, right: any) => {
+    if (right.validatorCount !== left.validatorCount) {
+      return right.validatorCount - left.validatorCount;
+    }
+    return right.totalDurationMs - left.totalDurationMs;
+  });
+}
+
+function resolveSelectionFamily(entry: any) {
+  if (entry?.family) {
+    const configured = selectionFamilies.find((family: any) => String(family?.id ?? '') === String(entry.family));
+    return {
+      id: String(entry.family),
+      label: String(configured?.label ?? entry.family),
+      description: String(configured?.description ?? '')
+    };
+  }
+  const tags = Array.isArray(entry?.tags) ? entry.tags.map((tag: any) => String(tag).toLowerCase()) : [];
+  for (const family of selectionFamilies) {
+    const matchTags = Array.isArray(family?.matchTags) ? family.matchTags.map((tag: any) => String(tag).toLowerCase()) : [];
+    if (matchTags.some((tag: string) => tags.includes(tag))) {
+      return {
+        id: String(family.id),
+        label: String(family.label ?? family.id),
+        description: String(family.description ?? '')
+      };
+    }
+  }
+  return {
+    id: 'misc',
+    label: 'Miscellaneous',
+    description: 'Validators not yet assigned to a managed family.'
   };
 }
 

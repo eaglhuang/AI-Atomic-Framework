@@ -469,7 +469,7 @@ export declare function planTeamBrokerLane(input: {
     cwd: string;
     taskId: string;
     actorId: string;
-    task: any;
+    task: Record<string, unknown> | null | undefined;
     writePaths: string[];
 }): {
     result: import("@ai-atomic-framework/core").TeamBrokerLaneResult;
@@ -477,7 +477,7 @@ export declare function planTeamBrokerLane(input: {
     findings: PermissionFinding[];
 };
 export declare function buildTeamPlan(input: {
-    task: any;
+    task: Record<string, unknown> | null | undefined;
     recipe: TeamRecipe;
     writePaths: string[];
     validation: {
@@ -648,8 +648,8 @@ export declare function buildTeamRuntimePilot(input: {
     };
     brokerLane: TeamBrokerLaneEvidence;
 }): TeamRuntimePilot;
-export declare function selectTeamImplementer(task: any, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector;
-export declare function assessLieutenantEscalation(task: any, writePaths: string[], validation: {
+export declare function selectTeamImplementer(task: Record<string, unknown> | null | undefined, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector;
+export declare function assessLieutenantEscalation(task: Record<string, unknown> | null | undefined, writePaths: string[], validation: {
     ok: boolean;
     findings: PermissionFinding[];
 }, brokerLane: TeamBrokerLaneEvidence, atomizationChecklist: ReturnType<typeof buildAtomizationChecklist>): {
@@ -686,7 +686,7 @@ export declare function assessLieutenantEscalation(task: any, writePaths: string
         };
     };
 };
-export declare function buildMinimalTaskCrewBriefingContract(task: any, writePaths: string[], validation: {
+export declare function buildMinimalTaskCrewBriefingContract(task: Record<string, unknown> | null | undefined, writePaths: string[], validation: {
     ok: boolean;
     findings: PermissionFinding[];
 }, brokerLane: TeamBrokerLaneEvidence): {
@@ -735,7 +735,7 @@ export declare function buildMinimalTaskCrewBriefingContract(task: any, writePat
         composerPath?: undefined;
     };
 };
-export declare function buildAtomizationChecklist(task: any, writePaths: string[]): {
+export declare function buildAtomizationChecklist(task: Record<string, unknown> | null | undefined, writePaths: string[]): {
     primaryAtom: string;
     relatedAtoms: string[];
     commandSurface: string[];
@@ -751,7 +751,7 @@ export declare function writeTeamRun(input: {
     cwd: string;
     actorId: string;
     taskId: string;
-    task: any;
+    task: Record<string, unknown> | null | undefined;
     recipe: TeamRecipe;
     teamPlan: ReturnType<typeof buildTeamPlan>;
     validation: {
@@ -784,10 +784,10 @@ export declare function writeTeamRun(input: {
     runtimeWritten: boolean;
     task: {
         taskId: string;
-        title: any;
-        status: any;
-        targetRepo: any;
-        sourcePlanPath: any;
+        title: {};
+        status: {} | null;
+        targetRepo: {} | null;
+        sourcePlanPath: {} | null;
     };
     roles: {
         agentId: string;
@@ -933,10 +933,10 @@ export declare function buildTeamPatrolReport(input: {
     followUp: string[];
     task: {
         taskId: string;
-        title: any;
-        status: any;
-        targetRepo: any;
-        sourcePlanPath: any;
+        title: {};
+        status: {} | null;
+        targetRepo: {} | null;
+        sourcePlanPath: {} | null;
     };
     inspected: {
         taskPath: string;

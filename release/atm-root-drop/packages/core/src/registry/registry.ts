@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { isRegistryEntryStatus, isRegistryGovernanceTier, registryGovernanceTiers } from './status-machine.ts';
 import { createSourceHashSnapshot, normalizeSourcePathList } from '../hash-lock/hash-lock.ts';
-import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint } from './semantic-fingerprint.ts';
+import { createAtomicSpecSemanticFingerprint, normalizeSemanticFingerprint, type SemanticFingerprintPortRecord } from './semantic-fingerprint.ts';
 import { migrateRegistryStatus } from './status-migration.ts';
 import { resolveAtomWorkbenchPath } from '../manager/atom-space.ts';
 import { writeRegistryCatalogFile } from './registry-catalog.ts';
@@ -18,11 +18,111 @@ export const defaultRegistryOwner = Object.freeze({
   contact: 'maintainers@example.invalid'
 });
 
-export function createAtomicRegistryEntry(normalizedModel: any, options: any = {}) {
+/** Shape expected for a normalized atom spec model passed into registry functions */
+interface NormalizedModel {
+  identity: { atomId: string; logicalName?: string };
+  schema: { schemaId: string; specVersion: string };
+  source: { specPath: string | null; schemaPath?: string };
+  hashLock: Record<string, unknown>;
+  governance?: { semanticFingerprint?: unknown };
+  ports?: { inputs?: SemanticFingerprintPortRecord[]; outputs?: SemanticFingerprintPortRecord[] };
+  execution: {
+    language?: { primary?: string | null };
+    validation?: { evidenceRequired?: boolean };
+    performanceBudget?: Readonly<Record<string, unknown>> | null;
+    compatibility: {
+      coreVersion: string;
+      registryVersion: string;
+      pluginApiVersion?: string;
+      languageAdapter?: string;
+    };
+  };
+}
+
+/** Options accepted by createAtomicRegistryEntry */
+interface RegistryEntryOptions {
+  repositoryRoot?: string;
+  specPath?: string;
+  codePaths?: string | string[];
+  testPaths?: string | string[];
+  legacyPlanningId?: string | null;
+  reportPath?: string | null;
+  workbenchPath?: string | null;
+  atomVersion?: string | number;
+  currentVersion?: string;
+  semanticFingerprint?: unknown;
+  versions?: VersionRecord[];
+  status?: string;
+  governance?: { tier?: string };
+  governanceTier?: string;
+  id?: string;
+  logicalName?: string;
+  schemaPath?: string;
+  owner?: { name?: string; contact?: string };
+  lineageLogRef?: string;
+  evidenceIndexRef?: string;
+  ttl?: number;
+  evidence?: string[];
+  testReport?: {
+    artifacts?: Array<{ artifactKind: string; artifactPath: string }>;
+    evidence?: Array<{ artifactPaths?: string[] }>;
+  };
+}
+
+interface VersionRecord {
+  version?: string;
+  specHash?: string;
+  codeHash?: string;
+  testHash?: string;
+  timestamp?: string;
+  semanticFingerprint?: unknown;
+}
+
+interface NormalizedVersionRecord {
+  version: string;
+  specHash: string;
+  codeHash: string;
+  testHash: string;
+  timestamp: string;
+  semanticFingerprint?: unknown;
+}
+
+/** Options for createRegistryDocument */
+interface RegistryDocumentOptions {
+  registryId?: string;
+  generatedAt?: string;
+  migration?: { strategy?: string; fromVersion?: string | null; notes?: string };
+  sharding?: { strategy?: string; partPaths?: string[]; nextRegistryId?: string | null };
+}
+
+/** Options for writeRegistryArtifacts */
+interface WriteRegistryArtifactsOptions {
+  repositoryRoot?: string;
+  registryPath?: string;
+  writeCatalog?: boolean;
+  specRepositoryRoot?: string;
+  catalogPath?: string;
+  catalogTitle?: string;
+  sourceOfTruthLabel?: string;
+}
+
+/** Options for validateRegistryDocument */
+interface ValidateRegistryDocumentOptions {
+  schemaPath?: string;
+  validatorMode?: string;
+  validatorReason?: string;
+}
+
+/** Options for evaluateRegistryEntryDrift */
+interface EvaluateRegistryEntryDriftOptions {
+  repositoryRoot?: string;
+}
+
+export function createAtomicRegistryEntry(normalizedModel: NormalizedModel, options: RegistryEntryOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const selfVerification = createSourceHashSnapshot({
     repositoryRoot,
-    specPath: options.specPath ?? normalizedModel.source.specPath,
+    specPath: options.specPath ?? normalizedModel.source.specPath ?? undefined,
     codePaths: options.codePaths,
     testPaths: options.testPaths,
     legacyPlanningId: options.legacyPlanningId ?? null
@@ -90,8 +190,8 @@ export function createAtomicRegistryEntry(normalizedModel: any, options: any = {
   };
 }
 
-export function createRegistryDocument(entries: any, options: any = {}) {
-  const document: any = {
+export function createRegistryDocument(entries: unknown[], options: RegistryDocumentOptions = {}) {
+  const document: Record<string, unknown> = {
     schemaId: 'atm.registry',
     specVersion: '0.1.0',
     migration: normalizeMigration(options.migration),
@@ -107,13 +207,13 @@ export function createRegistryDocument(entries: any, options: any = {}) {
   return document;
 }
 
-export function writeRegistryArtifacts(registryDocument: any, options: any = {}) {
+export function writeRegistryArtifacts(registryDocument: Record<string, unknown>, options: WriteRegistryArtifactsOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const registryPath = resolveProjectPath(repositoryRoot, options.registryPath ?? 'atomic-registry.json');
   mkdirSync(path.dirname(registryPath), { recursive: true });
   writeFileSync(registryPath, `${JSON.stringify(registryDocument, null, 2)}\n`, 'utf8');
 
-  const result = {
+  const result: { registryPath: string; catalogPath: string | null } = {
     registryPath: toProjectPath(repositoryRoot, registryPath),
     catalogPath: null
   };
@@ -126,13 +226,13 @@ export function writeRegistryArtifacts(registryDocument: any, options: any = {})
       title: options.catalogTitle,
       sourceOfTruthLabel: options.sourceOfTruthLabel
     });
-    result.catalogPath = catalogResult.catalogPath;
+    result.catalogPath = catalogResult.catalogPath ?? null;
   }
 
   return result;
 }
 
-export function validateRegistryDocument(registryDocument: any, options: any = {}) {
+export function validateRegistryDocument(registryDocument: unknown, options: ValidateRegistryDocumentOptions = {}) {
   const schemaPath = path.resolve(options.schemaPath ?? defaultRegistrySchemaPath);
   const validatorMode = normalizeValidatorMode(options.validatorMode);
   if (!existsSync(schemaPath)) {
@@ -184,12 +284,12 @@ export function validateRegistryDocument(registryDocument: any, options: any = {
     const validate = ajv.compile(JSON.parse(readFileSync(schemaPath, 'utf8')));
     const valid = validate(registryDocument);
     if (!valid) {
-      return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', (validate.errors || []).map((error: any) => ({
+      return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', (validate.errors || []).map((err: { keyword: string; instancePath: string; message?: string }) => ({
         code: 'ATM_REGISTRY_INVALID',
-        keyword: error.keyword,
-        path: error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/',
-        text: error.message ?? 'Invalid registry document.',
-        prompt: `Fix the registry document field at ${error.instancePath && error.instancePath.length > 0 ? error.instancePath : '/'} (${error.keyword}).`
+        keyword: err.keyword,
+        path: err.instancePath && err.instancePath.length > 0 ? err.instancePath : '/',
+        text: err.message ?? 'Invalid registry document.',
+        prompt: `Fix the registry document field at ${err.instancePath && err.instancePath.length > 0 ? err.instancePath : '/'} (${err.keyword}).`
       })));
     }
 
@@ -199,7 +299,7 @@ export function validateRegistryDocument(registryDocument: any, options: any = {
       validationMode: 'schema',
       promptReport: {
         code: 'ATM_REGISTRY_OK',
-        summary: `Registry document ${registryDocument.registryId} validated successfully.`,
+        summary: `Registry document ${(registryDocument as Record<string, unknown>).registryId} validated successfully.`,
         issues: []
       }
     };
@@ -208,7 +308,7 @@ export function validateRegistryDocument(registryDocument: any, options: any = {
   return validateRegistryDocumentStructurally(registryDocument, { schemaPath });
 }
 
-export function validateRegistryDocumentFile(registryPath: any, options: any = {}) {
+export function validateRegistryDocumentFile(registryPath: string, options: ValidateRegistryDocumentOptions = {}) {
   const resolvedPath = path.resolve(registryPath);
   if (!existsSync(resolvedPath)) {
     return {
@@ -265,7 +365,17 @@ export function validateRegistryDocumentFile(registryPath: any, options: any = {
   };
 }
 
-export function evaluateRegistryEntryDrift(entry: any, options: any = {}) {
+interface RegistryEntry {
+  selfVerification?: {
+    sourcePaths?: { spec?: string; code?: string | string[]; tests?: string[] };
+    specHash?: string;
+    codeHash?: string;
+    testHash?: string;
+    legacyPlanningId?: string | null;
+  };
+}
+
+export function evaluateRegistryEntryDrift(entry: RegistryEntry, options: EvaluateRegistryEntryDriftOptions = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? process.cwd());
   const sourcePaths = entry?.selfVerification?.sourcePaths;
   if (!sourcePaths?.spec) {
@@ -284,28 +394,28 @@ export function evaluateRegistryEntryDrift(entry: any, options: any = {}) {
       specPath: sourcePaths.spec,
       codePaths: normalizeSourcePathList(sourcePaths.code),
       testPaths: sourcePaths.tests,
-      legacyPlanningId: entry.selfVerification.legacyPlanningId ?? null
+      legacyPlanningId: entry.selfVerification!.legacyPlanningId ?? null
     });
     const report = {
       legacyPlanningId: {
-        expected: entry.selfVerification.legacyPlanningId ?? null,
+        expected: entry.selfVerification!.legacyPlanningId ?? null,
         actual: current.legacyPlanningId,
-        ok: (entry.selfVerification.legacyPlanningId ?? null) === current.legacyPlanningId
+        ok: (entry.selfVerification!.legacyPlanningId ?? null) === current.legacyPlanningId
       },
       specHash: {
-        expected: entry.selfVerification.specHash,
+        expected: entry.selfVerification!.specHash,
         actual: current.specHash,
-        ok: entry.selfVerification.specHash === current.specHash
+        ok: entry.selfVerification!.specHash === current.specHash
       },
       codeHash: {
-        expected: entry.selfVerification.codeHash,
+        expected: entry.selfVerification!.codeHash,
         actual: current.codeHash,
-        ok: entry.selfVerification.codeHash === current.codeHash
+        ok: entry.selfVerification!.codeHash === current.codeHash
       },
       testHash: {
-        expected: entry.selfVerification.testHash,
+        expected: entry.selfVerification!.testHash,
         actual: current.testHash,
-        ok: entry.selfVerification.testHash === current.testHash
+        ok: entry.selfVerification!.testHash === current.testHash
       }
     };
 
@@ -326,7 +436,13 @@ export function evaluateRegistryEntryDrift(entry: any, options: any = {}) {
   }
 }
 
-function normalizeVersionHistory(versions: any, options: any = {}) {
+interface NormalizeVersionHistoryOptions {
+  currentVersion?: string;
+  selfVerification?: { specHash?: string; codeHash?: string; testHash?: string; digest?: string };
+  semanticFingerprint?: unknown;
+}
+
+function normalizeVersionHistory(versions: VersionRecord[] | undefined, options: NormalizeVersionHistoryOptions = {}): NormalizedVersionRecord[] {
   if (Array.isArray(versions) && versions.length > 0) {
     return versions.map((version) => normalizeVersionRecord(version));
   }
@@ -343,9 +459,9 @@ function normalizeVersionHistory(versions: any, options: any = {}) {
   ];
 }
 
-function normalizeVersionRecord(versionRecord: any) {
+function normalizeVersionRecord(versionRecord: VersionRecord): NormalizedVersionRecord {
   const semanticFingerprint = normalizeSemanticFingerprint(versionRecord?.semanticFingerprint ?? null);
-  const normalized: any = {
+  const normalized: NormalizedVersionRecord = {
     version: String(versionRecord?.version ?? '0.1.0').trim(),
     specHash: String(versionRecord?.specHash ?? '').trim(),
     codeHash: String(versionRecord?.codeHash ?? '').trim(),
@@ -362,10 +478,10 @@ function normalizeVersionRecord(versionRecord: any) {
   return normalized;
 }
 
-function collectEvidencePaths(repositoryRoot: any, normalizedModel: any, options: any, reportPath: any) {
-  const fromOptions = normalizeStringArray((options.evidence ?? []).map((value: any) => normalizeProjectPath(repositoryRoot, value)));
-  const fromArtifacts = normalizeStringArray((options.testReport?.artifacts ?? []).map((artifact: any) => normalizeProjectPath(repositoryRoot, artifact.artifactPath)));
-  const fromEvidence = normalizeStringArray((options.testReport?.evidence ?? []).flatMap((entry: any) => entry.artifactPaths ?? []).map((value: any) => normalizeProjectPath(repositoryRoot, value)));
+function collectEvidencePaths(repositoryRoot: string, normalizedModel: NormalizedModel, options: RegistryEntryOptions, reportPath: string | null): string[] {
+  const fromOptions = normalizeStringArray((options.evidence ?? []).map((value: string) => normalizeProjectPath(repositoryRoot, value)));
+  const fromArtifacts = normalizeStringArray((options.testReport?.artifacts ?? []).map((artifact: { artifactKind: string; artifactPath: string }) => normalizeProjectPath(repositoryRoot, artifact.artifactPath)));
+  const fromEvidence = normalizeStringArray((options.testReport?.evidence ?? []).flatMap((entry: { artifactPaths?: string[] }) => entry.artifactPaths ?? []).map((value: string) => normalizeProjectPath(repositoryRoot, value)));
   const baseline = normalizeStringArray([
     normalizeProjectPath(repositoryRoot, normalizedModel.source.specPath),
     reportPath
@@ -373,8 +489,8 @@ function collectEvidencePaths(repositoryRoot: any, normalizedModel: any, options
   return normalizeStringArray([...fromOptions, ...fromArtifacts, ...fromEvidence, ...baseline]);
 }
 
-function createCompatibilityRecord(normalizedModel: any) {
-  const compatibility: any = {
+function createCompatibilityRecord(normalizedModel: NormalizedModel): Record<string, string> {
+  const compatibility: Record<string, string> = {
     coreVersion: normalizedModel.execution.compatibility.coreVersion,
     registryVersion: normalizedModel.execution.compatibility.registryVersion
   };
@@ -387,21 +503,27 @@ function createCompatibilityRecord(normalizedModel: any) {
   return compatibility;
 }
 
-function deriveReportPath(repositoryRoot: any, reportPath: any, testReport: any) {
-  const explicitPath = reportPath ?? testReport?.artifacts?.find((artifact: any) => artifact.artifactKind === 'report')?.artifactPath ?? null;
-  return explicitPath ? normalizeProjectPath(repositoryRoot, explicitPath) : null;
+function deriveReportPath(repositoryRoot: string, reportPath: string | null, testReport: RegistryEntryOptions['testReport']): string | null {
+  const explicitPath = reportPath ?? testReport?.artifacts?.find((artifact: { artifactKind: string; artifactPath: string }) => artifact.artifactKind === 'report')?.artifactPath ?? null;
+  return explicitPath ? (normalizeProjectPath(repositoryRoot, explicitPath) ?? null) : null;
 }
 
-function deriveWorkbenchPath(normalizedModel: any, options: any) {
+interface DeriveWorkbenchPathOptions {
+  repositoryRoot: string;
+  workbenchPath: string | null;
+  reportPath: string | null;
+}
+
+function deriveWorkbenchPath(normalizedModel: NormalizedModel, options: DeriveWorkbenchPathOptions): string | null {
   const candidate = options.workbenchPath
     ? resolveProjectPath(options.repositoryRoot, options.workbenchPath)
     : options.reportPath
       ? path.dirname(resolveProjectPath(options.repositoryRoot, options.reportPath))
       : resolveAtomWorkbenchPath(normalizedModel, { repositoryRoot: options.repositoryRoot });
-  return candidate ? normalizeProjectPath(options.repositoryRoot, candidate) : null;
+  return candidate ? (normalizeProjectPath(options.repositoryRoot, candidate) ?? null) : null;
 }
 
-function normalizeMigration(migration: any) {
+function normalizeMigration(migration: RegistryDocumentOptions['migration']): { strategy: string; fromVersion: string | null; notes: string } {
   return {
     strategy: migration?.strategy ?? 'none',
     fromVersion: migration?.fromVersion ?? null,
@@ -409,14 +531,14 @@ function normalizeMigration(migration: any) {
   };
 }
 
-function normalizeOwner(owner: any) {
+function normalizeOwner(owner: { name?: string; contact?: string } | undefined): { name: string; contact: string } {
   return {
     name: owner?.name ?? defaultRegistryOwner.name,
     contact: owner?.contact ?? defaultRegistryOwner.contact
   };
 }
 
-function normalizeSharding(sharding: any) {
+function normalizeSharding(sharding: { strategy?: string; partPaths?: string[]; nextRegistryId?: string | null }): { strategy: string; partPaths: string[]; nextRegistryId: string | null } {
   return {
     strategy: sharding.strategy ?? 'single-document',
     partPaths: [...(sharding.partPaths ?? [])],
@@ -424,14 +546,14 @@ function normalizeSharding(sharding: any) {
   };
 }
 
-function normalizeProjectPath(repositoryRoot: any, value: any) {
+function normalizeProjectPath(repositoryRoot: string, value: string | null | undefined): string | null | undefined {
   if (!value) {
     return value;
   }
   return toProjectPath(repositoryRoot, resolveProjectPath(repositoryRoot, value));
 }
 
-function normalizeSchemaPath(repositoryRoot: any, value: any) {
+function normalizeSchemaPath(repositoryRoot: string, value: string | undefined): string | undefined {
   if (!value) {
     return value;
   }
@@ -450,13 +572,13 @@ function normalizeSchemaPath(repositoryRoot: any, value: any) {
   return toPortablePath(resolvedPath);
 }
 
-function resolveProjectPath(repositoryRoot: any, value: any) {
+function resolveProjectPath(repositoryRoot: string, value: string): string {
   return path.isAbsolute(value)
     ? path.normalize(value)
     : path.resolve(repositoryRoot, value);
 }
 
-function toProjectPath(repositoryRoot: any, filePath: any) {
+function toProjectPath(repositoryRoot: string, filePath: string): string {
   const relative = path.relative(repositoryRoot, filePath).replace(/\\/g, '/');
   if (!relative || relative.startsWith('..')) {
     return toPortablePath(filePath);
@@ -464,23 +586,34 @@ function toProjectPath(repositoryRoot: any, filePath: any) {
   return relative;
 }
 
-function normalizeStringArray(values: any) {
-  return Array.from(new Set(values.filter(Boolean)));
+function normalizeStringArray(values: (string | null | undefined)[]): string[] {
+  return Array.from(new Set(values.filter(Boolean))) as string[];
 }
 
-function normalizeValidatorMode(value: any) {
+function normalizeValidatorMode(value: string | undefined): 'auto' | 'schema' | 'structural-only' {
   const mode = String(value ?? 'auto').trim();
   if (mode === 'auto' || mode === 'schema' || mode === 'structural-only') {
-    return mode;
+    return mode as 'auto' | 'schema' | 'structural-only';
   }
   throw new Error(`Unsupported registry validator mode: ${mode || '<empty>'}`);
 }
 
-function validateRegistryDocumentStructurally(registryDocument: any, options: any = {}) {
+type IssueReporter = (pathValue: string, keyword: string, text: string) => void;
+
+interface ValidationIssue {
+  code: string;
+  keyword: string;
+  path: string;
+  text: string;
+  prompt: string;
+}
+
+function validateRegistryDocumentStructurally(registryDocument: unknown, options: ValidateRegistryDocumentOptions = {}) {
   const schemaPath = toPortablePath(options.schemaPath ?? defaultRegistrySchemaPath);
-  const issues: any[] = [];
-  const registryId = typeof registryDocument?.registryId === 'string' ? registryDocument.registryId : '<unknown>';
-  const issue = (pathValue: string, keyword: string, text: string) => {
+  const issues: ValidationIssue[] = [];
+  const doc = registryDocument as Record<string, unknown> | null | undefined;
+  const registryId = typeof doc?.registryId === 'string' ? doc.registryId : '<unknown>';
+  const issue: IssueReporter = (pathValue: string, keyword: string, text: string) => {
     issues.push({
       code: 'ATM_REGISTRY_INVALID',
       keyword,
@@ -495,29 +628,30 @@ function validateRegistryDocumentStructurally(registryDocument: any, options: an
     return createFailure(schemaPath, 'ATM_REGISTRY_INVALID', issues);
   }
 
-  if (registryDocument.schemaId !== 'atm.registry') {
+  if (doc!.schemaId !== 'atm.registry') {
     issue('/schemaId', 'const', 'Registry document schemaId must equal atm.registry.');
   }
-  if (!isNonEmptyString(registryDocument.specVersion)) {
+  if (!isNonEmptyString(doc!.specVersion)) {
     issue('/specVersion', 'type', 'Registry document specVersion must be a non-empty string.');
   }
-  if (!isNonEmptyString(registryDocument.registryId)) {
+  if (!isNonEmptyString(doc!.registryId)) {
     issue('/registryId', 'type', 'Registry document registryId must be a non-empty string.');
   }
-  if (!isNonEmptyString(registryDocument.generatedAt)) {
+  if (!isNonEmptyString(doc!.generatedAt)) {
     issue('/generatedAt', 'type', 'Registry document generatedAt must be a non-empty string.');
   }
-  if (!Array.isArray(registryDocument.entries)) {
+  if (!Array.isArray(doc!.entries)) {
     issue('/entries', 'type', 'Registry document entries must be an array.');
   } else {
-    registryDocument.entries.forEach((entry: any, index: number) => validateRegistryEntryStructurally(entry, `/entries/${index}`, issue));
+    (doc!.entries as unknown[]).forEach((entry: unknown, index: number) => validateRegistryEntryStructurally(entry, `/entries/${index}`, issue));
   }
 
-  if (isPlainObject(registryDocument.sharding)) {
-    if (!['single-document', 'external-parts'].includes(String(registryDocument.sharding.strategy ?? '').trim())) {
+  if (isPlainObject(doc!.sharding)) {
+    const sharding = doc!.sharding as Record<string, unknown>;
+    if (!['single-document', 'external-parts'].includes(String(sharding.strategy ?? '').trim())) {
       issue('/sharding/strategy', 'enum', 'Registry sharding strategy must be single-document or external-parts.');
     }
-    if (!Array.isArray(registryDocument.sharding.partPaths)) {
+    if (!Array.isArray(sharding.partPaths)) {
       issue('/sharding/partPaths', 'type', 'Registry sharding partPaths must be an array.');
     }
   }
@@ -541,24 +675,25 @@ function validateRegistryDocumentStructurally(registryDocument: any, options: an
   };
 }
 
-function validateRegistryEntryStructurally(entry: any, basePath: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function validateRegistryEntryStructurally(entry: unknown, basePath: string, issue: IssueReporter): void {
   if (!isPlainObject(entry)) {
     issue(basePath, 'type', 'Registry entry must be an object.');
     return;
   }
 
-  if (entry.schemaId === 'atm.atomicMap') {
-    validateAtomicMapRegistryEntryStructurally(entry, basePath, issue);
+  const e = entry as Record<string, unknown>;
+  if (e.schemaId === 'atm.atomicMap') {
+    validateAtomicMapRegistryEntryStructurally(e, basePath, issue);
     return;
   }
-  if (entry.schemaId === 'atm.atomicSpec') {
-    validateAtomicSpecRegistryEntryStructurally(entry, basePath, issue);
+  if (e.schemaId === 'atm.atomicSpec') {
+    validateAtomicSpecRegistryEntryStructurally(e, basePath, issue);
     return;
   }
   issue(`${basePath}/schemaId`, 'enum', 'Registry entry schemaId must be atm.atomicSpec or atm.atomicMap.');
 }
 
-function validateAtomicMapRegistryEntryStructurally(entry: any, basePath: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function validateAtomicMapRegistryEntryStructurally(entry: Record<string, unknown>, basePath: string, issue: IssueReporter): void {
   requireString(entry.mapId, `${basePath}/mapId`, issue);
   requireString(entry.mapVersion, `${basePath}/mapVersion`, issue);
   requireString(entry.specVersion, `${basePath}/specVersion`, issue);
@@ -577,9 +712,10 @@ function validateAtomicMapRegistryEntryStructurally(entry: any, basePath: string
     if (!isPlainObject(entry.replacement)) {
       issue(`${basePath}/replacement`, 'type', 'Atomic map replacement must be an object.');
     } else {
-      requireStringArray(entry.replacement.legacyUris, `${basePath}/replacement/legacyUris`, issue);
-      requireStringArray(entry.replacement.evidenceRefs, `${basePath}/replacement/evidenceRefs`, issue);
-      const mode = String(entry.replacement.mode ?? '').trim();
+      const replacement = entry.replacement as Record<string, unknown>;
+      requireStringArray(replacement.legacyUris, `${basePath}/replacement/legacyUris`, issue);
+      requireStringArray(replacement.evidenceRefs, `${basePath}/replacement/evidenceRefs`, issue);
+      const mode = String(replacement.mode ?? '').trim();
       if (!['draft', 'shadow', 'canary', 'active', 'legacy-retired'].includes(mode)) {
         issue(`${basePath}/replacement/mode`, 'enum', 'Atomic map replacement mode must be draft, shadow, canary, active, or legacy-retired.');
       }
@@ -587,7 +723,7 @@ function validateAtomicMapRegistryEntryStructurally(entry: any, basePath: string
   }
 }
 
-function validateAtomicSpecRegistryEntryStructurally(entry: any, basePath: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function validateAtomicSpecRegistryEntryStructurally(entry: Record<string, unknown>, basePath: string, issue: IssueReporter): void {
   requireString(entry.atomId, `${basePath}/atomId`, issue);
   requireString(entry.specVersion, `${basePath}/specVersion`, issue);
   requireString(entry.schemaPath, `${basePath}/schemaPath`, issue);
@@ -597,112 +733,117 @@ function validateAtomicSpecRegistryEntryStructurally(entry: any, basePath: strin
   requireOptionalLocation(entry.location, `${basePath}/location`, issue);
   requireOptionalEvidence(entry.evidence, `${basePath}/evidence`, issue);
 
-  if (!isPlainObject(entry.hashLock) || !isNonEmptyString(entry.hashLock.digest)) {
+  if (!isPlainObject(entry.hashLock) || !isNonEmptyString((entry.hashLock as Record<string, unknown>).digest)) {
     issue(`${basePath}/hashLock`, 'type', 'Atomic spec registry entry hashLock must include a digest.');
   }
-  if (!isPlainObject(entry.owner) || !isNonEmptyString(entry.owner.name) || !isNonEmptyString(entry.owner.contact)) {
+  if (!isPlainObject(entry.owner) || !isNonEmptyString((entry.owner as Record<string, unknown>).name) || !isNonEmptyString((entry.owner as Record<string, unknown>).contact)) {
     issue(`${basePath}/owner`, 'type', 'Atomic spec registry entry owner must include name and contact.');
   }
-  if (!isPlainObject(entry.compatibility) || !isNonEmptyString(entry.compatibility.coreVersion) || !isNonEmptyString(entry.compatibility.registryVersion)) {
+  if (!isPlainObject(entry.compatibility) || !isNonEmptyString((entry.compatibility as Record<string, unknown>).coreVersion) || !isNonEmptyString((entry.compatibility as Record<string, unknown>).registryVersion)) {
     issue(`${basePath}/compatibility`, 'type', 'Atomic spec registry entry compatibility must include coreVersion and registryVersion.');
   }
   if (!isPlainObject(entry.selfVerification)) {
     issue(`${basePath}/selfVerification`, 'type', 'Atomic spec registry entry selfVerification must be an object.');
     return;
   }
-  requireString(entry.selfVerification.specHash, `${basePath}/selfVerification/specHash`, issue);
-  requireString(entry.selfVerification.codeHash, `${basePath}/selfVerification/codeHash`, issue);
-  requireString(entry.selfVerification.testHash, `${basePath}/selfVerification/testHash`, issue);
-  if (!isPlainObject(entry.selfVerification.sourcePaths)) {
+  const sv = entry.selfVerification as Record<string, unknown>;
+  requireString(sv.specHash, `${basePath}/selfVerification/specHash`, issue);
+  requireString(sv.codeHash, `${basePath}/selfVerification/codeHash`, issue);
+  requireString(sv.testHash, `${basePath}/selfVerification/testHash`, issue);
+  if (!isPlainObject(sv.sourcePaths)) {
     issue(`${basePath}/selfVerification/sourcePaths`, 'type', 'Atomic spec registry entry selfVerification.sourcePaths must be an object.');
   } else {
-    requireString(entry.selfVerification.sourcePaths.spec, `${basePath}/selfVerification/sourcePaths/spec`, issue);
-    const code = entry.selfVerification.sourcePaths.code;
+    const sourcePaths = sv.sourcePaths as Record<string, unknown>;
+    requireString(sourcePaths.spec, `${basePath}/selfVerification/sourcePaths/spec`, issue);
+    const code = sourcePaths.code;
     if (!(isNonEmptyString(code) || Array.isArray(code))) {
       issue(`${basePath}/selfVerification/sourcePaths/code`, 'type', 'Atomic spec registry entry selfVerification.sourcePaths.code must be a string or array.');
     }
-    requireStringArray(entry.selfVerification.sourcePaths.tests, `${basePath}/selfVerification/sourcePaths/tests`, issue);
+    requireStringArray(sourcePaths.tests, `${basePath}/selfVerification/sourcePaths/tests`, issue);
   }
 }
 
-function requireString(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireString(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!isNonEmptyString(value)) {
     issue(pathValue, 'type', 'Field must be a non-empty string.');
   }
 }
 
-function requireStringArray(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireStringArray(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!Array.isArray(value)) {
     issue(pathValue, 'type', 'Field must be an array of non-empty strings.');
     return;
   }
-  value.forEach((entry: any, index: number) => {
+  value.forEach((entry: unknown, index: number) => {
     if (!isNonEmptyString(entry)) {
       issue(`${pathValue}/${index}`, 'type', 'Array item must be a non-empty string.');
     }
   });
 }
 
-function requireMembers(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireMembers(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!Array.isArray(value)) {
     issue(pathValue, 'type', 'Atomic map members must be an array.');
     return;
   }
-  value.forEach((member: any, index: number) => {
+  value.forEach((member: unknown, index: number) => {
     if (!isPlainObject(member)) {
       issue(`${pathValue}/${index}`, 'type', 'Atomic map member must be an object.');
       return;
     }
-    requireString(member.atomId, `${pathValue}/${index}/atomId`, issue);
-    requireString(member.version, `${pathValue}/${index}/version`, issue);
+    const m = member as Record<string, unknown>;
+    requireString(m.atomId, `${pathValue}/${index}/atomId`, issue);
+    requireString(m.version, `${pathValue}/${index}/version`, issue);
   });
 }
 
-function requireEdges(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireEdges(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!Array.isArray(value)) {
     issue(pathValue, 'type', 'Atomic map edges must be an array.');
     return;
   }
-  value.forEach((edge: any, index: number) => {
+  value.forEach((edge: unknown, index: number) => {
     if (!isPlainObject(edge)) {
       issue(`${pathValue}/${index}`, 'type', 'Atomic map edge must be an object.');
       return;
     }
-    requireString(edge.from, `${pathValue}/${index}/from`, issue);
-    requireString(edge.to, `${pathValue}/${index}/to`, issue);
-    requireString(edge.binding, `${pathValue}/${index}/binding`, issue);
+    const e = edge as Record<string, unknown>;
+    requireString(e.from, `${pathValue}/${index}/from`, issue);
+    requireString(e.to, `${pathValue}/${index}/to`, issue);
+    requireString(e.binding, `${pathValue}/${index}/binding`, issue);
   });
 }
 
-function requireQualityTargets(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireQualityTargets(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!isPlainObject(value)) {
     issue(pathValue, 'type', 'Atomic map qualityTargets must be an object.');
     return;
   }
-  for (const [key, targetValue] of Object.entries(value)) {
+  for (const [key, targetValue] of Object.entries(value as Record<string, unknown>)) {
     if (!['string', 'number', 'boolean'].includes(typeof targetValue)) {
       issue(`${pathValue}/${key}`, 'type', 'Atomic map quality target values must be string, number, or boolean.');
     }
   }
 }
 
-function requireRegistryStatus(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireRegistryStatus(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!isRegistryEntryStatus(value)) {
     issue(pathValue, 'enum', 'Registry status must be one of the supported registry entry statuses.');
   }
 }
 
-function requireGovernance(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireGovernance(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (!isPlainObject(value)) {
     issue(pathValue, 'type', 'Governance must be an object.');
     return;
   }
-  if (!isRegistryGovernanceTier(value.tier)) {
+  const gov = value as Record<string, unknown>;
+  if (!isRegistryGovernanceTier(gov.tier)) {
     issue(`${pathValue}/tier`, 'enum', `Governance tier must be one of ${registryGovernanceTiers.join(', ')}.`);
   }
 }
 
-function requireOptionalLocation(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireOptionalLocation(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (value === undefined) {
     return;
   }
@@ -710,31 +851,32 @@ function requireOptionalLocation(value: any, pathValue: string, issue: (pathValu
     issue(pathValue, 'type', 'Location must be an object.');
     return;
   }
-  requireString(value.specPath, `${pathValue}/specPath`, issue);
-  if (!Array.isArray(value.codePaths)) {
+  const loc = value as Record<string, unknown>;
+  requireString(loc.specPath, `${pathValue}/specPath`, issue);
+  if (!Array.isArray(loc.codePaths)) {
     issue(`${pathValue}/codePaths`, 'type', 'Location codePaths must be an array.');
   }
-  if (!Array.isArray(value.testPaths)) {
+  if (!Array.isArray(loc.testPaths)) {
     issue(`${pathValue}/testPaths`, 'type', 'Location testPaths must be an array.');
   }
 }
 
-function requireOptionalEvidence(value: any, pathValue: string, issue: (pathValue: string, keyword: string, text: string) => void) {
+function requireOptionalEvidence(value: unknown, pathValue: string, issue: IssueReporter): void {
   if (value === undefined) {
     return;
   }
   requireStringArray(value, pathValue, issue);
 }
 
-function isPlainObject(value: any) {
+function isPlainObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
-function isNonEmptyString(value: any) {
+function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function createFailure(schemaPath: any, code: any, issues: any) {
+function createFailure(schemaPath: string, code: string, issues: ValidationIssue[]) {
   return {
     ok: false,
     schemaPath: toPortablePath(schemaPath),
@@ -746,6 +888,6 @@ function createFailure(schemaPath: any, code: any, issues: any) {
   };
 }
 
-function toPortablePath(value: any) {
+function toPortablePath(value: string): string {
   return value.replace(/\\/g, '/');
 }

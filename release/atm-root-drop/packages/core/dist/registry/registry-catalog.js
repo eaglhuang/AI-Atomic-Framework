@@ -115,16 +115,21 @@ function readSpecDocument(repositoryRoot, entry, specCache) {
     const resolvedPath = path.isAbsolute(specPath)
         ? path.normalize(specPath)
         : path.resolve(repositoryRoot, specPath);
-    const document = JSON.parse(readFileSync(resolvedPath, 'utf8'));
-    specCache.set(specPath, document);
-    return document;
+    try {
+        const document = JSON.parse(readFileSync(resolvedPath, 'utf8'));
+        specCache.set(specPath, document);
+        return document;
+    }
+    catch {
+        return {};
+    }
 }
 function normalizeInlineText(value) {
     return String(value || '').replace(/\s+/g, ' ').trim();
 }
 function deriveGeneratorProvenance(entry) {
     const marker = (entry?.evidence ?? []).find((value) => typeof value === 'string' && value.startsWith('generator-provenance:'));
-    return marker ? marker.slice('generator-provenance:'.length) : 'unmarked';
+    return marker ? String(marker).slice('generator-provenance:'.length) : 'unmarked';
 }
 function resolveEntryId(entry) {
     return String(entry?.atomId || entry?.mapId || '').trim();

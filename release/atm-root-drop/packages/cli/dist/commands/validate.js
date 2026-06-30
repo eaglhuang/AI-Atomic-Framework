@@ -150,8 +150,9 @@ function validateAtomizationCoverage(cwd) {
             stdout = execSync(cmd, { encoding: 'utf8' });
         }
         catch (err) {
-            stdout = err.stdout?.toString() ?? '';
-            exitCode = err.status ?? 1;
+            const errorObj = err;
+            stdout = errorObj.stdout?.toString() ?? '';
+            exitCode = errorObj.status ?? 1;
         }
         const report = stdout ? JSON.parse(stdout) : { ok: false, violations: [{ detail: 'no output' }] };
         const violations = report.violations ?? [];
@@ -170,14 +171,15 @@ function validateAtomizationCoverage(cwd) {
         });
     }
     catch (err) {
+        const errorObj = err;
         return makeResult({
             ok: false,
             command: 'validate',
             cwd,
             messages: [
-                message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage validation failed: ${err.message}`, {})
+                message('error', 'ATM_VALIDATE_ATOMIZATION_COVERAGE_FAILED', `Atomization coverage validation failed: ${errorObj.message}`, {})
             ],
-            evidence: { validation: 'atomization-coverage', error: err.message }
+            evidence: { validation: 'atomization-coverage', error: errorObj.message }
         });
     }
 }
@@ -261,23 +263,30 @@ function validateAtomicSpecShape(spec) {
             errors.push({ code: 'ATM_SPEC_REQUIRED_FIELD', path: `/${field}`, text: `Atomic spec is missing required field: ${field}` });
         }
     }
+    const migration = spec.migration;
+    const language = spec.language;
+    const runtime = spec.runtime;
+    const adapterRequirements = spec.adapterRequirements;
+    const compatibility = spec.compatibility;
+    const hashLock = spec.hashLock;
+    const dependencyPolicy = spec.dependencyPolicy;
     requireConst(errors, spec.schemaId, 'atm.atomicSpec', '/schemaId');
     requireConst(errors, spec.specVersion, '0.1.0', '/specVersion');
     requireStringPattern(errors, spec.id, /^ATM-[A-Z][A-Z0-9]*-\d{4}$/, '/id', 'ATM_SPEC_ID_PATTERN');
     requireNonEmptyString(errors, spec.title, '/title');
-    requireEnum(errors, spec.migration?.strategy, ['none', 'additive', 'breaking'], '/migration/strategy');
-    requireEnum(errors, spec.language?.primary, ['language-neutral', 'javascript', 'typescript', 'json', 'markdown', 'shell', 'other'], '/language/primary');
-    requireEnum(errors, spec.runtime?.kind, ['language-neutral', 'node', 'browser', 'deno', 'shell', 'custom'], '/runtime/kind');
-    requireEnum(errors, spec.runtime?.environment, ['local', 'ci', 'sandbox', 'any'], '/runtime/environment');
-    requireEnum(errors, spec.adapterRequirements?.storage, ['local-fs', 'git', 'host-adapter', 'none'], '/adapterRequirements/storage');
-    requireStringPattern(errors, spec.compatibility?.coreVersion, /^\d+\.\d+\.\d+$/, '/compatibility/coreVersion', 'ATM_SPEC_VERSION_PATTERN');
-    requireStringPattern(errors, spec.compatibility?.registryVersion, /^\d+\.\d+\.\d+$/, '/compatibility/registryVersion', 'ATM_SPEC_VERSION_PATTERN');
-    requireConst(errors, spec.hashLock?.algorithm, 'sha256', '/hashLock/algorithm');
-    requireStringPattern(errors, spec.hashLock?.digest, /^sha256:[a-f0-9]{64}$/, '/hashLock/digest', 'ATM_SPEC_HASH_PATTERN');
-    requireEnum(errors, spec.hashLock?.canonicalization, ['json-stable-v1', 'text-normalized-v1'], '/hashLock/canonicalization');
-    if (spec.dependencyPolicy) {
-        requireEnum(errors, spec.dependencyPolicy.external, ['none', 'workspace-only', 'declared'], '/dependencyPolicy/external');
-        requireEnum(errors, spec.dependencyPolicy.hostCoupling, ['forbidden', 'adapter-only', 'allowed'], '/dependencyPolicy/hostCoupling');
+    requireEnum(errors, migration?.strategy, ['none', 'additive', 'breaking'], '/migration/strategy');
+    requireEnum(errors, language?.primary, ['language-neutral', 'javascript', 'typescript', 'json', 'markdown', 'shell', 'other'], '/language/primary');
+    requireEnum(errors, runtime?.kind, ['language-neutral', 'node', 'browser', 'deno', 'shell', 'custom'], '/runtime/kind');
+    requireEnum(errors, runtime?.environment, ['local', 'ci', 'sandbox', 'any'], '/runtime/environment');
+    requireEnum(errors, adapterRequirements?.storage, ['local-fs', 'git', 'host-adapter', 'none'], '/adapterRequirements/storage');
+    requireStringPattern(errors, compatibility?.coreVersion, /^\d+\.\d+\.\d+$/, '/compatibility/coreVersion', 'ATM_SPEC_VERSION_PATTERN');
+    requireStringPattern(errors, compatibility?.registryVersion, /^\d+\.\d+\.\d+$/, '/compatibility/registryVersion', 'ATM_SPEC_VERSION_PATTERN');
+    requireConst(errors, hashLock?.algorithm, 'sha256', '/hashLock/algorithm');
+    requireStringPattern(errors, hashLock?.digest, /^sha256:[a-f0-9]{64}$/, '/hashLock/digest', 'ATM_SPEC_HASH_PATTERN');
+    requireEnum(errors, hashLock?.canonicalization, ['json-stable-v1', 'text-normalized-v1'], '/hashLock/canonicalization');
+    if (dependencyPolicy) {
+        requireEnum(errors, dependencyPolicy.external, ['none', 'workspace-only', 'declared'], '/dependencyPolicy/external');
+        requireEnum(errors, dependencyPolicy.hostCoupling, ['forbidden', 'adapter-only', 'allowed'], '/dependencyPolicy/hostCoupling');
     }
     return errors;
 }
@@ -287,7 +296,7 @@ function requireConst(errors, value, expected, checkPath) {
     }
 }
 function requireEnum(errors, value, allowed, checkPath) {
-    if (!allowed.includes(value)) {
+    if (typeof value !== 'string' || !allowed.includes(value)) {
         errors.push({ code: 'ATM_SPEC_ENUM_MISMATCH', path: checkPath, text: `${checkPath} must be one of: ${allowed.join(', ')}.` });
     }
 }

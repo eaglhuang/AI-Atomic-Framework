@@ -78,7 +78,7 @@ export function validateRegistryDocumentAgainstSchema(cwd, registryPath = regist
     const validation = validateRegistryDocumentFile(registryPath, { schemaPath: registrySchemaPath });
     const messages = validation.ok
         ? [message('info', successCode, successText)]
-        : (validation.promptReport?.issues ?? []).map((issue) => message('error', issue.code ?? 'ATM_REGISTRY_SCHEMA_ERROR', issue.text ?? 'Registry schema validation failed.', { path: issue.path ?? '/' }));
+        : (validation.promptReport?.issues ?? []).map((issue) => message('error', String(issue.code ?? 'ATM_REGISTRY_SCHEMA_ERROR'), String(issue.text ?? 'Registry schema validation failed.'), { path: String(issue.path ?? '/') }));
     return makeResult({
         ok: validation.ok === true,
         command: commandName,

@@ -1,9 +1,45 @@
+interface VersionRecord {
+    version: string;
+    specHash: string;
+    codeHash: string;
+    testHash: string;
+    timestamp: string;
+    semanticFingerprint?: string | null;
+}
+interface VersionLineage {
+    versions?: VersionRecord[];
+    sourceRef?: string;
+    currentVersion?: string;
+}
+interface RegistryAtomEntry {
+    atomId?: string;
+    id?: string;
+    versions?: VersionRecord[];
+    versionLineage?: VersionLineage;
+    lineageLogRef?: string;
+    schemaId?: string;
+    members?: RegistryMapMember[];
+    mapId?: string;
+}
+interface RegistryMapMember {
+    atomId?: string;
+    versionLineage?: VersionLineage;
+}
+interface RegistryDocument {
+    entries?: RegistryAtomEntry[];
+}
+interface HashDiffReportOptions {
+    entry: RegistryAtomEntry;
+    fromVersion: string;
+    toVersion: string;
+    driftReason?: string;
+}
 export interface RegistryDiffResolvedEntry {
     readonly atomId: string;
-    readonly versions: readonly any[];
+    readonly versions: readonly VersionRecord[];
     readonly sourceKind: 'atom-entry' | 'member-version-lineage';
     readonly sourceRef?: string;
-    readonly registryEntry?: any;
+    readonly registryEntry?: RegistryAtomEntry;
     readonly memberIndex?: number;
     readonly mapId?: string;
 }
@@ -28,8 +64,9 @@ export interface RegistryDiffResolutionFailure {
     };
 }
 export type RegistryDiffResolution = RegistryDiffResolutionSuccess | RegistryDiffResolutionFailure;
-export declare function findRegistryEntry(registryDoc: any, atomId: any): any;
-export declare function findVersionRecord(entry: any, version: any): any;
-export declare function resolveRegistryDiffTarget(registryDoc: any, atomId: any): RegistryDiffResolution;
-export declare function computeHashDiffReport(options: any): any;
-export declare function loadRegistryDocument(registryPath: any): any;
+export declare function findRegistryEntry(registryDoc: RegistryDocument | null | undefined, atomId: string): RegistryAtomEntry | null;
+export declare function findVersionRecord(entry: RegistryAtomEntry | null | undefined, version: string): VersionRecord | null;
+export declare function resolveRegistryDiffTarget(registryDoc: RegistryDocument | null | undefined, atomId: string): RegistryDiffResolution;
+export declare function computeHashDiffReport(options: HashDiffReportOptions): Record<string, unknown>;
+export declare function loadRegistryDocument(registryPath: string | null | undefined): RegistryDocument;
+export {};

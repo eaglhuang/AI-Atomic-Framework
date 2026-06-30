@@ -1064,7 +1064,10 @@ function readConfiguredBrokerRunEvidenceDir(cwd) {
         }
         const config = JSON.parse(readFileSync(configPath, 'utf8'));
         const broker = config && typeof config === 'object' ? config.broker : null;
-        const dir = broker && typeof broker === 'object' ? broker.runEvidenceDir : null;
+        const brokerRecord = broker && typeof broker === 'object' && !Array.isArray(broker)
+            ? broker
+            : null;
+        const dir = brokerRecord?.runEvidenceDir ?? null;
         return typeof dir === 'string' && dir.trim() ? dir.trim() : null;
     }
     catch {

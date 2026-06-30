@@ -33,6 +33,9 @@ interface WelcomeLineageRecord {
 
 export async function runWelcome(argv: string[]) {
   const spec = getCommandSpec('welcome');
+  if (!spec) {
+    throw new CliError('ATM_CLI_HELP_NOT_FOUND', 'No help spec found for welcome.', { exitCode: 2 });
+  }
   const parsed = parseArgsForCommand(spec, argv);
   const cwd = path.resolve(String(parsed.options.cwd ?? process.cwd()));
   const dryRun = parsed.options.dryRun === true;

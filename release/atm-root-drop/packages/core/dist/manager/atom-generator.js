@@ -24,7 +24,7 @@ export function generateAtom(request, options = {}) {
         const existingEntry = findExistingEntry(registryDocument, normalizedRequest);
         if (existingEntry && options.force !== true) {
             return createSuccess({
-                atomId: existingEntry.atomId,
+                atomId: existingEntry.atomId ?? null,
                 workbenchPath: existingEntry.location?.workbenchPath ?? null,
                 specPath: existingEntry.location?.specPath ?? existingEntry.specPath ?? null,
                 testPath: existingEntry.location?.testPaths?.[0] ?? null,
@@ -72,6 +72,10 @@ export function generateAtom(request, options = {}) {
             dryRun,
             overwriteExisting: options.overwriteExisting === true
         }));
+        const normalizedModel = parsed.normalizedModel;
+        if (!normalizedModel) {
+            throw createGeneratorError('ATM_GENERATOR_SPEC_INVALID', 'Generated atomic spec did not produce a normalized model.', { parseResult: parsed });
+        }
         if (!dryRun) {
             mkdirSync(path.dirname(specAbsolutePath), { recursive: true });
             if (!specExistsBefore || options.overwriteExisting === true) {
@@ -102,14 +106,14 @@ export function generateAtom(request, options = {}) {
                 phases
             });
         }
-        const testRun = recordPhase(phases, 'test', () => runAtomicTestRunner(parsed.normalizedModel, {
+        const testRun = recordPhase(phases, 'test', () => runAtomicTestRunner(normalizedModel, {
             repositoryRoot,
             now: options.now
         }));
         if (!testRun.ok) {
             throw createGeneratorError('ATM_GENERATOR_TEST_FAILED', 'Generated atom validation command failed.', { testRun });
         }
-        const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicRegistryEntry(parsed.normalizedModel, {
+        const registryEntry = recordPhase(phases, 'register-entry', () => createAtomicRegistryEntry(normalizedModel, {
             repositoryRoot,
             atomVersion: options.atomVersion ?? '0.1.0',
             status: options.status ?? 'active',
@@ -118,7 +122,7 @@ export function generateAtom(request, options = {}) {
             testPaths: options.testPaths ?? [paths.testPath],
             testReport: testRun.report,
             logicalName: normalizedRequest.logicalName,
-            semanticFingerprint: parsed.normalizedModel.governance?.semanticFingerprint ?? null,
+            semanticFingerprint: normalizedModel.governance?.semanticFingerprint ?? null,
             evidence: ['generator-provenance:generated', paths.sourcePath, ...(options.evidence ?? [])],
             legacyPlanningId: options.legacyPlanningId ?? null
         }));
@@ -141,7 +145,7 @@ export function generateAtom(request, options = {}) {
             specPath: paths.specPath,
             sourcePath: paths.sourcePath,
             testPath: paths.testPath,
-            registryEntry,
+            registryEntry: registryEntry,
             registryPath: writeResult.registryPath,
             catalogPath: writeResult.catalogPath,
             allocation,
@@ -240,10 +244,11 @@ function normalizeRequest(request) {
     if (!request || typeof request !== 'object' || Array.isArray(request)) {
         throw createGeneratorError('ATM_GENERATOR_REQUEST_INVALID', 'Atom generator request must be an object.');
     }
-    const bucket = normalizeAtomBucket(request.bucket);
-    const title = normalizeRequiredText(request.title, 'title');
-    const description = normalizeRequiredText(request.description, 'description');
-    const logicalName = request.logicalName ? normalizeLogicalName(request.logicalName) : `atom.${bucket.toLowerCase()}-${slugify(title)}`;
+    const req = request;
+    const bucket = normalizeAtomBucket(req.bucket);
+    const title = normalizeRequiredText(req.title, 'title');
+    const description = normalizeRequiredText(req.description, 'description');
+    const logicalName = req.logicalName ? normalizeLogicalName(req.logicalName) : `atom.${bucket.toLowerCase()}-${slugify(title)}`;
     return {
         bucket,
         title,
@@ -406,6 +411,7 @@ function recordPhase(phases, phase, action) {
 function createSuccess(result) {
     return {
         ok: true,
+        phases: [],
         ...result
     };
 }

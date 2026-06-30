@@ -167,7 +167,7 @@ export async function runDoctor(argv) {
                 })]
             : []),
         ...(gitHeadEvidenceCheck.details?.downgradedToWarning
-            ? [message('warning', 'ATM_DOCTOR_GIT_EVIDENCE_WARNING', 'Latest Git commit has no matching ATM git-head evidence. This is a warning in adopter repositories; framework repositories and protected commit-range gates remain strict.', {
+            ? [message('warning', 'ATM_DOCTOR_GIT_EVIDENCE_WARNING', 'Latest Git commit has no matching ATM git-head evidence. This is a warning; same-commit governed provenance and high-risk closeout evidence remain the strict boundaries.', {
                     failedChecks: [],
                     enforcement: gitHeadEvidenceCheck.details.enforcement,
                     commitSha: gitHeadEvidenceCheck.details.commitSha ?? null,
@@ -347,7 +347,7 @@ function downgradeAdopterGitHeadEvidenceCheck(check, repoIdentity) {
     const status = (details && typeof details === 'object' && 'status' in details)
         ? details.status
         : null;
-    if (repoIdentity.isFrameworkRepo || check.ok || status !== 'missing') {
+    if (check.ok || status !== 'missing') {
         return check;
     }
     return {
@@ -357,7 +357,8 @@ function downgradeAdopterGitHeadEvidenceCheck(check, repoIdentity) {
             ...details,
             enforcement: 'warning',
             downgradedToWarning: true,
-            strictInFrameworkRepo: true
+            perCriticalCommitEnforcement: 'disabled',
+            strictBoundary: 'same-commit-provenance-and-closeout-evidence'
         }
     };
 }
@@ -514,10 +515,8 @@ function createGovernanceEntryReadinessCheck(root, repoIdentity, gitHeadEvidence
                 ? 'no-upstream'
                 : aheadCount === 0
                     ? 'no-ahead-commits'
-                    : latestGitHeadStatus === 'missing'
-                        ? 'missing-git-head-evidence'
-                        : 'ready';
-    const ok = protectedPushReadiness !== 'missing-git-head-evidence' && !actorRegistryState.blocking;
+                    : 'ready';
+    const ok = !actorRegistryState.blocking;
     return createCheck('governance-entry-readiness', ok, {
         schemaId: 'atm.governanceEntryReadiness.v1',
         repoRole: repoIdentity.isFrameworkRepo ? 'framework' : 'host',
@@ -529,16 +528,19 @@ function createGovernanceEntryReadinessCheck(root, repoIdentity, gitHeadEvidence
         requiresProtectedPushReadiness,
         protectedPushReadiness,
         latestGitHeadStatus: latestGitHeadStatus,
+        perCriticalCommitGitHeadEvidence: {
+            enforcement: 'disabled',
+            reason: 'Per-critical-commit git-head evidence created protected-push deadlocks and is no longer a readiness gate.',
+            retainedStrictBoundaries: ['same-commit governed provenance', 'closure packet', 'evidence-only repair', 'task closeout']
+        },
         actorRegistryState: actorRegistryState,
         queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
         branchQueueSummary: 'Governed framework commits may serialize through the branch commit queue and retry on safe HEAD drift instead of surfacing raw Git races.',
         recommendedAction: actorRegistryState.blocking
             ? `Actor registry is a tracked governance surface and currently has unstaged drift at ${actorRegistryState.path}. Stage and commit it with the matching identity/governance change, or restore it before continuing.`
-            : protectedPushReadiness === 'missing-git-head-evidence'
-                ? 'Generate governed git-head evidence before pushing protected framework history. Run node atm.mjs evidence git-head-backfill --actor <id> --reason "<reason>" --json and rerun doctor or hook pre-push.'
-                : protectedPushReadiness === 'no-upstream'
-                    ? 'Set or fetch the upstream branch before relying on protected push readiness diagnostics.'
-                    : 'Before editing or pushing framework changes, confirm actor identity, framework claim, doctor readiness, and protected-branch push readiness.'
+            : protectedPushReadiness === 'no-upstream'
+                ? 'Set or fetch the upstream branch before relying on protected push readiness diagnostics.'
+                : 'Before editing or pushing framework changes, confirm actor identity, framework claim, doctor readiness, same-commit governed provenance, and closeout evidence where applicable.'
     });
 }
 function createBacklogSyncCheck(root, repoIdentity) {

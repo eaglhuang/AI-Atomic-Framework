@@ -1,4 +1,4 @@
-export declare function validateAtomicSpecFileAgainstSchema(cwd: any, specOption: any, options?: {
+export declare function validateAtomicSpecFileAgainstSchema(cwd: string, specOption: string, options?: {
     commandName?: string;
     successCode?: string;
     successText?: string;

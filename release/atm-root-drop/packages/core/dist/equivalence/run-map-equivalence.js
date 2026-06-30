@@ -9,6 +9,11 @@ export const defaultMapEquivalenceReportMigration = Object.freeze({
     fromVersion: null,
     notes: 'Initial alpha0 map equivalence report.'
 });
+function asRecord(value) {
+    return value && typeof value === 'object' && !Array.isArray(value)
+        ? value
+        : null;
+}
 export function resolveMapEquivalencePaths(mapId) {
     const canonical = resolveCanonicalMapPaths(mapId);
     return {
@@ -37,7 +42,7 @@ export async function runMapEquivalence(mapId, fixturePath, options = {}) {
             specPath: target.specPath
         });
     }
-    const fixtureSet = readJson(fixtureAbsolutePath);
+    const fixtureSet = asRecord(readJson(fixtureAbsolutePath));
     if (fixtureSet?.mapId && String(fixtureSet.mapId).trim() !== mapId) {
         throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_MAP_MISMATCH', 'Fixture set mapId does not match the requested map.', {
             expectedMapId: mapId,
@@ -121,6 +126,7 @@ export async function runMapEquivalence(mapId, fixturePath, options = {}) {
 export function createMapEquivalenceReport(input) {
     const cases = [...(input.cases ?? [])];
     const documentedKnownDivergenceIds = new Set(input.documentedKnownDivergenceIds ?? []);
+    const knownDivergences = input.knownDivergences ?? [];
     const totalCases = cases.length;
     const passedCases = cases.filter((entry) => entry.passed === true).length;
     const failedCases = cases.filter((entry) => entry.passed !== true).length;
@@ -143,7 +149,7 @@ export function createMapEquivalenceReport(input) {
             }
         ],
         cases,
-        ...(input.knownDivergences?.length > 0 ? { knownDivergences: [...input.knownDivergences] } : {}),
+        ...(knownDivergences.length > 0 ? { knownDivergences: [...knownDivergences] } : {}),
         summary: {
             totalCases,
             passedCases,
@@ -191,13 +197,14 @@ export function createMapEquivalenceReport(input) {
     };
 }
 async function loadExecutor(repositoryRoot, descriptor, fieldName) {
-    const modulePath = String(descriptor?.modulePath || '').trim();
+    const descriptorRecord = asRecord(descriptor);
+    const modulePath = String(descriptorRecord?.modulePath ?? '').trim();
     if (!modulePath) {
         throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', `${fieldName}.modulePath is required.`, {
             fieldName
         });
     }
-    const exportName = String(descriptor?.exportName || 'run').trim();
+    const exportName = String(descriptorRecord?.exportName ?? 'run').trim();
     const absoluteModulePath = path.resolve(repositoryRoot, modulePath);
     if (!existsSync(absoluteModulePath)) {
         throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_EXECUTOR_NOT_FOUND', `${fieldName} module was not found.`, {
@@ -233,7 +240,8 @@ function normalizeFixtureCases(value) {
         throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', 'Fixture set must define at least one case.', {});
     }
     return value.map((entry, index) => {
-        const caseId = String(entry?.caseId || '').trim();
+        const record = asRecord(entry);
+        const caseId = String(record?.caseId ?? '').trim();
         if (!caseId) {
             throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', `Fixture case at index ${index} is missing caseId.`, {
                 index
@@ -241,10 +249,10 @@ function normalizeFixtureCases(value) {
         }
         return {
             caseId,
-            input: entry?.input ?? null,
-            metric: entry?.metric ?? null,
-            evidenceRefs: entry?.evidenceRefs,
-            knownDivergence: entry?.knownDivergence === true
+            input: record?.input ?? null,
+            metric: record?.metric ?? null,
+            evidenceRefs: record?.evidenceRefs,
+            knownDivergence: record?.knownDivergence === true
         };
     });
 }
@@ -256,12 +264,13 @@ function normalizeKnownDivergences(value) {
         throw createMapEquivalenceError('ATM_MAP_EQUIVALENCE_FIXTURES_INVALID', 'knownDivergences must be an array when provided.', {});
     }
     return value.map((entry, index) => {
+        const record = asRecord(entry);
         const normalized = {
-            caseId: String(entry?.caseId || '').trim(),
-            reason: String(entry?.reason || '').trim(),
-            justification: String(entry?.justification || '').trim(),
-            reviewer: String(entry?.reviewer || '').trim(),
-            reviewRef: String(entry?.reviewRef || '').trim()
+            caseId: String(record?.caseId ?? '').trim(),
+            reason: String(record?.reason ?? '').trim(),
+            justification: String(record?.justification ?? '').trim(),
+            reviewer: String(record?.reviewer ?? '').trim(),
+            reviewRef: String(record?.reviewRef ?? '').trim()
         };
         for (const [fieldName, fieldValue] of Object.entries(normalized)) {
             if (!fieldValue) {
@@ -275,22 +284,23 @@ function normalizeKnownDivergences(value) {
     });
 }
 function createCaseMetric(metric, passed) {
-    const baseline = typeof metric?.baseline === 'number' ? metric.baseline : 1;
-    const current = typeof metric?.current === 'number'
-        ? metric.current
+    const metricRecord = asRecord(metric);
+    const baseline = typeof metricRecord?.baseline === 'number' ? metricRecord.baseline : 1;
+    const current = typeof metricRecord?.current === 'number'
+        ? metricRecord.current
         : (passed ? baseline : 0);
     const output = {
-        name: String(metric?.name || 'semanticMatch').trim(),
+        name: String(metricRecord?.name ?? 'semanticMatch').trim(),
         baseline,
         current,
         delta: current - baseline,
-        direction: normalizeMetricDirection(metric?.direction),
+        direction: normalizeMetricDirection(metricRecord?.direction),
         passed
     };
-    if (typeof metric?.tolerance === 'number' && metric.tolerance >= 0) {
+    if (typeof metricRecord?.tolerance === 'number' && metricRecord.tolerance >= 0) {
         return {
             ...output,
-            tolerance: metric.tolerance
+            tolerance: metricRecord.tolerance
         };
     }
     return output;
@@ -303,7 +313,7 @@ function normalizeEvidenceRefs(value, caseId) {
     return normalized.length > 0 ? normalized : [`equivalence-fixture:${caseId}`];
 }
 function normalizeMetricDirection(value) {
-    const direction = String(value || 'higher-is-better').trim();
+    const direction = String(value ?? 'higher-is-better').trim();
     if (direction === 'higher-is-better' || direction === 'lower-is-better' || direction === 'informational') {
         return direction;
     }
@@ -316,7 +326,7 @@ function normalizeLegacyUris(value) {
     return value.map((entry) => String(entry || '').trim()).filter(Boolean);
 }
 function normalizeFixtureSetId(value, fallbackSource) {
-    const explicit = String(value || '').trim();
+    const explicit = String(value ?? '').trim();
     if (explicit) {
         return explicit;
     }
