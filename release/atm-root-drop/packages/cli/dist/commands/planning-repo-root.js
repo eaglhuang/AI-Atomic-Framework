@@ -32,6 +32,7 @@ const TARGET_REPO_ROOT_PREFIXES = [
     'release/',
     'schemas/',
     'scripts/',
+    'src/',
     'specs/',
     'templates/',
     'tests/'
@@ -118,10 +119,24 @@ export function resolveStoredPlanningPath(cwd, storedPath) {
     const config = resolvePlanningRepoRootConfig(cwd);
     const legacyExternal = normalizedStored.startsWith('../');
     const docRelative = toPlanningRootRelativeFromDocPath(normalizedStored);
+    const repoLocalAbsolute = path.isAbsolute(normalizedStored)
+        ? path.resolve(normalizedStored)
+        : path.resolve(cwd, normalizedStored);
     let absolutePath = path.isAbsolute(normalizedStored)
         ? path.resolve(normalizedStored)
         : path.resolve(cwd, normalizedStored);
     if (docRelative !== null) {
+        // Prefer an existing repo-local docs mirror over external planning roots when the
+        // caller explicitly points at a concrete docs/... file inside the current repo.
+        if (existsSync(repoLocalAbsolute)) {
+            return {
+                storedPath: normalizedStored,
+                absolutePath: repoLocalAbsolute,
+                planningRoot: null,
+                planningRelativePath: null,
+                isExternalPlanning: false
+            };
+        }
         for (const planningRoot of config.effectiveRoots) {
             const candidate = docRelative
                 ? path.resolve(planningRoot, docRelative)

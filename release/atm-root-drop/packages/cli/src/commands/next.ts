@@ -33,7 +33,7 @@ import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
-import { describeBuildReleaseHygienePolicy } from '../../../../scripts/build-release-hygiene.ts';
+import { describeBuildReleaseHygienePolicy } from './build-release-hygiene.ts';
 import { classifyTaskDelivery, type TaskDeliveryClassification } from './task-intent.ts';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/src/broker/lifecycle.ts';
 import {
@@ -968,7 +968,8 @@ async function claimNextImportedTask(input: {
       for (const candidate of parallelResult.evidence.candidates) {
         const finding = candidate.finding;
         if (finding) {
-          if (finding.verdict === 'blocked-cid-conflict') {
+          const overlappingAtomIds = Array.isArray(finding.overlappingAtomIds) ? finding.overlappingAtomIds : [];
+          if (finding.verdict === 'blocked-cid-conflict' || overlappingAtomIds.length > 0) {
             // TASK-CID-0024: same-file / same-atom overlap only blocks the
             // claim when the overlapping task is actively write-claimed by
             // another actor. Queued-but-idle overlaps and closeout-only
@@ -981,14 +982,14 @@ async function claimNextImportedTask(input: {
             const activeWriteConflict = Boolean(conflictActorId)
               && conflictActorId !== resolvedActor.actorId
               && conflictIntent !== 'closeout-only';
-            if (claimIntent !== 'closeout-only' && activeWriteConflict) {
-              throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `Claim blocked due to parallel CID logic conflict with actively claimed task ${candidate.taskId} on atom(s): ${finding.overlappingAtomIds.join(', ')}.`, {
+            if (claimIntent !== 'closeout-only' && activeWriteConflict && overlappingAtomIds.length > 0) {
+              throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `Claim blocked due to parallel CID logic conflict with actively claimed task ${candidate.taskId} on atom(s): ${overlappingAtomIds.join(', ')}.`, {
                 exitCode: 1,
                 details: {
                   taskId: claimableTask.workItemId,
                   conflictWithTaskId: candidate.taskId,
                   conflictClaimActorId: conflictActorId,
-                  overlappingAtomIds: finding.overlappingAtomIds,
+                  overlappingAtomIds,
                   verdict: 'blocked-cid-conflict',
                   closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
                 }
@@ -1008,7 +1009,7 @@ async function claimNextImportedTask(input: {
             }
             continue;
           }
-          if (Array.isArray(finding.overlappingAtomIds) && finding.overlappingAtomIds.length > 0 && !parallelAdvisory) {
+          if (overlappingAtomIds.length > 0 && !parallelAdvisory) {
             parallelAdvisory = {
               ...finding,
               verdict: finding.verdict ?? 'insufficient-mutation-intent',

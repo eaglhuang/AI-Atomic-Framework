@@ -8,8 +8,8 @@ import {
   registerIntent,
   releaseTask,
   cleanupStale,
-  WriteIntent,
-  WriteBrokerRegistryDocument
+  type WriteIntent,
+  type WriteBrokerRegistryDocument
 } from '../packages/core/src/index.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

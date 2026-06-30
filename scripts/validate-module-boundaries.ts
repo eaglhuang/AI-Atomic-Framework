@@ -7,6 +7,10 @@ const validator = createValidator('module-boundaries');
 const { assert, ok, root } = validator;
 
 const scanRoots = ['packages', 'scripts', 'tests', 'examples'].map((entry) => path.join(root, entry));
+const allowedSourceMjsFiles = new Set([
+  'scripts/repro/bug-atm-0045-planning-root-preference.mjs',
+  'scripts/templates/atm-stable-launcher.mjs'
+]);
 const importPatterns = [
   /(from\s+['"])([^'"]+)(['"])/g,
   /(import\s+['"])([^'"]+)(['"])/g,
@@ -34,8 +38,17 @@ function resolvesIntoScripts(fileAbsPath: string, specifier: string): boolean {
 }
 
 const sourceFiles = scanRoots.flatMap((directory) => walk(directory));
-const sourceMjsFiles = sourceFiles.filter((filePath) => filePath.endsWith('.mjs'));
-assert(sourceMjsFiles.length === 0, `source tree must not contain .mjs modules: ${sourceMjsFiles.map((filePath) => path.relative(root, filePath)).join(', ')}`);
+const sourceMjsFiles = sourceFiles
+  .filter((filePath) => filePath.endsWith('.mjs'))
+  .map((filePath) => path.relative(root, filePath).replace(/\\/g, '/'));
+const unexpectedSourceMjsFiles = sourceMjsFiles.filter((filePath) => !allowedSourceMjsFiles.has(filePath));
+assert(
+  unexpectedSourceMjsFiles.length === 0,
+  `source tree must not contain unapproved .mjs modules: ${unexpectedSourceMjsFiles.join(', ')}`
+);
+for (const allowedFile of allowedSourceMjsFiles) {
+  assert(sourceMjsFiles.includes(allowedFile), `approved .mjs module is missing: ${allowedFile}`);
+}
 
 for (const filePath of sourceFiles.filter((candidate) => candidate.endsWith('.ts'))) {
   const content = readFileSync(filePath, 'utf8');

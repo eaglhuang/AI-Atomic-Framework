@@ -259,6 +259,7 @@ export async function runBatch(argv: string[]) {
     const updated = updateBatchRun(options.cwd, active, {
       currentIndex: queue?.currentIndex ?? active.currentIndex,
       currentTaskId: nextTaskId,
+      pendingCommitTaskId: currentTaskId,
       status: queue?.status === 'completed' || !nextTaskId ? 'completed' : 'active',
       hold: holdNextClaim && nextTaskId
         ? {
@@ -1013,7 +1014,11 @@ export function buildPendingCheckpointCommitWindow(cwd: string, batchRun: BatchR
   const gitChanges = readGitChangedFiles(cwd);
   const changedFiles = gitChanges.files;
   if (gitChanges.available && changedFiles.length === 0) return null;
-  for (const taskId of batchRun.taskIds.map(String)) {
+  const candidateTaskIds = uniqueStrings([
+    typeof batchRun.pendingCommitTaskId === 'string' ? batchRun.pendingCommitTaskId : '',
+    ...batchRun.taskIds.map(String)
+  ].filter(Boolean));
+  for (const taskId of candidateTaskIds) {
     const taskFile = `.atm/history/tasks/${taskId}.json`;
     const relatedFiles = changedFiles.filter((file) => isTaskCheckpointRelatedFile(file, taskId));
     if (gitChanges.available && !relatedFiles.includes(taskFile)) continue;

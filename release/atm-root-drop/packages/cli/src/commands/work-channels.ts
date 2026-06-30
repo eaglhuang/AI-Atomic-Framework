@@ -34,6 +34,7 @@ export interface BatchRunRecord {
   readonly currentTaskId: string | null;
   readonly commitMode: 'per-task' | 'checkpoint' | 'single';
   readonly checkpointSize: number;
+  readonly pendingCommitTaskId?: string | null;
   readonly status: 'active' | 'paused' | 'completed' | 'abandoned';
   readonly hold?: BatchRunHold | null;
   readonly skippedTasks?: readonly BatchSkippedTaskRecord[];
@@ -245,6 +246,7 @@ export function writeBatchRun(input: {
     currentTaskId: taskIds[currentIndex] ?? null,
     commitMode: input.commitMode ?? 'per-task',
     checkpointSize: Math.max(1, input.checkpointSize ?? 3),
+    pendingCommitTaskId: null,
     status: 'active',
     createdByActor: input.actorId,
     createdAt: new Date().toISOString(),
@@ -444,6 +446,9 @@ function normalizeBatchRunRecord(record: BatchRunRecord): BatchRunRecord {
     scopeKey: record.scopeKey || deriveBatchScopeKey([], record.sourcePrompt ?? '', taskIds),
     queueId: record.queueId ?? null,
     taskIds,
+    pendingCommitTaskId: typeof record.pendingCommitTaskId === 'string' && record.pendingCommitTaskId.trim().length > 0
+      ? record.pendingCommitTaskId
+      : null,
     skippedTasks: Array.isArray(record.skippedTasks) ? record.skippedTasks : []
   };
 }

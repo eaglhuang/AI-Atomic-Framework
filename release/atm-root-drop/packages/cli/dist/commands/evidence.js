@@ -9,7 +9,7 @@ import { createFrameworkModeStatus } from './framework-development.js';
 import { CliError, makeResult, message, relativePathFrom } from './shared.js';
 import { gitHeadEvidencePath } from './git-head-evidence.js';
 import { resolveTaskRunnerArbitration } from './validate.js';
-import { readTestCatalog, resolveTestPlanForTask, selectTestEntries } from '../../../../scripts/lib/test-catalog.ts';
+import { readTestCatalog, resolveTestPlanForTask, selectTestEntries } from './test-catalog.js';
 import { generateDiffEvidence, mergeDiffEvidenceWithExisting, validateDiffEvidence } from '../../../core/dist/evidence/diff-evidence.js';
 import { inspectHistoricalDelivery, pathMatchesTaskScope } from './tasks/historical-delivery.js';
 export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';

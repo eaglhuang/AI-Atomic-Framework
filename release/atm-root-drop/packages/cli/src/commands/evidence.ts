@@ -14,7 +14,7 @@ import {
   resolveTestPlanForTask,
   selectTestEntries,
   type TestCatalogEntry
-} from '../../../../scripts/lib/test-catalog.ts';
+} from './test-catalog.ts';
 import {
   generateDiffEvidence,
   mergeDiffEvidenceWithExisting,

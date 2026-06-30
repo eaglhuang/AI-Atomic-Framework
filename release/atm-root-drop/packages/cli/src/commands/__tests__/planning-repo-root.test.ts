@@ -63,4 +63,31 @@ describe('planning-repo-root', () => {
       rmSync(targetCwd, { recursive: true, force: true });
     }
   });
+
+  it('prefers an existing repo-local docs path over external planning roots', () => {
+    const targetCwd = mkdtempSync(path.join(os.tmpdir(), 'aaf-local-docs-'));
+    const planningRoot = path.join(path.dirname(targetCwd), 'planning-repo', 'docs', 'ai_atomic_framework');
+    const localCardAbsolute = path.join(targetCwd, 'docs', 'ai_atomic_framework', 'atm-agent-first-operability', 'tasks', 'TASK-LOCAL.task.md');
+    const externalCardAbsolute = path.join(planningRoot, 'atm-agent-first-operability', 'tasks', 'TASK-LOCAL.task.md');
+    mkdirSync(path.dirname(localCardAbsolute), { recursive: true });
+    mkdirSync(path.dirname(externalCardAbsolute), { recursive: true });
+    writeFileSync(localCardAbsolute, '# local card\n', 'utf8');
+    writeFileSync(externalCardAbsolute, '# external card\n', 'utf8');
+    mkdirSync(path.join(targetCwd, '.atm'), { recursive: true });
+    writeFileSync(path.join(targetCwd, '.atm', 'config.json'), `${JSON.stringify({
+      taskLedger: {
+        planningRoots: ['../planning-repo/docs/ai_atomic_framework']
+      }
+    }, null, 2)}\n`, 'utf8');
+
+    const resolved = resolveStoredPlanningPath(
+      targetCwd,
+      'docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-LOCAL.task.md'
+    );
+    assert.equal(resolved.absolutePath, localCardAbsolute);
+    assert.equal(resolved.isExternalPlanning, false);
+
+    rmSync(targetCwd, { recursive: true, force: true });
+    rmSync(path.join(path.dirname(targetCwd), 'planning-repo'), { recursive: true, force: true });
+  });
 });

@@ -28,6 +28,7 @@ export interface BatchRunRecord {
     readonly currentTaskId: string | null;
     readonly commitMode: 'per-task' | 'checkpoint' | 'single';
     readonly checkpointSize: number;
+    readonly pendingCommitTaskId?: string | null;
     readonly status: 'active' | 'paused' | 'completed' | 'abandoned';
     readonly hold?: BatchRunHold | null;
     readonly skippedTasks?: readonly BatchSkippedTaskRecord[];
