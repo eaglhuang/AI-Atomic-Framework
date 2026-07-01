@@ -1,0 +1,226 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0013",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "44a9408889a93a00da36de2310643664c1c2d434",
+  "governedTreeSha": "d8612ceb3ea495818795fb2dbfc72a760cccd8c1",
+  "targetCommitDelta": {
+    "currentCommitSha": "44a9408889a93a00da36de2310643664c1c2d434",
+    "parentCommitShas": [
+      "44a9408889a93a00da36de2310643664c1c2d434"
+    ],
+    "governedTreeSha": "d8612ceb3ea495818795fb2dbfc72a760cccd8c1",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0013.json",
+      ".atm/history/task-events/TASK-RFT-0013/2026-07-01T11-24-57-683Z-import-58a0a6d5cb30.json",
+      ".atm/history/task-events/TASK-RFT-0013/2026-07-01T11-26-27-582Z-reserve-0112da8273e8.json",
+      ".atm/history/task-events/TASK-RFT-0013/2026-07-01T11-26-27-584Z-promote-c44d252e38df.json",
+      ".atm/history/task-events/TASK-RFT-0013/2026-07-01T11-28-22-584Z-claim-9246441c0e21.json",
+      ".atm/history/tasks/TASK-RFT-0013.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+      "packages/cli/src/commands/tasks/close-helpers/broker-admission-explanation.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4af41630dc9d9a2466e2cc128ee790539e0f0bccfaae3d070d6abb6c22f902a5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3dfe36176bd7bc3757166b75195f8f2cf5f4874fb328774a40ba4febe99fec39",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4c0740e9c8289bc9dcb981584e3c47c686f1c2747fd5d4d6505dd15f8191b63a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:477e38e0ab8c4d6a8556a730c3e3e837179ef9a11a2b3246723f17aca9aef661",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:tasks-close-helpers-atomic-map",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0a32cfa4927e8a947feb1d1d95de9c4f080ee7864d4902b9835392e140051643",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:tasks-close-helpers-atomic-map"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-01T11:38:30.823Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0013.*",
+      ".atm/history/task-events/TASK-RFT-0013/**",
+      ".atm/history/tasks/TASK-RFT-0013.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+      "packages/cli/src/commands/tasks/close-helpers/broker-admission-explanation.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "rft-hardening/tasks/TASK-RFT-0013-tasks-close-helper-cluster-split.task.md",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts"
+    ],
+    "criticalChangedFiles": [
+      "package.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+      "packages/cli/src/commands/tasks/close-helpers/broker-admission-explanation.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0013.json",
+  "closedAt": "2026-07-01T11:38:30.824Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "sessionId": "session-20260701112822-claude-code-opus-4-7-TASK-RFT-0013-67ab364847",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "44a9408889a93a00da36de2310643664c1c2d434",
+    "taskMatchedFiles": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+      "packages/cli/src/commands/tasks/close-helpers/broker-admission-explanation.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

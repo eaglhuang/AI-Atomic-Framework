@@ -1,0 +1,92 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-01T11-38-30-832Z-close-41df1a9f0c12",
+  "taskId": "TASK-RFT-0013",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260701112822-claude-code-opus-4-7-TASK-RFT-0013-67ab364847",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0013.json",
+  "taskSha256": "sha256:72e67b359157d3543d1f2be9df1ec4f9f63c45070e73de04c4135862734063f1",
+  "createdAt": "2026-07-01T11:38:30.832Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0013 --actor claude-code-opus-4-7 --status done --historical-delivery 44a9408889a93a00da36de2310643664c1c2d434",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260701112822-claude-code-opus-4-7-TASK-RFT-0013-67ab364847",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0013.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:tasks-close-helpers-atomic-map"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-01T11:38:30.823Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0013.*",
+        ".atm/history/task-events/TASK-RFT-0013/**",
+        ".atm/history/tasks/TASK-RFT-0013.json",
+        "docs/reports/tasks-command-atomic-map.md",
+        "package.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+        "packages/cli/src/commands/tasks/close-helpers/broker-admission-explanation.ts",
+        "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+        "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+        "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "rft-hardening/tasks/TASK-RFT-0013-tasks-close-helper-cluster-split.task.md",
+        "scripts/validate-tasks-close-helpers-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-broker-admission-explanation.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-close-artifact-staging.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-close-window-diagnostics.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-helpers-task-transition-writer.spec.ts",
+        "packages/cli/src/commands/tasks/close-helpers/broker-admission-explanation.ts",
+        "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+        "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+        "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "scripts/validate-tasks-close-helpers-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
