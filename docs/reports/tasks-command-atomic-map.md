@@ -130,3 +130,38 @@ see no surface change.
 
 - This map is intentionally read-only.
 - It identifies where downstream extraction should slice the `tasks` command without changing runtime behavior in this task.
+
+---
+
+## TASK-RFT-0013 — Close-helper cluster split (2026-07-01)
+
+### Before / after
+
+- Before TASK-RFT-0013: `packages/cli/src/commands/tasks.ts` = 6,491 lines
+- After  TASK-RFT-0013: `packages/cli/src/commands/tasks.ts` = 5,985 lines
+- Target: < 6,000 lines (met)
+
+### New close-helper cluster (Layer 3)
+
+Under `packages/cli/src/commands/tasks/close-helpers/`:
+
+- `close-artifact-staging.ts` — `stageTaskCloseArtifacts`, `existingTaskCloseArtifacts`, `extractTaskCloseDeclaredFiles`, `extractTaskDeliverableFiles`, `taskDeliveryPrincipleText`, `evaluateTaskDeliverableGate`.
+- `task-transition-writer.ts` — `writeTaskDocumentWithTransition`; re-exports `buildTaskTransitionCommand` and `createClosureTransitionMetadata` from `task-transition-helpers.ts` so all four transition-writer symbols live under `close-helpers/`.
+- `broker-admission-explanation.ts` — `buildBrokerAdmissionExplanation`, `explainBrokerAdapterForPath`, `hasUnexplainedSharedProjection` plus the `BrokerAdmissionExplanation` / `BrokerAdapterExplanation` type surfaces.
+- `close-window-diagnostics.ts` — `readDeferredForeignStagedFilesForActiveCloseWindow`, `evaluateFrameworkDeliveryWindow`, `loadHistoricalBatchCloseSlice` plus the `HistoricalBatchCloseSlice` interface.
+
+`close-orchestrator.ts` now imports these symbols directly from the new modules rather than through `tasks.ts` re-exports. `tasks.ts` retains thin delegating re-exports to preserve any external consumer surface.
+
+### Not extracted (deferred to RFT-0014+)
+
+The following clusters were intentionally left in `tasks.ts` to keep RFT-0013 scoped and to avoid touching non-close code paths:
+
+- **Import helpers** — `writeTaskFiles`, `parseTaskProposalAdmission`, `parseProposalAdmissionBoundedRegions`, and the surrounding `runTasksImport` support code. `writeTaskFiles` is called by both the close path and `import-orchestrator.ts`, so it must not move under `close-helpers/`.
+- **Plan-derived helpers** — `parseDispatchMetadataFromPlanText`, `createTaskFromTableMetadata`, and related plan-import scaffolding.
+- **Write helpers not on the close path** — `writeTaskDocument`, `writeLockCleanupReport`, `writeTakeoverEvidence`, `syncScopeAmendmentState`, `syncScopeAmendmentRuntimeLock`. These are candidates for a future `tasks/write-helpers/` cluster.
+- **Parallel-advisor infrastructure** — `runTasksParallel`, `analyzeParallelPair`, `parseTasksParallelArgs`, `buildParallelHotspotReport`, `intersect`, `incrementMap`, `sortMapEntries`, `globLikeMatch`. Broker-admission-explanation is the close-facing slice; the rest is a candidate cluster for RFT-0014+.
+- **Runtime state / lock helpers** — `runTasksLock`, `runTasksAudit`, `runTasksMigrateLegacyLedger`.
+
+### Validator
+
+- `npm run validate:tasks-close-helpers-atomic-map` — asserts (a) each helper module exists, (b) `close-orchestrator.ts` imports each helper module, (c) `tasks.ts` line count stays under 6,000.

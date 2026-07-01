@@ -126,6 +126,28 @@ import {
   listCommittedFilesSinceClaim as delegatedListCommittedFilesSinceClaim
 } from './tasks/task-git-helpers.ts';
 import { readCloseWindowStagedIndexLockReport } from './tasks/close-window-lock.ts';
+// TASK-RFT-0013: close-helper cluster split.
+import {
+  readDeferredForeignStagedFilesForActiveCloseWindow as delegatedReadDeferredForeignStagedFilesForActiveCloseWindow,
+  evaluateFrameworkDeliveryWindow as delegatedEvaluateFrameworkDeliveryWindow,
+  loadHistoricalBatchCloseSlice as delegatedLoadHistoricalBatchCloseSlice
+} from './tasks/close-helpers/close-window-diagnostics.ts';
+import {
+  buildBrokerAdmissionExplanation as delegatedBuildBrokerAdmissionExplanation,
+  explainBrokerAdapterForPath as delegatedExplainBrokerAdapterForPath,
+  hasUnexplainedSharedProjection as delegatedHasUnexplainedSharedProjection
+} from './tasks/close-helpers/broker-admission-explanation.ts';
+import {
+  extractTaskCloseDeclaredFiles as delegatedExtractTaskCloseDeclaredFiles,
+  extractTaskDeliverableFiles as delegatedExtractTaskDeliverableFiles,
+  taskDeliveryPrincipleText as delegatedTaskDeliveryPrincipleText,
+  evaluateTaskDeliverableGate as delegatedEvaluateTaskDeliverableGate,
+  stageTaskCloseArtifacts as delegatedStageTaskCloseArtifacts,
+  existingTaskCloseArtifacts as delegatedExistingTaskCloseArtifacts
+} from './tasks/close-helpers/close-artifact-staging.ts';
+import {
+  writeTaskDocumentWithTransition as delegatedWriteTaskDocumentWithTransition
+} from './tasks/close-helpers/task-transition-writer.ts';
 import {
   collectKeyValue as delegatedCollectKeyValue,
   collectKeyValueFromLines as delegatedCollectKeyValueFromLines,
@@ -1018,7 +1040,6 @@ async function runTasksReconcile(argv: string[]) {
 }
 
 
-
 async function runTasksDeliverAndClose(argv: string[]): Promise<CommandResult> {
   const options = parseDeliverAndCloseOptions(argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -1252,9 +1273,6 @@ async function runTasksDeliverAndClose(argv: string[]): Promise<CommandResult> {
     }
   });
 }
-
-
-
 
 
 async function runTasksCreate(argv: string[]) {
@@ -1872,22 +1890,7 @@ async function runTasksReset(argv: string[]) {
 }
 
 export function readDeferredForeignStagedFilesForActiveCloseWindow(cwd: string, taskId: string): string[] {
-  const lock = readCloseWindowStagedIndexLockReport(cwd);
-  if (!lock || lock.status !== 'active') return [];
-  if (lock.taskId !== normalizeTaskId(taskId)) return [];
-  if (!lock.foreignStagedSnapshotPath) return [];
-  const snapshotPath = path.resolve(cwd, lock.foreignStagedSnapshotPath);
-  if (!existsSync(snapshotPath)) return [];
-  try {
-    const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
-    if (snapshot.schemaId !== 'atm.closeWindowForeignStagedSnapshot.v1') return [];
-    const files = Array.isArray(snapshot.files) ? snapshot.files : [];
-    return [...new Set(files
-      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
-      .map((entry) => entry.replace(/\\/g, '/')))];
-  } catch {
-    return [];
-  }
+  return delegatedReadDeferredForeignStagedFilesForActiveCloseWindow(cwd, taskId);
 }
 
 
@@ -2338,7 +2341,6 @@ function runTasksScopeRepair(argv: string[]) {
 }
 
 
-
 async function runTasksLockCleanup(argv: string[]) {
   const options = parseLockCleanupOptions(argv);
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -2475,7 +2477,6 @@ async function cleanupTaskLock(input: {
     reportPath
   };
 }
-
 
 
 function runTasksQueue(argv: string[]) {
@@ -2857,87 +2858,9 @@ function analyzeParallelPair(left: ParallelAdvisorTaskRef, right: ParallelAdviso
   };
 }
 
-function buildBrokerAdmissionExplanation(input: {
-  readonly overlappingFiles: readonly string[];
-  readonly overlappingAtomIds: readonly string[];
-  readonly sharedProjections: readonly string[];
-}): BrokerAdmissionExplanation {
-  const adapterExplanations = input.overlappingFiles.flatMap((filePath) => explainBrokerAdapterForPath(filePath));
-  const needsMutationIntent = input.overlappingAtomIds.length > 0
-    || adapterExplanations.some((entry) => entry.mutationIntentStatus === 'missing');
-  return {
-    schemaId: 'atm.brokerAdmissionExplanation.v1',
-    authority: 'broker-conflict-engine',
-    confirmedConflict: false,
-    mutationIntentStatus: needsMutationIntent ? 'missing' : 'not-required',
-    reason: needsMutationIntent
-      ? 'Task metadata exposes overlapping ownership or shared non-code surfaces, but no Broker mutation request / conflict key is available. Admission must not present this as a confirmed CID conflict.'
-      : 'No Broker mutation conflict evidence is required for this pair.',
-    conflictKeys: [],
-    adapterExplanations
-  };
-}
-
-function explainBrokerAdapterForPath(filePath: string): BrokerAdapterExplanation[] {
-  const normalized = filePath.replace(/\\/g, '/');
-  if (normalized === 'atomic_workbench/atomization-coverage/path-to-atom-map.json') {
-    return [{
-      filePath: normalized,
-      adapterId: 'path-to-atom-map',
-      conflictSurface: 'projection',
-      mutationIntentStatus: 'missing',
-      reason: 'path-to-atom-map.json is a derived projection. Row-level conflict keys require owner-shard mutation targets, not the projection file alone.',
-      canonicalPathHint: 'atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-*.json'
-    }];
-  }
-  if (/atomic_workbench\/atomization-coverage\/path-to-atom-map-shards\/owner-shard-[^/]+\.json$/.test(normalized)) {
-    return [{
-      filePath: normalized,
-      adapterId: 'path-to-atom-map',
-      conflictSurface: 'owner-shard',
-      mutationIntentStatus: 'missing',
-      reason: 'Owner-shard path is adapter-aware, but task ledgers do not declare the row mutation target (path_pattern::atom_id), so the Broker cannot confirm a row conflict at claim time.'
-    }];
-  }
-  if (normalized.endsWith('.scalars.json') || normalized.endsWith('.counter.json')) {
-    return [{
-      filePath: normalized,
-      adapterId: 'numeric-scalar',
-      conflictSurface: 'scalar',
-      mutationIntentStatus: 'missing',
-      reason: 'Scalar JSON can be adapter-merged only when mutation requests declare the scalar target and operation.'
-    }];
-  }
-  if (normalized.endsWith('.json')) {
-    return [{
-      filePath: normalized,
-      adapterId: 'json-record',
-      conflictSurface: 'json-record',
-      mutationIntentStatus: 'missing',
-      reason: 'JSON record conflicts require JSON pointer mutation targets; task file scope alone is insufficient.'
-    }];
-  }
-  if (normalized.endsWith('.md') || normalized.endsWith('.txt')) {
-    return [{
-      filePath: normalized,
-      adapterId: 'text-range',
-      conflictSurface: 'text-range',
-      mutationIntentStatus: 'missing',
-      reason: 'Text conflicts require line-range or anchor mutation targets; task file scope alone is insufficient.'
-    }];
-  }
-  return [];
-}
-
-function hasUnexplainedSharedProjection(
-  sharedProjections: readonly string[],
-  brokerAdmission: BrokerAdmissionExplanation
-): boolean {
-  return sharedProjections.some((projection) => {
-    const normalized = projection.replace(/\\/g, '/');
-    return !brokerAdmission.adapterExplanations.some((entry) => entry.filePath === normalized);
-  });
-}
+const buildBrokerAdmissionExplanation = delegatedBuildBrokerAdmissionExplanation;
+const explainBrokerAdapterForPath = delegatedExplainBrokerAdapterForPath;
+const hasUnexplainedSharedProjection = delegatedHasUnexplainedSharedProjection;
 
 function buildParallelHotspotReport(tasks: readonly ParallelAdvisorTaskRef[]) {
   const fileCounts = new Map<string, number>();
@@ -3631,76 +3554,7 @@ function parseReservationOptions(action: 'reserve' | 'promote', argv: string[]) 
 }
 
 
-
-export function evaluateFrameworkDeliveryWindow(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly actorId: string;
-  readonly batchId: string | null;
-  readonly fromBatchCheckpoint: boolean;
-  readonly taskDeclaredFiles: readonly string[];
-  readonly criticalChangedFiles: readonly string[];
-  readonly historicalDeliveryRefs: readonly string[];
-  readonly historicalBatchCloseReady?: boolean;
-}) {
-  const criticalChangedFiles = uniqueStrings(input.criticalChangedFiles.map(normalizeRelativePath).filter(Boolean));
-  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
-  const scopedCriticalChangedFiles = criticalChangedFiles.filter((filePath) =>
-    declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared))
-  );
-  const unscopedCriticalChangedFiles = criticalChangedFiles.filter((filePath) => !scopedCriticalChangedFiles.includes(filePath));
-  const checkpointCommand = input.batchId
-    ? `node atm.mjs batch checkpoint --actor ${input.actorId} --batch ${input.batchId} --json`
-    : `node atm.mjs batch checkpoint --actor ${input.actorId} --json`;
-  const historicalCommand = input.batchId
-    ? `node atm.mjs batch checkpoint --actor ${input.actorId} --batch ${input.batchId} --delivery-commit <commit> --json`
-    : `node atm.mjs batch checkpoint --actor ${input.actorId} --delivery-commit <commit> --json`;
-  const normalHistoricalCloseCommand = `node atm.mjs tasks close --task ${input.taskId} --actor ${input.actorId} --status done --historical-delivery <deliveryCommit> --json`;
-  const normalDeliveryCommitCommand = `node atm.mjs git commit --actor ${input.actorId} --task ${input.taskId} --message "<delivery message>" --json`;
-  // TASK-AAO-0057: scoped diff isolation — unrelated (unscoped) critical changes
-  // are advisory and no longer block the governed window; the window is governed
-  // by either --from-batch-checkpoint or --historical-delivery covering the
-  // scoped diff. Out-of-scope dirty files are surfaced separately as advisory
-  // isolation diagnostics by the caller.
-  const hasHistoricalDelivery = input.historicalDeliveryRefs.length > 0;
-  const hasGovernedDeliveryFlag = input.fromBatchCheckpoint || hasHistoricalDelivery;
-  const ok = input.historicalBatchCloseReady === true
-    ? hasHistoricalDelivery
-    : input.fromBatchCheckpoint
-      ? hasGovernedDeliveryFlag && scopedCriticalChangedFiles.length > 0
-      : hasHistoricalDelivery;
-  return {
-    schemaId: 'atm.frameworkDeliveryWindow.v1',
-    taskId: input.taskId,
-    batchId: input.batchId,
-    ok,
-    reason: ok
-      ? input.historicalBatchCloseReady === true
-        ? 'historical-batch-close-ready'
-        : input.fromBatchCheckpoint
-        ? 'batch-checkpoint-scoped-framework-critical-diff'
-        : 'historical-delivery-scoped-framework-critical-diff'
-      : !hasGovernedDeliveryFlag
-        ? 'not-from-batch-checkpoint'
-        : input.fromBatchCheckpoint
-          ? 'no-active-framework-critical-diff'
-          : 'historical-delivery-gate',
-    criticalChangedFiles,
-    scopedCriticalChangedFiles,
-    unscopedCriticalChangedFiles,
-    declaredFiles,
-    historicalDeliveryRefs: input.historicalDeliveryRefs,
-    allowedBlockers: input.historicalBatchCloseReady === true
-      ? ['active-framework-claim-required', 'git-head-evidence-missing', 'framework-stale-lock-cleanup-required']
-      : ['active-framework-claim-required', 'git-head-evidence-missing'],
-    requiredCommand: input.fromBatchCheckpoint ? checkpointCommand : normalDeliveryCommitCommand,
-    remediation: ok
-      ? 'Batch checkpoint is the governed delivery window; commit the scoped deliverables, evidence, task file, and task events together after checkpoint succeeds.'
-      : input.fromBatchCheckpoint
-        ? `Remove unrelated framework critical diffs or add the real deliverable paths to the task scope before rerunning ${checkpointCommand}. If the scoped delivery already landed, use ${historicalCommand}.`
-        : `Normal framework critical tasks close in two phases: first create a governed delivery commit with ${normalDeliveryCommitCommand}; then close with ${normalHistoricalCloseCommand}. Batch checkpoint commands are only for --from-batch-checkpoint closures.`
-  };
-}
+export const evaluateFrameworkDeliveryWindow = delegatedEvaluateFrameworkDeliveryWindow;
 
 interface TaskClaimIntentResolution {
   readonly requestedClaimIntent: 'write' | 'closeout-only';
@@ -3785,191 +3639,16 @@ function isTaskClaimDeliverableTrackedInHead(cwd: string, filePath: string): boo
   }
 }
 
-export function evaluateTaskDeliverableGate(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly taskDocument: Record<string, unknown>;
-  readonly taskDeclaredFiles: readonly string[];
-  readonly claim: TaskClaimRecord | null;
-  readonly historicalDeliveryRefs?: readonly string[];
-  readonly historicalDeliveryRepo?: string | null;
-  readonly waiverOutOfScopeDelivery?: boolean;
-  readonly waiverReason?: string | null;
-}): TaskDeliverableGateReport {
-  const required = isDeliverableDiffRequired(input.taskDocument);
-  const declaredFiles = normalizeTaskScopePaths(input.cwd, input.taskDeclaredFiles);
-  const changedFileReport = listChangedFilesForDeliverableGate(input.cwd, input.claim, input.taskId);
-  const changedFiles = (changedFileReport.gitAvailable
-    ? changedFileReport.files
-    : uniqueStrings([
-      ...changedFileReport.files,
-      ...declaredFiles.filter((filePath) => existsSync(path.resolve(input.cwd, filePath)))
-    ])
-  );
-  const deliverableFiles = changedFiles.filter((filePath) => isDeliverableGateCandidate(filePath, declaredFiles));
-  const enforceDeclaredScope = declaredFiles.some((filePath) =>
-    !filePath.startsWith('.atm/') && filePath !== normalizeRelativePath((input.taskDocument.source as { planPath?: string } | undefined)?.planPath ?? '')
-  );
-  const scopedDeliverables = enforceDeclaredScope
-    ? deliverableFiles.filter((filePath) => declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
-    : deliverableFiles;
-  const historicalDeliveries = (input.historicalDeliveryRefs ?? []).map((ref) => inspectHistoricalDelivery({
-    cwd: input.historicalDeliveryRepo ?? input.cwd,
-    taskId: input.taskId,
-    requestedRef: ref,
-    declaredFiles,
-    enforceDeclaredScope,
-    waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
-    waiverReason: input.waiverReason ?? null
-  }));
-  const historicalDeliveryErrors = historicalDeliveries.filter((entry) => !entry.ok);
-  const historicalDeliverableFiles = uniqueStrings(historicalDeliveries.flatMap((entry) => entry.deliverableFiles));
-  const allDeliverableFiles = uniqueStrings([...scopedDeliverables, ...historicalDeliverableFiles]);
-  const ok = !required || (allDeliverableFiles.length > 0 && historicalDeliveryErrors.length === 0);
-  const reason = required
-    ? ok
-      ? scopedDeliverables.length > 0
-        ? 'real-deliverable-diff-present'
-        : 'historical-delivery-diff-present'
-      : historicalDeliveryErrors.length > 0
-        ? 'historical-delivery-invalid'
-        : 'missing-real-deliverable-diff'
-    : 'task-does-not-require-real-deliverable-diff';
-  return {
-    schemaId: 'atm.taskDeliverableGate.v1',
-    generatedAt: new Date().toISOString(),
-    taskId: input.taskId,
-    deliveryPrinciple: taskDeliveryPrincipleText(),
-    required,
-    ok,
-    reason,
-    changedFiles,
-    deliverableFiles: allDeliverableFiles,
-    declaredFiles,
-    historicalDeliveries,
-    notAllowedAsCompletion: [
-      'only changing .atm/history task JSON, evidence JSON, task-events, runtime locks, or queue state',
-      'text-only evidence without a real deliverable file diff',
-      'replaying old close commits or cherry-picking prior ledger-only closure without a scoped delivery commit',
-      'closing a batch queue item before implementing the current task deliverables'
-    ],
-    remediation: ok
-      ? 'Deliverable diff found; continue with validators and closure evidence.'
-      : 'Implement the deliverables described by the task, stage or leave the real file changes visible, then rerun tasks close --status done. If the deliverable already landed in an earlier commit, pass --historical-delivery <commit> so ATM can verify the scoped non-.atm files. If the historical commit also contains unrelated source files, pass --waiver-out-of-scope-delivery with --reason. If the task is not delivered yet, close review instead of done.',
-    requiredCommand: ok ? null : `node atm.mjs tasks close --task ${input.taskId} --actor <actor> --status review --reason "awaiting real deliverable diff" --json`
-  };
-}
+export const evaluateTaskDeliverableGate = delegatedEvaluateTaskDeliverableGate;
 
-export function taskDeliveryPrincipleText() {
-  return 'The goal is to deliver the requested task content, not to close task cards. done is only the record after real deliverables and validators exist.';
-}
+export const taskDeliveryPrincipleText = delegatedTaskDeliveryPrincipleText;
 
-function resolveHistoricalBatchPath(cwd: string, batchRef: string) {
-  const trimmed = batchRef.trim();
-  if (!trimmed) return null;
-  if (path.isAbsolute(trimmed)) return trimmed;
-  if (trimmed.includes('/') || trimmed.includes('\\')) return path.resolve(cwd, trimmed);
-  return path.join(cwd, '.atm', 'history', 'evidence', 'historical-batches', trimmed.endsWith('.json') ? trimmed : `${trimmed}.json`);
-}
 
-export function loadHistoricalBatchCloseSlice(cwd: string, taskId: string, batchRef: string): HistoricalBatchCloseSlice {
-  const batchPath = resolveHistoricalBatchPath(cwd, batchRef);
-  if (!batchPath || !existsSync(batchPath)) {
-    throw new CliError('ATM_TASK_CLOSE_HISTORICAL_BATCH_NOT_FOUND', `Historical batch evidence not found for ${batchRef}.`, {
-      exitCode: 1,
-      details: { taskId, batchRef, batchPath: batchPath ? relativePathFrom(cwd, batchPath) : null }
-    });
-  }
-  const envelope = JSON.parse(readFileSync(batchPath, 'utf8')) as Record<string, unknown>;
-  const tasks = Array.isArray(envelope.tasks) ? envelope.tasks : [];
-  const rawSlice = tasks.find((entry) =>
-    entry && typeof entry === 'object' && !Array.isArray(entry) && String((entry as Record<string, unknown>).taskId ?? '') === taskId
-  ) as Record<string, unknown> | undefined;
-  if (!rawSlice) {
-    throw new CliError('ATM_TASK_CLOSE_HISTORICAL_BATCH_TASK_NOT_FOUND', `Historical batch ${batchRef} does not contain task ${taskId}.`, {
-      exitCode: 1,
-      details: { taskId, batchRef, batchPath: relativePathFrom(cwd, batchPath) }
-    });
-  }
-  const validatorClaims = Array.isArray(rawSlice.validatorClaims)
-    ? rawSlice.validatorClaims.filter((entry): entry is Record<string, unknown> =>
-      Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry)
-    )
-    : [];
-  const validationPassesByKind = (kind: string) => validatorClaims
-    .filter((entry) => entry.kind === kind && entry.satisfied === true)
-    .map((entry) => typeof entry.gate === 'string' ? entry.gate.trim() : '')
-    .filter(Boolean);
-  return {
-    batchId: typeof envelope.batchId === 'string' ? envelope.batchId : path.basename(batchPath, '.json'),
-    batchPath: relativePathFrom(cwd, batchPath),
-    ok: rawSlice.ok === true,
-    matchedCommits: Array.isArray(rawSlice.matchedCommits) ? rawSlice.matchedCommits.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : [],
-    matchedFiles: Array.isArray(rawSlice.matchedFiles) ? rawSlice.matchedFiles.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : [],
-    coverageStatus: rawSlice.coverageStatus === 'complete' || rawSlice.coverageStatus === 'partial' || rawSlice.coverageStatus === 'blocked'
-      ? rawSlice.coverageStatus
-      : 'blocked',
-    okToRecordEvidence: rawSlice.okToRecordEvidence === true,
-    okToCloseTask: rawSlice.okToCloseTask === true,
-    diagnosticOnly: rawSlice.diagnosticOnly === true,
-    missingCoverage: Array.isArray(rawSlice.missingCoverage) ? rawSlice.missingCoverage.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0) : [],
-    taskSpecificValidationPasses: Array.isArray(rawSlice.taskSpecificValidationPasses)
-      ? rawSlice.taskSpecificValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
-      : validationPassesByKind('taskSpecific'),
-    batchWideValidationPasses: Array.isArray(rawSlice.batchWideValidationPasses)
-      ? rawSlice.batchWideValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
-      : validationPassesByKind('batchWide'),
-    advisoryValidationPasses: Array.isArray(rawSlice.advisoryValidationPasses)
-      ? rawSlice.advisoryValidationPasses.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
-      : validationPassesByKind('advisory')
-  };
-}
+export const loadHistoricalBatchCloseSlice = delegatedLoadHistoricalBatchCloseSlice;
 
-function extractTaskCloseClaimScopeFiles(taskDocument: Record<string, unknown>, cwd?: string, taskId?: string): readonly string[] {
-  const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
-    ? taskDocument.taskDirectionLock as Record<string, unknown>
-    : {};
-  const claim = taskDocument.claim && typeof taskDocument.claim === 'object' && !Array.isArray(taskDocument.claim)
-    ? taskDocument.claim as Record<string, unknown>
-    : {};
-  const runtimeLock = cwd && taskId ? readRuntimeTaskDirectionLock(cwd, taskId) : {};
-  return uniqueStrings([
-    ...extractStringList(taskDirectionLock.allowedFiles),
-    ...extractStringList(runtimeLock.allowedFiles),
-    ...extractStringList(claim.files)
-  ]);
-}
 
-export function extractTaskCloseDeclaredFiles(
-  taskDocument: Record<string, unknown>,
-  cwd?: string,
-  taskId?: string,
-  options: { checkpointScoped?: boolean } = {}
-): readonly string[] {
-  const claimScopedFiles = extractTaskCloseClaimScopeFiles(taskDocument, cwd, taskId);
-  if (options.checkpointScoped) {
-    return claimScopedFiles;
-  }
-  return uniqueStrings([
-    ...claimScopedFiles,
-    ...extractStringList(taskDocument.targetAllowedFiles),
-    ...extractTaskDeclaredFiles(taskDocument)
-  ]);
-}
+export const extractTaskCloseDeclaredFiles = delegatedExtractTaskCloseDeclaredFiles;
 
-function readRuntimeTaskDirectionLock(cwd: string, taskId: string): Record<string, unknown> {
-  const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
-  if (!existsSync(lockPath)) return {};
-  try {
-    const outerLock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
-    const embeddedLock = outerLock.taskDirectionLock;
-    return embeddedLock && typeof embeddedLock === 'object' && !Array.isArray(embeddedLock)
-      ? embeddedLock as Record<string, unknown>
-      : {};
-  } catch {
-    return {};
-  }
-}
 
 function extractStringList(value: unknown): readonly string[] {
   return Array.isArray(value)
@@ -3977,9 +3656,7 @@ function extractStringList(value: unknown): readonly string[] {
     : [];
 }
 
-export function extractTaskDeliverableFiles(taskDocument: Record<string, unknown>): readonly string[] {
-  return extractStringList(taskDocument.deliverables);
-}
+export const extractTaskDeliverableFiles = delegatedExtractTaskDeliverableFiles;
 
 function normalizeTaskScopePaths(cwd: string, values: readonly string[]): readonly string[] {
   return sanitizeTaskDirectionAllowedFiles(values.map((entry) => {
@@ -3991,80 +3668,6 @@ function normalizeTaskScopePaths(cwd: string, values: readonly string[]): readon
   }));
 }
 
-function isDeliverableDiffRequired(taskDocument: Record<string, unknown>): boolean {
-  const mode = String(taskDocument.deliverableMode ?? taskDocument.deliverable_mode ?? '').toLowerCase();
-  if (mode === 'ledger-only') return false;
-  const source = taskDocument.source && typeof taskDocument.source === 'object' && !Array.isArray(taskDocument.source)
-    ? taskDocument.source as Record<string, unknown>
-    : {};
-  const importedFromPlan = typeof source.planPath === 'string' && source.planPath.trim().length > 0;
-  if (importedFromPlan) return true;
-  const haystack = [
-    taskDocument.title,
-    taskDocument.type,
-    taskDocument.kind,
-    taskDocument.category,
-    ...(Array.isArray(taskDocument.tags) ? taskDocument.tags : []),
-    ...(Array.isArray(taskDocument.deliverables) ? taskDocument.deliverables : []),
-    ...(Array.isArray(taskDocument.acceptance) ? taskDocument.acceptance : [])
-  ].filter((entry): entry is string => typeof entry === 'string').join('\n').toLowerCase();
-  return /\b(code|pipeline|data|runner|script|report|artifact|manifest|bundle|adapter|checker|builder|job|jsonl|python|typescript|reviewer)\b/.test(haystack)
-    || /資料|管線|腳本|執行器|報告|產物|審核表|清單|候選|白名單|黑名單|人物|關係/.test(haystack);
-}
-
-function listChangedFilesForDeliverableGate(cwd: string, claim: TaskClaimRecord | null, taskId: string | null = null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
-  const files = new Set<string>();
-  let gitAvailable = false;
-
-  let allowedSet: Set<string> | null = null;
-  if (taskId) {
-    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
-    if (existsSync(taskPath)) {
-      try {
-        const taskDoc = JSON.parse(readFileSync(taskPath, 'utf8'));
-        const allowedFiles = extractTaskCloseDeclaredFiles(taskDoc as Record<string, unknown>);
-        if (allowedFiles.length > 0) {
-          allowedSet = new Set(normalizeTaskScopePaths(cwd, allowedFiles));
-        }
-      } catch {
-        // Ignore read/parse errors
-      }
-    }
-  }
-
-  for (const args of [
-    ['-C', cwd, 'diff', '--name-only', '--cached'],
-    ['-C', cwd, 'diff', '--name-only'],
-    ['-C', cwd, 'ls-files', '-o', '--exclude-standard']
-  ]) {
-    try {
-      const output = execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
-      gitAvailable = true;
-      const isUntrackedCmd = args.includes('ls-files');
-      for (const line of output.split(/\r?\n/)) {
-        const normalized = normalizeRelativePath(line);
-        if (normalized) {
-          if (isUntrackedCmd && allowedSet) {
-            const isDeliverable = allowedSet.has(normalized)
-              || isTaskCloseGovernanceCriticalPath(normalized, taskId || '');
-            if (!isDeliverable) {
-              continue;
-            }
-          }
-          files.add(normalized);
-        }
-      }
-    } catch {
-      // Sandboxed or non-git hosts use a declared-file existence fallback.
-    }
-  }
-  const committedSinceClaim = listCommittedFilesSinceClaim(cwd, claim);
-  if (committedSinceClaim.gitAvailable) gitAvailable = true;
-  for (const filePath of committedSinceClaim.files) {
-    files.add(filePath);
-  }
-  return { files: [...files].sort((left, right) => left.localeCompare(right)), gitAvailable };
-}
 
 function listCommittedFilesSinceClaim(cwd: string, claim: TaskClaimRecord | null): { readonly files: readonly string[]; readonly gitAvailable: boolean } {
   return delegatedListCommittedFilesSinceClaim(cwd, claim);
@@ -4082,9 +3685,6 @@ function readGitNameOnly(cwd: string, args: readonly string[]): readonly string[
     return [];
   }
 }
-
-
-
 
 
 function writeLockCleanupReport(input: {
@@ -4110,7 +3710,6 @@ function writeLockCleanupReport(input: {
   }, null, 2)}\n`, 'utf8');
   return relativePathFrom(input.cwd, filePath);
 }
-
 
 
 function writeTaskDocument(taskPath: string, document: Record<string, unknown>) {
@@ -4191,7 +3790,6 @@ function persistScopeAmendmentTransition(input: {
 }
 
 
-
 function readLegacyLedgerTaskFiles(cwd: string): readonly LegacyLedgerTaskFile[] {
   const root = path.resolve(cwd);
   const taskLedger = readTaskLedgerPolicy(root);
@@ -4225,7 +3823,6 @@ function readLegacyLedgerTaskFiles(cwd: string): readonly LegacyLedgerTaskFile[]
     });
   return [...jsonTasks, ...markdownTasks].sort((left, right) => left.relativePath.localeCompare(right.relativePath));
 }
-
 
 
 function writeLegacyBaselineTransition(input: {
@@ -4303,7 +3900,6 @@ function listTaskFiles(directoryPath: string, predicate: (filePath: string) => b
 }
 
 
-
 function shouldSkipTaskFileDiscoveryDirectory(directoryPath: string) {
   const normalized = directoryPath.replace(/\\/g, '/');
   const segments = normalized.split('/').filter(Boolean);
@@ -4326,7 +3922,6 @@ function shouldSkipTaskFileDiscoveryDirectory(directoryPath: string) {
   if (ignoredSegmentNames.has(basename)) return true;
   return segments.some((segment, index) => segment === 'local' && (segments[index + 1] === 'tmp' || segments[index + 1] === 'temp'));
 }
-
 
 
 function parseTaskMarkdownFrontmatter(text: string): Record<string, unknown> {
@@ -4435,103 +4030,12 @@ function quoteCommandValue(value: string): string {
     : `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
-export function writeTaskDocumentWithTransition(input: {
-  readonly cwd: string;
-  readonly taskPath: string;
-  readonly taskId: string;
-  readonly taskDocument: Record<string, unknown>;
-  readonly action: string;
-  readonly actorId: string | null;
-  readonly sessionId?: string | null;
-  readonly previousStatus: string | null;
-  readonly closureMetadata?: TaskTransitionClosureMetadata | null;
-  readonly command?: string;
-}) {
-  const nextStatus = typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null;
-  const createdAt = new Date().toISOString();
-  const transitionId = createTaskTransitionId({
-    createdAt,
-    taskId: input.taskId,
-    action: input.action,
-    taskDocument: input.taskDocument
-  });
-  input.taskDocument.lastTransitionId = transitionId;
-  input.taskDocument.lastTransitionAt = createdAt;
-  input.taskDocument.ledgerContractVersion = 'task-ledger/v1';
-  const transition = appendTaskTransitionEvent({
-    cwd: input.cwd,
-    taskId: input.taskId,
-    action: input.action,
-    actorId: input.actorId,
-    sessionId: input.sessionId ?? null,
-    fromStatus: input.previousStatus,
-    toStatus: nextStatus,
-    taskPath: input.taskPath,
-    taskDocument: input.taskDocument,
-    command: input.command ?? `node atm.mjs tasks ${input.action}`,
-    closureMetadata: input.closureMetadata ?? null,
-    createdAt,
-    transitionId
-  });
-  writeTaskDocument(input.taskPath, input.taskDocument);
-  verifyPersistedTaskDocument({
-    taskPath: input.taskPath,
-    taskId: input.taskId,
-    expectedStatus: nextStatus,
-    action: input.action
-  });
-  return transition.eventPath;
-}
+export const writeTaskDocumentWithTransition = delegatedWriteTaskDocumentWithTransition;
 
-export function stageTaskCloseArtifacts(cwd: string, files: readonly (string | null | undefined)[]) {
-  const normalizedFiles = uniqueStrings(files.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean));
-  if (normalizedFiles.length === 0) return;
-  execFileSync('git', ['add', '--', ...normalizedFiles], {
-    cwd,
-    stdio: ['ignore', 'ignore', 'pipe']
-  });
-}
+export const stageTaskCloseArtifacts = delegatedStageTaskCloseArtifacts;
 
-export function existingTaskCloseArtifacts(cwd: string, files: readonly (string | null | undefined)[]) {
-  return uniqueStrings(files
-    .map((entry) => typeof entry === 'string' ? entry.trim() : '')
-    .filter((entry) => entry && existsSync(path.resolve(cwd, entry))));
-}
+export const existingTaskCloseArtifacts = delegatedExistingTaskCloseArtifacts;
 
-function verifyPersistedTaskDocument(input: {
-  readonly taskPath: string;
-  readonly taskId: string;
-  readonly expectedStatus: string | null;
-  readonly action: string;
-}) {
-  let persisted: Record<string, unknown>;
-  try {
-    persisted = parseJsonText(readFileSync(input.taskPath, 'utf8')) as Record<string, unknown>;
-  } catch (error) {
-    throw new CliError('ATM_TASK_LEDGER_WRITE_INVALID_JSON', `Task ${input.taskId} was written by ${input.action}, but the persisted JSON is unreadable.`, {
-      details: {
-        taskId: input.taskId,
-        taskPath: input.taskPath,
-        action: input.action,
-        reason: error instanceof Error ? error.message : String(error)
-      }
-    });
-  }
-  const persistedTaskId = normalizeTaskDocumentId(persisted, path.basename(input.taskPath, '.json'));
-  const persistedStatus = typeof persisted.status === 'string' ? persisted.status : null;
-  if (!taskIdsEqual(persistedTaskId, input.taskId) || persistedStatus !== input.expectedStatus) {
-    throw new CliError('ATM_TASK_LEDGER_WRITE_MISMATCH', `Task ${input.taskId} persisted an unexpected state after ${input.action}.`, {
-      details: {
-        taskId: input.taskId,
-        taskPath: input.taskPath,
-        action: input.action,
-        expectedStatus: input.expectedStatus,
-        persistedTaskId,
-        persistedStatus
-      }
-    });
-  }
-}
 
 export function createClosureTransitionMetadata(
   closurePacketPath: string | null,
@@ -5777,9 +5281,6 @@ interface FrontMatter {
 }
 
 
-
-
-
 interface HeadingSection {
   readonly heading: string;
   readonly lines: readonly string[];
@@ -5877,7 +5378,6 @@ function cleanCellText(value: string): string {
 }
 
 
-
 function isMarkdownTableRow(value: string): boolean {
   return value.startsWith('|') && value.endsWith('|');
 }
@@ -5897,13 +5397,6 @@ function findTableColumnIndex(headers: readonly string[], candidates: readonly s
 function cellAt(cells: readonly string[], index: number): string {
   return index >= 0 && index < cells.length ? cells[index] : '';
 }
-
-
-
-
-
-
-
 
 
 export function uniqueStrings(values: readonly string[]): readonly string[] {

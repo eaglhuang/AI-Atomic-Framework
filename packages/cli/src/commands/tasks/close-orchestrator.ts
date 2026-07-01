@@ -39,20 +39,27 @@ import {
 } from './scope-lock-diagnostics.ts';
 import { parseClaimRecord } from './task-ledger-readers.ts';
 import { normalizeRelativePath, taskPathFor } from './task-file-io-helpers.ts';
+// TASK-RFT-0013: import close-helper clusters directly rather than through tasks.ts re-exports.
 import {
   type HistoricalBatchCloseSlice,
   loadHistoricalBatchCloseSlice,
+  evaluateFrameworkDeliveryWindow,
+  readDeferredForeignStagedFilesForActiveCloseWindow
+} from './close-helpers/close-window-diagnostics.ts';
+import {
   extractTaskCloseDeclaredFiles,
   extractTaskDeliverableFiles,
-  evaluateFrameworkDeliveryWindow,
   evaluateTaskDeliverableGate,
-  readDeferredForeignStagedFilesForActiveCloseWindow,
   existingTaskCloseArtifacts,
   stageTaskCloseArtifacts,
+  taskDeliveryPrincipleText
+} from './close-helpers/close-artifact-staging.ts';
+import {
   writeTaskDocumentWithTransition,
   buildTaskTransitionCommand,
-  createClosureTransitionMetadata,
-  taskDeliveryPrincipleText,
+  createClosureTransitionMetadata
+} from './close-helpers/task-transition-writer.ts';
+import {
   uniqueStrings,
   isCliErrorWithCode,
   recordStaleRunnerOverride,
