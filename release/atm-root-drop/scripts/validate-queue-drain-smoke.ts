@@ -9,6 +9,7 @@ const harness = createValidator('queue-drain-smoke', {
 });
 
 const artifactDir = harness.repoPath('artifacts', 'queue-drain-smoke', '20260628');
+const artifactGeneratedAt = '2026-06-28T00:00:00.000Z';
 const sizes = [5, 10, 20, 50];
 const rows = sizes.map((size) => ({
   schemaId: 'atm.queueDrainSmokeRow.v1',
@@ -24,7 +25,7 @@ mkdirSync(artifactDir, { recursive: true });
 
 const summary = {
   schemaId: 'atm.queueDrainSmokeSummary.v1',
-  generatedAt: new Date().toISOString(),
+  generatedAt: artifactGeneratedAt,
   sizes,
   preservedIntentTotal: rows.reduce((sum, row) => sum + row.preservedIntents, 0),
   lostIntentTotal: rows.reduce((sum, row) => sum + row.lostIntents, 0),

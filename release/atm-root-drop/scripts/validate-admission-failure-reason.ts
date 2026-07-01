@@ -11,6 +11,7 @@ const harness = createValidator('admission-failure-reason', {
 });
 
 const artifactDir = harness.repoPath('artifacts', 'generated', 'admission-failure-reason', '20260628');
+const artifactGeneratedAt = '2026-06-28T00:00:00.000Z';
 
 function makeIntent(overrides: Partial<WriteIntent> = {}): WriteIntent {
   return {
@@ -111,7 +112,7 @@ mkdirSync(artifactDir, { recursive: true });
 
 const summary = {
   schemaId: 'atm.admissionFailureReasonSummary.v1',
-  generatedAt: new Date().toISOString(),
+  generatedAt: artifactGeneratedAt,
   cases: cases.map((entry) => ({
     id: entry.id,
     verdict: entry.decision.verdict,

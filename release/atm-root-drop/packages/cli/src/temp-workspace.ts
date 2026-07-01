@@ -40,8 +40,16 @@ function resolveTempBaseRoot() {
   if (explicitRoot) {
     return explicitRoot;
   }
-  const repoLocalRoot = path.join(process.cwd(), '.atm-temp');
-  if (existsSync(process.cwd())) {
+  const cwd = process.cwd();
+  const repoLocalRoot = path.join(cwd, '.atm-temp');
+  // WSL interop can surface Linux working directories as UNC paths
+  // (for example \\wsl.localhost\Ubuntu\home\user\repo). Temporary
+  // validator repos created under that synthetic path can confuse Git/Node
+  // child processes, so prefer the platform temp root there.
+  if (process.platform !== 'win32' && cwd.startsWith('\\\\')) {
+    return os.tmpdir();
+  }
+  if (existsSync(cwd)) {
     return repoLocalRoot;
   }
   return os.tmpdir();

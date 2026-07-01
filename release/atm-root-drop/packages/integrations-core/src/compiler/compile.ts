@@ -6,7 +6,8 @@
  * Adapter-specific skill template compiler. Emits IntegrationSourceFile
  * objects ready for installation by the manifest/construct layer.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -200,6 +201,10 @@ function loadSkillTemplateCompanionFiles(templateId: string): readonly Integrati
 }
 
 function walkCompanionDirectory(directoryPath: string): readonly string[] {
+  const trackedFiles = listTrackedFilesUnder(directoryPath);
+  if (trackedFiles) {
+    return trackedFiles;
+  }
   try {
     const entries = readdirSync(directoryPath, { withFileTypes: true });
     return entries.flatMap((entry) => {
@@ -215,6 +220,27 @@ function walkCompanionDirectory(directoryPath: string): readonly string[] {
   } catch {
     return [];
   }
+}
+
+function listTrackedFilesUnder(directoryPath: string): readonly string[] | null {
+  const relativeDirectory = path.relative(integrationsCoreRepoRoot, directoryPath);
+  if (!relativeDirectory || relativeDirectory.startsWith('..')) {
+    return null;
+  }
+  const gitRelativeDirectory = relativeDirectory.replace(/\\/g, '/');
+  const result = spawnSync('git', ['ls-files', '-z', '--', gitRelativeDirectory], {
+    cwd: integrationsCoreRepoRoot,
+    encoding: 'utf8'
+  });
+  if (result.status !== 0) {
+    return null;
+  }
+  return result.stdout
+    .split('\0')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => path.join(integrationsCoreRepoRoot, entry))
+    .filter((entry) => existsSync(entry));
 }
 
 function inferIntegrationFileFormat(filePath: string): IntegrationSourceFile['fileFormat'] {

@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -149,6 +150,10 @@ if (!process.exitCode) {
 }
 
 function countCompanionFiles(directoryPath: string): number {
+  const trackedFiles = listTrackedFilesUnder(directoryPath);
+  if (trackedFiles) {
+    return trackedFiles.length;
+  }
   if (!existsSync(directoryPath)) {
     return 0;
   }
@@ -160,4 +165,24 @@ function countCompanionFiles(directoryPath: string): number {
     }
     return entry.isFile() ? total + 1 : total;
   }, 0);
+}
+
+function listTrackedFilesUnder(directoryPath: string): readonly string[] | null {
+  const relativeDirectory = path.relative(root, directoryPath);
+  if (!relativeDirectory || relativeDirectory.startsWith('..')) {
+    return null;
+  }
+  const result = spawnSync('git', ['ls-files', '-z', '--', relativeDirectory.replace(/\\/g, '/')], {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  if (result.status !== 0) {
+    return null;
+  }
+  return result.stdout
+    .split('\0')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => path.join(root, entry))
+    .filter((entry) => existsSync(entry));
 }

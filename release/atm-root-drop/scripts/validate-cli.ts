@@ -29,6 +29,9 @@ for (const key of Object.keys(process.env)) {
     delete process.env[key];
   }
 }
+for (const key of ['AGENT_IDENTITY', 'ATM_EDITOR_ID', 'CODEX_HOME']) {
+  delete process.env[key];
+}
 for (const key of ['GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
   delete process.env[key];
 }

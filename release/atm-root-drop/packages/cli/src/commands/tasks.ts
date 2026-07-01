@@ -174,114 +174,47 @@ import {
   parseLegacyLedgerMigrationOptions,
   parseAllowStaleRunnerFlag
 } from './tasks/task-option-parsers.ts';
+import {
+  type TaskImportSource as TaskImportSourceContract,
+  type TaskCardImportDiagnostic as TaskCardImportDiagnosticContract,
+  type TaskImportRecord as TaskImportRecordContract,
+  type TaskImportStatus as TaskImportStatusContract,
+  type TaskImportManifest as TaskImportManifestContract,
+  type TaskDeliverableGateReport as TaskDeliverableGateReportContract,
+  type TaskImportDiagnostic as TaskImportDiagnosticContract,
+  type TaskVerifyReport as TaskVerifyReportContract,
+  type TaskLegacyLedgerMigrationReport as TaskLegacyLedgerMigrationReportContract,
+  type TaskLegacyLedgerMigrationEntry as TaskLegacyLedgerMigrationEntryContract,
+  type TaskLegacyLedgerMigrationSkip as TaskLegacyLedgerMigrationSkipContract
+} from './tasks/result-contracts.ts';
+import {
+  buildTaskStatusTriangulation as buildTaskStatusTriangulationDelegated,
+  readScopeAmendmentEvents as readScopeAmendmentEventsDelegated,
+  readLastTransitionEventRecord as readLastTransitionEventRecordDelegated,
+  resolvePlanningCardPath as resolvePlanningCardPathDelegated
+} from './tasks/status-triangulation.ts';
+import {
+  recordStaleRunnerOverride as recordStaleRunnerOverrideDelegated,
+  recordFailedEmergencyUseAttempt as recordFailedEmergencyUseAttemptDelegated,
+  isCliErrorWithCode as isCliErrorWithCodeDelegated
+} from './tasks/close-governance.ts';
 
-export interface TaskImportSource {
-  readonly planPath: string;
-  readonly sectionTitle: string;
-  readonly headingLine: number;
-  readonly hash: string;
-}
-
-export interface TaskCardImportDiagnostic {
-  readonly code: string;
-  readonly severity: 'info' | 'warning' | 'error';
-  readonly message: string;
-  readonly field?: string;
-  readonly alias?: string;
-  readonly canonical?: string;
-  readonly candidates?: readonly string[];
-}
-
-export interface TaskImportRecord {
-  readonly schemaVersion: 'atm.workItem.v0.2';
-  readonly workItemId: string;
-  readonly title: string;
-  readonly status: TaskImportStatus;
-  readonly milestone?: string | null;
-  readonly dependencies: readonly string[];
-  readonly acceptance: readonly string[];
-  readonly deliverables: readonly string[];
-  readonly scopePaths?: readonly string[];
-  readonly validators?: readonly string[];
-  readonly testPlan?: Record<string, unknown>;
-  readonly planningRepo?: string | null;
-  readonly targetRepo?: string | null;
-  readonly closureAuthority?: string | null;
-  readonly planningReadOnlyPaths?: readonly string[];
-  readonly planningMirrorPaths?: readonly string[];
-  readonly outOfScope?: readonly string[];
-  readonly nonGoals?: readonly string[];
-  readonly evidenceRequired?: string | null;
-  readonly rollbackStrategy?: string | null;
-  readonly rollbackNotes?: string | null;
-  readonly atomizationImpact?: {
-    readonly ownerAtomOrMap?: string | null;
-    readonly atomCid?: string | null;
-    readonly mapUpdates?: readonly string[];
-  };
-  readonly proposalAdmission?: {
-    readonly trigger: 'not-required' | 'hot-file' | 'same-file-overlap-risk' | 'shared-surface-risk' | 'manual-review-surface';
-    readonly summarySubmitted: boolean;
-    readonly boundedRegions?: readonly {
-      readonly filePath: string;
-      readonly lineStart: number;
-      readonly lineEnd: number;
-    }[];
-    readonly hotFiles?: readonly string[];
-    readonly notes?: string | null;
-  };
-  readonly legacyImportAliases?: Record<string, readonly string[] | string>;
-  readonly importDiagnostics?: readonly TaskCardImportDiagnostic[];
-  readonly tags: readonly string[];
-  readonly notes?: string | null;
-  readonly contextMap?: ContextMap;
-  readonly dispatchPattern?: TaskDispatchPattern;
-  readonly conditionReview?: readonly string[];
-  readonly mailboxAssignee?: string | null;
-  readonly source: TaskImportSource;
-  readonly importedAt: string;
-}
-
-export type TaskImportStatus =
-  | 'planned'
-  | 'open'
-  | 'in_progress'
-  | 'reserved'
-  | 'ready'
-  | 'running'
-  | 'review'
-  | 'blocked'
-  | 'abandoned'
-  | 'done';
-
-export interface TaskImportManifest {
-  readonly schemaId: 'atm.taskImportManifest';
-  readonly specVersion: '0.1.0';
-  readonly generatedAt: string;
-  readonly planPath: string;
-  readonly mode: 'dry-run' | 'write';
-  readonly tasks: readonly TaskImportRecord[];
-  readonly diagnostics: readonly TaskImportDiagnostic[];
-  readonly writtenPaths: readonly string[];
-  readonly evidencePath: string | null;
-}
-
-export interface TaskDeliverableGateReport {
-  readonly schemaId: 'atm.taskDeliverableGate.v1';
-  readonly generatedAt: string;
-  readonly taskId: string;
-  readonly deliveryPrinciple: string;
-  readonly required: boolean;
-  readonly ok: boolean;
-  readonly reason: string;
-  readonly changedFiles: readonly string[];
-  readonly deliverableFiles: readonly string[];
-  readonly declaredFiles: readonly string[];
-  readonly historicalDeliveries: readonly TaskHistoricalDeliveryReport[];
-  readonly notAllowedAsCompletion: readonly string[];
-  readonly remediation: string;
-  readonly requiredCommand: string | null;
-}
+// ---------------------------------------------------------------------------
+// Public result-contract types are re-exported from `./tasks/result-contracts.ts`
+// so existing import paths keep working. New code should import from
+// `./tasks/result-contracts.ts` directly.
+// ---------------------------------------------------------------------------
+export type TaskImportSource = TaskImportSourceContract;
+export type TaskCardImportDiagnostic = TaskCardImportDiagnosticContract;
+export type TaskImportRecord = TaskImportRecordContract;
+export type TaskImportStatus = TaskImportStatusContract;
+export type TaskImportManifest = TaskImportManifestContract;
+export type TaskDeliverableGateReport = TaskDeliverableGateReportContract;
+export type TaskImportDiagnostic = TaskImportDiagnosticContract;
+export type TaskVerifyReport = TaskVerifyReportContract;
+export type TaskLegacyLedgerMigrationReport = TaskLegacyLedgerMigrationReportContract;
+export type TaskLegacyLedgerMigrationEntry = TaskLegacyLedgerMigrationEntryContract;
+export type TaskLegacyLedgerMigrationSkip = TaskLegacyLedgerMigrationSkipContract;
 
 interface HistoricalBatchCloseSlice {
   readonly batchId: string;
@@ -297,55 +230,6 @@ interface HistoricalBatchCloseSlice {
   readonly taskSpecificValidationPasses: readonly string[];
   readonly batchWideValidationPasses: readonly string[];
   readonly advisoryValidationPasses: readonly string[];
-}
-
-export interface TaskImportDiagnostic {
-  readonly level: 'info' | 'warning' | 'error';
-  readonly code: string;
-  readonly text: string;
-  readonly workItemId?: string;
-  readonly sourceLine?: number;
-}
-
-export interface TaskVerifyReport {
-  readonly schemaId: 'atm.taskVerifyReport';
-  readonly specVersion: '0.1.0';
-  readonly generatedAt: string;
-  readonly taskStorePath: string;
-  readonly inspectedTasks: number;
-  readonly findings: readonly TaskImportDiagnostic[];
-  readonly ok: boolean;
-}
-
-export interface TaskLegacyLedgerMigrationReport {
-  readonly schemaId: 'atm.taskLegacyLedgerMigrationReport';
-  readonly specVersion: '0.1.0';
-  readonly generatedAt: string;
-  readonly mode: 'dry-run' | 'apply';
-  readonly taskRoot: string;
-  readonly eventRoot: string;
-  readonly inspectedTaskCount: number;
-  readonly migratableTaskCount: number;
-  readonly migratedTaskCount: number;
-  readonly skippedTaskCount: number;
-  readonly migratedTasks: readonly TaskLegacyLedgerMigrationEntry[];
-  readonly skippedTasks: readonly TaskLegacyLedgerMigrationSkip[];
-}
-
-export interface TaskLegacyLedgerMigrationEntry {
-  readonly taskId: string;
-  readonly taskPath: string;
-  readonly taskFormat: 'json' | 'markdown';
-  readonly status: string;
-  readonly reason: 'missing-transition-id' | 'missing-transition-event';
-  readonly transitionPath: string | null;
-}
-
-export interface TaskLegacyLedgerMigrationSkip {
-  readonly taskId: string;
-  readonly taskPath: string;
-  readonly taskFormat: 'json' | 'markdown';
-  readonly reason: string;
 }
 
 const validStatuses = new Set<TaskImportStatus>(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
@@ -431,318 +315,22 @@ async function runTasksShow(argv: string[]): Promise<CommandResult> {
   });
 }
 
-function resolvePlanningCardPath(cwd: string, taskDocument: Record<string, unknown>): string | null {
-  const source = taskDocument.source as { planPath?: string } | undefined;
-  if (source?.planPath) {
-    const resolved = path.resolve(cwd, source.planPath);
-    if (existsSync(resolved)) return resolved;
-  }
-  const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;
-  if (typeof relatedPlan === 'string' && relatedPlan.trim()) {
-    const resolved = path.resolve(cwd, relatedPlan);
-    if (existsSync(resolved)) return resolved;
-  }
-  const aliases = taskDocument.legacyImportAliases as { allowed_files?: string[] } | undefined;
-  const planningFile = aliases?.allowed_files?.find((entry) => entry.endsWith('.task.md') && existsSync(entry));
-  return planningFile ?? null;
-}
+// TASK-RFT-0010: status-triangulation atoms now live in
+// ./tasks/status-triangulation.ts. Aliases below preserve the in-file call
+// sites used by `runTasksStatus`, `runTasksReconcile`, residue diagnosis etc.
+const resolvePlanningCardPath = resolvePlanningCardPathDelegated;
+const readLastTransitionEventRecord = readLastTransitionEventRecordDelegated;
+const readScopeAmendmentEvents = readScopeAmendmentEventsDelegated;
+const buildTaskStatusTriangulation = buildTaskStatusTriangulationDelegated;
 
-function readLastTransitionEventRecord(cwd: string, taskId: string, transitionId: string | null): Record<string, unknown> | null {
-  if (!transitionId) return null;
-  const policy = readTaskLedgerPolicy(cwd);
-  const eventPath = path.join(cwd, policy.eventRoot, taskId, `${transitionId}.json`);
-  if (!existsSync(eventPath)) return null;
-  return JSON.parse(readFileSync(eventPath, 'utf8')) as Record<string, unknown>;
-}
-
-/**
- * 讀取指定任務的所有 scope-amendment 事件，依時間順序排列。
- * 供 `buildTaskStatusTriangulation` 與 closeback 輸出使用，讓 reviewer 能區分
- * 正常 linked-surface 成長與可疑 scope drift。
- */
-function readScopeAmendmentEvents(cwd: string, taskId: string): TaskScopeAmendmentSnapshot[] {
-  const policy = readTaskLedgerPolicy(cwd);
-  const eventDir = path.join(cwd, policy.eventRoot, taskId);
-  if (!existsSync(eventDir)) return [];
-  let files: string[];
-  try {
-    files = readdirSync(eventDir)
-      .filter((f) => f.includes('scope-amendment') && f.endsWith('.json'))
-      .sort();
-  } catch {
-    return [];
-  }
-  const snapshots: TaskScopeAmendmentSnapshot[] = [];
-  for (const f of files) {
-    try {
-      const raw = JSON.parse(readFileSync(path.join(eventDir, f), 'utf8')) as Record<string, unknown>;
-      if (raw.action !== 'scope-amendment') continue;
-      const meta = raw.amendmentMetadata as Record<string, unknown> | undefined;
-      // 從 command 字串解析 addedPaths（向下相容未帶 metadata 的舊事件）
-      const command = typeof raw.command === 'string' ? raw.command : '';
-      const addMatch = /--add\s+([^\s]+)/.exec(command);
-      const addedPaths = addMatch
-        ? addMatch[1].split(',').map((p) => p.trim()).filter(Boolean)
-        : [];
-      snapshots.push({
-        transitionId: typeof raw.transitionId === 'string' ? raw.transitionId : f.replace('.json', ''),
-        actorId: typeof raw.actorId === 'string' ? raw.actorId : null,
-        createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : '',
-        addedPaths,
-        amendmentClass: typeof meta?.amendmentClass === 'string' ? meta.amendmentClass : null,
-        amendmentPhase: typeof meta?.amendmentPhase === 'string' ? meta.amendmentPhase : null,
-        amendmentMode: meta?.amendmentMode === 'normal' || meta?.amendmentMode === 'repair'
-          ? meta.amendmentMode
-          : null,
-        reason: typeof meta?.reason === 'string' ? meta.reason : null
-      });
-    } catch {
-      // 跳過無法解析的事件檔
-    }
-  }
-  return snapshots;
-}
-
-function normalizeParityLifecycleValue(value: string | null): string | null {
-  const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
-  return normalized || null;
-}
-
-function isOpenPlanningParityStatus(status: string | null): boolean {
-  if (!status) return false;
-  return ['draft', 'planned', 'open', 'ready', 'running', 'in_progress'].includes(status);
-}
-
-function hasOnlyStatusDivergence(divergence: readonly TaskResidueDivergence[]): boolean {
-  return divergence.length > 0 && divergence.every((entry) => entry.field === 'status');
-}
-
-function buildPlanningMirrorParityOverride(input: {
-  taskId: string;
-  liveLedger: TaskResidueLedgerSnapshot;
-  planningFrontmatter: TaskResiduePlanningSnapshot;
-  lastTransitionEvent: TaskResidueTransitionSnapshot | null;
-  divergence: readonly TaskResidueDivergence[];
-}): {
-    residueClassification: TaskResidueClassification;
-    recommendation: string | null;
-  } | null {
-  if (!hasOnlyStatusDivergence(input.divergence)) return null;
-  const liveStatus = normalizeParityLifecycleValue(input.liveLedger.status);
-  const planningStatus = normalizeParityLifecycleValue(input.planningFrontmatter.status);
-  if (!isOpenPlanningParityStatus(liveStatus) || !isOpenPlanningParityStatus(planningStatus)) {
-    return null;
-  }
-  const claimState = normalizeParityLifecycleValue(input.liveLedger.claimState);
-  const lastAction = normalizeParityLifecycleValue(input.lastTransitionEvent?.action ?? null);
-  const activeClaimLane = claimState === 'active' || lastAction === 'claim';
-  const releasedPredecessorLane = claimState === 'released' || lastAction === 'release';
-  if (!activeClaimLane && !releasedPredecessorLane) {
-    return null;
-  }
-  const uniqueLaneStatus = activeClaimLane
-    ? {
-      truth: 'planning mirror is stale, but the active live claim already defines a unique governed lane',
-      residue: 'Planning-mirror parity drift is advisory while the active claim remains authoritative.',
-      reason: 'The live ledger claim state already identifies the governed operator lane, so the stale planning status should not force import repair or ambiguous-manual-review.'
-    }
-    : {
-      truth: 'planning mirror is stale, but the live ledger already records an intentional release or supersede lane',
-      residue: 'The predecessor task was intentionally released or superseded, so parity drift is advisory rather than repairable by import by default.',
-      reason: 'The live ledger already records a unique non-claim operator story, so the stale planning status should not push the operator back through tasks import.'
-    };
-  return {
-    residueClassification: {
-      bucket: 'no-residue',
-      truth: uniqueLaneStatus.truth,
-      residue: uniqueLaneStatus.residue,
-      reason: uniqueLaneStatus.reason,
-      nextCommandTemplate: 'node atm.mjs tasks status --task <id> --json',
-      nextCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
-      autoMutationAllowed: false
-    },
-    recommendation: null
-  };
-}
-
-function buildTaskStatusTriangulation(cwd: string, taskId: string, taskDocument: Record<string, unknown>): TaskStatusTriangulation {
-  const claim = parseClaimRecord(taskDocument.claim);
-  const liveLedger: TaskResidueLedgerSnapshot = {
-    status: typeof taskDocument.status === 'string' ? taskDocument.status : null,
-    claimState: claim?.state ?? null,
-    lastTransitionId: typeof taskDocument.lastTransitionId === 'string' ? taskDocument.lastTransitionId : null,
-    lastTransitionAt: typeof taskDocument.lastTransitionAt === 'string' ? taskDocument.lastTransitionAt : null
-  };
-  const lastTransitionEventRecord = readLastTransitionEventRecord(cwd, taskId, liveLedger.lastTransitionId);
-  const lastTransitionEvent: TaskResidueTransitionSnapshot | null = lastTransitionEventRecord ? {
-    action: typeof lastTransitionEventRecord.action === 'string' ? lastTransitionEventRecord.action : null,
-    actorId: typeof lastTransitionEventRecord.actorId === 'string' ? lastTransitionEventRecord.actorId : null,
-    createdAt: typeof lastTransitionEventRecord.createdAt === 'string' ? lastTransitionEventRecord.createdAt : null,
-    fromStatus: typeof lastTransitionEventRecord.fromStatus === 'string' ? lastTransitionEventRecord.fromStatus : null,
-    toStatus: typeof lastTransitionEventRecord.toStatus === 'string' ? lastTransitionEventRecord.toStatus : null
-  } : null;
-  const planningCardPath = resolvePlanningCardPath(cwd, taskDocument);
-  let planningFrontmatter: TaskResiduePlanningSnapshot = { status: null, source: null };
-  if (planningCardPath) {
-    const frontMatter = extractFrontMatter(readFileSync(planningCardPath, 'utf8'));
-    if (frontMatter) {
-      planningFrontmatter = {
-        status: typeof frontMatter.data.status === 'string' ? frontMatter.data.status : null,
-        source: relativePathFrom(cwd, planningCardPath)
-      };
-    }
-  }
-  const divergence: TaskResidueDivergence[] = [];
-  if (planningFrontmatter.status && planningFrontmatter.status !== liveLedger.status) {
-    divergence.push({
-      field: 'status',
-      liveLedger: liveLedger.status,
-      planningFrontmatter: planningFrontmatter.status,
-      lastTransitionEvent: lastTransitionEvent?.toStatus ?? null
-    });
-  }
-  if (lastTransitionEvent?.toStatus && lastTransitionEvent.toStatus !== liveLedger.status) {
-    const existing = divergence.find((entry) => entry.field === 'status');
-    if (!existing) {
-      divergence.push({
-        field: 'status',
-        liveLedger: liveLedger.status,
-        lastTransitionEvent: lastTransitionEvent.toStatus
-      });
-    }
-  }
-  const residueClassification = buildResidueClassification({
-    cwd,
-    taskId,
-    taskDocument,
-    liveLedger,
-    planningFrontmatter,
-    lastTransitionEvent,
-    divergence
-  });
-  const parityOverride = buildPlanningMirrorParityOverride({
-    taskId,
-    liveLedger,
-    planningFrontmatter,
-    lastTransitionEvent,
-    divergence
-  });
-  const recommendation = parityOverride
-    ? parityOverride.recommendation
-    : divergence.length > 0
-    ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
-      ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
-      : `node atm.mjs tasks import --from <plan.md> --write --json`)
-    : null;
-  const amendmentHistory = readScopeAmendmentEvents(cwd, taskId);
-  return {
-    ssot: 'liveLedger' as const,
-    liveLedger,
-    lastTransitionEvent,
-    planningFrontmatter,
-    divergence,
-    recommendation,
-    residueClassification: parityOverride?.residueClassification ?? residueClassification,
-    amendmentHistory
-  };
-}
 
 export type { TaskResidueBucket, TaskResidueClassification } from './tasks/residue-diagnostics.ts';
 
-async function recordStaleRunnerOverride(input: {
-  readonly cwd: string;
-  readonly taskId: string;
-  readonly actorId: string | null;
-  readonly action: string;
-  readonly command: string;
-}) {
-  const taskPath = taskPathFor(input.cwd, input.taskId);
-  if (!existsSync(taskPath)) return null;
-  const taskDocument = readJsonRecord(taskPath);
-  const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
-  appendTaskTransitionEvent({
-    cwd: input.cwd,
-    taskId: input.taskId,
-    action: 'allow-stale-runner',
-    actorId: input.actorId,
-    sessionId: null,
-    fromStatus: previousStatus,
-    toStatus: previousStatus,
-    taskPath,
-    taskDocument,
-    command: input.command
-  });
-  return true;
-}
+// TASK-RFT-0010: close-governance atoms now live in ./tasks/close-governance.ts.
+const recordStaleRunnerOverride = recordStaleRunnerOverrideDelegated;
+const isCliErrorWithCode = isCliErrorWithCodeDelegated;
+const recordFailedEmergencyUseAttempt = recordFailedEmergencyUseAttemptDelegated;
 
-function isCliErrorWithCode(error: unknown, codePrefix: string): boolean {
-  return error instanceof CliError && typeof error.code === 'string' && error.code.startsWith(codePrefix);
-}
-
-function recordFailedEmergencyUseAttempt(input: {
-  readonly cwd: string;
-  readonly leaseId: string | null | undefined;
-  readonly permission: EmergencyPermissionId;
-  readonly surface: string;
-  readonly taskId: string;
-  readonly actorId: string | null;
-  readonly reason: string | null;
-  readonly command: string | null;
-  readonly failureCode: string | null;
-  readonly flags?: readonly string[];
-}) {
-  const auditPath = recordFailedProtectedOverrideAttempt({
-    cwd: input.cwd,
-    leaseId: input.leaseId,
-    permission: input.permission,
-    surface: input.surface,
-    taskId: input.taskId,
-    actorId: input.actorId,
-    reason: input.reason,
-    command: input.command,
-    flags: input.flags,
-    failureCode: input.failureCode
-  });
-  if (!input.leaseId) return auditPath;
-  try {
-    const lease = readEmergencyLease(input.cwd, input.leaseId);
-    if (lease.status !== 'active') return auditPath;
-    if (lease.permission !== input.permission) return auditPath;
-    if (lease.taskId && lease.taskId !== input.taskId) return auditPath;
-    if (input.actorId && lease.actorId !== input.actorId) return auditPath;
-    const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
-    if (!Number.isFinite(usedCount) || usedCount >= lease.maxUses) return auditPath;
-    if (Date.parse(lease.expiresAt) <= Date.now()) return auditPath;
-    const usedAt = new Date().toISOString();
-    const usePath = path.join(emergencyRoot(input.cwd), 'uses', `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
-    mkdirSync(path.dirname(usePath), { recursive: true });
-    writeFileSync(usePath, `${JSON.stringify({
-      schemaId: 'atm.emergencyMaintenanceUse.v1',
-      leaseId: lease.leaseId,
-      taskId: input.taskId,
-      actorId: input.actorId,
-      permission: input.permission,
-      surface: input.surface,
-      usedAt,
-      reason: input.reason,
-      command: input.command,
-      result: 'failed',
-      before: {
-        leaseStatus: lease.status,
-        usedCount
-      },
-      after: {
-        leaseStatus: lease.status,
-        usedCount,
-        failureCode: input.failureCode
-      },
-      touchedFiles: []
-    }, null, 2)}\n`, 'utf8');
-    return relativePathFrom(input.cwd, usePath);
-  } catch {
-    return auditPath;
-  }
-}
 
 export function loadTaskDocumentOrThrow(cwd: string, taskId: string): { taskPath: string; taskDocument: Record<string, unknown> } {
   const taskPath = taskPathFor(cwd, taskId);

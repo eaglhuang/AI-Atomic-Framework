@@ -17,6 +17,10 @@ const releaseEntries = [
   'CONTRIBUTING.md',
   'LICENSE',
   'README.md',
+  // Root-drop bundles need a frozen runner available in clean checkouts.
+  // Carry the tracked onefile release so bundle-local atm.mjs can launch
+  // without relying on ignored dist artifacts from a dirty workspace.
+  'release/atm-onefile',
   'atomic-registry.json',
   'atomic_workbench',
   'docs',

@@ -21,12 +21,10 @@ import { evaluateTaskClaimAdmission, evaluateTaskDoneCloseAdmission, evaluateTas
 import { buildHistoricalDeliveryProvenance, inspectHistoricalDelivery, isDeliverableGateCandidate, pathMatchesTaskScope } from './tasks/historical-delivery.js';
 import { attachDirtyGuardToScopedDiffIsolation, buildCloseScopedDiffIsolation, evaluateFrameworkCloseDirtyGuard } from './tasks/scope-lock-diagnostics.js';
 import { applyClaimRepairWrite, buildRepairClaimCommand, diagnoseClaimRepairState } from './tasks/claim-repair-diagnostics.js';
-import { buildResidueClassification, buildResidueDiagnosisEvidenceFromTriangulation } from './tasks/residue-diagnostics.js';
+import { buildResidueDiagnosisEvidenceFromTriangulation } from './tasks/residue-diagnostics.js';
 import { dispatchTasksAction } from './tasks/command-dispatch.js';
 import { runAtmGit } from './git-governance.js';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.js';
-import { recordFailedProtectedOverrideAttempt } from './emergency/protected-override-audit.js';
-import { emergencyRoot, readEmergencyLease } from './emergency/leases.js';
 import { parseClaimRecord, createClaimRecord, isClaimExpired, listRuntimeLockTaskIds } from './tasks/task-ledger-readers.js';
 import { isFrontmatterScalar as delegatedIsFrontmatterScalar } from './tasks/is-frontmatter-scalar-helper.js';
 import { normalizeStringValue as delegatedNormalizeStringValue } from './tasks/normalize-string-value-helper.js';
@@ -39,6 +37,8 @@ import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines a
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './tasks/task-file-io-helpers.js';
 import { coerceStatus, extractFrontMatter, extractTaskDeclaredFiles, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, taskIdsEqual, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './tasks/task-import-validators.js';
 import { parseReconcileOptions, parseDeliverAndCloseOptions, parseCreateOptions, parseMirrorOptions, parseCloseOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseClaimLifecycleOptions, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './tasks/task-option-parsers.js';
+import { buildTaskStatusTriangulation as buildTaskStatusTriangulationDelegated, readScopeAmendmentEvents as readScopeAmendmentEventsDelegated, readLastTransitionEventRecord as readLastTransitionEventRecordDelegated, resolvePlanningCardPath as resolvePlanningCardPathDelegated } from './tasks/status-triangulation.js';
+import { recordStaleRunnerOverride as recordStaleRunnerOverrideDelegated, recordFailedEmergencyUseAttempt as recordFailedEmergencyUseAttemptDelegated, isCliErrorWithCode as isCliErrorWithCodeDelegated } from './tasks/close-governance.js';
 const validStatuses = new Set(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria', '驗收', '驗收條件'];
 const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes', '交付物', '產物', '輸出'];
@@ -122,299 +122,17 @@ async function runTasksShow(argv) {
         }
     });
 }
-function resolvePlanningCardPath(cwd, taskDocument) {
-    const source = taskDocument.source;
-    if (source?.planPath) {
-        const resolved = path.resolve(cwd, source.planPath);
-        if (existsSync(resolved))
-            return resolved;
-    }
-    const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;
-    if (typeof relatedPlan === 'string' && relatedPlan.trim()) {
-        const resolved = path.resolve(cwd, relatedPlan);
-        if (existsSync(resolved))
-            return resolved;
-    }
-    const aliases = taskDocument.legacyImportAliases;
-    const planningFile = aliases?.allowed_files?.find((entry) => entry.endsWith('.task.md') && existsSync(entry));
-    return planningFile ?? null;
-}
-function readLastTransitionEventRecord(cwd, taskId, transitionId) {
-    if (!transitionId)
-        return null;
-    const policy = readTaskLedgerPolicy(cwd);
-    const eventPath = path.join(cwd, policy.eventRoot, taskId, `${transitionId}.json`);
-    if (!existsSync(eventPath))
-        return null;
-    return JSON.parse(readFileSync(eventPath, 'utf8'));
-}
-/**
- * 讀取指定任務的所有 scope-amendment 事件，依時間順序排列。
- * 供 `buildTaskStatusTriangulation` 與 closeback 輸出使用，讓 reviewer 能區分
- * 正常 linked-surface 成長與可疑 scope drift。
- */
-function readScopeAmendmentEvents(cwd, taskId) {
-    const policy = readTaskLedgerPolicy(cwd);
-    const eventDir = path.join(cwd, policy.eventRoot, taskId);
-    if (!existsSync(eventDir))
-        return [];
-    let files;
-    try {
-        files = readdirSync(eventDir)
-            .filter((f) => f.includes('scope-amendment') && f.endsWith('.json'))
-            .sort();
-    }
-    catch {
-        return [];
-    }
-    const snapshots = [];
-    for (const f of files) {
-        try {
-            const raw = JSON.parse(readFileSync(path.join(eventDir, f), 'utf8'));
-            if (raw.action !== 'scope-amendment')
-                continue;
-            const meta = raw.amendmentMetadata;
-            // 從 command 字串解析 addedPaths（向下相容未帶 metadata 的舊事件）
-            const command = typeof raw.command === 'string' ? raw.command : '';
-            const addMatch = /--add\s+([^\s]+)/.exec(command);
-            const addedPaths = addMatch
-                ? addMatch[1].split(',').map((p) => p.trim()).filter(Boolean)
-                : [];
-            snapshots.push({
-                transitionId: typeof raw.transitionId === 'string' ? raw.transitionId : f.replace('.json', ''),
-                actorId: typeof raw.actorId === 'string' ? raw.actorId : null,
-                createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : '',
-                addedPaths,
-                amendmentClass: typeof meta?.amendmentClass === 'string' ? meta.amendmentClass : null,
-                amendmentPhase: typeof meta?.amendmentPhase === 'string' ? meta.amendmentPhase : null,
-                amendmentMode: meta?.amendmentMode === 'normal' || meta?.amendmentMode === 'repair'
-                    ? meta.amendmentMode
-                    : null,
-                reason: typeof meta?.reason === 'string' ? meta.reason : null
-            });
-        }
-        catch {
-            // 跳過無法解析的事件檔
-        }
-    }
-    return snapshots;
-}
-function normalizeParityLifecycleValue(value) {
-    const normalized = String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
-    return normalized || null;
-}
-function isOpenPlanningParityStatus(status) {
-    if (!status)
-        return false;
-    return ['draft', 'planned', 'open', 'ready', 'running', 'in_progress'].includes(status);
-}
-function hasOnlyStatusDivergence(divergence) {
-    return divergence.length > 0 && divergence.every((entry) => entry.field === 'status');
-}
-function buildPlanningMirrorParityOverride(input) {
-    if (!hasOnlyStatusDivergence(input.divergence))
-        return null;
-    const liveStatus = normalizeParityLifecycleValue(input.liveLedger.status);
-    const planningStatus = normalizeParityLifecycleValue(input.planningFrontmatter.status);
-    if (!isOpenPlanningParityStatus(liveStatus) || !isOpenPlanningParityStatus(planningStatus)) {
-        return null;
-    }
-    const claimState = normalizeParityLifecycleValue(input.liveLedger.claimState);
-    const lastAction = normalizeParityLifecycleValue(input.lastTransitionEvent?.action ?? null);
-    const activeClaimLane = claimState === 'active' || lastAction === 'claim';
-    const releasedPredecessorLane = claimState === 'released' || lastAction === 'release';
-    if (!activeClaimLane && !releasedPredecessorLane) {
-        return null;
-    }
-    const uniqueLaneStatus = activeClaimLane
-        ? {
-            truth: 'planning mirror is stale, but the active live claim already defines a unique governed lane',
-            residue: 'Planning-mirror parity drift is advisory while the active claim remains authoritative.',
-            reason: 'The live ledger claim state already identifies the governed operator lane, so the stale planning status should not force import repair or ambiguous-manual-review.'
-        }
-        : {
-            truth: 'planning mirror is stale, but the live ledger already records an intentional release or supersede lane',
-            residue: 'The predecessor task was intentionally released or superseded, so parity drift is advisory rather than repairable by import by default.',
-            reason: 'The live ledger already records a unique non-claim operator story, so the stale planning status should not push the operator back through tasks import.'
-        };
-    return {
-        residueClassification: {
-            bucket: 'no-residue',
-            truth: uniqueLaneStatus.truth,
-            residue: uniqueLaneStatus.residue,
-            reason: uniqueLaneStatus.reason,
-            nextCommandTemplate: 'node atm.mjs tasks status --task <id> --json',
-            nextCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
-            autoMutationAllowed: false
-        },
-        recommendation: null
-    };
-}
-function buildTaskStatusTriangulation(cwd, taskId, taskDocument) {
-    const claim = parseClaimRecord(taskDocument.claim);
-    const liveLedger = {
-        status: typeof taskDocument.status === 'string' ? taskDocument.status : null,
-        claimState: claim?.state ?? null,
-        lastTransitionId: typeof taskDocument.lastTransitionId === 'string' ? taskDocument.lastTransitionId : null,
-        lastTransitionAt: typeof taskDocument.lastTransitionAt === 'string' ? taskDocument.lastTransitionAt : null
-    };
-    const lastTransitionEventRecord = readLastTransitionEventRecord(cwd, taskId, liveLedger.lastTransitionId);
-    const lastTransitionEvent = lastTransitionEventRecord ? {
-        action: typeof lastTransitionEventRecord.action === 'string' ? lastTransitionEventRecord.action : null,
-        actorId: typeof lastTransitionEventRecord.actorId === 'string' ? lastTransitionEventRecord.actorId : null,
-        createdAt: typeof lastTransitionEventRecord.createdAt === 'string' ? lastTransitionEventRecord.createdAt : null,
-        fromStatus: typeof lastTransitionEventRecord.fromStatus === 'string' ? lastTransitionEventRecord.fromStatus : null,
-        toStatus: typeof lastTransitionEventRecord.toStatus === 'string' ? lastTransitionEventRecord.toStatus : null
-    } : null;
-    const planningCardPath = resolvePlanningCardPath(cwd, taskDocument);
-    let planningFrontmatter = { status: null, source: null };
-    if (planningCardPath) {
-        const frontMatter = extractFrontMatter(readFileSync(planningCardPath, 'utf8'));
-        if (frontMatter) {
-            planningFrontmatter = {
-                status: typeof frontMatter.data.status === 'string' ? frontMatter.data.status : null,
-                source: relativePathFrom(cwd, planningCardPath)
-            };
-        }
-    }
-    const divergence = [];
-    if (planningFrontmatter.status && planningFrontmatter.status !== liveLedger.status) {
-        divergence.push({
-            field: 'status',
-            liveLedger: liveLedger.status,
-            planningFrontmatter: planningFrontmatter.status,
-            lastTransitionEvent: lastTransitionEvent?.toStatus ?? null
-        });
-    }
-    if (lastTransitionEvent?.toStatus && lastTransitionEvent.toStatus !== liveLedger.status) {
-        const existing = divergence.find((entry) => entry.field === 'status');
-        if (!existing) {
-            divergence.push({
-                field: 'status',
-                liveLedger: liveLedger.status,
-                lastTransitionEvent: lastTransitionEvent.toStatus
-            });
-        }
-    }
-    const residueClassification = buildResidueClassification({
-        cwd,
-        taskId,
-        taskDocument,
-        liveLedger,
-        planningFrontmatter,
-        lastTransitionEvent,
-        divergence
-    });
-    const parityOverride = buildPlanningMirrorParityOverride({
-        taskId,
-        liveLedger,
-        planningFrontmatter,
-        lastTransitionEvent,
-        divergence
-    });
-    const recommendation = parityOverride
-        ? parityOverride.recommendation
-        : divergence.length > 0
-            ? (planningFrontmatter.status === 'done' && liveLedger.status !== 'done'
-                ? `node atm.mjs tasks reconcile --task ${taskId} --actor <actor> --delivery-commit <sha> --json`
-                : `node atm.mjs tasks import --from <plan.md> --write --json`)
-            : null;
-    const amendmentHistory = readScopeAmendmentEvents(cwd, taskId);
-    return {
-        ssot: 'liveLedger',
-        liveLedger,
-        lastTransitionEvent,
-        planningFrontmatter,
-        divergence,
-        recommendation,
-        residueClassification: parityOverride?.residueClassification ?? residueClassification,
-        amendmentHistory
-    };
-}
-async function recordStaleRunnerOverride(input) {
-    const taskPath = taskPathFor(input.cwd, input.taskId);
-    if (!existsSync(taskPath))
-        return null;
-    const taskDocument = readJsonRecord(taskPath);
-    const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
-    appendTaskTransitionEvent({
-        cwd: input.cwd,
-        taskId: input.taskId,
-        action: 'allow-stale-runner',
-        actorId: input.actorId,
-        sessionId: null,
-        fromStatus: previousStatus,
-        toStatus: previousStatus,
-        taskPath,
-        taskDocument,
-        command: input.command
-    });
-    return true;
-}
-function isCliErrorWithCode(error, codePrefix) {
-    return error instanceof CliError && typeof error.code === 'string' && error.code.startsWith(codePrefix);
-}
-function recordFailedEmergencyUseAttempt(input) {
-    const auditPath = recordFailedProtectedOverrideAttempt({
-        cwd: input.cwd,
-        leaseId: input.leaseId,
-        permission: input.permission,
-        surface: input.surface,
-        taskId: input.taskId,
-        actorId: input.actorId,
-        reason: input.reason,
-        command: input.command,
-        flags: input.flags,
-        failureCode: input.failureCode
-    });
-    if (!input.leaseId)
-        return auditPath;
-    try {
-        const lease = readEmergencyLease(input.cwd, input.leaseId);
-        if (lease.status !== 'active')
-            return auditPath;
-        if (lease.permission !== input.permission)
-            return auditPath;
-        if (lease.taskId && lease.taskId !== input.taskId)
-            return auditPath;
-        if (input.actorId && lease.actorId !== input.actorId)
-            return auditPath;
-        const usedCount = typeof lease.usedCount === 'number' ? lease.usedCount : Number(lease.usedCount ?? 0);
-        if (!Number.isFinite(usedCount) || usedCount >= lease.maxUses)
-            return auditPath;
-        if (Date.parse(lease.expiresAt) <= Date.now())
-            return auditPath;
-        const usedAt = new Date().toISOString();
-        const usePath = path.join(emergencyRoot(input.cwd), 'uses', `${usedAt.replace(/[:.]/g, '-')}-${lease.leaseId}.json`);
-        mkdirSync(path.dirname(usePath), { recursive: true });
-        writeFileSync(usePath, `${JSON.stringify({
-            schemaId: 'atm.emergencyMaintenanceUse.v1',
-            leaseId: lease.leaseId,
-            taskId: input.taskId,
-            actorId: input.actorId,
-            permission: input.permission,
-            surface: input.surface,
-            usedAt,
-            reason: input.reason,
-            command: input.command,
-            result: 'failed',
-            before: {
-                leaseStatus: lease.status,
-                usedCount
-            },
-            after: {
-                leaseStatus: lease.status,
-                usedCount,
-                failureCode: input.failureCode
-            },
-            touchedFiles: []
-        }, null, 2)}\n`, 'utf8');
-        return relativePathFrom(input.cwd, usePath);
-    }
-    catch {
-        return auditPath;
-    }
-}
+// TASK-RFT-0010: status-triangulation atoms now live in
+// ./tasks/status-triangulation.ts. Aliases below preserve the in-file call
+// sites used by `runTasksStatus`, `runTasksReconcile`, residue diagnosis etc.
+const resolvePlanningCardPath = resolvePlanningCardPathDelegated;
+const readLastTransitionEventRecord = readLastTransitionEventRecordDelegated;
+const readScopeAmendmentEvents = readScopeAmendmentEventsDelegated;
+const buildTaskStatusTriangulation = buildTaskStatusTriangulationDelegated;
+// TASK-RFT-0010: close-governance atoms now live in ./tasks/close-governance.ts.
+const recordStaleRunnerOverride = recordStaleRunnerOverrideDelegated;
+const isCliErrorWithCode = isCliErrorWithCodeDelegated;
+const recordFailedEmergencyUseAttempt = recordFailedEmergencyUseAttemptDelegated;
 export function loadTaskDocumentOrThrow(cwd, taskId) {
     const taskPath = taskPathFor(cwd, taskId);
     if (!existsSync(taskPath)) {

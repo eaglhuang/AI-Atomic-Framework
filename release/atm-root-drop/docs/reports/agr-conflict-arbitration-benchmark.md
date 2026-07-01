@@ -6,7 +6,7 @@
 
 - Scenario count: 8
 - Catch rate: 100% (7/7 unsafe scenarios caught)
-- Average latency: 1186075 ns per scenario (deterministic local harness)
+- Latency note: runtime latency is measured during each validator run and recorded in receipts/stdout, but omitted from this tracked report because host timing is non-authoritative.
 - Ship-safe: yes
 
 ## False-safe regressions
@@ -17,13 +17,7 @@
 
 - none
 
-## Per-scenario latency (ns)
+## Runtime Measurement Policy
 
-- capsule-cid-drift-freeze: 72500
-- cid-conflict-blocked: 45600
-- manual-override-collision: 618100
-- orphan-lock-cleanup: 251100
-- parallel-safe-disjoint: 669600
-- physical-overlap-steward: 82600
-- read-write-dependency-freeze: 7704800
-- shared-surface-blocked: 44300
+- Validator receipts and stdout carry the current run latency evidence.
+- The tracked markdown stays content-stable across equivalent reruns so governance checks do not fail on host-specific timing jitter.

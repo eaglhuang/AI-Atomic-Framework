@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runNext } from '../../next.js';
@@ -139,7 +139,9 @@ assert.equal(successTaskDoc.status, 'done');
 const rollbackFixture = await makeCloseAtomicityFixture('rollback');
 const hookDir = path.join(rollbackFixture.planningRepo, '.githooks');
 mkdirSync(hookDir, { recursive: true });
-writeText(path.join(hookDir, 'pre-commit'), '#!/bin/sh\nexit 1\n');
+const hookPath = path.join(hookDir, 'pre-commit');
+writeText(hookPath, '#!/bin/sh\nexit 1\n');
+chmodSync(hookPath, 0o755);
 execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: rollbackFixture.planningRepo, stdio: 'ignore' });
 const rollbackClose = await runTaskflow([
     'close',

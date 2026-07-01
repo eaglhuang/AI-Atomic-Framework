@@ -210,4 +210,47 @@ if (!dispatchSource.includes("case 'claim':") || !dispatchSource.includes('handl
   fail('command-dispatch must own claim lifecycle action grouping');
 }
 
+// ---------------------------------------------------------------------------
+// TASK-RFT-0010 — assert the four new owner modules exist and are referenced
+// by the atomic-map report.
+// ---------------------------------------------------------------------------
+
+const rftOwnerModules = [
+  'packages/cli/src/commands/tasks/close-governance.ts',
+  'packages/cli/src/commands/tasks/status-triangulation.ts',
+  'packages/cli/src/commands/tasks/import-verify.ts',
+  'packages/cli/src/commands/tasks/result-contracts.ts'
+];
+
+for (const ownerModule of rftOwnerModules) {
+  if (!existsSync(path.join(root, ownerModule))) {
+    fail(`TASK-RFT-0010 missing owner module file: ${ownerModule}`);
+  }
+  if (!report.includes(ownerModule)) {
+    fail(`TASK-RFT-0010 report must reference owner module: ${ownerModule}`);
+  }
+}
+
+const rftSpecModules = [
+  'packages/cli/src/commands/tasks/__tests__/close-governance.spec.ts',
+  'packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts',
+  'packages/cli/src/commands/tasks/__tests__/import-verify.spec.ts',
+  'packages/cli/src/commands/tasks/__tests__/result-contracts.spec.ts'
+];
+for (const specModule of rftSpecModules) {
+  if (!existsSync(path.join(root, specModule))) {
+    fail(`TASK-RFT-0010 missing spec file: ${specModule}`);
+  }
+}
+
+if (!tasksSource.includes("from './tasks/close-governance.ts'")) {
+  fail('tasks.ts must import close-governance owner module');
+}
+if (!tasksSource.includes("from './tasks/status-triangulation.ts'")) {
+  fail('tasks.ts must import status-triangulation owner module');
+}
+if (!tasksSource.includes("from './tasks/result-contracts.ts'")) {
+  fail('tasks.ts must import result-contracts owner module for re-export');
+}
+
 console.log('[tasks-atomic-map] ok');

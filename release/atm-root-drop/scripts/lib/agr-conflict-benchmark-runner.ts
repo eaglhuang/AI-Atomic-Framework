@@ -290,7 +290,7 @@ export function renderAgrConflictBenchmarkMarkdown(report: AgrConflictBenchmarkR
     '',
     `- Scenario count: ${report.scenarioCount}`,
     `- Catch rate: ${report.catchRate.catchRatePercent}% (${report.catchRate.caughtCount}/${report.catchRate.unsafeScenarioCount} unsafe scenarios caught)`,
-    `- Average latency: ${report.latency.averageNs} ns per scenario (deterministic local harness)`,
+    '- Latency note: runtime latency is measured during each validator run and recorded in receipts/stdout, but omitted from this tracked report because host timing is non-authoritative.',
     `- Ship-safe: ${report.shipSafe ? 'yes' : 'no'}`,
     '',
     '## False-safe regressions',
@@ -305,10 +305,9 @@ export function renderAgrConflictBenchmarkMarkdown(report: AgrConflictBenchmarkR
       ? '- none'
       : report.expectationFailures.map((entry) => `- ${entry}`).join('\n'),
     '',
-    '## Per-scenario latency (ns)',
+    '## Runtime Measurement Policy',
     '',
-    ...Object.entries(report.latency.perScenarioNs)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([scenarioId, latencyNs]) => `- ${scenarioId}: ${latencyNs}`)
+    '- Validator receipts and stdout carry the current run latency evidence.',
+    '- The tracked markdown stays content-stable across equivalent reruns so governance checks do not fail on host-specific timing jitter.'
   ].join('\n');
 }
