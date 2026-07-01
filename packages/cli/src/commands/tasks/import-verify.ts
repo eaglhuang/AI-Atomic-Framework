@@ -82,6 +82,130 @@ export function importDiagnosticFromUnknownError(
 }
 
 // ---------------------------------------------------------------------------
+// TASK-RFT-0011 — reset-open UX classifier
+// ---------------------------------------------------------------------------
+
+/**
+ * Classifier states for `tasks import --write --reset-open`. The purpose is to
+ * distinguish the *normal* Phase 0 → Phase 1 handoff (planning card marked
+ * `in-progress`, but no runtime ledger has been opened yet) from the *safety*
+ * cases where reset-open would clobber a real active claim.
+ */
+export type TaskImportResetOpenState =
+  | 'fresh-open'
+  | 'drift-with-active-claim'
+  | 'drift-without-claim'
+  | 'planning-in-progress-no-runtime';
+
+export interface TaskImportResetOpenInput {
+  /**
+   * Planning-side card status parsed from the plan markdown / frontmatter. May
+   * be null if the planning source declares no status.
+   */
+  readonly planningStatus: string | null;
+  /** Runtime ledger record for the same task, or null when no runtime entry exists. */
+  readonly runtimeLedgerStatus: string | null;
+  /** Runtime ledger active-claim actor id, or null when no active claim exists. */
+  readonly runtimeActiveClaimActorId: string | null;
+}
+
+export interface TaskImportResetOpenClassification {
+  readonly state: TaskImportResetOpenState;
+  /**
+   * True when `--reset-open` may proceed WITHOUT an emergency lease. Only
+   * `planning-in-progress-no-runtime` (and the trivial `fresh-open`) qualify;
+   * every other state must still route through the emergency lane so an
+   * operator explicitly acknowledges the runtime override.
+   */
+  readonly resetOpenEmergencyRequired: boolean;
+  /** Human-readable diagnostic reason. */
+  readonly reason: string;
+}
+
+const PLANNING_IN_PROGRESS_TOKENS = new Set([
+  'in-progress',
+  'in_progress',
+  'inprogress',
+  'wip',
+  'started'
+]);
+
+const RUNTIME_ACTIVE_TOKENS = new Set([
+  'in-progress',
+  'in_progress',
+  'claimed',
+  'started'
+]);
+
+function normalizeStatusToken(raw: string | null): string {
+  return (raw ?? '').trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+/**
+ * Classify a `tasks import --reset-open` invocation.
+ *
+ * Rules:
+ *   - `fresh-open`: no runtime ledger yet — the import can just open.
+ *     `--reset-open` is a no-op here, do not gate.
+ *   - `planning-in-progress-no-runtime`: planning card frontmatter is
+ *     `in-progress` but no runtime claim exists. This is the normal
+ *     Phase 0 → Phase 1 handoff after Captain writes `status: in-progress`
+ *     into the plan card up-front. Allow reset-open without emergency lease.
+ *   - `drift-with-active-claim`: some other actor still holds a live claim.
+ *     `--reset-open` here really would clobber active work — keep emergency
+ *     gating.
+ *   - `drift-without-claim`: runtime ledger has drifted (e.g. stale
+ *     `in-progress` without a live claim record). Emergency gating stays on
+ *     for now; this atom does not soften that case.
+ */
+export function classifyResetOpenImport(
+  input: TaskImportResetOpenInput
+): TaskImportResetOpenClassification {
+  const planningToken = normalizeStatusToken(input.planningStatus);
+  const runtimeToken = normalizeStatusToken(input.runtimeLedgerStatus);
+  const hasRuntimeLedger = runtimeToken.length > 0;
+  const hasActiveClaim = typeof input.runtimeActiveClaimActorId === 'string'
+    && input.runtimeActiveClaimActorId.trim().length > 0;
+
+  if (!hasRuntimeLedger) {
+    if (PLANNING_IN_PROGRESS_TOKENS.has(planningToken)) {
+      return {
+        state: 'planning-in-progress-no-runtime',
+        resetOpenEmergencyRequired: false,
+        reason: 'Planning frontmatter is in-progress; runtime ledger will open fresh — reset-open is safe without emergency lease.'
+      };
+    }
+    return {
+      state: 'fresh-open',
+      resetOpenEmergencyRequired: false,
+      reason: 'No runtime ledger entry exists; --reset-open is a no-op safe path.'
+    };
+  }
+
+  if (hasActiveClaim) {
+    return {
+      state: 'drift-with-active-claim',
+      resetOpenEmergencyRequired: true,
+      reason: `Runtime ledger has an active claim held by ${input.runtimeActiveClaimActorId}; reset-open would clobber it and still requires an emergency lease.`
+    };
+  }
+
+  if (RUNTIME_ACTIVE_TOKENS.has(runtimeToken)) {
+    return {
+      state: 'drift-without-claim',
+      resetOpenEmergencyRequired: true,
+      reason: 'Runtime ledger is active-flavored without an active claim record; drift is real — emergency lease still required.'
+    };
+  }
+
+  return {
+    state: 'fresh-open',
+    resetOpenEmergencyRequired: false,
+    reason: 'Runtime ledger is closed/inert; --reset-open is not a destructive action.'
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Import manifest envelope
 // ---------------------------------------------------------------------------
 

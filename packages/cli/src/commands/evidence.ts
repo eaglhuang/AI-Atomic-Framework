@@ -1078,34 +1078,44 @@ export function executeAutoEvidencePlan(input: {
   cwd: string;
   taskId: string;
   actorId: string;
+  /**
+   * TASK-RFT-0011: optional mapper that rewrites the command taskflow will
+   * execute for a plan entry (e.g. switching a `node --strip-types scripts/foo.ts`
+   * declaration to `npm run foo` when the two are equivalent). The mapper is
+   * pure — evidence.ts does not know about npm-script equivalence rules on its
+   * own; callers (taskflow.ts) inject one bound to the current package.json.
+   */
+  commandMapper?: (declaredCommand: string) => string;
 }): AutoEvidenceExecutionResult {
   const resolvedCwd = path.resolve(input.cwd);
   const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
   const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
   const runs: AutoEvidenceExecutionResult['runs'][number][] = [];
+  const mapper = input.commandMapper;
 
   for (const entry of plan.toRun) {
     if (!entry.command) continue;
+    const effectiveCommand = mapper ? mapper(entry.command) : entry.command;
     try {
       runEvidenceRun([
         '--cwd', resolvedCwd,
         '--task', input.taskId,
         '--actor', input.actorId,
-        '--command', entry.command,
+        '--command', effectiveCommand,
         '--runner-kind', runnerArbitration.preferredRunnerKind,
         ...(entry.linkedValidators.length > 0 ? ['--validators', entry.linkedValidators.join(',')] : []),
         '--json'
       ]);
-      runs.push({ validator: entry.validator, command: entry.command, ok: true });
+      runs.push({ validator: entry.validator, command: effectiveCommand, ok: true });
     } catch (error) {
       const errorCode = error instanceof CliError ? error.code : 'ATM_AUTO_EVIDENCE_RUN_FAILED';
-      const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, entry.command, entry.validator, runnerArbitration.preferredRunnerKind);
+      const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, effectiveCommand, entry.validator, runnerArbitration.preferredRunnerKind);
       return {
         schemaId: 'atm.autoEvidenceExecution.v1',
         taskId: input.taskId,
         ok: false,
         plan,
-        runs: [...runs, { validator: entry.validator, command: entry.command, ok: false, errorCode }],
+        runs: [...runs, { validator: entry.validator, command: effectiveCommand, ok: false, errorCode }],
         failedValidator: entry.validator,
         remediationCommand
       };

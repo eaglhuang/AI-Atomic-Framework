@@ -98,6 +98,7 @@ import {
   type TaskStatusTriangulation
 } from './tasks/residue-diagnostics.ts';
 import { dispatchTasksAction } from './tasks/command-dispatch.ts';
+import { classifyResetOpenImport, type TaskImportResetOpenClassification } from './tasks/import-verify.ts';
 import { runAtmGit } from './git-governance.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { recordFailedProtectedOverrideAttempt } from './emergency/protected-override-audit.ts';
@@ -1258,10 +1259,24 @@ async function runTasksImport(argv: string[]) {
   if (options.dryRun === options.write) {
     throw new CliError('ATM_CLI_USAGE', 'tasks import requires exactly one of --dry-run or --write.', { exitCode: 2 });
   }
+  // TASK-RFT-0011 — reset-open UX classification.
+  // The historical behavior: any use of `--reset-open` on a `--write` import
+  // triggered `ATM_EMERGENCY_LANE_APPROVAL_REQUIRED`. In the normal
+  // Phase 0 → Phase 1 handoff the planning card is marked `in-progress` but no
+  // runtime ledger yet exists — reset-open is a harmless no-op there. We peek
+  // at the plan + runtime ledger, classify, and only require emergency approval
+  // when the reset would actually clobber active state.
+  let resetOpenClassification: TaskImportResetOpenClassification | null = null;
+  if (options.write && options.resetOpen) {
+    resetOpenClassification = classifyResetOpenImportForOptions(options);
+  }
+  const resetOpenNeedsEmergency = options.resetOpen && (
+    resetOpenClassification?.resetOpenEmergencyRequired ?? true
+  );
   const importEmergencyRequired = options.write && (
     options.force
     || options.forceOverwriteClaims
-    || options.resetOpen
+    || resetOpenNeedsEmergency
     || options.allowStaleRunner
   );
   let emergencyUse: EmergencyUseEvidence = null;
@@ -1276,7 +1291,7 @@ async function runTasksImport(argv: string[]) {
       flags: [
         ...(options.force ? ['--force'] : []),
         ...(options.forceOverwriteClaims ? ['--force-overwrite-claims'] : []),
-        ...(options.resetOpen ? ['--reset-open'] : []),
+        ...(resetOpenNeedsEmergency ? ['--reset-open'] : []),
         ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
       ],
       reason: 'Direct task runtime import backend write.',
@@ -5690,6 +5705,71 @@ function extractErrorDetails(error: unknown): Record<string, unknown> {
   const details = (error as { details?: unknown }).details;
   if (!details || typeof details !== 'object' || Array.isArray(details)) return {};
   return details as Record<string, unknown>;
+}
+
+/**
+ * TASK-RFT-0011: peek at the planning source + runtime ledger to classify a
+ * `tasks import --write --reset-open` invocation. If the peek fails for any
+ * reason (missing files, JSON parse errors), we return the conservative
+ * `drift-with-active-claim`-equivalent classification so the emergency gate
+ * remains armed by default.
+ */
+function classifyResetOpenImportForOptions(options: {
+  cwd: string;
+  from: string;
+}): TaskImportResetOpenClassification {
+  try {
+    const planAbsolute = resolvePlanAbsoluteFromStored(options.cwd, options.from);
+    let planningStatus: string | null = null;
+    if (existsSync(planAbsolute) && statSync(planAbsolute).isFile()) {
+      const planText = readFileSync(planAbsolute, 'utf8');
+      // Extract frontmatter `status: <value>` on the first status line.
+      const match = planText.match(/^status\s*:\s*([A-Za-z0-9_\-]+)/m);
+      if (match) planningStatus = match[1].trim();
+    }
+    const taskId = options.from.match(/TASK-[A-Z]+-\d+/i)?.[0] ?? null;
+    let runtimeLedgerStatus: string | null = null;
+    let runtimeActiveClaimActorId: string | null = null;
+    if (taskId) {
+      const ledgerPath = path.join(options.cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+      if (existsSync(ledgerPath)) {
+        try {
+          const raw = JSON.parse(readFileSync(ledgerPath, 'utf8'));
+          if (raw && typeof raw === 'object') {
+            const record = raw as Record<string, unknown>;
+            if (typeof record.status === 'string') runtimeLedgerStatus = record.status;
+            const claim = record.claim;
+            if (claim && typeof claim === 'object' && !Array.isArray(claim)) {
+              const actor = (claim as Record<string, unknown>).actorId;
+              const claimState = (claim as Record<string, unknown>).state;
+              if (typeof actor === 'string' && actor.trim().length > 0 && claimState !== 'released') {
+                runtimeActiveClaimActorId = actor;
+              }
+            }
+          }
+        } catch {
+          // Malformed ledger — treat as drift with active claim by returning
+          // conservative classification below.
+          return {
+            state: 'drift-with-active-claim',
+            resetOpenEmergencyRequired: true,
+            reason: 'Runtime ledger JSON is unreadable; emergency lease required to override safely.'
+          };
+        }
+      }
+    }
+    return classifyResetOpenImport({
+      planningStatus,
+      runtimeLedgerStatus,
+      runtimeActiveClaimActorId
+    });
+  } catch {
+    return {
+      state: 'drift-with-active-claim',
+      resetOpenEmergencyRequired: true,
+      reason: 'Reset-open classification peek failed; falling back to emergency-gated behavior.'
+    };
+  }
 }
 
 function parseImportOptions(argv: string[]) {

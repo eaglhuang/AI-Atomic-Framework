@@ -27,6 +27,11 @@ import {
   type NextDecisionTrailEntry
 } from './next/match-and-sort.ts';
 import { runDoctor } from './doctor.ts';
+import {
+  evaluateClaimAdmission,
+  type ClaimAdmissionCidVerdict
+} from './next/claim-admission.ts';
+import type { BrokerArbitrationVerdict } from '../../../core/src/broker/conflict-matrix.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
@@ -975,6 +980,14 @@ async function claimNextImportedTask(input: {
             // another actor. Queued-but-idle overlaps and closeout-only
             // counterparts are admitted with an advisory so same-file
             // CID-disjoint parallel work stops being serialized by default.
+            //
+            // TASK-RFT-0011: route the final admission decision through the
+            // `next.claim.admission` policy object so the block-vs-admit call
+            // is unified with `broker register`'s conflict-matrix verdict. The
+            // legacy CID diagnostic is preserved as a wrapper — divergence
+            // (which should not happen) is surfaced as
+            // `ATM_CLAIM_ADMISSION_BROKER_CID_DIVERGENCE` for future
+            // regression detection.
             const conflictActorId = typeof candidate.activeClaimActorId === 'string' && candidate.activeClaimActorId.trim().length > 0
               ? candidate.activeClaimActorId
               : null;
@@ -982,8 +995,31 @@ async function claimNextImportedTask(input: {
             const activeWriteConflict = Boolean(conflictActorId)
               && conflictActorId !== resolvedActor.actorId
               && conflictIntent !== 'closeout-only';
-            if (claimIntent !== 'closeout-only' && activeWriteConflict && overlappingAtomIds.length > 0) {
-              throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `Claim blocked due to parallel CID logic conflict with actively claimed task ${candidate.taskId} on atom(s): ${overlappingAtomIds.join(', ')}.`, {
+            const shouldBlockPerCid = claimIntent !== 'closeout-only'
+              && activeWriteConflict
+              && overlappingAtomIds.length > 0;
+            const cidVerdict: ClaimAdmissionCidVerdict = shouldBlockPerCid
+              ? 'blocked-cid-conflict'
+              : (overlappingAtomIds.length > 0
+                ? 'parallel-safe-with-cid-overlap-advisory'
+                : 'parallel-safe');
+            // Broker verdict derivation: the parallel-preflight is itself the
+            // broker-authoritative arbitration for this claim path. `blocked`
+            // maps to broker `freeze`; anything else the CID gate would admit
+            // maps to broker `allow`. When broker's separate authoritative
+            // registry adds a distinct verdict feed here in a follow-up, the
+            // divergence detector will start firing.
+            const brokerVerdict: BrokerArbitrationVerdict = shouldBlockPerCid ? 'freeze' : 'allow';
+            const admission = evaluateClaimAdmission({
+              brokerVerdict,
+              cidVerdict,
+              candidateTaskId: claimableTask.workItemId,
+              conflictingTaskId: candidate.taskId,
+              overlappingAtomIds
+            });
+            if (!admission.admitted) {
+              throw new CliError(admission.blockCode ?? 'ATM_NEXT_CLAIM_BLOCKED', admission.blockReason
+                ?? `Claim blocked due to parallel CID logic conflict with actively claimed task ${candidate.taskId} on atom(s): ${overlappingAtomIds.join(', ')}.`, {
                 exitCode: 1,
                 details: {
                   taskId: claimableTask.workItemId,
@@ -991,6 +1027,9 @@ async function claimNextImportedTask(input: {
                   conflictClaimActorId: conflictActorId,
                   overlappingAtomIds,
                   verdict: 'blocked-cid-conflict',
+                  brokerVerdict,
+                  cidVerdict,
+                  admissionDivergence: admission.divergence,
                   closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
                 }
               });
@@ -1004,7 +1043,10 @@ async function claimNextImportedTask(input: {
                 admitted: true,
                 admissionReason: claimIntent === 'closeout-only'
                   ? 'closeout-only-claim-intent'
-                  : 'cid-overlap-without-active-write-claim'
+                  : 'cid-overlap-without-active-write-claim',
+                brokerVerdict,
+                cidVerdict,
+                ...(admission.divergence ? { admissionDivergence: admission.divergence } : {})
               };
             }
             continue;
