@@ -1,0 +1,218 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0011",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "093d8eb33a5c5b3a8ff813c8b739bf852c18bca3",
+  "governedTreeSha": "ab9114baf88d85e3b493c000e0f322526bb12ada",
+  "targetCommitDelta": {
+    "currentCommitSha": "093d8eb33a5c5b3a8ff813c8b739bf852c18bca3",
+    "parentCommitShas": [
+      "093d8eb33a5c5b3a8ff813c8b739bf852c18bca3"
+    ],
+    "governedTreeSha": "ab9114baf88d85e3b493c000e0f322526bb12ada",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0011.json",
+      ".atm/history/task-events/TASK-RFT-0011/2026-07-01T03-50-28-805Z-import-172c3224d3d9.json",
+      ".atm/history/task-events/TASK-RFT-0011/2026-07-01T03-52-10-337Z-import-aa620c212cf9.json",
+      ".atm/history/task-events/TASK-RFT-0011/2026-07-01T03-52-20-632Z-reserve-c6ebb5820b6e.json",
+      ".atm/history/task-events/TASK-RFT-0011/2026-07-01T03-52-20-634Z-promote-df747c196690.json",
+      ".atm/history/task-events/TASK-RFT-0011/2026-07-01T03-52-21-097Z-claim-7e013db20978.json",
+      ".atm/history/tasks/TASK-RFT-0011.json",
+      "docs/reports/atm-governance-fix-wave.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "scripts/validate-governance-fix-wave.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ba8373cf15dfb4bc1765c5fb613b372c1c8e679020bbb04f80f269a7c48a19e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:902b3d80981ae165f60f8668e819fabc98b9684fb8d328d5083ad56b0009c39c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0e7054e2067149c9baee7bcbfc956ba31fad958359f9f8c48669a74d78db1b51",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-fix-wave",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:89678ae60eb11cfd67bdce0bb36a5b00e086f7d235d1357c3b299fc38ef70c58",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-fix-wave"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-01T04:06:02.893Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0011.*",
+      ".atm/history/task-events/TASK-RFT-0011/**",
+      ".atm/history/tasks/TASK-RFT-0011.json",
+      "docs/reports/atm-governance-fix-wave.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "rft-hardening/tasks/TASK-RFT-0011-atm-governance-fix-wave.task.md",
+      "scripts/validate-governance-fix-wave.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "scripts/validate-governance-fix-wave.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0011.json",
+  "closedAt": "2026-07-01T04:06:02.893Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "sessionId": "session-20260701035220-claude-code-opus-4-7-TASK-RFT-0011-2e42076368",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "093d8eb33a5c5b3a8ff813c8b739bf852c18bca3",
+    "taskMatchedFiles": [
+      "docs/reports/atm-governance-fix-wave.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "scripts/validate-governance-fix-wave.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "package.json",
+      "packages/cli/src/commands/evidence.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "package.json",
+      "packages/cli/src/commands/evidence.ts"
+    ],
+    "waiverReason": "additive package.json + evidence.ts"
+  },
+  "teamSummary": null
+}

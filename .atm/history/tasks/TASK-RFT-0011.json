@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0011",
+  "title": "ATM governance-fix wave (auto-evidence mapper + reset-open UX + broker/CID unified matrix)",
+  "status": "done",
+  "milestone": "RFT-M4",
+  "dependencies": [
+    "TASK-RFT-0010"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+    "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+    "scripts/validate-governance-fix-wave.ts",
+    "docs/reports/atm-governance-fix-wave.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/import-verify.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/claim-admission.ts",
+    "packages/core/src/broker/conflict-matrix.ts",
+    "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+    "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+    "scripts/validate-governance-fix-wave.ts",
+    "docs/reports/atm-governance-fix-wave.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-governance-fix-wave.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Rewriting the auto-evidence subsystem beyond the npm-script existence check + fallback",
+    "Rewriting the tasks import subsystem beyond the reset-open detection + UX hint",
+    "Rewriting the broker or CID gate subsystems beyond routing next --claim through the shared conflict-matrix",
+    "Any refactor of tasks.ts, taskflow.ts, or next.ts atomic map (that is TASK-RFT-0012 and later)"
+  ],
+  "nonGoals": [
+    "Do not change the emergency-lease permission catalog",
+    "Do not remove the emergency lease pathway; only remove the false-positive trigger for reset-open",
+    "Do not merge the broker conflict-matrix and the CID gate into one code path; only make next --claim consult the same matrix"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if any of the three fixes changes CLI semantics on the golden paths (auto-evidence with valid npm scripts, tasks import with fresh open state, next --claim with truly-conflicting parallel work).",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.governance-fix-wave",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/atm-governance-fix-wave.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0011-atm-governance-fix-wave.task.md",
+    "sectionTitle": "TASK-RFT-0011",
+    "headingLine": 67,
+    "hash": "b7c86e81e6e9cd55"
+  },
+  "importedAt": "2026-07-01T03:52:10.330Z",
+  "lastTransitionId": "2026-07-01T04-06-02-898Z-close-952e6da98d1e",
+  "lastTransitionAt": "2026-07-01T04:06:02.898Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-4-7",
+  "reservedAt": "2026-07-01T03:52:20.632Z",
+  "promotedAt": "2026-07-01T03:52:20.634Z",
+  "claim": {
+    "actorId": "claude-code-opus-4-7",
+    "leaseId": "lease-ca1272a81521",
+    "claimedAt": "2026-07-01T03:52:20.637Z",
+    "heartbeatAt": "2026-07-01T04:06:02.896Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0011.json",
+      "docs/reports/atm-governance-fix-wave.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "scripts/validate-governance-fix-wave.ts"
+    ],
+    "state": "released",
+    "reason": "additive package.json + evidence.ts"
+  },
+  "startedAt": "2026-07-01T03:52:20.637Z",
+  "startedByActor": "claude-code-opus-4-7",
+  "startedBySessionId": "session-20260701035220-claude-code-opus-4-7-TASK-RFT-0011-2e42076368",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0011",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0011.*",
+      ".atm/history/task-events/TASK-RFT-0011/**",
+      ".atm/history/tasks/TASK-RFT-0011.json",
+      "docs/reports/atm-governance-fix-wave.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission-broker-parity.spec.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/auto-evidence-mapper.spec.ts",
+      "packages/cli/src/commands/taskflow/auto-evidence-mapper.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-reset-open-ux.spec.ts",
+      "packages/cli/src/commands/tasks/import-verify.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "scripts/validate-governance-fix-wave.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bb16dfc6680cbbbb4ef030a6c3595a398c21c092b40c00da5c3b625bb1696b22",
+    "actorId": "claude-code-opus-4-7",
+    "createdAt": "2026-07-01T03:52:21.096Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-01T04:06:02.896Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "closedBySessionId": "session-20260701035220-claude-code-opus-4-7-TASK-RFT-0011-2e42076368",
+  "closeReason": "additive package.json + evidence.ts",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0011.closure-packet.json"
+}
