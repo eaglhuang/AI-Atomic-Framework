@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-01T04-56-46-375Z-close-c56ea821af7a",
+  "taskId": "TASK-RFT-0012",
+  "action": "close",
+  "actorId": "claude-code-opus-4-7",
+  "sessionId": "session-20260701044932-claude-code-opus-4-7-TASK-RFT-0012-cc133896df",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0012.json",
+  "taskSha256": "sha256:ebb20edce2429fe5a458c1d47392c7b7e38b5e84a6ef16da6c989a02d2700b47",
+  "createdAt": "2026-07-01T04:56:46.375Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0012 --actor claude-code-opus-4-7 --status done --historical-delivery 3cb5c64a79348a781a69e7fa5f28f56d287b134b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260701044932-claude-code-opus-4-7-TASK-RFT-0012-cc133896df",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0012.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:tasks-orchestrator-atomic-map"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-01T04:56:46.370Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0012.*",
+        ".atm/history/task-events/TASK-RFT-0012/**",
+        ".atm/history/tasks/TASK-RFT-0012.json",
+        "docs/reports/tasks-command-atomic-map.md",
+        "package.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/verify-orchestrator.ts",
+        "rft-hardening/tasks/TASK-RFT-0012-tasks-orchestrator-body-extraction.task.md",
+        "scripts/validate-tasks-orchestrator-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/verify-orchestrator.ts",
+        "scripts/validate-tasks-orchestrator-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0012",
+  "title": "tasks.ts orchestrator body extraction (close/import/verify)",
+  "status": "done",
+  "milestone": "RFT-M4",
+  "dependencies": [
+    "TASK-RFT-0010",
+    "TASK-RFT-0011"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/verify-orchestrator.ts",
+    "packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+    "scripts/validate-tasks-orchestrator-atomic-map.ts",
+    "docs/reports/tasks-command-atomic-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/verify-orchestrator.ts",
+    "packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+    "scripts/validate-tasks-orchestrator-atomic-map.ts",
+    "docs/reports/tasks-command-atomic-map.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-tasks-orchestrator-atomic-map.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Extracting helper clusters that runTasksClose depends on (that is TASK-RFT-0013)",
+    "Changing public CLI verb names or JSON field names",
+    "Rewriting already-extracted atoms from RFT-0010"
+  ],
+  "nonGoals": [
+    "Do not chase further line-count reduction by inlining helpers into orchestrators; the split is shell-first, helpers stay put for now",
+    "Do not treat this card as a full facade rewrite; orchestrators still contain their existing helper calls"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if orchestrator extraction changes CLI semantics for tasks close, tasks import, or tasks verify golden paths.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-command-atomic-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0012-tasks-orchestrator-body-extraction.task.md",
+    "sectionTitle": "TASK-RFT-0012",
+    "headingLine": 62,
+    "hash": "9c21938c91bcaf11"
+  },
+  "importedAt": "2026-07-01T04:46:40.064Z",
+  "lastTransitionId": "2026-07-01T04-56-46-375Z-close-c56ea821af7a",
+  "lastTransitionAt": "2026-07-01T04:56:46.375Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-code-opus-4-7",
+  "reservedAt": "2026-07-01T04:48:04.963Z",
+  "promotedAt": "2026-07-01T04:48:04.967Z",
+  "claim": {
+    "actorId": "claude-code-opus-4-7",
+    "leaseId": "lease-cebeb6ca983d",
+    "claimedAt": "2026-07-01T04:49:32.206Z",
+    "heartbeatAt": "2026-07-01T04:56:46.373Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/verify-orchestrator.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+      "scripts/validate-tasks-orchestrator-atomic-map.ts",
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json"
+    ],
+    "state": "released",
+    "reason": "additive package.json npm script + 31 export-prefix additions to tasks.ts (visibility-only, no body changes)"
+  },
+  "startedAt": "2026-07-01T04:49:32.206Z",
+  "startedByActor": "claude-code-opus-4-7",
+  "startedBySessionId": "session-20260701044932-claude-code-opus-4-7-TASK-RFT-0012-cc133896df",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0012",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0012.*",
+      ".atm/history/task-events/TASK-RFT-0012/**",
+      ".atm/history/tasks/TASK-RFT-0012.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/close-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/verify-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/verify-orchestrator.ts",
+      "scripts/validate-tasks-orchestrator-atomic-map.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0ddb04885ec65b99d6565656966d7cbbdc396804e4409a6bb78a599f14cf8a6f",
+    "actorId": "claude-code-opus-4-7",
+    "createdAt": "2026-07-01T04:49:32.676Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-01T04:56:46.373Z",
+  "closedByActor": "claude-code-opus-4-7",
+  "closedBySessionId": "session-20260701044932-claude-code-opus-4-7-TASK-RFT-0012-cc133896df",
+  "closeReason": "additive package.json npm script + 31 export-prefix additions to tasks.ts (visibility-only, no body changes)",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0012.closure-packet.json"
+}
