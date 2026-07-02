@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0015",
+  "title": "Onefile frozen runner executes stale generation via nested launcher recursion (payload embeds previous release/atm-onefile)",
+  "status": "open",
+  "milestone": "RFT-M5",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/build-root-drop-release.ts",
+    "scripts/validate-onefile-release.ts"
+  ],
+  "scopePaths": [
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/launcher-entrypoint-guards.ts",
+    "scripts/validate-onefile-release.ts",
+    "scripts/validate-runner-reproducibility.ts",
+    "scripts/validate-runner-entrypoints.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:onefile-release",
+    "npm run validate:runner-reproducibility",
+    "npm run validate:runner-entrypoints",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing the pinned-runner adopter sync flow (internal-release.ts)",
+    "Changing the onefile payload format"
+  ],
+  "nonGoals": [
+    "Do not band-aid by clearing caches; the payload content itself must stop embedding a previous-generation onefile launcher"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if excluding release/ from the root-drop payload breaks adopter bootstrap or internal-release sync flows.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-pipeline",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0015-onefile-nested-launcher-recursion.task.md",
+    "sectionTitle": "TASK-RFT-0015",
+    "headingLine": 45,
+    "hash": "46bb1c22df2080ce"
+  },
+  "importedAt": "2026-07-02T16:59:34.032Z",
+  "lastTransitionId": "2026-07-02T16-59-45-474Z-release-5286c812d8f4",
+  "lastTransitionAt": "2026-07-02T16:59:45.474Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex",
+  "reservedAt": "2026-07-02T16:59:43.838Z",
+  "promotedAt": "2026-07-02T16:59:43.840Z",
+  "claim": {
+    "actorId": "codex",
+    "leaseId": "lease-1c5126c1cda1",
+    "claimedAt": "2026-07-02T16:59:43.843Z",
+    "heartbeatAt": "2026-07-02T16:59:45.462Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0015.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/launcher-entrypoint-guards.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-runner-entrypoints.ts",
+      "scripts/validate-runner-reproducibility.ts"
+    ],
+    "state": "released",
+    "reason": "commit-session only for landing imported bug card"
+  },
+  "startedAt": "2026-07-02T16:59:43.843Z",
+  "startedByActor": "codex",
+  "startedBySessionId": "session-20260702165943-codex-TASK-RFT-0015-8348ab2825",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0015",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0015.*",
+      ".atm/history/task-events/TASK-RFT-0015/**",
+      ".atm/history/tasks/TASK-RFT-0015.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/launcher-entrypoint-guards.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-runner-entrypoints.ts",
+      "scripts/validate-runner-reproducibility.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ce6eee58f83161e6a27428351ffb26e037bf1758b2856876201813ad1a08f03c",
+    "actorId": "codex",
+    "createdAt": "2026-07-02T16:59:44.073Z",
+    "status": "active"
+  }
+}
