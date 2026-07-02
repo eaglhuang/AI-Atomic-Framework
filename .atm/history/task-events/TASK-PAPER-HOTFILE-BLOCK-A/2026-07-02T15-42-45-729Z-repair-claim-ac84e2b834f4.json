@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-02T15-42-45-729Z-repair-claim-ac84e2b834f4",
+  "taskId": "TASK-PAPER-HOTFILE-BLOCK-A",
+  "action": "repair-claim",
+  "actorId": "codex",
+  "sessionId": "session-20260622093614-bench-PAPER-HOTFILE-BLOCK-TASK-PAPER-HOTFILE-BLOCK-A-codex-gpt5-TASK-PAPER-HOTFILE-BLOCK-A-7fd125ecd6",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-PAPER-HOTFILE-BLOCK-A.json",
+  "taskSha256": "sha256:94581e60248a4a0abd6dcd05d2a7f599f28a0192111d0703ed9859ba22534b66",
+  "createdAt": "2026-07-02T15:42:45.729Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-PAPER-HOTFILE-BLOCK-A --actor codex --write --reason \"stale claim drift: claiming session vanished 8-14 days ago, repair-claim diagnose reported REPAIRABLE on 2026-07-02 backlog sweep\" --json"
+}
