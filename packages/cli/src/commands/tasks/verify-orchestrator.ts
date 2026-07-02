@@ -9,9 +9,9 @@ import {
   type TaskVerifyReport,
   inspectTaskVerifyStatus,
   inspectTaskSourceTrace,
+  parseVerifyOptions,
   validStatuses
 } from '../tasks.ts';
-import { parseVerifyOptions } from '../tasks.ts';
 
 export async function runTasksVerify(argv: string[]) {
   const options = parseVerifyOptions(argv);
