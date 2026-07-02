@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-CID-0112",
   "title": "Broker explicit-input mutation-intent seed",
-  "status": "running",
+  "status": "open",
   "milestone": "M20",
   "dependencies": [
     "TASK-CID-0097"
@@ -62,17 +62,16 @@
     "hash": "1ff03ea6cd209857"
   },
   "importedAt": "2026-06-18T06:24:56.909Z",
-  "lastTransitionId": "2026-06-18T15-43-38-521Z-claim-0f9bf0d76b1c",
-  "lastTransitionAt": "2026-06-18T15:43:38.521Z",
+  "lastTransitionId": "2026-07-02T16-37-28-857Z-release-d9a66d7200ed",
+  "lastTransitionAt": "2026-07-02T16:37:28.857Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-gpt-5.4-mini",
   "reservedAt": "2026-06-18T15:43:38.436Z",
   "promotedAt": "2026-06-18T15:43:38.443Z",
   "claim": {
-    "actorId": "codex-gpt-5.4-mini",
-    "leaseId": "lease-5fbe6fbdc05e",
-    "claimedAt": "2026-06-18T15:43:38.446Z",
-    "heartbeatAt": "2026-06-18T15:43:38.446Z",
+    "actorId": "codex",
+    "leaseId": "lease-2e726d1bb04a",
+    "claimedAt": "2026-07-02T16:37:27.627Z",
+    "heartbeatAt": "2026-07-02T16:37:28.847Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-CID-0112.json",
@@ -80,12 +79,13 @@
       "packages/core/src/broker/**",
       "schemas/broker/**"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "commit-session only for landing stale-claim repair records"
   },
   "startedAt": "2026-06-18T15:22:48.743Z",
   "startedByActor": "cursor-composer-2.5",
-  "startedBySessionId": "session-20260618154338-codex-gpt-5.4-mini-TASK-CID-0112-7eb3ce7144",
+  "startedBySessionId": "session-20260702163727-codex-TASK-CID-0112-8018d4d9c9",
+  "owner": "codex",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -106,8 +106,8 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "99189a33e76db208f5d96b816a096962dac215ffc35e62c5053b82f81e9e8e5f",
-    "actorId": "codex-gpt-5.4-mini",
-    "createdAt": "2026-06-18T15:43:38.520Z",
+    "actorId": "codex",
+    "createdAt": "2026-07-02T16:37:27.886Z",
     "status": "active"
   }
 }
