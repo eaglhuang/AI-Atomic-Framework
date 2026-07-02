@@ -1902,15 +1902,23 @@ function runTasksAudit(argv: string[]) {
     command: 'tasks',
     cwd: options.cwd,
     messages: [
-      report.ok
-        ? message('info', 'ATM_TASKS_AUDIT_OK', 'Task audit passed.', {
-          inspectedTaskCount: report.inspectedTaskCount,
-          inspectedEvidenceCount: report.inspectedEvidenceCount
-        })
-        : message('error', 'ATM_TASKS_AUDIT_FAILED', 'Task audit found invalid task closure evidence.', {
+      !report.ok
+        ? message('error', 'ATM_TASKS_AUDIT_FAILED', 'Task audit found invalid task closure evidence.', {
           findingCount: report.findings.length,
           errorCount: report.findings.filter((finding) => finding.level === 'error').length
         })
+        : report.findings.length > 0
+          ? message('warn', 'ATM_TASKS_AUDIT_WARNINGS', `Task audit passed with ${report.findings.length} warning(s), including stalled backlog entries.`, {
+            inspectedTaskCount: report.inspectedTaskCount,
+            inspectedEvidenceCount: report.inspectedEvidenceCount,
+            warningCount: report.findings.length,
+            warningCodes: Array.from(new Set(report.findings.map((finding) => finding.code))),
+            findings: report.findings
+          })
+          : message('info', 'ATM_TASKS_AUDIT_OK', 'Task audit passed.', {
+            inspectedTaskCount: report.inspectedTaskCount,
+            inspectedEvidenceCount: report.inspectedEvidenceCount
+          })
     ],
     evidence: {
       action: 'audit',

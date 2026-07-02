@@ -11,7 +11,7 @@ This report does not change production command behavior. It exists to define the
 | Atom | Responsibility | Primary File(s) | Notes |
 | --- | --- | --- | --- |
 | `tasks.command.dispatch` | Top-level `tasks` action router | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/command-dispatch.ts` | `tasks.ts` now supplies the handler table; `command-dispatch.ts` owns argv normalization, action aliases, usage errors, and fan-out over `close`, `reset`, `claim`, `reconcile`, `repair-closure`, `status`, `finalize`, etc. |
-| `tasks.close.governance` | Close path governance and closure packet enforcement | `packages/cli/src/commands/tasks.ts` | Owns close command admission, closure authority, historical delivery, and commit-window registration. |
+| `tasks.close.governance` | Close path governance and closure packet enforcement | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/close-orchestrator.ts` | Owns close command admission, closure authority, historical delivery, and commit-window registration. Under TASK-RFT-0012 the `runTasksClose` orchestrator body lives in `tasks/close-orchestrator.ts`; `tasks.ts` re-exports it and keeps only the router surface. |
 | `tasks.claim.lifecycle` | Claim / renew / release / handoff / takeover lifecycle | `packages/cli/src/commands/tasks.ts`, `packages/core/src/broker/lifecycle.ts` | Shared claim-state logic with broker claim intent recording. |
 | `tasks.reconcile.delivery` | Historical delivery reconciliation and provenance | `packages/cli/src/commands/tasks.ts` | Handles delivery commit refs, provenance checks, and close/truth repair. |
 | `tasks.repair.closure` | Closure packet repair / normalization | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/framework-development.ts` | Repairs closure packet before closeout. |
@@ -19,7 +19,7 @@ This report does not change production command behavior. It exists to define the
 | `tasks.residue.diagnostics` | Residue bucket classification and next-command recommendation | `packages/cli/src/commands/tasks.ts` | Produces `complete-but-unfinalized`, `interrupted-close`, `planning-mirror-only`, etc. |
 | `tasks.scope.locking` | Scope-lock and path gating for tasks | `packages/cli/src/commands/tasks.ts` | Governs current task lock state and write surface restriction. |
 | `tasks.surface.invariants` | Shared closeout routing, backend selection, and validator strategy | `packages/cli/src/commands/tasks/surface-invariants.ts`, `packages/cli/src/commands/taskflow/close-orchestration.ts` | `surface-invariants.ts` owns close mode / backend policy and close evidence validator constants; `close-orchestration.ts` consumes the strategy without owning the table. |
-| `tasks.ledger.import.verify` | Import / verify / legacy-ledger migration surfaces | `packages/cli/src/commands/tasks.ts` | Maintains task-store and task-event synchronization. |
+| `tasks.ledger.import.verify` | Import / verify / legacy-ledger migration surfaces | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/import-orchestrator.ts`, `packages/cli/src/commands/tasks/verify-orchestrator.ts` | Maintains task-store and task-event synchronization. Under TASK-RFT-0012 the `runTasksImport` and `runTasksVerify` orchestrator bodies live in `tasks/import-orchestrator.ts` and `tasks/verify-orchestrator.ts`; `tasks.ts` re-exports them. |
 | `next.imported-task.routing` | Imported-task queue selection and claim routing | `packages/cli/src/commands/next.ts` | Finds the queue head and prepares claimable tasks. |
 | `next.route.predicates` | Predicate library for routing decisions | `packages/cli/src/commands/next/route-predicates.ts` | Shared logic for dependency gating, claim state, explicit route matching, and closed-task checks. |
 
@@ -130,3 +130,38 @@ see no surface change.
 
 - This map is intentionally read-only.
 - It identifies where downstream extraction should slice the `tasks` command without changing runtime behavior in this task.
+
+---
+
+## TASK-RFT-0013 — Close-helper cluster split (2026-07-01)
+
+### Before / after
+
+- Before TASK-RFT-0013: `packages/cli/src/commands/tasks.ts` = 6,491 lines
+- After  TASK-RFT-0013: `packages/cli/src/commands/tasks.ts` = 5,985 lines
+- Target: < 6,000 lines (met)
+
+### New close-helper cluster (Layer 3)
+
+Under `packages/cli/src/commands/tasks/close-helpers/`:
+
+- `close-artifact-staging.ts` — `stageTaskCloseArtifacts`, `existingTaskCloseArtifacts`, `extractTaskCloseDeclaredFiles`, `extractTaskDeliverableFiles`, `taskDeliveryPrincipleText`, `evaluateTaskDeliverableGate`.
+- `task-transition-writer.ts` — `writeTaskDocumentWithTransition`; re-exports `buildTaskTransitionCommand` and `createClosureTransitionMetadata` from `task-transition-helpers.ts` so all four transition-writer symbols live under `close-helpers/`.
+- `broker-admission-explanation.ts` — `buildBrokerAdmissionExplanation`, `explainBrokerAdapterForPath`, `hasUnexplainedSharedProjection` plus the `BrokerAdmissionExplanation` / `BrokerAdapterExplanation` type surfaces.
+- `close-window-diagnostics.ts` — `readDeferredForeignStagedFilesForActiveCloseWindow`, `evaluateFrameworkDeliveryWindow`, `loadHistoricalBatchCloseSlice` plus the `HistoricalBatchCloseSlice` interface.
+
+`close-orchestrator.ts` now imports these symbols directly from the new modules rather than through `tasks.ts` re-exports. `tasks.ts` retains thin delegating re-exports to preserve any external consumer surface.
+
+### Not extracted (deferred to RFT-0014+)
+
+The following clusters were intentionally left in `tasks.ts` to keep RFT-0013 scoped and to avoid touching non-close code paths:
+
+- **Import helpers** — `writeTaskFiles`, `parseTaskProposalAdmission`, `parseProposalAdmissionBoundedRegions`, and the surrounding `runTasksImport` support code. `writeTaskFiles` is called by both the close path and `import-orchestrator.ts`, so it must not move under `close-helpers/`.
+- **Plan-derived helpers** — `parseDispatchMetadataFromPlanText`, `createTaskFromTableMetadata`, and related plan-import scaffolding.
+- **Write helpers not on the close path** — `writeTaskDocument`, `writeLockCleanupReport`, `writeTakeoverEvidence`, `syncScopeAmendmentState`, `syncScopeAmendmentRuntimeLock`. These are candidates for a future `tasks/write-helpers/` cluster.
+- **Parallel-advisor infrastructure** — `runTasksParallel`, `analyzeParallelPair`, `parseTasksParallelArgs`, `buildParallelHotspotReport`, `intersect`, `incrementMap`, `sortMapEntries`, `globLikeMatch`. Broker-admission-explanation is the close-facing slice; the rest is a candidate cluster for RFT-0014+.
+- **Runtime state / lock helpers** — `runTasksLock`, `runTasksAudit`, `runTasksMigrateLegacyLedger`.
+
+### Validator
+
+- `npm run validate:tasks-close-helpers-atomic-map` — asserts (a) each helper module exists, (b) `close-orchestrator.ts` imports each helper module, (c) `tasks.ts` line count stays under 6,000.

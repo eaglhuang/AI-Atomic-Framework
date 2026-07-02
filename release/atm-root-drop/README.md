@@ -1,7 +1,8 @@
 # AI-Atomic-Framework
 
 [![Release v0.9.0-alpha.1](https://img.shields.io/badge/Release-v0.9.0--alpha.1-2563eb.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/releases/tag/v0.9.0-alpha.1)
-[![Paper](https://img.shields.io/badge/Paper-Landing%20Page-b91c1c.svg)](https://eaglhuang.github.io/AI-learning-notes/atm_pre_write_admission_paper_en.html)
+[![arXiv 2607.00041](https://img.shields.io/badge/arXiv-2607.00041-b31b1b.svg)](https://arxiv.org/abs/2607.00041)
+[![Paper Landing](https://img.shields.io/badge/Paper-Landing%20Page-b91c1c.svg)](https://eaglhuang.github.io/AI-learning-notes/atm_pre_write_admission_paper_en.html)
 [![CI](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglhuang/AI-Atomic-Framework/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-0f172a.svg)](LICENSE)
 [![Node 24](https://img.shields.io/badge/Node-24-1f6feb.svg)](package.json)

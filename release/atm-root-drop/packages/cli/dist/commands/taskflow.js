@@ -5,6 +5,7 @@ import { getCommandSpec } from './command-specs.js';
 import { buildResidueDiagnosisEvidence, generateTaskCard, loadTaskDocumentOrThrow, runTasks, runTasksRosterUpdate } from './tasks/public-surface.js';
 import { assertClosebackPlanningPathReady, buildCloseBackendArgv, buildClosebackPlan, buildCloseWriteRollbackSnapshot, buildTaskflowCloseDiagnostics, executeCloseWriteCommitPhase, resolveClosebackPlanningPath, resolveCloseWriteSupport, capturePlanningCardSnapshot, applyPlanningCardCloseback, resolvePlanningRosterPaths } from './taskflow/closeback-orchestration.js';
 import { buildAutoEvidencePlan, executeAutoEvidencePlan } from './evidence.js';
+import { mapAutoEvidenceCommand } from './taskflow/auto-evidence-mapper.js';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, relativePathFrom } from './shared.js';
 import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, resolveOpenerMode, resolveWriteSupport } from './taskflow/profile-loader.js';
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
@@ -79,6 +80,27 @@ async function runRosterSyncFollowUp(input) {
 }
 function buildTasksImportCommand(input) {
     return `node atm.mjs tasks import --from ${quoteCliValue(input.fromPath)} --write --json`;
+}
+/**
+ * TASK-RFT-0011: read package.json for auto-evidence npm-script mapping.
+ * Returns `null` when the file is missing or malformed — the mapper degrades
+ * to declared-verbatim in that case.
+ */
+function readPackageJsonForAutoEvidence(cwd) {
+    const pkgPath = path.join(cwd, 'package.json');
+    if (!existsSync(pkgPath))
+        return null;
+    try {
+        const raw = readFileSync(pkgPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+            return parsed;
+        }
+        return null;
+    }
+    catch {
+        return null;
+    }
 }
 function buildOrchestrationPlan(input) {
     const resolvedTaskId = input.hostPolicyDecision?.taskId ?? input.taskId ?? null;
@@ -570,7 +592,17 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             if (!actorId) {
                 throw new CliError('ATM_CLI_USAGE', 'taskflow close --auto-evidence requires --actor <id>.', { exitCode: 2 });
             }
-            autoEvidenceExecution = executeAutoEvidencePlan({ cwd, taskId, actorId });
+            // TASK-RFT-0011: build a per-run mapper that consults the current
+            // package.json so `node --strip-types scripts/<name>.ts` declarations
+            // that have an equivalent npm script get executed as `npm run <name>`.
+            // Fallback: verbatim declared command.
+            const packageJson = readPackageJsonForAutoEvidence(cwd);
+            autoEvidenceExecution = executeAutoEvidencePlan({
+                cwd,
+                taskId,
+                actorId,
+                commandMapper: (declared) => mapAutoEvidenceCommand(declared, packageJson).command
+            });
             if (!autoEvidenceExecution.ok) {
                 throw new CliError('ATM_TASKFLOW_AUTO_EVIDENCE_FAILED', `Auto-evidence could not satisfy declared validators for ${taskId}.`, {
                     exitCode: 1,

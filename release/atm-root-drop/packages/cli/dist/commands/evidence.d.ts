@@ -196,6 +196,14 @@ export declare function executeAutoEvidencePlan(input: {
     cwd: string;
     taskId: string;
     actorId: string;
+    /**
+     * TASK-RFT-0011: optional mapper that rewrites the command taskflow will
+     * execute for a plan entry (e.g. switching a `node --strip-types scripts/foo.ts`
+     * declaration to `npm run foo` when the two are equivalent). The mapper is
+     * pure — evidence.ts does not know about npm-script equivalence rules on its
+     * own; callers (taskflow.ts) inject one bound to the current package.json.
+     */
+    commandMapper?: (declaredCommand: string) => string;
 }): AutoEvidenceExecutionResult;
 export declare function verifyTaskEvidence(input: {
     cwd: string;

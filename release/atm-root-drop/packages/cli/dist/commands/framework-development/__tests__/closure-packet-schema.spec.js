@@ -102,7 +102,28 @@ try {
         + '| ATM-BUG-TEST | Reproduced with `node atm.mjs next --claim --prompt "[SKL batch execution prompt omitted for audit safety]" --json`. |\n');
     writeFileSync(path.join(auditRoot, 'docs', 'closeout-report.md'), '# Closeout\n\nstatus: **all completed**\n');
     writeFileSync(path.join(auditRoot, 'docs', 'governance', 'completion-report.md'), '# Governance Notes\n\nstatus: **all completed**\n');
+    mkdirSync(path.join(auditRoot, '.atm', 'history', 'tasks'), { recursive: true });
+    writeFileSync(path.join(auditRoot, '.atm', 'history', 'tasks', 'TASK-STALE-0001.json'), JSON.stringify({
+        schemaVersion: 'atm.workItem.v0.2',
+        workItemId: 'TASK-STALE-0001',
+        title: 'stale claim fixture',
+        status: 'running',
+        claim: {
+            actorId: 'vanished-agent',
+            leaseId: 'lease-deadbeef0000',
+            claimedAt: '2026-01-01T00:00:00.000Z',
+            heartbeatAt: '2026-01-01T00:00:00.000Z',
+            ttlSeconds: 1800,
+            files: ['packages/cli/src/atm.ts'],
+            state: 'active'
+        }
+    }, null, 2));
     const audit = auditTasks(auditRoot);
+    const staleClaimFindings = audit.findings.filter((entry) => entry.code === 'ATM_TASK_AUDIT_STALE_CLAIM');
+    assert.equal(staleClaimFindings.length, 1);
+    assert.equal(staleClaimFindings[0]?.taskId, 'TASK-STALE-0001');
+    assert.equal(staleClaimFindings[0]?.level, 'warning');
+    assert.ok(staleClaimFindings[0]?.detail.includes('repair-claim'));
     const completionFindings = audit.findings.filter((entry) => entry.code === 'ATM_TASK_AUDIT_COMPLETION_REPORT_UNVERIFIED');
     assert.deepEqual(completionFindings.map((entry) => entry.path), ['docs/closeout-report.md', 'docs/governance/completion-report.md']);
 }

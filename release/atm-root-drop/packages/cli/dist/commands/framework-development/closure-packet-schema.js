@@ -12,6 +12,7 @@ import { bootstrapTaskId, detectGovernanceRuntime } from '../governance-runtime.
 import { listActorWorkSessions } from '../actor-session.js';
 import { readActiveTaskDirectionLocks } from '../task-direction.js';
 import { externalTaskKey, readTaskLedgerPolicy, resolveTaskLedgerMode, transitionEventExists } from '../task-ledger.js';
+import { isClaimExpired, parseClaimRecord } from '../tasks/task-ledger-readers.js';
 import { isAtmCriticalNonDocSurface } from './path-classification.js';
 import { describeBuildReleaseHygienePolicy } from '../build-release-hygiene.js';
 export function isTaskCloseGovernanceCriticalPath(filePath, taskId) {
@@ -940,6 +941,26 @@ export function auditTasks(cwd) {
                 detail: `Task ${task.taskId} references missing transition event ${lastTransitionId}.`
             });
         }
+        const claimStatus = normalizeOptionalString(task.status)?.toLowerCase().replace(/-/g, '_') ?? '';
+        if (claimStatus === 'running' || claimStatus === 'review') {
+            const claim = parseClaimRecord(task.document.claim);
+            const staleClaimDetail = !claim
+                ? 'no parseable claim record exists'
+                : claim.state !== 'active'
+                    ? `claim state is "${claim.state}"`
+                    : isClaimExpired(claim, generatedAt)
+                        ? `claim lease ${claim.leaseId} for actor ${claim.actorId} expired (ttl ${claim.ttlSeconds}s, last heartbeat ${claim.heartbeatAt})`
+                        : null;
+            if (staleClaimDetail) {
+                findings.push({
+                    level: 'warning',
+                    code: 'ATM_TASK_AUDIT_STALE_CLAIM',
+                    path: task.relativePath,
+                    taskId: task.taskId,
+                    detail: `Task ${task.taskId} is ${claimStatus} but ${staleClaimDetail}; the backlog entry is stalled. Run "node atm.mjs tasks repair-claim --task ${task.taskId} --actor <id> --json" to diagnose and clear it.`
+                });
+            }
+        }
         if (task.status !== 'done')
             continue;
         const closureAuthority = normalizeClosureAuthority(task.document.closure_authority ?? task.document.closureAuthority);
@@ -999,6 +1020,16 @@ export function auditTasks(cwd) {
                 });
             }
         }
+    }
+    for (const staleLock of detectFrameworkStaleLocks(root)) {
+        if (staleLock.kind === 'still-active')
+            continue;
+        findings.push({
+            level: 'warning',
+            code: 'ATM_TASK_AUDIT_STALE_FRAMEWORK_LOCK',
+            path: staleLock.lockPath,
+            detail: `Framework-mode lock for actor ${staleLock.actorId} is ${staleLock.kind}${staleLock.lockedAt ? ` (locked at ${staleLock.lockedAt})` : ''}; run "${staleLock.requiredCommand}" to clear the stalled lock.`
+        });
     }
     const latestBulk = inspectLatestCommitForBulkTaskClose(root);
     if (latestBulk.changedDoneTaskFiles.length > 1 && !hasBulkClosureManifest(root)) {
