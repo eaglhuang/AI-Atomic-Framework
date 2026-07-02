@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-02T15-42-44-996Z-repair-claim-cd65fb6e58d6",
+  "taskId": "TASK-MAO-0021",
+  "action": "repair-claim",
+  "actorId": "codex",
+  "sessionId": "session-20260618052835-claude-code-opus-4-7-TASK-MAO-0021-356ae88caa",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0021.json",
+  "taskSha256": "sha256:7f5bc6cd717f4ce9cb0bc7a918b799e43126b6c2a0b17e17e3b8670b399ac853",
+  "createdAt": "2026-07-02T15:42:44.996Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-MAO-0021 --actor codex --write --reason \"stale claim drift: claiming session vanished 8-14 days ago, repair-claim diagnose reported REPAIRABLE on 2026-07-02 backlog sweep\" --json"
+}
