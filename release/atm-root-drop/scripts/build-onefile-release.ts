@@ -102,10 +102,20 @@ function resolveReleaseGeneratedAt() {
   return deterministicGeneratedAt;
 }
 
+// The root-drop tree intentionally carries release/atm-onefile for blank-repo
+// drops, but embedding it in the onefile payload makes the extracted launcher
+// recurse into the previous-generation runner (TASK-RFT-0015). The onefile IS
+// the runner, so the payload must never contain release/**; the extracted
+// launcher falls back to packages/cli/dist/atm.js.
+const excludedPayloadPrefixes = ['release/'];
+
 function collectPayloadFiles(root: any) {
   const files: any[] = [];
   for (const absolutePath of walkFiles(root)) {
     const relativePath = path.relative(root, absolutePath).replace(/\\/g, '/');
+    if (excludedPayloadPrefixes.some((prefix) => relativePath.startsWith(prefix))) {
+      continue;
+    }
     const stats = statSync(absolutePath);
     files.push({
       path: relativePath,
