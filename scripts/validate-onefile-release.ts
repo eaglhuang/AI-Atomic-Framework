@@ -1,6 +1,7 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
+import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
 import { buildOnefileRelease } from './build-onefile-release.ts';
@@ -128,6 +129,19 @@ try {
   });
   assert(existsSync(path.join(rootDrop.releaseRoot, governanceRouterSkillRelativePath)), 'root-drop source for onefile must include governance router skill');
   assert(existsSync(release.outputFilePath), 'onefile build must emit release/atm-onefile/atm.mjs');
+
+  // TASK-RFT-0015 regression guard: the payload must never embed release/**.
+  // A nested release/atm-onefile/atm.mjs makes the extracted launcher recurse
+  // into the previous runner generation, silently freezing governance behavior.
+  {
+    const onefileSource = readFileSync(release.outputFilePath, 'utf8');
+    const payloadMatch = onefileSource.match(/payloadBase64 = "([^"]+)"/);
+    assert(Boolean(payloadMatch), 'onefile runtime must embed payloadBase64');
+    const decodedPayload = JSON.parse(gunzipSync(Buffer.from(payloadMatch![1], 'base64')).toString('utf8'));
+    const nestedReleaseEntries = decodedPayload.files.filter((entry: { path: string }) => entry.path.startsWith('release/'));
+    assert(nestedReleaseEntries.length === 0, `onefile payload must not embed release/** entries (nested launcher recursion); found: ${nestedReleaseEntries.map((entry: { path: string }) => entry.path).slice(0, 5).join(', ')}`);
+    assert(decodedPayload.files.some((entry: { path: string }) => entry.path === 'packages/cli/dist/atm.js'), 'onefile payload must keep packages/cli/dist/atm.js so the extracted launcher has a runnable fallback entrypoint');
+  }
 
   const externalBootstrapRepo = path.join(tempRoot, 'external-bootstrap-repo');
   mkdirSync(externalBootstrapRepo, { recursive: true });
@@ -267,6 +281,16 @@ async function validateExtractionLockWait(input: {
   const lockRoot = `${cacheRoot}.lock`;
   rmSync(cacheBaseRoot, { recursive: true, force: true });
   mkdirSync(lockRoot, { recursive: true });
+  // Stage the extracted tree before spawning the waiter so the handoff below
+  // is a fast rename instead of a multi-second cpSync racing the child's
+  // extraction-lock timeout (the real extractor also stages then renames).
+  const stagingRoot = `${cacheRoot}.handoff-staging`;
+  cpSync(input.releaseRoot, stagingRoot, { recursive: true });
+  writeFileSync(path.join(stagingRoot, '.payload-ready.json'), JSON.stringify({
+    schemaVersion: 'atm.onefilePayload.v0.1',
+    generatedAt: '1970-01-01T00:00:00.000Z',
+    payloadSha256: input.payloadSha256
+  }, null, 2) + '\n', 'utf8');
   writeFileSync(path.join(lockRoot, 'owner.json'), JSON.stringify({
     pid: process.pid,
     fixture: 'validate-onefile-release'
@@ -288,13 +312,7 @@ async function validateExtractionLockWait(input: {
   child.stderr.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
 
   await delay(150);
-  mkdirSync(cacheRoot, { recursive: true });
-  cpSync(input.releaseRoot, cacheRoot, { recursive: true });
-  writeFileSync(path.join(cacheRoot, '.payload-ready.json'), JSON.stringify({
-    schemaVersion: 'atm.onefilePayload.v0.1',
-    generatedAt: '1970-01-01T00:00:00.000Z',
-    payloadSha256: input.payloadSha256
-  }, null, 2) + '\n', 'utf8');
+  renameSync(stagingRoot, cacheRoot);
   rmSync(lockRoot, { recursive: true, force: true });
 
   const exitCode = await new Promise<number>((resolve, reject) => {
