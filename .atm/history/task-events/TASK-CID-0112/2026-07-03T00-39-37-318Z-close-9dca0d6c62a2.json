@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-03T00-39-37-318Z-close-9dca0d6c62a2",
+  "taskId": "TASK-CID-0112",
+  "action": "close",
+  "actorId": "codex",
+  "sessionId": "session-20260702163727-codex-TASK-CID-0112-8018d4d9c9",
+  "fromStatus": "open",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CID-0112.json",
+  "taskSha256": "sha256:65234aabe06910a0da6e2585076bf2663630bd2c0323ff6643ba03729cbeb48a",
+  "createdAt": "2026-07-03T00:39:37.318Z",
+  "command": "node atm.mjs tasks close --task TASK-CID-0112 --actor codex --status done --historical-delivery 0f97299bce835bcbd330a228faf9fe22b714cd5e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260702163727-codex-TASK-CID-0112-8018d4d9c9",
+    "closurePacketPath": ".atm/history/evidence/TASK-CID-0112.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "test",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-03T00:39:37.305Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0112-broker-explicit-input-mutation-intent-seed.task.md",
+        ".atm/history/evidence/TASK-CID-0112.*",
+        ".atm/history/task-events/TASK-CID-0112/**",
+        ".atm/history/tasks/TASK-CID-0112.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/core/src/broker/__tests__/**",
+        "packages/core/src/broker/**",
+        "packages/core/src/broker/adapters/index.ts",
+        "packages/core/src/broker/adapters/registry.ts",
+        "packages/core/src/broker/types.ts",
+        "schemas/broker/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

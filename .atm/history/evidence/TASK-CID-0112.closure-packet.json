@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-CID-0112",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0605659c2d156c0e63cb061c3677cb10191d905f",
+  "governedTreeSha": "94bffee9a68230fd68bd0f18ee498e6e5e85e849",
+  "targetCommitDelta": {
+    "currentCommitSha": "0605659c2d156c0e63cb061c3677cb10191d905f",
+    "parentCommitShas": [
+      "0605659c2d156c0e63cb061c3677cb10191d905f"
+    ],
+    "governedTreeSha": "94bffee9a68230fd68bd0f18ee498e6e5e85e849",
+    "changedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/mutation-request.schema.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm test",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:64b0a2e1f0d2b8397b2cc1888f8615dc327a8159b19f1fb780b9f4fdc344fb6e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "test",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-03T00:39:37.305Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      "../3KLife/docs/ai_atomic_framework/cid-hardening/tasks/TASK-CID-0112-broker-explicit-input-mutation-intent-seed.task.md",
+      ".atm/history/evidence/TASK-CID-0112.*",
+      ".atm/history/task-events/TASK-CID-0112/**",
+      ".atm/history/tasks/TASK-CID-0112.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/**",
+      "packages/core/src/broker/**",
+      "packages/core/src/broker/adapters/index.ts",
+      "packages/core/src/broker/adapters/registry.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/**"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-CID-0112.json",
+  "closedAt": "2026-07-03T00:39:37.305Z",
+  "closedByActor": "codex",
+  "sessionId": "session-20260702163727-codex-TASK-CID-0112-8018d4d9c9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0f97299bce835bcbd330a228faf9fe22b714cd5e",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/batch-planner.test.ts",
+      "packages/core/src/broker/types.ts",
+      "schemas/broker/mutation-request.schema.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-CID-0112.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T06-24-56-913Z-import-cbe0c193e849.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-22-48-734Z-reserve-06d044a77655.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-22-48-739Z-promote-b22c3f4d382c.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-22-48-784Z-claim-b47d2103f3ea.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-36-16-711Z-scope-amendment-2d49da971b19.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-43-10-097Z-handoff-2c6971e66e3a.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-43-38-437Z-reserve-7bc551dcab11.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-43-38-443Z-promote-cc6490b491c4.json",
+      ".atm/history/task-events/TASK-CID-0112/2026-06-18T15-43-38-521Z-claim-0f9bf0d76b1c.json",
+      ".atm/history/tasks/TASK-CID-0112.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
