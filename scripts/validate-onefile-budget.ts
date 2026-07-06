@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -193,13 +193,21 @@ async function validateExtractionLockHandoff(input: {
   child.stderr.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
 
   await delay(150);
-  mkdirSync(input.cacheRoot, { recursive: true });
-  cpSync(input.releaseRoot, input.cacheRoot, { recursive: true });
-  writeFileSync(path.join(input.cacheRoot, '.payload-ready.json'), JSON.stringify({
+  // Mirror the real payload contents: exclude release/** so the fixture tree
+  // cannot contain a same-sha nested onefile launcher that re-enters its own
+  // cache dir and self-spawns forever (TASK-RFT-0015). Stage then rename so
+  // the handoff is atomic instead of racing the child's 4s lock timeout.
+  const handoffStagingRoot = `${input.cacheRoot}.handoff-staging`;
+  cpSync(input.releaseRoot, handoffStagingRoot, {
+    recursive: true,
+    filter: (source) => !path.relative(input.releaseRoot, source).replace(/\\/g, '/').startsWith('release')
+  });
+  writeFileSync(path.join(handoffStagingRoot, '.payload-ready.json'), JSON.stringify({
     schemaVersion: 'atm.onefilePayload.v0.1',
     generatedAt: '1970-01-01T00:00:00.000Z',
     payloadSha256: input.payloadSha256
   }, null, 2) + '\n');
+  renameSync(handoffStagingRoot, input.cacheRoot);
   rmSync(lockRoot, { recursive: true, force: true });
 
   const exitCode = await new Promise<number>((resolve, reject) => {
