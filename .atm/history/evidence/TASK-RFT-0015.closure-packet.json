@@ -1,0 +1,186 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0015",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b324b8b86b69b46b6f5e3d3547440de5ee9bede8",
+  "governedTreeSha": "c9348a4e0f0adb5e23f8ef5f093ed7aff30686a9",
+  "targetCommitDelta": {
+    "currentCommitSha": "b324b8b86b69b46b6f5e3d3547440de5ee9bede8",
+    "parentCommitShas": [
+      "b324b8b86b69b46b6f5e3d3547440de5ee9bede8"
+    ],
+    "governedTreeSha": "c9348a4e0f0adb5e23f8ef5f093ed7aff30686a9",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0015.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/validate-onefile-budget.ts",
+      "scripts/validate-onefile-release.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:runner-entrypoints",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0edc8b6d39a7b2e180f8a51ce2a2f663dfcb25effe5453df9afe24f2fbb46b40",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:runner-reproducibility",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b122270d061d0eed1a752c11e0bda29f66f123032c0fc9202c5f91fdb9c17c02",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:root-drop-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3a720f8d986d62739a0f622cf3ba4d25a4dc5b32fdd555ca22877258b7b0e160",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release",
+    "validate:runner-entrypoints",
+    "validate:runner-reproducibility"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:root-drop-release"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-06T15:43:01.843Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0015.*",
+      ".atm/history/task-events/TASK-RFT-0015/**",
+      ".atm/history/tasks/TASK-RFT-0015.json",
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/launcher-entrypoint-guards.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-runner-entrypoints.ts",
+      "scripts/validate-runner-reproducibility.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/build-onefile-release.ts",
+      "scripts/build-root-drop-release.ts",
+      "scripts/launcher-entrypoint-guards.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-runner-entrypoints.ts",
+      "scripts/validate-runner-reproducibility.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0015.json",
+  "closedAt": "2026-07-06T15:43:01.844Z",
+  "closedByActor": "codex",
+  "sessionId": "session-20260703023908-codex-TASK-RFT-0015-140ae5a647",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "286e0cdb025fd5e29d97c8d6422bb10ae2932d1d",
+    "taskMatchedFiles": [
+      "scripts/build-onefile-release.ts",
+      "scripts/validate-onefile-release.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0015/2026-07-03T00-41-59-378Z-reserve-098a03642cb4.json",
+      ".atm/history/task-events/TASK-RFT-0015/2026-07-03T00-41-59-382Z-promote-26728a0493b1.json",
+      ".atm/history/task-events/TASK-RFT-0015/2026-07-03T00-41-59-638Z-claim-69150a0bb0e0.json",
+      ".atm/history/task-events/TASK-RFT-0015/2026-07-03T02-39-08-519Z-claim-df9085230b66.json",
+      ".atm/history/tasks/TASK-RFT-0015.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

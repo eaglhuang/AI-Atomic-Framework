@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-06T15-43-01-848Z-close-f5d868566140",
+  "taskId": "TASK-RFT-0015",
+  "action": "close",
+  "actorId": "codex",
+  "sessionId": "session-20260703023908-codex-TASK-RFT-0015-140ae5a647",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0015.json",
+  "taskSha256": "sha256:3fb2327f9810782d519e8c1843910b6be3548d92745433f95ce575e2fbb5c479",
+  "createdAt": "2026-07-06T15:43:01.848Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0015 --actor codex --status done --historical-delivery 286e0cdb025fd5e29d97c8d6422bb10ae2932d1d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260703023908-codex-TASK-RFT-0015-140ae5a647",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0015.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release",
+      "validate:runner-entrypoints",
+      "validate:runner-reproducibility"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-06T15:43:01.843Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0015.*",
+        ".atm/history/task-events/TASK-RFT-0015/**",
+        ".atm/history/tasks/TASK-RFT-0015.json",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/launcher-entrypoint-guards.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-runner-entrypoints.ts",
+        "scripts/validate-runner-reproducibility.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/launcher-entrypoint-guards.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-runner-entrypoints.ts",
+        "scripts/validate-runner-reproducibility.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
