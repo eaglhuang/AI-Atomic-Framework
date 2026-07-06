@@ -284,8 +284,14 @@ async function validateExtractionLockWait(input: {
   // Stage the extracted tree before spawning the waiter so the handoff below
   // is a fast rename instead of a multi-second cpSync racing the child's
   // extraction-lock timeout (the real extractor also stages then renames).
+  // Exclude release/** to mirror the real payload contents: a nested
+  // release/atm-onefile/atm.mjs with the SAME payload sha makes the extracted
+  // launcher re-enter its own cache dir and self-spawn forever (TASK-RFT-0015).
   const stagingRoot = `${cacheRoot}.handoff-staging`;
-  cpSync(input.releaseRoot, stagingRoot, { recursive: true });
+  cpSync(input.releaseRoot, stagingRoot, {
+    recursive: true,
+    filter: (source) => !path.relative(input.releaseRoot, source).replace(/\\/g, '/').startsWith('release')
+  });
   writeFileSync(path.join(stagingRoot, '.payload-ready.json'), JSON.stringify({
     schemaVersion: 'atm.onefilePayload.v0.1',
     generatedAt: '1970-01-01T00:00:00.000Z',
