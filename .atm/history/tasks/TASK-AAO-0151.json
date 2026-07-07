@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0151",
+  "title": "Fix validate:prompt-scoped-next persistent red (broker freeze on TASK-CONFLICT fixture)",
+  "status": "open",
+  "milestone": "RFT-M5",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/validate-prompt-scoped-next.ts"
+  ],
+  "scopePaths": [
+    "scripts/validate-prompt-scoped-next.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks/",
+    "packages/core/src/broker/"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:prompt-scoped-next",
+    "npm run validate:broker-proposal",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Weakening real broker conflict blocking for confirmed mutation-intent overlaps"
+  ],
+  "nonGoals": [
+    "Do not delete the conflict-fixture coverage; make expectation and behavior agree"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if broker arbitration verdicts change for real (non-fixture) conflict scenarios.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-routing",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-AAO-0151-prompt-scoped-next-red-validator.task.md",
+    "sectionTitle": "TASK-AAO-0151",
+    "headingLine": 40,
+    "hash": "5e0aedd6ef600a45"
+  },
+  "importedAt": "2026-07-07T07:18:31.683Z",
+  "lastTransitionId": "2026-07-07T07-40-53-613Z-release-0905f438a9cc",
+  "lastTransitionAt": "2026-07-07T07:40:53.613Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex",
+  "reservedAt": "2026-07-07T07:40:51.902Z",
+  "promotedAt": "2026-07-07T07:40:51.906Z",
+  "claim": {
+    "actorId": "codex",
+    "leaseId": "lease-7d98e392bbc6",
+    "claimedAt": "2026-07-07T07:40:51.910Z",
+    "heartbeatAt": "2026-07-07T07:40:53.601Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0151.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks/",
+      "packages/core/src/broker/",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "state": "released",
+    "reason": "commit-session only for landing imported card"
+  },
+  "startedAt": "2026-07-07T07:40:51.910Z",
+  "startedByActor": "codex",
+  "startedBySessionId": "session-20260707074051-codex-TASK-AAO-0151-f3b925df14",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0151",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0151.*",
+      ".atm/history/task-events/TASK-AAO-0151/**",
+      ".atm/history/tasks/TASK-AAO-0151.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks/",
+      "packages/core/src/broker/",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bf58e066e4f04c5d3a8278f7be5da1a37be8e9d32a53b1bed9c11c419bf42f33",
+    "actorId": "codex",
+    "createdAt": "2026-07-07T07:40:52.112Z",
+    "status": "active"
+  }
+}
