@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T04-17-05-741Z-scope-amendment-cb0a35b9c1e1",
+  "taskId": "TASK-RFT-0016",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0016.json",
+  "taskSha256": "sha256:cffea9570e95618f6cdc246e86588bcecb6e80adb63172865efe26b28dd2451d",
+  "createdAt": "2026-07-07T04:17:05.741Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-RFT-0016 --actor codex --add \"release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/scripts/build-onefile-release.ts\" --reason \"Add build-generated release artifacts required by onefile source-entrypoint CI fix; original direction lock covered source scripts but omitted retained release outputs.\" --emergency-approval EMG-TASK-RFT-0016-3fd24621e9 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Add build-generated release artifacts required by onefile source-entrypoint CI fix; original direction lock covered source scripts but omitted retained release outputs."
+  }
+}
