@@ -53,6 +53,10 @@ bridge after the paper-aligned public release.
   budget reporting, scoped git-lane prompt repair, and governance
   repair git-head evidence backfill (`c589f1250`, `004802818`,
   `f57dbfe0b`, `8006bb7e6`).
+- **Main-push audit baseline cleanup** keeps historical release notes
+  from being interpreted as task closeout reports and preserves the
+  missing PAPER-HOTFILE handoff transition artifact used by the audit
+  baseline.
 
 ### Daily log
 
