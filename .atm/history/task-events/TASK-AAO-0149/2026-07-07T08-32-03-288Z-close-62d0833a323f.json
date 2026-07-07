@@ -1,0 +1,89 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T08-32-03-288Z-close-62d0833a323f",
+  "taskId": "TASK-AAO-0149",
+  "action": "close",
+  "actorId": "codex",
+  "sessionId": "session-20260707082543-codex-TASK-AAO-0149-8b897c0f91",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0149.json",
+  "taskSha256": "sha256:b1acaf039253fcdcdf2b9f4fd0a57cb065eb29fe8affe4dadd3520c38d2d61b6",
+  "createdAt": "2026-07-07T08:32:03.288Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0149 --actor codex --status done --historical-delivery 3616cf3299134a8a1c4b2e82d7664ffd769d2b79",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707082543-codex-TASK-AAO-0149-8b897c0f91",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0149.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:branch-commit-queue",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:schemas",
+      "validate:taskflow-close-atomicity"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T08:32:03.279Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0149.*",
+        ".atm/history/task-events/TASK-AAO-0149/**",
+        ".atm/history/tasks/TASK-AAO-0149.json",
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/tasks/__tests__/",
+        "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+        "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "schemas/governance/branch-commit-queue.schema.json",
+        "scripts/validate-branch-commit-queue.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-schemas.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+        "packages/cli/src/commands/tasks/__tests__/",
+        "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+        "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "schemas/governance/branch-commit-queue.schema.json",
+        "scripts/validate-branch-commit-queue.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-schemas.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

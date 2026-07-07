@@ -1,0 +1,213 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0149",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "3616cf3299134a8a1c4b2e82d7664ffd769d2b79",
+  "governedTreeSha": "c708a91b97653bd403d530f25719deba57bb35b5",
+  "targetCommitDelta": {
+    "currentCommitSha": "3616cf3299134a8a1c4b2e82d7664ffd769d2b79",
+    "parentCommitShas": [
+      "3616cf3299134a8a1c4b2e82d7664ffd769d2b79"
+    ],
+    "governedTreeSha": "c708a91b97653bd403d530f25719deba57bb35b5",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0149.bundle-manifest.json",
+      ".atm/history/evidence/TASK-AAO-0149.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "schemas/governance/branch-commit-queue.schema.json",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-schemas.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:branch-commit-queue",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e37bc3ef31d61d3c9d3be8dbc0022f1d6311e5e359e14450d466166c06f77daa",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:schemas",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3e4bc82e6eccc7d2b696a5b58ac73d41fb0e224c373ccdde10668243b419e994",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:onefile-release",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:daaf71978d5500869a97d8b5d0ca141c4e784513a33bdc3ebee8ce4381082455",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:taskflow-close-atomicity",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:44b959b3b510ddfdcecae38c82b78eab69c190104deed08ec0822e440659d875",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:branch-commit-queue",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:onefile-release",
+    "validate:schemas",
+    "validate:taskflow-close-atomicity"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-07T08:32:03.279Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0149.*",
+      ".atm/history/task-events/TASK-AAO-0149/**",
+      ".atm/history/tasks/TASK-AAO-0149.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/tasks/__tests__/",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "schemas/governance/branch-commit-queue.schema.json",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-schemas.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts",
+      "packages/cli/src/commands/tasks/__tests__/",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "schemas/governance/branch-commit-queue.schema.json",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-schemas.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0149.json",
+  "closedAt": "2026-07-07T08:32:03.280Z",
+  "closedByActor": "codex",
+  "sessionId": "session-20260707082543-codex-TASK-AAO-0149-8b897c0f91",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "3616cf3299134a8a1c4b2e82d7664ffd769d2b79",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "schemas/governance/branch-commit-queue.schema.json",
+      "scripts/validate-branch-commit-queue.ts",
+      "scripts/validate-onefile-release.ts",
+      "scripts/validate-schemas.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0149.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-02-23-555Z-reserve-cfa17b7fba47.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-02-23-560Z-promote-bc48695c59fd.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-02-23-871Z-claim-33d70b5016e9.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-02-35-173Z-scope-amendment-89aed514f77d.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-04-00-530Z-scope-amendment-ffb6622eb35f.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-05-15-622Z-scope-amendment-654c765551a5.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-25-44-150Z-claim-716828cb826b.json",
+      ".atm/history/task-events/TASK-AAO-0149/2026-07-07T08-25-57-980Z-scope-amendment-e0d8c3360d7d.json",
+      ".atm/history/tasks/TASK-AAO-0149.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

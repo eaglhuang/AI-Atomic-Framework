@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0149",
   "title": "taskflow close resilience: rollback must not contradict a landed close commit, and auto-evidence must bound its waits",
-  "status": "running",
+  "status": "done",
   "milestone": "RFT-M5",
   "dependencies": [],
   "acceptance": [
@@ -60,8 +60,8 @@
     "hash": "3941c5a2f74cad7b"
   },
   "importedAt": "2026-07-07T02:00:18.975Z",
-  "lastTransitionId": "2026-07-07T08-25-57-980Z-scope-amendment-e0d8c3360d7d",
-  "lastTransitionAt": "2026-07-07T08:25:57.980Z",
+  "lastTransitionId": "2026-07-07T08-32-03-288Z-close-62d0833a323f",
+  "lastTransitionAt": "2026-07-07T08:32:03.288Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex",
   "reservedAt": "2026-07-07T08:02:23.555Z",
@@ -70,7 +70,7 @@
     "actorId": "codex",
     "leaseId": "lease-997cbd000f67",
     "claimedAt": "2026-07-07T08:25:43.850Z",
-    "heartbeatAt": "2026-07-07T08:25:43.850Z",
+    "heartbeatAt": "2026-07-07T08:32:03.285Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-AAO-0149.*",
@@ -89,8 +89,8 @@
       "scripts/validate-onefile-release.ts",
       "scripts/validate-schemas.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-07T02:01:16.749Z",
   "startedByActor": "codex",
@@ -134,5 +134,9 @@
     "actorId": "codex",
     "createdAt": "2026-07-07T08:25:44.154Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-07T08:32:03.285Z",
+  "closedByActor": "codex",
+  "closedBySessionId": "session-20260707082543-codex-TASK-AAO-0149-8b897c0f91",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0149.closure-packet.json"
 }
