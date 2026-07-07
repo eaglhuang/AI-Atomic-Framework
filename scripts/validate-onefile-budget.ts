@@ -193,14 +193,22 @@ async function validateExtractionLockHandoff(input: {
   child.stderr.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk)));
 
   await delay(150);
-  // Mirror the real payload contents: exclude release/** so the fixture tree
-  // cannot contain a same-sha nested onefile launcher that re-enters its own
-  // cache dir and self-spawns forever (TASK-RFT-0015). Stage then rename so
-  // the handoff is atomic instead of racing the child's 4s lock timeout.
+  // Mirror the real payload contents exactly (TASK-RFT-0015/0016): the fixture
+  // tree must contain the same allowlisted files the launcher would extract,
+  // otherwise the extracted entrypoint crashes or, worse, a same-sha nested
+  // onefile launcher re-enters its own cache dir and self-spawns forever.
+  // Stage then rename so the handoff is atomic instead of racing the child's
+  // 4s lock timeout.
   const handoffStagingRoot = `${input.cacheRoot}.handoff-staging`;
   cpSync(input.releaseRoot, handoffStagingRoot, {
     recursive: true,
-    filter: (source) => !path.relative(input.releaseRoot, source).replace(/\\/g, '/').startsWith('release')
+    filter: (source) => {
+      const relativePath = path.relative(input.releaseRoot, source).replace(/\\/g, '/');
+      if (!relativePath) return true;
+      const stats = statSync(source);
+      if (stats.isDirectory()) return true;
+      return isOnefilePayloadPath(relativePath);
+    }
   });
   writeFileSync(path.join(handoffStagingRoot, '.payload-ready.json'), JSON.stringify({
     schemaVersion: 'atm.onefilePayload.v0.1',
