@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T18-28-54-371Z-close-c7f04bbc8e46",
+  "taskId": "TASK-PAPER-HOTFILE-POS2-A",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260707182625-codex-captain-TASK-PAPER-HOTFILE-POS2-A-4c31c0ce16",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-PAPER-HOTFILE-POS2-A.json",
+  "taskSha256": "sha256:606e60e8b5ec8a8904a76bbf3b9b20180d2b4115032a017d84062c4c5aabb08b",
+  "createdAt": "2026-07-07T18:28:54.371Z",
+  "command": "node atm.mjs tasks close --task TASK-PAPER-HOTFILE-POS2-A --actor codex-captain --status done --historical-delivery 42365275e8a2d28e09ee52be7f4330f52c755a2a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707182625-codex-captain-TASK-PAPER-HOTFILE-POS2-A-4c31c0ce16",
+    "closurePacketPath": ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T18:28:54.365Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.*",
+        ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/**",
+        ".atm/history/tasks/TASK-PAPER-HOTFILE-POS2-A.json",
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

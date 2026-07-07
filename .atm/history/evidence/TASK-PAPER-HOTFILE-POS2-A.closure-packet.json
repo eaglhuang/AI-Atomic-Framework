@@ -1,0 +1,139 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-PAPER-HOTFILE-POS2-A",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "5bd2c14614d44d444c08b9b859fbe554fe9bfc5d",
+  "governedTreeSha": "e9d020d501030bcc22a2b8a6fa1bb3b31fe6d8d4",
+  "targetCommitDelta": {
+    "currentCommitSha": "5bd2c14614d44d444c08b9b859fbe554fe9bfc5d",
+    "parentCommitShas": [
+      "5bd2c14614d44d444c08b9b859fbe554fe9bfc5d"
+    ],
+    "governedTreeSha": "e9d020d501030bcc22a2b8a6fa1bb3b31fe6d8d4",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.bundle-manifest.json",
+      ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.json",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-07-07T18-26-25-734Z-reserve-e802ce941dce.json",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-07-07T18-26-25-738Z-promote-ad85ee13d599.json",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-07-07T18-26-26-491Z-claim-6e490b86dfc9.json",
+      ".atm/history/tasks/TASK-PAPER-HOTFILE-POS2-A.json",
+      "packages/cli/src/commands/broker.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-07T18:28:54.365Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.*",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/**",
+      ".atm/history/tasks/TASK-PAPER-HOTFILE-POS2-A.json",
+      "packages/cli/src/commands/broker.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.json",
+  "closedAt": "2026-07-07T18:28:54.366Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260707182625-codex-captain-TASK-PAPER-HOTFILE-POS2-A-4c31c0ce16",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "42365275e8a2d28e09ee52be7f4330f52c755a2a",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-PAPER-HOTFILE-POS2-A.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-22T02-15-09-468Z-import-2c5670613451.json",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-22T02-25-58-452Z-reserve-643434532615.json",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-22T02-25-58-458Z-promote-6b2433c4b110.json",
+      ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-22T02-25-58-639Z-claim-424a4a03f852.json",
+      ".atm/history/tasks/TASK-PAPER-HOTFILE-POS2-A.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
