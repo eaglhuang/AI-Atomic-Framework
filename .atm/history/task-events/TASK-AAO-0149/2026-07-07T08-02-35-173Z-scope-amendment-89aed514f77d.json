@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T08-02-35-173Z-scope-amendment-89aed514f77d",
+  "taskId": "TASK-AAO-0149",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0149.json",
+  "taskSha256": "sha256:f74d8f5e389c0af4439974fba1aa86d56e750afcb167c5d0127100d804ef510d",
+  "createdAt": "2026-07-07T08:02:35.173Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0149 --actor codex --add \"packages/cli/src/commands/git-governance.ts,packages/cli/src/commands/taskflow/branch-commit-queue-gate.ts,scripts/validate-branch-commit-queue.ts\" --class linked-surface --phase during-implementation --reason \"Add branch commit queue stale lock self-heal surfaces requested for TASK-AAO-0149 resilience work.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Add branch commit queue stale lock self-heal surfaces requested for TASK-AAO-0149 resilience work."
+  }
+}

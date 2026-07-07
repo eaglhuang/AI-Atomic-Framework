@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T08-05-15-622Z-scope-amendment-654c765551a5",
+  "taskId": "TASK-AAO-0149",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0149.json",
+  "taskSha256": "sha256:324d6cd3fe78346e82ac3a7bad9518ec4fb5adb11b7994f8c892694f9c5b533a",
+  "createdAt": "2026-07-07T08:05:15.622Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0149 --actor codex --add scripts/validate-onefile-release.ts --class linked-surface --phase during-implementation --reason \"Include same-turn onefile release handoff fixture repair requested with TASK-AAO-0149 continuation.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include same-turn onefile release handoff fixture repair requested with TASK-AAO-0149 continuation."
+  }
+}
