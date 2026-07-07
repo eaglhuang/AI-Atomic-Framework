@@ -30,7 +30,11 @@ for (const detail of collectMissingSourceContractAnchors(gitGovernanceSource, [
   { token: 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE', detail: 'git-governance must keep the branch queue race retry code' },
   { token: "schemaId: 'atm.branchCommitQueueEvidence.v1'", detail: 'git-governance must emit branch commit queue evidence' },
   { token: 'function isHeadRaceCommitFailure', detail: 'git-governance must detect raw HEAD race failures explicitly' },
-  { token: 'withBranchCommitQueueLock(', detail: 'git-governance must serialize final branch-tip mutation through the branch queue lock' }
+  { token: 'withBranchCommitQueueLock(', detail: 'git-governance must serialize final branch-tip mutation through the branch queue lock' },
+  { token: 'ownerPid: process.pid', detail: 'branch queue locks must record ownerPid for stale self-heal evidence' },
+  { token: 'ATM_BRANCH_COMMIT_QUEUE_STALE_SELF_HEALED', detail: 'branch queue lock self-heal must leave an explicit audit reason' },
+  { token: 'branch-commit-queue-stale-cleanup.jsonl', detail: 'branch queue stale cleanup must write durable runtime audit evidence' },
+  { token: 'record.actorId !== input.actorId', detail: 'branch queue stale self-heal must not clean cross-actor locks' }
 ])) {
   fail(detail);
 }
@@ -73,4 +77,4 @@ for (const detail of collectMissingSourceContractAnchors(taskflowDryRunSource, [
   fail(detail);
 }
 
-console.log('[branch-commit-queue:validate] ok (branch queue busy/race guard and regression anchors verified)');
+console.log('[branch-commit-queue:validate] ok (branch queue busy/race guard and stale self-heal anchors verified)');

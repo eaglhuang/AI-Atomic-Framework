@@ -311,6 +311,7 @@ if (!branchCommitQueueSchema) {
     branchRef: 'refs/heads/main',
     branchName: 'main',
     headShaAtAcquire: 'abc123schema-before',
+    ownerPid: 12345,
     createdAt: '2026-06-19T00:00:00.000Z'
   };
   if (!branchCommitQueueSchema(queueLock)) {

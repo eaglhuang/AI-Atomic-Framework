@@ -5121,6 +5121,11 @@ function collectBulletList(sections: readonly HeadingSection[], headingNames: re
     if (match) {
       const value = (match[1] ?? match[2] ?? '').trim();
       if (value) items.push(value);
+      continue;
+    }
+    const continuation = /^\s{2,}(\S.*)$/.exec(line);
+    if (continuation && items.length > 0) {
+      items[items.length - 1] = `${items[items.length - 1]} ${continuation[1].trim()}`;
     }
   }
   return items;

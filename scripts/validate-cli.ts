@@ -1432,6 +1432,41 @@ try {
     ], autoLinkTempWorkspace);
     assert(importRes.parsed.ok === true, 'import task must succeed');
 
+    const multilineAcceptancePlanPath = path.join(autoLinkTempWorkspace, 'TASK-REGRESS-MULTILINE-ACCEPTANCE.task.md');
+    writeFileSync(multilineAcceptancePlanPath, [
+      '---',
+      'task_id: TASK-REGRESS-MULTILINE-ACCEPTANCE',
+      'title: "Multiline acceptance import regression"',
+      'status: open',
+      'scopePaths:',
+      '  - "packages/cli/src/commands/tasks.ts"',
+      'validators:',
+      '  - "npm run validate:cli"',
+      'deliverables:',
+      '  - "packages/cli/src/commands/tasks.ts"',
+      '---',
+      '',
+      '# TASK-REGRESS-MULTILINE-ACCEPTANCE',
+      '',
+      '## Acceptance',
+      '',
+      '- `next --prompt x --json` warm latency under 5s on the same machine, with',
+      '  byte-identical routing evidence for a fixed fixture repo (semantic no-change proof).',
+      ''
+    ].join('\n'));
+    const multilineImportRes = await runAtm([
+      'tasks', 'import',
+      '--from', multilineAcceptancePlanPath,
+      '--write'
+    ], autoLinkTempWorkspace);
+    assert(multilineImportRes.parsed.ok === true, 'multiline acceptance import must succeed');
+    const multilineTaskPath = path.join(autoLinkTempWorkspace, '.atm/history/tasks/TASK-REGRESS-MULTILINE-ACCEPTANCE.json');
+    const multilineTask = JSON.parse(readFileSync(multilineTaskPath, 'utf8'));
+    assert(
+      multilineTask.acceptance?.[0]?.includes('byte-identical routing evidence'),
+      'task import must preserve indented continuation lines in acceptance bullets'
+    );
+
     // Register active session to satisfy evidence add constraint
     await runAtm(['next', '--claim', '--actor', 'Antigravity', '--task', 'TASK-AAO-0063'], autoLinkTempWorkspace);
 

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { actorIdEnvVar, actorRegistryRelativePath, findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.ts';
@@ -335,6 +335,7 @@ function isIgnorableTaskScopedDirtySideEffect(filePath: string): boolean {
 
 const branchCommitQueueLockTimeoutMs = 15_000;
 const branchCommitQueueLockRetryMs = 200;
+const branchCommitQueueStaleSelfHealMs = 5 * 60 * 1000;
 
 export interface GitUnexpectedStagedTaskReport {
   readonly taskId: string;
@@ -383,6 +384,7 @@ interface BranchCommitQueueLockRecord {
   readonly branchRef: string;
   readonly branchName: string;
   readonly headShaAtAcquire: string | null;
+  readonly ownerPid?: number;
   readonly createdAt: string;
 }
 
@@ -2654,6 +2656,102 @@ function branchCommitQueueLockPath(cwd: string, branchRef: string | null): strin
   return path.join(cwd, '.atm', 'runtime', 'locks', `git-commit-queue-${safeName}.lock`);
 }
 
+function isBranchCommitQueueOwnerAlive(ownerPid: unknown): boolean | null {
+  if (typeof ownerPid !== 'number' || !Number.isInteger(ownerPid) || ownerPid <= 0) {
+    return null;
+  }
+  try {
+    process.kill(ownerPid, 0);
+    return true;
+  } catch (error) {
+    const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: unknown }).code ?? '') : '';
+    if (code === 'ESRCH') {
+      return false;
+    }
+    return true;
+  }
+}
+
+function readBranchCommitQueueLockRecord(lockPath: string): BranchCommitQueueLockRecord | null {
+  try {
+    const raw = JSON.parse(readFileSync(path.join(lockPath, 'record.json'), 'utf8')) as Record<string, unknown>;
+    if (raw.schemaId !== 'atm.branchCommitQueueLock.v1') {
+      return null;
+    }
+    return {
+      schemaId: 'atm.branchCommitQueueLock.v1',
+      specVersion: raw.specVersion === '0.1.0' ? '0.1.0' : '0.1.0',
+      actorId: typeof raw.actorId === 'string' ? raw.actorId : '',
+      taskId: typeof raw.taskId === 'string' ? raw.taskId : null,
+      branchRef: typeof raw.branchRef === 'string' ? raw.branchRef : 'detached-head',
+      branchName: typeof raw.branchName === 'string' ? raw.branchName : 'detached-head',
+      headShaAtAcquire: typeof raw.headShaAtAcquire === 'string' ? raw.headShaAtAcquire : null,
+      ownerPid: typeof raw.ownerPid === 'number' ? raw.ownerPid : undefined,
+      createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : ''
+    };
+  } catch {
+    return null;
+  }
+}
+
+function recordBranchCommitQueueStaleCleanup(input: {
+  readonly cwd: string;
+  readonly lockPath: string;
+  readonly record: BranchCommitQueueLockRecord;
+  readonly actorId: string;
+  readonly currentHeadSha: string | null;
+  readonly ownerAlive: boolean | null;
+  readonly ageMs: number;
+  readonly reason: string;
+}) {
+  const auditPath = path.join(input.cwd, '.atm', 'runtime', 'locks', 'branch-commit-queue-stale-cleanup.jsonl');
+  mkdirSync(path.dirname(auditPath), { recursive: true });
+  appendFileSync(auditPath, `${JSON.stringify({
+    schemaId: 'atm.branchCommitQueueStaleCleanup.v1',
+    cleanedAt: new Date().toISOString(),
+    actorId: input.actorId,
+    lockPath: relativePathFrom(input.cwd, input.lockPath),
+    lockRecord: input.record,
+    currentHeadSha: input.currentHeadSha,
+    ownerAlive: input.ownerAlive,
+    ageMs: input.ageMs,
+    reason: input.reason
+  })}\n`, 'utf8');
+}
+
+function maybeCleanupStaleBranchCommitQueueLock(input: {
+  readonly cwd: string;
+  readonly lockPath: string;
+  readonly actorId: string;
+  readonly currentHeadSha: string | null;
+}): boolean {
+  const record = readBranchCommitQueueLockRecord(input.lockPath);
+  if (!record || record.actorId !== input.actorId) {
+    return false;
+  }
+  const createdMs = Date.parse(record.createdAt);
+  const ageMs = Number.isFinite(createdMs) ? Date.now() - createdMs : Number.POSITIVE_INFINITY;
+  const ownerAlive = isBranchCommitQueueOwnerAlive(record.ownerPid);
+  const headMoved = Boolean(record.headShaAtAcquire && input.currentHeadSha && record.headShaAtAcquire !== input.currentHeadSha);
+  const staleEnough = ageMs >= branchCommitQueueStaleSelfHealMs;
+  const ownerGoneOrLegacy = ownerAlive === false || ownerAlive === null;
+  if (!staleEnough || !ownerGoneOrLegacy || !headMoved) {
+    return false;
+  }
+  recordBranchCommitQueueStaleCleanup({
+    cwd: input.cwd,
+    lockPath: input.lockPath,
+    record,
+    actorId: input.actorId,
+    currentHeadSha: input.currentHeadSha,
+    ownerAlive,
+    ageMs,
+    reason: 'ATM_BRANCH_COMMIT_QUEUE_STALE_SELF_HEALED'
+  });
+  rmSync(input.lockPath, { recursive: true, force: true });
+  return true;
+}
+
 function withBranchCommitQueueLock<T>(input: {
   readonly cwd: string;
   readonly actorId: string;
@@ -2676,6 +2774,7 @@ function withBranchCommitQueueLock<T>(input: {
         branchRef: input.branchRef ?? 'detached-head',
         branchName: input.branchName,
         headShaAtAcquire: input.headShaAtAcquire,
+        ownerPid: process.pid,
         createdAt: new Date().toISOString()
       };
       writeFileSync(path.join(lockPath, 'record.json'), `${JSON.stringify(record, null, 2)}\n`, 'utf8');
@@ -2684,6 +2783,15 @@ function withBranchCommitQueueLock<T>(input: {
       const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: unknown }).code ?? '') : '';
       if (code !== 'EEXIST' && code !== 'EACCES') {
         throw error;
+      }
+      const headShaCurrent = readHeadCommitSha(input.cwd);
+      if (maybeCleanupStaleBranchCommitQueueLock({
+        cwd: input.cwd,
+        lockPath,
+        actorId: input.actorId,
+        currentHeadSha: headShaCurrent
+      })) {
+        continue;
       }
       if ((Date.now() - startedAt) >= branchCommitQueueLockTimeoutMs) {
         throw new CliError('ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', `Another ATM commit is already finalizing ${input.branchName}; retry after the active writer finishes.`, {
@@ -2694,7 +2802,7 @@ function withBranchCommitQueueLock<T>(input: {
             branchRef: input.branchRef,
             branchName: input.branchName,
             headShaAtAcquire: input.headShaAtAcquire,
-            headShaCurrent: readHeadCommitSha(input.cwd),
+            headShaCurrent,
             lockPath: relativePathFrom(input.cwd, lockPath),
             retryable: true,
             requiredCommand: 'Retry the same node atm.mjs git commit command after the active writer releases the branch queue lock.'

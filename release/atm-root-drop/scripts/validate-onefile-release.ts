@@ -1,10 +1,10 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
-import { buildOnefileRelease } from './build-onefile-release.ts';
+import { buildOnefileRelease, isOnefilePayloadPath } from './build-onefile-release.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -284,13 +284,22 @@ async function validateExtractionLockWait(input: {
   // Stage the extracted tree before spawning the waiter so the handoff below
   // is a fast rename instead of a multi-second cpSync racing the child's
   // extraction-lock timeout (the real extractor also stages then renames).
-  // Exclude release/** to mirror the real payload contents: a nested
-  // release/atm-onefile/atm.mjs with the SAME payload sha makes the extracted
-  // launcher re-enter its own cache dir and self-spawn forever (TASK-RFT-0015).
+  // Mirror the real payload contents: using the same allowlist keeps this
+  // handoff fixture aligned with payload diet changes and still excludes
+  // release/** nested launchers (TASK-RFT-0015).
   const stagingRoot = `${cacheRoot}.handoff-staging`;
   cpSync(input.releaseRoot, stagingRoot, {
     recursive: true,
-    filter: (source) => !path.relative(input.releaseRoot, source).replace(/\\/g, '/').startsWith('release')
+    filter: (source) => {
+      const relativePath = path.relative(input.releaseRoot, source).replace(/\\/g, '/');
+      if (!relativePath) {
+        return true;
+      }
+      if (statSync(source).isDirectory()) {
+        return true;
+      }
+      return isOnefilePayloadPath(relativePath);
+    }
   });
   writeFileSync(path.join(stagingRoot, '.payload-ready.json'), JSON.stringify({
     schemaVersion: 'atm.onefilePayload.v0.1',
