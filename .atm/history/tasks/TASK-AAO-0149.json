@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0149",
+  "title": "taskflow close resilience: rollback must not contradict a landed close commit, and auto-evidence must bound its waits",
+  "status": "open",
+  "milestone": "RFT-M5",
+  "dependencies": [],
+  "acceptance": [
+    "Simulated post-commit failure leaves ledger consistent with HEAD (roll-forward)",
+    "Simulated hung validator gets killed at its timeout and close aborts with the"
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+    "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+    "packages/cli/src/commands/evidence.ts",
+    "packages/cli/src/commands/tasks/__tests__/"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:taskflow-close-atomicity",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Redesigning the closure packet schema",
+    "Auto-repair of ambiguous residue without human confirmation"
+  ],
+  "nonGoals": [
+    "Do not remove the rollback path; make it consistent with what actually landed"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if close-window staged-index lock semantics or closure packet contract change for the normal (non-failure) close path.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-command-atomic-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-AAO-0149-taskflow-close-rollback-resilience.task.md",
+    "sectionTitle": "TASK-AAO-0149",
+    "headingLine": 45,
+    "hash": "3941c5a2f74cad7b"
+  },
+  "importedAt": "2026-07-07T02:00:18.975Z",
+  "lastTransitionId": "2026-07-07T02-01-22-961Z-release-a773e5c5d8e4",
+  "lastTransitionAt": "2026-07-07T02:01:22.961Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex",
+  "reservedAt": "2026-07-07T02:01:16.742Z",
+  "promotedAt": "2026-07-07T02:01:16.745Z",
+  "claim": {
+    "actorId": "codex",
+    "leaseId": "lease-07b7888b870b",
+    "claimedAt": "2026-07-07T02:01:16.749Z",
+    "heartbeatAt": "2026-07-07T02:01:22.946Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0149.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/tasks/__tests__/",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts"
+    ],
+    "state": "released",
+    "reason": "commit-session only for landing imported card"
+  },
+  "startedAt": "2026-07-07T02:01:16.749Z",
+  "startedByActor": "codex",
+  "startedBySessionId": "session-20260707020116-codex-TASK-AAO-0149-3de5e29e08",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0149",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0149.*",
+      ".atm/history/task-events/TASK-AAO-0149/**",
+      ".atm/history/tasks/TASK-AAO-0149.json",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/tasks/__tests__/",
+      "packages/cli/src/commands/tasks/close-helpers/close-artifact-staging.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2b757add4ccacb56380164a4693c34afce0a06a2f84813d494f1188587068f2f",
+    "actorId": "codex",
+    "createdAt": "2026-07-07T02:01:18.052Z",
+    "status": "active"
+  }
+}
