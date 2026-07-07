@@ -7,16 +7,27 @@
 
 ## 1. Coverage matrix
 
-| Failure mode | Primitive | Fixture | Expected decision |
+`scripts/validate-runner-broker-failures.ts` now fails unless at least nine
+scenario families are exercised. The current matrix covers ten families across
+fixture-backed and deterministic in-process scenarios.
+
+| Failure mode | Primitive | Evidence surface | Expected decision |
 |---|---|---|---|
 | Malformed envelope (version-publish without target) | runner-submit-pipeline | `malformed-envelope.json` | `reject-malformed` |
 | Stale base (declared commit lags ref head) | runner-submit-pipeline | `stale-base.json` | `reject-stale-base` |
 | Target ref currently frozen | runner-submit-pipeline | `frozen-target.json` | `freeze-await-rebase` |
 | Orphaned `in-dev/HEAD` recovery | runner-bootstrap | `orphan-head-recovery.json` | `rollback-rc-to-in-dev` |
+| Non-Broker `release/**` textual diff attempt | runner-submit-pipeline | built-in validator + unit test | `reject-malformed` |
+| `in-dev-bump` aimed at a version ref | runner-submit-pipeline | built-in validator + unit test | `reject-malformed` |
+| Version publish missing target ref | runner-submit-pipeline | built-in validator + unit test | `reject-malformed` |
+| Patch-only ATM core change requiring steward rebuild | runner-submit-pipeline | built-in validator + unit test | `accept` with steward rebuild next action |
+| Published stream still holding a stale lease | runner-bootstrap | built-in validator + unit test | `quarantine` with audit next action |
+| Healthy published baseline | runner-bootstrap | built-in validator | `no-recovery-needed` |
 
-Additional canonical failure-mode assertions that do not need a fixture
-(deterministic input is small) live in
-`packages/core/src/broker/__tests__/runner-failure-modes.test.ts`.
+The companion unit test
+`packages/core/src/broker/__tests__/runner-failure-modes.test.ts` mirrors the
+canonical small-input scenarios so primitive regressions are visible without
+requiring new fixture files for every boundary.
 
 ## 2. Out of scope
 
@@ -30,4 +41,8 @@ Additional canonical failure-mode assertions that do not need a fixture
 2. The validator script auto-discovers and exercises all fixtures.
 3. Add an assertion to `runner-failure-modes.test.ts` for any failure mode whose inputs are smaller than a fixture.
 
-This card delivers the validator harness and four canonical fixtures. Operator-runbook narrative for each failure mode lives in `runner-broker-recovery.md` (TASK-MAO-0020).
+This card delivers the validator harness, four canonical fixtures, and six
+deterministic built-in scenario families. Operator-runbook narrative for each
+failure mode lives in `runner-broker-recovery.md` (TASK-MAO-0020). The remaining
+manual boundary is real process or host-loss recovery, which stays out of scope
+for this local deterministic validator.

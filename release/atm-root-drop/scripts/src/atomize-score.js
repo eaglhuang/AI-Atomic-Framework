@@ -174,7 +174,7 @@ function evaluateCommandCoverage(cwd) {
   const publicCommands = [];
   const internalCommands = [];
   // Each entry is on its own line, e.g. `actor: actorSpec,`,
-  // `'agent-pack': agentPackSpec,`, or `do: withVisibility(doSpec, 'internal'),`.
+  // `'agent-pack': agentPackSpec,`, or `daemon: withVisibility(daemonSpec, 'internal'),`.
   // We parse line-by-line so commas inside withVisibility(...) do not split the RHS.
   const entryLineRe = /^\s*(?:'([^']+)'|([A-Za-z][A-Za-z0-9_-]*))\s*:\s*(.+?),?\s*$/;
   for (const line of block.split(/\r?\n/)) {

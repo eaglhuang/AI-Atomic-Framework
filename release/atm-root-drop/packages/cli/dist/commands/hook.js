@@ -11,7 +11,6 @@ import { CliError, makeResult, message, quoteCliValue, readFrameworkVersion, rel
 import { buildProtectedOverrideRepairCandidate, recordProtectedOverrideAuditEvent } from './emergency/protected-override-audit.js';
 import { diagnoseTaskDirectionLockAllowedFiles, isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.js';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.js';
-import { runContextMapAdvisor } from './hook/context-map-advisor.js';
 import { readBrokerLifecycleState } from '../../../core/dist/broker/lifecycle.js';
 import { buildPendingCheckpointCommitWindow } from './batch.js';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from './tasks/task-import-validators.js';
@@ -384,12 +383,6 @@ function runPreCommitHook(cwd) {
             diagnoses: directionLockAllowedFilesMismatches
         })
         : null;
-    try {
-        runContextMapAdvisor(root);
-    }
-    catch {
-        // ignore
-    }
     return makeResult({
         ok,
         command: 'hook',

@@ -37,7 +37,6 @@ import {
   type TaskDirectionAllowedFilesDiagnosis
 } from './task-direction.ts';
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from './work-channels.ts';
-import { runContextMapAdvisor } from './hook/context-map-advisor.ts';
 import { readBrokerLifecycleState } from '../../../core/src/broker/lifecycle.ts';
 import { buildPendingCheckpointCommitWindow } from './batch.ts';
 import {
@@ -669,12 +668,6 @@ function runPreCommitHook(cwd: string) {
       diagnoses: directionLockAllowedFilesMismatches
     })
     : null;
-
-  try {
-    runContextMapAdvisor(root);
-  } catch {
-    // ignore
-  }
 
   return makeResult({
     ok,

@@ -10,7 +10,10 @@ import {
 } from '../runner-ref-store.ts';
 import { submitRunnerPatch } from '../runner-submit-pipeline.ts';
 import { analyzeBootstrap } from '../runner-bootstrap.ts';
-import { createRunnerVersionStream } from '../runner-version-state.ts';
+import {
+  createRunnerVersionStream,
+  transitionRunnerVersion
+} from '../runner-version-state.ts';
 
 function baseEnvelope() {
   return createPatchEnvelope({
@@ -79,9 +82,93 @@ function testBootstrapEmptyStoreSuggestsReseed() {
   assert.equal(plan.decision, 'reseed-from-version');
 }
 
+function testReleaseOnlyDiffRejected() {
+  const env = annotateForAtmCore(
+    createPatchEnvelope({
+      taskId: 'T',
+      actorId: 'a',
+      freezeId: 'f',
+      targetFiles: ['release/atm-onefile/atm.mjs'],
+      patchText: 'diff --git a/release/atm-onefile/atm.mjs b/release/atm-onefile/atm.mjs',
+      wipState: 'complete',
+      confidence: 'high'
+    }),
+    {
+      scopeClass: 'release-only',
+      publishIntent: 'patch-only'
+    }
+  );
+  const d = submitRunnerPatch({ envelope: env, refStore: createEmptyRunnerRefStore() });
+  assert.equal(d.verdict, 'reject-malformed');
+  assert.match(d.reason, /release-only scope/);
+}
+
+function testInDevBumpRejectsVersionRefTarget() {
+  const env = annotateForAtmCore(baseEnvelope(), {
+    scopeClass: 'atm-core',
+    publishIntent: 'in-dev-bump',
+    targetRunnerRef: 'v0.1.0'
+  });
+  const d = submitRunnerPatch({ envelope: env, refStore: createEmptyRunnerRefStore() });
+  assert.equal(d.verdict, 'reject-malformed');
+}
+
+function testVersionPublishRequiresTarget() {
+  const env = annotateForAtmCore(baseEnvelope(), {
+    scopeClass: 'atm-core',
+    publishIntent: 'version-publish'
+  });
+  const d = submitRunnerPatch({ envelope: env, refStore: createEmptyRunnerRefStore() });
+  assert.equal(d.verdict, 'reject-malformed');
+}
+
+function testPatchOnlyAcceptsIntoStewardLane() {
+  const env = annotateForAtmCore(baseEnvelope(), {
+    scopeClass: 'atm-core',
+    publishIntent: 'patch-only'
+  });
+  const d = submitRunnerPatch({ envelope: env, refStore: createEmptyRunnerRefStore() });
+  assert.equal(d.verdict, 'accept');
+  assert.match(d.suggestedNextAction, /steward rebuild lane/);
+}
+
+function testPublishedStreamWithStaleLeaseQuarantines() {
+  const published = transitionRunnerVersion(
+    transitionRunnerVersion(
+      transitionRunnerVersion(createRunnerVersionStream('runner'), 'cut-rc', 'steward').record,
+      'freeze-rc',
+      'steward'
+    ).record,
+    'publish',
+    'steward'
+  ).record;
+  const store = publishRunnerRef(createEmptyRunnerRefStore(), {
+    refName: 'v0.1.0',
+    kind: 'version',
+    sourceCommit: 'published',
+    artifactSha256: 'sha256:p',
+    publisherActorId: 'steward'
+  }).store;
+  const plan = analyzeBootstrap({
+    refStore: store,
+    stream: {
+      ...published,
+      lease: { heldBy: 'stale-steward', heldUntil: '2099-01-01T00:00:00.000Z' }
+    },
+    reachableSourceCommits: new Set(['published'])
+  });
+  assert.equal(plan.decision, 'quarantine');
+  assert.ok(plan.findings.some((finding) => finding.code === 'lease-held-but-state-published'));
+}
+
 testRejectMalformedFamily();
 testStaleBaseFamily();
 testFreezeFamily();
 testBootstrapEmptyStoreSuggestsReseed();
+testReleaseOnlyDiffRejected();
+testInDevBumpRejectsVersionRefTarget();
+testVersionPublishRequiresTarget();
+testPatchOnlyAcceptsIntoStewardLane();
+testPublishedStreamWithStaleLeaseQuarantines();
 
 console.log('runner failure modes tests: ok');

@@ -729,10 +729,13 @@ function assertBrokerRegisterCliParity(intent, options) {
     const mismatchSummary = mismatches
         .map((entry) => `${entry.field}: CLI=${entry.cliValue} payload=${entry.payloadValue}`)
         .join('; ');
+    const mismatchFields = mismatches.map((entry) => entry.field);
     throw new CliError('ATM_BROKER_REGISTER_PAYLOAD_FLAG_MISMATCH', `broker register CLI flags do not match intent payload. ${mismatchSummary}`, {
         exitCode: 1,
         details: {
             intentFile: options.intentFile,
+            mismatchCount: mismatches.length,
+            mismatchFields,
             mismatches
         }
     });

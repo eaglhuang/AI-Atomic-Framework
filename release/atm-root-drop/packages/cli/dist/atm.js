@@ -54,7 +54,6 @@ import { runAtomRef } from './commands/atom-ref.js';
 import { runAtomCapsule } from './commands/atom-capsule.js';
 import { runMapCapsule } from './commands/map-capsule.js';
 import { runRescue } from './commands/rescue.js';
-import { runDo } from './commands/do.js';
 import { runDaemon } from './commands/daemon.js';
 import { runCache } from './commands/cache.js';
 import { runHealthReport } from './commands/health-report.js';
@@ -122,7 +121,6 @@ export const cliCommandRunners = {
     'atom-capsule': runAtomCapsule,
     'map-capsule': runMapCapsule,
     rescue: runRescue,
-    do: runDo,
     daemon: runDaemon,
     cache: runCache,
     'health-report': runHealthReport,

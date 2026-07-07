@@ -54,7 +54,6 @@ import { runAtomRef } from './commands/atom-ref.ts';
 import { runAtomCapsule } from './commands/atom-capsule.ts';
 import { runMapCapsule } from './commands/map-capsule.ts';
 import { runRescue } from './commands/rescue.ts';
-import { runDo } from './commands/do.ts';
 import { runDaemon } from './commands/daemon.ts';
 import { runCache } from './commands/cache.ts';
 import { runHealthReport } from './commands/health-report.ts';
@@ -123,7 +122,6 @@ export const cliCommandRunners: Record<string, (argv: string[]) => Promise<Comma
   'atom-capsule': runAtomCapsule,
   'map-capsule': runMapCapsule,
   rescue: runRescue,
-  do: runDo,
   daemon: runDaemon,
   cache: runCache,
   'health-report': runHealthReport,

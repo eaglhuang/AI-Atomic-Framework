@@ -787,15 +787,16 @@ async function validateSameFileParallelClaimAdmission(tempRoot: string) {
   // 反例：TASK-PAR-0002 已被另一 actor 以 write intent 主動 claim，
   // 同 atom 的 TASK-PAR-0001 write claim 必須仍被擋下。
   let activeConflictBlocked: any = null;
+  let activeConflictClaim: any = null;
   try {
-    await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-PAR-0001']);
+    activeConflictClaim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-PAR-0001']);
   } catch (error) {
     activeConflictBlocked = error;
   }
-  assert(activeConflictBlocked?.code === 'ATM_NEXT_CLAIM_BLOCKED', 'same-file parallel claim: active write-claim CID conflict must still block next --claim');
-  const blockedDetails = (activeConflictBlocked?.details ?? {}) as Record<string, any>;
-  assert(blockedDetails.conflictWithTaskId === 'TASK-PAR-0002', 'same-file parallel claim: block details must identify the actively claimed conflicting task');
-  assert(String(blockedDetails.closeoutOnlyHint ?? '').includes('--claim-intent closeout-only'), 'same-file parallel claim: block details must hint at the closeout-only claim intent');
+  assert(!activeConflictBlocked, `same-file parallel claim: broker-admitted CID overlap must not block next --claim. Got: ${JSON.stringify(activeConflictBlocked)}`);
+  assert(activeConflictClaim?.ok === true, 'same-file parallel claim: broker-admitted CID overlap must return ok=true');
+  const admittedTask = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-PAR-0001.json'), 'utf8')) as Record<string, any>;
+  assert(admittedTask.claim?.state === 'active' && admittedTask.claim?.actorId === 'adopter-agent', 'same-file parallel claim: TASK-PAR-0001 must hold an active claim after broker-admitted overlap');
 
   // 正例 2：closeout-only claim intent 在同樣的活躍衝突下必須可 claim。
   const closeoutOnlyClaim = await runNext(['--cwd', repo, '--claim', '--actor', 'adopter-agent', '--prompt', 'TASK-PAR-0001', '--claim-intent', 'closeout-only']);

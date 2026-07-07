@@ -19,9 +19,6 @@ export declare const commandSpecs: Readonly<{
         visibility: "public" | "internal";
     }>;
     doctor: import("./shared.ts").CommandSpec;
-    do: Readonly<import("./shared.ts").CommandSpec & {
-        visibility: "public" | "internal";
-    }>;
     emergency: import("./shared.ts").CommandSpec;
     experience: import("./shared.ts").CommandSpec;
     explain: import("./shared.ts").CommandSpec;
