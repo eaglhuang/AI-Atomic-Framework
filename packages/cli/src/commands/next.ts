@@ -995,12 +995,20 @@ async function claimNextImportedTask(input: {
             const activeWriteConflict = Boolean(conflictActorId)
               && conflictActorId !== resolvedActor.actorId
               && conflictIntent !== 'closeout-only';
+            const brokerAdmission = finding.brokerAdmission && typeof finding.brokerAdmission === 'object'
+              ? finding.brokerAdmission as { confirmedConflict?: unknown; mutationIntentStatus?: unknown }
+              : null;
+            const confirmedBrokerConflict = brokerAdmission?.confirmedConflict === true;
+            const insufficientMutationIntent = finding.verdict === 'insufficient-mutation-intent'
+              || brokerAdmission?.mutationIntentStatus === 'missing';
             const shouldBlockPerCid = claimIntent !== 'closeout-only'
               && activeWriteConflict
-              && overlappingAtomIds.length > 0;
+              && confirmedBrokerConflict;
             const cidVerdict: ClaimAdmissionCidVerdict = shouldBlockPerCid
               ? 'blocked-cid-conflict'
-              : (overlappingAtomIds.length > 0
+              : (insufficientMutationIntent
+                ? 'insufficient-mutation-intent'
+                : overlappingAtomIds.length > 0
                 ? 'parallel-safe-with-cid-overlap-advisory'
                 : 'parallel-safe');
             // Broker verdict derivation: the parallel-preflight is itself the
@@ -1037,11 +1045,15 @@ async function claimNextImportedTask(input: {
             if (!parallelAdvisory) {
               parallelAdvisory = {
                 ...finding,
-                verdict: 'parallel-safe-with-cid-overlap-advisory',
+                verdict: insufficientMutationIntent
+                  ? 'insufficient-mutation-intent'
+                  : 'parallel-safe-with-cid-overlap-advisory',
                 conflictWithTaskId: candidate.taskId,
                 conflictClaimActorId: conflictActorId,
                 admitted: true,
-                admissionReason: claimIntent === 'closeout-only'
+                admissionReason: insufficientMutationIntent
+                  ? 'broker-conflict-not-confirmed'
+                  : claimIntent === 'closeout-only'
                   ? 'closeout-only-claim-intent'
                   : 'cid-overlap-without-active-write-claim',
                 brokerVerdict,

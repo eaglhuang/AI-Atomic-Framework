@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T14-00-10-007Z-scope-amendment-90b21b1e9992",
+  "taskId": "TASK-AAO-0151",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0151.json",
+  "taskSha256": "sha256:1f81f673d938913e7539b3e2f2c1495380bea7eeca693ad2bdb990f1e70397aa",
+  "createdAt": "2026-07-07T14:00:10.007Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0151 --actor codex-captain --add docs/governance/atm-bug-and-optimization-backlog.md --class linked-surface --phase during-implementation --reason \"dogfood friction discovered while delivering TASK-AAO-0151; user requested ATM backlog recording for hard-to-use/stuck workflow issues\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "dogfood friction discovered while delivering TASK-AAO-0151; user requested ATM backlog recording for hard-to-use/stuck workflow issues"
+  }
+}
