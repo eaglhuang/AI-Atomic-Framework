@@ -126,6 +126,7 @@ import {
 } from './next/planning-root-preference.ts';
 
 export async function runNext(argv: string[]) {
+  const profile = createNextProfiler();
   // TASK-CID-0024: --claim-intent is a next-only claim flag; extract it before
   // the shared option parser so the rest of the surface stays unchanged.
   const claimIntentExtraction = extractClaimIntentFlag(Array.isArray(argv) ? argv : []);
@@ -143,8 +144,11 @@ export async function runNext(argv: string[]) {
     }
   }
   const { options } = parseOptions(argv, 'next');
+  profile.mark('parse-options');
   const integrationBootstrap = inspectIntegrationBootstrap(options.cwd);
+  profile.mark('inspect-integration-bootstrap');
   const runtimeAdapterReadiness = inspectRuntimeAdapterReadiness(options.cwd);
+  profile.mark('inspect-runtime-adapter-readiness');
   const explicitTaskIds = uniqueInOrder([
     ...(typeof options.task === 'string' && options.task.trim().length > 0 ? [options.task] : []),
     ...(Array.isArray(options.tasks) ? options.tasks : [])
@@ -154,13 +158,19 @@ export async function runNext(argv: string[]) {
     intentPath: options.intent,
     explicitTaskIds
   });
+  profile.mark('resolve-task-intent');
   const importedTaskQueue = inspectImportedTaskQueue(options.cwd, taskIntent, claimIntent ?? 'write');
+  profile.mark('inspect-imported-task-queue');
   const scopedTargetRepo = importedTaskQueue.promptScope?.targetRepo ?? null;
-  const earlyFrameworkStatus = createFrameworkModeStatus({
-    cwd: options.cwd,
-    targetRepo: scopedTargetRepo
-  });
-  if (earlyFrameworkStatus.mode === 'cross-repo-target-required') {
+  const earlyFrameworkStatus = shouldInspectCrossRepoFrameworkStatus(options.cwd, scopedTargetRepo)
+    ? createFrameworkModeStatus({
+      cwd: options.cwd,
+      targetRepo: scopedTargetRepo
+    })
+    : null;
+  profile.mark(`create-framework-mode-status skipped=${earlyFrameworkStatus === null}`);
+  if (earlyFrameworkStatus?.mode === 'cross-repo-target-required') {
+    profile.flush('cross-repo-target-required');
     return withRunnerMode(buildCrossRepoFrameworkNextResult({
       cwd: options.cwd,
       frameworkStatus: earlyFrameworkStatus,
@@ -170,6 +180,8 @@ export async function runNext(argv: string[]) {
     }), options.cwd);
   }
   if (!taskIntent && hasPromptScopedWorkItems(importedTaskQueue)) {
+    profile.mark('has-prompt-scoped-work-items');
+    profile.flush('prompt-required');
     return withRunnerMode(buildPromptRequiredNextResult({
       cwd: options.cwd,
       claimRequested: Boolean(options.claim),
@@ -179,6 +191,7 @@ export async function runNext(argv: string[]) {
     }), options.cwd);
   }
   if (options.claim) {
+    profile.flush('claim-route');
     return withRunnerMode(await claimNextImportedTask({
       cwd: options.cwd,
       actor: options.agent,
@@ -197,7 +210,9 @@ export async function runNext(argv: string[]) {
     integrationBootstrap,
     runtimeAdapterReadiness
   });
+  profile.mark('build-prompt-scoped-next-result');
   if (promptScopeResult) {
+    profile.flush('prompt-scope-result');
     return withRunnerMode(promptScopeResult, options.cwd);
   }
   const promptGuidanceResult = buildPromptGuidanceNextResult({
@@ -206,15 +221,19 @@ export async function runNext(argv: string[]) {
     integrationBootstrap,
     runtimeAdapterReadiness
   });
+  profile.mark('build-prompt-guidance-next-result');
   if (promptGuidanceResult) {
+    profile.flush('prompt-guidance-result');
     return withRunnerMode(promptGuidanceResult, options.cwd);
   }
   const activeGuidanceSession = readActiveGuidanceSession(options.cwd);
+  profile.mark('read-active-guidance-session');
   if (activeGuidanceSession) {
     const baseAction = toGuidanceNextAction(activeGuidanceSession.packet, activeGuidanceSession.routeDecision.blockedBy);
     const legacyPlan = activeGuidanceSession.legacyRoutePlan ?? null;
     const nextAction = legacyPlan ? enrichWithLegacyPlan(options.cwd, baseAction, legacyPlan, activeGuidanceSession.sessionId) : baseAction;
     const userNotice = buildFirstUseUserNotice(nextAction as Parameters<typeof buildFirstUseUserNotice>[0]);
+    profile.flush('active-guidance-session');
     return withRunnerMode(makeResult({
       ok: nextAction.status !== 'blocked',
       command: 'next',
@@ -247,11 +266,14 @@ export async function runNext(argv: string[]) {
   }
 
   const doctor = await runDoctor(['--cwd', options.cwd]);
+  profile.mark('run-doctor');
   const runtime = detectGovernanceRuntime(options.cwd, bootstrapTaskId);
+  profile.mark('detect-governance-runtime');
   const doctorChecks = doctor.evidence.checks as Array<{ name: string; ok: boolean }>;
   const failed = doctorChecks.find((check) => check.ok !== true);
   const nextAction = decideNextAction(runtime, failed?.name ?? null, importedTaskQueue);
   const userNotice = buildFirstUseUserNotice(nextAction);
+  profile.flush('default-next');
   return withRunnerMode(makeResult({
     ok: nextAction.status === 'ready',
     command: 'next',
@@ -281,6 +303,27 @@ export async function runNext(argv: string[]) {
       lastHandoffAt: runtime.lastHandoffAt
     }
   }), options.cwd);
+}
+
+function createNextProfiler(header = 'ATM_NEXT_PROFILE') {
+  const enabled = process.env.ATM_NEXT_PROFILE === '1';
+  const startedAt = Date.now();
+  let previousAt = startedAt;
+  const marks: string[] = [];
+  return {
+    mark(label: string) {
+      if (!enabled) return;
+      const now = Date.now();
+      marks.push(`${label}: +${now - previousAt}ms (${now - startedAt}ms)`);
+      previousAt = now;
+    },
+    flush(label: string) {
+      if (!enabled) return;
+      const now = Date.now();
+      marks.push(`${label}: +${now - previousAt}ms (${now - startedAt}ms)`);
+      process.stderr.write(`[${header}]\n${marks.join('\n')}\n`);
+    }
+  };
 }
 
 // TASK-CID-0024: claim intent for next --claim.
@@ -995,12 +1038,20 @@ async function claimNextImportedTask(input: {
             const activeWriteConflict = Boolean(conflictActorId)
               && conflictActorId !== resolvedActor.actorId
               && conflictIntent !== 'closeout-only';
+            const brokerAdmission = finding.brokerAdmission && typeof finding.brokerAdmission === 'object'
+              ? finding.brokerAdmission as { confirmedConflict?: unknown; mutationIntentStatus?: unknown }
+              : null;
+            const confirmedBrokerConflict = brokerAdmission?.confirmedConflict === true;
+            const insufficientMutationIntent = finding.verdict === 'insufficient-mutation-intent'
+              || brokerAdmission?.mutationIntentStatus === 'missing';
             const shouldBlockPerCid = claimIntent !== 'closeout-only'
               && activeWriteConflict
-              && overlappingAtomIds.length > 0;
+              && confirmedBrokerConflict;
             const cidVerdict: ClaimAdmissionCidVerdict = shouldBlockPerCid
               ? 'blocked-cid-conflict'
-              : (overlappingAtomIds.length > 0
+              : (insufficientMutationIntent
+                ? 'insufficient-mutation-intent'
+                : overlappingAtomIds.length > 0
                 ? 'parallel-safe-with-cid-overlap-advisory'
                 : 'parallel-safe');
             // Broker verdict derivation: the parallel-preflight is itself the
@@ -1037,11 +1088,15 @@ async function claimNextImportedTask(input: {
             if (!parallelAdvisory) {
               parallelAdvisory = {
                 ...finding,
-                verdict: 'parallel-safe-with-cid-overlap-advisory',
+                verdict: insufficientMutationIntent
+                  ? 'insufficient-mutation-intent'
+                  : 'parallel-safe-with-cid-overlap-advisory',
                 conflictWithTaskId: candidate.taskId,
                 conflictClaimActorId: conflictActorId,
                 admitted: true,
-                admissionReason: claimIntent === 'closeout-only'
+                admissionReason: insufficientMutationIntent
+                  ? 'broker-conflict-not-confirmed'
+                  : claimIntent === 'closeout-only'
                   ? 'closeout-only-claim-intent'
                   : 'cid-overlap-without-active-write-claim',
                 brokerVerdict,
@@ -1424,8 +1479,10 @@ function buildPromptScopedNextResult(input: {
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
+  const profile = createNextProfiler('ATM_NEXT_PROMPT_SCOPE_PROFILE');
   const promptScope = input.importedTaskQueue.promptScope;
   if (!promptScope) return null;
+  profile.mark('read-prompt-scope');
   const selectedTasks = promptScope.selectedTasks;
   if (promptScope.status === 'empty') {
     const nextAction = {
@@ -1687,6 +1744,7 @@ function buildPromptScopedNextResult(input: {
   }
   const selectedTask = selectedTasks[0] ?? null;
   if (!selectedTask) return null;
+  profile.mark('select-task');
   const deliveryClassification = classifyTaskDelivery({
     cwd: input.cwd,
     task: {
@@ -1699,6 +1757,7 @@ function buildPromptScopedNextResult(input: {
       taskPath: selectedTask.taskPath
     }
   });
+  profile.mark('classify-task-delivery');
   const sourceStatus = deliveryClassification.sourceStatus;
   const ledgerStatus = deliveryClassification.ledgerStatus;
 
@@ -1845,6 +1904,7 @@ function buildPromptScopedNextResult(input: {
     });
   }
   const activeBatch = readActiveBatchRun(input.cwd, { taskId: selectedTask.workItemId });
+  profile.mark('read-active-batch-run');
   if (activeBatch?.status === 'active' && activeBatch.taskIds.includes(selectedTask.workItemId)) {
     const activeQueue = findActiveTaskQueue(input.cwd, activeBatch.sourcePrompt, { batchId: activeBatch.batchId }) ?? findActiveTaskQueue(input.cwd, null, { batchId: activeBatch.batchId });
     const consistency = inspectBatchRunConsistency(activeBatch, activeQueue);
@@ -1988,6 +2048,19 @@ function buildPromptScopedNextResult(input: {
     ? `node atm.mjs next --claim --actor <id> --task ${explicitTaskSelector} --auto-intent --json`
     : `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(input.taskIntent?.userPrompt ?? selectedTask.workItemId)} --auto-intent --json`;
   const taskScopedClaimCommand = `node atm.mjs next --claim --actor <id> --task ${selectedTask.workItemId} --auto-intent --json`;
+  profile.mark('build-claim-commands');
+  const governanceReadiness = buildGovernanceReadinessHint(input.cwd, {
+    channel: 'normal',
+    prompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId,
+    taskId: selectedTask.workItemId
+  });
+  profile.mark('build-governance-readiness');
+  const knowledgeSummary = buildTeamKnowledgeSummary({
+    cwd: input.cwd,
+    taskId: selectedTask.workItemId,
+    top: 3
+  });
+  profile.mark('build-team-knowledge-summary');
   const nextAction: NextActionLike = embedTeamRecommendation({
     status: 'task-route-ready',
     command: normalClaimCommand,
@@ -2001,11 +2074,7 @@ function buildPromptScopedNextResult(input: {
       taskId: selectedTask.workItemId,
       originalPrompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId
     }),
-    governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
-      channel: 'normal',
-      prompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId,
-      taskId: selectedTask.workItemId
-    }),
+    governanceReadiness,
     deliveryPrinciple: buildTaskDeliveryPrinciple({
       channel: 'normal',
       taskId: selectedTask.workItemId
@@ -2018,12 +2087,10 @@ function buildPromptScopedNextResult(input: {
   }, {
     taskId: selectedTask.workItemId,
     channel: 'normal',
-    knowledgeSummary: buildTeamKnowledgeSummary({
-      cwd: input.cwd,
-      taskId: selectedTask.workItemId,
-      top: 3
-    })
+    knowledgeSummary
   });
+  profile.mark('embed-team-recommendation');
+  profile.flush('build-normal-task-route-ready');
   return makeResult({
     ok: true,
     command: 'next',
@@ -2284,26 +2351,37 @@ export interface PromptScopedTaskContext {
 }
 
 function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, claimIntent: NextClaimIntent = 'write'): ImportedTaskQueue {
+  const profile = createNextProfiler('ATM_NEXT_QUEUE_PROFILE');
   const planningRootResolution = resolveCandidatePlanningRoots(cwd, {
     configuredRoots: readConfiguredPlanningRoots(cwd)
   });
+  profile.mark('resolve-planning-roots');
   const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
   const jsonTasks = existsSync(taskStorePath) ? readdirSync(taskStorePath)
     .filter((entry) => entry.endsWith('.json'))
     .flatMap((entry): ImportedTaskSummaryWithOutOfScope[] => {
       const filePath = path.join(taskStorePath, entry);
       try {
-        const parsed = parseJsonText(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
-        const schemaVersion = typeof parsed.schemaVersion === 'string' ? parsed.schemaVersion : '';
-        if (schemaVersion !== 'atm.workItem.v0.2' && parsed.source === undefined) {
+        const rawText = readFileSync(filePath, 'utf8');
+        const metadata = extractJsonTaskMetadata(rawText);
+        if (metadata.schemaVersion !== 'atm.workItem.v0.2' && !metadata.hasSource) {
           return [];
         }
-        const workItemId = typeof parsed.workItemId === 'string'
-          ? parsed.workItemId
-          : typeof parsed.id === 'string'
-            ? parsed.id
-            : '';
+        const workItemId = metadata.workItemId;
         if (!workItemId) return [];
+        const status = metadata.status ?? 'planned';
+        const shouldHydrateScope = isTaskRoutable(status, taskIntent) || isTaskIdMentioned(workItemId, taskIntent);
+        if (!shouldHydrateScope) {
+          return [buildMinimalImportedJsonTaskSummary({
+            cwd,
+            filePath,
+            workItemId,
+            title: metadata.title ?? workItemId,
+            status,
+            sourcePlanPath: metadata.sourcePlanPath
+          })];
+        }
+        const parsed = parseJsonText(rawText) as Record<string, unknown>;
         const dependencies = Array.isArray(parsed.dependencies)
           ? parsed.dependencies.filter((entry): entry is string => typeof entry === 'string')
           : [];
@@ -2311,11 +2389,12 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
           ? parsed.claim as Record<string, unknown>
           : {};
         const source = parsed.source && typeof parsed.source === 'object' ? parsed.source as Record<string, unknown> : {};
+        const sourcePlanPath = normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path);
         const outOfScope = readStringArray(parsed.outOfScope ?? parsed.out_of_scope ?? parsed.forbidden_files ?? parsed.forbiddenFiles);
         return [finalizeImportedTaskSummary({
           workItemId,
           title: typeof parsed.title === 'string' && parsed.title.trim() ? parsed.title.trim() : workItemId,
-          status: typeof parsed.status === 'string' ? parsed.status : 'planned',
+          status,
           closedAt: normalizeOptionalString(parsed.closedAt ?? parsed.closed_at),
           closedByActor: normalizeOptionalString(parsed.closedByActor ?? parsed.closed_by_actor),
           closurePacket: normalizeOptionalString(parsed.closurePacket ?? parsed.closure_packet),
@@ -2325,9 +2404,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
           dependencies,
           taskPath: path.relative(cwd, filePath).replace(/\\/g, '/'),
           format: 'json',
-          sourcePlanPath: normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path),
+          sourcePlanPath,
           nearbyPlanPaths: [],
-          scopePaths: (() => {
+          scopePaths: shouldHydrateScope ? (() => {
             const explicit = uniqueSorted([
               ...readStringArray(parsed.scope),
               ...readStringArray(parsed.scopePaths),
@@ -2344,7 +2423,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
               ])
               : uniqueSorted([
                 ...extractDeclaredTaskPathsFromDocument(parsed),
-                ...extractLinkedSourceTaskArtifactPaths(cwd, normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path))
+                ...extractLinkedSourceTaskArtifactPaths(cwd, sourcePlanPath)
               ].map((p) => {
                 const norm = p.replace(/\\/g, '/').replace(/^\.\//, '').trim();
                 return path.isAbsolute(norm) ? path.relative(cwd, norm).replace(/\\/g, '/') : norm;
@@ -2352,7 +2431,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
             return outOfScope.length > 0
               ? rawScope.filter((entry) => !isPathAllowedByScope(entry, outOfScope))
               : rawScope;
-          })(),
+          })() : [],
           outOfScope,
           targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo ?? parsed.upstream_repo ?? parsed.upstreamRepo),
           planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
@@ -2369,14 +2448,18 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
         return [];
       }
     }) : [];
+  profile.mark(`read-json-tasks count=${jsonTasks.length}`);
   const skipMarkdownTaskDiscovery = shouldSkipMarkdownTaskDiscovery(cwd, jsonTasks, taskIntent);
+  profile.mark(`should-skip-markdown-task-discovery value=${skipMarkdownTaskDiscovery}`);
   const skipExternalTaskCardScan = skipMarkdownTaskDiscovery || shouldSkipExternalTaskCardScan(cwd, jsonTasks, taskIntent);
+  profile.mark(`should-skip-external-task-card-scan value=${skipExternalTaskCardScan}`);
   const markdownTaskFiles = shouldDiscoverMarkdownTaskCards(taskIntent) && !skipMarkdownTaskDiscovery
     ? uniqueSorted([
       ...listTaskCardFiles(cwd),
       ...(skipExternalTaskCardScan ? [] : listPromptScopedExternalTaskCardFiles(cwd, taskIntent, planningRootResolution.roots))
     ])
     : [];
+  profile.mark('list-markdown-task-files');
   const markdownTasks = markdownTaskFiles
     .map((filePath): ImportedTaskSummaryWithOutOfScope | null => {
       const rawText = readFileSync(filePath, 'utf8');
@@ -2435,7 +2518,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
       }, cwd);
     })
     .filter((entry): entry is ImportedTaskSummaryWithOutOfScope => entry !== null);
+  profile.mark('read-markdown-tasks');
   const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
+  profile.mark('dedupe-tasks');
 
   const tasks = allTasks
     .filter((task) => isTaskRoutable(task.status, taskIntent) || isTaskExplicitlyMentioned(task, taskIntent))
@@ -2445,6 +2530,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
     });
   const statusById = new Map(allTasks.map((task) => [task.workItemId, task.status]));
   const activeQueue = findActiveTaskQueueForIntent(cwd, taskIntent);
+  profile.mark('find-active-task-queue');
   const activeQueueTasks = activeQueue
     ? activeQueue.taskIds
       .slice(activeQueue.currentIndex)
@@ -2459,6 +2545,7 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
       diagnostics: [`active-queue:${activeQueue.queueId}`, `queue-index:${activeQueue.currentIndex}`]
     }
     : resolvePromptScopedTaskRoute(cwd, tasks, taskIntent, planningRootResolution);
+  profile.mark('resolve-prompt-scoped-task-route');
   const planningRootMissing = promptScope?.status === 'not-found' && taskIntent
     ? shouldReportPlanningRootMissing({
       cwd,
@@ -2477,13 +2564,16 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
     statusById,
     cwd
   );
+  profile.mark('select-imported-task-for-prompt-scope');
   const claimableTask = selectedTask
     && selectedTask.format === 'json'
     && (isSelectedTaskClaimableForIntent(selectedTask, claimIntent) || isTaskAlreadyActivelyClaimed(selectedTask))
     && (areTaskDependenciesSatisfied(selectedTask, statusById, cwd) || isTaskAlreadyActivelyClaimed(selectedTask))
     ? selectedTask
     : null;
+  profile.mark('resolve-claimable-task');
 
+  profile.flush('inspect-imported-task-queue');
   return {
     taskStorePath: existsSync(taskStorePath) ? path.relative(cwd, taskStorePath).replace(/\\/g, '/') : '.atm/history/tasks',
     openTaskCount: tasks.length,
@@ -2518,6 +2608,12 @@ export function shouldSkipMarkdownTaskDiscovery(
 ): boolean {
   if (!taskIntent?.taskScopeMentioned) return false;
   if (taskIntent.mentionedPlanPaths.length > 0) return false;
+  if (
+    taskIntent.mentionedTaskIds.length > 0
+    && jsonTasks.some((task) => isTaskIdMentioned(task.workItemId, taskIntent))
+  ) {
+    return true;
+  }
   const promptScopedJsonRoute = resolvePromptScopedTaskRoute(cwd, jsonTasks, taskIntent);
   return Boolean(promptScopedJsonRoute && promptScopedJsonRoute.selectedTasks.length > 0);
 }
@@ -4520,6 +4616,69 @@ function readQueueHeadTaskId(value: unknown): string | null {
   return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate.trim() : null;
 }
 
+function isTaskIdMentioned(workItemId: string, intent: TaskIntent | null) {
+  if (!intent || intent.mentionedTaskIds.length === 0) return false;
+  return intent.mentionedTaskIds.includes(workItemId.trim().toUpperCase());
+}
+
+function extractJsonTaskMetadata(rawText: string) {
+  const pick = (key: string) => {
+    const match = new RegExp(`"${key}"\\s*:\\s*"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"`, 'm').exec(rawText);
+    if (!match?.[1]) return null;
+    try {
+      return JSON.parse(`"${match[1]}"`) as string;
+    } catch {
+      return match[1];
+    }
+  };
+  const sourcePlanPath = /"source"\s*:\s*\{[\s\S]*?"planPath"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/m.exec(rawText)?.[1] ?? null;
+  return {
+    schemaVersion: pick('schemaVersion'),
+    workItemId: pick('workItemId') ?? pick('id') ?? '',
+    title: pick('title'),
+    status: pick('status'),
+    sourcePlanPath: sourcePlanPath ? JSON.parse(`"${sourcePlanPath}"`) as string : (pick('planPath') ?? pick('plan_path')),
+    hasSource: /"source"\s*:/.test(rawText)
+  };
+}
+
+function buildMinimalImportedJsonTaskSummary(input: {
+  readonly cwd: string;
+  readonly filePath: string;
+  readonly workItemId: string;
+  readonly title: string;
+  readonly status: string;
+  readonly sourcePlanPath: string | null;
+}): ImportedTaskSummaryWithOutOfScope {
+  return {
+    workItemId: input.workItemId,
+    title: input.title,
+    status: input.status,
+    closedAt: null,
+    closedByActor: null,
+    closurePacket: null,
+    lastTransitionId: null,
+    lastTransitionAt: null,
+    milestone: null,
+    dependencies: [],
+    taskPath: path.relative(input.cwd, input.filePath).replace(/\\/g, '/'),
+    format: 'json',
+    sourcePlanPath: input.sourcePlanPath,
+    nearbyPlanPaths: [],
+    scopePaths: [],
+    outOfScope: [],
+    targetRepo: null,
+    planningRepo: null,
+    allowPlanningMirror: false,
+    closureAuthority: null,
+    activeClaimActorId: null,
+    activeClaimIntent: null,
+    planningReadOnlyPaths: [],
+    planningMirrorPaths: [],
+    targetAllowedFiles: []
+  };
+}
+
 function buildNextMessages(
   nextAction: NextActionLike,
   userNotice: AtmUserNotice | null,
@@ -4672,15 +4831,17 @@ function buildGovernanceReadinessHint(cwd: string, input: {
   readonly taskId?: string | null;
   readonly frameworkClaimRequired?: boolean;
 }) {
-  const frameworkStatus = createFrameworkModeStatus({ cwd });
-  const currentBranch = runGitScalar(cwd, ['branch', '--show-current']);
-  const upstreamRef = currentBranch ? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`]) : null;
-  const aheadCount = upstreamRef ? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10) || 0 : 0;
+  const gitReadiness = readFastGitReadiness(cwd);
+  const currentBranch = gitReadiness.currentBranch;
+  const upstreamRef = gitReadiness.upstreamRef;
+  const aheadCount = gitReadiness.aheadCount;
   const protectedBranchTarget = Boolean(currentBranch && isProtectedFrameworkBranchTarget(currentBranch));
+  const needsFrameworkStatus = Boolean(input.frameworkClaimRequired) || isFrameworkMaintenancePrompt(input.prompt);
+  const frameworkStatus = needsFrameworkStatus ? createFrameworkModeStatus({ cwd }) : null;
   const earlyPreparation = [
     'Read evidence.nextAction.playbook before editing, closing, or committing.',
     'Resolve explicit actor identity before claim, commit, or report.',
-    ...(input.frameworkClaimRequired || (frameworkStatus.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(input.prompt))
+    ...(input.frameworkClaimRequired || (frameworkStatus?.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(input.prompt))
       ? ['Acquire framework-mode claim before editing framework-critical files.']
       : []),
     ...(input.channel === 'batch'
@@ -4708,6 +4869,103 @@ function buildGovernanceReadinessHint(cwd: string, input: {
       ? 'Protected framework branches no longer require per-critical-commit git-head evidence; same-commit governed provenance and high-risk closeout evidence remain strict.'
       : null
   };
+}
+
+function readFastGitReadiness(cwd: string) {
+  const gitDirectory = resolveGitDirectory(cwd);
+  const currentBranch = gitDirectory ? readCurrentBranchFromGitDir(gitDirectory) : runGitScalar(cwd, ['branch', '--show-current']);
+  const upstreamRef = currentBranch && gitDirectory
+    ? readUpstreamFromGitConfig(gitDirectory, currentBranch) ?? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`])
+    : (currentBranch ? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`]) : null);
+  const aheadCount = currentBranch && upstreamRef && gitDirectory
+    ? (readAheadCountFast(gitDirectory, currentBranch, upstreamRef) ?? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10)) || 0
+    : 0;
+  return { currentBranch, upstreamRef, aheadCount };
+}
+
+function resolveGitDirectory(cwd: string) {
+  const dotGit = path.join(cwd, '.git');
+  if (!existsSync(dotGit)) return null;
+  try {
+    const stat = statSync(dotGit);
+    if (stat.isDirectory()) return dotGit;
+    if (stat.isFile()) {
+      const text = readFileSync(dotGit, 'utf8').trim();
+      const match = /^gitdir:\s*(.+)$/i.exec(text);
+      if (match?.[1]) {
+        const gitdir = match[1].trim();
+        return path.isAbsolute(gitdir) ? gitdir : path.resolve(cwd, gitdir);
+      }
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function readCurrentBranchFromGitDir(gitDirectory: string) {
+  try {
+    const head = readFileSync(path.join(gitDirectory, 'HEAD'), 'utf8').trim();
+    const prefix = 'ref: refs/heads/';
+    return head.startsWith(prefix) ? head.slice(prefix.length).trim() || null : null;
+  } catch {
+    return null;
+  }
+}
+
+function readUpstreamFromGitConfig(gitDirectory: string, branch: string) {
+  try {
+    const config = readFileSync(path.join(gitDirectory, 'config'), 'utf8');
+    const escaped = branch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const section = new RegExp(`\\[branch "${escaped}"\\]([\\s\\S]*?)(?=\\n\\[|$)`).exec(config)?.[1];
+    if (!section) return null;
+    const remote = /^\s*remote\s*=\s*(.+)\s*$/m.exec(section)?.[1]?.trim();
+    const merge = /^\s*merge\s*=\s*refs\/heads\/(.+)\s*$/m.exec(section)?.[1]?.trim();
+    return remote && merge ? `${remote}/${merge}` : null;
+  } catch {
+    return null;
+  }
+}
+
+function readAheadCountFast(gitDirectory: string, branch: string, upstreamRef: string) {
+  const localSha = readRefSha(gitDirectory, `refs/heads/${branch}`);
+  const upstreamSha = readRefSha(gitDirectory, `refs/remotes/${upstreamRef}`);
+  if (!localSha || !upstreamSha) return null;
+  return localSha === upstreamSha ? 0 : null;
+}
+
+function readRefSha(gitDirectory: string, refPath: string) {
+  try {
+    const value = readFileSync(path.join(gitDirectory, ...refPath.split('/')), 'utf8').trim();
+    return /^[0-9a-f]{40}$/i.test(value) ? value : null;
+  } catch {
+    return readPackedRefSha(gitDirectory, refPath);
+  }
+}
+
+function readPackedRefSha(gitDirectory: string, refPath: string) {
+  try {
+    const packedRefs = readFileSync(path.join(gitDirectory, 'packed-refs'), 'utf8');
+    for (const line of packedRefs.split(/\r?\n/)) {
+      if (line.startsWith('#') || line.startsWith('^')) continue;
+      const [sha, ref] = line.trim().split(/\s+/, 2);
+      if (ref === refPath && /^[0-9a-f]{40}$/i.test(sha)) return sha;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function shouldInspectCrossRepoFrameworkStatus(cwd: string, targetRepo: string | null) {
+  if (!targetRepo) return false;
+  const normalizedTarget = targetRepo.replace(/\\/g, '/').trim();
+  if (!normalizedTarget) return false;
+  const currentRoot = path.resolve(cwd);
+  const currentName = path.basename(currentRoot).toLowerCase();
+  if (normalizedTarget.toLowerCase() === currentName) return false;
+  if (path.isAbsolute(normalizedTarget) && path.resolve(normalizedTarget) === currentRoot) return false;
+  return true;
 }
 
 function runGitScalar(cwd: string, args: readonly string[]) {

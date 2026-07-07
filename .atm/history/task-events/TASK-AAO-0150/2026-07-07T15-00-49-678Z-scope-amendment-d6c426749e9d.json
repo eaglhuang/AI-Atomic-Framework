@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T15-00-49-678Z-scope-amendment-d6c426749e9d",
+  "taskId": "TASK-AAO-0150",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0150.json",
+  "taskSha256": "sha256:052ed878a2d5c511ccfe4635f8652b8b34a72f1a913a838a3ff4431f701ec4e5",
+  "createdAt": "2026-07-07T15:00:49.678Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0150 --actor codex-captain --add \"release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/packages/cli/dist/commands/next.js,release/atm-root-drop/packages/cli/src/commands/next.ts,release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md\" --class linked-surface --phase during-implementation --reason \"Include generated release mirrors from ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build for TASK-AAO-0150 source and backlog changes\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Include generated release mirrors from ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build for TASK-AAO-0150 source and backlog changes"
+  }
+}

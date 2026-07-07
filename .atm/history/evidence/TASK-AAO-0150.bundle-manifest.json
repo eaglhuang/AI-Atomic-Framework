@@ -1,0 +1,104 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0150",
+  "updatedAt": "2026-07-07T15:05:58.388Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:prompt-scoped-next"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-07T14:54:24.036Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:prompt-scoped-next",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:95bce88e9070e4129260c656362e3d82209ef931bdd21f7915d9107b4e880f21",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:prompt-scoped-next"
+      ],
+      "generatedAt": "2026-07-07T14:55:35.535Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-07T14:58:54.818Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-07T14:59:04.958Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    },
+    {
+      "command": "npm run lint",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-07T14:59:23.677Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    },
+    {
+      "command": "node packages\\\\cli\\\\dist\\\\atm.js next --prompt TASK-AAO-0150 --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4f35450639152f97e2087c39f6ab659c724f56ddcf2d322c551fce297fda6e47",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-07T15:00:03.375Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-07T15:05:58.450Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dae8c10ef21dcf1e2adefd56284fe689ec9ebae0",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
