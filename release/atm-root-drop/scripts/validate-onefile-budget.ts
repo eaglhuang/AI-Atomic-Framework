@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
-import { buildOnefileRelease } from './build-onefile-release.ts';
+import { buildOnefileRelease, isOnefilePayloadPath } from './build-onefile-release.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -326,6 +326,7 @@ function collectLargestFiles(root: string, limit: number) {
       path: path.relative(root, absolutePath).replace(/\\/g, '/'),
       bytes: statSync(absolutePath).size
     }))
+    .filter((file) => isOnefilePayloadPath(file.path))
     .sort((left, right) => right.bytes - left.bytes)
     .slice(0, limit);
 }

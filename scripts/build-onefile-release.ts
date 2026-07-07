@@ -102,18 +102,37 @@ function resolveReleaseGeneratedAt() {
   return deterministicGeneratedAt;
 }
 
-// The root-drop tree intentionally carries release/atm-onefile for blank-repo
-// drops, but embedding it in the onefile payload makes the extracted launcher
-// recurse into the previous-generation runner (TASK-RFT-0015). The onefile IS
-// the runner, so the payload must never contain release/**; the extracted
-// launcher falls back to packages/cli/dist/atm.js.
-const excludedPayloadPrefixes = ['release/'];
+// The root-drop tree intentionally carries the full framework snapshot for
+// multi-file drops. The onefile payload is a runtime launcher, not a source
+// archive, so it carries the built CLI surface plus portable schemas/templates.
+// This avoids embedding both src and dist copies while keeping blank-repo
+// bootstrap, doctor, self-host-alpha, and integration install flows runnable.
+const onefilePayloadRootFiles = new Set([
+  'atm.mjs',
+  'atomic-registry.json',
+  'compatibility-matrix.json',
+  'compatibility-matrix.legacy.json',
+  'LICENSE',
+  'package-lock.json',
+  'package.json',
+  'README.md',
+  'tsconfig.json'
+]);
+
+const onefilePayloadPrefixes = [
+  'docs/governance/',
+  'examples/hello-world/',
+  'integrations/',
+  'packages/',
+  'schemas/',
+  'templates/'
+];
 
 function collectPayloadFiles(root: any) {
   const files: any[] = [];
   for (const absolutePath of walkFiles(root)) {
     const relativePath = path.relative(root, absolutePath).replace(/\\/g, '/');
-    if (excludedPayloadPrefixes.some((prefix) => relativePath.startsWith(prefix))) {
+    if (!isOnefilePayloadPath(relativePath)) {
       continue;
     }
     const stats = statSync(absolutePath);
@@ -124,6 +143,28 @@ function collectPayloadFiles(root: any) {
     });
   }
   return files;
+}
+
+export function isOnefilePayloadPath(relativePath: string) {
+  const normalized = String(relativePath || '').replace(/\\/g, '/').replace(/^\/+/, '');
+  if (onefilePayloadRootFiles.has(normalized)) {
+    return true;
+  }
+  if (!onefilePayloadPrefixes.some((prefix) => normalized.startsWith(prefix))) {
+    return false;
+  }
+  if (normalized.startsWith('docs/governance/')) {
+    return normalized.endsWith('.json');
+  }
+  if (normalized.startsWith('packages/')) {
+    if (normalized.includes('/dist/') && normalized.includes('/__tests__/')) {
+      return false;
+    }
+    return normalized.endsWith('/package.json')
+      || normalized.includes('/dist/')
+      || normalized.includes('/templates/');
+  }
+  return true;
 }
 
 function collectGeneratedArtifactPaths(root: string, repoRelativeRoot: string, appendFiles: readonly string[] = []) {
@@ -352,9 +393,12 @@ function firstPositionalCommand(args) {
 function run() {
   try {
     const extractedRoot = ensureExtractedRoot();
+    const distEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'dist', 'atm.js');
     const sourceEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'src', 'atm.ts');
     const stableEntrypoint = path.join(extractedRoot, 'atm.mjs');
-    const entrypoint = existsSync(sourceEntrypoint) ? sourceEntrypoint : stableEntrypoint;
+    const entrypoint = existsSync(distEntrypoint)
+      ? distEntrypoint
+      : existsSync(sourceEntrypoint) ? sourceEntrypoint : stableEntrypoint;
     if (!existsSync(entrypoint)) {
       fail('Extracted payload is missing an ATM runtime entrypoint.');
       return;

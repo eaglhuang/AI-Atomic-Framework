@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T05-46-16-763Z-scope-amendment-5118c7915511",
+  "taskId": "TASK-RFT-0016",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0016.json",
+  "taskSha256": "sha256:a40fb6537507d6db19831f343f7266cbdcd747a48f3d76f7791bb4e591754135",
+  "createdAt": "2026-07-07T05:46:16.763Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-RFT-0016 --actor codex --add \".atm/history/protected-override-audit/2026-07-07T05-37-21-374Z-POA-5def8905e95c.json,.atm/history/protected-override-audit/2026-07-07T05-37-32-209Z-POA-dca8e865e497.json\" --reason \"Include emergency scope-amendment protected override audit evidence so the TASK-RFT-0016 delivery commit preserves the full governance trail for the temporary scope repair.\" --emergency-approval EMG-TASK-RFT-0016-5d24771a12 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Include emergency scope-amendment protected override audit evidence so the TASK-RFT-0016 delivery commit preserves the full governance trail for the temporary scope repair."
+  }
+}

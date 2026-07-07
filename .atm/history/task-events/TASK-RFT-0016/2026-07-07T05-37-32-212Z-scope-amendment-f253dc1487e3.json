@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T05-37-32-212Z-scope-amendment-f253dc1487e3",
+  "taskId": "TASK-RFT-0016",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0016.json",
+  "taskSha256": "sha256:ad1ae2ab15bb3122a9eeb0354b240a5bb92985e52db226aa065ebade0149f5f1",
+  "createdAt": "2026-07-07T05:37:32.212Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-RFT-0016 --actor codex --add \"release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/scripts/build-onefile-release.ts,release/atm-root-drop/scripts/validate-onefile-budget.ts\" --reason \"Restore the full generated release artifact set after a later scope repair rewrote allowedFiles from the base task scope; these paths are required for the onefile payload diet and retained root-drop mirror synchronization.\" --emergency-approval EMG-TASK-RFT-0016-5d24771a12 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Restore the full generated release artifact set after a later scope repair rewrote allowedFiles from the base task scope; these paths are required for the onefile payload diet and retained root-drop mirror synchronization."
+  }
+}

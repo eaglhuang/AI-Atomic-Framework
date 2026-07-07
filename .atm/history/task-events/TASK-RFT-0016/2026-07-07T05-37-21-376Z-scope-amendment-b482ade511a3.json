@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T05-37-21-376Z-scope-amendment-b482ade511a3",
+  "taskId": "TASK-RFT-0016",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0016.json",
+  "taskSha256": "sha256:2774ae8a75aa8cf9be34d904d3c25d0f452f04dff752c3d64ddcbb8136114694",
+  "createdAt": "2026-07-07T05:37:21.376Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-RFT-0016 --actor codex --add release/atm-root-drop/scripts/validate-onefile-budget.ts --reason \"Add generated root-drop mirror for scripts/validate-onefile-budget.ts so retained release artifacts stay synchronized with the onefile payload budget validator change.\" --emergency-approval EMG-TASK-RFT-0016-5d24771a12 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Add generated root-drop mirror for scripts/validate-onefile-budget.ts so retained release artifacts stay synchronized with the onefile payload budget validator change."
+  }
+}
