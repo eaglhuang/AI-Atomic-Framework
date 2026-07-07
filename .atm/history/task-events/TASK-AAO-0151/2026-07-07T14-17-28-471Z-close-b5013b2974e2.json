@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T14-17-28-471Z-close-b5013b2974e2",
+  "taskId": "TASK-AAO-0151",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260707140901-codex-captain-TASK-AAO-0151-41f198784d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0151.json",
+  "taskSha256": "sha256:d6b185befb0fe430a5fcacfd3bbc7b9a7ec7adca6700acec82539853c13e642a",
+  "createdAt": "2026-07-07T14:17:28.471Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0151 --actor codex-captain --status done --historical-delivery 5dc57599fac7fb1694b831ea90a4d801caee25b4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707140901-codex-captain-TASK-AAO-0151-41f198784d",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0151.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:broker-proposal",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T14:17:28.465Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0151.*",
+        ".atm/history/task-events/TASK-AAO-0151/**",
+        ".atm/history/tasks/TASK-AAO-0151.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks/",
+        "packages/core/src/broker/",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/tasks/",
+        "packages/core/src/broker/",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
