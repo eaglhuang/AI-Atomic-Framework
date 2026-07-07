@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T15-25-47-196Z-close-5bf3f0dadc1e",
+  "taskId": "TASK-AAO-0147",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260707151709-codex-captain-TASK-AAO-0147-3a5af87a89",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0147.json",
+  "taskSha256": "sha256:bfd8afc5a39c5bcc8e4e2a199f4925e78a0354c81fcc14c65e82ff27dee40750",
+  "createdAt": "2026-07-07T15:25:47.196Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0147 --actor codex-captain --status done --historical-delivery cda57058723279c7a4e0edd2df90c3b4dd7d6a13",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707151709-codex-captain-TASK-AAO-0147-3a5af87a89",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0147.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node atm.mjs hook pre-push --json",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T15:25:47.188Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0147.*",
+        ".atm/history/task-events/TASK-AAO-0147/**",
+        ".atm/history/task-events/TASK-PAPER-HOTFILE-POS2-A/2026-06-23T04-16-26-573Z-handoff-b256aa30342e.json",
+        ".atm/history/tasks/TASK-AAO-0147.json",
+        "CHANGELOG.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
