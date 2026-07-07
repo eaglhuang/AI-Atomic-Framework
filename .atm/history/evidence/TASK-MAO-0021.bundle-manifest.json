@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-MAO-0021",
+  "updatedAt": "2026-07-07T17:35:26.172Z",
+  "updatedBy": "codex-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/runner-failure-modes.test.ts",
+    "typecheck",
+    "validate:runner-broker-failures",
+    "validate:standard:cached"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-runner-broker-failures.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cea5a5754c37fb2f0a8490994d27abbcb385c16c80a1e0584b9cab07b0d5bb7c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:runner-broker-failures"
+      ],
+      "generatedAt": "2026-07-07T15:33:53.324Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f688565cd7803c8b0d3a3e8b655875c6c0ed21f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/runner-failure-modes.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f03ff3677236cf88e728340ff6b1b1e9f44cbae2e2b20ecea6994392bc8b3e2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/runner-failure-modes.test.ts"
+      ],
+      "generatedAt": "2026-07-07T15:34:00.157Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f688565cd7803c8b0d3a3e8b655875c6c0ed21f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-07T15:34:18.941Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f688565cd7803c8b0d3a3e8b655875c6c0ed21f",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-07T15:34:25.435Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f688565cd7803c8b0d3a3e8b655875c6c0ed21f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:standard:cached",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8af4a129de9a03a9bce1d0424da951e6508eeee716784576fe5327cbd207eec3",
+      "stderrSha256": "sha256:f844115872468bea85aca78b2587ac0dbfc21172b1a8734d87ec7565a905c77c",
+      "validators": [
+        "validate:standard:cached"
+      ],
+      "generatedAt": "2026-07-07T17:35:26.228Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ec324d3c07678c03f7de0412e7ead444b5f9828f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
