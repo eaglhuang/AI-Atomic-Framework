@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { buildRootDropRelease } from './build-root-drop-release.ts';
@@ -18,6 +19,7 @@ export function buildOnefileRelease(options: any = {}) {
   const outputRoot = path.resolve(options.outputRoot ?? onefileReleaseRoot);
   const outputFilePath = path.join(outputRoot, 'atm.mjs');
 
+  ensureBuiltCliDist(repositoryRoot);
   if (!existsSync(rootDropRoot)) {
     buildRootDropRelease({ repositoryRoot, releaseRoot: rootDropRoot });
   }
@@ -88,6 +90,22 @@ export function buildOnefileRelease(options: any = {}) {
     payloadSha256,
     fileCount: payloadFiles.length
   };
+}
+
+function ensureBuiltCliDist(repositoryRoot: string) {
+  const cliDistEntrypoint = path.join(repositoryRoot, 'packages', 'cli', 'dist', 'atm.js');
+  if (existsSync(cliDistEntrypoint)) {
+    return;
+  }
+  const buildScript = path.join(repositoryRoot, 'scripts', 'build-package-dist.ts');
+  const result = spawnSync(process.execPath, ['--strip-types', buildScript], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+    stdio: 'inherit'
+  });
+  if ((result.status ?? 1) !== 0) {
+    throw new Error(`Failed to build package dist before onefile release (exit ${result.status ?? 1}).`);
+  }
 }
 
 function resolveReleaseGeneratedAt() {
