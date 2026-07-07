@@ -112,6 +112,7 @@ const onefilePayloadRootFiles = new Set([
   'atomic-registry.json',
   'compatibility-matrix.json',
   'compatibility-matrix.legacy.json',
+  'docs/SELF_HOSTING_ALPHA.md',
   'LICENSE',
   'package-lock.json',
   'package.json',
@@ -125,8 +126,18 @@ const onefilePayloadPrefixes = [
   'integrations/',
   'packages/',
   'schemas/',
+  'specs/',
   'templates/'
 ];
+
+const onefilePayloadFrameworkMarkers = new Set([
+  'packages/cli/src/atm.ts',
+  'packages/cli/src/commands/self-host-alpha.ts',
+  'packages/core/seed.js',
+  'packages/core/src/index.ts',
+  'scripts/validate-seed-registry.ts',
+  'scripts/validate-seed-spec.ts'
+]);
 
 function collectPayloadFiles(root: any) {
   const files: any[] = [];
@@ -148,6 +159,9 @@ function collectPayloadFiles(root: any) {
 export function isOnefilePayloadPath(relativePath: string) {
   const normalized = String(relativePath || '').replace(/\\/g, '/').replace(/^\/+/, '');
   if (onefilePayloadRootFiles.has(normalized)) {
+    return true;
+  }
+  if (onefilePayloadFrameworkMarkers.has(normalized)) {
     return true;
   }
   if (!onefilePayloadPrefixes.some((prefix) => normalized.startsWith(prefix))) {
