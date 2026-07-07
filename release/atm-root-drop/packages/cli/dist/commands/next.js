@@ -1171,7 +1171,7 @@ async function claimNextImportedTask(input) {
                 ? 'node atm.mjs batch checkpoint --actor <id> --json'
                 : null,
             blockedPattern: nextAction.recommendedChannel === 'batch'
-                ? 'manual tasks reserve/promote/claim/close loop'
+                ? 'manual tasks claim/close loop'
                 : null,
             ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
             ignoredUntrackedNote: scopeDiagnostic.ignoredUntrackedFiles.length > 0
@@ -1395,7 +1395,7 @@ function buildPromptScopedNextResult(input) {
             requiredCommand: queueHeadTask
                 ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
                 : 'node atm.mjs next --prompt "<current user prompt>" --json',
-            batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks reserve/promote/claim/close.',
+            batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks claim/close.',
             playbook: buildChannelPlaybook({
                 channel: 'batch',
                 taskId: queueHeadTaskId ?? undefined,
@@ -1444,7 +1444,7 @@ function buildPromptScopedNextResult(input) {
                 firstTask: queueHeadTask ? toTaskCandidateView(queueHeadTask) : null,
                 requiredCommand: nextAction.command,
                 batchCheckpointCommand: 'node atm.mjs batch checkpoint --actor <id> --json',
-                blockedPattern: 'manual tasks reserve/promote/claim/close loop'
+                blockedPattern: 'manual tasks claim/close loop'
             })),
             evidence: {
                 nextAction,
@@ -1919,7 +1919,7 @@ function buildPromptRequiredNextResult(input) {
             'node atm.mjs next --claim --actor <id> --prompt "<current user prompt>" --auto-intent --json'
         ],
         blockedCommands: [
-            'manual tasks reserve/promote/claim/close loops without prompt-scoped next',
+            'manual tasks claim/close loops without prompt-scoped next',
             'batch task closure without node atm.mjs batch checkpoint --actor <id> --json'
         ]
     };
@@ -3699,7 +3699,7 @@ function buildChannelPlaybook(input) {
                     'Continue with the next queue head returned by batch checkpoint.'
                 ],
             doNot: [
-                'Do not run tasks reserve/promote/claim/close manually.',
+                'Do not run tasks claim/close manually.',
                 'Do not run next --prompt with a later single task id to leave batch.',
                 'Do not commit before batch checkpoint succeeds.',
                 'Do not close later tasks before the queue head is delivered.',
@@ -3734,7 +3734,7 @@ function buildChannelPlaybook(input) {
             `When ready: ${closeOps.write}`
         ],
         doNot: [
-            'Do not manually reserve/promote/claim before next --claim.',
+            'Do not manually claim before next --claim.',
             'Do not call tasks close directly for normal closeback; taskflow close owns the operator lane.',
             'Do not run taskflow close --write before dry-run/pre-close when blockers are unknown.',
             'Do not commit task closure separately from the deliverable it proves.'

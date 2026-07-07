@@ -26,7 +26,6 @@ const handlers = {
     parallel: handler('parallel'),
     lock: handler('lock'),
     migrateLegacyLedger: handler('migrate-legacy-ledger'),
-    reservation: (action, argv) => handler(action)(argv),
     claimLifecycle: (action, argv) => handler(action)(argv),
     reconcile: handler('reconcile'),
     repairClosure: handler('repair-closure'),

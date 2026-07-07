@@ -70,7 +70,6 @@ export declare function prepareTaskForClaim(input: {
     readonly status: unknown;
     readonly title?: string | null;
     readonly transitionCommand?: string | null;
-    readonly stopAfterAction?: 'reserve' | 'promote' | 'all';
 }): TaskClaimPreparationResult;
 export { verifyCloseoutProvenance } from './tasks/closeout-provenance.ts';
 export { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';

@@ -48,7 +48,7 @@ export default defineCommandSpec({
         ],
         commonMistakes: [
             'Passing one broad prompt that names many task ids; prefer --task, --tasks, or an intent file when the scope is already known.',
-            'Running low-level tasks reserve/promote/claim loops after next selected a batch lane.',
+            'Running low-level tasks claim loops after next selected a batch lane.',
             'Treating next as task closure; next chooses the governed route, but evidence and closeout still happen in the selected playbook.'
         ],
         playbookNotes: [

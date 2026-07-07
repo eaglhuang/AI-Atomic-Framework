@@ -1,5 +1,5 @@
 import { CliError } from '../shared.js';
-export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
+export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
 export function normalizeTasksArgv(argv) {
     const cleanArgv = [];
     for (let i = 0; i < argv.length; i++) {
@@ -38,9 +38,6 @@ export async function dispatchTasksAction(argv, handlers) {
             return await handlers.lock(rest);
         case 'migrate-legacy-ledger':
             return await handlers.migrateLegacyLedger(rest);
-        case 'reserve':
-        case 'promote':
-            return await handlers.reservation(action, rest);
         case 'claim':
         case 'renew':
         case 'release':

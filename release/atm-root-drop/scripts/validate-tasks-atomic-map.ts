@@ -253,4 +253,61 @@ if (!tasksSource.includes("from './tasks/result-contracts.ts'")) {
   fail('tasks.ts must import result-contracts owner module for re-export');
 }
 
-console.log('[tasks-atomic-map] ok');
+// --- Merged from validate-tasks-orchestrator-atomic-map.ts (TASK-RFT-0012) ---
+// runTasksClose / runTasksImport / runTasksVerify bodies must live in their
+// orchestrator files, not tasks.ts, and tasks.ts stays under the size cap.
+
+function bodyDefinesFunction(source: string, name: string): boolean {
+  const re = new RegExp('^(?:export\\s+)?(?:async\\s+)?function\\s+' + name + '\\s*\\(', 'm');
+  return re.test(source);
+}
+
+const closeOrchestratorSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/close-orchestrator.ts'), 'utf8');
+const importOrchestratorSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/import-orchestrator.ts'), 'utf8');
+const verifyOrchestratorSource = readFileSync(path.join(root, 'packages/cli/src/commands/tasks/verify-orchestrator.ts'), 'utf8');
+
+for (const name of ['runTasksClose', 'runTasksImport', 'runTasksVerify']) {
+  if (bodyDefinesFunction(tasksSource, name)) {
+    fail(`${name} function body still defined in tasks.ts; expected to live only in its orchestrator file.`);
+  }
+}
+if (!bodyDefinesFunction(closeOrchestratorSource, 'runTasksClose')) {
+  fail('runTasksClose not defined in tasks/close-orchestrator.ts.');
+}
+if (!bodyDefinesFunction(importOrchestratorSource, 'runTasksImport')) {
+  fail('runTasksImport not defined in tasks/import-orchestrator.ts.');
+}
+if (!bodyDefinesFunction(verifyOrchestratorSource, 'runTasksVerify')) {
+  fail('runTasksVerify not defined in tasks/verify-orchestrator.ts.');
+}
+
+// --- Merged from validate-tasks-close-helpers-atomic-map.ts (TASK-RFT-0013) ---
+// Close-helper cluster split stays in place and tasks.ts stays under 6,000 lines.
+
+const closeHelperModules = [
+  'close-artifact-staging.ts',
+  'task-transition-writer.ts',
+  'broker-admission-explanation.ts',
+  'close-window-diagnostics.ts'
+];
+for (const helper of closeHelperModules) {
+  if (!existsSync(path.join(root, 'packages/cli/src/commands/tasks/close-helpers', helper))) {
+    fail(`close-helper module missing: packages/cli/src/commands/tasks/close-helpers/${helper}`);
+  }
+}
+for (const helper of ['close-artifact-staging', 'task-transition-writer', 'close-window-diagnostics']) {
+  if (!closeOrchestratorSource.includes(`./close-helpers/${helper}`)) {
+    fail(`close-orchestrator.ts does not import from ./close-helpers/${helper}.`);
+  }
+}
+if (!tasksSource.includes('./tasks/close-helpers/broker-admission-explanation')) {
+  fail('tasks.ts does not import from ./tasks/close-helpers/broker-admission-explanation.');
+}
+
+const tasksSourceLineCount = tasksSource.split('\n').length;
+if (tasksSourceLineCount >= 6000) {
+  fail(`tasks.ts has ${tasksSourceLineCount} lines; expected under 6000 after the orchestrator and close-helper splits.`);
+}
+
+console.log(`[tasks-atomic-map] ok (tasks.ts=${tasksSourceLineCount} lines, orchestrators and close helpers wired)`);
+

@@ -12,7 +12,6 @@ export interface TaskCommandDispatchTable {
   readonly parallel: TaskCommandHandler;
   readonly lock: TaskCommandHandler;
   readonly migrateLegacyLedger: TaskCommandHandler;
-  readonly reservation: (action: 'reserve' | 'promote', argv: string[]) => CommandResult | Promise<CommandResult>;
   readonly claimLifecycle: (action: 'claim' | 'renew' | 'release' | 'handoff' | 'takeover', argv: string[]) => CommandResult | Promise<CommandResult>;
   readonly reconcile: TaskCommandHandler;
   readonly repairClosure: TaskCommandHandler;
@@ -28,7 +27,7 @@ export interface TaskCommandDispatchTable {
   readonly scope: TaskCommandHandler;
 }
 
-export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reserve | promote | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
+export const TASKS_ACTION_USAGE = 'tasks requires an action (create | import | mirror | verify | scope | queue | parallel | lock | reset | claim | renew | release | handoff | takeover | block | abandon | close | reconcile | repair-closure | repair-claim | show | status | finalize | deliver-and-close | audit | migrate-legacy-ledger | roster | new).';
 
 export function normalizeTasksArgv(argv: readonly string[]): string[] {
   const cleanArgv: string[] = [];
@@ -70,9 +69,6 @@ export async function dispatchTasksAction(argv: readonly string[], handlers: Tas
       return await handlers.lock(rest);
     case 'migrate-legacy-ledger':
       return await handlers.migrateLegacyLedger(rest);
-    case 'reserve':
-    case 'promote':
-      return await handlers.reservation(action, rest);
     case 'claim':
     case 'renew':
     case 'release':
