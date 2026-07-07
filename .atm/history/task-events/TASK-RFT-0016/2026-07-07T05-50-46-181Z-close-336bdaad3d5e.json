@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T05-50-46-181Z-close-336bdaad3d5e",
+  "taskId": "TASK-RFT-0016",
+  "action": "close",
+  "actorId": "codex",
+  "sessionId": "session-20260707041151-codex-TASK-RFT-0016-ac1c41d92b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0016.json",
+  "taskSha256": "sha256:c1c6747380f091c45c1403e86b0e52c7f53c1f680a897c188529109cfeae5a11",
+  "createdAt": "2026-07-07T05:50:46.181Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0016 --actor codex --status done --historical-delivery fe0bff300c21c5e36ca07a07917ca86564804ec0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707041151-codex-TASK-RFT-0016-ac1c41d92b",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0016.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:bootstrap",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-budget",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:onefile-release",
+      "validate:root-drop-release"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T05:50:46.171Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0016.*",
+        ".atm/history/protected-override-audit/2026-07-07T05-37-21-374Z-POA-5def8905e95c.json",
+        ".atm/history/protected-override-audit/2026-07-07T05-37-32-209Z-POA-dca8e865e497.json",
+        ".atm/history/task-events/TASK-RFT-0016/**",
+        ".atm/history/tasks/TASK-RFT-0016.json",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/scripts/build-onefile-release.ts",
+        "release/atm-root-drop/scripts/validate-onefile-budget.ts",
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-onefile-budget.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-root-drop-release.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/build-onefile-release.ts",
+        "scripts/build-root-drop-release.ts",
+        "scripts/validate-onefile-budget.ts",
+        "scripts/validate-onefile-release.ts",
+        "scripts/validate-root-drop-release.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence",
+        "validate:onefile-release",
+        "validate:root-drop-release"
+      ]
+    }
+  }
+}
