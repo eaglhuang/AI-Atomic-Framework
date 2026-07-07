@@ -352,9 +352,11 @@ function firstPositionalCommand(args) {
 function run() {
   try {
     const extractedRoot = ensureExtractedRoot();
-    const entrypoint = path.join(extractedRoot, 'atm.mjs');
+    const sourceEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'src', 'atm.ts');
+    const stableEntrypoint = path.join(extractedRoot, 'atm.mjs');
+    const entrypoint = existsSync(sourceEntrypoint) ? sourceEntrypoint : stableEntrypoint;
     if (!existsSync(entrypoint)) {
-      fail('Extracted payload is missing atm.mjs.');
+      fail('Extracted payload is missing an ATM runtime entrypoint.');
       return;
     }
     const userArgs = process.argv.slice(2);
@@ -364,7 +366,10 @@ function run() {
     const forwardedArgs = shouldUseExtractedFrameworkCwd
       ? [...userArgs, '--cwd', extractedRoot]
       : userArgs;
-    const child = spawnSync(process.execPath, [entrypoint, ...forwardedArgs], {
+    const nodeArgs = entrypoint === sourceEntrypoint
+      ? ['--strip-types', entrypoint, ...forwardedArgs]
+      : [entrypoint, ...forwardedArgs];
+    const child = spawnSync(process.execPath, nodeArgs, {
       cwd: shouldUseExtractedFrameworkCwd ? extractedRoot : process.cwd(),
       stdio: 'inherit',
       env: {
