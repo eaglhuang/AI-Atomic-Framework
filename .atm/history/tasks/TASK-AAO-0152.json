@@ -2,16 +2,40 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0152",
   "title": "Fix task card import acceptance continuation parsing",
-  "status": "running",
+  "status": "done",
   "owner": "codex",
   "dependencies": [],
-  "acceptance": [],
-  "deliverables": [],
+  "acceptance": [
+    "Task card import preserves indented continuation lines in Acceptance bullets.",
+    "TASK-AAO-0150 runtime metadata is re-imported with its full multiline acceptance criterion.",
+    "Emergency force re-import uses are recorded with protected override audit evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "scripts/validate-cli.ts",
+    "release/atm-onefile/atm.mjs",
+    "release/atm-onefile/release-manifest.json",
+    "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+    "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+    "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+    "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+    "release/atm-root-drop/schemas/governance/branch-commit-queue.schema.json",
+    "release/atm-root-drop/scripts/validate-branch-commit-queue.ts",
+    "release/atm-root-drop/scripts/validate-cli.ts",
+    "release/atm-root-drop/scripts/validate-onefile-budget.ts",
+    "release/atm-root-drop/scripts/validate-onefile-release.ts",
+    "release/atm-root-drop/scripts/validate-schemas.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
   "tags": [],
   "createdAt": "2026-07-07T08:39:18.192Z",
   "createdByActor": "codex",
-  "lastTransitionId": "2026-07-07T08-47-20-213Z-scope-amendment-a53f830f76d2",
-  "lastTransitionAt": "2026-07-07T08:47:20.213Z",
+  "lastTransitionId": "2026-07-07T09-09-25-121Z-close-18c8a4f564a9",
+  "lastTransitionAt": "2026-07-07T09:09:25.121Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-07-07T08:39:49.967Z",
   "promotedAt": "2026-07-07T08:39:49.971Z",
@@ -19,7 +43,7 @@
     "actorId": "codex",
     "leaseId": "lease-cddff118726e",
     "claimedAt": "2026-07-07T08:40:08.981Z",
-    "heartbeatAt": "2026-07-07T08:40:08.981Z",
+    "heartbeatAt": "2026-07-07T09:09:25.119Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-AAO-0152.*",
@@ -48,8 +72,8 @@
       "release/atm-root-drop/scripts/validate-schemas.ts",
       "scripts/validate-cli.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-07T08:40:08.981Z",
   "startedByActor": "codex",
@@ -96,5 +120,9 @@
     "actorId": "codex",
     "createdAt": "2026-07-07T08:40:09.221Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-07T09:09:25.119Z",
+  "closedByActor": "codex",
+  "closedBySessionId": "session-20260707084008-codex-TASK-AAO-0152-0d63655906",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0152.closure-packet.json"
 }

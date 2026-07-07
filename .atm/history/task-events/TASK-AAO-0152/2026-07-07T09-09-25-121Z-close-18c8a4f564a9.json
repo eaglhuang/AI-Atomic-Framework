@@ -1,0 +1,84 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T09-09-25-121Z-close-18c8a4f564a9",
+  "taskId": "TASK-AAO-0152",
+  "action": "close",
+  "actorId": "codex",
+  "sessionId": "session-20260707084008-codex-TASK-AAO-0152-0d63655906",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0152.json",
+  "taskSha256": "sha256:f8bc7c2a49b5744604a56aabb5a3d7fe68d215b09bedd04b2b88cb5138eb29f5",
+  "createdAt": "2026-07-07T09:09:25.121Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0152 --actor codex --status done --historical-delivery 045e1fc3f704d612f349236f939089f6eb55f697",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707084008-codex-TASK-AAO-0152-0d63655906",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0152.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T09:09:25.112Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0152.*",
+        ".atm/history/protected-override-audit/2026-07-07T08-45-37-694Z-POA-97475d7dc30c.json",
+        ".atm/history/protected-override-audit/2026-07-07T08-45-37-704Z-POA-ac96f64e4a24.json",
+        ".atm/history/reports/task-import/2026-07-07T08-45-37-702Z.json",
+        ".atm/history/reports/task-import/2026-07-07T08-45-37-709Z.json",
+        ".atm/history/task-events/TASK-AAO-0150/2026-07-07T08-45-37-714Z-import-09a7bc0bedee.json",
+        ".atm/history/task-events/TASK-AAO-0151/2026-07-07T08-45-37-719Z-import-7276f599ca6a.json",
+        ".atm/history/task-events/TASK-AAO-0152/**",
+        ".atm/history/tasks/TASK-AAO-0150.json",
+        ".atm/history/tasks/TASK-AAO-0151.json",
+        ".atm/history/tasks/TASK-AAO-0152.json",
+        "packages/cli/src/commands/tasks.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+        "release/atm-root-drop/packages/cli/dist/commands/tasks.js",
+        "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+        "release/atm-root-drop/packages/cli/src/commands/tasks.ts",
+        "release/atm-root-drop/schemas/governance/branch-commit-queue.schema.json",
+        "release/atm-root-drop/scripts/validate-branch-commit-queue.ts",
+        "release/atm-root-drop/scripts/validate-cli.ts",
+        "release/atm-root-drop/scripts/validate-onefile-budget.ts",
+        "release/atm-root-drop/scripts/validate-onefile-release.ts",
+        "release/atm-root-drop/scripts/validate-schemas.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
