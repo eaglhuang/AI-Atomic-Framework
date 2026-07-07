@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0016",
+  "title": "Trim onefile payload back under the 4.5MB size budget (root-drop payload diet)",
+  "status": "open",
+  "milestone": "RFT-M5",
+  "dependencies": [
+    "TASK-RFT-0014"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-onefile-budget.ts"
+  ],
+  "scopePaths": [
+    "scripts/build-root-drop-release.ts",
+    "scripts/build-onefile-release.ts",
+    "scripts/validate-onefile-budget.ts",
+    "scripts/validate-onefile-release.ts",
+    "scripts/validate-root-drop-release.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:onefile-budget",
+    "npm run validate:onefile-release",
+    "npm run validate:root-drop-release",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing the payload format or extraction protocol",
+    "Loosening the 4.5MB budget without a maintainer decision recorded on this card"
+  ],
+  "nonGoals": [
+    "Do not silence validate:onefile-budget; make it pass by shrinking the payload"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if excluding additional payload entries breaks onefile bootstrap, doctor, or self-host-alpha flows in a blank repo.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-pipeline",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0016-onefile-size-budget-trim.task.md",
+    "sectionTitle": "TASK-RFT-0016",
+    "headingLine": 44,
+    "hash": "84c65422d7a4e675"
+  },
+  "importedAt": "2026-07-07T01:58:14.138Z",
+  "lastTransitionId": "2026-07-07T01-58-14-152Z-import-fa41b3705889",
+  "lastTransitionAt": "2026-07-07T01:58:14.152Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
