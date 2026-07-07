@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-36a9630ba0ef",
+  "recordedAt": "2026-07-07T09:09:25.118Z",
+  "actorId": "codex",
+  "taskId": "TASK-AAO-0152",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0152 --actor codex --status done --json",
+  "flags": [
+    "--historical-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-AAO-0152-7e67feb6fd",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.close"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-07T09-09-25-117Z-EMG-TASK-AAO-0152-7e67feb6fd.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
