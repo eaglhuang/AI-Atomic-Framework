@@ -1,0 +1,226 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0014",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "567c51038b42802e7e989ed5f0668cae16ba2428",
+  "governedTreeSha": "6d02d28d550d50631c543188cc350890d205c604",
+  "targetCommitDelta": {
+    "currentCommitSha": "567c51038b42802e7e989ed5f0668cae16ba2428",
+    "parentCommitShas": [
+      "567c51038b42802e7e989ed5f0668cae16ba2428"
+    ],
+    "governedTreeSha": "6d02d28d550d50631c543188cc350890d205c604",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0014.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validate-tasks-atomic-map.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts",
+      "scripts/validate-tasks-orchestrator-atomic-map.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-commands",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0198d67b654c6c29fa7cb81aabf19eea6d88162e3035b92851db89233f0faaa",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:tasks-surface",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:dd8986336b943c93322601ee86fbc09f204fb62cb69acb3281a605cdd49bcabb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-commands",
+    "validate:tasks-surface"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:integration-adapter",
+    "validate:skill-templates"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-07T03:29:48.987Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0014.*",
+      ".atm/history/task-events/TASK-RFT-0014/**",
+      ".atm/history/tasks/TASK-RFT-0014.json",
+      ".claude/skills/",
+      "docs/reports/tasks-command-atomic-map.md",
+      "integrations/",
+      "package.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts",
+      "packages/cli/src/commands/tasks/close-governance.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/lifecycle-state.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validate-tasks-atomic-map.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts",
+      "scripts/validate-tasks-orchestrator-atomic-map.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "criticalChangedFiles": [
+      "integrations/",
+      "package.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
+      "packages/cli/src/commands/command-specs/tasks.spec.ts",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-head-evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts",
+      "packages/cli/src/commands/tasks/close-governance.ts",
+      "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/lifecycle-state.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/status-triangulation.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "scripts/validate-tasks-atomic-map.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts",
+      "scripts/validate-tasks-orchestrator-atomic-map.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:skill-templates"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0014.json",
+  "closedAt": "2026-07-07T03:29:48.987Z",
+  "closedByActor": "codex",
+  "sessionId": "session-20260707020354-codex-TASK-RFT-0014-76a0124ed6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "43e444297bf1835896226243364b4fa6a1ecacfd",
+    "taskMatchedFiles": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "package.json",
+      "scripts/validate-tasks-atomic-map.ts",
+      "scripts/validate-tasks-close-helpers-atomic-map.ts",
+      "scripts/validate-tasks-orchestrator-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0014/2026-07-07T03-10-11-242Z-scope-amendment-6789dadb732f.json",
+      ".atm/history/tasks/TASK-RFT-0014.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
