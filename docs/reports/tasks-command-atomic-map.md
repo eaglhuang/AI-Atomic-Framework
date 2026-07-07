@@ -164,4 +164,4 @@ The following clusters were intentionally left in `tasks.ts` to keep RFT-0013 sc
 
 ### Validator
 
-- `npm run validate:tasks-close-helpers-atomic-map` — asserts (a) each helper module exists, (b) `close-orchestrator.ts` imports each helper module, (c) `tasks.ts` line count stays under 6,000.
+- `npm run validate:tasks-atomic-map` (merged from validate:tasks-close-helpers-atomic-map) — asserts (a) each helper module exists, (b) `close-orchestrator.ts` imports each helper module, (c) `tasks.ts` line count stays under 6,000.

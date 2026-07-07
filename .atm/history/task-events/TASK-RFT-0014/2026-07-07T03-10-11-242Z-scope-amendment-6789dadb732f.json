@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T03-10-11-242Z-scope-amendment-6789dadb732f",
+  "taskId": "TASK-RFT-0014",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0014.json",
+  "taskSha256": "sha256:431c1f3efeb6849746d400a5377e4843c8de14e05957e61111d906e87a7dd605",
+  "createdAt": "2026-07-07T03:10:11.242Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0014 --actor codex --add \"scripts/validate-tasks-atomic-map.ts,scripts/validate-tasks-close-helpers-atomic-map.ts,scripts/validate-tasks-orchestrator-atomic-map.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
