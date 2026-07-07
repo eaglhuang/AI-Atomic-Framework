@@ -1,0 +1,81 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T15-11-08-815Z-close-0ebc5f139cee",
+  "taskId": "TASK-AAO-0150",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260707142325-codex-captain-TASK-AAO-0150-95becd2207",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0150.json",
+  "taskSha256": "sha256:b4348bca55094888bd01769b416b5b80fb429a170b90a78c12c3a5a08fe9d2cb",
+  "createdAt": "2026-07-07T15:11:08.815Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0150 --actor codex-captain --status done --historical-delivery c63c472b41f97988aeed3edb254574d9532ffbfb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707142325-codex-captain-TASK-AAO-0150-95becd2207",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0150.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T15:11:08.808Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/catalog/registry/actors.json",
+        ".atm/history/evidence/TASK-AAO-0150.*",
+        ".atm/history/task-events/TASK-AAO-0150/**",
+        ".atm/history/tasks/TASK-AAO-0150.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/",
+        "packages/core/src/police/",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+        "release/atm-root-drop/packages/cli/dist/commands/next.js",
+        "release/atm-root-drop/packages/cli/src/commands/next.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/",
+        "packages/core/src/police/",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

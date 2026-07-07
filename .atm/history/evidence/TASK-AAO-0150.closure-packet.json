@@ -1,0 +1,199 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0150",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c63c472b41f97988aeed3edb254574d9532ffbfb",
+  "governedTreeSha": "18a49b1ac588230b5d8d1747caa5c39134931e85",
+  "targetCommitDelta": {
+    "currentCommitSha": "c63c472b41f97988aeed3edb254574d9532ffbfb",
+    "parentCommitShas": [
+      "c63c472b41f97988aeed3edb254574d9532ffbfb"
+    ],
+    "governedTreeSha": "18a49b1ac588230b5d8d1747caa5c39134931e85",
+    "changedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:prompt-scoped-next",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:95bce88e9070e4129260c656362e3d82209ef931bdd21f7915d9107b4e880f21",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run lint",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ccca8632bbdeed299c37139626594e27942cde4cde5a17f854278e8c400ab4d1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "powershell -NoProfile -Command \" =1",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node packages\\\\cli\\\\dist\\\\atm.js next --prompt TASK-AAO-0150 --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4f35450639152f97e2087c39f6ab659c724f56ddcf2d322c551fce297fda6e47",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:prompt-scoped-next"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-07T15:11:08.808Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-AAO-0150.*",
+      ".atm/history/task-events/TASK-AAO-0150/**",
+      ".atm/history/tasks/TASK-AAO-0150.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/",
+      "packages/core/src/police/",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/",
+      "packages/core/src/police/",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0150.json",
+  "closedAt": "2026-07-07T15:11:08.809Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260707142325-codex-captain-TASK-AAO-0150-95becd2207",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c63c472b41f97988aeed3edb254574d9532ffbfb",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0150.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T14-23-06-123Z-reserve-962ec154737a.json",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T14-23-06-125Z-promote-a71efbb7b131.json",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T14-23-06-344Z-claim-43addbf9da8b.json",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T14-23-25-905Z-claim-33b41d398a1b.json",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T14-53-25-572Z-scope-amendment-564a6f6d8d24.json",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T15-00-49-678Z-scope-amendment-d6c426749e9d.json",
+      ".atm/history/task-events/TASK-AAO-0150/2026-07-07T15-06-17-216Z-scope-amendment-3aaa5df41d9b.json",
+      ".atm/history/tasks/TASK-AAO-0150.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
