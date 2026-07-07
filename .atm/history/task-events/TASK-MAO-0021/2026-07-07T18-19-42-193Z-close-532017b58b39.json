@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T18-19-42-193Z-close-532017b58b39",
+  "taskId": "TASK-MAO-0021",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260707153133-codex-captain-TASK-MAO-0021-1cd681de60",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0021.json",
+  "taskSha256": "sha256:6d9dc4bc6cf348d3117217433dd99ac0e83b960f54cb2ef0053b939c12553418",
+  "createdAt": "2026-07-07T18:19:42.193Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0021 --actor codex-captain --status done --historical-delivery 4c8c6b9f4ca6c4f7d39ffe15461cc10e2ef1c33a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260707153133-codex-captain-TASK-MAO-0021-1cd681de60",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0021.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/runner-failure-modes.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:runner-broker-failures",
+      "validate:standard",
+      "validate:standard:cached"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-07T18:19:42.188Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-MAO-0021.*",
+        ".atm/history/task-events/TASK-MAO-0021/**",
+        ".atm/history/tasks/TASK-MAO-0021.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/reports/runner-broker-failure-coverage.md",
+        "packages/core/src/broker/__tests__/runner-failure-modes.test.ts",
+        "scripts/fixtures/runner-broker-failures/",
+        "scripts/validate-runner-broker-failures.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/__tests__/runner-failure-modes.test.ts",
+        "scripts/fixtures/runner-broker-failures/",
+        "scripts/validate-runner-broker-failures.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
