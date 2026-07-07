@@ -198,10 +198,12 @@ function run() {
     const extractedRoot = ensureExtractedRoot();
     const distEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'dist', 'atm.js');
     const sourceEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'src', 'atm.ts');
+    const sourceCommandMarker = path.join(extractedRoot, 'packages', 'cli', 'src', 'commands', 'atomize.ts');
     const stableEntrypoint = path.join(extractedRoot, 'atm.mjs');
+    const sourceEntrypointReady = existsSync(sourceEntrypoint) && existsSync(sourceCommandMarker);
     const entrypoint = existsSync(distEntrypoint)
       ? distEntrypoint
-      : existsSync(sourceEntrypoint) ? sourceEntrypoint : stableEntrypoint;
+      : sourceEntrypointReady ? sourceEntrypoint : stableEntrypoint;
     if (!existsSync(entrypoint)) {
       fail('Extracted payload is missing an ATM runtime entrypoint.');
       return;
