@@ -880,6 +880,7 @@ function assertBrokerRegisterCliParity(intent: WriteIntent, options: Pick<Parsed
       exitCode: 1,
       details: {
         intentFile: options.intentFile,
+        mismatchCount: mismatches.length,
         mismatchFields,
         mismatches
       }
