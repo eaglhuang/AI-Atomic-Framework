@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-07T02-58-15-473Z-scope-amendment-314282f052b6",
+  "taskId": "TASK-RFT-0014",
+  "action": "scope-amendment",
+  "actorId": "codex",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0014.json",
+  "taskSha256": "sha256:7ffda8516ff754af0486187026c8d18dd6194931eeef89b30ad263fe8d9fe3c4",
+  "createdAt": "2026-07-07T02:58:15.473Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0014 --actor codex --add \"packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts,packages/cli/src/commands/command-specs/next.spec.ts,scripts/validate-governance-commands.ts,scripts/validate-git-hooks-enforcement.ts,scripts/validate-task-ledger-governance.ts,tests/cli-fixtures/help-snapshots/next.json\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

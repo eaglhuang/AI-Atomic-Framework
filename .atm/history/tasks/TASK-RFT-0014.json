@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0014",
   "title": "Governance surface deletion pass (delete deprecated reserve/promote, delete disabled git-head evidence path, merge overlapping validators, dedupe skill registration)",
-  "status": "open",
+  "status": "running",
   "milestone": "RFT-M5",
   "dependencies": [],
   "acceptance": [],
@@ -78,24 +78,27 @@
     "hash": "8f00f58b210016a3"
   },
   "importedAt": "2026-07-02T15:58:42.321Z",
-  "lastTransitionId": "2026-07-02T16-40-26-093Z-release-9c68774c161c",
-  "lastTransitionAt": "2026-07-02T16:40:26.093Z",
+  "lastTransitionId": "2026-07-07T02-58-15-473Z-scope-amendment-314282f052b6",
+  "lastTransitionAt": "2026-07-07T02:58:15.473Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex",
-  "reservedAt": "2026-07-02T16:40:24.309Z",
-  "promotedAt": "2026-07-02T16:40:24.312Z",
+  "reservedAt": "2026-07-07T02:03:54.878Z",
+  "promotedAt": "2026-07-07T02:03:54.882Z",
   "claim": {
     "actorId": "codex",
-    "leaseId": "lease-f7ea09908ea3",
-    "claimedAt": "2026-07-02T16:40:24.315Z",
-    "heartbeatAt": "2026-07-02T16:40:26.082Z",
+    "leaseId": "lease-b604b3f1fafb",
+    "claimedAt": "2026-07-07T02:03:54.885Z",
+    "heartbeatAt": "2026-07-07T02:03:54.885Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-RFT-0014.*",
+      ".atm/history/task-events/TASK-RFT-0014/**",
       ".atm/history/tasks/TASK-RFT-0014.json",
       ".claude/skills/",
       "docs/reports/tasks-command-atomic-map.md",
       "integrations/",
       "package.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
       "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "packages/cli/src/commands/doctor.ts",
       "packages/cli/src/commands/evidence.ts",
@@ -105,6 +108,7 @@
       "packages/cli/src/commands/hook.ts",
       "packages/cli/src/commands/next.ts",
       "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts",
       "packages/cli/src/commands/tasks/close-governance.ts",
       "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
       "packages/cli/src/commands/tasks/command-dispatch.ts",
@@ -112,14 +116,18 @@
       "packages/cli/src/commands/tasks/result-contracts.ts",
       "packages/cli/src/commands/tasks/status-triangulation.ts",
       "scripts/run-validators.ts",
-      "scripts/validate-git-head-evidence.ts"
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
     ],
-    "state": "released",
-    "reason": "commit-session only for landing imported deletion card"
+    "state": "active",
+    "intent": "write"
   },
   "startedAt": "2026-07-02T16:40:24.315Z",
   "startedByActor": "codex",
-  "startedBySessionId": "session-20260702164024-codex-TASK-RFT-0014-30d1066b2c",
+  "startedBySessionId": "session-20260707020354-codex-TASK-RFT-0014-76a0124ed6",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -136,6 +144,7 @@
       "docs/reports/tasks-command-atomic-map.md",
       "integrations/",
       "package.json",
+      "packages/cli/src/commands/command-specs/next.spec.ts",
       "packages/cli/src/commands/command-specs/tasks.spec.ts",
       "packages/cli/src/commands/doctor.ts",
       "packages/cli/src/commands/evidence.ts",
@@ -145,6 +154,7 @@
       "packages/cli/src/commands/hook.ts",
       "packages/cli/src/commands/next.ts",
       "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/command-dispatch.test.ts",
       "packages/cli/src/commands/tasks/close-governance.ts",
       "packages/cli/src/commands/tasks/close-helpers/close-window-diagnostics.ts",
       "packages/cli/src/commands/tasks/command-dispatch.ts",
@@ -152,14 +162,25 @@
       "packages/cli/src/commands/tasks/result-contracts.ts",
       "packages/cli/src/commands/tasks/status-triangulation.ts",
       "scripts/run-validators.ts",
-      "scripts/validate-git-head-evidence.ts"
+      "scripts/validate-git-head-evidence.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-ledger-governance.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
     ],
-    "planningReadOnlyPaths": [],
-    "planningMirrorPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0014-governance-surface-deletion-pass.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/rft-hardening/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0014-governance-surface-deletion-pass.task.md"
+    ],
     "allowPlanningMirror": false,
     "promptHash": "aa47dfa5b0918e9c07126a0c36b8beab270b8acde8b58a19290fa701c597e424",
     "actorId": "codex",
-    "createdAt": "2026-07-02T16:40:24.650Z",
+    "createdAt": "2026-07-07T02:03:55.271Z",
     "status": "active"
   }
 }

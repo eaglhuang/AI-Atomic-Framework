@@ -1216,33 +1216,14 @@ try {
 
   const resetCreate = await runTasks(['create', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--title', 'Resettable task']);
   assert(resetCreate.ok === true, 'reset fixture task create must succeed');
-  const reservedBeforeRelease = await runTasks([
-    'reserve',
-    '--cwd',
-    resetRepo,
-    '--task',
-    'TASK-RESET-0001',
-    '--actor',
-    'validator',
-    '--maintainer-override-legacy-lifecycle'
-  ]);
-  assert(reservedBeforeRelease.ok === true, 'reserved fixture task must reserve successfully before reserved release');
-  assert((reservedBeforeRelease as any).evidence?.status === 'reserved', 'reserved fixture reserve evidence must report reserved status');
+  const resetTaskPath = path.join(resetRepo, '.atm', 'history', 'tasks', 'TASK-RESET-0001.json');
+  const resetTaskDoc = JSON.parse(readFileSync(resetTaskPath, 'utf8'));
+  writeJson(resetTaskPath, { ...resetTaskDoc, status: 'reserved', owner: 'validator', reservedAt: new Date().toISOString() });
   await expectTaskError(['release', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator'], 'ATM_TASK_CLAIM_MISSING');
   const reservedRelease = await runTasks(['release', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--reserved-ok', '--reason', 'rollback cleanup']);
   assert(reservedRelease.ok === true, 'reserved task without claim must release with --reserved-ok');
-  const reservedBeforeReset = await runTasks([
-    'reserve',
-    '--cwd',
-    resetRepo,
-    '--task',
-    'TASK-RESET-0001',
-    '--actor',
-    'validator',
-    '--maintainer-override-legacy-lifecycle'
-  ]);
-  assert(reservedBeforeReset.ok === true, 'reserved fixture task must reserve successfully before reset');
-  assert((reservedBeforeReset as any).evidence?.status === 'reserved', 'reserved fixture reset evidence must report reserved status');
+  const resetTaskDocAfterRelease = JSON.parse(readFileSync(resetTaskPath, 'utf8'));
+  writeJson(resetTaskPath, { ...resetTaskDocAfterRelease, status: 'reserved', owner: 'validator', reservedAt: new Date().toISOString() });
   const resetOpen = await runTasks(['reset', '--cwd', resetRepo, '--task', 'TASK-RESET-0001', '--actor', 'validator', '--to', 'open', '--reason', 'rollback cleanup']);
   assert(resetOpen.ok === true, 'reserved task must reset back to open');
 

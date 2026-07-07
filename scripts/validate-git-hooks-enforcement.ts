@@ -11,6 +11,21 @@ const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
 
+function writeReadyFixtureTask(repoPath: string, taskId: string, actorId: string, title: string) {
+  const taskPath = path.join(repoPath, '.atm', 'history', 'tasks', `${taskId}.json`);
+  mkdirSync(path.dirname(taskPath), { recursive: true });
+  const now = new Date().toISOString();
+  writeFileSync(taskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title,
+    status: 'ready',
+    owner: actorId,
+    reservedAt: now,
+    promotedAt: now
+  }, null, 2)}\n`, 'utf8');
+}
+
 function fail(message: string): never {
   console.error(`[git-hooks-enforcement:${mode}] ${message}`);
   process.exitCode = 1;
@@ -547,8 +562,7 @@ try {
   const reconcileIdentity = parsePayload(runCli(closureRepo, ['identity', 'set', '--cwd', closureRepo, '--actor', 'fixture-agent', '--git-name', 'Fixture Agent', '--git-email', 'fixture-agent@example.com', '--json']));
   assert(reconcileIdentity.ok === true, 'reconcile close-commit-window hook fixture identity must be configurable');
   const reconcileHookTaskId = 'TASK-X-RECONCILE';
-  assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile hook close window regression', '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, 'reconcile hook reserve must report ok=true');
-  assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, 'reconcile hook promote must report ok=true');
+  writeReadyFixtureTask(closureRepo, reconcileHookTaskId, 'fixture-agent', 'Reconcile hook close window regression');
   writeFileSync(path.join(closureRepo, 'packages', 'core', 'src', 'reconcile-close-window.ts'), 'export const reconcileCloseWindow = true;\n', 'utf8');
   assert(parsePayload(runCli(closureRepo, ['tasks', 'claim', '--cwd', closureRepo, '--task', reconcileHookTaskId, '--actor', 'fixture-agent', '--files', 'packages/core/src/reconcile-close-window.ts', '--json'])).ok === true, 'reconcile hook claim must report ok=true');
   runGit(closureRepo, ['add', 'packages/core/src/reconcile-close-window.ts']);
@@ -610,8 +624,7 @@ try {
   const sameFileTaskA = 'TASK-X-SAME-A';
   const sameFileTaskB = 'TASK-X-SAME-B';
   for (const sameFileTaskId of [sameFileTaskA, sameFileTaskB]) {
-    assert(parsePayload(runCli(closureRepo, ['tasks', 'reserve', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--title', `Same-file claim fixture ${sameFileTaskId}`, '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, `${sameFileTaskId} reserve must report ok=true`);
-    assert(parsePayload(runCli(closureRepo, ['tasks', 'promote', '--cwd', closureRepo, '--task', sameFileTaskId, '--actor', 'fixture-agent', '--maintainer-override-legacy-lifecycle', '--json'])).ok === true, `${sameFileTaskId} promote must report ok=true`);
+    writeReadyFixtureTask(closureRepo, sameFileTaskId, 'fixture-agent', `Same-file claim fixture ${sameFileTaskId}`);
   }
   writeFileSync(path.join(closureRepo, 'docs', 'same-file-shared.md'), '# shared fixture\n', 'utf8');
   writeFileSync(path.join(closureRepo, 'docs', 'same-file-a-only.md'), '# a only fixture\n', 'utf8');

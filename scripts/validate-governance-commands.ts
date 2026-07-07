@@ -34,14 +34,20 @@ function runAtm(args: any, env: Record<string, string> = {}) {
   };
 }
 
-const LEGACY_LIFECYCLE_OVERRIDE_FLAG = '--maintainer-override-legacy-lifecycle';
-
-function runLegacyReserve(args: string[], env: Record<string, string> = {}) {
-  return runAtm(['tasks', 'reserve', ...args, LEGACY_LIFECYCLE_OVERRIDE_FLAG], env);
-}
-
-function runLegacyPromote(args: string[], env: Record<string, string> = {}) {
-  return runAtm(['tasks', 'promote', ...args, LEGACY_LIFECYCLE_OVERRIDE_FLAG], env);
+function writeFixtureTask(repoPath: string, taskId: string, actorId: string, title: string, status: 'reserved' | 'ready' = 'ready') {
+  const taskPath = path.join(repoPath, '.atm', 'history', 'tasks', `${taskId}.json`);
+  mkdirSync(path.dirname(taskPath), { recursive: true });
+  const now = new Date().toISOString();
+  writeFileSync(taskPath, `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    title,
+    status,
+    owner: actorId,
+    reservedAt: now,
+    ...(status === 'ready' ? { promotedAt: now } : {})
+  }, null, 2)}\n`, 'utf8');
+  return taskPath;
 }
 
 function runGit(cwd: string, args: string[]) {
@@ -295,32 +301,21 @@ try {
   assert(guardFail.parsed.ok === false, 'guard encoding fail must report ok=false');
   assert(guardFail.parsed.evidence.findings.length >= 2, 'guard encoding fail must emit findings');
 
-  const reserveTaskDefault = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--title', 'Reservation test', '--json']);
-  assert(reserveTaskDefault.exitCode === 1, 'tasks reserve without legacy override must fail closed');
-  assert(reserveTaskDefault.parsed.ok === false, 'tasks reserve without legacy override must report ok=false');
-  assert(reserveTaskDefault.parsed.messages?.[0]?.code === 'ATM_LIFECYCLE_LEGACY_LOCK', 'tasks reserve without legacy override must surface ATM_LIFECYCLE_LEGACY_LOCK');
-  const reserveTask = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--title', 'Reservation test', '--json']);
-  assert(reserveTask.exitCode === 0, 'tasks reserve with legacy override must exit 0');
-  assert(reserveTask.parsed.ok === true, 'tasks reserve with legacy override must report ok=true');
-  assert(reserveTask.parsed.evidence.status === 'reserved', 'tasks reserve must set reserved status');
-  const reservedTaskDocument = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0103.json'), 'utf8'));
-  assert(reservedTaskDocument.status === 'reserved', 'tasks reserve must persist reserved status to the main task document');
+  const reserveRemoved = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--title', 'Reservation test', '--json']);
+  assert(reserveRemoved.exitCode === 2, 'deleted tasks reserve action must fail as unknown action');
+  assert(reserveRemoved.parsed.ok === false, 'deleted tasks reserve action must report ok=false');
+  assert(reserveRemoved.parsed.messages?.[0]?.code === 'ATM_CLI_USAGE', 'deleted tasks reserve action must surface ATM_CLI_USAGE');
+  const promoteRemoved = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  assert(promoteRemoved.exitCode === 2, 'deleted tasks promote action must fail as unknown action');
+  assert(promoteRemoved.parsed.messages?.[0]?.code === 'ATM_CLI_USAGE', 'deleted tasks promote action must surface ATM_CLI_USAGE');
 
+  writeFixtureTask(repo, 'ATM-GOV-0103', 'fixture-agent', 'Reservation test', 'reserved');
   const claimBeforeReady = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(claimBeforeReady.exitCode === 1, 'tasks claim before ready must exit 1');
   assert(claimBeforeReady.parsed.ok === false, 'tasks claim before ready must report ok=false');
   assert(claimBeforeReady.parsed.messages?.[0]?.code === 'ATM_TASK_CLAIM_NOT_READY', 'tasks claim before ready must return ATM_TASK_CLAIM_NOT_READY');
 
-  const promoteTaskDefault = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
-  assert(promoteTaskDefault.exitCode === 1, 'tasks promote without legacy override must fail closed');
-  assert(promoteTaskDefault.parsed.ok === false, 'tasks promote without legacy override must report ok=false');
-  assert(promoteTaskDefault.parsed.messages?.[0]?.code === 'ATM_LIFECYCLE_LEGACY_LOCK', 'tasks promote without legacy override must surface ATM_LIFECYCLE_LEGACY_LOCK');
-  const promoteTask = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
-  assert(promoteTask.exitCode === 0, 'tasks promote with legacy override must exit 0');
-  assert(promoteTask.parsed.ok === true, 'tasks promote with legacy override must report ok=true');
-  assert(promoteTask.parsed.evidence.status === 'ready', 'tasks promote must set ready status');
-  const promotedTaskDocument = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0103.json'), 'utf8'));
-  assert(promotedTaskDocument.status === 'ready', 'tasks promote must persist ready status to the main task document');
+  writeFixtureTask(repo, 'ATM-GOV-0103', 'fixture-agent', 'Reservation test', 'ready');
 
   const nextClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0103', '--json']);
   assert(nextClaim.exitCode === 0, 'next --claim must exit 0');
@@ -356,12 +351,7 @@ try {
   const plannedClaimTask = JSON.parse(readFileSync(path.join(plannedRepo, '.atm', 'history', 'tasks', 'ATM-GOV-0110.json'), 'utf8'));
   assert(plannedClaimTask.status === 'running', 'planned next --claim must leave the task in running state');
 
-  const renewTask = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--title', 'Renew release test', '--json']);
-  assert(renewTask.exitCode === 0, 'secondary tasks reserve must exit 0');
-  assert(renewTask.parsed.ok === true, 'secondary tasks reserve must report ok=true');
-  const renewPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--json']);
-  assert(renewPromote.exitCode === 0, 'secondary tasks promote must exit 0');
-  assert(renewPromote.parsed.ok === true, 'secondary tasks promote must report ok=true');
+  writeFixtureTask(repo, 'ATM-GOV-0102', 'fixture-agent', 'Renew release test');
   const renewClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0102.json', '--ttl-seconds', '30', '--json']);
   assert(renewClaim.exitCode === 0, 'secondary tasks claim must exit 0');
   assert(renewClaim.parsed.ok === true, 'secondary tasks claim must report ok=true');
@@ -379,10 +369,7 @@ try {
   assert(taskAfterRelease.status === 'open', 'tasks release must move running task back to open');
   assert(taskAfterRelease.claim?.state === 'released', 'tasks release must persist released claim state');
 
-  const handoffReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--title', 'Handoff test', '--json']);
-  assert(handoffReserve.exitCode === 0, 'handoff tasks reserve must exit 0');
-  const handoffPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--json']);
-  assert(handoffPromote.exitCode === 0, 'handoff tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0108', 'fixture-agent', 'Handoff test');
   const handoffClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0108.json', '--json']);
   assert(handoffClaim.exitCode === 0, 'handoff tasks claim must exit 0');
   const handoffTask = runAtm(['tasks', 'handoff', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--to', 'review-agent', '--reason', 'request review', '--json']);
@@ -418,10 +405,7 @@ try {
   assert(scopeEvent.action === 'scope-amendment', 'tasks scope add must persist a scope-amendment event action');
   assert(scopeEvent.taskSha256 === sha256(readFileSync(scopeTaskPath)), 'scope-amendment event sha must match the persisted task document');
 
-  const takeoverReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--title', 'Takeover test', '--json']);
-  assert(takeoverReserve.exitCode === 0, 'takeover tasks reserve must exit 0');
-  const takeoverPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--json']);
-  assert(takeoverPromote.exitCode === 0, 'takeover tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0109', 'stale-agent', 'Takeover test');
   const takeoverClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--files', '.atm/history/tasks/ATM-GOV-0109.json', '--ttl-seconds', '30', '--json']);
   assert(takeoverClaim.exitCode === 0, 'takeover tasks claim must exit 0');
   const missingTakeoverReason = runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--json']);
@@ -636,10 +620,7 @@ try {
   const stagingScopedFile = 'src/task-scoped-staging.ts';
   assert(runGit(repo, ['add', '-A']).exitCode === 0, 'staging diagnostics checkpoint must stage pending fixture work');
   assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: checkpoint before TASK-AAO-0141 staging diagnostics']).exitCode === 0, 'staging diagnostics checkpoint commit must succeed');
-  const stagingReserve = runLegacyReserve(['--cwd', repo, '--task', stagingTaskId, '--actor', 'fixture-agent', '--title', 'Task-scoped staging diagnostics', '--json']);
-  assert(stagingReserve.exitCode === 0, 'staging diagnostics tasks reserve must exit 0');
-  const stagingPromote = runLegacyPromote(['--cwd', repo, '--task', stagingTaskId, '--actor', 'fixture-agent', '--json']);
-  assert(stagingPromote.exitCode === 0, 'staging diagnostics tasks promote must exit 0');
+  writeFixtureTask(repo, stagingTaskId, 'fixture-agent', 'Task-scoped staging diagnostics');
   const stagingClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', stagingTaskId, '--actor', 'fixture-agent', '--files', stagingScopedFile, '--json']);
   assert(stagingClaim.exitCode === 0, 'staging diagnostics tasks claim must exit 0');
   const stagingTaskPath = path.join(repo, '.atm', 'history', 'tasks', `${stagingTaskId}.json`);
@@ -936,10 +917,7 @@ try {
 
   const reconcileTaskId = 'ATM-GOV-RECONCILE';
   assert(runGit(repo, ['restore', '--staged', '.']).exitCode === 0, 'reconcile fixture must start without foreign staged bundles');
-  const reconcileReserve = runLegacyReserve(['--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--title', 'Reconcile close window regression', '--json']);
-  assert(reconcileReserve.exitCode === 0, 'reconcile fixture reserve must exit 0');
-  const reconcilePromote = runLegacyPromote(['--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--json']);
-  assert(reconcilePromote.exitCode === 0, 'reconcile fixture promote must exit 0');
+  writeFixtureTask(repo, reconcileTaskId, 'fixture-agent', 'Reconcile close window regression');
   const reconcileSourcePath = path.join(repo, 'src', 'reconcile-close-window.ts');
   mkdirSync(path.dirname(reconcileSourcePath), { recursive: true });
   writeFileSync(reconcileSourcePath, 'export const reconcileCloseWindow = true;\n', 'utf8');
@@ -1111,10 +1089,7 @@ try {
   const historicalDeliveryCommit = runGit(repo, ['rev-parse', 'HEAD']).stdout;
   assert(historicalDeliveryCommit.length > 0, 'historical delivery fixture commit sha must be available');
 
-  const historicalReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--title', 'Historical delivery code close test', '--json']);
-  assert(historicalReserve.exitCode === 0, 'historical delivery tasks reserve must exit 0');
-  const historicalPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--json']);
-  assert(historicalPromote.exitCode === 0, 'historical delivery tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0111', 'fixture-agent', 'Historical delivery code close test');
   const historicalTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0111.json');
   const historicalTaskDocument = JSON.parse(readFileSync(historicalTaskPath, 'utf8'));
   historicalTaskDocument.scopePaths = ['src/historical-delivery.ts'];
@@ -1187,26 +1162,17 @@ try {
   assert(runGit(repo, ['clean', '-fd', '--', '.atm/history/task-events/ATM-GOV-0111', '.atm/history/evidence/ATM-GOV-0111.closure-packet.json']).exitCode === 0, 'historical delivery close fixture must clean untracked close artifacts after validation');
 
   // TASK-CID-0024: closeout-only / no-more-mutation claim intent CLI surface.
-  const closeoutIntentReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--title', 'Closeout-only claim intent surface test', '--json']);
-  assert(closeoutIntentReserve.exitCode === 0, 'closeout-only claim intent tasks reserve must exit 0');
-  const closeoutIntentPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--json']);
-  assert(closeoutIntentPromote.exitCode === 0, 'closeout-only claim intent tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0112', 'fixture-agent', 'Closeout-only claim intent surface test');
   const invalidClaimIntent = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--claim-intent', 'sneaky-write', '--json']);
   assert(invalidClaimIntent.exitCode === 2, 'tasks claim with an unknown --claim-intent value must fail closed with a usage error');
   const closeoutIntentClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--claim-intent', 'no-more-mutation', '--json']);
   assert(closeoutIntentClaim.exitCode === 0, 'tasks claim --claim-intent no-more-mutation must exit 0');
   assert(closeoutIntentClaim.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim must normalize no-more-mutation to closeout-only in evidence');
-  const closeoutIntentAliasReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--title', 'Closeout-only claim intent alias test', '--json']);
-  assert(closeoutIntentAliasReserve.exitCode === 0, 'closeout-only alias tasks reserve must exit 0');
-  const closeoutIntentAliasPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--json']);
-  assert(closeoutIntentAliasPromote.exitCode === 0, 'closeout-only alias tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0113', 'fixture-agent', 'Closeout-only claim intent alias test');
   const closeoutIntentShortAlias = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--closeout-only', '--json']);
   assert(closeoutIntentShortAlias.exitCode === 0, 'tasks claim --closeout-only must exit 0');
   assert(closeoutIntentShortAlias.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim --closeout-only must surface claimIntent=closeout-only');
-  const closeoutIntentAliasReserve2 = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--title', 'Closeout-only no-more-mutation alias test', '--json']);
-  assert(closeoutIntentAliasReserve2.exitCode === 0, 'closeout-only alias tasks reserve must exit 0');
-  const closeoutIntentPromote2 = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--json']);
-  assert(closeoutIntentPromote2.exitCode === 0, 'closeout-only alias tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0114', 'fixture-agent', 'Closeout-only no-more-mutation alias test');
   const closeoutIntentNoMoreMutationAlias = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--no-more-mutation', '--json']);
   assert(closeoutIntentNoMoreMutationAlias.exitCode === 0, 'tasks claim --no-more-mutation must exit 0');
   assert(closeoutIntentNoMoreMutationAlias.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim --no-more-mutation must surface claimIntent=closeout-only');
@@ -1219,10 +1185,7 @@ try {
   const closeoutIntentAliasRelease2 = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--reason', 'closeout-only alias test cleanup', '--json']);
   assert(closeoutIntentAliasRelease2.exitCode === 0, 'closeout-only alias tasks release2 must exit 0');
 
-  const artifactOnlyReserve = runLegacyReserve(['--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--title', 'Artifact-only closure guard', '--json']);
-  assert(artifactOnlyReserve.exitCode === 0, 'artifact-only tasks reserve must exit 0');
-  const artifactOnlyPromote = runLegacyPromote(['--cwd', repo, '--task', 'ATM-GOV-0110', '--actor', 'fixture-agent', '--json']);
-  assert(artifactOnlyPromote.exitCode === 0, 'artifact-only tasks promote must exit 0');
+  writeFixtureTask(repo, 'ATM-GOV-0110', 'fixture-agent', 'Artifact-only closure guard');
   const artifactOnlyTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0110.json');
   const artifactOnlyTask = JSON.parse(readFileSync(artifactOnlyTaskPath, 'utf8'));
   artifactOnlyTask.targetRepo = 'AI-Atomic-Framework';
