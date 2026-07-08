@@ -667,6 +667,21 @@ scopePaths:
     assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
     assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
 
+    // ATM-BUG-2026-07-07-047: a blanket "all/open/remaining task cards" prompt
+    // names no specific task, plan, or root, so keyword-based scoring finds
+    // nothing above zero. ATM must still route the already-discovered open
+    // queue instead of discarding it as task-scope-not-found.
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-BLANKET-0001.json'), 'TASK-BLANKET-0001', 'Ledger first standalone card', 'src/blanket-one.ts');
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-BLANKET-0002.json'), 'TASK-BLANKET-0002', 'Ledger second standalone card', 'src/blanket-two.ts');
+    const blanketRoute = await runNext(['--cwd', tempRoot, '--prompt', 'please finish all open task cards and push the results']);
+    assert(!blanketRoute.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'blanket all-open-task-cards prompt must not be discarded as task-scope-not-found');
+    assert(blanketRoute.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'blanket all-open-task-cards prompt must resolve to a scoped task queue');
+    const blanketNextAction = (blanketRoute.evidence.nextAction as any) ?? {};
+    assert(blanketNextAction.status === 'task-queue-ready', 'blanket all-open-task-cards prompt must report task-queue-ready status');
+    assert(blanketNextAction.recommendedChannel === 'batch', 'blanket all-open-task-cards prompt must recommend the batch channel');
+    assert(Array.isArray(blanketNextAction.selectedTasks) && blanketNextAction.selectedTasks.some((task: any) => task.workItemId === 'TASK-BLANKET-0001'), 'blanket all-open-task-cards prompt must include the discovered open queue');
+    assertDecisionTrail(blanketNextAction, 'task-queue-ready');
+
     // Regression: Parallel CID advisor preflight and team validation integration tests
     writeFileSync(path.join(atomizationCoverageDir, 'path-to-atom-map.json'), JSON.stringify({
       mappings: [
@@ -704,11 +719,17 @@ scopePaths:
       console.log('runTeam failed with error:', err.message, err.stack, JSON.stringify(err.details ?? {}, null, 2));
       throw err;
     }
-    console.log('teamPlanResult is:', JSON.stringify(teamPlanResult, null, 2));
-    assert(teamPlanResult.ok === true, 'team plan must not fail validation on unconfirmed same-atom metadata overlap');
-    const teamEvidence = teamPlanResult.evidence as any;
-    assert(teamEvidence?.validation?.ok === true, 'validation ok must stay true for unconfirmed same-atom metadata overlap');
-    assert(!teamEvidence?.validation?.findings?.some((f: any) => f.code === 'blocked-cid-conflict'), 'findings must not include blocked-cid-conflict without Broker confirmation');
+    try {
+      assert(teamPlanResult.ok === true, 'team plan must not fail validation on unconfirmed same-atom metadata overlap');
+      const teamEvidence = teamPlanResult.evidence as any;
+      assert(teamEvidence?.validation?.ok === true, 'validation ok must stay true for unconfirmed same-atom metadata overlap');
+      assert(!teamEvidence?.validation?.findings?.some((f: any) => f.code === 'blocked-cid-conflict'), 'findings must not include blocked-cid-conflict without Broker confirmation');
+    } catch (err) {
+      // Only dump the full payload when the assertions above actually fail;
+      // the success path stays quiet so CI/agent transcripts are scannable.
+      console.log('teamPlanResult is:', JSON.stringify(teamPlanResult, null, 2));
+      throw err;
+    }
   } finally {
     if (previousGitCeilingDirectories === undefined) {
       delete process.env.GIT_CEILING_DIRECTORIES;

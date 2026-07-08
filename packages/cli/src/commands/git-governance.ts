@@ -1199,7 +1199,8 @@ function runGitCommit(options: ParsedGitOptions) {
     `ATM-Actor: ${actorId}`,
     ...(options.taskId ? [`ATM-Task: ${options.taskId}`] : []),
     ...(claimForTrailers?.leaseId ? [`ATM-Claim: ${claimForTrailers.leaseId}`] : []),
-    ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : [])
+    ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : []),
+    ...options.extraTrailers
   ];
   const args = [
     'commit',
@@ -1494,6 +1495,7 @@ interface ParsedGitOptions {
   readonly dryRun: boolean;
   readonly stewardPlan: boolean;
   readonly applyToWorkingTree: boolean;
+  readonly extraTrailers: readonly string[];
 }
 
 function parseGitOptions(argv: string[]): ParsedGitOptions {
@@ -1517,7 +1519,8 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     deferForeignStaged: false,
     dryRun: false,
     stewardPlan: false,
-    applyToWorkingTree: false
+    applyToWorkingTree: false,
+    extraTrailers: [] as string[]
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -1567,6 +1570,15 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     }
     if (arg === '--message') {
       options.message = requireValue(argv, index, '--message');
+      index += 1;
+      continue;
+    }
+    if (arg === '--trailer') {
+      // Some editor shells (e.g. Cursor) auto-inject `--trailer "Co-authored-by: ..."`
+      // on any command line containing `git commit`, even when it wraps this governed
+      // CLI instead of calling host git directly. Accept it and fold it into the
+      // governed trailer set rather than failing the whole commit with ATM_CLI_USAGE.
+      options.extraTrailers = [...options.extraTrailers, requireValue(argv, index, '--trailer')];
       index += 1;
       continue;
     }

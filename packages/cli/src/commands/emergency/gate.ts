@@ -45,14 +45,23 @@ export function recordProtectedOverrideOutcome(input: {
   });
 }
 
+function dedupeFlags(flags: readonly string[]): string[] {
+  return Array.from(new Set(flags.filter((flag) => typeof flag === 'string' && flag.trim().length > 0)));
+}
+
 export function assertEmergencyApproval(input: EmergencyGateInput) {
   if (input.allowTaskflowOperatorLane !== false && isTaskflowOperatorLaneActive()) {
     return null;
   }
   if (!input.emergencyApproval) {
+    const requiredAllowedFlags = dedupeFlags(input.flags ?? []);
+    const allowedFlagArgs = requiredAllowedFlags.map((flag) => ` --allowed-flag ${flag}`).join('');
     throw new CliError(
       'ATM_EMERGENCY_LANE_APPROVAL_REQUIRED',
-      `${input.surface} is a protected backend emergency surface. Use taskflow open/close for normal work, or ask a human for an emergency approval lease and pass --emergency-approval <leaseId>.`,
+      `${input.surface} is a protected backend emergency surface. Use taskflow open/close for normal work, or ask a human for an emergency approval lease and pass --emergency-approval <leaseId>.`
+      + (requiredAllowedFlags.length > 0
+        ? ` The blocked command already uses protected flag(s) ${requiredAllowedFlags.join(', ')}; include matching --allowed-flag entries on the first approve call or the lease will reject them with ATM_EMERGENCY_FLAG_NOT_APPROVED.`
+        : ''),
       {
         exitCode: 1,
         details: {
@@ -60,7 +69,8 @@ export function assertEmergencyApproval(input: EmergencyGateInput) {
           permission: input.permission,
           taskId: input.taskId ?? null,
           actorId: input.actorId ?? null,
-          requiredCommand: `node atm.mjs emergency approve --permission ${input.permission} --actor ${input.actorId ?? '<actor>'}${input.taskId ? ` --task ${input.taskId}` : ''} --approval-text "<human approval sentence>" --reason "<why emergency backend is required>" --json`
+          requiredAllowedFlags,
+          requiredCommand: `node atm.mjs emergency approve --permission ${input.permission} --actor ${input.actorId ?? '<actor>'}${input.taskId ? ` --task ${input.taskId}` : ''}${allowedFlagArgs} --approval-text "<human approval sentence>" --reason "<why emergency backend is required>" --json`
         }
       }
     );

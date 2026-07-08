@@ -388,6 +388,13 @@ const historicalDeliveryTest = spawnSync(
 );
 assert(historicalDeliveryTest.status === 0, `historical-delivery focused test must pass: ${historicalDeliveryTest.stderr || historicalDeliveryTest.stdout}`);
 
+const emergencyGateTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'packages/cli/src/commands/emergency/__tests__/gate.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(emergencyGateTest.status === 0, `emergency gate focused test must pass: ${emergencyGateTest.stderr || emergencyGateTest.stdout}`);
+
 const scopeLockDiagnosticsTest = spawnSync(
   process.execPath,
   ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts')],

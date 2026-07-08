@@ -27,6 +27,7 @@ export default defineCommandSpec({
     { flag: '--email', value: 'text', summary: 'Override git author email for prepare/commit; with --name, also seeds the actor runtime identity profile during prepare.' },
     { flag: '--session', value: 'session-id', summary: 'Optional ATM work session id for check/commit alignment.' },
     { flag: '--message', value: 'text', summary: 'Commit summary for git commit; ATM appends governed trailers automatically.' },
+    { flag: '--trailer', value: 'text', summary: 'Repeatable extra trailer line for git commit (e.g. an editor-injected Co-authored-by line); folded into the governed trailer set instead of failing the commit.' },
     { flag: '--auto-stage', summary: 'Stage only the current task allowed delivery bundle before commit; report skipped external dirty files without using git add .' },
     { flag: '--defer-foreign-staged', summary: 'Snapshot and unstage foreign task governance files already in the index before resolving the bundle; never silent.' },
     { flag: '--dry-run', summary: 'Resolve the task-scoped commit bundle without staging or committing.' },
