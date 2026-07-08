@@ -160,7 +160,13 @@ assert.equal(autoFinal.targetRepo.status, 'committed');
 assert.ok(autoFinal.targetRepo.commitSha, 'auto-commit must record a target commit SHA');
 const autoTargetStaged = execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: autoTargetRepo, encoding: 'utf8' }).trim().split(/\r?\n/).filter(Boolean);
 assert.ok(autoTargetStaged.includes('scratch/foreign.txt'), 'parallel foreign staged work must remain staged');
-assert.ok(autoTargetStaged.includes('src/app.ts'), 'task bundle files must remain represented in the close lane');
+// ATM-BUG-2026-07-07-049: the temp index used to commit the close bundle never
+// touched the live index, so committed task files (e.g. src/app.ts) used to
+// show up as a phantom "deleted in index" diff afterwards -- looking like the
+// task had been reopened. commitRepoWithTemporaryIndex now resets exactly the
+// committed paths in the live index to the new HEAD, so no residual diff
+// should remain for them at all.
+assert.ok(!autoTargetStaged.includes('src/app.ts'), 'committed task bundle files must not leave a phantom staged diff after close');
 assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoTargetRepo, encoding: 'utf8' }).trim(), `chore(taskflow): close ${autoCommitTaskId} target governance bundle`);
 const sameRepoTaskId = 'TASK-BUNDLE-0003';
 const sameRepo = path.join(tempRoot, 'same-repo');
@@ -350,4 +356,84 @@ const proseBundle = buildTaskflowCommitBundle({
 });
 assert.equal(proseBundle.failClosed, false, 'sentence-style deliverables must not fail close when canonical file deliverables still exist');
 assert.ok(proseBundle.targetDeliveryFiles.includes('src/runtime.txt'));
+// ATM-BUG-2026-07-07-046: taskflow close's own raw-git commit lane used to read
+// whatever host git config happened to be set instead of the actor-scoped
+// identity `node atm.mjs git commit` resolves. Isolate this check from the
+// ATM_GIT_NAME/ATM_GIT_EMAIL env override the earlier auto-commit fixture set,
+// so it exercises the per-actor identity file resolution path specifically.
+const savedAtmGitName = process.env.ATM_GIT_NAME;
+const savedAtmGitEmail = process.env.ATM_GIT_EMAIL;
+delete process.env.ATM_GIT_NAME;
+delete process.env.ATM_GIT_EMAIL;
+try {
+    const identityTaskId = 'TASK-BUNDLE-0007';
+    const identityActorId = 'opt09-actor';
+    const identityTargetRepo = path.join(tempRoot, 'target-identity');
+    const identityPlanningRepo = path.join(tempRoot, 'planning-identity');
+    initGitRepo(identityTargetRepo);
+    initGitRepo(identityPlanningRepo);
+    // Simulate host git config drifting away from the actor's registered identity
+    // (e.g. a shared CI box, or a different agent's `git config` left behind).
+    execFileSync('git', ['config', 'user.name', 'drifted-host'], { cwd: identityTargetRepo, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'drifted-host@example.invalid'], { cwd: identityTargetRepo, stdio: 'ignore' });
+    writeJson(path.join(identityTargetRepo, '.atm/runtime/identity/actors', `${identityActorId}.json`), {
+        schemaId: 'atm.identityDefault.v1',
+        specVersion: '0.1.0',
+        actorId: identityActorId,
+        gitName: 'OPT-09 Actor',
+        gitEmail: 'opt09-actor@example.invalid',
+        editor: null,
+        provider: null,
+        activeSessionId: null,
+        updatedAt: '2026-07-08T00:00:00.000Z'
+    });
+    const identityPlanPath = path.join(identityPlanningRepo, 'docs/tasks/TASK-BUNDLE-0007.task.md');
+    writeText(identityPlanPath, `---\ntask_id: ${identityTaskId}\nstatus: running\n---\n# ${identityTaskId}\n`);
+    writeJson(path.join(identityTargetRepo, '.atm/history/tasks/TASK-BUNDLE-0007.json'), {
+        workItemId: identityTaskId,
+        title: `${identityTaskId} fixture`,
+        status: 'running',
+        claim: { actorId: identityActorId, leaseId: 'lease-bundle-0007', state: 'active' },
+        deliverables: ['src/app.ts'],
+        scopePaths: ['src/app.ts'],
+        source: { planPath: identityPlanPath }
+    });
+    writeJson(path.join(identityTargetRepo, '.atm/history/evidence/TASK-BUNDLE-0007.json'), {
+        taskId: identityTaskId,
+        schemaId: 'atm.taskEvidence.v1'
+    });
+    writeJson(path.join(identityTargetRepo, '.atm/history/evidence/TASK-BUNDLE-0007.closure-packet.json'), {
+        taskId: identityTaskId,
+        schemaId: 'atm.closurePacket.v1'
+    });
+    writeText(path.join(identityTargetRepo, 'src/app.ts'), 'export const value = 7;\n');
+    const identityBundle = buildTaskflowCommitBundle({
+        cwd: identityTargetRepo,
+        taskId: identityTaskId,
+        actorId: identityActorId,
+        commitMode: 'auto-commit',
+        planningMirrorPath: identityPlanPath,
+        rosterIndexPath: null,
+        planningAuthorityDeliveryOk: false
+    });
+    const identityFinal = await finalizeTaskflowCommitBundle({
+        bundle: identityBundle,
+        actorId: identityActorId,
+        taskId: identityTaskId
+    });
+    assert.equal(identityFinal.failClosed, false, 'identity fixture close must complete');
+    assert.equal(identityFinal.targetRepo.status, 'committed');
+    const identityAuthor = execFileSync('git', ['show', '-s', '--format=%an <%ae>', 'HEAD'], { cwd: identityTargetRepo, encoding: 'utf8' }).trim();
+    assert.equal(identityAuthor, 'OPT-09 Actor <opt09-actor@example.invalid>', 'taskflow close commit must use the actor-scoped identity, not drifted host git config');
+}
+finally {
+    if (savedAtmGitName === undefined)
+        delete process.env.ATM_GIT_NAME;
+    else
+        process.env.ATM_GIT_NAME = savedAtmGitName;
+    if (savedAtmGitEmail === undefined)
+        delete process.env.ATM_GIT_EMAIL;
+    else
+        process.env.ATM_GIT_EMAIL = savedAtmGitEmail;
+}
 console.log('ok: commit bundle assembly spec passed');

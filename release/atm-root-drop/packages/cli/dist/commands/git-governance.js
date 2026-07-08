@@ -31,6 +31,48 @@ export function resolveGitExecutable() {
     }
     return 'git';
 }
+// ATM-BUG-2026-07-07-048 (OPT-08): the real `git commit` spawn runs pre-commit
+// hooks with no timeout at all, so a hung hook silently wedges the governed
+// commit lane forever with no observable signal. Default to a generous but
+// finite ceiling, overridable per-invocation (--timeout-ms) or per-environment
+// (ATM_GIT_COMMIT_TIMEOUT_MS) for slower hook chains.
+const DEFAULT_GIT_COMMIT_TIMEOUT_MS = 120_000;
+function resolveGitCommitTimeoutMs(explicitTimeoutMs) {
+    if (explicitTimeoutMs !== null && Number.isFinite(explicitTimeoutMs) && explicitTimeoutMs > 0) {
+        return explicitTimeoutMs;
+    }
+    const envValue = Number(process.env.ATM_GIT_COMMIT_TIMEOUT_MS);
+    if (Number.isFinite(envValue) && envValue > 0) {
+        return envValue;
+    }
+    return DEFAULT_GIT_COMMIT_TIMEOUT_MS;
+}
+function gitCommitAttemptStatusRelativePath(actorId, taskId) {
+    const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, '_');
+    const safeTask = (taskId ?? 'no-task').replace(/[^a-zA-Z0-9_.-]/g, '_');
+    return `.atm/runtime/git-commit-attempts/${safeActor}__${safeTask}.json`;
+}
+function writeGitCommitAttemptStatus(cwd, statusRelativePath, status) {
+    try {
+        const absolutePath = path.join(cwd, statusRelativePath);
+        mkdirSync(path.dirname(absolutePath), { recursive: true });
+        writeFileSync(absolutePath, `${JSON.stringify(status, null, 2)}\n`, 'utf8');
+    }
+    catch {
+        // best-effort observability write; never let this block the actual commit.
+    }
+}
+function readGitCommitAttemptStatus(cwd, actorId, taskId) {
+    const absolutePath = path.join(cwd, gitCommitAttemptStatusRelativePath(actorId, taskId));
+    if (!existsSync(absolutePath))
+        return null;
+    try {
+        return JSON.parse(readFileSync(absolutePath, 'utf8'));
+    }
+    catch {
+        return null;
+    }
+}
 function runGitCommand(cwd, args, stdio = ['ignore', 'pipe', 'ignore']) {
     return execFileSync(resolveGitExecutable(), args, {
         cwd,
@@ -312,6 +354,18 @@ function isIgnorableTaskScopedDirtySideEffect(filePath) {
 const branchCommitQueueLockTimeoutMs = 15_000;
 const branchCommitQueueLockRetryMs = 200;
 const branchCommitQueueStaleSelfHealMs = 5 * 60 * 1000;
+/**
+ * Actor-scoped identity resolution for callers outside this module (e.g. taskflow
+ * close's own raw-git commit helper) that need to match the same author/committer
+ * identity `git commit` would use, instead of falling back to whatever host git
+ * config happens to be set. Returns nulls (never throws) so callers can decide
+ * whether an unresolved identity is fatal for their own flow.
+ */
+export function resolveActorGitIdentityForCommit(cwd, actorId) {
+    const resolvedActor = resolveActorId(actorId, cwd);
+    const actorRecord = resolvedActor ? findActorByResolvedId(cwd, resolvedActor) : null;
+    return resolveGitIdentityProfile(cwd, actorId, actorRecord);
+}
 export async function runAtmGit(argv) {
     const options = parseGitOptions(argv);
     if (options.action === 'prepare') {
@@ -325,6 +379,9 @@ export async function runAtmGit(argv) {
     }
     if (options.action === 'commit') {
         return runGitCommit(options);
+    }
+    if (options.action === 'commit-status') {
+        return runGitCommitStatus(options);
     }
     const check = evaluateGitGovernanceCheck({
         cwd: options.cwd,
@@ -787,6 +844,36 @@ function runGitPrepare(options) {
         }
     });
 }
+/**
+ * ATM-BUG-2026-07-07-048 (OPT-08): `git commit` had no idempotent way to ask
+ * "what happened to my last governed commit attempt?" after the fact -- an
+ * agent hitting a hang or a timeout could only guess from stdout/stderr that
+ * may already be lost. This reads the small status record `runGitCommit`
+ * writes before/after each attempt, keyed by actor (+ optional task).
+ */
+function runGitCommitStatus(options) {
+    const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+    if (!resolvedActor) {
+        throw new CliError('ATM_ACTOR_ID_MISSING', 'git commit-status requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+    }
+    const actorId = resolvedActor.actorId;
+    const status = readGitCommitAttemptStatus(options.cwd, actorId, options.taskId);
+    const label = `${actorId}${options.taskId ? ` / ${options.taskId}` : ''}`;
+    return makeResult({
+        ok: true,
+        command: 'git',
+        cwd: options.cwd,
+        messages: [status
+                ? message('info', 'ATM_GIT_COMMIT_STATUS_FOUND', `Last known governed commit attempt for ${label} is ${status.status} (phase: ${status.phase}).`, { status })
+                : message('info', 'ATM_GIT_COMMIT_STATUS_NOT_FOUND', `No recorded governed commit attempt for ${label}.`, {})],
+        evidence: {
+            action: 'commit-status',
+            actorId,
+            taskId: options.taskId,
+            commitAttemptStatus: status
+        }
+    });
+}
 function runGitCommit(options) {
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
     if (!resolvedActor) {
@@ -1028,7 +1115,8 @@ function runGitCommit(options) {
         `ATM-Actor: ${actorId}`,
         ...(options.taskId ? [`ATM-Task: ${options.taskId}`] : []),
         ...(claimForTrailers?.leaseId ? [`ATM-Claim: ${claimForTrailers.leaseId}`] : []),
-        ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : [])
+        ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : []),
+        ...options.extraTrailers
     ];
     const args = [
         'commit',
@@ -1043,6 +1131,29 @@ function runGitCommit(options) {
     const branchName = branchRef ? branchRef.replace(/^refs\/heads\//, '') : 'detached-head';
     const headShaBeforeCommit = readHeadCommitSha(options.cwd);
     let headShaAtCommitStart = headShaBeforeCommit;
+    // ATM-BUG-2026-07-07-047: this wrapper stages provenance files (git-head.jsonl,
+    // the tracked actor registry) directly onto the LIVE index before attempting
+    // the real `git commit`. If the commit itself fails (e.g. a pre-commit hook
+    // rejection), nothing previously unstaged that residue. Snapshot the live
+    // index now so the catch block can restore exactly what this attempt added.
+    const liveIndexSnapshotBeforeCommitAttempt = readStagedFiles(options.cwd);
+    const commitTimeoutMs = resolveGitCommitTimeoutMs(options.timeoutMs);
+    const commitAttemptStatusPath = gitCommitAttemptStatusRelativePath(actorId, options.taskId);
+    const commitAttemptStartedAt = new Date().toISOString();
+    writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
+        schemaId: 'atm.gitCommitAttemptStatus.v1',
+        actorId,
+        taskId: options.taskId,
+        sessionId: session?.sessionId ?? null,
+        status: 'in-progress',
+        phase: 'preparing-commit',
+        startedAt: commitAttemptStartedAt,
+        updatedAt: commitAttemptStartedAt,
+        commitSha: null,
+        timeoutMs: commitTimeoutMs,
+        errorCode: null,
+        errorSummary: null
+    });
     try {
         withBranchCommitQueueLock({
             cwd: options.cwd,
@@ -1116,7 +1227,22 @@ function runGitCommit(options) {
                 cwd: options.cwd,
                 encoding: 'utf8',
                 stdio: ['ignore', 'pipe', 'pipe'],
-                env
+                env,
+                timeout: commitTimeoutMs
+            });
+            writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
+                schemaId: 'atm.gitCommitAttemptStatus.v1',
+                actorId,
+                taskId: options.taskId,
+                sessionId: session?.sessionId ?? null,
+                status: 'in-progress',
+                phase: 'running-git-commit',
+                startedAt: commitAttemptStartedAt,
+                updatedAt: new Date().toISOString(),
+                commitSha: null,
+                timeoutMs: commitTimeoutMs,
+                errorCode: null,
+                errorSummary: null
             });
             if (bundleFiles.length > 0) {
                 withTaskScopedCommitIndex(options.cwd, bundleFiles, actorId, (scopedEnv) => {
@@ -1133,6 +1259,24 @@ function runGitCommit(options) {
     }
     catch (error) {
         cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
+        const liveIndexResidueRollback = rollbackNewlyStagedLiveIndexResidue(options.cwd, liveIndexSnapshotBeforeCommitAttempt);
+        const nodeChildError = error;
+        const isCommitTimeoutFailure = Boolean(nodeChildError
+            && (nodeChildError.code === 'ETIMEDOUT' || (nodeChildError.killed === true && Boolean(nodeChildError.signal))));
+        writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
+            schemaId: 'atm.gitCommitAttemptStatus.v1',
+            actorId,
+            taskId: options.taskId,
+            sessionId: session?.sessionId ?? null,
+            status: isCommitTimeoutFailure ? 'timeout' : 'failed',
+            phase: 'git-commit-failed',
+            startedAt: commitAttemptStartedAt,
+            updatedAt: new Date().toISOString(),
+            commitSha: null,
+            timeoutMs: commitTimeoutMs,
+            errorCode: error instanceof CliError ? error.code : (isCommitTimeoutFailure ? 'ATM_GIT_COMMIT_TIMEOUT' : 'UNKNOWN'),
+            errorSummary: error instanceof Error ? error.message.slice(0, 500) : String(error)
+        });
         if (error instanceof CliError && (error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY' || error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE')) {
             throw error;
         }
@@ -1195,7 +1339,8 @@ function runGitCommit(options) {
                             noVerify: options.noVerify
                         })
                     }),
-                    protectedOverrideOutcome
+                    protectedOverrideOutcome,
+                    liveIndexResidueRollback
                 }
             });
         }
@@ -1225,7 +1370,8 @@ function runGitCommit(options) {
                         noVerify: options.noVerify
                     })
                 }),
-                protectedOverrideOutcome
+                protectedOverrideOutcome,
+                liveIndexResidueRollback
             }
         });
     }
@@ -1254,6 +1400,20 @@ function runGitCommit(options) {
     }
     const commitSha = readHeadCommitSha(options.cwd);
     cleanupDeferredForeignStagedSnapshot(options.cwd, deferredForeignStagedSnapshotPath);
+    writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
+        schemaId: 'atm.gitCommitAttemptStatus.v1',
+        actorId,
+        taskId: options.taskId,
+        sessionId: session?.sessionId ?? null,
+        status: 'committed',
+        phase: 'committed',
+        startedAt: commitAttemptStartedAt,
+        updatedAt: new Date().toISOString(),
+        commitSha,
+        timeoutMs: commitTimeoutMs,
+        errorCode: null,
+        errorSummary: null
+    });
     const branchCommitQueue = {
         schemaId: 'atm.branchCommitQueueEvidence.v1',
         serializedBy: 'branch-commit-queue',
@@ -1321,7 +1481,9 @@ function parseGitOptions(argv) {
         deferForeignStaged: false,
         dryRun: false,
         stewardPlan: false,
-        applyToWorkingTree: false
+        applyToWorkingTree: false,
+        extraTrailers: [],
+        timeoutMs: null
     };
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
@@ -1374,6 +1536,15 @@ function parseGitOptions(argv) {
             index += 1;
             continue;
         }
+        if (arg === '--trailer') {
+            // Some editor shells (e.g. Cursor) auto-inject `--trailer "Co-authored-by: ..."`
+            // on any command line containing `git commit`, even when it wraps this governed
+            // CLI instead of calling host git directly. Accept it and fold it into the
+            // governed trailer set rather than failing the whole commit with ATM_CLI_USAGE.
+            options.extraTrailers = [...options.extraTrailers, requireValue(argv, index, '--trailer')];
+            index += 1;
+            continue;
+        }
         if (arg === '--no-verify') {
             options.noVerify = true;
             continue;
@@ -1412,6 +1583,16 @@ function parseGitOptions(argv) {
             options.applyToWorkingTree = true;
             continue;
         }
+        if (arg === '--timeout-ms') {
+            const rawTimeout = requireValue(argv, index, '--timeout-ms');
+            const parsedTimeout = Number(rawTimeout);
+            if (!Number.isFinite(parsedTimeout) || parsedTimeout <= 0) {
+                throw new CliError('ATM_CLI_USAGE', '--timeout-ms requires a positive number of milliseconds.', { exitCode: 2 });
+            }
+            options.timeoutMs = parsedTimeout;
+            index += 1;
+            continue;
+        }
         if (arg === '--output-json') {
             requireValue(argv, index, '--output-json');
             index += 1;
@@ -1426,8 +1607,8 @@ function parseGitOptions(argv) {
         if (options.action) {
             throw new CliError('ATM_CLI_USAGE', 'git accepts only one action.', { exitCode: 2 });
         }
-        if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit') {
-            throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit', { exitCode: 2 });
+        if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'commit-status') {
+            throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit, commit-status', { exitCode: 2 });
         }
         options.action = arg;
     }
@@ -1679,7 +1860,7 @@ function inspectCloseCommitWindowStagedArtifacts(cwd, taskId) {
         return { ok: false, taskId, stagedFiles, reason: 'no-staged-files' };
     }
     const activeTaskWindow = readActiveCloseCommitWindows(cwd).find((entry) => entry.taskId === taskId) ?? null;
-    if (activeTaskWindow && stagedFiles.every((filePath) => isAllowedGovernanceArtifactPath(filePath, taskId))) {
+    if (activeTaskWindow && stagedFiles.every((filePath) => isAllowedGovernanceArtifactPath(cwd, filePath, taskId))) {
         return { ok: true, taskId, stagedFiles, reason: 'active-close-commit-window-governance-bundle' };
     }
     const windowRecord = findCloseCommitWindowCoveringPaths(cwd, stagedFiles);
@@ -1715,6 +1896,31 @@ function readStagedFiles(cwd) {
         return [];
     }
 }
+/**
+ * ATM-BUG-2026-07-07-047: this wrapper stages provenance files (git-head.jsonl,
+ * the tracked actor registry, task-scoped preview bundle files) directly onto
+ * the live index before attempting the real `git commit`. When that commit
+ * ultimately fails, restore the live index to its pre-attempt state by
+ * unstaging only the paths this attempt newly staged -- never touching paths
+ * that were already staged before the attempt began (those belong to the
+ * caller or a prior deliberate `git prepare` step and must be left alone).
+ */
+function rollbackNewlyStagedLiveIndexResidue(cwd, stagedBeforeAttempt) {
+    const beforeSet = new Set(stagedBeforeAttempt);
+    const stagedAfterAttempt = readStagedFiles(cwd);
+    const newlyStaged = stagedAfterAttempt.filter((file) => !beforeSet.has(file));
+    if (newlyStaged.length === 0) {
+        return [];
+    }
+    try {
+        runGitCommand(cwd, ['restore', '--staged', '--', ...newlyStaged], ['ignore', 'pipe', 'pipe']);
+    }
+    catch {
+        // best-effort: still report what we attempted to roll back even if the
+        // restore itself could not run (e.g. git executable unavailable).
+    }
+    return newlyStaged;
+}
 function readStagedDiffNames(cwd, diffFilter) {
     try {
         return runGitCommand(cwd, ['diff', '--cached', '--name-only', `--diff-filter=${diffFilter}`])
@@ -1739,7 +1945,7 @@ function extractGovernanceTaskIdFromPath(filePath) {
         return eventMatch[1].toUpperCase();
     return null;
 }
-function isAllowedGovernanceArtifactPath(filePath, taskId) {
+function isAllowedGovernanceArtifactPath(cwd, filePath, taskId) {
     const normalized = normalizeRelativePath(filePath);
     const normalizedTaskId = taskId.toLowerCase();
     const lower = normalized.toLowerCase();
@@ -1753,10 +1959,10 @@ function isAllowedGovernanceArtifactPath(filePath, taskId) {
         return true;
     if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json'))
         return true;
-    return isIgnorableCommitStagingSideEffect(normalized, taskId);
+    return isIgnorableCommitStagingSideEffect(cwd, normalized, taskId);
 }
-function isFileAllowedInTaskBundle(filePath, taskId, declaredScope) {
-    if (isAllowedGovernanceArtifactPath(filePath, taskId))
+function isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope) {
+    if (isAllowedGovernanceArtifactPath(cwd, filePath, taskId))
         return true;
     return declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope));
 }
@@ -1786,7 +1992,7 @@ function buildCopyableGitCommitCommand(input) {
 function buildUnexpectedStagedTasksForGitCommit(cwd, taskId, declaredScope, stagedFiles) {
     const grouped = new Map();
     for (const filePath of stagedFiles) {
-        if (isFileAllowedInTaskBundle(filePath, taskId, declaredScope))
+        if (isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope))
             continue;
         const foreignTaskId = extractGovernanceTaskIdFromPath(filePath);
         if (!foreignTaskId || foreignTaskId === taskId.toUpperCase())
@@ -1895,15 +2101,15 @@ export function resolveTaskScopedCommitBundle(input) {
     const inScopeUnstagedDirty = unstagedDirtyFiles.filter((filePath) => !isRuntimeCommitSideEffect(filePath)
         && (isCommitAttributionSideEffectPath(filePath)
             || (declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
-                || isAllowedGovernanceArtifactPath(filePath, input.taskId))));
+                || isAllowedGovernanceArtifactPath(input.cwd, filePath, input.taskId))));
     const skippedExternalDirtyFiles = unstagedDirtyFiles.filter((filePath) => !isCommitAttributionSideEffectPath(filePath)
         && !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
         && !isIgnorableTaskScopedDirtySideEffect(filePath)
-        && !isIgnorableCommitStagingSideEffect(filePath, input.taskId));
-    const inScopeStagedFiles = stagedFiles.filter((filePath) => isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
-    const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
-    const inScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) => isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
-    const outOfScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) => !isFileAllowedInTaskBundle(filePath, input.taskId, declaredScope));
+        && !isIgnorableCommitStagingSideEffect(input.cwd, filePath, input.taskId));
+    const inScopeStagedFiles = stagedFiles.filter((filePath) => isFileAllowedInTaskBundle(input.cwd, filePath, input.taskId, declaredScope));
+    const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isFileAllowedInTaskBundle(input.cwd, filePath, input.taskId, declaredScope));
+    const inScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) => isFileAllowedInTaskBundle(input.cwd, filePath, input.taskId, declaredScope));
+    const outOfScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) => !isFileAllowedInTaskBundle(input.cwd, filePath, input.taskId, declaredScope));
     const governanceBundleWarnings = [];
     const commitAttributionStageCandidates = unstagedDirtyFiles.filter((filePath) => isCommitAttributionSideEffectPath(filePath));
     const stageCandidates = uniqueSorted([
@@ -1968,9 +2174,9 @@ function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocument) {
     const mismatchedTaskIds = [];
     if (claim?.state === 'active') {
         for (const filePath of stagedFiles) {
-            if (isIgnorableCommitStagingSideEffect(filePath, taskId))
+            if (isIgnorableCommitStagingSideEffect(cwd, filePath, taskId))
                 continue;
-            if (!isAllowedGovernanceArtifactPath(filePath, taskId))
+            if (!isAllowedGovernanceArtifactPath(cwd, filePath, taskId))
                 continue;
             const stagedTaskId = extractGovernanceTaskIdFromPath(filePath);
             if (stagedTaskId && stagedTaskId !== taskId.toUpperCase()) {
@@ -1985,8 +2191,8 @@ function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocument) {
             }
         }
         const declaredScope = resolveTaskDeclaredScope(cwd, taskId, taskDocument);
-        const outOfScopeStaged = stagedFiles.filter((filePath) => !isIgnorableCommitStagingSideEffect(filePath, taskId)
-            && !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
+        const outOfScopeStaged = stagedFiles.filter((filePath) => !isIgnorableCommitStagingSideEffect(cwd, filePath, taskId)
+            && !isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope));
         if (outOfScopeStaged.length > 0) {
             warnings.push(`Pre-commit warning: staged files outside allowedFiles for ${taskId}: ${outOfScopeStaged.join(', ')}`);
         }
@@ -2019,11 +2225,11 @@ function inspectTaskScopedUnstagedCommit(cwd, taskId, taskDocument) {
     }
     const deliverableDirtyFiles = dirtyFiles.filter((filePath) => declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope)));
     const skippedExternalDirtyFiles = dirtyFiles.filter((filePath) => !declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope))
-        && !isIgnorableCommitStagingSideEffect(filePath, taskId));
-    const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isIgnorableCommitStagingSideEffect(filePath, taskId)
-        && !isFileAllowedInTaskBundle(filePath, taskId, declaredScope));
+        && !isIgnorableCommitStagingSideEffect(cwd, filePath, taskId));
+    const outOfScopeStagedFiles = stagedFiles.filter((filePath) => !isIgnorableCommitStagingSideEffect(cwd, filePath, taskId)
+        && !isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope));
     const unstagedInScopeDirty = deliverableDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
-    const unstagedDeliverableDirty = unstagedInScopeDirty.filter((filePath) => !isAllowedGovernanceArtifactPath(filePath, taskId)
+    const unstagedDeliverableDirty = unstagedInScopeDirty.filter((filePath) => !isAllowedGovernanceArtifactPath(cwd, filePath, taskId)
         && !isCommitAttributionSideEffectPath(filePath));
     if (outOfScopeStagedFiles.length > 0
         && unstagedDeliverableDirty.length > 0) {
@@ -2046,7 +2252,7 @@ function inspectTaskScopedUnstagedCommit(cwd, taskId, taskDocument) {
         requiredCommand: buildTaskScopedStagingRequiredCommand(cwd, deliverableDirtyFiles)
     };
 }
-function isIgnorableCommitStagingSideEffect(filePath, taskId) {
+function isIgnorableCommitStagingSideEffect(cwd, filePath, taskId) {
     const normalized = normalizeRelativePath(filePath).toLowerCase();
     const normalizedTaskId = taskId.toLowerCase();
     if (normalized.startsWith('.atm/runtime/')) {
@@ -2061,7 +2267,34 @@ function isIgnorableCommitStagingSideEffect(filePath, taskId) {
     if (normalized.startsWith(`.atm/history/task-events/${normalizedTaskId}/`)) {
         return true;
     }
+    // ATM-BUG-2026-07-07-052 (OPT-14): protected-override-audit events are not
+    // filed per-task by path (their directory has no owning task segment), but
+    // they are durable governance evidence, not disposable residue. Let a
+    // *this-task-owned* audit event (matched by its own `taskId` field) ride
+    // along and be staged into this task's commit instead of being flagged as
+    // an unexplained external dirty file or (previously) deleted outright by
+    // the auto-generated-residue cleanup pass. Audit events owned by a
+    // different task are intentionally left alone here so they don't trip
+    // ATM_GIT_COMMIT_GOVERNANCE_BUNDLE_TASK_MISMATCH on an unrelated commit;
+    // they wait for their own owning task's commit/close to sweep them in.
+    if (isTaskOwnedProtectedOverrideAuditPath(cwd, normalized, normalizedTaskId)) {
+        return true;
+    }
     return false;
+}
+function isTaskOwnedProtectedOverrideAuditPath(cwd, filePath, normalizedTaskId) {
+    const normalized = normalizeRelativePath(filePath).toLowerCase();
+    if (!normalized.startsWith('.atm/history/protected-override-audit/') || !normalized.endsWith('.json')) {
+        return false;
+    }
+    try {
+        const absolutePath = path.join(cwd, filePath);
+        const parsed = JSON.parse(readFileSync(absolutePath, 'utf8'));
+        return typeof parsed.taskId === 'string' && parsed.taskId.toLowerCase() === normalizedTaskId;
+    }
+    catch {
+        return false;
+    }
 }
 function cleanupAutoGeneratedResidue(cwd, findings) {
     const cleaned = [];

@@ -477,6 +477,22 @@ try {
   const planningOnlyAudit = auditTasks(planningOnlyRepo);
   assert(planningOnlyAudit.ok === true, 'planning-only done tasks must not block target framework audit');
   assert(planningOnlyAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE'), 'planning-only done task must be reported as warning');
+  mkdirSync(path.join(planningOnlyRepo, 'docs', 'governance'), { recursive: true });
+  writeJson(path.join(planningOnlyRepo, 'docs', 'governance', 'tasks-audit-warning-baseline.json'), {
+    schemaId: 'atm.tasksAuditWarningBaseline.v1',
+    acknowledgedFindings: [
+      {
+        code: 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE',
+        path: '.atm/history/tasks/TASK-PLAN-0001.json',
+        taskId: 'TASK-PLAN-0001',
+        reason: 'fixture acknowledged planning-only warning'
+      }
+    ]
+  });
+  const acknowledgedPlanningOnlyAudit = auditTasks(planningOnlyRepo);
+  assert(acknowledgedPlanningOnlyAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_PLANNING_ONLY_DONE' && finding.acknowledged === true), 'baseline planning-only warning must remain visible and acknowledged');
+  assert(acknowledgedPlanningOnlyAudit.acknowledgedFindingCount === 1, 'baseline audit must count acknowledged findings');
+  assert(acknowledgedPlanningOnlyAudit.activeFindingCount === 0, 'baseline audit must not count acknowledged warnings as active findings');
 
   const mirrorResult = await runTasks([
     'mirror',
@@ -1951,8 +1967,6 @@ async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) {
   assert(planOnlyFinding!.detail.includes('tasks import'), 'planning-only warning must suggest sync/import action');
 
   const extFinding = auditReport.findings.find((f) => f.taskId === extTaskId);
-  console.log('DEBUG extFinding:', JSON.stringify(extFinding, null, 2));
-  console.log('DEBUG allFindings:', JSON.stringify(auditReport.findings, null, 2));
   assert(extFinding !== undefined, 'external-planning finding must exist');
   assert(extFinding!.level === 'warning', 'external-planning done task must be a warning');
   assert(extFinding!.code === 'ATM_TASK_AUDIT_CROSS_REPO_DONE_WITHOUT_PACKET', 'external-planning code must match');

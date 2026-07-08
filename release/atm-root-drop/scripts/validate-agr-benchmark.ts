@@ -33,8 +33,12 @@ function ensureWiring(): void {
   );
   harness.assert(validatorDef?.slow === false, 'validate-agr-benchmark should be a fast validator');
   harness.assert(
-    validatorsConfig.profiles?.standard?.validators?.includes('validate-agr-benchmark') === true,
-    'standard profile must include validate-agr-benchmark'
+    validatorsConfig.profiles?.full?.validators?.includes('validate-agr-benchmark') === true,
+    'full profile must include validate-agr-benchmark'
+  );
+  harness.assert(
+    validatorsConfig.profiles?.standard?.validators?.includes('validate-agr-benchmark') !== true,
+    'standard profile must not include validate-agr-benchmark after OPT-12 downgrade'
   );
 }
 

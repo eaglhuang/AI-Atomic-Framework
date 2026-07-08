@@ -501,6 +501,7 @@ export interface TaskAuditFinding {
   readonly path: string;
   readonly taskId?: string;
   readonly detail: string;
+  readonly acknowledged?: boolean;
 }
 
 export interface TaskAuditReport {
@@ -511,7 +512,13 @@ export interface TaskAuditReport {
   readonly inspectedTaskCount: number;
   readonly inspectedEvidenceCount: number;
   readonly findings: readonly TaskAuditFinding[];
+  readonly acknowledgedFindingCount?: number;
+  readonly activeFindingCount?: number;
   readonly ok: boolean;
+}
+
+interface TaskAuditWarningBaseline {
+  readonly acknowledgedFindings: ReadonlySet<string>;
 }
 
 interface AuditedTaskDocument {
@@ -1243,6 +1250,7 @@ export function auditTasks(cwd: string): TaskAuditReport {
   const generatedAt = new Date().toISOString();
   const repoIdentity = detectFrameworkRepoIdentity(root);
   const taskLedger = readTaskLedgerPolicy(root);
+  const baseline = readTaskAuditWarningBaseline(root);
   const findings: TaskAuditFinding[] = [];
   const taskDocs = readTaskDocuments(root);
   const evidenceDocs = readEvidenceDocuments(root);
@@ -1450,6 +1458,13 @@ export function auditTasks(cwd: string): TaskAuditReport {
   }
 
   const errorCount = findings.filter((entry) => entry.level === 'error').length;
+  const annotatedFindings = findings.map((entry) => {
+    if (entry.level !== 'warning') return entry;
+    if (!baseline.acknowledgedFindings.has(taskAuditFindingKey(entry))) return entry;
+    return { ...entry, acknowledged: true };
+  });
+  const acknowledgedFindingCount = annotatedFindings.filter((entry) => entry.acknowledged).length;
+  const activeFindingCount = annotatedFindings.filter((entry) => !entry.acknowledged).length;
   return {
     schemaId: 'atm.taskAuditReport',
     specVersion: frameworkModeSpecVersion,
@@ -1457,7 +1472,9 @@ export function auditTasks(cwd: string): TaskAuditReport {
     repoIdentity,
     inspectedTaskCount: taskDocs.length,
     inspectedEvidenceCount: evidenceDocs.length,
-    findings,
+    findings: annotatedFindings,
+    acknowledgedFindingCount,
+    activeFindingCount,
     ok: errorCount === 0
   };
 }
@@ -3179,6 +3196,29 @@ function readJsonIfExists(filePath: string): Record<string, unknown> | null {
   } catch {
     return null;
   }
+}
+
+function readTaskAuditWarningBaseline(root: string): TaskAuditWarningBaseline {
+  const baselinePath = path.join(root, 'docs', 'governance', 'tasks-audit-warning-baseline.json');
+  const document = readJsonIfExists(baselinePath);
+  const acknowledged = Array.isArray(document?.acknowledgedFindings)
+    ? document.acknowledgedFindings
+    : [];
+  const keys = new Set<string>();
+  for (const entry of acknowledged) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+    const record = entry as Record<string, unknown>;
+    const code = normalizeOptionalString(record.code);
+    const findingPath = normalizeOptionalString(record.path);
+    if (!code || !findingPath) continue;
+    const taskId = normalizeOptionalString(record.taskId);
+    keys.add(taskAuditFindingKey({ code, path: findingPath, taskId: taskId ?? undefined }));
+  }
+  return { acknowledgedFindings: keys };
+}
+
+function taskAuditFindingKey(finding: Pick<TaskAuditFinding, 'code' | 'path' | 'taskId'>): string {
+  return `${finding.code}\u0000${normalizeRelativePath(finding.path)}\u0000${finding.taskId ?? ''}`;
 }
 
 function normalizeOptionalString(value: unknown): string | null {

@@ -34,6 +34,14 @@ function ensureWiring(): void {
     'validate-agr-conflict-benchmark entry path mismatch'
   );
   harness.assert(validatorDef?.slow === false, 'validate-agr-conflict-benchmark should be a fast validator');
+  harness.assert(
+    validatorsConfig.profiles?.full?.validators?.includes('validate-agr-conflict-benchmark') === true,
+    'full profile must include validate-agr-conflict-benchmark'
+  );
+  harness.assert(
+    validatorsConfig.profiles?.standard?.validators?.includes('validate-agr-conflict-benchmark') !== true,
+    'standard profile must not include validate-agr-conflict-benchmark after OPT-12 downgrade'
+  );
 }
 
 function ensureFixturePack(): void {

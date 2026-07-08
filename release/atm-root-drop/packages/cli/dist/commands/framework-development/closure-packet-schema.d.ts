@@ -222,6 +222,7 @@ export interface TaskAuditFinding {
     readonly path: string;
     readonly taskId?: string;
     readonly detail: string;
+    readonly acknowledged?: boolean;
 }
 export interface TaskAuditReport {
     readonly schemaId: 'atm.taskAuditReport';
@@ -231,6 +232,8 @@ export interface TaskAuditReport {
     readonly inspectedTaskCount: number;
     readonly inspectedEvidenceCount: number;
     readonly findings: readonly TaskAuditFinding[];
+    readonly acknowledgedFindingCount?: number;
+    readonly activeFindingCount?: number;
     readonly ok: boolean;
 }
 interface FrameworkModeOptions {

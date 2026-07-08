@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -31,7 +31,53 @@ const DEFAULT_FAST_VALIDATOR_BUDGET_MS = 10_000;
 const DEFAULT_SLOW_VALIDATOR_BUDGET_MS = 90_000;
 const VALIDATOR_RUNS_ROOT = path.join(root, '.atm', 'runtime', 'validator-runs');
 
+// ATM-BUG-2026-07-07-054 (OPT-11): validator child processes previously had no
+// timeout and were never tracked, so a caller (e.g. an interrupted `atm`
+// wrapper) killing this parent process left already-spawned `spawn()` child
+// validators as orphans that kept running to completion (or forever) with no
+// way to observe or reap them. Track every live child here and reap them on
+// interrupt/termination.
+const runningValidatorChildren = new Set<ReturnType<typeof spawn>>();
+function killAllRunningValidatorChildren(signal: NodeJS.Signals): void {
+  for (const runningChild of runningValidatorChildren) {
+    try {
+      runningChild.kill(signal);
+    } catch {
+      // best-effort: the child may have already exited between iteration and kill.
+    }
+  }
+}
+process.on('SIGINT', () => {
+  killAllRunningValidatorChildren('SIGTERM');
+  process.exit(130);
+});
+process.on('SIGTERM', () => {
+  killAllRunningValidatorChildren('SIGTERM');
+  process.exit(143);
+});
+// Best-effort synchronous reap on normal/unexpected exit paths that don't go
+// through the signal handlers above (e.g. an uncaught exception).
+process.on('exit', () => {
+  for (const runningChild of runningValidatorChildren) {
+    try {
+      runningChild.kill('SIGTERM');
+    } catch {
+      // best-effort.
+    }
+  }
+});
+
 const parsedCli = parseCliArgs(process.argv.slice(2));
+
+// ATM-BUG-2026-07-07-054 (OPT-11): `--status --run-id <id>` (or `--status
+// --resume <id>`) is a read-only, idempotent query over a run's persisted
+// manifest + receipts. It never spawns a validator and never mutates run
+// state, so it is safe to poll repeatedly (e.g. after a caller timeout) to
+// find out whether the underlying run actually finished before deciding to
+// resume it.
+if (parsedCli.status) {
+  runStatusQueryAndExit(parsedCli);
+}
 const profileConfig = resolveProfileConfig(parsedCli.profile);
 const parallel = resolveParallelSetting(parsedCli, profileConfig);
 const resolvedFocusPaths = resolveFocusPaths(parsedCli.focusPaths, parsedCli.focusChanged);
@@ -121,7 +167,8 @@ const results = parallel
   ? await Promise.all(selectedValidators.map((validator: any) => runValidator(validator, profileConfig.mode, {
       json: parsedCli.json,
       cache: parsedCli.cache,
-      runContext
+      runContext,
+      validatorTimeoutMs: parsedCli.validatorTimeoutMs
     })))
     .then((items) => items.map((item) => markResultAgainstBaseline(item, baselineFingerprints)))
   : await runValidatorsSequential(selectedValidators, profileConfig.mode, {
@@ -130,6 +177,7 @@ const results = parallel
       stopOnFailure: parsedCli.legacy,
       baselineFingerprints,
       runContext,
+      validatorTimeoutMs: parsedCli.validatorTimeoutMs,
       summaryInput: {
         profile: parsedCli.profile,
         mode: profileConfig.mode,
@@ -214,6 +262,8 @@ function parseCliArgs(argv: any) {
     focusChanged: boolean;
     runId: string | null;
     resume: string | null;
+    status: boolean;
+    validatorTimeoutMs: number | null;
   } = {
     filters: [],
     parallel: false,
@@ -230,7 +280,9 @@ function parseCliArgs(argv: any) {
     focusPaths: [],
     focusChanged: false,
     runId: null,
-    resume: null
+    resume: null,
+    status: false,
+    validatorTimeoutMs: null
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -348,6 +400,15 @@ function parseCliArgs(argv: any) {
         throw new Error('--resume requires a run id');
       }
       options.resume = valueText;
+      index += 1;
+      continue;
+    }
+    if (arg === '--status') {
+      options.status = true;
+      continue;
+    }
+    if (arg === '--validator-timeout-ms') {
+      options.validatorTimeoutMs = parsePositiveIntegerOption(argv[index + 1], '--validator-timeout-ms');
       index += 1;
       continue;
     }
@@ -583,6 +644,77 @@ function createValidatorRunId(): string {
   return `run-${new Date().toISOString().replace(/[:.]/g, '-').replace('Z', 'Z')}-${process.pid}`;
 }
 
+// ATM-BUG-2026-07-07-054 (OPT-11): read-only status query for a persisted
+// validator run. Reports per-validator receipt status plus an overall
+// completion flag so a caller can decide whether `--resume <runId>` is
+// necessary (or whether a prior attempt already finished, e.g. after the
+// caller itself timed out waiting on the run).
+function runStatusQueryAndExit(parsedCli: any): never {
+  const runId = String(parsedCli.runId ?? parsedCli.resume ?? '').trim();
+  if (!runId) {
+    process.stderr.write('--status requires --run-id <id> or --resume <id>.\n');
+    process.exitCode = 2;
+    process.exit(2);
+  }
+  const runDir = path.join(VALIDATOR_RUNS_ROOT, runId);
+  const manifestPath = path.join(runDir, 'manifest.json');
+  if (!existsSync(manifestPath)) {
+    const notFound = {
+      schemaId: 'atm.validatorRunStatus.v1',
+      runId,
+      found: false
+    };
+    process.stdout.write(`${JSON.stringify(notFound, null, 2)}\n`);
+    process.exitCode = 1;
+    process.exit(1);
+  }
+  const manifest = readJsonFile(manifestPath);
+  const receiptsDir = path.join(runDir, 'receipts');
+  const receiptFiles = existsSync(receiptsDir)
+    ? readdirSync(receiptsDir).filter((entry: string) => entry.endsWith('.json'))
+    : [];
+  const validators = receiptFiles.map((fileName: string) => {
+    const receipt = readJsonFile(path.join(receiptsDir, fileName));
+    return {
+      name: receipt.validatorName ?? path.basename(fileName, '.json'),
+      status: receipt.status ?? 'unknown',
+      lastAttempt: receipt.lastAttempt ?? null,
+      updatedAt: receipt.updatedAt ?? null
+    };
+  });
+  const counts = validators.reduce((acc: Record<string, number>, entry: any) => {
+    acc[entry.status] = (acc[entry.status] ?? 0) + 1;
+    acc.total = (acc.total ?? 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const outstanding = validators.filter((entry: any) => entry.status !== 'passed' && entry.status !== 'failed' && entry.status !== 'timeout');
+  const summaryPath = path.join(runDir, 'summary.partial.json');
+  const lastSummary = existsSync(summaryPath) ? readJsonFile(summaryPath) : null;
+  const status = {
+    schemaId: 'atm.validatorRunStatus.v1',
+    runId,
+    found: true,
+    profile: manifest.profile ?? null,
+    mode: manifest.mode ?? null,
+    attempt: manifest.attempt ?? null,
+    startedAt: manifest.startedAt ?? null,
+    updatedAt: manifest.updatedAt ?? null,
+    latestPhase: manifest.latestPhase ?? null,
+    completed: outstanding.length === 0 && validators.length > 0,
+    outstandingValidators: outstanding.map((entry: any) => entry.name),
+    counts,
+    validators,
+    lastSummaryPhase: lastSummary?.phase ?? null,
+    lastSummaryTotals: lastSummary ? { total: lastSummary.total, passed: lastSummary.passed, failed: lastSummary.failed } : null,
+    resumeCommand: outstanding.length > 0
+      ? `node --strip-types scripts/run-validators.ts ${manifest.profile ?? 'standard'} --resume ${runId} --json`
+      : null
+  };
+  process.stdout.write(`${JSON.stringify(status, null, 2)}\n`);
+  process.exitCode = 0;
+  process.exit(0);
+}
+
 function buildSelectionFingerprint({ profile, mode, filters, focusPaths, validatorNames }: any): string {
   const fingerprint = {
     schemaId: 'atm.validatorSelectionFingerprint.v1',
@@ -756,6 +888,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
     let stderr = '';
     let spawnError: string | null = null;
     let settled = false;
+    let timedOut = false;
 
     let child: ReturnType<typeof spawn>;
     try {
@@ -767,6 +900,25 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
       finalize(1, formatSpawnError(error));
       return;
     }
+
+    runningValidatorChildren.add(child);
+
+    // ATM-BUG-2026-07-07-054 (OPT-11): a hung validator (e.g. stuck on a lock
+    // or an unresponsive external call) previously ran forever with no way to
+    // observe or bound it. Bound each validator attempt when a timeout is
+    // configured, and record it distinctly from an ordinary failure.
+    const timeoutMs = Number.isFinite(options.validatorTimeoutMs) ? Number(options.validatorTimeoutMs) : null;
+    const timeoutHandle = timeoutMs !== null
+      ? setTimeout(() => {
+        if (settled) return;
+        timedOut = true;
+        try {
+          child.kill('SIGTERM');
+        } catch {
+          // best-effort.
+        }
+      }, timeoutMs)
+      : null;
 
     child.stdout?.on('data', (chunk) => {
       stdout += String(chunk);
@@ -780,13 +932,17 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
     });
 
     child.on('close', (code) => {
-      finalize(code ?? 1);
+      finalize(timedOut ? 124 : (code ?? 1));
     });
 
     function finalize(exitCode: number, immediateSpawnError: string | null = null) {
       if (settled) return;
       settled = true;
-      spawnError = immediateSpawnError ?? spawnError;
+      runningValidatorChildren.delete(child);
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+      spawnError = immediateSpawnError ?? (timedOut ? `Validator exceeded --validator-timeout-ms budget of ${timeoutMs}ms and was killed.` : spawnError);
       const durationMs = Date.now() - startedAt;
       const envelope = createValidatorFailureEnvelope({
         validatorName: validator.name,
@@ -834,6 +990,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
         command,
         cacheKey,
         cached: false,
+        timedOut,
         requiredCommand: envelope.requiredCommand,
         blockingFindings: envelope.blockingFindings,
         envelope
@@ -844,7 +1001,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
           validatorName: validator.name,
           fingerprint: runFingerprint,
           result,
-          status: result.ok === true ? 'passed' : 'failed'
+          status: timedOut ? 'timeout' : (result.ok === true ? 'passed' : 'failed')
         });
       }
       if (options.cache && result.ok === true) {

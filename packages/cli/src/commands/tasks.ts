@@ -1746,6 +1746,9 @@ export function readDeferredForeignStagedFilesForActiveCloseWindow(cwd: string, 
 function runTasksAudit(argv: string[]) {
   const options = parseAuditOptions(argv);
   const report = auditTasks(options.cwd);
+  const activeFindings = report.findings.filter((finding) => !finding.acknowledged);
+  const activeWarnings = activeFindings.filter((finding) => finding.level === 'warning');
+  const errorFindings = report.findings.filter((finding) => finding.level === 'error');
   return makeResult({
     ok: report.ok,
     command: 'tasks',
@@ -1754,19 +1757,24 @@ function runTasksAudit(argv: string[]) {
       !report.ok
         ? message('error', 'ATM_TASKS_AUDIT_FAILED', 'Task audit found invalid task closure evidence.', {
           findingCount: report.findings.length,
-          errorCount: report.findings.filter((finding) => finding.level === 'error').length
+          errorCount: errorFindings.length,
+          activeFindingCount: activeFindings.length,
+          acknowledgedFindingCount: report.acknowledgedFindingCount ?? 0
         })
-        : report.findings.length > 0
-          ? message('warn', 'ATM_TASKS_AUDIT_WARNINGS', `Task audit passed with ${report.findings.length} warning(s), including stalled backlog entries.`, {
+        : activeWarnings.length > 0
+          ? message('warn', 'ATM_TASKS_AUDIT_WARNINGS', `Task audit passed with ${activeWarnings.length} active warning(s); ${report.acknowledgedFindingCount ?? 0} baseline warning(s) were acknowledged.`, {
             inspectedTaskCount: report.inspectedTaskCount,
             inspectedEvidenceCount: report.inspectedEvidenceCount,
-            warningCount: report.findings.length,
-            warningCodes: Array.from(new Set(report.findings.map((finding) => finding.code))),
+            warningCount: activeWarnings.length,
+            acknowledgedWarningCount: report.acknowledgedFindingCount ?? 0,
+            warningCodes: Array.from(new Set(activeWarnings.map((finding) => finding.code))),
+            activeFindings: activeWarnings,
             findings: report.findings
           })
           : message('info', 'ATM_TASKS_AUDIT_OK', 'Task audit passed.', {
             inspectedTaskCount: report.inspectedTaskCount,
-            inspectedEvidenceCount: report.inspectedEvidenceCount
+            inspectedEvidenceCount: report.inspectedEvidenceCount,
+            acknowledgedWarningCount: report.acknowledgedFindingCount ?? 0
           })
     ],
     evidence: {

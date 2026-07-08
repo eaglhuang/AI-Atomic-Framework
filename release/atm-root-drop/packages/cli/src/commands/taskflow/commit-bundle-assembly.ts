@@ -10,7 +10,7 @@ import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.ts';
 import { validateStrictPathHeuristic } from '../tasks/task-import-validators.ts';
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.ts';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
-import { runAtmGit } from '../git-governance.ts';
+import { resolveActorGitIdentityForCommit, runAtmGit } from '../git-governance.ts';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { CliError, quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
@@ -106,6 +106,23 @@ function listExistingFilesRecursively(root: string, relativeDirectory: string): 
     }
   }
   return files;
+}
+
+// ATM-BUG-2026-07-07-052 (OPT-14): protected-override-audit events aren't
+// filed per-task by path (their directory has no owning task segment), so a
+// blanket directory sweep would risk bundling another task's pending audit
+// event into this close (and could trip governance-bundle task-mismatch
+// checks elsewhere). Match by the event's own `taskId` field instead.
+function listTaskOwnedProtectedOverrideAuditFiles(root: string, taskId: string): string[] {
+  const directory = '.atm/history/protected-override-audit';
+  return listExistingFilesRecursively(root, directory).filter((relativePath) => {
+    try {
+      const parsed = JSON.parse(readFileSync(path.join(root, relativePath), 'utf8')) as { taskId?: unknown };
+      return typeof parsed.taskId === 'string' && parsed.taskId.toLowerCase() === taskId.toLowerCase();
+    } catch {
+      return false;
+    }
+  });
 }
 
 function listCurrentTaskGovernanceFiles(root: string, taskId: string): string[] {
@@ -506,7 +523,14 @@ export function buildTaskflowCommitBundle(input: {
   const backendGovernanceFiles = [
     ...listCurrentTaskGovernanceFiles(targetRepoRoot, input.taskId),
     ...listOptionalEvidenceBundleGovernanceArtifacts(targetRepoRoot, input.taskId),
-    ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : [])
+    ...(input.backendResult ? extractBackendStageFiles(input.backendResult) : []),
+    // ATM-BUG-2026-07-07-052 (OPT-14): this task's own protected-override-audit
+    // events were never part of any close bundle and would sit as untracked
+    // evidence forever (or previously, get deleted as "auto-clean-safe"
+    // residue by the git commit wrapper). Stage them here so `emergency audit
+    // --task <id>` keeps finding evidence that actually landed in version
+    // control.
+    ...listTaskOwnedProtectedOverrideAuditFiles(targetRepoRoot, input.taskId)
   ];
   const targetGovernanceFiles = uniqueSorted([
     ...(historicalBatchStageFile ? [historicalBatchStageFile] : []),
@@ -783,11 +807,19 @@ function commitRepoWithTemporaryIndex(input: {
 }) {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'atm-taskflow-commit-index-'));
   const tempIndexFile = path.join(tempDir, 'index');
+  // ATM-BUG-2026-07-07-046: resolve the same actor-scoped author/committer identity
+  // `node atm.mjs git commit` would use, instead of silently falling back to
+  // whatever host git config happens to be configured for this repo. Missing
+  // identity is non-fatal here (unlike the `git commit` wrapper) so existing
+  // closes for actors without a registered identity keep working unchanged.
+  const identity = input.actorId ? resolveActorGitIdentityForCommit(input.repoRoot, input.actorId) : null;
   const env = {
     ...process.env,
     GIT_INDEX_FILE: tempIndexFile,
     ...(input.actorId ? { ATM_COMMIT_ACTOR_ID: input.actorId } : {}),
-    ...(input.taskId ? { ATM_COMMIT_TASK_ID: input.taskId } : {})
+    ...(input.taskId ? { ATM_COMMIT_TASK_ID: input.taskId } : {}),
+    ...(identity?.gitName ? { GIT_AUTHOR_NAME: identity.gitName, GIT_COMMITTER_NAME: identity.gitName } : {}),
+    ...(identity?.gitEmail ? { GIT_AUTHOR_EMAIL: identity.gitEmail, GIT_COMMITTER_EMAIL: identity.gitEmail } : {})
   };
   try {
     // Build the commit from a clean HEAD-based temporary index so prior staged
@@ -797,6 +829,14 @@ function commitRepoWithTemporaryIndex(input: {
       runGitWithEnv(input.repoRoot, ['add', '-A', '-f', '--', ...input.stageFiles], env);
     }
     runGitWithEnv(input.repoRoot, input.args, env);
+    if (input.stageFiles.length > 0) {
+      // ATM-BUG-2026-07-07-049: the temp index never touches the live index, so
+      // any pre-existing (possibly stale) live-index entries for these paths
+      // would otherwise survive the commit as a phantom `git diff --cached`
+      // residue. Reset just these paths in the live index to the newly
+      // committed HEAD tree; unrelated staged files are left untouched.
+      runGitOrThrow(input.repoRoot, ['reset', '--quiet', '--', ...input.stageFiles]);
+    }
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
   }

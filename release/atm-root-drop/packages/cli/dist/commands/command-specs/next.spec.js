@@ -17,6 +17,7 @@ export default defineCommandSpec({
         { flag: '--tasks', value: 'csv', summary: 'Freeze an explicit comma-separated task id range for a batch claim.' },
         { flag: '--intent', value: 'path', summary: 'Read an atm.taskIntent.v1 JSON file produced by a trusted skill or integration hook.' },
         { flag: '--output', value: 'path', summary: 'Write JSON output to a file. When passed without a path, defaults to .atm-temp/next-<timestamp>.json.' },
+        { flag: '--verbose', summary: 'Skip default output compaction and return the full untrimmed envelope (large frameworkStatus file lists, full playbook echoed inside messages).' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption
@@ -54,7 +55,8 @@ export default defineCommandSpec({
         playbookNotes: [
             'Read evidence.nextAction.playbook before editing, committing, or closing a task.',
             'When the prompt already resolves to one exact task, prefer next --claim --task TASK-XXX over re-passing natural language.',
-            'If governanceReadiness is present, resolve doctor/framework claim/pre-push blockers before implementation.'
+            'If governanceReadiness is present, resolve doctor/framework claim/pre-push blockers before implementation.',
+            'Default output is compacted (large frameworkStatus file lists truncated, playbook echoed once via evidence.nextAction.playbook); pass --verbose for the full untrimmed envelope.'
         ]
     }
 });
