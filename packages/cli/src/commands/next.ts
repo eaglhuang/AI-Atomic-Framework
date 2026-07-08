@@ -2482,10 +2482,22 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
               return path.isAbsolute(norm) ? path.relative(cwd, norm).replace(/\\/g, '/') : norm;
             }));
             const claimFiles = readStringArray(claimRecord.files);
+            // ATM-BUG-2026-07-07-043/044: `tasks scope add` merges amended paths into
+            // taskDirectionLock.allowedFiles (and claim.files), but never rewrites this
+            // task's own static scope/scopePaths/files declaration. Re-hydrating scope
+            // here from `explicit` alone (and filtering claim.files against it) silently
+            // dropped scope-amendment paths on the next `next --claim`. Treat the
+            // governed taskDirectionLock.allowedFiles as an equally trusted source so
+            // scope amendments survive re-claim.
+            const directionLock = parsed.taskDirectionLock;
+            const lockAllowedFiles = directionLock && typeof directionLock === 'object' && !Array.isArray(directionLock)
+              ? readStringArray((directionLock as Record<string, unknown>).allowedFiles)
+              : [];
             const rawScope = explicit.length > 0
               ? uniqueSorted([
                 ...explicit,
-                ...claimFiles.filter((file) => isPathAllowedByScope(file, explicit))
+                ...claimFiles.filter((file) => isPathAllowedByScope(file, explicit)),
+                ...lockAllowedFiles
               ])
               : uniqueSorted([
                 ...extractDeclaredTaskPathsFromDocument(parsed),

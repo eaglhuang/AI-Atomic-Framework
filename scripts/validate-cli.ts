@@ -402,6 +402,47 @@ const scopeLockDiagnosticsTest = spawnSync(
 );
 assert(scopeLockDiagnosticsTest.status === 0, `scope-lock-diagnostics focused test must pass: ${scopeLockDiagnosticsTest.stderr || scopeLockDiagnosticsTest.stdout}`);
 
+// ATM-BUG-2026-07-07-047 (OPT-07): a failed `git commit --auto-stage` must roll
+// back the live-index provenance residue it staged for this attempt.
+const gitCommitFailureResidueRollbackTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'tests/cli/git-commit-failure-residue-rollback.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(gitCommitFailureResidueRollbackTest.status === 0, `git-commit-failure-residue-rollback focused test must pass: ${gitCommitFailureResidueRollbackTest.stderr || gitCommitFailureResidueRollbackTest.stdout}`);
+
+// ATM-BUG-2026-07-07-048 (OPT-08): `git commit` must bound a hung pre-commit
+// hook with --timeout-ms and expose a `commit-status` query for the last
+// governed commit attempt.
+const gitCommitTimeoutAndStatusTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'tests/cli/git-commit-timeout-and-status.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(gitCommitTimeoutAndStatusTest.status === 0, `git-commit-timeout-and-status focused test must pass: ${gitCommitTimeoutAndStatusTest.stderr || gitCommitTimeoutAndStatusTest.stdout}`);
+
+// ATM-BUG-2026-07-07-054 (OPT-11): `run-validators.ts` must expose a
+// read-only `--status` query, bound hung validators with
+// `--validator-timeout-ms`, and resume an interrupted run by only
+// re-executing outstanding validators.
+const validatorRunResumeAndStatusTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'tests/cli/validator-run-resume-and-status.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(validatorRunResumeAndStatusTest.status === 0, `validator-run-resume-and-status focused test must pass: ${validatorRunResumeAndStatusTest.stderr || validatorRunResumeAndStatusTest.stdout}`);
+
+// ATM-BUG-2026-07-07-052 (OPT-14): a this-task-owned protected-override-audit
+// event must survive the task-scoped commit bundle resolver and be staged
+// into the commit; a different task's pending audit event must be left
+// alone (neither deleted nor swept into an unrelated commit).
+const protectedOverrideAuditStagingTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'tests/cli/protected-override-audit-staging.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(protectedOverrideAuditStagingTest.status === 0, `protected-override-audit-staging focused test must pass: ${protectedOverrideAuditStagingTest.stderr || protectedOverrideAuditStagingTest.stdout}`);
+
 const planningRootPreferenceTest = spawnSync(
   process.execPath,
   ['--strip-types', path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')],

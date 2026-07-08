@@ -730,6 +730,61 @@ scopePaths:
       console.log('teamPlanResult is:', JSON.stringify(teamPlanResult, null, 2));
       throw err;
     }
+
+    // ATM-BUG-2026-07-07-043/044 (OPT-10): a `tasks scope add` amendment merges
+    // the new path into taskDirectionLock.allowedFiles and claim.files, but
+    // never rewrites the task's own static scope/scopePaths declaration.
+    // Re-claiming afterwards (e.g. escalating from closeout-only to write
+    // intent) used to rebuild allowedFiles from the static scope only and
+    // silently drop the amended path. Confirm the amendment survives re-claim.
+    const scopeAmendTaskId = 'TASK-SCOPEAMEND-0001';
+    const scopeAmendTaskPath = path.join(ledgerTaskDir, `${scopeAmendTaskId}.json`);
+    writeFileSync(scopeAmendTaskPath, `${JSON.stringify({
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: scopeAmendTaskId,
+      title: 'Scope amendment survives re-claim',
+      status: 'running',
+      dependencies: [],
+      acceptance: ['bootstrap output reviewed by human gate'],
+      scope: ['src/scope-amend-original.ts'],
+      scopePaths: ['src/scope-amend-original.ts'],
+      deliverables: ['src/scope-amend-original.ts'],
+      claim: {
+        actorId: 'prompt-scope-test',
+        leaseId: `lease-${scopeAmendTaskId.toLowerCase()}`,
+        claimedAt: '2026-05-24T00:00:00.000Z',
+        heartbeatAt: '2026-05-24T00:00:00.000Z',
+        ttlSeconds: 1800,
+        intent: 'closeout-only',
+        files: ['src/scope-amend-original.ts', 'src/scope-amend-linked.ts'],
+        state: 'active'
+      },
+      taskDirectionLock: {
+        allowedFiles: ['src/scope-amend-original.ts', 'src/scope-amend-linked.ts']
+      },
+      source: {
+        planPath: 'docs/plan/PlanAlpha.md',
+        sectionTitle: 'Scope amendment survives re-claim',
+        headingLine: 1,
+        hash: scopeAmendTaskId
+      }
+    }, null, 2)}\n`, 'utf8');
+
+    const reclaimWithEscalatedIntent = await runNext([
+      '--cwd', tempRoot,
+      '--claim',
+      '--actor', 'prompt-scope-test',
+      '--claim-intent', 'write',
+      '--prompt', scopeAmendTaskId
+    ]);
+    assert(reclaimWithEscalatedIntent.ok === true, `re-claim with escalated intent must succeed: ${JSON.stringify(reclaimWithEscalatedIntent.messages ?? [])}`);
+    const scopeAmendedTaskDocument = JSON.parse(readFileSync(scopeAmendTaskPath, 'utf8')) as Record<string, unknown>;
+    const scopeAmendedClaim = scopeAmendedTaskDocument.claim as Record<string, unknown> | undefined;
+    const scopeAmendedClaimFiles = Array.isArray(scopeAmendedClaim?.files) ? scopeAmendedClaim.files as string[] : [];
+    assert(
+      scopeAmendedClaimFiles.includes('src/scope-amend-linked.ts'),
+      `re-claim must not drop the tasks-scope-add-amended path; claim.files was ${JSON.stringify(scopeAmendedClaimFiles)}`
+    );
   } finally {
     if (previousGitCeilingDirectories === undefined) {
       delete process.env.GIT_CEILING_DIRECTORIES;

@@ -127,6 +127,22 @@ export function buildTaskflowCloseWriteReadinessHint(input: {
     ?? input.closebackPlan.closebackPathResolution?.planningMirrorPath
     ?? null;
   const planningResolved = resolvePlanningPath(input.cwd, planningMirrorPath);
+
+  // ATM-BUG-2026-07-07-050: `taskflow close --write` hard-fails via
+  // assertClosebackPlanningPathReady() when the closeback path resolution route
+  // is 'missing' or 'ambiguous' (e.g. a stale source.planPath with no usable
+  // fallback), but dry-run never evaluated that same gate, so it reported
+  // `ready` right up until the write attempt. Surface it here too so dry-run
+  // and --write agree on whether this task can actually close.
+  const closebackRoute = input.closebackPlan.closebackPathResolution?.route ?? null;
+  if (closebackRoute === 'missing' || closebackRoute === 'ambiguous') {
+    const resolution = input.closebackPlan.closebackPathResolution!;
+    blockers.push({
+      code: resolution.diagnostics.codes[0] ?? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING',
+      summary: resolution.diagnostics.messages.join(' ') || 'taskflow close could not resolve a usable closeback planning path.',
+      requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --profile <taskflow-profile.json> --write --json`
+    });
+  }
   const hasUncommittedDeliverables = input.previewCommitBundle.targetDeliveryFiles.length > 0;
   if (
     input.closebackPlan.historicalDeliveryGate.required
