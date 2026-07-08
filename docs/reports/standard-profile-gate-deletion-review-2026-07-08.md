@@ -2,7 +2,7 @@
 
 ## Scope
 
-This report is the Wave 3 inventory requested by OPT-12 (ATM-BUG-2026-07-07-040 lineage). It catalogs close/commit enforcement surfaces and the `standard` validator profile, records existing downgrade precedents, and proposes downgrade candidates **without applying any downgrade changes**. Downgrade decisions require explicit human approval per item.
+This report is the Wave 3 inventory requested by OPT-12 (ATM-BUG-2026-07-07-040 lineage). It catalogs close/commit enforcement surfaces and the `standard` validator profile, records existing downgrade precedents, and applies the human-approved profile slimming changes listed below.
 
 Method:
 
@@ -90,11 +90,11 @@ Grouping for close/commit relevance:
 | Test governance / facade | 2 | Medium | Meta-validation of validator runner itself |
 | Misc / sentinel / bench | 4 | Low | Operational bench, adopter sentinel |
 
-### Config hygiene finding (non-gate)
+### Config hygiene finding (resolved)
 
-- `validate-rollout-metrics` appears **twice** in `profiles.standard.validators`. This is wasted work, not a separate gate. **Proposal:** dedupe the profile entry (safe, no enforcement change).
+- `validate-rollout-metrics` previously appeared **twice** in `profiles.standard.validators`. The duplicate list entry was removed on 2026-07-08 after human approval.
 
-## Downgrade candidates (proposal only — requires human approval)
+## Downgrade candidates (human-approved 2026-07-08)
 
 Criteria used:
 
@@ -102,14 +102,14 @@ Criteria used:
 2. High duration cost in standard profile runs, or duplicate execution.
 3. An existing precedent for diagnostic-only or profile removal.
 
-| Candidate | Current placement | Owner entry | Intercept evidence | Proposal | Risk if downgraded |
-|---|---|---|---|---|---|
-| Duplicate `validate-rollout-metrics` | `standard` (twice) | `scripts/validators.config.json` | None (duplicate config) | Remove duplicate list entry | None |
-| `adopter-sentinel` | `standard` | `scripts/adopter-sentinel.ts` | Telemetry for adopters, not framework close | Move to `full` only | Lose early adopter drift signal in standard runs |
-| `validate-operational-bench` | `standard` | `scripts/validate-operational-bench.ts` | Bench artifact, not close interceptor | Move to `full` only | Lose bench regression in standard CI |
-| `validate-agr-benchmark` / `validate-agr-conflict-benchmark` | `standard` | broker bench scripts | Benchmark gates, not ordinary task close | Move to `full` only | Broker bench regressions surface later |
-| `validate-multi-agent-confidence` | `full` only today | docs/agent confidence | No close/commit intercept | Already non-standard; keep out of `standard` | N/A |
-| `validate-next-warm-run-latency` | `full` (added OPT-13) | `scripts/validate-next-warm-run-latency.ts` | Performance budget, not functional gate | Keep in `full` only (slow onefile build) | N/A — this is the intended placement |
+| Candidate | Previous placement | Owner entry | Decision | Applied change |
+|---|---|---|---|---|
+| Duplicate `validate-rollout-metrics` | `standard` (twice) | `scripts/validators.config.json` | **Approved** | Removed duplicate list entry |
+| `adopter-sentinel` | `standard` | `scripts/adopter-sentinel.ts` | **Approved** | Moved to `full` only |
+| `validate-operational-bench` | `standard` | `scripts/validate-operational-bench.ts` | **Approved** | Moved to `full` only |
+| `validate-agr-benchmark` / `validate-agr-conflict-benchmark` | `standard` | broker bench scripts | **Approved** | Moved to `full` only |
+| `validate-multi-agent-confidence` | `full` only | docs/agent confidence | Keep out of `standard` | Unchanged |
+| `validate-next-warm-run-latency` | `full` | latency validator | Keep in `full` only | Unchanged |
 
 ### Not proposed for downgrade
 

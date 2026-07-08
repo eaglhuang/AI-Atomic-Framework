@@ -45,8 +45,12 @@ function ensureWiring(): void {
   harness.assert(validatorDef?.entry === 'scripts/validate-operational-bench.ts', 'validate-operational-bench entry path mismatch');
   harness.assert(validatorDef?.slow === false, 'validate-operational-bench should be a fast validator');
   harness.assert(
-    validatorsConfig.profiles?.standard?.validators?.includes('validate-operational-bench') === true,
-    'standard profile must include validate-operational-bench'
+    validatorsConfig.profiles?.full?.validators?.includes('validate-operational-bench') === true,
+    'full profile must include validate-operational-bench'
+  );
+  harness.assert(
+    validatorsConfig.profiles?.standard?.validators?.includes('validate-operational-bench') !== true,
+    'standard profile must not include validate-operational-bench after OPT-12 downgrade'
   );
 
   harness.requireFile('scripts/lib/admission-bench/operational-runner.ts');
