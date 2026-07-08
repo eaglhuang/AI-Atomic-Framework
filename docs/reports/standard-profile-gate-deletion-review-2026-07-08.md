@@ -153,9 +153,12 @@ Inspect `performance.optimizationCandidates`, `slowestValidators`, and `familyHo
 | OPT-13 | Warm-run latency validator with CLI logic vs wrapper split | `scripts/validate-next-warm-run-latency.ts`; wired to `full` profile |
 | OPT-14 | Protected override audit staging + residue classification fix | `git-governance.ts`, `commit-bundle-assembly.ts`, `closure-packet-schema.ts`; regression test |
 
-## Next steps (human gate)
+## Human gate status
 
-1. Review each downgrade candidate row above and mark approve / reject / defer.
-2. For approved items, open a follow-up task card per change (do not batch silent profile edits).
-3. For approved profile slimming, require: dedupe-only change first, then one validator move per commit with `validate:standard` green.
-4. Re-run `node --strip-types scripts/run-validators.ts standard --performance-baseline ...` after any profile change to prove cost reduction without losing close/commit regressions.
+The downgrade rows above were human-approved and applied on 2026-07-08. This document no longer represents a pending approval queue.
+
+Retained follow-up controls:
+
+1. Keep future profile-slimming proposals explicit in this report or a successor report; do not batch silent profile edits.
+2. Require `validate:standard` green after any future `standard` profile change.
+3. Re-run `node --strip-types scripts/run-validators.ts standard --performance-baseline ...` after any future profile change to prove cost reduction without losing close/commit regressions.
