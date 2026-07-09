@@ -1,0 +1,90 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T07-31-08-095Z-close-fa42c0496e86",
+  "taskId": "TASK-AAO-0153",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260709070722-codex-captain-TASK-AAO-0153-c5813fa4d3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0153.json",
+  "taskSha256": "sha256:d977ea65df970464bfb0a3a14c165faf9b8518c55ce7be2a8a8bde79d0b3e16f",
+  "createdAt": "2026-07-09T07:31:08.095Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0153 --actor codex-captain --status done --historical-delivery c846fa7b01d457ab6fb4f732725bdcc557c87749",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260709070722-codex-captain-TASK-AAO-0153-c5813fa4d3",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0153.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+      "check:encoding:touched",
+      "doctor",
+      "lint",
+      "node --experimental-strip-types tests/cli/git-record-commit.test.ts",
+      "node atm.mjs hook pre-push --json",
+      "typecheck",
+      "validate:cli",
+      "validate:cli -- --mode validate",
+      "validate:git-head-evidence",
+      "validate:root-drop-release"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-09T07:31:08.091Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0153.*",
+        ".atm/history/protected-override-audit/2026-07-09T07-15-49-743Z-POA-0feec78b63bf.json",
+        ".atm/history/task-events/TASK-AAO-0153/**",
+        ".atm/history/tasks/TASK-AAO-0153.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/tasks/TASK-AAO-0153-record-only-commit-lane.task.md",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/",
+        "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+        "release/atm-root-drop/packages/cli/dist/commands/command-specs/git.spec.js",
+        "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+        "release/atm-root-drop/packages/cli/src/commands/command-specs/git.spec.ts",
+        "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+        "release/atm-root-drop/release-manifest.json",
+        "release/atm-root-drop/scripts/validate-cli.ts",
+        "release/atm-root-drop/tests/cli-fixtures/help-snapshots/next.json",
+        "scripts/validate-cli.ts",
+        "tests/cli/git-record-commit.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "scripts/validate-cli.ts",
+        "tests/cli/git-record-commit.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

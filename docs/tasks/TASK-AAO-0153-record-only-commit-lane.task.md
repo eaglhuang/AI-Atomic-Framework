@@ -2,7 +2,7 @@
 doc_id: doc_aao_0153
 task_id: TASK-AAO-0153
 title: "Record-only commit lane for task ledger maintenance"
-status: open
+status: done
 owner: atm-core
 priority: P1
 milestone: RFT-M5
@@ -50,6 +50,15 @@ outOfScope:
   - "Replacing normal task-bound delivery commits"
 nonGoals:
   - "Do not relax protected push, closeout, or same-commit provenance checks"
+completed_at: "2026-07-09T07:31:08.636Z"
+completed_by_agent: "codex-captain"
+closedAt: "2026-07-09T07:31:08.636Z"
+closedByActor: "codex-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-09T07-31-08-636Z-close-73af2a0895d3"
+lastTransitionAt: "2026-07-09T07:31:08.636Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "c846fa7b01d457ab6fb4f732725bdcc557c87749"
 ---
 
 # TASK-AAO-0153 - Record-only commit lane for task ledger maintenance

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0153",
   "title": "Record-only commit lane for task ledger maintenance",
-  "status": "running",
+  "status": "done",
   "milestone": "RFT-M5",
   "dependencies": [],
   "acceptance": [
@@ -79,7 +79,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-4bb9d9e30db6",
     "claimedAt": "2026-07-09T07:07:22.530Z",
-    "heartbeatAt": "2026-07-09T07:07:22.530Z",
+    "heartbeatAt": "2026-07-09T07:31:08.094Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-AAO-0153.*",
@@ -103,8 +103,8 @@
       "scripts/validate-cli.ts",
       "tests/cli/git-record-commit.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Delivery commit includes the TASK-AAO-0153 planning card in docs/tasks because this framework repo owns the task card locally; source, tests, release mirrors, evidence, and task metadata all belong to the same approved TASK-AAO-0153 delivery."
   },
   "owner": "codex-captain",
   "startedAt": "2026-07-09T07:07:22.530Z",
@@ -152,7 +152,12 @@
     "createdAt": "2026-07-09T07:07:23.329Z",
     "status": "active"
   },
-  "lastTransitionId": "2026-07-09T07-23-50-054Z-scope-amendment-de18d50fd280",
-  "lastTransitionAt": "2026-07-09T07:23:50.054Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-09T07-31-08-095Z-close-fa42c0496e86",
+  "lastTransitionAt": "2026-07-09T07:31:08.095Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "closedAt": "2026-07-09T07:31:08.094Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260709070722-codex-captain-TASK-AAO-0153-c5813fa4d3",
+  "closeReason": "Delivery commit includes the TASK-AAO-0153 planning card in docs/tasks because this framework repo owns the task card locally; source, tests, release mirrors, evidence, and task metadata all belong to the same approved TASK-AAO-0153 delivery.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0153.closure-packet.json"
 }
