@@ -2011,7 +2011,9 @@ function buildPromptGuidanceNextResult(input) {
             riskLevel: 'high',
             playbook: buildChannelPlaybook({
                 channel: 'fast',
-                originalPrompt: prompt
+                originalPrompt: prompt,
+                fastClaimCommand: claimCommand,
+                fastClaimLabel: 'framework temp claim'
             }),
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'fast',
@@ -3829,7 +3831,9 @@ function buildChannelPlaybook(input) {
     const actor = input.actorPlaceholder ?? '<id>';
     const prompt = input.originalPrompt?.trim() || '<current user prompt>';
     const taskId = input.taskId ?? '<task-id>';
-    const defaultClaimCommand = `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --auto-intent --json`;
+    const defaultClaimCommand = input.fastClaimCommand?.trim()
+        || `node atm.mjs next --claim --actor ${actor} --prompt ${quoteCliValue(prompt)} --auto-intent --json`;
+    const fastClaimLabel = input.fastClaimLabel?.trim() || 'quickfix lock';
     const closeOps = buildTaskflowCloseOperatorCommands(taskId, actor);
     if (input.channel === 'fast') {
         return {
@@ -3847,7 +3851,7 @@ function buildChannelPlaybook(input) {
             doNot: [
                 'Do not edit .atm/history/**.',
                 'Do not close task cards.',
-                'Do not expand the scope after the quickfix lock is created.'
+                `Do not expand the scope after the ${fastClaimLabel} is created.`
             ],
             commandSequence: [
                 defaultClaimCommand,

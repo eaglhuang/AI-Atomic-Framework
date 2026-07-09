@@ -159,6 +159,30 @@ async function main() {
     const quickfixRelease = await runQuickfix(['release', '--cwd', tempRoot, '--actor', 'prompt-scope-test', '--json']);
     assert((quickfixRelease.evidence.lock as any)?.status === 'released', 'quickfix release must mark the lock as released');
 
+    const frameworkRoot = mkdtempSync(path.join(process.cwd(), '.atm-temp', 'prompt-scoped-framework-'));
+    try {
+      mkdirSync(path.join(frameworkRoot, 'packages', 'cli', 'src'), { recursive: true });
+      mkdirSync(path.join(frameworkRoot, 'packages', 'core', 'src'), { recursive: true });
+      writeFileSync(path.join(frameworkRoot, 'package.json'), `${JSON.stringify({ name: 'ai-atomic-framework' }, null, 2)}\n`, 'utf8');
+      writeFileSync(path.join(frameworkRoot, 'packages', 'cli', 'src', 'atm.ts'), 'export {};\n', 'utf8');
+      writeFileSync(path.join(frameworkRoot, 'packages', 'core', 'src', 'index.ts'), 'export {};\n', 'utf8');
+      writeFileSync(path.join(frameworkRoot, 'atomic-registry.json'), '{}\n', 'utf8');
+      runGit(frameworkRoot, ['init']);
+      runGit(frameworkRoot, ['config', 'user.name', 'prompt-scope-validator']);
+      runGit(frameworkRoot, ['config', 'user.email', 'prompt-scope-validator@example.com']);
+      runGit(frameworkRoot, ['add', '.']);
+      runGit(frameworkRoot, ['commit', '-m', 'framework fixture baseline']);
+      const frameworkPrompt = '修正 ATM backlog 中最嚴重卡住治理的 bug';
+      const frameworkRoute = await runNext(['--cwd', frameworkRoot, '--prompt', frameworkPrompt]);
+      const frameworkAction = frameworkRoute.evidence.nextAction as any;
+      assert(frameworkRoute.messages.some((entry) => entry.code === 'ATM_NEXT_FRAMEWORK_TEMP_CLAIM_REQUIRED'), 'framework maintenance prompt must require framework temp claim');
+      assert(String(frameworkAction?.command ?? '').includes('framework-mode claim'), 'framework maintenance route command must use framework-mode claim');
+      assert(String(frameworkAction?.playbook?.steps?.[0] ?? '').includes('framework-mode claim'), 'framework fast playbook first step must use framework-mode claim');
+      assert(!String(frameworkAction?.playbook?.steps?.[0] ?? '').includes('next --claim'), 'framework fast playbook must not send no-task routes through next --claim');
+    } finally {
+      rmSync(frameworkRoot, { recursive: true, force: true });
+    }
+
     const markdownClaim = await runNext(['--cwd', tempRoot, '--claim', '--actor', 'prompt-scope-test', '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(markdownClaim.ok === false, 'next --claim must not pretend to claim a Markdown-only task card');
     assert(markdownClaim.messages.some((entry) => entry.code === 'ATM_NEXT_CLAIM_TASK_IMPORT_REQUIRED'), 'next --claim must require import for Markdown task cards');
