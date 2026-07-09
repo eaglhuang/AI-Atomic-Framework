@@ -112,6 +112,33 @@ TASK-RFT-0017 split the claim lifecycle cluster out of `packages/cli/src/command
 - `packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts`
 - `scripts/validate-tasks-claim-atomic-map.ts`
 
+## TASK-RFT-0018 Update
+
+TASK-RFT-0018 split the reconcile / repair-closure / deliver-and-close backend cluster out of `packages/cli/src/commands/tasks.ts` while preserving the public `tasks reconcile`, `tasks repair-closure`, and `tasks deliver-and-close` command surfaces.
+
+### Atomic Reconcile Map
+
+| Atom | Module | Responsibility |
+| --- | --- | --- |
+| `tasks.reconcile.delivery` | `packages/cli/src/commands/tasks/reconcile-orchestrator.ts` | Historical delivery reconciliation, command-backed evidence envelope, closure packet creation, close transaction writes, and close-commit-window registration. |
+| `tasks.repair.closure` | `packages/cli/src/commands/tasks/repairclose-orchestrator.ts` | Closure packet repair backend, emergency approval, stale runner override recording, and repair transition staging. |
+| `tasks.deliver.close` | `packages/cli/src/commands/tasks/deliver-close-orchestrator.ts` | Deliver-and-close two-step flow, cross-task mutation guard, batch checkpoint gate, delivery commit creation, close invocation, and governance commit staging. |
+
+### Before / After Line Counts
+
+- Before TASK-RFT-0018: `packages/cli/src/commands/tasks.ts` = 4,503 lines
+- After TASK-RFT-0018: `packages/cli/src/commands/tasks.ts` = 3,786 lines
+- New `packages/cli/src/commands/tasks/reconcile-orchestrator.ts` = 321 lines
+- New `packages/cli/src/commands/tasks/repairclose-orchestrator.ts` = 222 lines
+- New `packages/cli/src/commands/tasks/deliver-close-orchestrator.ts` = 276 lines
+
+### Specs / Validator
+
+- `packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts`
+- `scripts/validate-tasks-reconcile-atomic-map.ts`
+
 ## TASK-RFT-0010 Update
 
 TASK-RFT-0010 split the residual mass inside `packages/cli/src/commands/tasks.ts`

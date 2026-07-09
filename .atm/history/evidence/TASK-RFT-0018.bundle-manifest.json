@@ -1,0 +1,107 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0018",
+  "updatedAt": "2026-07-09T16:43:48.653Z",
+  "updatedBy": "codex-lane-b",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+    "typecheck",
+    "validate:tasks-reconcile-atomic-map"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de037972847a4190480351b171e7d443b578342a99b63d78bbd829303a6cd1f1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-07-09T16:41:03.979Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c02b3665843aea7ab14b9571b4993f8e1a607d833ab5c5f1e5d8d0136f2cf8d5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-07-09T16:41:10.706Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5de6fe9079bc35f8c1c048e75433ea00e5eb3ab4901c854fe2f0a4e895fddf4f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts"
+      ],
+      "generatedAt": "2026-07-09T16:41:18.986Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-tasks-reconcile-atomic-map.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aebf4b416f77af676e7b595b46700abb653f36ee33d870e425419d23447b3265",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:tasks-reconcile-atomic-map"
+      ],
+      "generatedAt": "2026-07-09T16:41:36.793Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "powershell -NoProfile -Command Set-Location C:\\Users\\User\\AI-Atomic-Framework-lane-b-0018; npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-09T16:42:03.101Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "git -C C:\\Users\\User\\AI-Atomic-Framework-lane-b-0018 diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:cac23764273ded22f8dd441d8b608d7c0d094e690e2c88451d564b5a46367812",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-09T16:43:18.841Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "powershell -NoProfile -Command Set-Location C:\\Users\\User\\AI-Atomic-Framework-lane-b-0018; npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-09T16:43:49.089Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
