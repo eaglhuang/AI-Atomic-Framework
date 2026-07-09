@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0153",
+  "title": "Record-only commit lane for task ledger maintenance",
+  "status": "running",
+  "milestone": "RFT-M5",
+  "dependencies": [],
+  "acceptance": [
+    "Add an official `node atm.mjs git record-commit` lane.",
+    "The lane must not require a task-bound session.",
+    "The lane must require explicit actor identity and a commit message.",
+    "The lane must fail closed when staged files are empty or include non-record paths.",
+    "The lane must reject closure packets, protected override audit, and repair-like evidence metadata so high-risk boundaries keep using their dedicated governed surfaces.",
+    "Same-commit `git-head` provenance must still be staged when governed ledger boundary files are committed.",
+    "Help/spec and focused regression coverage must describe the new lane.",
+    "Backlog row `ATM-BUG-2026-07-08-058` must be closed with validator evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "tests/cli/git-record-commit.test.ts",
+    "scripts/validate-cli.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/command-specs/git.spec.ts",
+    "tests/cli/git-record-commit.test.ts",
+    "scripts/validate-cli.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/tasks/TASK-AAO-0153-record-only-commit-lane.task.md",
+    "release/atm-root-drop/",
+    "release/atm-onefile/atm.mjs"
+  ],
+  "validators": [
+    "node --experimental-strip-types tests/cli/git-record-commit.test.ts",
+    "npm run typecheck",
+    "npm run lint",
+    "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+    "npm run validate:cli -- --mode validate",
+    "npm run validate:root-drop-release",
+    "npm run check:encoding:touched",
+    "node atm.mjs doctor --json",
+    "node atm.mjs hook pre-push --json"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing taskflow close, closure packet, repair-closure, or protected override semantics",
+    "Adding a broad auto-stage lane for arbitrary .atm files",
+    "Replacing normal task-bound delivery commits"
+  ],
+  "nonGoals": [
+    "Do not relax protected push, closeout, or same-commit provenance checks"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if record-only commits can include source files, closure packets, protected override audit, or repair-like evidence metadata without the existing governed close/repair lane.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "docs/tasks/TASK-AAO-0153-record-only-commit-lane.task.md",
+    "sectionTitle": "TASK-AAO-0153",
+    "headingLine": 55,
+    "hash": "767ea5a429aa64c3"
+  },
+  "importedAt": "2026-07-09T07:15:49.747Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-4bb9d9e30db6",
+    "claimedAt": "2026-07-09T07:07:22.530Z",
+    "heartbeatAt": "2026-07-09T07:07:22.530Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-0153.*",
+      ".atm/history/protected-override-audit/2026-07-09T07-15-49-743Z-POA-0feec78b63bf.json",
+      ".atm/history/task-events/TASK-AAO-0153/**",
+      ".atm/history/tasks/TASK-AAO-0153.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/git.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/git.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/next.json",
+      "scripts/validate-cli.ts",
+      "tests/cli/git-record-commit.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "owner": "codex-captain",
+  "startedAt": "2026-07-09T07:07:22.530Z",
+  "startedBySessionId": "session-20260709070722-codex-captain-TASK-AAO-0153-c5813fa4d3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0153",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0153.*",
+      ".atm/history/protected-override-audit/2026-07-09T07-15-49-743Z-POA-0feec78b63bf.json",
+      ".atm/history/task-events/TASK-AAO-0153/**",
+      ".atm/history/tasks/TASK-AAO-0153.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/command-specs/git.spec.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/git.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/git.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/next.json",
+      "scripts/validate-cli.ts",
+      "tests/cli/git-record-commit.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/AI-Atomic-Framework/docs/tasks/TASK-AAO-0153-record-only-commit-lane.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/tasks/",
+      "docs/tasks/TASK-AAO-0153-record-only-commit-lane.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "ed21c1437b1101804a3da93cfa3f263fe15ec3804d5552884607f8ebf96479a1",
+    "actorId": "codex-captain",
+    "createdAt": "2026-07-09T07:07:23.329Z",
+    "status": "active"
+  },
+  "lastTransitionId": "2026-07-09T07-23-50-054Z-scope-amendment-de18d50fd280",
+  "lastTransitionAt": "2026-07-09T07:23:50.054Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

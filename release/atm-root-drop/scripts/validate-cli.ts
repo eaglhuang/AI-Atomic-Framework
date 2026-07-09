@@ -431,6 +431,15 @@ const gitCommitTimeoutAndStatusTest = spawnSync(
 );
 assert(gitCommitTimeoutAndStatusTest.status === 0, `git-commit-timeout-and-status focused test must pass: ${gitCommitTimeoutAndStatusTest.stderr || gitCommitTimeoutAndStatusTest.stdout}`);
 
+// ATM-BUG-2026-07-08-058: record-only .atm/history maintenance should have a
+// narrow official commit lane without borrowing a task-bound delivery session.
+const gitRecordCommitTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'tests/cli/git-record-commit.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(gitRecordCommitTest.status === 0, `git-record-commit focused test must pass: ${gitRecordCommitTest.stderr || gitRecordCommitTest.stdout}`);
+
 // ATM-BUG-2026-07-07-054 (OPT-11): `run-validators.ts` must expose a
 // read-only `--status` query, bound hung validators with
 // `--validator-timeout-ms`, and resume an interrupted run by only

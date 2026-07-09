@@ -383,6 +383,9 @@ export async function runAtmGit(argv) {
     if (options.action === 'commit') {
         return runGitCommit(options);
     }
+    if (options.action === 'record-commit') {
+        return runGitRecordCommit(options);
+    }
     if (options.action === 'commit-status') {
         return runGitCommitStatus(options);
     }
@@ -876,6 +879,145 @@ function runGitCommitStatus(options) {
             commitAttemptStatus: status
         }
     });
+}
+function isRecordCommitAllowedPath(filePath) {
+    const normalized = normalizeRelativePath(filePath).toLowerCase();
+    if (!normalized)
+        return false;
+    if (normalized === gitHeadEvidencePaths.legacyJson || normalized === gitHeadEvidencePaths.jsonl)
+        return true;
+    if (isCommitAttributionSideEffectPath(normalized))
+        return true;
+    if (normalized.includes('/protected-override') || normalized.startsWith('.atm/history/protected-override-audit/'))
+        return false;
+    if (normalized.endsWith('.closure-packet.json'))
+        return false;
+    if (normalized.includes('/repair') || normalized.includes('.repair-'))
+        return false;
+    if (normalized.startsWith('.atm/history/tasks/') && normalized.endsWith('.json'))
+        return true;
+    if (normalized.startsWith('.atm/history/task-events/') && normalized.endsWith('.json'))
+        return true;
+    if (normalized.startsWith('.atm/history/reports/task-import/') && normalized.endsWith('.json'))
+        return true;
+    if (normalized.startsWith('.atm/history/evidence/historical-batches/') && normalized.endsWith('.json'))
+        return true;
+    if (/^\.atm\/history\/evidence\/[^/]+(?:\.bundle-manifest)?\.json$/.test(normalized))
+        return true;
+    return false;
+}
+function runGitRecordCommit(options) {
+    const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+    if (!resolvedActor) {
+        throw new CliError('ATM_ACTOR_ID_MISSING', `git record-commit requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
+    }
+    requireExplicitGitActor(resolvedActor, 'git record-commit');
+    if (!options.message) {
+        throw new CliError('ATM_CLI_USAGE', 'git record-commit requires --message <summary>.', { exitCode: 2 });
+    }
+    if (options.taskId) {
+        throw new CliError('ATM_GIT_RECORD_COMMIT_TASK_FORBIDDEN', 'git record-commit is task-session-free and does not accept --task; use git commit for task-bound delivery commits.', { exitCode: 2 });
+    }
+    if (options.autoStage || options.deferForeignStaged || options.noVerify) {
+        throw new CliError('ATM_GIT_RECORD_COMMIT_UNSUPPORTED_FLAG', 'git record-commit requires explicit staged record files and does not support --auto-stage, --defer-foreign-staged, or --no-verify.', {
+            exitCode: 2,
+            details: {
+                autoStage: options.autoStage,
+                deferForeignStaged: options.deferForeignStaged,
+                noVerify: options.noVerify
+            }
+        });
+    }
+    const stagedFiles = readStagedFiles(options.cwd);
+    if (stagedFiles.length === 0) {
+        throw new CliError('ATM_GIT_RECORD_COMMIT_EMPTY_INDEX', 'git record-commit requires explicitly staged .atm/history record files.', {
+            exitCode: 1,
+            details: {
+                allowedPrefixes: [
+                    '.atm/history/tasks/',
+                    '.atm/history/task-events/',
+                    '.atm/history/evidence/',
+                    '.atm/history/reports/task-import/'
+                ]
+            }
+        });
+    }
+    const blockedFiles = stagedFiles.filter((filePath) => !isRecordCommitAllowedPath(filePath));
+    if (blockedFiles.length > 0) {
+        throw new CliError('ATM_GIT_RECORD_COMMIT_SCOPE_VIOLATION', 'git record-commit only accepts low-risk .atm/history record files; use the dedicated governed lane for source, closure, repair, or protected override bundles.', {
+            exitCode: 1,
+            details: {
+                blockedFiles,
+                stagedFiles,
+                highRiskBoundaries: [
+                    'closure packets',
+                    'protected override audit',
+                    'repair metadata',
+                    'source or docs deliverables'
+                ]
+            }
+        });
+    }
+    const actorId = resolvedActor.actorId;
+    const trailers = [
+        `ATM-Actor: ${actorId}`,
+        'ATM-Record-Commit: true',
+        ...options.extraTrailers
+    ];
+    if (options.dryRun) {
+        return makeResult({
+            ok: true,
+            command: 'git',
+            cwd: options.cwd,
+            messages: [message('info', 'ATM_GIT_RECORD_COMMIT_DRY_RUN', 'git record-commit dry-run accepted the staged low-risk record files without mutating HEAD.', {
+                    actorId,
+                    stagedFiles
+                })],
+            evidence: {
+                action: 'record-commit',
+                dryRun: true,
+                actorId,
+                taskId: null,
+                stagedFiles,
+                trailers,
+                copyableCommitCommand: buildCopyableGitCommitCommand({
+                    cwd: options.cwd,
+                    message: options.message,
+                    trailers
+                })
+            }
+        });
+    }
+    const result = runGitCommit({
+        ...options,
+        action: 'commit',
+        taskId: null,
+        autoStage: false,
+        deferForeignStaged: false,
+        noVerify: false,
+        extraTrailers: trailers.slice(1)
+    });
+    return {
+        ...result,
+        messages: [
+            message('info', 'ATM_GIT_RECORD_COMMIT_OK', 'Created a governed record-only commit for low-risk .atm/history maintenance.', {
+                actorId,
+                stagedFiles
+            }),
+            ...result.messages
+        ],
+        evidence: {
+            ...(result.evidence && typeof result.evidence === 'object' ? result.evidence : {}),
+            action: 'record-commit',
+            actorId,
+            taskId: null,
+            recordCommit: {
+                stagedFiles,
+                policy: 'low-risk-atm-history-records-only',
+                highRiskBoundariesRejected: true
+            }
+        }
+    };
 }
 function runGitCommit(options) {
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -1646,13 +1788,13 @@ function parseGitOptions(argv) {
         if (options.action) {
             throw new CliError('ATM_CLI_USAGE', 'git accepts only one action.', { exitCode: 2 });
         }
-        if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'commit-status') {
-            throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit, commit-status', { exitCode: 2 });
+        if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status') {
+            throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit, record-commit, commit-status', { exitCode: 2 });
         }
         options.action = arg;
     }
     if (!options.action) {
-        throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | recover-push-fail | check | commit).', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | recover-push-fail | check | commit | record-commit | commit-status).', { exitCode: 2 });
     }
     return {
         ...options,

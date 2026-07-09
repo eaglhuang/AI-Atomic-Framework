@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'git',
-  summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
+  summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
   positional: [
-    { name: 'action', summary: 'prepare | admit | recover-push-fail | check | commit | commit-status', required: true }
+    { name: 'action', summary: 'prepare | admit | recover-push-fail | check | commit | record-commit | commit-status', required: true }
   ],
   options: [
     commonCwdOption,
@@ -30,7 +30,7 @@ export default defineCommandSpec({
     { flag: '--trailer', value: 'text', summary: 'Repeatable extra trailer line for git commit (e.g. an editor-injected Co-authored-by line); folded into the governed trailer set instead of failing the commit.' },
     { flag: '--auto-stage', summary: 'Stage only the current task allowed delivery bundle before commit; report skipped external dirty files without using git add .' },
     { flag: '--defer-foreign-staged', summary: 'Snapshot and unstage foreign task governance files already in the index before resolving the bundle; never silent.' },
-    { flag: '--dry-run', summary: 'Resolve the task-scoped commit bundle without staging or committing.' },
+    { flag: '--dry-run', summary: 'Resolve the task-scoped commit bundle without staging or committing; for record-commit, validate the staged record-only scope without mutating HEAD.' },
     { flag: '--no-verify', summary: 'Emergency-only pass-through to git commit; requires --emergency-approval with backend.gitHookBypass permission.' },
     { flag: '--emergency-approval', value: 'leaseId', summary: 'Required when --no-verify is used; must authorize backend.gitHookBypass.' },
     { flag: '--reason', value: 'text', summary: 'Human-readable reason for the governed hook bypass when using --no-verify.' },
@@ -55,6 +55,8 @@ export default defineCommandSpec({
     'node atm.mjs git commit --actor codex-main --task TASK-AAO-0141 --message "feat: scoped deliverable" --auto-stage --json',
     'node atm.mjs git commit --actor codex-main --task TASK-AAO-0141 --message "feat: scoped deliverable" --dry-run --json',
     'node atm.mjs git commit --actor codex-main --task TASK-AAO-0141 --message "feat: scoped deliverable" --auto-stage --timeout-ms 30000 --json',
+    'node atm.mjs git record-commit --actor codex-main --message "atm: sync imported task records" --dry-run --json',
+    'node atm.mjs git record-commit --actor codex-main --message "atm: sync imported task records" --json',
     'node atm.mjs git commit-status --actor codex-main --task TASK-AAO-0141 --json'
   ]
 });
