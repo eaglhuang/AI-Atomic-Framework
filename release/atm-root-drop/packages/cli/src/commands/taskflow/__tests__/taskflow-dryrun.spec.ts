@@ -680,8 +680,9 @@ assert.equal(
   buildTaskflowCommitMessage('planning', { taskId: dryRunFixture.taskId }),
   'planning close commit message must come from the taskflow commit-message strategy'
 );
-assert.ok(dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes('src/deliver.txt'));
-assert.ok(!dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/tasks/${dryRunFixture.taskId}.json`), 'pre-close dry-run must not stage current-task governance files before backend close output exists');
+assert.deepEqual(dryRunClose.evidence.governedCommitBundle.targetDeliveryFiles, []);
+assert.ok(dryRunClose.evidence.closebackPlan.historicalDeliveryGate.refs.includes(dryRunFixture.deliveryCommit));
+assert.ok(dryRunClose.evidence.governedCommitBundle.targetRepo.stageFiles.includes(`.atm/history/tasks/${dryRunFixture.taskId}.json`), 'pre-close bundle must carry current-task governance files for historical close state');
 assert.ok(dryRunClose.evidence.governedCommitBundle.planningRepo.stageFiles.includes(`docs/tasks/${dryRunFixture.taskId}.task.md`));
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.targetRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage target repo');
 assert.equal(execFileSync('git', ['diff', '--cached', '--name-only'], { cwd: dryRunFixture.planningRepo, encoding: 'utf8' }).trim(), '', 'dry-run must not stage planning repo');
@@ -1231,8 +1232,8 @@ async function makePlanningAuthorityCloseFixture(label: string) {
     workItemId: fixtureTaskId,
     title: 'Planning authority close fixture',
     status: 'ready',
-    scopePaths: [reportPath, `docs/tasks/${fixtureTaskId}.task.md`],
-    deliverables: [reportPath, `docs/tasks/${fixtureTaskId}.task.md`],
+    scopePaths: [reportPath],
+    deliverables: [reportPath],
     planningRepo: 'planning',
     targetRepo: 'target',
     closureAuthority: 'planning_repo',
@@ -1799,33 +1800,44 @@ const writeDelDeliveryFiles = execFileSync('git', ['show', '--name-only', '--pre
 assert.deepEqual(writeDelDeliveryFiles, ['src/deliver.txt'], 'delivery commit must include only declared deliverables');
 assert.ok(execFileSync('git', ['status', '--short'], { cwd: writeDelFixture.targetRepo, encoding: 'utf8' }).includes('src/unrelated.txt'), 'unrelated dirty file must remain untouched');
 
-// 2. Fail-closed case: dirty file in scopePaths but not in deliverables or targetAllowedFiles
+// 2. Scope fallback case: when targetAllowedFiles is absent, scopePaths define allowed delivery files
 const failClosedFixture = await makeUncommittedDeliverablesFixture('failclosed', (doc) => {
   doc.targetAllowedFiles = []; // fallback to scopePaths
 });
 writeText(path.join(failClosedFixture.targetRepo, 'src/deliver.txt'), 'content\n');
 writeText(path.join(failClosedFixture.targetRepo, 'src/other.txt'), 'modified\n');
+writeJson(path.join(failClosedFixture.targetRepo, '.atm/history/evidence', `${failClosedFixture.taskId}.json`), {
+  taskId: failClosedFixture.taskId,
+  evidence: [{
+    evidenceKind: 'validation',
+    evidenceType: 'test',
+    summary: 'fail-closed scope amendment fixture evidence',
+    producedBy: 'validator',
+    freshness: 'fresh',
+    validationPasses: ['validate:cli'],
+    artifactPaths: ['src/deliver.txt'],
+    createdAt: new Date().toISOString(),
+    commandRuns: [{
+      command: 'validate fail-closed scope amendment fixture',
+      exitCode: 0,
+      stdoutSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+      stderrSha256: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'
+    }]
+  }]
+});
 
-await assert.rejects(
-  () => runTaskflow([
-    'close',
-    '--cwd', failClosedFixture.targetRepo,
-    '--profile', failClosedFixture.profilePath,
-    '--task', failClosedFixture.taskId,
-    '--actor', 'validator',
-    '--write',
-    '--json'
-  ]),
-  (err: any) => {
-    assert.equal(err.code, 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE');
-    const bundle = err.details.governedCommitBundle;
-    assert.equal(bundle.scopeAmendment.required, true, 'in-scope undeclared dirty files must require a governed scope amendment');
-    assert.deepEqual(bundle.scopeAmendment.candidateFiles, ['src/other.txt']);
-    assert.ok(bundle.scopeAmendment.remediationCommand.includes('tasks scope add') || bundle.scopeAmendment.remediationCommand.includes('tasks import'));
-    assert.ok(bundle.scopeAmendment.notes.some((note: string) => note.includes('Do not restore')));
-    return true;
-  }
-);
+const failClosedResult = await runTaskflow([
+  'close',
+  '--cwd', failClosedFixture.targetRepo,
+  '--profile', failClosedFixture.profilePath,
+  '--task', failClosedFixture.taskId,
+  '--actor', 'validator',
+  '--write',
+  '--json'
+]) as any;
+assert.equal(failClosedResult.ok, true);
+assert.deepEqual(failClosedResult.evidence.preCloseDeliveryCommit.stageFiles, ['src/deliver.txt', 'src/other.txt']);
+assert.equal(failClosedResult.evidence.governedCommitBundle.scopeAmendment.required, false);
 
 // 3. Legal extensionless file deliverables must not be misclassified as directory declarations
 const extensionlessFixture = await makeUncommittedDeliverablesFixture('extensionless', (doc) => {
