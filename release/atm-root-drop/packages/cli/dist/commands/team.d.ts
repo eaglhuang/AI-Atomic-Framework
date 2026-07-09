@@ -36,6 +36,7 @@ type PermissionLease = {
 type TeamPermissionValidationOptions = {
     allowedWritePaths?: string[];
     repoRoot?: string;
+    allowEmptyWriteScope?: boolean;
 };
 type TeamCrewRole = {
     role: string;
@@ -485,6 +486,7 @@ export declare function buildTeamPlan(input: {
         findings: PermissionFinding[];
     };
     brokerLane: TeamBrokerLaneEvidence;
+    allowEmptyWriteScope?: boolean;
     knowledgeSummary?: TeamKnowledgeSummary;
 }): {
     requiredRoles: TeamCrewRole[];

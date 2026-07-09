@@ -345,6 +345,39 @@ async function main() {
       ['evidence.write', 'file.write', 'git.write', 'task.lifecycle']
     );
 
+    const crossRepoRoot = createTempWorkspace('team-cross-repo-planning-');
+    const targetRepo = path.join(crossRepoRoot, 'target');
+    const planningRepo = path.join(crossRepoRoot, 'planning');
+    const planningCardPath = path.join(planningRepo, 'docs', 'ai_atomic_framework', 'rft-hardening', 'tasks', 'TASK-AAO-0118.task.md');
+    mkdirSync(path.join(targetRepo, '.atm', 'history', 'tasks'), { recursive: true });
+    mkdirSync(path.dirname(planningCardPath), { recursive: true });
+    writeFileSync(planningCardPath, '# Planning-only Phase 0 card\n', 'utf8');
+    writeFileSync(path.join(targetRepo, '.atm', 'history', 'tasks', 'TASK-CROSS-PLANNING.json'), `${JSON.stringify({
+      schemaId: 'atm.task.v1',
+      workItemId: 'TASK-CROSS-PLANNING',
+      title: 'Cross repo planning-only team validation',
+      status: 'ready',
+      planningRepo,
+      targetRepo,
+      scopePaths: [planningCardPath],
+      deliverables: [],
+      validators: ['node --version']
+    }, null, 2)}\n`, 'utf8');
+    try {
+      const planningOnly = await runTeam(['validate', '--task', 'TASK-CROSS-PLANNING', '--cwd', targetRepo, '--json']);
+      const planningOnlyEvidence = planningOnly.evidence as any;
+      assert.equal(planningOnly.ok, true, 'planning-repo absolute scope paths must not block Team validate as write traversal');
+      assert.equal(planningOnlyEvidence?.validation?.ok, true);
+      assert.deepEqual(planningOnlyEvidence?.suggestedPermissionLeases?.filter((lease: any) => lease.permission === 'file.write') ?? [], []);
+      assert.equal(
+        planningOnlyEvidence?.validation?.findings?.some((finding: any) => finding.code === 'ATM_TEAM_WRITE_SCOPE_TRAVERSAL'),
+        false,
+        'planning-repo absolute paths must be classified away from file.write traversal findings'
+      );
+    } finally {
+      rmSync(crossRepoRoot, { recursive: true, force: true });
+    }
+
     console.log('[validate-team-agents] ok (permission-lease)');
     return;
   }

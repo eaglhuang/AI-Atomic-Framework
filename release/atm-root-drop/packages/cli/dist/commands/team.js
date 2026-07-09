@@ -942,10 +942,12 @@ async function buildTeamPlanningContext(input) {
         requestedRecipeId: input.requestedRecipeId,
         task
     });
-    const writePaths = deriveWritePaths(task, input.cwd);
+    const writeScope = deriveTeamWriteScope(task, input.cwd);
+    const writePaths = writeScope.writePaths;
     const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
         allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
-        repoRoot: input.cwd
+        repoRoot: input.cwd,
+        allowEmptyWriteScope: writeScope.allowEmptyWriteScope
     });
     const parallelFindings = [];
     try {
@@ -991,6 +993,7 @@ async function buildTeamPlanningContext(input) {
         writePaths,
         validation,
         brokerLane,
+        allowEmptyWriteScope: writeScope.allowEmptyWriteScope,
         knowledgeSummary: buildTeamKnowledgeSummary({
             cwd: input.cwd,
             taskId: String(task.workItemId ?? task.taskId ?? input.taskId),
@@ -1107,7 +1110,7 @@ function inferTaskLanguage(task) {
 }
 export function validateTeamPermissionModel(recipe, writePaths, options = {}) {
     const agentRoles = new Map(recipe.agents.map((agent) => [agent.agentId, agent.role]));
-    return mergeValidation(validateTeamRecipe(recipe, agentRoles), validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths), agentRoles, options));
+    return mergeValidation(validateTeamRecipe(recipe, agentRoles), validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths, options), agentRoles, options));
 }
 export function planTeamBrokerLane(input) {
     const brokerLaneResult = evaluateTeamBrokerLane(input);
@@ -1301,7 +1304,7 @@ function validatePermissionLeases(leases, agentRoles, options = {}) {
                 lease.agentId
             ]);
         }
-        if (definition.scopeRequired && (!Array.isArray(lease.paths) || lease.paths.length === 0)) {
+        if (definition.scopeRequired && (!Array.isArray(lease.paths) || lease.paths.length === 0) && !options.allowEmptyWriteScope) {
             findings.push(buildPermissionFinding({
                 level: 'error',
                 code: 'ATM_TEAM_PERMISSION_SCOPE_REQUIRED',
@@ -1437,7 +1440,7 @@ function mergeValidation(...reports) {
         findings
     };
 }
-function buildSuggestedPermissionLeases(recipe, writePaths) {
+function buildSuggestedPermissionLeases(recipe, writePaths, options = {}) {
     const coordinator = recipe.agents.find((agent) => agent.role === 'coordinator') ?? null;
     const fileWriteOwner = recipe.agents.find((agent) => agent.permissions.includes('file.write')) ?? null;
     return [
@@ -1446,7 +1449,7 @@ function buildSuggestedPermissionLeases(recipe, writePaths) {
             { permission: 'git.write', agentId: coordinator.agentId },
             { permission: 'evidence.write', agentId: coordinator.agentId }
         ] : []),
-        ...(fileWriteOwner ? [{
+        ...(fileWriteOwner && (writePaths.length > 0 || !options.allowEmptyWriteScope) ? [{
                 permission: 'file.write',
                 agentId: fileWriteOwner.agentId,
                 paths: writePaths
@@ -1490,7 +1493,7 @@ export function buildTeamPlan(input) {
             permissions: input.recipe.agents.find((agent) => agent.role === 'atomizationPlanner')?.permissions ?? []
         },
         atomizationChecklist,
-        suggestedPermissionLeases: buildSuggestedPermissionLeases(input.recipe, input.writePaths),
+        suggestedPermissionLeases: buildSuggestedPermissionLeases(input.recipe, input.writePaths, { allowEmptyWriteScope: input.allowEmptyWriteScope }),
         nextSteps: [
             'Review this dry-run plan.',
             'Run team start when you want a runtime team run record.',
@@ -2734,14 +2737,69 @@ function normalizeTeamBrokerPilotFindings(brokerLane, promotionTarget) {
     }));
 }
 function deriveWritePaths(task, repoRoot) {
-    const candidates = [
-        ...normalizeTaskPathArray(task?.targetAllowedFiles, repoRoot),
-        ...normalizeTaskPathArray(task?.deliverables, repoRoot),
-        ...normalizeTaskPathArray(task?.scopePaths, repoRoot)
+    return deriveTeamWriteScope(task, repoRoot).writePaths;
+}
+function deriveTeamWriteScope(task, repoRoot) {
+    const explicitAllowed = normalizeTaskPathArray(task?.targetAllowedFiles, repoRoot);
+    if (explicitAllowed.length > 0) {
+        return {
+            writePaths: normalizeTaskWriteScope(explicitAllowed, repoRoot),
+            planningReadOnlyPaths: [],
+            allowEmptyWriteScope: false
+        };
+    }
+    const rawCandidates = [
+        ...normalizeStringArray(task?.deliverables),
+        ...normalizeStringArray(task?.scopePaths)
     ];
-    return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
+    const candidates = normalizeTargetWritePathArray(rawCandidates, repoRoot);
+    const planningReadOnlyPaths = collectPlanningReadOnlyPaths(task, repoRoot, rawCandidates);
+    const writePaths = uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
         return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
     }));
+    return {
+        writePaths,
+        planningReadOnlyPaths,
+        allowEmptyWriteScope: writePaths.length === 0 && planningReadOnlyPaths.length > 0
+    };
+}
+function collectPlanningReadOnlyPaths(task, repoRoot, rawCandidates) {
+    const planningRepo = String(task?.planningRepo ?? '').trim();
+    if (!planningRepo)
+        return [];
+    const planningRoot = path.isAbsolute(planningRepo)
+        ? path.resolve(planningRepo)
+        : (repoRoot ? path.resolve(repoRoot, planningRepo) : '');
+    if (!planningRoot)
+        return [];
+    return uniqueStrings(rawCandidates.map((entry) => normalizeAbsolutePathUnderRoot(entry, planningRoot)).filter(Boolean));
+}
+function normalizeAbsolutePathUnderRoot(rawPath, rootPath) {
+    const raw = String(rawPath).trim();
+    if (!raw || !path.isAbsolute(raw))
+        return '';
+    const candidate = path.resolve(raw);
+    const relative = path.relative(path.resolve(rootPath), candidate);
+    if (!relative || relative === '')
+        return '';
+    if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative))
+        return '';
+    return relative.replace(/\\/g, '/');
+}
+function normalizeTargetWritePathArray(paths, repoRoot) {
+    return paths
+        .map((entry) => normalizeTargetWritePath(entry, repoRoot))
+        .filter((entry) => Boolean(entry) && validateStrictPathHeuristic(entry) === null);
+}
+function normalizeTargetWritePath(rawPath, repoRoot) {
+    const raw = String(rawPath).trim();
+    if (!raw)
+        return '';
+    const normalizedRaw = raw.replace(/\\/g, '/');
+    if ((normalizedRaw.startsWith('/') || /^[A-Za-z]:\//.test(normalizedRaw)) && normalizeRepoAbsoluteLeasePath(raw, repoRoot) === null) {
+        return '';
+    }
+    return normalizeTeamLeasePath(raw, repoRoot);
 }
 function collectTaskPathHints(task) {
     return uniqueStrings([

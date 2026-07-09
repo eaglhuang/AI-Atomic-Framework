@@ -78,6 +78,7 @@ type PermissionLease = {
 type TeamPermissionValidationOptions = {
   allowedWritePaths?: string[];
   repoRoot?: string;
+  allowEmptyWriteScope?: boolean;
 };
 
 type TeamCrewRole = {
@@ -1446,10 +1447,12 @@ async function buildTeamPlanningContext(input: {
     requestedRecipeId: input.requestedRecipeId,
     task
   });
-  const writePaths = deriveWritePaths(task, input.cwd);
+  const writeScope = deriveTeamWriteScope(task, input.cwd);
+  const writePaths = writeScope.writePaths;
   const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
     allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
-    repoRoot: input.cwd
+    repoRoot: input.cwd,
+    allowEmptyWriteScope: writeScope.allowEmptyWriteScope
   });
 
   const parallelFindings: PermissionFinding[] = [];
@@ -1502,6 +1505,7 @@ async function buildTeamPlanningContext(input: {
     writePaths,
     validation,
     brokerLane,
+    allowEmptyWriteScope: writeScope.allowEmptyWriteScope,
     knowledgeSummary: buildTeamKnowledgeSummary({
       cwd: input.cwd,
       taskId: String(task.workItemId ?? task.taskId ?? input.taskId),
@@ -1634,7 +1638,7 @@ export function validateTeamPermissionModel(
   const agentRoles = new Map(recipe.agents.map((agent) => [agent.agentId, agent.role]));
   return mergeValidation(
     validateTeamRecipe(recipe, agentRoles),
-    validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths), agentRoles, options)
+    validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths, options), agentRoles, options)
   );
 }
 
@@ -1868,7 +1872,7 @@ function validatePermissionLeases(
         lease.agentId
       ]);
     }
-    if (definition.scopeRequired && (!Array.isArray(lease.paths) || lease.paths.length === 0)) {
+    if (definition.scopeRequired && (!Array.isArray(lease.paths) || lease.paths.length === 0) && !options.allowEmptyWriteScope) {
       findings.push(buildPermissionFinding({
         level: 'error',
         code: 'ATM_TEAM_PERMISSION_SCOPE_REQUIRED',
@@ -2015,7 +2019,7 @@ function mergeValidation(...reports: { ok: boolean; findings: PermissionFinding[
   };
 }
 
-function buildSuggestedPermissionLeases(recipe: TeamRecipe, writePaths: string[]): PermissionLease[] {
+function buildSuggestedPermissionLeases(recipe: TeamRecipe, writePaths: string[], options: TeamPermissionValidationOptions = {}): PermissionLease[] {
   const coordinator = recipe.agents.find((agent) => agent.role === 'coordinator') ?? null;
   const fileWriteOwner = recipe.agents.find((agent) => agent.permissions.includes('file.write')) ?? null;
   return [
@@ -2024,7 +2028,7 @@ function buildSuggestedPermissionLeases(recipe: TeamRecipe, writePaths: string[]
       { permission: 'git.write', agentId: coordinator.agentId },
       { permission: 'evidence.write', agentId: coordinator.agentId }
     ] : []),
-    ...(fileWriteOwner ? [{
+    ...(fileWriteOwner && (writePaths.length > 0 || !options.allowEmptyWriteScope) ? [{
       permission: 'file.write',
       agentId: fileWriteOwner.agentId,
       paths: writePaths
@@ -2038,6 +2042,7 @@ export function buildTeamPlan(input: {
   writePaths: string[];
   validation: { ok: boolean; findings: PermissionFinding[] };
   brokerLane: TeamBrokerLaneEvidence;
+  allowEmptyWriteScope?: boolean;
   knowledgeSummary?: TeamKnowledgeSummary;
 }) {
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
@@ -2076,7 +2081,7 @@ export function buildTeamPlan(input: {
       permissions: input.recipe.agents.find((agent) => agent.role === 'atomizationPlanner')?.permissions ?? []
     },
     atomizationChecklist,
-    suggestedPermissionLeases: buildSuggestedPermissionLeases(input.recipe, input.writePaths),
+    suggestedPermissionLeases: buildSuggestedPermissionLeases(input.recipe, input.writePaths, { allowEmptyWriteScope: input.allowEmptyWriteScope }),
     nextSteps: [
       'Review this dry-run plan.',
       'Run team start when you want a runtime team run record.',
@@ -3574,14 +3579,69 @@ function normalizeTeamBrokerPilotFindings(
 }
 
 function deriveWritePaths(task: Record<string, unknown> | null | undefined, repoRoot?: string) {
-  const candidates = [
-    ...normalizeTaskPathArray((task as { targetAllowedFiles?: unknown })?.targetAllowedFiles, repoRoot),
-    ...normalizeTaskPathArray((task as { deliverables?: unknown })?.deliverables, repoRoot),
-    ...normalizeTaskPathArray((task as { scopePaths?: unknown })?.scopePaths, repoRoot)
+  return deriveTeamWriteScope(task, repoRoot).writePaths;
+}
+
+function deriveTeamWriteScope(task: Record<string, unknown> | null | undefined, repoRoot?: string) {
+  const explicitAllowed = normalizeTaskPathArray((task as { targetAllowedFiles?: unknown })?.targetAllowedFiles, repoRoot);
+  if (explicitAllowed.length > 0) {
+    return {
+      writePaths: normalizeTaskWriteScope(explicitAllowed, repoRoot),
+      planningReadOnlyPaths: [] as string[],
+      allowEmptyWriteScope: false
+    };
+  }
+
+  const rawCandidates = [
+    ...normalizeStringArray((task as { deliverables?: unknown })?.deliverables),
+    ...normalizeStringArray((task as { scopePaths?: unknown })?.scopePaths)
   ];
-  return uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
+  const candidates = normalizeTargetWritePathArray(rawCandidates, repoRoot);
+  const planningReadOnlyPaths = collectPlanningReadOnlyPaths(task, repoRoot, rawCandidates);
+  const writePaths = uniqueStrings(candidates.map((entry) => normalizeTeamLeasePath(entry, repoRoot)).filter((normalized) => {
     return normalized && !normalized.startsWith('.atm/runtime/') && !normalized.startsWith('.atm/history/');
   }));
+  return {
+    writePaths,
+    planningReadOnlyPaths,
+    allowEmptyWriteScope: writePaths.length === 0 && planningReadOnlyPaths.length > 0
+  };
+}
+
+function collectPlanningReadOnlyPaths(task: Record<string, unknown> | null | undefined, repoRoot: string | undefined, rawCandidates: string[]) {
+  const planningRepo = String((task as { planningRepo?: unknown } | null | undefined)?.planningRepo ?? '').trim();
+  if (!planningRepo) return [];
+  const planningRoot = path.isAbsolute(planningRepo)
+    ? path.resolve(planningRepo)
+    : (repoRoot ? path.resolve(repoRoot, planningRepo) : '');
+  if (!planningRoot) return [];
+  return uniqueStrings(rawCandidates.map((entry) => normalizeAbsolutePathUnderRoot(entry, planningRoot)).filter(Boolean));
+}
+
+function normalizeAbsolutePathUnderRoot(rawPath: string, rootPath: string) {
+  const raw = String(rawPath).trim();
+  if (!raw || !path.isAbsolute(raw)) return '';
+  const candidate = path.resolve(raw);
+  const relative = path.relative(path.resolve(rootPath), candidate);
+  if (!relative || relative === '') return '';
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return '';
+  return relative.replace(/\\/g, '/');
+}
+
+function normalizeTargetWritePathArray(paths: string[], repoRoot?: string) {
+  return paths
+    .map((entry) => normalizeTargetWritePath(entry, repoRoot))
+    .filter((entry) => Boolean(entry) && validateStrictPathHeuristic(entry) === null);
+}
+
+function normalizeTargetWritePath(rawPath: string, repoRoot?: string) {
+  const raw = String(rawPath).trim();
+  if (!raw) return '';
+  const normalizedRaw = raw.replace(/\\/g, '/');
+  if ((normalizedRaw.startsWith('/') || /^[A-Za-z]:\//.test(normalizedRaw)) && normalizeRepoAbsoluteLeasePath(raw, repoRoot) === null) {
+    return '';
+  }
+  return normalizeTeamLeasePath(raw, repoRoot);
 }
 
 function collectTaskPathHints(task: Record<string, unknown> | null | undefined) {
