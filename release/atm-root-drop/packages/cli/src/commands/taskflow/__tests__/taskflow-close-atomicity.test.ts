@@ -98,7 +98,7 @@ async function makeCloseAtomicityFixture(label: string) {
   execFileSync('git', ['add', '.'], { cwd: planningRepo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'base planning'], { cwd: planningRepo, stdio: 'ignore' });
 
-  const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', taskId]);
+  const claim = await runNext(['--cwd', targetRepo, '--claim', '--actor', 'validator', '--task', taskId, '--claim-intent', 'write']);
   assert.equal(claim.ok, true);
 
   writeText(path.join(targetRepo, 'src/deliver.txt'), 'delivery content\n');
