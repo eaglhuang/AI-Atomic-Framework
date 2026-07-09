@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0156",
   "title": "Fence .atm history mutation and staged ownership so weak agents cannot self-clean other lanes",
-  "status": "running",
+  "status": "done",
   "milestone": "RFT-M5",
   "dependencies": [],
   "acceptance": [
@@ -57,8 +57,8 @@
     "hash": "6d3949956030c4dd"
   },
   "importedAt": "2026-07-09T17:55:31.966Z",
-  "lastTransitionId": "2026-07-09T17-55-41-333Z-claim-90c9490a214b",
-  "lastTransitionAt": "2026-07-09T17:55:41.333Z",
+  "lastTransitionId": "2026-07-09T18-10-18-909Z-close-adad3dbd56da",
+  "lastTransitionAt": "2026-07-09T18:10:18.909Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-07-09T17:55:41.099Z",
@@ -67,7 +67,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-bc53d040e300",
     "claimedAt": "2026-07-09T17:55:41.105Z",
-    "heartbeatAt": "2026-07-09T17:55:41.105Z",
+    "heartbeatAt": "2026-07-09T18:10:18.908Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0156.json",
@@ -77,8 +77,8 @@
       "scripts/run-validators.ts",
       "scripts/validate-cli.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-09T17:55:41.105Z",
   "startedByActor": "codex-captain",
@@ -108,5 +108,9 @@
     "actorId": "codex-captain",
     "createdAt": "2026-07-09T17:55:41.333Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-09T18:10:18.908Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260709175541-codex-captain-TASK-AAO-0156-35ce6379a7",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0156.closure-packet.json"
 }
