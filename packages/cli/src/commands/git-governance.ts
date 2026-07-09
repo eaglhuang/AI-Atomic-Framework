@@ -426,6 +426,7 @@ export interface TaskScopedCommitBundleReport {
   readonly governanceBundleWarnings: readonly string[];
   readonly blockedCode: string | null;
   readonly blockedSummary: string | null;
+  readonly closeoutOnlyMutationFiles: readonly string[];
   readonly gitExecutable: string;
   readonly copyableCommitCommand: string | null;
   readonly deferredForeignStagedSnapshot: string | null;
@@ -1175,7 +1176,10 @@ function runGitCommit(options: ParsedGitOptions) {
           commitBundle: bundleReport,
           copyableCommitCommand,
           unexpectedStagedTasks: bundleReport.unexpectedStagedTasks,
-          skippedExternalDirtyFiles: bundleReport.skippedExternalDirtyFiles
+          skippedExternalDirtyFiles: bundleReport.skippedExternalDirtyFiles,
+          requiredCommand: bundleReport.blockedCode === 'ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION'
+            ? `node atm.mjs next --claim --actor ${quoteCliValue(actorId)} --task ${quoteCliValue(options.taskId)} --claim-intent write --json`
+            : null
         }
       });
     }
@@ -2446,6 +2450,16 @@ export function resolveTaskScopedCommitBundle(input: {
   const outOfScopeStagedDeletions = readStagedDiffNames(input.cwd, 'D').filter((filePath) =>
     !isFileAllowedInTaskBundle(input.cwd, filePath, input.taskId, declaredScope)
   );
+  const taskClaim = parseTaskClaim(input.taskDocument.claim);
+  const claimIntent = input.taskDocument.claim
+    && typeof input.taskDocument.claim === 'object'
+    && !Array.isArray(input.taskDocument.claim)
+    ? normalizeTaskClaimIntent((input.taskDocument.claim as Record<string, unknown>).intent)
+    : 'write';
+  const source = input.taskDocument.source && typeof input.taskDocument.source === 'object' && !Array.isArray(input.taskDocument.source)
+    ? input.taskDocument.source as Record<string, unknown>
+    : {};
+  const planningPath = typeof source.planPath === 'string' ? normalizeRelativePath(source.planPath) : '';
   const governanceBundleWarnings: string[] = [];
   const commitAttributionStageCandidates = unstagedDirtyFiles.filter((filePath) => isCommitAttributionSideEffectPath(filePath));
   const stageCandidates = uniqueSorted([
@@ -2462,6 +2476,15 @@ export function resolveTaskScopedCommitBundle(input: {
   const commitFilesWithGovernanceEvidence = shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)
     ? uniqueSorted([...commitFiles, gitHeadEvidencePath])
     : commitFiles;
+  const closeoutOnlyMutationFiles = claimIntent === 'closeout-only'
+    ? uniqueSorted(commitFiles.filter((filePath) => {
+      const normalized = normalizeRelativePath(filePath);
+      if (!normalized || normalized.startsWith('.atm/')) return false;
+      if (planningPath && normalized === planningPath) return false;
+      if (isCommitAttributionSideEffectPath(normalized)) return false;
+      return declaredScope.some((scope) => pathMatchesTaskScope(normalized, scope));
+    }))
+    : [];
 
   let blockedCode: string | null = null;
   let blockedSummary: string | null = null;
@@ -2472,6 +2495,9 @@ export function resolveTaskScopedCommitBundle(input: {
   } else if (manualReviewResidue.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_GENERATED_RESIDUE_MANUAL_REVIEW';
     blockedSummary = `Generated-looking residue needs manual review before commit: ${manualReviewResidue.map((entry) => entry.path).join(', ')}`;
+  } else if (taskClaim?.state === 'active' && closeoutOnlyMutationFiles.length > 0) {
+    blockedCode = 'ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION';
+    blockedSummary = `Task ${input.taskId} holds a closeout-only claim but the commit bundle contains source mutations: ${closeoutOnlyMutationFiles.join(', ')}. Re-claim with --claim-intent write before committing new source changes.`;
   }
 
   if (!blockedCode && input.apply && stageCandidates.length > 0) {
@@ -2499,6 +2525,7 @@ export function resolveTaskScopedCommitBundle(input: {
     governanceBundleWarnings,
     blockedCode,
     blockedSummary,
+    closeoutOnlyMutationFiles,
     gitExecutable,
     copyableCommitCommand,
     deferredForeignStagedSnapshot,
@@ -2506,6 +2533,12 @@ export function resolveTaskScopedCommitBundle(input: {
     blockedResidue,
     manualReviewResidue
   };
+}
+
+function normalizeTaskClaimIntent(value: unknown): 'write' | 'closeout-only' {
+  if (typeof value !== 'string') return 'write';
+  const normalized = value.trim().toLowerCase();
+  return normalized === 'closeout-only' || normalized === 'no-more-mutation' ? 'closeout-only' : 'write';
 }
 
 function inspectTaskScopedStagedGovernanceBundle(

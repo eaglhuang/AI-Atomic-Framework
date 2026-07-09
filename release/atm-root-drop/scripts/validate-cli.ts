@@ -411,6 +411,16 @@ const gitCommitFailureResidueRollbackTest = spawnSync(
 );
 assert(gitCommitFailureResidueRollbackTest.status === 0, `git-commit-failure-residue-rollback focused test must pass: ${gitCommitFailureResidueRollbackTest.stderr || gitCommitFailureResidueRollbackTest.stdout}`);
 
+// ATM-BUG-2026-07-07-043: a closeout-only task claim must reject source
+// mutations during commit-bundle preflight, before auto-stage or pre-commit
+// hooks can turn the mistake into a slow recovery loop.
+const gitCommitCloseoutOnlyPreflightTest = spawnSync(
+  process.execPath,
+  ['--strip-types', path.join(root, 'tests/cli/git-commit-closeout-only-preflight.test.ts')],
+  { cwd: root, encoding: 'utf8' }
+);
+assert(gitCommitCloseoutOnlyPreflightTest.status === 0, `git-commit-closeout-only-preflight focused test must pass: ${gitCommitCloseoutOnlyPreflightTest.stderr || gitCommitCloseoutOnlyPreflightTest.stdout}`);
+
 // ATM-BUG-2026-07-07-048 (OPT-08): `git commit` must bound a hung pre-commit
 // hook with --timeout-ms and expose a `commit-status` query for the last
 // governed commit attempt.

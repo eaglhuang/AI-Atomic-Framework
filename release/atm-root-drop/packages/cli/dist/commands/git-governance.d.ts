@@ -19,6 +19,7 @@ export interface TaskScopedCommitBundleReport {
     readonly governanceBundleWarnings: readonly string[];
     readonly blockedCode: string | null;
     readonly blockedSummary: string | null;
+    readonly closeoutOnlyMutationFiles: readonly string[];
     readonly gitExecutable: string;
     readonly copyableCommitCommand: string | null;
     readonly deferredForeignStagedSnapshot: string | null;
