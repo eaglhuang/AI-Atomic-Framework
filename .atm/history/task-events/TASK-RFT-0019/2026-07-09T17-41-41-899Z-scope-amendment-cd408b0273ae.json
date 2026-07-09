@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T17-41-41-899Z-scope-amendment-cd408b0273ae",
+  "taskId": "TASK-RFT-0019",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-b",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0019.json",
+  "taskSha256": "sha256:182077df47ff6db425c37f465c7b29c64b35f06ee04f0f3d1085e0336aa9cc0f",
+  "createdAt": "2026-07-09T17:41:41.899Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0019 --actor codex-lane-b --add packages/cli/src/commands/tasks/legacy-impl.ts --reason \"TASK-RFT-0019 final facade relocation needs a transitional compatibility implementation file so tasks.ts can remain a thin facade without changing command behavior.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0019 final facade relocation needs a transitional compatibility implementation file so tasks.ts can remain a thin facade without changing command behavior."
+  }
+}

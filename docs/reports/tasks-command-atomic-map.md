@@ -139,6 +139,44 @@ TASK-RFT-0018 split the reconcile / repair-closure / deliver-and-close backend c
 - `packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts`
 - `scripts/validate-tasks-reconcile-atomic-map.ts`
 
+## TASK-RFT-0019 Update
+
+TASK-RFT-0019 closes Lane B by reducing `packages/cli/src/commands/tasks.ts`
+to a thin compatibility facade and adding explicit atom entry points for task
+card parsing, task-card writing, and scope/queue coordination.
+
+### Final Facade Map
+
+| Atom | Module | Responsibility |
+| --- | --- | --- |
+| `tasks.command.facade` | `packages/cli/src/commands/tasks.ts` | Public compatibility exports and command entrypoint fan-out. The file now contains no parser, writer, scope, queue, parallel, or lock-cleanup function bodies. |
+| `tasks.card.parser` | `packages/atm-markdown-task-source/src/task-card-parser.ts` | Stable package-level import path for markdown task parsing and heading detection. |
+| `tasks.card.writer` | `packages/cli/src/commands/tasks/task-card-writer.ts` | Stable CLI-local import path for task import writes and import evidence writes. |
+| `tasks.scope.queue` | `packages/cli/src/commands/tasks/scope-queue.ts` | Stable atom boundary for scope, queue, parallel, lock cleanup, and roster-update command ownership. |
+| `tasks.legacy.compat` | `packages/cli/src/commands/tasks/legacy-impl.ts` | Transitional compatibility implementation relocated out of `tasks.ts`; retained so the final facade split does not change public JSON fields, exit codes, or command behavior while external AAO/RFT lanes are active. |
+
+### Before / After Line Counts
+
+- Before TASK-RFT-0019: `packages/cli/src/commands/tasks.ts` = 3,786 lines
+- After TASK-RFT-0019: `packages/cli/src/commands/tasks.ts` = 112 lines
+- New `packages/atm-markdown-task-source/src/task-card-parser.ts` = 13 lines
+- New `packages/cli/src/commands/tasks/task-card-writer.ts` = 9 lines
+- New `packages/cli/src/commands/tasks/scope-queue.ts` = 14 lines
+- Transitional `packages/cli/src/commands/tasks/legacy-impl.ts` keeps verbatim compatibility logic for follow-up atom peeling.
+
+### Lane B Boundary Evidence
+
+- RFT-0001 / Lane A `next.ts` surfaces were not touched by this card.
+- RFT-0002 / hook surfaces and AAO 0154-0156 broker files are external lanes and remain outside this delivery.
+- `scripts/validate-tasks-final-facade-atomic-map.ts` asserts the facade line count and verifies that parser/writer/scope-queue function bodies are no longer defined in `tasks.ts`.
+
+### Specs / Validator
+
+- `packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts`
+- `scripts/validate-tasks-final-facade-atomic-map.ts`
+
 ## TASK-RFT-0010 Update
 
 TASK-RFT-0010 split the residual mass inside `packages/cli/src/commands/tasks.ts`
