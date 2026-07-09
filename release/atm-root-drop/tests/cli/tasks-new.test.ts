@@ -11,7 +11,7 @@ const tempDir = path.resolve(root, '.atm-temp-test-new-cli');
 try {
   mkdirSync(tempDir, { recursive: true });
 
-  const outPath = 'TASK-AAO-9999-test.task.md';
+  const outPath = 'docs/tasks/TASK-AAO-9999-test.task.md';
   const targetAbsolute = path.join(tempDir, outPath);
 
   const result = await runTasks([
@@ -40,8 +40,8 @@ try {
   // 驗證內容填入正確
   assert.ok(generatedText.includes('task_id: TASK-AAO-9999'));
   assert.ok(generatedText.includes('title: "Test CLI Generation"'));
-  assert.ok(generatedText.includes('path: "src/commands/tasks.ts"'));
-  assert.ok(generatedText.includes('atom_id: "atm.test-tasks-cli"'));
+  assert.ok(generatedText.includes('- "src/commands/tasks.ts"'));
+  assert.ok(generatedText.includes('ownerAtomOrMap: "atm.test-tasks-cli"'));
 
   const sourceTemplatePath = path.join(root, 'packages/atm-markdown-task-source/templates/aao-l2-split-template.md');
   const packageManifestPath = path.join(root, 'packages/atm-markdown-task-source/package.json');
