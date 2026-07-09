@@ -11,6 +11,7 @@ Do not record non-ATM project bugs here. For adopter/app/game/site/data bugs, cr
 - `ATM-BUG-2026-07-09-059` is fixed by adding a read-only `ATM_NEXT_TASK_SCOPE_AUDIT_ADVISORY` route for missing task-like scope when `requestedAction` is `audit` or `analyze`; mutation-oriented missing scope remains fail-closed.
 - `ATM-BUG-2026-07-07-047` was already fixed before this sync; `npm run validate:prompt-scoped-next` now covers broad all/open/remaining task-card prompts and confirms they route to the discovered batch queue instead of `ATM_NEXT_TASK_SCOPE_NOT_FOUND`.
 - `ATM-BUG-2026-07-08-056` remains observable: after releasing and re-claiming a clean `ATM-FRAMEWORK-TEMP-codex-captain` lock, `doctor` / `tasks audit` can still report it as `stale-completed` with an old linked task even though the lock JSON no longer contains `linkedTaskId`. This is advisory and did not block `hook pre-push`, but it should be fixed before relying on stale-lock audit as a precise signal.
+- `ATM-BUG-2026-07-08-056` is fixed by moving framework lock auto-reconcile audit records to `.atm/runtime/framework-lock-auto-reconcile.jsonl` and by preventing active unlabeled temp locks from inferring stale linked-task context from older actor sessions. Regression coverage lives in `validate:framework-development-governance` and `validate:task-ledger-governance`.
 
 | ID | Date | Repo | Type | Severity | Status | Area | Finding | Expected behavior | Evidence / Repro | Follow-up |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

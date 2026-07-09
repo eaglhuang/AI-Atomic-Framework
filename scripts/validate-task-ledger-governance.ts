@@ -1417,7 +1417,24 @@ try {
   const staleClaimEvidence = (staleClaimResult as any).evidence?.autoReconcile;
   assert(staleClaimEvidence?.schemaId === 'atm.frameworkLockAutoReconcile.v1', 'auto-reconcile claim must emit framework lock auto-reconcile evidence');
   assert(staleClaimEvidence?.outcome === 'reclaimed', 'auto-reconcile evidence must record reclaimed outcome');
-  assert(String(staleClaimEvidence?.auditPath ?? '').includes('framework-lock-auto-reconcile.jsonl'), 'auto-reconcile evidence must report persisted audit path');
+  assert(String(staleClaimEvidence?.auditPath ?? '') === '.atm/runtime/framework-lock-auto-reconcile.jsonl', 'auto-reconcile evidence must report runtime audit path');
+  assert(!existsSync(path.join(fidelityRepo, '.atm', 'history', 'evidence', 'framework-lock-auto-reconcile.jsonl')), 'auto-reconcile evidence must not create protected history singleton evidence');
+  rmSync(staleLockPath, { force: true });
+
+  writeJson(staleLockPath, {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: staleLockTaskId,
+    lockedBy: staleLockActorId,
+    lockedAt: new Date().toISOString(),
+    actorId: staleLockActorId,
+    leaseId: 'lease-fresh-unlabeled-temp-lock',
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 86400,
+    files: ['packages/cli/src/commands/framework-development.ts']
+  });
+  const freshUnlabeledInfo = classifyFrameworkStaleLock(fidelityRepo, staleLockActorId);
+  assert(freshUnlabeledInfo === null, 'fresh unlabeled same-actor temp lock must not infer stale-completed context from older actor sessions');
   rmSync(staleLockPath, { force: true });
 
   // Regression: TASK-AAO-0055 historical done task reconcile / reopen closure sync

@@ -524,10 +524,22 @@ export function classifyFrameworkStaleLock(cwd, actorId, options = {}) {
     if (document.released === true)
         return null;
     const lockedAt = normalizeOptionalString(document.lockedAt ?? null);
-    const linkedTaskId = normalizeOptionalString(document.linkedTaskId ?? null)
-        ?? inferLinkedTaskIdFromActorSessions(root, actorId, lockedAt);
+    const explicitLinkedTaskId = normalizeOptionalString(document.linkedTaskId ?? null);
     const currentTaskId = resolveCurrentFrameworkTaskId(root, actorId, options.currentTaskId ?? null);
     const releaseCommand = buildFrameworkStaleReleaseCommand(actorId);
+    const lockActorId = normalizeOptionalString(document.actorId ?? document.lockedBy);
+    const lockWorkItemId = normalizeOptionalString(document.workItemId ?? null);
+    // A fresh temp framework claim intentionally has no linked task. Do not infer
+    // stale task context from older actor sessions while the lock itself is active.
+    if (!explicitLinkedTaskId
+        && !currentTaskId
+        && lockActorId === actorId
+        && lockWorkItemId === lockId
+        && isRuntimeLockActive(lockPath)) {
+        return null;
+    }
+    const linkedTaskId = explicitLinkedTaskId
+        ?? inferLinkedTaskIdFromActorSessions(root, actorId, lockedAt);
     const base = {
         lockTaskId: lockId,
         lockPath: relativePathFrom(root, lockPath),
@@ -573,8 +585,6 @@ export function classifyFrameworkStaleLock(cwd, actorId, options = {}) {
     // This covers the common "claim more files in the same session" path where
     // there is no linked task id yet, so treating the lock as stale would block
     // a legitimate scope refresh.
-    const lockActorId = normalizeOptionalString(document.actorId ?? document.lockedBy);
-    const lockWorkItemId = normalizeOptionalString(document.workItemId ?? null);
     if (lockActorId === actorId && lockWorkItemId === lockId && !linkedTaskId && !currentTaskId) {
         return null;
     }
@@ -620,7 +630,7 @@ export function isFrameworkStaleLockReleasable(staleLock) {
     return staleLock.kind === 'stale-completed' || staleLock.kind === 'stale-ttl-expired';
 }
 function writeFrameworkLockAutoReconcileEvidence(root, input) {
-    const auditPath = path.join(root, '.atm', 'history', 'evidence', 'framework-lock-auto-reconcile.jsonl');
+    const auditPath = path.join(root, '.atm', 'runtime', 'framework-lock-auto-reconcile.jsonl');
     const record = {
         schemaId: 'atm.frameworkLockAutoReconcile.v1',
         ...input,

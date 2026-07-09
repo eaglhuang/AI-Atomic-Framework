@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -504,7 +504,8 @@ try {
   const autoReconcileEvidence = (autoReconcileClaim.evidence as any).autoReconcile;
   assert(autoReconcileEvidence?.schemaId === 'atm.frameworkLockAutoReconcile.v1', 'framework-mode auto-reconcile must emit persisted audit evidence');
   assert(autoReconcileEvidence?.outcome === 'reclaimed', 'framework-mode auto-reconcile evidence must record reclaimed outcome');
-  assert(String(autoReconcileEvidence?.auditPath ?? '').includes('framework-lock-auto-reconcile.jsonl'), 'framework-mode auto-reconcile evidence must name the audit log path');
+  assert(String(autoReconcileEvidence?.auditPath ?? '') === '.atm/runtime/framework-lock-auto-reconcile.jsonl', 'framework-mode auto-reconcile evidence must use runtime audit storage, not protected history evidence');
+  assert(!existsSync(path.join(frameworkRepo, '.atm', 'history', 'evidence', 'framework-lock-auto-reconcile.jsonl')), 'framework-mode auto-reconcile must not write uncommittable protected singleton evidence');
   const postAutoRelease = await runFrameworkMode(['release', '--cwd', frameworkRepo, '--actor', 'test-agent', '--json']);
   assert(postAutoRelease.ok === true, 'framework-mode release must still succeed after auto-reconcile reclaim');
 
