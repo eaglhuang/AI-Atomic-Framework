@@ -1,0 +1,213 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0019",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0d890296acd5329ba6d546844c8d1b844c872eda",
+  "governedTreeSha": "b8857a026ac429b3ad4b0b38356131671b5c153a",
+  "targetCommitDelta": {
+    "currentCommitSha": "0d890296acd5329ba6d546844c8d1b844c872eda",
+    "parentCommitShas": [
+      "0d890296acd5329ba6d546844c8d1b844c872eda"
+    ],
+    "governedTreeSha": "b8857a026ac429b3ad4b0b38356131671b5c153a",
+    "changedFiles": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/atm-markdown-task-source/src/index.ts",
+      "packages/atm-markdown-task-source/src/task-card-parser.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-tasks-final-facade-atomic-map.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5d90a58e184b12a7189b514b058a8cdfffed435e3a246311f447dbff0e9d9afd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:216f742158eda2e11e05a2f166792d0e8f67898b18e162cd81b8b63c582a1717",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d9c229523d7082273a3f16ad950547b3e2c971a40605a8591a05bec14fd685e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-tasks-final-facade-atomic-map.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:154f08b8a6c77c13aa286c8c24aca133429163767f14a9f34527ea07ee1db2f4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:tasks-final-facade-atomic-map"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-09T17:48:59.456Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0019.*",
+      ".atm/history/task-events/TASK-RFT-0019/**",
+      ".atm/history/tasks/TASK-RFT-0019.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/atm-markdown-task-source/src/index.ts",
+      "packages/atm-markdown-task-source/src/task-card-parser.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "scripts/validate-tasks-final-facade-atomic-map.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/atm-markdown-task-source/src/index.ts",
+      "packages/atm-markdown-task-source/src/task-card-parser.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "scripts/validate-tasks-final-facade-atomic-map.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0019.json",
+  "closedAt": "2026-07-09T17:48:59.456Z",
+  "closedByActor": "codex-lane-b",
+  "sessionId": "session-20260709172307-codex-lane-b-TASK-RFT-0019-79e0e70334",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "318dae4fa48418272254c125f3e9a7b7b0a7d153",
+    "taskMatchedFiles": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/atm-markdown-task-source/src/index.ts",
+      "packages/atm-markdown-task-source/src/task-card-parser.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts",
+      "packages/cli/src/commands/tasks/task-card-writer.ts",
+      "scripts/validate-tasks-final-facade-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0019.json",
+      ".atm/history/task-events/TASK-RFT-0019/2026-07-09T14-11-09-393Z-import-6e61f5811f02.json",
+      ".atm/history/task-events/TASK-RFT-0019/2026-07-09T17-23-07-300Z-reserve-5989f325b557.json",
+      ".atm/history/task-events/TASK-RFT-0019/2026-07-09T17-23-07-303Z-promote-0a2afc480d1e.json",
+      ".atm/history/task-events/TASK-RFT-0019/2026-07-09T17-23-08-900Z-claim-6139bb5b9a90.json",
+      ".atm/history/task-events/TASK-RFT-0019/2026-07-09T17-41-41-899Z-scope-amendment-cd408b0273ae.json",
+      ".atm/history/tasks/TASK-RFT-0019.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
