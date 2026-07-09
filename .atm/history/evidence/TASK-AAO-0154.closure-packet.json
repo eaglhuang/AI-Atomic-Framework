@@ -1,0 +1,180 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0154",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "33030ccb06e25fde20af0989284e3bf84560d091",
+  "governedTreeSha": "9d3661d33a25257c9035958a0c31a8851871d3dc",
+  "targetCommitDelta": {
+    "currentCommitSha": "33030ccb06e25fde20af0989284e3bf84560d091",
+    "parentCommitShas": [
+      "33030ccb06e25fde20af0989284e3bf84560d091"
+    ],
+    "governedTreeSha": "9d3661d33a25257c9035958a0c31a8851871d3dc",
+    "changedFiles": [
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/index.ts",
+      "scripts/run-validators.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-09T17:29:51.132Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0154.*",
+      ".atm/history/protected-override-audit/2026-07-09T16-42-54-093Z-POA-f91ddf937e2a.json",
+      ".atm/history/protected-override-audit/2026-07-09T16-50-39-059Z-POA-21bfd9d5d7a4.json",
+      ".atm/history/task-events/TASK-AAO-0154/**",
+      ".atm/history/tasks/TASK-AAO-0154.json",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/",
+      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/index.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/",
+      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/index.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0154.json",
+  "closedAt": "2026-07-09T17:29:51.133Z",
+  "closedByActor": "codex-captain",
+  "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "33030ccb06e25fde20af0989284e3bf84560d091",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0154.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-12-07-832Z-import-0a29c0d192fc.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-12-25-981Z-reserve-876a47b217fa.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-12-25-986Z-promote-a0007be900ef.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-12-26-278Z-claim-dd0a6d1dfab4.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-19-38-765Z-scope-amendment-adb0d2c47bd6.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-20-42-738Z-scope-amendment-dc4615958bd1.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-43-17-661Z-takeover-6ed90c16ca4d.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-44-23-064Z-renew-e366a31b4ea3.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-51-16-078Z-release-633c78632591.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-51-59-411Z-reserve-24a93b1ee87c.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-51-59-416Z-promote-742b02deefa2.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-52-00-361Z-claim-ac43a1c7e2a0.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-52-00-370Z-scope-amendment.claim-first-resolved-c2f6fa49b9bc.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T16-52-00-372Z-scope-amendment-07ec12d615e4.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T17-25-56-718Z-scope-amendment-e5f779984b52.json",
+      ".atm/history/task-events/TASK-AAO-0154/2026-07-09T17-26-08-895Z-renew-881dd45a49d3.json",
+      ".atm/history/tasks/TASK-AAO-0154.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

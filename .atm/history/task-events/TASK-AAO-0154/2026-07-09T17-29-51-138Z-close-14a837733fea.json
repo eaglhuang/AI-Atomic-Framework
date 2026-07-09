@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T17-29-51-138Z-close-14a837733fea",
+  "taskId": "TASK-AAO-0154",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0154.json",
+  "taskSha256": "sha256:3ad2a9b04abb47f3b10574cadc54baed990c590fb289f85d97247c5250d59e09",
+  "createdAt": "2026-07-09T17:29:51.138Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0154 --actor codex-captain --status done --historical-delivery 33030ccb06e25fde20af0989284e3bf84560d091",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0154.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-09T17:29:51.132Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0154.*",
+        ".atm/history/protected-override-audit/2026-07-09T16-42-54-093Z-POA-f91ddf937e2a.json",
+        ".atm/history/protected-override-audit/2026-07-09T16-50-39-059Z-POA-21bfd9d5d7a4.json",
+        ".atm/history/task-events/TASK-AAO-0154/**",
+        ".atm/history/tasks/TASK-AAO-0154.json",
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/channel-strategy.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/core/src/broker/",
+        "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/index.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/channel-strategy.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/core/src/broker/",
+        "packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "packages/core/src/broker/index.ts",
+        "scripts/validate-cli.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

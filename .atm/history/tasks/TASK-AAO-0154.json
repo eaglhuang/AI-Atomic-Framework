@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0154",
   "title": "Fail closed on cross-task restore/reset/remove and enter incident-safe mode",
-  "status": "running",
+  "status": "done",
   "milestone": "RFT-M5",
   "dependencies": [],
   "acceptance": [
@@ -57,8 +57,8 @@
     "hash": "b45964ed38400de0"
   },
   "importedAt": "2026-07-09T16:12:07.819Z",
-  "lastTransitionId": "2026-07-09T17-26-08-895Z-renew-881dd45a49d3",
-  "lastTransitionAt": "2026-07-09T17:26:08.895Z",
+  "lastTransitionId": "2026-07-09T17-29-51-138Z-close-14a837733fea",
+  "lastTransitionAt": "2026-07-09T17:29:51.138Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-captain",
   "reservedAt": "2026-07-09T16:51:59.411Z",
@@ -67,7 +67,7 @@
     "actorId": "codex-captain",
     "leaseId": "lease-433a0de341e3",
     "claimedAt": "2026-07-09T16:51:59.421Z",
-    "heartbeatAt": "2026-07-09T17:26:08.888Z",
+    "heartbeatAt": "2026-07-09T17:29:51.136Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-AAO-0154.*",
@@ -87,7 +87,8 @@
       "packages/core/src/broker/index.ts",
       "scripts/validate-cli.ts"
     ],
-    "state": "active"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-09T16:12:25.991Z",
   "startedByActor": "antigravity",
@@ -125,5 +126,9 @@
     "actorId": "codex-captain",
     "createdAt": "2026-07-09T16:52:00.360Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-09T17:29:51.136Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0154.closure-packet.json"
 }
