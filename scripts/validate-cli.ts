@@ -14,6 +14,7 @@ import {
   isDeliverableGateCandidate,
   pathMatchesTaskScope
 } from '../packages/cli/src/commands/tasks/historical-delivery.ts';
+import { resolveTaskScopedCommitBundle } from '../packages/cli/src/commands/git-governance.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -480,6 +481,40 @@ const protectedOverrideAuditStagingTest = spawnSync(
   { cwd: root, encoding: 'utf8' }
 );
 assert(protectedOverrideAuditStagingTest.status === 0, `protected-override-audit-staging focused test must pass: ${protectedOverrideAuditStagingTest.stderr || protectedOverrideAuditStagingTest.stdout}`);
+
+// TASK-AAO-0156: --defer-foreign-staged must not evict another task's
+// staged .atm/history ownership from the shared index.
+const protectedForeignStagedWorkspace = createCliTempWorkspace('protected-foreign-staged');
+try {
+  initializeGitRepository(protectedForeignStagedWorkspace);
+  const foreignEvidencePath = path.join(protectedForeignStagedWorkspace, '.atm', 'history', 'evidence', 'TASK-FOREIGN-0001.json');
+  writeJson(foreignEvidencePath, {
+    schemaId: 'atm.taskEvidence.v1',
+    taskId: 'TASK-FOREIGN-0001',
+    evidence: []
+  });
+  spawnSync('git', ['-C', protectedForeignStagedWorkspace, 'add', '.atm/history/evidence/TASK-FOREIGN-0001.json'], { encoding: 'utf8' });
+  const protectedForeignReport = resolveTaskScopedCommitBundle({
+    cwd: protectedForeignStagedWorkspace,
+    taskId: 'TASK-LOCAL-0001',
+    taskDocument: {
+      workItemId: 'TASK-LOCAL-0001',
+      scopePaths: ['src/local.ts']
+    },
+    apply: true,
+    autoStage: false,
+    deferForeignStaged: true,
+    message: 'test protected staged ownership',
+    actorId: 'validator',
+    trailers: []
+  });
+  assert(protectedForeignReport.ok === false, 'protected foreign staged .atm/history files must block defer-foreign-staged');
+  assert(protectedForeignReport.blockedCode === 'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP', 'protected foreign staged ownership must expose deterministic blocked code');
+  const stagedAfterProtectedFence = spawnSync('git', ['-C', protectedForeignStagedWorkspace, 'diff', '--cached', '--name-only'], { encoding: 'utf8' }).stdout;
+  assert(stagedAfterProtectedFence.includes('.atm/history/evidence/TASK-FOREIGN-0001.json'), 'protected foreign staged evidence must remain staged after blocked defer attempt');
+} finally {
+  safeRmSync(protectedForeignStagedWorkspace);
+}
 
 const planningRootPreferenceTest = spawnSync(
   process.execPath,

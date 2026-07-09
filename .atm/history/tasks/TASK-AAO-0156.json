@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0156",
+  "title": "Fence .atm history mutation and staged ownership so weak agents cannot self-clean other lanes",
+  "status": "running",
+  "milestone": "RFT-M5",
+  "dependencies": [],
+  "acceptance": [
+    "Attempts to unstage or remove another task's staged ATM evidence are blocked with a deterministic diagnostic.",
+    "Same-task governed evidence writes still succeed through the approved close / claim / release paths.",
+    "Protected-surface checks are shared rather than duplicated across hook, taskflow, and git-governance flows.",
+    "Any new script or helper introduced by this card stays under 600 lines."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "scripts/run-validators.ts",
+    "scripts/validate-cli.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing the normal same-task close flow",
+    "Relaxing protected-push evidence requirements"
+  ],
+  "nonGoals": [
+    "Do not solve ambiguity by deleting or unstaging files automatically"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if legitimate same-task evidence writes or governed closeback commits become impossible.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.staged-ownership-and-history-fence",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Reuse the staged ownership concepts already present in CID and hook-era work;\n  harden the fence rather than inventing a second ownership vocabulary.\n- This card is about stronger boundaries and better operator feedback, not\n  about automatically repairing damaged runtime files.",
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-AAO-0156-protected-atm-history-and-staged-ownership-fencing.task.md",
+    "sectionTitle": "TASK-AAO-0156",
+    "headingLine": 41,
+    "hash": "6d3949956030c4dd"
+  },
+  "importedAt": "2026-07-09T17:55:31.966Z",
+  "lastTransitionId": "2026-07-09T17-55-41-333Z-claim-90c9490a214b",
+  "lastTransitionAt": "2026-07-09T17:55:41.333Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-07-09T17:55:41.099Z",
+  "promotedAt": "2026-07-09T17:55:41.102Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-bc53d040e300",
+    "claimedAt": "2026-07-09T17:55:41.105Z",
+    "heartbeatAt": "2026-07-09T17:55:41.105Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0156.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-09T17:55:41.105Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260709175541-codex-captain-TASK-AAO-0156-35ce6379a7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0156",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0156.*",
+      ".atm/history/task-events/TASK-AAO-0156/**",
+      ".atm/history/tasks/TASK-AAO-0156.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-cli.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "42bfc9b0cd463e5da26987920f0d2535d43e07e6d25318765f0ad7e4fb75545d",
+    "actorId": "codex-captain",
+    "createdAt": "2026-07-09T17:55:41.333Z",
+    "status": "active"
+  }
+}

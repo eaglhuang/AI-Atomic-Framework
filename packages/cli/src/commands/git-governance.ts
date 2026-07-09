@@ -2490,6 +2490,21 @@ function buildUnexpectedStagedTasksForGitCommit(
   });
 }
 
+function isProtectedStagedGovernanceOwnershipPath(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  return normalized.startsWith('.atm/history/tasks/')
+    || normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/');
+}
+
+function buildProtectedForeignStagedOwnershipFiles(
+  unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[]
+): readonly string[] {
+  return uniqueSorted(unexpectedStagedTasks.flatMap((entry) =>
+    entry.stagedFiles.filter((filePath) => isProtectedStagedGovernanceOwnershipPath(filePath))
+  ));
+}
+
 function deferForeignStagedFiles(
   cwd: string,
   taskId: string,
@@ -2576,11 +2591,13 @@ export function resolveTaskScopedCommitBundle(input: {
   });
   let stagedFiles = readStagedFiles(input.cwd);
   let unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
+  let protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   let deferredForeignStagedSnapshot: string | null = null;
-  if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply) {
+  if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply && protectedForeignStagedOwnershipFiles.length === 0) {
     deferredForeignStagedSnapshot = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedTasks);
     stagedFiles = readStagedFiles(input.cwd);
     unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
+    protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   }
   const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
   const residueCandidateFiles = dirtyFiles.filter((filePath) => !isIgnorableTaskScopedDirtySideEffect(filePath));
@@ -2658,7 +2675,10 @@ export function resolveTaskScopedCommitBundle(input: {
   let blockedCode: string | null = null;
   let blockedSummary: string | null = null;
 
-  if (blockedResidue.length > 0) {
+  if (input.deferForeignStaged && protectedForeignStagedOwnershipFiles.length > 0) {
+    blockedCode = 'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP';
+    blockedSummary = `Refusing to unstage protected .atm/history files that belong to another task: ${protectedForeignStagedOwnershipFiles.join(', ')}. Wait for that task owner to commit/release, or commit this task through the task-scoped bundle without --defer-foreign-staged.`;
+  } else if (blockedResidue.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED';
     blockedSummary = `Generated residue belongs to another task/run and must be cleared explicitly: ${blockedResidue.map((entry) => entry.path).join(', ')}`;
   } else if (manualReviewResidue.length > 0) {
