@@ -111,6 +111,7 @@ try {
   assert.equal(okStatusRecord!.commitSha, committedSha, 'commit-status must report the actual committed SHA');
   assert.equal(okStatusRecord!.headShaAfterAttempt, committedSha, 'commit-status must record the post-attempt HEAD SHA');
   assert.equal(okStatusRecord!.headAdvancedDuringAttempt, true, 'successful commit status must record that HEAD advanced');
+  assert.equal(okStatusRecord!.timeoutMs, 420_000, 'default governed commit timeout must cover observed multi-minute framework pre-commit gates');
 
   console.log('[git-commit-timeout-and-status:test] ok');
 } finally {

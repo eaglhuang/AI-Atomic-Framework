@@ -36,7 +36,10 @@ export function resolveGitExecutable() {
 // commit lane forever with no observable signal. Default to a generous but
 // finite ceiling, overridable per-invocation (--timeout-ms) or per-environment
 // (ATM_GIT_COMMIT_TIMEOUT_MS) for slower hook chains.
-const DEFAULT_GIT_COMMIT_TIMEOUT_MS = 120_000;
+// 2026-07-09 dogfood: normal framework pre-commit can legitimately take
+// ~3-5 minutes when task audit and git-head evidence validators run. Keep the
+// default above that observed green path while still bounding truly hung hooks.
+const DEFAULT_GIT_COMMIT_TIMEOUT_MS = 420_000;
 function resolveGitCommitTimeoutMs(explicitTimeoutMs) {
     if (explicitTimeoutMs !== null && Number.isFinite(explicitTimeoutMs) && explicitTimeoutMs > 0) {
         return explicitTimeoutMs;

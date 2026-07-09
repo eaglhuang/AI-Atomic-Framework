@@ -29,7 +29,7 @@ export default defineCommandSpec({
         { flag: '--emergency-approval', value: 'leaseId', summary: 'Required when --no-verify is used; must authorize backend.gitHookBypass.' },
         { flag: '--reason', value: 'text', summary: 'Human-readable reason for the governed hook bypass when using --no-verify.' },
         { flag: '--no-trailers', summary: 'Skip trailer checks in git check (identity/owner checks still run).' },
-        { flag: '--timeout-ms', value: 'ms', summary: 'For git commit: override the default 120000ms timeout for the underlying git commit spawn (also settable via ATM_GIT_COMMIT_TIMEOUT_MS); a hung pre-commit hook fails as a retryable timeout instead of hanging forever.' },
+        { flag: '--timeout-ms', value: 'ms', summary: 'For git commit: override the default 420000ms timeout for the underlying git commit spawn (also settable via ATM_GIT_COMMIT_TIMEOUT_MS); a hung pre-commit hook fails as a retryable timeout instead of hanging forever.' },
         commonJsonOption,
         commonPrettyOption,
         commonHelpOption
