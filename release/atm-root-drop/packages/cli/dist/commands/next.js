@@ -31,6 +31,21 @@ import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from './
 import { resolveCandidatePlanningRoots } from './next/planning-root-preference.js';
 const NEXT_LARGE_ARRAY_TRUNCATION_LIMIT = 20;
 const NEXT_TRUNCATABLE_FRAMEWORK_STATUS_FIELDS = ['changedFiles', 'criticalChangedFiles', 'docsOnlyChangedFiles'];
+const NEXT_DUPLICATED_TOP_LEVEL_KEYS = [
+    'nextAction',
+    'taskIntent',
+    'userNotice',
+    'runnerMode',
+    'frameworkReport',
+    'frameworkClaim',
+    'evidenceSummary',
+    'guardReport',
+    'taskflowReadiness',
+    'commitBundle',
+    'allowedCommands',
+    'blockedCommands',
+    'skillGrowth'
+];
 function isPlainRecord(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
@@ -67,8 +82,10 @@ function compactPlaybookMessageData(data) {
 function compactNextRouteResult(result) {
     const evidence = result.evidence;
     const compactedEvidence = evidence && isPlainRecord(evidence.frameworkStatus)
-        ? { ...evidence, frameworkStatus: compactFrameworkStatusFileLists(evidence.frameworkStatus) }
-        : evidence;
+        ? { ...evidence, frameworkStatus: compactFrameworkStatusFileLists(evidence.frameworkStatus), suppressToolBridgeProjection: true }
+        : evidence
+            ? { ...evidence, suppressToolBridgeProjection: true }
+            : evidence;
     const messages = Array.isArray(result.messages)
         ? result.messages.map((entry) => {
             const record = isPlainRecord(entry) ? entry : null;
@@ -78,15 +95,20 @@ function compactNextRouteResult(result) {
             return entry;
         })
         : result.messages;
-    return {
+    const compacted = {
         ...result,
         ...(compactedEvidence ? { evidence: compactedEvidence } : {}),
         ...(messages ? { messages } : {})
     };
+    for (const key of NEXT_DUPLICATED_TOP_LEVEL_KEYS) {
+        delete compacted[key];
+    }
+    return compacted;
 }
 export async function runNext(argv) {
     const verbose = Array.isArray(argv) && argv.includes('--verbose');
-    const result = await runNextRoute(argv);
+    const routeArgv = verbose ? argv.filter((arg) => arg !== '--verbose') : argv;
+    const result = await runNextRoute(routeArgv);
     return verbose ? result : compactNextRouteResult(result);
 }
 async function runNextRoute(argv) {

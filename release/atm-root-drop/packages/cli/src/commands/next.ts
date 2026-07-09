@@ -127,6 +127,21 @@ import {
 
 const NEXT_LARGE_ARRAY_TRUNCATION_LIMIT = 20;
 const NEXT_TRUNCATABLE_FRAMEWORK_STATUS_FIELDS = ['changedFiles', 'criticalChangedFiles', 'docsOnlyChangedFiles'] as const;
+const NEXT_DUPLICATED_TOP_LEVEL_KEYS = [
+  'nextAction',
+  'taskIntent',
+  'userNotice',
+  'runnerMode',
+  'frameworkReport',
+  'frameworkClaim',
+  'evidenceSummary',
+  'guardReport',
+  'taskflowReadiness',
+  'commitBundle',
+  'allowedCommands',
+  'blockedCommands',
+  'skillGrowth'
+] as const;
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -167,8 +182,10 @@ function compactPlaybookMessageData(data: Record<string, unknown>): Record<strin
 function compactNextRouteResult<T extends { evidence?: Record<string, unknown>; messages?: unknown[] }>(result: T): T {
   const evidence = result.evidence;
   const compactedEvidence = evidence && isPlainRecord(evidence.frameworkStatus)
-    ? { ...evidence, frameworkStatus: compactFrameworkStatusFileLists(evidence.frameworkStatus) }
-    : evidence;
+    ? { ...evidence, frameworkStatus: compactFrameworkStatusFileLists(evidence.frameworkStatus), suppressToolBridgeProjection: true }
+    : evidence
+      ? { ...evidence, suppressToolBridgeProjection: true }
+      : evidence;
   const messages = Array.isArray(result.messages)
     ? result.messages.map((entry) => {
       const record = isPlainRecord(entry) ? entry : null;
@@ -178,16 +195,21 @@ function compactNextRouteResult<T extends { evidence?: Record<string, unknown>; 
       return entry;
     })
     : result.messages;
-  return {
+  const compacted: Record<string, unknown> = {
     ...result,
     ...(compactedEvidence ? { evidence: compactedEvidence } : {}),
     ...(messages ? { messages } : {})
   };
+  for (const key of NEXT_DUPLICATED_TOP_LEVEL_KEYS) {
+    delete compacted[key];
+  }
+  return compacted as T;
 }
 
 export async function runNext(argv: string[]) {
   const verbose = Array.isArray(argv) && argv.includes('--verbose');
-  const result = await runNextRoute(argv);
+  const routeArgv = verbose ? argv.filter((arg) => arg !== '--verbose') : argv;
+  const result = await runNextRoute(routeArgv);
   return verbose ? result : compactNextRouteResult(result);
 }
 

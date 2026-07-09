@@ -129,6 +129,9 @@ function readStringList(value) {
     return filtered.length > 0 ? filtered : undefined;
 }
 export function projectToolBridgeFields(evidence) {
+    if (evidence.suppressToolBridgeProjection === true) {
+        return {};
+    }
     const nextAction = isRecord(evidence.nextAction) ? evidence.nextAction : null;
     const taskIntent = isRecord(evidence.taskIntent) ? evidence.taskIntent : null;
     const userNotice = isRecord(evidence.userNotice) ? evidence.userNotice : null;

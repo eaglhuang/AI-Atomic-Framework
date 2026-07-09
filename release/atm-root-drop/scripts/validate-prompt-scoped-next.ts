@@ -124,12 +124,23 @@ async function main() {
 
     const exact = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001']);
     assert(exact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'exact task id prompt must route to one task');
+    assert((exact as any).nextAction === undefined, 'default next output must omit duplicated top-level nextAction alias');
+    assert((exact as any).taskIntent === undefined, 'default next output must omit duplicated top-level taskIntent alias');
+    assert((exact as any).allowedCommands === undefined, 'default next output must omit duplicated top-level allowedCommands alias');
+    assert(JSON.stringify(exact).length < 30000, 'default next output must stay compact enough for agent transcripts');
     assert((exact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'exact task id prompt selected wrong task');
     assert((exact.evidence.nextAction as any).recommendedChannel === 'normal', 'exact task id prompt must recommend normal channel');
     const exactTrail = assertDecisionTrail(exact.evidence.nextAction as any, 'task-route-ready');
     assert(exactTrail.some((entry) => entry.check === 'task-selection' && entry.result === 'pass'), 'exact task route decisionTrail must record task selection');
     assertTeamRecommendation(exact.evidence.nextAction as any, 'normal', 'TASK-ALPHA-0001');
     assert(exact.messages.some((entry) => entry.code === 'ATM_TEAM_RECOMMENDATION'), 'task route must emit team recommendation advisory');
+
+    const exactVerbose = await runNext(['--cwd', tempRoot, '--prompt', 'Please implement TASK-ALPHA-0001', '--verbose']);
+    const compactPlaybookMessage = exact.messages.find((entry) => entry.code === 'ATM_CHANNEL_PLAYBOOK_REQUIRED') as any;
+    const verbosePlaybookMessage = exactVerbose.messages.find((entry) => entry.code === 'ATM_CHANNEL_PLAYBOOK_REQUIRED') as any;
+    assert(compactPlaybookMessage?.data?.fullPlaybookPath === 'evidence.nextAction.playbook', 'default next output must point duplicated playbook message data at evidence.nextAction.playbook');
+    assert(compactPlaybookMessage?.data?.steps === undefined, 'default next output must omit duplicated playbook steps from message data');
+    assert(Array.isArray(verbosePlaybookMessage?.data?.steps), 'next --verbose must retain full playbook steps in message data');
 
     const explicitTask = await runNext(['--cwd', tempRoot, '--task', 'TASK-ALPHA-0001']);
     assert(explicitTask.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'next --task must route to one task');
