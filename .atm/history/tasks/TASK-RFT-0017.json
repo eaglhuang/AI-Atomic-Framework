@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0017",
+  "title": "tasks.ts claim lifecycle orchestrator split",
+  "status": "running",
+  "milestone": "RFT-M6",
+  "dependencies": [
+    "TASK-RFT-0013"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+    "scripts/validate-tasks-claim-atomic-map.ts",
+    "docs/reports/tasks-command-atomic-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+    "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+    "scripts/validate-tasks-claim-atomic-map.ts",
+    "docs/reports/tasks-command-atomic-map.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-tasks-claim-atomic-map.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Touching packages/cli/src/commands/next.ts or RFT-0001 Lane A files",
+    "Changing claim lease JSON schema or public command names",
+    "Changing broker conflict rules",
+    "Extracting reconcile, repair-closure, deliver-and-close, card parsing, scope, queue, or parallel clusters"
+  ],
+  "nonGoals": [
+    "Do not optimize claim behavior while moving it; this is a verbatim extraction card.",
+    "Do not collapse repair-claim diagnostics into a generic lifecycle helper."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if claim, renew, release, handoff, takeover, or repair-claim semantics change.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.tasks-command-atomic-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/tasks-command-atomic-map.md"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0017-tasks-claim-lifecycle-orchestrator.task.md",
+    "sectionTitle": "TASK-RFT-0017",
+    "headingLine": 57,
+    "hash": "1117397f4ae2eb9e"
+  },
+  "importedAt": "2026-07-09T14:11:09.379Z",
+  "lastTransitionId": "2026-07-09T14-30-43-883Z-scope-amendment-631036c63013",
+  "lastTransitionAt": "2026-07-09T14:30:43.883Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-b",
+  "reservedAt": "2026-07-09T14:11:36.923Z",
+  "promotedAt": "2026-07-09T14:11:36.927Z",
+  "claim": {
+    "actorId": "codex-lane-b",
+    "leaseId": "lease-e67818860ebd",
+    "claimedAt": "2026-07-09T14:11:36.931Z",
+    "heartbeatAt": "2026-07-09T14:11:36.931Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0017.*",
+      ".atm/history/task-events/TASK-RFT-0017/**",
+      ".atm/history/tasks/TASK-RFT-0017.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/claim-intent.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/takeover-evidence.ts",
+      "scripts/validate-tasks-claim-atomic-map.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-09T14:11:36.931Z",
+  "startedByActor": "codex-lane-b",
+  "startedBySessionId": "session-20260709141136-codex-lane-b-TASK-RFT-0017-276b2f3aaa",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0017",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0017.*",
+      ".atm/history/task-events/TASK-RFT-0017/**",
+      ".atm/history/tasks/TASK-RFT-0017.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/claim-intent.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+      "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/takeover-evidence.ts",
+      "scripts/validate-tasks-claim-atomic-map.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0017-tasks-claim-lifecycle-orchestrator.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/rft-hardening/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/",
+      "docs/ai_atomic_framework/rft-hardening/tasks/TASK-RFT-0017-tasks-claim-lifecycle-orchestrator.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "7ad0bde4d854a37ed47e7f1e5212852d9b3ea66e8e9107d1335a6aa36959664f",
+    "actorId": "codex-lane-b",
+    "createdAt": "2026-07-09T14:11:38.149Z",
+    "status": "active"
+  }
+}

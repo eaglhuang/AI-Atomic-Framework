@@ -12,7 +12,8 @@ This report does not change production command behavior. It exists to define the
 | --- | --- | --- | --- |
 | `tasks.command.dispatch` | Top-level `tasks` action router | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/command-dispatch.ts` | `tasks.ts` now supplies the handler table; `command-dispatch.ts` owns argv normalization, action aliases, usage errors, and fan-out over `close`, `reset`, `claim`, `reconcile`, `repair-closure`, `status`, `finalize`, etc. |
 | `tasks.close.governance` | Close path governance and closure packet enforcement | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/close-orchestrator.ts` | Owns close command admission, closure authority, historical delivery, and commit-window registration. Under TASK-RFT-0012 the `runTasksClose` orchestrator body lives in `tasks/close-orchestrator.ts`; `tasks.ts` re-exports it and keeps only the router surface. |
-| `tasks.claim.lifecycle` | Claim / renew / release / handoff / takeover lifecycle | `packages/cli/src/commands/tasks.ts`, `packages/core/src/broker/lifecycle.ts` | Shared claim-state logic with broker claim intent recording. |
+| `tasks.claim.lifecycle` | Claim / renew / release / handoff / takeover lifecycle | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-intent.ts`, `packages/cli/src/commands/tasks/takeover-evidence.ts`, `packages/core/src/broker/lifecycle.ts` | Under TASK-RFT-0017 the lifecycle state machine lives in `claim-orchestrator.ts`; claim-intent resolution and takeover evidence are separate sub-atoms so CID can reason about each path independently. |
+| `tasks.repair.claim` | Diagnose and repair stale claim drift | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-repair-diagnostics.ts` | Under TASK-RFT-0017 the backend repair-claim command lives in `repair-claim-orchestrator.ts` and delegates drift classification / write repair to `claim-repair-diagnostics.ts`. |
 | `tasks.reconcile.delivery` | Historical delivery reconciliation and provenance | `packages/cli/src/commands/tasks.ts` | Handles delivery commit refs, provenance checks, and close/truth repair. |
 | `tasks.repair.closure` | Closure packet repair / normalization | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/framework-development.ts` | Repairs closure packet before closeout. |
 | `tasks.status.triangulation` | Status / claim / planning mirror truth triangulation | `packages/cli/src/commands/tasks.ts` | Compares live ledger, planning frontmatter, and last transition event. |
@@ -79,6 +80,35 @@ This report does not change production command behavior. It exists to define the
 - The validator should fail closed if any required section is missing or if the atom list does not mention the three caller surfaces.
 - TASK-CID-0058 requires the report to mention `packages/cli/src/commands/tasks/command-dispatch.ts` so future map checks keep the dispatch atom visible.
 - TASK-CID-0062 requires the report to mention `packages/cli/src/commands/tasks/dependency-gates.ts` and `packages/cli/src/commands/tasks/surface-invariants.ts` so future map checks keep the governance invariant owner modules visible.
+- TASK-RFT-0017 requires the report to mention `packages/cli/src/commands/tasks/claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-intent.ts`, `packages/cli/src/commands/tasks/takeover-evidence.ts`, and `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts`; each new atom file should stay at or below 600 lines.
+
+## TASK-RFT-0017 Update
+
+TASK-RFT-0017 split the claim lifecycle cluster out of `packages/cli/src/commands/tasks.ts` while keeping the public `tasks claim`, `tasks renew`, `tasks release`, `tasks handoff`, `tasks takeover`, and `tasks repair-claim` command surfaces unchanged.
+
+### Atomic Claim Map
+
+| Atom | Module | Responsibility |
+| --- | --- | --- |
+| `tasks.claim.lifecycle` | `packages/cli/src/commands/tasks/claim-orchestrator.ts` | Claim / renew / release / handoff / takeover state machine, lock acquisition/release, work-session state, task transition writes. |
+| `tasks.claim.intent` | `packages/cli/src/commands/tasks/claim-intent.ts` | Auto-resolve write vs closeout-only claim intent from scoped dirty files and deliverable presence in `HEAD`. |
+| `tasks.claim.takeover-evidence` | `packages/cli/src/commands/tasks/takeover-evidence.ts` | Append takeover validation evidence without mixing evidence writing into the lifecycle state machine. |
+| `tasks.repair.claim` | `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts` | CLI backend for diagnose-first repair-claim; consumes `claim-repair-diagnostics.ts`. |
+
+### Before / After Line Counts
+
+- Before TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 5,796 lines
+- After TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 4,991 lines
+- New `packages/cli/src/commands/tasks/claim-orchestrator.ts` = 554 lines
+- New `packages/cli/src/commands/tasks/claim-intent.ts` = 119 lines
+- New `packages/cli/src/commands/tasks/takeover-evidence.ts` = 31 lines
+- New `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts` = 190 lines
+
+### Specs / Validator
+
+- `packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts`
+- `scripts/validate-tasks-claim-atomic-map.ts`
 
 ## TASK-RFT-0010 Update
 

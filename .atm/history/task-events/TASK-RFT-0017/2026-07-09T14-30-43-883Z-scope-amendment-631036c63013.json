@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T14-30-43-883Z-scope-amendment-631036c63013",
+  "taskId": "TASK-RFT-0017",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-b",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0017.json",
+  "taskSha256": "sha256:bbef56f695d425c603f0d0b0a8152dc3827fe4ba355de154b2cba219916777ac",
+  "createdAt": "2026-07-09T14:30:43.883Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0017 --actor codex-lane-b --add packages/cli/src/commands/tasks/claim-preparation.ts --class linked-surface --phase during-implementation --reason \"extract claim preparation reserve/promote helper to meet TASK-RFT-0017 line target\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "extract claim preparation reserve/promote helper to meet TASK-RFT-0017 line target"
+  }
+}

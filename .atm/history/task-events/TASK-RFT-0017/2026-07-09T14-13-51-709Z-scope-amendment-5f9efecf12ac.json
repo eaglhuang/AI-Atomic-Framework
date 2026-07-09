@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T14-13-51-709Z-scope-amendment-5f9efecf12ac",
+  "taskId": "TASK-RFT-0017",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-b",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0017.json",
+  "taskSha256": "sha256:12907bfe55148de2bb18cd914818c42aea3c1c01c27672bfc9e67ea02a183983",
+  "createdAt": "2026-07-09T14:13:51.709Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0017 --actor codex-lane-b --add \"packages/cli/src/commands/tasks/claim-intent.ts,packages/cli/src/commands/tasks/takeover-evidence.ts\" --class linked-surface --phase during-implementation --reason \"split claim orchestrator helpers below 600-line atomic target\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "split claim orchestrator helpers below 600-line atomic target"
+  }
+}
