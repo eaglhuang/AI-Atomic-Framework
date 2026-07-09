@@ -73,9 +73,16 @@ interface GitCommitAttemptStatus {
   readonly startedAt: string;
   readonly updatedAt: string;
   readonly commitSha: string | null;
+  readonly headShaBeforeCommit: string | null;
+  readonly headShaAfterAttempt: string | null;
+  readonly headAdvancedDuringAttempt: boolean | null;
   readonly timeoutMs: number;
   readonly errorCode: string | null;
   readonly errorSummary: string | null;
+  readonly statusCommand: string;
+  readonly retryCommand: string;
+  readonly copyableCommitCommand: string | null;
+  readonly liveIndexResidueRollback: readonly string[];
 }
 
 function writeGitCommitAttemptStatus(cwd: string, statusRelativePath: string, status: GitCommitAttemptStatus) {
@@ -1308,6 +1315,14 @@ function runGitCommit(options: ParsedGitOptions) {
     ...(session?.sessionId ? [`ATM-Session: ${session.sessionId}`] : []),
     ...options.extraTrailers
   ];
+  const retryCommand = `node atm.mjs git commit --actor ${quoteCliValue(actorId)}${options.taskId ? ` --task ${quoteCliValue(options.taskId)}` : ''} --message ${quoteCliValue(options.message)}${options.autoStage ? ' --auto-stage' : ''}${options.noVerify ? ' --no-verify' : ''} --json`;
+  const statusCommand = `node atm.mjs git commit-status --actor ${quoteCliValue(actorId)}${options.taskId ? ` --task ${quoteCliValue(options.taskId)}` : ''} --json`;
+  const rawCopyableCommitCommand = buildCopyableGitCommitCommand({
+    cwd: options.cwd,
+    message: options.message,
+    trailers,
+    noVerify: options.noVerify
+  });
   const args = [
     'commit',
     ...(options.noVerify ? ['--no-verify'] : []),
@@ -1340,9 +1355,16 @@ function runGitCommit(options: ParsedGitOptions) {
     startedAt: commitAttemptStartedAt,
     updatedAt: commitAttemptStartedAt,
     commitSha: null,
+    headShaBeforeCommit,
+    headShaAfterAttempt: null,
+    headAdvancedDuringAttempt: null,
     timeoutMs: commitTimeoutMs,
     errorCode: null,
-    errorSummary: null
+    errorSummary: null,
+    statusCommand,
+    retryCommand,
+    copyableCommitCommand: rawCopyableCommitCommand,
+    liveIndexResidueRollback: []
   });
   try {
     withBranchCommitQueueLock({
@@ -1433,9 +1455,16 @@ function runGitCommit(options: ParsedGitOptions) {
         startedAt: commitAttemptStartedAt,
         updatedAt: new Date().toISOString(),
         commitSha: null,
+        headShaBeforeCommit,
+        headShaAfterAttempt: null,
+        headAdvancedDuringAttempt: null,
         timeoutMs: commitTimeoutMs,
         errorCode: null,
-        errorSummary: null
+        errorSummary: null,
+        statusCommand,
+        retryCommand,
+        copyableCommitCommand: rawCopyableCommitCommand,
+        liveIndexResidueRollback: []
       });
       if (bundleFiles.length > 0) {
         withTaskScopedCommitIndex(options.cwd, bundleFiles, actorId, (scopedEnv) => {
@@ -1456,19 +1485,32 @@ function runGitCommit(options: ParsedGitOptions) {
       nodeChildError
       && (nodeChildError.code === 'ETIMEDOUT' || (nodeChildError.killed === true && Boolean(nodeChildError.signal)))
     );
+    const headShaAfterFailure = readHeadCommitSha(options.cwd);
+    const headAdvancedDuringAttempt = Boolean(
+      headShaAfterFailure
+      && headShaBeforeCommit
+      && headShaAfterFailure !== headShaBeforeCommit
+    );
     writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
       schemaId: 'atm.gitCommitAttemptStatus.v1',
       actorId,
       taskId: options.taskId,
       sessionId: session?.sessionId ?? null,
-      status: isCommitTimeoutFailure ? 'timeout' : 'failed',
-      phase: 'git-commit-failed',
+      status: headAdvancedDuringAttempt ? 'committed' : (isCommitTimeoutFailure ? 'timeout' : 'failed'),
+      phase: headAdvancedDuringAttempt ? 'commit-observed-after-error' : 'git-commit-failed',
       startedAt: commitAttemptStartedAt,
       updatedAt: new Date().toISOString(),
-      commitSha: null,
+      commitSha: headAdvancedDuringAttempt ? headShaAfterFailure : null,
+      headShaBeforeCommit,
+      headShaAfterAttempt: headShaAfterFailure,
+      headAdvancedDuringAttempt,
       timeoutMs: commitTimeoutMs,
       errorCode: error instanceof CliError ? error.code : (isCommitTimeoutFailure ? 'ATM_GIT_COMMIT_TIMEOUT' : 'UNKNOWN'),
-      errorSummary: error instanceof Error ? error.message.slice(0, 500) : String(error)
+      errorSummary: error instanceof Error ? error.message.slice(0, 500) : String(error),
+      statusCommand,
+      retryCommand,
+      copyableCommitCommand: rawCopyableCommitCommand,
+      liveIndexResidueRollback
     });
     if (error instanceof CliError && (error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY' || error.code === 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE')) {
       throw error;
@@ -1509,28 +1551,22 @@ function runGitCommit(options: ParsedGitOptions) {
           branchRef,
           branchName,
           headShaBeforeCommit,
-          headShaAfterFailure: readHeadCommitSha(options.cwd),
+          headShaAfterFailure,
+          headAdvancedDuringAttempt,
+          commitAttemptStatusPath,
+          statusCommand,
+          retryCommand,
           retryable: true,
-          requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)}${options.taskId ? ` --task ${quoteCliValue(options.taskId)}` : ''} --message ${quoteCliValue(options.message)}${options.noVerify ? ' --no-verify' : ''} --json`,
+          requiredCommand: retryCommand,
           stdout,
           stderr,
           gitExecutable: resolveGitExecutable(),
-          copyableCommitCommand: buildCopyableGitCommitCommand({
-            cwd: options.cwd,
-            message: options.message,
-            trailers,
-            noVerify: options.noVerify
-          }),
+          copyableCommitCommand: rawCopyableCommitCommand,
           hostGitCompatibilityGuidance: buildHostGitCompatibilityGuidance({
             gitExecutable: resolveGitExecutable(),
             stderr,
             stdout,
-            copyableCommitCommand: buildCopyableGitCommitCommand({
-              cwd: options.cwd,
-              message: options.message,
-              trailers,
-              noVerify: options.noVerify
-            })
+            copyableCommitCommand: rawCopyableCommitCommand
           }),
           protectedOverrideOutcome,
           liveIndexResidueRollback
@@ -1545,23 +1581,22 @@ function runGitCommit(options: ParsedGitOptions) {
         sessionId: session?.sessionId ?? null,
         stdout,
         stderr,
+        headShaBeforeCommit,
+        headShaAfterFailure,
+        headAdvancedDuringAttempt,
+        commitAttemptStatusPath,
+        statusCommand,
+        retryCommand,
+        recoveryGuidance: headAdvancedDuringAttempt
+          ? `HEAD advanced during the failed wrapper attempt. Run ${statusCommand} before retrying; the commit may already have landed as ${headShaAfterFailure}.`
+          : `HEAD did not advance. Inspect stdout/stderr and rerun ${retryCommand} after fixing the blocking hook or host git error.`,
         gitExecutable: resolveGitExecutable(),
-        copyableCommitCommand: buildCopyableGitCommitCommand({
-          cwd: options.cwd,
-          message: options.message,
-          trailers,
-          noVerify: options.noVerify
-        }),
+        copyableCommitCommand: rawCopyableCommitCommand,
         hostGitCompatibilityGuidance: buildHostGitCompatibilityGuidance({
           gitExecutable: resolveGitExecutable(),
           stderr,
           stdout,
-          copyableCommitCommand: buildCopyableGitCommitCommand({
-            cwd: options.cwd,
-            message: options.message,
-            trailers,
-            noVerify: options.noVerify
-          })
+          copyableCommitCommand: rawCopyableCommitCommand
         }),
         protectedOverrideOutcome,
         liveIndexResidueRollback
@@ -1603,9 +1638,16 @@ function runGitCommit(options: ParsedGitOptions) {
     startedAt: commitAttemptStartedAt,
     updatedAt: new Date().toISOString(),
     commitSha,
+    headShaBeforeCommit,
+    headShaAfterAttempt: commitSha,
+    headAdvancedDuringAttempt: Boolean(commitSha && headShaBeforeCommit && commitSha !== headShaBeforeCommit),
     timeoutMs: commitTimeoutMs,
     errorCode: null,
-    errorSummary: null
+    errorSummary: null,
+    statusCommand,
+    retryCommand,
+    copyableCommitCommand: rawCopyableCommitCommand,
+    liveIndexResidueRollback: []
   });
   const branchCommitQueue = {
     schemaId: 'atm.branchCommitQueueEvidence.v1',

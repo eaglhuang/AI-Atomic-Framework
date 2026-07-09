@@ -88,6 +88,10 @@ try {
   const timeoutStatusRecord = timeoutStatusEvidence?.commitAttemptStatus as Record<string, unknown> | null | undefined;
   assert.ok(timeoutStatusRecord, 'expected a recorded commit attempt status after a timed-out commit');
   assert.equal(timeoutStatusRecord!.status, 'timeout', `expected status 'timeout', got ${JSON.stringify(timeoutStatusRecord)}`);
+  assert.equal(timeoutStatusRecord!.headAdvancedDuringAttempt, false, 'timed-out hook before commit must record that HEAD did not advance');
+  assert.match(String(timeoutStatusRecord!.statusCommand), /git commit-status --actor "?opt08-actor"? --json/, 'timeout status must include a copyable status command');
+  assert.match(String(timeoutStatusRecord!.retryCommand), /git commit --actor "?opt08-actor"? --message/, 'timeout status must include a retry command');
+  assert.ok(String(timeoutStatusRecord!.copyableCommitCommand).includes('commit'), 'timeout status must retain the raw copyable commit command for host-git diagnostics');
 
   // --- Scenario 3: successful commit reports `committed` with a matching SHA.
   writeFileSync(hookPath, '#!/bin/sh\nexit 0\n', { mode: 0o755 });
@@ -105,6 +109,8 @@ try {
   assert.ok(okStatusRecord, 'expected a recorded commit attempt status after a successful commit');
   assert.equal(okStatusRecord!.status, 'committed', `expected status 'committed', got ${JSON.stringify(okStatusRecord)}`);
   assert.equal(okStatusRecord!.commitSha, committedSha, 'commit-status must report the actual committed SHA');
+  assert.equal(okStatusRecord!.headShaAfterAttempt, committedSha, 'commit-status must record the post-attempt HEAD SHA');
+  assert.equal(okStatusRecord!.headAdvancedDuringAttempt, true, 'successful commit status must record that HEAD advanced');
 
   console.log('[git-commit-timeout-and-status:test] ok');
 } finally {

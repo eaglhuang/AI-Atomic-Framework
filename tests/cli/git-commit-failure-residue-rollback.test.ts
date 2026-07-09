@@ -79,6 +79,18 @@ try {
   assert.equal(cliError.code, 'ATM_GIT_COMMIT_FAILED', `unexpected error code: ${cliError.code}`);
 
   const details = cliError.details as Record<string, unknown> | undefined;
+  assert.equal(details?.headAdvancedDuringAttempt, false, 'failed signing attempt must report that HEAD did not advance');
+  assert.match(String(details?.statusCommand), /git commit-status --actor "?opt07-actor"? --json/, 'failed commit details must include a status command');
+  assert.match(String(details?.retryCommand), /git commit --actor "?opt07-actor"? --message/, 'failed commit details must include a retry command');
+  assert.match(String(details?.recoveryGuidance), /HEAD did not advance/, 'failed commit details must explain whether retry is safe');
+
+  const statusResult = await runAtmGit(['commit-status', '--cwd', repo, '--actor', 'opt07-actor', '--json']);
+  const statusEvidence = (statusResult as { evidence?: Record<string, unknown> }).evidence;
+  const statusRecord = statusEvidence?.commitAttemptStatus as Record<string, unknown> | null | undefined;
+  assert.ok(statusRecord, 'failed commit must leave an inspectable commit-status record');
+  assert.equal(statusRecord!.status, 'failed', `expected failed status, got ${JSON.stringify(statusRecord)}`);
+  assert.equal(statusRecord!.headAdvancedDuringAttempt, false, 'failed status must record that HEAD did not advance');
+
   const liveIndexResidueRollback = Array.isArray(details?.liveIndexResidueRollback)
     ? details!.liveIndexResidueRollback as string[]
     : [];
