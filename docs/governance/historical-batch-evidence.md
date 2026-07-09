@@ -80,6 +80,34 @@ node atm.mjs evidence historical-batch \
 That mode is for diagnostics and auditability. It does not auto-upgrade an
 incomplete slice into a closable slice.
 
+## Finalizing partial or diagnostic slices
+
+When a historical batch intentionally produces a partial, blocked, or
+diagnostic-only task slice, do not close the task and do not leave the residue
+ambiguous. Finalize the slice with an explicit disposition:
+
+```bash
+node atm.mjs evidence historical-batch-finalize \
+  --task TASK-B \
+  --batch hist-batch-2026-06-16T01-40-43-634Z \
+  --actor codex-main \
+  --disposition keep-diagnostic \
+  --reason "partial slice kept for audit only" \
+  --write \
+  --json
+```
+
+Allowed dispositions:
+
+- `keep-diagnostic` records that the slice is retained as audit evidence only.
+- `abandon` records that the slice should not be pursued as a close source.
+- `remove-evidence` removes only the task evidence records that reference that
+  batch slice, while retaining the batch envelope disposition log.
+
+`historical-batch-finalize` is fail-closed for close-ready slices. If the slice
+has `okToCloseTask: true`, use `taskflow close --historical-batch` instead.
+The command is a residue disposition lane, not a task lifecycle transition.
+
 ## Closing from a historical batch slice
 
 Once a task has a close-ready slice, run pre-close before any write:

@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, appendFileSync, unlinkSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
@@ -86,7 +86,10 @@ export async function runEvidence(argv) {
     if (action === 'historical-batch') {
         return runEvidenceHistoricalBatch(argv.slice(1));
     }
-    throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing, historical-batch', { exitCode: 2 });
+    if (action === 'historical-batch-finalize') {
+        return runEvidenceHistoricalBatchFinalize(argv.slice(1));
+    }
+    throw new CliError('ATM_CLI_USAGE', 'evidence supports: add, run, git-head-backfill, verify, diff, validators, missing, historical-batch, historical-batch-finalize', { exitCode: 2 });
 }
 const VALIDATOR_GATE_ALIAS_MAP = new Map([
     ['typecheck', 'typecheck'],
@@ -1590,6 +1593,283 @@ function parseEvidenceHistoricalBatchOptions(argv) {
         validators,
         validatorCommands
     };
+}
+function runEvidenceHistoricalBatchFinalize(argv) {
+    const options = parseEvidenceHistoricalBatchFinalizeOptions(argv);
+    const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+    if (!resolvedActor) {
+        throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence historical-batch-finalize requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+    }
+    const actorId = resolvedActor.actorId;
+    const batchPath = resolveHistoricalBatchPath(options.cwd, options.batchRef);
+    if (!existsSync(batchPath)) {
+        throw new CliError('ATM_HISTORICAL_BATCH_NOT_FOUND', 'historical-batch-finalize could not find the requested batch envelope.', {
+            exitCode: 1,
+            details: { batchRef: options.batchRef, batchPath: relativePathFrom(options.cwd, batchPath) }
+        });
+    }
+    const batchEnvelope = JSON.parse(readFileSync(batchPath, 'utf8'));
+    if (!isRecord(batchEnvelope) || batchEnvelope.schemaId !== 'atm.historicalBatchEvidence.v1') {
+        throw new CliError('ATM_HISTORICAL_BATCH_INVALID', 'historical-batch-finalize requires an atm.historicalBatchEvidence.v1 envelope.', {
+            exitCode: 1,
+            details: { batchPath: relativePathFrom(options.cwd, batchPath) }
+        });
+    }
+    const batchId = typeof batchEnvelope.batchId === 'string' ? batchEnvelope.batchId : path.basename(batchPath, '.json');
+    const tasks = Array.isArray(batchEnvelope.tasks) ? batchEnvelope.tasks.filter(isRecord) : [];
+    const slice = tasks.find((entry) => entry.taskId === options.taskId);
+    if (!slice) {
+        throw new CliError('ATM_HISTORICAL_BATCH_TASK_SLICE_NOT_FOUND', 'historical-batch-finalize could not find the requested task slice in the batch envelope.', {
+            exitCode: 1,
+            details: { batchId, taskId: options.taskId }
+        });
+    }
+    const okToCloseTask = slice.okToCloseTask === true;
+    const diagnosticOnly = slice.diagnosticOnly === true || okToCloseTask === false;
+    if (okToCloseTask) {
+        throw new CliError('ATM_HISTORICAL_BATCH_FINALIZE_CLOSE_READY_REFUSED', 'historical-batch-finalize only handles partial or diagnostic-only slices; close-ready slices must go through taskflow close.', {
+            exitCode: 1,
+            details: {
+                batchId,
+                taskId: options.taskId,
+                remediation: 'Run node atm.mjs taskflow close --task <task> --historical-batch <batch> instead of finalizing diagnostic residue.'
+            }
+        });
+    }
+    if (!diagnosticOnly) {
+        throw new CliError('ATM_HISTORICAL_BATCH_FINALIZE_UNSAFE_SLICE', 'historical-batch-finalize refused a slice that is neither diagnostic-only nor explicitly not close-ready.', {
+            exitCode: 1,
+            details: { batchId, taskId: options.taskId }
+        });
+    }
+    const nowIso = new Date().toISOString();
+    const evidencePath = evidencePathForTask(options.cwd, options.taskId);
+    const plan = {
+        batchId,
+        taskId: options.taskId,
+        disposition: options.disposition,
+        reason: options.reason,
+        batchPath: relativePathFrom(options.cwd, batchPath),
+        evidencePath: relativePathFrom(options.cwd, evidencePath),
+        write: options.write,
+        closeReady: okToCloseTask,
+        diagnosticOnly
+    };
+    let removedEvidenceRecords = 0;
+    let wroteDispositionRecord = false;
+    if (options.write) {
+        const existingFinalizations = Array.isArray(batchEnvelope.finalizedTaskSlices)
+            ? batchEnvelope.finalizedTaskSlices.filter(isRecord)
+            : [];
+        const finalizedTaskSlices = [
+            ...existingFinalizations.filter((entry) => !(entry.taskId === options.taskId && entry.batchId === batchId)),
+            {
+                schemaId: 'atm.historicalBatchTaskSliceDisposition.v1',
+                batchId,
+                taskId: options.taskId,
+                disposition: options.disposition,
+                reason: options.reason,
+                finalizedBy: actorId,
+                finalizedAt: nowIso,
+                closeReady: okToCloseTask,
+                diagnosticOnly
+            }
+        ];
+        writeFileSync(batchPath, `${JSON.stringify({ ...batchEnvelope, finalizedTaskSlices }, null, 2)}\n`, 'utf8');
+        if (options.disposition === 'remove-evidence') {
+            removedEvidenceRecords = removeHistoricalBatchTaskEvidenceRecords({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                batchId
+            });
+        }
+        else {
+            appendHistoricalBatchDispositionEvidence({
+                cwd: options.cwd,
+                taskId: options.taskId,
+                actorId,
+                nowIso,
+                batchId,
+                batchPath,
+                disposition: options.disposition,
+                reason: options.reason
+            });
+            wroteDispositionRecord = true;
+        }
+    }
+    return makeResult({
+        ok: true,
+        command: 'evidence',
+        cwd: options.cwd,
+        mode: options.write ? 'write' : 'dry-run',
+        messages: [
+            message('info', options.write ? 'ATM_HISTORICAL_BATCH_SLICE_FINALIZED' : 'ATM_HISTORICAL_BATCH_SLICE_FINALIZE_READY', options.write
+                ? `Historical batch slice ${batchId}/${options.taskId} finalized as ${options.disposition}.`
+                : `Historical batch slice ${batchId}/${options.taskId} can be finalized as ${options.disposition}.`, plan)
+        ],
+        evidence: {
+            action: 'historical-batch-finalize',
+            ...plan,
+            removedEvidenceRecords,
+            wroteDispositionRecord
+        }
+    });
+}
+function parseEvidenceHistoricalBatchFinalizeOptions(argv) {
+    const options = {
+        cwd: process.cwd(),
+        actorId: null,
+        taskId: '',
+        batchRef: '',
+        disposition: '',
+        reason: '',
+        write: false
+    };
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === '--cwd') {
+            options.cwd = requireValue(argv, index, '--cwd');
+            index += 1;
+            continue;
+        }
+        if (arg === '--actor') {
+            options.actorId = requireValue(argv, index, '--actor');
+            index += 1;
+            continue;
+        }
+        if (arg === '--task') {
+            options.taskId = requireValue(argv, index, '--task').trim();
+            index += 1;
+            continue;
+        }
+        if (arg === '--batch' || arg === '--historical-batch') {
+            options.batchRef = requireValue(argv, index, arg).trim();
+            index += 1;
+            continue;
+        }
+        if (arg === '--disposition') {
+            const disposition = requireValue(argv, index, '--disposition').trim();
+            if (!isHistoricalBatchFinalizeDisposition(disposition)) {
+                throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize --disposition must be keep-diagnostic, abandon, or remove-evidence.', { exitCode: 2 });
+            }
+            options.disposition = disposition;
+            index += 1;
+            continue;
+        }
+        if (arg === '--reason') {
+            options.reason = requireValue(argv, index, '--reason').trim();
+            index += 1;
+            continue;
+        }
+        if (arg === '--write') {
+            options.write = true;
+            continue;
+        }
+        if (arg === '--dry-run') {
+            options.write = false;
+            continue;
+        }
+        if (arg === '--json' || arg === '--pretty') {
+            continue;
+        }
+        throw new CliError('ATM_CLI_USAGE', `evidence historical-batch-finalize does not support option ${arg}`, { exitCode: 2 });
+    }
+    if (!options.taskId)
+        throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --task <id>.', { exitCode: 2 });
+    if (!options.batchRef)
+        throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --batch <id-or-path>.', { exitCode: 2 });
+    if (!options.disposition)
+        throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --disposition keep-diagnostic|abandon|remove-evidence.', { exitCode: 2 });
+    if (!options.reason)
+        throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --reason <text>.', { exitCode: 2 });
+    return {
+        ...options,
+        cwd: path.resolve(options.cwd),
+        disposition: options.disposition
+    };
+}
+function isHistoricalBatchFinalizeDisposition(value) {
+    return value === 'keep-diagnostic' || value === 'abandon' || value === 'remove-evidence';
+}
+function resolveHistoricalBatchPath(cwd, batchRef) {
+    const trimmed = batchRef.trim();
+    if (path.isAbsolute(trimmed))
+        return trimmed;
+    const normalized = normalizeRelativePath(trimmed);
+    if (normalized.includes('/') || normalized.endsWith('.json')) {
+        return path.resolve(cwd, normalized);
+    }
+    return path.join(cwd, '.atm', 'history', 'evidence', 'historical-batches', `${trimmed}.json`);
+}
+function appendHistoricalBatchDispositionEvidence(input) {
+    const evidencePath = evidencePathForTask(input.cwd, input.taskId);
+    const record = {
+        evidenceKind: 'attestation',
+        evidenceType: 'attestation',
+        summary: `Historical batch diagnostic disposition ${input.batchId} for ${input.taskId}: ${input.disposition}.`,
+        artifactPaths: [normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath))],
+        evidenceFreshness: 'historical-reference',
+        producedBy: input.actorId,
+        sessionId: null,
+        createdAt: input.nowIso,
+        details: {
+            actorId: input.actorId,
+            sessionId: null,
+            kind: 'attestation',
+            freshness: 'historical-reference',
+            historicalBatchDisposition: {
+                schemaId: 'atm.historicalBatchTaskSliceDisposition.v1',
+                batchId: input.batchId,
+                taskId: input.taskId,
+                disposition: input.disposition,
+                reason: input.reason,
+                finalizedBy: input.actorId,
+                finalizedAt: input.nowIso,
+                closeReady: false,
+                diagnosticOnly: true
+            }
+        }
+    };
+    withTaskEvidenceWriteLock(input.cwd, input.taskId, input.actorId, () => {
+        const bundle = readEvidenceBundle(input.cwd, input.taskId);
+        writeEvidenceEnvelope(evidencePath, {
+            taskId: input.taskId,
+            updatedAt: input.nowIso,
+            evidence: [...bundle.evidence, record]
+        });
+    });
+}
+function removeHistoricalBatchTaskEvidenceRecords(input) {
+    const evidencePath = evidencePathForTask(input.cwd, input.taskId);
+    if (!existsSync(evidencePath))
+        return 0;
+    const bundle = readEvidenceBundle(input.cwd, input.taskId);
+    const retained = bundle.evidence.filter((entry) => !evidenceRecordReferencesHistoricalBatch(entry, input.batchId));
+    const removed = bundle.evidence.length - retained.length;
+    if (removed === 0)
+        return 0;
+    if (retained.length === 0) {
+        unlinkSync(evidencePath);
+        return removed;
+    }
+    writeEvidenceEnvelope(evidencePath, {
+        taskId: input.taskId,
+        updatedAt: new Date().toISOString(),
+        evidence: retained
+    });
+    return removed;
+}
+function evidenceRecordReferencesHistoricalBatch(record, batchId) {
+    if (!isRecord(record.details))
+        return false;
+    const details = record.details;
+    if (isRecord(details.historicalBatch) && details.historicalBatch.batchId === batchId)
+        return true;
+    if (isRecord(details.historicalBatchValidatorAttestation) && details.historicalBatchValidatorAttestation.batchId === batchId)
+        return true;
+    if (isRecord(details.historicalBatchDisposition) && details.historicalBatchDisposition.batchId === batchId)
+        return true;
+    return false;
 }
 function splitCsv(value) {
     return value.split(',').map((entry) => entry.trim()).filter(Boolean);

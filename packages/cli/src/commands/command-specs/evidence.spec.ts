@@ -8,9 +8,9 @@ import {
 
 export default defineCommandSpec({
   name: 'evidence',
-  summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, or author historical-batch envelopes that later feed the taskflow close / tasks close operator lane. Successful fresh evidence updates the per-task bundle manifest at .atm/history/evidence/<taskId>.bundle-manifest.json.',
+  summary: 'Run validators as governed evidence, add raw/manual evidence for close/commit/PR gates, author historical-batch envelopes that feed taskflow close, or finalize diagnostic historical-batch slices. Successful fresh evidence updates the per-task bundle manifest at .atm/history/evidence/<taskId>.bundle-manifest.json.',
   positional: [
-    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | historical-batch', required: true }
+    { name: 'action', summary: 'add | run | git-head-backfill | verify | diff | validators | missing | historical-batch | historical-batch-finalize', required: true }
   ],
   options: [
     commonCwdOption,
@@ -41,6 +41,8 @@ export default defineCommandSpec({
     { flag: '--allow-unmatched', summary: 'Allow diagnostic historical batches even when some tasks have no scoped commit match.' },
     { flag: '--approved-by', value: 'actor', summary: 'Required with --allow-unmatched: approver for diagnostic-only historical batch evidence.' },
     { flag: '--approval-reason', value: 'text', summary: 'Required with --allow-unmatched: justification for recording unmatched historical batch diagnostics.' },
+    { flag: '--batch', value: 'id-or-path', summary: 'Historical-batch-finalize only: batch id or envelope path for the diagnostic slice disposition.' },
+    { flag: '--disposition', value: 'type', summary: 'Historical-batch-finalize only: keep-diagnostic|abandon|remove-evidence for non-close-ready task slices.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption
@@ -57,14 +59,16 @@ export default defineCommandSpec({
     'node atm.mjs evidence missing --task ATM-GOV-0104 --actor Augment --json',
     'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validator-command "npm run validate:cli" --dry-run --json',
     'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123,def456 --actor codex-main --validators typecheck --validator-command "npm run typecheck" --write --json',
-    'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123 --actor codex-main --validator-command "npm test" --allow-unmatched --approved-by captain --approval-reason "diagnostic backfill" --write --json'
+    'node atm.mjs evidence historical-batch --tasks TASK-A,TASK-B --commits abc123 --actor codex-main --validator-command "npm test" --allow-unmatched --approved-by captain --approval-reason "diagnostic backfill" --write --json',
+    'node atm.mjs evidence historical-batch-finalize --task TASK-B --batch hist-batch-2026-06-16T01-40-43-634Z --actor codex-main --disposition keep-diagnostic --reason "partial slice kept for audit only" --write --json'
   ],
   help: {
     audience: 'agent',
     requiredFlagSets: [
       { when: 'Recording governed evidence for one task', flags: ['--task', '--actor'] },
       { when: 'Running a command-backed validator', flags: ['run', '--command'] },
-      { when: 'Writing a diagnostic historical batch with unmatched tasks', flags: ['--allow-unmatched', '--approved-by', '--approval-reason'] }
+      { when: 'Writing a diagnostic historical batch with unmatched tasks', flags: ['--allow-unmatched', '--approved-by', '--approval-reason'] },
+      { when: 'Finalizing a diagnostic historical-batch slice', flags: ['historical-batch-finalize', '--task', '--batch', '--actor', '--disposition', '--reason'] }
     ],
     relatedCommands: [
       'node atm.mjs evidence validators --list --task TASK-ABC-0001 --json',
@@ -75,11 +79,13 @@ export default defineCommandSpec({
       'Manually typing validator names when evidence run can auto-link a declared validator from the command.',
       'Using raw evidence add as a substitute for fresh command-backed validation when the task requires validators.',
       'Writing historical-batch evidence without checking whether the matched commits actually cover the task deliverables.',
+      'Trying to use historical-batch-finalize on a close-ready slice; close-ready slices must go through taskflow close.',
       'Treating git-head-backfill as a protected-push requirement instead of a repair/diagnostic tool for legacy HEAD evidence.'
     ],
     playbookNotes: [
       'evidence validators --list is the fastest way to see what a task still needs before closeout.',
       'Use --recent-run when a matching cached command run already exists and you only need to re-link it into the current evidence update.',
+      'Use historical-batch-finalize to explicitly keep, abandon, or remove diagnostic-only historical-batch residue without changing task lifecycle state.',
       'git-head-backfill is retained for repair and audit trails; same-commit governed provenance should normally come from node atm.mjs git commit instead of a follow-up backfill.'
     ]
   }

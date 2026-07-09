@@ -267,6 +267,88 @@ try {
     unmatchedWithoutApprovalBlocked = error?.code === 'ATM_CLI_USAGE';
   }
   assert(unmatchedWithoutApprovalBlocked, '--allow-unmatched without approval metadata must fail closed');
+
+  const diagnosticBatchResult = await runEvidence([
+    'historical-batch',
+    '--cwd', repo,
+    '--delivery-repo', repo,
+    '--actor', 'tester',
+    '--tasks', 'TASK-HIST',
+    '--commits', unrelatedCommit,
+    '--validator-command', 'git diff --check',
+    '--allow-unmatched',
+    '--approved-by', 'captain',
+    '--approval-reason', 'diagnostic residue disposition test',
+    '--write'
+  ]);
+  assert(diagnosticBatchResult.ok, 'approved diagnostic historical-batch write must succeed');
+  const diagnosticBatchEvidence = diagnosticBatchResult.evidence as any;
+  assertEqual(diagnosticBatchEvidence.taskSlices[0].okToCloseTask, false, 'diagnostic slice must not become close-ready');
+  const finalizeDiagnostic = await runEvidence([
+    'historical-batch-finalize',
+    '--cwd', repo,
+    '--actor', 'tester',
+    '--task', 'TASK-HIST',
+    '--batch', diagnosticBatchEvidence.batchId,
+    '--disposition', 'keep-diagnostic',
+    '--reason', 'partial slice is retained as audit evidence only',
+    '--write'
+  ]);
+  assert(finalizeDiagnostic.ok, 'diagnostic historical-batch slice must support explicit disposition');
+  const finalizeDiagnosticEvidence = finalizeDiagnostic.evidence as any;
+  assertEqual(finalizeDiagnosticEvidence.wroteDispositionRecord, true, 'keep-diagnostic disposition must append an audit evidence record');
+  const finalizedBatch = JSON.parse(readFileSync(path.join(repo, String(diagnosticBatchEvidence.batchPath)), 'utf8')) as any;
+  assertEqual(finalizedBatch.finalizedTaskSlices?.[0]?.disposition, 'keep-diagnostic', 'batch envelope must record finalized diagnostic disposition');
+  const finalizedEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8')) as any;
+  const dispositionRecord = finalizedEvidence.evidence?.find((entry: any) => entry.details?.historicalBatchDisposition?.batchId === diagnosticBatchEvidence.batchId);
+  assertEqual(dispositionRecord?.details?.historicalBatchDisposition?.closeReady, false, 'disposition evidence must not claim close readiness');
+
+  const removableBatchResult = await runEvidence([
+    'historical-batch',
+    '--cwd', repo,
+    '--delivery-repo', repo,
+    '--actor', 'tester',
+    '--tasks', 'TASK-HIST',
+    '--commits', unrelatedCommit,
+    '--validator-command', 'git diff --check',
+    '--allow-unmatched',
+    '--approved-by', 'captain',
+    '--approval-reason', 'diagnostic cleanup disposition test',
+    '--write'
+  ]);
+  const removableBatchEvidence = removableBatchResult.evidence as any;
+  const removeDiagnostic = await runEvidence([
+    'historical-batch-finalize',
+    '--cwd', repo,
+    '--actor', 'tester',
+    '--task', 'TASK-HIST',
+    '--batch', removableBatchEvidence.batchId,
+    '--disposition', 'remove-evidence',
+    '--reason', 'diagnostic import was intentionally discarded',
+    '--write'
+  ]);
+  const removeDiagnosticEvidence = removeDiagnostic.evidence as any;
+  assert(removeDiagnosticEvidence.removedEvidenceRecords >= 2, 'remove-evidence must remove only records that reference the selected diagnostic batch');
+  const afterRemovalEvidence = JSON.parse(readFileSync(taskEvidencePath, 'utf8')) as any;
+  assert(!afterRemovalEvidence.evidence?.some((entry: any) => entry.details?.historicalBatch?.batchId === removableBatchEvidence.batchId), 'remove-evidence must clear the diagnostic historical slice record');
+  assert(!afterRemovalEvidence.evidence?.some((entry: any) => entry.details?.historicalBatchValidatorAttestation?.batchId === removableBatchEvidence.batchId), 'remove-evidence must clear the paired validator attestation record');
+
+  let closeReadyFinalizeBlocked = false;
+  try {
+    await runEvidence([
+      'historical-batch-finalize',
+      '--cwd', repo,
+      '--actor', 'tester',
+      '--task', 'TASK-HIST',
+      '--batch', String(batchResult.evidence.batchId),
+      '--disposition', 'abandon',
+      '--reason', 'should not bypass close-ready slice',
+      '--write'
+    ]);
+  } catch (error: any) {
+    closeReadyFinalizeBlocked = error?.code === 'ATM_HISTORICAL_BATCH_FINALIZE_CLOSE_READY_REFUSED';
+  }
+  assert(closeReadyFinalizeBlocked, 'close-ready historical-batch slices must go through taskflow close, not finalize');
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }
