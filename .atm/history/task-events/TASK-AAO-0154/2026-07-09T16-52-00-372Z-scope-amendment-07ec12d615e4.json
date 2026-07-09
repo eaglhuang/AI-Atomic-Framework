@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T16-52-00-372Z-scope-amendment-07ec12d615e4",
+  "taskId": "TASK-AAO-0154",
+  "action": "scope-amendment",
+  "actorId": "codex-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0154.json",
+  "taskSha256": "sha256:a00d243ddeb2fbd578f3c21d53aa95c6f0f5b4a3634bd3071da06c176359e495",
+  "createdAt": "2026-07-09T16:52:00.372Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0154 --actor codex-captain --add \"packages/core/src/broker/cross-task-mutation-guard.ts,packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts,packages/core/src/broker/index.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

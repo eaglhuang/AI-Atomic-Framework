@@ -14,6 +14,8 @@ import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrat
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { inspectTrackedActorRegistryState } from './actor-registry.ts';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
+import { detectCrossTaskMutation, readIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+
 
 const legacyBehaviorPackageNames = [
   'plugin-behavior-atomize',
@@ -151,7 +153,16 @@ export async function runDoctor(argv: readonly string[]) {
     createCheck('git-worktree-readiness', gitWorktreeReadiness.ok, gitWorktreeReadiness),
     gitHeadEvidenceCheck,
     governanceEntryReadiness,
-    backlogSyncCheck
+    backlogSyncCheck,
+    createCheck('cross-task-mutation-incident', (() => {
+      const activeTaskId = runtime.currentTaskId ?? null;
+      const block = detectCrossTaskMutation(root, activeTaskId, 'doctor');
+      const incident = readIncidentFlag(root);
+      return !block && !incident;
+    })(), {
+      incident: readIncidentFlag(root),
+      conflict: detectCrossTaskMutation(root, runtime.currentTaskId ?? null, 'doctor')
+    })
   ];
   const ok = checks.every((check) => check.ok);
   const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
@@ -267,6 +278,12 @@ export async function runDoctor(argv: readonly string[]) {
         ? [message('error', 'ATM_DOCTOR_INTEGRATION_DRIFT', 'Installed integration adapter manifests have missing, drifted, or stale files.', {
           failedChecks,
           remediation: integrationDriftRemediation
+        })]
+      : failedChecks.includes('cross-task-mutation-incident')
+        ? [message('error', 'ATM_CROSS_TASK_MUTATION_BLOCKED', 'Cross-task mutation incident detected: files owned by another active task or evidence have been modified, deleted, or staged. ATM has entered incident-safe mode.', {
+          failedChecks,
+          incident: readIncidentFlag(root),
+          conflict: detectCrossTaskMutation(root, runtime.currentTaskId ?? null, 'doctor')
         })]
       : failedChecks.includes('framework-integration-hooks')
         ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]

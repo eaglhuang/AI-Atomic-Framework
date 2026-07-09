@@ -23,6 +23,8 @@ import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } fr
 import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
+import { detectCrossTaskMutation, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
 export function resolveGitExecutable(): string {
@@ -900,6 +902,14 @@ export function evaluateGitGovernanceCheck(input: {
   const trailers = parseTrailers(readHeadCommitMessage(cwd));
 
   const violations: GitGovernanceViolation[] = [];
+  const crossTaskBlock = detectCrossTaskMutation(cwd, input.taskId, 'git check');
+  if (crossTaskBlock) {
+    recordIncidentFlag(cwd, crossTaskBlock);
+    violations.push({
+      code: 'cross-task-mutation-incident',
+      detail: `Cross-task mutation incident detected: files owned by active task ${crossTaskBlock.conflictTaskId} are mutated. File(s): ${crossTaskBlock.conflictFiles.join(', ')}. Recovery: ${crossTaskBlock.recoveryLane}`
+    });
+  }
   if (!profile.gitName || !profile.gitEmail) {
     violations.push({
       code: 'git-identity-profile-missing',

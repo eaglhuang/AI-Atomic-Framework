@@ -1,0 +1,316 @@
+{
+  "taskId": "TASK-AAO-0154",
+  "updatedAt": "2026-07-09T17:21:26.788Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "summary": "Takeover recorded for TASK-AAO-0154: antigravity -> codex-captain.",
+      "artifactPaths": [
+        ".atm/history/tasks/TASK-AAO-0154.json"
+      ],
+      "producedBy": "codex-captain",
+      "createdAt": "2026-07-09T16:43:17.665Z",
+      "details": {
+        "action": "takeover",
+        "previousClaim": {
+          "actorId": "antigravity",
+          "leaseId": "lease-c36c10225171",
+          "claimedAt": "2026-07-09T16:12:25.991Z",
+          "heartbeatAt": "2026-07-09T16:12:25.991Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/TASK-AAO-0154.*",
+            ".atm/history/task-events/TASK-AAO-0154/**",
+            ".atm/history/tasks/TASK-AAO-0154.json",
+            "packages/cli/src/commands/doctor.ts",
+            "packages/cli/src/commands/git-governance.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/channel-strategy.ts",
+            "packages/cli/src/commands/taskflow.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/core/src/broker/",
+            "scripts/validate-cli.ts"
+          ],
+          "state": "active"
+        },
+        "newClaim": {
+          "actorId": "codex-captain",
+          "leaseId": "lease-00f02dc9b9e5",
+          "claimedAt": "2026-07-09T16:43:17.644Z",
+          "heartbeatAt": "2026-07-09T16:43:17.644Z",
+          "ttlSeconds": 1800,
+          "files": [
+            ".atm/history/evidence/TASK-AAO-0154.*",
+            ".atm/history/task-events/TASK-AAO-0154/**",
+            ".atm/history/tasks/TASK-AAO-0154.json",
+            "packages/cli/src/commands/doctor.ts",
+            "packages/cli/src/commands/git-governance.ts",
+            "packages/cli/src/commands/next.ts",
+            "packages/cli/src/commands/next/channel-strategy.ts",
+            "packages/cli/src/commands/taskflow.ts",
+            "packages/cli/src/commands/tasks.ts",
+            "packages/core/src/broker/",
+            "scripts/validate-cli.ts"
+          ],
+          "state": "active",
+          "reason": "Human authorized codex-captain lifecycle takeover/repair for TASK-AAO-0154 after antigravity claim TTL elapsed"
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+      "createdAt": "2026-07-09T16:54:01.151Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.governed-mutation-boundary",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "89d542ad352bee3f07a66025f55aa56db1239737",
+            "cacheKey": "sha256:6846eb5d9fc1a4b15fc6cf5d5f33db1f7fdcdd891e92db4998da68b651f5c39b",
+            "cached": false,
+            "generatedAt": "2026-07-09T16:54:01.753Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:354782eb608be119981bca54a2a3bfd61ca3ddb7443588f93e27ac8e41015014",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+      "createdAt": "2026-07-09T17:00:33.735Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.governed-mutation-boundary",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "89d542ad352bee3f07a66025f55aa56db1239737",
+            "cacheKey": "sha256:ea9e60b336bd6f2abc28e8e331433bf9ed792eed440424967eed7e4f423176f1",
+            "cached": false,
+            "generatedAt": "2026-07-09T17:00:34.324Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:02ac8d932cd615a3739bb443659c5410356565c3e247d71e071b0728e79d47fb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+      "createdAt": "2026-07-09T17:12:32.452Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.governed-mutation-boundary",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "89d542ad352bee3f07a66025f55aa56db1239737",
+            "cacheKey": "sha256:e2f87d1e8342f692f8475a1617fa607fb7edda2137b35f25aa5c62a6c33c2c0a",
+            "cached": false,
+            "generatedAt": "2026-07-09T17:12:32.699Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0443341e9453e079e54236ed7b921b2ac4659ce6b3a324dad3be7307acd38e7b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+      "createdAt": "2026-07-09T17:17:01.205Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.governed-mutation-boundary",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "89d542ad352bee3f07a66025f55aa56db1239737",
+            "cacheKey": "sha256:bd986e383c3b44514c2e9be7aba5db9cc15128224019ebf430942a545df38db1",
+            "cached": false,
+            "generatedAt": "2026-07-09T17:17:01.255Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1e126cf4cab0d3bd9e3df1fb4401a5b675d70613dfae8f5e97b883d62429a1a0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-captain",
+      "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+      "createdAt": "2026-07-09T17:21:26.788Z",
+      "details": {
+        "actorId": "codex-captain",
+        "sessionId": "session-20260709165159-codex-captain-TASK-AAO-0154-689e3aabc0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.governed-mutation-boundary",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "48824b8c6c56a5dd7e0b16482285875f0d536a5f",
+            "cacheKey": "sha256:1ae47776a7986f977e03ed6e0b802c9dca6fa8db4b42e2ea9d3fd7f3bddcc1fe",
+            "cached": false,
+            "generatedAt": "2026-07-09T17:21:26.851Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:268ed6a50f67129e2ae6dc5a384fe958c35d93aa75c96e393a22c3ec15ed21d2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

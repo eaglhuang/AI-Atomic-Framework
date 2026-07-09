@@ -113,6 +113,15 @@ export function decideRuntimeNextAction(
       blockedCommands: blockedMutationCommands()
     };
   }
+  if (failedCheckName === 'cross-task-mutation-incident') {
+    return {
+      status: 'incident-safe-mode',
+      command: 'git status',
+      reason: 'Cross-task mutation incident detected: files owned by another active task or evidence have been modified, deleted, or staged. ATM has entered incident-safe mode.',
+      allowedCommands: ['git status', 'git diff', 'node atm.mjs doctor', 'node atm.mjs tasks status'],
+      blockedCommands: ['*']
+    };
+  }
   if (failedCheckName) {
     return {
       status: 'needs-validation',
