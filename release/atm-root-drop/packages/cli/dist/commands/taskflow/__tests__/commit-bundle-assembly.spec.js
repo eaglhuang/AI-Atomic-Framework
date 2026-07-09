@@ -116,6 +116,18 @@ writeJson(path.join(autoTargetRepo, '.atm/history/evidence/TASK-BUNDLE-0002.clos
     taskId: autoCommitTaskId,
     schemaId: 'atm.closurePacket.v1'
 });
+const autoBundleManifestPath = `.atm/history/evidence/${autoCommitTaskId}.bundle-manifest.json`;
+writeJson(path.join(autoTargetRepo, autoBundleManifestPath), {
+    taskId: autoCommitTaskId,
+    schemaId: 'atm.evidenceBundleManifest.v1',
+    summary: 'stale pre-standard manifest'
+});
+execFileSync('git', ['add', autoBundleManifestPath], { cwd: autoTargetRepo, stdio: 'ignore' });
+writeJson(path.join(autoTargetRepo, autoBundleManifestPath), {
+    taskId: autoCommitTaskId,
+    schemaId: 'atm.evidenceBundleManifest.v1',
+    summary: 'fresh standard manifest'
+});
 writeText(path.join(autoTargetRepo, 'src/app.ts'), 'export const value = 2;\n');
 mkdirSync(path.join(autoTargetRepo, '.atm', 'runtime', 'sessions'), { recursive: true });
 writeJson(path.join(autoTargetRepo, '.atm', 'runtime', 'sessions', 'session-bundle-0002.json'), {
@@ -167,6 +179,7 @@ assert.ok(autoTargetStaged.includes('scratch/foreign.txt'), 'parallel foreign st
 // committed paths in the live index to the new HEAD, so no residual diff
 // should remain for them at all.
 assert.ok(!autoTargetStaged.includes('src/app.ts'), 'committed task bundle files must not leave a phantom staged diff after close');
+assert.ok(!autoTargetStaged.includes(autoBundleManifestPath), 'refreshed same-task bundle manifest must not leave a stale staged diff after close');
 assert.equal(execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoTargetRepo, encoding: 'utf8' }).trim(), `chore(taskflow): close ${autoCommitTaskId} target governance bundle`);
 const sameRepoTaskId = 'TASK-BUNDLE-0003';
 const sameRepo = path.join(tempRoot, 'same-repo');
