@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-bbd3e8ba8ee7",
+  "recordedAt": "2026-07-09T17:46:41.482Z",
+  "actorId": "codex-lane-b",
+  "taskId": "TASK-RFT-0019",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-lane-b --task TASK-RFT-0019 --message \"refactor(tasks): finalize tasks command facade split\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-RFT-0019-002fc76d32",
+  "reason": "Team Broker arbitration: TASK-RFT-0019 must land its validated tasks.ts facade split before later TASK-AAO-0155 next-routing work rebases on the new facade.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-09T17-46-41-478Z-EMG-TASK-RFT-0019-002fc76d32.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
