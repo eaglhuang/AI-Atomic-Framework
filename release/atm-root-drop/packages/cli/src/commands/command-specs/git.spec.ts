@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'git',
-  summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
+  summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue owner diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
   positional: [
     { name: 'action', summary: 'prepare | admit | recover-push-fail | check | commit | record-commit | commit-status', required: true }
   ],

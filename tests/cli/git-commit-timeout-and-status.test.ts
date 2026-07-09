@@ -17,7 +17,7 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { chmodSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { CliError } from '../../packages/cli/src/commands/shared.ts';
@@ -34,6 +34,10 @@ function writeJson(filePath: string, value: unknown) {
 
 function readHeadSha(cwd: string): string {
   return runGit(cwd, ['rev-parse', 'HEAD']).trim();
+}
+
+function readHeadBranchRef(cwd: string): string {
+  return runGit(cwd, ['symbolic-ref', '-q', 'HEAD']).trim();
 }
 
 const repo = mkdtempSync(path.join(os.tmpdir(), 'atm-git-commit-timeout-'));
@@ -60,6 +64,32 @@ try {
   const neverAttemptedStatus = await runAtmGit(['commit-status', '--cwd', repo, '--actor', 'opt08-never-actor', '--json']);
   const neverAttemptedEvidence = (neverAttemptedStatus as { evidence?: Record<string, unknown> }).evidence;
   assert.equal(neverAttemptedEvidence?.commitAttemptStatus ?? null, null, 'expected no recorded commit attempt for a fresh actor/task pair');
+  assert.equal((neverAttemptedEvidence?.branchCommitQueueStatus as Record<string, unknown>)?.status, 'free', 'fresh repo must report a free branch commit queue');
+
+  // --- Scenario 1b: commit-status must surface a live branch queue owner so a
+  // caller-level timeout can distinguish "still committing" from "safe retry".
+  const branchRef = readHeadBranchRef(repo);
+  const safeBranch = branchRef.replace(/[^A-Za-z0-9._-]+/g, '-');
+  const queueLockPath = path.join(repo, '.atm/runtime/locks', `git-commit-queue-${safeBranch}.lock`);
+  mkdirSync(queueLockPath, { recursive: true });
+  writeJson(path.join(queueLockPath, 'record.json'), {
+    schemaId: 'atm.branchCommitQueueLock.v1',
+    specVersion: '0.1.0',
+    actorId: 'opt08-actor',
+    taskId: null,
+    branchRef,
+    branchName: branchRef.replace(/^refs\/heads\//, ''),
+    headShaAtAcquire: readHeadSha(repo),
+    ownerPid: process.pid,
+    createdAt: new Date().toISOString()
+  });
+  const busyQueueStatus = await runAtmGit(['commit-status', '--cwd', repo, '--actor', 'opt08-actor', '--json']);
+  const busyQueueEvidence = (busyQueueStatus as { evidence?: Record<string, unknown> }).evidence;
+  const busyQueueRecord = busyQueueEvidence?.branchCommitQueueStatus as Record<string, unknown>;
+  assert.equal(busyQueueRecord.status, 'busy', 'commit-status must report a live branch commit queue owner as busy');
+  assert.equal(busyQueueRecord.ownerAlive, true, 'commit-status must prove the queue owner process is alive when possible');
+  assert.match(String(busyQueueRecord.recommendedAction), /wait/i, 'busy queue guidance must tell the operator to wait instead of blindly retrying');
+  rmSync(queueLockPath, { recursive: true, force: true });
 
   // --- Scenario 2: hung pre-commit hook is bounded by --timeout-ms.
   mkdirSync(path.join(repo, '.git/hooks'), { recursive: true });

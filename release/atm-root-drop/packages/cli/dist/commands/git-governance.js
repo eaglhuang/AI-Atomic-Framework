@@ -864,19 +864,26 @@ function runGitCommitStatus(options) {
     }
     const actorId = resolvedActor.actorId;
     const status = readGitCommitAttemptStatus(options.cwd, actorId, options.taskId);
+    const branchQueueStatus = inspectCurrentBranchCommitQueueStatus(options.cwd);
     const label = `${actorId}${options.taskId ? ` / ${options.taskId}` : ''}`;
     return makeResult({
         ok: true,
         command: 'git',
         cwd: options.cwd,
-        messages: [status
+        messages: [
+            status
                 ? message('info', 'ATM_GIT_COMMIT_STATUS_FOUND', `Last known governed commit attempt for ${label} is ${status.status} (phase: ${status.phase}).`, { status })
-                : message('info', 'ATM_GIT_COMMIT_STATUS_NOT_FOUND', `No recorded governed commit attempt for ${label}.`, {})],
+                : message('info', 'ATM_GIT_COMMIT_STATUS_NOT_FOUND', `No recorded governed commit attempt for ${label}.`, {}),
+            branchQueueStatus.status === 'free'
+                ? message('info', 'ATM_GIT_COMMIT_BRANCH_QUEUE_FREE', 'No active branch commit queue lock is present.', { branchQueueStatus })
+                : message(branchQueueStatus.status === 'busy' ? 'warning' : 'warning', branchQueueStatus.status === 'busy' ? 'ATM_GIT_COMMIT_BRANCH_QUEUE_ACTIVE' : 'ATM_GIT_COMMIT_BRANCH_QUEUE_STALE_OR_DEAD', branchQueueStatus.recommendedAction, { branchQueueStatus })
+        ],
         evidence: {
             action: 'commit-status',
             actorId,
             taskId: options.taskId,
-            commitAttemptStatus: status
+            commitAttemptStatus: status,
+            branchCommitQueueStatus: branchQueueStatus
         }
     });
 }
@@ -2775,6 +2782,49 @@ function branchCommitQueueLockPath(cwd, branchRef) {
     const rawName = branchRef && branchRef.trim().length > 0 ? branchRef : 'detached-head';
     const safeName = rawName.replace(/[^A-Za-z0-9._-]+/g, '-');
     return path.join(cwd, '.atm', 'runtime', 'locks', `git-commit-queue-${safeName}.lock`);
+}
+function inspectCurrentBranchCommitQueueStatus(cwd) {
+    const branchRef = readHeadBranchRef(cwd) ?? 'detached-head';
+    const branchName = branchRef.replace(/^refs\/heads\//, '') || 'detached-head';
+    const lockPath = branchCommitQueueLockPath(cwd, branchRef);
+    const lockPathRelative = relativePathFrom(cwd, lockPath);
+    const currentHeadSha = readHeadCommitSha(cwd);
+    if (!existsSync(lockPath)) {
+        return {
+            schemaId: 'atm.gitCommitBranchQueueStatus.v1',
+            status: 'free',
+            branchRef,
+            branchName,
+            lockPath: lockPathRelative,
+            lockRecord: null,
+            ownerAlive: null,
+            ageMs: null,
+            currentHeadSha,
+            headMovedSinceAcquire: null,
+            recommendedAction: 'No branch commit queue lock is present; it is safe to start a new governed commit if the worktree is otherwise ready.'
+        };
+    }
+    const record = readBranchCommitQueueLockRecord(lockPath);
+    const createdMs = record?.createdAt ? Date.parse(record.createdAt) : NaN;
+    const ageMs = Number.isFinite(createdMs) ? Math.max(0, Date.now() - createdMs) : null;
+    const ownerAlive = record ? isBranchCommitQueueOwnerAlive(record.ownerPid) : null;
+    const headMovedSinceAcquire = Boolean(record?.headShaAtAcquire && currentHeadSha && record.headShaAtAcquire !== currentHeadSha);
+    const status = ownerAlive === true ? 'busy' : 'stale-or-dead';
+    return {
+        schemaId: 'atm.gitCommitBranchQueueStatus.v1',
+        status,
+        branchRef,
+        branchName,
+        lockPath: lockPathRelative,
+        lockRecord: record,
+        ownerAlive,
+        ageMs,
+        currentHeadSha,
+        headMovedSinceAcquire,
+        recommendedAction: status === 'busy'
+            ? `A governed commit is still active on ${branchName}; wait for owner PID ${record?.ownerPid ?? 'unknown'} to finish, then rerun git commit-status before retrying.`
+            : `A branch commit queue lock exists for ${branchName}, but its owner is not known to be alive. Do not blindly retry; inspect ${lockPathRelative}, current HEAD, and recent git commit-status output before cleaning the stale lock.`
+    };
 }
 function isBranchCommitQueueOwnerAlive(ownerPid) {
     if (typeof ownerPid !== 'number' || !Number.isInteger(ownerPid) || ownerPid <= 0) {
