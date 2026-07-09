@@ -1,0 +1,88 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T16-11-53-942Z-close-dfabf118bd6b",
+  "taskId": "TASK-RFT-0017",
+  "action": "close",
+  "actorId": "codex-lane-b",
+  "sessionId": "session-20260709141136-codex-lane-b-TASK-RFT-0017-276b2f3aaa",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0017.json",
+  "taskSha256": "sha256:854950b5e720bbd8063acc6ebca566f6f82f85fdb3399b643364ca5db874f70f",
+  "createdAt": "2026-07-09T16:11:53.942Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0017 --actor codex-lane-b --status done --historical-delivery bb5f914d60e886fbc9b21764c708c9156560106a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260709141136-codex-lane-b-TASK-RFT-0017-276b2f3aaa",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0017.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:tasks-claim-atomic-map"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-09T16:11:53.938Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0017.*",
+        ".atm/history/task-events/TASK-RFT-0017/**",
+        ".atm/history/tasks/TASK-RFT-0017.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/reports/tasks-command-atomic-map.md",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/claim-intent.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-preparation.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+        "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/takeover-evidence.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-tasks-claim-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/claim-intent.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-preparation.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+        "packages/cli/src/commands/tasks/repair-claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/takeover-evidence.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-tasks-claim-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
