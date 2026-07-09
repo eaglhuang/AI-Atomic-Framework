@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0018",
-  "updatedAt": "2026-07-09T16:43:48.653Z",
+  "updatedAt": "2026-07-09T17:18:10.366Z",
   "updatedBy": "codex-lane-b",
   "freshValidationPasses": [
     "git diff --check",
@@ -9,6 +9,8 @@
     "node --strip-types packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
     "node --strip-types packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
     "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:tasks-reconcile-atomic-map"
   ],
   "staleValidationPasses": [],
@@ -100,6 +102,32 @@
       "generatedAt": "2026-07-09T16:43:49.089Z",
       "runnerKind": "dev-source",
       "sourceCommit": "d6adba16e54e37e908337b4d30553d92676e4231",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-09T17:07:28.454Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-09T17:18:10.990Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
