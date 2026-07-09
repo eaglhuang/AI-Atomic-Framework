@@ -19,6 +19,8 @@
     "build:onefile-release": "node --strip-types scripts/build-onefile-release.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
+    "check:encoding:touched": "node --strip-types scripts/check-encoding-touched.ts --mode touched",
+    "check:encoding:staged": "node --strip-types scripts/check-encoding-touched.ts --mode staged",
     "test": "node --strip-types scripts/run-validators.ts test",
     "validate:quick": "node --strip-types scripts/run-validators.ts quick",
     "validate:quick:cached": "node --strip-types scripts/run-validators.ts quick --cache",

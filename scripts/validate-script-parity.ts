@@ -29,12 +29,16 @@ const manifestPath = path.join(
   'wrappers.json'
 );
 const wrappersManifest: WrappersManifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+const packageJson = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')) as {
+  scripts?: Record<string, string>;
+};
 const scriptRoutes: Record<string, readonly string[]> = Object.fromEntries(
   wrappersManifest.wrappers.map((w) => [
     w.name,
     [w.subcommand, ...w.extraArgs, ...(w.alwaysJson ? ['--json'] : [])],
   ])
 );
+const packageScripts = packageJson.scripts ?? {};
 
 function fail(message: string) {
   console.error(`[script-parity:${mode}] ${message}`);
@@ -77,6 +81,15 @@ function parseCliJson(result: any, label: string) {
     return {};
   }
 }
+
+assert(
+  packageScripts['check:encoding:touched'] === 'node --strip-types scripts/check-encoding-touched.ts --mode touched',
+  'package.json must expose check:encoding:touched for encoding-touched-guard'
+);
+assert(
+  packageScripts['check:encoding:staged'] === 'node --strip-types scripts/check-encoding-touched.ts --mode staged',
+  'package.json must expose check:encoding:staged for encoding-touched-guard'
+);
 
 for (const [scriptName, expectedRoute] of Object.entries(scriptRoutes)) {
   const shPath = path.join(root, 'templates', 'root-drop', '.atm', 'scripts', 'sh', `${scriptName}.sh`);
