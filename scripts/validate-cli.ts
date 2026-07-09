@@ -97,16 +97,35 @@ function sandboxEpermHint(args: any, cwd: any) {
   ].join(' ');
 }
 
+const cleanupSleepBuffer = new SharedArrayBuffer(4);
+const cleanupSleepView = new Int32Array(cleanupSleepBuffer);
+
+function sleepMs(durationMs: number) {
+  Atomics.wait(cleanupSleepView, 0, 0, durationMs);
+}
+
 function safeRmSync(targetPath: string) {
-  try {
-    rmSync(targetPath, { recursive: true, force: true });
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException | undefined)?.code;
-    if (code !== 'EPERM' && code !== 'EBUSY') {
-      throw error;
+  const retryableCodes = new Set(['EPERM', 'EBUSY', 'ENOTEMPTY']);
+  let lastError: NodeJS.ErrnoException | null = null;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      rmSync(targetPath, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      const candidate = error as NodeJS.ErrnoException | undefined;
+      const code = candidate?.code ?? null;
+      if (!code || !retryableCodes.has(code)) {
+        throw error;
+      }
+      lastError = candidate ?? null;
+      if (attempt < 5) {
+        sleepMs(40 * (attempt + 1));
+        continue;
+      }
     }
-    console.warn(`[cli:${mode}] warning: cleanup skipped for ${targetPath} (${code})`);
   }
+  const code = lastError?.code ?? 'unknown';
+  console.warn(`[cli:${mode}] warning: cleanup skipped for ${targetPath} (${code})`);
 }
 
 async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
@@ -1882,7 +1901,7 @@ try {
       const validCloseRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-VALID-CLOSE-DOWNSTREAM', '--actor', 'Antigravity'], regressWorkspace);
       assert(validCloseRes.exitCode === 0, 'valid closure packet must allow downstream claim');
     } finally {
-      rmSync(regressWorkspace, { recursive: true, force: true });
+      safeRmSync(regressWorkspace);
     }
 
     // Test 5.1b: import->done without governed closeout must classify as source-done-governance-incomplete (TASK-CID-0060)
@@ -2008,10 +2027,10 @@ try {
       assert(mixedWaiverInspect.ok, 'mixed commit must pass with waiver and reason');
       assert(mixedWaiverInspect.reason === 'scoped-deliverable-with-waived-out-of-scope', 'must report waived out-of-scope acceptance');
     } finally {
-      rmSync(histWorkspace, { recursive: true, force: true });
+      safeRmSync(histWorkspace);
     }
   } finally {
-    rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
+    safeRmSync(autoLinkTempWorkspace);
   }
 
   // Test 5.2: tasks close state machine and closure metadata hard gate regression check

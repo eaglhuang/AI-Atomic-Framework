@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T14-46-52-079Z-scope-amendment-f3b5bdc5719d",
+  "taskId": "TASK-RFT-0017",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-b",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0017.json",
+  "taskSha256": "sha256:0901853188e1c33e08923e6f5e978ad5892d9f5f03401b4b336e6ce590051632",
+  "createdAt": "2026-07-09T14:46:52.079Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0017 --actor codex-lane-b --add scripts/validate-cli.ts --class linked-surface --phase closeout --reason \"fix validate:cli Windows temp cleanup blocker required by TASK-RFT-0017 close gate\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "closeout",
+    "amendmentMode": "normal",
+    "reason": "fix validate:cli Windows temp cleanup blocker required by TASK-RFT-0017 close gate"
+  }
+}

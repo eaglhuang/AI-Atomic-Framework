@@ -25,6 +25,7 @@ function lineCount(text: string): number {
 
 const tasksFacade = read('packages/cli/src/commands/tasks.ts');
 const claimOrchestrator = read('packages/cli/src/commands/tasks/claim-orchestrator.ts');
+const claimPreparation = read('packages/cli/src/commands/tasks/claim-preparation.ts');
 const claimIntent = read('packages/cli/src/commands/tasks/claim-intent.ts');
 const takeoverEvidence = read('packages/cli/src/commands/tasks/takeover-evidence.ts');
 const repairClaimOrchestrator = read('packages/cli/src/commands/tasks/repair-claim-orchestrator.ts');
@@ -32,6 +33,7 @@ const atomicMap = read('docs/reports/tasks-command-atomic-map.md');
 
 const atomFiles = new Map([
   ['packages/cli/src/commands/tasks/claim-orchestrator.ts', claimOrchestrator],
+  ['packages/cli/src/commands/tasks/claim-preparation.ts', claimPreparation],
   ['packages/cli/src/commands/tasks/claim-intent.ts', claimIntent],
   ['packages/cli/src/commands/tasks/takeover-evidence.ts', takeoverEvidence],
   ['packages/cli/src/commands/tasks/repair-claim-orchestrator.ts', repairClaimOrchestrator]
@@ -43,11 +45,16 @@ for (const [filePath, text] of atomFiles) {
 }
 
 assert(tasksFacade.includes("import { runTasksClaimLifecycle as delegatedRunTasksClaimLifecycle } from './tasks/claim-orchestrator.ts';"), 'tasks.ts must delegate claim lifecycle');
+assert(tasksFacade.includes("import { prepareTaskForClaim as delegatedPrepareTaskForClaim } from './tasks/claim-preparation.ts';"), 'tasks.ts must delegate claim preparation');
 assert(tasksFacade.includes("import { runTasksRepairClaim } from './tasks/repair-claim-orchestrator.ts';"), 'tasks.ts must delegate repair-claim');
+assert(claimPreparation.includes('export function prepareTaskForClaim'), 'claim preparation atom must export prepareTaskForClaim');
+assert(claimPreparation.includes('parseSingleCard'), 'claim preparation atom must consume the injected parser boundary');
+assert(claimPreparation.includes('writeTaskFiles'), 'claim preparation atom must consume the injected task writer boundary');
+assert(claimPreparation.includes('writeImportEvidence'), 'claim preparation atom must consume the injected import-evidence writer boundary');
 assert(!tasksFacade.includes('function resolveTaskClaimIntent'), 'tasks.ts must not retain claim intent helper body');
 assert(!tasksFacade.includes('function writeTakeoverEvidence'), 'tasks.ts must not retain takeover evidence helper body');
 assert(!tasksFacade.includes('function parseRepairClaimOptions'), 'tasks.ts must not retain repair-claim parser body');
-assert(lineCount(tasksFacade) < 5200, 'tasks.ts must remain below the TASK-RFT-0017 target ceiling of 5,200 lines');
+assert(lineCount(tasksFacade) < 4800, 'tasks.ts must remain below the TASK-RFT-0017 target ceiling of 4,800 lines');
 assert(!atomicMap.includes('packages/cli/src/commands/next.ts` | `tasks.claim.lifecycle'), 'claim lifecycle atom must not move into next.ts');
 
 console.log('[validate-tasks-claim-atomic-map] ok');

@@ -80,7 +80,7 @@ This report does not change production command behavior. It exists to define the
 - The validator should fail closed if any required section is missing or if the atom list does not mention the three caller surfaces.
 - TASK-CID-0058 requires the report to mention `packages/cli/src/commands/tasks/command-dispatch.ts` so future map checks keep the dispatch atom visible.
 - TASK-CID-0062 requires the report to mention `packages/cli/src/commands/tasks/dependency-gates.ts` and `packages/cli/src/commands/tasks/surface-invariants.ts` so future map checks keep the governance invariant owner modules visible.
-- TASK-RFT-0017 requires the report to mention `packages/cli/src/commands/tasks/claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-intent.ts`, `packages/cli/src/commands/tasks/takeover-evidence.ts`, and `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts`; each new atom file should stay at or below 600 lines.
+- TASK-RFT-0017 requires the report to mention `packages/cli/src/commands/tasks/claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-preparation.ts`, `packages/cli/src/commands/tasks/claim-intent.ts`, `packages/cli/src/commands/tasks/takeover-evidence.ts`, and `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts`; each new atom file should stay at or below 600 lines.
 
 ## TASK-RFT-0017 Update
 
@@ -91,6 +91,7 @@ TASK-RFT-0017 split the claim lifecycle cluster out of `packages/cli/src/command
 | Atom | Module | Responsibility |
 | --- | --- | --- |
 | `tasks.claim.lifecycle` | `packages/cli/src/commands/tasks/claim-orchestrator.ts` | Claim / renew / release / handoff / takeover state machine, lock acquisition/release, work-session state, task transition writes. |
+| `tasks.claim.preparation` | `packages/cli/src/commands/tasks/claim-preparation.ts` | Reserve/promote preparation and planning-card auto-import orchestration; consumes parser, task-writer, and import-evidence writer via injection so those atoms can be split independently. |
 | `tasks.claim.intent` | `packages/cli/src/commands/tasks/claim-intent.ts` | Auto-resolve write vs closeout-only claim intent from scoped dirty files and deliverable presence in `HEAD`. |
 | `tasks.claim.takeover-evidence` | `packages/cli/src/commands/tasks/takeover-evidence.ts` | Append takeover validation evidence without mixing evidence writing into the lifecycle state machine. |
 | `tasks.repair.claim` | `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts` | CLI backend for diagnose-first repair-claim; consumes `claim-repair-diagnostics.ts`. |
@@ -98,8 +99,9 @@ TASK-RFT-0017 split the claim lifecycle cluster out of `packages/cli/src/command
 ### Before / After Line Counts
 
 - Before TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 5,796 lines
-- After TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 4,991 lines
+- After TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 4,759 lines
 - New `packages/cli/src/commands/tasks/claim-orchestrator.ts` = 554 lines
+- New `packages/cli/src/commands/tasks/claim-preparation.ts` = 272 lines
 - New `packages/cli/src/commands/tasks/claim-intent.ts` = 119 lines
 - New `packages/cli/src/commands/tasks/takeover-evidence.ts` = 31 lines
 - New `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts` = 190 lines
