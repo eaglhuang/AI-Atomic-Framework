@@ -298,6 +298,18 @@ async function runNextRoute(argv: string[]) {
       runtimeAdapterReadiness
     }), options.cwd);
   }
+  const activeTaskDivergenceResult = buildActiveTaskDivergenceResult({
+    cwd: options.cwd,
+    taskIntent,
+    importedTaskQueue,
+    integrationBootstrap,
+    runtimeAdapterReadiness
+  });
+  profile.mark('build-active-task-divergence-result');
+  if (activeTaskDivergenceResult) {
+    profile.flush('active-task-divergence-result');
+    return withRunnerMode(activeTaskDivergenceResult, options.cwd);
+  }
   const promptScopeResult = buildPromptScopedNextResult({
     cwd: options.cwd,
     taskIntent,
@@ -4180,6 +4192,178 @@ function buildMirrorSyncNextAction(input: {
 
 type GovernanceChannel = 'fast' | 'normal' | 'batch';
 type BatchPlaybookState = 'queue-preview' | 'queue-head-active' | 'repair-required';
+
+interface ActiveTaskDivergence {
+  readonly activeTask: ImportedTaskSummary;
+  readonly reasons: readonly string[];
+  readonly promptPaths: readonly string[];
+  readonly mentionedOtherTaskIds: readonly string[];
+}
+
+function buildActiveTaskDivergenceResult(input: {
+  readonly cwd: string;
+  readonly taskIntent: TaskIntent | null;
+  readonly importedTaskQueue: ImportedTaskQueue;
+  readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
+  readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
+}) {
+  const divergence = detectActiveTaskDivergence(input.cwd, input.taskIntent, input.importedTaskQueue);
+  if (!divergence) return null;
+  const activeTaskId = divergence.activeTask.workItemId;
+  const nextAction = {
+    status: 'active-task-divergence-blocked',
+    command: 'node atm.mjs next --prompt "<specific task id or imported task card>" --json',
+    reason: `the prompt appears to diverge from active task ${activeTaskId}; ATM will not attach new work to the active task silently`,
+    activeTask: toTaskCandidateView(divergence.activeTask),
+    divergence,
+    decisionOptions: [
+      'Open or import a new task card for the new work.',
+      `Repair ${activeTaskId} metadata if the prompt really belongs to the active task.`,
+      `Continue intentionally by naming ${activeTaskId} in the prompt.`
+    ],
+    allowedCommands: allowedGuidanceBootstrapCommands(),
+    blockedCommands: blockedMutationCommands(),
+    decisionTrail: [
+      {
+        check: 'route-status',
+        result: 'blocked',
+        reason: `ATM detected prompt divergence from active task ${activeTaskId}.`
+      },
+      {
+        check: 'active-task-divergence',
+        result: 'blocked',
+        reason: divergence.reasons.join('; ')
+      }
+    ] satisfies NextDecisionTrailEntry[]
+  };
+  return makeResult({
+    ok: false,
+    command: 'next',
+    cwd: input.cwd,
+    messages: buildNextMessages(
+      nextAction,
+      null,
+      input.integrationBootstrap,
+      input.runtimeAdapterReadiness,
+      message('error', 'ATM_NEXT_ACTIVE_TASK_DIVERGENCE_BLOCKED', `Prompt diverges from active task ${activeTaskId}; ATM refused to auto-attach it.`, {
+        activeTaskId,
+        reasons: divergence.reasons,
+        promptPaths: divergence.promptPaths,
+        mentionedOtherTaskIds: divergence.mentionedOtherTaskIds,
+        remediation: nextAction.decisionOptions
+      })
+    ),
+    evidence: {
+      nextAction,
+      taskIntent: input.taskIntent,
+      importedTaskQueue: input.importedTaskQueue,
+      activeTaskDivergence: divergence,
+      integrationBootstrap: input.integrationBootstrap,
+      runtimeAdapterReadiness: input.runtimeAdapterReadiness
+    }
+  });
+}
+
+function detectActiveTaskDivergence(
+  cwd: string,
+  taskIntent: TaskIntent | null,
+  importedTaskQueue: ImportedTaskQueue
+): ActiveTaskDivergence | null {
+  const prompt = taskIntent?.userPrompt?.trim() ?? '';
+  if (!prompt) return null;
+  if (importedTaskQueue.promptScope && importedTaskQueue.promptScope.status !== 'not-found') return null;
+  const activeTasks = readActiveClaimedTasks(cwd);
+  if (activeTasks.length === 0) return null;
+  const activeTaskIds = activeTasks.map((task) => task.workItemId.toUpperCase());
+  const mentionedTaskIds = uniqueSorted([
+    ...(taskIntent?.mentionedTaskIds ?? []),
+    ...(taskIntent?.explicitTaskIds ?? [])
+  ].map((taskId) => taskId.toUpperCase()));
+  if (mentionedTaskIds.some((taskId) => activeTaskIds.includes(taskId))) return null;
+
+  const reasons: string[] = [];
+  const mentionedOtherTaskIds = mentionedTaskIds.filter((taskId) => !activeTaskIds.includes(taskId));
+  if (mentionedOtherTaskIds.length > 0) {
+    reasons.push(`prompt names other task id(s): ${mentionedOtherTaskIds.join(', ')}`);
+  }
+  if (mentionsNotCurrentTask(prompt)) {
+    reasons.push('prompt explicitly says it is not the current active task');
+  }
+  const promptPaths = extractPathLikeStringsFromPrompt(prompt)
+    .map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '').trim())
+    .filter((entry) => entry.length > 0);
+  const activeScope = uniqueSorted(activeTasks.flatMap((task) => [
+    ...task.scopePaths,
+    ...task.targetAllowedFiles
+  ]));
+  const outsidePromptPaths = promptPaths.filter((entry) => !isPathAllowedByScope(entry, activeScope));
+  if (outsidePromptPaths.length > 0) {
+    reasons.push(`prompt path(s) are outside active task scope(s): ${outsidePromptPaths.join(', ')}`);
+  }
+  return reasons.length > 0
+    ? { activeTask: activeTasks[0], reasons, promptPaths, mentionedOtherTaskIds }
+    : null;
+}
+
+function readActiveClaimedTasks(cwd: string): ImportedTaskSummary[] {
+  const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
+  if (!existsSync(taskStorePath)) return [];
+  return readdirSync(taskStorePath)
+    .filter((entry) => entry.endsWith('.json'))
+    .flatMap((entry): ImportedTaskSummary[] => {
+      const filePath = path.join(taskStorePath, entry);
+      try {
+        const parsed = parseJsonText(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+        const workItemId = normalizeOptionalString(parsed.workItemId ?? parsed.id);
+        if (!workItemId || normalizeTaskRouteStatus(normalizeOptionalString(parsed.status) ?? '') !== 'running') return [];
+        const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+          ? parsed.claim as Record<string, unknown>
+          : {};
+        if (claimRecord.state !== 'active') return [];
+        const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
+          ? parsed.source as Record<string, unknown>
+          : {};
+        return [finalizeImportedTaskSummary({
+          workItemId,
+          title: normalizeOptionalString(parsed.title) ?? workItemId,
+          status: normalizeOptionalString(parsed.status) ?? 'running',
+          closedAt: normalizeOptionalString(parsed.closedAt ?? parsed.closed_at),
+          closedByActor: normalizeOptionalString(parsed.closedByActor ?? parsed.closed_by_actor),
+          closurePacket: normalizeOptionalString(parsed.closurePacket ?? parsed.closure_packet),
+          lastTransitionId: normalizeOptionalString(parsed.lastTransitionId ?? parsed.last_transition_id),
+          lastTransitionAt: normalizeOptionalString(parsed.lastTransitionAt ?? parsed.last_transition_at),
+          milestone: normalizeOptionalString(parsed.milestone),
+          dependencies: readStringArray(parsed.dependencies),
+          taskPath: path.relative(cwd, filePath).replace(/\\/g, '/'),
+          format: 'json',
+          sourcePlanPath: normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path),
+          nearbyPlanPaths: [],
+          scopePaths: uniqueSorted([
+            ...readStringArray(parsed.scope),
+            ...readStringArray(parsed.scopePaths),
+            ...readStringArray(parsed.files),
+            ...readStringArray(claimRecord.files)
+          ]),
+          outOfScope: readStringArray(parsed.outOfScope ?? parsed.out_of_scope),
+          targetRepo: normalizeOptionalString(parsed.target_repo ?? parsed.targetRepo),
+          planningRepo: normalizeOptionalString(parsed.planning_repo ?? parsed.planningRepo),
+          allowPlanningMirror: allowsPlanningMirror(parsed),
+          closureAuthority: normalizeOptionalString(parsed.closure_authority ?? parsed.closureAuthority),
+          activeClaimActorId: normalizeOptionalString(claimRecord.actorId),
+          activeClaimIntent: normalizeOptionalString(claimRecord.intent) ?? 'write'
+        }, cwd)];
+      } catch {
+        return [];
+      }
+    });
+}
+
+function mentionsNotCurrentTask(prompt: string) {
+  const normalized = normalizeSearchText(prompt);
+  return /\bnot\s+(?:the\s+)?current\s+task\b|\bnot\s+(?:this\s+)?active\s+task\b/.test(normalized)
+    || /不是(?:目前|當前|現在)?(?:這張|此)?(?:任務|active task|current task)/.test(prompt)
+    || /不要(?:接|掛|綁|套|附著|attach)(?:到|在)?(?:目前|當前|現在)?(?:這張|此)?(?:任務|active task|current task)/i.test(prompt);
+}
 
 function buildChannelPlaybook(input: {
   readonly channel: GovernanceChannel;

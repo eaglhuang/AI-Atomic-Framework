@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0155",
+  "title": "Prevent next --prompt from silently attaching new bug work to the wrong active task",
+  "status": "running",
+  "milestone": "RFT-M5",
+  "dependencies": [],
+  "acceptance": [
+    "For a divergent prompt, `next --prompt` returns a blocking or escalation result with explicit reasoning instead of auto-attaching to the current task.",
+    "The result tells the operator whether to open/import a new card, repair the current task metadata, or continue the active task intentionally.",
+    "Existing same-task continuation flows still work for real follow-up prompts.",
+    "New helper modules introduced by this card stay under 600 lines and keep the routing policy inspectable."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/core/src/broker/",
+    "scripts/validate-prompt-scoped-next.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:prompt-scoped-next",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Reworking the whole broker conflict model",
+    "Adding a free-form bypass that lets agents override divergence without evidence"
+  ],
+  "nonGoals": [
+    "Do not optimize for fewer prompts at the expense of task-boundary correctness"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if valid same-lane continuation prompts stop resolving to their intended active task.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-routing",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Prefer evidence-based divergence checks over keyword heuristics alone.\n- Use current task frontmatter, declared scope, and active claim metadata as\n  primary signals.\n- This card is a root-cause treatment for bug-lane misattachment; it must not\n  introduce validator downgrade mechanisms.",
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-AAO-0155-next-active-task-divergence-guard.task.md",
+    "sectionTitle": "TASK-AAO-0155",
+    "headingLine": 42,
+    "hash": "37144722d954b5b8"
+  },
+  "importedAt": "2026-07-09T17:33:38.103Z",
+  "lastTransitionId": "2026-07-09T17-33-49-051Z-claim-7d500ed560be",
+  "lastTransitionAt": "2026-07-09T17:33:49.051Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-07-09T17:33:47.796Z",
+  "promotedAt": "2026-07-09T17:33:47.799Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-fdf52c2fdd9d",
+    "claimedAt": "2026-07-09T17:33:47.806Z",
+    "heartbeatAt": "2026-07-09T17:33:47.806Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0155.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-09T17:33:47.806Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260709173347-codex-captain-TASK-AAO-0155-3c2f0c3dd7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0155",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0155.*",
+      ".atm/history/task-events/TASK-AAO-0155/**",
+      ".atm/history/tasks/TASK-AAO-0155.json",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/core/src/broker/",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "99a61f204c345f3a7e4848ec06a5fc7747bd6fc36fba71e697d11bfa74cd03aa",
+    "actorId": "codex-captain",
+    "createdAt": "2026-07-09T17:33:49.050Z",
+    "status": "active"
+  }
+}

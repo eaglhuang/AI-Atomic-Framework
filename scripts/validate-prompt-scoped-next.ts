@@ -710,6 +710,22 @@ scopePaths:
     assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
     assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
 
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-ACTIVE-0001.json'), 'TASK-ACTIVE-0001', 'Active scoped task', 'src/active-owned.ts', {
+      status: 'running',
+      claimActorId: 'prompt-scope-test'
+    });
+    const divergentActiveTask = await runNext(['--cwd', tempRoot, '--prompt', 'Please fix src/new-bug.ts, not the current task']);
+    assert(divergentActiveTask.ok === false, 'divergent prompt must not auto-attach to the active task');
+    assert(divergentActiveTask.messages.some((entry) => entry.code === 'ATM_NEXT_ACTIVE_TASK_DIVERGENCE_BLOCKED'), 'divergent prompt must emit active-task divergence blocker');
+    const divergentAction = (divergentActiveTask.evidence.nextAction as any) ?? {};
+    assert(divergentAction.status === 'active-task-divergence-blocked', 'divergent prompt must expose active-task-divergence-blocked status');
+    assert((divergentAction.decisionOptions ?? []).some((entry: string) => entry.includes('Open or import')), 'divergence blocker must tell the operator to open/import a new card');
+    assert((divergentAction.decisionOptions ?? []).some((entry: string) => entry.includes('Continue intentionally')), 'divergence blocker must allow intentional same-task continuation by naming the task');
+
+    const sameActiveTask = await runNext(['--cwd', tempRoot, '--prompt', 'Continue TASK-ACTIVE-0001']);
+    assert(sameActiveTask.ok === true, 'same-task continuation prompt must still route');
+    assert((sameActiveTask.evidence.nextAction as any).selectedTask?.workItemId === 'TASK-ACTIVE-0001', 'same-task continuation must select the active task');
+
     // ATM-BUG-2026-07-07-047: a blanket "all/open/remaining task cards" prompt
     // names no specific task, plan, or root, so keyword-based scoring finds
     // nothing above zero. ATM must still route the already-discovered open
