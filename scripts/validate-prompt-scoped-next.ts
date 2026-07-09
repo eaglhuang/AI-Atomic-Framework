@@ -200,6 +200,14 @@ async function main() {
     const scopedNotFoundTrail = assertDecisionTrail(scopedNotFound.evidence.nextAction as any, 'task-scope-not-found');
     assert(scopedNotFoundTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'blocked'), 'scope-not-found decisionTrail must record fail-closed scope resolution');
 
+    const retrospectiveAudit = await runNext(['--cwd', tempRoot, '--prompt', 'Please audit OPT-12 follow-up cleanup status and report whether the review is complete']);
+    assert(retrospectiveAudit.ok === true, 'read-only retrospective audit prompts with historical non-ledger labels must not hard-block as task-scope-not-found');
+    assert(retrospectiveAudit.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_AUDIT_ADVISORY'), 'retrospective audit prompt must report the missing historical scope as advisory');
+    assert(!retrospectiveAudit.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'retrospective audit prompt must not emit the hard task-scope-not-found blocker');
+    assert((retrospectiveAudit.evidence.nextAction as any).status === 'task-scope-audit-advisory', 'retrospective audit prompt must expose the advisory route status');
+    const retrospectiveAuditTrail = assertDecisionTrail(retrospectiveAudit.evidence.nextAction as any, 'retrospective audit advisory');
+    assert(retrospectiveAuditTrail.some((entry) => entry.check === 'prompt-scope-resolution' && entry.result === 'info'), 'audit advisory decisionTrail must record non-blocking scope resolution');
+
     const collaborationIsolationPrompt = '修正 git hook 的平行協作隔離：docs-only 或不含 ATM task/evidence 的一般 commit/push 不應被其他本機 ahead governance commits 或 active ATM task 狀態阻擋';
     const collaborationIsolation = await runNext(['--cwd', tempRoot, '--prompt', collaborationIsolationPrompt]);
     assert(!collaborationIsolation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'natural language commit/push isolation prompt must not be misread as a task scope because of task/evidence or commit/push text');

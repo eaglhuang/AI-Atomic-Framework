@@ -1378,6 +1378,47 @@ function buildPromptScopedNextResult(input) {
     if (promptScope.status === 'not-found') {
         const planningRootMissing = input.importedTaskQueue.planningRootMissing ?? null;
         const nonPlaybookHints = buildNonPlaybookRouteHints(input.cwd, input.taskIntent?.userPrompt ?? '');
+        if (!planningRootMissing && isReadOnlyPromptScopeMiss(input.taskIntent)) {
+            const nextAction = {
+                status: 'task-scope-audit-advisory',
+                command: 'node atm.mjs next --json',
+                reason: 'the prompt mentions a historical or non-ledger task label for read-only audit; ATM did not find a matching open task and will not block safe inspection',
+                taskIntent: input.taskIntent,
+                candidates: [],
+                diagnostics: promptScope.diagnostics,
+                decisionTrail: [
+                    {
+                        check: 'route-status',
+                        result: 'info',
+                        reason: 'ATM found a task-like prompt scope miss, but the requested action is read-only audit/analyze.'
+                    },
+                    {
+                        check: 'prompt-scope-resolution',
+                        result: 'info',
+                        reason: 'read-only audit/analyze prompt may inspect evidence without claiming a missing task scope'
+                    }
+                ],
+                allowedCommands: allowedGuidanceBootstrapCommands(),
+                blockedCommands: blockedMutationCommands(),
+                ...nonPlaybookHints
+            };
+            return makeResult({
+                ok: true,
+                command: 'next',
+                cwd: input.cwd,
+                messages: buildNextMessages(nextAction, null, input.integrationBootstrap, input.runtimeAdapterReadiness, message('info', 'ATM_NEXT_TASK_SCOPE_AUDIT_ADVISORY', 'The prompt names a task-like scope that ATM could not find, but the requested action is read-only audit/analyze.', {
+                    taskIntent: input.taskIntent,
+                    diagnostics: promptScope.diagnostics
+                })),
+                evidence: {
+                    nextAction,
+                    taskIntent: input.taskIntent,
+                    importedTaskQueue: input.importedTaskQueue,
+                    integrationBootstrap: input.integrationBootstrap,
+                    runtimeAdapterReadiness: input.runtimeAdapterReadiness
+                }
+            });
+        }
         const nextAction = {
             status: planningRootMissing ? 'planning-root-missing' : 'task-scope-not-found',
             command: planningRootMissing?.requiredCommand ?? 'node atm.mjs next --prompt "<current user prompt>" --json',
@@ -1911,6 +1952,12 @@ function buildPromptScopedNextResult(input) {
             runtimeAdapterReadiness: input.runtimeAdapterReadiness
         }
     });
+}
+function isReadOnlyPromptScopeMiss(taskIntent) {
+    if (!taskIntent)
+        return false;
+    const action = taskIntent.requestedAction;
+    return action === 'audit' || action === 'analyze';
 }
 function buildPromptGuidanceNextResult(input) {
     const prompt = input.taskIntent?.userPrompt?.trim();
