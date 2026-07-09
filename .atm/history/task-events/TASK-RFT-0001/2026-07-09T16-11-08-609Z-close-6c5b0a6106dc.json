@@ -1,0 +1,89 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-09T16-11-08-609Z-close-6c5b0a6106dc",
+  "taskId": "TASK-RFT-0001",
+  "action": "close",
+  "actorId": "cursor-composer-rft0001",
+  "sessionId": "session-20260709141801-cursor-composer-rft0001-TASK-RFT-0001-6d0fe6da1d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0001.json",
+  "taskSha256": "sha256:0d80ef007fd624f0fae1e837199a00d3848ded7ed79ffcc3a3f595bbcb5629b7",
+  "createdAt": "2026-07-09T16:11:08.609Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0001 --actor cursor-composer-rft0001 --status done --historical-delivery b513405f2ea00640ef7dd140c1714c6bdc561963",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260709141801-cursor-composer-rft0001-TASK-RFT-0001-6d0fe6da1d",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0001.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:next-atomic-map"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-09T16:11:08.604Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0001.*",
+        ".atm/history/task-events/TASK-RFT-0001/**",
+        ".atm/history/tasks/TASK-RFT-0001.json",
+        "docs/reports/next-command-atomic-map.md",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+        "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+        "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+        "packages/cli/src/commands/next/channel-strategy.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/runner-mode.ts",
+        "packages/cli/src/commands/next/task-scoped-claim-command.ts",
+        "scripts/validate-next-atomic-map.ts",
+        "tests/cli-fixtures/help-snapshots/next.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+        "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+        "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+        "packages/cli/src/commands/next/channel-strategy.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/runner-mode.ts",
+        "packages/cli/src/commands/next/task-scoped-claim-command.ts",
+        "scripts/validate-next-atomic-map.ts",
+        "tests/cli-fixtures/help-snapshots/next.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

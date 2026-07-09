@@ -1,0 +1,219 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0001",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bb5f914d60e886fbc9b21764c708c9156560106a",
+  "governedTreeSha": "8f3a07be91beedfa5bfca1a14321182bfded18d2",
+  "targetCommitDelta": {
+    "currentCommitSha": "bb5f914d60e886fbc9b21764c708c9156560106a",
+    "parentCommitShas": [
+      "bb5f914d60e886fbc9b21764c708c9156560106a"
+    ],
+    "governedTreeSha": "8f3a07be91beedfa5bfca1a14321182bfded18d2",
+    "changedFiles": [
+      "docs/reports/next-command-atomic-map.md",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+      "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/next/runner-mode.ts",
+      "packages/cli/src/commands/next/task-scoped-claim-command.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-next-atomic-map.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-next-atomic-map.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f04bfbc63af2ee2034495b3707a49d1554899ac5309bea04f4f22499b4dda71c",
+      "stderrSha256": "sha256:faa639da8eda8abe81023227b15f9a3acaa43ae703a080039e8f47cf4d661d82",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:cac23764273ded22f8dd441d8b608d7c0d094e690e2c88451d564b5a46367812",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:22affffb5213cd75968951d5d32877656ba4aa29629d12eacb74bfb60eeec290",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c861bff6ac517c5aed08760e80db1a5cbeabdfe13f4c62337bc678a6853e9d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6ad29b01fc5899ed3dd23f882f4b2a7a0f4aebe625cc91473c79234cf61ad7c2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1152c7e7ac45e18c7d011d98a992d078a11ec4898acf4671ef0a545e5b508c6b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:a1840768825f88ccfd04fa99a12f46fb05d1157f3057cef1b8fe24fdb99951d9",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:next-atomic-map"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-09T16:11:08.604Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0001.*",
+      ".atm/history/task-events/TASK-RFT-0001/**",
+      ".atm/history/tasks/TASK-RFT-0001.json",
+      "docs/reports/next-command-atomic-map.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+      "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/runner-mode.ts",
+      "packages/cli/src/commands/next/task-scoped-claim-command.ts",
+      "scripts/validate-next-atomic-map.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+      "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/runner-mode.ts",
+      "packages/cli/src/commands/next/task-scoped-claim-command.ts",
+      "scripts/validate-next-atomic-map.ts",
+      "tests/cli-fixtures/help-snapshots/next.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0001.json",
+  "closedAt": "2026-07-09T16:11:08.604Z",
+  "closedByActor": "cursor-composer-rft0001",
+  "sessionId": "session-20260709141801-cursor-composer-rft0001-TASK-RFT-0001-6d0fe6da1d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b513405f2ea00640ef7dd140c1714c6bdc561963",
+    "taskMatchedFiles": [
+      "docs/reports/next-command-atomic-map.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/channel-strategy.spec.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/__tests__/runner-mode.spec.ts",
+      "packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/next/runner-mode.ts",
+      "packages/cli/src/commands/next/task-scoped-claim-command.ts",
+      "scripts/validate-next-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0001.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0001/2026-07-09T14-11-39-365Z-import-488f3924f6de.json",
+      ".atm/history/task-events/TASK-RFT-0001/2026-07-09T14-18-01-879Z-reserve-4a9eaa910b99.json",
+      ".atm/history/task-events/TASK-RFT-0001/2026-07-09T14-18-01-882Z-promote-52bb2d6ebb72.json",
+      ".atm/history/task-events/TASK-RFT-0001/2026-07-09T14-18-06-763Z-claim-7f8fca12bcb1.json",
+      ".atm/history/tasks/TASK-RFT-0001.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
