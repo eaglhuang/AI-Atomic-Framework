@@ -1,0 +1,209 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0018",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "89d542ad352bee3f07a66025f55aa56db1239737",
+  "governedTreeSha": "ea2312c98e6d3229d4cb0a1d86e4a7f752d5f417",
+  "targetCommitDelta": {
+    "currentCommitSha": "89d542ad352bee3f07a66025f55aa56db1239737",
+    "parentCommitShas": [
+      "89d542ad352bee3f07a66025f55aa56db1239737"
+    ],
+    "governedTreeSha": "ea2312c98e6d3229d4cb0a1d86e4a7f752d5f417",
+    "changedFiles": [
+      ".atm/catalog/registry/actors.json",
+      ".atm/history/evidence/TASK-RFT-0018.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/evidence.ts",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook.ts",
+      "packages/cli/src/commands/next/channel-strategy.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
+      "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+      "packages/core/src/broker/index.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-tasks-reconcile-atomic-map.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de037972847a4190480351b171e7d443b578342a99b63d78bbd829303a6cd1f1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c02b3665843aea7ab14b9571b4993f8e1a607d833ab5c5f1e5d8d0136f2cf8d5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5de6fe9079bc35f8c1c048e75433ea00e5eb3ab4901c854fe2f0a4e895fddf4f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-tasks-reconcile-atomic-map.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aebf4b416f77af676e7b595b46700abb653f36ee33d870e425419d23447b3265",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "powershell -NoProfile -Command Set-Location C:\\Users\\User\\AI-Atomic-Framework-lane-b-0018; npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git -C C:\\Users\\User\\AI-Atomic-Framework-lane-b-0018 diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:cac23764273ded22f8dd441d8b608d7c0d094e690e2c88451d564b5a46367812",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:tasks-reconcile-atomic-map"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-09T17:19:47.576Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0018.*",
+      ".atm/history/task-events/TASK-RFT-0018/**",
+      ".atm/history/tasks/TASK-RFT-0018.json",
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
+      "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+      "scripts/validate-tasks-reconcile-atomic-map.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
+      "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+      "scripts/validate-tasks-reconcile-atomic-map.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0018.json",
+  "closedAt": "2026-07-09T17:19:47.576Z",
+  "closedByActor": "codex-lane-b",
+  "sessionId": "session-20260709162223-codex-lane-b-TASK-RFT-0018-7ab994e315",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "89d542ad352bee3f07a66025f55aa56db1239737",
+    "taskMatchedFiles": [
+      "docs/reports/tasks-command-atomic-map.md",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts",
+      "packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
+      "packages/cli/src/commands/tasks/repairclose-orchestrator.ts",
+      "scripts/validate-tasks-reconcile-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0018.json",
+      ".atm/history/task-events/TASK-RFT-0018/2026-07-09T14-11-08-774Z-import-4ade425bcc94.json",
+      ".atm/history/task-events/TASK-RFT-0018/2026-07-09T16-22-23-119Z-reserve-8a3cba6339f0.json",
+      ".atm/history/task-events/TASK-RFT-0018/2026-07-09T16-22-23-125Z-promote-02f02c9fc638.json",
+      ".atm/history/task-events/TASK-RFT-0018/2026-07-09T16-22-23-769Z-claim-c5721a463671.json",
+      ".atm/history/tasks/TASK-RFT-0018.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

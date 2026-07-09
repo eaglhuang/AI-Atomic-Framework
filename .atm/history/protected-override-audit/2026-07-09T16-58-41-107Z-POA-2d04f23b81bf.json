@@ -1,0 +1,29 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-2d04f23b81bf",
+  "recordedAt": "2026-07-09T16:58:41.107Z",
+  "actorId": "codex-lane-b",
+  "taskId": "TASK-RFT-0018",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0018 --actor codex-lane-b --status done --json",
+  "flags": [],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-RFT-0018-8dd6808cdc",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "protected-backend-surface"
+  ],
+  "touchedFiles": [],
+  "outcome": "failed",
+  "failureCode": "ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID",
+  "emergencyUsePath": null,
+  "parentEventId": null,
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Authorized protected override failed before completion; inspect failureCode and retry through the normal lane when possible.",
+    "suggestedCommand": "node atm.mjs tasks close --task TASK-RFT-0018 --actor codex-lane-b --status done --json",
+    "deferredChecks": [
+      "protected-backend-surface"
+    ]
+  }
+}
