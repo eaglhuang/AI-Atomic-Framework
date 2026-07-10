@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T08-34-32-294Z-close-c90869b7e937",
+  "taskId": "TASK-TEAM-0045",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260710082312-codex-gpt-5.4-mini-TASK-TEAM-0045-e3675edd02",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0045.json",
+  "taskSha256": "sha256:ca1901b38e2063bbe6bca9c3c8c757f0a653a66bf96117ed5663d23a5f95ff5f",
+  "createdAt": "2026-07-10T08:34:32.294Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0045 --actor codex-gpt-5.4-mini --status done --historical-delivery d45abbfb0b1e94273262a9a40f8a578d36efe46f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710082312-codex-gpt-5.4-mini-TASK-TEAM-0045-e3675edd02",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0045.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:integration-adapter",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T08:34:32.287Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0045.*",
+        ".atm/history/task-events/TASK-TEAM-0045/**",
+        ".atm/history/tasks/TASK-TEAM-0045.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/AGENT_PACK_ONBOARDING.md",
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "schemas/integrations/install-manifest.schema.json",
+        "scripts/validate-integration-adapter.ts",
+        "scripts/validate-team-agents.ts",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "schemas/integrations/install-manifest.schema.json",
+        "scripts/validate-integration-adapter.ts",
+        "scripts/validate-team-agents.ts",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
