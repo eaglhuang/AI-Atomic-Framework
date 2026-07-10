@@ -978,7 +978,7 @@ async function claimNextImportedTask(input: {
               || brokerAdmission?.mutationIntentStatus === 'missing';
             const shouldBlockPerCid = claimIntent !== 'closeout-only'
               && activeWriteConflict
-              && confirmedBrokerConflict;
+              && (confirmedBrokerConflict || insufficientMutationIntent);
             const cidVerdict: ClaimAdmissionCidVerdict = shouldBlockPerCid
               ? 'blocked-cid-conflict'
               : (insufficientMutationIntent
@@ -1012,6 +1012,14 @@ async function claimNextImportedTask(input: {
                   verdict: 'blocked-cid-conflict',
                   brokerVerdict,
                   cidVerdict,
+                  decisionClass: insufficientMutationIntent ? 'blocked' : 'serial-release',
+                  decisionReason: insufficientMutationIntent
+                    ? 'broker-conflict-blocked because active task overlap lacks a confirmed Broker mutation intent or resolution artifact.'
+                    : 'broker-conflict-blocked because the Broker confirmed an active task ownership conflict.',
+                  violationStatus: 'broker-conflict-blocked',
+                  statusCode: 'broker-conflict-blocked',
+                  requiredResolutionArtifact: 'atm.brokerConflictResolution.v1',
+                  requiredCommand: `node atm.mjs team broker resolve --task ${claimableTask.workItemId} --conflict ${candidate.taskId} --path <shared-path> --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`,
                   admissionDivergence: admission.divergence,
                   closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
                 }

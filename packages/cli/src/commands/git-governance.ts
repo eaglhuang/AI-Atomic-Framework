@@ -118,12 +118,18 @@ function readBrokerConflictResolutionArtifact(input: {
   const expectedFiles = [...input.conflictFiles].map((entry) => String(entry).replace(/\\/g, '/')).sort();
   const resolutionOrder = Array.isArray(artifact.resolutionOrder) ? artifact.resolutionOrder.map((entry) => String(entry).trim()).filter(Boolean) : [];
   const validatorPlan = Array.isArray(artifact.validatorPlan) ? artifact.validatorPlan.map((entry) => String(entry).trim()).filter(Boolean) : [];
+  const decisionClass = String(artifact.decisionClass ?? '').trim();
+  const decisionReason = String(artifact.decisionReason ?? '').trim();
+  const violationStatus = String(artifact.violationStatus ?? '').trim();
   if (
     artifact.schemaId !== 'atm.brokerConflictResolution.v1'
     || artifactConflictTaskId !== input.conflictTaskId
     || JSON.stringify(artifactConflictFiles) !== JSON.stringify(expectedFiles)
     || resolutionOrder.length < 2
     || validatorPlan.length === 0
+    || !['serial-release', 'human-signoff-required', 'adr-required', 'blocked'].includes(decisionClass)
+    || decisionReason.length === 0
+    || !['broker-conflict-blocked', 'resolution-issued', 'resolved'].includes(violationStatus)
   ) {
     throw new CliError(
       'ATM_GIT_COMMIT_BROKER_CONFLICT_RESOLUTION_INVALID',
@@ -135,7 +141,7 @@ function readBrokerConflictResolutionArtifact(input: {
           requiredSchemaId: 'atm.brokerConflictResolution.v1',
           expectedConflictTaskId: input.conflictTaskId,
           expectedConflictFiles: expectedFiles,
-          requiredFields: ['schemaId', 'conflictTaskId', 'conflictFiles', 'resolutionOrder[2+]', 'validatorPlan[1+]']
+          requiredFields: ['schemaId', 'conflictTaskId', 'conflictFiles', 'decisionClass', 'decisionReason', 'violationStatus', 'resolutionOrder[2+]', 'validatorPlan[1+]']
         }
       }
     );
@@ -192,6 +198,10 @@ function assertNoBrokerConflictBeforeHookBypass(options: {
         conflictFiles: crossTaskBlock.conflictFiles,
         conflicts: crossTaskBlock.conflicts,
         recoveryLane: crossTaskBlock.recoveryLane,
+        decisionClass: 'blocked',
+        decisionReason: 'broker-conflict-blocked because git commit --no-verify would bypass an active Team Broker ownership conflict.',
+        violationStatus: 'broker-conflict-blocked',
+        statusCode: 'broker-conflict-blocked',
         requiredAction: 'Resolve the active task ownership conflict through a paper-style Team Broker conflict-resolution artifact before retrying the commit.',
         hookBypassPermission: 'backend.gitHookBypass',
         brokerConflictOverridePermission: 'backend.brokerConflictOverride',

@@ -108,7 +108,7 @@ export function evaluateClaimAdmission(input: ClaimAdmissionInput): ClaimAdmissi
     return {
       admitted: false,
       blockCode: 'ATM_NEXT_CLAIM_BLOCKED',
-      blockReason: `Broker arbitration returned '${input.brokerVerdict}' — claim cannot proceed while the underlying conflict is unresolved`
+      blockReason: `Broker arbitration returned '${input.brokerVerdict}' (broker-conflict-blocked) - claim cannot proceed while the underlying conflict is unresolved`
         + (input.conflictingTaskId ? ` (conflict with ${input.conflictingTaskId}).` : '.'),
       divergence,
       advisory: null

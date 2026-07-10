@@ -751,6 +751,7 @@ export async function runTeam(argv: string[]) {
         relatedFindings: nonPermissionFindings,
         suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
         brokerLane: teamPlan.brokerLane,
+        sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
         runtimeContract,
         runtimePilot: teamPlan.runtimePilot
       }
@@ -783,6 +784,7 @@ export async function runTeam(argv: string[]) {
           validation,
           teamPlan,
           brokerLane: teamPlan.brokerLane,
+          sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
           runtimeContract,
           runtimePilot: teamPlan.runtimePilot
         }
@@ -848,9 +850,25 @@ export async function runTeam(argv: string[]) {
       teamPlan,
       runtimeContract,
       brokerLane: teamPlan.brokerLane,
+      sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
       runtimePilot: teamPlan.runtimePilot
     }
   });
+}
+
+export function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEvidence) {
+  if (brokerLane.safeToStart) {
+    return null;
+  }
+  const firstReason = brokerLane.blockedReasons[0] ?? 'Team Broker did not grant start authority.';
+  return {
+    decisionClass: 'blocked',
+    decisionReason: firstReason.includes('broker-conflict-blocked')
+      ? firstReason
+      : `broker-conflict-blocked: ${firstReason}`,
+    violationStatus: 'broker-conflict-blocked',
+    statusCode: 'broker-conflict-blocked'
+  };
 }
 
 function runTeamBroker(argv: string[], defaultCwd: string) {
