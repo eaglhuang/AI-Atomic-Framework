@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T06-45-08-306Z-close-1766af9551d7",
+  "taskId": "TASK-SKL-0012",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710062937-codex-captain-m8e-TASK-SKL-0012-64181389f7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0012.json",
+  "taskSha256": "sha256:0a8bf55911b7b32261789f452a0d8a99f5dfad27d98962d97527187dff811cbf",
+  "createdAt": "2026-07-10T06:45:08.306Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0012 --actor codex-captain-m8e --status done --historical-delivery e3f9f2e66f0421e0b4e5968013235dcfc14a5e1b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710062937-codex-captain-m8e-TASK-SKL-0012-64181389f7",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0012.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T06:45:08.300Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0012.*",
+        ".atm/history/task-events/TASK-SKL-0012/**",
+        ".atm/history/tasks/TASK-SKL-0012.json",
+        ".github/**",
+        "docs/**",
+        "integrations/**",
+        "packages/**"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/**"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

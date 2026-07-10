@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-SKL-0012",
-  "updatedAt": "2026-07-10T06:38:06.087Z",
+  "updatedAt": "2026-07-10T06:44:28.465Z",
   "updatedBy": "codex-captain-m8e",
   "freshValidationPasses": [
     "git diff --check",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -58,6 +59,19 @@
       "generatedAt": "2026-07-10T06:37:45.582Z",
       "runnerKind": "dev-source",
       "sourceCommit": "1dd572e4e6697c7bf71d63ac8c77c96dccc58919",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-10T06:44:28.965Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e3f9f2e66f0421e0b4e5968013235dcfc14a5e1b",
       "cached": false
     }
   ],
