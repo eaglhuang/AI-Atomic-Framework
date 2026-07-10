@@ -1,0 +1,56 @@
+{
+  "schemaId": "atm.maoBrokerConflictReplayFixture.v1",
+  "scenarioId": "M8E-BROKER-CONFLICT-RESOLUTION",
+  "description": "Sanitized offline replay for the M8E broker conflict resolution chain.",
+  "capabilityIntroducedBy": "TASK-MAO-0059",
+  "replayProvenance": {
+    "origin": "sanitized-benchmark",
+    "sanitizedFrom": "M8E Team Broker enforcement acceptance chain",
+    "notes": "No live runtime residue is used as fixture input."
+  },
+  "sharedVocabulary": [
+    "decisionClass",
+    "decisionReason",
+    "violationStatus",
+    "broker-conflict-blocked"
+  ],
+  "entryGates": [
+    "next-claim",
+    "team-start",
+    "taskflow-close",
+    "git-commit"
+  ],
+  "tasks": [
+    {
+      "taskId": "TASK-MAO-0059-A",
+      "actorId": "agent-a",
+      "atomId": "atm.team-broker-conflict-resolution",
+      "sharedPaths": [
+        "packages/core/src/team-runtime/permission-broker.ts"
+      ]
+    },
+    {
+      "taskId": "TASK-MAO-0059-B",
+      "actorId": "agent-b",
+      "atomId": "atm.team-broker-conflict-resolution",
+      "sharedPaths": [
+        "packages/core/src/team-runtime/permission-broker.ts"
+      ]
+    }
+  ],
+  "resolution": {
+    "decisionClass": "serial-release",
+    "decisionReason": "broker-conflict-blocked until the release order grants the next task.",
+    "violationStatus": "broker-conflict-blocked",
+    "releaseOrder": [
+      "TASK-MAO-0059-A",
+      "TASK-MAO-0059-B"
+    ]
+  },
+  "expected": {
+    "initialStatusCode": "broker-conflict-blocked",
+    "missingArtifactFailureCode": "missing-atm.brokerConflictResolution.v1",
+    "wrongOrderFailureCode": "resolution-order-ignored",
+    "finalState": "green"
+  }
+}

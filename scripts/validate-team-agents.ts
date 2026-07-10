@@ -28,6 +28,7 @@ import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/co
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
+import { runBrokerConflictResolutionReplayFixture } from './validate-mao-event-replay.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
@@ -583,6 +584,33 @@ async function main() {
     assert.ok(atomMap.includes('atm.brokerConflictUx.v1'));
 
     console.log('[validate-team-agents] ok (broker-conflict-ux)');
+    return;
+  }
+
+  if (taskCase === 'broker-conflict-resolution-replay') {
+    const replay = runBrokerConflictResolutionReplayFixture(process.cwd());
+    assert.equal(replay.ok, true);
+    assert.equal(replay.artifactType, 'atm.brokerConflictResolution.v1');
+    assert.equal(replay.finalState, 'green');
+    assert.equal(replay.initialGates.length, 4);
+    assert.ok(replay.initialGates.every((gate) => gate.statusCode === 'broker-conflict-blocked'));
+    assert.ok(replay.initialGates.every((gate) => gate.violationStatus === 'broker-conflict-blocked'));
+    assert.equal(replay.firstAdmission.ok, true);
+    assert.equal(replay.prematureSecondAdmission.ok, false);
+    assert.equal(replay.secondAdmissionAfterFirstRelease.ok, true);
+    assert.equal(replay.resolvedAdmission.statusCode, 'resolved');
+    assert.deepEqual([...replay.sharedVocabulary].sort(), [
+      'broker-conflict-blocked',
+      'decisionClass',
+      'decisionReason',
+      'violationStatus'
+    ]);
+
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('scripts/validate-mao-event-replay.ts#broker-conflict-resolution'));
+    assert.ok(atomMap.includes('scripts/fixtures/mao-event-replay/broker-conflict-resolution.fixture.json'));
+
+    console.log('[validate-team-agents] ok (broker-conflict-resolution-replay)');
     return;
   }
 

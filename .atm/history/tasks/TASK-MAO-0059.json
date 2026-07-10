@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MAO-0059",
+  "title": "broker conflict resolution replay benchmark",
+  "status": "running",
+  "milestone": "M8E",
+  "dependencies": [
+    "TASK-TEAM-0046",
+    "TASK-TEAM-0047"
+  ],
+  "acceptance": [
+    "Replay fails if a conflict proceeds without a resolution artifact.",
+    "Replay fails if the resolution order is ignored.",
+    "Replay records the shared vocabulary used by TEAM 0046/0047/0048 and SKL 0008 through 0012.",
+    "The fixture is sanitized and does not depend on `.atm/runtime/**` residue."
+  ],
+  "deliverables": [
+    "scripts/validate-mao-event-replay.ts",
+    "scripts/fixtures/mao-event-replay/**",
+    "packages/core/src/broker/**",
+    "packages/core/src/team-runtime/**",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-mao-event-replay.ts",
+    "scripts/fixtures/mao-event-replay/**",
+    "packages/core/src/broker/**",
+    "packages/core/src/team-runtime/**",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-mao-event-replay.ts --case broker-conflict-resolution",
+    "node --strip-types scripts/validate-team-agents.ts --case broker-conflict-resolution-replay",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not edit .atm/runtime/** or depend on live runtime residue as fixture input.",
+    "Do not place fixtures under release/**.",
+    "Do not edit docs/ai_atomic_framework/rft-hardening/** in 3KLife; Cursor RFT work owns that planning lane.",
+    "Do not edit scripts/captain-dispatch-mailbox/**; TASK-RFT-0005 owns that lane.",
+    "Do not edit RFT-owned target paths such as scripts/validators/task-ledger/**, packages/core/src/police/**, or RFT split helper files while RFT residue or locks exist."
+  ],
+  "nonGoals": [
+    "No vendor bridge implementation in this card.",
+    "No replay fixture that requires private or unsanitized task history."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert replay fixtures, validator changes, and benchmark wiring together if replay cannot deterministically prove M8E.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.multi-agent-orchestration-replay",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "multi-agent-orchestration/tasks/TASK-MAO-0059-broker-conflict-resolution-replay-benchmark.task.md",
+    "sectionTitle": "TASK-MAO-0059",
+    "headingLine": 56,
+    "hash": "49a49d377270a0a7"
+  },
+  "importedAt": "2026-07-10T05:12:08.090Z",
+  "lastTransitionId": "2026-07-10T05-12-28-533Z-claim-245095245be4",
+  "lastTransitionAt": "2026-07-10T05:12:28.533Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-m8e",
+  "reservedAt": "2026-07-10T05:12:27.712Z",
+  "promotedAt": "2026-07-10T05:12:27.714Z",
+  "claim": {
+    "actorId": "codex-captain-m8e",
+    "leaseId": "lease-f0eab34d4324",
+    "claimedAt": "2026-07-10T05:12:27.717Z",
+    "heartbeatAt": "2026-07-10T05:12:27.717Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-MAO-0059.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/**",
+      "packages/core/src/team-runtime/**",
+      "scripts/fixtures/mao-event-replay/**",
+      "scripts/validate-mao-event-replay.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-10T05:12:27.717Z",
+  "startedByActor": "codex-captain-m8e",
+  "startedBySessionId": "session-20260710051227-codex-captain-m8e-TASK-MAO-0059-9cffbe157f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-MAO-0059",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-MAO-0059.*",
+      ".atm/history/task-events/TASK-MAO-0059/**",
+      ".atm/history/tasks/TASK-MAO-0059.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/**",
+      "packages/core/src/team-runtime/**",
+      "scripts/fixtures/mao-event-replay/**",
+      "scripts/validate-mao-event-replay.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "287bd6aca1206c4821d5c7c5eb431527bad30bf3d206a7b59c0e39cd2e3b3aba",
+    "actorId": "codex-captain-m8e",
+    "createdAt": "2026-07-10T05:12:28.532Z",
+    "status": "active"
+  }
+}

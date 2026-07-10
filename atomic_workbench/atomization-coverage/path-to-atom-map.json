@@ -2053,6 +2053,27 @@
       "capability": "Benchmark report distinguishing hand-authored static coverage from sanitized event replay coverage.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-event-replay/broker-conflict-resolution.fixture.json",
+      "atom_id": "atm.multi-agent-orchestration-replay",
+      "capability": "Sanitized offline replay fixture for the M8E broker conflict resolution chain: two agents collide on one atom, four entry gates block with broker-conflict-blocked, and release order is declared by atm.brokerConflictResolution.v1.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0059"
+    },
+    {
+      "path_pattern": "scripts/validate-mao-event-replay.ts#broker-conflict-resolution",
+      "atom_id": "atm.multi-agent-orchestration-replay",
+      "capability": "Deterministic replay validator for M8E broker conflict resolution; fails without atm.brokerConflictResolution.v1, fails when release order is ignored, and proves ordered release to final green state.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0059"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#broker-conflict-resolution-replay",
+      "atom_id": "atm.multi-agent-orchestration-replay",
+      "capability": "Team Agents bridge validator asserting the MAO replay benchmark shares decisionClass, decisionReason, violationStatus, and broker-conflict-blocked vocabulary with the M8E Team Broker lane.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0059"
     }
   ],
   "summary": {
