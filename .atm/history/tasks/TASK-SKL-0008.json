@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0008",
+  "title": "Team role skill-pack and capability boundary contract",
+  "status": "done",
+  "milestone": "P3",
+  "dependencies": [
+    "TASK-SKL-0005",
+    "TASK-SKL-0007"
+  ],
+  "acceptance": [
+    "The contract defines how each Team role maps to one skill pack or a bounded set of specialist skills.",
+    "The contract preserves existing Coordinator-only lifecycle authority.",
+    "Each role documents:",
+    "allowed permissions,",
+    "forbidden permissions,",
+    "expected playbook slice,",
+    "growth-contract attachment point.",
+    "The role/skill-pack model stays provider-neutral."
+  ],
+  "deliverables": [
+    "docs/**",
+    "integrations/**",
+    "packages/cli/src/commands/team.ts"
+  ],
+  "scopePaths": [
+    "docs/**",
+    "integrations/**",
+    "packages/cli/src/commands/team.ts",
+    "packages/core/src/**"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not let Team roles become a second scheduler.",
+    "Do not grant lifecycle authority to non-Coordinator roles."
+  ],
+  "nonGoals": [
+    "No provider-specific runtime bridge in this card.",
+    "No role-specific bespoke learning taxonomy."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the role/skill-pack contract commit if Team role boundaries become less clear or conflict with Coordinator-only lifecycle.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-role-skill-pack-contract",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0008-team-role-skill-pack-and-capability-boundary-contract.task.md",
+    "sectionTitle": "TASK-SKL-0008",
+    "headingLine": 41,
+    "hash": "119434499bf94fae"
+  },
+  "importedAt": "2026-07-10T03:27:54.595Z",
+  "lastTransitionId": "2026-07-10T04-08-12-398Z-close-17c143b35a08",
+  "lastTransitionAt": "2026-07-10T04:08:12.398Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-m8e",
+  "reservedAt": "2026-07-10T03:52:49.128Z",
+  "promotedAt": "2026-07-10T03:52:49.130Z",
+  "claim": {
+    "actorId": "codex-captain-m8e",
+    "leaseId": "lease-fe8d9f1d1353",
+    "claimedAt": "2026-07-10T03:52:49.134Z",
+    "heartbeatAt": "2026-07-10T04:08:12.396Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-SKL-0008.json",
+      "docs/**",
+      "integrations/**",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-10T03:52:49.134Z",
+  "startedByActor": "codex-captain-m8e",
+  "startedBySessionId": "session-20260710035249-codex-captain-m8e-TASK-SKL-0008-f5c91711f1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-SKL-0008",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-SKL-0008.*",
+      ".atm/history/task-events/TASK-SKL-0008/**",
+      ".atm/history/tasks/TASK-SKL-0008.json",
+      "docs/**",
+      "integrations/**",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "657443c9cd792ba550f2b141206bdcb92045a195841c0d7c83f986c7bd4ec4de",
+    "actorId": "codex-captain-m8e",
+    "createdAt": "2026-07-10T03:52:49.373Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-10T04:08:12.396Z",
+  "closedByActor": "codex-captain-m8e",
+  "closedBySessionId": "session-20260710035249-codex-captain-m8e-TASK-SKL-0008-f5c91711f1",
+  "closurePacket": ".atm/history/evidence/TASK-SKL-0008.closure-packet.json"
+}
