@@ -1,0 +1,173 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0011",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b08e47ef427e7abb03a8905cd06154858d6b1a46",
+  "governedTreeSha": "4edc303998ed38065bc5cbe919163a991c472bff",
+  "targetCommitDelta": {
+    "currentCommitSha": "b08e47ef427e7abb03a8905cd06154858d6b1a46",
+    "parentCommitShas": [
+      "b08e47ef427e7abb03a8905cd06154858d6b1a46"
+    ],
+    "governedTreeSha": "4edc303998ed38065bc5cbe919163a991c472bff",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0011.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0011.json",
+      "docs/governance/team-agents/role-skill-pack-contract.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "scripts/run-validators.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/commands/team.ts docs/governance/team-agents/role-skill-pack-contract.md docs/governance/team-agents/team-vendor-runtime.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a8bd70d4c684047bac5c03df7d1fb0db4d1daf8c2337b19df1b9504d6b876df",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node -e console.log(JSON.stringify({ok:true}))",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:00370bef3d464f3265d2b03ad876ddcd5c11b90b2dc2a00553f8713698f407f3",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node -e const",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:08bbf5e34b794850d1fa04f81755305f7a168421d27aa609306e29adb9681534",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-10T06:25:59.847Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0011.*",
+      ".atm/history/task-events/TASK-SKL-0011/**",
+      ".atm/history/tasks/TASK-SKL-0011.json",
+      "docs/**",
+      "integrations/**",
+      "packages/**",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "criticalChangedFiles": [
+      "integrations/**",
+      "packages/**",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0011.json",
+  "closedAt": "2026-07-10T06:25:59.847Z",
+  "closedByActor": "codex-captain-m8e",
+  "sessionId": "session-20260710060913-codex-captain-m8e-TASK-SKL-0011-bd80717659",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b08e47ef427e7abb03a8905cd06154858d6b1a46",
+    "taskMatchedFiles": [
+      "docs/governance/team-agents/role-skill-pack-contract.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-SKL-0011.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-03-47-204Z-import-36fd5d4277e2.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-06-18-254Z-reserve-ee6e8cdae4a4.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-06-18-259Z-promote-1abe8f11f759.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-06-18-950Z-claim-999b32ec6e3a.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-08-55-600Z-release-6ef892b76178.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-09-13-901Z-reserve-a7dde40031c2.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-09-13-904Z-promote-f3971a30d1bf.json",
+      ".atm/history/task-events/TASK-SKL-0011/2026-07-10T06-09-14-152Z-claim-bbbd30d42972.json",
+      ".atm/history/tasks/TASK-SKL-0011.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
