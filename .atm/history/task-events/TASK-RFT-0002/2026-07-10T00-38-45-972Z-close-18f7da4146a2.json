@@ -1,0 +1,92 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T00-38-45-972Z-close-18f7da4146a2",
+  "taskId": "TASK-RFT-0002",
+  "action": "close",
+  "actorId": "cursor-composer-rft0002",
+  "sessionId": "session-20260709162336-cursor-composer-rft0002-TASK-RFT-0002-c9fe07492e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0002.json",
+  "taskSha256": "sha256:5259b044127c0284fa7c56a07e899cf2462c07fff034a6473161907d53871739",
+  "createdAt": "2026-07-10T00:38:45.972Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0002 --actor cursor-composer-rft0002 --status done --historical-delivery b5229d64b1a2c1990c76754a4d3cf832e7ddc72b",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260709162336-cursor-composer-rft0002-TASK-RFT-0002-c9fe07492e",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0002.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+      "node --strip-types packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+      "node --strip-types packages/cli/src/commands/hook/__tests__/git-index-diagnostics.spec.ts",
+      "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "node --strip-types packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:hook-atomic-map"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T00:38:45.965Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0002.*",
+        ".atm/history/task-events/TASK-RFT-0002/**",
+        ".atm/history/tasks/TASK-RFT-0002.json",
+        "docs/reports/hook-command-atomic-map.md",
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/git-index-diagnostics.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/commit-range-guard.ts",
+        "packages/cli/src/commands/hook/git-hooks-installer.ts",
+        "packages/cli/src/commands/hook/git-index-diagnostics.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "scripts/validate-hook-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/git-hooks-installer.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/git-index-diagnostics.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-push.spec.ts",
+        "packages/cli/src/commands/hook/commit-range-guard.ts",
+        "packages/cli/src/commands/hook/git-hooks-installer.ts",
+        "packages/cli/src/commands/hook/git-index-diagnostics.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "scripts/validate-hook-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
