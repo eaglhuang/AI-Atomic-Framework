@@ -52,6 +52,16 @@ assert.equal(routingMatrix.coordinatorOwnsLifecycle, true);
 assert.equal(routingMatrix.routes.length >= 3, true);
 assert.equal(routingMatrix.routes.some((route) => route.workstream === 'scoped-implementation' && route.primaryRole === 'implementer'), true);
 assert.equal(routingMatrix.routes.some((route) => route.workstream === 'validation-and-evidence' && route.primaryRole === 'validator'), true);
+const implementationRoute = routingMatrix.routes.find((route) => route.workstream === 'scoped-implementation');
+assert.ok(implementationRoute, 'scoped implementation route should exist');
+assert.deepEqual(implementationRoute?.roleOrder, ['coordinator', 'implementer']);
+assert.deepEqual(implementationRoute?.advisoryOnlyRoles, []);
+assert.equal(implementationRoute?.lifecycleOwner, 'coordinator');
+assert.equal(implementationRoute?.stopConditions.includes('broker-conflict-blocked'), true);
+const brokerConflictRoute = routingMatrix.routes.find((route) => route.workstream === 'broker-conflict-resolution');
+assert.ok(brokerConflictRoute, 'broker conflict route should exist');
+assert.equal(brokerConflictRoute?.playbookSlice, 'broker-conflict-resolution');
+assert.equal(brokerConflictRoute?.stopConditions.includes('missing-atm.brokerConflictResolution.v1'), true);
 
 const growthContract = buildTeamGrowthContract();
 assert.equal(growthContract.schemaId, 'atm.teamGrowthContract.v1');

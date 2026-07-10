@@ -119,7 +119,12 @@ type TeamRoleRoutingMatrix = {
     primaryRole: string;
     supportingRoles: string[];
     advisoryRoles: string[];
+    roleOrder: string[];
+    parallelSafeRoles: string[];
+    advisoryOnlyRoles: string[];
     playbookSlice: string;
+    lifecycleOwner: 'coordinator';
+    stopConditions: string[];
   }>;
 };
 
@@ -2299,32 +2304,78 @@ export function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkil
 export function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix {
   const hasRole = (role: string) => roleSkillPacks.roles.some((entry) => entry.role === role);
   const maybe = (role: string) => hasRole(role) ? [role] : [];
+  const route = (input: {
+    workstream: string;
+    primaryRole: string;
+    supportingRoles?: string[];
+    advisoryRoles?: string[];
+    roleOrder: string[];
+    parallelSafeRoles?: string[];
+    advisoryOnlyRoles?: string[];
+    playbookSlice: string;
+    stopConditions?: string[];
+  }) => ({
+    workstream: input.workstream,
+    primaryRole: input.primaryRole,
+    supportingRoles: input.supportingRoles ?? [],
+    advisoryRoles: input.advisoryRoles ?? [],
+    roleOrder: input.roleOrder,
+    parallelSafeRoles: input.parallelSafeRoles ?? [],
+    advisoryOnlyRoles: input.advisoryOnlyRoles ?? input.advisoryRoles ?? [],
+    playbookSlice: input.playbookSlice,
+    lifecycleOwner: 'coordinator' as const,
+    stopConditions: input.stopConditions ?? [
+      'broker-conflict-blocked',
+      'blocked-active-lease',
+      'proposal-submitted'
+    ]
+  });
   return {
     schemaId: 'atm.teamRoleRoutingMatrix.v1',
     providerNeutral: true,
     coordinatorOwnsLifecycle: true,
     routes: [
-      {
+      route({
         workstream: 'task-entry-routing',
         primaryRole: 'coordinator',
         supportingRoles: [...maybe('reader'), ...maybe('scopeGuardian')],
         advisoryRoles: [...maybe('evidenceCollector')],
+        roleOrder: ['coordinator', ...maybe('scopeGuardian'), ...maybe('reader'), ...maybe('evidenceCollector')],
+        parallelSafeRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
         playbookSlice: 'route-claim-close-commit'
-      },
-      {
+      }),
+      route({
         workstream: 'scoped-implementation',
         primaryRole: hasRole('implementer') ? 'implementer' : 'coordinator',
         supportingRoles: [...maybe('scopeGuardian')],
         advisoryRoles: [...maybe('reader')],
+        roleOrder: ['coordinator', ...maybe('scopeGuardian'), hasRole('implementer') ? 'implementer' : 'coordinator', ...maybe('reader')],
+        parallelSafeRoles: [...maybe('scopeGuardian'), ...maybe('reader')],
         playbookSlice: 'scoped-delivery'
-      },
-      {
+      }),
+      route({
         workstream: 'validation-and-evidence',
         primaryRole: hasRole('validator') ? 'validator' : 'coordinator',
         supportingRoles: [...maybe('evidenceCollector')],
         advisoryRoles: [...maybe('reader')],
+        roleOrder: ['coordinator', hasRole('validator') ? 'validator' : 'coordinator', ...maybe('evidenceCollector'), ...maybe('reader')],
+        parallelSafeRoles: [...maybe('evidenceCollector'), ...maybe('reader')],
         playbookSlice: 'validator-evidence-pass'
-      }
+      }),
+      route({
+        workstream: 'broker-conflict-resolution',
+        primaryRole: 'coordinator',
+        supportingRoles: [...maybe('scopeGuardian')],
+        advisoryRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
+        roleOrder: ['coordinator', ...maybe('scopeGuardian'), ...maybe('reader'), ...maybe('evidenceCollector')],
+        parallelSafeRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
+        playbookSlice: 'broker-conflict-resolution',
+        stopConditions: [
+          'broker-conflict-blocked',
+          'missing-atm.brokerConflictResolution.v1',
+          'manual-runtime-edit-requested'
+        ]
+      })
     ]
   };
 }
