@@ -1,0 +1,154 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0009",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "41815ca714753f3be97a653e37277cc5e6807b58",
+  "governedTreeSha": "11528107fd9b8e991aa49c29af1875164f608338",
+  "targetCommitDelta": {
+    "currentCommitSha": "41815ca714753f3be97a653e37277cc5e6807b58",
+    "parentCommitShas": [
+      "41815ca714753f3be97a653e37277cc5e6807b58"
+    ],
+    "governedTreeSha": "11528107fd9b8e991aa49c29af1875164f608338",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0009.json",
+      ".atm/history/task-events/TASK-SKL-0009/2026-07-10T04-32-17-661Z-import-693e04179879.json",
+      ".atm/history/task-events/TASK-SKL-0009/2026-07-10T04-39-32-852Z-reserve-5e96d383ee01.json",
+      ".atm/history/task-events/TASK-SKL-0009/2026-07-10T04-39-32-855Z-promote-bf0ef2c947e0.json",
+      ".atm/history/task-events/TASK-SKL-0009/2026-07-10T04-39-33-573Z-claim-2ffe5fbcc0ff.json",
+      ".atm/history/task-events/TASK-SKL-0009/2026-07-10T04-45-43-625Z-scope-amendment-814242b95b0d.json",
+      ".atm/history/tasks/TASK-SKL-0009.json",
+      "docs/governance/team-agents/role-routing-matrix.md",
+      "packages/cli/src/commands/team.ts",
+      "scripts/run-validators.ts",
+      "tests/cli/team-plan-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e9b9837fe4bc2c616b29efe147c0746c3a5fa50c292c6f4a5504cd28c2b39477",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-10T04:51:00.794Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0009.*",
+      ".atm/history/task-events/TASK-SKL-0009/**",
+      ".atm/history/tasks/TASK-SKL-0009.json",
+      "docs/**",
+      "integrations/**",
+      "packages/cli/src/commands/**",
+      "packages/cli/src/commands/team.ts",
+      "tests/cli/team-plan-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "integrations/**",
+      "packages/cli/src/commands/**",
+      "packages/cli/src/commands/team.ts",
+      "tests/cli/team-plan-contract.test.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0009.json",
+  "closedAt": "2026-07-10T04:51:00.794Z",
+  "closedByActor": "codex-captain-m8e",
+  "sessionId": "session-20260710043932-codex-captain-m8e-TASK-SKL-0009-2211d1dd4a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "41815ca714753f3be97a653e37277cc5e6807b58",
+    "taskMatchedFiles": [
+      "docs/governance/team-agents/role-routing-matrix.md",
+      "packages/cli/src/commands/team.ts",
+      "tests/cli/team-plan-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

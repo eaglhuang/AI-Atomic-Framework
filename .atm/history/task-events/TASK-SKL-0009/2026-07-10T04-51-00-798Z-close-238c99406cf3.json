@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T04-51-00-798Z-close-238c99406cf3",
+  "taskId": "TASK-SKL-0009",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710043932-codex-captain-m8e-TASK-SKL-0009-2211d1dd4a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0009.json",
+  "taskSha256": "sha256:11cfc8a7b178e41af36f041d3968663beb9714a2458d2c48245a92dfcc1f86eb",
+  "createdAt": "2026-07-10T04:51:00.798Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0009 --actor codex-captain-m8e --status done --historical-delivery 41815ca714753f3be97a653e37277cc5e6807b58",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710043932-codex-captain-m8e-TASK-SKL-0009-2211d1dd4a",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0009.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T04:51:00.794Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0009.*",
+        ".atm/history/task-events/TASK-SKL-0009/**",
+        ".atm/history/tasks/TASK-SKL-0009.json",
+        "docs/**",
+        "integrations/**",
+        "packages/cli/src/commands/**",
+        "packages/cli/src/commands/team.ts",
+        "tests/cli/team-plan-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/cli/src/commands/**",
+        "packages/cli/src/commands/team.ts",
+        "tests/cli/team-plan-contract.test.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
