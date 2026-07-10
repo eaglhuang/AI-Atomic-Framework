@@ -128,3 +128,6 @@ the envelope; individual skills should not invent separate top-level wrappers.
 - Transport and shape validation belong to the bridge/result contract.
 - Governance meaning still belongs to ATM commands, `messages`, and `evidence`.
 - This contract does not require a remote broker or editor plugin.
+- Tool-first orchestration guidance lives in
+  `docs/governance/skills/tool-first-orchestration.md`; consumers should treat
+  blocked structured results as route truth before choosing a CLI fallback.

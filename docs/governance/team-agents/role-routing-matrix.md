@@ -28,6 +28,10 @@ Typical surfaces:
 - `atm-task-intent-resolver`
 
 The router should not carry the full role-by-role execution logic.
+It should also follow the tool-first orchestration contract in
+`docs/governance/skills/tool-first-orchestration.md`: use structured ATM tool
+results when available, preserve blocked route truth, and hand the actual
+work order to the playbook or specialist role pack.
 
 ### Playbook layer
 

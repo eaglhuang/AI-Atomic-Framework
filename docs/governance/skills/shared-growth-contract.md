@@ -1,7 +1,7 @@
 # Shared Skill Growth Contract
 
 Status: draft-v1
-Related tasks: `TASK-SKL-0007`, `TASK-SKL-0008`, `TASK-SKL-0012`
+Related tasks: `TASK-SKL-0005`, `TASK-SKL-0007`, `TASK-SKL-0008`, `TASK-SKL-0012`
 
 This document defines the shared growth architecture for ATM skills. The goal
 is to let entry skills, playbook skills, and specialist skills learn from real
@@ -210,6 +210,18 @@ knowledge shards.
   lessons, and reuse hints;
 - task lifecycle, evidence, and close authority remain under ATM runtime and
   ledger surfaces.
+
+## Relationship to tool-first orchestration
+
+The tool-first orchestration contract in
+`docs/governance/skills/tool-first-orchestration.md` is the execution-order
+companion to this growth contract.
+
+- tool-first orchestration decides whether to use a structured tool, official
+  CLI fallback, or read-only shell inspection;
+- shared growth decides where reusable lessons about that route should live;
+- blocked tool results should become learning items before they become
+  permanent `SKILL.md` rules.
 
 ## Minimum adoption bar
 

@@ -91,6 +91,9 @@ role's permanent identity.
 
 Every role pack should reuse the shared skill growth contract in
 `docs/governance/skills/shared-growth-contract.md`.
+Every role pack should also preserve the tool-first orchestration contract in
+`docs/governance/skills/tool-first-orchestration.md`, especially when a blocked
+tool result carries broker conflict vocabulary.
 
 That keeps growth semantics aligned across:
 
@@ -99,6 +102,10 @@ That keeps growth semantics aligned across:
 - Team Agent role packs.
 
 The result is shared learning mechanics with isolated domain memory.
+
+Broker conflict role packs must preserve these shared fields when they appear
+in artifacts, evidence, or tool results: `decisionClass`, `decisionReason`,
+`violationStatus`, and `broker-conflict-blocked`.
 
 ## Observability mapping
 
