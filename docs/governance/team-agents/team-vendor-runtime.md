@@ -13,6 +13,12 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 - File, tool, network, and vendor-sensitive actions must flow through one governed permission broker contract.
 - Adopter repositories may tighten policy through a governed policy document that conforms to `schemas/governance/team-agent-permission-policy.schema.json`.
 - Provider bridges must not self-grant elevated permissions.
+- Provider bridges and runtime summaries must surface Broker conflicts through
+  the shared Captain UX vocabulary: `decisionClass`, `decisionReason`,
+  `violationStatus`, and `broker-conflict-blocked`.
+- A blocked bridge must point operators to the
+  `atm.brokerConflictResolution.v1` artifact and the `team broker resolve`
+  command. It must not instruct operators to hand-edit `.atm/runtime/**`.
 
 ## Governed Repo Vendor Config
 
@@ -35,3 +41,11 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 - Role-local learning may vary by provider quality or runtime mode, but the
   growth semantics should still reuse
   `docs/governance/skills/shared-growth-contract.md`.
+
+## Broker Conflict Runtime Projection
+
+Runtime integrations should render `atm.brokerConflictUx.v1` as the
+operator-facing conflict summary. The projection is derived from Team Broker and
+the canonical role-routing matrix, so M9I vendor bridges can display blocked
+task ids, shared paths or atom overlap, `decisionReason`, and the next safe
+resolution command without creating a second release-order source.

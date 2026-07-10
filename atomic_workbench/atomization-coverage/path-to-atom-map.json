@@ -813,6 +813,13 @@
       "source_task": "TASK-TEAM-0046"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildBrokerConflictUxProjection",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Operator-facing broker conflict UX projection for blocked task ids, shared paths or atom overlap, decisionReason, and nextSafeResolutionCommand without creating a second playbook.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0048"
+    },
+    {
       "path_pattern": "schemas/governance/broker-conflict-resolution.schema.json",
       "atom_id": "atm.team-broker-conflict-resolution",
       "capability": "Schema contract for atm.brokerConflictResolution.v1 artifacts shared by 0046/0047/0048 and SKL follow-up lanes.",
@@ -1153,7 +1160,7 @@
     {
       "path_pattern": "schemas/team-agents/captain-decision.schema.json",
       "atom_id": "atm.team-agents-template-map",
-      "capability": "JSON Schema contract for advisory Captain decisions, options, chosen option, reason, risk, lieutenant need, and next team shape",
+      "capability": "JSON Schema contract for advisory Captain decisions, options, chosen option, reason, risk, lieutenant need, next team shape, and M8E broker conflict vocabulary.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0017"
     },
@@ -1689,6 +1696,13 @@
       "capability": "Validator case proving Team Broker conflict resolution artifact schema, CLI output, decisionClass, decisionReason, violationStatus, broker-conflict-blocked, and serial release admission semantics.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0046"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#broker-conflict-ux",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Validator case proving broker conflict UX exposes blocked task ids, shared paths or atom overlap, decisionReason, nextSafeResolutionCommand, captain schema compatibility, and atm.brokerConflictUx.v1 guidance.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0048"
     },
     {
       "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",

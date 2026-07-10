@@ -117,6 +117,25 @@ without renaming it: `decisionClass`, `decisionReason`, `violationStatus`, and
 artifact, but role packs must not suggest manual edits to `.atm/runtime/**` or
 invent an alternate release order.
 
+## Captain conflict UX
+
+When a Broker conflict blocks an entrypoint, Captain-facing output must show the
+same operator fields as the `broker-conflict-resolution` slice:
+
+- `blockedTaskIds`: the tasks currently held behind the release order;
+- `sharedPaths` or `overlappingAtomIds`: the shared file or atom surface that
+  caused the block;
+- `decisionClass`, `decisionReason`, and `violationStatus`;
+- `requiredResolutionArtifact`: `atm.brokerConflictResolution.v1`;
+- `nextSafeResolutionCommand`: the `team broker resolve` command that produces
+  the artifact.
+
+This UX is a projection of the canonical route matrix, not a second playbook.
+If `violationStatus` is `broker-conflict-blocked`, Coordinator stops write
+progression, creates or consumes the `atm.brokerConflictResolution.v1` artifact,
+then releases tasks in order. Manual edits to `.atm/runtime/**` are outside the
+Captain path.
+
 ## Why this matters
 
 This matrix keeps the first skill small:

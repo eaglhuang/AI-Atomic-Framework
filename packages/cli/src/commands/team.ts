@@ -876,6 +876,54 @@ export function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEv
   };
 }
 
+export function buildBrokerConflictUxProjection(input: {
+  readonly primaryTaskId: string;
+  readonly conflictingTaskIds: readonly string[];
+  readonly sharedPaths?: readonly string[];
+  readonly overlappingAtomIds?: readonly string[];
+  readonly decisionClass: string;
+  readonly decisionReason: string;
+  readonly violationStatus: string;
+  readonly statusCode?: string;
+  readonly currentAllowedTaskId?: string | null;
+  readonly blockedTaskIds?: readonly string[];
+  readonly requiredCommand?: string | null;
+}) {
+  const primaryTaskId = String(input.primaryTaskId ?? '').trim();
+  const conflictingTaskIds = uniqueStrings(input.conflictingTaskIds.map((entry) => String(entry).trim()).filter(Boolean));
+  const sharedPaths = uniqueStrings((input.sharedPaths ?? []).map((entry) => String(entry).trim()).filter(Boolean));
+  const overlappingAtomIds = uniqueStrings((input.overlappingAtomIds ?? []).map((entry) => String(entry).trim()).filter(Boolean));
+  const currentAllowedTaskId = input.currentAllowedTaskId ?? primaryTaskId;
+  const blockedTaskIds = uniqueStrings((input.blockedTaskIds?.length ? input.blockedTaskIds : conflictingTaskIds)
+    .map((entry) => String(entry).trim())
+    .filter(Boolean));
+  const decisionReason = String(input.decisionReason ?? '').trim()
+    || 'broker-conflict-blocked until the release order grants the next task.';
+  const nextSafeResolutionCommand = input.requiredCommand?.trim()
+    || `node atm.mjs team broker resolve --task ${primaryTaskId} --conflict ${conflictingTaskIds[0] ?? '<task-id>'} --path ${sharedPaths[0] ?? '<shared-path>'} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+  return {
+    schemaId: 'atm.brokerConflictUx.v1',
+    playbookSlice: 'broker-conflict-resolution',
+    requiredResolutionArtifact: 'atm.brokerConflictResolution.v1',
+    decisionClass: input.decisionClass,
+    decisionReason,
+    violationStatus: input.violationStatus,
+    statusCode: input.statusCode ?? input.violationStatus,
+    primaryTaskId,
+    conflictingTaskIds,
+    blockedTaskIds,
+    currentAllowedTaskId,
+    sharedPaths,
+    overlappingAtomIds,
+    nextSafeResolutionCommand,
+    captainGuidance: [
+      'Stop write progression while violationStatus is broker-conflict-blocked.',
+      'Use the nextSafeResolutionCommand to produce an atm.brokerConflictResolution.v1 artifact.',
+      'Do not hand-edit .atm/runtime/** to clear or reorder the conflict.'
+    ]
+  };
+}
+
 function runTeamBroker(argv: string[], defaultCwd: string) {
   const action = String(argv[0] ?? '').toLowerCase();
   if (!['resolve', 'conflict-resolve'].includes(action)) {
@@ -914,6 +962,18 @@ export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string)
     releaseOrder: releaseOrder.length ? releaseOrder : undefined,
     createdAt
   });
+  const conflictUx = buildBrokerConflictUxProjection({
+    primaryTaskId: artifact.primaryTaskId,
+    conflictingTaskIds: artifact.conflictingTaskIds,
+    sharedPaths: artifact.sharedPaths,
+    decisionClass: artifact.decisionClass,
+    decisionReason: artifact.decisionReason,
+    violationStatus: artifact.violationStatus,
+    statusCode: artifact.statusCode,
+    currentAllowedTaskId: artifact.currentAllowedTaskId,
+    blockedTaskIds: artifact.blockedTaskIds,
+    requiredCommand: `node atm.mjs team broker resolve --task ${artifact.primaryTaskId} ${artifact.conflictingTaskIds.map((taskId) => `--conflict ${taskId}`).join(' ')} ${artifact.sharedPaths.map((sharedPath) => `--path ${sharedPath}`).join(' ')} --decision-reason "${artifact.decisionReason}" --json`
+  });
 
   return makeResult({
     ok: true,
@@ -926,7 +986,11 @@ export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string)
         violationStatus: artifact.violationStatus,
         statusCode: artifact.statusCode,
         currentAllowedTaskId: artifact.currentAllowedTaskId,
-        blockedTaskIds: artifact.blockedTaskIds
+        blockedTaskIds: artifact.blockedTaskIds,
+        sharedPaths: artifact.sharedPaths,
+        decisionReason: artifact.decisionReason,
+        requiredResolutionArtifact: conflictUx.requiredResolutionArtifact,
+        nextSafeResolutionCommand: conflictUx.nextSafeResolutionCommand
       })
     ],
     evidence: {
@@ -935,6 +999,7 @@ export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string)
       runtimeWritten: false,
       agentsSpawned: false,
       artifact,
+      conflictUx,
       sharedVocabulary: {
         decisionClass: artifact.decisionClass,
         decisionReason: artifact.decisionReason,

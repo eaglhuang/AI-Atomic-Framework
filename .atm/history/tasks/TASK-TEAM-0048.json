@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0048",
+  "title": "Conflict UX and Captain playbook",
+  "status": "running",
+  "milestone": "M8E",
+  "dependencies": [
+    "TASK-TEAM-0046"
+  ],
+  "acceptance": [
+    "CLI output for broker conflicts names the blocked task ids, shared paths or atom overlap, `decisionReason`, and next safe resolution command.",
+    "Captain playbook guidance routes operators from parallel analysis to the `atm.brokerConflictResolution.v1` artifact path instead of suggesting manual runtime edits.",
+    "The playbook slice is compatible with SKL-0009 and does not create a second role-routing source.",
+    "The captain decision schema accepts the shared M8E vocabulary.",
+    "The validator covers conflict UX and artifact hints."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/role-routing-matrix.md",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "schemas/team-agents/captain-decision.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/next.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/role-routing-matrix.md",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "schemas/team-agents/captain-decision.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/next.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case broker-conflict-ux",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not edit docs/ai_atomic_framework/rft-hardening/** in 3KLife; Cursor RFT work owns that planning lane.",
+    "Do not edit scripts/captain-dispatch-mailbox/**; TASK-RFT-0005 owns that lane.",
+    "Do not edit RFT-owned target paths such as scripts/validators/task-ledger/**, packages/core/src/police/**, or RFT split helper files while RFT residue or locks exist.",
+    "Do not create a second Team playbook separate from SKL-0009.",
+    "Do not add a high-authority override path without TASK-TEAM-0046 artifacts."
+  ],
+  "nonGoals": [
+    "No vendor bridge implementation in this card.",
+    "No broad rewrite of Team role routing."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert UX wording, schema vocabulary, and playbook changes together if operator guidance becomes misleading.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-broker-enforcement",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0048-conflict-ux-and-captain-playbook.task.md",
+    "sectionTitle": "TASK-TEAM-0048",
+    "headingLine": 56,
+    "hash": "bc3adce0742e434c"
+  },
+  "importedAt": "2026-07-10T04:53:22.305Z",
+  "lastTransitionId": "2026-07-10T04-53-40-317Z-claim-8e4c5890986c",
+  "lastTransitionAt": "2026-07-10T04:53:40.317Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-m8e",
+  "reservedAt": "2026-07-10T04:53:27.825Z",
+  "promotedAt": "2026-07-10T04:53:27.828Z",
+  "claim": {
+    "actorId": "codex-captain-m8e",
+    "leaseId": "lease-d3dbe6f1d50a",
+    "claimedAt": "2026-07-10T04:53:39.245Z",
+    "heartbeatAt": "2026-07-10T04:53:39.245Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0048.json",
+      ".atm/history/evidence/TASK-TEAM-0048.*",
+      ".atm/history/task-events/TASK-TEAM-0048/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/role-routing-matrix.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/team.ts",
+      "schemas/team-agents/captain-decision.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-10T04:53:27.831Z",
+  "startedByActor": "codex-captain-m8e",
+  "startedBySessionId": "session-20260710045339-codex-captain-m8e-TASK-TEAM-0048-ef5f76b399",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0048",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0048.*",
+      ".atm/history/task-events/TASK-TEAM-0048/**",
+      ".atm/history/tasks/TASK-TEAM-0048.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/role-routing-matrix.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/team.ts",
+      "schemas/team-agents/captain-decision.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "dd20fc8a0c118644e8798c3519b9075aac8b9958bc82a819cde357dc178d306f",
+    "actorId": "codex-captain-m8e",
+    "createdAt": "2026-07-10T04:53:40.317Z",
+    "status": "active"
+  }
+}

@@ -71,7 +71,7 @@ import {
   writeBatchRun,
   writeQuickfixLock
 } from './work-channels.ts';
-import { buildTeamRecommendation, type TeamRecommendation } from './team.ts';
+import { buildBrokerConflictUxProjection, buildTeamRecommendation, type TeamRecommendation } from './team.ts';
 import { buildTeamKnowledgeSummary } from './team-knowledge.ts';
 import { decideActiveBatchClaimTask } from './next-active-batch.ts';
 import { CliError, makeResult, message, parseJsonText, parseOptions, resolveNextDefaultOutputPath, setOutputJsonPath } from './shared.ts';
@@ -986,6 +986,29 @@ async function claimNextImportedTask(input: {
                 : overlappingAtomIds.length > 0
                 ? 'parallel-safe-with-cid-overlap-advisory'
                 : 'parallel-safe');
+            const overlappingFiles = Array.isArray(finding.overlappingFiles)
+              ? finding.overlappingFiles.map((entry: unknown) => String(entry).trim()).filter(Boolean)
+              : [];
+            const sharedConflictSurfaces = overlappingFiles.length > 0
+              ? overlappingFiles
+              : (overlappingAtomIds.length > 0 ? overlappingAtomIds : ['<shared-path>']);
+            const decisionClass = insufficientMutationIntent ? 'blocked' : 'serial-release';
+            const decisionReason = insufficientMutationIntent
+              ? 'broker-conflict-blocked because active task overlap lacks a confirmed Broker mutation intent or resolution artifact.'
+              : 'broker-conflict-blocked because the Broker confirmed an active task ownership conflict.';
+            const requiredCommand = `node atm.mjs team broker resolve --task ${claimableTask.workItemId} --conflict ${candidate.taskId} --path ${sharedConflictSurfaces[0] ?? '<shared-path>'} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+            const conflictUx = buildBrokerConflictUxProjection({
+              primaryTaskId: claimableTask.workItemId,
+              conflictingTaskIds: [candidate.taskId],
+              sharedPaths: overlappingFiles,
+              overlappingAtomIds,
+              decisionClass,
+              decisionReason,
+              violationStatus: 'broker-conflict-blocked',
+              statusCode: 'broker-conflict-blocked',
+              blockedTaskIds: [candidate.taskId],
+              requiredCommand
+            });
             // Broker verdict derivation: the parallel-preflight is itself the
             // broker-authoritative arbitration for this claim path. `blocked`
             // maps to broker `freeze`; anything else the CID gate would admit
@@ -1008,18 +1031,19 @@ async function claimNextImportedTask(input: {
                   taskId: claimableTask.workItemId,
                   conflictWithTaskId: candidate.taskId,
                   conflictClaimActorId: conflictActorId,
+                  blockedTaskIds: conflictUx.blockedTaskIds,
+                  sharedPaths: conflictUx.sharedPaths,
                   overlappingAtomIds,
                   verdict: 'blocked-cid-conflict',
                   brokerVerdict,
                   cidVerdict,
-                  decisionClass: insufficientMutationIntent ? 'blocked' : 'serial-release',
-                  decisionReason: insufficientMutationIntent
-                    ? 'broker-conflict-blocked because active task overlap lacks a confirmed Broker mutation intent or resolution artifact.'
-                    : 'broker-conflict-blocked because the Broker confirmed an active task ownership conflict.',
+                  decisionClass,
+                  decisionReason,
                   violationStatus: 'broker-conflict-blocked',
                   statusCode: 'broker-conflict-blocked',
                   requiredResolutionArtifact: 'atm.brokerConflictResolution.v1',
-                  requiredCommand: `node atm.mjs team broker resolve --task ${claimableTask.workItemId} --conflict ${candidate.taskId} --path <shared-path> --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`,
+                  requiredCommand,
+                  conflictUx,
                   admissionDivergence: admission.divergence,
                   closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
                 }
