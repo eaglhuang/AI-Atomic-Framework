@@ -82,6 +82,62 @@
       "source_task": "TASK-TEAM-0005"
     },
     {
+      "path_pattern": "schemas/integrations/install-manifest.schema.json#teamRuntimeCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Optional integration manifest declaration for Team runtime backend provider, mode, execution surface, role, status, and evidence",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "tests/schema-fixtures/positive/integration-install-manifest.json#teamRuntimeCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Positive schema fixture proving Team runtime backend capability declarations remain valid without making all editor integrations runnable backends",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/integration.ts#inspectTeamRuntimeBackendCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Integration manifest inspection surface for declared Team runtime backend readiness and broker-only fallback summary",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/doctor.ts#team-runtime-backend-capabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Doctor readiness check that reports declared Team runtime backend capabilities without failing clean broker-only repositories",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#integration-runtime-backend-readiness",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Team plan, validate, and start evidence wiring plus non-broker runtime start gate for missing backend capability declarations",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "scripts/validate-integration-adapter.ts#teamRuntimeCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Integration adapter regression checks for optional Team runtime capability schema coverage and non-automatic backend declarations",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#integration-capability-wiring",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Team Agents regression case for manifest capability inspection, readiness evidence, and missing backend start gate anchors",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "docs/AGENT_PACK_ONBOARDING.md#team-runtime-capability-manifest",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Adopter-neutral onboarding guidance separating editor entry installation from declared Team runtime backend capability",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
       "path_pattern": "docs/governance/team-agents/templates/patrol-report-template.md",
       "atom_id": "atm.team-agents-template-map",
       "capability": "Canonical patrol report template for read-only patrol scope, validation plan, evidence plan, and closeout-ready status",

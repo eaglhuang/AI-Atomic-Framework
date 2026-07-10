@@ -143,6 +143,7 @@ export async function runDoctor(argv: readonly string[]) {
     createCheck('onboarding-lifecycle', onboardingLifecycle.ok, onboardingLifecycle),
     createCheck('version-compatibility', versionSummary.compatibility.ok || versionSummary.compatibility.code === 'chart-missing', versionSummary),
     createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
+    createCheck('team-runtime-backend-capabilities', true, integrationHealth.teamRuntimeBackends),
     createCheck(
       'framework-integration-hooks',
       frameworkHookReadiness.ok || cleanCheckoutFrameworkHookContractOk,

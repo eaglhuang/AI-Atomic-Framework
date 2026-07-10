@@ -47,6 +47,12 @@
         "$ref": "#/$defs/manifestFile"
       }
     },
+    "teamRuntimeCapabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/teamRuntimeCapability"
+      }
+    },
     "metadata": {
       "type": "object",
       "additionalProperties": {
@@ -95,6 +101,48 @@
         },
         "fileFormat": {
           "enum": ["skill", "agent-md", "prompt-md", "instructions-md", "toml", "yaml", "markdown"]
+        }
+      }
+    },
+    "teamRuntimeCapability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["providerId", "runtimeModes", "executionSurfaces", "roles", "status", "evidence"],
+      "properties": {
+        "providerId": {
+          "enum": ["openai", "azure-openai", "claude-code", "gemini", "microsoft-foundry"]
+        },
+        "runtimeModes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["real-agent", "editor-subagent", "broker-only"]
+          },
+          "uniqueItems": true
+        },
+        "executionSurfaces": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["agent-runtime", "editor-subagent", "cli-style", "broker-governance"]
+          },
+          "uniqueItems": true
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": ["supported", "experimental", "unavailable"]
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }

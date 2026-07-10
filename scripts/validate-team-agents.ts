@@ -9,7 +9,7 @@ import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../package
 import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
-import { discoverGovernedVendorConfigSurface } from '../packages/cli/src/commands/integration.ts';
+import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
 import { TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
 import { TeamProviderRegistry } from '../packages/core/src/team-runtime/provider-registry.ts';
@@ -832,6 +832,61 @@ async function main() {
     assert.ok(atomMap.includes('scripts/validate-team-agents.ts#microsoft-foundry-bridge'));
 
     console.log('[validate-team-agents] ok (microsoft-foundry-bridge)');
+    return;
+  }
+
+  if (taskCase === 'integration-capability-wiring') {
+    const tempRoot = createTempWorkspace('atm-team-runtime-backend-');
+    const manifestDir = path.join(tempRoot, '.atm', 'integrations');
+    mkdirSync(manifestDir, { recursive: true });
+    writeFileSync(path.join(manifestDir, 'codex.manifest.json'), JSON.stringify({
+      schemaId: 'atm.integrationInstallManifest.v1',
+      adapterId: 'codex',
+      adapterVersion: '0.0.0-test',
+      installedAt: '2026-07-10T00:00:00.000Z',
+      installedBy: 'validator',
+      targetDir: 'integrations/codex-skills',
+      metadata: {},
+      files: [],
+      teamRuntimeCapabilities: [
+        {
+          providerId: 'claude-code',
+          runtimeModes: ['editor-subagent'],
+          executionSurfaces: ['editor-subagent'],
+          roles: ['implementer', 'validator'],
+          status: 'experimental',
+          evidence: 'validator fixture declares editor-subagent backend capability'
+        }
+      ]
+    }, null, 2));
+
+    const declaredReadiness = inspectTeamRuntimeBackendCapabilities(tempRoot);
+    assert.equal(declaredReadiness.schemaId, 'atm.integrationTeamRuntimeBackendReadiness.v1');
+    assert.equal(declaredReadiness.declaredBackendCount, 1);
+    assert.equal(declaredReadiness.startReadiness, 'runtime-backend-declared');
+    assert.equal(declaredReadiness.capabilities[0]?.providerId, 'claude-code');
+    assert.deepEqual(declaredReadiness.capabilities[0]?.runtimeModes, ['editor-subagent']);
+
+    const repositoryReadiness = inspectTeamRuntimeBackendCapabilities(process.cwd());
+    assert.equal(repositoryReadiness.schemaId, 'atm.integrationTeamRuntimeBackendReadiness.v1');
+    const validateResult = await runTeam(['validate', '--task', 'TASK-TEAM-0045', '--cwd', process.cwd(), '--runtime-mode', 'editor-subagent', '--provider', 'claude-code', '--json']);
+    assert.equal((validateResult.evidence as any)?.runtimeBackendReadiness?.schemaId, 'atm.integrationTeamRuntimeBackendReadiness.v1');
+    assert.equal((validateResult.evidence as any)?.runtimeContract?.runtimeMode, 'editor-subagent');
+    assert.equal((validateResult.evidence as any)?.runtimeContract?.providerId, 'claude-code');
+
+    const teamSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'team.ts'), 'utf8');
+    assert.ok(teamSource.includes('ATM_TEAM_RUNTIME_BACKEND_MISSING'));
+    assert.ok(teamSource.includes('Installed editor integrations are not runtime backends unless their manifest declares this capability.'));
+
+    const onboarding = readFileSync(path.join(process.cwd(), 'docs', 'AGENT_PACK_ONBOARDING.md'), 'utf8');
+    assert.ok(onboarding.includes('teamRuntimeCapabilities'));
+    assert.ok(onboarding.includes('ATM_TEAM_RUNTIME_BACKEND_MISSING'));
+
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/cli/src/commands/integration.ts#inspectTeamRuntimeBackendCapabilities'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#integration-capability-wiring'));
+
+    console.log('[validate-team-agents] ok (integration-capability-wiring)');
     return;
   }
 

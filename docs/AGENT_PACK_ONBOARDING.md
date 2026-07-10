@@ -68,6 +68,20 @@ Expected pack behavior:
 
 This keeps convenience at the edge and governance in ATM.
 
+## Team Runtime Capability Manifest
+
+Integration manifests may declare optional `teamRuntimeCapabilities` entries when
+an installed integration also provides a Team runtime backend. This declaration
+is separate from the generated editor entry files. Installing a Codex, Claude
+Code, Cursor, Copilot, Gemini, or Antigravity entry pack does not automatically
+make that adapter a runnable Team backend.
+
+`node atm.mjs doctor --json` reports `team-runtime-backend-capabilities` from
+installed manifests. `node atm.mjs team validate --json` includes the same
+readiness evidence, and `node atm.mjs team start` blocks non-`broker-only`
+runtime modes with `ATM_TEAM_RUNTIME_BACKEND_MISSING` when no manifest declares
+the requested provider, runtime mode, and execution surface.
+
 ## Boundary Rules
 
 - Do not put host-specific agent behavior in `packages/core`.

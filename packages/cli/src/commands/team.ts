@@ -16,6 +16,7 @@ import {
   type TeamClosureReviewerIndependenceEvidence
 } from './evidence.ts';
 import { getCommandSpec } from './command-specs.ts';
+import { inspectTeamRuntimeBackendCapabilities } from './integration.ts';
 import { runTasks } from './tasks.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
 import { validateStrictPathHeuristic } from './tasks/task-import-validators.ts';
@@ -915,6 +916,7 @@ export async function runTeam(argv: string[]) {
     permissionLeases: teamPlan.suggestedPermissionLeases,
     evidenceRequired: String(task.evidenceRequired ?? 'command-backed')
   });
+  const runtimeBackendReadiness = inspectTeamRuntimeBackendCapabilities(cwd);
 
   if (action === 'validate') {
     const permissionOk = permissionValidation.ok;
@@ -951,6 +953,7 @@ export async function runTeam(argv: string[]) {
         brokerLane: teamPlan.brokerLane,
         sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
         runtimeContract,
+        runtimeBackendReadiness,
         runtimePilot: teamPlan.runtimePilot
       }
     });
@@ -984,6 +987,38 @@ export async function runTeam(argv: string[]) {
           brokerLane: teamPlan.brokerLane,
           sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
           runtimeContract,
+          runtimeBackendReadiness,
+          runtimePilot: teamPlan.runtimePilot
+        }
+      });
+    }
+    const backendAdmission = evaluateTeamRuntimeBackendAdmission(runtimeContract, runtimeBackendReadiness);
+    if (!backendAdmission.ok) {
+      return makeResult({
+        ok: false,
+        command: 'team',
+        cwd,
+        messages: [
+          message('error', 'ATM_TEAM_RUNTIME_BACKEND_MISSING', backendAdmission.reason, {
+            taskId,
+            recipeId: recipe.recipeId,
+            providerId: runtimeContract.providerId,
+            runtimeMode: runtimeContract.runtimeMode,
+            executionSurface: runtimeContract.executionSurface
+          })
+        ],
+        evidence: {
+          action: 'start',
+          runtimeWritten: false,
+          agentsSpawned: false,
+          task: summarizeTask(taskId, task),
+          recipe,
+          validation,
+          teamPlan,
+          brokerLane: teamPlan.brokerLane,
+          sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
+          runtimeContract,
+          runtimeBackendReadiness,
           runtimePilot: teamPlan.runtimePilot
         }
       });
@@ -1017,6 +1052,7 @@ export async function runTeam(argv: string[]) {
         teamRun,
         brokerLane: teamPlan.brokerLane,
         runtimeContract,
+        runtimeBackendReadiness,
         runtimePilot: teamPlan.runtimePilot
       }
     });
@@ -1047,6 +1083,7 @@ export async function runTeam(argv: string[]) {
       validation,
       teamPlan,
       runtimeContract,
+      runtimeBackendReadiness,
       brokerLane: teamPlan.brokerLane,
       sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
       runtimePilot: teamPlan.runtimePilot
@@ -1066,6 +1103,35 @@ export function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEv
       : `broker-conflict-blocked: ${firstReason}`,
     violationStatus: 'broker-conflict-blocked',
     statusCode: 'broker-conflict-blocked'
+  };
+}
+
+function evaluateTeamRuntimeBackendAdmission(
+  runtimeContract: TeamRuntimeContract,
+  readiness: ReturnType<typeof inspectTeamRuntimeBackendCapabilities>
+) {
+  if (runtimeContract.runtimeMode === 'broker-only') {
+    return {
+      ok: true,
+      reason: 'broker-only mode is governed by Team Broker and does not require a declared runtime backend.'
+    };
+  }
+  const providerId = runtimeContract.providerId ?? '';
+  const matchingCapability = readiness.capabilities.find((capability) => {
+    return capability.providerId === providerId
+      && capability.status !== 'unavailable'
+      && capability.runtimeModes.includes(runtimeContract.runtimeMode)
+      && capability.executionSurfaces.includes(runtimeContract.executionSurface);
+  }) ?? null;
+  if (matchingCapability) {
+    return {
+      ok: true,
+      reason: `Runtime backend declared by ${matchingCapability.manifestPath}.`
+    };
+  }
+  return {
+    ok: false,
+    reason: `Team runtime start requires an integration manifest teamRuntimeCapabilities entry for provider ${providerId || '(missing)'}, mode ${runtimeContract.runtimeMode}, and surface ${runtimeContract.executionSurface}. Installed editor integrations are not runtime backends unless their manifest declares this capability.`
   };
 }
 
