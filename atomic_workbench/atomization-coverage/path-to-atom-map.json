@@ -2207,11 +2207,39 @@
       "capability": "Validator case proving Claude Code and Gemini config validation, editor execution launch through atm.teamProviderContract.v1, shared artifact envelope, role-envelope normalization, observability events, broker permission checks, docs coverage, and atom map coverage.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Microsoft Foundry provider-family Team runtime bridge with distinct project-chat-inference and agent-service config surfaces, broker-checked launch permission, shared atm.teamProviderRunArtifact.v1 output, and redacted observability.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildMicrosoftFoundryRuntimeBridgeSummary",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Team plan projection for Microsoft Foundry runtime bridge descriptors, including supported surfaces, config schema, broker-checked permissions, observability event types, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#microsoft-foundry-provider-family-bridge",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Documents Microsoft Foundry provider-family config boundaries for project-chat-inference and agent-service surfaces, shared provider run artifact, secret redaction, broker permission enforcement, and broker-conflict-blocked vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#microsoft-foundry-bridge",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Validator case proving Microsoft Foundry config validation, distinct project chat and agent-service launch surfaces, shared artifact envelope, observability events, broker permission checks, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
     }
   ],
   "summary": {
-    "total_production_paths": 210,
-    "mapped_paths": 210,
+    "total_production_paths": 214,
+    "mapped_paths": 214,
     "coverage_percentage": 100,
     "atoms_defined": 113,
     "atoms_with_evidence": 0,

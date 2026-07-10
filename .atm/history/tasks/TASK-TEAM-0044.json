@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0044",
+  "title": "Microsoft Foundry provider family bridge",
+  "status": "running",
+  "milestone": "M9I",
+  "dependencies": [
+    "TASK-TEAM-0037",
+    "TASK-TEAM-0038",
+    "TASK-TEAM-0039",
+    "TASK-TEAM-0041"
+  ],
+  "acceptance": [
+    "Team runtime can represent Foundry chat/inference and Foundry agent-service references distinctly.",
+    "Foundry-specific project endpoint and agent reference config are validated through the governed-repo config surface.",
+    "Artifact, retry, and observability contracts remain shared with other providers."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+    "packages/cli/src/commands/team.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+    "packages/cli/src/commands/team.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case microsoft-foundry-bridge",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Hard-coding a single Foundry deployment shape",
+    "Treating Foundry Agent Service and Foundry chat as one undifferentiated surface"
+  ],
+  "nonGoals": [
+    "Do not collapse service-managed agents and chat inference into one config model",
+    "Do not bypass adopter repo config for project endpoints or agent references"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert Microsoft Foundry provider family bridge, docs, and validator coverage together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "2026-06-19 | planned | Microsoft Foundry provider-family lane opened as a distinct bridge from plain OpenAI-style direct providers.",
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0044-microsoft-foundry-provider-family-bridge.task.md",
+    "sectionTitle": "TASK-TEAM-0044",
+    "headingLine": 51,
+    "hash": "da495222e7a822df"
+  },
+  "importedAt": "2026-07-10T07:38:37.869Z",
+  "lastTransitionId": "2026-07-10T07-38-48-440Z-claim-1d9eb7e41446",
+  "lastTransitionAt": "2026-07-10T07:38:48.440Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-10T07:38:47.413Z",
+  "promotedAt": "2026-07-10T07:38:47.416Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-ac914f9c1de0",
+    "claimedAt": "2026-07-10T07:38:47.418Z",
+    "heartbeatAt": "2026-07-10T07:38:47.418Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0044.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-10T07:38:47.418Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260710073847-codex-gpt-5.4-mini-TASK-TEAM-0044-33ee5e6c8f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0044",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0044.*",
+      ".atm/history/task-events/TASK-TEAM-0044/**",
+      ".atm/history/tasks/TASK-TEAM-0044.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "1c121959891a1ebc0c6eeb11f3053f125a7cf756f3945d9507b04f0313136f8a",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-07-10T07:38:48.438Z",
+    "status": "active"
+  }
+}

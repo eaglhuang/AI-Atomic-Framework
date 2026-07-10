@@ -6,7 +6,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface } from '../packages/cli/src/commands/integration.ts';
@@ -20,6 +20,7 @@ import { resolveTeamProviderSelection } from '../packages/core/src/team-runtime/
 import { createAzureOpenAITeamProviderBridge, launchAzureOpenAITeamProviderRun, validateAzureOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/azure-openai.ts';
 import { createClaudeCodeTeamProviderBridge, launchClaudeCodeTeamProviderRun, validateClaudeCodeTeamProviderConfig } from '../packages/core/src/team-runtime/providers/claude-code.ts';
 import { createGeminiTeamProviderBridge, launchGeminiTeamProviderRun, validateGeminiTeamProviderConfig } from '../packages/core/src/team-runtime/providers/gemini.ts';
+import { createMicrosoftFoundryTeamProviderBridge, launchMicrosoftFoundryTeamProviderRun, validateMicrosoftFoundryTeamProviderConfig } from '../packages/core/src/team-runtime/providers/microsoft-foundry.ts';
 import { createOpenAITeamProviderBridge, launchOpenAITeamProviderRun, validateOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/openai.ts';
 import {
   validateScopeLeaseEpoch,
@@ -690,6 +691,147 @@ async function main() {
     assert.ok(atomMap.includes('scripts/validate-team-agents.ts#claude-gemini-bridges'));
 
     console.log('[validate-team-agents] ok (claude-gemini-bridges)');
+    return;
+  }
+
+  if (taskCase === 'microsoft-foundry-bridge') {
+    const incompleteChat = validateMicrosoftFoundryTeamProviderConfig({
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1',
+      providerId: 'microsoft-foundry',
+      sdkId: 'microsoft-foundry',
+      surface: 'project-chat-inference',
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      deploymentName: ''
+    });
+    assert.equal(incompleteChat.ok, false);
+    assert.deepEqual(incompleteChat.missingFields, ['deploymentName']);
+    assert.equal(incompleteChat.rawSecretsLogged, false);
+
+    const incompleteAgent = validateMicrosoftFoundryTeamProviderConfig({
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1',
+      providerId: 'microsoft-foundry',
+      sdkId: 'microsoft-foundry',
+      surface: 'agent-service',
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      agentIdEnvVar: ''
+    });
+    assert.equal(incompleteAgent.ok, false);
+    assert.deepEqual(incompleteAgent.missingFields, ['agentIdEnvVar']);
+
+    const chatConfig = {
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1' as const,
+      providerId: 'microsoft-foundry' as const,
+      sdkId: 'microsoft-foundry' as const,
+      surface: 'project-chat-inference' as const,
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      deploymentName: 'team-runtime-chat',
+      tenantIdEnvVar: 'AZURE_TENANT_ID'
+    };
+    const agentConfig = {
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1' as const,
+      providerId: 'microsoft-foundry' as const,
+      sdkId: 'microsoft-foundry' as const,
+      surface: 'agent-service' as const,
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      agentIdEnvVar: 'AZURE_AI_FOUNDRY_AGENT_ID',
+      tenantIdEnvVar: 'AZURE_TENANT_ID'
+    };
+    const chatBridge = createMicrosoftFoundryTeamProviderBridge(chatConfig);
+    const agentBridge = createMicrosoftFoundryTeamProviderBridge(agentConfig);
+    assert.equal(chatBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(agentBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(chatBridge.configValidation.ok, true);
+    assert.equal(agentBridge.configValidation.ok, true);
+    assert.equal(chatBridge.configValidation.surface, 'project-chat-inference');
+    assert.equal(agentBridge.configValidation.surface, 'agent-service');
+    assert.ok(chatBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+    assert.ok(agentBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+
+    const policy = createDefaultTeamPermissionPolicy();
+    const chatRun = launchMicrosoftFoundryTeamProviderRun({
+      bridge: chatBridge,
+      config: chatConfig,
+      request: {
+        taskId: 'TASK-TEAM-0044',
+        role: 'implementer',
+        runtimeMode: 'real-agent',
+        providerId: 'microsoft-foundry',
+        sdkId: 'microsoft-foundry',
+        modelId: 'gpt-5-mini'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/microsoft-foundry.ts'],
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const agentRun = launchMicrosoftFoundryTeamProviderRun({
+      bridge: agentBridge,
+      config: agentConfig,
+      request: {
+        taskId: 'TASK-TEAM-0044',
+        role: 'validator',
+        runtimeMode: 'real-agent',
+        providerId: 'microsoft-foundry',
+        sdkId: 'microsoft-foundry',
+        modelId: 'gpt-5-mini'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/microsoft-foundry.ts'],
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    for (const run of [chatRun, agentRun]) {
+      assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
+      assert.equal(run.ok, true);
+      assert.equal(run.providerId, 'microsoft-foundry');
+      assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
+      assert.equal(run.artifact.runtimeMode, 'real-agent');
+      assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.redaction.rawSecretsLogged, false);
+      assert.equal(run.artifact.observabilityEventCount, 3);
+      assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
+        'session.start',
+        'artifact.output',
+        'session.complete'
+      ]);
+      assert.ok(run.observabilityEvents.every((event) => event.schemaId === 'atm.teamAgentObservabilityEvent.v1'));
+      assert.ok(run.observabilityEvents.every((event) => event.redaction.rawSecretsLogged === false));
+      assert.ok(run.observabilityEvents.every((event) => event.evidenceBoundary.rawSecretsAllowed === false));
+    }
+    assert.equal(chatRun.artifact.artifactType, agentRun.artifact.artifactType);
+    assert.equal(chatRun.artifact.foundrySurface, 'project-chat-inference');
+    assert.equal(agentRun.artifact.foundrySurface, 'agent-service');
+    assert.equal(chatRun.artifact.foundryConfigRefs.deploymentName, 'team-runtime-chat');
+    assert.equal(agentRun.artifact.foundryConfigRefs.agentIdEnvVar, 'AZURE_AI_FOUNDRY_AGENT_ID');
+
+    const bridgeSummary = buildMicrosoftFoundryRuntimeBridgeSummary();
+    assert.equal(bridgeSummary.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');
+    assert.deepEqual(bridgeSummary.providerIds, ['microsoft-foundry']);
+    assert.deepEqual(bridgeSummary.supportedSurfaces, ['project-chat-inference', 'agent-service']);
+    assert.equal(bridgeSummary.sharedProviderInterface, 'atm.teamProviderContract.v1');
+    assert.ok(bridgeSummary.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+    assert.ok(bridgeSummary.bridges.every((bridge) => bridge.rawSecretsLogged === false));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0044', '--cwd', process.cwd(), '--json']);
+    const planBridgeSummary = (planResult.evidence as any)?.teamPlan?.microsoftFoundryRuntimeBridges;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating Foundry bridge wiring');
+    assert.equal(planBridgeSummary?.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');
+    assert.deepEqual(planBridgeSummary?.providerIds, ['microsoft-foundry']);
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.microsoftFoundryTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('project-chat-inference'));
+    assert.ok(vendorRuntimeDoc.includes('agent-service'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/microsoft-foundry.ts'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#microsoft-foundry-bridge'));
+
+    console.log('[validate-team-agents] ok (microsoft-foundry-bridge)');
     return;
   }
 

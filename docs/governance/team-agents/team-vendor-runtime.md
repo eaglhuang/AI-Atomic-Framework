@@ -80,6 +80,35 @@ route blocked work through the same `decisionClass`, `decisionReason`,
 `violationStatus`, and `broker-conflict-blocked` vocabulary used by the M8E
 Team Broker lane.
 
+## Microsoft Foundry Provider-Family Bridge
+
+Microsoft Foundry is represented as one provider family with two distinct
+governed surfaces:
+
+- `project-chat-inference` uses project endpoint chat or inference through
+  `atm.microsoftFoundryTeamProviderConfig.v1`. Required fields are `surface`,
+  `modelId`, `projectEndpointEnvVar`, and `deploymentName`.
+- `agent-service` references a service-managed Foundry agent through the same
+  config schema. Required fields are `surface`, `modelId`,
+  `projectEndpointEnvVar`, and `agentIdEnvVar`.
+
+The shared config shape keeps endpoint and agent identifiers as adopter-repo
+environment-variable references. The framework validates the references and the
+selected surface, but it does not store project endpoints, tenant values,
+agent ids, credentials, or private prompts in this repository.
+
+Foundry bridges still run through `atm.teamProviderContract.v1`, emit
+`atm.teamProviderRunArtifact.v1`, and write
+`atm.teamAgentObservabilityEvent.v1` records. The artifact records the selected
+Foundry surface and the relevant config reference names so replay and
+observability can distinguish chat/inference from service-managed agents
+without creating a vendor-local lifecycle authority.
+
+Foundry does not self-grant `git.write`, `task.lifecycle`, `file.write`, or
+close authority. Broker conflicts must reuse `decisionClass`,
+`decisionReason`, `violationStatus`, and `broker-conflict-blocked`, then point
+operators to the governed `atm.brokerConflictResolution.v1` resolution lane.
+
 ## Provider Selection
 
 - Repo defaults provide the baseline provider, SDK, model, and runtime mode.
