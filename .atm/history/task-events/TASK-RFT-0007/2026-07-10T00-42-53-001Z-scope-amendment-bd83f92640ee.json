@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T00-42-53-001Z-scope-amendment-bd83f92640ee",
+  "taskId": "TASK-RFT-0007",
+  "action": "scope-amendment",
+  "actorId": "cursor-composer-rft0007",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0007.json",
+  "taskSha256": "sha256:9cd637c9c5e5e7aae9b72710a34cdcbc11e89348803eda335aa20fec4119a8b2",
+  "createdAt": "2026-07-10T00:42:53.001Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0007 --actor cursor-composer-rft0007 --add \"packages/cli/src/commands/evidence/historical-batch.ts,packages/cli/src/commands/evidence/historical-batch-finalize.ts,packages/cli/src/commands/evidence/bundle-io.ts,packages/cli/src/commands/evidence/__tests__/missing-report.spec.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
