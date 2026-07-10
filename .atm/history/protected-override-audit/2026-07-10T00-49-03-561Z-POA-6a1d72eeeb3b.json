@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-6a1d72eeeb3b",
+  "recordedAt": "2026-07-10T00:49:03.561Z",
+  "actorId": "codex-team-broker",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-team-broker --message \"docs(governance): require broker conflict resolution artifact\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-049231bd67",
+  "reason": "Normal pre-commit remains blocked by unrelated RFT-0007 evidence split WIP; this commit records protected override evidence and hardens the broker-conflict backlog requirement.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-10T00-49-03-559Z-EMG-GLOBAL-049231bd67.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
