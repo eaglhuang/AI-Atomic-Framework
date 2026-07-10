@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T05-28-57-008Z-close-aaee11ef7ea4",
+  "taskId": "TASK-MAO-0059",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710051227-codex-captain-m8e-TASK-MAO-0059-9cffbe157f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-MAO-0059.json",
+  "taskSha256": "sha256:75c520d6795263073992472d708252d214b87f632806228b9cbedfb847cb2865",
+  "createdAt": "2026-07-10T05:28:57.008Z",
+  "command": "node atm.mjs tasks close --task TASK-MAO-0059 --actor codex-captain-m8e --status done --historical-delivery b68247806a97c842ae205629eb58ada3ec9e17f6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710051227-codex-captain-m8e-TASK-MAO-0059-9cffbe157f",
+    "closurePacketPath": ".atm/history/evidence/TASK-MAO-0059.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:mao-event-replay",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T05:28:57.003Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-MAO-0059.*",
+        ".atm/history/task-events/TASK-MAO-0059/**",
+        ".atm/history/tasks/TASK-MAO-0059.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/broker/**",
+        "packages/core/src/team-runtime/**",
+        "scripts/fixtures/mao-event-replay/**",
+        "scripts/validate-mao-event-replay.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/**",
+        "packages/core/src/team-runtime/**",
+        "scripts/fixtures/mao-event-replay/**",
+        "scripts/validate-mao-event-replay.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
