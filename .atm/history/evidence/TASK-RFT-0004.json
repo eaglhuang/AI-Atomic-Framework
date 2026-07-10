@@ -1,0 +1,517 @@
+{
+  "taskId": "TASK-RFT-0004",
+  "updatedAt": "2026-07-10T01:38:25.376Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:22:48.950Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:e886d2a9e8250917fc974936b477c147db41ffac6964b0ba002c52b4019ac114",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:22:49.003Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:60dc24add0bd5973c75f0f220888e199e29be199c8e2d205a962092dd0d026fe",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-task-ledger-atomic-map.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:22:51.341Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:task-ledger-atomic-map"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-task-ledger-atomic-map.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:359827c8a9a68f9efa56bc14ae943fcadb0f99ebb2bd929e1f4b8cb6d716d932",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:task-ledger-atomic-map"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:4f32abeb0a09fbf4e639ce970e9b1deab767dc3a73d11c00a88913bfaa06b23e",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:22:51.836Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:54ff07dfe5a748bcf69c95a5c9cceb3c0276bd7405d99b8f6291eb90916237ab",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:22:55.096Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3b86da5fd8b2b6f92ce32cef0af472b7334e8cf9275b7ffbddecc71760883cf0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:bc0bddaaf01c70e38bb29c6ddba70006e0c4b4bf4887256c7bb30c4d3d6b84db",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:22:55.151Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bf3bfacf15bc052b5c19e4a6df05783533f582c117a21e8633c555b4052c347f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:23:00.479Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:619f288413cb2309d756bf60ce041211b3f754d0b3ad4d8eb384fb81a7771fdc",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:4e6b625eac5df0851cbffd6189a523995ccf4e08d12344679a0a4a4e58e246d0",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:23:00.533Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b3e2a8d79217191034d4b45682afedf5ede17d2023b985f6b2ef45cf6deeef5d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:23:27.372Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6533c62c21ab5686c1e9a75cfa5d240478e24dff5018fec0436b2430957b2c13",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:967f9aa38b482e80af281c59dc2a6a377b8767bee86064084cadad101838feaa",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:23:27.925Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:22cb1c5890959192d1eaef78b70a7419025daa64b2489ece3c2d0afe438bae85",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:23:30.223Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:2fa09071209b912eea0dff5cab367dd73c8c27d72768eb448dd940cb0bc83ea7",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:23:30.305Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f8975740c5c59aac5241f81a298563bfe3879b2f22a55073a952be8c7351bc57",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-task-ledger-governance.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:26:02.573Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:task-ledger-governance"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-task-ledger-governance.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:8164d2d203d065c34a2019262a39ca124d9e85d2e8086a12b90dd2e47ba8e1ff",
+            "stderrSha256": "sha256:4a5eaa6aeb350e1e29635437a1c6710aa366b85cb6827a44c95dd7b65fd6d4d0",
+            "validators": [
+              "validate:task-ledger-governance"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+            "cacheKey": "sha256:3fcf8680eb3a6ce7ee16f7c8098e7f01fae840f09f1604984c16b2fed37bb32f",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:26:02.631Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bb4a3b333c835fa82930d8ed8bf85aaeb910df90caf36d8981f5c6cb21a1ee77",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:36:54.000Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:36:54.426Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f6dea87940f9ed70ec898ebac93de596a5d8451065f193948478117cc07ff36e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0004",
+      "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+      "createdAt": "2026-07-10T01:38:25.376Z",
+      "details": {
+        "actorId": "cursor-composer-rft0004",
+        "sessionId": "session-20260710010949-cursor-composer-rft0004-TASK-RFT-0004-e987bf9f46",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger-governance-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/task-ledger-governance-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:38:25.433Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a1893ce0920e7335baeb1d5c4a78913497b2f53174dd901a168732601e937834",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

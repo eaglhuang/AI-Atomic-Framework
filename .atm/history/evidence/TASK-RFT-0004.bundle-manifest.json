@@ -1,0 +1,138 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0004",
+  "updatedAt": "2026-07-10T01:38:25.376Z",
+  "updatedBy": "cursor-composer-rft0004",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts",
+    "node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts",
+    "node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:task-ledger-atomic-map",
+    "validate:task-ledger-governance"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-10T01:22:49.003Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-ledger-atomic-map.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:359827c8a9a68f9efa56bc14ae943fcadb0f99ebb2bd929e1f4b8cb6d716d932",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:task-ledger-atomic-map"
+      ],
+      "generatedAt": "2026-07-10T01:22:51.836Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3b86da5fd8b2b6f92ce32cef0af472b7334e8cf9275b7ffbddecc71760883cf0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/validators/task-ledger/__tests__/registry.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:22:55.151Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:619f288413cb2309d756bf60ce041211b3f754d0b3ad4d8eb384fb81a7771fdc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/validators/task-ledger/__tests__/residue-classification.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:23:00.533Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6533c62c21ab5686c1e9a75cfa5d240478e24dff5018fec0436b2430957b2c13",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/validators/task-ledger/__tests__/taskflow-close-orchestration.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:23:27.925Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-10T01:23:30.305Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-ledger-governance.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8164d2d203d065c34a2019262a39ca124d9e85d2e8086a12b90dd2e47ba8e1ff",
+      "stderrSha256": "sha256:4a5eaa6aeb350e1e29635437a1c6710aa366b85cb6827a44c95dd7b65fd6d4d0",
+      "validators": [
+        "validate:task-ledger-governance"
+      ],
+      "generatedAt": "2026-07-10T01:26:02.631Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "596d69cc0fda60f194cdbbdd97458dce9e528b8b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-10T01:36:54.426Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-10T01:38:25.433Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
