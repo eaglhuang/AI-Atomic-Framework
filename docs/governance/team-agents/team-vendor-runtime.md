@@ -53,3 +53,22 @@ operator-facing conflict summary. The projection is derived from Team Broker and
 the canonical role-routing matrix, so M9I vendor bridges can display blocked
 task ids, shared paths or atom overlap, `decisionReason`, and the next safe
 resolution command without creating a second release-order source.
+
+## Cross-Vendor Observability
+
+All provider bridges must emit `atm.teamAgentObservabilityEvent.v1` records for
+session start, step execution, tool invocation, artifact output, completion, and
+failure. The same schema also covers Broker conflict events through
+`broker.conflict.blocked` and `broker.conflict.resolution`.
+
+Operators query the shared log by `taskId`, `teamRunId`, `providerId`, `role`,
+`artifactType`, or `eventType`; providers must not add vendor-local query keys
+as a replacement for the shared surface. Broker conflict events reuse
+`decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked` from the M8E lane and point at the
+`atm.brokerConflictResolution.v1` artifact.
+
+Observability is evidence metadata, not a secret sink. Events must set
+`rawSecretsLogged: false`, preserve `rawSecretsAllowed: false`, and keep raw
+provider prompts, tokens, credentials, and private tool payloads out of the
+governance log.

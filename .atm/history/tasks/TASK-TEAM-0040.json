@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0040",
+  "title": "Cross-vendor observability and query log",
+  "status": "running",
+  "milestone": "M8I",
+  "dependencies": [
+    "TASK-TEAM-0037"
+  ],
+  "acceptance": [
+    "Team runtime emits one event schema for session start, step execution, tool invocation, artifact output, and completion/failure.",
+    "Operators can query by task, team run, provider, role, and artifact.",
+    "Event logging preserves governance evidence boundaries and redaction policy."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/observability.ts",
+    "schemas/governance/team-agent-observability-event.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/observability.ts",
+    "schemas/governance/team-agent-observability-event.schema.json",
+    "packages/cli/src/commands/team.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case cross-vendor-observability",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "External SIEM export pipelines",
+    "Provider-specific tracing UIs"
+  ],
+  "nonGoals": [
+    "Do not let each vendor invent a separate event model",
+    "Do not log raw secrets"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert observability contract, schema, query log hooks, and validator coverage together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "2026-06-19 | planned | observability lane opened as a first-class runtime contract, not a provider-specific afterthought.",
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0040-cross-vendor-observability-and-query-log.task.md",
+    "sectionTitle": "TASK-TEAM-0040",
+    "headingLine": 50,
+    "hash": "32297a180467f7cc"
+  },
+  "importedAt": "2026-07-10T05:45:32.274Z",
+  "lastTransitionId": "2026-07-10T05-45-48-260Z-claim-29aa80388053",
+  "lastTransitionAt": "2026-07-10T05:45:48.260Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-m8e",
+  "reservedAt": "2026-07-10T05:45:47.851Z",
+  "promotedAt": "2026-07-10T05:45:47.854Z",
+  "claim": {
+    "actorId": "codex-captain-m8e",
+    "leaseId": "lease-9b20d4a69ee6",
+    "claimedAt": "2026-07-10T05:45:47.858Z",
+    "heartbeatAt": "2026-07-10T05:45:47.858Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0040.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "schemas/governance/team-agent-observability-event.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-10T05:45:47.858Z",
+  "startedByActor": "codex-captain-m8e",
+  "startedBySessionId": "session-20260710054547-codex-captain-m8e-TASK-TEAM-0040-922470753a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0040",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0040.*",
+      ".atm/history/task-events/TASK-TEAM-0040/**",
+      ".atm/history/tasks/TASK-TEAM-0040.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "schemas/governance/team-agent-observability-event.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "49f61e5d92e1f04f0a4cd6e1487af40281b520101762d2106559cfdba20d6bbc",
+    "actorId": "codex-captain-m8e",
+    "createdAt": "2026-07-10T05:45:48.259Z",
+    "status": "active"
+  }
+}

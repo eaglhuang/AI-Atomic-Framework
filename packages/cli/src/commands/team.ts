@@ -36,6 +36,11 @@ import {
   type BrokerConflictDecisionClass,
   type BrokerConflictViolationStatus
 } from '../../../core/src/team-runtime/permission-broker.ts';
+import {
+  buildTeamObservabilityContract,
+  createBrokerConflictObservabilityEvents,
+  queryTeamObservabilityEvents
+} from '../../../core/src/team-runtime/observability.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { resolveTeamProviderSelection, type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 
@@ -694,6 +699,11 @@ export async function runTeam(argv: string[]) {
     return runTeamBroker(argv.slice(1), process.cwd());
   }
 
+  if (String(argv[0] ?? '').toLowerCase() === 'observability') {
+    const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
+    return runTeamObservability(argv.slice(1), cwd);
+  }
+
   const spec = getCommandSpec('team')!;
   const parsed = parseArgsForCommand(spec, argv);
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
@@ -713,8 +723,12 @@ export async function runTeam(argv: string[]) {
     return runTeamBroker(parsed.positional.slice(1).map(String), cwd);
   }
 
+  if (action === 'observability') {
+    return runTeamObservability(parsed.positional.slice(1).map(String), cwd);
+  }
+
   if (!['plan', 'start', 'status', 'validate', 'patrol'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge, broker resolve', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge, broker resolve, observability query', { exitCode: 2 });
   }
 
   if (action === 'status') {
@@ -968,6 +982,73 @@ function runTeamBroker(argv: string[], defaultCwd: string) {
     throw new CliError('ATM_CLI_USAGE', 'team broker supports: resolve', { exitCode: 2 });
   }
   return runTeamBrokerConflictResolve(argv.slice(1), defaultCwd);
+}
+
+function runTeamObservability(argv: string[], defaultCwd: string) {
+  const action = String(argv[0] ?? '').toLowerCase();
+  if (action !== 'query') {
+    throw new CliError('ATM_CLI_USAGE', 'team observability supports: query', { exitCode: 2 });
+  }
+
+  const fixture = String(readOptionValue(argv, '--fixture') ?? 'broker-conflict-resolution').trim();
+  if (fixture !== 'broker-conflict-resolution') {
+    throw new CliError('ATM_TEAM_OBSERVABILITY_FIXTURE_UNSUPPORTED', `Unsupported team observability fixture: ${fixture}`, { exitCode: 2 });
+  }
+
+  const emittedAt = readOptionValue(argv, '--emitted-at') ?? '2026-07-10T00:00:00.000Z';
+  const primaryTaskId = String(readOptionValue(argv, '--task') ?? 'TASK-TEAM-0040').trim();
+  const conflictingTaskIds = readOptionValues(argv, '--conflict');
+  const sharedPaths = readOptionValues(argv, '--path');
+  const artifact = createBrokerConflictResolutionArtifact({
+    primaryTaskId,
+    conflictingTaskIds: conflictingTaskIds.length > 0 ? conflictingTaskIds : ['TASK-TEAM-0047'],
+    sharedPaths: sharedPaths.length > 0 ? sharedPaths : ['packages/cli/src/commands/team.ts'],
+    decisionClass: normalizeBrokerDecisionClass(readOptionValue(argv, '--decision-class')),
+    decisionReason: readOptionValue(argv, '--decision-reason')
+      ?? 'broker-conflict-blocked until the release order grants the next task.',
+    violationStatus: normalizeBrokerViolationStatus(readOptionValue(argv, '--violation-status')),
+    releaseOrder: readOptionValues(argv, '--release-order'),
+    createdAt: emittedAt
+  });
+  const providerId = String(readOptionValue(argv, '--provider') ?? 'openai').trim() as any;
+  const role = String(readOptionValue(argv, '--role') ?? 'coordinator').trim();
+  const teamRunId = readOptionValue(argv, '--team-run') ?? `team-observability-${artifact.resolutionId.toLowerCase()}`;
+  const events = createBrokerConflictObservabilityEvents({
+    artifact,
+    providerId,
+    role,
+    teamRunId,
+    emittedAt
+  });
+  const query = queryTeamObservabilityEvents(events, {
+    taskId: readOptionValue(argv, '--task-filter') ?? readOptionValue(argv, '--task'),
+    teamRunId: readOptionValue(argv, '--team-run-filter') ?? readOptionValue(argv, '--team-run'),
+    providerId: readOptionValue(argv, '--provider-filter') ?? readOptionValue(argv, '--provider'),
+    role: readOptionValue(argv, '--role-filter') ?? readOptionValue(argv, '--role'),
+    artifactType: readOptionValue(argv, '--artifact') ?? readOptionValue(argv, '--artifact-type'),
+    eventType: readOptionValue(argv, '--event-type') as any
+  });
+
+  return makeResult({
+    ok: true,
+    command: 'team observability query',
+    mode: 'standalone',
+    cwd: defaultCwd,
+    messages: [
+      message('info', 'ATM_TEAM_OBSERVABILITY_QUERY_READY', 'Team observability query returned shared event records.', {
+        eventCount: query.eventCount,
+        filters: query.filters
+      })
+    ],
+    evidence: {
+      action: 'observability.query',
+      dryRun: true,
+      fixture,
+      contract: buildTeamObservabilityContract(),
+      artifact,
+      query
+    }
+  });
 }
 
 export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string) {
@@ -2303,6 +2384,7 @@ export function buildTeamPlan(input: {
   const roleSkillPackManifest = buildProviderNeutralRoleSkillPackManifest({ recipe: input.recipe, roleSkillPacks });
   const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
   const growthContract = buildTeamGrowthContract();
+  const observabilityContract = buildTeamObservabilityContract();
   const runtimePilot = buildTeamRuntimePilot({
     roleSkillPacks,
     routingMatrix,
@@ -2322,6 +2404,7 @@ export function buildTeamPlan(input: {
     roleSkillPackManifest,
     routingMatrix,
     growthContract,
+    observabilityContract,
     runtimePilot,
     ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     requiredRoles: crewBriefingContract.requiredRoles,
