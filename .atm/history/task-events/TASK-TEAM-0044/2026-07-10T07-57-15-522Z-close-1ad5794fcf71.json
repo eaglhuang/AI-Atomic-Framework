@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T07-57-15-522Z-close-1ad5794fcf71",
+  "taskId": "TASK-TEAM-0044",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260710073847-codex-gpt-5.4-mini-TASK-TEAM-0044-33ee5e6c8f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0044.json",
+  "taskSha256": "sha256:9e23bfaab822b525371ab8729906afd0963b98b4d5df396d14a44ecb34e82964",
+  "createdAt": "2026-07-10T07:57:15.522Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0044 --actor codex-gpt-5.4-mini --status done --historical-delivery d26ba3ba09146d73b8ad61866ea6e60f78377bd9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710073847-codex-gpt-5.4-mini-TASK-TEAM-0044-33ee5e6c8f",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0044.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T07:57:15.514Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0044.*",
+        ".atm/history/task-events/TASK-TEAM-0044/**",
+        ".atm/history/tasks/TASK-TEAM-0044.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
