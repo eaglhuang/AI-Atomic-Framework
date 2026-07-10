@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-1f8e29eca3e7",
+  "recordedAt": "2026-07-10T00:47:33.580Z",
+  "actorId": "codex-team-broker",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-team-broker --message \"fix(git): keep hook bypass behind broker guard\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-45e7bef58e",
+  "reason": "Normal pre-commit is blocked by unrelated RFT-0007 evidence split WIP; focused broker bypass regression and encoding guard passed.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-10T00-47-33-578Z-EMG-GLOBAL-45e7bef58e.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
