@@ -1,0 +1,282 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0005",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9457a002d6c42a45b1ee05b81a129c1e8e7df0b6",
+  "governedTreeSha": "67f658ac101167a3c8edf4cbd54e4c316049a7bd",
+  "targetCommitDelta": {
+    "currentCommitSha": "9457a002d6c42a45b1ee05b81a129c1e8e7df0b6",
+    "parentCommitShas": [
+      "9457a002d6c42a45b1ee05b81a129c1e8e7df0b6"
+    ],
+    "governedTreeSha": "67f658ac101167a3c8edf4cbd54e4c316049a7bd",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0005.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-03-19-187Z-import-1dc7de8190dd.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-03-32-587Z-reserve-077e09fcbcf0.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-03-32-589Z-promote-f895c11330a6.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-03-33-389Z-claim-dd03130fb93e.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-11-20-809Z-renew-b1063cfaa1c2.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-11-25-433Z-scope-amendment-c8164a367904.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-11-38-181Z-scope-amendment-984dee389447.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-11-40-072Z-scope-amendment-44a4bf9d104f.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-11-42-611Z-scope-amendment-f45215bf4e49.json",
+      ".atm/history/task-events/TASK-RFT-0005/2026-07-10T02-19-26-481Z-scope-amendment-573ce53ab891.json",
+      ".atm/history/tasks/TASK-RFT-0005.json",
+      "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+      "scripts/captain-dispatch-mailbox.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+      "scripts/captain-dispatch-mailbox/cli.ts",
+      "scripts/captain-dispatch-mailbox/constants.ts",
+      "scripts/captain-dispatch-mailbox/frontmatter.ts",
+      "scripts/captain-dispatch-mailbox/fs-utils.ts",
+      "scripts/captain-dispatch-mailbox/lanes/inbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/outbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/reports.ts",
+      "scripts/captain-dispatch-mailbox/layout.ts",
+      "scripts/captain-dispatch-mailbox/ledger.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/captain-dispatch-mailbox/stop-loss.ts",
+      "scripts/captain-dispatch-mailbox/types.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-captain-dispatch-atomic-map.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-captain-dispatch-atomic-map.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fa7e8f2199b25232a529bd0a16ca3d6fbc37878a2ed96d16ca4793f7d9bb9611",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b065f253d55cd48c1a8c69f6f80f1031578281adcb06e429cac4d794ca85075e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:26eeaac8bde9ef43bc59320ff92ed2f863caefde54f2954749674a02040aee64",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e46f7dd45327ebbb3eda2c02e02b93ce89a1c7b4248628e4734f0745583c7d5b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:44cc75ca350ac71dea7f93aeb41157941c3d09cd79e59c755b9927932e10d627",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:04b5ff582879f8e74eaf7b8ad037fe5250c10b3adc27e11805bc77ec45f12665",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a4fc1bddbebe25962b6fdb1676527c4a00d2de1bb2ee6118bf405dd455aca91c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+    "node --strip-types scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+    "node --strip-types scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+    "node --strip-types scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+    "node --strip-types scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+    "node --strip-types scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+    "typecheck",
+    "validate:captain-dispatch-atomic-map",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-10T02:28:36.823Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0005.*",
+      ".atm/history/task-events/TASK-RFT-0005/**",
+      ".atm/history/tasks/TASK-RFT-0005.json",
+      "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+      "scripts/captain-dispatch-mailbox.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+      "scripts/captain-dispatch-mailbox/cli.ts",
+      "scripts/captain-dispatch-mailbox/constants.ts",
+      "scripts/captain-dispatch-mailbox/frontmatter.ts",
+      "scripts/captain-dispatch-mailbox/fs-utils.ts",
+      "scripts/captain-dispatch-mailbox/lanes/inbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/outbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/reports.ts",
+      "scripts/captain-dispatch-mailbox/layout.ts",
+      "scripts/captain-dispatch-mailbox/ledger.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/captain-dispatch-mailbox/stop-loss.ts",
+      "scripts/captain-dispatch-mailbox/types.ts",
+      "scripts/validate-captain-dispatch-atomic-map.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/captain-dispatch-mailbox.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+      "scripts/captain-dispatch-mailbox/cli.ts",
+      "scripts/captain-dispatch-mailbox/constants.ts",
+      "scripts/captain-dispatch-mailbox/frontmatter.ts",
+      "scripts/captain-dispatch-mailbox/fs-utils.ts",
+      "scripts/captain-dispatch-mailbox/lanes/inbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/outbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/reports.ts",
+      "scripts/captain-dispatch-mailbox/layout.ts",
+      "scripts/captain-dispatch-mailbox/ledger.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/captain-dispatch-mailbox/stop-loss.ts",
+      "scripts/captain-dispatch-mailbox/types.ts",
+      "scripts/validate-captain-dispatch-atomic-map.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0005.json",
+  "closedAt": "2026-07-10T02:28:36.823Z",
+  "closedByActor": "cursor-composer-rft0005",
+  "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9457a002d6c42a45b1ee05b81a129c1e8e7df0b6",
+    "taskMatchedFiles": [
+      "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+      "scripts/captain-dispatch-mailbox.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+      "scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+      "scripts/captain-dispatch-mailbox/cli.ts",
+      "scripts/captain-dispatch-mailbox/constants.ts",
+      "scripts/captain-dispatch-mailbox/frontmatter.ts",
+      "scripts/captain-dispatch-mailbox/fs-utils.ts",
+      "scripts/captain-dispatch-mailbox/lanes/inbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/outbox.ts",
+      "scripts/captain-dispatch-mailbox/lanes/reports.ts",
+      "scripts/captain-dispatch-mailbox/layout.ts",
+      "scripts/captain-dispatch-mailbox/ledger.ts",
+      "scripts/captain-dispatch-mailbox/render.ts",
+      "scripts/captain-dispatch-mailbox/stop-loss.ts",
+      "scripts/captain-dispatch-mailbox/types.ts",
+      "scripts/validate-captain-dispatch-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

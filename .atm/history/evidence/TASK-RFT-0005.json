@@ -1,0 +1,632 @@
+{
+  "taskId": "TASK-RFT-0005",
+  "updatedAt": "2026-07-10T02:28:18.048Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:11:51.308Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:f077571bbd50c938f40904bfb52829367c62a10e20b0d1cabcb39186098459a7",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:11:51.365Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6e033eafb238d780fdd843c00e60a6a4ad29ce8df914b54f31d962b83a15d47c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-captain-dispatch-atomic-map.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:04.284Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:captain-dispatch-atomic-map"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-captain-dispatch-atomic-map.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:fa7e8f2199b25232a529bd0a16ca3d6fbc37878a2ed96d16ca4793f7d9bb9611",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:captain-dispatch-atomic-map"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:d473410f5cba1282e6fb0925e53323f5b31137bf28e0a5d10726db4f56beba9b",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:04.345Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f30d4405d86a4035493161b8e139992c21469e3865eb433e56468dc3c920c77f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:09.094Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b065f253d55cd48c1a8c69f6f80f1031578281adcb06e429cac4d794ca85075e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/captain-dispatch-mailbox/__tests__/layout.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:e5e9a207137834ad2cf55ecb8b7ba5ff3bcaafb6d3a3b363776d94b1980d408f",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:09.157Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b5ce34a6d1e6254d6829f7edbc10d1c5b7c3a8dcf36256b858ea5eef2e184757",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:11.133Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:26eeaac8bde9ef43bc59320ff92ed2f863caefde54f2954749674a02040aee64",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/captain-dispatch-mailbox/__tests__/ledger.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:5135751425b6be305da18e3c4e28d45a4090353d17e131fdd68d777d85f73845",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:11.187Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:18993463d3ac1b4a52731775f9bf396f221b441f00e94eefd1a8377ffa101029",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:15.118Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e46f7dd45327ebbb3eda2c02e02b93ce89a1c7b4248628e4734f0745583c7d5b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/captain-dispatch-mailbox/__tests__/inbox.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:52ef7eb14eff35693f6fe5d1d9ac9f509e5987402587bf83d1584ebc419c787d",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:15.177Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0bd71b8c76f8c8b5a2eb58d88dc21ca0feeed713ecf868464244326b84d611bf",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:17.557Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:44cc75ca350ac71dea7f93aeb41157941c3d09cd79e59c755b9927932e10d627",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/captain-dispatch-mailbox/__tests__/outbox.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:d71ff6239f40068a03349119603627e7a87c4dbf5946c0668da4cbe536aaef83",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:18.053Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:19a7cf4de89869de6138cb072da9c59014bb7a5104fb17715b72072d6668d769",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:21.542Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:04b5ff582879f8e74eaf7b8ad037fe5250c10b3adc27e11805bc77ec45f12665",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/captain-dispatch-mailbox/__tests__/reports.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:b00b8b3b04d52c22bb08c4eabc386447c2f86ef439e825b1005f6fadba7c78ec",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:21.596Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1e763483bccbc8b62b5defb4e0c89c0d232c5a465b5d42419ef509dbea0e32f8",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:25.731Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:a4fc1bddbebe25962b6fdb1676527c4a00d2de1bb2ee6118bf405dd455aca91c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/captain-dispatch-mailbox/__tests__/stop-loss.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:d3dad67ec05b547f9549df31b5485fc59fd47677a10373336b5b8f8f58124516",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:26.695Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:85e03eb8c2d0bf8a29862a214567dd4e4fe754d5fd776d195bf80e9458b3b72e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:12:28.726Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:a694e2ba254bd8990df2657d9267fa395879384808f96f328ee219378cf52fe0",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:12:28.784Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:cc9aa44fd1e1015631498575992f7f45aa3878c666747f0030adb46b4a79d959",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:14:21.141Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "9358bd4b158a5ca749a6bcbc7a91d91a81b2b7c9",
+            "cacheKey": "sha256:1481d0bd3b5b0428ba743c4a93e864d2f46aca70541f2b0743fc479b456832a9",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:14:21.212Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ff82ba2952f3934091dddfaec6785f2b0d042ba973b9186818a6b20595c5891a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0005",
+      "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+      "createdAt": "2026-07-10T02:28:18.048Z",
+      "details": {
+        "actorId": "cursor-composer-rft0005",
+        "sessionId": "session-20260710020332-cursor-composer-rft0005-TASK-RFT-0005-5d2a231aec",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.captain-dispatch-mailbox-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/captain-dispatch-mailbox-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:28:18.110Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1183f86b7961beed16afa3f65e0d988c920772913800db709b2b9e67e06d288c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
