@@ -25,6 +25,33 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 - Adopter repositories should place vendor configuration under `agent-integrations/vendors/**`.
 - The framework may validate layout and explain missing or malformed config, but it must not store adopter secrets in the framework repository.
 
+## OpenAI-Family Direct Bridges
+
+M9I starts with two direct real-agent provider bridges under the shared
+`atm.teamProviderContract.v1` interface:
+
+- `openai` uses `atm.openaiTeamProviderConfig.v1`. Required fields are
+  `modelId` and the secret reference `apiKeyEnvVar`. Optional organization,
+  project, and base URL values are represented as environment-variable
+  references, not raw values.
+- `azure-openai` uses `atm.azureOpenAITeamProviderConfig.v1`. Required fields
+  include `endpointEnvVar`, `deploymentName`, `modelId`, and `authMode`.
+  `api-key-env` additionally requires `apiKeyEnvVar`; `managed-identity`
+  additionally requires `tenantIdEnvVar`.
+
+Both bridges produce the same `atm.teamProviderRunArtifact.v1` envelope and
+the same `atm.teamAgentObservabilityEvent.v1` event sequence:
+`session.start`, `artifact.output`, and `session.complete`. The bridge artifact
+records `rawSecretsLogged: false`; provider credentials, endpoints, and tenant
+values are stored only as configured references in adopter repositories.
+
+OpenAI-family bridges must request permissions through the shared broker before
+launching work. They do not self-grant `git.write`, `task.lifecycle`,
+`file.write`, or close authority. If a bridge is blocked by Team Broker, the
+operator-facing message must reuse `decisionClass`, `decisionReason`,
+`violationStatus`, and `broker-conflict-blocked`, and point to the governed
+resolution artifact rather than local runtime edits.
+
 ## Provider Selection
 
 - Repo defaults provide the baseline provider, SDK, model, and runtime mode.

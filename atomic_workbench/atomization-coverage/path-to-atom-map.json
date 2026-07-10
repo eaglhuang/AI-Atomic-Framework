@@ -2137,11 +2137,46 @@
       "capability": "Validator case proving Team observability event schema validation, broker conflict artifact event projection, query filtering, team plan wiring, docs coverage, and atom map coverage.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0040"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/openai.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "OpenAI direct real-agent Team runtime bridge with config reference validation, broker-checked launch permission, shared atm.teamProviderRunArtifact.v1 output, and raw-secret-free observability events.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Azure OpenAI direct real-agent Team runtime bridge with endpoint, deployment, and auth-mode validation separate from plain OpenAI config while preserving the shared provider artifact and observability envelope.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildOpenAIFamilyRuntimeBridgeSummary",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Team plan projection for OpenAI-family runtime bridge descriptors, including config schemas, broker-checked permissions, observability event types, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#openai-family-direct-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Documents OpenAI and Azure OpenAI direct bridge config boundaries, shared provider run artifact, secret redaction, broker permission enforcement, and broker-conflict-blocked operator vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#openai-azure-openai-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Validator case proving OpenAI and Azure OpenAI config validation, real-agent launch through atm.teamProviderContract.v1, shared artifact envelope, observability events, broker permission checks, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
     }
   ],
   "summary": {
-    "total_production_paths": 200,
-    "mapped_paths": 200,
+    "total_production_paths": 205,
+    "mapped_paths": 205,
     "coverage_percentage": 100,
     "atoms_defined": 113,
     "atoms_with_evidence": 0,

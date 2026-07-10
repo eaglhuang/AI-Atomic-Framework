@@ -41,6 +41,8 @@ import {
   createBrokerConflictObservabilityEvents,
   queryTeamObservabilityEvents
 } from '../../../core/src/team-runtime/observability.ts';
+import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
+import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { resolveTeamProviderSelection, type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 
@@ -226,6 +228,21 @@ type TeamRoleGrowthObservabilityContract = {
     violationStatus: string;
     blockedCode: 'broker-conflict-blocked';
   };
+};
+
+type TeamOpenAIFamilyRuntimeBridgeSummary = {
+  schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1';
+  milestone: 'M9I';
+  providerIds: readonly ['openai', 'azure-openai'];
+  sharedProviderInterface: 'atm.teamProviderContract.v1';
+  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+  coordinatorOwnedAuthority: true;
+  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+  bridges: readonly [
+    ReturnType<typeof buildOpenAITeamProviderBridgeDescriptor>,
+    ReturnType<typeof buildAzureOpenAITeamProviderBridgeDescriptor>
+  ];
 };
 
 type TeamRuntimePilot = {
@@ -2500,6 +2517,7 @@ export function buildTeamPlan(input: {
     growthContract,
     observabilityContract,
     roleGrowthObservabilityContract,
+    openAIFamilyRuntimeBridges: buildOpenAIFamilyRuntimeBridgeSummary(),
     runtimePilot,
     ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     requiredRoles: crewBriefingContract.requiredRoles,
@@ -2518,6 +2536,23 @@ export function buildTeamPlan(input: {
       'Do not hand-edit .atm/runtime team state.'
     ],
     validation: input.validation
+  };
+}
+
+export function buildOpenAIFamilyRuntimeBridgeSummary(): TeamOpenAIFamilyRuntimeBridgeSummary {
+  return {
+    schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1',
+    milestone: 'M9I',
+    providerIds: ['openai', 'azure-openai'],
+    sharedProviderInterface: 'atm.teamProviderContract.v1',
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+    coordinatorOwnedAuthority: true,
+    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+    bridges: [
+      buildOpenAITeamProviderBridgeDescriptor(),
+      buildAzureOpenAITeamProviderBridgeDescriptor()
+    ]
   };
 }
 

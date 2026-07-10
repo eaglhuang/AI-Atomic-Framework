@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0042",
+  "title": "OpenAI and Azure OpenAI runtime bridges",
+  "status": "running",
+  "milestone": "M9I",
+  "dependencies": [
+    "TASK-TEAM-0037",
+    "TASK-TEAM-0038",
+    "TASK-TEAM-0041"
+  ],
+  "acceptance": [
+    "Team runtime can launch OpenAI-backed and Azure OpenAI-backed real-agent runs through one shared provider interface.",
+    "Azure-specific endpoint, deployment, and auth fields are validated separately from plain OpenAI config.",
+    "Both bridges emit the same artifact and observability envelope shape."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/providers/openai.ts",
+    "packages/core/src/team-runtime/providers/azure-openai.ts",
+    "packages/cli/src/commands/team.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/providers/openai.ts",
+    "packages/core/src/team-runtime/providers/azure-openai.ts",
+    "packages/cli/src/commands/team.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case openai-azure-openai-bridges",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Microsoft Foundry hosted-agent references",
+    "Claude Code editor bridge",
+    "Gemini execution bridge"
+  ],
+  "nonGoals": [
+    "Do not assume Azure OpenAI config is identical to OpenAI config",
+    "Do not skip permission or observability enforcement for direct providers"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert OpenAI and Azure OpenAI provider bridges, docs, and validator coverage together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "2026-06-19 | planned | first direct-provider implementation lane opened for OpenAI-family runtimes.",
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0042-openai-and-azure-openai-runtime-bridges.task.md",
+    "sectionTitle": "TASK-TEAM-0042",
+    "headingLine": 53,
+    "hash": "666ae806ae9f7c77"
+  },
+  "importedAt": "2026-07-10T06:48:43.770Z",
+  "lastTransitionId": "2026-07-10T06-49-05-924Z-claim-a2ab0490a42f",
+  "lastTransitionAt": "2026-07-10T06:49:05.924Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-10T06:49:05.396Z",
+  "promotedAt": "2026-07-10T06:49:05.398Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-caca40d69db9",
+    "claimedAt": "2026-07-10T06:49:05.402Z",
+    "heartbeatAt": "2026-07-10T06:49:05.402Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0042.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-10T06:49:05.402Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260710064905-codex-gpt-5.4-mini-TASK-TEAM-0042-3fe31f9736",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0042",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0042.*",
+      ".atm/history/task-events/TASK-TEAM-0042/**",
+      ".atm/history/tasks/TASK-TEAM-0042.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a8f5c1f2528e267ea9d180cfd655b3ab2768b2ff8007c9072492e809fb6b0665",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-07-10T06:49:05.923Z",
+    "status": "active"
+  }
+}

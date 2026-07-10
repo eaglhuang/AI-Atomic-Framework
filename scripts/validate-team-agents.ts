@@ -6,7 +6,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface } from '../packages/cli/src/commands/integration.ts';
@@ -17,6 +17,8 @@ import { runProviderOrchestration } from '../packages/core/src/team-runtime/exec
 import { advanceBrokerConflictResolution, createBrokerConflictResolutionArtifact, createDefaultTeamPermissionPolicy, decideBrokerConflictResolutionAdmission, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
 import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, createTeamObservabilityEvent, queryTeamObservabilityEvents } from '../packages/core/src/team-runtime/observability.ts';
 import { resolveTeamProviderSelection } from '../packages/core/src/team-runtime/provider-selection.ts';
+import { createAzureOpenAITeamProviderBridge, launchAzureOpenAITeamProviderRun, validateAzureOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/azure-openai.ts';
+import { createOpenAITeamProviderBridge, launchOpenAITeamProviderRun, validateOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/openai.ts';
 import {
   validateScopeLeaseEpoch,
   validateScopeLeaseFencing,
@@ -424,6 +426,134 @@ async function main() {
     });
     assert.equal(deny.ok, false);
     console.log('[validate-team-agents] ok (provider-permission-broker)');
+    return;
+  }
+
+  if (taskCase === 'openai-azure-openai-bridges') {
+    const incompleteOpenAI = validateOpenAITeamProviderConfig({
+      schemaId: 'atm.openaiTeamProviderConfig.v1',
+      providerId: 'openai',
+      sdkId: 'openai-responses',
+      modelId: '',
+      apiKeyEnvVar: ''
+    });
+    assert.equal(incompleteOpenAI.ok, false);
+    assert.deepEqual(incompleteOpenAI.missingFields, ['modelId', 'apiKeyEnvVar']);
+    assert.equal(incompleteOpenAI.rawSecretsLogged, false);
+
+    const incompleteAzure = validateAzureOpenAITeamProviderConfig({
+      schemaId: 'atm.azureOpenAITeamProviderConfig.v1',
+      providerId: 'azure-openai',
+      sdkId: 'azure-openai-responses',
+      endpointEnvVar: 'AZURE_OPENAI_ENDPOINT',
+      deploymentName: '',
+      modelId: 'gpt-5-mini',
+      authMode: 'api-key-env',
+      apiKeyEnvVar: ''
+    });
+    assert.equal(incompleteAzure.ok, false);
+    assert.ok(incompleteAzure.missingFields.includes('deploymentName'));
+    assert.ok(incompleteAzure.missingFields.includes('apiKeyEnvVar'));
+
+    const openaiBridge = createOpenAITeamProviderBridge({
+      schemaId: 'atm.openaiTeamProviderConfig.v1',
+      providerId: 'openai',
+      sdkId: 'openai-responses',
+      modelId: 'gpt-5-mini',
+      apiKeyEnvVar: 'OPENAI_API_KEY'
+    });
+    const azureBridge = createAzureOpenAITeamProviderBridge({
+      schemaId: 'atm.azureOpenAITeamProviderConfig.v1',
+      providerId: 'azure-openai',
+      sdkId: 'azure-openai-responses',
+      endpointEnvVar: 'AZURE_OPENAI_ENDPOINT',
+      deploymentName: 'atm-team-runtime',
+      modelId: 'gpt-5-mini',
+      authMode: 'managed-identity',
+      tenantIdEnvVar: 'AZURE_TENANT_ID'
+    });
+    assert.equal(openaiBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(azureBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(openaiBridge.configValidation.ok, true);
+    assert.equal(azureBridge.configValidation.ok, true);
+    assert.ok(openaiBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+    assert.ok(azureBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+
+    const policy = createDefaultTeamPermissionPolicy();
+    const openaiRun = launchOpenAITeamProviderRun({
+      bridge: openaiBridge,
+      request: {
+        taskId: 'TASK-TEAM-0042',
+        role: 'implementer',
+        runtimeMode: 'real-agent',
+        providerId: 'openai',
+        sdkId: 'openai-responses',
+        modelId: 'gpt-5-mini'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/openai.ts'],
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const azureRun = launchAzureOpenAITeamProviderRun({
+      bridge: azureBridge,
+      request: {
+        taskId: 'TASK-TEAM-0042',
+        role: 'implementer',
+        runtimeMode: 'real-agent',
+        providerId: 'azure-openai',
+        sdkId: 'azure-openai-responses',
+        modelId: 'gpt-5-mini'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/azure-openai.ts'],
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    for (const run of [openaiRun, azureRun]) {
+      assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
+      assert.equal(run.ok, true);
+      assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
+      assert.equal(run.artifact.runtimeMode, 'real-agent');
+      assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.redaction.rawSecretsLogged, false);
+      assert.equal(run.artifact.observabilityEventCount, 3);
+      assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
+        'session.start',
+        'artifact.output',
+        'session.complete'
+      ]);
+      assert.ok(run.observabilityEvents.every((event) => event.schemaId === 'atm.teamAgentObservabilityEvent.v1'));
+      assert.ok(run.observabilityEvents.every((event) => event.redaction.rawSecretsLogged === false));
+      assert.ok(run.observabilityEvents.every((event) => event.evidenceBoundary.rawSecretsAllowed === false));
+    }
+    assert.equal(openaiRun.artifact.artifactType, azureRun.artifact.artifactType);
+    assert.equal(openaiRun.observabilityEvents[1]?.artifactType, azureRun.observabilityEvents[1]?.artifactType);
+
+    const bridgeSummary = buildOpenAIFamilyRuntimeBridgeSummary();
+    assert.equal(bridgeSummary.schemaId, 'atm.openAIFamilyRuntimeBridgeSummary.v1');
+    assert.deepEqual(bridgeSummary.providerIds, ['openai', 'azure-openai']);
+    assert.equal(bridgeSummary.sharedProviderInterface, 'atm.teamProviderContract.v1');
+    assert.ok(bridgeSummary.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+    assert.ok(bridgeSummary.bridges.every((bridge) => bridge.rawSecretsLogged === false));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0042', '--cwd', process.cwd(), '--json']);
+    const planBridgeSummary = (planResult.evidence as any)?.teamPlan?.openAIFamilyRuntimeBridges;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating OpenAI bridge wiring');
+    assert.equal(planBridgeSummary?.schemaId, 'atm.openAIFamilyRuntimeBridgeSummary.v1');
+    assert.deepEqual(planBridgeSummary?.providerIds, ['openai', 'azure-openai']);
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.openaiTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.azureOpenAITeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.teamProviderRunArtifact.v1'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/openai.ts'));
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/azure-openai.ts'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#openai-azure-openai-bridges'));
+
+    console.log('[validate-team-agents] ok (openai-azure-openai-bridges)');
     return;
   }
 
