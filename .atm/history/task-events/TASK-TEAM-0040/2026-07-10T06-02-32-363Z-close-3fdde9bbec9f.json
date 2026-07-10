@@ -1,0 +1,72 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T06-02-32-363Z-close-3fdde9bbec9f",
+  "taskId": "TASK-TEAM-0040",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710054547-codex-captain-m8e-TASK-TEAM-0040-922470753a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0040.json",
+  "taskSha256": "sha256:44e0be7d86047ca4df4949a8270fd719d9fefe185ab06ff4531a18bff800faba",
+  "createdAt": "2026-07-10T06:02:32.363Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0040 --actor codex-captain-m8e --status done --historical-delivery 6a64b8a928626fbcca19b183cd97229f75901172",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710054547-codex-captain-m8e-TASK-TEAM-0040-922470753a",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0040.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T06:02:32.358Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0040.*",
+        ".atm/history/task-events/TASK-TEAM-0040/**",
+        ".atm/history/tasks/TASK-TEAM-0040.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/observability.ts",
+        "schemas/governance/team-agent-observability-event.schema.json",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/observability.ts",
+        "schemas/governance/team-agent-observability-event.schema.json",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

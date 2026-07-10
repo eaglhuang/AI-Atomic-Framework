@@ -1,0 +1,163 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0040",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6a64b8a928626fbcca19b183cd97229f75901172",
+  "governedTreeSha": "fbf020ec691cd21c03b7ed1325c0401b4230c13e",
+  "targetCommitDelta": {
+    "currentCommitSha": "6a64b8a928626fbcca19b183cd97229f75901172",
+    "parentCommitShas": [
+      "6a64b8a928626fbcca19b183cd97229f75901172"
+    ],
+    "governedTreeSha": "fbf020ec691cd21c03b7ed1325c0401b4230c13e",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0040.bundle-manifest.json",
+      ".atm/history/evidence/TASK-TEAM-0040.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "schemas/governance/team-agent-observability-event.schema.json",
+      "scripts/run-validators.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case cross-vendor-observability",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e99cc526dbd3b9e1a46e715b5a748bded4c9073cc8076d5032a4cb97ae768cf",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-10T06:02:32.358Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0040.*",
+      ".atm/history/task-events/TASK-TEAM-0040/**",
+      ".atm/history/tasks/TASK-TEAM-0040.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "schemas/governance/team-agent-observability-event.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "schemas/governance/team-agent-observability-event.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0040.json",
+  "closedAt": "2026-07-10T06:02:32.359Z",
+  "closedByActor": "codex-captain-m8e",
+  "sessionId": "session-20260710054547-codex-captain-m8e-TASK-TEAM-0040-922470753a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6a64b8a928626fbcca19b183cd97229f75901172",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "schemas/governance/team-agent-observability-event.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TEAM-0040.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-TEAM-0040/2026-07-10T05-45-32-280Z-import-f20d08b3c456.json",
+      ".atm/history/task-events/TASK-TEAM-0040/2026-07-10T05-45-47-851Z-reserve-909c2efbbe7b.json",
+      ".atm/history/task-events/TASK-TEAM-0040/2026-07-10T05-45-47-854Z-promote-f2f64b061166.json",
+      ".atm/history/task-events/TASK-TEAM-0040/2026-07-10T05-45-48-260Z-claim-29aa80388053.json",
+      ".atm/history/tasks/TASK-TEAM-0040.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
