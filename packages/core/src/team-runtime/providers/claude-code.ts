@@ -1,7 +1,10 @@
 import { decideTeamPermission, type TeamPermissionPolicy } from '../permission-broker.ts';
 import { createTeamObservabilityEvent, type TeamObservabilityEvent } from '../observability.ts';
+import { spawn } from 'node:child_process';
 import {
   type TeamProviderContract,
+  type TeamProviderCommandExecutor,
+  type TeamProviderExecutionResult,
   type TeamProviderId,
   type TeamProviderMetadata,
   type TeamProviderSessionRequest
@@ -42,6 +45,12 @@ export type TeamExecutionBridgeRunArtifact = {
     readonly reason: string;
   };
   readonly outputArtifacts: readonly string[];
+  readonly execution: {
+    readonly mode: 'editor-cli';
+    readonly statusCode?: number;
+    readonly retryable: boolean;
+    readonly outputTextPreview: string;
+  };
   readonly observabilityEventCount: number;
   readonly redaction: {
     readonly rawSecretsLogged: false;
@@ -79,6 +88,7 @@ export type ClaudeCodeTeamProviderConfigValidation = {
 
 export type ClaudeCodeTeamProviderBridge = TeamProviderContract & {
   readonly bridgeSchemaId: 'atm.claudeCodeTeamProviderBridge.v1';
+  readonly config: ClaudeCodeTeamProviderConfig;
   readonly configValidation: ClaudeCodeTeamProviderConfigValidation;
   readonly secretRefFields: readonly string[];
   readonly executionSurface: 'editor-subagent';
@@ -118,6 +128,7 @@ export function createClaudeCodeTeamProviderBridge(
   return {
     schemaId: 'atm.teamProviderContract.v1',
     bridgeSchemaId: 'atm.claudeCodeTeamProviderBridge.v1',
+    config,
     metadata,
     configValidation,
     secretRefFields: [],
@@ -147,20 +158,37 @@ export function createClaudeCodeTeamProviderBridge(
   };
 }
 
-export function launchClaudeCodeTeamProviderRun(input: {
+export async function launchClaudeCodeTeamProviderRun(input: {
   readonly bridge: ClaudeCodeTeamProviderBridge;
   readonly request: TeamProviderSessionRequest & { readonly runtimeMode: 'editor-subagent'; readonly providerId: 'claude-code' };
   readonly permissionPolicy: TeamPermissionPolicy;
   readonly scopedPaths: readonly string[];
   readonly permissionLeases?: readonly string[];
+  readonly executor?: TeamProviderCommandExecutor;
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
   readonly emittedAt?: string;
-}): TeamExecutionBridgeRunResult {
+}): Promise<TeamExecutionBridgeRunResult> {
   const session = input.bridge.openSession(input.request);
   const permissionDecision = decideTeamPermission(input.permissionPolicy, {
     permission: 'exec.validator',
     providerId: input.request.providerId,
     scopedPaths: input.scopedPaths
   });
+  const execution = permissionDecision.ok
+    ? await executeClaudeCodeCommand({
+      config: input.bridge.config,
+      request: input.request,
+      sessionId: session.sessionId,
+      scopedPaths: input.scopedPaths,
+      permissionLeases: input.permissionLeases ?? ['exec.validator'],
+      executor: input.executor,
+      cwd: input.cwd,
+      env: input.env,
+      timeoutMs: input.timeoutMs
+    })
+    : blockedCommandExecutionResult();
   const artifact = createTeamExecutionBridgeRunArtifact({
     request: input.request,
     sessionId: session.sessionId,
@@ -168,7 +196,8 @@ export function launchClaudeCodeTeamProviderRun(input: {
     allowedFiles: input.scopedPaths,
     permissionLeases: input.permissionLeases ?? ['exec.validator'],
     permissionDecision,
-    secretRefFields: input.bridge.secretRefFields
+    secretRefFields: input.bridge.secretRefFields,
+    execution
   });
   const observabilityEvents = createTeamExecutionBridgeObservabilityEvents({
     request: input.request,
@@ -179,7 +208,7 @@ export function launchClaudeCodeTeamProviderRun(input: {
 
   return {
     schemaId: 'atm.teamProviderBridgeRunResult.v1',
-    ok: permissionDecision.ok,
+    ok: permissionDecision.ok && execution.ok,
     providerId: 'claude-code',
     sessionId: session.sessionId,
     artifact: {
@@ -188,6 +217,40 @@ export function launchClaudeCodeTeamProviderRun(input: {
     },
     observabilityEvents
   };
+}
+
+export async function executeClaudeCodeCommand(input: {
+  readonly config: ClaudeCodeTeamProviderConfig;
+  readonly request: TeamProviderSessionRequest & { readonly runtimeMode: 'editor-subagent'; readonly providerId: 'claude-code' };
+  readonly sessionId: string;
+  readonly scopedPaths: readonly string[];
+  readonly permissionLeases: readonly string[];
+  readonly executor?: TeamProviderCommandExecutor;
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
+}): Promise<TeamProviderExecutionResult> {
+  const stdin = JSON.stringify({
+    schemaId: 'atm.teamEditorSubagentRoleEnvelope.v1',
+    taskId: input.request.taskId,
+    role: input.request.role,
+    providerId: input.request.providerId,
+    sdkId: input.request.sdkId,
+    modelId: input.request.modelId,
+    runtimeMode: input.request.runtimeMode,
+    allowedFiles: input.scopedPaths,
+    permissionLeases: input.permissionLeases,
+    coordinatorOwnedAuthority: true,
+    instructions: input.request.instructions ?? input.request.input ?? `Run Team role ${input.request.role} for ${input.request.taskId}.`
+  });
+  return (input.executor ?? defaultCommandExecutor)({
+    command: input.config.editorCommand,
+    args: ['--model', input.config.modelId, '--print'],
+    cwd: input.cwd,
+    env: input.env,
+    timeoutMs: input.timeoutMs,
+    stdin
+  });
 }
 
 export function buildClaudeCodeTeamProviderBridgeDescriptor() {
@@ -201,6 +264,7 @@ export function buildClaudeCodeTeamProviderBridgeDescriptor() {
     supportedRuntimeModes: ['editor-subagent', 'broker-only'] as const,
     requiredConfigRefs: CLAUDE_CODE_REQUIRED_FIELDS,
     authModes: ['editor-session'] as const,
+    executionReadiness: 'vendor-execution-ready' as const,
     brokerCheckedPermissions: ['exec.validator'] as const,
     artifactType: 'atm.teamProviderRunArtifact.v1',
     observabilityEventTypes: ['session.start', 'artifact.output', 'session.complete'] as const,
@@ -217,6 +281,7 @@ export function createTeamExecutionBridgeRunArtifact(input: {
   readonly permissionLeases: readonly string[];
   readonly permissionDecision: { readonly ok: boolean; readonly permission: string; readonly reason: string };
   readonly secretRefFields: readonly string[];
+  readonly execution: TeamProviderExecutionResult;
 }): TeamExecutionBridgeRunArtifact {
   return {
     schemaId: 'atm.teamProviderRunArtifact.v1',
@@ -236,7 +301,13 @@ export function createTeamExecutionBridgeRunArtifact(input: {
       permissionLeases: input.permissionLeases
     }),
     permissionDecision: input.permissionDecision,
-    outputArtifacts: ['agent-report', 'evidence-summary'],
+    outputArtifacts: input.execution.outputArtifacts ?? ['agent-report', 'evidence-summary'],
+    execution: {
+      mode: 'editor-cli',
+      statusCode: input.execution.statusCode,
+      retryable: input.execution.retryable,
+      outputTextPreview: redactPreview(input.execution.outputText)
+    },
     observabilityEventCount: 0,
     redaction: {
       rawSecretsLogged: false,
@@ -320,4 +391,74 @@ function stableSessionId(taskId: string, role: string, providerId: TeamProviderI
 
 function uniqueStrings(values: readonly string[]): string[] {
   return [...new Set(values)];
+}
+
+export function blockedCommandExecutionResult(): TeamProviderExecutionResult {
+  return {
+    ok: false,
+    outputText: '',
+    retryable: false,
+    summary: 'Execution blocked by Team permission broker.',
+    executionMode: 'editor-cli'
+  };
+}
+
+export function defaultCommandExecutor(input: {
+  readonly command: string;
+  readonly args: readonly string[];
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
+  readonly stdin: string;
+}): Promise<TeamProviderExecutionResult> {
+  return new Promise((resolve) => {
+    const child = spawn(input.command, [...input.args], {
+      cwd: input.cwd,
+      env: { ...process.env, ...input.env },
+      shell: process.platform === 'win32',
+      stdio: ['pipe', 'pipe', 'pipe']
+    });
+    let stdout = '';
+    let stderr = '';
+    const timeout = input.timeoutMs
+      ? setTimeout(() => {
+        child.kill();
+        resolve({
+          ok: false,
+          outputText: stdout || stderr,
+          retryable: true,
+          summary: `Command ${input.command} timed out.`,
+          executionMode: 'editor-cli'
+        });
+      }, input.timeoutMs)
+      : null;
+    child.stdout?.on('data', (chunk) => { stdout += String(chunk); });
+    child.stderr?.on('data', (chunk) => { stderr += String(chunk); });
+    child.on('error', (error) => {
+      if (timeout) clearTimeout(timeout);
+      resolve({
+        ok: false,
+        outputText: error.message,
+        retryable: false,
+        summary: `Command ${input.command} could not be started.`,
+        executionMode: 'editor-cli'
+      });
+    });
+    child.on('close', (code) => {
+      if (timeout) clearTimeout(timeout);
+      resolve({
+        ok: code === 0,
+        statusCode: code ?? undefined,
+        outputText: stdout || stderr,
+        retryable: code !== 0,
+        summary: code === 0 ? `Command ${input.command} completed.` : `Command ${input.command} exited with ${code}.`,
+        executionMode: 'editor-cli'
+      });
+    });
+    child.stdin?.end(input.stdin);
+  });
+}
+
+function redactPreview(text: string): string {
+  return text.replace(/sk-[A-Za-z0-9_-]+/g, '[redacted]').slice(0, 500);
 }

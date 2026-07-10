@@ -30,6 +30,8 @@ export type TeamProviderSessionRequest = {
   readonly providerId: TeamProviderId;
   readonly sdkId: string;
   readonly modelId: string;
+  readonly input?: string;
+  readonly instructions?: string;
 };
 
 export type TeamProviderStepResult = {
@@ -40,6 +42,41 @@ export type TeamProviderStepResult = {
   readonly retryable: boolean;
   readonly summary: string;
 };
+
+export type TeamProviderExecutionInput = {
+  readonly request: TeamProviderSessionRequest;
+  readonly sessionId: string;
+  readonly input: string;
+  readonly instructions?: string;
+  readonly scopedPaths: readonly string[];
+};
+
+export type TeamProviderExecutionResult = {
+  readonly ok: boolean;
+  readonly statusCode?: number;
+  readonly outputText: string;
+  readonly outputArtifacts?: readonly string[];
+  readonly retryable: boolean;
+  readonly summary: string;
+  readonly executionMode: 'vendor-api' | 'editor-cli';
+};
+
+export type TeamProviderHttpExecutor = (input: {
+  readonly url: string;
+  readonly method: 'POST';
+  readonly headers: Record<string, string>;
+  readonly body: unknown;
+  readonly timeoutMs?: number;
+}) => Promise<TeamProviderExecutionResult>;
+
+export type TeamProviderCommandExecutor = (input: {
+  readonly command: string;
+  readonly args: readonly string[];
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
+  readonly stdin: string;
+}) => Promise<TeamProviderExecutionResult>;
 
 export interface TeamProviderContract {
   readonly schemaId: 'atm.teamProviderContract.v1';

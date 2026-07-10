@@ -3,10 +3,14 @@ import {
   assertEditorExecutionRequest,
   createTeamExecutionBridgeObservabilityEvents,
   createTeamExecutionBridgeRunArtifact,
+  defaultCommandExecutor,
+  blockedCommandExecutionResult,
   type TeamExecutionBridgeRunResult
 } from './claude-code.ts';
 import {
   type TeamProviderContract,
+  type TeamProviderCommandExecutor,
+  type TeamProviderExecutionResult,
   type TeamProviderMetadata,
   type TeamProviderSessionRequest
 } from '../provider-contract.ts';
@@ -32,6 +36,7 @@ export type GeminiTeamProviderConfigValidation = {
 
 export type GeminiTeamProviderBridge = TeamProviderContract & {
   readonly bridgeSchemaId: 'atm.geminiTeamProviderBridge.v1';
+  readonly config: GeminiTeamProviderConfig;
   readonly configValidation: GeminiTeamProviderConfigValidation;
   readonly secretRefFields: readonly string[];
   readonly executionSurface: 'cli-style';
@@ -69,6 +74,7 @@ export function createGeminiTeamProviderBridge(config: GeminiTeamProviderConfig)
   return {
     schemaId: 'atm.teamProviderContract.v1',
     bridgeSchemaId: 'atm.geminiTeamProviderBridge.v1',
+    config,
     metadata,
     configValidation,
     secretRefFields: [],
@@ -98,20 +104,37 @@ export function createGeminiTeamProviderBridge(config: GeminiTeamProviderConfig)
   };
 }
 
-export function launchGeminiTeamProviderRun(input: {
+export async function launchGeminiTeamProviderRun(input: {
   readonly bridge: GeminiTeamProviderBridge;
   readonly request: TeamProviderSessionRequest & { readonly runtimeMode: 'editor-subagent'; readonly providerId: 'gemini' };
   readonly permissionPolicy: TeamPermissionPolicy;
   readonly scopedPaths: readonly string[];
   readonly permissionLeases?: readonly string[];
+  readonly executor?: TeamProviderCommandExecutor;
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
   readonly emittedAt?: string;
-}): TeamExecutionBridgeRunResult {
+}): Promise<TeamExecutionBridgeRunResult> {
   const session = input.bridge.openSession(input.request);
   const permissionDecision = decideTeamPermission(input.permissionPolicy, {
     permission: 'exec.validator',
     providerId: input.request.providerId,
     scopedPaths: input.scopedPaths
   });
+  const execution = permissionDecision.ok
+    ? await executeGeminiCommand({
+      config: input.bridge.config,
+      request: input.request,
+      sessionId: session.sessionId,
+      scopedPaths: input.scopedPaths,
+      permissionLeases: input.permissionLeases ?? ['exec.validator'],
+      executor: input.executor,
+      cwd: input.cwd,
+      env: input.env,
+      timeoutMs: input.timeoutMs
+    })
+    : blockedCommandExecutionResult();
   const artifact = createTeamExecutionBridgeRunArtifact({
     request: input.request,
     sessionId: session.sessionId,
@@ -119,7 +142,8 @@ export function launchGeminiTeamProviderRun(input: {
     allowedFiles: input.scopedPaths,
     permissionLeases: input.permissionLeases ?? ['exec.validator'],
     permissionDecision,
-    secretRefFields: input.bridge.secretRefFields
+    secretRefFields: input.bridge.secretRefFields,
+    execution
   });
   const observabilityEvents = createTeamExecutionBridgeObservabilityEvents({
     request: input.request,
@@ -130,7 +154,7 @@ export function launchGeminiTeamProviderRun(input: {
 
   return {
     schemaId: 'atm.teamProviderBridgeRunResult.v1',
-    ok: permissionDecision.ok,
+    ok: permissionDecision.ok && execution.ok,
     providerId: 'gemini',
     sessionId: session.sessionId,
     artifact: {
@@ -139,6 +163,40 @@ export function launchGeminiTeamProviderRun(input: {
     },
     observabilityEvents
   };
+}
+
+export async function executeGeminiCommand(input: {
+  readonly config: GeminiTeamProviderConfig;
+  readonly request: TeamProviderSessionRequest & { readonly runtimeMode: 'editor-subagent'; readonly providerId: 'gemini' };
+  readonly sessionId: string;
+  readonly scopedPaths: readonly string[];
+  readonly permissionLeases: readonly string[];
+  readonly executor?: TeamProviderCommandExecutor;
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
+}): Promise<TeamProviderExecutionResult> {
+  const stdin = JSON.stringify({
+    schemaId: 'atm.teamEditorSubagentRoleEnvelope.v1',
+    taskId: input.request.taskId,
+    role: input.request.role,
+    providerId: input.request.providerId,
+    sdkId: input.request.sdkId,
+    modelId: input.request.modelId,
+    runtimeMode: input.request.runtimeMode,
+    allowedFiles: input.scopedPaths,
+    permissionLeases: input.permissionLeases,
+    coordinatorOwnedAuthority: true,
+    instructions: input.request.instructions ?? input.request.input ?? `Run Team role ${input.request.role} for ${input.request.taskId}.`
+  });
+  return (input.executor ?? defaultCommandExecutor)({
+    command: input.config.cliCommand,
+    args: ['--model', input.config.modelId],
+    cwd: input.cwd,
+    env: input.env,
+    timeoutMs: input.timeoutMs,
+    stdin
+  });
 }
 
 export function buildGeminiTeamProviderBridgeDescriptor() {
@@ -152,6 +210,7 @@ export function buildGeminiTeamProviderBridgeDescriptor() {
     supportedRuntimeModes: ['editor-subagent', 'broker-only'] as const,
     requiredConfigRefs: GEMINI_REQUIRED_FIELDS,
     authModes: ['cli-auth'] as const,
+    executionReadiness: 'vendor-execution-ready' as const,
     brokerCheckedPermissions: ['exec.validator'] as const,
     artifactType: 'atm.teamProviderRunArtifact.v1',
     observabilityEventTypes: ['session.start', 'artifact.output', 'session.complete'] as const,

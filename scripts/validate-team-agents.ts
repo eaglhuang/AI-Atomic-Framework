@@ -483,7 +483,20 @@ async function main() {
     assert.ok(azureBridge.metadata.supportedRuntimeModes.includes('real-agent'));
 
     const policy = createDefaultTeamPermissionPolicy();
-    const openaiRun = launchOpenAITeamProviderRun({
+    const httpCalls: any[] = [];
+    const fakeHttpExecutor = async (request: any) => {
+      httpCalls.push(request);
+      return {
+        ok: true,
+        statusCode: 200,
+        outputText: 'provider execution completed',
+        outputArtifacts: ['agent-report', 'evidence-summary', 'provider-output'],
+        retryable: false,
+        summary: 'fake vendor API completed',
+        executionMode: 'vendor-api' as const
+      };
+    };
+    const openaiRun = await launchOpenAITeamProviderRun({
       bridge: openaiBridge,
       request: {
         taskId: 'TASK-TEAM-0042',
@@ -491,13 +504,16 @@ async function main() {
         runtimeMode: 'real-agent',
         providerId: 'openai',
         sdkId: 'openai-responses',
-        modelId: 'gpt-5-mini'
+        modelId: 'gpt-5-mini',
+        input: 'Implement scoped provider execution.'
       },
       permissionPolicy: policy,
       scopedPaths: ['packages/core/src/team-runtime/providers/openai.ts'],
+      executor: fakeHttpExecutor,
+      env: { OPENAI_API_KEY: 'test-openai-key' },
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
-    const azureRun = launchAzureOpenAITeamProviderRun({
+    const azureRun = await launchAzureOpenAITeamProviderRun({
       bridge: azureBridge,
       request: {
         taskId: 'TASK-TEAM-0042',
@@ -505,10 +521,17 @@ async function main() {
         runtimeMode: 'real-agent',
         providerId: 'azure-openai',
         sdkId: 'azure-openai-responses',
-        modelId: 'gpt-5-mini'
+        modelId: 'gpt-5-mini',
+        input: 'Validate Azure execution.'
       },
       permissionPolicy: policy,
       scopedPaths: ['packages/core/src/team-runtime/providers/azure-openai.ts'],
+      executor: fakeHttpExecutor,
+      env: {
+        AZURE_OPENAI_ENDPOINT: 'https://example.openai.azure.com',
+        AZURE_OPENAI_BEARER_TOKEN: 'test-azure-token',
+        AZURE_TENANT_ID: 'tenant'
+      },
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
     for (const run of [openaiRun, azureRun]) {
@@ -517,6 +540,9 @@ async function main() {
       assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
       assert.equal(run.artifact.runtimeMode, 'real-agent');
       assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.execution.mode, 'vendor-api');
+      assert.equal(run.artifact.execution.statusCode, 200);
+      assert.equal(run.artifact.execution.outputTextPreview, 'provider execution completed');
       assert.equal(run.artifact.redaction.rawSecretsLogged, false);
       assert.equal(run.artifact.observabilityEventCount, 3);
       assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
@@ -530,6 +556,11 @@ async function main() {
     }
     assert.equal(openaiRun.artifact.artifactType, azureRun.artifact.artifactType);
     assert.equal(openaiRun.observabilityEvents[1]?.artifactType, azureRun.observabilityEvents[1]?.artifactType);
+    assert.equal(httpCalls.length, 2);
+    assert.equal(httpCalls[0].url, 'https://api.openai.com/v1/responses');
+    assert.ok(httpCalls[0].headers.Authorization.startsWith('Bearer '));
+    assert.ok(httpCalls[1].url.includes('/openai/deployments/atm-team-runtime/responses?api-version='));
+    assert.ok(httpCalls[1].headers.Authorization.startsWith('Bearer '));
 
     const bridgeSummary = buildOpenAIFamilyRuntimeBridgeSummary();
     assert.equal(bridgeSummary.schemaId, 'atm.openAIFamilyRuntimeBridgeSummary.v1');
@@ -609,7 +640,20 @@ async function main() {
     assert.ok(geminiBridge.metadata.supportedRuntimeModes.includes('editor-subagent'));
 
     const policy = createDefaultTeamPermissionPolicy();
-    const claudeRun = launchClaudeCodeTeamProviderRun({
+    const commandCalls: any[] = [];
+    const fakeCommandExecutor = async (request: any) => {
+      commandCalls.push(request);
+      return {
+        ok: true,
+        statusCode: 0,
+        outputText: 'editor execution completed',
+        outputArtifacts: ['agent-report', 'evidence-summary', 'provider-output'],
+        retryable: false,
+        summary: 'fake command completed',
+        executionMode: 'editor-cli' as const
+      };
+    };
+    const claudeRun = await launchClaudeCodeTeamProviderRun({
       bridge: claudeBridge,
       request: {
         taskId: 'TASK-TEAM-0043',
@@ -617,14 +661,16 @@ async function main() {
         runtimeMode: 'editor-subagent',
         providerId: 'claude-code',
         sdkId: 'claude-code-editor-subagent',
-        modelId: 'claude-opus-4'
+        modelId: 'claude-opus-4',
+        instructions: 'Run bounded Claude role.'
       },
       permissionPolicy: policy,
       scopedPaths: ['packages/core/src/team-runtime/providers/claude-code.ts'],
       permissionLeases: ['exec.validator'],
+      executor: fakeCommandExecutor,
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
-    const geminiRun = launchGeminiTeamProviderRun({
+    const geminiRun = await launchGeminiTeamProviderRun({
       bridge: geminiBridge,
       request: {
         taskId: 'TASK-TEAM-0043',
@@ -632,11 +678,13 @@ async function main() {
         runtimeMode: 'editor-subagent',
         providerId: 'gemini',
         sdkId: 'gemini-cli',
-        modelId: 'gemini-2.5-pro'
+        modelId: 'gemini-2.5-pro',
+        instructions: 'Run bounded Gemini role.'
       },
       permissionPolicy: policy,
       scopedPaths: ['packages/core/src/team-runtime/providers/gemini.ts'],
       permissionLeases: ['exec.validator'],
+      executor: fakeCommandExecutor,
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
     for (const run of [claudeRun, geminiRun]) {
@@ -649,6 +697,9 @@ async function main() {
       assert.ok(run.artifact.roleEnvelope.allowedFiles.length > 0);
       assert.ok(run.artifact.roleEnvelope.brokerConflictVocabulary.includes('broker-conflict-blocked'));
       assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.execution.mode, 'editor-cli');
+      assert.equal(run.artifact.execution.statusCode, 0);
+      assert.equal(run.artifact.execution.outputTextPreview, 'editor execution completed');
       assert.equal(run.artifact.redaction.rawSecretsLogged, false);
       assert.equal(run.artifact.observabilityEventCount, 3);
       assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
@@ -663,6 +714,12 @@ async function main() {
     assert.equal(claudeRun.artifact.artifactType, geminiRun.artifact.artifactType);
     assert.equal(claudeRun.artifact.roleEnvelope.executionSurface, 'editor-subagent');
     assert.equal(geminiRun.artifact.roleEnvelope.executionSurface, 'cli-style');
+    assert.equal(commandCalls.length, 2);
+    assert.equal(commandCalls[0].command, 'claude');
+    assert.deepEqual(commandCalls[0].args, ['--model', 'claude-opus-4', '--print']);
+    assert.equal(commandCalls[1].command, 'gemini');
+    assert.deepEqual(commandCalls[1].args, ['--model', 'gemini-2.5-pro']);
+    assert.ok(commandCalls.every((call) => JSON.parse(call.stdin).coordinatorOwnedAuthority === true));
 
     const bridgeSummary = buildEditorExecutionRuntimeBridgeSummary();
     assert.equal(bridgeSummary.schemaId, 'atm.editorExecutionRuntimeBridgeSummary.v1');
@@ -752,7 +809,20 @@ async function main() {
     assert.ok(agentBridge.metadata.supportedRuntimeModes.includes('real-agent'));
 
     const policy = createDefaultTeamPermissionPolicy();
-    const chatRun = launchMicrosoftFoundryTeamProviderRun({
+    const foundryCalls: any[] = [];
+    const fakeFoundryExecutor = async (request: any) => {
+      foundryCalls.push(request);
+      return {
+        ok: true,
+        statusCode: 200,
+        outputText: 'foundry execution completed',
+        outputArtifacts: ['agent-report', 'evidence-summary', 'provider-output'],
+        retryable: false,
+        summary: 'fake Foundry API completed',
+        executionMode: 'vendor-api' as const
+      };
+    };
+    const chatRun = await launchMicrosoftFoundryTeamProviderRun({
       bridge: chatBridge,
       config: chatConfig,
       request: {
@@ -761,13 +831,20 @@ async function main() {
         runtimeMode: 'real-agent',
         providerId: 'microsoft-foundry',
         sdkId: 'microsoft-foundry',
-        modelId: 'gpt-5-mini'
+        modelId: 'gpt-5-mini',
+        input: 'Run Foundry chat.'
       },
       permissionPolicy: policy,
       scopedPaths: ['packages/core/src/team-runtime/providers/microsoft-foundry.ts'],
+      executor: fakeFoundryExecutor,
+      env: {
+        AZURE_AI_FOUNDRY_PROJECT_ENDPOINT: 'https://example.services.ai.azure.com',
+        AZURE_AI_FOUNDRY_BEARER_TOKEN: 'test-foundry-token',
+        AZURE_TENANT_ID: 'tenant'
+      },
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
-    const agentRun = launchMicrosoftFoundryTeamProviderRun({
+    const agentRun = await launchMicrosoftFoundryTeamProviderRun({
       bridge: agentBridge,
       config: agentConfig,
       request: {
@@ -776,10 +853,18 @@ async function main() {
         runtimeMode: 'real-agent',
         providerId: 'microsoft-foundry',
         sdkId: 'microsoft-foundry',
-        modelId: 'gpt-5-mini'
+        modelId: 'gpt-5-mini',
+        input: 'Run Foundry agent.'
       },
       permissionPolicy: policy,
       scopedPaths: ['packages/core/src/team-runtime/providers/microsoft-foundry.ts'],
+      executor: fakeFoundryExecutor,
+      env: {
+        AZURE_AI_FOUNDRY_PROJECT_ENDPOINT: 'https://example.services.ai.azure.com',
+        AZURE_AI_FOUNDRY_BEARER_TOKEN: 'test-foundry-token',
+        AZURE_AI_FOUNDRY_AGENT_ID: 'agent-123',
+        AZURE_TENANT_ID: 'tenant'
+      },
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
     for (const run of [chatRun, agentRun]) {
@@ -789,6 +874,9 @@ async function main() {
       assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
       assert.equal(run.artifact.runtimeMode, 'real-agent');
       assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.execution.mode, 'vendor-api');
+      assert.equal(run.artifact.execution.statusCode, 200);
+      assert.equal(run.artifact.execution.outputTextPreview, 'foundry execution completed');
       assert.equal(run.artifact.redaction.rawSecretsLogged, false);
       assert.equal(run.artifact.observabilityEventCount, 3);
       assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
@@ -805,6 +893,10 @@ async function main() {
     assert.equal(agentRun.artifact.foundrySurface, 'agent-service');
     assert.equal(chatRun.artifact.foundryConfigRefs.deploymentName, 'team-runtime-chat');
     assert.equal(agentRun.artifact.foundryConfigRefs.agentIdEnvVar, 'AZURE_AI_FOUNDRY_AGENT_ID');
+    assert.equal(foundryCalls.length, 2);
+    assert.ok(foundryCalls[0].url.includes('/openai/deployments/team-runtime-chat/chat/completions?api-version='));
+    assert.ok(foundryCalls[1].url.includes('/assistants/agent-123/messages?api-version='));
+    assert.ok(foundryCalls.every((call) => call.headers.Authorization.startsWith('Bearer ')));
 
     const bridgeSummary = buildMicrosoftFoundryRuntimeBridgeSummary();
     assert.equal(bridgeSummary.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');

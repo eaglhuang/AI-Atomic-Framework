@@ -42,8 +42,18 @@ M9I starts with two direct real-agent provider bridges under the shared
 Both bridges produce the same `atm.teamProviderRunArtifact.v1` envelope and
 the same `atm.teamAgentObservabilityEvent.v1` event sequence:
 `session.start`, `artifact.output`, and `session.complete`. The bridge artifact
-records `rawSecretsLogged: false`; provider credentials, endpoints, and tenant
-values are stored only as configured references in adopter repositories.
+records `rawSecretsLogged: false`; provider credentials, endpoints, bearer
+tokens, and tenant values are read only through configured environment-variable
+references and are never copied into artifacts or observability events.
+
+The direct bridge execution path is real, not only a descriptor. OpenAI posts to
+the Responses API endpoint selected by `baseUrlEnvVar` or
+`https://api.openai.com/v1`. Azure OpenAI posts to the configured deployment
+Responses endpoint under `endpointEnvVar`, using `api-key-env` or a bearer token
+from `AZURE_OPENAI_BEARER_TOKEN` / `AZURE_ACCESS_TOKEN` for managed-identity
+deployments. `AZURE_OPENAI_API_VERSION` may override the default API version.
+Tests inject a deterministic HTTP executor, but production runs use the runtime
+HTTP executor.
 
 OpenAI-family bridges must request permissions through the shared broker before
 launching work. They do not self-grant `git.write`, `task.lifecycle`,
@@ -80,6 +90,14 @@ route blocked work through the same `decisionClass`, `decisionReason`,
 `violationStatus`, and `broker-conflict-blocked` vocabulary used by the M8E
 Team Broker lane.
 
+The editor bridge execution path invokes the configured command rather than
+stopping at envelope creation. Claude Code runs `editorCommand --model
+<modelId> --print`; Gemini runs `cliCommand --model <modelId>`. The role
+envelope is written to stdin as structured JSON so provider tools receive the
+task id, role, allowed files, permission leases, and coordinator-owned authority
+without gaining lifecycle authority. Production uses the command executor;
+validators inject a deterministic command executor.
+
 ## Microsoft Foundry Provider-Family Bridge
 
 Microsoft Foundry is represented as one provider family with two distinct
@@ -108,6 +126,15 @@ Foundry does not self-grant `git.write`, `task.lifecycle`, `file.write`, or
 close authority. Broker conflicts must reuse `decisionClass`,
 `decisionReason`, `violationStatus`, and `broker-conflict-blocked`, then point
 operators to the governed `atm.brokerConflictResolution.v1` resolution lane.
+
+The Foundry execution backend uses the project endpoint reference from
+`projectEndpointEnvVar` plus a bearer token from
+`AZURE_AI_FOUNDRY_BEARER_TOKEN` / `AZURE_ACCESS_TOKEN`. Chat/inference posts to
+the configured deployment chat completions endpoint. Agent-service posts to the
+configured service-managed agent id from `agentIdEnvVar`.
+`AZURE_AI_FOUNDRY_API_VERSION` may override the default API version. Endpoint,
+token, tenant, and agent id values remain outside artifacts; artifacts keep only
+the reference names and selected surface.
 
 ## Provider Selection
 
