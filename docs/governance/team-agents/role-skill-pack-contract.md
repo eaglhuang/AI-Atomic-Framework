@@ -57,6 +57,23 @@ introduced casually. Prefer reusing these baseline semantics when possible.
 | `knowledge-scout` | Retrieve prior lessons and reusable hints | shared growth, knowledge query, path hints | `file.read` |
 | `neutral-write-steward` | Apply bounded writes under broker governance | broker/steward apply flow | bounded write only, no `git.write`, no `task.lifecycle` |
 
+## Capability boundary matrix
+
+Every role pack must expose the same four boundary fields. This keeps a Team
+role concrete enough for tools and humans to inspect without turning the role
+into a second scheduler.
+
+| Role | Allowed permissions | Forbidden permissions | Expected playbook slice | Growth attachment point |
+|---|---|---|---|---|
+| `coordinator` | `task.lifecycle`, `git.write`, `evidence.write`; read-only inspection needed to route work | direct implementation writes unless also acting under a separate scoped implementer lease | entry, claim, sequencing, close, commit, handoff | shared routing lessons in `docs/governance/skills/shared-growth-contract.md`; role cases in `docs/governance/team-agents/role-pack-learning-loop.md` |
+| `scope-guardian` | `file.read`; scope, lock, direction-lock, and broker status inspection | `file.write`, `git.write`, `task.lifecycle`, self-close | boundary preflight, overlap review, out-of-scope warning | scope and lease lessons in `docs/governance/team-agents/role-pack-learning-loop.md` |
+| `implementer` | `file.write` only for explicitly leased target files; read access to task card and accepted context | `git.write`, `task.lifecycle`, `evidence.write`, self-close, widening scope | scoped delivery and implementation notes | implementation friction first lands in `docs/governance/team-agents/role-pack-learning-loop.md`; cross-role durable rules promote to shared growth |
+| `reviewer` | `file.read`; findings, return-to-work signals, and acceptance comparison | `file.write`, `git.write`, `task.lifecycle`, evidence promotion | review loop and acceptance check | review patterns remain role-local unless they change global ATM routing |
+| `validator` | `exec.validator`; read access to touched files and validator configs | `file.write`, `git.write`, `task.lifecycle`, self-close | validator execution, failure interpretation, rerun budget | validator-result lessons attach to role-pack learning, then promote to shared growth when reusable |
+| `evidence-collector` | `file.read`; `evidence.write` only when Coordinator delegates it explicitly | `git.write`, `task.lifecycle`, implementation writes, self-close | evidence packaging, artifact manifest review, close-readiness summary | evidence-shape lessons attach to shared growth only after they are stable across roles |
+| `knowledge-scout` | `file.read`; knowledge query and prior-case retrieval | `file.write`, `exec.mutating`, `git.write`, `task.lifecycle` | advisory context retrieval before or during playbook execution | lessons stay reference-first and must not mutate role authority |
+| `neutral-write-steward` | broker-authorized bounded apply for a named merge plan or proposal | `git.write`, `task.lifecycle`, self-close, unbounded source edits | steward apply after Broker/Coordinator approval | steward lessons attach to role-pack learning and must preserve Broker evidence ids |
+
 ## Skill-pack rules
 
 - A skill pack may contain multiple small skills.
@@ -65,6 +82,10 @@ introduced casually. Prefer reusing these baseline semantics when possible.
   in case".
 - Role packs should prefer shared references and shared growth taxonomy over
   duplicating rules across every skill.
+- A role pack receives a playbook slice. It does not choose a different channel,
+  close a task, or commit unless the Coordinator explicitly owns that action.
+- A role pack that sees a blocked ATM tool result must preserve the blocked
+  status and return it to the Coordinator instead of inventing a fallback path.
 
 Examples:
 
@@ -87,6 +108,13 @@ If a role needs a stronger capability for one route, the playbook must delegate
 it explicitly through a scoped lease instead of baking that privilege into the
 role's permanent identity.
 
+Team Broker authority is a separate boundary. When Broker reports
+`broker-conflict-blocked`, `blocked-active-lease`, `proposal-submitted`, or any
+other blocked admission state, role packs must stop write progression and hand
+the decision back to the Coordinator with the original Broker fields intact.
+Coordinator may sequence recovery, but Coordinator does not silently override
+Broker conflict authority.
+
 ## Growth compatibility
 
 Every role pack should reuse the shared skill growth contract in
@@ -106,6 +134,12 @@ The result is shared learning mechanics with isolated domain memory.
 Broker conflict role packs must preserve these shared fields when they appear
 in artifacts, evidence, or tool results: `decisionClass`, `decisionReason`,
 `violationStatus`, and `broker-conflict-blocked`.
+
+When those fields are absent but a Broker result is still blocked, role packs
+should keep the nearest available structured fields such as `verdict`, `lane`,
+`admission.state`, `failureReason`, and `blockedReasons`. The shared vocabulary
+is the preferred contract for M8E conflict UX; the fallback fields preserve
+truth until all lanes emit the M8E shape.
 
 ## Observability mapping
 

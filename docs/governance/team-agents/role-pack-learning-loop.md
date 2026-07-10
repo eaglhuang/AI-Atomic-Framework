@@ -54,6 +54,26 @@ Record lessons using the shared growth fields:
 
 ## Active runtime-observability cases
 
+## 2026-07-10 - proposal-first Broker gate preserves role-pack authority
+
+- Category: role-specific-friction
+- Trigger: `TASK-SKL-0008` was claimed with a scope that included
+  `packages/cli/src/commands/team.ts`, so `team plan` entered the hot-file
+  proposal-first lane
+- Symptom: `team validate` passed permission checks, but `team plan` reported
+  `safeToStart=false` with the Broker reason "Proposal-first lane is active;
+  broker recorded a provisional write lease before final admission."
+- Correct route: keep Coordinator authority primary, avoid touching the hot
+  file unless the proposal-first admission is completed, and deliver the role
+  contract through non-hot docs/integration surfaces when that satisfies the
+  task acceptance
+- Durable rule: a role pack may observe `parallel-safe` while still blocked by
+  admission state; `parallel-safe` is not write permission when Broker also
+  reports a provisional or blocked lane
+- Promotion target: role-skill-pack-contract.md and role-routing-matrix.md
+- Confidence: high
+- Reuse scope: coordinator, implementer, scope-guardian, validator packs
+
 ## 2026-06-24 - blocked runtime pilot still maps cleanly to role contracts
 
 - Category: role-specific-friction

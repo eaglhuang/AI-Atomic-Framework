@@ -51,6 +51,10 @@ This is the middle layer between a thin router and specialized role packs.
 Each role pack receives a narrow workstream and should focus on one governance
 purpose.
 
+The role pack consumes the playbook slice selected by the Coordinator. It may
+return findings, validator output, implementation notes, or Broker status, but
+it does not select a new ATM channel or lifecycle route on its own.
+
 ## Baseline routing matrix
 
 | Workstream | Primary role | Supporting roles | Advisory roles | Playbook slice |
@@ -63,6 +67,18 @@ purpose.
 | Bounded broker apply | `neutral-write-steward` | `coordinator` | `scope-guardian` | steward |
 | Review loop | `reviewer` | `implementer` | `knowledge-scout` | review |
 | Final close/commit | `coordinator` | `validator`, `evidence-collector` | `scope-guardian` | closeout |
+
+## Broker stop states
+
+Team Broker results are route truth for write admission. A role pack must stop
+and return control to Coordinator when any of these states appears:
+
+| Broker signal | Role-pack response | Coordinator response |
+|---|---|---|
+| `broker-conflict-blocked` | Preserve `decisionClass`, `decisionReason`, and `violationStatus`; do not write | Run the conflict-resolution playbook and serialize release order |
+| `blocked-active-lease` | Report the blocking task, lease, and `blockedReasons` | Release or repair only with official CLI surfaces, then rerun Broker status |
+| `proposal-submitted` | Treat the lane as provisional, not admitted | Complete proposal-first admission or narrow the actual write scope |
+| `needs-steward` / steward apply required | Do not apply directly | Route through neutral-write-steward and keep Broker evidence |
 
 ## Why this matters
 
@@ -80,3 +96,6 @@ This matrix keeps the first skill small:
   lifecycle.
 - No layer may create a second governance model outside the existing ATM
   lifecycle.
+- Blocked Broker decisions stay blocked until the Coordinator follows the
+  official recovery route; role packs must not translate them into ad hoc
+  shell workarounds.

@@ -1,7 +1,7 @@
 # SKL Team Role Runtime Pilot
 
 Status: draft
-Related tasks: `TASK-SKL-0011`, `TASK-SKL-0012`
+Related tasks: `TASK-SKL-0008`, `TASK-SKL-0011`, `TASK-SKL-0012`
 
 This report records the governed `Agent + Skill` runtime pilot used for the SKL
 lane. The goal is not to prove that every Team Agent path is production-ready.
@@ -25,6 +25,7 @@ Runtime hygiene companion command:
 
 ```bash
 node atm.mjs broker cleanup --json
+node atm.mjs broker release --task <done-task-id> --json
 ```
 
 Frozen-runner proof rule for CLI / close / taskflow-adjacent changes:
@@ -75,9 +76,15 @@ The governed pilot currently shows a realistic role-trio workflow:
 `team validate` passes permission-lease checks, which proves the role contract
 is internally coherent.
 
-`team plan` still reports a broker-governed blocked state because stale lease
-epochs require takeover before conflict arbitration. That blocked state is part
-of the pilot evidence, not a reason to collapse back into one oversized skill.
+`team plan` may still report a broker-governed blocked state. Two observed
+blocked states are useful pilot evidence:
+
+- stale lease epochs can require takeover before conflict arbitration;
+- hot-file routes can enter `proposal-submitted`, where Broker records a
+  provisional write lease but does not grant final write admission.
+
+Those blocked states are part of the pilot evidence, not a reason to collapse
+back into one oversized skill or bypass Broker authority.
 
 The same delivery lane also surfaced `ATM-BUG-2026-06-24-022`: source-first
 success did not prove the frozen runner was updated. That dogfood/build lesson
@@ -94,6 +101,9 @@ is now intentionally linked back into the four-layer SKL growth path:
 - Coordinator-only lifecycle authority is preserved.
 - The blocked state is observable as role-specific friction rather than hidden
   inside generic failure text.
+- `parallel-safe` remains distinct from final write admission; a provisional
+  proposal-first lane still stops role-pack writes until Coordinator resolves
+  the admission path.
 - The refinement finding routes directly into
   `docs/governance/team-agents/role-pack-learning-loop.md`.
 
@@ -108,3 +118,8 @@ is now intentionally linked back into the four-layer SKL growth path:
 - Treat stale broker lease/takeover cleanup as product follow-up, while keeping
   the operator lesson in active growth references until the product fix is
   stable.
+- Preserve `decisionClass`, `decisionReason`, `violationStatus`, and
+  `broker-conflict-blocked` whenever conflict-resolution artifacts appear; when
+  older Broker lanes emit only `verdict`, `lane`, `admission.state`, or
+  `blockedReasons`, keep those fields intact until the M8E shared vocabulary is
+  available end to end.
