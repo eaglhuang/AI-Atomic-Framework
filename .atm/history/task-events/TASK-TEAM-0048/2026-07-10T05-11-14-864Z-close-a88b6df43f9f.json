@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T05-11-14-864Z-close-a88b6df43f9f",
+  "taskId": "TASK-TEAM-0048",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710045339-codex-captain-m8e-TASK-TEAM-0048-ef5f76b399",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0048.json",
+  "taskSha256": "sha256:49e9dbdb8401d96662bfd80ae1522009c6bde41a53c946587983baff4248f6f2",
+  "createdAt": "2026-07-10T05:11:14.864Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0048 --actor codex-captain-m8e --status done --historical-delivery 9ba4ea7e9bbaebb25772f985822795224d2ab069",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710045339-codex-captain-m8e-TASK-TEAM-0048-ef5f76b399",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0048.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T05:11:14.859Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0048.*",
+        ".atm/history/task-events/TASK-TEAM-0048/**",
+        ".atm/history/tasks/TASK-TEAM-0048.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/role-routing-matrix.md",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/team.ts",
+        "schemas/team-agents/captain-decision.schema.json",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/team.ts",
+        "schemas/team-agents/captain-decision.schema.json",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
