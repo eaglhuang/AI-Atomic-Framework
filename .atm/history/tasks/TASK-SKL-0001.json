@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-SKL-0001",
+  "title": "SKL tool-first plan and task pack",
+  "status": "done",
+  "milestone": "P0",
+  "dependencies": [],
+  "acceptance": [
+    "lane root 與 `tasks/` 結構完整，命名與 `TASK-SKL-*` 編號一致。",
+    "計畫書清楚描述目標 result shape、tool surface、skill migration 與 hardening 主題。",
+    "計畫書清楚描述 `router / playbook / specialist skill` 分層與 shared growth contract。",
+    "計畫書清楚描述 Team Agents 與 `Agent + Skill` 治理單元的整合模型。",
+    "任務索引可作為 captain dispatch 與後續 import 的入口。",
+    "每張 task card 都含有 machine-readable frontmatter 與完整內容段落。",
+    "planning lane 只寫 `3KLife` 規劃文件，不直接授權 framework source mutation。"
+  ],
+  "deliverables": [
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/README.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/00-verified-facts.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/SKL-tool-first-upgrade-plan.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/taskflow.profile.json",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/README.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0001-skl-tool-first-plan-and-task-pack.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0002-tool-bridge-v1-schema-and-result-adapter.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0003-next-claim-framework-mode-tools.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0004-evidence-guard-taskflow-governed-commit-tools.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0005-skill-tool-first-orchestration-migration.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0006-governed-commit-and-close-lane-hardening.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0008-team-role-skill-pack-and-capability-boundary-contract.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0009-team-role-routing-matrix-and-playbook-slices.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0010-provider-neutral-role-skill-pack-manifest.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0011-agent-plus-skill-runtime-pilot.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0012-team-role-growth-and-observability-integration.task.md"
+  ],
+  "scopePaths": [
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/README.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/00-verified-facts.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/SKL-tool-first-upgrade-plan.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/taskflow.profile.json",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/README.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0001-skl-tool-first-plan-and-task-pack.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0002-tool-bridge-v1-schema-and-result-adapter.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0003-next-claim-framework-mode-tools.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0004-evidence-guard-taskflow-governed-commit-tools.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0005-skill-tool-first-orchestration-migration.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0006-governed-commit-and-close-lane-hardening.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0007-shared-skill-growth-contract-and-learning-loop.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0008-team-role-skill-pack-and-capability-boundary-contract.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0009-team-role-routing-matrix-and-playbook-slices.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0010-provider-neutral-role-skill-pack-manifest.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0011-agent-plus-skill-runtime-pilot.task.md",
+    "docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-0012-team-role-growth-and-observability-integration.task.md"
+  ],
+  "validators": [
+    "encoding-touched guard on touched planning files",
+    "git diff --check",
+    "node atm.mjs tasks import --from \\\"C:/Users/User/3KLife/docs/ai_atomic_framework/skl-tool-first-upgrade/tasks/TASK-SKL-*.task.md\\\" --dry-run --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "3KLife",
+  "closureAuthority": "planning_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Editing AI-Atomic-Framework source files",
+    "Manual mutation of .atm/history/** or .atm/runtime/**",
+    "Introducing a second task model outside ATM"
+  ],
+  "nonGoals": [
+    "Do not implement the tool bridge in this card",
+    "Do not rewrite existing CID lane artifacts"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the planning-doc commit that opened the SKL lane. This card is planning-only and must not write framework source.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.skl-tool-first-planning-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "使用者提供的升級計畫已經把 work packages 切成六個主題，但目前還沒有對應的 lane 結構、task index、taskflow profile 與 machine-readable task cards。若沒有先開包，後續工具化實作就會失去 planning source of truth 與一致的 dispatch 邊界。",
+  "source": {
+    "planPath": "skl-tool-first-upgrade/tasks/TASK-SKL-0001-skl-tool-first-plan-and-task-pack.task.md",
+    "sectionTitle": "TASK-SKL-0001",
+    "headingLine": 72,
+    "hash": "e841b94971bac87e"
+  },
+  "importedAt": "2026-07-10T04:33:17.836Z",
+  "lastTransitionId": "2026-07-10T04-33-17-843Z-import-832c1a03b0a4",
+  "lastTransitionAt": "2026-07-10T04:33:17.843Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
