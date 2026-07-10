@@ -82,9 +82,17 @@ result. Do not replace a blocked tool route with an ad hoc shell workaround.
 Keep this router thin. After `next`, `next --claim`, or the task-intent
 resolver returns, delegate sequencing to `evidence.nextAction.playbook` and
 specialist skills such as `atm-next`, `atm-evidence`, `atm-lock`,
-`atm-dispatch`, and future Team role packs. Preserve shared Team Broker fields
-when they appear: `decisionClass`, `decisionReason`, `violationStatus`, and
-`broker-conflict-blocked`.
+`atm-dispatch`, and Team role packs. Preserve shared Team Agents fields when
+they appear: `teamLevel`, `runtimeTier`, `decisionClass`, `decisionReason`,
+`requiresHumanSignoff`, `requiresAdr`, `violationStatus`,
+`escalationTarget`, and `broker-conflict-blocked`.
+
+For Team Agents work, do not rely on the older assumption that `team start`
+always means "no execution." Plain `team start` is still state-only, but
+`team start --execute` is a governed provider orchestration lane. Route crew
+completeness with `--team-size L1..L5`, route per-role providers with
+`--role-provider role=provider:model[:sdk][:mode]`, and keep
+`broker-conflict-blocked` as a hard gate.
 
 ## First Command
 

@@ -91,6 +91,50 @@ Each follow-up card should answer:
 4. Which command-backed evidence proves completion?
 5. What is the rollback path?
 
+## Team Agents Card Addendum
+
+For Team Agents cards, add a small machine-readable Team block when the task
+depends on Team runtime behavior:
+
+```yaml
+team:
+  required: true
+  teamLevel: L3
+  roleProviders:
+    implementer: openai:gpt-5-mini:responses:real-agent
+    validator: anthropic:claude-3-5-sonnet:anthropic-messages:real-agent
+  runtimeTier:
+    reader: raw-api
+    implementer: agent-sdk
+    lieutenant: editor
+  review:
+    requiredFormalSignatures: 2
+    reviewerIndependencePolicy: different-provider
+  knowledge:
+    permissions:
+      - knowledge.query
+  observability:
+    requiredEventTypes:
+      - artifact.output
+      - broker.conflict.blocked
+```
+
+Use L1 through L5 consistently:
+
+- L1: Coordinator, Atomization Planner, Implementer, Validator.
+- L2: L1 plus Reader and Evidence Collector.
+- L3: L2 plus Scope Guardian.
+- L4: L3 plus Lieutenant boundary.
+- L5: L4 plus Review Agent and Knowledge Scout.
+
+Acceptance for Team cards should name the actual runtime proof, not only the
+planning intent: `team start --execute` when execution is required,
+`atm.teamProviderRunArtifact.v1` for provider runs,
+`atm.reviewAgentSignature.v1` for review signatures, `knowledge.query` for
+Knowledge Scout reads, and real observability events for runtime queries.
+`broker-conflict-blocked` is a hard gate and should have a required recovery
+artifact or command.
+
 ## Import Check
 
 After authoring or editing cards, dry-run import before asking another agent to

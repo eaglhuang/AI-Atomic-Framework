@@ -46,6 +46,20 @@ After every `next --prompt` or `next --claim` response, read
 Treat the active dispatch card as the authority. Follow its scope, deliverables,
 validators, report contract, and write boundary.
 
+## Team Agents Worker Rule
+
+If the dispatch comes from a Team Agents lane, the worker remains bounded even
+when the Team runtime used `team start --execute`:
+
+- Do not self-close, self-commit, or claim `task.lifecycle` / `git.write`.
+- Respect L1 through L5 role boundaries and only perform the role assigned to
+  this worker.
+- If the report contains `broker-conflict-blocked`, stop and report the
+  blocker; do not continue through local edits or hook bypass.
+- Include `atm.teamProviderRunArtifact.v1`, `atm.reviewAgentSignature.v1`, real
+  observability events, or `knowledge.query` output when those are the required
+  evidence surfaces for the role.
+
 ## Completion Rule
 
 Report completion only when the required work is actually finished. Do not mark

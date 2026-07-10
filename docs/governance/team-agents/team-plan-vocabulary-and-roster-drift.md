@@ -69,3 +69,16 @@ Cross-repo mirror triangulation bugs remain in the ATM bug backlog cluster `ATM-
 Professional roles Data Pipeline Agent, DB/Container Agent, CI Agent, Web Research Agent, QA Lead, and Closure Steward are catalog-ready and roster-deferred. Do not count them as missing Team runtime roles until a dedicated promotion card assigns runtime semantics.
 
 The stale lock `ATM-FRAMEWORK-TEMP-codex-team-broker` must be released through the formal CLI/runtime release path only. Do not hand-edit `.atm/runtime/**`.
+
+## Skill Surface Sync
+
+Team Agents runtime changes must update the canonical skill templates before an adapter refresh is considered complete. The required surfaces are:
+
+- `templates/skills/atm-dispatch.skill.md` for Captain/dispatch wording, L1 through L5 crew scale, `--team-size`, `--role-provider`, `team start --execute`, governance fields, `team.required`, and `broker-conflict-blocked`.
+- `templates/skills/atm-next.skill.md` for returned next-action semantics, execution-lane warnings, evidence surfaces, `runtimeTier`, `atm.teamProviderRunArtifact.v1`, `atm.reviewAgentSignature.v1`, knowledge permissions, and observability events.
+- `templates/skills/atm-governance-router.skill.md` for natural-language routing into Team Agents without bypassing the governed `next` / `guide` entry.
+- `templates/skills/atm-task-card-authoring.skill.md` for task-card frontmatter and acceptance evidence covering `team.required`, `teamLevel`, role providers, runtime tiers, review signatures, knowledge permissions, and observability event types.
+- `templates/skills/atm-evidence.skill.md` for evidence interpretation, hard-gate handling, review signature authority, and knowledge permission boundaries.
+- `templates/skills/mailbox-worker-execution.skill.md` for spawned-worker limits: workers never self-close, self-commit, bypass broker, or continue after `broker-conflict-blocked`.
+
+After changing those templates, refresh installed editor surfaces through `node atm.mjs integration add <adapter> --force --json` and verify each installed adapter with `node atm.mjs integration verify <adapter> --json`. Current target adapters are `claude-code`, `codex`, `copilot`, `cursor`, `gemini`, and `antigravity`.
