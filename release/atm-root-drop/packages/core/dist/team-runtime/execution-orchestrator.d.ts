@@ -10,4 +10,4 @@ export type TeamOrchestrationResult = {
     readonly coordinatorOwnedAuthority: true;
     readonly stepResult: TeamProviderStepResult;
 };
-export declare function runProviderOrchestration(provider: TeamProviderContract, request: TeamOrchestrationRequest): TeamOrchestrationResult;
+export declare function runProviderOrchestration(provider: TeamProviderContract, request: TeamOrchestrationRequest): Promise<TeamOrchestrationResult>;

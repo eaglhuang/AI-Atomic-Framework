@@ -2176,6 +2176,7 @@ export function parseImportOptions(argv: string[]) {
     forceOverwriteClaims: false,
     resetOpen: false,
     reopen: false,
+    reconcileMirror: false,
     // TASK-AAO-0064: --strict-paths flag
     strictPaths: false,
     emergencyApproval: null as string | null,
@@ -2215,6 +2216,10 @@ export function parseImportOptions(argv: string[]) {
     }
     if (arg === '--reopen') {
       options.reopen = true;
+      continue;
+    }
+    if (arg === '--reconcile-mirror') {
+      options.reconcileMirror = true;
       continue;
     }
     if (arg === '--strict-paths') {
@@ -2644,6 +2649,25 @@ function parseSingleCard(input: {
       });
     }
   }
+  importDiagnostics.push(...buildMechanicalSplitScopeDiagnostics({
+    title,
+    body,
+    scopePaths,
+    deliverables,
+    mapUpdates,
+    ownerAtomOrMap: normalizeOptionalString(
+      frontMatter.data.ownerAtomOrMap
+      ?? frontMatter.data.owner_atom_or_map
+      ?? atomizationImpactFrontMatter.ownerAtomOrMap
+      ?? atomizationImpactFrontMatter.owner_atom_or_map
+    )
+  }));
+  const ownerAtomOrMap = normalizeOptionalString(
+    frontMatter.data.ownerAtomOrMap
+    ?? frontMatter.data.owner_atom_or_map
+    ?? atomizationImpactFrontMatter.ownerAtomOrMap
+    ?? atomizationImpactFrontMatter.owner_atom_or_map
+  );
   return {
     schemaVersion: 'atm.workItem.v0.2',
     workItemId,
@@ -2673,12 +2697,7 @@ function parseSingleCard(input: {
       : {}),
     ...(dispatchMetadata.mailboxAssignee ? { mailboxAssignee: dispatchMetadata.mailboxAssignee } : {}),
     atomizationImpact: {
-      ownerAtomOrMap: normalizeOptionalString(
-        frontMatter.data.ownerAtomOrMap
-        ?? frontMatter.data.owner_atom_or_map
-        ?? atomizationImpactFrontMatter.ownerAtomOrMap
-        ?? atomizationImpactFrontMatter.owner_atom_or_map
-      ),
+      ownerAtomOrMap,
       atomCid: normalizeOptionalString(
         frontMatter.data.atomCid
         ?? frontMatter.data.atom_cid
@@ -2704,6 +2723,40 @@ function parseSingleCard(input: {
     },
     importedAt: input.importedAt
   };
+}
+
+function buildMechanicalSplitScopeDiagnostics(input: {
+  readonly title: string;
+  readonly body: string;
+  readonly scopePaths: readonly string[];
+  readonly deliverables: readonly string[];
+  readonly mapUpdates: readonly string[];
+  readonly ownerAtomOrMap: string | null;
+}): readonly TaskCardImportDiagnostic[] {
+  const haystack = [
+    input.title,
+    input.body,
+    input.ownerAtomOrMap ?? '',
+    ...input.mapUpdates
+  ].join('\n').toLowerCase();
+  if (!/(split|mechanical|extract|facade|module|atom[-_\s]?map|atomization|拆分|切分|抽出|門面|模組)/i.test(haystack)) {
+    return [];
+  }
+  const declared = uniqueStrings([...input.scopePaths, ...input.deliverables].map(normalizeYamlScalar).filter(Boolean));
+  const fileLike = declared.filter((entry) => /\.[A-Za-z0-9]+$/.test(entry) && !/[*/{}]/.test(entry));
+  const broadPatterns = declared.filter((entry) => /[*]|\*\*|\/$/.test(entry));
+  if (fileLike.length > 1 || broadPatterns.length > 0) return [];
+  const candidates = uniqueStrings([
+    ...declared,
+    ...input.mapUpdates.map(normalizeYamlScalar).filter(Boolean)
+  ]);
+  return [{
+    code: 'ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST',
+    severity: 'warning',
+    field: 'scopePaths',
+    message: 'Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.',
+    candidates
+  }];
 }
 function normalizeTaskTestPlan(value: unknown): Record<string, unknown> | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -2850,6 +2903,7 @@ function importWouldOverwriteTask(input: {
   readonly force: boolean;
   readonly resetOpen: boolean;
   readonly reopen: boolean;
+  readonly reconcileMirror?: boolean;
 }): boolean {
   const currentHash = (input.current.source as { hash?: string } | undefined)?.hash ?? (input.current.hash as string | undefined) ?? '';
   if (input.resetOpen || input.reopen) return true;
@@ -2861,9 +2915,10 @@ function shouldSkipImportForActiveClaim(options: {
   readonly forceOverwriteClaims: boolean;
   readonly resetOpen: boolean;
   readonly reopen: boolean;
+  readonly reconcileMirror?: boolean;
   readonly wouldOverwrite: boolean;
 }): boolean {
-  if (!options.wouldOverwrite || options.forceOverwriteClaims || options.force || options.resetOpen || options.reopen) {
+  if (!options.wouldOverwrite || options.forceOverwriteClaims || options.force || options.resetOpen || options.reopen || options.reconcileMirror) {
     return false;
   }
   return true;
@@ -2876,6 +2931,7 @@ export function collectActiveClaimImportSkips(
     readonly forceOverwriteClaims: boolean;
     readonly resetOpen: boolean;
     readonly reopen: boolean;
+    readonly reconcileMirror?: boolean;
   }
 ): TaskImportDiagnostic[] {
   const diagnostics: TaskImportDiagnostic[] = [];
@@ -2914,9 +2970,11 @@ export function writeTaskFiles(input: {
   readonly forceOverwriteClaims: boolean;
   readonly resetOpen: boolean;
   readonly reopen: boolean;
+  readonly reconcileMirror?: boolean;
 }): { writtenPaths: string[]; diagnostics: TaskImportDiagnostic[] } {
   const writtenPaths: string[] = [];
   const diagnostics: TaskImportDiagnostic[] = [];
+  const reconcileMirror = input.reconcileMirror === true;
   const taskLedger = readTaskLedgerPolicy(input.cwd);
   const taskStoreDirectory = path.join(input.cwd, taskLedger.taskRoot);
   mkdirSync(taskStoreDirectory, { recursive: true });
@@ -2926,6 +2984,16 @@ export function writeTaskFiles(input: {
       try {
         const current = JSON.parse(readFileSync(filePath, 'utf8')) as { hash?: string; source?: { hash?: string } };
         const currentHash = current.source?.hash ?? current.hash ?? '';
+        const currentStatus = normalizeTaskStatus((current as { status?: unknown }).status);
+        if (currentStatus === 'done' && reconcileMirror) {
+          diagnostics.push({
+            level: 'info',
+            code: 'ATM_TASKS_IMPORT_RECONCILE_MIRROR_READY',
+            text: `Task ${task.workItemId} is done; planning mirror metadata will be reconciled without reopening delivery state.`,
+            workItemId: task.workItemId
+          });
+          continue;
+        }
         if (currentHash === task.source.hash && !input.resetOpen && !input.reopen) {
           diagnostics.push({
             level: 'info',
@@ -2935,7 +3003,6 @@ export function writeTaskFiles(input: {
           });
           continue;
         }
-        const currentStatus = normalizeTaskStatus((current as { status?: unknown }).status);
         if (currentStatus === 'done' && !input.reopen && !input.resetOpen) {
           diagnostics.push({
             level: 'error',
@@ -2971,6 +3038,7 @@ export function writeTaskFiles(input: {
           forceOverwriteClaims: input.forceOverwriteClaims,
           resetOpen: input.resetOpen,
           reopen: input.reopen,
+          reconcileMirror,
           wouldOverwrite
         })) {
           diagnostics.push({
@@ -3004,7 +3072,7 @@ export function writeTaskFiles(input: {
   }
   for (const task of input.tasks) {
     const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
-    if (existsSync(filePath) && !input.force) {
+    if (existsSync(filePath) && !input.force && !reconcileMirror) {
       continue;
     }
     let existingDocument: Record<string, unknown> | null = null;
@@ -3029,6 +3097,7 @@ export function writeTaskFiles(input: {
       forceOverwriteClaims: input.forceOverwriteClaims,
       resetOpen: input.resetOpen,
       reopen: input.reopen,
+      reconcileMirror,
       wouldOverwrite
     })) {
       diagnostics.push({
@@ -3047,7 +3116,9 @@ export function writeTaskFiles(input: {
       ...(input.resetOpen ? { status: 'open' as const } : {}),
       ...(input.reopen ? { status: 'open' as const, reopenedAt: new Date().toISOString() } : {})
     } as Record<string, unknown>;
-    if (input.resetOpen || input.reopen) {
+    if (existingDocument && reconcileMirror && normalizeTaskStatus(existingDocument.status) === 'done') {
+      Object.assign(taskDocument, reconcileMirrorOnlyTaskDocument(existingDocument, task));
+    } else if (input.resetOpen || input.reopen) {
       delete taskDocument.claim;
       delete taskDocument.closedAt;
       delete taskDocument.closedByActor;
@@ -3072,7 +3143,9 @@ export function writeTaskFiles(input: {
       taskPath: filePath,
       taskId: task.workItemId,
       taskDocument,
-      action: 'import',
+      action: existingDocument && reconcileMirror && normalizeTaskStatus(existingDocument.status) === 'done'
+        ? 'planning-mirror-reconcile'
+        : 'import',
       actorId: null,
       previousStatus
     });
@@ -3104,6 +3177,29 @@ export function writeTaskFiles(input: {
     writtenPaths.push(relativePathFrom(input.cwd, filePath));
   }
   return { writtenPaths, diagnostics };
+}
+
+function reconcileMirrorOnlyTaskDocument(existingDocument: Record<string, unknown>, task: TaskImportRecord): Record<string, unknown> {
+  const merged: Record<string, unknown> = {
+    ...existingDocument,
+    source: task.source,
+    importedAt: task.importedAt,
+    planningRepo: task.planningRepo ?? existingDocument.planningRepo ?? null,
+    targetRepo: task.targetRepo ?? existingDocument.targetRepo ?? null,
+    closureAuthority: task.closureAuthority ?? existingDocument.closureAuthority ?? null,
+    planningReadOnlyPaths: task.planningReadOnlyPaths ?? existingDocument.planningReadOnlyPaths,
+    planningMirrorPaths: task.planningMirrorPaths ?? existingDocument.planningMirrorPaths,
+    importDiagnostics: task.importDiagnostics ?? existingDocument.importDiagnostics,
+    legacyImportAliases: task.legacyImportAliases ?? existingDocument.legacyImportAliases
+  };
+  if (typeof existingDocument.status === 'string') merged.status = existingDocument.status;
+  if ('claim' in existingDocument) merged.claim = existingDocument.claim;
+  if ('closedAt' in existingDocument) merged.closedAt = existingDocument.closedAt;
+  if ('closedByActor' in existingDocument) merged.closedByActor = existingDocument.closedByActor;
+  if ('closurePacket' in existingDocument) merged.closurePacket = existingDocument.closurePacket;
+  if ('closeReason' in existingDocument) merged.closeReason = existingDocument.closeReason;
+  if ('lastTransitionId' in existingDocument) merged.lastTransitionId = existingDocument.lastTransitionId;
+  return merged;
 }
 export function writeImportEvidence(input: {
   readonly cwd: string;

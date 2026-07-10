@@ -5,7 +5,9 @@ export type TeamRuntimeGateFinding = {
   code: 'ATM_TEAM_GIT_OWNER_REQUIRED' | 'ATM_TEAM_WRITE_SCOPE_EXCEEDED';
   detail: string;
   teamRunId: string;
+  teamRunIds?: string[];
   taskId: string | null;
+  taskIds?: string[];
   actorId: string | null;
   files: string[];
   requiredCommand: string;
@@ -68,6 +70,7 @@ export function evaluateTeamPreCommitGate(input: {
   if (stagedFiles.length === 0) return [];
   const activeRuns = listActiveTeamRunProjections(input.cwd);
   const findings: TeamRuntimeGateFinding[] = [];
+  const gitOwnerBlockedRuns: TeamRunProjection[] = [];
   for (const run of activeRuns) {
     const gitOwners = new Set(run.permissionLeases
       .filter((lease) => lease.permission === 'git.write')
@@ -75,16 +78,36 @@ export function evaluateTeamPreCommitGate(input: {
     gitOwners.add('coordinator');
     if (run.actorId) gitOwners.add(run.actorId);
     if (!actorId || !gitOwners.has(actorId)) {
-      findings.push({
-        code: 'ATM_TEAM_GIT_OWNER_REQUIRED',
-        detail: `Active Team run ${run.teamRunId} only allows Coordinator/git.write owner to commit.`,
-        teamRunId: run.teamRunId,
-        taskId: run.taskId,
-        actorId,
-        files: stagedFiles,
-        requiredCommand: `ATM_COMMIT_ACTOR_ID=coordinator git commit`
-      });
+      gitOwnerBlockedRuns.push(run);
     }
+  }
+  if (gitOwnerBlockedRuns.length === 1) {
+    const run = gitOwnerBlockedRuns[0];
+    findings.push({
+      code: 'ATM_TEAM_GIT_OWNER_REQUIRED',
+      detail: `Active Team run ${run.teamRunId} only allows Coordinator/git.write owner to commit.`,
+      teamRunId: run.teamRunId,
+      teamRunIds: [run.teamRunId],
+      taskId: run.taskId,
+      taskIds: normalizePaths(run.taskId ? [run.taskId] : []),
+      actorId,
+      files: stagedFiles,
+      requiredCommand: `ATM_COMMIT_ACTOR_ID=coordinator git commit`
+    });
+  } else if (gitOwnerBlockedRuns.length > 1) {
+    const teamRunIds = normalizePaths(gitOwnerBlockedRuns.map((run) => run.teamRunId));
+    const taskIds = normalizePaths(gitOwnerBlockedRuns.map((run) => run.taskId ?? '').filter(Boolean));
+    findings.push({
+      code: 'ATM_TEAM_GIT_OWNER_REQUIRED',
+      detail: `Multiple active Team runs only allow Coordinator/git.write owners to commit. Runs: ${teamRunIds.join(', ')}.`,
+      teamRunId: teamRunIds[0],
+      teamRunIds,
+      taskId: taskIds[0] ?? null,
+      taskIds,
+      actorId,
+      files: stagedFiles,
+      requiredCommand: `ATM_COMMIT_ACTOR_ID=coordinator git commit`
+    });
   }
   return findings;
 }

@@ -1,5 +1,6 @@
 export const TEAM_PROVIDER_IDS = [
   'openai',
+  'anthropic',
   'azure-openai',
   'claude-code',
   'gemini',
@@ -30,6 +31,8 @@ export type TeamProviderSessionRequest = {
   readonly providerId: TeamProviderId;
   readonly sdkId: string;
   readonly modelId: string;
+  readonly input?: string;
+  readonly instructions?: string;
 };
 
 export type TeamProviderStepResult = {
@@ -41,11 +44,47 @@ export type TeamProviderStepResult = {
   readonly summary: string;
 };
 
+export type TeamProviderExecutionInput = {
+  readonly request: TeamProviderSessionRequest;
+  readonly sessionId: string;
+  readonly input: string;
+  readonly instructions?: string;
+  readonly scopedPaths: readonly string[];
+};
+
+export type TeamProviderExecutionResult = {
+  readonly ok: boolean;
+  readonly statusCode?: number;
+  readonly outputText: string;
+  readonly outputArtifacts?: readonly string[];
+  readonly retryable: boolean;
+  readonly summary: string;
+  readonly executionMode: 'vendor-api' | 'editor-cli';
+};
+
+export type TeamProviderHttpExecutor = (input: {
+  readonly url: string;
+  readonly method: 'POST';
+  readonly headers: Record<string, string>;
+  readonly body: unknown;
+  readonly timeoutMs?: number;
+}) => Promise<TeamProviderExecutionResult>;
+
+export type TeamProviderCommandExecutor = (input: {
+  readonly command: string;
+  readonly args: readonly string[];
+  readonly cwd?: string;
+  readonly env?: Record<string, string | undefined>;
+  readonly timeoutMs?: number;
+  readonly stdin: string;
+}) => Promise<TeamProviderExecutionResult>;
+
 export interface TeamProviderContract {
   readonly schemaId: 'atm.teamProviderContract.v1';
   readonly metadata: TeamProviderMetadata;
   readonly sessionLifecycle: TeamProviderSessionLifecycle;
   openSession(request: TeamProviderSessionRequest): { sessionId: string; providerId: TeamProviderId };
+  executeStep?(input: TeamProviderExecutionInput): Promise<TeamProviderExecutionResult> | TeamProviderExecutionResult;
   closeSession(sessionId: string): { closed: true; sessionId: string };
   cancelSession(sessionId: string, reason: string): { cancelled: true; sessionId: string; reason: string };
 }
@@ -72,7 +111,7 @@ export function createTeamProviderContract(providerId: TeamProviderId): TeamProv
     },
     openSession(request) {
       return {
-        sessionId: `${request.taskId}:${request.role}:${providerId}`,
+        sessionId: `${request.taskId}:${request.role}:${providerId}:${request.modelId}`,
         providerId
       };
     },

@@ -20,6 +20,7 @@
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
+import { resolvePlanAbsoluteFromStored } from '../planning-repo-root.ts';
 import { relativePathFrom } from '../shared.ts';
 import { readTaskLedgerPolicy } from '../task-ledger.ts';
 import { parseClaimRecord } from './task-ledger-readers.ts';
@@ -38,7 +39,7 @@ import {
 export function resolvePlanningCardPath(cwd: string, taskDocument: Record<string, unknown>): string | null {
   const source = taskDocument.source as { planPath?: string } | undefined;
   if (source?.planPath) {
-    const resolved = path.resolve(cwd, source.planPath);
+    const resolved = resolvePlanAbsoluteFromStored(cwd, source.planPath);
     if (existsSync(resolved)) return resolved;
   }
   const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;

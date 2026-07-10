@@ -15,6 +15,7 @@ const teamKnowledgeSpec = defineCommandSpec({
         { flag: '--dry-run', summary: 'Report planned build outputs without writing runtime cache files.' },
         { flag: '--write', summary: 'Write generated runtime cache files under .atm/runtime/knowledge.' },
         { flag: '--task', value: 'id', summary: 'Task id used to derive query text.' },
+        { flag: '--actor', value: 'id', summary: 'Team actor requesting the knowledge operation.' },
         { flag: '--query', value: 'text', summary: 'Literal query text.' },
         { flag: '--top', value: 'n', summary: 'Maximum query hits to return.' },
         { flag: '--repo', value: 'name', summary: 'Metadata filter.' },
@@ -35,19 +36,68 @@ export async function runTeamKnowledge(argv, inheritedCwd) {
     const parsed = parseArgsForCommand(teamKnowledgeSpec, argv);
     const action = String(parsed.positional[0] ?? 'build').toLowerCase();
     const cwd = path.resolve(String(parsed.options.cwd ?? inheritedCwd ?? process.cwd()));
+    const permission = evaluateKnowledgePermission(action, parsed.options);
+    if (!permission.ok) {
+        return makeResult({
+            ok: false,
+            command: 'team',
+            cwd,
+            messages: [
+                message('error', permission.code, permission.reason, permission.details)
+            ],
+            evidence: {
+                action: `knowledge.${action}`,
+                permission
+            }
+        });
+    }
     if (action === 'build') {
-        return runKnowledgeBuild(parsed.options, cwd);
+        return runKnowledgeBuild(parsed.options, cwd, permission);
     }
     if (action === 'query') {
-        return runKnowledgeQuery(parsed.options, cwd);
+        return runKnowledgeQuery(parsed.options, cwd, permission);
     }
     if (action === 'stats') {
-        return runKnowledgeStats(parsed.options, cwd);
+        return runKnowledgeStats(parsed.options, cwd, permission);
     }
     if (action === 'compact') {
-        return runKnowledgeCompact(parsed.options, cwd);
+        return runKnowledgeCompact(parsed.options, cwd, permission);
     }
     throw new CliError('ATM_CLI_USAGE', 'team knowledge supports: build, query, stats, compact', { exitCode: 2 });
+}
+function evaluateKnowledgePermission(action, options) {
+    const actorId = String(options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? '').trim() || null;
+    const dryRun = Boolean(options['dry-run']) || !Boolean(options.write);
+    const writesIndex = action === 'compact' || (action === 'build' && !dryRun);
+    if (!writesIndex) {
+        return {
+            ok: true,
+            code: 'ATM_TEAM_KNOWLEDGE_PERMISSION_ALLOWED',
+            permission: 'knowledge.query',
+            actorId,
+            reason: 'knowledge.query is shareable and advisory-only.',
+            details: { action, shareable: true }
+        };
+    }
+    const coordinatorActor = actorId === 'coordinator' || String(actorId ?? '').endsWith('-coordinator');
+    if (!coordinatorActor) {
+        return {
+            ok: false,
+            code: 'ATM_TEAM_KNOWLEDGE_INDEX_WRITE_FORBIDDEN',
+            permission: 'knowledge.index.write',
+            actorId,
+            reason: 'knowledge.index.write is coordinator-only and may only write generated runtime cache files.',
+            details: { action, actorId, requiredActor: 'coordinator', allowedRoot: '.atm/runtime/knowledge' }
+        };
+    }
+    return {
+        ok: true,
+        code: 'ATM_TEAM_KNOWLEDGE_PERMISSION_ALLOWED',
+        permission: 'knowledge.index.write',
+        actorId,
+        reason: 'knowledge.index.write granted for coordinator-owned generated runtime cache update.',
+        details: { action, actorId, allowedRoot: '.atm/runtime/knowledge' }
+    };
 }
 export function buildTeamKnowledgeSummary(input) {
     const cwd = path.resolve(input.cwd);
@@ -99,7 +149,7 @@ export function buildTeamKnowledgeSummary(input) {
         followUpCommand
     };
 }
-function runKnowledgeBuild(options, cwd) {
+function runKnowledgeBuild(options, cwd, permission) {
     const scope = String(options.scope ?? 'project').trim() || 'project';
     if (scope !== 'project') {
         throw new CliError('ATM_TEAM_KNOWLEDGE_SCOPE_UNSUPPORTED', 'team knowledge build currently supports --scope project only.', {
@@ -131,6 +181,7 @@ function runKnowledgeBuild(options, cwd) {
             action: 'knowledge.build',
             advisoryOnly: true,
             dryRun,
+            permission,
             scope,
             canonicalRoot: outputs.canonicalRootRelative,
             plannedOutputs: {
@@ -147,7 +198,7 @@ function runKnowledgeBuild(options, cwd) {
         }
     });
 }
-function runKnowledgeQuery(options, cwd) {
+function runKnowledgeQuery(options, cwd, permission) {
     const outputs = resolveKnowledgeOutputs(cwd);
     const top = parsePositiveInteger(options.top, 5, 20);
     const query = deriveQueryText(cwd, options);
@@ -166,6 +217,7 @@ function runKnowledgeQuery(options, cwd) {
             evidence: {
                 action: 'knowledge.query',
                 advisoryOnly: true,
+                permission,
                 indexStatus: 'missing',
                 buildCommand: 'node atm.mjs team knowledge build --scope project --dry-run --json',
                 query,
@@ -222,6 +274,7 @@ function runKnowledgeQuery(options, cwd) {
         evidence: {
             action: 'knowledge.query',
             advisoryOnly: true,
+            permission,
             indexStatus: 'ready',
             query,
             filters,
@@ -231,7 +284,7 @@ function runKnowledgeQuery(options, cwd) {
         }
     });
 }
-function runKnowledgeStats(options, cwd) {
+function runKnowledgeStats(options, cwd, permission) {
     const stats = buildKnowledgeStats(cwd, options);
     const level = stats.budget.status === 'hard-limit' ? 'error' : stats.budget.status === 'warning' ? 'warn' : 'info';
     const code = stats.budget.status === 'hard-limit'
@@ -252,11 +305,12 @@ function runKnowledgeStats(options, cwd) {
         ],
         evidence: {
             action: 'knowledge.stats',
+            permission,
             ...stats
         }
     });
 }
-function runKnowledgeCompact(options, cwd) {
+function runKnowledgeCompact(options, cwd, permission) {
     const stats = buildKnowledgeStats(cwd, options);
     const outputs = resolveKnowledgeOutputs(cwd);
     const dryRun = Boolean(options['dry-run']) || !Boolean(options.write);
@@ -291,6 +345,7 @@ function runKnowledgeCompact(options, cwd) {
             action: 'knowledge.compact',
             advisoryOnly: true,
             dryRun,
+            permission,
             canonicalMutated: false,
             runtimeCacheMutated: !dryRun,
             prunedRuntimeFiles,

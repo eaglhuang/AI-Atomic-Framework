@@ -13,6 +13,16 @@
     "risk": { "enum": ["low", "medium", "high"] },
     "lieutenantNeed": { "type": "boolean" },
     "nextTeamShape": { "type": "string", "minLength": 1 },
+    "decisionClass": { "enum": ["serial-release", "human-signoff-required", "adr-required", "blocked"] },
+    "decisionReason": { "type": "string", "minLength": 1 },
+    "violationStatus": { "enum": ["broker-conflict-blocked", "resolution-issued", "resolved"] },
+    "statusCode": { "enum": ["broker-conflict-blocked", "resolved"] },
+    "requiredResolutionArtifact": { "const": "atm.brokerConflictResolution.v1" },
+    "playbookSlice": { "const": "broker-conflict-resolution" },
+    "blockedTaskIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sharedPaths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sharedAtomIds": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "nextSafeResolutionCommand": { "type": "string", "minLength": 1 },
     "advisoryOnly": { "const": true }
   }
 }

@@ -1,5 +1,6 @@
 import { extractFrontMatter, normalizeTaskId } from '../../cli/dist/commands/tasks/task-import-validators.js';
 import { loadTemplate, applyIntent } from './templates.js';
+export { parsePlanMarkdown, detectPlanHeadings, parseSingleCardFromPlugin, uniqueStrings } from './task-card-parser.js';
 export class AtmMarkdownTaskSourcePlugin {
     kind = 'external-task-source';
     id = 'atm.markdown-task-source';

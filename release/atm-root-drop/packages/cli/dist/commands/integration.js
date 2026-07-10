@@ -43,20 +43,91 @@ export async function checkIntegrationHealth(repositoryRoot) {
             manifestDir: '.atm/integrations',
             installed: [],
             manifests: [],
-            failed: []
+            failed: [],
+            teamRuntimeBackends: inspectTeamRuntimeBackendCapabilities(repositoryRoot)
         };
     }
     const manifestReports = await Promise.all(readdirSync(manifestDirectory)
         .filter((entryName) => entryName.endsWith('.manifest.json'))
         .sort((left, right) => left.localeCompare(right))
         .map((entryName) => verifyManifestFile(repositoryRoot, entryName)));
+    const teamRuntimeBackends = inspectTeamRuntimeBackendCapabilities(repositoryRoot);
     return {
         ok: manifestReports.every((report) => report.ok),
         manifestDir: '.atm/integrations',
         installed: manifestReports.filter((report) => report.adapterId).map((report) => report.adapterId),
         manifests: manifestReports,
-        failed: manifestReports.filter((report) => !report.ok)
+        failed: manifestReports.filter((report) => !report.ok),
+        teamRuntimeBackends
     };
+}
+export function inspectTeamRuntimeBackendCapabilities(repositoryRoot) {
+    const manifestDirectory = path.join(repositoryRoot, '.atm', 'integrations');
+    if (!existsSync(manifestDirectory)) {
+        return {
+            schemaId: 'atm.integrationTeamRuntimeBackendReadiness.v1',
+            ok: true,
+            manifestDir: '.atm/integrations',
+            declaredBackendCount: 0,
+            capabilities: [],
+            missingBackendSummary: 'No installed integration manifest declares Team runtime backend capability.',
+            startReadiness: 'broker-only-only'
+        };
+    }
+    const capabilities = readdirSync(manifestDirectory)
+        .filter((entryName) => entryName.endsWith('.manifest.json'))
+        .sort((left, right) => left.localeCompare(right))
+        .flatMap((entryName) => {
+        const manifestPath = `.atm/integrations/${entryName}`;
+        try {
+            const manifest = JSON.parse(readFileSync(path.join(repositoryRoot, manifestPath), 'utf8'));
+            return normalizeTeamRuntimeCapabilities(manifest, manifestPath);
+        }
+        catch {
+            return [];
+        }
+    });
+    return {
+        schemaId: 'atm.integrationTeamRuntimeBackendReadiness.v1',
+        ok: true,
+        manifestDir: '.atm/integrations',
+        declaredBackendCount: capabilities.length,
+        capabilities,
+        missingBackendSummary: capabilities.length === 0
+            ? 'No installed integration manifest declares Team runtime backend capability.'
+            : null,
+        startReadiness: capabilities.some((capability) => capability.status !== 'unavailable')
+            ? 'runtime-backend-declared'
+            : 'broker-only-only'
+    };
+}
+function normalizeTeamRuntimeCapabilities(manifest, manifestPath) {
+    const rawCapabilities = Array.isArray(manifest.teamRuntimeCapabilities)
+        ? manifest.teamRuntimeCapabilities
+        : [];
+    return rawCapabilities
+        .map((capability) => ({
+        manifestPath,
+        adapterId: manifest.adapterId ?? null,
+        providerId: typeof capability.providerId === 'string' ? capability.providerId : '',
+        runtimeModes: Array.isArray(capability.runtimeModes)
+            ? capability.runtimeModes.filter((mode) => typeof mode === 'string' && mode.length > 0)
+            : [],
+        executionSurfaces: Array.isArray(capability.executionSurfaces)
+            ? capability.executionSurfaces.filter((surface) => typeof surface === 'string' && surface.length > 0)
+            : [],
+        roles: Array.isArray(capability.roles)
+            ? capability.roles.filter((role) => typeof role === 'string' && role.length > 0)
+            : [],
+        status: capability.status,
+        evidence: typeof capability.evidence === 'string' ? capability.evidence : ''
+    }))
+        .filter((capability) => capability.providerId.length > 0
+        && capability.runtimeModes.length > 0
+        && capability.executionSurfaces.length > 0
+        && capability.roles.length > 0
+        && ['supported', 'experimental', 'unavailable'].includes(capability.status)
+        && capability.evidence.length > 0);
 }
 export function inspectIntegrationBootstrap(repositoryRoot) {
     const repoBootstrapped = existsSync(path.join(repositoryRoot, '.atm', 'config.json'));
@@ -304,6 +375,8 @@ export async function runIntegration(argv) {
                 findings: verifyReport.findings,
                 driftedFiles: verifyReport.driftedFiles,
                 staleFields: verifyReport.staleFields,
+                teamRuntimeCapabilities: verifyReport.teamRuntimeCapabilities,
+                teamRuntimeBackendReadiness: inspectTeamRuntimeBackendCapabilities(cwd),
                 hookVerifyReport
             }
         });
@@ -552,7 +625,8 @@ async function verifyInstalledManifest(repositoryRoot, manifestPath, adapter, pr
         adapterId: adapter.id,
         findings: verifyReport.findings,
         driftedFiles: [],
-        staleFields: []
+        staleFields: [],
+        teamRuntimeCapabilities: normalizeTeamRuntimeCapabilities(manifest, manifestPath)
     });
 }
 function compareManifestParity(installed, expected) {
@@ -568,6 +642,11 @@ function compareManifestParity(installed, expected) {
     const expectedMetadata = JSON.stringify(expected.metadata ?? {});
     if (installedMetadata !== expectedMetadata) {
         changedFields.push('metadata');
+    }
+    const installedTeamRuntimeCapabilities = JSON.stringify(installed.teamRuntimeCapabilities ?? []);
+    const expectedTeamRuntimeCapabilities = JSON.stringify(expected.teamRuntimeCapabilities ?? []);
+    if (installedTeamRuntimeCapabilities !== expectedTeamRuntimeCapabilities) {
+        changedFields.push('teamRuntimeCapabilities');
     }
     const installedFiles = new Map(installed.files.map((entry) => [entry.path, entry]));
     const expectedFiles = new Map(expected.files.map((entry) => [entry.path, entry]));
@@ -599,7 +678,8 @@ function createManifestHealthReport(input) {
         adapterId: input.adapterId,
         findings: input.findings,
         driftedFiles: input.driftedFiles,
-        staleFields: Array.isArray(input.staleFields) ? input.staleFields : []
+        staleFields: Array.isArray(input.staleFields) ? input.staleFields : [],
+        teamRuntimeCapabilities: Array.isArray(input.teamRuntimeCapabilities) ? input.teamRuntimeCapabilities : []
     };
 }
 function readIntegrationManifest(repositoryRoot, adapterId) {

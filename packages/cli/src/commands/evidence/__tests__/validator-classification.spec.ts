@@ -19,6 +19,9 @@ assert.equal(isClosureRequiredValidator('doctor', []), false);
 assert.equal(isClosureRequiredValidator('typecheck', []), true);
 assert.equal(isClosureRequiredValidator('validate:cli', [], ['docs/readme.md']), false);
 assert.equal(isClosureRequiredValidator('validate:cli', [], ['packages/cli/src/commands/evidence.ts']), true);
+assert.equal(isClosureRequiredValidator('validate:git-head-evidence', [], ['docs/readme.md']), false);
+assert.equal(isClosureRequiredValidator('validate:git-head-evidence', [], ['packages/cli/src/commands/evidence/bundle-io.ts']), true);
+assert.equal(isClosureRequiredValidator('validate:git-head-evidence', ['validate:git-head-evidence'], ['docs/readme.md']), true);
 assert.equal(isClosureRequiredValidator('custom-gate', ['custom-gate']), true);
 
 console.log('[validator-classification.spec] ok');

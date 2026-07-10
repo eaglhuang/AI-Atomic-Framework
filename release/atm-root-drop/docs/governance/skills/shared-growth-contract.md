@@ -1,7 +1,7 @@
 # Shared Skill Growth Contract
 
 Status: draft-v1
-Related tasks: `TASK-SKL-0007`, `TASK-SKL-0008`, `TASK-SKL-0012`
+Related tasks: `TASK-SKL-0005`, `TASK-SKL-0007`, `TASK-SKL-0008`, `TASK-SKL-0012`
 
 This document defines the shared growth architecture for ATM skills. The goal
 is to let entry skills, playbook skills, and specialist skills learn from real
@@ -48,6 +48,8 @@ Use one of these categories when recording a learning item:
 - `tooling-mismatch`
 - `encoding-risk`
 - `overloaded-context`
+- `shared-atm-routing-friction`
+- `role-specific-friction`
 - `repo-specific-but-generalizable`
 
 These categories are shared with backlog triage on purpose. A backlog item may
@@ -56,6 +58,13 @@ promoted into skill learning references immediately.
 
 Skills may add a local subcategory, but they should not replace the shared top
 level category set unless a governed task updates this contract.
+
+Use `shared-atm-routing-friction` when the wall-hit comes from the common ATM
+route, claim, Broker, runner, evidence, or closeout path and would affect more
+than one role. Use `role-specific-friction` when the symptom is primarily about
+one role's authority boundary, skill-pack scope, or playbook slice. This keeps
+Coordinator, Implementer, Validator, Review, and future role packs on the same
+taxonomy without merging their role-local memories.
 
 ## Shared capture template
 
@@ -200,6 +209,20 @@ That means Team Agents should not invent a separate memory architecture. Role
 packs may keep separate reference files, but they should still use the same
 taxonomy, capture fields, and promotion semantics defined here.
 
+Team plans expose this stitching through
+`atm.teamRoleGrowthObservabilityContract.v1`. The contract maps each role to a
+skill pack, playbook slice, shared taxonomy, and reference-first learning
+target. A role learning event should be observable as a governance artifact,
+but the raw lesson still lands first in
+`docs/governance/team-agents/role-pack-learning-loop.md` instead of being copied
+into every role entry file.
+
+The shared M8E Broker vocabulary is part of the growth taxonomy bridge:
+`decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked`. Team role growth should track
+`broker-conflict-blocked.hit-rate` as an observability metric when Broker
+conflict events or role learning artifacts report that state.
+
 ## Relationship to Team knowledge
 
 The growth contract is not a second registry and not a replacement for Team
@@ -210,6 +233,18 @@ knowledge shards.
   lessons, and reuse hints;
 - task lifecycle, evidence, and close authority remain under ATM runtime and
   ledger surfaces.
+
+## Relationship to tool-first orchestration
+
+The tool-first orchestration contract in
+`docs/governance/skills/tool-first-orchestration.md` is the execution-order
+companion to this growth contract.
+
+- tool-first orchestration decides whether to use a structured tool, official
+  CLI fallback, or read-only shell inspection;
+- shared growth decides where reusable lessons about that route should live;
+- blocked tool results should become learning items before they become
+  permanent `SKILL.md` rules.
 
 ## Minimum adoption bar
 

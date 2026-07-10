@@ -53,12 +53,14 @@ try {
 
   const taskA = 'TASK-MAO-0053-A';
   const taskB = 'TASK-MAO-0053-B';
+  const taskC = 'TASK-MAO-0053-C';
   const leaseA = 'lease-actor-a';
   const leaseB = 'lease-actor-b';
   const sessionA = 'session-actor-a';
   const sessionB = 'session-actor-b';
   const fileA = 'src/actor-a.ts';
   const fileB = 'src/actor-b.ts';
+  const fileC = 'src/actor-c.ts';
 
   writeJson(path.join(tempDir, '.atm/history/tasks', `${taskA}.json`), {
     schemaVersion: 'atm.workItem.v0.2',
@@ -79,6 +81,15 @@ try {
     scopePaths: [fileB],
     deliverables: [fileB],
     claim: { actorId: 'actor-b', leaseId: leaseB, state: 'active', files: [fileB] }
+  });
+  writeJson(path.join(tempDir, '.atm/history/tasks', `${taskC}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskC,
+    title: 'actor c next claim fixture',
+    status: 'open',
+    owner: 'actor-c',
+    scopePaths: [fileC],
+    deliverables: [fileC]
   });
   writeJson(path.join(tempDir, '.atm/runtime/sessions', `${sessionA}.json`), {
     schemaId: 'atm.actorWorkSession.v1',
@@ -106,6 +117,7 @@ try {
   mkdirSync(path.join(tempDir, 'src'), { recursive: true });
   writeFileSync(path.join(tempDir, fileA), 'export const actorA = "A";\n', 'utf8');
   writeFileSync(path.join(tempDir, fileB), 'export const actorB = "B";\n', 'utf8');
+  writeFileSync(path.join(tempDir, fileC), 'export const actorC = "C";\n', 'utf8');
 
   runGit(tempDir, ['add', '.atm', 'src']);
   runGit(tempDir, ['commit', '-m', 'chore: bootstrap actor routing fixture']);
@@ -115,6 +127,26 @@ try {
 
   runAtm(tempDir, ['identity', 'set', '--actor', 'actor-a', '--git-name', 'Actor A', '--git-email', 'actor-a@example.com', '--json']);
   runAtm(tempDir, ['identity', 'set', '--actor', 'actor-b', '--git-name', 'Actor B', '--git-email', 'actor-b@example.com', '--json']);
+  writeJson(path.join(tempDir, '.atm/runtime/identity/default.json'), {
+    schemaId: 'atm.identityDefault.v1',
+    specVersion: '0.1.0',
+    actorId: 'repo-default-actor',
+    gitName: 'Repo Default',
+    gitEmail: 'repo-default@example.com',
+    updatedAt: '2026-06-18T00:00:00.000Z'
+  });
+
+  const identityShow = JSON.parse(runAtm(tempDir, ['identity', 'show', '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: '' })) as Record<string, any>;
+  assert.equal(identityShow.evidence.actorResolution.resolved.actorId, 'actor-c');
+  assert.equal(identityShow.evidence.actorResolution.resolved.source, 'legacy-env');
+  assert.equal(identityShow.evidence.actorResolution.repoDefaultActorId, 'repo-default-actor');
+  assert(String(identityShow.evidence.actorResolution.warning).includes('overrides repo default actor'), 'identity show must explain env/default precedence');
+
+  const nextClaim = JSON.parse(runAtm(tempDir, ['next', '--claim', '--task', taskC, '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: '' })) as Record<string, any>;
+  assert.equal(nextClaim.evidence.actorResolution.resolved.actorId, 'actor-c');
+  assert.equal(nextClaim.evidence.actorResolution.resolved.source, 'legacy-env');
+  assert.equal(nextClaim.evidence.actorResolution.repoDefaultActorId, 'repo-default-actor');
+  assert(nextClaim.messages.some((entry: any) => entry.code === 'ATM_NEXT_CLAIMED' && entry.data.actorSource === 'legacy-env'), 'next --claim output must expose actor source');
 
   const actorAIdentity = readJson(path.join(tempDir, '.atm/runtime/identity/actors/actor-a.json'));
   const actorBIdentity = readJson(path.join(tempDir, '.atm/runtime/identity/actors/actor-b.json'));

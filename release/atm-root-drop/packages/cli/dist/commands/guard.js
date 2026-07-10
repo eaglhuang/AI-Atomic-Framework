@@ -247,8 +247,17 @@ function parseGuardArgs(argv) {
             continue;
         }
         if (arg === '--files') {
-            state.files = requireValue(argv, index, '--files').split(',').map((entry) => normalizeRelativePath(entry)).filter(Boolean);
-            index += 1;
+            const files = [];
+            let cursor = index + 1;
+            while (cursor < argv.length && !(argv[cursor] ?? '').startsWith('--')) {
+                files.push(...(argv[cursor] ?? '').split(','));
+                cursor += 1;
+            }
+            if (files.length === 0) {
+                throw new CliError('ATM_CLI_USAGE', 'guard requires a value for --files', { exitCode: 2 });
+            }
+            state.files = files.map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+            index = cursor - 1;
             continue;
         }
         if (arg === '--task') {

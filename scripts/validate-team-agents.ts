@@ -41,7 +41,12 @@ import { runIntegrationHookInvocationInProcess } from '../packages/cli/src/comma
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
-await main();
+const sourceTeamRunSnapshot = snapshotSourceTeamRunFiles(process.cwd());
+try {
+  await main();
+} finally {
+  cleanupNewSourceTeamRunFiles(process.cwd(), sourceTeamRunSnapshot);
+}
 
 async function main() {
   // TASK-MAO-0027: Team Agents Wave Mode runtime self-check. Runs on every
@@ -124,6 +129,24 @@ async function main() {
     assert.equal(highRisk.nextTeamShape.signals.scopeCount, 4);
 
     console.log('[validate-team-agents] ok (lieutenant-escalation)');
+    return;
+  }
+
+  if (taskCase === 'source-runtime-residue-cleanup') {
+    const cleanupRoot = path.join(createTempWorkspace('atm-team-source-cleanup-'), 'source');
+    const teamRunDir = path.join(cleanupRoot, '.atm', 'runtime', 'team-runs');
+    mkdirSync(teamRunDir, { recursive: true });
+    const existingPath = path.join(teamRunDir, 'team-existing.json');
+    const residuePath = path.join(teamRunDir, 'team-validator-residue.json');
+    writeFileSync(existingPath, '{}\n', 'utf8');
+    const snapshot = snapshotSourceTeamRunFiles(cleanupRoot);
+    writeFileSync(residuePath, '{}\n', 'utf8');
+    cleanupNewSourceTeamRunFiles(cleanupRoot, snapshot);
+    assert.equal(existsSync(existingPath), true, 'cleanup must preserve pre-existing team runtime files');
+    assert.equal(existsSync(residuePath), false, 'cleanup must remove validator-created source runtime residue');
+    rmSync(path.dirname(cleanupRoot), { recursive: true, force: true });
+
+    console.log('[validate-team-agents] ok (source-runtime-residue-cleanup)');
     return;
   }
 
@@ -3835,6 +3858,19 @@ async function main() {
       assert.equal(integrationBlocked.ok, false);
       assert.equal(integrationBlocked.messages[0]?.code, 'ATM_TEAM_WRITE_SCOPE_EXCEEDED');
 
+      writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', 'team-hook-fixture-secondary.json'), `${JSON.stringify({
+        schemaId: 'atm.teamRun.v1',
+        teamRunId: 'team-hook-fixture-secondary',
+        taskId: 'TASK-HOOK-TEAM-0002',
+        actorId: 'coordinator',
+        status: 'active',
+        permissionLeases: [
+          { permission: 'git.write', agentId: 'coordinator' }
+        ],
+        createdAt: '2026-07-10T00:00:00.000Z',
+        updatedAt: '2026-07-10T00:00:00.000Z'
+      }, null, 2)}\n`, 'utf8');
+
       const blockedCommit = evaluateTeamPreCommitGate({
         cwd,
         actorId: 'implementer-typescript',
@@ -3842,6 +3878,8 @@ async function main() {
       });
       assert.equal(blockedCommit.length, 1);
       assert.equal(blockedCommit[0].code, 'ATM_TEAM_GIT_OWNER_REQUIRED');
+      assert.deepEqual(blockedCommit[0].teamRunIds, ['team-hook-fixture', 'team-hook-fixture-secondary']);
+      assert.deepEqual(blockedCommit[0].files, ['packages/cli/src/commands/team.ts']);
 
       const allowedCommit = evaluateTeamPreCommitGate({
         cwd,
@@ -4518,6 +4556,25 @@ function assertBrokerRunScanIndex(): void {
 function fail(message: string): never {
   console.error(`[validate-team-agents] ${message}`);
   process.exit(1);
+}
+
+function snapshotSourceTeamRunFiles(cwd: string): Set<string> {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  if (!existsSync(directory)) return new Set();
+  return new Set(readdirSync(directory)
+    .filter((entry) => entry.endsWith('.json'))
+    .map((entry) => path.join(directory, entry)));
+}
+
+function cleanupNewSourceTeamRunFiles(cwd: string, before: Set<string>): void {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  if (!existsSync(directory)) return;
+  for (const entry of readdirSync(directory)) {
+    if (!entry.endsWith('.json')) continue;
+    const filePath = path.join(directory, entry);
+    if (before.has(filePath)) continue;
+    rmSync(filePath, { force: true });
+  }
 }
 
 async function assertRejectsCliError(action: () => Promise<unknown>, code: string): Promise<CliError> {

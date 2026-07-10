@@ -282,6 +282,41 @@ const amendedBundle = buildTaskflowCommitBundle({
 });
 assert.equal(amendedBundle.failClosed, false, 'runtime-amended deliverables should not force historical lane fail-close');
 assert.ok(amendedBundle.targetDeliveryFiles.includes('packages/cli/src/runtime-scope.ts'), 'claim-expanded runtime file must be treated as deliverable');
+const historicalScratchTaskId = 'TASK-BUNDLE-0004B';
+const historicalScratchTargetRepo = path.join(tempRoot, 'target-historical-scratch');
+const historicalScratchPlanningRepo = path.join(tempRoot, 'planning-historical-scratch');
+initGitRepo(historicalScratchTargetRepo);
+initGitRepo(historicalScratchPlanningRepo);
+const historicalScratchPlanPath = path.join(historicalScratchPlanningRepo, 'docs/tasks/TASK-BUNDLE-0004B.task.md');
+writeText(historicalScratchPlanPath, `---\ntask_id: ${historicalScratchTaskId}\nstatus: running\n---\n# ${historicalScratchTaskId}\n`);
+writeJson(path.join(historicalScratchTargetRepo, '.atm/history/tasks/TASK-BUNDLE-0004B.json'), {
+    workItemId: historicalScratchTaskId,
+    title: `${historicalScratchTaskId} fixture`,
+    status: 'running',
+    deliverables: ['packages/**'],
+    scopePaths: ['packages/**'],
+    targetAllowedFiles: ['packages/**'],
+    source: { planPath: historicalScratchPlanPath }
+});
+writeText(path.join(historicalScratchTargetRepo, 'packages/cli/src/delivered.ts'), 'export const delivered = true;\n');
+execFileSync('git', ['add', '.'], { cwd: historicalScratchTargetRepo, stdio: 'ignore' });
+execFileSync('git', ['commit', '-m', 'feat: historical delivery'], { cwd: historicalScratchTargetRepo, stdio: 'ignore' });
+const historicalScratchDeliverySha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: historicalScratchTargetRepo, encoding: 'utf8' }).trim();
+writeText(path.join(historicalScratchTargetRepo, 'packages/cli/src/commands/evidence.ts.bak'), 'scratch backup\n');
+const historicalScratchBundle = buildTaskflowCommitBundle({
+    cwd: historicalScratchTargetRepo,
+    taskId: historicalScratchTaskId,
+    actorId: 'validator',
+    commitMode: 'dry-run',
+    planningMirrorPath: historicalScratchPlanPath,
+    rosterIndexPath: null,
+    historicalDeliveryRefs: [historicalScratchDeliverySha],
+    planningAuthorityDeliveryOk: false
+});
+assert.equal(historicalScratchBundle.failClosed, false, 'historical closeback must not fail on unrelated scratch backup files under broad scope');
+assert.equal(historicalScratchBundle.targetDeliveryFiles.includes('packages/cli/src/commands/evidence.ts.bak'), false, 'broad historical deliverables must not absorb .bak scratch files');
+assert.equal(historicalScratchBundle.targetRepo.stageFiles.includes('packages/cli/src/commands/evidence.ts.bak'), false, 'scratch backup files must not be staged by historical closeback');
+assert.equal(historicalScratchBundle.excludedReasons['packages/cli/src/commands/evidence.ts.bak'], 'scratch/backup file inside broad scope; excluded as advisory residue during historical closeback');
 const externalTaskId = 'TASK-BUNDLE-0005';
 const externalTargetRepo = path.join(tempRoot, 'target-external');
 const externalPlanningRepo = path.join(tempRoot, 'planning-external');

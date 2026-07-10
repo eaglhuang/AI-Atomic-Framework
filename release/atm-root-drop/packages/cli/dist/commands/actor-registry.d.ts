@@ -16,6 +16,16 @@ export interface ResolvedActorId {
     readonly actorId: string;
     readonly source: 'option' | 'env' | 'legacy-env' | 'repo-default';
 }
+export interface ActorResolutionDiagnostic {
+    readonly resolved: ResolvedActorId | null;
+    readonly precedence: readonly ['option', 'env', 'legacy-env', 'repo-default'];
+    readonly envActorId: string | null;
+    readonly legacyEnvActorId: string | null;
+    readonly repoDefaultActorId: string | null;
+    readonly repoDefaultPath: typeof runtimeIdentityRelativePath;
+    readonly warning: string | null;
+    readonly requiredCommand: string | null;
+}
 export interface RuntimeIdentityDefaultDocument {
     readonly schemaId: 'atm.identityDefault.v1';
     readonly specVersion: '0.1.0';
@@ -53,6 +63,7 @@ export declare function readRuntimeIdentityForActor(cwd: string, actorId: string
 export declare function writeRuntimeIdentityForActor(cwd: string, actorId: string, document: RuntimeIdentityDefaultDocument): string;
 export declare function clearRuntimeIdentityForActor(cwd: string, actorId: string): boolean;
 export declare function resolveActorId(inputActorId?: string | null, cwd?: string | null): ResolvedActorId | null;
+export declare function describeActorResolution(inputActorId?: string | null, cwd?: string | null): ActorResolutionDiagnostic;
 export declare function findActorByResolvedId(cwd: string, resolved: ResolvedActorId): ActorRecord | null;
 export declare function sanitizeActorKind(value: unknown): ActorKind | null;
 export interface GitLocalIdentitySnapshot {

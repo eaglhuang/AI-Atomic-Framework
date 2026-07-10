@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { writeImportEvidence, writeTaskFiles } from '../task-card-writer.ts';
+import { parsePlanMarkdown } from '../legacy-impl.ts';
 
 const cwd = mkdtempSync(path.join(tmpdir(), 'atm-task-card-writer-'));
 try {
@@ -48,6 +49,34 @@ try {
   });
   const evidence = JSON.parse(readFileSync(path.join(cwd, evidencePath), 'utf8'));
   assert.equal(evidence.taskIds[0], 'TASK-RFT-0019');
+
+  const splitCard = parsePlanMarkdown({
+    planRelativePath: 'docs/tasks/TASK-RFT-0020.task.md',
+    importedAt: '2026-07-10T00:00:00.000Z',
+    planText: [
+      '---',
+      'task_id: TASK-RFT-0020',
+      'title: "Mechanical split task facade extraction"',
+      'status: planned',
+      'scopePaths:',
+      '  - packages/cli/src/commands/tasks.ts',
+      'deliverables:',
+      '  - packages/cli/src/commands/tasks.ts',
+      'atomizationImpact:',
+      '  ownerAtomOrMap: atm.tasks',
+      '  mapUpdates:',
+      '    - packages/cli/src/commands/tasks/types.ts',
+      '---',
+      '# TASK-RFT-0020',
+      '',
+      'Split the facade into module files.'
+    ].join('\n')
+  });
+  assert.equal(splitCard.tasks.length, 1);
+  assert.ok(
+    splitCard.tasks[0].importDiagnostics?.some((entry) => entry.code === 'ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST'),
+    'mechanical split cards with one declared file should surface a one-shot scope checklist'
+  );
 } finally {
   rmSync(cwd, { recursive: true, force: true });
 }

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, type RuntimeIdentityDefaultDocument, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.ts';
+import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, describeActorResolution, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, type RuntimeIdentityDefaultDocument, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.ts';
 import { listActorWorkSessions, resolveActorWorkSession } from './actor-session.ts';
 import { CliError, makeResult, message } from './shared.ts';
 
@@ -10,6 +10,7 @@ export async function runIdentity(argv: string[]) {
       ? readRuntimeIdentityForActor(options.cwd, options.actorId)
       : readRuntimeIdentityDefault(options.cwd);
     const session = current?.activeSessionId ? resolveActorWorkSession(options.cwd, { sessionId: current.activeSessionId, includeNonActive: true }) : null;
+    const actorResolution = describeActorResolution(options.actorId, options.cwd);
     return makeResult({
       ok: true,
       command: 'identity',
@@ -20,7 +21,9 @@ export async function runIdentity(argv: string[]) {
           : `Loaded repo default identity for ${current.actorId}.`
         : options.actorId
           ? `No actor identity is configured yet for ${options.actorId}.`
-          : 'No repo default identity is configured yet.')],
+          : 'No repo default identity is configured yet.', {
+        actorResolution
+      })],
       evidence: {
         identity: current,
         identityPath: current
@@ -28,6 +31,7 @@ export async function runIdentity(argv: string[]) {
             ? runtimeIdentityActorRelativePath(options.actorId)
             : runtimeIdentityRelativePath
           : null,
+        actorResolution,
         activeSession: session,
         recentSessions: listActorWorkSessions(options.cwd).slice(0, 5)
       }

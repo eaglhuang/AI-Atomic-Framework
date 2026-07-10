@@ -12,7 +12,8 @@ This report does not change production command behavior. It exists to define the
 | --- | --- | --- | --- |
 | `tasks.command.dispatch` | Top-level `tasks` action router | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/command-dispatch.ts` | `tasks.ts` now supplies the handler table; `command-dispatch.ts` owns argv normalization, action aliases, usage errors, and fan-out over `close`, `reset`, `claim`, `reconcile`, `repair-closure`, `status`, `finalize`, etc. |
 | `tasks.close.governance` | Close path governance and closure packet enforcement | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/close-orchestrator.ts` | Owns close command admission, closure authority, historical delivery, and commit-window registration. Under TASK-RFT-0012 the `runTasksClose` orchestrator body lives in `tasks/close-orchestrator.ts`; `tasks.ts` re-exports it and keeps only the router surface. |
-| `tasks.claim.lifecycle` | Claim / renew / release / handoff / takeover lifecycle | `packages/cli/src/commands/tasks.ts`, `packages/core/src/broker/lifecycle.ts` | Shared claim-state logic with broker claim intent recording. |
+| `tasks.claim.lifecycle` | Claim / renew / release / handoff / takeover lifecycle | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-intent.ts`, `packages/cli/src/commands/tasks/takeover-evidence.ts`, `packages/core/src/broker/lifecycle.ts` | Under TASK-RFT-0017 the lifecycle state machine lives in `claim-orchestrator.ts`; claim-intent resolution and takeover evidence are separate sub-atoms so CID can reason about each path independently. |
+| `tasks.repair.claim` | Diagnose and repair stale claim drift | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-repair-diagnostics.ts` | Under TASK-RFT-0017 the backend repair-claim command lives in `repair-claim-orchestrator.ts` and delegates drift classification / write repair to `claim-repair-diagnostics.ts`. |
 | `tasks.reconcile.delivery` | Historical delivery reconciliation and provenance | `packages/cli/src/commands/tasks.ts` | Handles delivery commit refs, provenance checks, and close/truth repair. |
 | `tasks.repair.closure` | Closure packet repair / normalization | `packages/cli/src/commands/tasks.ts`, `packages/cli/src/commands/framework-development.ts` | Repairs closure packet before closeout. |
 | `tasks.status.triangulation` | Status / claim / planning mirror truth triangulation | `packages/cli/src/commands/tasks.ts` | Compares live ledger, planning frontmatter, and last transition event. |
@@ -79,6 +80,102 @@ This report does not change production command behavior. It exists to define the
 - The validator should fail closed if any required section is missing or if the atom list does not mention the three caller surfaces.
 - TASK-CID-0058 requires the report to mention `packages/cli/src/commands/tasks/command-dispatch.ts` so future map checks keep the dispatch atom visible.
 - TASK-CID-0062 requires the report to mention `packages/cli/src/commands/tasks/dependency-gates.ts` and `packages/cli/src/commands/tasks/surface-invariants.ts` so future map checks keep the governance invariant owner modules visible.
+- TASK-RFT-0017 requires the report to mention `packages/cli/src/commands/tasks/claim-orchestrator.ts`, `packages/cli/src/commands/tasks/claim-preparation.ts`, `packages/cli/src/commands/tasks/claim-intent.ts`, `packages/cli/src/commands/tasks/takeover-evidence.ts`, and `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts`; each new atom file should stay at or below 600 lines.
+
+## TASK-RFT-0017 Update
+
+TASK-RFT-0017 split the claim lifecycle cluster out of `packages/cli/src/commands/tasks.ts` while keeping the public `tasks claim`, `tasks renew`, `tasks release`, `tasks handoff`, `tasks takeover`, and `tasks repair-claim` command surfaces unchanged.
+
+### Atomic Claim Map
+
+| Atom | Module | Responsibility |
+| --- | --- | --- |
+| `tasks.claim.lifecycle` | `packages/cli/src/commands/tasks/claim-orchestrator.ts` | Claim / renew / release / handoff / takeover state machine, lock acquisition/release, work-session state, task transition writes. |
+| `tasks.claim.preparation` | `packages/cli/src/commands/tasks/claim-preparation.ts` | Reserve/promote preparation and planning-card auto-import orchestration; consumes parser, task-writer, and import-evidence writer via injection so those atoms can be split independently. |
+| `tasks.claim.intent` | `packages/cli/src/commands/tasks/claim-intent.ts` | Auto-resolve write vs closeout-only claim intent from scoped dirty files and deliverable presence in `HEAD`. |
+| `tasks.claim.takeover-evidence` | `packages/cli/src/commands/tasks/takeover-evidence.ts` | Append takeover validation evidence without mixing evidence writing into the lifecycle state machine. |
+| `tasks.repair.claim` | `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts` | CLI backend for diagnose-first repair-claim; consumes `claim-repair-diagnostics.ts`. |
+
+### Before / After Line Counts
+
+- Before TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 5,796 lines
+- After TASK-RFT-0017: `packages/cli/src/commands/tasks.ts` = 4,759 lines
+- New `packages/cli/src/commands/tasks/claim-orchestrator.ts` = 554 lines
+- New `packages/cli/src/commands/tasks/claim-preparation.ts` = 272 lines
+- New `packages/cli/src/commands/tasks/claim-intent.ts` = 119 lines
+- New `packages/cli/src/commands/tasks/takeover-evidence.ts` = 31 lines
+- New `packages/cli/src/commands/tasks/repair-claim-orchestrator.ts` = 190 lines
+
+### Specs / Validator
+
+- `packages/cli/src/commands/tasks/__tests__/claim-orchestrator.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/repair-claim-orchestrator.spec.ts`
+- `scripts/validate-tasks-claim-atomic-map.ts`
+
+## TASK-RFT-0018 Update
+
+TASK-RFT-0018 split the reconcile / repair-closure / deliver-and-close backend cluster out of `packages/cli/src/commands/tasks.ts` while preserving the public `tasks reconcile`, `tasks repair-closure`, and `tasks deliver-and-close` command surfaces.
+
+### Atomic Reconcile Map
+
+| Atom | Module | Responsibility |
+| --- | --- | --- |
+| `tasks.reconcile.delivery` | `packages/cli/src/commands/tasks/reconcile-orchestrator.ts` | Historical delivery reconciliation, command-backed evidence envelope, closure packet creation, close transaction writes, and close-commit-window registration. |
+| `tasks.repair.closure` | `packages/cli/src/commands/tasks/repairclose-orchestrator.ts` | Closure packet repair backend, emergency approval, stale runner override recording, and repair transition staging. |
+| `tasks.deliver.close` | `packages/cli/src/commands/tasks/deliver-close-orchestrator.ts` | Deliver-and-close two-step flow, cross-task mutation guard, batch checkpoint gate, delivery commit creation, close invocation, and governance commit staging. |
+
+### Before / After Line Counts
+
+- Before TASK-RFT-0018: `packages/cli/src/commands/tasks.ts` = 4,503 lines
+- After TASK-RFT-0018: `packages/cli/src/commands/tasks.ts` = 3,786 lines
+- New `packages/cli/src/commands/tasks/reconcile-orchestrator.ts` = 321 lines
+- New `packages/cli/src/commands/tasks/repairclose-orchestrator.ts` = 222 lines
+- New `packages/cli/src/commands/tasks/deliver-close-orchestrator.ts` = 276 lines
+
+### Specs / Validator
+
+- `packages/cli/src/commands/tasks/__tests__/reconcile-orchestrator.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/repairclose-orchestrator.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/deliver-close-orchestrator.spec.ts`
+- `scripts/validate-tasks-reconcile-atomic-map.ts`
+
+## TASK-RFT-0019 Update
+
+TASK-RFT-0019 closes Lane B by reducing `packages/cli/src/commands/tasks.ts`
+to a thin compatibility facade and adding explicit atom entry points for task
+card parsing, task-card writing, and scope/queue coordination.
+
+### Final Facade Map
+
+| Atom | Module | Responsibility |
+| --- | --- | --- |
+| `tasks.command.facade` | `packages/cli/src/commands/tasks.ts` | Public compatibility exports and command entrypoint fan-out. The file now contains no parser, writer, scope, queue, parallel, or lock-cleanup function bodies. |
+| `tasks.card.parser` | `packages/atm-markdown-task-source/src/task-card-parser.ts` | Stable package-level import path for markdown task parsing and heading detection. |
+| `tasks.card.writer` | `packages/cli/src/commands/tasks/task-card-writer.ts` | Stable CLI-local import path for task import writes and import evidence writes. |
+| `tasks.scope.queue` | `packages/cli/src/commands/tasks/scope-queue.ts` | Stable atom boundary for scope, queue, parallel, lock cleanup, and roster-update command ownership. |
+| `tasks.legacy.compat` | `packages/cli/src/commands/tasks/legacy-impl.ts` | Transitional compatibility implementation relocated out of `tasks.ts`; retained so the final facade split does not change public JSON fields, exit codes, or command behavior while external AAO/RFT lanes are active. |
+
+### Before / After Line Counts
+
+- Before TASK-RFT-0019: `packages/cli/src/commands/tasks.ts` = 3,786 lines
+- After TASK-RFT-0019: `packages/cli/src/commands/tasks.ts` = 112 lines
+- New `packages/atm-markdown-task-source/src/task-card-parser.ts` = 13 lines
+- New `packages/cli/src/commands/tasks/task-card-writer.ts` = 9 lines
+- New `packages/cli/src/commands/tasks/scope-queue.ts` = 14 lines
+- Transitional `packages/cli/src/commands/tasks/legacy-impl.ts` keeps verbatim compatibility logic for follow-up atom peeling.
+
+### Lane B Boundary Evidence
+
+- RFT-0001 / Lane A `next.ts` surfaces were not touched by this card.
+- RFT-0002 / hook surfaces and AAO 0154-0156 broker files are external lanes and remain outside this delivery.
+- `scripts/validate-tasks-final-facade-atomic-map.ts` asserts the facade line count and verifies that parser/writer/scope-queue function bodies are no longer defined in `tasks.ts`.
+
+### Specs / Validator
+
+- `packages/cli/src/commands/tasks/__tests__/task-card-parser.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts`
+- `packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts`
+- `scripts/validate-tasks-final-facade-atomic-map.ts`
 
 ## TASK-RFT-0010 Update
 

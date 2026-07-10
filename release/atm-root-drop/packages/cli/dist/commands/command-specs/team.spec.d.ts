@@ -5,10 +5,15 @@ export declare const teamSpecCommandSurface: {
         name: string;
         summary: string;
     }[];
-    options: {
+    options: ({
         flag: string;
         summary: string;
-    }[];
+    } | {
+        flag: string;
+        value: string;
+        repeatable: boolean;
+        summary: string;
+    })[];
 };
 export declare const teamSpecCrewBriefing: {
     summary: string;

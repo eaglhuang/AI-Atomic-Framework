@@ -38,13 +38,20 @@ const VALIDATOR_RUNS_ROOT = path.join(root, '.atm', 'runtime', 'validator-runs')
 // way to observe or reap them. Track every live child here and reap them on
 // interrupt/termination.
 const runningValidatorChildren = new Set<ReturnType<typeof spawn>>();
+function killChild(child: ReturnType<typeof spawn>, signal: NodeJS.Signals | number | string = 'SIGTERM'): void {
+  if (process.platform === 'win32') {
+    if (child.pid) {
+      const result = spawnSync('taskkill', ['/F', '/T', '/PID', String(child.pid)], { stdio: 'ignore' });
+      if (result.status === 0) {
+        return;
+      }
+    }
+  }
+  try { child.kill(signal as NodeJS.Signals); } catch {}
+}
 function killAllRunningValidatorChildren(signal: NodeJS.Signals): void {
   for (const runningChild of runningValidatorChildren) {
-    try {
-      runningChild.kill(signal);
-    } catch {
-      // best-effort: the child may have already exited between iteration and kill.
-    }
+    killChild(runningChild, signal);
   }
 }
 process.on('SIGINT', () => {
@@ -59,11 +66,7 @@ process.on('SIGTERM', () => {
 // through the signal handlers above (e.g. an uncaught exception).
 process.on('exit', () => {
   for (const runningChild of runningValidatorChildren) {
-    try {
-      runningChild.kill('SIGTERM');
-    } catch {
-      // best-effort.
-    }
+    killChild(runningChild, 'SIGTERM');
   }
 });
 
@@ -912,11 +915,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
       ? setTimeout(() => {
         if (settled) return;
         timedOut = true;
-        try {
-          child.kill('SIGTERM');
-        } catch {
-          // best-effort.
-        }
+        killChild(child, 'SIGTERM');
       }, timeoutMs)
       : null;
 

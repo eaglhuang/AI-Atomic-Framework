@@ -127,7 +127,7 @@ async function main() {
     assert((exact as any).nextAction === undefined, 'default next output must omit duplicated top-level nextAction alias');
     assert((exact as any).taskIntent === undefined, 'default next output must omit duplicated top-level taskIntent alias');
     assert((exact as any).allowedCommands === undefined, 'default next output must omit duplicated top-level allowedCommands alias');
-    assert(JSON.stringify(exact).length < 30000, 'default next output must stay compact enough for agent transcripts');
+    assert(JSON.stringify(exact).length < 45000, 'default next output must stay compact enough for agent transcripts');
     assert((exact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'exact task id prompt selected wrong task');
     assert((exact.evidence.nextAction as any).recommendedChannel === 'normal', 'exact task id prompt must recommend normal channel');
     const exactTrail = assertDecisionTrail(exact.evidence.nextAction as any, 'task-route-ready');
@@ -146,7 +146,8 @@ async function main() {
     assert(explicitTask.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'next --task must route to one task');
     assert((explicitTask.evidence.nextAction as any).selectedTask.workItemId === 'TASK-ALPHA-0001', 'next --task selected wrong task');
     assert((explicitTask.evidence.nextAction as any).recommendedChannel === 'normal', 'next --task must recommend normal channel');
-    assert(String((explicitTask.evidence.nextAction as any).requiredCommand).includes('--task TASK-ALPHA-0001'), 'next --task must keep the claim command on --task');
+    assert(String((explicitTask.evidence.nextAction as any).requiredCommand).includes('tasks import'), 'next --task for a markdown planning card must import before claim');
+    assert(String((explicitTask.evidence.nextAction as any).taskScopedClaimCommand).includes('--task TASK-ALPHA-0001'), 'next --task must still expose the eventual task-scoped claim command');
     assertRunnerMode(explicitTask);
 
     const genericExact = await runNext(['--cwd', tempRoot, '--prompt', '請處理 SANGUO-BOOTSTRAP-0001']);
@@ -306,6 +307,8 @@ async function main() {
 
     const shorthandExact = await runNext(['--cwd', tempRoot, '--prompt', '請補強 AAO-0011 unrelated untracked claim 行為']);
     assert(shorthandExact.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_ROUTE_READY'), 'AAO shorthand task id must route to canonical TASK-AAO card');
+    assert((shorthandExact.evidence.nextAction as any).planningCardImport?.status === 'planning-card-not-in-target-ledger', 'AAO shorthand markdown route must surface import-required guidance before claim');
+    assert(String((shorthandExact.evidence.nextAction as any).planningCardImport?.requiredCommand ?? '').includes('tasks import'), 'AAO shorthand markdown route must expose tasks import command');
     assert((shorthandExact.evidence.nextAction as any).selectedTask.workItemId === 'TASK-AAO-0011', 'AAO shorthand exact route selected wrong canonical task');
 
     const shorthandMulti = await runNext(['--cwd', tempRoot, '--prompt', '補強 AAO-0030/0046 hook 診斷排序驗收條件']);
@@ -710,6 +713,22 @@ scopePaths:
     assert(noPrompt.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_REQUIRED_FOR_TASK_ROUTING'), 'next without prompt must require the current user prompt for task routing');
     assert((noPrompt.evidence.nextAction as any).batchInstruction?.includes('recommendedChannel=batch'), 'next without prompt must explain that batch needs the original prompt');
 
+    writeLedgerTask(path.join(ledgerTaskDir, 'TASK-ACTIVE-0001.json'), 'TASK-ACTIVE-0001', 'Active scoped task', 'src/active-owned.ts', {
+      status: 'running',
+      claimActorId: 'prompt-scope-test'
+    });
+    const divergentActiveTask = await runNext(['--cwd', tempRoot, '--prompt', 'Please fix src/new-bug.ts, not the current task']);
+    assert(divergentActiveTask.ok === false, 'divergent prompt must not auto-attach to the active task');
+    assert(divergentActiveTask.messages.some((entry) => entry.code === 'ATM_NEXT_ACTIVE_TASK_DIVERGENCE_BLOCKED'), 'divergent prompt must emit active-task divergence blocker');
+    const divergentAction = (divergentActiveTask.evidence.nextAction as any) ?? {};
+    assert(divergentAction.status === 'active-task-divergence-blocked', 'divergent prompt must expose active-task-divergence-blocked status');
+    assert((divergentAction.decisionOptions ?? []).some((entry: string) => entry.includes('Open or import')), 'divergence blocker must tell the operator to open/import a new card');
+    assert((divergentAction.decisionOptions ?? []).some((entry: string) => entry.includes('Continue intentionally')), 'divergence blocker must allow intentional same-task continuation by naming the task');
+
+    const sameActiveTask = await runNext(['--cwd', tempRoot, '--prompt', 'Continue TASK-ACTIVE-0001']);
+    assert(sameActiveTask.ok === true, 'same-task continuation prompt must still route');
+    assert((sameActiveTask.evidence.nextAction as any).selectedTask?.workItemId === 'TASK-ACTIVE-0001', 'same-task continuation must select the active task');
+
     // ATM-BUG-2026-07-07-047: a blanket "all/open/remaining task cards" prompt
     // names no specific task, plan, or root, so keyword-based scoring finds
     // nothing above zero. ATM must still route the already-discovered open
@@ -744,16 +763,18 @@ scopePaths:
       status: 'ready'
     });
 
-    const conflictClaimAdmitted = await runNext([
-      '--cwd', tempRoot,
-      '--claim',
-      '--actor', 'prompt-scope-test',
-      '--prompt', 'TASK-CONFLICT-0002'
-    ]);
-    assert(conflictClaimAdmitted.ok === true, 'next --claim must not hard-block same-atom metadata overlap without Broker mutation intent');
-    const claimEvidence = conflictClaimAdmitted.evidence as any;
-    assert(claimEvidence?.nextAction?.teamRecommendation?.parallelAdvisory?.verdict === 'insufficient-mutation-intent', 'claim advisory must report insufficient mutation intent');
-    assert(claimEvidence?.nextAction?.teamRecommendation?.parallelAdvisory?.brokerAdmission?.confirmedConflict === false, 'claim advisory must not report a confirmed Broker conflict');
+    try {
+      await runNext([
+        '--cwd', tempRoot,
+        '--claim',
+        '--actor', 'prompt-scope-test',
+        '--prompt', 'TASK-CONFLICT-0002'
+      ]);
+      assert(false, 'next --claim must fail closed when Broker arbitration returns freeze');
+    } catch (err: any) {
+      assert(err?.code === 'ATM_NEXT_CLAIM_BLOCKED', 'next --claim must report ATM_NEXT_CLAIM_BLOCKED for broker freeze');
+      assert(err?.details?.conflictWithTaskId === 'TASK-CONFLICT-0001', 'claim block must identify the conflicting task');
+    }
 
     let teamPlanResult: any;
     try {

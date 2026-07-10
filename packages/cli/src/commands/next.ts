@@ -44,7 +44,7 @@ import type { BrokerArbitrationVerdict } from '../../../core/src/broker/conflict
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
-import { resolveActorId } from './actor-registry.ts';
+import { describeActorResolution, resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
 import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
 import { classifyTaskDelivery, type TaskDeliveryClassification } from './task-intent.ts';
@@ -835,7 +835,8 @@ async function claimNextImportedTask(input: {
       }
     });
   }
-  const resolvedActor = resolveActorId(input.actor ?? undefined, input.cwd);
+  const actorResolution = describeActorResolution(input.actor ?? undefined, input.cwd);
+  const resolvedActor = actorResolution.resolved;
   if (!resolvedActor) {
     throw new CliError('ATM_ACTOR_ID_MISSING', 'next --claim requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
   }
@@ -927,7 +928,12 @@ async function claimNextImportedTask(input: {
       exitCode: 1,
       details: {
         taskId: claimableTask.workItemId,
-        actorId: existingClaimActorId
+        actorId: existingClaimActorId,
+        requestedActorId: resolvedActor.actorId,
+        actorResolution,
+        recoveryHint: existingClaimActorId === actorResolution.repoDefaultActorId
+          ? `Continue with the existing claim owner ${existingClaimActorId}, or rerun with --actor ${existingClaimActorId}.`
+          : `Continue with the existing claim owner ${existingClaimActorId}, or release/take over the task before claiming as ${resolvedActor.actorId}.`
       }
     });
   }
@@ -1370,6 +1376,8 @@ async function claimNextImportedTask(input: {
       message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
         taskId: claimableTask.workItemId,
         actorId: resolvedActor.actorId,
+        actorSource: resolvedActor.source,
+        actorResolution,
         recommendedChannel: nextAction.recommendedChannel,
         claimIntent: resolvedClaimIntent,
         batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
@@ -1386,6 +1394,7 @@ async function claimNextImportedTask(input: {
     ),
     evidence: {
       nextAction,
+      actorResolution,
       claimIntent: resolvedClaimIntent,
       claimPreparation,
       claimResult: claimResult.evidence,
@@ -1673,17 +1682,19 @@ function buildPromptScopedNextResult(input: {
       currentIndex: activeBatchQueue?.currentIndex ?? 0,
       queueHeadTaskId
     };
+    const queueHeadImport = queueHeadTask ? buildPlanningCardImportRequirement(queueHeadTask) : null;
     const nextAction = embedTeamRecommendation({
       status: 'task-queue-ready',
-      command: queueHeadTask
+      command: queueHeadImport?.requiredCommand ?? (queueHeadTask
         ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
-        : 'node atm.mjs next --prompt "<current user prompt>" --json',
+        : 'node atm.mjs next --prompt "<current user prompt>" --json'),
       reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
       recommendedChannel: 'batch',
       riskLevel: 'high',
-      requiredCommand: queueHeadTask
+      requiredCommand: queueHeadImport?.requiredCommand ?? (queueHeadTask
         ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
-        : 'node atm.mjs next --prompt "<current user prompt>" --json',
+        : 'node atm.mjs next --prompt "<current user prompt>" --json'),
+      planningCardImport: queueHeadImport,
       batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks claim/close.',
       playbook: buildChannelPlaybook({
         channel: 'batch',
@@ -1738,7 +1749,8 @@ function buildPromptScopedNextResult(input: {
           firstTask: queueHeadTask ? toTaskCandidateView(queueHeadTask) : null,
           requiredCommand: nextAction.command,
           batchCheckpointCommand: 'node atm.mjs batch checkpoint --actor <id> --json',
-          blockedPattern: 'manual tasks claim/close loop'
+          blockedPattern: 'manual tasks claim/close loop',
+          planningCardImport: queueHeadImport
         })
       ),
       evidence: {
@@ -2077,9 +2089,10 @@ function buildPromptScopedNextResult(input: {
     top: 3
   });
   profile.mark('build-team-knowledge-summary');
+  const planningCardImport = buildPlanningCardImportRequirement(selectedTask);
   const nextAction: NextActionLike = embedTeamRecommendation({
     status: 'task-route-ready',
-    command: normalClaimCommand,
+    command: planningCardImport?.requiredCommand ?? normalClaimCommand,
     reason: `the prompt resolves to task ${selectedTask.workItemId}`,
     recommendedChannel: 'normal',
     riskLevel: 'medium',
@@ -2097,7 +2110,8 @@ function buildPromptScopedNextResult(input: {
     }),
     selectedTask,
     targetRepo: selectedTask.targetRepo,
-    requiredCommand: normalClaimCommand,
+    requiredCommand: planningCardImport?.requiredCommand ?? normalClaimCommand,
+    planningCardImport,
     allowedCommands: allowedGuidanceBootstrapCommands(),
     blockedCommands: blockedMutationCommands()
   }, {
@@ -2118,7 +2132,8 @@ function buildPromptScopedNextResult(input: {
       input.runtimeAdapterReadiness,
       message('info', 'ATM_NEXT_TASK_ROUTE_READY', 'ATM resolved the prompt to one task route.', {
         task: toTaskCandidateView(selectedTask),
-        requiredCommand: nextAction.requiredCommand
+        requiredCommand: nextAction.requiredCommand,
+        planningCardImport
       })
     ),
     evidence: {
@@ -2137,6 +2152,24 @@ function isReadOnlyPromptScopeMiss(taskIntent: TaskIntent | null): boolean {
   if (!taskIntent) return false;
   const action: RequestedTaskAction | null = taskIntent.requestedAction;
   return action === 'audit' || action === 'analyze';
+}
+
+function buildPlanningCardImportRequirement(task: ImportedTaskSummary | null | undefined) {
+  if (!task) return null;
+  const taskPath = typeof task.taskPath === 'string' ? task.taskPath : null;
+  if (taskPath?.startsWith('.atm/history/tasks/')) return null;
+  const importPath = taskPath || task.sourcePlanPath;
+  if (!importPath) return null;
+  return {
+    schemaId: 'atm.planningCardImportRequirement.v1',
+    status: 'planning-card-not-in-target-ledger',
+    taskId: task.workItemId,
+    sourcePlanPath: task.sourcePlanPath,
+    taskCardPath: task.taskPath,
+    requiredCommand: `node atm.mjs tasks import --from ${quoteCliValue(importPath)} --write --json`,
+    dryRunCommand: `node atm.mjs tasks import --from ${quoteCliValue(importPath)} --dry-run --json`,
+    reason: 'The prompt resolved to a Markdown planning card, but ATM has no imported target-ledger task for it yet.'
+  };
 }
 
 function buildPromptGuidanceNextResult(input: {

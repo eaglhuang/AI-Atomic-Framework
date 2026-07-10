@@ -34,6 +34,12 @@ export async function runTasksImport(argv: string[]) {
   if (options.dryRun === options.write) {
     throw new CliError('ATM_CLI_USAGE', 'tasks import requires exactly one of --dry-run or --write.', { exitCode: 2 });
   }
+  if (options.reconcileMirror && !options.write) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks import --reconcile-mirror requires --write.', { exitCode: 2 });
+  }
+  if (options.reconcileMirror && (options.force || options.forceOverwriteClaims || options.resetOpen || options.reopen)) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks import --reconcile-mirror cannot be combined with --force, --force-overwrite-claims, --reset-open, or --reopen.', { exitCode: 2 });
+  }
   // TASK-RFT-0011 — reset-open UX classification.
   // The historical behavior: any use of `--reset-open` on a `--write` import
   // triggered `ATM_EMERGENCY_LANE_APPROVAL_REQUIRED`. In the normal
@@ -220,7 +226,8 @@ export async function runTasksImport(argv: string[]) {
       force: options.force,
       forceOverwriteClaims: options.forceOverwriteClaims,
       resetOpen: options.resetOpen,
-      reopen: options.reopen
+      reopen: options.reopen,
+      reconcileMirror: options.reconcileMirror
     });
     writtenPaths.push(...result.writtenPaths);
     parsed.diagnostics.push(...result.diagnostics);
@@ -246,7 +253,8 @@ export async function runTasksImport(argv: string[]) {
     force: options.force,
     forceOverwriteClaims: options.forceOverwriteClaims,
     resetOpen: options.resetOpen,
-    reopen: options.reopen
+    reopen: options.reopen,
+    reconcileMirror: options.reconcileMirror
   });
   parsed.diagnostics.push(...activeClaimSkips);
 

@@ -32,9 +32,12 @@ function readFilesOption(argv: string[]): string[] {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index] ?? '';
     if (arg === '--files') {
-      const value = argv[index + 1] ?? '';
-      files.push(...splitFileList(value));
-      index += 1;
+      let cursor = index + 1;
+      while (cursor < argv.length && !(argv[cursor] ?? '').startsWith('--')) {
+        files.push(...splitFileList(argv[cursor] ?? ''));
+        cursor += 1;
+      }
+      index = cursor - 1;
       continue;
     }
     if (arg.startsWith('--files=')) {

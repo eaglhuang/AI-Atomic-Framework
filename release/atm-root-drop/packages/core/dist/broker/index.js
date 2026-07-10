@@ -16,3 +16,4 @@ export * from './patch-envelope.js';
 export * from './failure-reason.js';
 export * from './conflict-key-overlap.js';
 export * from './adapters/index.js';
+export * from './cross-task-mutation-guard.js';

@@ -658,6 +658,9 @@ const normalLaneStage = await runTaskflow([
 ]);
 assert.equal(normalLaneStage.evidence.closeMode, 'normal-close');
 assert.equal(normalLaneStage.evidence.planningCardCloseback?.mode, 'frontmatter-closeback', 'taskflow close must update the planning card in the same closeback story');
+assert.equal(normalLaneStage.evidence.planningIndexAdvisory?.status, 'updated', 'taskflow close must report planning roster/index closeback status');
+assert.equal(normalLaneStage.evidence.planningIndexAdvisory?.indexPath, 'docs/tasks/README.md', 'planning index advisory must identify the roster index path');
+assert.ok(normalLaneStage.evidence.planningIndexAdvisory?.frontmatterFields.includes('lastTransitionId'), 'planning index advisory must list the closeback frontmatter fields that keep the plan snapshot auditable');
 const normalLanePlanningCard = readFileSync(normalLaneFixture.planPath, 'utf8');
 assert.ok(normalLanePlanningCard.includes('status: done'), 'taskflow close must mark the planning card done');
 assert.ok(normalLanePlanningCard.includes('completed_by_agent: "validator"'), 'taskflow close must record the planning closeback actor');

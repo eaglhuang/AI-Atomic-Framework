@@ -23,6 +23,17 @@ export interface ResolvedActorId {
   readonly source: 'option' | 'env' | 'legacy-env' | 'repo-default';
 }
 
+export interface ActorResolutionDiagnostic {
+  readonly resolved: ResolvedActorId | null;
+  readonly precedence: readonly ['option', 'env', 'legacy-env', 'repo-default'];
+  readonly envActorId: string | null;
+  readonly legacyEnvActorId: string | null;
+  readonly repoDefaultActorId: string | null;
+  readonly repoDefaultPath: typeof runtimeIdentityRelativePath;
+  readonly warning: string | null;
+  readonly requiredCommand: string | null;
+}
+
 export interface RuntimeIdentityDefaultDocument {
   readonly schemaId: 'atm.identityDefault.v1';
   readonly specVersion: '0.1.0';
@@ -241,8 +252,38 @@ export function resolveActorId(inputActorId?: string | null, cwd?: string | null
   return null;
 }
 
+export function describeActorResolution(inputActorId?: string | null, cwd?: string | null): ActorResolutionDiagnostic {
+  const explicit = sanitizeOptional(inputActorId);
+  const envActor = sanitizeOptional(process.env[actorIdEnvVar]) ?? null;
+  const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]) ?? null;
+  const repoDefaultActor = cwd ? readRuntimeIdentityDefault(cwd)?.actorId ?? null : null;
+  const resolved = resolveActorId(inputActorId, cwd);
+  const warning = !explicit && resolved && resolved.source !== 'repo-default' && repoDefaultActor && repoDefaultActor !== resolved.actorId
+    ? `${actorResolutionSourceLabel(resolved.source)} actor ${resolved.actorId} overrides repo default actor ${repoDefaultActor}. Pass --actor ${repoDefaultActor} to claim as the repo default actor, or clear/update the environment identity before claiming.`
+    : null;
+  return {
+    resolved,
+    precedence: ['option', 'env', 'legacy-env', 'repo-default'],
+    envActorId: envActor,
+    legacyEnvActorId: legacyEnvActor,
+    repoDefaultActorId: repoDefaultActor,
+    repoDefaultPath: runtimeIdentityRelativePath,
+    warning,
+    requiredCommand: warning && repoDefaultActor
+      ? `node atm.mjs next --claim --actor ${repoDefaultActor} --prompt "<task-or-prompt>" --json`
+      : null
+  };
+}
+
 export function findActorByResolvedId(cwd: string, resolved: ResolvedActorId): ActorRecord | null {
   return readActorRegistry(cwd).actors.find((entry) => entry.actorId === resolved.actorId) ?? null;
+}
+
+function actorResolutionSourceLabel(source: ResolvedActorId['source']): string {
+  if (source === 'env') return actorIdEnvVar;
+  if (source === 'legacy-env') return legacyActorIdEnvVar;
+  if (source === 'option') return '--actor';
+  return 'repo default';
 }
 
 function runGitPathProbe(cwd: string, args: readonly string[]): boolean {

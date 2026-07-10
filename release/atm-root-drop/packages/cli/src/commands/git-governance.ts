@@ -23,6 +23,8 @@ import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } fr
 import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
+import { detectCrossTaskMutation, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
 export function resolveGitExecutable(): string {
@@ -58,6 +60,155 @@ function resolveGitCommitTimeoutMs(explicitTimeoutMs: number | null): number {
     return envValue;
   }
   return DEFAULT_GIT_COMMIT_TIMEOUT_MS;
+}
+
+function readBrokerConflictResolutionArtifact(input: {
+  readonly cwd: string;
+  readonly artifactPath: string | null;
+  readonly conflictTaskId: string;
+  readonly conflictFiles: readonly string[];
+}) {
+  if (!input.artifactPath?.trim()) {
+    throw new CliError(
+      'ATM_GIT_COMMIT_BROKER_CONFLICT_RESOLUTION_REQUIRED',
+      'Team Broker conflict override requires --broker-conflict-resolution <artifact.json> before commit.',
+      {
+        exitCode: 1,
+        details: {
+          conflictTaskId: input.conflictTaskId,
+          conflictFiles: input.conflictFiles,
+          requiredArtifact: {
+            schemaId: 'atm.brokerConflictResolution.v1',
+            conflictTaskId: input.conflictTaskId,
+            conflictFiles: input.conflictFiles,
+            resolutionOrder: ['<task-id-that-commits-first>', '<task-id-that-rebases-or-revalidates>'],
+            validatorPlan: ['<focused validator command>']
+          }
+        }
+      }
+    );
+  }
+  const artifactPath = path.resolve(input.cwd, input.artifactPath);
+  if (!existsSync(artifactPath)) {
+    throw new CliError('ATM_GIT_COMMIT_BROKER_CONFLICT_RESOLUTION_NOT_FOUND', `Broker conflict resolution artifact not found: ${input.artifactPath}`, {
+      exitCode: 1,
+      details: {
+        artifactPath: input.artifactPath,
+        conflictTaskId: input.conflictTaskId,
+        conflictFiles: input.conflictFiles
+      }
+    });
+  }
+  let artifact: Record<string, unknown>;
+  try {
+    artifact = JSON.parse(readFileSync(artifactPath, 'utf8')) as Record<string, unknown>;
+  } catch (error) {
+    throw new CliError('ATM_GIT_COMMIT_BROKER_CONFLICT_RESOLUTION_INVALID', 'Broker conflict resolution artifact must be valid JSON.', {
+      exitCode: 1,
+      details: {
+        artifactPath: input.artifactPath,
+        error: error instanceof Error ? error.message : String(error)
+      }
+    });
+  }
+  const artifactConflictTaskId = String(artifact.conflictTaskId ?? '').trim().toUpperCase();
+  const artifactConflictFiles = Array.isArray(artifact.conflictFiles)
+    ? artifact.conflictFiles.map((entry) => String(entry).replace(/\\/g, '/')).filter(Boolean).sort()
+    : [];
+  const expectedFiles = [...input.conflictFiles].map((entry) => String(entry).replace(/\\/g, '/')).sort();
+  const resolutionOrder = Array.isArray(artifact.resolutionOrder) ? artifact.resolutionOrder.map((entry) => String(entry).trim()).filter(Boolean) : [];
+  const validatorPlan = Array.isArray(artifact.validatorPlan) ? artifact.validatorPlan.map((entry) => String(entry).trim()).filter(Boolean) : [];
+  const decisionClass = String(artifact.decisionClass ?? '').trim();
+  const decisionReason = String(artifact.decisionReason ?? '').trim();
+  const violationStatus = String(artifact.violationStatus ?? '').trim();
+  if (
+    artifact.schemaId !== 'atm.brokerConflictResolution.v1'
+    || artifactConflictTaskId !== input.conflictTaskId
+    || JSON.stringify(artifactConflictFiles) !== JSON.stringify(expectedFiles)
+    || resolutionOrder.length < 2
+    || validatorPlan.length === 0
+    || !['serial-release', 'human-signoff-required', 'adr-required', 'blocked'].includes(decisionClass)
+    || decisionReason.length === 0
+    || !['broker-conflict-blocked', 'resolution-issued', 'resolved'].includes(violationStatus)
+  ) {
+    throw new CliError(
+      'ATM_GIT_COMMIT_BROKER_CONFLICT_RESOLUTION_INVALID',
+      'Broker conflict resolution artifact is missing required paper-style conflict metadata.',
+      {
+        exitCode: 1,
+        details: {
+          artifactPath: input.artifactPath,
+          requiredSchemaId: 'atm.brokerConflictResolution.v1',
+          expectedConflictTaskId: input.conflictTaskId,
+          expectedConflictFiles: expectedFiles,
+          requiredFields: ['schemaId', 'conflictTaskId', 'conflictFiles', 'decisionClass', 'decisionReason', 'violationStatus', 'resolutionOrder[2+]', 'validatorPlan[1+]']
+        }
+      }
+    );
+  }
+  return {
+    artifactPath: relativePathFrom(input.cwd, artifactPath),
+    artifact
+  };
+}
+
+function assertNoBrokerConflictBeforeHookBypass(options: {
+  readonly cwd: string;
+  readonly taskId: string | null;
+  readonly actorId: string;
+  readonly brokerConflictOverrideApproval: string | null;
+  readonly brokerConflictResolutionPath: string | null;
+  readonly reason: string | null;
+  readonly command: string;
+}) {
+  const { cwd, taskId } = options;
+  const crossTaskBlock = detectCrossTaskMutation(cwd, taskId, 'git commit --no-verify');
+  if (!crossTaskBlock) return;
+  recordIncidentFlag(cwd, crossTaskBlock);
+  if (options.brokerConflictOverrideApproval) {
+    const resolutionArtifact = readBrokerConflictResolutionArtifact({
+      cwd,
+      artifactPath: options.brokerConflictResolutionPath,
+      conflictTaskId: crossTaskBlock.conflictTaskId,
+      conflictFiles: crossTaskBlock.conflictFiles
+    });
+    assertEmergencyApproval({
+      cwd,
+      surface: 'git commit broker-conflict override',
+      permission: 'backend.brokerConflictOverride',
+      taskId,
+      actorId: options.actorId,
+      emergencyApproval: options.brokerConflictOverrideApproval,
+      flags: ['--broker-conflict-override'],
+      reason: options.reason ?? 'High-authority Team Broker conflict override after recorded parallel conflict resolution.',
+      command: options.command
+    });
+    return {
+      crossTaskBlock,
+      resolutionArtifact
+    };
+  }
+  throw new CliError(
+    'ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED',
+    `git commit --no-verify cannot bypass a Team Broker cross-task mutation block for ${crossTaskBlock.conflictTaskId}.`,
+    {
+      exitCode: 1,
+      details: {
+        conflictTaskId: crossTaskBlock.conflictTaskId,
+        conflictFiles: crossTaskBlock.conflictFiles,
+        conflicts: crossTaskBlock.conflicts,
+        recoveryLane: crossTaskBlock.recoveryLane,
+        decisionClass: 'blocked',
+        decisionReason: 'broker-conflict-blocked because git commit --no-verify would bypass an active Team Broker ownership conflict.',
+        violationStatus: 'broker-conflict-blocked',
+        statusCode: 'broker-conflict-blocked',
+        requiredAction: 'Resolve the active task ownership conflict through a paper-style Team Broker conflict-resolution artifact before retrying the commit.',
+        hookBypassPermission: 'backend.gitHookBypass',
+        brokerConflictOverridePermission: 'backend.brokerConflictOverride',
+        requiredCommand: 'node atm.mjs emergency approve --permission backend.brokerConflictOverride --actor <actor> --allowed-flag --broker-conflict-override --approval-text "<human approval sentence>" --reason "<why the recorded conflict resolution must override serialization>" --json'
+      }
+    }
+  );
 }
 
 function gitCommitAttemptStatusRelativePath(actorId: string, taskId: string | null): string {
@@ -900,6 +1051,14 @@ export function evaluateGitGovernanceCheck(input: {
   const trailers = parseTrailers(readHeadCommitMessage(cwd));
 
   const violations: GitGovernanceViolation[] = [];
+  const crossTaskBlock = detectCrossTaskMutation(cwd, input.taskId, 'git check');
+  if (crossTaskBlock) {
+    recordIncidentFlag(cwd, crossTaskBlock);
+    violations.push({
+      code: 'cross-task-mutation-incident',
+      detail: `Cross-task mutation incident detected: files owned by active task ${crossTaskBlock.conflictTaskId} are mutated. File(s): ${crossTaskBlock.conflictFiles.join(', ')}. Recovery: ${crossTaskBlock.recoveryLane}`
+    });
+  }
   if (!profile.gitName || !profile.gitEmail) {
     violations.push({
       code: 'git-identity-profile-missing',
@@ -1236,6 +1395,15 @@ function runGitCommit(options: ParsedGitOptions) {
       emergencyApproval: options.emergencyApproval,
       flags: ['--no-verify'],
       reason: options.overrideReason ?? 'Governed git hook bypass for emergency recovery.',
+      command: commitCommand
+    });
+    assertNoBrokerConflictBeforeHookBypass({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      brokerConflictOverrideApproval: options.brokerConflictOverrideApproval,
+      brokerConflictResolutionPath: options.brokerConflictResolutionPath,
+      reason: options.overrideReason,
       command: commitCommand
     });
   }
@@ -1876,6 +2044,8 @@ interface ParsedGitOptions {
   readonly message: string | null;
   readonly noVerify: boolean;
   readonly emergencyApproval: string | null;
+  readonly brokerConflictOverrideApproval: string | null;
+  readonly brokerConflictResolutionPath: string | null;
   readonly overrideReason: string | null;
   readonly checkTrailers: boolean;
   readonly autoStage: boolean;
@@ -1902,6 +2072,8 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     message: null as string | null,
     noVerify: false,
     emergencyApproval: null as string | null,
+    brokerConflictOverrideApproval: null as string | null,
+    brokerConflictResolutionPath: null as string | null,
     overrideReason: null as string | null,
     checkTrailers: true,
     autoStage: false,
@@ -1978,6 +2150,16 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     }
     if (arg === '--emergency-approval' || arg === '--lease') {
       options.emergencyApproval = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--broker-conflict-override') {
+      options.brokerConflictOverrideApproval = requireValue(argv, index, '--broker-conflict-override');
+      index += 1;
+      continue;
+    }
+    if (arg === '--broker-conflict-resolution') {
+      options.brokerConflictResolutionPath = requireValue(argv, index, '--broker-conflict-resolution');
       index += 1;
       continue;
     }
@@ -2480,6 +2662,24 @@ function buildUnexpectedStagedTasksForGitCommit(
   });
 }
 
+function isProtectedStagedGovernanceOwnershipPath(filePath: string): boolean {
+  const normalized = normalizeRelativePath(filePath).toLowerCase();
+  if (/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized)) {
+    return false;
+  }
+  return normalized.startsWith('.atm/history/tasks/')
+    || normalized.startsWith('.atm/history/task-events/')
+    || normalized.startsWith('.atm/history/evidence/');
+}
+
+function buildProtectedForeignStagedOwnershipFiles(
+  unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[]
+): readonly string[] {
+  return uniqueSorted(unexpectedStagedTasks.flatMap((entry) =>
+    entry.stagedFiles.filter((filePath) => isProtectedStagedGovernanceOwnershipPath(filePath))
+  ));
+}
+
 function deferForeignStagedFiles(
   cwd: string,
   taskId: string,
@@ -2566,11 +2766,15 @@ export function resolveTaskScopedCommitBundle(input: {
   });
   let stagedFiles = readStagedFiles(input.cwd);
   let unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
+  let protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   let deferredForeignStagedSnapshot: string | null = null;
-  if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply) {
+  let deferredForeignStagedFiles: readonly string[] = [];
+  if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply && protectedForeignStagedOwnershipFiles.length === 0) {
+    deferredForeignStagedFiles = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
     deferredForeignStagedSnapshot = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedTasks);
     stagedFiles = readStagedFiles(input.cwd);
     unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
+    protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   }
   const dirtyFiles = listTaskScopedWorktreeDirtyFiles(input.cwd);
   const residueCandidateFiles = dirtyFiles.filter((filePath) => !isIgnorableTaskScopedDirtySideEffect(filePath));
@@ -2578,7 +2782,10 @@ export function resolveTaskScopedCommitBundle(input: {
   const autoCleanedResidue = input.apply
     ? cleanupAutoGeneratedResidue(input.cwd, residueReport.autoCleanSafe)
     : [];
-  const blockedResidue = residueReport.blockAndExplain;
+  const deferredForeignStagedSet = new Set(deferredForeignStagedFiles.map(normalizeRelativePath));
+  const blockedResidue = residueReport.blockAndExplain.filter((entry) =>
+    !deferredForeignStagedSet.has(normalizeRelativePath(entry.path))
+  );
   const manualReviewResidue = residueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path));
   const effectiveDirtyFiles = autoCleanedResidue.length > 0
     ? listTaskScopedWorktreeDirtyFiles(input.cwd)
@@ -2648,7 +2855,10 @@ export function resolveTaskScopedCommitBundle(input: {
   let blockedCode: string | null = null;
   let blockedSummary: string | null = null;
 
-  if (blockedResidue.length > 0) {
+  if (input.deferForeignStaged && protectedForeignStagedOwnershipFiles.length > 0) {
+    blockedCode = 'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP';
+    blockedSummary = `Refusing to unstage protected .atm/history files that belong to another task: ${protectedForeignStagedOwnershipFiles.join(', ')}. Wait for that task owner to commit/release, or commit this task through the task-scoped bundle without --defer-foreign-staged.`;
+  } else if (blockedResidue.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED';
     blockedSummary = `Generated residue belongs to another task/run and must be cleared explicitly: ${blockedResidue.map((entry) => entry.path).join(', ')}`;
   } else if (manualReviewResidue.length > 0) {

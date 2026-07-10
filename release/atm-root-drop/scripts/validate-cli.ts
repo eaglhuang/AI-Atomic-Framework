@@ -14,6 +14,7 @@ import {
   isDeliverableGateCandidate,
   pathMatchesTaskScope
 } from '../packages/cli/src/commands/tasks/historical-delivery.ts';
+import { resolveTaskScopedCommitBundle } from '../packages/cli/src/commands/git-governance.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
@@ -97,16 +98,35 @@ function sandboxEpermHint(args: any, cwd: any) {
   ].join(' ');
 }
 
+const cleanupSleepBuffer = new SharedArrayBuffer(4);
+const cleanupSleepView = new Int32Array(cleanupSleepBuffer);
+
+function sleepMs(durationMs: number) {
+  Atomics.wait(cleanupSleepView, 0, 0, durationMs);
+}
+
 function safeRmSync(targetPath: string) {
-  try {
-    rmSync(targetPath, { recursive: true, force: true });
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException | undefined)?.code;
-    if (code !== 'EPERM' && code !== 'EBUSY') {
-      throw error;
+  const retryableCodes = new Set(['EPERM', 'EBUSY', 'ENOTEMPTY']);
+  let lastError: NodeJS.ErrnoException | null = null;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      rmSync(targetPath, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      const candidate = error as NodeJS.ErrnoException | undefined;
+      const code = candidate?.code ?? null;
+      if (!code || !retryableCodes.has(code)) {
+        throw error;
+      }
+      lastError = candidate ?? null;
+      if (attempt < 5) {
+        sleepMs(40 * (attempt + 1));
+        continue;
+      }
     }
-    console.warn(`[cli:${mode}] warning: cleanup skipped for ${targetPath} (${code})`);
   }
+  const code = lastError?.code ?? 'unknown';
+  console.warn(`[cli:${mode}] warning: cleanup skipped for ${targetPath} (${code})`);
 }
 
 async function runAtm(args: any, cwd = root, env: Record<string, string> = {}) {
@@ -461,6 +481,40 @@ const protectedOverrideAuditStagingTest = spawnSync(
   { cwd: root, encoding: 'utf8' }
 );
 assert(protectedOverrideAuditStagingTest.status === 0, `protected-override-audit-staging focused test must pass: ${protectedOverrideAuditStagingTest.stderr || protectedOverrideAuditStagingTest.stdout}`);
+
+// TASK-AAO-0156: --defer-foreign-staged must not evict another task's
+// staged .atm/history ownership from the shared index.
+const protectedForeignStagedWorkspace = createCliTempWorkspace('protected-foreign-staged');
+try {
+  initializeGitRepository(protectedForeignStagedWorkspace);
+  const foreignEvidencePath = path.join(protectedForeignStagedWorkspace, '.atm', 'history', 'evidence', 'TASK-FOREIGN-0001.json');
+  writeJson(foreignEvidencePath, {
+    schemaId: 'atm.taskEvidence.v1',
+    taskId: 'TASK-FOREIGN-0001',
+    evidence: []
+  });
+  spawnSync('git', ['-C', protectedForeignStagedWorkspace, 'add', '.atm/history/evidence/TASK-FOREIGN-0001.json'], { encoding: 'utf8' });
+  const protectedForeignReport = resolveTaskScopedCommitBundle({
+    cwd: protectedForeignStagedWorkspace,
+    taskId: 'TASK-LOCAL-0001',
+    taskDocument: {
+      workItemId: 'TASK-LOCAL-0001',
+      scopePaths: ['src/local.ts']
+    },
+    apply: true,
+    autoStage: false,
+    deferForeignStaged: true,
+    message: 'test protected staged ownership',
+    actorId: 'validator',
+    trailers: []
+  });
+  assert(protectedForeignReport.ok === false, 'protected foreign staged .atm/history files must block defer-foreign-staged');
+  assert(protectedForeignReport.blockedCode === 'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP', 'protected foreign staged ownership must expose deterministic blocked code');
+  const stagedAfterProtectedFence = spawnSync('git', ['-C', protectedForeignStagedWorkspace, 'diff', '--cached', '--name-only'], { encoding: 'utf8' }).stdout;
+  assert(stagedAfterProtectedFence.includes('.atm/history/evidence/TASK-FOREIGN-0001.json'), 'protected foreign staged evidence must remain staged after blocked defer attempt');
+} finally {
+  safeRmSync(protectedForeignStagedWorkspace);
+}
 
 const planningRootPreferenceTest = spawnSync(
   process.execPath,
@@ -1882,7 +1936,7 @@ try {
       const validCloseRes = await runAtm(['tasks', 'claim', '--task', 'TASK-REGRESS-VALID-CLOSE-DOWNSTREAM', '--actor', 'Antigravity'], regressWorkspace);
       assert(validCloseRes.exitCode === 0, 'valid closure packet must allow downstream claim');
     } finally {
-      rmSync(regressWorkspace, { recursive: true, force: true });
+      safeRmSync(regressWorkspace);
     }
 
     // Test 5.1b: import->done without governed closeout must classify as source-done-governance-incomplete (TASK-CID-0060)
@@ -2008,10 +2062,10 @@ try {
       assert(mixedWaiverInspect.ok, 'mixed commit must pass with waiver and reason');
       assert(mixedWaiverInspect.reason === 'scoped-deliverable-with-waived-out-of-scope', 'must report waived out-of-scope acceptance');
     } finally {
-      rmSync(histWorkspace, { recursive: true, force: true });
+      safeRmSync(histWorkspace);
     }
   } finally {
-    rmSync(autoLinkTempWorkspace, { recursive: true, force: true });
+    safeRmSync(autoLinkTempWorkspace);
   }
 
   // Test 5.2: tasks close state machine and closure metadata hard gate regression check

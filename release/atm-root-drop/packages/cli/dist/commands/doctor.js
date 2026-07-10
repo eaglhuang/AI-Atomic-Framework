@@ -14,6 +14,7 @@ import { checkIntegrationHealth, describeIntegrationInstallHint, inspectIntegrat
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { inspectTrackedActorRegistryState } from './actor-registry.js';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.js';
+import { detectCrossTaskMutation, readIncidentFlag } from '../../../core/dist/broker/cross-task-mutation-guard.js';
 const legacyBehaviorPackageNames = [
     'plugin-behavior-atomize',
     'plugin-behavior-compose',
@@ -112,13 +113,23 @@ export async function runDoctor(argv) {
         createCheck('onboarding-lifecycle', onboardingLifecycle.ok, onboardingLifecycle),
         createCheck('version-compatibility', versionSummary.compatibility.ok || versionSummary.compatibility.code === 'chart-missing', versionSummary),
         createCheck('integration-adapters', integrationHealth.ok, integrationHealth),
+        createCheck('team-runtime-backend-capabilities', true, integrationHealth.teamRuntimeBackends),
         createCheck('framework-integration-hooks', frameworkHookReadiness.ok || cleanCheckoutFrameworkHookContractOk, { ...frameworkHookReadiness, cleanCheckoutFrameworkHookContractOk }),
         ...(trustMode && trustIntegrity ? [createCheck('release-trust', trustIntegrity.ok, trustIntegrity)] : []),
         ...(knownBadMode && knownBadStatus ? [createCheck('known-bad-version', knownBadStatus.ok, knownBadStatus)] : []),
         createCheck('git-worktree-readiness', gitWorktreeReadiness.ok, gitWorktreeReadiness),
         gitHeadEvidenceCheck,
         governanceEntryReadiness,
-        backlogSyncCheck
+        backlogSyncCheck,
+        createCheck('cross-task-mutation-incident', (() => {
+            const activeTaskId = runtime.currentTaskId ?? null;
+            const block = detectCrossTaskMutation(root, activeTaskId, 'doctor');
+            const incident = readIncidentFlag(root);
+            return !block && !incident;
+        })(), {
+            incident: readIncidentFlag(root),
+            conflict: detectCrossTaskMutation(root, runtime.currentTaskId ?? null, 'doctor')
+        })
     ];
     const ok = checks.every((check) => check.ok);
     const failedChecks = checks.filter((check) => !check.ok).map((check) => check.name);
@@ -225,9 +236,15 @@ export async function runDoctor(argv) {
                                                             failedChecks,
                                                             remediation: integrationDriftRemediation
                                                         })]
-                                                    : failedChecks.includes('framework-integration-hooks')
-                                                        ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
-                                                        : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
+                                                    : failedChecks.includes('cross-task-mutation-incident')
+                                                        ? [message('error', 'ATM_CROSS_TASK_MUTATION_BLOCKED', 'Cross-task mutation incident detected: files owned by another active task or evidence have been modified, deleted, or staged. ATM has entered incident-safe mode.', {
+                                                                failedChecks,
+                                                                incident: readIncidentFlag(root),
+                                                                conflict: detectCrossTaskMutation(root, runtime.currentTaskId ?? null, 'doctor')
+                                                            })]
+                                                        : failedChecks.includes('framework-integration-hooks')
+                                                            ? [message('error', 'ATM_DOCTOR_FRAMEWORK_HOOKS_MISSING', 'ATM framework repository is missing mandatory editor or Git hook gates.', { failedChecks, frameworkHookReadiness })]
+                                                            : [message('error', 'ATM_DOCTOR_FAILED', 'ATM engineering or runtime signals need attention.', { failedChecks })])
     ];
     // Report stale framework locks without deleting runtime state automatically.
     const staleLocks = detectFrameworkStaleLocks(root);

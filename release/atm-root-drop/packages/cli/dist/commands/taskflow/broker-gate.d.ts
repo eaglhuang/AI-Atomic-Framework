@@ -6,6 +6,10 @@ export interface TaskflowBrokerConflictGate {
     readonly summary: string;
     readonly requiredCommand: string | null;
     readonly brokerVerdict: string | null;
+    readonly decisionClass: 'serial-release' | 'blocked' | null;
+    readonly decisionReason: string | null;
+    readonly violationStatus: 'broker-conflict-blocked' | null;
+    readonly statusCode: 'broker-conflict-blocked' | null;
 }
 export declare function evaluateTaskflowBrokerConflictGate(input: {
     cwd: string;

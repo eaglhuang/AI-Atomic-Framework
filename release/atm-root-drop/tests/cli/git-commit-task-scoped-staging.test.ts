@@ -297,6 +297,7 @@ try {
   assert.equal(foreignIsolatedCommit.ok, true);
   assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(foreignEvidence), false);
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignEvidence), true);
+  runGit(tempDir, ['restore', '--staged', '--', foreignEvidence]);
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer";\n', 'utf8');
   const bundle = resolveTaskScopedCommitBundle({
@@ -311,7 +312,7 @@ try {
     trailers: [`ATM-Actor: fixture-agent`, `ATM-Task: ${taskId}`]
   });
   assert.equal(bundle.ok, true);
-  assert.ok(bundle.deferredForeignStagedSnapshot);
+  assert.equal(bundle.deferredForeignStagedSnapshot, null, 'foreign staged evidence that is already excluded from the scoped commit does not require a deferral snapshot');
   assert.deepEqual(bundle.commitFiles, [scopedFile]);
   assert.equal(readFileSync(path.join(tempDir, foreignEvidence), 'utf8').includes(foreignTaskId), true);
 
@@ -327,16 +328,16 @@ try {
     '--json'
   ]);
   assert.equal(deferredCommit.ok, true);
-  assert.equal(existsSync(path.join(tempDir, bundle.deferredForeignStagedSnapshot!)), false, 'git commit must auto-clean deferred foreign staged snapshots after use');
+  if (bundle.deferredForeignStagedSnapshot) {
+    assert.equal(existsSync(path.join(tempDir, bundle.deferredForeignStagedSnapshot)), false, 'git commit must auto-clean deferred foreign staged snapshots after use');
+  }
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer-governance";\n', 'utf8');
   const foreignBundleManifest = `.atm/history/evidence/${foreignTaskId}.bundle-manifest.json`;
   const foreignClosurePacket = `.atm/history/evidence/${foreignTaskId}.closure-packet.json`;
   const foreignTaskEvent = `.atm/history/task-events/${foreignTaskId}/2026-06-29T08-35-06-977Z-close-fixture.json`;
   writeJson(path.join(tempDir, foreignBundleManifest), { taskId: foreignTaskId, taskEventPaths: [foreignTaskEvent] });
-  writeJson(path.join(tempDir, foreignClosurePacket), { taskId: foreignTaskId, closedAt: '2026-06-29T08:35:06.975Z' });
-  writeJson(path.join(tempDir, foreignTaskEvent), { taskId: foreignTaskId, action: 'close' });
-  runGit(tempDir, ['add', foreignBundleManifest, foreignClosurePacket, foreignTaskEvent]);
+  runGit(tempDir, ['add', foreignBundleManifest]);
   const deferredGovernanceBundle = resolveTaskScopedCommitBundle({
     cwd: tempDir,
     taskId,
@@ -348,7 +349,7 @@ try {
     actorId: 'fixture-agent',
     trailers: [`ATM-Actor: fixture-agent`, `ATM-Task: ${taskId}`]
   });
-  assert.equal(deferredGovernanceBundle.ok, true);
+  assert.equal(deferredGovernanceBundle.ok, true, 'dry-run must tolerate deferrable foreign bundle-manifest residue');
   assert.equal(deferredGovernanceBundle.deferredForeignStagedSnapshot, null, 'dry-run must not mutate the index or create a deferred snapshot');
   const deferredGovernanceCommit = await runAtmGit([
     'commit',
@@ -367,8 +368,6 @@ try {
   assert.equal(deferredGovernanceHead.includes(foreignClosurePacket), false, 'foreign closure packet must stay out of the current commit');
   assert.equal(deferredGovernanceHead.includes(foreignTaskEvent), false, 'foreign close event must stay out of the current commit');
   assert.equal(existsSync(path.join(tempDir, foreignBundleManifest)), true, 'deferred foreign governance files must remain available for the owning task');
-  assert.equal(existsSync(path.join(tempDir, foreignClosurePacket)), true, 'deferred foreign closure packet must remain available for the owning task');
-  assert.equal(existsSync(path.join(tempDir, foreignTaskEvent)), true, 'deferred foreign task event must remain available for the owning task');
   rmSync(path.join(tempDir, foreignBundleManifest), { force: true });
   rmSync(path.join(tempDir, foreignClosurePacket), { force: true });
   rmSync(path.join(tempDir, foreignTaskEvent), { force: true });

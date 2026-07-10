@@ -159,6 +159,13 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             requiredCommand: brokerConflictGate.requiredCommand
         });
     }
+    else if (brokerConflictGate.verdict === 'insufficientMutationIntent') {
+        blockers.push({
+            code: 'ATM_TASKFLOW_CLOSE_BROKER_CONFLICT_BLOCKED',
+            summary: brokerConflictGate.summary,
+            requiredCommand: brokerConflictGate.requiredCommand
+        });
+    }
     if (branchCommitQueueGate.status === 'busy') {
         blockers.push({
             code: 'ATM_TASKFLOW_CLOSE_BRANCH_COMMIT_QUEUE_BUSY',

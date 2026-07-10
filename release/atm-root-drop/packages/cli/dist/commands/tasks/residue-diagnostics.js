@@ -78,7 +78,7 @@ function classifyTaskResidue(input) {
             bucket: (mirrorPath && !isCrossRepo) ? 'planning-mirror-only' : 'stale-import',
             truth: 'live ledger is done, but the planning mirror has not converged',
             residue: (mirrorPath && !isCrossRepo) ? 'Only the planning mirror remains to be refreshed or retired.' : 'The imported ledger is ahead of the planning mirror.',
-            nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --force --json',
+            nextCommand: 'node atm.mjs tasks import --from <plan.md> --write --reconcile-mirror --json',
             reason: (mirrorPath && !isCrossRepo) ? 'The task appears complete in the target ledger, but the planning mirror still needs a governed refresh.' : 'The ledger is ahead of the planning mirror and should be re-imported from the authoritative plan.'
         };
     }

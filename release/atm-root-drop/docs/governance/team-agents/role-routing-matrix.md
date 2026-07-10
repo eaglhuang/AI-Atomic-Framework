@@ -28,6 +28,10 @@ Typical surfaces:
 - `atm-task-intent-resolver`
 
 The router should not carry the full role-by-role execution logic.
+It should also follow the tool-first orchestration contract in
+`docs/governance/skills/tool-first-orchestration.md`: use structured ATM tool
+results when available, preserve blocked route truth, and hand the actual
+work order to the playbook or specialist role pack.
 
 ### Playbook layer
 
@@ -47,6 +51,10 @@ This is the middle layer between a thin router and specialized role packs.
 Each role pack receives a narrow workstream and should focus on one governance
 purpose.
 
+The role pack consumes the playbook slice selected by the Coordinator. It may
+return findings, validator output, implementation notes, or Broker status, but
+it does not select a new ATM channel or lifecycle route on its own.
+
 ## Baseline routing matrix
 
 | Workstream | Primary role | Supporting roles | Advisory roles | Playbook slice |
@@ -59,6 +67,74 @@ purpose.
 | Bounded broker apply | `neutral-write-steward` | `coordinator` | `scope-guardian` | steward |
 | Review loop | `reviewer` | `implementer` | `knowledge-scout` | review |
 | Final close/commit | `coordinator` | `validator`, `evidence-collector` | `scope-guardian` | closeout |
+
+## Playbook slice contract
+
+A playbook slice is the route-local handoff contract between the Coordinator
+and role skill packs. It must describe:
+
+- `roleOrder`: the sequence that owns route progression;
+- `parallelSafeRoles`: roles that may inspect or prepare context without
+  mutating shared state;
+- `advisoryOnlyRoles`: roles that may return findings but must not write,
+  claim, close, or commit;
+- `lifecycleOwner`: always `coordinator`;
+- `stopConditions`: ATM or Broker states that must halt progression.
+
+The canonical CLI artifact is `atm.teamRoleRoutingMatrix.v1`. Team runtime,
+Captain UX, and future provider bridges should consume this matrix instead of
+creating a second Team playbook.
+
+## Canonical route slices
+
+| Workstream | `roleOrder` | `parallelSafeRoles` | `advisoryOnlyRoles` | Stop conditions |
+|---|---|---|---|---|
+| `task-entry-routing` | `coordinator` -> `scope-guardian` / `reader` -> optional `evidence-collector` | `reader`, `evidence-collector` | `evidence-collector` | `broker-conflict-blocked`, `blocked-active-lease`, `proposal-submitted` |
+| `scoped-implementation` | `coordinator` -> `scope-guardian` -> `implementer` -> optional `reader` | `scope-guardian`, `reader` | `reader` | `broker-conflict-blocked`, `blocked-active-lease`, `proposal-submitted` |
+| `validation-and-evidence` | `coordinator` -> `validator` -> `evidence-collector` -> optional `reader` | `evidence-collector`, `reader` | `reader` | `broker-conflict-blocked`, `blocked-active-lease`, `proposal-submitted` |
+| `broker-conflict-resolution` | `coordinator` -> `scope-guardian` -> optional `reader` / `evidence-collector` | `reader`, `evidence-collector` | `reader`, `evidence-collector` | `broker-conflict-blocked`, `missing-atm.brokerConflictResolution.v1`, `manual-runtime-edit-requested` |
+
+The slash in `roleOrder` means the roles are ordered after the previous owner
+but may run in either order relative to each other when they are also listed in
+`parallelSafeRoles`.
+
+## Broker stop states
+
+Team Broker results are route truth for write admission. A role pack must stop
+and return control to Coordinator when any of these states appears:
+
+| Broker signal | Role-pack response | Coordinator response |
+|---|---|---|
+| `broker-conflict-blocked` | Preserve `decisionClass`, `decisionReason`, and `violationStatus`; do not write | Run the conflict-resolution playbook and serialize release order |
+| `blocked-active-lease` | Report the blocking task, lease, and `blockedReasons` | Release or repair only with official CLI surfaces, then rerun Broker status |
+| `proposal-submitted` | Treat the lane as provisional, not admitted | Complete proposal-first admission or narrow the actual write scope |
+| `needs-steward` / steward apply required | Do not apply directly | Route through neutral-write-steward and keep Broker evidence |
+
+The `broker-conflict-resolution` slice must preserve the shared M8E vocabulary
+without renaming it: `decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked`. The Coordinator may run
+`team broker resolve` to produce an `atm.brokerConflictResolution.v1`
+artifact, but role packs must not suggest manual edits to `.atm/runtime/**` or
+invent an alternate release order.
+
+## Captain conflict UX
+
+When a Broker conflict blocks an entrypoint, Captain-facing output must show the
+same operator fields as the `broker-conflict-resolution` slice:
+
+- `blockedTaskIds`: the tasks currently held behind the release order;
+- `sharedPaths` or `overlappingAtomIds`: the shared file or atom surface that
+  caused the block;
+- `decisionClass`, `decisionReason`, and `violationStatus`;
+- `requiredResolutionArtifact`: `atm.brokerConflictResolution.v1`;
+- `nextSafeResolutionCommand`: the `team broker resolve` command that produces
+  the artifact.
+
+This UX is a projection of the canonical route matrix, not a second playbook.
+If `violationStatus` is `broker-conflict-blocked`, Coordinator stops write
+progression, creates or consumes the `atm.brokerConflictResolution.v1` artifact,
+then releases tasks in order. Manual edits to `.atm/runtime/**` are outside the
+Captain path.
 
 ## Why this matters
 
@@ -76,3 +152,6 @@ This matrix keeps the first skill small:
   lifecycle.
 - No layer may create a second governance model outside the existing ATM
   lifecycle.
+- Blocked Broker decisions stay blocked until the Coordinator follows the
+  official recovery route; role packs must not translate them into ad hoc
+  shell workarounds.

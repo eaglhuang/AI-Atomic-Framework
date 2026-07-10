@@ -2,6 +2,12 @@ import { type TeamClosureAttestationEvidence, type TeamClosureReviewerIndependen
 import { type TeamKnowledgeSummary } from './team-knowledge.ts';
 import { type TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import { type TeamWorkerAdapterContract } from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
+import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/anthropic.ts';
+import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
+import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/claude-code.ts';
+import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
+import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
+import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
 import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 type TeamRecipeAgent = {
     agentId: string;
@@ -17,6 +23,7 @@ type TeamRecipe = {
     language?: string;
     agents: TeamRecipeAgent[];
 };
+type TeamLevel = 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
 type PermissionFinding = {
     level: 'error' | 'warning';
     code: string;
@@ -32,6 +39,20 @@ type PermissionLease = {
     permission: string;
     agentId: string;
     paths?: string[];
+};
+type TeamGovernanceRuntimeFields = {
+    schemaId: 'atm.teamGovernanceRuntimeFields.v1';
+    decisionClass: 'allowed' | 'blocked' | 'escalated';
+    decisionReason: string;
+    requiresHumanSignoff: boolean;
+    requiresAdr: boolean;
+    violationStatus: 'allowed' | 'warning' | 'broker-conflict-blocked' | 'policy-blocked' | 'escalated';
+    escalationTarget: string | null;
+};
+type ReviewerIdentity = {
+    providerId: string;
+    modelId: string;
+    modelCertificationId?: string | null;
 };
 type TeamPermissionValidationOptions = {
     allowedWritePaths?: string[];
@@ -60,6 +81,42 @@ type TeamRoleSkillPackContract = {
         growthContractAttachment: string;
     }>;
 };
+type TeamRoleSkillPackManifest = {
+    schemaId: 'atm.teamRoleSkillPackManifest.v1';
+    providerNeutral: true;
+    coordinatorOwnsLifecycle: true;
+    discoveryMode: 'capability-driven';
+    roleFirstProviderSecond: true;
+    sharedVocabulary: {
+        brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+    };
+    roles: Array<{
+        role: string;
+        skillPackId: string;
+        playbookSlice: string;
+        capabilityTags: string[];
+        permissionLease: {
+            alignment: 'role-first';
+            allowedPermissions: string[];
+            forbiddenPermissions: string[];
+        };
+        selectedProvider: {
+            providerId: string;
+            sdkId: string;
+            modelId: string;
+            runtimeMode: TeamRuntimeMode;
+            source: 'repo-default' | 'role-override' | 'cli-role-override';
+        };
+        providerCapabilities: Array<{
+            providerId: string;
+            runtimeModes: TeamRuntimeMode[];
+            artifacts: string[];
+            satisfiesRolePack: true;
+            reason: string;
+        }>;
+        growthContractAttachment: string;
+    }>;
+};
 type TeamRoleRoutingMatrix = {
     schemaId: 'atm.teamRoleRoutingMatrix.v1';
     providerNeutral: true;
@@ -69,7 +126,12 @@ type TeamRoleRoutingMatrix = {
         primaryRole: string;
         supportingRoles: string[];
         advisoryRoles: string[];
+        roleOrder: string[];
+        parallelSafeRoles: string[];
+        advisoryOnlyRoles: string[];
         playbookSlice: string;
+        lifecycleOwner: 'coordinator';
+        stopConditions: string[];
     }>;
 };
 type TeamGrowthContract = {
@@ -82,6 +144,107 @@ type TeamGrowthContract = {
         rawCaseTarget: string;
     };
 };
+type TeamRoleGrowthObservabilityContract = {
+    schemaId: 'atm.teamRoleGrowthObservabilityContract.v1';
+    sharedAcrossRolePacks: true;
+    referenceFirst: true;
+    sourceGrowthContract: 'atm.teamGrowthContract.v1';
+    sourceObservabilityContract: 'atm.teamAgentObservabilityContract.v1';
+    learningEventProjection: {
+        eventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+        eventType: 'artifact.output';
+        artifactType: 'atm.teamRoleGrowthLearningItem.v1';
+        queryKeys: string[];
+        artifactFields: string[];
+    };
+    frictionClassification: {
+        sharedAtmRoutingFriction: string[];
+        roleSpecificFriction: string[];
+    };
+    roleMappings: Array<{
+        role: string;
+        agentId: string;
+        skillPackId: string;
+        playbookSlice: string;
+        growthAttachmentPoint: string;
+        learningReference: string;
+        taxonomy: string[];
+        observableEventSelector: {
+            role: string;
+            eventType: 'artifact.output';
+            artifactType: 'atm.teamRoleGrowthLearningItem.v1';
+        };
+    }>;
+    metrics: Array<{
+        metricId: string;
+        description: string;
+        numerator: Record<string, string>;
+        denominator: Record<string, string>;
+        groupedBy: string[];
+    }>;
+    brokerConflictVocabulary: {
+        decisionClass: string;
+        decisionReason: string;
+        violationStatus: string;
+        blockedCode: 'broker-conflict-blocked';
+    };
+};
+type TeamOpenAIFamilyRuntimeBridgeSummary = {
+    schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1';
+    milestone: 'M9I';
+    providerIds: readonly ['openai', 'azure-openai'];
+    sharedProviderInterface: 'atm.teamProviderContract.v1';
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+    coordinatorOwnedAuthority: true;
+    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+    bridges: readonly [
+        ReturnType<typeof buildOpenAITeamProviderBridgeDescriptor>,
+        ReturnType<typeof buildAzureOpenAITeamProviderBridgeDescriptor>
+    ];
+};
+type TeamEditorExecutionRuntimeBridgeSummary = {
+    schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1';
+    milestone: 'M9I';
+    providerIds: readonly ['claude-code', 'gemini'];
+    sharedProviderInterface: 'atm.teamProviderContract.v1';
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+    roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1';
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+    coordinatorOwnedAuthority: true;
+    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+    bridges: readonly [
+        ReturnType<typeof buildClaudeCodeTeamProviderBridgeDescriptor>,
+        ReturnType<typeof buildGeminiTeamProviderBridgeDescriptor>
+    ];
+};
+type TeamMicrosoftFoundryRuntimeBridgeSummary = {
+    schemaId: 'atm.microsoftFoundryRuntimeBridgeSummary.v1';
+    milestone: 'M9I';
+    providerIds: readonly ['microsoft-foundry'];
+    sharedProviderInterface: 'atm.teamProviderContract.v1';
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+    supportedSurfaces: readonly ['project-chat-inference', 'agent-service'];
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+    coordinatorOwnedAuthority: true;
+    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+    bridges: readonly [
+        ReturnType<typeof buildMicrosoftFoundryTeamProviderBridgeDescriptor>
+    ];
+};
+type TeamAnthropicRuntimeBridgeSummary = {
+    schemaId: 'atm.anthropicRuntimeBridgeSummary.v1';
+    milestone: 'M10X';
+    providerIds: readonly ['anthropic'];
+    sharedProviderInterface: 'atm.teamProviderContract.v1';
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+    coordinatorOwnedAuthority: true;
+    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+    bridges: readonly [
+        ReturnType<typeof buildAnthropicTeamProviderBridgeDescriptor>
+    ];
+};
 type TeamRuntimePilot = {
     schemaId: 'atm.teamRuntimePilot.v1';
     providerNeutral: true;
@@ -89,13 +252,57 @@ type TeamRuntimePilot = {
     pilotMode: 'role-pair' | 'role-trio';
     selectedRoles: string[];
     selectedSkillPackIds: string[];
+    agentSkillUnits: Array<{
+        role: string;
+        agentId: string;
+        skillPackId: string;
+        boundedSkillPackLoaded: true;
+        permissionLease: {
+            allowedPermissions: string[];
+            forbiddenPermissions: string[];
+        };
+        playbookSlice: string;
+        lifecycleAuthority: 'coordinator-owned' | 'worker-forbidden';
+    }>;
     realisticWorkflow: string[];
+    workflowEvidence: {
+        scenarioId: 'agent-plus-skill-runtime-pilot';
+        roleOrder: string[];
+        coordinatorOnlyLifecyclePreserved: true;
+        workerWriteScope: 'bounded-by-task-lease';
+        blockedByBroker: boolean;
+        brokerViolationStatus: 'none' | 'proposal-submitted' | 'broker-conflict-blocked';
+    };
     roleBoundarySignals: string[];
     lifecycleAuthority: {
         ownerRole: string;
         forbiddenToWorkers: string[];
     };
     roleConfusionReduction: string[];
+    roleConfusionMetrics: {
+        baselineLoadedSkillPacks: 'monolithic-team-context';
+        pilotLoadedSkillPacks: string[];
+        preventedPermissionDrift: string[];
+        refinementSignalCount: number;
+    };
+    roleGrowthObservability: {
+        contractSchemaId: 'atm.teamRoleGrowthObservabilityContract.v1';
+        eventType: 'artifact.output';
+        artifactType: 'atm.teamRoleGrowthLearningItem.v1';
+        frictionDimensions: ['shared-atm-routing-friction', 'role-specific-friction'];
+        brokerConflictBlockedMetricId: 'broker-conflict-blocked.hit-rate';
+        roleContractMappings: Array<{
+            role: string;
+            skillPackId: string;
+            playbookSlice: string;
+        }>;
+    };
+    brokerConflictVocabulary: {
+        decisionClass: string;
+        decisionReason: string;
+        violationStatus: 'allowed' | 'proposal-submitted' | 'broker-conflict-blocked';
+        blockedCode: 'broker-conflict-blocked' | null;
+    };
     actionableRefinementFindings: Array<{
         category: string;
         summary: string;
@@ -130,6 +337,7 @@ type TeamImplementerSelector = {
 type TeamPatrolMode = 'claim-preflight' | 'close-preflight' | 'big-script' | 'daily-noon';
 type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
 type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
+type TeamRuntimeTier = 'raw-api' | 'agent-sdk' | 'editor';
 type TeamReworkRouteStatus = 'work-in-progress' | 'needs-rework' | 'revalidate-pending' | 'ready-for-close' | 'blocked' | 'escalated';
 type TeamReworkFinding = {
     source: 'reviewer' | 'validator';
@@ -386,6 +594,11 @@ export declare const TEAM_ATOM_BOUNDARIES: {
         readonly capability: "Advisory Team Agents knowledge build/query dry-run surface with metadata filtering and lexical ranking.";
         readonly downstreamTasks: readonly ["TASK-TEAM-0021"];
     };
+    readonly 'team.broker-conflict-resolution': {
+        readonly anchor: "packages/cli/src/commands/team.ts#runTeamBrokerConflictResolve";
+        readonly capability: "Team Broker conflict resolve command that emits atm.brokerConflictResolution.v1 artifacts with decisionClass, decisionReason, violationStatus, and broker-conflict-blocked release-order semantics.";
+        readonly downstreamTasks: readonly ["TASK-TEAM-0046"];
+    };
 };
 export type TeamRecommendationChannel = 'fast' | 'normal' | 'batch';
 export type TeamRecommendation = {
@@ -416,6 +629,42 @@ export declare function buildTeamRecommendation(input: {
     readonly parallelAdvisory?: unknown;
 }): TeamRecommendation | null;
 export declare function runTeam(argv: string[]): Promise<import("./shared.ts").CommandResult>;
+export declare function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEvidence): {
+    decisionClass: string;
+    decisionReason: string;
+    violationStatus: string;
+    statusCode: string;
+} | null;
+export declare function buildBrokerConflictUxProjection(input: {
+    readonly primaryTaskId: string;
+    readonly conflictingTaskIds: readonly string[];
+    readonly sharedPaths?: readonly string[];
+    readonly overlappingAtomIds?: readonly string[];
+    readonly decisionClass: string;
+    readonly decisionReason: string;
+    readonly violationStatus: string;
+    readonly statusCode?: string;
+    readonly currentAllowedTaskId?: string | null;
+    readonly blockedTaskIds?: readonly string[];
+    readonly requiredCommand?: string | null;
+}): {
+    schemaId: string;
+    playbookSlice: string;
+    requiredResolutionArtifact: string;
+    decisionClass: string;
+    decisionReason: string;
+    violationStatus: string;
+    statusCode: string;
+    primaryTaskId: string;
+    conflictingTaskIds: string[];
+    blockedTaskIds: string[];
+    currentAllowedTaskId: string;
+    sharedPaths: string[];
+    overlappingAtomIds: string[];
+    nextSafeResolutionCommand: string;
+    captainGuidance: string[];
+};
+export declare function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string): import("./shared.ts").CommandResult;
 export declare function buildTeamRuntimeContract(input: {
     runtimeMode?: unknown;
     runtimeLanguage?: unknown;
@@ -487,6 +736,14 @@ export declare function buildTeamPlan(input: {
     };
     brokerLane: TeamBrokerLaneEvidence;
     allowEmptyWriteScope?: boolean;
+    requestedTeamSize?: string;
+    providerSelectionConfig?: TeamProviderSelectionConfig | null;
+    providerSelectionSource?: {
+        schemaId: 'atm.teamAgentsConfig.v1';
+        path: string | null;
+        loaded: boolean;
+        cliOverrideCount: number;
+    } | null;
     knowledgeSummary?: TeamKnowledgeSummary;
 }): {
     requiredRoles: TeamCrewRole[];
@@ -564,6 +821,36 @@ export declare function buildTeamPlan(input: {
     schemaId: string;
     recipeId: string;
     channelHint: string;
+    teamLevel: TeamLevel;
+    rosterProjection: {
+        schemaId: string;
+        teamLevel: TeamLevel;
+        teamSize: string;
+        activeRoles: string[];
+        syntheticRoles: string[];
+        deferredRoles: string[];
+        catalogReadyRosterDeferredRoles: string[];
+        roleRules: {
+            L1: string;
+            L2: string;
+            L3: string;
+            L4: string;
+            L5: string;
+        };
+    };
+    governanceRuntime: TeamGovernanceRuntimeFields;
+    decisionClass: "blocked" | "allowed" | "escalated";
+    decisionReason: string;
+    requiresHumanSignoff: boolean;
+    requiresAdr: boolean;
+    violationStatus: "warning" | "allowed" | "broker-conflict-blocked" | "escalated" | "policy-blocked";
+    escalationTarget: string | null;
+    providerSelectionSource: {
+        schemaId: "atm.teamAgentsConfig.v1";
+        path: string | null;
+        loaded: boolean;
+        cliOverrideCount: number;
+    } | null;
     brokerLane: TeamBrokerLaneEvidence;
     agents: TeamRecipeAgent[];
     captainDecision: {
@@ -578,6 +865,8 @@ export declare function buildTeamPlan(input: {
             coordinator: string;
         };
         conflictRules: string[];
+        teamLevel: TeamLevel;
+        teamLevelSource: string;
         teamSize: string;
         requiredRoles: string[];
         optionalRoles: string[];
@@ -633,13 +922,58 @@ export declare function buildTeamPlan(input: {
     };
     implementerSelector: TeamImplementerSelector;
     roleSkillPacks: TeamRoleSkillPackContract;
+    roleSkillPackManifest: TeamRoleSkillPackManifest;
     routingMatrix: TeamRoleRoutingMatrix;
     growthContract: TeamGrowthContract;
+    observabilityContract: {
+        readonly schemaId: "atm.teamAgentObservabilityContract.v1";
+        readonly eventSchemaId: "atm.teamAgentObservabilityEvent.v1";
+        readonly queryResultSchemaId: "atm.teamAgentObservabilityQueryResult.v1";
+        readonly providerNeutral: true;
+        readonly queryKeys: readonly ["taskId", "teamRunId", "providerId", "role", "artifactType", "eventType"];
+        readonly eventTypes: readonly ["session.start", "step.execution", "tool.invocation", "artifact.output", "session.complete", "session.failure", "broker.conflict.blocked", "broker.conflict.resolution"];
+        readonly brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
+        readonly redactionPolicy: {
+            readonly rawSecretsLogged: false;
+            readonly rawSecretsAllowed: false;
+            readonly governanceEvidenceOnly: true;
+        };
+    };
+    roleGrowthObservabilityContract: TeamRoleGrowthObservabilityContract;
+    runtimeTierContract: {
+        schemaId: string;
+        tiers: readonly ["raw-api", "agent-sdk", "editor"];
+        providerContractCompatibility: readonly ["RawChatAdapter", "AgentLoopAdapter", "EditorAgentAdapter"];
+        roleTiers: {
+            role: string;
+            agentId: string;
+            runtimeTier: TeamRuntimeTier;
+            rationale: string;
+        }[];
+    };
+    openAIFamilyRuntimeBridges: TeamOpenAIFamilyRuntimeBridgeSummary;
+    editorExecutionRuntimeBridges: TeamEditorExecutionRuntimeBridgeSummary;
+    microsoftFoundryRuntimeBridges: TeamMicrosoftFoundryRuntimeBridgeSummary;
+    anthropicRuntimeBridges: TeamAnthropicRuntimeBridgeSummary;
     runtimePilot: TeamRuntimePilot;
 };
+export declare function buildOpenAIFamilyRuntimeBridgeSummary(): TeamOpenAIFamilyRuntimeBridgeSummary;
+export declare function buildEditorExecutionRuntimeBridgeSummary(): TeamEditorExecutionRuntimeBridgeSummary;
+export declare function buildMicrosoftFoundryRuntimeBridgeSummary(): TeamMicrosoftFoundryRuntimeBridgeSummary;
+export declare function buildAnthropicRuntimeBridgeSummary(): TeamAnthropicRuntimeBridgeSummary;
 export declare function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract;
+export declare function buildProviderNeutralRoleSkillPackManifest(input: {
+    recipe: TeamRecipe;
+    roleSkillPacks?: TeamRoleSkillPackContract;
+    selectionConfig?: TeamProviderSelectionConfig;
+    providerIds?: readonly string[];
+}): TeamRoleSkillPackManifest;
 export declare function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix;
 export declare function buildTeamGrowthContract(): TeamGrowthContract;
+export declare function buildTeamRoleGrowthObservabilityContract(input: {
+    roleSkillPacks: TeamRoleSkillPackContract;
+    growthContract?: TeamGrowthContract;
+}): TeamRoleGrowthObservabilityContract;
 export declare function buildTeamRuntimePilot(input: {
     roleSkillPacks: TeamRoleSkillPackContract;
     routingMatrix: TeamRoleRoutingMatrix;
@@ -650,6 +984,76 @@ export declare function buildTeamRuntimePilot(input: {
     };
     brokerLane: TeamBrokerLaneEvidence;
 }): TeamRuntimePilot;
+export declare function evaluateReviewerIndependence(input: {
+    implementer: ReviewerIdentity;
+    reviewer: ReviewerIdentity;
+    policy: 'different-provider' | 'different-model-family' | 'different-certification';
+}): {
+    schemaId: string;
+    ok: boolean;
+    policy: "different-provider" | "different-model-family" | "different-certification";
+    checks: {
+        differentProvider: boolean;
+        differentModelFamily: boolean;
+        differentCertification: boolean;
+    };
+    reason: string;
+};
+export declare function buildReviewAgentSignature(input: {
+    taskId: string;
+    reviewer: ReviewerIdentity;
+    implementer: ReviewerIdentity;
+    reviewedDiffHash: string;
+    policy: 'different-provider' | 'different-model-family' | 'different-certification';
+    findings?: readonly string[];
+}): {
+    schemaId: string;
+    taskId: string;
+    signatureStatus: string;
+    permission: string | null;
+    reviewer: {
+        providerId: string;
+        modelId: string;
+        modelCertificationId: string | null;
+    };
+    implementer: {
+        providerId: string;
+        modelId: string;
+        modelCertificationId: string | null;
+    };
+    modelCertificationId: string | null;
+    reviewerIndependencePolicy: "different-provider" | "different-model-family" | "different-certification";
+    independence: {
+        schemaId: string;
+        ok: boolean;
+        policy: "different-provider" | "different-model-family" | "different-certification";
+        checks: {
+            differentProvider: boolean;
+            differentModelFamily: boolean;
+            differentCertification: boolean;
+        };
+        reason: string;
+    };
+    reviewedDiffHash: string;
+    findings: string[];
+    earlyWarning: {
+        category: string;
+        finding: string;
+    }[];
+};
+export declare function evaluateReviewQuorum(input: {
+    signatures: readonly ReturnType<typeof buildReviewAgentSignature>[];
+    requiredFormalSignatures: number;
+}): {
+    schemaId: string;
+    ok: boolean;
+    requiredFormalSignatures: number;
+    formalSignatureCount: number;
+    advisoryNoteCount: number;
+    conflicts: string[];
+    escalationTarget: string | null;
+    reason: string;
+};
 export declare function selectTeamImplementer(task: Record<string, unknown> | null | undefined, recipe: TeamRecipe, writePaths: string[]): TeamImplementerSelector;
 export declare function assessLieutenantEscalation(task: Record<string, unknown> | null | undefined, writePaths: string[], validation: {
     ok: boolean;
@@ -805,6 +1209,13 @@ export declare function writeTeamRun(input: {
         ok: boolean;
         findings: PermissionFinding[];
     };
+    governanceRuntime: TeamGovernanceRuntimeFields;
+    decisionClass: "blocked" | "allowed" | "escalated";
+    decisionReason: string;
+    requiresHumanSignoff: boolean;
+    requiresAdr: boolean;
+    violationStatus: "warning" | "allowed" | "broker-conflict-blocked" | "escalated" | "policy-blocked";
+    escalationTarget: string | null;
     brokerLane: TeamBrokerLaneEvidence;
     captainDecision: {
         schemaId: string;
@@ -818,6 +1229,8 @@ export declare function writeTeamRun(input: {
             coordinator: string;
         };
         conflictRules: string[];
+        teamLevel: TeamLevel;
+        teamLevelSource: string;
         teamSize: string;
         requiredRoles: string[];
         optionalRoles: string[];
@@ -871,6 +1284,17 @@ export declare function writeTeamRun(input: {
             authorityChain: string;
         };
     };
+    runtimeTierContract: {
+        schemaId: string;
+        tiers: readonly ["raw-api", "agent-sdk", "editor"];
+        providerContractCompatibility: readonly ["RawChatAdapter", "AgentLoopAdapter", "EditorAgentAdapter"];
+        roleTiers: {
+            role: string;
+            agentId: string;
+            runtimeTier: TeamRuntimeTier;
+            rationale: string;
+        }[];
+    };
     runtimePilot: TeamRuntimePilot;
     reworkRoute: TeamReworkRoute;
     agentReports: never[];
@@ -886,7 +1310,7 @@ export declare function writeTeamRun(input: {
             brokerSubagentEnabled: boolean;
             brokerDecisionSurface: "brokerLane";
             brokerStewardId: "neutral-write-steward";
-            brokerGoverns: ("steward-apply" | "write-intents" | "scope-conflicts" | "commit-lane")[];
+            brokerGoverns: ("write-intents" | "scope-conflicts" | "steward-apply" | "commit-lane")[];
             brokerEvidenceRequired: ("atm.brokerOperationRunRecordEnvelope.v1" | "atm.stewardApplyEvidence.v1" | "atm.teamBrokerLaneEvidence.v1")[];
             commitLaneSerializedBy: "branch-commit-queue";
             commitLaneOwnerRole: "coordinator";
@@ -905,6 +1329,91 @@ export declare function buildTeamStatusResult(input: {
     requestedTeamRunId: string;
     compact: boolean;
 }): import("./shared.ts").CommandResult;
+export declare function evaluateTeamRequiredCompletionGate(input: {
+    cwd: string;
+    taskId: string;
+    taskDocument: Record<string, unknown>;
+}): {
+    ok: boolean;
+    required: boolean;
+    taskId: string;
+    teamRun: null;
+    requiredCommand: null;
+} | {
+    ok: boolean;
+    required: boolean;
+    taskId: string;
+    teamRun: {
+        teamRunId?: undefined;
+        taskId?: undefined;
+        recipeId?: undefined;
+        actorId?: undefined;
+        status?: undefined;
+        roleCount?: undefined;
+        leaseCount?: undefined;
+        brokerSubagentEnabled?: undefined;
+        brokerDecisionSurface?: undefined;
+        brokerStewardId?: undefined;
+        brokerGovernanceSummaryId?: undefined;
+        runtimePilotMode?: undefined;
+        runtimePilotRoles?: undefined;
+        decisionClass?: undefined;
+        decisionReason?: undefined;
+        requiresHumanSignoff?: undefined;
+        requiresAdr?: undefined;
+        violationStatus?: undefined;
+        escalationTarget?: undefined;
+        brokerEvidenceRequired?: undefined;
+        commitLaneSerializedBy?: undefined;
+        commitLaneOwnerRole?: undefined;
+        workerGitWrite?: undefined;
+        workerTaskLifecycle?: undefined;
+        workerSelfClose?: undefined;
+        agentsSpawned?: undefined;
+        completedAt?: undefined;
+        completedBy?: undefined;
+        abandonedAt?: undefined;
+        abandonedBy?: undefined;
+        lifecycleEventCount?: undefined;
+        createdAt?: undefined;
+        updatedAt?: undefined;
+    } | {
+        teamRunId: unknown;
+        taskId: unknown;
+        recipeId: unknown;
+        actorId: unknown;
+        status: unknown;
+        roleCount: number;
+        leaseCount: number;
+        brokerSubagentEnabled: boolean;
+        brokerDecisionSurface: {} | null;
+        brokerStewardId: {} | null;
+        brokerGovernanceSummaryId: {} | null;
+        runtimePilotMode: {} | null;
+        runtimePilotRoles: string[];
+        decisionClass: {} | null;
+        decisionReason: {} | null;
+        requiresHumanSignoff: {};
+        requiresAdr: {};
+        violationStatus: {} | null;
+        escalationTarget: {} | null;
+        brokerEvidenceRequired: string[];
+        commitLaneSerializedBy: {} | null;
+        commitLaneOwnerRole: {} | null;
+        workerGitWrite: boolean | null;
+        workerTaskLifecycle: boolean | null;
+        workerSelfClose: boolean | null;
+        agentsSpawned: boolean;
+        completedAt: {} | null;
+        completedBy: {} | null;
+        abandonedAt: {} | null;
+        abandonedBy: {} | null;
+        lifecycleEventCount: number;
+        createdAt: {} | null;
+        updatedAt: {} | null;
+    } | null;
+    requiredCommand: string;
+};
 export declare function buildTeamPatrolResult(input: {
     cwd: string;
     taskId: string;

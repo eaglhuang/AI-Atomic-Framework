@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.js';
+import { clearRuntimeIdentityDefault, clearRuntimeIdentityForActor, describeActorResolution, findActorByResolvedId, readRuntimeIdentityDefault, readRuntimeIdentityForActor, runtimeIdentityActorRelativePath, runtimeIdentityRelativePath, sanitizeActorKind, upsertActorRecord, writeRuntimeIdentityDefault, writeRuntimeIdentityForActor } from './actor-registry.js';
 import { listActorWorkSessions, resolveActorWorkSession } from './actor-session.js';
 import { CliError, makeResult, message } from './shared.js';
 export async function runIdentity(argv) {
@@ -9,6 +9,7 @@ export async function runIdentity(argv) {
             ? readRuntimeIdentityForActor(options.cwd, options.actorId)
             : readRuntimeIdentityDefault(options.cwd);
         const session = current?.activeSessionId ? resolveActorWorkSession(options.cwd, { sessionId: current.activeSessionId, includeNonActive: true }) : null;
+        const actorResolution = describeActorResolution(options.actorId, options.cwd);
         return makeResult({
             ok: true,
             command: 'identity',
@@ -19,7 +20,9 @@ export async function runIdentity(argv) {
                         : `Loaded repo default identity for ${current.actorId}.`
                     : options.actorId
                         ? `No actor identity is configured yet for ${options.actorId}.`
-                        : 'No repo default identity is configured yet.')],
+                        : 'No repo default identity is configured yet.', {
+                    actorResolution
+                })],
             evidence: {
                 identity: current,
                 identityPath: current
@@ -27,6 +30,7 @@ export async function runIdentity(argv) {
                         ? runtimeIdentityActorRelativePath(options.actorId)
                         : runtimeIdentityRelativePath
                     : null,
+                actorResolution,
                 activeSession: session,
                 recentSessions: listActorWorkSessions(options.cwd).slice(0, 5)
             }

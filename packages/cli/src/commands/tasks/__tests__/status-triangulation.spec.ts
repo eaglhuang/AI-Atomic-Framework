@@ -3,11 +3,15 @@
  *
  * Covers truth-aligned / planning-live mismatch / residue routing.
  */
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   buildPlanningMirrorParityOverride,
   hasOnlyStatusDivergence,
   isOpenPlanningParityStatus,
-  normalizeParityLifecycleValue
+  normalizeParityLifecycleValue,
+  resolvePlanningCardPath
 } from '../status-triangulation.ts';
 import type { TaskResidueDivergence } from '../residue-diagnostics.ts';
 
@@ -96,5 +100,34 @@ const mixedDivergenceOverride = buildPlanningMirrorParityOverride({
   ]
 });
 assert(mixedDivergenceOverride === null, 'mixed-field divergence should not be silently overridden');
+
+// --- planning root-relative source.planPath resolves through ATM_PLANNING_REPO_ROOT ---
+const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-status-triangulation-'));
+try {
+  const targetRepo = path.join(tempRoot, 'target');
+  const planningRoot = path.join(tempRoot, 'planning', 'docs', 'ai_atomic_framework');
+  const planningCard = path.join(planningRoot, 'rft-hardening', 'tasks', 'TASK-RFT-0004.task.md');
+  mkdirSync(path.dirname(planningCard), { recursive: true });
+  mkdirSync(targetRepo, { recursive: true });
+  writeFileSync(planningCard, '---\nstatus: done\n---\n# TASK-RFT-0004\n', 'utf8');
+  const previousPlanningRoot = process.env.ATM_PLANNING_REPO_ROOT;
+  process.env.ATM_PLANNING_REPO_ROOT = planningRoot;
+  try {
+    const resolved = resolvePlanningCardPath(targetRepo, {
+      source: {
+        planPath: 'rft-hardening/tasks/TASK-RFT-0004.task.md'
+      }
+    });
+    assert(resolved === planningCard, 'source.planPath must resolve relative to ATM_PLANNING_REPO_ROOT when repo-local path is absent');
+  } finally {
+    if (previousPlanningRoot === undefined) {
+      delete process.env.ATM_PLANNING_REPO_ROOT;
+    } else {
+      process.env.ATM_PLANNING_REPO_ROOT = previousPlanningRoot;
+    }
+  }
+} finally {
+  rmSync(tempRoot, { recursive: true, force: true });
+}
 
 console.log('[status-triangulation.spec] ok');

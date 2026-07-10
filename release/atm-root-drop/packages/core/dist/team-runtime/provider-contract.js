@@ -1,5 +1,6 @@
 export const TEAM_PROVIDER_IDS = [
     'openai',
+    'anthropic',
     'azure-openai',
     'claude-code',
     'gemini',
@@ -26,7 +27,7 @@ export function createTeamProviderContract(providerId) {
         },
         openSession(request) {
             return {
-                sessionId: `${request.taskId}:${request.role}:${providerId}`,
+                sessionId: `${request.taskId}:${request.role}:${providerId}:${request.modelId}`,
                 providerId
             };
         },

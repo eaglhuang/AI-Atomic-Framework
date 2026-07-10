@@ -2283,7 +2283,9 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
           code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
           source: 'cross-file-consistency',
           file: stagedFile,
+          files: [resolvedFile],
           detail: `Stage-time cross-file consistency failure in ${stagedFile}: references untracked local file ${resolvedFile} which will not be committed. Please stage ${resolvedFile} first.`,
+          requiredCommand: `git add -- ${quoteCliValue(resolvedFile)}`,
           classification: 'current-task'
         });
         continue;
@@ -2294,7 +2296,9 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
           code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
           source: 'cross-file-consistency',
           file: stagedFile,
+          files: [resolvedFile],
           detail: `Stage-time cross-file consistency failure in ${stagedFile}: references deleted local file ${resolvedFile}.`,
+          requiredCommand: `git add -- ${quoteCliValue(resolvedFile)}`,
           classification: 'current-task'
         });
         continue;
@@ -2325,7 +2329,9 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
             code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
             source: 'cross-file-consistency',
             file: stagedFile,
+            files: [resolvedFile],
             detail: `Stage-time cross-file consistency failure in ${stagedFile}: missing staged changes for symbol(s) "${missingSymbols.join(', ')}" imported from ${resolvedFile} (which has unstaged changes modifying these symbols). Please stage ${resolvedFile}.`,
+            requiredCommand: `git add -- ${quoteCliValue(resolvedFile)}`,
             classification: 'current-task'
           });
         }

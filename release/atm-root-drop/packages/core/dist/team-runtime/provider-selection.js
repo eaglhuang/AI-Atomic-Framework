@@ -13,3 +13,68 @@ export function resolveTeamProviderSelection(role, config) {
         ...config.repoDefault
     };
 }
+export function mergeTeamProviderSelectionConfig(input) {
+    const repoDefault = normalizeOverride(input.repoConfig?.repoDefault) ?? {
+        providerId: 'openai',
+        sdkId: 'responses',
+        modelId: 'gpt-5-mini',
+        runtimeMode: 'broker-only'
+    };
+    const roleOverrides = {};
+    for (const [role, override] of Object.entries(input.repoConfig?.roleOverrides ?? {})) {
+        const normalized = normalizeOverride(override);
+        if (normalized)
+            roleOverrides[role] = normalized;
+    }
+    for (const rawOverride of input.cliRoleOverrides ?? []) {
+        const parsed = parseRoleProviderOverride(rawOverride);
+        if (parsed)
+            roleOverrides[parsed.role] = parsed.override;
+    }
+    return {
+        repoDefault,
+        roleOverrides
+    };
+}
+export function parseRoleProviderOverride(value) {
+    const [rolePart, providerPart] = String(value ?? '').split('=');
+    const role = rolePart?.trim();
+    const providerSpec = providerPart?.trim();
+    if (!role || !providerSpec)
+        return null;
+    const [providerId, modelId, sdkId, runtimeMode] = providerSpec.split(':').map((entry) => entry.trim()).filter(Boolean);
+    if (!providerId || !modelId)
+        return null;
+    return {
+        role,
+        override: {
+            providerId,
+            modelId,
+            sdkId: sdkId ?? providerId,
+            runtimeMode: normalizeRuntimeMode(runtimeMode)
+        }
+    };
+}
+function normalizeOverride(value) {
+    if (!value || typeof value !== 'object')
+        return null;
+    const record = value;
+    const providerId = String(record.providerId ?? '').trim();
+    const sdkId = String(record.sdkId ?? providerId).trim();
+    const modelId = String(record.modelId ?? '').trim();
+    if (!providerId || !sdkId || !modelId)
+        return null;
+    return {
+        providerId,
+        sdkId,
+        modelId,
+        runtimeMode: normalizeRuntimeMode(record.runtimeMode)
+    };
+}
+function normalizeRuntimeMode(value) {
+    const normalized = String(value ?? '').trim();
+    if (normalized === 'real-agent' || normalized === 'editor-subagent' || normalized === 'broker-only') {
+        return normalized;
+    }
+    return 'broker-only';
+}

@@ -68,6 +68,32 @@ resolver skill is available.
 
 {{ACTOR_IDENTITY_HANDOFF_GATE}}
 
+## Tool-First Orchestration
+
+Prefer a structured ATM tool or editor connector before shelling out when the
+environment exposes one. Treat a blocked tool result as route truth: surface its
+status, reason, `allowedCommands`, `blockedCommands`, user notice, and
+`evidence.nextAction.command` before choosing any fallback.
+
+Use CLI fallback only for read-only inspection, legacy editors, explicit user
+fallback, unavailable tools, or a fallback command named by the structured
+result. Do not replace a blocked tool route with an ad hoc shell workaround.
+
+Keep this router thin. After `next`, `next --claim`, or the task-intent
+resolver returns, delegate sequencing to `evidence.nextAction.playbook` and
+specialist skills such as `atm-next`, `atm-evidence`, `atm-lock`,
+`atm-dispatch`, and Team role packs. Preserve shared Team Agents fields when
+they appear: `teamLevel`, `runtimeTier`, `decisionClass`, `decisionReason`,
+`requiresHumanSignoff`, `requiresAdr`, `violationStatus`,
+`escalationTarget`, and `broker-conflict-blocked`.
+
+For Team Agents work, do not rely on the older assumption that `team start`
+always means "no execution." Plain `team start` is still state-only, but
+`team start --execute` is a governed provider orchestration lane. Route crew
+completeness with `--team-size L1..L5`, route per-role providers with
+`--role-provider role=provider:model[:sdk][:mode]`, and keep
+`broker-conflict-blocked` as a hard gate.
+
 ## First Command
 
 ```bash

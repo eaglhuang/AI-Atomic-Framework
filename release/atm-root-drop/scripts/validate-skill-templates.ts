@@ -26,6 +26,68 @@ const requiredTemplateIds = [
   'atm-atom-map-refactor'
 ];
 
+const requiredTeamAgentsTermsByTemplate: Record<string, readonly string[]> = {
+  'atm-dispatch': [
+    'L1 through L5',
+    '--team-size L1..L5',
+    '--role-provider role=provider:model[:sdk][:mode]',
+    'team start --execute',
+    'decisionClass',
+    'requiresHumanSignoff',
+    'broker-conflict-blocked',
+    'team.required: true'
+  ],
+  'atm-next': [
+    'teamLevel',
+    '--team-size L1..L5',
+    'team start --execute',
+    'decisionClass',
+    'runtimeTier',
+    'atm.teamProviderRunArtifact.v1',
+    'atm.reviewAgentSignature.v1',
+    'knowledge.query',
+    'broker-conflict-blocked'
+  ],
+  'atm-governance-router': [
+    'teamLevel',
+    'runtimeTier',
+    'decisionClass',
+    'requiresAdr',
+    'team start --execute',
+    '--role-provider role=provider:model[:sdk][:mode]',
+    'broker-conflict-blocked'
+  ],
+  'atm-task-card-authoring': [
+    'team.required',
+    'teamLevel',
+    'roleProviders',
+    'runtimeTier',
+    'reviewerIndependencePolicy',
+    'knowledge.query',
+    'broker.conflict.blocked',
+    'atm.teamProviderRunArtifact.v1',
+    'atm.reviewAgentSignature.v1'
+  ],
+  'atm-evidence': [
+    'atm.teamProviderRunArtifact.v1',
+    'atm.reviewAgentSignature.v1',
+    'atm.teamAgentObservabilityEvent.v1',
+    'knowledge.query',
+    'knowledge.index.write',
+    'review.signature.write',
+    'broker-conflict-blocked'
+  ],
+  'mailbox-worker-execution': [
+    'team start --execute',
+    'L1 through L5',
+    'task.lifecycle',
+    'git.write',
+    'broker-conflict-blocked',
+    'atm.teamProviderRunArtifact.v1',
+    'knowledge.query'
+  ]
+};
+
 function fail(message: string) {
   console.error(`[skill-templates:${mode}] ${message}`);
   process.exitCode = 1;
@@ -107,6 +169,9 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
     assert(template.body.includes('Semantic Extraction First'), 'atm-task-intent-resolver must require semantic extraction before CLI routing');
     assert(template.body.includes('"source": "atm-skill"'), 'atm-task-intent-resolver must produce atm-skill intent');
     assert(template.body.includes('primary route when this skill is available'), 'atm-task-intent-resolver must downgrade next --prompt to fallback');
+  }
+  for (const requiredTerm of requiredTeamAgentsTermsByTemplate[entryDefinition.id] || []) {
+    assert(template.body.includes(requiredTerm), `${entryDefinition.id} missing Team Agents skill surface term: ${requiredTerm}`);
   }
   assert(!hasForbiddenPlanningHint(readFileSync(path.join(root, template.sourcePath), 'utf8')), `${entryDefinition.id} must not bake planning hints into template source`);
 }

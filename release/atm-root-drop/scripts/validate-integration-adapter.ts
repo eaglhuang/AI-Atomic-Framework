@@ -90,6 +90,10 @@ if (!process.exitCode) {
   if (!validateManifest(fixtureManifest)) {
     fail(`integration install manifest fixture failed schema validation: ${formatErrors(validateManifest.errors)}`);
   }
+  assert(Array.isArray(fixtureManifest.teamRuntimeCapabilities), 'fixture must include optional teamRuntimeCapabilities coverage');
+  assert(fixtureManifest.teamRuntimeCapabilities.length === 1, 'fixture must declare exactly one Team runtime backend capability');
+  assert(fixtureManifest.teamRuntimeCapabilities[0].providerId === 'claude-code', 'fixture Team runtime provider mismatch');
+  assert(fixtureManifest.teamRuntimeCapabilities[0].runtimeModes.includes('editor-subagent'), 'fixture Team runtime mode coverage missing');
 
   const packageModule = await import(pathToFileURL(path.join(root, 'packages/integrations-core/src/index.ts')).href);
   assert(packageModule.integrationsCorePackage?.packageName === '@ai-atomic-framework/integrations-core', 'package descriptor mismatch');
@@ -212,6 +216,7 @@ function exerciseAdapter(
     assert(install.manifest.adapterId === adapterSpec.id, `${adapterSpec.id} install manifest adapterId mismatch`);
     assert(install.manifest.files.length >= adapterSpec.expectedMinimumFiles, `${adapterSpec.id} install manifest must record expected files`);
     assert(validateManifest(install.manifest) === true, `${adapterSpec.id} install manifest schema mismatch: ${formatErrors(validateManifest.errors)}`);
+    assert(!Object.hasOwn(install.manifest, 'teamRuntimeCapabilities'), `${adapterSpec.id} install manifest must not become a Team runtime backend without an explicit declaration`);
     assert(existsSync(path.join(repositoryRoot, '.atm/integrations/manifest.json')), `${adapterSpec.id} install must write manifest`);
 
     const installedPaths = install.manifest.files.map((fileRecord: any) => fileRecord.path);

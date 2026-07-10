@@ -78,10 +78,12 @@ async function testCrossFileConsistency() {
     // 1. 執行 pre-commit hook，應因為 b.ts 修改了 foo 且未 staged 被拒絕
     const hookResult1 = await runHook(['pre-commit', '--cwd', tempRoot]) as any;
     assert.equal(hookResult1.ok, false, 'should block commit due to cross-file consistency failure');
-    const hasConsistencyError = hookResult1.evidence.blockingFindings.some(
+    const consistencyFinding = hookResult1.evidence.blockingFindings.find(
       (finding: any) => finding.code === 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY'
     );
-    assert.ok(hasConsistencyError, 'should report ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY error');
+    assert.ok(consistencyFinding, 'should report ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY error');
+    assert.deepEqual(consistencyFinding.files, [bFile], 'consistency finding should identify the missing sibling file');
+    assert.equal(consistencyFinding.requiredCommand, `git add -- "${bFile}"`, 'consistency finding should include a copyable staging command');
 
     // 2. 將 b.ts 也 stage 進去，此時無 consistency 錯誤，應該通過
     execFileSync('git', ['add', bFile], { cwd: tempRoot });

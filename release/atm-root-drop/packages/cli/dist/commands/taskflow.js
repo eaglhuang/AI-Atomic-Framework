@@ -763,6 +763,19 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     });
                 }
             }
+            const planningIndexAdvisory = buildTaskflowPlanningIndexAdvisory({
+                taskId,
+                planningRosterPaths,
+                rosterCloseback,
+                rosterCommand: closebackPlan.writerBoundary.rosterClosebackCommand ?? null
+            });
+            if (planningIndexAdvisory) {
+                closeMessages.push(message(planningIndexAdvisory.status === 'follow-up-required' ? 'warn' : 'info', planningIndexAdvisory.status === 'follow-up-required'
+                    ? 'ATM_TASKFLOW_CLOSE_PLANNING_INDEX_FOLLOWUP_REQUIRED'
+                    : 'ATM_TASKFLOW_CLOSE_PLANNING_INDEX_SYNCED', planningIndexAdvisory.status === 'follow-up-required'
+                    ? 'taskflow close succeeded; planning roster/index sync still needs an explicit follow-up command.'
+                    : 'taskflow close synced the planning roster/index and recorded the closeback fields.', planningIndexAdvisory));
+            }
             const commitBundleInput = buildTaskflowCommitBundle({
                 cwd,
                 taskId,
@@ -807,6 +820,10 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     }
                 };
             const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+            const residueAdvisory = writeOk ? buildTaskflowCloseResidueAdvisory(enrichedDiagnosis) : null;
+            if (residueAdvisory) {
+                closeMessages.push(message('warn', 'ATM_TASKFLOW_CLOSE_RESIDUE_ADVISORY', 'taskflow close succeeded; remaining planning mirror residue is advisory and should be reconciled separately.', residueAdvisory));
+            }
             closeMessages.push(message(writeOk ? 'info' : 'error', writeOk
                 ? 'ATM_TASKFLOW_CLOSE_WRITE_ORCHESTRATED'
                 : closeWriteTransaction.phase === 'rolled_back'
@@ -849,6 +866,8 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                         releasedCloseWindowLock,
                         deferredGovernanceDirty,
                         residueDiagnosis: enrichedDiagnosis,
+                        residueAdvisory,
+                        planningIndexAdvisory,
                         closebackPathResolution,
                         ...(autoEvidenceExecution ? { autoEvidenceExecution, autoEvidencePlan: autoEvidenceExecution.plan } : {}),
                         ...(profileData ? { profile: profileData } : {})
@@ -1153,5 +1172,69 @@ export async function runTaskflow(argv = []) {
         schemaId: 'atm.taskflowOpenResult.v1',
         writeEnabled: false,
         writeReadinessHint
+    };
+}
+export function buildTaskflowCloseResidueAdvisory(diagnosis) {
+    const bucket = typeof diagnosis.bucket === 'string' ? diagnosis.bucket : null;
+    const advisoryBuckets = new Set([
+        'planning-mirror-only',
+        'stale-import',
+        'ledger-ahead-of-planning-mirror'
+    ]);
+    if (!bucket || !advisoryBuckets.has(bucket))
+        return null;
+    return {
+        schemaId: 'atm.taskflowCloseResidueAdvisory.v1',
+        bucket,
+        truth: typeof diagnosis.truth === 'string' ? diagnosis.truth : null,
+        residue: typeof diagnosis.residue === 'string' ? diagnosis.residue : null,
+        reason: typeof diagnosis.reason === 'string' ? diagnosis.reason : null,
+        recoveryCommand: typeof diagnosis.nextCommand === 'string'
+            ? diagnosis.nextCommand
+            : 'node atm.mjs tasks status --task <id> --residue --json',
+        severity: 'warning',
+        closeSucceeded: true
+    };
+}
+export function buildTaskflowPlanningIndexAdvisory(input) {
+    if (!input.rosterCommand && !input.planningRosterPaths?.indexPath)
+        return null;
+    const result = input.rosterCloseback?.result;
+    const evidence = result && typeof result === 'object' && !Array.isArray(result)
+        ? result.evidence
+        : null;
+    const evidenceRecord = evidence && typeof evidence === 'object' && !Array.isArray(evidence)
+        ? evidence
+        : {};
+    const diff = evidenceRecord.diff && typeof evidenceRecord.diff === 'object' && !Array.isArray(evidenceRecord.diff)
+        ? evidenceRecord.diff
+        : null;
+    const ok = result && typeof result === 'object' && !Array.isArray(result)
+        ? result.ok === true
+        : false;
+    const unchanged = evidenceRecord.unchanged === true
+        || (diff && typeof diff.before === 'string' && typeof diff.after === 'string' && diff.before === diff.after);
+    return {
+        schemaId: 'atm.taskflowPlanningIndexAdvisory.v1',
+        taskId: input.taskId,
+        status: ok ? (unchanged ? 'already-current' : 'updated') : 'follow-up-required',
+        repoRoot: input.planningRosterPaths?.repoRoot ?? null,
+        indexPath: input.planningRosterPaths?.indexPath ?? null,
+        planningCardPath: input.planningRosterPaths?.fromPath ?? null,
+        frontmatterFields: [
+            'status',
+            'completed_by_agent',
+            'closedByActor',
+            'closedByCommand',
+            'lastTransitionId',
+            'delivery_commit'
+        ],
+        requiredCommand: input.rosterCommand
+            ?? (input.planningRosterPaths?.indexPath && input.planningRosterPaths?.fromPath
+                ? buildRosterSyncCommand({ indexPath: input.planningRosterPaths.indexPath, fromPath: input.planningRosterPaths.fromPath })
+                : 'node atm.mjs tasks roster update --index <tasks/README.md> --from <task-card.md> --json'),
+        diff: diff
+            ? { before: diff.before ?? null, after: diff.after ?? null }
+            : null
     };
 }

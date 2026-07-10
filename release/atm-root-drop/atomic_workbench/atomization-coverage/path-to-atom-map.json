@@ -82,6 +82,62 @@
       "source_task": "TASK-TEAM-0005"
     },
     {
+      "path_pattern": "schemas/integrations/install-manifest.schema.json#teamRuntimeCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Optional integration manifest declaration for Team runtime backend provider, mode, execution surface, role, status, and evidence",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "tests/schema-fixtures/positive/integration-install-manifest.json#teamRuntimeCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Positive schema fixture proving Team runtime backend capability declarations remain valid without making all editor integrations runnable backends",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/integration.ts#inspectTeamRuntimeBackendCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Integration manifest inspection surface for declared Team runtime backend readiness and broker-only fallback summary",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/doctor.ts#team-runtime-backend-capabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Doctor readiness check that reports declared Team runtime backend capabilities without failing clean broker-only repositories",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#integration-runtime-backend-readiness",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Team plan, validate, and start evidence wiring plus non-broker runtime start gate for missing backend capability declarations",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "scripts/validate-integration-adapter.ts#teamRuntimeCapabilities",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Integration adapter regression checks for optional Team runtime capability schema coverage and non-automatic backend declarations",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#integration-capability-wiring",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Team Agents regression case for manifest capability inspection, readiness evidence, and missing backend start gate anchors",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
+      "path_pattern": "docs/AGENT_PACK_ONBOARDING.md#team-runtime-capability-manifest",
+      "atom_id": "atm.integration-capability-manifest-map",
+      "capability": "Adopter-neutral onboarding guidance separating editor entry installation from declared Team runtime backend capability",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0045"
+    },
+    {
       "path_pattern": "docs/governance/team-agents/templates/patrol-report-template.md",
       "atom_id": "atm.team-agents-template-map",
       "capability": "Canonical patrol report template for read-only patrol scope, validation plan, evidence plan, and closeout-ready status",
@@ -801,9 +857,30 @@
     {
       "path_pattern": "packages/core/src/team-runtime/permission-broker.ts",
       "atom_id": "atm.team-agents-runtime",
-      "capability": "Governed Team permission broker and policy decision surface for provider-neutral permission checks.",
+      "capability": "Governed Team permission broker and policy decision surface for provider-neutral permission checks, including broker conflict resolution artifact helpers for serial release admission.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeamBrokerConflictResolve",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Team Broker conflict resolve CLI emits atm.brokerConflictResolution.v1 artifacts with decisionClass, decisionReason, violationStatus, broker-conflict-blocked, and release-order admission vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0046"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildBrokerConflictUxProjection",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Operator-facing broker conflict UX projection for blocked task ids, shared paths or atom overlap, decisionReason, and nextSafeResolutionCommand without creating a second playbook.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0048"
+    },
+    {
+      "path_pattern": "schemas/governance/broker-conflict-resolution.schema.json",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Schema contract for atm.brokerConflictResolution.v1 artifacts shared by 0046/0047/0048 and SKL follow-up lanes.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0046"
     },
     {
       "path_pattern": "schemas/governance/team-agent-permission-policy.schema.json",
@@ -1139,7 +1216,7 @@
     {
       "path_pattern": "schemas/team-agents/captain-decision.schema.json",
       "atom_id": "atm.team-agents-template-map",
-      "capability": "JSON Schema contract for advisory Captain decisions, options, chosen option, reason, risk, lieutenant need, and next team shape",
+      "capability": "JSON Schema contract for advisory Captain decisions, options, chosen option, reason, risk, lieutenant need, next team shape, and M8E broker conflict vocabulary.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0017"
     },
@@ -1670,6 +1747,20 @@
       "source_task": "TASK-TEAM-0036"
     },
     {
+      "path_pattern": "scripts/validate-team-agents.ts#broker-conflict-resolution",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Validator case proving Team Broker conflict resolution artifact schema, CLI output, decisionClass, decisionReason, violationStatus, broker-conflict-blocked, and serial release admission semantics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0046"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#broker-conflict-ux",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Validator case proving broker conflict UX exposes blocked task ids, shared paths or atom overlap, decisionReason, nextSafeResolutionCommand, captain schema compatibility, and atm.brokerConflictUx.v1 guidance.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0048"
+    },
+    {
       "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",
       "atom_id": "atm.team-wave-runtime-map",
       "capability": "Wave Mode runtime record + dispatch surface (team wave dispatch writes a coordinator-owned wave envelope to .atm/runtime/team-waves) plus the safe/unsafe/mixed/envelope self-check run on every validate-team-agents invocation (TASK-MAO-0027).",
@@ -2018,11 +2109,193 @@
       "capability": "Benchmark report distinguishing hand-authored static coverage from sanitized event replay coverage.",
       "coverage_status": "active",
       "source_task": "TASK-MAO-0048"
+    },
+    {
+      "path_pattern": "scripts/fixtures/mao-event-replay/broker-conflict-resolution.fixture.json",
+      "atom_id": "atm.multi-agent-orchestration-replay",
+      "capability": "Sanitized offline replay fixture for the M8E broker conflict resolution chain: two agents collide on one atom, four entry gates block with broker-conflict-blocked, and release order is declared by atm.brokerConflictResolution.v1.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0059"
+    },
+    {
+      "path_pattern": "scripts/validate-mao-event-replay.ts#broker-conflict-resolution",
+      "atom_id": "atm.multi-agent-orchestration-replay",
+      "capability": "Deterministic replay validator for M8E broker conflict resolution; fails without atm.brokerConflictResolution.v1, fails when release order is ignored, and proves ordered release to final green state.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0059"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#broker-conflict-resolution-replay",
+      "atom_id": "atm.multi-agent-orchestration-replay",
+      "capability": "Team Agents bridge validator asserting the MAO replay benchmark shares decisionClass, decisionReason, violationStatus, and broker-conflict-blocked vocabulary with the M8E Team Broker lane.",
+      "coverage_status": "active",
+      "source_task": "TASK-MAO-0059"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildProviderNeutralRoleSkillPackManifest",
+      "atom_id": "atm.provider-neutral-role-skill-pack-manifest",
+      "capability": "Builds atm.teamRoleSkillPackManifest.v1 from Team role skill-pack contracts, capability-driven provider satisfaction, role-first permission leases, selected provider decisions, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-SKL-0010"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/role-skill-pack-contract.md#provider-neutral-manifest",
+      "atom_id": "atm.provider-neutral-role-skill-pack-manifest",
+      "capability": "Documents the provider-neutral role skill-pack manifest as a role-first, provider-second machine-readable stitching layer for SKL role contracts and Team Broker shared vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-SKL-0010"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#role-skill-pack-compatibility",
+      "atom_id": "atm.provider-neutral-role-skill-pack-manifest",
+      "capability": "Requires vendor runtime adapters to consume atm.teamRoleSkillPackManifest.v1 with capability-driven discovery and roleFirstProviderSecond authority boundaries.",
+      "coverage_status": "active",
+      "source_task": "TASK-SKL-0010"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#provider-neutral-role-skill-pack-manifest",
+      "atom_id": "atm.provider-neutral-role-skill-pack-manifest",
+      "capability": "Validator case proving provider-neutral role skill-pack manifest generation, provider/runtime capability satisfaction, role-first permission lease alignment, plan output wiring, docs coverage, and shared Broker vocabulary preservation.",
+      "coverage_status": "active",
+      "source_task": "TASK-SKL-0010"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/observability.ts",
+      "atom_id": "atm.team-agent-observability",
+      "capability": "Provider-neutral Team Agent observability event contract, query helpers, redaction boundary, and M8E broker conflict event projection using decisionClass, decisionReason, violationStatus, and broker-conflict-blocked.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0040"
+    },
+    {
+      "path_pattern": "schemas/governance/team-agent-observability-event.schema.json",
+      "atom_id": "atm.team-agent-observability",
+      "capability": "JSON schema for atm.teamAgentObservabilityEvent.v1, including shared provider/runtime/role/artifact fields and fail-closed redaction metadata.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0040"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeamObservability",
+      "atom_id": "atm.team-agent-observability",
+      "capability": "Team CLI observability query surface for filtering shared cross-vendor event records by task, team run, provider, role, artifact, and event type.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0040"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#cross-vendor-observability",
+      "atom_id": "atm.team-agent-observability",
+      "capability": "Documents cross-vendor Team observability requirements, shared query keys, broker conflict event types, and no-raw-secret logging boundaries.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0040"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#cross-vendor-observability",
+      "atom_id": "atm.team-agent-observability",
+      "capability": "Validator case proving Team observability event schema validation, broker conflict artifact event projection, query filtering, team plan wiring, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0040"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/openai.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "OpenAI direct real-agent Team runtime bridge with config reference validation, broker-checked launch permission, shared atm.teamProviderRunArtifact.v1 output, and raw-secret-free observability events.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Azure OpenAI direct real-agent Team runtime bridge with endpoint, deployment, and auth-mode validation separate from plain OpenAI config while preserving the shared provider artifact and observability envelope.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildOpenAIFamilyRuntimeBridgeSummary",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Team plan projection for OpenAI-family runtime bridge descriptors, including config schemas, broker-checked permissions, observability event types, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#openai-family-direct-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Documents OpenAI and Azure OpenAI direct bridge config boundaries, shared provider run artifact, secret redaction, broker permission enforcement, and broker-conflict-blocked operator vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#openai-azure-openai-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Validator case proving OpenAI and Azure OpenAI config validation, real-agent launch through atm.teamProviderContract.v1, shared artifact envelope, observability events, broker permission checks, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/claude-code.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Claude Code editor-subagent Team execution bridge with config validation, normalized role envelope, broker-checked launch permission, shared atm.teamProviderRunArtifact.v1 output, and raw-secret-free observability events.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/gemini.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Gemini CLI-style Team execution bridge preserving editor-subagent runtime semantics, role-envelope normalization, broker permission checks, shared provider artifacts, and redacted observability.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildEditorExecutionRuntimeBridgeSummary",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Team plan projection for Claude Code and Gemini execution bridge descriptors, including role-envelope schema, broker-checked permissions, observability event types, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#claude-code-and-gemini-execution-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Documents Claude Code and Gemini execution bridge config boundaries, shared editor-subagent role envelope, provider run artifact, secret redaction, broker permission enforcement, and broker-conflict-blocked vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#claude-gemini-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Validator case proving Claude Code and Gemini config validation, editor execution launch through atm.teamProviderContract.v1, shared artifact envelope, role-envelope normalization, observability events, broker permission checks, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Microsoft Foundry provider-family Team runtime bridge with distinct project-chat-inference and agent-service config surfaces, broker-checked launch permission, shared atm.teamProviderRunArtifact.v1 output, and redacted observability.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildMicrosoftFoundryRuntimeBridgeSummary",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Team plan projection for Microsoft Foundry runtime bridge descriptors, including supported surfaces, config schema, broker-checked permissions, observability event types, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#microsoft-foundry-provider-family-bridge",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Documents Microsoft Foundry provider-family config boundaries for project-chat-inference and agent-service surfaces, shared provider run artifact, secret redaction, broker permission enforcement, and broker-conflict-blocked vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#microsoft-foundry-bridge",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Validator case proving Microsoft Foundry config validation, distinct project chat and agent-service launch surfaces, shared artifact envelope, observability events, broker permission checks, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0044"
     }
   ],
   "summary": {
-    "total_production_paths": 200,
-    "mapped_paths": 200,
+    "total_production_paths": 214,
+    "mapped_paths": 214,
     "coverage_percentage": 100,
     "atoms_defined": 113,
     "atoms_with_evidence": 0,

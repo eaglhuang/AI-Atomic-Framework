@@ -138,6 +138,38 @@ try {
   const helloWorld = run(process.execPath, ['atm.mjs', 'test', '--atom', 'hello-world', '--json'], bundleRepo);
   const helloWorldJson = parseCliJson(helloWorld, 'hello-world smoke');
   assert(helloWorldJson.ok === true, 'root-drop hello-world smoke must pass after wrapper install');
+
+  const firstEncodingProbe = path.join(tempRoot, 'encoding-first.ts');
+  const secondEncodingProbe = path.join(tempRoot, 'encoding-second.ts');
+  cpSync(path.join(root, 'scripts', 'check-encoding-touched.ts'), path.join(tempRoot, 'check-encoding-touched.ts'));
+  cpSync(path.join(root, 'atm.mjs'), path.join(tempRoot, 'atm.mjs'));
+  cpSync(path.join(root, 'release'), path.join(tempRoot, 'release'), { recursive: true });
+  mkdirSync(path.join(tempRoot, 'packages'), { recursive: true });
+  cpSync(path.join(root, 'packages', 'cli'), path.join(tempRoot, 'packages', 'cli'), { recursive: true });
+  cpSync(path.join(root, 'packages', 'core'), path.join(tempRoot, 'packages', 'core'), { recursive: true });
+  cpSync(path.join(root, 'packages', 'plugin-governance-local'), path.join(tempRoot, 'packages', 'plugin-governance-local'), { recursive: true });
+  cpSync(path.join(root, 'packages', 'adapter-local-git'), path.join(tempRoot, 'packages', 'adapter-local-git'), { recursive: true });
+  cpSync(path.join(root, 'packages', 'language-js'), path.join(tempRoot, 'packages', 'language-js'), { recursive: true });
+  cpSync(path.join(root, 'schemas'), path.join(tempRoot, 'schemas'), { recursive: true });
+  cpSync(path.join(root, 'atomic-registry.json'), path.join(tempRoot, 'atomic-registry.json'));
+  cpSync(path.join(root, 'package.json'), path.join(tempRoot, 'package.json'));
+  cpSync(path.join(root, 'tsconfig.json'), path.join(tempRoot, 'tsconfig.json'));
+  cpSync(path.join(root, 'tsconfig.build.json'), path.join(tempRoot, 'tsconfig.build.json'));
+  mkdirSync(path.dirname(firstEncodingProbe), { recursive: true });
+  cpSync(path.join(root, 'README.md'), firstEncodingProbe);
+  cpSync(path.join(root, 'README.md'), secondEncodingProbe);
+  const encodingProbe = run(process.execPath, [
+    '--strip-types',
+    'check-encoding-touched.ts',
+    '--mode',
+    'touched',
+    '--files',
+    'encoding-first.ts',
+    'encoding-second.ts'
+  ], tempRoot);
+  const encodingJson = parseCliJson(encodingProbe, 'encoding touched multi-file probe');
+  const encodedFiles = encodingJson.evidence?.files ?? [];
+  assert(Array.isArray(encodedFiles) && encodedFiles.includes('encoding-first.ts') && encodedFiles.includes('encoding-second.ts'), 'encoding touched probe must report every explicit --files token');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

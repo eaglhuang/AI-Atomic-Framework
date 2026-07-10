@@ -22,6 +22,28 @@ function brokerPathMatches(filePath, declaredPath) {
     }
     return file === declared || file.startsWith(`${declared}/`);
 }
+function buildBrokerConflictResolveCommand(taskId, overlappingTaskIds, declaredFiles) {
+    const conflictTaskId = overlappingTaskIds[0];
+    const sharedPath = declaredFiles[0];
+    if (!conflictTaskId || !sharedPath)
+        return null;
+    return `node atm.mjs team broker resolve --task ${taskId} --conflict ${conflictTaskId} --path ${quoteCliValue(sharedPath)} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+}
+function noConflictGate(summary, brokerVerdict = null) {
+    return {
+        schemaId: 'atm.taskflowBrokerConflictGate.v1',
+        verdict: 'noConflict',
+        confirmedConflict: false,
+        overlappingTaskIds: [],
+        summary,
+        requiredCommand: null,
+        brokerVerdict,
+        decisionClass: null,
+        decisionReason: null,
+        violationStatus: null,
+        statusCode: null
+    };
+}
 function activeIntentToWriteIntent(intent) {
     const rangeByCid = new Map();
     for (const range of intent.resourceKeys.atomRanges ?? []) {
@@ -68,15 +90,7 @@ export function evaluateTaskflowBrokerConflictGate(input) {
     const registryPath = path.join(input.cwd, '.atm', 'runtime', 'write-broker.registry.json');
     const currentFiles = [...input.declaredFiles];
     if (!existsSync(registryPath) || currentFiles.length === 0) {
-        return {
-            schemaId: 'atm.taskflowBrokerConflictGate.v1',
-            verdict: 'noConflict',
-            confirmedConflict: false,
-            overlappingTaskIds: [],
-            summary: 'No broker conflict evidence is available for this close.',
-            requiredCommand: null,
-            brokerVerdict: null
-        };
+        return noConflictGate('No broker conflict evidence is available for this close.');
     }
     const registry = loadRegistry(registryPath);
     const currentIntent = registry.activeIntents.find((entry) => entry.taskId === input.taskId) ?? null;
@@ -86,15 +100,7 @@ export function evaluateTaskflowBrokerConflictGate(input) {
         ? overlapping.filter((entry) => typeof entry.leaseEpoch === 'number' && entry.leaseEpoch < registry.currentEpoch)
         : [];
     if (overlapping.length === 0) {
-        return {
-            schemaId: 'atm.taskflowBrokerConflictGate.v1',
-            verdict: 'noConflict',
-            confirmedConflict: false,
-            overlappingTaskIds: [],
-            summary: 'No overlapping broker-tracked write intents affect this close.',
-            requiredCommand: null,
-            brokerVerdict: null
-        };
+        return noConflictGate('No overlapping broker-tracked write intents affect this close.');
     }
     if (staleEpochOverlap.length > 0) {
         const repairTarget = staleEpochOverlap[0]?.taskId ?? null;
@@ -108,7 +114,11 @@ export function evaluateTaskflowBrokerConflictGate(input) {
             requiredCommand: repairTarget
                 ? `node atm.mjs tasks repair-claim --task ${repairTarget} --actor ${quoteCliValue(actorId)} --json`
                 : null,
-            brokerVerdict: 'blocked-active-lease'
+            brokerVerdict: 'blocked-active-lease',
+            decisionClass: 'blocked',
+            decisionReason: 'broker-conflict-blocked because broker found stale or malformed active lease state before close.',
+            violationStatus: 'broker-conflict-blocked',
+            statusCode: 'broker-conflict-blocked'
         };
     }
     if (!currentIntent) {
@@ -117,9 +127,13 @@ export function evaluateTaskflowBrokerConflictGate(input) {
             verdict: 'insufficientMutationIntent',
             confirmedConflict: false,
             overlappingTaskIds: overlapping.map((entry) => entry.taskId),
-            summary: 'Broker found overlapping active write intents, but this task has no registered broker mutation intent to confirm whether the overlap is real. Supplement mutation intent for precision; close remains advisory here.',
-            requiredCommand: null,
-            brokerVerdict: null
+            summary: 'broker-conflict-blocked: Broker found overlapping active write intents, but this task has no registered broker mutation intent or resolution artifact to prove a safe release order.',
+            requiredCommand: buildBrokerConflictResolveCommand(input.taskId, overlapping.map((entry) => entry.taskId), currentFiles),
+            brokerVerdict: null,
+            decisionClass: 'blocked',
+            decisionReason: 'broker-conflict-blocked because active task overlap lacks a registered mutation intent or resolution artifact.',
+            violationStatus: 'broker-conflict-blocked',
+            statusCode: 'broker-conflict-blocked'
         };
     }
     const currentWriteIntent = activeIntentToWriteIntent(currentIntent);
@@ -129,9 +143,13 @@ export function evaluateTaskflowBrokerConflictGate(input) {
             verdict: 'insufficientMutationIntent',
             confirmedConflict: false,
             overlappingTaskIds: overlapping.map((entry) => entry.taskId),
-            summary: 'Broker found overlapping active write intents, but the registered mutation intent lacks atom-level detail. Supplement mutation intent for precision; close remains advisory here.',
-            requiredCommand: null,
-            brokerVerdict: null
+            summary: 'broker-conflict-blocked: Broker found overlapping active write intents, but the registered mutation intent lacks atom-level detail or a resolution artifact.',
+            requiredCommand: buildBrokerConflictResolveCommand(input.taskId, overlapping.map((entry) => entry.taskId), currentFiles),
+            brokerVerdict: null,
+            decisionClass: 'blocked',
+            decisionReason: 'broker-conflict-blocked because active task overlap lacks atom-level mutation intent or resolution artifact.',
+            violationStatus: 'broker-conflict-blocked',
+            statusCode: 'broker-conflict-blocked'
         };
     }
     const comparisonRegistry = {
@@ -146,8 +164,12 @@ export function evaluateTaskflowBrokerConflictGate(input) {
             confirmedConflict: true,
             overlappingTaskIds: overlapping.map((entry) => entry.taskId),
             summary: 'Broker reports a confirmed CID/read-set conflict with another active write intent. taskflow close --write must stop until the conflict is resolved.',
-            requiredCommand: null,
-            brokerVerdict: decision.verdict
+            requiredCommand: buildBrokerConflictResolveCommand(input.taskId, overlapping.map((entry) => entry.taskId), currentFiles),
+            brokerVerdict: decision.verdict,
+            decisionClass: 'serial-release',
+            decisionReason: 'broker-conflict-blocked because Broker reports a confirmed CID/read-set conflict with another active write intent.',
+            violationStatus: 'broker-conflict-blocked',
+            statusCode: 'broker-conflict-blocked'
         };
     }
     if (decision.verdict === 'blocked-active-lease') {
@@ -167,7 +189,11 @@ export function evaluateTaskflowBrokerConflictGate(input) {
             requiredCommand: repairTarget
                 ? `node atm.mjs tasks repair-claim --task ${repairTarget} --actor ${quoteCliValue(actorId)} --json`
                 : null,
-            brokerVerdict: decision.verdict
+            brokerVerdict: decision.verdict,
+            decisionClass: 'blocked',
+            decisionReason: 'broker-conflict-blocked because broker found stale or malformed active lease state before close.',
+            violationStatus: 'broker-conflict-blocked',
+            statusCode: 'broker-conflict-blocked'
         };
     }
     if (decision.verdict === 'needs-physical-split' || decision.verdict === 'blocked-shared-surface') {
@@ -176,18 +202,17 @@ export function evaluateTaskflowBrokerConflictGate(input) {
             verdict: 'insufficientMutationIntent',
             confirmedConflict: false,
             overlappingTaskIds: overlapping.map((entry) => entry.taskId),
-            summary: 'Broker found overlapping write surfaces, but not a confirmed CID conflict. Supplement mutation intent for precision; close remains advisory here.',
-            requiredCommand: null,
-            brokerVerdict: decision.verdict
+            summary: 'broker-conflict-blocked: Broker found overlapping write surfaces without a confirmed safe release artifact.',
+            requiredCommand: buildBrokerConflictResolveCommand(input.taskId, overlapping.map((entry) => entry.taskId), currentFiles),
+            brokerVerdict: decision.verdict,
+            decisionClass: 'blocked',
+            decisionReason: 'broker-conflict-blocked because active write surfaces overlap without a resolution artifact.',
+            violationStatus: 'broker-conflict-blocked',
+            statusCode: 'broker-conflict-blocked'
         };
     }
     return {
-        schemaId: 'atm.taskflowBrokerConflictGate.v1',
-        verdict: 'noConflict',
-        confirmedConflict: false,
-        overlappingTaskIds: overlapping.map((entry) => entry.taskId),
-        summary: 'Broker re-check found no confirmed CID conflict for this close.',
-        requiredCommand: null,
-        brokerVerdict: decision.verdict
+        ...noConflictGate('Broker re-check found no confirmed CID conflict for this close.', decision.verdict),
+        overlappingTaskIds: overlapping.map((entry) => entry.taskId)
     };
 }

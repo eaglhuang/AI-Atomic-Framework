@@ -8,6 +8,12 @@ import type {
   GeneratedExternalTaskCard
 } from '@ai-atomic-framework/plugin-sdk';
 import { loadTemplate, applyIntent } from './templates.ts';
+export {
+  parsePlanMarkdown,
+  detectPlanHeadings,
+  parseSingleCardFromPlugin,
+  uniqueStrings
+} from './task-card-parser.ts';
 
 export class AtmMarkdownTaskSourcePlugin implements ExternalTaskSourcePlugin {
   readonly kind = 'external-task-source';

@@ -19,6 +19,7 @@ import { buildFrameworkTempClaimCommand, createFrameworkModeStatus, detectFramew
 import { isPlanningMirrorPath, isTaskDirectionPathCandidate, readActiveTaskDirectionLocks } from './task-direction.js';
 import { extractPathLikeStringsFromPrompt, isPathAllowedByScope, isQuickfixPrompt, readActiveQuickfixLock } from './work-channels.js';
 import { hookContractVersion, hookMarker, hookProvider, inspectGitHooks, installGitHooks } from './hook.js';
+import { evaluateTeamPreToolGate } from './team-runtime-gates.js';
 import { resolvePromptScopedTaskContext } from './next.js';
 import { CliError, makeResult, message } from './shared.js';
 const adapterHookEvents = {
@@ -640,6 +641,35 @@ function runPreToolHook(options) {
                 toolFiles,
                 criticalFiles,
                 frameworkClaimCommand: claimCommand,
+                frameworkStatus: status
+            }
+        });
+    }
+    const teamGateFindings = evaluateTeamPreToolGate({
+        cwd: options.cwd,
+        actorId: process.env.ATM_ACTOR_ID ?? process.env.ATM_COMMIT_ACTOR_ID ?? options.editor,
+        files: toolFiles,
+        command: options.command,
+        toolName: options.toolName
+    });
+    if (teamGateFindings.length > 0) {
+        return makeResult({
+            ok: false,
+            command: 'integration',
+            cwd: options.cwd,
+            messages: [message('error', 'ATM_TEAM_WRITE_SCOPE_EXCEEDED', 'Active Team run blocked a write outside the current file.write lease.', {
+                    editor: options.editor,
+                    findings: teamGateFindings,
+                    requiredCommand: teamGateFindings[0]?.requiredCommand ?? null,
+                    canonicalCode: 'ATM_TEAM_WRITE_SCOPE_EXCEEDED',
+                    legacyEquivalentCode: 'ATM_TEAM_WRITE_SCOPE_OUT_OF_BOUNDS'
+                })],
+            evidence: {
+                action: 'hook pre-tool',
+                editor: options.editor,
+                toolName: options.toolName,
+                toolFiles,
+                teamGateFindings,
                 frameworkStatus: status
             }
         });

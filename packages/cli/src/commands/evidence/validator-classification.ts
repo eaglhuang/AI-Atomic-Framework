@@ -116,8 +116,30 @@ export function isClosureRequiredValidator(
     }
   }
 
+  if (gate === 'validate:git-head-evidence' && !touchesProtectedGitHeadEvidenceSurface(scopePaths)) {
+    return false;
+  }
+
   const tier = classifyValidatorTier(gate);
   return tier === 'focused' || tier === 'release';
+}
+
+function touchesProtectedGitHeadEvidenceSurface(scopePaths: readonly string[]): boolean {
+  return scopePaths.some((p) => {
+    const norm = p.replace(/\\/g, '/').toLowerCase();
+    return norm.startsWith('packages/cli/src/commands/git')
+      || norm.startsWith('packages/cli/src/commands/hook/')
+      || norm.startsWith('packages/cli/src/commands/evidence/')
+      || norm.startsWith('packages/cli/src/commands/framework-development/')
+      || norm.startsWith('packages/cli/src/commands/taskflow/')
+      || norm.startsWith('packages/cli/src/commands/tasks/')
+      || norm.startsWith('packages/core/')
+      || norm.startsWith('scripts/validate-git-head-evidence')
+      || norm.startsWith('scripts/validate-framework-development-governance')
+      || norm.includes('release')
+      || norm.startsWith('.github/workflows/')
+      || norm.startsWith('integrations/');
+  });
 }
 
 /** 依 gate 名稱回傳對應的執行指令（human-readable 提示用） */

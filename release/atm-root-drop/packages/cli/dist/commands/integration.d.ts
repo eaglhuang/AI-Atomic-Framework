@@ -9,6 +9,14 @@ export type GovernedVendorConfigSurface = {
     templateReadme: string;
     exists: boolean;
 };
+export type IntegrationTeamRuntimeCapability = {
+    readonly providerId: string;
+    readonly runtimeModes: readonly string[];
+    readonly executionSurfaces: readonly string[];
+    readonly roles: readonly string[];
+    readonly status: 'supported' | 'experimental' | 'unavailable';
+    readonly evidence: string;
+};
 export declare function discoverGovernedVendorConfigSurface(repositoryRoot: string): GovernedVendorConfigSurface;
 declare const integrationAdapterFactories: Readonly<{
     'claude-code': typeof createClaudeCodeIntegrationAdapter;
@@ -43,6 +51,7 @@ export declare function checkIntegrationHealth(repositoryRoot: string): Promise<
         findings: readonly unknown[];
         driftedFiles: readonly string[];
         staleFields: any[];
+        teamRuntimeCapabilities: any[];
     }[];
     failed: {
         ok: boolean;
@@ -52,8 +61,45 @@ export declare function checkIntegrationHealth(repositoryRoot: string): Promise<
         findings: readonly unknown[];
         driftedFiles: readonly string[];
         staleFields: any[];
+        teamRuntimeCapabilities: any[];
     }[];
+    teamRuntimeBackends: {
+        schemaId: string;
+        ok: boolean;
+        manifestDir: string;
+        declaredBackendCount: number;
+        capabilities: {
+            manifestPath: string;
+            adapterId: string;
+            providerId: any;
+            runtimeModes: any;
+            executionSurfaces: any;
+            roles: any;
+            status: any;
+            evidence: any;
+        }[];
+        missingBackendSummary: string | null;
+        startReadiness: "broker-only-only" | "runtime-backend-declared";
+    };
 }>;
+export declare function inspectTeamRuntimeBackendCapabilities(repositoryRoot: string): {
+    schemaId: string;
+    ok: boolean;
+    manifestDir: string;
+    declaredBackendCount: number;
+    capabilities: {
+        manifestPath: string;
+        adapterId: string;
+        providerId: any;
+        runtimeModes: any;
+        executionSurfaces: any;
+        roles: any;
+        status: any;
+        evidence: any;
+    }[];
+    missingBackendSummary: string | null;
+    startReadiness: "broker-only-only" | "runtime-backend-declared";
+};
 export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
     repoBootstrapped: boolean;
     currentEditorId: "claude-code" | "copilot" | "cursor" | "gemini" | "codex" | "antigravity" | null;

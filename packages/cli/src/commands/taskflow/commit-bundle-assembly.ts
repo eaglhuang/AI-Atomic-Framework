@@ -87,6 +87,10 @@ function uniqueSorted(values: readonly string[]): string[] {
   return [...new Set(values.map((value) => value.replace(/\\/g, '/')).filter(Boolean))].sort((a, b) => a.localeCompare(b));
 }
 
+function normalizeTaskflowRelativePath(filePath: string): string {
+  return filePath.trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
 function normalizeRepoRelativePath(repoRoot: string, filePath: string): string {
   const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(repoRoot, filePath);
   return path.relative(repoRoot, resolved).replace(/\\/g, '/');
@@ -577,9 +581,15 @@ export function buildTaskflowCommitBundle(input: {
     if (file.startsWith('.atm/')) continue;
     const inScope = scopePaths.some((sp) => taskflowPathMatches(file, sp));
     const isDeclared = effectiveDeliverables.some((del) => taskflowPathMatches(file, del));
+    const isExplicitlyDeclaredFile = effectiveDeliverables.some((del) => normalizeTaskflowRelativePath(del) === file);
     const isAllowed = allowed.some((all) => taskflowPathMatches(file, all));
 
-    if (isDeclared && isAllowed) {
+    if (historicalCloseback && isTaskflowScratchBackupFile(file) && !isExplicitlyDeclaredFile) {
+      excludedDirtyFiles.push(file);
+      excludedReasons[file] = inScope
+        ? 'scratch/backup file inside broad scope; excluded as advisory residue during historical closeback'
+        : 'scratch/backup file outside task scope; excluded from governed bundle and must be left untouched';
+    } else if (isDeclared && isAllowed) {
       targetDeliveryFiles.push(file);
     } else {
       excludedDirtyFiles.push(file);
@@ -676,6 +686,16 @@ export function buildTaskflowCommitBundle(input: {
     excludedReasons,
     scopeAmendment
   };
+}
+
+function isTaskflowScratchBackupFile(file: string): boolean {
+  const normalized = normalizeTaskflowRelativePath(file).toLowerCase();
+  return normalized.endsWith('.bak')
+    || normalized.endsWith('.backup')
+    || normalized.endsWith('.orig')
+    || normalized.endsWith('.tmp')
+    || normalized.includes('/.tmp/')
+    || normalized.includes('/tmp/');
 }
 
 export function assertCommitBundleReady(bundle: TaskflowGovernedCommitBundle) {

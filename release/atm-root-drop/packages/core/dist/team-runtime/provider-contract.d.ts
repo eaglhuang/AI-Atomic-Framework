@@ -1,4 +1,4 @@
-export declare const TEAM_PROVIDER_IDS: readonly ["openai", "azure-openai", "claude-code", "gemini", "microsoft-foundry"];
+export declare const TEAM_PROVIDER_IDS: readonly ["openai", "anthropic", "azure-openai", "claude-code", "gemini", "microsoft-foundry"];
 export type TeamProviderId = typeof TEAM_PROVIDER_IDS[number];
 export type TeamProviderSessionLifecycle = {
     readonly createSession: true;
@@ -20,6 +20,8 @@ export type TeamProviderSessionRequest = {
     readonly providerId: TeamProviderId;
     readonly sdkId: string;
     readonly modelId: string;
+    readonly input?: string;
+    readonly instructions?: string;
 };
 export type TeamProviderStepResult = {
     readonly ok: boolean;
@@ -29,6 +31,37 @@ export type TeamProviderStepResult = {
     readonly retryable: boolean;
     readonly summary: string;
 };
+export type TeamProviderExecutionInput = {
+    readonly request: TeamProviderSessionRequest;
+    readonly sessionId: string;
+    readonly input: string;
+    readonly instructions?: string;
+    readonly scopedPaths: readonly string[];
+};
+export type TeamProviderExecutionResult = {
+    readonly ok: boolean;
+    readonly statusCode?: number;
+    readonly outputText: string;
+    readonly outputArtifacts?: readonly string[];
+    readonly retryable: boolean;
+    readonly summary: string;
+    readonly executionMode: 'vendor-api' | 'editor-cli';
+};
+export type TeamProviderHttpExecutor = (input: {
+    readonly url: string;
+    readonly method: 'POST';
+    readonly headers: Record<string, string>;
+    readonly body: unknown;
+    readonly timeoutMs?: number;
+}) => Promise<TeamProviderExecutionResult>;
+export type TeamProviderCommandExecutor = (input: {
+    readonly command: string;
+    readonly args: readonly string[];
+    readonly cwd?: string;
+    readonly env?: Record<string, string | undefined>;
+    readonly timeoutMs?: number;
+    readonly stdin: string;
+}) => Promise<TeamProviderExecutionResult>;
 export interface TeamProviderContract {
     readonly schemaId: 'atm.teamProviderContract.v1';
     readonly metadata: TeamProviderMetadata;
@@ -37,6 +70,7 @@ export interface TeamProviderContract {
         sessionId: string;
         providerId: TeamProviderId;
     };
+    executeStep?(input: TeamProviderExecutionInput): Promise<TeamProviderExecutionResult> | TeamProviderExecutionResult;
     closeSession(sessionId: string): {
         closed: true;
         sessionId: string;

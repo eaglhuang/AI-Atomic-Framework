@@ -6,14 +6,23 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
-import { discoverGovernedVendorConfigSurface } from '../packages/cli/src/commands/integration.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
+import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
+import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
 import { TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
 import { TeamProviderRegistry } from '../packages/core/src/team-runtime/provider-registry.ts';
 import { runProviderOrchestration } from '../packages/core/src/team-runtime/execution-orchestrator.ts';
-import { createDefaultTeamPermissionPolicy, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
-import { resolveTeamProviderSelection } from '../packages/core/src/team-runtime/provider-selection.ts';
+import { advanceBrokerConflictResolution, createBrokerConflictResolutionArtifact, createDefaultTeamPermissionPolicy, decideBrokerConflictResolutionAdmission, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
+import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, createTeamObservabilityEvent, queryTeamObservabilityEvents } from '../packages/core/src/team-runtime/observability.ts';
+import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../packages/core/src/team-runtime/provider-selection.ts';
+import { createAzureOpenAITeamProviderBridge, launchAzureOpenAITeamProviderRun, validateAzureOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/azure-openai.ts';
+import { createClaudeCodeTeamProviderBridge, launchClaudeCodeTeamProviderRun, validateClaudeCodeTeamProviderConfig } from '../packages/core/src/team-runtime/providers/claude-code.ts';
+import { createGeminiTeamProviderBridge, launchGeminiTeamProviderRun, validateGeminiTeamProviderConfig } from '../packages/core/src/team-runtime/providers/gemini.ts';
+import { createMicrosoftFoundryTeamProviderBridge, launchMicrosoftFoundryTeamProviderRun, validateMicrosoftFoundryTeamProviderConfig } from '../packages/core/src/team-runtime/providers/microsoft-foundry.ts';
+import { createOpenAITeamProviderBridge, launchOpenAITeamProviderRun, validateOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/openai.ts';
+import { createAnthropicTeamProviderBridge, launchAnthropicTeamProviderRun, validateAnthropicTeamProviderConfig } from '../packages/core/src/team-runtime/providers/anthropic.ts';
 import {
   validateScopeLeaseEpoch,
   validateScopeLeaseFencing,
@@ -26,10 +35,18 @@ import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/co
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
+import { runBrokerConflictResolutionReplayFixture } from './validate-mao-event-replay.ts';
+import { evaluateTeamPreCommitGate, evaluateTeamPreToolGate } from '../packages/cli/src/commands/team-runtime-gates.ts';
+import { runIntegrationHookInvocationInProcess } from '../packages/cli/src/commands/integration-hooks.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
-await main();
+const sourceTeamRunSnapshot = snapshotSourceTeamRunFiles(process.cwd());
+try {
+  await main();
+} finally {
+  cleanupNewSourceTeamRunFiles(process.cwd(), sourceTeamRunSnapshot);
+}
 
 async function main() {
   // TASK-MAO-0027: Team Agents Wave Mode runtime self-check. Runs on every
@@ -112,6 +129,24 @@ async function main() {
     assert.equal(highRisk.nextTeamShape.signals.scopeCount, 4);
 
     console.log('[validate-team-agents] ok (lieutenant-escalation)');
+    return;
+  }
+
+  if (taskCase === 'source-runtime-residue-cleanup') {
+    const cleanupRoot = path.join(createTempWorkspace('atm-team-source-cleanup-'), 'source');
+    const teamRunDir = path.join(cleanupRoot, '.atm', 'runtime', 'team-runs');
+    mkdirSync(teamRunDir, { recursive: true });
+    const existingPath = path.join(teamRunDir, 'team-existing.json');
+    const residuePath = path.join(teamRunDir, 'team-validator-residue.json');
+    writeFileSync(existingPath, '{}\n', 'utf8');
+    const snapshot = snapshotSourceTeamRunFiles(cleanupRoot);
+    writeFileSync(residuePath, '{}\n', 'utf8');
+    cleanupNewSourceTeamRunFiles(cleanupRoot, snapshot);
+    assert.equal(existsSync(existingPath), true, 'cleanup must preserve pre-existing team runtime files');
+    assert.equal(existsSync(residuePath), false, 'cleanup must remove validator-created source runtime residue');
+    rmSync(path.dirname(cleanupRoot), { recursive: true, force: true });
+
+    console.log('[validate-team-agents] ok (source-runtime-residue-cleanup)');
     return;
   }
 
@@ -390,7 +425,7 @@ async function main() {
     assert.equal(registry.list().length, TEAM_PROVIDER_IDS.length);
     const provider = registry.get('claude-code');
     assert.ok(provider);
-    const orchestration = runProviderOrchestration(provider!, {
+    const orchestration = await runProviderOrchestration(provider!, {
       taskId: 'TASK-TEAM-0037',
       role: 'implementer',
       runtimeMode: 'broker-only',
@@ -402,6 +437,156 @@ async function main() {
     assert.equal(orchestration.ok, true);
     assert.equal(orchestration.coordinatorOwnedAuthority, true);
     console.log('[validate-team-agents] ok (vendor-neutral-runtime-contract)');
+    return;
+  }
+
+  if (taskCase === 'team-start-execution-wiring') {
+    let attemptCount = 0;
+    const provider = {
+      schemaId: 'atm.teamProviderContract.v1' as const,
+      metadata: createTeamProviderMetadata('openai'),
+      sessionLifecycle: {
+        createSession: true as const,
+        closeSession: true as const,
+        cancelSession: true as const,
+        retryStep: true as const
+      },
+      openSession(request: any) {
+        return { sessionId: `${request.taskId}:${request.role}:${request.providerId}:${request.modelId}`, providerId: 'openai' as const };
+      },
+      executeStep(input: any) {
+        attemptCount += 1;
+        return {
+          ok: attemptCount > 1,
+          outputText: `attempt ${attemptCount} for ${input.request.role}`,
+          outputArtifacts: ['agent-report', `role-${input.request.role}`],
+          retryable: attemptCount === 1,
+          summary: attemptCount > 1 ? 'fake provider completed' : 'fake provider retry requested',
+          executionMode: 'vendor-api' as const
+        };
+      },
+      closeSession(sessionId: string) {
+        return { closed: true as const, sessionId };
+      },
+      cancelSession(sessionId: string, reason: string) {
+        return { cancelled: true as const, sessionId, reason };
+      }
+    };
+    const orchestration = await runProviderOrchestration(provider, {
+      taskId: 'TASK-TEAM-0050',
+      role: 'implementer',
+      runtimeMode: 'real-agent',
+      providerId: 'openai',
+      sdkId: 'openai-responses',
+      modelId: 'gpt-5-mini',
+      retries: 2
+    });
+    assert.equal(orchestration.ok, true);
+    assert.equal(orchestration.attempts, 2);
+    assert.equal(attemptCount, 2);
+    assert.equal(orchestration.sessionId, 'TASK-TEAM-0050:implementer:openai:gpt-5-mini');
+    assert.deepEqual(orchestration.stepResult.artifacts, ['agent-report', 'role-implementer']);
+    console.log('[validate-team-agents] ok (team-start-execution-wiring)');
+    return;
+  }
+
+  if (taskCase === 'heterogeneous-multi-bot-team-run') {
+    const makeProvider = (providerId: 'openai' | 'claude-code') => ({
+      schemaId: 'atm.teamProviderContract.v1' as const,
+      metadata: createTeamProviderMetadata(providerId),
+      sessionLifecycle: {
+        createSession: true as const,
+        closeSession: true as const,
+        cancelSession: true as const,
+        retryStep: true as const
+      },
+      openSession(request: any) {
+        return { sessionId: `${request.taskId}:${request.role}:${request.providerId}:${request.modelId}`, providerId };
+      },
+      executeStep(input: any) {
+        if (input.request.role === 'validator') {
+          return {
+            ok: false,
+            outputText: 'broker-conflict-blocked',
+            outputArtifacts: ['atm.brokerConflictResolution.v1'],
+            retryable: false,
+            summary: 'single role blocked by broker conflict',
+            executionMode: 'vendor-api' as const
+          };
+        }
+        return {
+          ok: true,
+          outputText: `completed ${input.request.role}`,
+          outputArtifacts: ['atm.teamProviderRunArtifact.v1', `role-${input.request.role}`],
+          retryable: false,
+          summary: `${providerId} fake executor completed`,
+          executionMode: providerId === 'openai' ? 'vendor-api' as const : 'editor-cli' as const
+        };
+      },
+      closeSession(sessionId: string) {
+        return { closed: true as const, sessionId };
+      },
+      cancelSession(sessionId: string, reason: string) {
+        return { cancelled: true as const, sessionId, reason };
+      }
+    });
+    const requests = [
+      { role: 'implementer', providerId: 'openai' as const, sdkId: 'responses', modelId: 'gpt-5-mini' },
+      { role: 'reader', providerId: 'claude-code' as const, sdkId: 'claude-code', modelId: 'claude-sonnet' },
+      { role: 'validator', providerId: 'openai' as const, sdkId: 'responses', modelId: 'gpt-5-mini' }
+    ];
+    const results = await Promise.all(requests.map((request) => runProviderOrchestration(makeProvider(request.providerId), {
+      taskId: 'TASK-TEAM-0052',
+      role: request.role,
+      runtimeMode: request.providerId === 'openai' ? 'real-agent' : 'editor-subagent',
+      providerId: request.providerId,
+      sdkId: request.sdkId,
+      modelId: request.modelId,
+      retries: 1
+    })));
+    assert.equal(new Set(results.map((result) => result.providerId)).size, 2);
+    assert.deepEqual(results.map((result) => result.sessionId), [
+      'TASK-TEAM-0052:implementer:openai:gpt-5-mini',
+      'TASK-TEAM-0052:reader:claude-code:claude-sonnet',
+      'TASK-TEAM-0052:validator:openai:gpt-5-mini'
+    ]);
+    assert.equal(results.filter((result) => result.ok).length, 2);
+    assert.equal(results.find((result) => result.stepResult.role === 'validator')?.stepResult.summary, 'single role blocked by broker conflict');
+    assert.ok(results.filter((result) => result.ok).every((result) => result.stepResult.artifacts.includes('atm.teamProviderRunArtifact.v1')));
+    console.log('[validate-team-agents] ok (heterogeneous-multi-bot-team-run)');
+    return;
+  }
+
+  if (taskCase === 'runtime-tier-contract') {
+    const recipe = {
+      schemaId: 'atm.teamRecipe.v1' as const,
+      recipeId: 'validator.runtime-tier',
+      agents: [
+        { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write'] },
+        { agentId: 'reader', role: 'reader', profile: 'atm.reader.v1', permissions: ['file.read'] },
+        { agentId: 'implementer-typescript', role: 'implementer', profile: 'atm.implementer.typescript.v1', permissions: ['file.write'] },
+        { agentId: 'validator', role: 'validator', profile: 'atm.validator.v1', permissions: ['exec.validator'] }
+      ]
+    };
+    const plan = buildTeamPlan({
+      task: { workItemId: 'TASK-TEAM-0062', title: 'Runtime tier contract' },
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: { ok: true, findings: [] },
+      brokerLane: safeBrokerLane(),
+      requestedTeamSize: 'L5'
+    }) as any;
+    assert.equal(plan.runtimeTierContract.schemaId, 'atm.teamRuntimeTierContract.v1');
+    const roleTiers = Object.fromEntries(plan.runtimeTierContract.roleTiers.map((entry: any) => [entry.role, entry.runtimeTier]));
+    assert.equal(roleTiers.reader, 'raw-api');
+    assert.equal(roleTiers.validator, 'raw-api');
+    assert.equal(roleTiers.reviewAgent, 'raw-api');
+    assert.equal(roleTiers.knowledgeScout, 'raw-api');
+    assert.equal(roleTiers.implementer, 'agent-sdk');
+    assert.equal(roleTiers.coordinator, 'agent-sdk');
+    assert.equal(roleTiers.lieutenant, 'editor');
+    assert.ok(plan.runtimeTierContract.providerContractCompatibility.includes('RawChatAdapter'));
+    console.log('[validate-team-agents] ok (runtime-tier-contract)');
     return;
   }
 
@@ -420,6 +605,906 @@ async function main() {
     });
     assert.equal(deny.ok, false);
     console.log('[validate-team-agents] ok (provider-permission-broker)');
+    return;
+  }
+
+  if (taskCase === 'anthropic-direct-bridge') {
+    assert.ok(TEAM_PROVIDER_IDS.includes('anthropic'));
+    const incomplete = validateAnthropicTeamProviderConfig({
+      schemaId: 'atm.anthropicTeamProviderConfig.v1',
+      providerId: 'anthropic',
+      sdkId: 'anthropic-messages',
+      modelId: ''
+    });
+    assert.equal(incomplete.ok, false);
+    assert.ok(incomplete.missingFields.includes('modelId'));
+    assert.ok(incomplete.missingFields.includes('apiKeyEnvVar'));
+    const bridge = createAnthropicTeamProviderBridge({
+      schemaId: 'atm.anthropicTeamProviderConfig.v1',
+      providerId: 'anthropic',
+      sdkId: 'anthropic-messages',
+      modelId: 'claude-3-5-sonnet',
+      apiKeyEnvVar: 'ANTHROPIC_API_KEY'
+    });
+    let observedRequest: any = null;
+    const result = await launchAnthropicTeamProviderRun({
+      bridge,
+      request: {
+        taskId: 'TASK-TEAM-0063',
+        role: 'validator',
+        runtimeMode: 'real-agent',
+        providerId: 'anthropic',
+        sdkId: 'anthropic-messages',
+        modelId: 'claude-3-5-sonnet',
+        instructions: 'Validate Anthropic bridge.'
+      },
+      permissionPolicy: createDefaultTeamPermissionPolicy(),
+      scopedPaths: ['packages/core/src/team-runtime/providers/anthropic.ts'],
+      env: { ANTHROPIC_API_KEY: 'secret-test-key' },
+      emittedAt: '2026-07-10T02:00:00.000Z',
+      executor: async (request) => {
+        observedRequest = request;
+        return {
+          ok: true,
+          statusCode: 200,
+          outputText: 'anthropic fake executor completed',
+          outputArtifacts: ['agent-report', 'evidence-summary'],
+          retryable: false,
+          summary: 'Anthropic Messages API fake request completed.',
+          executionMode: 'vendor-api'
+        };
+      }
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.providerId, 'anthropic');
+    assert.equal(result.artifact.providerId, 'anthropic');
+    assert.equal(result.artifact.redaction.rawSecretsLogged, false);
+    assert.equal(result.observabilityEvents.length, 3);
+    assert.equal(observedRequest.url, 'https://api.anthropic.com/v1/messages');
+    assert.equal(observedRequest.headers['anthropic-version'], '2023-06-01');
+    assert.equal(observedRequest.body.model, 'claude-3-5-sonnet');
+    assert.equal(observedRequest.body.messages[0].role, 'user');
+    const summary = buildAnthropicRuntimeBridgeSummary();
+    assert.equal(summary.providerIds[0], 'anthropic');
+    assert.equal(summary.bridges[0].executionSurface, 'anthropic-messages-http');
+    console.log('[validate-team-agents] ok (anthropic-direct-bridge)');
+    return;
+  }
+
+  if (taskCase === 'openai-azure-openai-bridges') {
+    const incompleteOpenAI = validateOpenAITeamProviderConfig({
+      schemaId: 'atm.openaiTeamProviderConfig.v1',
+      providerId: 'openai',
+      sdkId: 'openai-responses',
+      modelId: '',
+      apiKeyEnvVar: ''
+    });
+    assert.equal(incompleteOpenAI.ok, false);
+    assert.deepEqual(incompleteOpenAI.missingFields, ['modelId', 'apiKeyEnvVar']);
+    assert.equal(incompleteOpenAI.rawSecretsLogged, false);
+
+    const incompleteAzure = validateAzureOpenAITeamProviderConfig({
+      schemaId: 'atm.azureOpenAITeamProviderConfig.v1',
+      providerId: 'azure-openai',
+      sdkId: 'azure-openai-responses',
+      endpointEnvVar: 'AZURE_OPENAI_ENDPOINT',
+      deploymentName: '',
+      modelId: 'gpt-5-mini',
+      authMode: 'api-key-env',
+      apiKeyEnvVar: ''
+    });
+    assert.equal(incompleteAzure.ok, false);
+    assert.ok(incompleteAzure.missingFields.includes('deploymentName'));
+    assert.ok(incompleteAzure.missingFields.includes('apiKeyEnvVar'));
+
+    const openaiBridge = createOpenAITeamProviderBridge({
+      schemaId: 'atm.openaiTeamProviderConfig.v1',
+      providerId: 'openai',
+      sdkId: 'openai-responses',
+      modelId: 'gpt-5-mini',
+      apiKeyEnvVar: 'OPENAI_API_KEY'
+    });
+    const azureBridge = createAzureOpenAITeamProviderBridge({
+      schemaId: 'atm.azureOpenAITeamProviderConfig.v1',
+      providerId: 'azure-openai',
+      sdkId: 'azure-openai-responses',
+      endpointEnvVar: 'AZURE_OPENAI_ENDPOINT',
+      deploymentName: 'atm-team-runtime',
+      modelId: 'gpt-5-mini',
+      authMode: 'managed-identity',
+      tenantIdEnvVar: 'AZURE_TENANT_ID'
+    });
+    assert.equal(openaiBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(azureBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(openaiBridge.configValidation.ok, true);
+    assert.equal(azureBridge.configValidation.ok, true);
+    assert.ok(openaiBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+    assert.ok(azureBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+
+    const policy = createDefaultTeamPermissionPolicy();
+    const httpCalls: any[] = [];
+    const fakeHttpExecutor = async (request: any) => {
+      httpCalls.push(request);
+      return {
+        ok: true,
+        statusCode: 200,
+        outputText: 'provider execution completed',
+        outputArtifacts: ['agent-report', 'evidence-summary', 'provider-output'],
+        retryable: false,
+        summary: 'fake vendor API completed',
+        executionMode: 'vendor-api' as const
+      };
+    };
+    const openaiRun = await launchOpenAITeamProviderRun({
+      bridge: openaiBridge,
+      request: {
+        taskId: 'TASK-TEAM-0042',
+        role: 'implementer',
+        runtimeMode: 'real-agent',
+        providerId: 'openai',
+        sdkId: 'openai-responses',
+        modelId: 'gpt-5-mini',
+        input: 'Implement scoped provider execution.'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/openai.ts'],
+      executor: fakeHttpExecutor,
+      env: { OPENAI_API_KEY: 'test-openai-key' },
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const azureRun = await launchAzureOpenAITeamProviderRun({
+      bridge: azureBridge,
+      request: {
+        taskId: 'TASK-TEAM-0042',
+        role: 'implementer',
+        runtimeMode: 'real-agent',
+        providerId: 'azure-openai',
+        sdkId: 'azure-openai-responses',
+        modelId: 'gpt-5-mini',
+        input: 'Validate Azure execution.'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/azure-openai.ts'],
+      executor: fakeHttpExecutor,
+      env: {
+        AZURE_OPENAI_ENDPOINT: 'https://example.openai.azure.com',
+        AZURE_OPENAI_BEARER_TOKEN: 'test-azure-token',
+        AZURE_TENANT_ID: 'tenant'
+      },
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    for (const run of [openaiRun, azureRun]) {
+      assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
+      assert.equal(run.ok, true);
+      assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
+      assert.equal(run.artifact.runtimeMode, 'real-agent');
+      assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.execution.mode, 'vendor-api');
+      assert.equal(run.artifact.execution.statusCode, 200);
+      assert.equal(run.artifact.execution.outputTextPreview, 'provider execution completed');
+      assert.equal(run.artifact.redaction.rawSecretsLogged, false);
+      assert.equal(run.artifact.observabilityEventCount, 3);
+      assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
+        'session.start',
+        'artifact.output',
+        'session.complete'
+      ]);
+      assert.ok(run.observabilityEvents.every((event) => event.schemaId === 'atm.teamAgentObservabilityEvent.v1'));
+      assert.ok(run.observabilityEvents.every((event) => event.redaction.rawSecretsLogged === false));
+      assert.ok(run.observabilityEvents.every((event) => event.evidenceBoundary.rawSecretsAllowed === false));
+    }
+    assert.equal(openaiRun.artifact.artifactType, azureRun.artifact.artifactType);
+    assert.equal(openaiRun.observabilityEvents[1]?.artifactType, azureRun.observabilityEvents[1]?.artifactType);
+    assert.equal(httpCalls.length, 2);
+    assert.equal(httpCalls[0].url, 'https://api.openai.com/v1/responses');
+    assert.ok(httpCalls[0].headers.Authorization.startsWith('Bearer '));
+    assert.ok(httpCalls[1].url.includes('/openai/deployments/atm-team-runtime/responses?api-version='));
+    assert.ok(httpCalls[1].headers.Authorization.startsWith('Bearer '));
+
+    const bridgeSummary = buildOpenAIFamilyRuntimeBridgeSummary();
+    assert.equal(bridgeSummary.schemaId, 'atm.openAIFamilyRuntimeBridgeSummary.v1');
+    assert.deepEqual(bridgeSummary.providerIds, ['openai', 'azure-openai']);
+    assert.equal(bridgeSummary.sharedProviderInterface, 'atm.teamProviderContract.v1');
+    assert.ok(bridgeSummary.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+    assert.ok(bridgeSummary.bridges.every((bridge) => bridge.rawSecretsLogged === false));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0042', '--cwd', process.cwd(), '--json']);
+    const planBridgeSummary = (planResult.evidence as any)?.teamPlan?.openAIFamilyRuntimeBridges;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating OpenAI bridge wiring');
+    assert.equal(planBridgeSummary?.schemaId, 'atm.openAIFamilyRuntimeBridgeSummary.v1');
+    assert.deepEqual(planBridgeSummary?.providerIds, ['openai', 'azure-openai']);
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.openaiTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.azureOpenAITeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.teamProviderRunArtifact.v1'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/openai.ts'));
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/azure-openai.ts'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#openai-azure-openai-bridges'));
+
+    console.log('[validate-team-agents] ok (openai-azure-openai-bridges)');
+    return;
+  }
+
+  if (taskCase === 'claude-gemini-bridges') {
+    const incompleteClaude = validateClaudeCodeTeamProviderConfig({
+      schemaId: 'atm.claudeCodeTeamProviderConfig.v1',
+      providerId: 'claude-code',
+      sdkId: 'claude-code-editor-subagent',
+      modelId: '',
+      editorCommand: '',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    assert.equal(incompleteClaude.ok, false);
+    assert.deepEqual(incompleteClaude.missingFields, ['modelId', 'editorCommand']);
+    assert.equal(incompleteClaude.rawSecretsLogged, false);
+
+    const incompleteGemini = validateGeminiTeamProviderConfig({
+      schemaId: 'atm.geminiTeamProviderConfig.v1',
+      providerId: 'gemini',
+      sdkId: 'gemini-cli',
+      modelId: '',
+      cliCommand: '',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    assert.equal(incompleteGemini.ok, false);
+    assert.deepEqual(incompleteGemini.missingFields, ['modelId', 'cliCommand']);
+    assert.equal(incompleteGemini.rawSecretsLogged, false);
+
+    const claudeBridge = createClaudeCodeTeamProviderBridge({
+      schemaId: 'atm.claudeCodeTeamProviderConfig.v1',
+      providerId: 'claude-code',
+      sdkId: 'claude-code-editor-subagent',
+      modelId: 'claude-opus-4',
+      editorCommand: 'claude',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    const geminiBridge = createGeminiTeamProviderBridge({
+      schemaId: 'atm.geminiTeamProviderConfig.v1',
+      providerId: 'gemini',
+      sdkId: 'gemini-cli',
+      modelId: 'gemini-2.5-pro',
+      cliCommand: 'gemini',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    assert.equal(claudeBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(geminiBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(claudeBridge.configValidation.ok, true);
+    assert.equal(geminiBridge.configValidation.ok, true);
+    assert.ok(claudeBridge.metadata.supportedRuntimeModes.includes('editor-subagent'));
+    assert.ok(geminiBridge.metadata.supportedRuntimeModes.includes('editor-subagent'));
+
+    const policy = createDefaultTeamPermissionPolicy();
+    const commandCalls: any[] = [];
+    const fakeCommandExecutor = async (request: any) => {
+      commandCalls.push(request);
+      return {
+        ok: true,
+        statusCode: 0,
+        outputText: 'editor execution completed',
+        outputArtifacts: ['agent-report', 'evidence-summary', 'provider-output'],
+        retryable: false,
+        summary: 'fake command completed',
+        executionMode: 'editor-cli' as const
+      };
+    };
+    const claudeRun = await launchClaudeCodeTeamProviderRun({
+      bridge: claudeBridge,
+      request: {
+        taskId: 'TASK-TEAM-0043',
+        role: 'implementer',
+        runtimeMode: 'editor-subagent',
+        providerId: 'claude-code',
+        sdkId: 'claude-code-editor-subagent',
+        modelId: 'claude-opus-4',
+        instructions: 'Run bounded Claude role.'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/claude-code.ts'],
+      permissionLeases: ['exec.validator'],
+      executor: fakeCommandExecutor,
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const geminiRun = await launchGeminiTeamProviderRun({
+      bridge: geminiBridge,
+      request: {
+        taskId: 'TASK-TEAM-0043',
+        role: 'validator',
+        runtimeMode: 'editor-subagent',
+        providerId: 'gemini',
+        sdkId: 'gemini-cli',
+        modelId: 'gemini-2.5-pro',
+        instructions: 'Run bounded Gemini role.'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/gemini.ts'],
+      permissionLeases: ['exec.validator'],
+      executor: fakeCommandExecutor,
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    for (const run of [claudeRun, geminiRun]) {
+      assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
+      assert.equal(run.ok, true);
+      assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
+      assert.equal(run.artifact.runtimeMode, 'editor-subagent');
+      assert.equal(run.artifact.roleEnvelope.schemaId, 'atm.teamEditorSubagentRoleEnvelope.v1');
+      assert.equal(run.artifact.roleEnvelope.coordinatorOwnedAuthority, true);
+      assert.ok(run.artifact.roleEnvelope.allowedFiles.length > 0);
+      assert.ok(run.artifact.roleEnvelope.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+      assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.execution.mode, 'editor-cli');
+      assert.equal(run.artifact.execution.statusCode, 0);
+      assert.equal(run.artifact.execution.outputTextPreview, 'editor execution completed');
+      assert.equal(run.artifact.redaction.rawSecretsLogged, false);
+      assert.equal(run.artifact.observabilityEventCount, 3);
+      assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
+        'session.start',
+        'artifact.output',
+        'session.complete'
+      ]);
+      assert.ok(run.observabilityEvents.every((event) => event.schemaId === 'atm.teamAgentObservabilityEvent.v1'));
+      assert.ok(run.observabilityEvents.every((event) => event.redaction.rawSecretsLogged === false));
+      assert.ok(run.observabilityEvents.every((event) => event.evidenceBoundary.rawSecretsAllowed === false));
+    }
+    assert.equal(claudeRun.artifact.artifactType, geminiRun.artifact.artifactType);
+    assert.equal(claudeRun.artifact.roleEnvelope.executionSurface, 'editor-subagent');
+    assert.equal(geminiRun.artifact.roleEnvelope.executionSurface, 'cli-style');
+    assert.equal(commandCalls.length, 2);
+    assert.equal(commandCalls[0].command, 'claude');
+    assert.deepEqual(commandCalls[0].args, ['--model', 'claude-opus-4', '--print']);
+    assert.equal(commandCalls[1].command, 'gemini');
+    assert.deepEqual(commandCalls[1].args, ['--model', 'gemini-2.5-pro']);
+    assert.ok(commandCalls.every((call) => JSON.parse(call.stdin).coordinatorOwnedAuthority === true));
+
+    const bridgeSummary = buildEditorExecutionRuntimeBridgeSummary();
+    assert.equal(bridgeSummary.schemaId, 'atm.editorExecutionRuntimeBridgeSummary.v1');
+    assert.deepEqual(bridgeSummary.providerIds, ['claude-code', 'gemini']);
+    assert.equal(bridgeSummary.sharedProviderInterface, 'atm.teamProviderContract.v1');
+    assert.equal(bridgeSummary.roleEnvelopeSchemaId, 'atm.teamEditorSubagentRoleEnvelope.v1');
+    assert.ok(bridgeSummary.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+    assert.ok(bridgeSummary.bridges.every((bridge) => bridge.rawSecretsLogged === false));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0043', '--cwd', process.cwd(), '--json']);
+    const planBridgeSummary = (planResult.evidence as any)?.teamPlan?.editorExecutionRuntimeBridges;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating Claude/Gemini bridge wiring');
+    assert.equal(planBridgeSummary?.schemaId, 'atm.editorExecutionRuntimeBridgeSummary.v1');
+    assert.deepEqual(planBridgeSummary?.providerIds, ['claude-code', 'gemini']);
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.claudeCodeTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.geminiTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.teamEditorSubagentRoleEnvelope.v1'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/claude-code.ts'));
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/gemini.ts'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#claude-gemini-bridges'));
+
+    console.log('[validate-team-agents] ok (claude-gemini-bridges)');
+    return;
+  }
+
+  if (taskCase === 'microsoft-foundry-bridge') {
+    const incompleteChat = validateMicrosoftFoundryTeamProviderConfig({
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1',
+      providerId: 'microsoft-foundry',
+      sdkId: 'microsoft-foundry',
+      surface: 'project-chat-inference',
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      deploymentName: ''
+    });
+    assert.equal(incompleteChat.ok, false);
+    assert.deepEqual(incompleteChat.missingFields, ['deploymentName']);
+    assert.equal(incompleteChat.rawSecretsLogged, false);
+
+    const incompleteAgent = validateMicrosoftFoundryTeamProviderConfig({
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1',
+      providerId: 'microsoft-foundry',
+      sdkId: 'microsoft-foundry',
+      surface: 'agent-service',
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      agentIdEnvVar: ''
+    });
+    assert.equal(incompleteAgent.ok, false);
+    assert.deepEqual(incompleteAgent.missingFields, ['agentIdEnvVar']);
+
+    const chatConfig = {
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1' as const,
+      providerId: 'microsoft-foundry' as const,
+      sdkId: 'microsoft-foundry' as const,
+      surface: 'project-chat-inference' as const,
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      deploymentName: 'team-runtime-chat',
+      tenantIdEnvVar: 'AZURE_TENANT_ID'
+    };
+    const agentConfig = {
+      schemaId: 'atm.microsoftFoundryTeamProviderConfig.v1' as const,
+      providerId: 'microsoft-foundry' as const,
+      sdkId: 'microsoft-foundry' as const,
+      surface: 'agent-service' as const,
+      modelId: 'gpt-5-mini',
+      projectEndpointEnvVar: 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT',
+      agentIdEnvVar: 'AZURE_AI_FOUNDRY_AGENT_ID',
+      tenantIdEnvVar: 'AZURE_TENANT_ID'
+    };
+    const chatBridge = createMicrosoftFoundryTeamProviderBridge(chatConfig);
+    const agentBridge = createMicrosoftFoundryTeamProviderBridge(agentConfig);
+    assert.equal(chatBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(agentBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(chatBridge.configValidation.ok, true);
+    assert.equal(agentBridge.configValidation.ok, true);
+    assert.equal(chatBridge.configValidation.surface, 'project-chat-inference');
+    assert.equal(agentBridge.configValidation.surface, 'agent-service');
+    assert.ok(chatBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+    assert.ok(agentBridge.metadata.supportedRuntimeModes.includes('real-agent'));
+
+    const policy = createDefaultTeamPermissionPolicy();
+    const foundryCalls: any[] = [];
+    const fakeFoundryExecutor = async (request: any) => {
+      foundryCalls.push(request);
+      return {
+        ok: true,
+        statusCode: 200,
+        outputText: 'foundry execution completed',
+        outputArtifacts: ['agent-report', 'evidence-summary', 'provider-output'],
+        retryable: false,
+        summary: 'fake Foundry API completed',
+        executionMode: 'vendor-api' as const
+      };
+    };
+    const chatRun = await launchMicrosoftFoundryTeamProviderRun({
+      bridge: chatBridge,
+      config: chatConfig,
+      request: {
+        taskId: 'TASK-TEAM-0044',
+        role: 'implementer',
+        runtimeMode: 'real-agent',
+        providerId: 'microsoft-foundry',
+        sdkId: 'microsoft-foundry',
+        modelId: 'gpt-5-mini',
+        input: 'Run Foundry chat.'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/microsoft-foundry.ts'],
+      executor: fakeFoundryExecutor,
+      env: {
+        AZURE_AI_FOUNDRY_PROJECT_ENDPOINT: 'https://example.services.ai.azure.com',
+        AZURE_AI_FOUNDRY_BEARER_TOKEN: 'test-foundry-token',
+        AZURE_TENANT_ID: 'tenant'
+      },
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const agentRun = await launchMicrosoftFoundryTeamProviderRun({
+      bridge: agentBridge,
+      config: agentConfig,
+      request: {
+        taskId: 'TASK-TEAM-0044',
+        role: 'validator',
+        runtimeMode: 'real-agent',
+        providerId: 'microsoft-foundry',
+        sdkId: 'microsoft-foundry',
+        modelId: 'gpt-5-mini',
+        input: 'Run Foundry agent.'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/microsoft-foundry.ts'],
+      executor: fakeFoundryExecutor,
+      env: {
+        AZURE_AI_FOUNDRY_PROJECT_ENDPOINT: 'https://example.services.ai.azure.com',
+        AZURE_AI_FOUNDRY_BEARER_TOKEN: 'test-foundry-token',
+        AZURE_AI_FOUNDRY_AGENT_ID: 'agent-123',
+        AZURE_TENANT_ID: 'tenant'
+      },
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    for (const run of [chatRun, agentRun]) {
+      assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
+      assert.equal(run.ok, true);
+      assert.equal(run.providerId, 'microsoft-foundry');
+      assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
+      assert.equal(run.artifact.runtimeMode, 'real-agent');
+      assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.execution.mode, 'vendor-api');
+      assert.equal(run.artifact.execution.statusCode, 200);
+      assert.equal(run.artifact.execution.outputTextPreview, 'foundry execution completed');
+      assert.equal(run.artifact.redaction.rawSecretsLogged, false);
+      assert.equal(run.artifact.observabilityEventCount, 3);
+      assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
+        'session.start',
+        'artifact.output',
+        'session.complete'
+      ]);
+      assert.ok(run.observabilityEvents.every((event) => event.schemaId === 'atm.teamAgentObservabilityEvent.v1'));
+      assert.ok(run.observabilityEvents.every((event) => event.redaction.rawSecretsLogged === false));
+      assert.ok(run.observabilityEvents.every((event) => event.evidenceBoundary.rawSecretsAllowed === false));
+    }
+    assert.equal(chatRun.artifact.artifactType, agentRun.artifact.artifactType);
+    assert.equal(chatRun.artifact.foundrySurface, 'project-chat-inference');
+    assert.equal(agentRun.artifact.foundrySurface, 'agent-service');
+    assert.equal(chatRun.artifact.foundryConfigRefs.deploymentName, 'team-runtime-chat');
+    assert.equal(agentRun.artifact.foundryConfigRefs.agentIdEnvVar, 'AZURE_AI_FOUNDRY_AGENT_ID');
+    assert.equal(foundryCalls.length, 2);
+    assert.ok(foundryCalls[0].url.includes('/openai/deployments/team-runtime-chat/chat/completions?api-version='));
+    assert.ok(foundryCalls[1].url.includes('/assistants/agent-123/messages?api-version='));
+    assert.ok(foundryCalls.every((call) => call.headers.Authorization.startsWith('Bearer ')));
+
+    const bridgeSummary = buildMicrosoftFoundryRuntimeBridgeSummary();
+    assert.equal(bridgeSummary.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');
+    assert.deepEqual(bridgeSummary.providerIds, ['microsoft-foundry']);
+    assert.deepEqual(bridgeSummary.supportedSurfaces, ['project-chat-inference', 'agent-service']);
+    assert.equal(bridgeSummary.sharedProviderInterface, 'atm.teamProviderContract.v1');
+    assert.ok(bridgeSummary.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+    assert.ok(bridgeSummary.bridges.every((bridge) => bridge.rawSecretsLogged === false));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0044', '--cwd', process.cwd(), '--json']);
+    const planBridgeSummary = (planResult.evidence as any)?.teamPlan?.microsoftFoundryRuntimeBridges;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating Foundry bridge wiring');
+    assert.equal(planBridgeSummary?.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');
+    assert.deepEqual(planBridgeSummary?.providerIds, ['microsoft-foundry']);
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.microsoftFoundryTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('project-chat-inference'));
+    assert.ok(vendorRuntimeDoc.includes('agent-service'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/microsoft-foundry.ts'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#microsoft-foundry-bridge'));
+
+    console.log('[validate-team-agents] ok (microsoft-foundry-bridge)');
+    return;
+  }
+
+  if (taskCase === 'integration-capability-wiring') {
+    const tempRoot = createTempWorkspace('atm-team-runtime-backend-');
+    const manifestDir = path.join(tempRoot, '.atm', 'integrations');
+    mkdirSync(manifestDir, { recursive: true });
+    writeFileSync(path.join(manifestDir, 'codex.manifest.json'), JSON.stringify({
+      schemaId: 'atm.integrationInstallManifest.v1',
+      adapterId: 'codex',
+      adapterVersion: '0.0.0-test',
+      installedAt: '2026-07-10T00:00:00.000Z',
+      installedBy: 'validator',
+      targetDir: 'integrations/codex-skills',
+      metadata: {},
+      files: [],
+      teamRuntimeCapabilities: [
+        {
+          providerId: 'claude-code',
+          runtimeModes: ['editor-subagent'],
+          executionSurfaces: ['editor-subagent'],
+          roles: ['implementer', 'validator'],
+          status: 'experimental',
+          evidence: 'validator fixture declares editor-subagent backend capability'
+        }
+      ]
+    }, null, 2));
+
+    const declaredReadiness = inspectTeamRuntimeBackendCapabilities(tempRoot);
+    assert.equal(declaredReadiness.schemaId, 'atm.integrationTeamRuntimeBackendReadiness.v1');
+    assert.equal(declaredReadiness.declaredBackendCount, 1);
+    assert.equal(declaredReadiness.startReadiness, 'runtime-backend-declared');
+    assert.equal(declaredReadiness.capabilities[0]?.providerId, 'claude-code');
+    assert.deepEqual(declaredReadiness.capabilities[0]?.runtimeModes, ['editor-subagent']);
+
+    const repositoryReadiness = inspectTeamRuntimeBackendCapabilities(process.cwd());
+    assert.equal(repositoryReadiness.schemaId, 'atm.integrationTeamRuntimeBackendReadiness.v1');
+    const validateResult = await runTeam(['validate', '--task', 'TASK-TEAM-0045', '--cwd', process.cwd(), '--runtime-mode', 'editor-subagent', '--provider', 'claude-code', '--json']);
+    assert.equal((validateResult.evidence as any)?.runtimeBackendReadiness?.schemaId, 'atm.integrationTeamRuntimeBackendReadiness.v1');
+    assert.equal((validateResult.evidence as any)?.runtimeContract?.runtimeMode, 'editor-subagent');
+    assert.equal((validateResult.evidence as any)?.runtimeContract?.providerId, 'claude-code');
+
+    const teamSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'team.ts'), 'utf8');
+    assert.ok(teamSource.includes('ATM_TEAM_RUNTIME_BACKEND_MISSING'));
+    assert.ok(teamSource.includes('Installed editor integrations are not runtime backends unless their manifest declares this capability.'));
+
+    const onboarding = readFileSync(path.join(process.cwd(), 'docs', 'AGENT_PACK_ONBOARDING.md'), 'utf8');
+    assert.ok(onboarding.includes('teamRuntimeCapabilities'));
+    assert.ok(onboarding.includes('ATM_TEAM_RUNTIME_BACKEND_MISSING'));
+
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/cli/src/commands/integration.ts#inspectTeamRuntimeBackendCapabilities'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#integration-capability-wiring'));
+
+    console.log('[validate-team-agents] ok (integration-capability-wiring)');
+    return;
+  }
+
+  if (taskCase === 'broker-conflict-resolution') {
+    const schema = JSON.parse(readFileSync(path.join(process.cwd(), 'schemas', 'governance', 'broker-conflict-resolution.schema.json'), 'utf8'));
+    const validate = new Ajv2020({ allErrors: true }).compile(schema);
+    const fixture = createBrokerConflictResolutionArtifact({
+      primaryTaskId: 'TASK-TEAM-0046-A',
+      conflictingTaskIds: ['TASK-TEAM-0046-B'],
+      sharedPaths: ['packages/core/src/team-runtime/permission-broker.ts'],
+      decisionClass: 'serial-release',
+      decisionReason: 'broker-conflict-blocked until the release order grants the next task.',
+      createdAt: '2026-07-10T00:00:00.000Z'
+    });
+
+    assert.equal(fixture.schemaId, 'atm.brokerConflictResolution.v1');
+    assert.equal(fixture.decisionClass, 'serial-release');
+    assert.ok(fixture.decisionReason.includes('broker-conflict-blocked'));
+    assert.equal(fixture.violationStatus, 'broker-conflict-blocked');
+    assert.equal(fixture.statusCode, 'broker-conflict-blocked');
+    assert.deepEqual(fixture.releaseOrder, ['TASK-TEAM-0046-A', 'TASK-TEAM-0046-B']);
+    assert.equal(fixture.currentAllowedTaskId, 'TASK-TEAM-0046-A');
+    assert.deepEqual(fixture.blockedTaskIds, ['TASK-TEAM-0046-B']);
+    assert.equal(validate(fixture), true, JSON.stringify(validate.errors));
+
+    const firstAdmission = decideBrokerConflictResolutionAdmission(fixture, 'TASK-TEAM-0046-A');
+    const blockedAdmission = decideBrokerConflictResolutionAdmission(fixture, 'TASK-TEAM-0046-B');
+    assert.equal(firstAdmission.ok, true);
+    assert.equal(firstAdmission.statusCode, 'broker-conflict-blocked');
+    assert.equal(blockedAdmission.ok, false);
+    assert.equal(blockedAdmission.violationStatus, 'broker-conflict-blocked');
+    assert.equal(blockedAdmission.statusCode, 'broker-conflict-blocked');
+
+    const advanced = advanceBrokerConflictResolution(fixture, 'TASK-TEAM-0046-A');
+    assert.equal(advanced.currentAllowedTaskId, 'TASK-TEAM-0046-B');
+    assert.equal(decideBrokerConflictResolutionAdmission(advanced, 'TASK-TEAM-0046-B').ok, true);
+    const resolved = advanceBrokerConflictResolution(advanced, 'TASK-TEAM-0046-B');
+    assert.equal(resolved.violationStatus, 'resolved');
+    assert.equal(resolved.currentAllowedTaskId, null);
+    assert.equal(decideBrokerConflictResolutionAdmission(resolved, 'TASK-TEAM-0046-A').statusCode, 'resolved');
+
+    const commandResult = await runTeam([
+      'broker',
+      'resolve',
+      '--task',
+      'TASK-TEAM-0046-A',
+      '--conflict',
+      'TASK-TEAM-0046-B',
+      '--path',
+      'packages/core/src/team-runtime/permission-broker.ts',
+      '--decision-reason',
+      'broker-conflict-blocked by atom overlap; release sequentially.',
+      '--created-at',
+      '2026-07-10T00:00:00.000Z',
+      '--cwd',
+      process.cwd(),
+      '--json'
+    ]);
+    const artifact = (commandResult.evidence as any)?.artifact;
+    assert.equal(commandResult.ok, true);
+    assert.equal(artifact?.schemaId, 'atm.brokerConflictResolution.v1');
+    assert.equal(artifact?.decisionClass, 'serial-release');
+    assert.equal(artifact?.violationStatus, 'broker-conflict-blocked');
+    assert.equal(artifact?.statusCode, 'broker-conflict-blocked');
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    assert.equal((commandResult.evidence as any)?.sharedVocabulary?.decisionClass, 'serial-release');
+    assert.equal((commandResult.evidence as any)?.sharedVocabulary?.violationStatus, 'broker-conflict-blocked');
+    assert.ok(TEAM_ATOM_BOUNDARIES['team.broker-conflict-resolution'].capability.includes('decisionClass'));
+
+    console.log('[validate-team-agents] ok (broker-conflict-resolution)');
+    return;
+  }
+
+  if (taskCase === 'broker-conflict-ux') {
+    const captainDecisionSchema = JSON.parse(readFileSync(path.join(process.cwd(), 'schemas', 'team-agents', 'captain-decision.schema.json'), 'utf8'));
+    const validateCaptainDecision = new Ajv2020({ allErrors: true }).compile(captainDecisionSchema);
+    const commandResult = await runTeam([
+      'broker',
+      'resolve',
+      '--task',
+      'TASK-TEAM-0048-A',
+      '--conflict',
+      'TASK-TEAM-0048-B',
+      '--path',
+      'packages/cli/src/commands/team.ts',
+      '--decision-reason',
+      'broker-conflict-blocked by shared Team Broker UX surface; release sequentially.',
+      '--created-at',
+      '2026-07-10T00:00:00.000Z',
+      '--cwd',
+      process.cwd(),
+      '--json'
+    ]);
+    const evidence = commandResult.evidence as any;
+    const conflictUx = evidence?.conflictUx;
+    assert.equal(commandResult.ok, true);
+    assert.equal(conflictUx?.schemaId, 'atm.brokerConflictUx.v1');
+    assert.equal(conflictUx?.playbookSlice, 'broker-conflict-resolution');
+    assert.equal(conflictUx?.requiredResolutionArtifact, 'atm.brokerConflictResolution.v1');
+    assert.deepEqual(conflictUx?.blockedTaskIds, ['TASK-TEAM-0048-B']);
+    assert.deepEqual(conflictUx?.sharedPaths, ['packages/cli/src/commands/team.ts']);
+    assert.equal(conflictUx?.decisionClass, 'serial-release');
+    assert.ok(conflictUx?.decisionReason.includes('broker-conflict-blocked'));
+    assert.equal(conflictUx?.violationStatus, 'broker-conflict-blocked');
+    assert.ok(conflictUx?.nextSafeResolutionCommand.includes('team broker resolve'));
+    assert.ok(conflictUx?.nextSafeResolutionCommand.includes('atm.brokerConflictResolution.v1') === false, 'command should produce the artifact, not pretend it is a flag');
+    assert.ok(commandResult.messages?.some((entry: any) => entry?.data?.blockedTaskIds?.includes('TASK-TEAM-0048-B')));
+    assert.ok(commandResult.messages?.some((entry: any) => entry?.data?.sharedPaths?.includes('packages/cli/src/commands/team.ts')));
+    assert.ok(commandResult.messages?.some((entry: any) => entry?.data?.nextSafeResolutionCommand?.includes('team broker resolve')));
+
+    const atomOnlyUx = buildBrokerConflictUxProjection({
+      primaryTaskId: 'TASK-TEAM-0048-A',
+      conflictingTaskIds: ['TASK-TEAM-0048-B'],
+      overlappingAtomIds: ['atm.team-broker-conflict-resolution'],
+      decisionClass: 'blocked',
+      decisionReason: 'broker-conflict-blocked by atom overlap.',
+      violationStatus: 'broker-conflict-blocked',
+      statusCode: 'broker-conflict-blocked'
+    });
+    assert.deepEqual(atomOnlyUx.overlappingAtomIds, ['atm.team-broker-conflict-resolution']);
+    assert.ok(atomOnlyUx.nextSafeResolutionCommand.includes('--path <shared-path>'));
+
+    const captainDecisionFixture = {
+      decision: 'block',
+      optionsConsidered: ['continue', 'serialize via Broker'],
+      chosenOption: 'serialize via Broker',
+      reason: 'Broker conflict UX requires serial release.',
+      risk: 'medium',
+      lieutenantNeed: false,
+      nextTeamShape: 'coordinator-only',
+      advisoryOnly: true,
+      decisionClass: conflictUx.decisionClass,
+      decisionReason: conflictUx.decisionReason,
+      violationStatus: conflictUx.violationStatus,
+      statusCode: conflictUx.statusCode,
+      requiredResolutionArtifact: conflictUx.requiredResolutionArtifact,
+      playbookSlice: conflictUx.playbookSlice,
+      blockedTaskIds: conflictUx.blockedTaskIds,
+      sharedPaths: conflictUx.sharedPaths,
+      sharedAtomIds: atomOnlyUx.overlappingAtomIds,
+      nextSafeResolutionCommand: conflictUx.nextSafeResolutionCommand
+    };
+    assert.equal(validateCaptainDecision(captainDecisionFixture), true, JSON.stringify(validateCaptainDecision.errors));
+
+    const roleRouting = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'role-routing-matrix.md'), 'utf8');
+    assert.ok(roleRouting.includes('Captain conflict UX'));
+    assert.ok(roleRouting.includes('nextSafeResolutionCommand'));
+    assert.ok(roleRouting.includes('atm.brokerConflictResolution.v1'));
+    assert.ok(roleRouting.includes('Manual edits to `.atm/runtime/**` are outside the'));
+
+    const vendorRuntime = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntime.includes('atm.brokerConflictUx.v1'));
+    assert.ok(vendorRuntime.includes('decisionClass'));
+    assert.ok(vendorRuntime.includes('team broker resolve'));
+
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#broker-conflict-ux'));
+    assert.ok(atomMap.includes('schemas/team-agents/captain-decision.schema.json'));
+    assert.ok(atomMap.includes('atm.brokerConflictUx.v1'));
+
+    console.log('[validate-team-agents] ok (broker-conflict-ux)');
+    return;
+  }
+
+  if (taskCase === 'broker-conflict-resolution-replay') {
+    const replay = runBrokerConflictResolutionReplayFixture(process.cwd());
+    assert.equal(replay.ok, true);
+    assert.equal(replay.artifactType, 'atm.brokerConflictResolution.v1');
+    assert.equal(replay.finalState, 'green');
+    assert.equal(replay.initialGates.length, 4);
+    assert.ok(replay.initialGates.every((gate) => gate.statusCode === 'broker-conflict-blocked'));
+    assert.ok(replay.initialGates.every((gate) => gate.violationStatus === 'broker-conflict-blocked'));
+    assert.equal(replay.firstAdmission.ok, true);
+    assert.equal(replay.prematureSecondAdmission.ok, false);
+    assert.equal(replay.secondAdmissionAfterFirstRelease.ok, true);
+    assert.equal(replay.resolvedAdmission.statusCode, 'resolved');
+    assert.deepEqual([...replay.sharedVocabulary].sort(), [
+      'broker-conflict-blocked',
+      'decisionClass',
+      'decisionReason',
+      'violationStatus'
+    ]);
+
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('scripts/validate-mao-event-replay.ts#broker-conflict-resolution'));
+    assert.ok(atomMap.includes('scripts/fixtures/mao-event-replay/broker-conflict-resolution.fixture.json'));
+
+    console.log('[validate-team-agents] ok (broker-conflict-resolution-replay)');
+    return;
+  }
+
+  if (taskCase === 'broker-override-gate-parity') {
+    const claimAdmission = evaluateClaimAdmission({
+      brokerVerdict: 'freeze',
+      cidVerdict: 'insufficient-mutation-intent',
+      candidateTaskId: 'TASK-TEAM-0047',
+      conflictingTaskId: 'TASK-RFT-0005',
+      overlappingAtomIds: ['atm.team-broker-enforcement']
+    });
+    assert.equal(claimAdmission.admitted, false);
+    assert.equal(claimAdmission.blockCode, 'ATM_NEXT_CLAIM_BLOCKED');
+    assert.ok(claimAdmission.blockReason?.includes('broker-conflict-blocked'));
+
+    const cwd = createTempWorkspace('team-broker-gate-parity-');
+    mkdirSync(path.join(cwd, '.atm', 'runtime'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'write-broker.registry.json'), `${JSON.stringify({
+      schemaId: 'atm.writeBrokerRegistry.v1',
+      specVersion: '0.1.0',
+      repoId: 'fixture-repo',
+      workspaceId: 'main',
+      activeIntents: [
+        {
+          intentId: 'intent-TASK-TEAM-0047',
+          taskId: 'TASK-TEAM-0047',
+          teamRunId: null,
+          actorId: 'captain',
+          baseCommit: 'base-fixture',
+          resourceKeys: {
+            files: ['src/shared.ts'],
+            atomIds: [],
+            atomCids: [],
+            generators: [],
+            projections: [],
+            registries: [],
+            validators: [],
+            artifacts: []
+          },
+          leaseEpoch: 1,
+          leaseSeconds: 1800,
+          leaseMaxSeconds: 1800,
+          heartbeatAt: '2026-07-10T00:00:00.000Z',
+          lane: 'direct-brokered',
+          expiresAt: '2099-01-01T00:00:00.000Z'
+        },
+        {
+          intentId: 'intent-TASK-RFT-0005',
+          taskId: 'TASK-RFT-0005',
+          teamRunId: null,
+          actorId: 'cursor',
+          baseCommit: 'base-fixture',
+          resourceKeys: {
+            files: ['src/shared.ts'],
+            atomIds: [],
+            atomCids: [],
+            generators: [],
+            projections: [],
+            registries: [],
+            validators: [],
+            artifacts: []
+          },
+          leaseEpoch: 1,
+          leaseSeconds: 1800,
+          leaseMaxSeconds: 1800,
+          heartbeatAt: '2026-07-10T00:00:00.000Z',
+          lane: 'direct-brokered',
+          expiresAt: '2099-01-01T00:00:00.000Z'
+        }
+      ]
+    }, null, 2)}\n`, 'utf8');
+    const taskflowGate = evaluateTaskflowBrokerConflictGate({
+      cwd,
+      taskId: 'TASK-TEAM-0047',
+      declaredFiles: ['src/shared.ts'],
+      actorId: 'captain'
+    });
+    assert.equal(taskflowGate.verdict, 'insufficientMutationIntent');
+    assert.equal(taskflowGate.decisionClass, 'blocked');
+    assert.equal(taskflowGate.violationStatus, 'broker-conflict-blocked');
+    assert.equal(taskflowGate.statusCode, 'broker-conflict-blocked');
+    assert.ok(taskflowGate.requiredCommand?.includes('team broker resolve'));
+    assert.ok(taskflowGate.requiredCommand?.includes('broker-conflict-blocked'));
+
+    const sharedVocabulary = buildBrokerConflictSharedVocabulary({
+      safeToStart: false,
+      blockedReasons: ['Proposal-first lane is active; broker recorded a provisional write lease before final admission.']
+    } as any);
+    assert.equal(sharedVocabulary?.decisionClass, 'blocked');
+    assert.ok(sharedVocabulary?.decisionReason.includes('broker-conflict-blocked'));
+    assert.equal(sharedVocabulary?.violationStatus, 'broker-conflict-blocked');
+
+    const gitGovernanceSource = readFileSync(path.join(process.cwd(), 'packages', 'cli', 'src', 'commands', 'git-governance.ts'), 'utf8');
+    assert.ok(gitGovernanceSource.includes("'decisionClass'"));
+    assert.ok(gitGovernanceSource.includes("'decisionReason'"));
+    assert.ok(gitGovernanceSource.includes("'violationStatus'"));
+    assert.ok(gitGovernanceSource.includes('ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED'));
+
+    console.log('[validate-team-agents] ok (broker-override-gate-parity)');
     return;
   }
 
@@ -472,6 +1557,545 @@ async function main() {
     assert.equal(runtime.providerId, 'gemini');
     assert.ok(runtime.selectionReason.includes('selection=role-override'));
     console.log('[validate-team-agents] ok (provider-selection-overrides)');
+    return;
+  }
+
+  if (taskCase === 'per-role-provider-selection-config') {
+    const selectionConfig = mergeTeamProviderSelectionConfig({
+      repoConfig: {
+        repoDefault: {
+          providerId: 'openai',
+          sdkId: 'responses',
+          modelId: 'gpt-5-mini',
+          runtimeMode: 'broker-only'
+        },
+        roleOverrides: {
+          validator: {
+            providerId: 'gemini',
+            sdkId: 'gemini-cli',
+            modelId: 'gemini-2.5-pro',
+            runtimeMode: 'editor-subagent'
+          }
+        }
+      },
+      cliRoleOverrides: ['validator=claude-code:claude-sonnet:claude-code:editor-subagent']
+    });
+    const validatorSelection = resolveTeamProviderSelection('validator', selectionConfig);
+    assert.equal(validatorSelection.providerId, 'claude-code');
+    assert.equal(validatorSelection.modelId, 'claude-sonnet');
+    assert.equal(validatorSelection.runtimeMode, 'editor-subagent');
+    const readerSelection = resolveTeamProviderSelection('reader', selectionConfig);
+    assert.equal(readerSelection.providerId, 'openai');
+    assert.equal(readerSelection.modelId, 'gpt-5-mini');
+
+    const task = {
+      workItemId: 'TASK-TEAM-0051',
+      title: 'Per-role provider config and L5 roster projection',
+      scopePaths: ['packages/cli/src/commands/team.ts'],
+      deliverables: ['packages/cli/src/commands/team.ts'],
+      validators: ['npm run typecheck']
+    };
+    const recipe = {
+      schemaId: 'atm.teamRecipe.v1' as const,
+      recipeId: 'atm.default.normal.typescript',
+      language: 'typescript',
+      agents: [
+        { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write'] },
+        { agentId: 'atomization-planner', role: 'atomizationPlanner', profile: 'atm.atomizationPlanner.v1', permissions: ['file.read'] },
+        { agentId: 'reader', role: 'reader', profile: 'atm.reader.v1', permissions: ['file.read'] },
+        { agentId: 'scope-guardian', role: 'scopeGuardian', profile: 'atm.scopeGuardian.v1', permissions: ['file.read'] },
+        { agentId: 'implementer-typescript', role: 'implementer', profile: 'atm.implementer.typescript.v1', language: 'typescript', permissions: ['file.write'] },
+        { agentId: 'validator', role: 'validator', profile: 'atm.validator.v1', permissions: ['exec.validator'] },
+        { agentId: 'evidence-collector', role: 'evidenceCollector', profile: 'atm.evidenceCollector.v1', permissions: ['file.read'] }
+      ]
+    };
+    const plan = buildTeamPlan({
+      task,
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: { ok: true, findings: [] },
+      brokerLane: safeBrokerLane(),
+      requestedTeamSize: 'L5',
+      providerSelectionConfig: selectionConfig,
+      providerSelectionSource: {
+        schemaId: 'atm.teamAgentsConfig.v1',
+        path: '.atm/config/team-provider-selection.json',
+        loaded: true,
+        cliOverrideCount: 1
+      }
+    }) as any;
+    assert.equal(plan.teamLevel, 'L5');
+    assert.equal(plan.captainDecision.teamLevel, 'L5');
+    assert.equal(plan.captainDecision.teamLevelSource, 'manual');
+    assert.equal(plan.captainDecision.teamSize, 'large');
+    assert.equal(plan.providerSelectionSource.loaded, true);
+    assert.deepEqual(plan.rosterProjection.activeRoles, [
+      'coordinator',
+      'atomizationPlanner',
+      'reader',
+      'scopeGuardian',
+      'implementer',
+      'validator',
+      'evidenceCollector',
+      'lieutenant',
+      'reviewAgent',
+      'knowledgeScout'
+    ]);
+    assert.deepEqual(plan.rosterProjection.syntheticRoles, ['lieutenant', 'reviewAgent', 'knowledgeScout']);
+    const validatorManifest = plan.roleSkillPackManifest.roles.find((entry: any) => entry.role === 'validator');
+    assert.equal(validatorManifest.selectedProvider.providerId, 'claude-code');
+    assert.equal(validatorManifest.selectedProvider.modelId, 'claude-sonnet');
+    const l1Plan = buildTeamPlan({
+      task,
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: { ok: true, findings: [] },
+      brokerLane: safeBrokerLane(),
+      requestedTeamSize: 'L1',
+      providerSelectionConfig: selectionConfig
+    }) as any;
+    assert.equal(l1Plan.teamLevel, 'L1');
+    assert.deepEqual(l1Plan.rosterProjection.activeRoles, ['coordinator', 'atomizationPlanner', 'implementer', 'validator']);
+
+    console.log('[validate-team-agents] ok (per-role-provider-selection-config)');
+    return;
+  }
+
+  if (taskCase === 'team-governance-runtime-fields') {
+    const recipe = {
+      schemaId: 'atm.teamRecipe.v1' as const,
+      recipeId: 'validator.governance-fields',
+      agents: [
+        { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write'] },
+        { agentId: 'atomization-planner', role: 'atomizationPlanner', profile: 'atm.atomizationPlanner.v1', permissions: ['file.read'] },
+        { agentId: 'implementer-typescript', role: 'implementer', profile: 'atm.implementer.typescript.v1', language: 'typescript', permissions: ['file.write'] },
+        { agentId: 'validator', role: 'validator', profile: 'atm.validator.v1', permissions: ['exec.validator'] }
+      ]
+    };
+    const allowedPlan = buildTeamPlan({
+      task: { workItemId: 'TASK-TEAM-0056', title: 'Governance runtime fields' },
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: { ok: true, findings: [] },
+      brokerLane: safeBrokerLane(),
+      requestedTeamSize: 'L1'
+    }) as any;
+    assert.equal(allowedPlan.decisionClass, 'allowed');
+    assert.equal(allowedPlan.violationStatus, 'allowed');
+    assert.equal(allowedPlan.requiresHumanSignoff, false);
+    const blockedPlan = buildTeamPlan({
+      task: { workItemId: 'TASK-TEAM-0056', title: 'Governance runtime fields' },
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: {
+        ok: false,
+        findings: [{
+          level: 'error',
+          code: 'ATM_TEAM_WRITE_SCOPE_EXCEEDED',
+          summary: 'Write scope exceeded.',
+          detail: 'file.write lease outside task scope.',
+          suggestedFix: 'Narrow the lease.'
+        }]
+      },
+      brokerLane: safeBrokerLane(),
+      requestedTeamSize: 'L1'
+    }) as any;
+    assert.equal(blockedPlan.decisionClass, 'blocked');
+    assert.equal(blockedPlan.violationStatus, 'policy-blocked');
+    assert.equal(blockedPlan.governanceRuntime.schemaId, 'atm.teamGovernanceRuntimeFields.v1');
+    console.log('[validate-team-agents] ok (team-governance-runtime-fields)');
+    return;
+  }
+
+  if (taskCase === 'review-agent-signature') {
+    const signature = buildReviewAgentSignature({
+      taskId: 'TASK-TEAM-0059',
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-openai-mini' },
+      reviewer: { providerId: 'claude-code', modelId: 'claude-sonnet', modelCertificationId: 'cert-claude-sonnet' },
+      reviewedDiffHash: 'sha256:reviewed-diff',
+      policy: 'different-provider',
+      findings: ['missing tests around close gate']
+    });
+    assert.equal(signature.schemaId, 'atm.reviewAgentSignature.v1');
+    assert.equal(signature.signatureStatus, 'formal-signature');
+    assert.equal(signature.permission, 'review.signature.write');
+    assert.equal(signature.modelCertificationId, 'cert-claude-sonnet');
+    assert.equal(signature.earlyWarning[0].category, 'missing-tests');
+    const advisory = buildReviewAgentSignature({
+      taskId: 'TASK-TEAM-0059',
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-openai-mini' },
+      reviewer: { providerId: 'openai', modelId: 'gpt-5-mini' },
+      reviewedDiffHash: 'sha256:reviewed-diff',
+      policy: 'different-provider'
+    });
+    assert.equal(advisory.signatureStatus, 'advisory-note');
+    assert.equal(advisory.permission, null);
+    console.log('[validate-team-agents] ok (review-agent-signature)');
+    return;
+  }
+
+  if (taskCase === 'reviewer-independence-early-warning') {
+    assert.equal(evaluateReviewerIndependence({
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-a' },
+      reviewer: { providerId: 'claude-code', modelId: 'claude-sonnet', modelCertificationId: 'cert-b' },
+      policy: 'different-provider'
+    }).ok, true);
+    assert.equal(evaluateReviewerIndependence({
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-a' },
+      reviewer: { providerId: 'openai', modelId: 'gpt-5-large', modelCertificationId: 'cert-b' },
+      policy: 'different-provider'
+    }).ok, false);
+    assert.equal(evaluateReviewerIndependence({
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-a' },
+      reviewer: { providerId: 'openai', modelId: 'claude-sonnet', modelCertificationId: 'cert-b' },
+      policy: 'different-model-family'
+    }).ok, true);
+    assert.equal(evaluateReviewerIndependence({
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-a' },
+      reviewer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-b' },
+      policy: 'different-certification'
+    }).ok, true);
+    const signature = buildReviewAgentSignature({
+      taskId: 'TASK-TEAM-0060',
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-a' },
+      reviewer: { providerId: 'claude-code', modelId: 'claude-sonnet', modelCertificationId: 'cert-b' },
+      reviewedDiffHash: 'sha256:early-warning',
+      policy: 'different-provider',
+      findings: ['scope drift in generated file', 'rollback gap missing']
+    });
+    assert.deepEqual(signature.earlyWarning.map((entry: any) => entry.category), ['scope-drift', 'rollback-gap']);
+    console.log('[validate-team-agents] ok (reviewer-independence-early-warning)');
+    return;
+  }
+
+  if (taskCase === 'multi-signature-quorum') {
+    const formalA = buildReviewAgentSignature({
+      taskId: 'TASK-TEAM-0061',
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-openai-mini' },
+      reviewer: { providerId: 'claude-code', modelId: 'claude-sonnet', modelCertificationId: 'cert-claude-sonnet' },
+      reviewedDiffHash: 'sha256:quorum',
+      policy: 'different-provider',
+      findings: ['approve']
+    });
+    const advisory = buildReviewAgentSignature({
+      taskId: 'TASK-TEAM-0061',
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-openai-mini' },
+      reviewer: { providerId: 'openai', modelId: 'gpt-5-mini' },
+      reviewedDiffHash: 'sha256:quorum',
+      policy: 'different-provider',
+      findings: ['approve']
+    });
+    const insufficient = evaluateReviewQuorum({ signatures: [formalA, advisory], requiredFormalSignatures: 2 });
+    assert.equal(insufficient.ok, false);
+    assert.equal(insufficient.formalSignatureCount, 1);
+    assert.equal(insufficient.escalationTarget, 'Coordinator/Captain/human review');
+    const formalB = buildReviewAgentSignature({
+      taskId: 'TASK-TEAM-0061',
+      implementer: { providerId: 'openai', modelId: 'gpt-5-mini', modelCertificationId: 'cert-openai-mini' },
+      reviewer: { providerId: 'gemini', modelId: 'gemini-pro', modelCertificationId: 'cert-gemini-pro' },
+      reviewedDiffHash: 'sha256:quorum',
+      policy: 'different-provider',
+      findings: ['approve']
+    });
+    assert.equal(evaluateReviewQuorum({ signatures: [formalA, formalB], requiredFormalSignatures: 2 }).ok, true);
+    const conflict = evaluateReviewQuorum({
+      signatures: [formalA, { ...formalB, findings: ['block'] }],
+      requiredFormalSignatures: 2
+    });
+    assert.equal(conflict.ok, false);
+    assert.equal(conflict.conflicts.length, 1);
+    console.log('[validate-team-agents] ok (multi-signature-quorum)');
+    return;
+  }
+
+  if (taskCase === 'provider-neutral-role-skill-pack-manifest') {
+    const recipe = {
+      schemaId: 'atm.teamRecipe.v1' as const,
+      recipeId: 'validator.provider-neutral-manifest',
+      agents: [
+        { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write'] },
+        { agentId: 'scope-guardian', role: 'scopeGuardian', profile: 'atm.scopeGuardian.v1', permissions: ['file.read'] },
+        { agentId: 'implementer-typescript', role: 'implementer', profile: 'atm.implementer.typescript.v1', language: 'typescript', permissions: ['file.write'] },
+        { agentId: 'validator', role: 'validator', profile: 'atm.validator.v1', permissions: ['exec.validator'] },
+        { agentId: 'evidence-collector', role: 'evidenceCollector', profile: 'atm.evidenceCollector.v1', permissions: ['file.read'] }
+      ]
+    };
+    const manifest = buildProviderNeutralRoleSkillPackManifest({
+      recipe,
+      selectionConfig: {
+        repoDefault: {
+          providerId: 'openai',
+          sdkId: 'responses',
+          modelId: 'gpt-5-mini',
+          runtimeMode: 'broker-only'
+        },
+        roleOverrides: {
+          validator: {
+            providerId: 'gemini',
+            sdkId: 'gemini-cli',
+            modelId: 'gemini-2.5-pro',
+            runtimeMode: 'editor-subagent'
+          }
+        }
+      }
+    });
+    assert.equal(manifest.schemaId, 'atm.teamRoleSkillPackManifest.v1');
+    assert.equal(manifest.providerNeutral, true);
+    assert.equal(manifest.discoveryMode, 'capability-driven');
+    assert.equal(manifest.roleFirstProviderSecond, true);
+    assert.deepEqual(manifest.sharedVocabulary.brokerConflict, [
+      'decisionClass',
+      'decisionReason',
+      'violationStatus',
+      'broker-conflict-blocked'
+    ]);
+    assert.equal(manifest.roles.length, recipe.agents.length);
+    assert.ok(manifest.roles.every((role) => role.permissionLease.alignment === 'role-first'));
+    assert.ok(manifest.roles.every((role) => role.providerCapabilities.length === TEAM_PROVIDER_IDS.length));
+    assert.ok(manifest.roles.every((role) => role.providerCapabilities.every((provider) => provider.satisfiesRolePack)));
+    const coordinator = manifest.roles.find((role) => role.role === 'coordinator');
+    assert.ok(coordinator);
+    assert.ok(coordinator?.capabilityTags.includes('lifecycle-authority'));
+    assert.deepEqual(coordinator?.permissionLease.forbiddenPermissions, []);
+    const implementer = manifest.roles.find((role) => role.role === 'implementer');
+    assert.ok(implementer?.permissionLease.allowedPermissions.includes('file.write'));
+    assert.ok(implementer?.permissionLease.forbiddenPermissions.includes('git.write'));
+    assert.ok(implementer?.permissionLease.forbiddenPermissions.includes('task.lifecycle'));
+    const validator = manifest.roles.find((role) => role.role === 'validator');
+    assert.equal(validator?.selectedProvider.providerId, 'gemini');
+    assert.equal(validator?.selectedProvider.source, 'role-override');
+    assert.ok(validator?.providerCapabilities.some((provider) => provider.providerId === 'microsoft-foundry'));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-SKL-0010', '--cwd', process.cwd(), '--json']);
+    const planManifest = (planResult.evidence as any)?.teamPlan?.roleSkillPackManifest;
+    assert.equal(planResult.ok, true);
+    assert.equal(planManifest?.schemaId, 'atm.teamRoleSkillPackManifest.v1');
+    assert.equal(planManifest?.roleFirstProviderSecond, true);
+    assert.deepEqual(planManifest?.sharedVocabulary?.brokerConflict, manifest.sharedVocabulary.brokerConflict);
+
+    const roleContractDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'role-skill-pack-contract.md'), 'utf8');
+    assert.ok(roleContractDoc.includes('atm.teamRoleSkillPackManifest.v1'));
+    assert.ok(roleContractDoc.includes('roleFirstProviderSecond'));
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('capability-driven'));
+    assert.ok(vendorRuntimeDoc.includes('atm.teamRoleSkillPackManifest.v1'));
+
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/cli/src/commands/team.ts#buildProviderNeutralRoleSkillPackManifest'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#provider-neutral-role-skill-pack-manifest'));
+
+    console.log('[validate-team-agents] ok (provider-neutral-role-skill-pack-manifest)');
+    return;
+  }
+
+  if (taskCase === 'cross-vendor-observability') {
+    const schema = JSON.parse(readFileSync(path.join(process.cwd(), 'schemas', 'governance', 'team-agent-observability-event.schema.json'), 'utf8'));
+    const validate = new Ajv2020({ allErrors: true }).compile(schema);
+    const contract = buildTeamObservabilityContract();
+    assert.equal(contract.schemaId, 'atm.teamAgentObservabilityContract.v1');
+    assert.equal(contract.eventSchemaId, 'atm.teamAgentObservabilityEvent.v1');
+    assert.ok(contract.eventTypes.includes('broker.conflict.blocked'));
+    assert.ok(contract.eventTypes.includes('broker.conflict.resolution'));
+    assert.deepEqual(contract.brokerConflictVocabulary, [
+      'decisionClass',
+      'decisionReason',
+      'violationStatus',
+      'broker-conflict-blocked'
+    ]);
+    assert.equal(contract.redactionPolicy.rawSecretsLogged, false);
+
+    const artifact = createBrokerConflictResolutionArtifact({
+      primaryTaskId: 'TASK-TEAM-0040',
+      conflictingTaskIds: ['TASK-TEAM-0047'],
+      sharedPaths: ['packages/cli/src/commands/team.ts'],
+      decisionClass: 'serial-release',
+      decisionReason: 'broker-conflict-blocked until observability records the release order.',
+      violationStatus: 'broker-conflict-blocked',
+      releaseOrder: ['TASK-TEAM-0040', 'TASK-TEAM-0047'],
+      createdAt: '2026-07-10T00:00:00.000Z'
+    });
+    const genericEvent = createTeamObservabilityEvent({
+      eventType: 'tool.invocation',
+      taskId: 'TASK-TEAM-0040',
+      teamRunId: 'team-observability-fixture',
+      providerId: 'gemini',
+      role: 'validator',
+      runtimeMode: 'editor-subagent',
+      artifactType: 'validator-report',
+      artifactId: 'validator-report-1',
+      summary: 'validator invoked shared observability gate',
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const brokerEvents = createBrokerConflictObservabilityEvents({
+      artifact,
+      providerId: 'openai',
+      role: 'coordinator',
+      teamRunId: 'team-observability-fixture',
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const events = [genericEvent, ...brokerEvents];
+    for (const event of events) {
+      assert.equal(validate(event), true, JSON.stringify(validate.errors));
+      assert.equal(event.redaction.rawSecretsLogged, false);
+      assert.equal(event.evidenceBoundary.rawSecretsAllowed, false);
+    }
+    assert.equal(brokerEvents[0].eventType, 'broker.conflict.blocked');
+    assert.equal(brokerEvents[0].artifactType, 'atm.brokerConflictResolution.v1');
+    assert.equal(brokerEvents[0].decisionClass, 'serial-release');
+    assert.ok(brokerEvents[0].decisionReason?.includes('broker-conflict-blocked'));
+    assert.equal(brokerEvents[0].violationStatus, 'broker-conflict-blocked');
+    assert.equal(brokerEvents[0].statusCode, 'broker-conflict-blocked');
+
+    const taskQuery = queryTeamObservabilityEvents(events, { taskId: 'TASK-TEAM-0040' });
+    assert.equal(taskQuery.schemaId, 'atm.teamAgentObservabilityQueryResult.v1');
+    assert.equal(taskQuery.eventCount, 3);
+    const providerRoleQuery = queryTeamObservabilityEvents(events, {
+      providerId: 'openai',
+      role: 'coordinator',
+      artifactType: 'atm.brokerConflictResolution.v1'
+    });
+    assert.equal(providerRoleQuery.eventCount, 2);
+    assert.ok(providerRoleQuery.events.every((event) => event.providerId === 'openai'));
+    assert.ok(providerRoleQuery.events.every((event) => event.role === 'coordinator'));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0040', '--cwd', process.cwd(), '--json']);
+    const planContract = (planResult.evidence as any)?.teamPlan?.observabilityContract;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating observability wiring');
+    assert.equal(planContract?.schemaId, 'atm.teamAgentObservabilityContract.v1');
+    assert.ok(planContract?.queryKeys?.includes('artifactType'));
+    assert.ok(planContract?.brokerConflictVocabulary?.includes('broker-conflict-blocked'));
+
+    const queryResult = await runTeam([
+      'observability',
+      'query',
+      '--fixture',
+      'broker-conflict-resolution',
+      '--task',
+      'TASK-TEAM-0040',
+      '--conflict',
+      'TASK-TEAM-0047',
+      '--provider',
+      'openai',
+      '--role',
+      'coordinator',
+      '--artifact',
+      'atm.brokerConflictResolution.v1',
+      '--cwd',
+      process.cwd(),
+      '--json'
+    ]);
+    const queryEvidence = queryResult.evidence as any;
+    assert.equal(queryResult.ok, true);
+    assert.equal(queryEvidence?.action, 'observability.query');
+    assert.equal(queryEvidence?.query?.eventCount, 2);
+    assert.equal(queryEvidence?.query?.events?.[0]?.schemaId, 'atm.teamAgentObservabilityEvent.v1');
+    assert.equal(queryEvidence?.query?.events?.[0]?.violationStatus, 'broker-conflict-blocked');
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.teamAgentObservabilityEvent.v1'));
+    assert.ok(vendorRuntimeDoc.includes('broker.conflict.blocked'));
+    assert.ok(vendorRuntimeDoc.includes('rawSecretsLogged: false'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/observability.ts'));
+    assert.ok(atomMap.includes('schemas/governance/team-agent-observability-event.schema.json'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#cross-vendor-observability'));
+
+    console.log('[validate-team-agents] ok (cross-vendor-observability)');
+    return;
+  }
+
+  if (taskCase === 'real-observability-query') {
+    const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-real-observability');
+    const teamRunId = 'team-real-observability-fixture';
+    rmSync(cwd, { recursive: true, force: true });
+    mkdirSync(path.join(cwd, '.atm', 'runtime', 'team-runs', teamRunId), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), `${JSON.stringify({
+      schemaId: 'atm.teamRun.v1',
+      teamRunId,
+      taskId: 'TASK-TEAM-0058',
+      status: 'active',
+      observabilityEvents: []
+    }, null, 2)}\n`, 'utf8');
+    const providerEvent = createTeamObservabilityEvent({
+      eventType: 'artifact.output',
+      taskId: 'TASK-TEAM-0058',
+      teamRunId,
+      providerId: 'openai',
+      role: 'implementer',
+      runtimeMode: 'real-agent',
+      artifactType: 'atm.teamProviderRunArtifact.v1',
+      artifactId: 'provider-run-1',
+      summary: 'provider run artifact emitted',
+      emittedAt: '2026-07-10T01:00:00.000Z'
+    });
+    const conflictArtifact = createBrokerConflictResolutionArtifact({
+      primaryTaskId: 'TASK-TEAM-0058',
+      conflictingTaskIds: ['TASK-TEAM-0047'],
+      sharedPaths: ['packages/cli/src/commands/team.ts'],
+      decisionClass: 'serial-release',
+      decisionReason: 'broker-conflict-blocked runtime event query fixture.',
+      violationStatus: 'broker-conflict-blocked',
+      releaseOrder: ['TASK-TEAM-0058', 'TASK-TEAM-0047'],
+      createdAt: '2026-07-10T01:00:00.000Z'
+    });
+    const conflictEvents = createBrokerConflictObservabilityEvents({
+      artifact: conflictArtifact,
+      providerId: 'openai',
+      role: 'validator',
+      teamRunId,
+      emittedAt: '2026-07-10T01:00:00.000Z'
+    });
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', teamRunId, 'observability-events.jsonl'), [
+      providerEvent,
+      ...conflictEvents
+    ].map((event) => JSON.stringify(event)).join('\n') + '\n', 'utf8');
+
+    try {
+      const providerQuery = await runTeam([
+        'observability',
+        'query',
+        '--cwd',
+        cwd,
+        '--team-run',
+        teamRunId,
+        '--provider',
+        'openai',
+        '--role',
+        'implementer',
+        '--artifact',
+        'atm.teamProviderRunArtifact.v1',
+        '--json'
+      ]);
+      const providerEvidence = providerQuery.evidence as any;
+      assert.equal(providerQuery.ok, true);
+      assert.equal(providerEvidence?.eventSource, 'runtime');
+      assert.equal(providerEvidence?.query?.eventCount, 1);
+      assert.equal(providerEvidence?.query?.events?.[0]?.artifactType, 'atm.teamProviderRunArtifact.v1');
+
+      const conflictQuery = await runTeam([
+        'observability',
+        'query',
+        '--cwd',
+        cwd,
+        '--team-run',
+        teamRunId,
+        '--event-type',
+        'broker.conflict.blocked',
+        '--json'
+      ]);
+      const conflictEvidence = conflictQuery.evidence as any;
+      assert.equal(conflictQuery.ok, true);
+      assert.equal(conflictEvidence?.query?.eventCount, 1);
+      assert.equal(conflictEvidence?.query?.events?.[0]?.violationStatus, 'broker-conflict-blocked');
+      assert.equal(conflictEvidence?.query?.events?.[0]?.redaction?.rawSecretsLogged, false);
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+
+    console.log('[validate-team-agents] ok (real-observability-query)');
     return;
   }
 
@@ -1574,6 +3198,28 @@ async function main() {
     return;
   }
 
+  if (taskCase === 'minimal-team-agents-example') {
+    const root = path.join(process.cwd(), 'examples', 'team-agents-minimal');
+    const requiredFiles = [
+      'README.md',
+      'team-brief.md',
+      'agent-report.md',
+      'team-summary.md',
+      'captain-decision.md',
+      'team-memory-shard.md',
+      'patrol-report.md',
+      'QUICK_START_WALK_THROUGH.md'
+    ];
+    for (const file of requiredFiles) {
+      assert.equal(existsSync(path.join(root, file)), true, `${file} should exist`);
+    }
+    assert.ok(readFileSync(path.join(root, 'team-brief.md'), 'utf8').includes('Team level: L1'));
+    assert.ok(readFileSync(path.join(root, 'team-summary.md'), 'utf8').includes('decisionClass'));
+    assert.ok(readFileSync(path.join(root, 'QUICK_START_WALK_THROUGH.md'), 'utf8').includes('90 minutes'));
+    console.log('[validate-team-agents] ok (minimal-team-agents-example)');
+    return;
+  }
+
   if (taskCase === 'knowledge-build-query') {
     const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-knowledge');
     rmSync(cwd, { recursive: true, force: true });
@@ -1607,8 +3253,16 @@ async function main() {
       assert.ok(missingQuery.messages.some((entry: any) => entry.code === 'ATM_TEAM_KNOWLEDGE_INDEX_MISSING'));
       assert.ok(String(missingEvidence?.buildCommand).includes('team knowledge build'));
 
-      const writeBuild = await runTeam(['knowledge', 'build', '--scope', 'project', '--write', '--cwd', cwd, '--json']);
+      const deniedBuild = await runTeam(['knowledge', 'build', '--scope', 'project', '--write', '--actor', 'knowledge-scout', '--cwd', cwd, '--json']);
+      const deniedEvidence = deniedBuild.evidence as any;
+      assert.equal(deniedBuild.ok, false);
+      assert.equal(deniedEvidence?.permission?.permission, 'knowledge.index.write');
+      assert.ok(deniedBuild.messages.some((entry: any) => entry.code === 'ATM_TEAM_KNOWLEDGE_INDEX_WRITE_FORBIDDEN'));
+
+      const writeBuild = await runTeam(['knowledge', 'build', '--scope', 'project', '--write', '--actor', 'coordinator', '--cwd', cwd, '--json']);
+      const writeEvidence = writeBuild.evidence as any;
       assert.equal(writeBuild.ok, true);
+      assert.equal(writeEvidence?.permission?.permission, 'knowledge.index.write');
       assert.equal(existsSync(path.join(cwd, '.atm', 'runtime', 'knowledge', 'team-knowledge-index.json')), true);
 
       const query = await runTeam([
@@ -1739,7 +3393,7 @@ async function main() {
     ].join('\n'), 'utf8');
 
     try {
-      const writeBuild = await runTeam(['knowledge', 'build', '--scope', 'project', '--write', '--cwd', cwd, '--json']);
+      const writeBuild = await runTeam(['knowledge', 'build', '--scope', 'project', '--write', '--actor', 'coordinator', '--cwd', cwd, '--json']);
       assert.equal(writeBuild.ok, true);
 
       const lexicalOnly = await runTeam([
@@ -1969,6 +3623,275 @@ async function main() {
     }
 
     console.log('[validate-team-agents] ok (patrol-report)');
+    return;
+  }
+
+  if (taskCase === 'team-lifecycle-verbs') {
+    const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-lifecycle-verbs');
+    const taskId = 'TASK-TEAM-LIFECYCLE-0001';
+    const teamRunId = 'team-lifecycle-fixture';
+    rmSync(cwd, { recursive: true, force: true });
+    mkdirSync(path.join(cwd, '.atm', 'runtime', 'team-runs'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), `${JSON.stringify({
+      schemaId: 'atm.teamRun.v1',
+      teamRunId,
+      taskId,
+      actorId: 'coordinator',
+      status: 'active',
+      executionMode: 'manual-team',
+      agentsSpawned: false,
+      leases: [],
+      permissionLeases: [],
+      teamSummary: {
+        decision: 'fixture',
+        closeReady: false
+      },
+      createdAt: '2026-07-10T00:00:00.000Z',
+      updatedAt: '2026-07-10T00:00:00.000Z'
+    }, null, 2)}\n`, 'utf8');
+
+    try {
+      const lease = await runTeam([
+        'lease',
+        '--team',
+        teamRunId,
+        '--actor',
+        'implementer-typescript',
+        '--permission',
+        'file.write',
+        '--paths',
+        'packages/cli/src/commands/team.ts,scripts/validate-team-agents.ts',
+        '--reason',
+        'validator fixture lease',
+        '--cwd',
+        cwd,
+        '--json'
+      ]);
+      assert.equal(lease.ok, true);
+      assert.equal((lease.evidence as any)?.status, 'active');
+      assert.equal((lease.evidence as any)?.leaseCount, 1);
+
+      const afterLease = JSON.parse(readFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), 'utf8'));
+      assert.equal(afterLease.permissionLeases.length, 1);
+      assert.equal(afterLease.permissionLeases[0].permission, 'file.write');
+      assert.equal(afterLease.permissionLeases[0].agentId, 'implementer-typescript');
+      assert.deepEqual(afterLease.permissionLeases[0].paths, [
+        'packages/cli/src/commands/team.ts',
+        'scripts/validate-team-agents.ts'
+      ]);
+      assert.equal(afterLease.lifecycleEvents[0].type, 'lease.granted');
+
+      const release = await runTeam([
+        'release',
+        '--team',
+        teamRunId,
+        '--actor',
+        'implementer-typescript',
+        '--permission',
+        'file.write',
+        '--reason',
+        'validator fixture release',
+        '--cwd',
+        cwd,
+        '--json'
+      ]);
+      assert.equal(release.ok, true);
+      assert.equal((release.evidence as any)?.leaseCount, 0);
+
+      const complete = await runTeam([
+        'complete',
+        '--team',
+        teamRunId,
+        '--actor',
+        'coordinator',
+        '--reason',
+        'validator fixture complete',
+        '--cwd',
+        cwd,
+        '--json'
+      ]);
+      assert.equal(complete.ok, true);
+      assert.equal((complete.evidence as any)?.status, 'completed');
+      assert.equal((complete.evidence as any)?.teamRun?.status, 'completed');
+      assert.equal(typeof (complete.evidence as any)?.teamRun?.completedAt, 'string');
+
+      const finalRun = JSON.parse(readFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), 'utf8'));
+      assert.equal(finalRun.status, 'completed');
+      assert.equal(finalRun.completedBy, 'coordinator');
+      assert.equal(finalRun.teamSummary.closeReady, true);
+      assert.deepEqual(finalRun.lifecycleEvents.map((event: any) => event.type), [
+        'lease.granted',
+        'lease.released',
+        'team.completed'
+      ]);
+
+      const postCompleteBlocked = await assertRejectsCliError(
+        () => runTeam(['abandon', '--team', teamRunId, '--actor', 'coordinator', '--cwd', cwd, '--json']),
+        'ATM_TEAM_RUN_NOT_ACTIVE'
+      );
+      assert.equal(postCompleteBlocked.details?.status, 'completed');
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+
+    console.log('[validate-team-agents] ok (team-lifecycle-verbs)');
+    return;
+  }
+
+  if (taskCase === 'team-required-close-gate') {
+    const cwd = path.join(process.cwd(), '.atm-temp', 'validate-team-required-close-gate');
+    const taskId = 'TASK-TEAM-REQUIRED-0001';
+    const teamRunId = 'team-required-fixture';
+    const taskDocument = {
+      schemaId: 'atm.taskLedger.v1',
+      workItemId: taskId,
+      status: 'running',
+      team: { required: true }
+    };
+    rmSync(cwd, { recursive: true, force: true });
+    mkdirSync(path.join(cwd, '.atm', 'runtime', 'team-runs'), { recursive: true });
+
+    try {
+      const missing = evaluateTeamRequiredCompletionGate({ cwd, taskId, taskDocument });
+      assert.equal(missing.ok, false);
+      assert.equal(missing.required, true);
+      assert.ok(missing.requiredCommand?.includes('team complete'));
+
+      writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), `${JSON.stringify({
+        schemaId: 'atm.teamRun.v1',
+        teamRunId,
+        taskId,
+        actorId: 'coordinator',
+        status: 'active',
+        teamSummary: { closeReady: false },
+        createdAt: '2026-07-10T00:00:00.000Z',
+        updatedAt: '2026-07-10T00:00:00.000Z'
+      }, null, 2)}\n`, 'utf8');
+      const activeOnly = evaluateTeamRequiredCompletionGate({ cwd, taskId, taskDocument });
+      assert.equal(activeOnly.ok, false);
+
+      const complete = await runTeam([
+        'complete',
+        '--team',
+        teamRunId,
+        '--actor',
+        'coordinator',
+        '--reason',
+        'required close gate fixture',
+        '--cwd',
+        cwd,
+        '--json'
+      ]);
+      assert.equal(complete.ok, true);
+      const ready = evaluateTeamRequiredCompletionGate({ cwd, taskId, taskDocument });
+      assert.equal(ready.ok, true);
+      assert.equal((ready.teamRun as any)?.teamRunId, teamRunId);
+      assert.equal((ready.teamRun as any)?.status, 'completed');
+
+      const notRequired = evaluateTeamRequiredCompletionGate({
+        cwd,
+        taskId: 'TASK-NO-TEAM',
+        taskDocument: { schemaId: 'atm.taskLedger.v1', workItemId: 'TASK-NO-TEAM', status: 'running' }
+      });
+      assert.equal(notRequired.ok, true);
+      assert.equal(notRequired.required, false);
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+
+    console.log('[validate-team-agents] ok (team-required-close-gate)');
+    return;
+  }
+
+  if (taskCase === 'hook-team-gate') {
+    const cwd = path.join(process.cwd(), '.atm-temp', 'validate-hook-team-gate');
+    const teamRunId = 'team-hook-fixture';
+    rmSync(cwd, { recursive: true, force: true });
+    mkdirSync(path.join(cwd, '.atm', 'runtime', 'team-runs'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', `${teamRunId}.json`), `${JSON.stringify({
+      schemaId: 'atm.teamRun.v1',
+      teamRunId,
+      taskId: 'TASK-HOOK-TEAM-0001',
+      actorId: 'coordinator',
+      status: 'active',
+      permissionLeases: [
+        { permission: 'git.write', agentId: 'coordinator' },
+        { permission: 'file.write', agentId: 'implementer-typescript', paths: ['packages/cli/src/commands/team.ts'] }
+      ],
+      createdAt: '2026-07-10T00:00:00.000Z',
+      updatedAt: '2026-07-10T00:00:00.000Z'
+    }, null, 2)}\n`, 'utf8');
+
+    try {
+      const allowedTool = evaluateTeamPreToolGate({
+        cwd,
+        actorId: 'implementer-typescript',
+        files: ['packages/cli/src/commands/team.ts'],
+        command: null,
+        toolName: 'apply_patch'
+      });
+      assert.equal(allowedTool.length, 0);
+
+      const blockedTool = evaluateTeamPreToolGate({
+        cwd,
+        actorId: 'implementer-typescript',
+        files: ['scripts/validate-team-agents.ts'],
+        command: null,
+        toolName: 'apply_patch'
+      });
+      assert.equal(blockedTool.length, 1);
+      assert.equal(blockedTool[0].code, 'ATM_TEAM_WRITE_SCOPE_EXCEEDED');
+      assert.equal(blockedTool[0].teamRunId, teamRunId);
+
+      const integrationBlocked = runIntegrationHookInvocationInProcess([
+        'pre-tool',
+        '--editor',
+        'codex',
+        '--tool-name',
+        'apply_patch',
+        '--files',
+        'scripts/validate-team-agents.ts',
+        '--cwd',
+        cwd,
+        '--json'
+      ]);
+      assert.equal(integrationBlocked.ok, false);
+      assert.equal(integrationBlocked.messages[0]?.code, 'ATM_TEAM_WRITE_SCOPE_EXCEEDED');
+
+      writeFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', 'team-hook-fixture-secondary.json'), `${JSON.stringify({
+        schemaId: 'atm.teamRun.v1',
+        teamRunId: 'team-hook-fixture-secondary',
+        taskId: 'TASK-HOOK-TEAM-0002',
+        actorId: 'coordinator',
+        status: 'active',
+        permissionLeases: [
+          { permission: 'git.write', agentId: 'coordinator' }
+        ],
+        createdAt: '2026-07-10T00:00:00.000Z',
+        updatedAt: '2026-07-10T00:00:00.000Z'
+      }, null, 2)}\n`, 'utf8');
+
+      const blockedCommit = evaluateTeamPreCommitGate({
+        cwd,
+        actorId: 'implementer-typescript',
+        stagedFiles: ['packages/cli/src/commands/team.ts']
+      });
+      assert.equal(blockedCommit.length, 1);
+      assert.equal(blockedCommit[0].code, 'ATM_TEAM_GIT_OWNER_REQUIRED');
+      assert.deepEqual(blockedCommit[0].teamRunIds, ['team-hook-fixture', 'team-hook-fixture-secondary']);
+      assert.deepEqual(blockedCommit[0].files, ['packages/cli/src/commands/team.ts']);
+
+      const allowedCommit = evaluateTeamPreCommitGate({
+        cwd,
+        actorId: 'coordinator',
+        stagedFiles: ['packages/cli/src/commands/team.ts']
+      });
+      assert.equal(allowedCommit.length, 0);
+    } finally {
+      rmSync(cwd, { recursive: true, force: true });
+    }
+
+    console.log('[validate-team-agents] ok (hook-team-gate)');
     return;
   }
 
@@ -2633,4 +4556,34 @@ function assertBrokerRunScanIndex(): void {
 function fail(message: string): never {
   console.error(`[validate-team-agents] ${message}`);
   process.exit(1);
+}
+
+function snapshotSourceTeamRunFiles(cwd: string): Set<string> {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  if (!existsSync(directory)) return new Set();
+  return new Set(readdirSync(directory)
+    .filter((entry) => entry.endsWith('.json'))
+    .map((entry) => path.join(directory, entry)));
+}
+
+function cleanupNewSourceTeamRunFiles(cwd: string, before: Set<string>): void {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  if (!existsSync(directory)) return;
+  for (const entry of readdirSync(directory)) {
+    if (!entry.endsWith('.json')) continue;
+    const filePath = path.join(directory, entry);
+    if (before.has(filePath)) continue;
+    rmSync(filePath, { force: true });
+  }
+}
+
+async function assertRejectsCliError(action: () => Promise<unknown>, code: string): Promise<CliError> {
+  try {
+    await action();
+  } catch (error) {
+    assert.ok(error instanceof CliError, `expected CliError ${code}, got ${String(error)}`);
+    assert.equal(error.code, code);
+    return error;
+  }
+  assert.fail(`expected CliError ${code}`);
 }

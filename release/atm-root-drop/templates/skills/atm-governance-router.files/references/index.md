@@ -5,6 +5,10 @@ the agent still feels friction, confusion, or near-bypass pressure.
 
 Default rule: do not load every lesson file.
 
+For execution-order questions, first apply the durable tool-first contract in
+`docs/governance/skills/tool-first-orchestration.md`. Load a shard only when
+that contract does not resolve the current friction.
+
 Read order:
 
 1. Stay in `SKILL.md` and `atm-next` if the promoted rule already answers the

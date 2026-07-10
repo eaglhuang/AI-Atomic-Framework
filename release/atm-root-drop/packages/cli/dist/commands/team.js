@@ -1,9 +1,10 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, readJsonFile, writeJsonFile } from './shared.js';
 import { TEAM_CLOSURE_ATTESTATION_SCHEMA_ID } from './evidence.js';
 import { getCommandSpec } from './command-specs.js';
+import { inspectTeamRuntimeBackendCapabilities } from './integration.js';
 import { runTasks } from './tasks.js';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.js';
 import { validateStrictPathHeuristic } from './tasks/task-import-validators.js';
@@ -11,7 +12,18 @@ import { buildTeamKnowledgeSummary, runTeamKnowledge } from './team-knowledge.js
 import { runTeamWave } from './team-wave.js';
 import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane } from '../../../core/dist/broker/team-lane.js';
 import { resolveNodejsTeamWorkerAdapter } from '../../../core/dist/team-runtime/nodejs-worker-adapter.js';
-import { resolveTeamProviderSelection } from '../../../core/dist/team-runtime/provider-selection.js';
+import { createBrokerConflictResolutionArtifact } from '../../../core/dist/team-runtime/permission-broker.js';
+import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, createTeamObservabilityEvent, queryTeamObservabilityEvents } from '../../../core/dist/team-runtime/observability.js';
+import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/anthropic.js';
+import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/azure-openai.js';
+import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/claude-code.js';
+import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/gemini.js';
+import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/microsoft-foundry.js';
+import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/openai.js';
+import { TEAM_PROVIDER_IDS } from '../../../core/dist/team-runtime/provider-contract.js';
+import { createTeamProviderContract } from '../../../core/dist/team-runtime/provider-contract.js';
+import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../../core/dist/team-runtime/provider-selection.js';
+import { runProviderOrchestration } from '../../../core/dist/team-runtime/execution-orchestrator.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive' },
     { id: 'git.write', mode: 'exclusive' },
@@ -25,7 +37,10 @@ const teamPermissionCatalog = [
     { id: 'pipeline.write', mode: 'exclusive', scopeRequired: true },
     { id: 'database.write', mode: 'exclusive', scopeRequired: true },
     { id: 'ci.write', mode: 'exclusive', scopeRequired: true },
-    { id: 'evidence.write', mode: 'exclusive' }
+    { id: 'evidence.write', mode: 'exclusive' },
+    { id: 'knowledge.query', mode: 'shareable' },
+    { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true },
+    { id: 'review.signature.write', mode: 'exclusive' }
 ];
 const coordinatorExclusivePermissions = ['task.lifecycle', 'git.write', 'evidence.write'];
 const readOnlyTeamRoles = new Set([
@@ -33,15 +48,20 @@ const readOnlyTeamRoles = new Set([
     'scopeGuardian',
     'reader',
     'evidenceCollector',
-    'validator'
+    'validator',
+    'lieutenant',
+    'reviewAgent',
+    'knowledgeScout'
 ]);
 const writeTeamPermissions = new Set([
     'task.lifecycle',
     'git.write',
     'file.write',
     'evidence.write',
+    'review.signature.write',
     'web.query',
     'web.download',
+    'knowledge.index.write',
     'exec.mutating',
     'sandbox.write',
     'pipeline.write',
@@ -145,6 +165,11 @@ export const TEAM_ATOM_BOUNDARIES = {
         anchor: 'packages/cli/src/commands/team-knowledge.ts#runTeamKnowledge',
         capability: 'Advisory Team Agents knowledge build/query dry-run surface with metadata filtering and lexical ranking.',
         downstreamTasks: ['TASK-TEAM-0021']
+    },
+    'team.broker-conflict-resolution': {
+        anchor: 'packages/cli/src/commands/team.ts#runTeamBrokerConflictResolve',
+        capability: 'Team Broker conflict resolve command that emits atm.brokerConflictResolution.v1 artifacts with decisionClass, decisionReason, violationStatus, and broker-conflict-blocked release-order semantics.',
+        downstreamTasks: ['TASK-TEAM-0046']
     }
 };
 export function resolveTeamRecipeIdForChannel(channel) {
@@ -237,10 +262,37 @@ const builtInRecipes = [
         ]
     }
 ];
+const teamRosterLevelRoles = {
+    L1: ['coordinator', 'atomizationPlanner', 'implementer', 'validator'],
+    L2: ['coordinator', 'atomizationPlanner', 'reader', 'implementer', 'validator', 'evidenceCollector'],
+    L3: ['coordinator', 'atomizationPlanner', 'reader', 'scopeGuardian', 'implementer', 'validator', 'evidenceCollector'],
+    L4: ['coordinator', 'atomizationPlanner', 'reader', 'scopeGuardian', 'implementer', 'validator', 'evidenceCollector', 'lieutenant'],
+    L5: ['coordinator', 'atomizationPlanner', 'reader', 'scopeGuardian', 'implementer', 'validator', 'evidenceCollector', 'lieutenant', 'reviewAgent', 'knowledgeScout']
+};
+const teamRosterSyntheticAgents = {
+    lieutenant: { agentId: 'lieutenant', role: 'lieutenant', profile: 'atm.lieutenant.v1', permissions: ['file.read', 'exec.validator'] },
+    reviewAgent: { agentId: 'review-agent', role: 'reviewAgent', profile: 'atm.reviewAgent.v1', permissions: ['file.read', 'exec.validator'] },
+    knowledgeScout: { agentId: 'knowledge-scout', role: 'knowledgeScout', profile: 'atm.knowledgeScout.v1', permissions: ['file.read'] }
+};
+const catalogReadyRosterDeferredRoles = [
+    'dataPipelineAgent',
+    'dbContainerAgent',
+    'ciAgent',
+    'webResearchAgent',
+    'qaLead',
+    'closureSteward'
+];
 export async function runTeam(argv) {
     if (String(argv[0] ?? '').toLowerCase() === 'knowledge') {
         const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
         return runTeamKnowledge(argv.slice(1), cwd);
+    }
+    if (String(argv[0] ?? '').toLowerCase() === 'broker') {
+        return runTeamBroker(argv.slice(1), process.cwd());
+    }
+    if (String(argv[0] ?? '').toLowerCase() === 'observability') {
+        const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
+        return runTeamObservability(argv.slice(1), cwd);
     }
     const spec = getCommandSpec('team');
     const parsed = parseArgsForCommand(spec, argv);
@@ -254,14 +306,31 @@ export async function runTeam(argv) {
         const knowledgeArgv = argv[0]?.toLowerCase() === 'knowledge' ? argv.slice(1) : parsed.positional.slice(1).map(String);
         return runTeamKnowledge(knowledgeArgv, cwd);
     }
-    if (!['plan', 'start', 'status', 'validate', 'patrol'].includes(action)) {
-        throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge', { exitCode: 2 });
+    if (action === 'broker') {
+        return runTeamBroker(parsed.positional.slice(1).map(String), cwd);
+    }
+    if (action === 'observability') {
+        return runTeamObservability(parsed.positional.slice(1).map(String), cwd);
+    }
+    if (!['plan', 'start', 'status', 'validate', 'patrol', 'lease', 'release', 'complete', 'abandon'].includes(action)) {
+        throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, lease, release, complete, abandon, wave, knowledge, broker resolve, observability query', { exitCode: 2 });
     }
     if (action === 'status') {
         return buildTeamStatusResult({
             cwd,
             requestedTeamRunId: String(parsed.options.team ?? '').trim(),
             compact: Boolean(parsed.options.compact)
+        });
+    }
+    if (['lease', 'release', 'complete', 'abandon'].includes(action)) {
+        return runTeamLifecycleAction({
+            cwd,
+            action: action,
+            teamRunId: String(parsed.options.team ?? '').trim(),
+            actorId: String(parsed.options.actor ?? '').trim(),
+            permission: String(parsed.options.permission ?? '').trim(),
+            paths: normalizeTeamLifecyclePaths(parsed.options.paths),
+            reason: String(parsed.options.reason ?? '').trim()
         });
     }
     const taskId = String(parsed.options.task ?? '').trim();
@@ -280,7 +349,9 @@ export async function runTeam(argv) {
         cwd,
         taskId,
         requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
-        actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim()
+        actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim(),
+        requestedTeamSize: String(parsed.options.teamSize ?? '').trim(),
+        providerSelectionConfig: loadTeamProviderSelectionConfig(cwd, normalizeStringArray(parsed.options.roleProvider))
     });
     const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
     const ok = validation.findings.every((finding) => finding.level !== 'error');
@@ -291,12 +362,15 @@ export async function runTeam(argv) {
         providerId: parsed.options.provider,
         sdkId: parsed.options.sdk,
         modelId: parsed.options.model,
+        roleName: 'coordinator',
+        selectionConfig: context.providerSelectionConfig,
         editorBridgeDisabled: parsed.options.disableEditorBridge,
         recipe,
         allowedFiles: deriveWritePaths(task, cwd),
         permissionLeases: teamPlan.suggestedPermissionLeases,
         evidenceRequired: String(task.evidenceRequired ?? 'command-backed')
     });
+    const runtimeBackendReadiness = inspectTeamRuntimeBackendCapabilities(cwd);
     if (action === 'validate') {
         const permissionOk = permissionValidation.ok;
         const nonPermissionFindings = validation.findings.filter((finding) => !permissionValidation.findings.includes(finding));
@@ -327,8 +401,11 @@ export async function runTeam(argv) {
                 safeToStart,
                 relatedFindings: nonPermissionFindings,
                 suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
+                governanceRuntime: teamPlan.governanceRuntime,
                 brokerLane: teamPlan.brokerLane,
+                sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
                 runtimeContract,
+                runtimeBackendReadiness,
                 runtimePilot: teamPlan.runtimePilot
             }
         });
@@ -359,7 +436,40 @@ export async function runTeam(argv) {
                     validation,
                     teamPlan,
                     brokerLane: teamPlan.brokerLane,
+                    sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
                     runtimeContract,
+                    runtimeBackendReadiness,
+                    runtimePilot: teamPlan.runtimePilot
+                }
+            });
+        }
+        const backendAdmission = evaluateTeamRuntimeBackendAdmission(runtimeContract, runtimeBackendReadiness);
+        if (!backendAdmission.ok) {
+            return makeResult({
+                ok: false,
+                command: 'team',
+                cwd,
+                messages: [
+                    message('error', 'ATM_TEAM_RUNTIME_BACKEND_MISSING', backendAdmission.reason, {
+                        taskId,
+                        recipeId: recipe.recipeId,
+                        providerId: runtimeContract.providerId,
+                        runtimeMode: runtimeContract.runtimeMode,
+                        executionSurface: runtimeContract.executionSurface
+                    })
+                ],
+                evidence: {
+                    action: 'start',
+                    runtimeWritten: false,
+                    agentsSpawned: false,
+                    task: summarizeTask(taskId, task),
+                    recipe,
+                    validation,
+                    teamPlan,
+                    brokerLane: teamPlan.brokerLane,
+                    sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
+                    runtimeContract,
+                    runtimeBackendReadiness,
                     runtimePilot: teamPlan.runtimePilot
                 }
             });
@@ -374,25 +484,49 @@ export async function runTeam(argv) {
             validation,
             runtimeContract
         });
+        const executeRequested = Boolean(parsed.options.execute);
+        const providerOrchestration = executeRequested
+            ? await runTeamProviderExecution({
+                taskId,
+                teamRunId: teamRun.teamRunId,
+                cwd,
+                recipe,
+                runtimeContract,
+                runtimePilot: teamPlan.runtimePilot
+            })
+            : {
+                requested: false,
+                blockedReason: null,
+                results: []
+            };
         return makeResult({
             ok: true,
             command: 'team',
             cwd,
             messages: [
-                message('info', 'ATM_TEAM_STARTED', 'Team run started. Runtime state was written, but no agents were spawned.', {
+                message('info', executeRequested && providerOrchestration.results.length > 0 ? 'ATM_TEAM_STARTED_EXECUTED' : 'ATM_TEAM_STARTED', executeRequested && providerOrchestration.results.length > 0
+                    ? 'Team run started and governed provider orchestration executed.'
+                    : 'Team run started. Runtime state was written, but no agents were spawned.', {
                     teamRunId: teamRun.teamRunId,
                     taskId,
-                    recipeId: recipe.recipeId
+                    recipeId: recipe.recipeId,
+                    executeRequested,
+                    providerExecutionCount: providerOrchestration.results.length,
+                    providerExecutionBlockedReason: providerOrchestration.blockedReason
                 })
             ],
             evidence: {
                 action: 'start',
                 runtimeWritten: true,
-                agentsSpawned: runtimeContract.agentsSpawned,
+                agentsSpawned: providerOrchestration.results.length > 0,
+                executeRequested,
                 teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
                 teamRun,
+                governanceRuntime: teamPlan.governanceRuntime,
+                providerOrchestration,
                 brokerLane: teamPlan.brokerLane,
                 runtimeContract,
+                runtimeBackendReadiness,
                 runtimePilot: teamPlan.runtimePilot
             }
         });
@@ -421,9 +555,301 @@ export async function runTeam(argv) {
             permissionCatalog: teamPermissionCatalog,
             validation,
             teamPlan,
+            governanceRuntime: teamPlan.governanceRuntime,
             runtimeContract,
+            runtimeBackendReadiness,
             brokerLane: teamPlan.brokerLane,
+            sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
             runtimePilot: teamPlan.runtimePilot
+        }
+    });
+}
+export function buildBrokerConflictSharedVocabulary(brokerLane) {
+    if (brokerLane.safeToStart) {
+        return null;
+    }
+    const firstReason = brokerLane.blockedReasons[0] ?? 'Team Broker did not grant start authority.';
+    return {
+        decisionClass: 'blocked',
+        decisionReason: firstReason.includes('broker-conflict-blocked')
+            ? firstReason
+            : `broker-conflict-blocked: ${firstReason}`,
+        violationStatus: 'broker-conflict-blocked',
+        statusCode: 'broker-conflict-blocked'
+    };
+}
+function evaluateTeamRuntimeBackendAdmission(runtimeContract, readiness) {
+    if (runtimeContract.runtimeMode === 'broker-only') {
+        return {
+            ok: true,
+            reason: 'broker-only mode is governed by Team Broker and does not require a declared runtime backend.'
+        };
+    }
+    const providerId = runtimeContract.providerId ?? '';
+    const matchingCapability = readiness.capabilities.find((capability) => {
+        return capability.providerId === providerId
+            && capability.status !== 'unavailable'
+            && capability.runtimeModes.includes(runtimeContract.runtimeMode)
+            && capability.executionSurfaces.includes(runtimeContract.executionSurface);
+    }) ?? null;
+    if (matchingCapability) {
+        return {
+            ok: true,
+            reason: `Runtime backend declared by ${matchingCapability.manifestPath}.`
+        };
+    }
+    return {
+        ok: false,
+        reason: `Team runtime start requires an integration manifest teamRuntimeCapabilities entry for provider ${providerId || '(missing)'}, mode ${runtimeContract.runtimeMode}, and surface ${runtimeContract.executionSurface}. Installed editor integrations are not runtime backends unless their manifest declares this capability.`
+    };
+}
+export function buildBrokerConflictUxProjection(input) {
+    const primaryTaskId = String(input.primaryTaskId ?? '').trim();
+    const conflictingTaskIds = uniqueStrings(input.conflictingTaskIds.map((entry) => String(entry).trim()).filter(Boolean));
+    const sharedPaths = uniqueStrings((input.sharedPaths ?? []).map((entry) => String(entry).trim()).filter(Boolean));
+    const overlappingAtomIds = uniqueStrings((input.overlappingAtomIds ?? []).map((entry) => String(entry).trim()).filter(Boolean));
+    const currentAllowedTaskId = input.currentAllowedTaskId ?? primaryTaskId;
+    const blockedTaskIds = uniqueStrings((input.blockedTaskIds?.length ? input.blockedTaskIds : conflictingTaskIds)
+        .map((entry) => String(entry).trim())
+        .filter(Boolean));
+    const decisionReason = String(input.decisionReason ?? '').trim()
+        || 'broker-conflict-blocked until the release order grants the next task.';
+    const nextSafeResolutionCommand = input.requiredCommand?.trim()
+        || `node atm.mjs team broker resolve --task ${primaryTaskId} --conflict ${conflictingTaskIds[0] ?? '<task-id>'} --path ${sharedPaths[0] ?? '<shared-path>'} --decision-reason "broker-conflict-blocked until the release order grants the next task." --json`;
+    return {
+        schemaId: 'atm.brokerConflictUx.v1',
+        playbookSlice: 'broker-conflict-resolution',
+        requiredResolutionArtifact: 'atm.brokerConflictResolution.v1',
+        decisionClass: input.decisionClass,
+        decisionReason,
+        violationStatus: input.violationStatus,
+        statusCode: input.statusCode ?? input.violationStatus,
+        primaryTaskId,
+        conflictingTaskIds,
+        blockedTaskIds,
+        currentAllowedTaskId,
+        sharedPaths,
+        overlappingAtomIds,
+        nextSafeResolutionCommand,
+        captainGuidance: [
+            'Stop write progression while violationStatus is broker-conflict-blocked.',
+            'Use the nextSafeResolutionCommand to produce an atm.brokerConflictResolution.v1 artifact.',
+            'Do not hand-edit .atm/runtime/** to clear or reorder the conflict.'
+        ]
+    };
+}
+function runTeamBroker(argv, defaultCwd) {
+    const action = String(argv[0] ?? '').toLowerCase();
+    if (!['resolve', 'conflict-resolve'].includes(action)) {
+        throw new CliError('ATM_CLI_USAGE', 'team broker supports: resolve', { exitCode: 2 });
+    }
+    return runTeamBrokerConflictResolve(argv.slice(1), defaultCwd);
+}
+function runTeamObservability(argv, defaultCwd) {
+    const action = String(argv[0] ?? '').toLowerCase();
+    if (action !== 'query') {
+        throw new CliError('ATM_CLI_USAGE', 'team observability supports: query', { exitCode: 2 });
+    }
+    const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? defaultCwd);
+    const fixture = readOptionValue(argv, '--fixture')?.trim() ?? null;
+    const filters = {
+        taskId: readOptionValue(argv, '--task-filter') ?? readOptionValue(argv, '--task'),
+        teamRunId: readOptionValue(argv, '--team-run-filter') ?? readOptionValue(argv, '--team-run'),
+        providerId: readOptionValue(argv, '--provider-filter') ?? readOptionValue(argv, '--provider'),
+        role: readOptionValue(argv, '--role-filter') ?? readOptionValue(argv, '--role'),
+        artifactType: readOptionValue(argv, '--artifact') ?? readOptionValue(argv, '--artifact-type'),
+        eventType: readOptionValue(argv, '--event-type')
+    };
+    if (!fixture) {
+        const events = readTeamRuntimeObservabilityEvents(cwd, readOptionValue(argv, '--team-run'));
+        const query = queryTeamObservabilityEvents(events, filters);
+        return makeResult({
+            ok: true,
+            command: 'team observability query',
+            mode: 'standalone',
+            cwd,
+            messages: [
+                message('info', 'ATM_TEAM_OBSERVABILITY_QUERY_READY', 'Team observability query returned runtime event records.', {
+                    eventCount: query.eventCount,
+                    filters: query.filters
+                })
+            ],
+            evidence: {
+                action: 'observability.query',
+                dryRun: true,
+                fixture: null,
+                eventSource: 'runtime',
+                contract: buildTeamObservabilityContract(),
+                query
+            }
+        });
+    }
+    if (fixture !== 'broker-conflict-resolution') {
+        throw new CliError('ATM_TEAM_OBSERVABILITY_FIXTURE_UNSUPPORTED', `Unsupported team observability fixture: ${fixture}`, { exitCode: 2 });
+    }
+    const emittedAt = readOptionValue(argv, '--emitted-at') ?? '2026-07-10T00:00:00.000Z';
+    const primaryTaskId = String(readOptionValue(argv, '--task') ?? 'TASK-TEAM-0040').trim();
+    const conflictingTaskIds = readOptionValues(argv, '--conflict');
+    const sharedPaths = readOptionValues(argv, '--path');
+    const artifact = createBrokerConflictResolutionArtifact({
+        primaryTaskId,
+        conflictingTaskIds: conflictingTaskIds.length > 0 ? conflictingTaskIds : ['TASK-TEAM-0047'],
+        sharedPaths: sharedPaths.length > 0 ? sharedPaths : ['packages/cli/src/commands/team.ts'],
+        decisionClass: normalizeBrokerDecisionClass(readOptionValue(argv, '--decision-class')),
+        decisionReason: readOptionValue(argv, '--decision-reason')
+            ?? 'broker-conflict-blocked until the release order grants the next task.',
+        violationStatus: normalizeBrokerViolationStatus(readOptionValue(argv, '--violation-status')),
+        releaseOrder: readOptionValues(argv, '--release-order'),
+        createdAt: emittedAt
+    });
+    const providerId = String(readOptionValue(argv, '--provider') ?? 'openai').trim();
+    const role = String(readOptionValue(argv, '--role') ?? 'coordinator').trim();
+    const teamRunId = readOptionValue(argv, '--team-run') ?? `team-observability-${artifact.resolutionId.toLowerCase()}`;
+    const events = createBrokerConflictObservabilityEvents({
+        artifact,
+        providerId,
+        role,
+        teamRunId,
+        emittedAt
+    });
+    const query = queryTeamObservabilityEvents(events, filters);
+    return makeResult({
+        ok: true,
+        command: 'team observability query',
+        mode: 'standalone',
+        cwd,
+        messages: [
+            message('info', 'ATM_TEAM_OBSERVABILITY_QUERY_READY', 'Team observability query returned shared event records.', {
+                eventCount: query.eventCount,
+                filters: query.filters
+            })
+        ],
+        evidence: {
+            action: 'observability.query',
+            dryRun: true,
+            fixture,
+            eventSource: 'fixture',
+            contract: buildTeamObservabilityContract(),
+            artifact,
+            query
+        }
+    });
+}
+function readTeamRuntimeObservabilityEvents(cwd, requestedTeamRunId) {
+    const runIds = requestedTeamRunId?.trim()
+        ? [requestedTeamRunId.trim()]
+        : listTeamRuns(cwd).map((run) => String(run.teamRunId ?? '')).filter(Boolean);
+    const events = [];
+    for (const teamRunId of runIds) {
+        const runDir = path.join(teamRunsDirectory(cwd), teamRunId);
+        const jsonlPath = path.join(runDir, 'observability-events.jsonl');
+        if (existsSync(jsonlPath)) {
+            for (const line of readFileSync(jsonlPath, 'utf8').split(/\r?\n/)) {
+                const trimmed = line.trim();
+                if (!trimmed)
+                    continue;
+                try {
+                    const parsed = JSON.parse(trimmed);
+                    if (parsed?.schemaId === 'atm.teamAgentObservabilityEvent.v1') {
+                        events.push(parsed);
+                    }
+                }
+                catch {
+                    // Ignore malformed runtime event lines; validators can flag corruption separately.
+                }
+            }
+        }
+        const run = existsSync(path.join(teamRunsDirectory(cwd), `${teamRunId}.json`))
+            ? readTeamRun(cwd, teamRunId)
+            : null;
+        const embedded = Array.isArray(run?.observabilityEvents) ? run.observabilityEvents : [];
+        for (const event of embedded) {
+            if (event?.schemaId === 'atm.teamAgentObservabilityEvent.v1') {
+                events.push(event);
+            }
+        }
+    }
+    const seen = new Set();
+    return events.filter((event) => {
+        if (seen.has(event.eventId))
+            return false;
+        seen.add(event.eventId);
+        return true;
+    });
+}
+export function runTeamBrokerConflictResolve(argv, defaultCwd) {
+    const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? defaultCwd);
+    const primaryTaskId = readOptionValue(argv, '--task')?.trim();
+    if (!primaryTaskId) {
+        throw new CliError('ATM_TEAM_BROKER_RESOLVE_TASK_REQUIRED', 'team broker resolve requires --task <id>.', { exitCode: 2 });
+    }
+    const conflictingTaskIds = readOptionValues(argv, '--conflict');
+    if (conflictingTaskIds.length === 0) {
+        throw new CliError('ATM_TEAM_BROKER_RESOLVE_CONFLICT_REQUIRED', 'team broker resolve requires at least one --conflict <task-id>.', { exitCode: 2 });
+    }
+    const sharedPaths = readOptionValues(argv, '--path');
+    if (sharedPaths.length === 0) {
+        throw new CliError('ATM_TEAM_BROKER_RESOLVE_PATH_REQUIRED', 'team broker resolve requires at least one --path <file>.', { exitCode: 2 });
+    }
+    const decisionReason = readOptionValue(argv, '--decision-reason')?.trim()
+        ?? 'Broker conflict blocked; tasks must consume the release order one at a time.';
+    const decisionClass = normalizeBrokerDecisionClass(readOptionValue(argv, '--decision-class'));
+    const violationStatus = normalizeBrokerViolationStatus(readOptionValue(argv, '--violation-status'));
+    const releaseOrder = readOptionValues(argv, '--release-order');
+    const createdAt = readOptionValue(argv, '--created-at')?.trim();
+    const artifact = createBrokerConflictResolutionArtifact({
+        primaryTaskId,
+        conflictingTaskIds,
+        sharedPaths,
+        decisionClass,
+        decisionReason,
+        violationStatus,
+        releaseOrder: releaseOrder.length ? releaseOrder : undefined,
+        createdAt
+    });
+    const conflictUx = buildBrokerConflictUxProjection({
+        primaryTaskId: artifact.primaryTaskId,
+        conflictingTaskIds: artifact.conflictingTaskIds,
+        sharedPaths: artifact.sharedPaths,
+        decisionClass: artifact.decisionClass,
+        decisionReason: artifact.decisionReason,
+        violationStatus: artifact.violationStatus,
+        statusCode: artifact.statusCode,
+        currentAllowedTaskId: artifact.currentAllowedTaskId,
+        blockedTaskIds: artifact.blockedTaskIds,
+        requiredCommand: `node atm.mjs team broker resolve --task ${artifact.primaryTaskId} ${artifact.conflictingTaskIds.map((taskId) => `--conflict ${taskId}`).join(' ')} ${artifact.sharedPaths.map((sharedPath) => `--path ${sharedPath}`).join(' ')} --decision-reason "${artifact.decisionReason}" --json`
+    });
+    return makeResult({
+        ok: true,
+        command: 'team',
+        cwd,
+        messages: [
+            message('info', 'ATM_TEAM_BROKER_CONFLICT_RESOLUTION_READY', 'Team Broker conflict resolution artifact generated.', {
+                resolutionId: artifact.resolutionId,
+                decisionClass: artifact.decisionClass,
+                violationStatus: artifact.violationStatus,
+                statusCode: artifact.statusCode,
+                currentAllowedTaskId: artifact.currentAllowedTaskId,
+                blockedTaskIds: artifact.blockedTaskIds,
+                sharedPaths: artifact.sharedPaths,
+                decisionReason: artifact.decisionReason,
+                requiredResolutionArtifact: conflictUx.requiredResolutionArtifact,
+                nextSafeResolutionCommand: conflictUx.nextSafeResolutionCommand
+            })
+        ],
+        evidence: {
+            action: 'broker.resolve',
+            dryRun: true,
+            runtimeWritten: false,
+            agentsSpawned: false,
+            artifact,
+            conflictUx,
+            sharedVocabulary: {
+                decisionClass: artifact.decisionClass,
+                decisionReason: artifact.decisionReason,
+                violationStatus: artifact.violationStatus,
+                statusCode: artifact.statusCode
+            }
         }
     });
 }
@@ -433,6 +859,37 @@ function readOptionValue(argv, flag) {
         return undefined;
     }
     return argv[index + 1];
+}
+function readOptionValues(argv, flag) {
+    const values = [];
+    for (let index = 0; index < argv.length; index += 1) {
+        if (argv[index] !== flag)
+            continue;
+        const value = argv[index + 1];
+        if (!value || value.startsWith('--'))
+            continue;
+        values.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
+    }
+    return [...new Set(values)];
+}
+function normalizeBrokerDecisionClass(value) {
+    const normalized = value?.trim();
+    if (normalized === 'serial-release'
+        || normalized === 'human-signoff-required'
+        || normalized === 'adr-required'
+        || normalized === 'blocked') {
+        return normalized;
+    }
+    return 'serial-release';
+}
+function normalizeBrokerViolationStatus(value) {
+    const normalized = value?.trim();
+    if (normalized === 'broker-conflict-blocked'
+        || normalized === 'resolution-issued'
+        || normalized === 'resolved') {
+        return normalized;
+    }
+    return 'broker-conflict-blocked';
 }
 export function buildTeamRuntimeContract(input) {
     const runtimeMode = normalizeTeamRuntimeMode(input.runtimeMode);
@@ -942,9 +1399,11 @@ async function buildTeamPlanningContext(input) {
         requestedRecipeId: input.requestedRecipeId,
         task
     });
+    const requestedRosterLevel = normalizeTeamSizeOverride(input.requestedTeamSize)?.teamLevel ?? null;
+    const activeRecipe = requestedRosterLevel ? projectTeamRecipeForLevel(recipe, requestedRosterLevel).recipe : recipe;
     const writeScope = deriveTeamWriteScope(task, input.cwd);
     const writePaths = writeScope.writePaths;
-    const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
+    const permissionValidation = validateTeamPermissionModel(activeRecipe, writePaths, {
         allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
         repoRoot: input.cwd,
         allowEmptyWriteScope: writeScope.allowEmptyWriteScope
@@ -989,11 +1448,14 @@ async function buildTeamPlanningContext(input) {
     const validation = mergeValidation(permissionValidation, { ok: claimAdmissionFindings.every((f) => f.level !== 'error'), findings: claimAdmissionFindings }, { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings }, { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings });
     const finalTeamPlan = buildTeamPlan({
         task,
-        recipe,
+        recipe: activeRecipe,
         writePaths,
         validation,
         brokerLane,
         allowEmptyWriteScope: writeScope.allowEmptyWriteScope,
+        requestedTeamSize: input.requestedTeamSize,
+        providerSelectionConfig: input.providerSelectionConfig?.config ?? null,
+        providerSelectionSource: input.providerSelectionConfig?.source ?? null,
         knowledgeSummary: buildTeamKnowledgeSummary({
             cwd: input.cwd,
             taskId: String(task.workItemId ?? task.taskId ?? input.taskId),
@@ -1003,9 +1465,11 @@ async function buildTeamPlanningContext(input) {
     return {
         task,
         recipes,
-        recipe,
+        recipe: activeRecipe,
         permissionValidation,
         validation,
+        providerSelectionConfig: input.providerSelectionConfig?.config ?? null,
+        providerSelectionSource: input.providerSelectionConfig?.source ?? null,
         teamPlan: {
             ...finalTeamPlan,
             validation,
@@ -1056,6 +1520,24 @@ function loadTeamRecipes(cwd) {
             { kind: 'built-in-json', recipeIds: builtInRecipes.map((entry) => entry.recipeId) },
             ...repoRecipes.map((entry) => entry.source)
         ]
+    };
+}
+function loadTeamProviderSelectionConfig(cwd, cliRoleOverrides) {
+    const configPath = path.join(cwd, '.atm', 'config', 'team-provider-selection.json');
+    const repoConfig = existsSync(configPath)
+        ? readJsonFile(configPath, 'ATM_TEAM_PROVIDER_SELECTION_CONFIG_INVALID')
+        : null;
+    return {
+        config: mergeTeamProviderSelectionConfig({
+            repoConfig,
+            cliRoleOverrides
+        }),
+        source: {
+            schemaId: 'atm.teamAgentsConfig.v1',
+            path: existsSync(configPath) ? path.relative(cwd, configPath).replace(/\\/g, '/') : null,
+            loaded: existsSync(configPath),
+            cliOverrideCount: cliRoleOverrides.length
+        }
     };
 }
 function normalizeRecipe(value) {
@@ -1460,10 +1942,24 @@ export function buildTeamPlan(input) {
     const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
     const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
     const implementerSelector = selectTeamImplementer(input.task, input.recipe, input.writePaths);
-    const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector);
-    const roleSkillPacks = buildTeamRoleSkillPackContract(input.recipe);
+    const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector, input.requestedTeamSize);
+    const activeTeamLevel = captainDecision.teamLevel ?? mapTeamSizeToLevel(captainDecision.teamSize);
+    const rosterProjection = projectTeamRecipeForLevel(input.recipe, activeTeamLevel);
+    const activeRecipe = rosterProjection.recipe;
+    const roleSkillPacks = buildTeamRoleSkillPackContract(activeRecipe);
+    const roleSkillPackManifest = buildProviderNeutralRoleSkillPackManifest({
+        recipe: activeRecipe,
+        roleSkillPacks,
+        selectionConfig: input.providerSelectionConfig ?? undefined
+    });
     const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
     const growthContract = buildTeamGrowthContract();
+    const observabilityContract = buildTeamObservabilityContract();
+    const roleGrowthObservabilityContract = buildTeamRoleGrowthObservabilityContract({
+        roleSkillPacks,
+        growthContract
+    });
+    const runtimeTierContract = buildRuntimeTierContract(activeRecipe);
     const runtimePilot = buildTeamRuntimePilot({
         roleSkillPacks,
         routingMatrix,
@@ -1471,17 +1967,41 @@ export function buildTeamPlan(input) {
         validation: input.validation,
         brokerLane: input.brokerLane
     });
+    const governanceRuntime = buildTeamGovernanceRuntimeFields({
+        validation: input.validation,
+        brokerLane: input.brokerLane,
+        runtimePilot,
+        captainDecision
+    });
     return {
         schemaId: 'atm.teamPlan.v1',
-        recipeId: input.recipe.recipeId,
+        recipeId: activeRecipe.recipeId,
         channelHint: 'normal',
+        teamLevel: activeTeamLevel,
+        rosterProjection: rosterProjection.projection,
+        governanceRuntime,
+        decisionClass: governanceRuntime.decisionClass,
+        decisionReason: governanceRuntime.decisionReason,
+        requiresHumanSignoff: governanceRuntime.requiresHumanSignoff,
+        requiresAdr: governanceRuntime.requiresAdr,
+        violationStatus: governanceRuntime.violationStatus,
+        escalationTarget: governanceRuntime.escalationTarget,
+        providerSelectionSource: input.providerSelectionSource ?? null,
         brokerLane: input.brokerLane,
-        agents: input.recipe.agents,
+        agents: activeRecipe.agents,
         captainDecision,
         implementerSelector,
         roleSkillPacks,
+        roleSkillPackManifest,
         routingMatrix,
         growthContract,
+        observabilityContract,
+        roleGrowthObservabilityContract,
+        runtimeTierContract,
+        openAIFamilyRuntimeBridges: buildOpenAIFamilyRuntimeBridgeSummary(),
+        editorExecutionRuntimeBridges: buildEditorExecutionRuntimeBridgeSummary(),
+        microsoftFoundryRuntimeBridges: buildMicrosoftFoundryRuntimeBridgeSummary(),
+        anthropicRuntimeBridges: buildAnthropicRuntimeBridgeSummary(),
         runtimePilot,
         ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
         requiredRoles: crewBriefingContract.requiredRoles,
@@ -1500,6 +2020,70 @@ export function buildTeamPlan(input) {
             'Do not hand-edit .atm/runtime team state.'
         ],
         validation: input.validation
+    };
+}
+export function buildOpenAIFamilyRuntimeBridgeSummary() {
+    return {
+        schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1',
+        milestone: 'M9I',
+        providerIds: ['openai', 'azure-openai'],
+        sharedProviderInterface: 'atm.teamProviderContract.v1',
+        sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+        observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+        coordinatorOwnedAuthority: true,
+        brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+        bridges: [
+            buildOpenAITeamProviderBridgeDescriptor(),
+            buildAzureOpenAITeamProviderBridgeDescriptor()
+        ]
+    };
+}
+export function buildEditorExecutionRuntimeBridgeSummary() {
+    return {
+        schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1',
+        milestone: 'M9I',
+        providerIds: ['claude-code', 'gemini'],
+        sharedProviderInterface: 'atm.teamProviderContract.v1',
+        sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+        roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1',
+        observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+        coordinatorOwnedAuthority: true,
+        brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+        bridges: [
+            buildClaudeCodeTeamProviderBridgeDescriptor(),
+            buildGeminiTeamProviderBridgeDescriptor()
+        ]
+    };
+}
+export function buildMicrosoftFoundryRuntimeBridgeSummary() {
+    return {
+        schemaId: 'atm.microsoftFoundryRuntimeBridgeSummary.v1',
+        milestone: 'M9I',
+        providerIds: ['microsoft-foundry'],
+        sharedProviderInterface: 'atm.teamProviderContract.v1',
+        sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+        supportedSurfaces: ['project-chat-inference', 'agent-service'],
+        observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+        coordinatorOwnedAuthority: true,
+        brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+        bridges: [
+            buildMicrosoftFoundryTeamProviderBridgeDescriptor()
+        ]
+    };
+}
+export function buildAnthropicRuntimeBridgeSummary() {
+    return {
+        schemaId: 'atm.anthropicRuntimeBridgeSummary.v1',
+        milestone: 'M10X',
+        providerIds: ['anthropic'],
+        sharedProviderInterface: 'atm.teamProviderContract.v1',
+        sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+        observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+        coordinatorOwnedAuthority: true,
+        brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+        bridges: [
+            buildAnthropicTeamProviderBridgeDescriptor()
+        ]
     };
 }
 export function buildTeamRoleSkillPackContract(recipe) {
@@ -1538,6 +2122,21 @@ export function buildTeamRoleSkillPackContract(recipe) {
             skillPackId: 'atm.role-pack.atomization-planner',
             specialistSkills: ['atm-atom-map-refactor', 'atm-task-card-authoring'],
             playbookSlice: 'atomization-scope-shaping'
+        },
+        lieutenant: {
+            skillPackId: 'atm.role-pack.lieutenant',
+            specialistSkills: ['atm-dispatch', 'atm-lock'],
+            playbookSlice: 'coordination-boundary-watch'
+        },
+        reviewAgent: {
+            skillPackId: 'atm.role-pack.review-agent',
+            specialistSkills: ['atm-evidence'],
+            playbookSlice: 'review-signature-advisory'
+        },
+        knowledgeScout: {
+            skillPackId: 'atm.role-pack.knowledge-scout',
+            specialistSkills: ['atm-orient'],
+            playbookSlice: 'knowledge-query-advisory'
         }
     };
     const coordinatorExclusive = ['task.lifecycle', 'git.write', 'evidence.write'];
@@ -1564,37 +2163,161 @@ export function buildTeamRoleSkillPackContract(recipe) {
         })
     };
 }
+export function buildProviderNeutralRoleSkillPackManifest(input) {
+    const roleSkillPacks = input.roleSkillPacks ?? buildTeamRoleSkillPackContract(input.recipe);
+    const selectionConfig = input.selectionConfig ?? {
+        repoDefault: {
+            providerId: 'openai',
+            sdkId: 'responses',
+            modelId: 'gpt-5-mini',
+            runtimeMode: 'broker-only'
+        },
+        roleOverrides: {}
+    };
+    const providerIds = uniqueStrings([...(input.providerIds ?? TEAM_PROVIDER_IDS)]);
+    return {
+        schemaId: 'atm.teamRoleSkillPackManifest.v1',
+        providerNeutral: true,
+        coordinatorOwnsLifecycle: true,
+        discoveryMode: 'capability-driven',
+        roleFirstProviderSecond: true,
+        sharedVocabulary: {
+            brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked']
+        },
+        roles: roleSkillPacks.roles.map((entry) => {
+            const selection = resolveTeamProviderSelection(entry.role, selectionConfig);
+            return {
+                role: entry.role,
+                skillPackId: entry.skillPackId,
+                playbookSlice: entry.playbookSlice,
+                capabilityTags: capabilityTagsForRole(entry.role),
+                permissionLease: {
+                    alignment: 'role-first',
+                    allowedPermissions: entry.allowedPermissions,
+                    forbiddenPermissions: entry.forbiddenPermissions
+                },
+                selectedProvider: {
+                    providerId: selection.providerId,
+                    sdkId: selection.sdkId,
+                    modelId: selection.modelId,
+                    runtimeMode: selection.runtimeMode,
+                    source: selection.source
+                },
+                providerCapabilities: providerIds.map((providerId) => ({
+                    providerId,
+                    runtimeModes: ['real-agent', 'editor-subagent', 'broker-only'],
+                    artifacts: artifactsForRole(entry.role),
+                    satisfiesRolePack: true,
+                    reason: `${providerId} can satisfy ${entry.skillPackId} through role-first permission leases and ${entry.playbookSlice}.`
+                })),
+                growthContractAttachment: entry.growthContractAttachment
+            };
+        })
+    };
+}
 export function buildTeamRoleRoutingMatrix(roleSkillPacks) {
     const hasRole = (role) => roleSkillPacks.roles.some((entry) => entry.role === role);
     const maybe = (role) => hasRole(role) ? [role] : [];
+    const route = (input) => ({
+        workstream: input.workstream,
+        primaryRole: input.primaryRole,
+        supportingRoles: input.supportingRoles ?? [],
+        advisoryRoles: input.advisoryRoles ?? [],
+        roleOrder: input.roleOrder,
+        parallelSafeRoles: input.parallelSafeRoles ?? [],
+        advisoryOnlyRoles: input.advisoryOnlyRoles ?? input.advisoryRoles ?? [],
+        playbookSlice: input.playbookSlice,
+        lifecycleOwner: 'coordinator',
+        stopConditions: input.stopConditions ?? [
+            'broker-conflict-blocked',
+            'blocked-active-lease',
+            'proposal-submitted'
+        ]
+    });
     return {
         schemaId: 'atm.teamRoleRoutingMatrix.v1',
         providerNeutral: true,
         coordinatorOwnsLifecycle: true,
         routes: [
-            {
+            route({
                 workstream: 'task-entry-routing',
                 primaryRole: 'coordinator',
                 supportingRoles: [...maybe('reader'), ...maybe('scopeGuardian')],
                 advisoryRoles: [...maybe('evidenceCollector')],
+                roleOrder: ['coordinator', ...maybe('scopeGuardian'), ...maybe('reader'), ...maybe('evidenceCollector')],
+                parallelSafeRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
                 playbookSlice: 'route-claim-close-commit'
-            },
-            {
+            }),
+            route({
                 workstream: 'scoped-implementation',
                 primaryRole: hasRole('implementer') ? 'implementer' : 'coordinator',
                 supportingRoles: [...maybe('scopeGuardian')],
                 advisoryRoles: [...maybe('reader')],
+                roleOrder: ['coordinator', ...maybe('scopeGuardian'), hasRole('implementer') ? 'implementer' : 'coordinator', ...maybe('reader')],
+                parallelSafeRoles: [...maybe('scopeGuardian'), ...maybe('reader')],
                 playbookSlice: 'scoped-delivery'
-            },
-            {
+            }),
+            route({
                 workstream: 'validation-and-evidence',
                 primaryRole: hasRole('validator') ? 'validator' : 'coordinator',
                 supportingRoles: [...maybe('evidenceCollector')],
                 advisoryRoles: [...maybe('reader')],
+                roleOrder: ['coordinator', hasRole('validator') ? 'validator' : 'coordinator', ...maybe('evidenceCollector'), ...maybe('reader')],
+                parallelSafeRoles: [...maybe('evidenceCollector'), ...maybe('reader')],
                 playbookSlice: 'validator-evidence-pass'
-            }
+            }),
+            route({
+                workstream: 'broker-conflict-resolution',
+                primaryRole: 'coordinator',
+                supportingRoles: [...maybe('scopeGuardian')],
+                advisoryRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
+                roleOrder: ['coordinator', ...maybe('scopeGuardian'), ...maybe('reader'), ...maybe('evidenceCollector')],
+                parallelSafeRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
+                playbookSlice: 'broker-conflict-resolution',
+                stopConditions: [
+                    'broker-conflict-blocked',
+                    'missing-atm.brokerConflictResolution.v1',
+                    'manual-runtime-edit-requested'
+                ]
+            })
         ]
     };
+}
+function capabilityTagsForRole(role) {
+    const normalized = role.toLowerCase();
+    if (normalized === 'coordinator')
+        return ['task-routing', 'lifecycle-authority', 'closeout-sequencing'];
+    if (normalized.includes('scope'))
+        return ['scope-boundary', 'broker-preflight', 'lease-watch'];
+    if (normalized.includes('implementer'))
+        return ['scoped-delivery', 'bounded-file-write'];
+    if (normalized.includes('validator'))
+        return ['validator-run', 'failure-interpretation'];
+    if (normalized.includes('evidence'))
+        return ['evidence-packaging', 'closure-readiness'];
+    if (normalized.includes('knowledge'))
+        return ['knowledge-query', 'shared-growth-context'];
+    if (normalized.includes('steward'))
+        return ['broker-authorized-apply', 'bounded-merge-plan'];
+    return ['specialist-advisory'];
+}
+function artifactsForRole(role) {
+    const normalized = role.toLowerCase();
+    if (normalized === 'coordinator')
+        return ['captain-decision', 'team-brief', 'handoff'];
+    if (normalized.includes('validator'))
+        return ['validator-report'];
+    if (normalized.includes('evidence'))
+        return ['evidence-summary'];
+    if (normalized.includes('implementer'))
+        return ['agent-report', 'patch-summary'];
+    if (normalized.includes('scope'))
+        return ['scope-report'];
+    if (normalized.includes('knowledge'))
+        return ['knowledge-summary'];
+    if (normalized.includes('steward'))
+        return ['broker-apply-report'];
+    return ['agent-report'];
 }
 export function buildTeamGrowthContract() {
     return {
@@ -1608,6 +2331,7 @@ export function buildTeamGrowthContract() {
             'validator-gap',
             'tooling-mismatch',
             'overloaded-context',
+            'shared-atm-routing-friction',
             'role-specific-friction'
         ],
         captureTemplate: [
@@ -1624,11 +2348,158 @@ export function buildTeamGrowthContract() {
         }
     };
 }
+export function buildTeamRoleGrowthObservabilityContract(input) {
+    const growthContract = input.growthContract ?? buildTeamGrowthContract();
+    const learningReference = growthContract.promotionPolicy.rawCaseTarget;
+    return {
+        schemaId: 'atm.teamRoleGrowthObservabilityContract.v1',
+        sharedAcrossRolePacks: true,
+        referenceFirst: true,
+        sourceGrowthContract: 'atm.teamGrowthContract.v1',
+        sourceObservabilityContract: 'atm.teamAgentObservabilityContract.v1',
+        learningEventProjection: {
+            eventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+            eventType: 'artifact.output',
+            artifactType: 'atm.teamRoleGrowthLearningItem.v1',
+            queryKeys: ['taskId', 'teamRunId', 'providerId', 'role', 'artifactType', 'eventType'],
+            artifactFields: [
+                'Category',
+                'Trigger',
+                'Symptom',
+                'Correct route',
+                'Durable rule',
+                'Promotion target',
+                'Confidence',
+                'Reuse scope'
+            ]
+        },
+        frictionClassification: {
+            sharedAtmRoutingFriction: [
+                'entry-friction',
+                'route-confusion',
+                'fallback-misuse',
+                'tooling-mismatch',
+                'shared-atm-routing-friction'
+            ],
+            roleSpecificFriction: [
+                'boundary-confusion',
+                'validator-gap',
+                'overloaded-context',
+                'role-specific-friction'
+            ]
+        },
+        roleMappings: input.roleSkillPacks.roles.map((entry) => ({
+            role: entry.role,
+            agentId: entry.agentId,
+            skillPackId: entry.skillPackId,
+            playbookSlice: entry.playbookSlice,
+            growthAttachmentPoint: entry.growthContractAttachment,
+            learningReference,
+            taxonomy: growthContract.taxonomy,
+            observableEventSelector: {
+                role: entry.role,
+                eventType: 'artifact.output',
+                artifactType: 'atm.teamRoleGrowthLearningItem.v1'
+            }
+        })),
+        metrics: [
+            {
+                metricId: 'role-growth.learning-events.by-role',
+                description: 'Counts reference-first role learning artifacts by role and skill pack.',
+                numerator: {
+                    eventType: 'artifact.output',
+                    artifactType: 'atm.teamRoleGrowthLearningItem.v1'
+                },
+                denominator: {
+                    eventType: 'artifact.output',
+                    artifactType: 'atm.teamRoleGrowthLearningItem.v1'
+                },
+                groupedBy: ['role', 'skillPackId', 'playbookSlice']
+            },
+            {
+                metricId: 'role-growth.role-specific-friction.rate',
+                description: 'Separates role-boundary friction from shared ATM routing friction.',
+                numerator: {
+                    category: 'role-specific-friction'
+                },
+                denominator: {
+                    artifactType: 'atm.teamRoleGrowthLearningItem.v1'
+                },
+                groupedBy: ['role', 'skillPackId']
+            },
+            {
+                metricId: 'broker-conflict-blocked.hit-rate',
+                description: 'Tracks how often Team role growth observes the M8E broker-conflict-blocked state.',
+                numerator: {
+                    violationStatus: 'broker-conflict-blocked'
+                },
+                denominator: {
+                    eventType: 'broker.conflict.blocked'
+                },
+                groupedBy: ['role', 'taskId', 'decisionClass']
+            }
+        ],
+        brokerConflictVocabulary: {
+            decisionClass: 'decisionClass',
+            decisionReason: 'decisionReason',
+            violationStatus: 'violationStatus',
+            blockedCode: 'broker-conflict-blocked'
+        }
+    };
+}
+function buildRuntimeTierContract(recipe) {
+    return {
+        schemaId: 'atm.teamRuntimeTierContract.v1',
+        tiers: ['raw-api', 'agent-sdk', 'editor'],
+        providerContractCompatibility: ['RawChatAdapter', 'AgentLoopAdapter', 'EditorAgentAdapter'],
+        roleTiers: recipe.agents.map((agent) => {
+            const tier = recommendRuntimeTier(agent.role);
+            return {
+                role: agent.role,
+                agentId: agent.agentId,
+                runtimeTier: tier,
+                rationale: runtimeTierRationale(agent.role, tier)
+            };
+        })
+    };
+}
+function recommendRuntimeTier(role) {
+    if (['reader', 'validator', 'knowledgeScout', 'reviewAgent', 'evidenceCollector'].includes(role))
+        return 'raw-api';
+    if (['implementer', 'coordinator'].includes(role))
+        return 'agent-sdk';
+    if (role === 'lieutenant' || role === 'scopeGuardian' || role === 'atomizationPlanner')
+        return 'editor';
+    return 'raw-api';
+}
+function runtimeTierRationale(role, tier) {
+    if (tier === 'raw-api')
+        return `${role} is advisory/read-heavy and should prefer direct low-state API calls.`;
+    if (tier === 'agent-sdk')
+        return `${role} may need tool-loop orchestration while preserving Coordinator-owned lifecycle.`;
+    return `${role} benefits from editor context but remains bounded by Team permission leases.`;
+}
 export function buildTeamRuntimePilot(input) {
     const orderedRoles = ['coordinator', 'implementer', 'validator'];
     const selectedRoles = orderedRoles.filter((role) => input.roleSkillPacks.roles.some((entry) => entry.role === role));
     const pilotRoles = selectedRoles.length >= 3 ? selectedRoles.slice(0, 3) : selectedRoles.slice(0, 2);
     const selectedEntries = input.roleSkillPacks.roles.filter((entry) => pilotRoles.includes(entry.role));
+    const blockedByBroker = input.brokerLane.safeToStart === false;
+    const brokerViolationStatus = blockedByBroker
+        ? input.brokerLane.decision.admission?.state === 'proposal-submitted'
+            ? 'proposal-submitted'
+            : 'broker-conflict-blocked'
+        : 'none';
+    const brokerConflictVocabulary = {
+        decisionClass: blockedByBroker ? 'blocked' : 'allowed',
+        decisionReason: input.brokerLane.blockedReasons[0] ?? input.brokerLane.decision.reason ?? 'Team Broker allowed the runtime pilot lane.',
+        violationStatus: blockedByBroker
+            ? brokerViolationStatus === 'proposal-submitted'
+                ? 'proposal-submitted'
+                : 'broker-conflict-blocked'
+            : 'allowed',
+        blockedCode: blockedByBroker && brokerViolationStatus !== 'proposal-submitted' ? 'broker-conflict-blocked' : null
+    };
     const actionableRefinementFindings = [
         ...input.validation.findings.map((finding) => ({
             category: classifyTeamPilotFinding(finding.code),
@@ -1646,11 +2517,31 @@ export function buildTeamRuntimePilot(input) {
         pilotMode: pilotRoles.length >= 3 ? 'role-trio' : 'role-pair',
         selectedRoles: pilotRoles,
         selectedSkillPackIds: selectedEntries.map((entry) => entry.skillPackId),
+        agentSkillUnits: selectedEntries.map((entry) => ({
+            role: entry.role,
+            agentId: entry.agentId,
+            skillPackId: entry.skillPackId,
+            boundedSkillPackLoaded: true,
+            permissionLease: {
+                allowedPermissions: entry.allowedPermissions,
+                forbiddenPermissions: entry.forbiddenPermissions
+            },
+            playbookSlice: entry.playbookSlice,
+            lifecycleAuthority: entry.role === 'coordinator' ? 'coordinator-owned' : 'worker-forbidden'
+        })),
         realisticWorkflow: [
             'Coordinator routes the task and remains the only lifecycle and git.write owner.',
             'Implementer loads only the scoped delivery pack for the active workstream.',
             'Validator loads only validator-evidence guidance and returns findings to Coordinator.'
         ],
+        workflowEvidence: {
+            scenarioId: 'agent-plus-skill-runtime-pilot',
+            roleOrder: input.routingMatrix.routes.find((route) => route.workstream === 'scoped-implementation')?.roleOrder ?? pilotRoles,
+            coordinatorOnlyLifecyclePreserved: true,
+            workerWriteScope: 'bounded-by-task-lease',
+            blockedByBroker,
+            brokerViolationStatus
+        },
         roleBoundarySignals: [
             ...selectedEntries.map((entry) => `${entry.role} -> ${entry.playbookSlice}`),
             ...input.routingMatrix.routes
@@ -1666,11 +2557,179 @@ export function buildTeamRuntimePilot(input) {
             'Workers return findings or diffs to Coordinator instead of widening into closeout authority.',
             'Growth lessons land in a shared taxonomy without contaminating unrelated role packs.'
         ],
+        roleConfusionMetrics: {
+            baselineLoadedSkillPacks: 'monolithic-team-context',
+            pilotLoadedSkillPacks: selectedEntries.map((entry) => entry.skillPackId),
+            preventedPermissionDrift: uniqueStrings(selectedEntries.flatMap((entry) => entry.forbiddenPermissions)),
+            refinementSignalCount: actionableRefinementFindings.length
+        },
+        roleGrowthObservability: {
+            contractSchemaId: 'atm.teamRoleGrowthObservabilityContract.v1',
+            eventType: 'artifact.output',
+            artifactType: 'atm.teamRoleGrowthLearningItem.v1',
+            frictionDimensions: ['shared-atm-routing-friction', 'role-specific-friction'],
+            brokerConflictBlockedMetricId: 'broker-conflict-blocked.hit-rate',
+            roleContractMappings: selectedEntries.map((entry) => ({
+                role: entry.role,
+                skillPackId: entry.skillPackId,
+                playbookSlice: entry.playbookSlice
+            }))
+        },
+        brokerConflictVocabulary,
         actionableRefinementFindings
     };
 }
-function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector) {
-    const sizing = decideTeamSizing(task, writePaths, validation, brokerLane);
+function buildTeamGovernanceRuntimeFields(input) {
+    const blockingFinding = input.validation.findings.find((finding) => finding.level === 'error') ?? null;
+    const blockedByBroker = input.runtimePilot.brokerConflictVocabulary.violationStatus === 'broker-conflict-blocked'
+        || input.brokerLane.safeToStart === false;
+    const brokerVerdict = String(input.brokerLane.decision.verdict ?? '');
+    const escalationRequired = input.captainDecision.escalationRequired === true
+        || brokerVerdict === 'needs-steward'
+        || brokerVerdict === 'historical-delivery-required';
+    const requiresAdr = brokerVerdict === 'needs-steward'
+        || normalizeStringArray(input.brokerLane.blockedReasons).some((reason) => reason.toLowerCase().includes('adr'));
+    const requiresHumanSignoff = escalationRequired || requiresAdr;
+    const decisionClass = blockedByBroker || blockingFinding
+        ? 'blocked'
+        : escalationRequired
+            ? 'escalated'
+            : 'allowed';
+    const decisionReason = blockingFinding?.summary
+        ?? input.runtimePilot.brokerConflictVocabulary.decisionReason
+        ?? input.captainDecision.reason;
+    const violationStatus = blockedByBroker
+        ? 'broker-conflict-blocked'
+        : blockingFinding
+            ? 'policy-blocked'
+            : escalationRequired
+                ? 'escalated'
+                : 'allowed';
+    return {
+        schemaId: 'atm.teamGovernanceRuntimeFields.v1',
+        decisionClass,
+        decisionReason,
+        requiresHumanSignoff,
+        requiresAdr,
+        violationStatus,
+        escalationTarget: requiresHumanSignoff
+            ? (requiresAdr ? 'ADR + Captain review' : 'Captain / human review')
+            : null
+    };
+}
+export function evaluateReviewerIndependence(input) {
+    const implementerFamily = normalizeModelFamily(input.implementer.modelId);
+    const reviewerFamily = normalizeModelFamily(input.reviewer.modelId);
+    const checks = {
+        differentProvider: input.implementer.providerId !== input.reviewer.providerId,
+        differentModelFamily: implementerFamily !== reviewerFamily,
+        differentCertification: Boolean(input.implementer.modelCertificationId)
+            && Boolean(input.reviewer.modelCertificationId)
+            && input.implementer.modelCertificationId !== input.reviewer.modelCertificationId
+    };
+    const ok = input.policy === 'different-provider'
+        ? checks.differentProvider
+        : input.policy === 'different-model-family'
+            ? checks.differentModelFamily
+            : checks.differentCertification;
+    return {
+        schemaId: 'atm.reviewerIndependenceDecision.v1',
+        ok,
+        policy: input.policy,
+        checks,
+        reason: ok
+            ? `Reviewer satisfies ${input.policy}.`
+            : `Reviewer does not satisfy ${input.policy}; advisory note only.`
+    };
+}
+export function buildReviewAgentSignature(input) {
+    const independence = evaluateReviewerIndependence({
+        implementer: input.implementer,
+        reviewer: input.reviewer,
+        policy: input.policy
+    });
+    const certificationPresent = Boolean(input.reviewer.modelCertificationId);
+    const formal = independence.ok && certificationPresent;
+    return {
+        schemaId: 'atm.reviewAgentSignature.v1',
+        taskId: input.taskId,
+        signatureStatus: formal ? 'formal-signature' : 'advisory-note',
+        permission: formal ? 'review.signature.write' : null,
+        reviewer: {
+            providerId: input.reviewer.providerId,
+            modelId: input.reviewer.modelId,
+            modelCertificationId: input.reviewer.modelCertificationId ?? null
+        },
+        implementer: {
+            providerId: input.implementer.providerId,
+            modelId: input.implementer.modelId,
+            modelCertificationId: input.implementer.modelCertificationId ?? null
+        },
+        modelCertificationId: input.reviewer.modelCertificationId ?? null,
+        reviewerIndependencePolicy: input.policy,
+        independence,
+        reviewedDiffHash: input.reviewedDiffHash,
+        findings: [...(input.findings ?? [])],
+        earlyWarning: classifyReviewEarlyWarnings(input.findings ?? [])
+    };
+}
+export function evaluateReviewQuorum(input) {
+    const formal = input.signatures.filter((signature) => signature.signatureStatus === 'formal-signature');
+    const conflicts = detectReviewSignatureConflicts(input.signatures);
+    const ok = formal.length >= input.requiredFormalSignatures && conflicts.length === 0;
+    return {
+        schemaId: 'atm.reviewQuorumDecision.v1',
+        ok,
+        requiredFormalSignatures: input.requiredFormalSignatures,
+        formalSignatureCount: formal.length,
+        advisoryNoteCount: input.signatures.length - formal.length,
+        conflicts,
+        escalationTarget: ok ? null : 'Coordinator/Captain/human review',
+        reason: ok
+            ? 'Review quorum satisfied.'
+            : 'Review quorum insufficient or conflicting; formal signature is blocked but advisory notes remain usable.'
+    };
+}
+function normalizeModelFamily(modelId) {
+    return String(modelId ?? '').trim().toLowerCase().split(/[-_.:]/)[0] || 'unknown';
+}
+function classifyReviewEarlyWarnings(findings) {
+    return findings.map((finding) => {
+        const normalized = finding.toLowerCase();
+        const category = normalized.includes('scope')
+            ? 'scope-drift'
+            : normalized.includes('test')
+                ? 'missing-tests'
+                : normalized.includes('contract')
+                    ? 'consumer-contract'
+                    : normalized.includes('rollback')
+                        ? 'rollback-gap'
+                        : 'review-note';
+        return { category, finding };
+    });
+}
+function detectReviewSignatureConflicts(signatures) {
+    const findingSets = signatures.map((signature) => new Set(signature.findings.map((finding) => finding.toLowerCase())));
+    const conflicts = [];
+    for (let index = 1; index < findingSets.length; index += 1) {
+        const previous = findingSets[index - 1];
+        const current = findingSets[index];
+        if (previous.has('approve') && current.has('block') || previous.has('block') && current.has('approve')) {
+            conflicts.push(`reviewer-${index}-decision-conflict`);
+        }
+    }
+    return conflicts;
+}
+function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector, requestedTeamSize) {
+    const automaticSizing = decideTeamSizing(task, writePaths, validation, brokerLane);
+    const manualSizing = normalizeTeamSizeOverride(requestedTeamSize);
+    const sizing = manualSizing
+        ? {
+            teamSize: manualSizing.teamSize,
+            confidence: 'high',
+            reason: `Manual team size override ${manualSizing.teamLevel} selected by CLI/config.`
+        }
+        : automaticSizing;
     const lieutenantEscalation = assessLieutenantEscalation(task, writePaths, validation, brokerLane, atomizationChecklist);
     return {
         schemaId: 'atm.teamCaptainDecision.v1',
@@ -1688,6 +2747,8 @@ function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBrie
             'If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.',
             'Coordinator must not silently override broker verdicts inside broker-governed conflict domains.'
         ],
+        teamLevel: manualSizing?.teamLevel ?? mapTeamSizeToLevel(sizing.teamSize),
+        teamLevelSource: manualSizing ? 'manual' : 'automatic',
         teamSize: sizing.teamSize,
         requiredRoles: crewBriefingContract.requiredRoles.map((role) => role.role),
         optionalRoles: crewBriefingContract.optionalRoles.map((role) => role.role),
@@ -1707,6 +2768,67 @@ function buildCaptainDecision(task, writePaths, validation, brokerLane, crewBrie
             escalationRequired: lieutenantEscalation.escalationRequired,
             needLieutenant: lieutenantEscalation.needLieutenant,
             authorityChain: 'Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them.'
+        }
+    };
+}
+function normalizeTeamSizeOverride(value) {
+    const normalized = String(value ?? '').trim().toLowerCase();
+    if (!normalized)
+        return null;
+    if (normalized === 'small' || normalized === 'l1')
+        return { teamLevel: 'L1', teamSize: 'small' };
+    if (normalized === 'medium' || normalized === 'normal' || normalized === 'l2')
+        return { teamLevel: 'L2', teamSize: 'medium' };
+    if (normalized === 'large' || normalized === 'l3')
+        return { teamLevel: 'L3', teamSize: 'large' };
+    if (normalized === 'l4')
+        return { teamLevel: 'L4', teamSize: 'large' };
+    if (normalized === 'l5')
+        return { teamLevel: 'L5', teamSize: 'large' };
+    throw new CliError('ATM_TEAM_SIZE_INVALID', `Unsupported team size override: ${value}`, {
+        exitCode: 2,
+        details: { supported: ['small', 'medium', 'large', 'L1', 'L2', 'L3', 'L4', 'L5'] }
+    });
+}
+function mapTeamSizeToLevel(value) {
+    const normalized = String(value ?? '').trim();
+    if (normalized === 'large')
+        return 'L3';
+    if (normalized === 'medium')
+        return 'L2';
+    return 'L1';
+}
+function projectTeamRecipeForLevel(recipe, teamLevel) {
+    const targetRoles = teamRosterLevelRoles[teamLevel];
+    const agentsByRole = new Map(recipe.agents.map((agent) => [agent.role, agent]));
+    const agents = targetRoles
+        .map((role) => agentsByRole.get(role) ?? teamRosterSyntheticAgents[role] ?? null)
+        .filter((agent) => agent !== null);
+    const activeRoles = agents.map((agent) => agent.role);
+    const deferredRoles = recipe.agents
+        .map((agent) => agent.role)
+        .filter((role) => !activeRoles.includes(role));
+    const syntheticRoles = activeRoles.filter((role) => !recipe.agents.some((agent) => agent.role === role));
+    return {
+        recipe: {
+            ...recipe,
+            agents
+        },
+        projection: {
+            schemaId: 'atm.teamRosterProjection.v1',
+            teamLevel,
+            teamSize: teamLevel === 'L1' ? 'small' : teamLevel === 'L2' ? 'medium' : 'large',
+            activeRoles,
+            syntheticRoles,
+            deferredRoles,
+            catalogReadyRosterDeferredRoles,
+            roleRules: {
+                L1: 'Core four: Coordinator, Atomization Planner, Implementer, Validator.',
+                L2: 'Normal crew: L1 plus Reader and Evidence Collector.',
+                L3: 'Large crew: L2 plus Scope Guardian.',
+                L4: 'Escalated crew: L3 plus Lieutenant coordination boundary.',
+                L5: 'Full advisory crew: L4 plus Review Agent and Knowledge Scout.'
+            }
         }
     };
 }
@@ -2217,8 +3339,16 @@ export function writeTeamRun(input) {
         leases: input.teamPlan.suggestedPermissionLeases,
         permissionLeases: input.teamPlan.suggestedPermissionLeases,
         validation: input.validation,
+        governanceRuntime: input.teamPlan.governanceRuntime,
+        decisionClass: input.teamPlan.decisionClass,
+        decisionReason: input.teamPlan.decisionReason,
+        requiresHumanSignoff: input.teamPlan.requiresHumanSignoff,
+        requiresAdr: input.teamPlan.requiresAdr,
+        violationStatus: input.teamPlan.violationStatus,
+        escalationTarget: input.teamPlan.escalationTarget,
         brokerLane: input.teamPlan.brokerLane,
         captainDecision: input.teamPlan.captainDecision,
+        runtimeTierContract: input.teamPlan.runtimeTierContract,
         runtimePilot: input.teamPlan.runtimePilot,
         reworkRoute: buildTeamReworkRouteStateMachine({
             findings: [],
@@ -2245,6 +3375,121 @@ export function writeTeamRun(input) {
     mkdirSync(directory, { recursive: true });
     writeJsonFile(path.join(directory, `${teamRunId}.json`), teamRun);
     return teamRun;
+}
+async function runTeamProviderExecution(input) {
+    if (input.runtimeContract.runtimeMode === 'broker-only') {
+        return {
+            requested: true,
+            blockedReason: 'broker-only-runtime-never-spawns',
+            results: []
+        };
+    }
+    const providerId = normalizeTeamProviderId(input.runtimeContract.providerId);
+    if (!providerId) {
+        return {
+            requested: true,
+            blockedReason: 'provider-not-selected',
+            results: []
+        };
+    }
+    const provider = createTeamProviderContract(providerId);
+    const selectedRoles = normalizeStringArray(input.runtimePilot.selectedRoles).length > 0
+        ? normalizeStringArray(input.runtimePilot.selectedRoles)
+        : input.recipe.agents.slice(0, 2).map((agent) => agent.role);
+    const results = [];
+    for (const role of selectedRoles) {
+        results.push(await runProviderOrchestration(provider, {
+            taskId: input.taskId,
+            role,
+            runtimeMode: input.runtimeContract.runtimeMode,
+            providerId,
+            sdkId: input.runtimeContract.sdkId ?? 'unknown-sdk',
+            modelId: input.runtimeContract.modelId ?? 'unknown-model',
+            instructions: `Run Team role ${role} for ${input.taskId}.`,
+            retries: 1
+        }));
+    }
+    appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
+        taskId: input.taskId,
+        teamRunId: input.teamRunId,
+        runtimeMode: input.runtimeContract.runtimeMode,
+        result
+    })));
+    return {
+        requested: true,
+        blockedReason: null,
+        results
+    };
+}
+function buildProviderOrchestrationEvents(input) {
+    const role = String(input.result.stepResult.role ?? 'worker');
+    const providerId = normalizeTeamProviderId(input.result.providerId) ?? 'unknown';
+    const conflictBlocked = input.result.stepResult.artifacts.includes('atm.brokerConflictResolution.v1')
+        || input.result.stepResult.summary.includes('broker-conflict-blocked');
+    return [
+        createTeamObservabilityEvent({
+            eventType: 'session.start',
+            taskId: input.taskId,
+            teamRunId: input.teamRunId,
+            providerId,
+            role,
+            runtimeMode: input.runtimeMode,
+            summary: `Provider session started: ${input.result.sessionId}.`
+        }),
+        createTeamObservabilityEvent({
+            eventType: input.result.ok ? 'step.execution' : 'session.failure',
+            taskId: input.taskId,
+            teamRunId: input.teamRunId,
+            providerId,
+            role,
+            runtimeMode: input.runtimeMode,
+            decisionClass: input.result.ok ? 'allowed' : 'blocked',
+            decisionReason: input.result.stepResult.summary,
+            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
+            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+            summary: input.result.stepResult.summary
+        }),
+        ...input.result.stepResult.artifacts.map((artifactType) => createTeamObservabilityEvent({
+            eventType: artifactType === 'atm.brokerConflictResolution.v1' || conflictBlocked ? 'broker.conflict.blocked' : 'artifact.output',
+            taskId: input.taskId,
+            teamRunId: input.teamRunId,
+            providerId,
+            role,
+            runtimeMode: input.runtimeMode,
+            artifactType,
+            artifactId: `${input.result.sessionId}:${artifactType}`,
+            decisionClass: conflictBlocked ? 'blocked' : input.result.ok ? 'allowed' : 'blocked',
+            decisionReason: input.result.stepResult.summary,
+            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
+            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+            summary: `${artifactType} emitted by ${role}.`
+        })),
+        createTeamObservabilityEvent({
+            eventType: input.result.ok ? 'session.complete' : 'session.failure',
+            taskId: input.taskId,
+            teamRunId: input.teamRunId,
+            providerId,
+            role,
+            runtimeMode: input.runtimeMode,
+            decisionClass: input.result.ok ? 'allowed' : 'blocked',
+            decisionReason: input.result.stepResult.summary,
+            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
+            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+            summary: input.result.ok ? `Provider session completed: ${input.result.sessionId}.` : `Provider session failed: ${input.result.sessionId}.`
+        })
+    ];
+}
+function appendTeamRuntimeObservabilityEvents(cwd, teamRunId, events) {
+    if (events.length === 0)
+        return;
+    const runDir = path.join(teamRunsDirectory(cwd), teamRunId);
+    mkdirSync(runDir, { recursive: true });
+    const jsonlPath = path.join(runDir, 'observability-events.jsonl');
+    appendFileSync(jsonlPath, `${events.map((event) => JSON.stringify(event)).join('\n')}\n`, 'utf8');
+}
+function normalizeTeamProviderId(value) {
+    const normalized = String(value ?? '').trim();
+    return TEAM_PROVIDER_IDS.includes(normalized) ? normalized : null;
 }
 function buildTeamBrokerGovernanceSummary(runtimeContract) {
     return {
@@ -2281,6 +3526,46 @@ export function buildTeamStatusResult(input) {
             teamRuns: input.compact ? runs.map(compactTeamRun) : runs
         }
     });
+}
+export function evaluateTeamRequiredCompletionGate(input) {
+    const required = isTeamRequiredTask(input.taskDocument);
+    if (!required) {
+        return {
+            ok: true,
+            required: false,
+            taskId: input.taskId,
+            teamRun: null,
+            requiredCommand: null
+        };
+    }
+    const completedRun = listTeamRuns(input.cwd)
+        .filter((run) => typeof run === 'object' && run !== null)
+        .filter((run) => run.taskId === input.taskId)
+        .filter((run) => run.status === 'completed')
+        .filter((run) => {
+        const teamSummary = run.teamSummary;
+        return typeof teamSummary === 'object' && teamSummary !== null && teamSummary.closeReady === true;
+    })
+        .sort((left, right) => String(right.completedAt ?? right.updatedAt ?? '').localeCompare(String(left.completedAt ?? left.updatedAt ?? '')))[0] ?? null;
+    const requiredCommand = `node atm.mjs team complete --team <teamRunId> --actor <coordinator> --reason "team.required close gate" --json`;
+    return {
+        ok: Boolean(completedRun),
+        required: true,
+        taskId: input.taskId,
+        teamRun: completedRun ? compactTeamRun(completedRun) : null,
+        requiredCommand
+    };
+}
+function isTeamRequiredTask(taskDocument) {
+    const direct = taskDocument.teamRequired ?? taskDocument['team.required'];
+    if (direct === true || direct === 'true')
+        return true;
+    const team = taskDocument.team;
+    if (typeof team === 'object' && team !== null) {
+        const required = team.required;
+        return required === true || required === 'true';
+    }
+    return false;
 }
 export function buildTeamPatrolResult(input) {
     const report = buildTeamPatrolReport(input);
@@ -2435,6 +3720,161 @@ function readTeamRun(cwd, teamRunId) {
         });
     }
     return readJsonFile(filePath, 'ATM_TEAM_RUN_INVALID');
+}
+function writeExistingTeamRun(cwd, teamRunId, run) {
+    const filePath = path.join(teamRunsDirectory(cwd), `${teamRunId}.json`);
+    if (!existsSync(filePath)) {
+        throw new CliError('ATM_TEAM_RUN_NOT_FOUND', `Team run not found: ${teamRunId}`, {
+            exitCode: 2,
+            details: { teamRunId, path: path.relative(cwd, filePath).replace(/\\/g, '/') }
+        });
+    }
+    writeJsonFile(filePath, run);
+}
+function normalizeTeamLifecyclePaths(value) {
+    return uniqueStrings(String(value ?? '')
+        .split(',')
+        .map((entry) => entry.trim().replace(/\\/g, '/'))
+        .filter(Boolean));
+}
+function runTeamLifecycleAction(input) {
+    if (!input.teamRunId) {
+        throw new CliError('ATM_TEAM_RUN_REQUIRED', `team ${input.action} requires --team <id>.`, { exitCode: 2 });
+    }
+    if (!input.actorId) {
+        throw new CliError('ATM_TEAM_ACTOR_REQUIRED', `team ${input.action} requires --actor <id>.`, { exitCode: 2 });
+    }
+    if ((input.action === 'lease' || input.action === 'release') && !input.permission) {
+        throw new CliError('ATM_TEAM_PERMISSION_REQUIRED', `team ${input.action} requires --permission <id>.`, { exitCode: 2 });
+    }
+    const run = readTeamRun(input.cwd, input.teamRunId);
+    const status = String(run.status ?? '');
+    if (status !== 'active') {
+        throw new CliError('ATM_TEAM_RUN_NOT_ACTIVE', `Team run ${input.teamRunId} is ${status || 'unknown'}, not active.`, {
+            exitCode: 1,
+            details: { teamRunId: input.teamRunId, status }
+        });
+    }
+    const now = new Date().toISOString();
+    const currentLeases = normalizePermissionLeaseRecords(run.permissionLeases ?? run.leases);
+    const lifecycleEvents = Array.isArray(run.lifecycleEvents) ? [...run.lifecycleEvents] : [];
+    let nextLeases = currentLeases;
+    if (input.action === 'lease') {
+        const conflict = currentLeases.find((lease) => lease.permission === input.permission && lease.agentId !== input.actorId);
+        if (conflict) {
+            throw new CliError('ATM_TEAM_LEASE_CONFLICT', `Permission ${input.permission} is already leased to ${conflict.agentId}.`, {
+                exitCode: 1,
+                details: {
+                    teamRunId: input.teamRunId,
+                    permission: input.permission,
+                    currentOwner: conflict.agentId,
+                    requestedOwner: input.actorId,
+                    requiredCommand: `node atm.mjs team release --team ${input.teamRunId} --actor ${conflict.agentId} --permission ${input.permission} --json`
+                }
+            });
+        }
+        const lease = {
+            permission: input.permission,
+            agentId: input.actorId,
+            paths: input.paths
+        };
+        nextLeases = [
+            ...currentLeases.filter((entry) => !(entry.permission === input.permission && entry.agentId === input.actorId)),
+            lease
+        ];
+        lifecycleEvents.push(teamLifecycleEvent('lease.granted', input, now, { lease }));
+    }
+    if (input.action === 'release') {
+        const matched = currentLeases.filter((lease) => lease.permission === input.permission && lease.agentId === input.actorId);
+        if (matched.length === 0) {
+            throw new CliError('ATM_TEAM_LEASE_NOT_FOUND', `No ${input.permission} lease owned by ${input.actorId} exists on ${input.teamRunId}.`, {
+                exitCode: 1,
+                details: { teamRunId: input.teamRunId, permission: input.permission, actorId: input.actorId }
+            });
+        }
+        nextLeases = currentLeases.filter((lease) => !(lease.permission === input.permission && lease.agentId === input.actorId));
+        lifecycleEvents.push(teamLifecycleEvent('lease.released', input, now, { releasedLeases: matched }));
+    }
+    if (input.action === 'complete') {
+        run.status = 'completed';
+        run.completedAt = now;
+        run.completedBy = input.actorId;
+        run.completionReason = input.reason || null;
+        const teamSummary = typeof run.teamSummary === 'object' && run.teamSummary !== null
+            ? { ...run.teamSummary, closeReady: true }
+            : { closeReady: true };
+        run.teamSummary = teamSummary;
+        lifecycleEvents.push(teamLifecycleEvent('team.completed', input, now));
+    }
+    if (input.action === 'abandon') {
+        run.status = 'abandoned';
+        run.abandonedAt = now;
+        run.abandonedBy = input.actorId;
+        run.abandonReason = input.reason || null;
+        const teamSummary = typeof run.teamSummary === 'object' && run.teamSummary !== null
+            ? { ...run.teamSummary, closeReady: false }
+            : { closeReady: false };
+        run.teamSummary = teamSummary;
+        lifecycleEvents.push(teamLifecycleEvent('team.abandoned', input, now));
+    }
+    run.leases = nextLeases;
+    run.permissionLeases = nextLeases;
+    run.lifecycleEvents = lifecycleEvents;
+    run.updatedAt = now;
+    writeExistingTeamRun(input.cwd, input.teamRunId, run);
+    return makeResult({
+        ok: true,
+        command: 'team',
+        cwd: input.cwd,
+        messages: [
+            message('info', 'ATM_TEAM_LIFECYCLE_UPDATED', `Team run ${input.teamRunId} ${input.action} recorded.`, {
+                teamRunId: input.teamRunId,
+                action: input.action,
+                status: run.status,
+                leaseCount: nextLeases.length
+            })
+        ],
+        evidence: {
+            action: `team.${input.action}`,
+            teamRunId: input.teamRunId,
+            actorId: input.actorId,
+            permission: input.permission || null,
+            paths: input.paths,
+            status: run.status,
+            leaseCount: nextLeases.length,
+            lifecycleEventCount: lifecycleEvents.length,
+            teamRun: compactTeamRun(run)
+        }
+    });
+}
+function teamLifecycleEvent(type, input, occurredAt, extra = {}) {
+    return {
+        schemaId: 'atm.teamRuntimeLifecycleEvent.v1',
+        type,
+        teamRunId: input.teamRunId,
+        actorId: input.actorId,
+        permission: input.permission || null,
+        paths: input.paths,
+        reason: input.reason || null,
+        occurredAt,
+        ...extra
+    };
+}
+function normalizePermissionLeaseRecords(value) {
+    if (!Array.isArray(value))
+        return [];
+    return value.map((entry) => {
+        const record = entry;
+        const permission = String(record.permission ?? '').trim();
+        const agentId = String(record.agentId ?? '').trim();
+        if (!permission || !agentId)
+            return null;
+        return {
+            permission,
+            agentId,
+            paths: normalizeStringArray(record.paths)
+        };
+    }).filter((entry) => entry !== null);
 }
 function normalizeTeamPatrolMode(value) {
     const mode = String(value ?? 'claim-preflight').trim();
@@ -2659,6 +4099,7 @@ function compactTeamRun(run) {
     const permissionLeases = r.permissionLeases;
     const brokerSubagent = r.brokerSubagent;
     const runtimeContract = r.runtimeContract;
+    const governanceRuntime = r.governanceRuntime ?? null;
     return {
         teamRunId: r.teamRunId,
         taskId: r.taskId,
@@ -2673,6 +4114,12 @@ function compactTeamRun(run) {
         brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
         runtimePilotMode: run?.runtimePilot?.pilotMode ?? null,
         runtimePilotRoles: normalizeStringArray(r.runtimePilot?.selectedRoles),
+        decisionClass: governanceRuntime?.decisionClass ?? r.decisionClass ?? null,
+        decisionReason: governanceRuntime?.decisionReason ?? r.decisionReason ?? null,
+        requiresHumanSignoff: governanceRuntime?.requiresHumanSignoff ?? r.requiresHumanSignoff ?? false,
+        requiresAdr: governanceRuntime?.requiresAdr ?? r.requiresAdr ?? false,
+        violationStatus: governanceRuntime?.violationStatus ?? r.violationStatus ?? null,
+        escalationTarget: governanceRuntime?.escalationTarget ?? r.escalationTarget ?? null,
         brokerEvidenceRequired: normalizeStringArray(brokerGovernance?.brokerEvidenceRequired ?? brokerSubagent?.evidenceRequired ?? runtimeContract?.brokerSubagent?.evidenceRequired),
         commitLaneSerializedBy: brokerGovernance?.commitLaneSerializedBy ?? runtimeContract?.commitLane?.serializedBy ?? null,
         commitLaneOwnerRole: brokerGovernance?.commitLaneOwnerRole ?? runtimeContract?.commitLane?.ownerRole ?? null,
@@ -2680,6 +4127,11 @@ function compactTeamRun(run) {
         workerTaskLifecycle: brokerGovernance?.workerTaskLifecycle ?? runtimeContract?.workerAdapter?.authorityBoundary?.taskLifecycle ?? null,
         workerSelfClose: brokerGovernance?.workerSelfClose ?? runtimeContract?.workerAdapter?.authorityBoundary?.selfClose ?? null,
         agentsSpawned: r.agentsSpawned === true,
+        completedAt: r.completedAt ?? null,
+        completedBy: r.completedBy ?? null,
+        abandonedAt: r.abandonedAt ?? null,
+        abandonedBy: r.abandonedBy ?? null,
+        lifecycleEventCount: Array.isArray(r.lifecycleEvents) ? r.lifecycleEvents.length : 0,
         createdAt: r.createdAt ?? null,
         updatedAt: r.updatedAt ?? null
     };
