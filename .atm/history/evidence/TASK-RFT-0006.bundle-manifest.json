@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0006",
+  "updatedAt": "2026-07-10T02:02:06.278Z",
+  "updatedBy": "cursor-composer-rft0006",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/police/__tests__/dedup.spec.ts",
+    "node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts",
+    "node --strip-types packages/core/src/police/__tests__/quality.spec.ts",
+    "node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts",
+    "node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:police-atomic-map",
+    "validate:police-family"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-10T01:51:40.091Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-police-atomic-map.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:800303473742e14a7f5119b9cb1f49458a66ac61c83caef77bdafd6b2cf569cb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:police-atomic-map"
+      ],
+      "generatedAt": "2026-07-10T01:51:54.071Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2dbb22cc6594e0610270135fa0dc717084429e3ff3a7d23ee325f16c5b47d5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:51:57.773Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d20e88baf7e46ebd0761d3489cb4877c74717390a35ccca94f81105a11ef184",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:52:01.495Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/police/__tests__/dedup.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0fef32ab256c09a0ff06ac438d7032fc97eae0d15d9768a08279f1a61f356b9a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/police/__tests__/dedup.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:52:03.429Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/police/__tests__/quality.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:145bd83200ac47cf264030f065e1408a713f2629d78fe6e1a005feb6f12e5242",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/police/__tests__/quality.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:52:07.691Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5ed3379e40f4bb7fc1b8e1949914ba4b97d431a7f85cb10c5ca8ee95659b121e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts"
+      ],
+      "generatedAt": "2026-07-10T01:52:09.614Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-10T01:52:15.603Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-police-family.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:920277543abdce403d365a5dc68a1fdc7373ce6953097c687a619cfa068097b7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:police-family"
+      ],
+      "generatedAt": "2026-07-10T01:52:26.400Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-10T01:54:06.041Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-10T02:02:06.588Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

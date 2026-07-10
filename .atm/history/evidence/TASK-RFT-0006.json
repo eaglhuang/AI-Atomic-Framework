@@ -1,0 +1,632 @@
+{
+  "taskId": "TASK-RFT-0006",
+  "updatedAt": "2026-07-10T02:02:06.278Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:51:40.039Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:c8e1282d3091efff995fe6d40f0e2e4ea55bffd1b97b8baa12a391a7acdb75a4",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:51:40.091Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a064a124dfc1d633e2f2f69c022cb7f7f9131d65881777a121a167f114c8c333",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-police-atomic-map.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:51:53.695Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:police-atomic-map"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-police-atomic-map.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:800303473742e14a7f5119b9cb1f49458a66ac61c83caef77bdafd6b2cf569cb",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:police-atomic-map"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:70528e5e36b6d9efdd107c4c8af98a708a6be12aa33a86097392ee3ab6827f75",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:51:54.071Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:fb082e26a92ebfe4bf7789675bd1337010057ee802655f9db3d5124bfa74dd9e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:51:57.722Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2dbb22cc6594e0610270135fa0dc717084429e3ff3a7d23ee325f16c5b47d5",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/police/__tests__/role-registry.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:b4ba78d6d1f85b7d40143a3bc629465cf8547ea318dbf071935ad6b4e5b2fefc",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:51:57.773Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:76f171e99d4dec0759b4760e9e9eafc11461eb244b89d37cb77be6c1866eecf5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:52:01.434Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2d20e88baf7e46ebd0761d3489cb4877c74717390a35ccca94f81105a11ef184",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/police/__tests__/suppression-keys.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:56bc1df7e7c3b82dbfa48f29a24b8a5a0e7cab14c88b13cef6bbe89c850e0688",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:52:01.495Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:819a2140b98227ee48815be254ec76c5f4097e3b6ffcd9fd240f6bb9e1927e63",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/police/__tests__/dedup.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:52:03.375Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/police/__tests__/dedup.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/police/__tests__/dedup.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0fef32ab256c09a0ff06ac438d7032fc97eae0d15d9768a08279f1a61f356b9a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/police/__tests__/dedup.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:74fe81d8b60ed9bb2304f5f9d0f0cc44f91013fe0499ec86012d32bf2a61d5e3",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:52:03.429Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:26f59fae11dc3ec10e8dcb461bb3bdde1604a6e4d04ae9cc1817decb2fc792d3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/police/__tests__/quality.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:52:07.623Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/police/__tests__/quality.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/police/__tests__/quality.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:145bd83200ac47cf264030f065e1408a713f2629d78fe6e1a005feb6f12e5242",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/police/__tests__/quality.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:b11c21a3ff90cea2b2e747edec20635bb0bb371ab36d875f2a97c3670828a82d",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:52:07.691Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7dee990d18ca4c857a7954b688a7702c935943b36aa5f20a5e58de31a74ef301",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:52:09.563Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5ed3379e40f4bb7fc1b8e1949914ba4b97d431a7f85cb10c5ca8ee95659b121e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/core/src/police/__tests__/polymorph.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:f91c0c93387fa98baf9bf5c430722554e25aacafe11a100aa992876e9c9dee51",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:52:09.614Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:057f890dd272a3c370903b678fb31b7a05d169a956f807333f533a14d3bb9a98",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:52:15.549Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:903d6027084897c6bd855bdc4f27d9f0f131461df4fd4e5161d0e41435d31157",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:52:15.603Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:24718e5926082cdc0ca9b1838253c8b8aa7252f11331612539d1643191c7f2ba",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-police-family.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:52:26.350Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:police-family"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-police-family.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:920277543abdce403d365a5dc68a1fdc7373ce6953097c687a619cfa068097b7",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:police-family"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:0b7056ee4abdfc377de3870a948d9c4ce077e882e25f801af5218f1ac3fe8e1c",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:52:26.400Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5d542c56d4d2a4cfea6d9149972c89a48f7397ffaf235595c4eb833a688b8c90",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T01:54:05.983Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "33ad26490161b3277aedddd6648e05457c03ab4b",
+            "cacheKey": "sha256:0b8f3aa930064812cea51971feee92cd919e1812f3fb14e11613e596142fdf6c",
+            "cached": false,
+            "generatedAt": "2026-07-10T01:54:06.041Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c1de9f50c880160d4e5856a1fe80fecaf199d42fa57480c5f42ec372116b1fca",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-composer-rft0006",
+      "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+      "createdAt": "2026-07-10T02:02:06.278Z",
+      "details": {
+        "actorId": "cursor-composer-rft0006",
+        "sessionId": "session-20260710014134-cursor-composer-rft0006-TASK-RFT-0006-5594b2936c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.police-family-atomic-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/police-family-atomic-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7cb57160a3ba68eaee4f8cd848024720b06c8fa4e9500f44712d6da52339227e",
+            "cached": false,
+            "generatedAt": "2026-07-10T02:02:06.588Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e60bd615950518543e34f53efb5a8063714e31554431ccecf509d666796afaec",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
