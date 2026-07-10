@@ -45,6 +45,11 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 - Role-local learning may vary by provider quality or runtime mode, but the
   growth semantics should still reuse
   `docs/governance/skills/shared-growth-contract.md`.
+- Runtime adapters should preserve `atm.teamRuntimePilot.v1` when present. The
+  pilot records `agentSkillUnits`, `workflowEvidence`, and
+  `roleConfusionMetrics` for the Coordinator / Implementer / Validator lane,
+  so bridges can prove bounded skill-pack loading without granting worker
+  lifecycle authority.
 
 ## Broker Conflict Runtime Projection
 

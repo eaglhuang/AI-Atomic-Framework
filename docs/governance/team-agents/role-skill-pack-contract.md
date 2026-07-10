@@ -117,6 +117,31 @@ The manifest must preserve the shared Broker conflict vocabulary:
 `decisionClass`, `decisionReason`, `violationStatus`, and
 `broker-conflict-blocked`.
 
+## Agent+Skill runtime pilot
+
+`atm.teamRuntimePilot.v1` is the first concrete pilot surface for the
+Agent+Skill model. It proves the contract with a small role trio rather than a
+full swarm rollout:
+
+- `coordinator` loads `atm.role-pack.coordinator` and remains the only owner of
+  task lifecycle, closeout, and `git.write`.
+- `implementer` loads `atm.role-pack.implementer` only for scoped delivery
+  under the task lease.
+- `validator` loads `atm.role-pack.validator` only for validator execution and
+  evidence interpretation.
+
+The pilot must expose `agentSkillUnits[]` so operators can inspect each
+role's skill pack, lease permissions, forbidden permissions, and playbook
+slice. It must also expose `workflowEvidence` and `roleConfusionMetrics` so a
+blocked or successful run still explains whether role confusion decreased.
+
+The pilot is allowed to stop before runtime start when Team Broker reports
+`proposal-submitted`, `blocked-active-lease`, or `broker-conflict-blocked`.
+That stop is evidence, not failure theater. The role pack must preserve
+`decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked` on the pilot surface and hand control back to the
+Coordinator.
+
 ## Authority boundary
 
 Role specialization must never imply lifecycle authority drift.

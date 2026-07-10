@@ -189,13 +189,45 @@ type TeamRuntimePilot = {
   pilotMode: 'role-pair' | 'role-trio';
   selectedRoles: string[];
   selectedSkillPackIds: string[];
+  agentSkillUnits: Array<{
+    role: string;
+    agentId: string;
+    skillPackId: string;
+    boundedSkillPackLoaded: true;
+    permissionLease: {
+      allowedPermissions: string[];
+      forbiddenPermissions: string[];
+    };
+    playbookSlice: string;
+    lifecycleAuthority: 'coordinator-owned' | 'worker-forbidden';
+  }>;
   realisticWorkflow: string[];
+  workflowEvidence: {
+    scenarioId: 'agent-plus-skill-runtime-pilot';
+    roleOrder: string[];
+    coordinatorOnlyLifecyclePreserved: true;
+    workerWriteScope: 'bounded-by-task-lease';
+    blockedByBroker: boolean;
+    brokerViolationStatus: 'none' | 'proposal-submitted' | 'broker-conflict-blocked';
+  };
   roleBoundarySignals: string[];
   lifecycleAuthority: {
     ownerRole: string;
     forbiddenToWorkers: string[];
   };
   roleConfusionReduction: string[];
+  roleConfusionMetrics: {
+    baselineLoadedSkillPacks: 'monolithic-team-context';
+    pilotLoadedSkillPacks: string[];
+    preventedPermissionDrift: string[];
+    refinementSignalCount: number;
+  };
+  brokerConflictVocabulary: {
+    decisionClass: string;
+    decisionReason: string;
+    violationStatus: 'allowed' | 'proposal-submitted' | 'broker-conflict-blocked';
+    blockedCode: 'broker-conflict-blocked' | null;
+  };
   actionableRefinementFindings: Array<{
     category: string;
     summary: string;
@@ -2691,6 +2723,22 @@ export function buildTeamRuntimePilot(input: {
   const selectedRoles = orderedRoles.filter((role) => input.roleSkillPacks.roles.some((entry) => entry.role === role));
   const pilotRoles = selectedRoles.length >= 3 ? selectedRoles.slice(0, 3) : selectedRoles.slice(0, 2);
   const selectedEntries = input.roleSkillPacks.roles.filter((entry) => pilotRoles.includes(entry.role));
+  const blockedByBroker = input.brokerLane.safeToStart === false;
+  const brokerViolationStatus = blockedByBroker
+    ? input.brokerLane.decision.admission?.state === 'proposal-submitted'
+      ? 'proposal-submitted'
+      : 'broker-conflict-blocked'
+    : 'none';
+  const brokerConflictVocabulary = {
+    decisionClass: blockedByBroker ? 'blocked' : 'allowed',
+    decisionReason: input.brokerLane.blockedReasons[0] ?? input.brokerLane.decision.reason ?? 'Team Broker allowed the runtime pilot lane.',
+    violationStatus: blockedByBroker
+      ? brokerViolationStatus === 'proposal-submitted'
+        ? 'proposal-submitted'
+        : 'broker-conflict-blocked'
+      : 'allowed',
+    blockedCode: blockedByBroker && brokerViolationStatus !== 'proposal-submitted' ? 'broker-conflict-blocked' : null
+  } satisfies TeamRuntimePilot['brokerConflictVocabulary'];
   const actionableRefinementFindings = [
     ...input.validation.findings.map((finding) => ({
       category: classifyTeamPilotFinding(finding.code),
@@ -2708,11 +2756,31 @@ export function buildTeamRuntimePilot(input: {
     pilotMode: pilotRoles.length >= 3 ? 'role-trio' : 'role-pair',
     selectedRoles: pilotRoles,
     selectedSkillPackIds: selectedEntries.map((entry) => entry.skillPackId),
+    agentSkillUnits: selectedEntries.map((entry) => ({
+      role: entry.role,
+      agentId: entry.agentId,
+      skillPackId: entry.skillPackId,
+      boundedSkillPackLoaded: true,
+      permissionLease: {
+        allowedPermissions: entry.allowedPermissions,
+        forbiddenPermissions: entry.forbiddenPermissions
+      },
+      playbookSlice: entry.playbookSlice,
+      lifecycleAuthority: entry.role === 'coordinator' ? 'coordinator-owned' : 'worker-forbidden'
+    })),
     realisticWorkflow: [
       'Coordinator routes the task and remains the only lifecycle and git.write owner.',
       'Implementer loads only the scoped delivery pack for the active workstream.',
       'Validator loads only validator-evidence guidance and returns findings to Coordinator.'
     ],
+    workflowEvidence: {
+      scenarioId: 'agent-plus-skill-runtime-pilot',
+      roleOrder: input.routingMatrix.routes.find((route) => route.workstream === 'scoped-implementation')?.roleOrder ?? pilotRoles,
+      coordinatorOnlyLifecyclePreserved: true,
+      workerWriteScope: 'bounded-by-task-lease',
+      blockedByBroker,
+      brokerViolationStatus
+    },
     roleBoundarySignals: [
       ...selectedEntries.map((entry) => `${entry.role} -> ${entry.playbookSlice}`),
       ...input.routingMatrix.routes
@@ -2728,6 +2796,13 @@ export function buildTeamRuntimePilot(input: {
       'Workers return findings or diffs to Coordinator instead of widening into closeout authority.',
       'Growth lessons land in a shared taxonomy without contaminating unrelated role packs.'
     ],
+    roleConfusionMetrics: {
+      baselineLoadedSkillPacks: 'monolithic-team-context',
+      pilotLoadedSkillPacks: selectedEntries.map((entry) => entry.skillPackId),
+      preventedPermissionDrift: uniqueStrings(selectedEntries.flatMap((entry) => entry.forbiddenPermissions)),
+      refinementSignalCount: actionableRefinementFindings.length
+    },
+    brokerConflictVocabulary,
     actionableRefinementFindings
   };
 }

@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-SKL-0011",
+  "updatedAt": "2026-07-10T06:18:11.235Z",
+  "updatedBy": "codex-captain-m8e",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-10T06:10:52.868Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "18719b361d8e95ae2b0c20da6d4a80848142d05f",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-10T06:11:06.723Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "18719b361d8e95ae2b0c20da6d4a80848142d05f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-10T06:13:04.508Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "18719b361d8e95ae2b0c20da6d4a80848142d05f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-10T06:15:17.016Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "18719b361d8e95ae2b0c20da6d4a80848142d05f",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/commands/team.ts docs/governance/team-agents/role-skill-pack-contract.md docs/governance/team-agents/team-vendor-runtime.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a8bd70d4c684047bac5c03df7d1fb0db4d1daf8c2337b19df1b9504d6b876df",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-10T06:15:55.544Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "18719b361d8e95ae2b0c20da6d4a80848142d05f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
