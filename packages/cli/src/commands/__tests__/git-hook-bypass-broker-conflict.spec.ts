@@ -22,6 +22,7 @@ try {
   runGit(repo, ['init']);
   runGit(repo, ['config', 'user.name', 'Fixture Agent']);
   runGit(repo, ['config', 'user.email', 'fixture@example.com']);
+  runGit(repo, ['commit', '--allow-empty', '--no-verify', '-m', 'chore: baseline']);
 
   const taskId = 'TASK-BROKER-CONFLICT';
   const taskPath = path.join(repo, '.atm', 'history', 'tasks', `${taskId}.json`);
@@ -48,7 +49,7 @@ try {
   writeFileSync(path.join(repo, 'src', 'broker-owned.ts'), 'export const brokerOwned = true;\n', 'utf8');
   runGit(repo, ['add', 'src/broker-owned.ts']);
 
-  const { lease } = createEmergencyLease({
+  const { lease: hookBypassLease } = createEmergencyLease({
     cwd: repo,
     taskId: null,
     actorId: 'fixture-agent',
@@ -73,7 +74,7 @@ try {
       'chore: blocked broker conflict bypass',
       '--no-verify',
       '--emergency-approval',
-      lease.leaseId
+      hookBypassLease.leaseId
     ]),
     (error: unknown) => {
       assert(error instanceof CliError);
@@ -89,6 +90,71 @@ try {
       return true;
     }
   );
+
+  const { lease: secondHookBypassLease } = createEmergencyLease({
+    cwd: repo,
+    taskId: null,
+    actorId: 'fixture-agent',
+    permission: 'backend.gitHookBypass',
+    approvedBy: 'fixture-human',
+    approvalText: 'Human fixture approval for hook bypass after broker conflict resolution.',
+    reason: 'Validate high-authority broker conflict override integration.',
+    surface: 'git commit --no-verify',
+    allowedFlags: ['--no-verify'],
+    ttlMinutes: 10,
+    maxUses: 1
+  });
+  const { lease: brokerOverrideLease } = createEmergencyLease({
+    cwd: repo,
+    taskId: null,
+    actorId: 'fixture-agent',
+    permission: 'backend.brokerConflictOverride',
+    approvedBy: 'fixture-human',
+    approvalText: 'Human fixture approval for high-authority Team Broker conflict override.',
+    reason: 'Validate that broker conflict override requires a recorded paper-style resolution artifact.',
+    surface: 'git commit broker-conflict override',
+    allowedFlags: ['--broker-conflict-override'],
+    ttlMinutes: 5,
+    maxUses: 1
+  });
+  const resolutionPath = path.join(repo, '.atm', 'runtime', 'broker-conflict-resolution.json');
+  mkdirSync(path.dirname(resolutionPath), { recursive: true });
+  writeFileSync(resolutionPath, `${JSON.stringify({
+    schemaId: 'atm.brokerConflictResolution.v1',
+    conflictTaskId: taskId,
+    conflictFiles: ['src/broker-owned.ts'],
+    resolutionOrder: ['fixture-agent-delivery', taskId],
+    ownerAcknowledgement: {
+      mode: 'timeout',
+      waitedUntil: new Date().toISOString()
+    },
+    validatorPlan: [
+      'node --experimental-strip-types packages/cli/src/commands/__tests__/git-hook-bypass-broker-conflict.spec.ts'
+    ]
+  }, null, 2)}\n`, 'utf8');
+
+  const overrideCommit = await runAtmGit([
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--name',
+    'Fixture Agent',
+    '--email',
+    'fixture@example.com',
+    '--message',
+    'chore: broker conflict override fixture',
+    '--no-verify',
+    '--emergency-approval',
+    secondHookBypassLease.leaseId,
+    '--broker-conflict-override',
+    brokerOverrideLease.leaseId,
+    '--broker-conflict-resolution',
+    resolutionPath
+  ]);
+  assert.equal(overrideCommit.ok, true);
+  assert.equal(String(overrideCommit.evidence?.commitSha ?? '').length, 40);
 } finally {
   rmSync(repo, { recursive: true, force: true });
 }

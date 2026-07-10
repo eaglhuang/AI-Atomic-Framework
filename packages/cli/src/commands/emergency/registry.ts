@@ -8,6 +8,7 @@ export type EmergencyPermissionId =
   | 'backend.tasks.scopeAmend'
   | 'backend.waiver.historicalDeliveryOutOfScope'
   | 'backend.runnerRecovery'
+  | 'backend.brokerConflictOverride'
   | 'backend.gitHookBypass';
 
 export interface EmergencyPermissionDefinition {
@@ -151,6 +152,20 @@ export const emergencyPermissionRegistry: readonly EmergencyPermissionDefinition
     requiresHumanApprovalText: true,
     auditRequired: true,
     validatorTags: ['emergency-runner-recovery']
+  },
+  {
+    id: 'backend.brokerConflictOverride',
+    summary: 'High-authority Team Broker conflict override after a recorded parallel conflict-resolution artifact.',
+    protectedSurfaces: ['git commit broker-conflict override'],
+    normalLane: 'Team Broker parallel conflict-resolution artifact',
+    riskTier: 'critical',
+    defaultTtlMinutes: 5,
+    defaultMaxUses: 1,
+    requiresTaskId: false,
+    requiresActor: true,
+    requiresHumanApprovalText: true,
+    auditRequired: true,
+    validatorTags: ['emergency-broker-conflict-override', 'team-broker-resolution']
   },
   {
     id: 'backend.gitHookBypass',
