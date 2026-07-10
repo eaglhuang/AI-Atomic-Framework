@@ -1,0 +1,83 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T04-30-54-303Z-close-7b70c5e28d95",
+  "taskId": "TASK-TEAM-0047",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710042432-codex-captain-m8e-TASK-TEAM-0047-a852a2586e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0047.json",
+  "taskSha256": "sha256:5efabd2a42b7193f0c5b07361f7a550a86e7a60552cdfe57ec4305426b379e57",
+  "createdAt": "2026-07-10T04:30:54.303Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0047 --actor codex-captain-m8e --status done --historical-delivery 2a4df02ebafe1353ad3c4f6fd9462e156c7a14b4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710042432-codex-captain-m8e-TASK-TEAM-0047-a852a2586e",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0047.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T04:30:54.298Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0047.*",
+        ".atm/history/task-events/TASK-TEAM-0047/**",
+        ".atm/history/tasks/TASK-TEAM-0047.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/broker-gate.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/write-readiness.ts",
+        "packages/cli/src/commands/tasks.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

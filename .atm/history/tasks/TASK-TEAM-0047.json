@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0047",
+  "title": "Broker override gate parity",
+  "status": "done",
+  "milestone": "M8E",
+  "dependencies": [
+    "TASK-TEAM-0046"
+  ],
+  "acceptance": [
+    "Active task overlap without a valid `atm.brokerConflictResolution.v1` artifact blocks all four entries with `broker-conflict-blocked`.",
+    "Override requires the resolution artifact and preserves `decisionClass`, `decisionReason`, and `violationStatus`.",
+    "The four entries return consistent diagnostics and retry guidance.",
+    "`taskflow close` and `atm git commit` cannot become weaker late-stage bypasses.",
+    "The validator includes a four-entry parity case."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case broker-override-gate-parity",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not edit docs/ai_atomic_framework/rft-hardening/** in 3KLife; Cursor RFT work owns that planning lane.",
+    "Do not edit scripts/captain-dispatch-mailbox/**; TASK-RFT-0005 owns that lane.",
+    "Do not edit RFT-owned target paths such as scripts/validators/task-ledger/**, packages/core/src/police/**, or RFT split helper files while RFT residue or locks exist.",
+    "Do not implement new scheduler semantics.",
+    "Do not bypass TASK-TEAM-0046 artifact requirements."
+  ],
+  "nonGoals": [
+    "No vendor bridge implementation in this card.",
+    "No high-authority override that lacks an artifact."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the four-entry gate changes together if one entry becomes weaker than the others.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-broker-enforcement",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0047-broker-override-gate-parity.task.md",
+    "sectionTitle": "TASK-TEAM-0047",
+    "headingLine": 56,
+    "hash": "ccb5c0a215c65c19"
+  },
+  "importedAt": "2026-07-10T04:12:08.819Z",
+  "lastTransitionId": "2026-07-10T04-30-54-303Z-close-7b70c5e28d95",
+  "lastTransitionAt": "2026-07-10T04:30:54.303Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-m8e",
+  "reservedAt": "2026-07-10T04:12:25.318Z",
+  "promotedAt": "2026-07-10T04:12:25.321Z",
+  "claim": {
+    "actorId": "codex-captain-m8e",
+    "leaseId": "lease-fbca71935ca0",
+    "claimedAt": "2026-07-10T04:24:32.928Z",
+    "heartbeatAt": "2026-07-10T04:30:54.301Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0047.json",
+      ".atm/history/evidence/TASK-TEAM-0047.*",
+      ".atm/history/task-events/TASK-TEAM-0047/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-10T04:12:25.324Z",
+  "startedByActor": "codex-captain-m8e",
+  "startedBySessionId": "session-20260710042432-codex-captain-m8e-TASK-TEAM-0047-a852a2586e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0047",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0047.*",
+      ".atm/history/task-events/TASK-TEAM-0047/**",
+      ".atm/history/tasks/TASK-TEAM-0047.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/broker-gate.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9bc8778e458be35da309bb236033437e8a42a69b214dae1006efa314b9882ce1",
+    "actorId": "codex-captain-m8e",
+    "createdAt": "2026-07-10T04:24:33.395Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-10T04:30:54.301Z",
+  "closedByActor": "codex-captain-m8e",
+  "closedBySessionId": "session-20260710042432-codex-captain-m8e-TASK-TEAM-0047-a852a2586e",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0047.closure-packet.json"
+}
