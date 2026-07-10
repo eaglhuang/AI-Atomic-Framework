@@ -48,6 +48,8 @@ Use one of these categories when recording a learning item:
 - `tooling-mismatch`
 - `encoding-risk`
 - `overloaded-context`
+- `shared-atm-routing-friction`
+- `role-specific-friction`
 - `repo-specific-but-generalizable`
 
 These categories are shared with backlog triage on purpose. A backlog item may
@@ -56,6 +58,13 @@ promoted into skill learning references immediately.
 
 Skills may add a local subcategory, but they should not replace the shared top
 level category set unless a governed task updates this contract.
+
+Use `shared-atm-routing-friction` when the wall-hit comes from the common ATM
+route, claim, Broker, runner, evidence, or closeout path and would affect more
+than one role. Use `role-specific-friction` when the symptom is primarily about
+one role's authority boundary, skill-pack scope, or playbook slice. This keeps
+Coordinator, Implementer, Validator, Review, and future role packs on the same
+taxonomy without merging their role-local memories.
 
 ## Shared capture template
 
@@ -199,6 +208,20 @@ This contract is intentionally skill-size-neutral. It applies equally to:
 That means Team Agents should not invent a separate memory architecture. Role
 packs may keep separate reference files, but they should still use the same
 taxonomy, capture fields, and promotion semantics defined here.
+
+Team plans expose this stitching through
+`atm.teamRoleGrowthObservabilityContract.v1`. The contract maps each role to a
+skill pack, playbook slice, shared taxonomy, and reference-first learning
+target. A role learning event should be observable as a governance artifact,
+but the raw lesson still lands first in
+`docs/governance/team-agents/role-pack-learning-loop.md` instead of being copied
+into every role entry file.
+
+The shared M8E Broker vocabulary is part of the growth taxonomy bridge:
+`decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked`. Team role growth should track
+`broker-conflict-blocked.hit-rate` as an observability metric when Broker
+conflict events or role learning artifacts report that state.
 
 ## Relationship to Team knowledge
 

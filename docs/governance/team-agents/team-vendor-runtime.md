@@ -50,6 +50,10 @@ This document defines the emergency-minimum vendor runtime contract used by Team
   `roleConfusionMetrics` for the Coordinator / Implementer / Validator lane,
   so bridges can prove bounded skill-pack loading without granting worker
   lifecycle authority.
+- Runtime adapters should preserve
+  `atm.teamRoleGrowthObservabilityContract.v1` when present. It maps role
+  learning artifacts back to the role contract, skill pack, and playbook slice
+  while keeping raw lessons reference-first in Team role-pack learning docs.
 
 ## Broker Conflict Runtime Projection
 
@@ -72,6 +76,18 @@ as a replacement for the shared surface. Broker conflict events reuse
 `decisionClass`, `decisionReason`, `violationStatus`, and
 `broker-conflict-blocked` from the M8E lane and point at the
 `atm.brokerConflictResolution.v1` artifact.
+
+Role-growth observability uses the same query surface. A provider bridge should
+project role learning as an `artifact.output` event with artifact type
+`atm.teamRoleGrowthLearningItem.v1` and preserve the role name, provider id,
+team run id, and task id. The corresponding Team plan contract decides whether
+the learning item is shared ATM routing friction or role-specific friction; the
+provider bridge should not invent vendor-local categories in place of that
+shared taxonomy.
+
+The cross-vendor broker metric is `broker-conflict-blocked.hit-rate`. Bridges
+should calculate it from events whose `violationStatus` is
+`broker-conflict-blocked`, grouped by role, task id, and `decisionClass`.
 
 Observability is evidence metadata, not a secret sink. Events must set
 `rawSecretsLogged: false`, preserve `rawSecretsAllowed: false`, and keep raw

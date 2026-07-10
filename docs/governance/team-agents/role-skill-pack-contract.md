@@ -1,7 +1,7 @@
 # Team Role Skill-Pack Contract
 
 Status: draft-v1
-Related tasks: `TASK-SKL-0008`, `TASK-SKL-0010`, `TASK-SKL-0011`
+Related tasks: `TASK-SKL-0008`, `TASK-SKL-0010`, `TASK-SKL-0011`, `TASK-SKL-0012`
 
 This document defines the provider-neutral contract for mapping a Team Agent
 role to a low-coupling skill pack.
@@ -193,9 +193,36 @@ truth until all lanes emit the M8E shape.
 Role-pack growth must stay observable from Team runtime surfaces.
 
 - Team plan/start/status should expose enough metadata to map a learning event
-  back to the originating role contract and bounded skill pack.
+  back to the originating role contract, bounded skill pack, and playbook slice.
 - Observability should distinguish shared ATM routing friction from
   role-specific friction such as lease, scope, or validation boundary drift.
 - Raw role-pack lessons should remain reference-first and point back to
   `docs/governance/team-agents/role-pack-learning-loop.md` instead of bloating
   every role entry file.
+
+`atm.teamRoleGrowthObservabilityContract.v1` is the machine-readable mapping
+for that rule. It projects role learning through the existing
+`atm.teamAgentObservabilityEvent.v1` surface by treating learning captures as
+`artifact.output` events with artifact type
+`atm.teamRoleGrowthLearningItem.v1`. The projected artifact uses the shared
+capture fields from `docs/governance/skills/shared-growth-contract.md`, while
+the Team plan keeps the durable mapping:
+
+- role -> `agentId`;
+- role -> `skillPackId`;
+- role -> `playbookSlice`;
+- role -> `growthContractAttachment`;
+- role -> reference target.
+
+The contract also separates:
+
+- `shared-atm-routing-friction`: entry, route, fallback, tooling, Broker, or
+  closeout friction that can affect several roles;
+- `role-specific-friction`: boundary, scope, validator, context, or
+  permission-lease friction tied to one role pack.
+
+Broker conflict growth must keep the M8E vocabulary intact. The shared
+observability metric is `broker-conflict-blocked.hit-rate`, keyed by
+`decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked`, so role packs can learn from Broker blocks without
+creating a second release-order source.

@@ -54,6 +54,41 @@ Record lessons using the shared growth fields:
 
 ## Active runtime-observability cases
 
+## 2026-07-10 - Team role growth observability remains reference-first
+
+- Category: shared-atm-routing-friction
+- Trigger: `TASK-SKL-0012` needed role learning events to be observable across
+  Coordinator, Implementer, Validator, Review, and future role packs without
+  creating a second memory product
+- Symptom: role packs needed a way to map learning events back to
+  `skillPackId`, `playbookSlice`, and shared taxonomy while keeping raw cases
+  out of every role entry file
+- Correct route: expose `atm.teamRoleGrowthObservabilityContract.v1` from Team
+  plan/runtime surfaces, project role learning as governance artifact output,
+  and keep raw lessons in this reference file until a durable rule is promoted
+- Durable rule: role-growth observability is a mapping layer, not a memory
+  store; it must distinguish `shared-atm-routing-friction` from
+  `role-specific-friction`
+- Promotion target: role-skill-pack-contract.md and shared-growth-contract.md
+- Confidence: high
+- Reuse scope: coordinator, implementer, validator, reviewer,
+  evidence-collector, knowledge-scout packs
+
+## 2026-07-10 - stale Broker lease should become observable friction
+
+- Category: shared-atm-routing-friction
+- Trigger: after `TASK-SKL-0011` was closed, `team plan` for `TASK-SKL-0012`
+  initially saw a stale `TASK-SKL-0011` active Broker intent
+- Symptom: Team Broker reported `blocked-active-lease` and required cleanup
+  before the new role-growth work could proceed
+- Correct route: use the official `broker release --task <task-id>` route for
+  stale write intents, rerun `broker status`, and rerun `team plan`
+- Durable rule: stale Broker registry friction should be recorded as shared
+  ATM routing friction, while role-boundary failures stay role-specific
+- Promotion target: shared-growth-contract.md
+- Confidence: high
+- Reuse scope: coordinator and scope-guardian packs
+
 ## 2026-07-10 - proposal-first Broker gate preserves role-pack authority
 
 - Category: role-specific-friction
