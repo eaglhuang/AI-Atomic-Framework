@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T03-47-34-015Z-close-2256073066d7",
+  "taskId": "TASK-SKL-0005",
+  "action": "close",
+  "actorId": "codex-captain-m8e",
+  "sessionId": "session-20260710032858-codex-captain-m8e-TASK-SKL-0005-851f4903b1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-SKL-0005.json",
+  "taskSha256": "sha256:cd6b3e2d187360d058836130c14c8e6358f28a35d6b423327bc0435f03692708",
+  "createdAt": "2026-07-10T03:47:34.015Z",
+  "command": "node atm.mjs tasks close --task TASK-SKL-0005 --actor codex-captain-m8e --status done --historical-delivery 132592efdfd7d066b51b3d1ec33e1276189f4f57",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260710032858-codex-captain-m8e-TASK-SKL-0005-851f4903b1",
+    "closurePacketPath": ".atm/history/evidence/TASK-SKL-0005.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-10T03:47:34.010Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-SKL-0005.*",
+        ".atm/history/task-events/TASK-SKL-0005/**",
+        ".atm/history/tasks/TASK-SKL-0005.json",
+        ".claude/**",
+        ".github/**",
+        ".github/prompts/atm-governance-router.prompt.md",
+        "docs/**",
+        "integrations/**",
+        "packages/**",
+        "templates/skills/atm-governance-router.files/references/fallback-design.md",
+        "templates/skills/atm-governance-router.files/references/index.md",
+        "templates/skills/atm-governance-router.skill.md",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/**",
+        "tests/schema-fixtures/positive/integration-install-manifest.json"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

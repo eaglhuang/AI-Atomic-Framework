@@ -1,0 +1,171 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-SKL-0005",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "132592efdfd7d066b51b3d1ec33e1276189f4f57",
+  "governedTreeSha": "0f465a21617ac901856bd254c37a9b57ce6544c3",
+  "targetCommitDelta": {
+    "currentCommitSha": "132592efdfd7d066b51b3d1ec33e1276189f4f57",
+    "parentCommitShas": [
+      "132592efdfd7d066b51b3d1ec33e1276189f4f57"
+    ],
+    "governedTreeSha": "0f465a21617ac901856bd254c37a9b57ce6544c3",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0005.json",
+      ".atm/history/task-events/TASK-SKL-0005/2026-07-10T03-28-35-094Z-import-cf34830f009f.json",
+      ".atm/history/task-events/TASK-SKL-0005/2026-07-10T03-28-58-191Z-reserve-d8817c15e7d5.json",
+      ".atm/history/task-events/TASK-SKL-0005/2026-07-10T03-28-58-194Z-promote-26887f75a489.json",
+      ".atm/history/task-events/TASK-SKL-0005/2026-07-10T03-29-01-694Z-claim-0532891337dc.json",
+      ".atm/history/task-events/TASK-SKL-0005/2026-07-10T03-32-39-652Z-scope-amendment-0350066f1fed.json",
+      ".atm/history/task-events/TASK-SKL-0005/2026-07-10T03-33-06-408Z-scope-amendment-286c71b794e1.json",
+      ".atm/history/tasks/TASK-SKL-0005.json",
+      ".claude/skills/atm-governance-router/references/fallback-design.md",
+      ".claude/skills/atm-governance-router/references/index.md",
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/prompts/atm-governance-router.prompt.md",
+      "docs/governance/skills/shared-growth-contract.md",
+      "docs/governance/skills/tool-first-orchestration.md",
+      "docs/governance/team-agents/role-routing-matrix.md",
+      "docs/governance/team-agents/role-skill-pack-contract.md",
+      "docs/specs/cli-result-contract-v1.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "scripts/run-validators.ts",
+      "templates/skills/atm-governance-router.skill.md",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-10T03:47:34.010Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-SKL-0005.*",
+      ".atm/history/task-events/TASK-SKL-0005/**",
+      ".atm/history/tasks/TASK-SKL-0005.json",
+      ".claude/**",
+      ".github/**",
+      ".github/prompts/atm-governance-router.prompt.md",
+      "docs/**",
+      "integrations/**",
+      "packages/**",
+      "templates/skills/atm-governance-router.files/references/fallback-design.md",
+      "templates/skills/atm-governance-router.files/references/index.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "criticalChangedFiles": [
+      "integrations/**",
+      "packages/**",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-SKL-0005.json",
+  "closedAt": "2026-07-10T03:47:34.010Z",
+  "closedByActor": "codex-captain-m8e",
+  "sessionId": "session-20260710032858-codex-captain-m8e-TASK-SKL-0005-851f4903b1",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "132592efdfd7d066b51b3d1ec33e1276189f4f57",
+    "taskMatchedFiles": [
+      ".claude/skills/atm-governance-router/SKILL.md",
+      ".claude/skills/atm-governance-router/references/fallback-design.md",
+      ".claude/skills/atm-governance-router/references/index.md",
+      ".github/instructions/atm-governance-router.instructions.md",
+      ".github/prompts/atm-governance-router.prompt.md",
+      "docs/governance/skills/shared-growth-contract.md",
+      "docs/governance/skills/tool-first-orchestration.md",
+      "docs/governance/team-agents/role-routing-matrix.md",
+      "docs/governance/team-agents/role-skill-pack-contract.md",
+      "docs/specs/cli-result-contract-v1.md",
+      "integrations/codex-skills/atm-governance-router/SKILL.md",
+      "templates/skills/atm-governance-router.skill.md",
+      "tests/schema-fixtures/positive/integration-install-manifest.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
