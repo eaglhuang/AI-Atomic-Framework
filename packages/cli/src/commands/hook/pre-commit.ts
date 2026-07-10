@@ -31,6 +31,7 @@ import {
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from '../work-channels.ts';
 import { readBrokerLifecycleState } from '../../../../core/src/broker/lifecycle.ts';
 import { buildPendingCheckpointCommitWindow } from '../batch.ts';
+import { evaluateTeamPreCommitGate } from '../team-runtime-gates.ts';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../tasks/task-import-validators.ts';
 import { hookContractVersion, hookProvider } from './git-hooks-installer.ts';
 import { inspectGitIndexAccess, normalizeRelativePath, runGit, runGitLines, runGitScalar, createSanitizedGitEnv } from './git-index-diagnostics.ts';
@@ -329,7 +330,7 @@ export function runPreCommitHook(cwd: string) {
     if (INVARIANT_TASK_AUDIT_CODES.has(entry.code)) return true;
     return 'path' in entry && typeof entry.path === 'string' && stagedFilesSet.has(entry.path);
   });
-  const ok = encodingReport.ok
+  const baseOk = encodingReport.ok
     && gitIndexDiagnostic.ok
     && blockingFrameworkIssues.length === 0
     && planningMirrorDriftFiles.length === 0
@@ -351,12 +352,25 @@ export function runPreCommitHook(cwd: string) {
     stagedFiles,
     criticalChangedFiles: frameworkStatus.criticalChangedFiles
   });
-  const evidenceWrite = ok && gitHeadEvidenceRequired && !scopedIndexActive
-    ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
-    : null;
   // TASK-AAO-0136: collect tree-wide advisory findings (warnings only, not blockers).
   const advisoryFindings: PreCommitAdvisoryFinding[] = [...validatorRunTriage.advisoryFindings];
-  const blockingFindings = buildPreCommitBlockingFindings({
+  const teamGateFindings = evaluateTeamPreCommitGate({
+    cwd: root,
+    actorId: process.env.ATM_COMMIT_ACTOR_ID ?? process.env.ATM_ACTOR_ID ?? null,
+    stagedFiles
+  }).map((finding): PreCommitBlockingFinding => ({
+    code: finding.code,
+    source: 'team-runtime-gate',
+    detail: finding.detail,
+    files: finding.files,
+    requiredCommand: finding.requiredCommand,
+    classification: 'current-task',
+    blockerKind: 'governance-state',
+    scope: 'staged',
+    data: finding
+  }));
+  const blockingFindings = [
+    ...buildPreCommitBlockingFindings({
     encodingReport,
     gitIndexDiagnostic,
     blockingFrameworkIssues,
@@ -382,7 +396,13 @@ export function runPreCommitHook(cwd: string) {
       ...residueReport.blockAndExplain,
       ...residueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path))
     ]
-  });
+    }),
+    ...teamGateFindings
+  ];
+  const ok = baseOk && teamGateFindings.length === 0;
+  const evidenceWrite = ok && gitHeadEvidenceRequired && !scopedIndexActive
+    ? writeStagedGitHeadEvidence(root, stagedFiles, commandRuns)
+    : null;
   const failureEnvelope = ok
     ? null
     : buildPreCommitFailureEnvelope({
@@ -2557,4 +2577,3 @@ function resolveLocalImportFile(root: string, stagedFile: string, importPath: st
   }
   return null;
 }
-

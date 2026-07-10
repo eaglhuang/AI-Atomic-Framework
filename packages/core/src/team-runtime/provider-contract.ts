@@ -1,5 +1,6 @@
 export const TEAM_PROVIDER_IDS = [
   'openai',
+  'anthropic',
   'azure-openai',
   'claude-code',
   'gemini',
@@ -83,6 +84,7 @@ export interface TeamProviderContract {
   readonly metadata: TeamProviderMetadata;
   readonly sessionLifecycle: TeamProviderSessionLifecycle;
   openSession(request: TeamProviderSessionRequest): { sessionId: string; providerId: TeamProviderId };
+  executeStep?(input: TeamProviderExecutionInput): Promise<TeamProviderExecutionResult> | TeamProviderExecutionResult;
   closeSession(sessionId: string): { closed: true; sessionId: string };
   cancelSession(sessionId: string, reason: string): { cancelled: true; sessionId: string; reason: string };
 }
@@ -109,7 +111,7 @@ export function createTeamProviderContract(providerId: TeamProviderId): TeamProv
     },
     openSession(request) {
       return {
-        sessionId: `${request.taskId}:${request.role}:${providerId}`,
+        sessionId: `${request.taskId}:${request.role}:${providerId}:${request.modelId}`,
         providerId
       };
     },

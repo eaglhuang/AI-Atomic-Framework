@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import {
   CliError,
@@ -40,15 +40,23 @@ import {
 import {
   buildTeamObservabilityContract,
   createBrokerConflictObservabilityEvents,
+  createTeamObservabilityEvent,
   queryTeamObservabilityEvents
 } from '../../../core/src/team-runtime/observability.ts';
+import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/anthropic.ts';
 import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
 import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/claude-code.ts';
 import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
 import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
 import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
-import { resolveTeamProviderSelection, type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
+import { createTeamProviderContract, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
+import {
+  mergeTeamProviderSelectionConfig,
+  resolveTeamProviderSelection,
+  type TeamProviderSelectionConfig
+} from '../../../core/src/team-runtime/provider-selection.ts';
+import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -74,6 +82,8 @@ type TeamRecipe = {
   agents: TeamRecipeAgent[];
 };
 
+type TeamLevel = 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+
 type PermissionFinding = {
   level: 'error' | 'warning';
   code: string;
@@ -90,6 +100,23 @@ type PermissionLease = {
   permission: string;
   agentId: string;
   paths?: string[];
+};
+
+type TeamLifecycleAction = 'lease' | 'release' | 'complete' | 'abandon';
+type TeamGovernanceRuntimeFields = {
+  schemaId: 'atm.teamGovernanceRuntimeFields.v1';
+  decisionClass: 'allowed' | 'blocked' | 'escalated';
+  decisionReason: string;
+  requiresHumanSignoff: boolean;
+  requiresAdr: boolean;
+  violationStatus: 'allowed' | 'warning' | 'broker-conflict-blocked' | 'policy-blocked' | 'escalated';
+  escalationTarget: string | null;
+};
+
+type ReviewerIdentity = {
+  providerId: string;
+  modelId: string;
+  modelCertificationId?: string | null;
 };
 
 type TeamPermissionValidationOptions = {
@@ -146,7 +173,7 @@ type TeamRoleSkillPackManifest = {
       sdkId: string;
       modelId: string;
       runtimeMode: TeamRuntimeMode;
-      source: 'repo-default' | 'role-override';
+      source: 'repo-default' | 'role-override' | 'cli-role-override';
     };
     providerCapabilities: Array<{
       providerId: string;
@@ -280,6 +307,20 @@ type TeamMicrosoftFoundryRuntimeBridgeSummary = {
   ];
 };
 
+type TeamAnthropicRuntimeBridgeSummary = {
+  schemaId: 'atm.anthropicRuntimeBridgeSummary.v1';
+  milestone: 'M10X';
+  providerIds: readonly ['anthropic'];
+  sharedProviderInterface: 'atm.teamProviderContract.v1';
+  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+  coordinatorOwnedAuthority: true;
+  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+  bridges: readonly [
+    ReturnType<typeof buildAnthropicTeamProviderBridgeDescriptor>
+  ];
+};
+
 type TeamRuntimePilot = {
   schemaId: 'atm.teamRuntimePilot.v1';
   providerNeutral: true;
@@ -376,6 +417,7 @@ type TeamPatrolMode = 'claim-preflight' | 'close-preflight' | 'big-script' | 'da
 type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
 
 type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
+type TeamRuntimeTier = 'raw-api' | 'agent-sdk' | 'editor';
 
 type TeamReworkRouteStatus =
   | 'work-in-progress'
@@ -576,7 +618,10 @@ const teamPermissionCatalog: TeamPermissionDefinition[] = [
   { id: 'pipeline.write', mode: 'exclusive', scopeRequired: true },
   { id: 'database.write', mode: 'exclusive', scopeRequired: true },
   { id: 'ci.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'evidence.write', mode: 'exclusive' }
+  { id: 'evidence.write', mode: 'exclusive' },
+  { id: 'knowledge.query', mode: 'shareable' },
+  { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true },
+  { id: 'review.signature.write', mode: 'exclusive' }
 ];
 
 const coordinatorExclusivePermissions = ['task.lifecycle', 'git.write', 'evidence.write'] as const;
@@ -586,7 +631,10 @@ const readOnlyTeamRoles = new Set([
   'scopeGuardian',
   'reader',
   'evidenceCollector',
-  'validator'
+  'validator',
+  'lieutenant',
+  'reviewAgent',
+  'knowledgeScout'
 ]);
 
 const writeTeamPermissions = new Set([
@@ -594,8 +642,10 @@ const writeTeamPermissions = new Set([
   'git.write',
   'file.write',
   'evidence.write',
+  'review.signature.write',
   'web.query',
   'web.download',
+  'knowledge.index.write',
   'exec.mutating',
   'sandbox.write',
   'pipeline.write',
@@ -831,6 +881,29 @@ const builtInRecipes: TeamRecipe[] = [
   }
 ];
 
+const teamRosterLevelRoles: Record<TeamLevel, string[]> = {
+  L1: ['coordinator', 'atomizationPlanner', 'implementer', 'validator'],
+  L2: ['coordinator', 'atomizationPlanner', 'reader', 'implementer', 'validator', 'evidenceCollector'],
+  L3: ['coordinator', 'atomizationPlanner', 'reader', 'scopeGuardian', 'implementer', 'validator', 'evidenceCollector'],
+  L4: ['coordinator', 'atomizationPlanner', 'reader', 'scopeGuardian', 'implementer', 'validator', 'evidenceCollector', 'lieutenant'],
+  L5: ['coordinator', 'atomizationPlanner', 'reader', 'scopeGuardian', 'implementer', 'validator', 'evidenceCollector', 'lieutenant', 'reviewAgent', 'knowledgeScout']
+};
+
+const teamRosterSyntheticAgents: Record<string, TeamRecipeAgent> = {
+  lieutenant: { agentId: 'lieutenant', role: 'lieutenant', profile: 'atm.lieutenant.v1', permissions: ['file.read', 'exec.validator'] },
+  reviewAgent: { agentId: 'review-agent', role: 'reviewAgent', profile: 'atm.reviewAgent.v1', permissions: ['file.read', 'exec.validator'] },
+  knowledgeScout: { agentId: 'knowledge-scout', role: 'knowledgeScout', profile: 'atm.knowledgeScout.v1', permissions: ['file.read'] }
+};
+
+const catalogReadyRosterDeferredRoles = [
+  'dataPipelineAgent',
+  'dbContainerAgent',
+  'ciAgent',
+  'webResearchAgent',
+  'qaLead',
+  'closureSteward'
+];
+
 export async function runTeam(argv: string[]) {
   if (String(argv[0] ?? '').toLowerCase() === 'knowledge') {
     const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
@@ -869,8 +942,8 @@ export async function runTeam(argv: string[]) {
     return runTeamObservability(parsed.positional.slice(1).map(String), cwd);
   }
 
-  if (!['plan', 'start', 'status', 'validate', 'patrol'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge, broker resolve, observability query', { exitCode: 2 });
+  if (!['plan', 'start', 'status', 'validate', 'patrol', 'lease', 'release', 'complete', 'abandon'].includes(action)) {
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, lease, release, complete, abandon, wave, knowledge, broker resolve, observability query', { exitCode: 2 });
   }
 
   if (action === 'status') {
@@ -878,6 +951,18 @@ export async function runTeam(argv: string[]) {
       cwd,
       requestedTeamRunId: String(parsed.options.team ?? '').trim(),
       compact: Boolean(parsed.options.compact)
+    });
+  }
+
+  if (['lease', 'release', 'complete', 'abandon'].includes(action)) {
+    return runTeamLifecycleAction({
+      cwd,
+      action: action as TeamLifecycleAction,
+      teamRunId: String(parsed.options.team ?? '').trim(),
+      actorId: String(parsed.options.actor ?? '').trim(),
+      permission: String(parsed.options.permission ?? '').trim(),
+      paths: normalizeTeamLifecyclePaths(parsed.options.paths),
+      reason: String(parsed.options.reason ?? '').trim()
     });
   }
 
@@ -899,7 +984,9 @@ export async function runTeam(argv: string[]) {
     cwd,
     taskId,
     requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
-    actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim()
+    actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim(),
+    requestedTeamSize: String(parsed.options.teamSize ?? '').trim(),
+    providerSelectionConfig: loadTeamProviderSelectionConfig(cwd, normalizeStringArray(parsed.options.roleProvider))
   });
   const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
   const ok = validation.findings.every((finding) => finding.level !== 'error');
@@ -910,6 +997,8 @@ export async function runTeam(argv: string[]) {
     providerId: parsed.options.provider,
     sdkId: parsed.options.sdk,
     modelId: parsed.options.model,
+    roleName: 'coordinator',
+    selectionConfig: context.providerSelectionConfig,
     editorBridgeDisabled: parsed.options.disableEditorBridge,
     recipe,
     allowedFiles: deriveWritePaths(task, cwd),
@@ -950,6 +1039,7 @@ export async function runTeam(argv: string[]) {
         safeToStart,
         relatedFindings: nonPermissionFindings,
         suggestedPermissionLeases: teamPlan.suggestedPermissionLeases,
+        governanceRuntime: teamPlan.governanceRuntime,
         brokerLane: teamPlan.brokerLane,
         sharedVocabulary: buildBrokerConflictSharedVocabulary(teamPlan.brokerLane),
         runtimeContract,
@@ -1033,23 +1123,46 @@ export async function runTeam(argv: string[]) {
       validation,
       runtimeContract
     });
+    const executeRequested = Boolean(parsed.options.execute);
+    const providerOrchestration = executeRequested
+      ? await runTeamProviderExecution({
+        taskId,
+        teamRunId: teamRun.teamRunId,
+        cwd,
+        recipe,
+        runtimeContract,
+        runtimePilot: teamPlan.runtimePilot
+      })
+      : {
+        requested: false,
+        blockedReason: null,
+        results: []
+      };
     return makeResult({
       ok: true,
       command: 'team',
       cwd,
       messages: [
-        message('info', 'ATM_TEAM_STARTED', 'Team run started. Runtime state was written, but no agents were spawned.', {
+        message('info', executeRequested && providerOrchestration.results.length > 0 ? 'ATM_TEAM_STARTED_EXECUTED' : 'ATM_TEAM_STARTED', executeRequested && providerOrchestration.results.length > 0
+          ? 'Team run started and governed provider orchestration executed.'
+          : 'Team run started. Runtime state was written, but no agents were spawned.', {
           teamRunId: teamRun.teamRunId,
           taskId,
-          recipeId: recipe.recipeId
+          recipeId: recipe.recipeId,
+          executeRequested,
+          providerExecutionCount: providerOrchestration.results.length,
+          providerExecutionBlockedReason: providerOrchestration.blockedReason
         })
       ],
       evidence: {
         action: 'start',
         runtimeWritten: true,
-        agentsSpawned: runtimeContract.agentsSpawned,
+        agentsSpawned: providerOrchestration.results.length > 0,
+        executeRequested,
         teamRunPath: `.atm/runtime/team-runs/${teamRun.teamRunId}.json`,
         teamRun,
+        governanceRuntime: teamPlan.governanceRuntime,
+        providerOrchestration,
         brokerLane: teamPlan.brokerLane,
         runtimeContract,
         runtimeBackendReadiness,
@@ -1082,6 +1195,7 @@ export async function runTeam(argv: string[]) {
       permissionCatalog: teamPermissionCatalog,
       validation,
       teamPlan,
+      governanceRuntime: teamPlan.governanceRuntime,
       runtimeContract,
       runtimeBackendReadiness,
       brokerLane: teamPlan.brokerLane,
@@ -1197,7 +1311,42 @@ function runTeamObservability(argv: string[], defaultCwd: string) {
     throw new CliError('ATM_CLI_USAGE', 'team observability supports: query', { exitCode: 2 });
   }
 
-  const fixture = String(readOptionValue(argv, '--fixture') ?? 'broker-conflict-resolution').trim();
+  const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? defaultCwd);
+  const fixture = readOptionValue(argv, '--fixture')?.trim() ?? null;
+  const filters = {
+    taskId: readOptionValue(argv, '--task-filter') ?? readOptionValue(argv, '--task'),
+    teamRunId: readOptionValue(argv, '--team-run-filter') ?? readOptionValue(argv, '--team-run'),
+    providerId: readOptionValue(argv, '--provider-filter') ?? readOptionValue(argv, '--provider'),
+    role: readOptionValue(argv, '--role-filter') ?? readOptionValue(argv, '--role'),
+    artifactType: readOptionValue(argv, '--artifact') ?? readOptionValue(argv, '--artifact-type'),
+    eventType: readOptionValue(argv, '--event-type') as any
+  };
+
+  if (!fixture) {
+    const events = readTeamRuntimeObservabilityEvents(cwd, readOptionValue(argv, '--team-run'));
+    const query = queryTeamObservabilityEvents(events, filters);
+    return makeResult({
+      ok: true,
+      command: 'team observability query',
+      mode: 'standalone',
+      cwd,
+      messages: [
+        message('info', 'ATM_TEAM_OBSERVABILITY_QUERY_READY', 'Team observability query returned runtime event records.', {
+          eventCount: query.eventCount,
+          filters: query.filters
+        })
+      ],
+      evidence: {
+        action: 'observability.query',
+        dryRun: true,
+        fixture: null,
+        eventSource: 'runtime',
+        contract: buildTeamObservabilityContract(),
+        query
+      }
+    });
+  }
+
   if (fixture !== 'broker-conflict-resolution') {
     throw new CliError('ATM_TEAM_OBSERVABILITY_FIXTURE_UNSUPPORTED', `Unsupported team observability fixture: ${fixture}`, { exitCode: 2 });
   }
@@ -1227,20 +1376,13 @@ function runTeamObservability(argv: string[], defaultCwd: string) {
     teamRunId,
     emittedAt
   });
-  const query = queryTeamObservabilityEvents(events, {
-    taskId: readOptionValue(argv, '--task-filter') ?? readOptionValue(argv, '--task'),
-    teamRunId: readOptionValue(argv, '--team-run-filter') ?? readOptionValue(argv, '--team-run'),
-    providerId: readOptionValue(argv, '--provider-filter') ?? readOptionValue(argv, '--provider'),
-    role: readOptionValue(argv, '--role-filter') ?? readOptionValue(argv, '--role'),
-    artifactType: readOptionValue(argv, '--artifact') ?? readOptionValue(argv, '--artifact-type'),
-    eventType: readOptionValue(argv, '--event-type') as any
-  });
+  const query = queryTeamObservabilityEvents(events, filters);
 
   return makeResult({
     ok: true,
     command: 'team observability query',
     mode: 'standalone',
-    cwd: defaultCwd,
+    cwd,
     messages: [
       message('info', 'ATM_TEAM_OBSERVABILITY_QUERY_READY', 'Team observability query returned shared event records.', {
         eventCount: query.eventCount,
@@ -1251,10 +1393,51 @@ function runTeamObservability(argv: string[], defaultCwd: string) {
       action: 'observability.query',
       dryRun: true,
       fixture,
+      eventSource: 'fixture',
       contract: buildTeamObservabilityContract(),
       artifact,
       query
     }
+  });
+}
+
+function readTeamRuntimeObservabilityEvents(cwd: string, requestedTeamRunId?: string | null) {
+  const runIds = requestedTeamRunId?.trim()
+    ? [requestedTeamRunId.trim()]
+    : listTeamRuns(cwd).map((run) => String((run as Record<string, unknown>).teamRunId ?? '')).filter(Boolean);
+  const events: ReturnType<typeof createTeamObservabilityEvent>[] = [];
+  for (const teamRunId of runIds) {
+    const runDir = path.join(teamRunsDirectory(cwd), teamRunId);
+    const jsonlPath = path.join(runDir, 'observability-events.jsonl');
+    if (existsSync(jsonlPath)) {
+      for (const line of readFileSync(jsonlPath, 'utf8').split(/\r?\n/)) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (parsed?.schemaId === 'atm.teamAgentObservabilityEvent.v1') {
+            events.push(parsed);
+          }
+        } catch {
+          // Ignore malformed runtime event lines; validators can flag corruption separately.
+        }
+      }
+    }
+    const run = existsSync(path.join(teamRunsDirectory(cwd), `${teamRunId}.json`))
+      ? readTeamRun(cwd, teamRunId) as Record<string, unknown>
+      : null;
+    const embedded = Array.isArray(run?.observabilityEvents) ? run.observabilityEvents : [];
+    for (const event of embedded) {
+      if ((event as { schemaId?: unknown })?.schemaId === 'atm.teamAgentObservabilityEvent.v1') {
+        events.push(event as ReturnType<typeof createTeamObservabilityEvent>);
+      }
+    }
+  }
+  const seen = new Set<string>();
+  return events.filter((event) => {
+    if (seen.has(event.eventId)) return false;
+    seen.add(event.eventId);
+    return true;
   });
 }
 
@@ -1389,7 +1572,7 @@ export function buildTeamRuntimeContract(input: {
   sdkId?: unknown;
   modelId?: unknown;
   roleName?: unknown;
-  selectionConfig?: TeamProviderSelectionConfig | null;
+    selectionConfig?: TeamProviderSelectionConfig | null;
   editorBridgeDisabled?: unknown;
   recipe?: TeamRecipe;
   allowedFiles?: readonly string[];
@@ -1956,7 +2139,7 @@ function describeRuntimeSelection(input: {
   runtimeMode: TeamRuntimeMode;
   runtimeLanguage: string;
   runtimeAdapterId: string | null;
-  selectionSource?: 'repo-default' | 'role-override' | null;
+  selectionSource?: 'repo-default' | 'role-override' | 'cli-role-override' | null;
   roleName?: string | null;
 }): string {
   const adapter = input.runtimeAdapterId ?? 'no adapter override';
@@ -1977,6 +2160,11 @@ async function buildTeamPlanningContext(input: {
   taskId: string;
   requestedRecipeId: string;
   actorId: string;
+  requestedTeamSize?: string;
+  providerSelectionConfig?: {
+    config: TeamProviderSelectionConfig;
+    source: { schemaId: 'atm.teamAgentsConfig.v1'; path: string | null; loaded: boolean; cliOverrideCount: number };
+  };
 }) {
   const task = readTask(input.cwd, input.taskId);
   const recipes = loadTeamRecipes(input.cwd);
@@ -1985,9 +2173,11 @@ async function buildTeamPlanningContext(input: {
     requestedRecipeId: input.requestedRecipeId,
     task
   });
+  const requestedRosterLevel = normalizeTeamSizeOverride(input.requestedTeamSize)?.teamLevel ?? null;
+  const activeRecipe = requestedRosterLevel ? projectTeamRecipeForLevel(recipe, requestedRosterLevel).recipe : recipe;
   const writeScope = deriveTeamWriteScope(task, input.cwd);
   const writePaths = writeScope.writePaths;
-  const permissionValidation = validateTeamPermissionModel(recipe, writePaths, {
+  const permissionValidation = validateTeamPermissionModel(activeRecipe, writePaths, {
     allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
     repoRoot: input.cwd,
     allowEmptyWriteScope: writeScope.allowEmptyWriteScope
@@ -2039,11 +2229,14 @@ async function buildTeamPlanningContext(input: {
 
   const finalTeamPlan = buildTeamPlan({
     task,
-    recipe,
+    recipe: activeRecipe,
     writePaths,
     validation,
     brokerLane,
     allowEmptyWriteScope: writeScope.allowEmptyWriteScope,
+    requestedTeamSize: input.requestedTeamSize,
+    providerSelectionConfig: input.providerSelectionConfig?.config ?? null,
+    providerSelectionSource: input.providerSelectionConfig?.source ?? null,
     knowledgeSummary: buildTeamKnowledgeSummary({
       cwd: input.cwd,
       taskId: String(task.workItemId ?? task.taskId ?? input.taskId),
@@ -2054,9 +2247,11 @@ async function buildTeamPlanningContext(input: {
   return {
     task,
     recipes,
-    recipe,
+    recipe: activeRecipe,
     permissionValidation,
     validation,
+    providerSelectionConfig: input.providerSelectionConfig?.config ?? null,
+    providerSelectionSource: input.providerSelectionConfig?.source ?? null,
     teamPlan: {
       ...finalTeamPlan,
       validation,
@@ -2110,6 +2305,25 @@ function loadTeamRecipes(cwd: string): { recipes: TeamRecipe[]; sources: unknown
       { kind: 'built-in-json', recipeIds: builtInRecipes.map((entry) => entry.recipeId) },
       ...repoRecipes.map((entry) => entry.source)
     ]
+  };
+}
+
+function loadTeamProviderSelectionConfig(cwd: string, cliRoleOverrides: string[]) {
+  const configPath = path.join(cwd, '.atm', 'config', 'team-provider-selection.json');
+  const repoConfig = existsSync(configPath)
+    ? readJsonFile(configPath, 'ATM_TEAM_PROVIDER_SELECTION_CONFIG_INVALID') as Partial<TeamProviderSelectionConfig>
+    : null;
+  return {
+    config: mergeTeamProviderSelectionConfig({
+      repoConfig,
+      cliRoleOverrides
+    }),
+    source: {
+      schemaId: 'atm.teamAgentsConfig.v1' as const,
+      path: existsSync(configPath) ? path.relative(cwd, configPath).replace(/\\/g, '/') : null,
+      loaded: existsSync(configPath),
+      cliOverrideCount: cliRoleOverrides.length
+    }
   };
 }
 
@@ -2581,14 +2795,24 @@ export function buildTeamPlan(input: {
   validation: { ok: boolean; findings: PermissionFinding[] };
   brokerLane: TeamBrokerLaneEvidence;
   allowEmptyWriteScope?: boolean;
+  requestedTeamSize?: string;
+  providerSelectionConfig?: TeamProviderSelectionConfig | null;
+  providerSelectionSource?: { schemaId: 'atm.teamAgentsConfig.v1'; path: string | null; loaded: boolean; cliOverrideCount: number } | null;
   knowledgeSummary?: TeamKnowledgeSummary;
 }) {
   const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
   const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
   const implementerSelector = selectTeamImplementer(input.task, input.recipe, input.writePaths);
-  const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector);
-  const roleSkillPacks = buildTeamRoleSkillPackContract(input.recipe);
-  const roleSkillPackManifest = buildProviderNeutralRoleSkillPackManifest({ recipe: input.recipe, roleSkillPacks });
+  const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector, input.requestedTeamSize);
+  const activeTeamLevel = captainDecision.teamLevel ?? mapTeamSizeToLevel(captainDecision.teamSize);
+  const rosterProjection = projectTeamRecipeForLevel(input.recipe, activeTeamLevel);
+  const activeRecipe = rosterProjection.recipe;
+  const roleSkillPacks = buildTeamRoleSkillPackContract(activeRecipe);
+  const roleSkillPackManifest = buildProviderNeutralRoleSkillPackManifest({
+    recipe: activeRecipe,
+    roleSkillPacks,
+    selectionConfig: input.providerSelectionConfig ?? undefined
+  });
   const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
   const growthContract = buildTeamGrowthContract();
   const observabilityContract = buildTeamObservabilityContract();
@@ -2596,6 +2820,7 @@ export function buildTeamPlan(input: {
     roleSkillPacks,
     growthContract
   });
+  const runtimeTierContract = buildRuntimeTierContract(activeRecipe);
   const runtimePilot = buildTeamRuntimePilot({
     roleSkillPacks,
     routingMatrix,
@@ -2603,12 +2828,28 @@ export function buildTeamPlan(input: {
     validation: input.validation,
     brokerLane: input.brokerLane
   });
+  const governanceRuntime = buildTeamGovernanceRuntimeFields({
+    validation: input.validation,
+    brokerLane: input.brokerLane,
+    runtimePilot,
+    captainDecision
+  });
   return {
     schemaId: 'atm.teamPlan.v1',
-    recipeId: input.recipe.recipeId,
+    recipeId: activeRecipe.recipeId,
     channelHint: 'normal',
+    teamLevel: activeTeamLevel,
+    rosterProjection: rosterProjection.projection,
+    governanceRuntime,
+    decisionClass: governanceRuntime.decisionClass,
+    decisionReason: governanceRuntime.decisionReason,
+    requiresHumanSignoff: governanceRuntime.requiresHumanSignoff,
+    requiresAdr: governanceRuntime.requiresAdr,
+    violationStatus: governanceRuntime.violationStatus,
+    escalationTarget: governanceRuntime.escalationTarget,
+    providerSelectionSource: input.providerSelectionSource ?? null,
     brokerLane: input.brokerLane,
-    agents: input.recipe.agents,
+    agents: activeRecipe.agents,
     captainDecision,
     implementerSelector,
     roleSkillPacks,
@@ -2617,9 +2858,11 @@ export function buildTeamPlan(input: {
     growthContract,
     observabilityContract,
     roleGrowthObservabilityContract,
+    runtimeTierContract,
     openAIFamilyRuntimeBridges: buildOpenAIFamilyRuntimeBridgeSummary(),
     editorExecutionRuntimeBridges: buildEditorExecutionRuntimeBridgeSummary(),
     microsoftFoundryRuntimeBridges: buildMicrosoftFoundryRuntimeBridgeSummary(),
+    anthropicRuntimeBridges: buildAnthropicRuntimeBridgeSummary(),
     runtimePilot,
     ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     requiredRoles: crewBriefingContract.requiredRoles,
@@ -2693,6 +2936,22 @@ export function buildMicrosoftFoundryRuntimeBridgeSummary(): TeamMicrosoftFoundr
   };
 }
 
+export function buildAnthropicRuntimeBridgeSummary(): TeamAnthropicRuntimeBridgeSummary {
+  return {
+    schemaId: 'atm.anthropicRuntimeBridgeSummary.v1',
+    milestone: 'M10X',
+    providerIds: ['anthropic'],
+    sharedProviderInterface: 'atm.teamProviderContract.v1',
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+    coordinatorOwnedAuthority: true,
+    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+    bridges: [
+      buildAnthropicTeamProviderBridgeDescriptor()
+    ]
+  };
+}
+
 export function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract {
   const rolePackDefaults: Record<string, { skillPackId: string; specialistSkills: string[]; playbookSlice: string }> = {
     coordinator: {
@@ -2729,6 +2988,21 @@ export function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkil
       skillPackId: 'atm.role-pack.atomization-planner',
       specialistSkills: ['atm-atom-map-refactor', 'atm-task-card-authoring'],
       playbookSlice: 'atomization-scope-shaping'
+    },
+    lieutenant: {
+      skillPackId: 'atm.role-pack.lieutenant',
+      specialistSkills: ['atm-dispatch', 'atm-lock'],
+      playbookSlice: 'coordination-boundary-watch'
+    },
+    reviewAgent: {
+      skillPackId: 'atm.role-pack.review-agent',
+      specialistSkills: ['atm-evidence'],
+      playbookSlice: 'review-signature-advisory'
+    },
+    knowledgeScout: {
+      skillPackId: 'atm.role-pack.knowledge-scout',
+      specialistSkills: ['atm-orient'],
+      playbookSlice: 'knowledge-query-advisory'
     }
   };
   const coordinatorExclusive = ['task.lifecycle', 'git.write', 'evidence.write'];
@@ -3051,6 +3325,36 @@ export function buildTeamRoleGrowthObservabilityContract(input: {
   };
 }
 
+function buildRuntimeTierContract(recipe: TeamRecipe) {
+  return {
+    schemaId: 'atm.teamRuntimeTierContract.v1',
+    tiers: ['raw-api', 'agent-sdk', 'editor'] as const,
+    providerContractCompatibility: ['RawChatAdapter', 'AgentLoopAdapter', 'EditorAgentAdapter'] as const,
+    roleTiers: recipe.agents.map((agent) => {
+      const tier = recommendRuntimeTier(agent.role);
+      return {
+        role: agent.role,
+        agentId: agent.agentId,
+        runtimeTier: tier,
+        rationale: runtimeTierRationale(agent.role, tier)
+      };
+    })
+  };
+}
+
+function recommendRuntimeTier(role: string): TeamRuntimeTier {
+  if (['reader', 'validator', 'knowledgeScout', 'reviewAgent', 'evidenceCollector'].includes(role)) return 'raw-api';
+  if (['implementer', 'coordinator'].includes(role)) return 'agent-sdk';
+  if (role === 'lieutenant' || role === 'scopeGuardian' || role === 'atomizationPlanner') return 'editor';
+  return 'raw-api';
+}
+
+function runtimeTierRationale(role: string, tier: TeamRuntimeTier) {
+  if (tier === 'raw-api') return `${role} is advisory/read-heavy and should prefer direct low-state API calls.`;
+  if (tier === 'agent-sdk') return `${role} may need tool-loop orchestration while preserving Coordinator-owned lifecycle.`;
+  return `${role} benefits from editor context but remains bounded by Team permission leases.`;
+}
+
 export function buildTeamRuntimePilot(input: {
   roleSkillPacks: TeamRoleSkillPackContract;
   routingMatrix: TeamRoleRoutingMatrix;
@@ -3158,6 +3462,173 @@ export function buildTeamRuntimePilot(input: {
   };
 }
 
+function buildTeamGovernanceRuntimeFields(input: {
+  validation: { ok: boolean; findings: PermissionFinding[] };
+  brokerLane: TeamBrokerLaneEvidence;
+  runtimePilot: TeamRuntimePilot;
+  captainDecision: ReturnType<typeof buildCaptainDecision>;
+}): TeamGovernanceRuntimeFields {
+  const blockingFinding = input.validation.findings.find((finding) => finding.level === 'error') ?? null;
+  const blockedByBroker = input.runtimePilot.brokerConflictVocabulary.violationStatus === 'broker-conflict-blocked'
+    || input.brokerLane.safeToStart === false;
+  const brokerVerdict = String(input.brokerLane.decision.verdict ?? '');
+  const escalationRequired = input.captainDecision.escalationRequired === true
+    || brokerVerdict === 'needs-steward'
+    || brokerVerdict === 'historical-delivery-required';
+  const requiresAdr = brokerVerdict === 'needs-steward'
+    || normalizeStringArray(input.brokerLane.blockedReasons).some((reason) => reason.toLowerCase().includes('adr'));
+  const requiresHumanSignoff = escalationRequired || requiresAdr;
+  const decisionClass = blockedByBroker || blockingFinding
+    ? 'blocked'
+    : escalationRequired
+      ? 'escalated'
+      : 'allowed';
+  const decisionReason = blockingFinding?.summary
+    ?? input.runtimePilot.brokerConflictVocabulary.decisionReason
+    ?? input.captainDecision.reason;
+  const violationStatus = blockedByBroker
+    ? 'broker-conflict-blocked'
+    : blockingFinding
+      ? 'policy-blocked'
+      : escalationRequired
+        ? 'escalated'
+        : 'allowed';
+  return {
+    schemaId: 'atm.teamGovernanceRuntimeFields.v1',
+    decisionClass,
+    decisionReason,
+    requiresHumanSignoff,
+    requiresAdr,
+    violationStatus,
+    escalationTarget: requiresHumanSignoff
+      ? (requiresAdr ? 'ADR + Captain review' : 'Captain / human review')
+      : null
+  };
+}
+
+export function evaluateReviewerIndependence(input: {
+  implementer: ReviewerIdentity;
+  reviewer: ReviewerIdentity;
+  policy: 'different-provider' | 'different-model-family' | 'different-certification';
+}) {
+  const implementerFamily = normalizeModelFamily(input.implementer.modelId);
+  const reviewerFamily = normalizeModelFamily(input.reviewer.modelId);
+  const checks = {
+    differentProvider: input.implementer.providerId !== input.reviewer.providerId,
+    differentModelFamily: implementerFamily !== reviewerFamily,
+    differentCertification: Boolean(input.implementer.modelCertificationId)
+      && Boolean(input.reviewer.modelCertificationId)
+      && input.implementer.modelCertificationId !== input.reviewer.modelCertificationId
+  };
+  const ok = input.policy === 'different-provider'
+    ? checks.differentProvider
+    : input.policy === 'different-model-family'
+      ? checks.differentModelFamily
+      : checks.differentCertification;
+  return {
+    schemaId: 'atm.reviewerIndependenceDecision.v1',
+    ok,
+    policy: input.policy,
+    checks,
+    reason: ok
+      ? `Reviewer satisfies ${input.policy}.`
+      : `Reviewer does not satisfy ${input.policy}; advisory note only.`
+  };
+}
+
+export function buildReviewAgentSignature(input: {
+  taskId: string;
+  reviewer: ReviewerIdentity;
+  implementer: ReviewerIdentity;
+  reviewedDiffHash: string;
+  policy: 'different-provider' | 'different-model-family' | 'different-certification';
+  findings?: readonly string[];
+}) {
+  const independence = evaluateReviewerIndependence({
+    implementer: input.implementer,
+    reviewer: input.reviewer,
+    policy: input.policy
+  });
+  const certificationPresent = Boolean(input.reviewer.modelCertificationId);
+  const formal = independence.ok && certificationPresent;
+  return {
+    schemaId: 'atm.reviewAgentSignature.v1',
+    taskId: input.taskId,
+    signatureStatus: formal ? 'formal-signature' : 'advisory-note',
+    permission: formal ? 'review.signature.write' : null,
+    reviewer: {
+      providerId: input.reviewer.providerId,
+      modelId: input.reviewer.modelId,
+      modelCertificationId: input.reviewer.modelCertificationId ?? null
+    },
+    implementer: {
+      providerId: input.implementer.providerId,
+      modelId: input.implementer.modelId,
+      modelCertificationId: input.implementer.modelCertificationId ?? null
+    },
+    modelCertificationId: input.reviewer.modelCertificationId ?? null,
+    reviewerIndependencePolicy: input.policy,
+    independence,
+    reviewedDiffHash: input.reviewedDiffHash,
+    findings: [...(input.findings ?? [])],
+    earlyWarning: classifyReviewEarlyWarnings(input.findings ?? [])
+  };
+}
+
+export function evaluateReviewQuorum(input: {
+  signatures: readonly ReturnType<typeof buildReviewAgentSignature>[];
+  requiredFormalSignatures: number;
+}) {
+  const formal = input.signatures.filter((signature) => signature.signatureStatus === 'formal-signature');
+  const conflicts = detectReviewSignatureConflicts(input.signatures);
+  const ok = formal.length >= input.requiredFormalSignatures && conflicts.length === 0;
+  return {
+    schemaId: 'atm.reviewQuorumDecision.v1',
+    ok,
+    requiredFormalSignatures: input.requiredFormalSignatures,
+    formalSignatureCount: formal.length,
+    advisoryNoteCount: input.signatures.length - formal.length,
+    conflicts,
+    escalationTarget: ok ? null : 'Coordinator/Captain/human review',
+    reason: ok
+      ? 'Review quorum satisfied.'
+      : 'Review quorum insufficient or conflicting; formal signature is blocked but advisory notes remain usable.'
+  };
+}
+
+function normalizeModelFamily(modelId: string) {
+  return String(modelId ?? '').trim().toLowerCase().split(/[-_.:]/)[0] || 'unknown';
+}
+
+function classifyReviewEarlyWarnings(findings: readonly string[]) {
+  return findings.map((finding) => {
+    const normalized = finding.toLowerCase();
+    const category = normalized.includes('scope')
+      ? 'scope-drift'
+      : normalized.includes('test')
+        ? 'missing-tests'
+        : normalized.includes('contract')
+          ? 'consumer-contract'
+          : normalized.includes('rollback')
+            ? 'rollback-gap'
+            : 'review-note';
+    return { category, finding };
+  });
+}
+
+function detectReviewSignatureConflicts(signatures: readonly ReturnType<typeof buildReviewAgentSignature>[]) {
+  const findingSets = signatures.map((signature) => new Set(signature.findings.map((finding) => finding.toLowerCase())));
+  const conflicts: string[] = [];
+  for (let index = 1; index < findingSets.length; index += 1) {
+    const previous = findingSets[index - 1];
+    const current = findingSets[index];
+    if (previous.has('approve') && current.has('block') || previous.has('block') && current.has('approve')) {
+      conflicts.push(`reviewer-${index}-decision-conflict`);
+    }
+  }
+  return conflicts;
+}
+
 function buildCaptainDecision(
   task: Record<string, unknown> | null | undefined,
   writePaths: string[],
@@ -3165,9 +3636,18 @@ function buildCaptainDecision(
   brokerLane: TeamBrokerLaneEvidence,
   crewBriefingContract: ReturnType<typeof buildMinimalTaskCrewBriefingContract>,
   atomizationChecklist: ReturnType<typeof buildAtomizationChecklist>,
-  implementerSelector: TeamImplementerSelector
+  implementerSelector: TeamImplementerSelector,
+  requestedTeamSize?: string
 ) {
-  const sizing = decideTeamSizing(task, writePaths, validation, brokerLane);
+  const automaticSizing = decideTeamSizing(task, writePaths, validation, brokerLane);
+  const manualSizing = normalizeTeamSizeOverride(requestedTeamSize);
+  const sizing = manualSizing
+    ? {
+      teamSize: manualSizing.teamSize,
+      confidence: 'high',
+      reason: `Manual team size override ${manualSizing.teamLevel} selected by CLI/config.`
+    }
+    : automaticSizing;
   const lieutenantEscalation = assessLieutenantEscalation(task, writePaths, validation, brokerLane, atomizationChecklist);
   return {
     schemaId: 'atm.teamCaptainDecision.v1',
@@ -3185,6 +3665,8 @@ function buildCaptainDecision(
       'If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.',
       'Coordinator must not silently override broker verdicts inside broker-governed conflict domains.'
     ],
+    teamLevel: manualSizing?.teamLevel ?? mapTeamSizeToLevel(sizing.teamSize),
+    teamLevelSource: manualSizing ? 'manual' : 'automatic',
     teamSize: sizing.teamSize,
     requiredRoles: crewBriefingContract.requiredRoles.map((role) => role.role),
     optionalRoles: crewBriefingContract.optionalRoles.map((role) => role.role),
@@ -3204,6 +3686,62 @@ function buildCaptainDecision(
       escalationRequired: lieutenantEscalation.escalationRequired,
       needLieutenant: lieutenantEscalation.needLieutenant,
       authorityChain: 'Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them.'
+    }
+  };
+}
+
+function normalizeTeamSizeOverride(value: unknown): { teamLevel: TeamLevel; teamSize: 'small' | 'medium' | 'large' } | null {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized === 'small' || normalized === 'l1') return { teamLevel: 'L1', teamSize: 'small' };
+  if (normalized === 'medium' || normalized === 'normal' || normalized === 'l2') return { teamLevel: 'L2', teamSize: 'medium' };
+  if (normalized === 'large' || normalized === 'l3') return { teamLevel: 'L3', teamSize: 'large' };
+  if (normalized === 'l4') return { teamLevel: 'L4', teamSize: 'large' };
+  if (normalized === 'l5') return { teamLevel: 'L5', teamSize: 'large' };
+  throw new CliError('ATM_TEAM_SIZE_INVALID', `Unsupported team size override: ${value}`, {
+    exitCode: 2,
+    details: { supported: ['small', 'medium', 'large', 'L1', 'L2', 'L3', 'L4', 'L5'] }
+  });
+}
+
+function mapTeamSizeToLevel(value: unknown): TeamLevel {
+  const normalized = String(value ?? '').trim();
+  if (normalized === 'large') return 'L3';
+  if (normalized === 'medium') return 'L2';
+  return 'L1';
+}
+
+function projectTeamRecipeForLevel(recipe: TeamRecipe, teamLevel: TeamLevel) {
+  const targetRoles = teamRosterLevelRoles[teamLevel];
+  const agentsByRole = new Map(recipe.agents.map((agent) => [agent.role, agent]));
+  const agents = targetRoles
+    .map((role) => agentsByRole.get(role) ?? teamRosterSyntheticAgents[role] ?? null)
+    .filter((agent): agent is TeamRecipeAgent => agent !== null);
+  const activeRoles = agents.map((agent) => agent.role);
+  const deferredRoles = recipe.agents
+    .map((agent) => agent.role)
+    .filter((role) => !activeRoles.includes(role));
+  const syntheticRoles = activeRoles.filter((role) => !recipe.agents.some((agent) => agent.role === role));
+  return {
+    recipe: {
+      ...recipe,
+      agents
+    },
+    projection: {
+      schemaId: 'atm.teamRosterProjection.v1',
+      teamLevel,
+      teamSize: teamLevel === 'L1' ? 'small' : teamLevel === 'L2' ? 'medium' : 'large',
+      activeRoles,
+      syntheticRoles,
+      deferredRoles,
+      catalogReadyRosterDeferredRoles,
+      roleRules: {
+        L1: 'Core four: Coordinator, Atomization Planner, Implementer, Validator.',
+        L2: 'Normal crew: L1 plus Reader and Evidence Collector.',
+        L3: 'Large crew: L2 plus Scope Guardian.',
+        L4: 'Escalated crew: L3 plus Lieutenant coordination boundary.',
+        L5: 'Full advisory crew: L4 plus Review Agent and Knowledge Scout.'
+      }
     }
   };
 }
@@ -3790,8 +4328,16 @@ export function writeTeamRun(input: {
     leases: input.teamPlan.suggestedPermissionLeases,
     permissionLeases: input.teamPlan.suggestedPermissionLeases,
     validation: input.validation,
+    governanceRuntime: input.teamPlan.governanceRuntime,
+    decisionClass: input.teamPlan.decisionClass,
+    decisionReason: input.teamPlan.decisionReason,
+    requiresHumanSignoff: input.teamPlan.requiresHumanSignoff,
+    requiresAdr: input.teamPlan.requiresAdr,
+    violationStatus: input.teamPlan.violationStatus,
+    escalationTarget: input.teamPlan.escalationTarget,
     brokerLane: input.teamPlan.brokerLane,
     captainDecision: input.teamPlan.captainDecision,
+    runtimeTierContract: input.teamPlan.runtimeTierContract,
     runtimePilot: input.teamPlan.runtimePilot,
     reworkRoute: buildTeamReworkRouteStateMachine({
       findings: [],
@@ -3818,6 +4364,136 @@ export function writeTeamRun(input: {
   mkdirSync(directory, { recursive: true });
   writeJsonFile(path.join(directory, `${teamRunId}.json`), teamRun);
   return teamRun;
+}
+
+async function runTeamProviderExecution(input: {
+  cwd: string;
+  taskId: string;
+  teamRunId: string;
+  recipe: TeamRecipe;
+  runtimeContract: TeamRuntimeContract;
+  runtimePilot: TeamRuntimePilot;
+}) {
+  if (input.runtimeContract.runtimeMode === 'broker-only') {
+    return {
+      requested: true,
+      blockedReason: 'broker-only-runtime-never-spawns',
+      results: [] as Array<Awaited<ReturnType<typeof runProviderOrchestration>>>
+    };
+  }
+  const providerId = normalizeTeamProviderId(input.runtimeContract.providerId);
+  if (!providerId) {
+    return {
+      requested: true,
+      blockedReason: 'provider-not-selected',
+      results: [] as Array<Awaited<ReturnType<typeof runProviderOrchestration>>>
+    };
+  }
+  const provider = createTeamProviderContract(providerId);
+  const selectedRoles = normalizeStringArray(input.runtimePilot.selectedRoles).length > 0
+    ? normalizeStringArray(input.runtimePilot.selectedRoles)
+    : input.recipe.agents.slice(0, 2).map((agent) => agent.role);
+  const results = [];
+  for (const role of selectedRoles) {
+    results.push(await runProviderOrchestration(provider, {
+      taskId: input.taskId,
+      role,
+      runtimeMode: input.runtimeContract.runtimeMode,
+      providerId,
+      sdkId: input.runtimeContract.sdkId ?? 'unknown-sdk',
+      modelId: input.runtimeContract.modelId ?? 'unknown-model',
+      instructions: `Run Team role ${role} for ${input.taskId}.`,
+      retries: 1
+    }));
+  }
+  appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
+    taskId: input.taskId,
+    teamRunId: input.teamRunId,
+    runtimeMode: input.runtimeContract.runtimeMode,
+    result
+  })));
+  return {
+    requested: true,
+    blockedReason: null,
+    results
+  };
+}
+
+function buildProviderOrchestrationEvents(input: {
+  taskId: string;
+  teamRunId: string;
+  runtimeMode: TeamRuntimeMode;
+  result: Awaited<ReturnType<typeof runProviderOrchestration>>;
+}) {
+  const role = String(input.result.stepResult.role ?? 'worker');
+  const providerId = normalizeTeamProviderId(input.result.providerId) ?? 'unknown';
+  const conflictBlocked = input.result.stepResult.artifacts.includes('atm.brokerConflictResolution.v1')
+    || input.result.stepResult.summary.includes('broker-conflict-blocked');
+  return [
+    createTeamObservabilityEvent({
+      eventType: 'session.start',
+      taskId: input.taskId,
+      teamRunId: input.teamRunId,
+      providerId,
+      role,
+      runtimeMode: input.runtimeMode,
+      summary: `Provider session started: ${input.result.sessionId}.`
+    }),
+    createTeamObservabilityEvent({
+      eventType: input.result.ok ? 'step.execution' : 'session.failure',
+      taskId: input.taskId,
+      teamRunId: input.teamRunId,
+      providerId,
+      role,
+      runtimeMode: input.runtimeMode,
+      decisionClass: input.result.ok ? 'allowed' : 'blocked',
+      decisionReason: input.result.stepResult.summary,
+      violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
+      statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+      summary: input.result.stepResult.summary
+    }),
+    ...input.result.stepResult.artifacts.map((artifactType) => createTeamObservabilityEvent({
+      eventType: artifactType === 'atm.brokerConflictResolution.v1' || conflictBlocked ? 'broker.conflict.blocked' : 'artifact.output',
+      taskId: input.taskId,
+      teamRunId: input.teamRunId,
+      providerId,
+      role,
+      runtimeMode: input.runtimeMode,
+      artifactType,
+      artifactId: `${input.result.sessionId}:${artifactType}`,
+      decisionClass: conflictBlocked ? 'blocked' : input.result.ok ? 'allowed' : 'blocked',
+      decisionReason: input.result.stepResult.summary,
+      violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
+      statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+      summary: `${artifactType} emitted by ${role}.`
+    })),
+    createTeamObservabilityEvent({
+      eventType: input.result.ok ? 'session.complete' : 'session.failure',
+      taskId: input.taskId,
+      teamRunId: input.teamRunId,
+      providerId,
+      role,
+      runtimeMode: input.runtimeMode,
+      decisionClass: input.result.ok ? 'allowed' : 'blocked',
+      decisionReason: input.result.stepResult.summary,
+      violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
+      statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+      summary: input.result.ok ? `Provider session completed: ${input.result.sessionId}.` : `Provider session failed: ${input.result.sessionId}.`
+    })
+  ];
+}
+
+function appendTeamRuntimeObservabilityEvents(cwd: string, teamRunId: string, events: ReturnType<typeof createTeamObservabilityEvent>[]) {
+  if (events.length === 0) return;
+  const runDir = path.join(teamRunsDirectory(cwd), teamRunId);
+  mkdirSync(runDir, { recursive: true });
+  const jsonlPath = path.join(runDir, 'observability-events.jsonl');
+  appendFileSync(jsonlPath, `${events.map((event) => JSON.stringify(event)).join('\n')}\n`, 'utf8');
+}
+
+function normalizeTeamProviderId(value: unknown): TeamProviderId | null {
+  const normalized = String(value ?? '').trim();
+  return (TEAM_PROVIDER_IDS as readonly string[]).includes(normalized) ? normalized as TeamProviderId : null;
 }
 
 function buildTeamBrokerGovernanceSummary(runtimeContract: TeamRuntimeContract) {
@@ -3860,6 +4536,51 @@ export function buildTeamStatusResult(input: {
       teamRuns: input.compact ? runs.map(compactTeamRun) : runs
     }
   });
+}
+
+export function evaluateTeamRequiredCompletionGate(input: {
+  cwd: string;
+  taskId: string;
+  taskDocument: Record<string, unknown>;
+}) {
+  const required = isTeamRequiredTask(input.taskDocument);
+  if (!required) {
+    return {
+      ok: true,
+      required: false,
+      taskId: input.taskId,
+      teamRun: null,
+      requiredCommand: null
+    };
+  }
+  const completedRun = listTeamRuns(input.cwd)
+    .filter((run: unknown): run is Record<string, unknown> => typeof run === 'object' && run !== null)
+    .filter((run) => run.taskId === input.taskId)
+    .filter((run) => run.status === 'completed')
+    .filter((run) => {
+      const teamSummary = run.teamSummary;
+      return typeof teamSummary === 'object' && teamSummary !== null && (teamSummary as Record<string, unknown>).closeReady === true;
+    })
+    .sort((left, right) => String(right.completedAt ?? right.updatedAt ?? '').localeCompare(String(left.completedAt ?? left.updatedAt ?? '')))[0] ?? null;
+  const requiredCommand = `node atm.mjs team complete --team <teamRunId> --actor <coordinator> --reason "team.required close gate" --json`;
+  return {
+    ok: Boolean(completedRun),
+    required: true,
+    taskId: input.taskId,
+    teamRun: completedRun ? compactTeamRun(completedRun) : null,
+    requiredCommand
+  };
+}
+
+function isTeamRequiredTask(taskDocument: Record<string, unknown>) {
+  const direct = taskDocument.teamRequired ?? taskDocument['team.required'];
+  if (direct === true || direct === 'true') return true;
+  const team = taskDocument.team;
+  if (typeof team === 'object' && team !== null) {
+    const required = (team as Record<string, unknown>).required;
+    return required === true || required === 'true';
+  }
+  return false;
 }
 
 export function buildTeamPatrolResult(input: {
@@ -4033,6 +4754,187 @@ function readTeamRun(cwd: string, teamRunId: string) {
     });
   }
   return readJsonFile(filePath, 'ATM_TEAM_RUN_INVALID');
+}
+
+function writeExistingTeamRun(cwd: string, teamRunId: string, run: Record<string, unknown>) {
+  const filePath = path.join(teamRunsDirectory(cwd), `${teamRunId}.json`);
+  if (!existsSync(filePath)) {
+    throw new CliError('ATM_TEAM_RUN_NOT_FOUND', `Team run not found: ${teamRunId}`, {
+      exitCode: 2,
+      details: { teamRunId, path: path.relative(cwd, filePath).replace(/\\/g, '/') }
+    });
+  }
+  writeJsonFile(filePath, run);
+}
+
+function normalizeTeamLifecyclePaths(value: unknown): string[] {
+  return uniqueStrings(String(value ?? '')
+    .split(',')
+    .map((entry) => entry.trim().replace(/\\/g, '/'))
+    .filter(Boolean));
+}
+
+function runTeamLifecycleAction(input: {
+  cwd: string;
+  action: TeamLifecycleAction;
+  teamRunId: string;
+  actorId: string;
+  permission: string;
+  paths: string[];
+  reason: string;
+}) {
+  if (!input.teamRunId) {
+    throw new CliError('ATM_TEAM_RUN_REQUIRED', `team ${input.action} requires --team <id>.`, { exitCode: 2 });
+  }
+  if (!input.actorId) {
+    throw new CliError('ATM_TEAM_ACTOR_REQUIRED', `team ${input.action} requires --actor <id>.`, { exitCode: 2 });
+  }
+  if ((input.action === 'lease' || input.action === 'release') && !input.permission) {
+    throw new CliError('ATM_TEAM_PERMISSION_REQUIRED', `team ${input.action} requires --permission <id>.`, { exitCode: 2 });
+  }
+
+  const run = readTeamRun(input.cwd, input.teamRunId) as Record<string, unknown>;
+  const status = String(run.status ?? '');
+  if (status !== 'active') {
+    throw new CliError('ATM_TEAM_RUN_NOT_ACTIVE', `Team run ${input.teamRunId} is ${status || 'unknown'}, not active.`, {
+      exitCode: 1,
+      details: { teamRunId: input.teamRunId, status }
+    });
+  }
+
+  const now = new Date().toISOString();
+  const currentLeases = normalizePermissionLeaseRecords(run.permissionLeases ?? run.leases);
+  const lifecycleEvents = Array.isArray(run.lifecycleEvents) ? [...run.lifecycleEvents] : [];
+  let nextLeases = currentLeases;
+
+  if (input.action === 'lease') {
+    const conflict = currentLeases.find((lease) => lease.permission === input.permission && lease.agentId !== input.actorId);
+    if (conflict) {
+      throw new CliError('ATM_TEAM_LEASE_CONFLICT', `Permission ${input.permission} is already leased to ${conflict.agentId}.`, {
+        exitCode: 1,
+        details: {
+          teamRunId: input.teamRunId,
+          permission: input.permission,
+          currentOwner: conflict.agentId,
+          requestedOwner: input.actorId,
+          requiredCommand: `node atm.mjs team release --team ${input.teamRunId} --actor ${conflict.agentId} --permission ${input.permission} --json`
+        }
+      });
+    }
+    const lease = {
+      permission: input.permission,
+      agentId: input.actorId,
+      paths: input.paths
+    };
+    nextLeases = [
+      ...currentLeases.filter((entry) => !(entry.permission === input.permission && entry.agentId === input.actorId)),
+      lease
+    ];
+    lifecycleEvents.push(teamLifecycleEvent('lease.granted', input, now, { lease }));
+  }
+
+  if (input.action === 'release') {
+    const matched = currentLeases.filter((lease) => lease.permission === input.permission && lease.agentId === input.actorId);
+    if (matched.length === 0) {
+      throw new CliError('ATM_TEAM_LEASE_NOT_FOUND', `No ${input.permission} lease owned by ${input.actorId} exists on ${input.teamRunId}.`, {
+        exitCode: 1,
+        details: { teamRunId: input.teamRunId, permission: input.permission, actorId: input.actorId }
+      });
+    }
+    nextLeases = currentLeases.filter((lease) => !(lease.permission === input.permission && lease.agentId === input.actorId));
+    lifecycleEvents.push(teamLifecycleEvent('lease.released', input, now, { releasedLeases: matched }));
+  }
+
+  if (input.action === 'complete') {
+    run.status = 'completed';
+    run.completedAt = now;
+    run.completedBy = input.actorId;
+    run.completionReason = input.reason || null;
+    const teamSummary = typeof run.teamSummary === 'object' && run.teamSummary !== null
+      ? { ...(run.teamSummary as Record<string, unknown>), closeReady: true }
+      : { closeReady: true };
+    run.teamSummary = teamSummary;
+    lifecycleEvents.push(teamLifecycleEvent('team.completed', input, now));
+  }
+
+  if (input.action === 'abandon') {
+    run.status = 'abandoned';
+    run.abandonedAt = now;
+    run.abandonedBy = input.actorId;
+    run.abandonReason = input.reason || null;
+    const teamSummary = typeof run.teamSummary === 'object' && run.teamSummary !== null
+      ? { ...(run.teamSummary as Record<string, unknown>), closeReady: false }
+      : { closeReady: false };
+    run.teamSummary = teamSummary;
+    lifecycleEvents.push(teamLifecycleEvent('team.abandoned', input, now));
+  }
+
+  run.leases = nextLeases;
+  run.permissionLeases = nextLeases;
+  run.lifecycleEvents = lifecycleEvents;
+  run.updatedAt = now;
+  writeExistingTeamRun(input.cwd, input.teamRunId, run);
+
+  return makeResult({
+    ok: true,
+    command: 'team',
+    cwd: input.cwd,
+    messages: [
+      message('info', 'ATM_TEAM_LIFECYCLE_UPDATED', `Team run ${input.teamRunId} ${input.action} recorded.`, {
+        teamRunId: input.teamRunId,
+        action: input.action,
+        status: run.status,
+        leaseCount: nextLeases.length
+      })
+    ],
+    evidence: {
+      action: `team.${input.action}`,
+      teamRunId: input.teamRunId,
+      actorId: input.actorId,
+      permission: input.permission || null,
+      paths: input.paths,
+      status: run.status,
+      leaseCount: nextLeases.length,
+      lifecycleEventCount: lifecycleEvents.length,
+      teamRun: compactTeamRun(run)
+    }
+  });
+}
+
+function teamLifecycleEvent(type: string, input: {
+  action: TeamLifecycleAction;
+  teamRunId: string;
+  actorId: string;
+  permission: string;
+  paths: string[];
+  reason: string;
+}, occurredAt: string, extra: Record<string, unknown> = {}) {
+  return {
+    schemaId: 'atm.teamRuntimeLifecycleEvent.v1',
+    type,
+    teamRunId: input.teamRunId,
+    actorId: input.actorId,
+    permission: input.permission || null,
+    paths: input.paths,
+    reason: input.reason || null,
+    occurredAt,
+    ...extra
+  };
+}
+
+function normalizePermissionLeaseRecords(value: unknown): PermissionLease[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((entry): PermissionLease | null => {
+    const record = entry as { permission?: unknown; agentId?: unknown; paths?: unknown };
+    const permission = String(record.permission ?? '').trim();
+    const agentId = String(record.agentId ?? '').trim();
+    if (!permission || !agentId) return null;
+    return {
+      permission,
+      agentId,
+      paths: normalizeStringArray(record.paths)
+    };
+  }).filter((entry): entry is PermissionLease => entry !== null);
 }
 
 function normalizeTeamPatrolMode(value: unknown): TeamPatrolMode {
@@ -4363,6 +5265,18 @@ interface CompactRunInput {
     selectedRoles?: unknown;
   };
   agentsSpawned?: boolean;
+  governanceRuntime?: Partial<TeamGovernanceRuntimeFields> | null;
+  decisionClass?: unknown;
+  decisionReason?: unknown;
+  requiresHumanSignoff?: unknown;
+  requiresAdr?: unknown;
+  violationStatus?: unknown;
+  escalationTarget?: unknown;
+  completedAt?: unknown;
+  completedBy?: unknown;
+  abandonedAt?: unknown;
+  abandonedBy?: unknown;
+  lifecycleEvents?: unknown[];
   createdAt?: unknown;
   updatedAt?: unknown;
 }
@@ -4377,6 +5291,7 @@ function compactTeamRun(run: Record<string, unknown> | null | undefined) {
   const permissionLeases = r.permissionLeases;
   const brokerSubagent = r.brokerSubagent;
   const runtimeContract = r.runtimeContract;
+  const governanceRuntime = r.governanceRuntime ?? null;
   return {
     teamRunId: r.teamRunId,
     taskId: r.taskId,
@@ -4391,6 +5306,12 @@ function compactTeamRun(run: Record<string, unknown> | null | undefined) {
     brokerGovernanceSummaryId: brokerGovernance?.schemaId ?? null,
     runtimePilotMode: (run as { runtimePilot?: { pilotMode?: unknown } })?.runtimePilot?.pilotMode ?? null,
     runtimePilotRoles: normalizeStringArray(r.runtimePilot?.selectedRoles),
+    decisionClass: governanceRuntime?.decisionClass ?? r.decisionClass ?? null,
+    decisionReason: governanceRuntime?.decisionReason ?? r.decisionReason ?? null,
+    requiresHumanSignoff: governanceRuntime?.requiresHumanSignoff ?? r.requiresHumanSignoff ?? false,
+    requiresAdr: governanceRuntime?.requiresAdr ?? r.requiresAdr ?? false,
+    violationStatus: governanceRuntime?.violationStatus ?? r.violationStatus ?? null,
+    escalationTarget: governanceRuntime?.escalationTarget ?? r.escalationTarget ?? null,
     brokerEvidenceRequired: normalizeStringArray(
       brokerGovernance?.brokerEvidenceRequired ?? brokerSubagent?.evidenceRequired ?? runtimeContract?.brokerSubagent?.evidenceRequired
     ),
@@ -4400,6 +5321,11 @@ function compactTeamRun(run: Record<string, unknown> | null | undefined) {
     workerTaskLifecycle: brokerGovernance?.workerTaskLifecycle ?? runtimeContract?.workerAdapter?.authorityBoundary?.taskLifecycle ?? null,
     workerSelfClose: brokerGovernance?.workerSelfClose ?? runtimeContract?.workerAdapter?.authorityBoundary?.selfClose ?? null,
     agentsSpawned: r.agentsSpawned === true,
+    completedAt: r.completedAt ?? null,
+    completedBy: r.completedBy ?? null,
+    abandonedAt: r.abandonedAt ?? null,
+    abandonedBy: r.abandonedBy ?? null,
+    lifecycleEventCount: Array.isArray(r.lifecycleEvents) ? r.lifecycleEvents.length : 0,
     createdAt: r.createdAt ?? null,
     updatedAt: r.updatedAt ?? null
   };

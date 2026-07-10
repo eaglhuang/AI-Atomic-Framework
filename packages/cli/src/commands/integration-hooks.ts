@@ -39,6 +39,7 @@ import {
   inspectGitHooks,
   installGitHooks
 } from './hook.ts';
+import { evaluateTeamPreToolGate } from './team-runtime-gates.ts';
 import { resolvePromptScopedTaskContext } from './next.ts';
 import { CliError, makeResult, message, relativePathFrom } from './shared.ts';
 
@@ -706,6 +707,36 @@ function runPreToolHook(options: HookInvocationOptions) {
         toolFiles,
         criticalFiles,
         frameworkClaimCommand: claimCommand,
+        frameworkStatus: status
+      }
+    });
+  }
+
+  const teamGateFindings = evaluateTeamPreToolGate({
+    cwd: options.cwd,
+    actorId: process.env.ATM_ACTOR_ID ?? process.env.ATM_COMMIT_ACTOR_ID ?? options.editor,
+    files: toolFiles,
+    command: options.command,
+    toolName: options.toolName
+  });
+  if (teamGateFindings.length > 0) {
+    return makeResult({
+      ok: false,
+      command: 'integration',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_TEAM_WRITE_SCOPE_EXCEEDED', 'Active Team run blocked a write outside the current file.write lease.', {
+        editor: options.editor,
+        findings: teamGateFindings,
+        requiredCommand: teamGateFindings[0]?.requiredCommand ?? null,
+        canonicalCode: 'ATM_TEAM_WRITE_SCOPE_EXCEEDED',
+        legacyEquivalentCode: 'ATM_TEAM_WRITE_SCOPE_OUT_OF_BOUNDS'
+      })],
+      evidence: {
+        action: 'hook pre-tool',
+        editor: options.editor,
+        toolName: options.toolName,
+        toolFiles,
+        teamGateFindings,
         frameworkStatus: status
       }
     });

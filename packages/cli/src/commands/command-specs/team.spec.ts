@@ -9,7 +9,7 @@ export const teamSpecCommandSurface = {
     {
       name: 'action',
       summary:
-        'Team action. Supports: plan, start, status, validate, patrol, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
+        'Team action. Supports: plan, start, status, validate, patrol, lease, release, complete, abandon, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
     }
   ],
   options: [
@@ -23,8 +23,14 @@ export const teamSpecCommandSurface = {
     { flag: '--provider', value: 'id', summary: 'Optional provider metadata recorded on the runtime contract.' },
     { flag: '--sdk', value: 'id', summary: 'Optional SDK metadata recorded on the runtime contract.' },
     { flag: '--model', value: 'id', summary: 'Optional model metadata recorded on the runtime contract.' },
+    { flag: '--role-provider', value: 'role=provider:model[:sdk][:mode]', repeatable: true, summary: 'Override provider/model selection for one Team role. Repeatable.' },
+    { flag: '--team-size', value: 'level', summary: 'Manual team size/level override: small, medium, large, L1, L2, L3, L4, or L5.' },
     { flag: '--disable-editor-bridge', summary: 'Disable the editor-subagent bridge contract for this run while preserving Team governance semantics.' },
+    { flag: '--execute', summary: 'Execute governed provider orchestration for selected Team roles after runtime state is written. Defaults off.' },
     { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },
+    { flag: '--permission', value: 'id', summary: 'Permission id for team lease or release.' },
+    { flag: '--paths', value: 'csv', summary: 'Comma-separated lease paths for team lease.' },
+    { flag: '--reason', value: 'text', summary: 'Reason recorded for team lease, release, complete, or abandon.' },
     { flag: '--mode', value: 'name', summary: 'Team patrol mode: claim-preflight, close-preflight, big-script, or daily-noon.' },
     { flag: '--compact', summary: 'Return a compact status payload.' },
     { flag: '--scope', value: 'name', summary: 'Knowledge build scope for team knowledge build.' },

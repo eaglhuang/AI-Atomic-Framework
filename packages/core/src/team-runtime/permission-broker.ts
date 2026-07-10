@@ -82,6 +82,7 @@ export function createDefaultTeamPermissionPolicy(): TeamPermissionPolicy {
     ],
     vendorPermissions: {
       openai: ['file.read', 'exec.validator'],
+      anthropic: ['file.read', 'exec.validator'],
       'azure-openai': ['file.read', 'exec.validator'],
       'claude-code': ['file.read', 'file.write', 'exec.validator'],
       gemini: ['file.read', 'exec.validator'],

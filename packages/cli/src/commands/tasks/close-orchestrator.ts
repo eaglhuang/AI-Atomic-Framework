@@ -8,6 +8,7 @@ import { resolveActorId } from '../actor-registry.ts';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.ts';
 import { computeMissingValidatorReport, verifyTaskEvidence } from '../evidence.ts';
 import { cleanupStaleTeamRunsForTerminalTasks } from '../team-runtime-cleanup.ts';
+import { evaluateTeamRequiredCompletionGate } from '../team.ts';
 import {
   assertRunnerFreshForWriteAction,
   createClosurePacket,
@@ -229,6 +230,22 @@ export async function runTasksClose(argv: string[]) {
     assertTaskCloseAllowedByDirection(options.cwd, options.taskId, actorId, {
       allowHistoricalCloseback
     });
+    const teamRequiredGate = evaluateTeamRequiredCompletionGate({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      taskDocument
+    });
+    if (!teamRequiredGate.ok) {
+      throw new CliError('ATM_TEAM_COMPLETION_REQUIRED', `Task ${options.taskId} declares team.required and cannot close until a Team run is completed.`, {
+        exitCode: 1,
+        details: {
+          taskId: options.taskId,
+          required: teamRequiredGate.required,
+          requiredCommand: teamRequiredGate.requiredCommand,
+          remediation: 'Run or inspect the active Team run, then close it with team complete before closing the task.'
+        }
+      });
+    }
   }
 
   const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId, {

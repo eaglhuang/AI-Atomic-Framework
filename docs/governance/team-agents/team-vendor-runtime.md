@@ -5,7 +5,7 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 ## Vendor-Neutral Core
 
 - The Team runtime core must keep provider registration, session lifecycle, retries, cancellation, and role orchestration vendor-neutral.
-- Provider metadata must support `openai`, `azure-openai`, `claude-code`, `gemini`, and `microsoft-foundry` without changing the orchestration contract shape.
+- Provider metadata must support `openai`, `anthropic`, `azure-openai`, `claude-code`, `gemini`, and `microsoft-foundry` without changing the orchestration contract shape.
 - Worker authority remains coordinator-owned. Provider bridges do not gain `git.write`, `task.lifecycle`, or self-close authority.
 
 ## Permission Broker
@@ -61,6 +61,29 @@ launching work. They do not self-grant `git.write`, `task.lifecycle`,
 operator-facing message must reuse `decisionClass`, `decisionReason`,
 `violationStatus`, and `broker-conflict-blocked`, and point to the governed
 resolution artifact rather than local runtime edits.
+
+## Anthropic Direct Bridge
+
+M10X adds `anthropic` as a direct Tier A / raw-api reference bridge for the
+Anthropic Messages API. It uses `atm.anthropicTeamProviderConfig.v1`; required
+fields are `modelId` and the secret reference `apiKeyEnvVar`, with optional
+`baseUrlEnvVar`. The bridge posts to `/messages`, records only secret
+references, and produces the shared `atm.teamProviderRunArtifact.v1` artifact
+plus `atm.teamAgentObservabilityEvent.v1` events.
+
+The Anthropic bridge is discoverable through `TEAM_PROVIDER_IDS`, role provider
+selection, the runtime bridge summary, and provider permission broker policy. CI
+and deterministic validators use an injected HTTP executor and must not call a
+live paid API.
+
+## Runtime Tiers
+
+Team plans expose `atm.teamRuntimeTierContract.v1` per active role. Reader,
+Validator, Knowledge Scout, Review Agent, and Evidence Collector default to
+`raw-api`; Implementer and Coordinator default to `agent-sdk`; Lieutenant,
+Scope Guardian, and Atomization Planner default to `editor`. These tiers are
+compatible extensions of the existing provider contract: `RawChatAdapter`,
+`AgentLoopAdapter`, and `EditorAgentAdapter`.
 
 ## Claude Code and Gemini Execution Bridges
 
