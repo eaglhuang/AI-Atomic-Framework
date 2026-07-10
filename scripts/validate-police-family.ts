@@ -162,7 +162,7 @@ check(
   'Dedup Police must ignore same-polymorph group'
 );
 check(
-  readText('packages/core/src/police/family.ts').includes('findByFingerprintPrefix'),
+  readText('packages/core/src/police/roles/dedup.ts').includes('findByFingerprintPrefix'),
   'Dedup Police source must use RegistryIndex fingerprint prefix lookup hot path'
 );
 
