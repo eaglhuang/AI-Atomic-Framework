@@ -35,6 +35,10 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 
 - Provider selection must bind to a provider-neutral role contract before it
   binds to a model or SDK.
+- Runtime adapters should consume `atm.teamRoleSkillPackManifest.v1` as the
+  machine-readable role-pack manifest. Its discovery mode is
+  `capability-driven`, and `roleFirstProviderSecond` keeps role authority ahead
+  of provider choice.
 - Runtime adapters should consume role and skill-pack semantics from
   `docs/governance/team-agents/role-skill-pack-contract.md` rather than baking
   provider-specific role meanings into the runtime.

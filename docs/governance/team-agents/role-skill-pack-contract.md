@@ -95,6 +95,28 @@ Examples:
 - Validator pack: `atm-evidence` plus validator orchestration guidance
 - Knowledge Scout pack: shared growth contract and Team knowledge retrieval
 
+## Provider-Neutral Manifest
+
+`atm.teamRoleSkillPackManifest.v1` is the machine-readable stitching layer for
+role packs. It does not merge SKL role contracts into Team Broker runtime
+implementation; it records the common vocabulary that provider bridges and
+role packs must preserve.
+
+The manifest is role-first and provider-second:
+
+- `roleFirstProviderSecond: true` means provider selection cannot redefine role
+  authority.
+- `discoveryMode: capability-driven` means a provider or runtime is listed only
+  as a way to satisfy the role pack capabilities, not as the owner of the role.
+- `permissionLease.alignment: role-first` means allowed and forbidden
+  permissions come from the role contract before provider choice.
+- `providerCapabilities[]` lists which provider/runtime/artifact surfaces can
+  satisfy the role pack.
+
+The manifest must preserve the shared Broker conflict vocabulary:
+`decisionClass`, `decisionReason`, `violationStatus`, and
+`broker-conflict-blocked`.
+
 ## Authority boundary
 
 Role specialization must never imply lifecycle authority drift.

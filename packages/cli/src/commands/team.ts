@@ -36,6 +36,7 @@ import {
   type BrokerConflictDecisionClass,
   type BrokerConflictViolationStatus
 } from '../../../core/src/team-runtime/permission-broker.ts';
+import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { resolveTeamProviderSelection, type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
@@ -106,6 +107,43 @@ type TeamRoleSkillPackContract = {
     allowedPermissions: string[];
     forbiddenPermissions: string[];
     playbookSlice: string;
+    growthContractAttachment: string;
+  }>;
+};
+
+type TeamRoleSkillPackManifest = {
+  schemaId: 'atm.teamRoleSkillPackManifest.v1';
+  providerNeutral: true;
+  coordinatorOwnsLifecycle: true;
+  discoveryMode: 'capability-driven';
+  roleFirstProviderSecond: true;
+  sharedVocabulary: {
+    brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+  };
+  roles: Array<{
+    role: string;
+    skillPackId: string;
+    playbookSlice: string;
+    capabilityTags: string[];
+    permissionLease: {
+      alignment: 'role-first';
+      allowedPermissions: string[];
+      forbiddenPermissions: string[];
+    };
+    selectedProvider: {
+      providerId: string;
+      sdkId: string;
+      modelId: string;
+      runtimeMode: TeamRuntimeMode;
+      source: 'repo-default' | 'role-override';
+    };
+    providerCapabilities: Array<{
+      providerId: string;
+      runtimeModes: TeamRuntimeMode[];
+      artifacts: string[];
+      satisfiesRolePack: true;
+      reason: string;
+    }>;
     growthContractAttachment: string;
   }>;
 };
@@ -2262,6 +2300,7 @@ export function buildTeamPlan(input: {
   const implementerSelector = selectTeamImplementer(input.task, input.recipe, input.writePaths);
   const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector);
   const roleSkillPacks = buildTeamRoleSkillPackContract(input.recipe);
+  const roleSkillPackManifest = buildProviderNeutralRoleSkillPackManifest({ recipe: input.recipe, roleSkillPacks });
   const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
   const growthContract = buildTeamGrowthContract();
   const runtimePilot = buildTeamRuntimePilot({
@@ -2280,6 +2319,7 @@ export function buildTeamPlan(input: {
     captainDecision,
     implementerSelector,
     roleSkillPacks,
+    roleSkillPackManifest,
     routingMatrix,
     growthContract,
     runtimePilot,
@@ -2366,6 +2406,65 @@ export function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkil
   };
 }
 
+export function buildProviderNeutralRoleSkillPackManifest(input: {
+  recipe: TeamRecipe;
+  roleSkillPacks?: TeamRoleSkillPackContract;
+  selectionConfig?: TeamProviderSelectionConfig;
+  providerIds?: readonly string[];
+}): TeamRoleSkillPackManifest {
+  const roleSkillPacks = input.roleSkillPacks ?? buildTeamRoleSkillPackContract(input.recipe);
+  const selectionConfig = input.selectionConfig ?? {
+    repoDefault: {
+      providerId: 'openai',
+      sdkId: 'responses',
+      modelId: 'gpt-5-mini',
+      runtimeMode: 'broker-only'
+    },
+    roleOverrides: {}
+  };
+  const providerIds = uniqueStrings([...(input.providerIds ?? TEAM_PROVIDER_IDS)]);
+
+  return {
+    schemaId: 'atm.teamRoleSkillPackManifest.v1',
+    providerNeutral: true,
+    coordinatorOwnsLifecycle: true,
+    discoveryMode: 'capability-driven',
+    roleFirstProviderSecond: true,
+    sharedVocabulary: {
+      brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked']
+    },
+    roles: roleSkillPacks.roles.map((entry) => {
+      const selection = resolveTeamProviderSelection(entry.role, selectionConfig);
+      return {
+        role: entry.role,
+        skillPackId: entry.skillPackId,
+        playbookSlice: entry.playbookSlice,
+        capabilityTags: capabilityTagsForRole(entry.role),
+        permissionLease: {
+          alignment: 'role-first',
+          allowedPermissions: entry.allowedPermissions,
+          forbiddenPermissions: entry.forbiddenPermissions
+        },
+        selectedProvider: {
+          providerId: selection.providerId,
+          sdkId: selection.sdkId,
+          modelId: selection.modelId,
+          runtimeMode: selection.runtimeMode,
+          source: selection.source
+        },
+        providerCapabilities: providerIds.map((providerId) => ({
+          providerId,
+          runtimeModes: ['real-agent', 'editor-subagent', 'broker-only'],
+          artifacts: artifactsForRole(entry.role),
+          satisfiesRolePack: true as const,
+          reason: `${providerId} can satisfy ${entry.skillPackId} through role-first permission leases and ${entry.playbookSlice}.`
+        })),
+        growthContractAttachment: entry.growthContractAttachment
+      };
+    })
+  };
+}
+
 export function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix {
   const hasRole = (role: string) => roleSkillPacks.roles.some((entry) => entry.role === role);
   const maybe = (role: string) => hasRole(role) ? [role] : [];
@@ -2443,6 +2542,30 @@ export function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackCont
       })
     ]
   };
+}
+
+function capabilityTagsForRole(role: string): string[] {
+  const normalized = role.toLowerCase();
+  if (normalized === 'coordinator') return ['task-routing', 'lifecycle-authority', 'closeout-sequencing'];
+  if (normalized.includes('scope')) return ['scope-boundary', 'broker-preflight', 'lease-watch'];
+  if (normalized.includes('implementer')) return ['scoped-delivery', 'bounded-file-write'];
+  if (normalized.includes('validator')) return ['validator-run', 'failure-interpretation'];
+  if (normalized.includes('evidence')) return ['evidence-packaging', 'closure-readiness'];
+  if (normalized.includes('knowledge')) return ['knowledge-query', 'shared-growth-context'];
+  if (normalized.includes('steward')) return ['broker-authorized-apply', 'bounded-merge-plan'];
+  return ['specialist-advisory'];
+}
+
+function artifactsForRole(role: string): string[] {
+  const normalized = role.toLowerCase();
+  if (normalized === 'coordinator') return ['captain-decision', 'team-brief', 'handoff'];
+  if (normalized.includes('validator')) return ['validator-report'];
+  if (normalized.includes('evidence')) return ['evidence-summary'];
+  if (normalized.includes('implementer')) return ['agent-report', 'patch-summary'];
+  if (normalized.includes('scope')) return ['scope-report'];
+  if (normalized.includes('knowledge')) return ['knowledge-summary'];
+  if (normalized.includes('steward')) return ['broker-apply-report'];
+  return ['agent-report'];
 }
 
 export function buildTeamGrowthContract(): TeamGrowthContract {
