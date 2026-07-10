@@ -1,0 +1,161 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0042",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e540beb98184008657ea9ab6110237dd98080c02",
+  "governedTreeSha": "46630b5349fd8326936fd5c2e98aa5af35ae3d8e",
+  "targetCommitDelta": {
+    "currentCommitSha": "e540beb98184008657ea9ab6110237dd98080c02",
+    "parentCommitShas": [
+      "e540beb98184008657ea9ab6110237dd98080c02"
+    ],
+    "governedTreeSha": "46630b5349fd8326936fd5c2e98aa5af35ae3d8e",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/run-validators.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case openai-azure-openai-bridges",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:495258b2f0f09c6011d10d08eb47221c6a0e133ac59d019899f490686bac34f1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-10T07:10:18.473Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0042.*",
+      ".atm/history/task-events/TASK-TEAM-0042/**",
+      ".atm/history/tasks/TASK-TEAM-0042.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0042.json",
+  "closedAt": "2026-07-10T07:10:18.474Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260710064905-codex-gpt-5.4-mini-TASK-TEAM-0042-3fe31f9736",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e540beb98184008657ea9ab6110237dd98080c02",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/providers/azure-openai.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TEAM-0042.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-TEAM-0042/2026-07-10T06-48-43-777Z-import-64da8dc1e439.json",
+      ".atm/history/task-events/TASK-TEAM-0042/2026-07-10T06-49-05-396Z-reserve-d55178210a65.json",
+      ".atm/history/task-events/TASK-TEAM-0042/2026-07-10T06-49-05-398Z-promote-bcb02e23868d.json",
+      ".atm/history/task-events/TASK-TEAM-0042/2026-07-10T06-49-05-924Z-claim-a2ab0490a42f.json",
+      ".atm/history/tasks/TASK-TEAM-0042.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
