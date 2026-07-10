@@ -801,9 +801,23 @@
     {
       "path_pattern": "packages/core/src/team-runtime/permission-broker.ts",
       "atom_id": "atm.team-agents-runtime",
-      "capability": "Governed Team permission broker and policy decision surface for provider-neutral permission checks.",
+      "capability": "Governed Team permission broker and policy decision surface for provider-neutral permission checks, including broker conflict resolution artifact helpers for serial release admission.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeamBrokerConflictResolve",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Team Broker conflict resolve CLI emits atm.brokerConflictResolution.v1 artifacts with decisionClass, decisionReason, violationStatus, broker-conflict-blocked, and release-order admission vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0046"
+    },
+    {
+      "path_pattern": "schemas/governance/broker-conflict-resolution.schema.json",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Schema contract for atm.brokerConflictResolution.v1 artifacts shared by 0046/0047/0048 and SKL follow-up lanes.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0046"
     },
     {
       "path_pattern": "schemas/governance/team-agent-permission-policy.schema.json",
@@ -1668,6 +1682,13 @@
       "capability": "Validator case proving Python and C# Team worker adapter examples use the same adapter schema as Node.js, keep Node.js as default, and preserve broker, lease, validator, police, evidence, artifact, retry, and closure authority gates.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0036"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#broker-conflict-resolution",
+      "atom_id": "atm.team-broker-conflict-resolution",
+      "capability": "Validator case proving Team Broker conflict resolution artifact schema, CLI output, decisionClass, decisionReason, violationStatus, broker-conflict-blocked, and serial release admission semantics.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0046"
     },
     {
       "path_pattern": "scripts/validate-team-agents.ts#validateWaveMode",

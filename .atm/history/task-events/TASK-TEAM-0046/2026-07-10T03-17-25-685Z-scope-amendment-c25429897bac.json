@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-10T03-17-25-685Z-scope-amendment-c25429897bac",
+  "taskId": "TASK-TEAM-0046",
+  "action": "scope-amendment",
+  "actorId": "codex-captain-m8e",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0046.json",
+  "taskSha256": "sha256:9c07054a2124e897f0ce23f18705e03b28c9e6b9d607a268c13e17a66c710123",
+  "createdAt": "2026-07-10T03:17:25.685Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0046 --actor codex-captain-m8e --add \"packages/cli/dist/**,packages/core/dist/**,release/atm-root-drop/**,release/atm-onefile/**\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TEAM-0046",
+  "updatedAt": "2026-07-10T03:21:46.693Z",
+  "updatedBy": "codex-captain-m8e",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-10T03:12:56.977Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3bd1c556dc1e2d1cbd3f3735bc80cd65035fe7ea",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-conflict-resolution",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:63d717d69ba8aa1851feccdb463389ce7ead37100ba7e474e4b8168343740124",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-agents"
+      ],
+      "generatedAt": "2026-07-10T03:12:57.582Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3bd1c556dc1e2d1cbd3f3735bc80cd65035fe7ea",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-10T03:13:04.335Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3bd1c556dc1e2d1cbd3f3735bc80cd65035fe7ea",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-10T03:15:06.920Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3bd1c556dc1e2d1cbd3f3735bc80cd65035fe7ea",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-10T03:16:25.754Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3bd1c556dc1e2d1cbd3f3735bc80cd65035fe7ea",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs team broker resolve --task TASK-TEAM-0046-A --conflict TASK-TEAM-0046-B --path packages/core/src/team-runtime/permission-broker.ts --decision-reason broker-conflict-blocked --created-at 2026-07-10T00:00:00.000Z --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:19a4076bb159b4e7e75ca9e455aa921b0a9a8d1343a4f91e91daea3e31976c54",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-10T03:21:46.762Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3bd1c556dc1e2d1cbd3f3735bc80cd65035fe7ea",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

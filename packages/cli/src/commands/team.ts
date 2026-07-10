@@ -31,6 +31,11 @@ import {
   resolveNodejsTeamWorkerAdapter,
   type TeamWorkerAdapterContract
 } from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
+import {
+  createBrokerConflictResolutionArtifact,
+  type BrokerConflictDecisionClass,
+  type BrokerConflictViolationStatus
+} from '../../../core/src/team-runtime/permission-broker.ts';
 import { resolveTeamProviderSelection, type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
@@ -507,6 +512,11 @@ export const TEAM_ATOM_BOUNDARIES = {
     anchor: 'packages/cli/src/commands/team-knowledge.ts#runTeamKnowledge',
     capability: 'Advisory Team Agents knowledge build/query dry-run surface with metadata filtering and lexical ranking.',
     downstreamTasks: ['TASK-TEAM-0021']
+  },
+  'team.broker-conflict-resolution': {
+    anchor: 'packages/cli/src/commands/team.ts#runTeamBrokerConflictResolve',
+    capability: 'Team Broker conflict resolve command that emits atm.brokerConflictResolution.v1 artifacts with decisionClass, decisionReason, violationStatus, and broker-conflict-blocked release-order semantics.',
+    downstreamTasks: ['TASK-TEAM-0046']
   }
 } as const;
 
@@ -637,6 +647,10 @@ export async function runTeam(argv: string[]) {
     return runTeamKnowledge(argv.slice(1), cwd);
   }
 
+  if (String(argv[0] ?? '').toLowerCase() === 'broker') {
+    return runTeamBroker(argv.slice(1), process.cwd());
+  }
+
   const spec = getCommandSpec('team')!;
   const parsed = parseArgsForCommand(spec, argv);
   const action = String(parsed.positional[0] ?? 'plan').toLowerCase();
@@ -652,8 +666,12 @@ export async function runTeam(argv: string[]) {
     return runTeamKnowledge(knowledgeArgv, cwd);
   }
 
+  if (action === 'broker') {
+    return runTeamBroker(parsed.positional.slice(1).map(String), cwd);
+  }
+
   if (!['plan', 'start', 'status', 'validate', 'patrol'].includes(action)) {
-    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'team supports: plan, start, status, validate, patrol, wave, knowledge, broker resolve', { exitCode: 2 });
   }
 
   if (action === 'status') {
@@ -835,6 +853,75 @@ export async function runTeam(argv: string[]) {
   });
 }
 
+function runTeamBroker(argv: string[], defaultCwd: string) {
+  const action = String(argv[0] ?? '').toLowerCase();
+  if (!['resolve', 'conflict-resolve'].includes(action)) {
+    throw new CliError('ATM_CLI_USAGE', 'team broker supports: resolve', { exitCode: 2 });
+  }
+  return runTeamBrokerConflictResolve(argv.slice(1), defaultCwd);
+}
+
+export function runTeamBrokerConflictResolve(argv: string[], defaultCwd: string) {
+  const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? defaultCwd);
+  const primaryTaskId = readOptionValue(argv, '--task')?.trim();
+  if (!primaryTaskId) {
+    throw new CliError('ATM_TEAM_BROKER_RESOLVE_TASK_REQUIRED', 'team broker resolve requires --task <id>.', { exitCode: 2 });
+  }
+  const conflictingTaskIds = readOptionValues(argv, '--conflict');
+  if (conflictingTaskIds.length === 0) {
+    throw new CliError('ATM_TEAM_BROKER_RESOLVE_CONFLICT_REQUIRED', 'team broker resolve requires at least one --conflict <task-id>.', { exitCode: 2 });
+  }
+  const sharedPaths = readOptionValues(argv, '--path');
+  if (sharedPaths.length === 0) {
+    throw new CliError('ATM_TEAM_BROKER_RESOLVE_PATH_REQUIRED', 'team broker resolve requires at least one --path <file>.', { exitCode: 2 });
+  }
+  const decisionReason = readOptionValue(argv, '--decision-reason')?.trim()
+    ?? 'Broker conflict blocked; tasks must consume the release order one at a time.';
+  const decisionClass = normalizeBrokerDecisionClass(readOptionValue(argv, '--decision-class'));
+  const violationStatus = normalizeBrokerViolationStatus(readOptionValue(argv, '--violation-status'));
+  const releaseOrder = readOptionValues(argv, '--release-order');
+  const createdAt = readOptionValue(argv, '--created-at')?.trim();
+  const artifact = createBrokerConflictResolutionArtifact({
+    primaryTaskId,
+    conflictingTaskIds,
+    sharedPaths,
+    decisionClass,
+    decisionReason,
+    violationStatus,
+    releaseOrder: releaseOrder.length ? releaseOrder : undefined,
+    createdAt
+  });
+
+  return makeResult({
+    ok: true,
+    command: 'team',
+    cwd,
+    messages: [
+      message('info', 'ATM_TEAM_BROKER_CONFLICT_RESOLUTION_READY', 'Team Broker conflict resolution artifact generated.', {
+        resolutionId: artifact.resolutionId,
+        decisionClass: artifact.decisionClass,
+        violationStatus: artifact.violationStatus,
+        statusCode: artifact.statusCode,
+        currentAllowedTaskId: artifact.currentAllowedTaskId,
+        blockedTaskIds: artifact.blockedTaskIds
+      })
+    ],
+    evidence: {
+      action: 'broker.resolve',
+      dryRun: true,
+      runtimeWritten: false,
+      agentsSpawned: false,
+      artifact,
+      sharedVocabulary: {
+        decisionClass: artifact.decisionClass,
+        decisionReason: artifact.decisionReason,
+        violationStatus: artifact.violationStatus,
+        statusCode: artifact.statusCode
+      }
+    }
+  });
+}
+
 function readOptionValue(argv: string[], flag: string): string | undefined {
   const index = argv.indexOf(flag);
   if (index < 0) {
@@ -842,6 +929,43 @@ function readOptionValue(argv: string[], flag: string): string | undefined {
   }
   return argv[index + 1];
 }
+
+function readOptionValues(argv: string[], flag: string): string[] {
+  const values: string[] = [];
+  for (let index = 0; index < argv.length; index += 1) {
+    if (argv[index] !== flag) continue;
+    const value = argv[index + 1];
+    if (!value || value.startsWith('--')) continue;
+    values.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
+  }
+  return [...new Set(values)];
+}
+
+function normalizeBrokerDecisionClass(value: string | undefined): BrokerConflictDecisionClass {
+  const normalized = value?.trim();
+  if (
+    normalized === 'serial-release'
+    || normalized === 'human-signoff-required'
+    || normalized === 'adr-required'
+    || normalized === 'blocked'
+  ) {
+    return normalized;
+  }
+  return 'serial-release';
+}
+
+function normalizeBrokerViolationStatus(value: string | undefined): BrokerConflictViolationStatus {
+  const normalized = value?.trim();
+  if (
+    normalized === 'broker-conflict-blocked'
+    || normalized === 'resolution-issued'
+    || normalized === 'resolved'
+  ) {
+    return normalized;
+  }
+  return 'broker-conflict-blocked';
+}
+
 
 export function buildTeamRuntimeContract(input: {
   runtimeMode?: unknown;

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0046",
+  "title": "Broker conflict resolution command",
+  "status": "running",
+  "milestone": "M8E",
+  "dependencies": [
+    "TASK-TEAM-0038",
+    "TASK-TEAM-0041"
+  ],
+  "acceptance": [
+    "A command such as `tasks parallel resolve` or `team broker resolve` can create an `atm.brokerConflictResolution.v1` artifact from conflicting task ids.",
+    "The artifact records task ids, shared paths, CID or atom overlap, owner acknowledgement or timeout, `decisionClass`, `decisionReason`, `violationStatus`, `escalationTarget`, resolution order, and validator plan.",
+    "A blocked conflict returns or records `broker-conflict-blocked`.",
+    "The permission broker consumes the artifact and allows follow-up work only in the recorded resolution order.",
+    "The validator proves the full chain without touching `scripts/captain-dispatch-mailbox/**` or other RFT-owned paths."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "schemas/governance/broker-conflict-resolution.schema.json",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/tasks.ts",
+    "schemas/governance/broker-conflict-resolution.schema.json",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case broker-conflict-resolution",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Do not edit docs/ai_atomic_framework/rft-hardening/** in 3KLife; Cursor RFT work owns that planning lane.",
+    "Do not edit scripts/captain-dispatch-mailbox/**; TASK-RFT-0005 owns that lane.",
+    "Do not edit RFT-owned target paths such as scripts/validators/task-ledger/**, packages/core/src/police/**, or RFT split helper files while RFT residue or locks exist.",
+    "Do not rename or reuse TASK-TEAM-0042, TASK-TEAM-0043, or TASK-TEAM-0044.",
+    "Do not hand-edit .atm/runtime/** or .atm/history/**."
+  ],
+  "nonGoals": [
+    "No vendor bridge implementation in this card.",
+    "No broad scheduler replacement."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the command, schema, validator case, and broker wiring together if conflict resolution becomes ambiguous.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-broker-enforcement",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0046-broker-conflict-resolution-command.task.md",
+    "sectionTitle": "TASK-TEAM-0046",
+    "headingLine": 55,
+    "hash": "4e0441df2e82b750"
+  },
+  "importedAt": "2026-07-10T03:02:17.592Z",
+  "lastTransitionId": "2026-07-10T03-17-25-685Z-scope-amendment-c25429897bac",
+  "lastTransitionAt": "2026-07-10T03:17:25.685Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain-m8e",
+  "reservedAt": "2026-07-10T03:02:30.870Z",
+  "promotedAt": "2026-07-10T03:02:30.873Z",
+  "claim": {
+    "actorId": "codex-captain-m8e",
+    "leaseId": "lease-cf748691b691",
+    "claimedAt": "2026-07-10T03:02:30.876Z",
+    "heartbeatAt": "2026-07-10T03:02:30.876Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-TEAM-0046.*",
+      ".atm/history/task-events/TASK-TEAM-0046/**",
+      ".atm/history/tasks/TASK-TEAM-0046.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/dist/**",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "schemas/governance/broker-conflict-resolution.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-10T03:02:30.876Z",
+  "startedByActor": "codex-captain-m8e",
+  "startedBySessionId": "session-20260710030230-codex-captain-m8e-TASK-TEAM-0046-2e0f31324c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0046",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0046.*",
+      ".atm/history/task-events/TASK-TEAM-0046/**",
+      ".atm/history/tasks/TASK-TEAM-0046.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/tasks.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/dist/**",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "release/atm-onefile/**",
+      "release/atm-root-drop/**",
+      "schemas/governance/broker-conflict-resolution.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0046-broker-conflict-resolution-command.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/team-agents/",
+      "docs/ai_atomic_framework/team-agents/tasks/",
+      "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0046-broker-conflict-resolution-command.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "c55d1a1ccfbf0469653b655ba9ea45b5821c81eaa5f2549fcef75f3820dd8f02",
+    "actorId": "codex-captain-m8e",
+    "createdAt": "2026-07-10T03:02:32.384Z",
+    "status": "active"
+  }
+}

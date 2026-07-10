@@ -12,7 +12,7 @@ import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtim
 import { TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
 import { TeamProviderRegistry } from '../packages/core/src/team-runtime/provider-registry.ts';
 import { runProviderOrchestration } from '../packages/core/src/team-runtime/execution-orchestrator.ts';
-import { createDefaultTeamPermissionPolicy, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
+import { advanceBrokerConflictResolution, createBrokerConflictResolutionArtifact, createDefaultTeamPermissionPolicy, decideBrokerConflictResolutionAdmission, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
 import { resolveTeamProviderSelection } from '../packages/core/src/team-runtime/provider-selection.ts';
 import {
   validateScopeLeaseEpoch,
@@ -420,6 +420,76 @@ async function main() {
     });
     assert.equal(deny.ok, false);
     console.log('[validate-team-agents] ok (provider-permission-broker)');
+    return;
+  }
+
+  if (taskCase === 'broker-conflict-resolution') {
+    const schema = JSON.parse(readFileSync(path.join(process.cwd(), 'schemas', 'governance', 'broker-conflict-resolution.schema.json'), 'utf8'));
+    const validate = new Ajv2020({ allErrors: true }).compile(schema);
+    const fixture = createBrokerConflictResolutionArtifact({
+      primaryTaskId: 'TASK-TEAM-0046-A',
+      conflictingTaskIds: ['TASK-TEAM-0046-B'],
+      sharedPaths: ['packages/core/src/team-runtime/permission-broker.ts'],
+      decisionClass: 'serial-release',
+      decisionReason: 'broker-conflict-blocked until the release order grants the next task.',
+      createdAt: '2026-07-10T00:00:00.000Z'
+    });
+
+    assert.equal(fixture.schemaId, 'atm.brokerConflictResolution.v1');
+    assert.equal(fixture.decisionClass, 'serial-release');
+    assert.ok(fixture.decisionReason.includes('broker-conflict-blocked'));
+    assert.equal(fixture.violationStatus, 'broker-conflict-blocked');
+    assert.equal(fixture.statusCode, 'broker-conflict-blocked');
+    assert.deepEqual(fixture.releaseOrder, ['TASK-TEAM-0046-A', 'TASK-TEAM-0046-B']);
+    assert.equal(fixture.currentAllowedTaskId, 'TASK-TEAM-0046-A');
+    assert.deepEqual(fixture.blockedTaskIds, ['TASK-TEAM-0046-B']);
+    assert.equal(validate(fixture), true, JSON.stringify(validate.errors));
+
+    const firstAdmission = decideBrokerConflictResolutionAdmission(fixture, 'TASK-TEAM-0046-A');
+    const blockedAdmission = decideBrokerConflictResolutionAdmission(fixture, 'TASK-TEAM-0046-B');
+    assert.equal(firstAdmission.ok, true);
+    assert.equal(firstAdmission.statusCode, 'broker-conflict-blocked');
+    assert.equal(blockedAdmission.ok, false);
+    assert.equal(blockedAdmission.violationStatus, 'broker-conflict-blocked');
+    assert.equal(blockedAdmission.statusCode, 'broker-conflict-blocked');
+
+    const advanced = advanceBrokerConflictResolution(fixture, 'TASK-TEAM-0046-A');
+    assert.equal(advanced.currentAllowedTaskId, 'TASK-TEAM-0046-B');
+    assert.equal(decideBrokerConflictResolutionAdmission(advanced, 'TASK-TEAM-0046-B').ok, true);
+    const resolved = advanceBrokerConflictResolution(advanced, 'TASK-TEAM-0046-B');
+    assert.equal(resolved.violationStatus, 'resolved');
+    assert.equal(resolved.currentAllowedTaskId, null);
+    assert.equal(decideBrokerConflictResolutionAdmission(resolved, 'TASK-TEAM-0046-A').statusCode, 'resolved');
+
+    const commandResult = await runTeam([
+      'broker',
+      'resolve',
+      '--task',
+      'TASK-TEAM-0046-A',
+      '--conflict',
+      'TASK-TEAM-0046-B',
+      '--path',
+      'packages/core/src/team-runtime/permission-broker.ts',
+      '--decision-reason',
+      'broker-conflict-blocked by atom overlap; release sequentially.',
+      '--created-at',
+      '2026-07-10T00:00:00.000Z',
+      '--cwd',
+      process.cwd(),
+      '--json'
+    ]);
+    const artifact = (commandResult.evidence as any)?.artifact;
+    assert.equal(commandResult.ok, true);
+    assert.equal(artifact?.schemaId, 'atm.brokerConflictResolution.v1');
+    assert.equal(artifact?.decisionClass, 'serial-release');
+    assert.equal(artifact?.violationStatus, 'broker-conflict-blocked');
+    assert.equal(artifact?.statusCode, 'broker-conflict-blocked');
+    assert.equal(validate(artifact), true, JSON.stringify(validate.errors));
+    assert.equal((commandResult.evidence as any)?.sharedVocabulary?.decisionClass, 'serial-release');
+    assert.equal((commandResult.evidence as any)?.sharedVocabulary?.violationStatus, 'broker-conflict-blocked');
+    assert.ok(TEAM_ATOM_BOUNDARIES['team.broker-conflict-resolution'].capability.includes('decisionClass'));
+
+    console.log('[validate-team-agents] ok (broker-conflict-resolution)');
     return;
   }
 
