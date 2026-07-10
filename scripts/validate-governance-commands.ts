@@ -450,6 +450,66 @@ try {
   assert(runGit(repo, ['config', 'user.email', 'fixture-agent@example.com']).exitCode === 0, 'fixture git user.email must match the registered actor before governed commits');
   assert(runGit(repo, ['add', '.atm/catalog/registry/actors.json']).exitCode === 0, 'fixture actor registry must be stageable');
   assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: register fixture actor']).exitCode === 0, 'fixture actor registry commit must succeed');
+
+  const brokerConflictTaskPath = writeFixtureTask(repo, 'ATM-GOV-BROKER-CONFLICT', 'broker-owner', 'Broker conflict hook bypass fixture');
+  const brokerConflictTask = JSON.parse(readFileSync(brokerConflictTaskPath, 'utf8'));
+  brokerConflictTask.status = 'running';
+  brokerConflictTask.scopePaths = ['src/broker-owned.ts'];
+  brokerConflictTask.deliverables = ['src/broker-owned.ts'];
+  brokerConflictTask.claim = {
+    state: 'active',
+    actorId: 'broker-owner',
+    leaseId: 'lease-broker-conflict',
+    files: ['src/broker-owned.ts'],
+    heartbeatAt: new Date().toISOString(),
+    ttlSeconds: 1800
+  };
+  writeFileSync(brokerConflictTaskPath, `${JSON.stringify(brokerConflictTask, null, 2)}\n`, 'utf8');
+  mkdirSync(path.join(repo, 'src'), { recursive: true });
+  writeFileSync(path.join(repo, 'src', 'broker-owned.ts'), 'export const brokerOwned = true;\n', 'utf8');
+  assert(runGit(repo, ['add', 'src/broker-owned.ts']).exitCode === 0, 'broker conflict fixture source must be staged');
+  const hookBypassApproval = runAtm([
+    'emergency',
+    'approve',
+    '--cwd',
+    repo,
+    '--permission',
+    'backend.gitHookBypass',
+    '--actor',
+    'fixture-agent',
+    '--allowed-flag',
+    '--no-verify',
+    '--approval-text',
+    'Human fixture approval for hook bypass regression validation.',
+    '--reason',
+    'Validate that hook bypass cannot override Team Broker conflict ownership.',
+    '--json'
+  ]);
+  assert(hookBypassApproval.exitCode === 0, 'hook bypass fixture emergency approval must exit 0');
+  const hookBypassLease = String(hookBypassApproval.parsed.evidence?.lease?.leaseId ?? hookBypassApproval.parsed.evidence?.leaseId ?? '');
+  assert(hookBypassLease.length > 0, 'hook bypass fixture approval must return a lease id');
+  const brokerBlockedBypass = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'chore: blocked broker conflict bypass',
+    '--no-verify',
+    '--emergency-approval',
+    hookBypassLease,
+    '--json'
+  ]);
+  assert(brokerBlockedBypass.exitCode === 1, 'git commit --no-verify must not bypass Team Broker cross-task mutation conflicts');
+  assert(brokerBlockedBypass.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED', 'broker conflict hook bypass must return the broker-specific override code');
+  assert(brokerBlockedBypass.parsed.messages?.[0]?.data?.conflictTaskId === 'ATM-GOV-BROKER-CONFLICT', 'broker conflict hook bypass must name the conflicting task');
+  assert((brokerBlockedBypass.parsed.messages?.[0]?.data?.conflictFiles ?? []).includes('src/broker-owned.ts'), 'broker conflict hook bypass must name the conflicting staged file');
+  runGit(repo, ['reset', '--mixed', 'HEAD']);
+  rmSync(path.join(repo, 'src', 'broker-owned.ts'), { force: true });
+  rmSync(brokerConflictTaskPath, { force: true });
+
   const registerActorDrift = runAtm([
     'actor',
     'register',

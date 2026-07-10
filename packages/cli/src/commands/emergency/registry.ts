@@ -154,8 +154,8 @@ export const emergencyPermissionRegistry: readonly EmergencyPermissionDefinition
   },
   {
     id: 'backend.gitHookBypass',
-    summary: 'Governed git hook bypass recovery.',
-    protectedSurfaces: ['git recovery flags'],
+    summary: 'Governed git hook bypass recovery; does not override Team Broker cross-task mutation blocks.',
+    protectedSurfaces: ['git recovery flags except broker-conflict ownership overrides'],
     normalLane: 'governed git commit wrapper',
     riskTier: 'critical',
     defaultTtlMinutes: 10,

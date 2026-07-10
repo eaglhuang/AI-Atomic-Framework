@@ -62,6 +62,28 @@ function resolveGitCommitTimeoutMs(explicitTimeoutMs: number | null): number {
   return DEFAULT_GIT_COMMIT_TIMEOUT_MS;
 }
 
+function assertNoBrokerConflictBeforeHookBypass(cwd: string, taskId: string | null) {
+  const crossTaskBlock = detectCrossTaskMutation(cwd, taskId, 'git commit --no-verify');
+  if (!crossTaskBlock) return;
+  recordIncidentFlag(cwd, crossTaskBlock);
+  throw new CliError(
+    'ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED',
+    `git commit --no-verify cannot bypass a Team Broker cross-task mutation block for ${crossTaskBlock.conflictTaskId}.`,
+    {
+      exitCode: 1,
+      details: {
+        conflictTaskId: crossTaskBlock.conflictTaskId,
+        conflictFiles: crossTaskBlock.conflictFiles,
+        conflicts: crossTaskBlock.conflicts,
+        recoveryLane: crossTaskBlock.recoveryLane,
+        requiredAction: 'Resolve the active task ownership conflict through handoff, release, repair-claim, or an explicit broker-conflict override lane before retrying the commit.',
+        hookBypassPermission: 'backend.gitHookBypass',
+        brokerConflictOverrideAvailable: false
+      }
+    }
+  );
+}
+
 function gitCommitAttemptStatusRelativePath(actorId: string, taskId: string | null): string {
   const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, '_');
   const safeTask = (taskId ?? 'no-task').replace(/[^a-zA-Z0-9_.-]/g, '_');
@@ -1248,6 +1270,7 @@ function runGitCommit(options: ParsedGitOptions) {
       reason: options.overrideReason ?? 'Governed git hook bypass for emergency recovery.',
       command: commitCommand
     });
+    assertNoBrokerConflictBeforeHookBypass(options.cwd, options.taskId);
   }
   const actorRecord = findActorByResolvedId(options.cwd, resolvedActor);
   const profile = resolveGitIdentityProfile(options.cwd, actorId, actorRecord, {
