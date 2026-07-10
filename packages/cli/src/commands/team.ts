@@ -42,6 +42,8 @@ import {
   queryTeamObservabilityEvents
 } from '../../../core/src/team-runtime/observability.ts';
 import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
+import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/claude-code.ts';
+import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
 import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { resolveTeamProviderSelection, type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
@@ -242,6 +244,22 @@ type TeamOpenAIFamilyRuntimeBridgeSummary = {
   bridges: readonly [
     ReturnType<typeof buildOpenAITeamProviderBridgeDescriptor>,
     ReturnType<typeof buildAzureOpenAITeamProviderBridgeDescriptor>
+  ];
+};
+
+type TeamEditorExecutionRuntimeBridgeSummary = {
+  schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1';
+  milestone: 'M9I';
+  providerIds: readonly ['claude-code', 'gemini'];
+  sharedProviderInterface: 'atm.teamProviderContract.v1';
+  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
+  roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1';
+  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
+  coordinatorOwnedAuthority: true;
+  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
+  bridges: readonly [
+    ReturnType<typeof buildClaudeCodeTeamProviderBridgeDescriptor>,
+    ReturnType<typeof buildGeminiTeamProviderBridgeDescriptor>
   ];
 };
 
@@ -2518,6 +2536,7 @@ export function buildTeamPlan(input: {
     observabilityContract,
     roleGrowthObservabilityContract,
     openAIFamilyRuntimeBridges: buildOpenAIFamilyRuntimeBridgeSummary(),
+    editorExecutionRuntimeBridges: buildEditorExecutionRuntimeBridgeSummary(),
     runtimePilot,
     ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
     requiredRoles: crewBriefingContract.requiredRoles,
@@ -2552,6 +2571,24 @@ export function buildOpenAIFamilyRuntimeBridgeSummary(): TeamOpenAIFamilyRuntime
     bridges: [
       buildOpenAITeamProviderBridgeDescriptor(),
       buildAzureOpenAITeamProviderBridgeDescriptor()
+    ]
+  };
+}
+
+export function buildEditorExecutionRuntimeBridgeSummary(): TeamEditorExecutionRuntimeBridgeSummary {
+  return {
+    schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1',
+    milestone: 'M9I',
+    providerIds: ['claude-code', 'gemini'],
+    sharedProviderInterface: 'atm.teamProviderContract.v1',
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+    roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1',
+    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
+    coordinatorOwnedAuthority: true,
+    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
+    bridges: [
+      buildClaudeCodeTeamProviderBridgeDescriptor(),
+      buildGeminiTeamProviderBridgeDescriptor()
     ]
   };
 }

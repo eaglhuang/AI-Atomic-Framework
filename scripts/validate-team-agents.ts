@@ -6,7 +6,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface } from '../packages/cli/src/commands/integration.ts';
@@ -18,6 +18,8 @@ import { advanceBrokerConflictResolution, createBrokerConflictResolutionArtifact
 import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, createTeamObservabilityEvent, queryTeamObservabilityEvents } from '../packages/core/src/team-runtime/observability.ts';
 import { resolveTeamProviderSelection } from '../packages/core/src/team-runtime/provider-selection.ts';
 import { createAzureOpenAITeamProviderBridge, launchAzureOpenAITeamProviderRun, validateAzureOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/azure-openai.ts';
+import { createClaudeCodeTeamProviderBridge, launchClaudeCodeTeamProviderRun, validateClaudeCodeTeamProviderConfig } from '../packages/core/src/team-runtime/providers/claude-code.ts';
+import { createGeminiTeamProviderBridge, launchGeminiTeamProviderRun, validateGeminiTeamProviderConfig } from '../packages/core/src/team-runtime/providers/gemini.ts';
 import { createOpenAITeamProviderBridge, launchOpenAITeamProviderRun, validateOpenAITeamProviderConfig } from '../packages/core/src/team-runtime/providers/openai.ts';
 import {
   validateScopeLeaseEpoch,
@@ -554,6 +556,140 @@ async function main() {
     assert.ok(atomMap.includes('scripts/validate-team-agents.ts#openai-azure-openai-bridges'));
 
     console.log('[validate-team-agents] ok (openai-azure-openai-bridges)');
+    return;
+  }
+
+  if (taskCase === 'claude-gemini-bridges') {
+    const incompleteClaude = validateClaudeCodeTeamProviderConfig({
+      schemaId: 'atm.claudeCodeTeamProviderConfig.v1',
+      providerId: 'claude-code',
+      sdkId: 'claude-code-editor-subagent',
+      modelId: '',
+      editorCommand: '',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    assert.equal(incompleteClaude.ok, false);
+    assert.deepEqual(incompleteClaude.missingFields, ['modelId', 'editorCommand']);
+    assert.equal(incompleteClaude.rawSecretsLogged, false);
+
+    const incompleteGemini = validateGeminiTeamProviderConfig({
+      schemaId: 'atm.geminiTeamProviderConfig.v1',
+      providerId: 'gemini',
+      sdkId: 'gemini-cli',
+      modelId: '',
+      cliCommand: '',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    assert.equal(incompleteGemini.ok, false);
+    assert.deepEqual(incompleteGemini.missingFields, ['modelId', 'cliCommand']);
+    assert.equal(incompleteGemini.rawSecretsLogged, false);
+
+    const claudeBridge = createClaudeCodeTeamProviderBridge({
+      schemaId: 'atm.claudeCodeTeamProviderConfig.v1',
+      providerId: 'claude-code',
+      sdkId: 'claude-code-editor-subagent',
+      modelId: 'claude-opus-4',
+      editorCommand: 'claude',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    const geminiBridge = createGeminiTeamProviderBridge({
+      schemaId: 'atm.geminiTeamProviderConfig.v1',
+      providerId: 'gemini',
+      sdkId: 'gemini-cli',
+      modelId: 'gemini-2.5-pro',
+      cliCommand: 'gemini',
+      roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1'
+    });
+    assert.equal(claudeBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(geminiBridge.schemaId, 'atm.teamProviderContract.v1');
+    assert.equal(claudeBridge.configValidation.ok, true);
+    assert.equal(geminiBridge.configValidation.ok, true);
+    assert.ok(claudeBridge.metadata.supportedRuntimeModes.includes('editor-subagent'));
+    assert.ok(geminiBridge.metadata.supportedRuntimeModes.includes('editor-subagent'));
+
+    const policy = createDefaultTeamPermissionPolicy();
+    const claudeRun = launchClaudeCodeTeamProviderRun({
+      bridge: claudeBridge,
+      request: {
+        taskId: 'TASK-TEAM-0043',
+        role: 'implementer',
+        runtimeMode: 'editor-subagent',
+        providerId: 'claude-code',
+        sdkId: 'claude-code-editor-subagent',
+        modelId: 'claude-opus-4'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/claude-code.ts'],
+      permissionLeases: ['exec.validator'],
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    const geminiRun = launchGeminiTeamProviderRun({
+      bridge: geminiBridge,
+      request: {
+        taskId: 'TASK-TEAM-0043',
+        role: 'validator',
+        runtimeMode: 'editor-subagent',
+        providerId: 'gemini',
+        sdkId: 'gemini-cli',
+        modelId: 'gemini-2.5-pro'
+      },
+      permissionPolicy: policy,
+      scopedPaths: ['packages/core/src/team-runtime/providers/gemini.ts'],
+      permissionLeases: ['exec.validator'],
+      emittedAt: '2026-07-10T00:00:00.000Z'
+    });
+    for (const run of [claudeRun, geminiRun]) {
+      assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
+      assert.equal(run.ok, true);
+      assert.equal(run.artifact.schemaId, 'atm.teamProviderRunArtifact.v1');
+      assert.equal(run.artifact.runtimeMode, 'editor-subagent');
+      assert.equal(run.artifact.roleEnvelope.schemaId, 'atm.teamEditorSubagentRoleEnvelope.v1');
+      assert.equal(run.artifact.roleEnvelope.coordinatorOwnedAuthority, true);
+      assert.ok(run.artifact.roleEnvelope.allowedFiles.length > 0);
+      assert.ok(run.artifact.roleEnvelope.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+      assert.equal(run.artifact.permissionDecision.ok, true);
+      assert.equal(run.artifact.redaction.rawSecretsLogged, false);
+      assert.equal(run.artifact.observabilityEventCount, 3);
+      assert.deepEqual(run.observabilityEvents.map((event) => event.eventType), [
+        'session.start',
+        'artifact.output',
+        'session.complete'
+      ]);
+      assert.ok(run.observabilityEvents.every((event) => event.schemaId === 'atm.teamAgentObservabilityEvent.v1'));
+      assert.ok(run.observabilityEvents.every((event) => event.redaction.rawSecretsLogged === false));
+      assert.ok(run.observabilityEvents.every((event) => event.evidenceBoundary.rawSecretsAllowed === false));
+    }
+    assert.equal(claudeRun.artifact.artifactType, geminiRun.artifact.artifactType);
+    assert.equal(claudeRun.artifact.roleEnvelope.executionSurface, 'editor-subagent');
+    assert.equal(geminiRun.artifact.roleEnvelope.executionSurface, 'cli-style');
+
+    const bridgeSummary = buildEditorExecutionRuntimeBridgeSummary();
+    assert.equal(bridgeSummary.schemaId, 'atm.editorExecutionRuntimeBridgeSummary.v1');
+    assert.deepEqual(bridgeSummary.providerIds, ['claude-code', 'gemini']);
+    assert.equal(bridgeSummary.sharedProviderInterface, 'atm.teamProviderContract.v1');
+    assert.equal(bridgeSummary.roleEnvelopeSchemaId, 'atm.teamEditorSubagentRoleEnvelope.v1');
+    assert.ok(bridgeSummary.brokerConflictVocabulary.includes('broker-conflict-blocked'));
+    assert.ok(bridgeSummary.bridges.every((bridge) => bridge.rawSecretsLogged === false));
+
+    const planResult = await runTeam(['plan', '--task', 'TASK-TEAM-0043', '--cwd', process.cwd(), '--json']);
+    const planBridgeSummary = (planResult.evidence as any)?.teamPlan?.editorExecutionRuntimeBridges;
+    const findings = (planResult.evidence as any)?.teamPlan?.validation?.findings ?? [];
+    const onlyBrokerAdmissionFinding = findings.length <= 1
+      && findings.every((finding: any) => ['blocked-broker-cid-conflict', 'blocked-cid-conflict'].includes(finding?.code));
+    assert.equal(planResult.ok === true || onlyBrokerAdmissionFinding, true, 'plan may be blocked only by active broker admission while validating Claude/Gemini bridge wiring');
+    assert.equal(planBridgeSummary?.schemaId, 'atm.editorExecutionRuntimeBridgeSummary.v1');
+    assert.deepEqual(planBridgeSummary?.providerIds, ['claude-code', 'gemini']);
+
+    const vendorRuntimeDoc = readFileSync(path.join(process.cwd(), 'docs', 'governance', 'team-agents', 'team-vendor-runtime.md'), 'utf8');
+    assert.ok(vendorRuntimeDoc.includes('atm.claudeCodeTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.geminiTeamProviderConfig.v1'));
+    assert.ok(vendorRuntimeDoc.includes('atm.teamEditorSubagentRoleEnvelope.v1'));
+    const atomMap = readFileSync(path.join(process.cwd(), 'atomic_workbench', 'atomization-coverage', 'path-to-atom-map.json'), 'utf8');
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/claude-code.ts'));
+    assert.ok(atomMap.includes('packages/core/src/team-runtime/providers/gemini.ts'));
+    assert.ok(atomMap.includes('scripts/validate-team-agents.ts#claude-gemini-bridges'));
+
+    console.log('[validate-team-agents] ok (claude-gemini-bridges)');
     return;
   }
 

@@ -2172,11 +2172,46 @@
       "capability": "Validator case proving OpenAI and Azure OpenAI config validation, real-agent launch through atm.teamProviderContract.v1, shared artifact envelope, observability events, broker permission checks, docs coverage, and atom map coverage.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0042"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/claude-code.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Claude Code editor-subagent Team execution bridge with config validation, normalized role envelope, broker-checked launch permission, shared atm.teamProviderRunArtifact.v1 output, and raw-secret-free observability events.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "packages/core/src/team-runtime/providers/gemini.ts",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Gemini CLI-style Team execution bridge preserving editor-subagent runtime semantics, role-envelope normalization, broker permission checks, shared provider artifacts, and redacted observability.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildEditorExecutionRuntimeBridgeSummary",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Team plan projection for Claude Code and Gemini execution bridge descriptors, including role-envelope schema, broker-checked permissions, observability event types, and M8E shared Broker vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "docs/governance/team-agents/team-vendor-runtime.md#claude-code-and-gemini-execution-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Documents Claude Code and Gemini execution bridge config boundaries, shared editor-subagent role envelope, provider run artifact, secret redaction, broker permission enforcement, and broker-conflict-blocked vocabulary.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#claude-gemini-bridges",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Validator case proving Claude Code and Gemini config validation, editor execution launch through atm.teamProviderContract.v1, shared artifact envelope, role-envelope normalization, observability events, broker permission checks, docs coverage, and atom map coverage.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0043"
     }
   ],
   "summary": {
-    "total_production_paths": 205,
-    "mapped_paths": 205,
+    "total_production_paths": 210,
+    "mapped_paths": 210,
     "coverage_percentage": 100,
     "atoms_defined": 113,
     "atoms_with_evidence": 0,

@@ -52,6 +52,34 @@ operator-facing message must reuse `decisionClass`, `decisionReason`,
 `violationStatus`, and `broker-conflict-blocked`, and point to the governed
 resolution artifact rather than local runtime edits.
 
+## Claude Code and Gemini Execution Bridges
+
+M9I also includes two editor execution bridges under the same
+`atm.teamProviderContract.v1` interface:
+
+- `claude-code` uses `atm.claudeCodeTeamProviderConfig.v1`. Required fields
+  are `modelId`, `editorCommand`, and
+  `roleEnvelopeSchemaId: atm.teamEditorSubagentRoleEnvelope.v1`.
+- `gemini` uses `atm.geminiTeamProviderConfig.v1`. Required fields are
+  `modelId`, `cliCommand`, and
+  `roleEnvelopeSchemaId: atm.teamEditorSubagentRoleEnvelope.v1`.
+
+Both bridges run as `editor-subagent` Team provider sessions, but they preserve
+different execution surfaces in the role envelope: Claude Code records
+`editor-subagent`, while Gemini records `cli-style`. The normalized
+`atm.teamEditorSubagentRoleEnvelope.v1` envelope keeps `taskId`, `role`,
+`providerId`, `sdkId`, `modelId`, allowed files, permission leases, and
+coordinator-owned authority together before any provider work begins.
+
+Claude Code and Gemini bridges emit the shared
+`atm.teamProviderRunArtifact.v1` artifact and the shared
+`atm.teamAgentObservabilityEvent.v1` sequence: `session.start`,
+`artifact.output`, and `session.complete`. They do not log raw secrets, do not
+grant themselves `git.write`, `task.lifecycle`, or close authority, and must
+route blocked work through the same `decisionClass`, `decisionReason`,
+`violationStatus`, and `broker-conflict-blocked` vocabulary used by the M8E
+Team Broker lane.
+
 ## Provider Selection
 
 - Repo defaults provide the baseline provider, SDK, model, and runtime mode.
