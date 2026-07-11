@@ -247,8 +247,21 @@ async function runNodeScriptTest(spec: NodeScriptTestSpec): Promise<NodeScriptTe
   });
 }
 
-async function runNodeScriptTestsInParallel(specs: NodeScriptTestSpec[]) {
-  const results = await Promise.all(specs.map((spec) => runNodeScriptTest(spec)));
+async function runNodeScriptTestsInParallel(specs: NodeScriptTestSpec[], concurrency = specs.length) {
+  if (specs.length === 0) {
+    console.error(`[cli:${mode}] focused tests ok: none registered`);
+    return;
+  }
+  const results: NodeScriptTestResult[] = [];
+  let nextIndex = 0;
+  const workerCount = Math.max(1, Math.min(concurrency, specs.length));
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < specs.length) {
+      const spec = specs[nextIndex];
+      nextIndex += 1;
+      results.push(await runNodeScriptTest(spec));
+    }
+  }));
   const failed = results.filter((result) => result.status !== 0 || result.errorMessage);
   if (failed.length > 0) {
     for (const result of failed) {
@@ -261,28 +274,6 @@ async function runNodeScriptTestsInParallel(specs: NodeScriptTestSpec[]) {
     .map((result) => `${result.name}=${formatDuration(result.durationMs)}`)
     .join(', ');
   console.error(`[cli:${mode}] parallel focused tests ok: ${timings}`);
-}
-
-async function runAtmFrozenSpawned(args: any, cwd = root, env: Record<string, string> = {}) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.mjs'), ...args], {
-    cwd,
-    encoding: 'utf8',
-    env: { ...process.env, ...env }
-  });
-  if ((result.error as NodeJS.ErrnoException | undefined)?.code === 'EPERM') {
-    console.error(`[cli:${mode}] warning: ${sandboxEpermHint(args, cwd)}`);
-    return runAtmInProcess(args, cwd, env);
-  }
-  const payload = (result.stdout || result.stderr || '').trim();
-  const parsed: any = payload || !args.includes('--output-json')
-    ? parseCliJsonFromStreams(result.stdout ?? '', result.stderr ?? '', args)
-    : {};
-  return {
-    exitCode: result.status ?? 0,
-    stdout: result.stdout,
-    stderr: result.stderr,
-    parsed
-  };
 }
 
 async function runAtmInProcess(args: any, cwd = root, env: Record<string, string> = {}) {
@@ -489,8 +480,9 @@ assert(teamUsageText.includes('--dry-run'), 'team --help must document advisory 
 
 logProgress('focused regression subprocess tests');
 // Keep default validate:cli below 30 seconds. Add low-cost, parallel-safe CLI
-// regressions to the fast batch; route slower temp-workspace fixtures to the
-// full-only batch so validate:cli:full preserves coverage without taxing hooks.
+// regressions to the fast batch. Git/hook-heavy regressions stay as targeted
+// direct tests so validate:cli:full can exercise the integration workspace
+// without creating Windows branch-queue and hook contention against itself.
 const fastFocusedRegressionTests: NodeScriptTestSpec[] = [
   {
     name: 'lifecycle-state',
@@ -538,34 +530,7 @@ const fastFocusedRegressionTests: NodeScriptTestSpec[] = [
   }
 ];
 
-const fullOnlyFocusedRegressionTests: NodeScriptTestSpec[] = [
-  {
-    name: 'historical-delivery',
-    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')
-  },
-  {
-    name: 'git-commit-failure-residue-rollback',
-    scriptPath: path.join(root, 'tests/cli/git-commit-failure-residue-rollback.test.ts')
-  },
-  {
-    name: 'git-commit-timeout-and-status',
-    scriptPath: path.join(root, 'tests/cli/git-commit-timeout-and-status.test.ts')
-  },
-  {
-    name: 'git-record-commit',
-    scriptPath: path.join(root, 'tests/cli/git-record-commit.test.ts')
-  },
-  {
-    name: 'validate-cli-close-gate',
-    scriptPath: path.join(root, 'tests/cli/validate-cli-close-gate.test.ts')
-  }
-];
-
 await runNodeScriptTestsInParallel(fastFocusedRegressionTests);
-if (!fastOnly && !surfaceOnly) {
-  logProgress('full-only focused regression subprocess tests');
-  await runNodeScriptTestsInParallel(fullOnlyFocusedRegressionTests);
-}
 
 // TASK-AAO-0156: --defer-foreign-staged must not evict another task's
 // staged .atm/history ownership from the shared index.
@@ -800,15 +765,14 @@ try {
   assert(initDryRun.parsed.evidence.adoptedAt, 'init --adopt --dry-run must report adoptedAt');
   assert(initDryRun.parsed.evidence.dryRun === true, 'init --adopt --dry-run must report dryRun=true');
 
+  logProgress('onboarding and ATMChart fixtures');
   const atmChartRepo = path.join(tempRoot, 'atm-chart-repo');
   mkdirSync(atmChartRepo, { recursive: true });
   initializeGitRepository(atmChartRepo);
-  // Keep ATMChart / onboarding validation process-isolated so command-level
-  // root and cwd resolution cannot inherit earlier in-process CLI state.
-  const atmChartBootstrap = await runAtmFrozenSpawned(['bootstrap', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const atmChartBootstrap = await runAtm(['bootstrap', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartBootstrap.exitCode === 0, 'bootstrap must exit 0 before ATMChart render');
 
-  const atmChartRender = await runAtmFrozenSpawned(['atm-chart', 'render', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const atmChartRender = await runAtm(['atm-chart', 'render', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartRender.exitCode === 0, 'atm-chart render must exit 0 after bootstrap');
   assertReadable(atmChartRender, 'atm-chart');
   assert(atmChartRender.parsed.ok === true, 'atm-chart render must report ok=true');
@@ -816,25 +780,25 @@ try {
   assert(existsSync(path.join(atmChartRepo, '.atm/memory/atm-chart.md')), 'atm-chart render must write .atm/memory/atm-chart.md');
   assertMessageCode(atmChartRender, 'ATM_CHART_RENDERED');
 
-  const atmChartVerify = await runAtmFrozenSpawned(['atm-chart', 'verify', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const atmChartVerify = await runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartVerify.exitCode === 0, 'atm-chart verify must exit 0 immediately after render');
   assertReadable(atmChartVerify, 'atm-chart');
   assert(atmChartVerify.parsed.ok === true, 'atm-chart verify must report ok=true when fresh');
   assertMessageCode(atmChartVerify, 'ATM_CHART_VERIFY_OK');
 
-  const atmChartVersionVerify = await runAtmFrozenSpawned(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const atmChartVersionVerify = await runAtm(['atm-chart', 'verify', '--version-check', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartVersionVerify.exitCode === 0, 'atm-chart verify --version-check must exit 0 for default rendered chart');
   assertReadable(atmChartVersionVerify, 'atm-chart');
   assert(atmChartVersionVerify.parsed.evidence.versionCompatibility.status === 'supported', 'atm-chart verify --version-check must report supported status');
   assertMessageCode(atmChartVersionVerify, 'ATM_CHART_VERSION_CHECK_OK');
 
-  const agentPackList = await runAtmFrozenSpawned(['agent-pack', 'list', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const agentPackList = await runAtm(['agent-pack', 'list', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackList.exitCode === 0, 'agent-pack list must exit 0');
   assertReadable(agentPackList, 'agent-pack');
   assert(agentPackList.parsed.ok === true, 'agent-pack list must report ok=true');
   assert(Array.isArray(agentPackList.parsed.evidence.installedPacks), 'agent-pack list must report installedPacks array');
 
-  const agentPackInstall = await runAtmFrozenSpawned(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const agentPackInstall = await runAtm(['agent-pack', 'install', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackInstall.exitCode === 0, 'agent-pack install --id must exit 0 after bootstrap');
   assertReadable(agentPackInstall, 'agent-pack');
   assert(agentPackInstall.parsed.ok === true, 'agent-pack install --id must report ok=true');
@@ -842,13 +806,13 @@ try {
   assert(existsSync(path.join(atmChartRepo, '.atm/agent-pack/claude-code.manifest.json')), 'agent-pack install must write the pack manifest');
   assertMessageCode(agentPackInstall, 'ATM_AGENT_PACK_INSTALL');
 
-  const agentPackVerifyFresh = await runAtmFrozenSpawned(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const agentPackVerifyFresh = await runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackVerifyFresh.exitCode === 0, 'agent-pack verify-fresh must exit 0 immediately after install');
   assertReadable(agentPackVerifyFresh, 'agent-pack');
   assert(agentPackVerifyFresh.parsed.ok === true, 'agent-pack verify-fresh must report ok=true when fresh');
   assertMessageCode(agentPackVerifyFresh, 'ATM_AGENT_PACK_VERIFY_FRESH_OK');
 
-  const welcomeDryRun = await runAtmFrozenSpawned(['welcome', '--cwd', atmChartRepo, '--dry-run', '--json'], atmChartRepo);
+  const welcomeDryRun = await runAtm(['welcome', '--cwd', atmChartRepo, '--dry-run', '--json'], atmChartRepo);
   assert(welcomeDryRun.exitCode === 0, 'welcome --dry-run must exit 0 after ATMChart render');
   assertReadable(welcomeDryRun, 'welcome');
   assert(welcomeDryRun.parsed.ok === true, 'welcome --dry-run must report ok=true');
@@ -862,7 +826,7 @@ try {
   assertMessageCode(welcomeDryRun, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
   assert(welcomeDryRun.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'welcome --dry-run must recommend editor integration install when none are present');
 
-  const welcome = await runAtmFrozenSpawned(['welcome', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const welcome = await runAtm(['welcome', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(welcome.exitCode === 0, 'welcome must exit 0 after ATMChart render');
   assertReadable(welcome, 'welcome');
   assert(welcome.parsed.ok === true, 'welcome must report ok=true');
@@ -873,7 +837,7 @@ try {
   assertMessageCode(welcome, 'ATM_WELCOME_READY');
   assertMessageCode(welcome, 'ATM_WELCOME_INTEGRATION_INSTALL_RECOMMENDED');
 
-  const nextAfterWelcome = await runAtmFrozenSpawned(['next', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const nextAfterWelcome = await runAtm(['next', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assertReadable(nextAfterWelcome, 'next');
   assert(nextAfterWelcome.parsed.evidence.agent_pack_hint != null, 'next must surface agent_pack_hint');
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.slashCommandId === 'string', 'agent_pack_hint must have slashCommandId');
@@ -881,7 +845,7 @@ try {
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.command === 'string', 'agent_pack_hint must have command');
   assert(typeof nextAfterWelcome.parsed.evidence.agent_pack_hint.reason === 'string', 'agent_pack_hint must have reason');
 
-  const welcomeDoctor = await runAtmFrozenSpawned(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const welcomeDoctor = await runAtm(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assertReadable(welcomeDoctor, 'doctor');
   const onboardingCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
   const versionCheck = welcomeDoctor.parsed.evidence.checks.find((check: any) => check.name === 'version-compatibility');
@@ -894,7 +858,7 @@ try {
   assert(welcomeDoctor.parsed.evidence.integrationBootstrap.needsInstallHint === true, 'doctor must recommend editor integration install when none are present');
 
   writeHostPackageLockSignals(atmChartRepo);
-  const packageLockHostDoctor = await runAtmFrozenSpawned(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const packageLockHostDoctor = await runAtm(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(packageLockHostDoctor.exitCode === 0, 'doctor must stay green for host repos that happen to use package-lock');
   assertReadable(packageLockHostDoctor, 'doctor');
   assert(packageLockHostDoctor.parsed.ok === true, 'doctor must report ok=true for package-lock host repos');
@@ -909,17 +873,17 @@ try {
   guards.guards[0].summary = `${guards.guards[0].summary} (drift)`;
   writeFileSync(guardsPath, `${JSON.stringify(guards, null, 2)}\n`, 'utf8');
 
-  const atmChartStale = await runAtmFrozenSpawned(['atm-chart', 'verify', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const atmChartStale = await runAtm(['atm-chart', 'verify', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(atmChartStale.exitCode === 2, 'atm-chart verify must exit 2 when source guards drift');
   assert(atmChartStale.parsed.ok === false, 'atm-chart verify must report ok=false when stale');
   assertMessageCode(atmChartStale, 'ATM_CHART_STALE');
 
-  const agentPackStale = await runAtmFrozenSpawned(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const agentPackStale = await runAtm(['agent-pack', 'verify-fresh', '--id', 'claude-code', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(agentPackStale.exitCode === 2, 'agent-pack verify-fresh must exit 2 when source guards drift');
   assert(agentPackStale.parsed.ok === false, 'agent-pack verify-fresh must report ok=false when stale');
   assertMessageCode(agentPackStale, 'ATM_AGENT_PACK_STALE');
 
-  const staleDoctor = await runAtmFrozenSpawned(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
+  const staleDoctor = await runAtm(['doctor', '--cwd', atmChartRepo, '--json'], atmChartRepo);
   assert(staleDoctor.exitCode === 1, 'doctor must fail when onboarding ATMChart is stale');
   assertReadable(staleDoctor, 'doctor');
   const staleOnboardingCheck = staleDoctor.parsed.evidence.checks.find((check: any) => check.name === 'onboarding-lifecycle');
@@ -948,6 +912,7 @@ try {
   assert(validateTaxonomy.parsed.evidence.taxonomy['validate:neutrality'].scope === 'global-advisory', 'neutrality must default to global-advisory when no protected files touched');
   assertMessageCode(validateTaxonomy, 'ATM_VALIDATE_TAXONOMY_OK');
 
+  logProgress('integration adapter fixtures');
   const integrationRepo = path.join(tempRoot, 'integration-repo');
   mkdirSync(integrationRepo, { recursive: true });
   const integrationList = await runAtm(['integration', 'list', '--cwd', integrationRepo], integrationRepo);
@@ -1106,6 +1071,7 @@ try {
   const staleRemediation = staleIntegrationDoctor.parsed.evidence.integrationDriftRemediation;
   assert(staleRemediation.failedAdapters.some((entry: any) => entry.adapterId === 'claude-code' && entry.reinstallCommand === 'node atm.mjs integration add claude-code --force --json'), 'doctor stale parity remediation must keep precise reinstall command');
 
+  logProgress('spec and verification fixtures');
   const validSpecPath = path.join(root, fixture.validAtomicSpec);
   const validateSpec = await runAtm(['validate', '--spec', validSpecPath], blankRepo);
   assert(validateSpec.exitCode === 0, 'validate --spec valid fixture must exit 0');
@@ -1145,6 +1111,7 @@ try {
   assert(specValidateMissing.parsed.ok === false, 'spec --validate missing fixture must report ok=false');
   assertMessageCode(specValidateMissing, 'ATM_SPEC_NOT_FOUND');
 
+  logProgress('bootstrap and verify fixtures');
   const bootstrapRepo = path.join(tempRoot, 'bootstrap-repo');
   mkdirSync(bootstrapRepo, { recursive: true });
   const bootstrap = await runAtm(['bootstrap', '--cwd', bootstrapRepo, '--task', 'Bootstrap ATM self-hosting alpha'], bootstrapRepo);
@@ -1187,6 +1154,7 @@ try {
   assert(Array.isArray(verifyGuardsMissing.parsed.evidence.missingJustifications), 'verify --guards missing-justification must list missingJustifications');
   assert(verifyGuardsMissing.parsed.evidence.missingJustifications.includes('evidence-after-change'), 'verify --guards missing-justification must name the offending guardId');
 
+  logProgress('upgrade and review fixtures');
   const upgradePass = await runAtm([
     'upgrade',
     '--propose',
