@@ -488,17 +488,13 @@ assert(teamUsageText.includes('team knowledge query'), 'team --help examples mus
 assert(teamUsageText.includes('--dry-run'), 'team --help must document advisory knowledge dry-run');
 
 logProgress('focused regression subprocess tests');
-// Keep new spawned/temp-workspace CLI regressions in this parallel batch when
-// they do not require shared integration state. The default validate:cli budget
-// is under 30 seconds; long sequential fixtures belong in validate:cli:full.
-await runNodeScriptTestsInParallel([
+// Keep default validate:cli below 30 seconds. Add low-cost, parallel-safe CLI
+// regressions to the fast batch; route slower temp-workspace fixtures to the
+// full-only batch so validate:cli:full preserves coverage without taxing hooks.
+const fastFocusedRegressionTests: NodeScriptTestSpec[] = [
   {
     name: 'lifecycle-state',
     scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts')
-  },
-  {
-    name: 'historical-delivery',
-    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')
   },
   {
     name: 'emergency-gate',
@@ -509,20 +505,8 @@ await runNodeScriptTestsInParallel([
     scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts')
   },
   {
-    name: 'git-commit-failure-residue-rollback',
-    scriptPath: path.join(root, 'tests/cli/git-commit-failure-residue-rollback.test.ts')
-  },
-  {
     name: 'git-commit-closeout-only-preflight',
     scriptPath: path.join(root, 'tests/cli/git-commit-closeout-only-preflight.test.ts')
-  },
-  {
-    name: 'git-commit-timeout-and-status',
-    scriptPath: path.join(root, 'tests/cli/git-commit-timeout-and-status.test.ts')
-  },
-  {
-    name: 'git-record-commit',
-    scriptPath: path.join(root, 'tests/cli/git-record-commit.test.ts')
   },
   {
     name: 'validator-run-resume-and-status',
@@ -549,14 +533,39 @@ await runNodeScriptTestsInParallel([
     scriptPath: path.join(root, 'tests/cli/validate-cli-historical-delivery.test.ts')
   },
   {
-    name: 'validate-cli-close-gate',
-    scriptPath: path.join(root, 'tests/cli/validate-cli-close-gate.test.ts')
-  },
-  {
     name: 'closure-required-gates-contract',
     scriptPath: path.join(root, 'tests/cli/closure-required-gates-contract.test.ts')
   }
-]);
+];
+
+const fullOnlyFocusedRegressionTests: NodeScriptTestSpec[] = [
+  {
+    name: 'historical-delivery',
+    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')
+  },
+  {
+    name: 'git-commit-failure-residue-rollback',
+    scriptPath: path.join(root, 'tests/cli/git-commit-failure-residue-rollback.test.ts')
+  },
+  {
+    name: 'git-commit-timeout-and-status',
+    scriptPath: path.join(root, 'tests/cli/git-commit-timeout-and-status.test.ts')
+  },
+  {
+    name: 'git-record-commit',
+    scriptPath: path.join(root, 'tests/cli/git-record-commit.test.ts')
+  },
+  {
+    name: 'validate-cli-close-gate',
+    scriptPath: path.join(root, 'tests/cli/validate-cli-close-gate.test.ts')
+  }
+];
+
+await runNodeScriptTestsInParallel(fastFocusedRegressionTests);
+if (!fastOnly && !surfaceOnly) {
+  logProgress('full-only focused regression subprocess tests');
+  await runNodeScriptTestsInParallel(fullOnlyFocusedRegressionTests);
+}
 
 // TASK-AAO-0156: --defer-foreign-staged must not evict another task's
 // staged .atm/history ownership from the shared index.
