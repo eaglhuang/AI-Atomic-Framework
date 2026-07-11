@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T12-44-57-723Z-close-2748a22d9b11",
+  "taskId": "TASK-TEAM-0066",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Sol",
+  "sessionId": "session-20260711123811-Codex-GPT5.6-Sol-TASK-TEAM-0066-54b1edc4b8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0066.json",
+  "taskSha256": "sha256:42440ac067f1da3a067fac1df35fff27c0055b54d4afb5e0353e02aa54436475",
+  "createdAt": "2026-07-11T12:44:57.723Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0066 --actor \"Codex-GPT5.6 Sol\" --status done --historical-delivery c145f244c13d2c3b46ab6caa205d0a4cfb4d8250",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711123811-Codex-GPT5.6-Sol-TASK-TEAM-0066-54b1edc4b8",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0066.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T12:44:57.708Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0066.*",
+        ".atm/history/task-events/TASK-TEAM-0066/**",
+        ".atm/history/tasks/TASK-TEAM-0066.json",
+        "docs/governance/team-agents/paid-multi-vendor-live-dogfood.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

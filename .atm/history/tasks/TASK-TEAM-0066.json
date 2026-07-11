@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0066",
+  "title": "Paid OpenAI and Anthropic Team Agents live dogfood",
+  "status": "done",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0053"
+  ],
+  "acceptance": [
+    "The L5 plan is admitted without `broker-conflict-blocked`.",
+    "A real paid run invokes both OpenAI and Anthropic provider backends.",
+    "OpenAI owns Coordinator and Review Agent roles; Anthropic owns Implementer.",
+    "The report records the Team run id, provider/model assignments, per-role success or failure, governance fields, and `rawSecretsLogged: false`.",
+    "No raw secret appears in CLI output, artifacts, the report, or tracked files.",
+    "Any live defect is reported as a separate follow-up task instead of widening this evidence-only task."
+  ],
+  "deliverables": [
+    "docs/governance/team-agents/paid-multi-vendor-live-dogfood.md"
+  ],
+  "scopePaths": [
+    "docs/governance/team-agents/paid-multi-vendor-live-dogfood.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:team-agents",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Any provider implementation change",
+    "Committing or printing raw provider secrets",
+    "Live paid API calls in CI"
+  ],
+  "nonGoals": [
+    "Do not reopen TASK-TEAM-0053",
+    "Do not grant worker roles task.lifecycle, git.write, evidence.write, or self-close authority"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the redacted live dogfood report and ATM closure evidence.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0066-paid-multi-vendor-live-dogfood.task.md",
+    "sectionTitle": "TASK-TEAM-0066",
+    "headingLine": 39,
+    "hash": "7ac7575924cb16c5"
+  },
+  "importedAt": "2026-07-11T11:27:02.865Z",
+  "lastTransitionId": "2026-07-11T12-44-57-723Z-close-2748a22d9b11",
+  "lastTransitionAt": "2026-07-11T12:44:57.723Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Sol",
+  "reservedAt": "2026-07-11T12:38:11.924Z",
+  "promotedAt": "2026-07-11T12:38:11.927Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Sol",
+    "leaseId": "lease-3aebcbe1b264",
+    "claimedAt": "2026-07-11T12:38:11.931Z",
+    "heartbeatAt": "2026-07-11T12:44:57.719Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0066.json",
+      ".atm/history/evidence/TASK-TEAM-0066.*",
+      ".atm/history/task-events/TASK-TEAM-0066/**",
+      "docs/governance/team-agents/paid-multi-vendor-live-dogfood.md"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-11T11:27:05.334Z",
+  "startedByActor": "Codex-GPT5.5",
+  "startedBySessionId": "session-20260711123811-Codex-GPT5.6-Sol-TASK-TEAM-0066-54b1edc4b8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0066",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0066.*",
+      ".atm/history/task-events/TASK-TEAM-0066/**",
+      ".atm/history/tasks/TASK-TEAM-0066.json",
+      "docs/governance/team-agents/paid-multi-vendor-live-dogfood.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "588b4d49c018bcb0c8a049734edb9c80bae52fd3fe2ac19ed159d3a105dcb2f9",
+    "actorId": "Codex-GPT5.6 Sol",
+    "createdAt": "2026-07-11T12:38:13.851Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-11T12:44:57.719Z",
+  "closedByActor": "Codex-GPT5.6 Sol",
+  "closedBySessionId": "session-20260711123811-Codex-GPT5.6-Sol-TASK-TEAM-0066-54b1edc4b8",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0066.closure-packet.json"
+}
