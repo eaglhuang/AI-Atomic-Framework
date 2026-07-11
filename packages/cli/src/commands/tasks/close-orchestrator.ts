@@ -17,6 +17,7 @@ import {
   inspectFrameworkCloseWorktree,
   registerCloseCommitWindow,
   requireTargetRepoClosureAuthority,
+  requiredValidationPassesForClosure,
   type ClosurePacket,
   validateClosurePacket,
   writeClosurePacket
@@ -493,6 +494,7 @@ export async function runTasksClose(argv: string[]) {
     closurePacket = packet;
     closurePacketPath = existingClosurePacketPath;
   } else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
+    const closePacketChangedFiles = deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
     pendingClosurePacket = createClosurePacket({
       cwd: options.cwd,
       taskId: options.taskId,
@@ -504,8 +506,8 @@ export async function runTasksClose(argv: string[]) {
           ...historicalBatchSlice.taskSpecificValidationPasses,
           ...historicalBatchSlice.batchWideValidationPasses
         ])
-        : frameworkStatus.requiredGates,
-      changedFiles: deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles,
+        : requiredValidationPassesForClosure(frameworkStatus.requiredGates, closePacketChangedFiles),
+      changedFiles: closePacketChangedFiles,
       frameworkStatus,
       validationPasses: historicalBatchSlice?.okToCloseTask === true
         ? uniqueStrings([

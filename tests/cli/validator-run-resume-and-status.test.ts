@@ -50,7 +50,7 @@ function writeJson(filePath: string, value: unknown): void {
   writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-const filterValidators = 'validate-terminology,validate-neutrality-scanner';
+const filterValidators = 'validate-terminology,validate-product-charter';
 const runId = `opt11-test-resume-${process.pid}`;
 const timeoutRunId = `opt11-test-timeout-${process.pid}`;
 const runDir = path.join(runsRoot, runId);
@@ -80,10 +80,10 @@ try {
   // --- Scenario 3: simulate an interruption by resetting one receipt to
   // 'pending' (as if the process were killed before that validator finished),
   // then confirm --status sees it as outstanding and --resume only re-runs it.
-  const neutralityReceiptPath = path.join(runDir, 'receipts', 'validate-neutrality-scanner.json');
-  const neutralityReceiptBeforeReset = readJson(neutralityReceiptPath);
-  writeJson(neutralityReceiptPath, {
-    ...neutralityReceiptBeforeReset,
+  const productCharterReceiptPath = path.join(runDir, 'receipts', 'validate-product-charter.json');
+  const productCharterReceiptBeforeReset = readJson(productCharterReceiptPath);
+  writeJson(productCharterReceiptPath, {
+    ...productCharterReceiptBeforeReset,
     status: 'pending',
     result: undefined,
     attempts: []
@@ -92,8 +92,8 @@ try {
   const interruptedStatus = JSON.parse(runValidators(['standard', '--status', '--run-id', runId]).stdout);
   assert.equal(interruptedStatus.completed, false, 'simulated interruption must report completed: false');
   assert.ok(
-    interruptedStatus.outstandingValidators.includes('validate-neutrality-scanner'),
-    `expected validate-neutrality-scanner to be outstanding, got ${JSON.stringify(interruptedStatus.outstandingValidators)}`
+    interruptedStatus.outstandingValidators.includes('validate-product-charter'),
+    `expected validate-product-charter to be outstanding, got ${JSON.stringify(interruptedStatus.outstandingValidators)}`
   );
   assert.ok(interruptedStatus.resumeCommand, 'interrupted run must surface a resume command');
 
@@ -101,12 +101,12 @@ try {
   assert.equal(resumedRun.status, 0, `resumed run must pass: ${resumedRun.stdout}`);
   const resumedSummary = JSON.parse(resumedRun.stdout);
   const resumedTerminology = resumedSummary.validators.find((entry: any) => entry.name === 'validate-terminology');
-  const resumedNeutrality = resumedSummary.validators.find((entry: any) => entry.name === 'validate-neutrality-scanner');
+  const resumedProductCharter = resumedSummary.validators.find((entry: any) => entry.name === 'validate-product-charter');
   assert.ok(resumedTerminology?.resumedFromReceipt === true, `already-passed validator must be reused from its receipt, not re-run: ${JSON.stringify(resumedTerminology)}`);
   assert.equal(resumedTerminology?.durationMs, 0, 'reused receipt result must report zero duration (it was not re-executed)');
   assert.ok(
-    resumedNeutrality && resumedNeutrality.resumedFromReceipt !== true && resumedNeutrality.ok === true,
-    `outstanding validator must actually re-run and pass: ${JSON.stringify(resumedNeutrality)}`
+    resumedProductCharter && resumedProductCharter.resumedFromReceipt !== true && resumedProductCharter.ok === true,
+    `outstanding validator must actually re-run and pass: ${JSON.stringify(resumedProductCharter)}`
   );
   assert.equal(resumedSummary.failed, 0, 'resumed run must produce a single coherent summary with zero failures');
 

@@ -551,6 +551,10 @@ await runNodeScriptTestsInParallel([
   {
     name: 'validate-cli-close-gate',
     scriptPath: path.join(root, 'tests/cli/validate-cli-close-gate.test.ts')
+  },
+  {
+    name: 'closure-required-gates-contract',
+    scriptPath: path.join(root, 'tests/cli/closure-required-gates-contract.test.ts')
   }
 ]);
 
