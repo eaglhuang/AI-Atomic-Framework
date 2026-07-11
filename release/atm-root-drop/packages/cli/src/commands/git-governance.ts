@@ -1259,6 +1259,42 @@ function isRecordCommitAllowedPath(filePath: string): boolean {
   return false;
 }
 
+function extractRecordCommitTaskOwner(filePath: string): string | null {
+  const normalized = normalizeRelativePath(filePath);
+  const match = normalized.match(/^\.atm\/history\/(?:tasks|task-events|evidence)\/([^/.]+)/i);
+  return match ? match[1].toUpperCase() : null;
+}
+
+function assertRecordCommitSingleTaskOwner(cwd: string, stagedFiles: readonly string[]) {
+  const taskOwnerFiles = new Map<string, string[]>();
+  for (const filePath of stagedFiles) {
+    const ownerTaskId = extractRecordCommitTaskOwner(filePath);
+    if (!ownerTaskId) continue;
+    if (!existsSync(path.join(cwd, '.atm', 'history', 'tasks', `${ownerTaskId}.json`))) continue;
+    taskOwnerFiles.set(ownerTaskId, [...(taskOwnerFiles.get(ownerTaskId) ?? []), filePath]);
+  }
+  if (taskOwnerFiles.size <= 1) return null;
+  const conflicts = Array.from(taskOwnerFiles.entries())
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([conflictTaskId, conflictFiles]) => ({
+      conflictTaskId,
+      conflictFiles: uniqueSorted(conflictFiles),
+      owner: conflictTaskId,
+      surface: 'task-history' as const
+    }));
+  const conflictFiles = uniqueSorted(conflicts.flatMap((conflict) => conflict.conflictFiles));
+  throw new CliError('ATM_CROSS_TASK_MUTATION_BLOCKED', `git record-commit cannot combine low-risk record files owned by multiple tasks. File(s): ${conflictFiles.join(', ')}.`, {
+    exitCode: 1,
+    details: {
+      taskId: null,
+      conflictTaskId: conflicts[0]?.conflictTaskId ?? null,
+      conflictFiles,
+      conflicts,
+      recoveryLane: 'Split record maintenance by task owner, or use the governed closeback/reconcile lane that owns the full cross-task packet.'
+    }
+  });
+}
+
 function runGitRecordCommit(options: ParsedGitOptions) {
   const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
   if (!resolvedActor) {
@@ -1311,6 +1347,7 @@ function runGitRecordCommit(options: ParsedGitOptions) {
       }
     });
   }
+  assertRecordCommitSingleTaskOwner(options.cwd, stagedFiles);
   const actorId = resolvedActor.actorId;
   const trailers = [
     `ATM-Actor: ${actorId}`,
