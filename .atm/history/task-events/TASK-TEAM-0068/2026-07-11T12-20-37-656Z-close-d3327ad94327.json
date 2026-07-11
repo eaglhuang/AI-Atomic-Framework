@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T12-20-37-656Z-close-d3327ad94327",
+  "taskId": "TASK-TEAM-0068",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Sol",
+  "sessionId": "session-20260711121249-Codex-GPT5.6-Sol-TASK-TEAM-0068-63d86fde45",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0068.json",
+  "taskSha256": "sha256:1fe52c7ecf490d03464c07dbfefe7e685d7ee2561f00e73ce1097416365531e8",
+  "createdAt": "2026-07-11T12:20:37.656Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0068 --actor \"Codex-GPT5.6 Sol\" --status done --historical-delivery 43f59df711b6e9251735ce28c31363654d9f1f48",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711121249-Codex-GPT5.6-Sol-TASK-TEAM-0068-63d86fde45",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0068.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T12:20:37.644Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0068.*",
+        ".atm/history/task-events/TASK-TEAM-0068/**",
+        ".atm/history/tasks/TASK-TEAM-0068.json",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0068",
+  "title": "Forward governed task scope to direct provider bridges",
+  "status": "done",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0067"
+  ],
+  "acceptance": [
+    "Team direct-provider execution forwards the task's normalized allowed files to concrete bridge permission checks and request metadata.",
+    "The permission broker policy remains unchanged and continues to reject an actually empty scope.",
+    "A deterministic injected-executor regression proves non-empty scoped paths admit OpenAI and Anthropic bridge execution without paid calls."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts --case direct-provider-scoped-path-forwarding",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing permission broker policy",
+    "Changing provider HTTP request formats",
+    "Committing local API credentials"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert scoped path forwarding and its deterministic bridge regression together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0068-direct-provider-scoped-path-forwarding.task.md",
+    "sectionTitle": "TASK-TEAM-0068",
+    "headingLine": 38,
+    "hash": "8a3069e1c0561213"
+  },
+  "importedAt": "2026-07-11T11:57:10.862Z",
+  "lastTransitionId": "2026-07-11T12-20-37-656Z-close-d3327ad94327",
+  "lastTransitionAt": "2026-07-11T12:20:37.656Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Sol",
+  "reservedAt": "2026-07-11T12:12:49.027Z",
+  "promotedAt": "2026-07-11T12:12:49.030Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Sol",
+    "leaseId": "lease-cbbc3337f38e",
+    "claimedAt": "2026-07-11T12:12:49.034Z",
+    "heartbeatAt": "2026-07-11T12:20:37.654Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0068.json",
+      ".atm/history/evidence/TASK-TEAM-0068.*",
+      ".atm/history/task-events/TASK-TEAM-0068/**",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-11T11:57:17.510Z",
+  "startedByActor": "Codex-GPT5.6 Sol",
+  "startedBySessionId": "session-20260711121249-Codex-GPT5.6-Sol-TASK-TEAM-0068-63d86fde45",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0068",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0068.*",
+      ".atm/history/task-events/TASK-TEAM-0068/**",
+      ".atm/history/tasks/TASK-TEAM-0068.json",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "93ba87bc7a623b59f6feaa748615a5d30e6c7a369be5835222a40dc6347bc280",
+    "actorId": "Codex-GPT5.6 Sol",
+    "createdAt": "2026-07-11T12:12:49.380Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-11T12:20:37.654Z",
+  "closedByActor": "Codex-GPT5.6 Sol",
+  "closedBySessionId": "session-20260711121249-Codex-GPT5.6-Sol-TASK-TEAM-0068-63d86fde45",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0068.closure-packet.json"
+}

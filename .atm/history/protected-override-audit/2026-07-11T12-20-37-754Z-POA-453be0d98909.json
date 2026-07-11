@@ -1,0 +1,30 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-453be0d98909",
+  "recordedAt": "2026-07-11T12:20:37.754Z",
+  "actorId": "Codex-GPT5.6 Sol",
+  "taskId": "TASK-TEAM-0068",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0068 --actor Codex-GPT5.6 Sol --status done --json",
+  "flags": [
+    "--historical-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-TEAM-0068-5ee7b7e5f1",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "taskflow-operator-lane",
+    "protected-backend-surface"
+  ],
+  "touchedFiles": [
+    ".atm/history/evidence/TASK-TEAM-0068.closure-packet.json",
+    ".atm/history/evidence/TASK-TEAM-0068.json",
+    ".atm/history/task-events/TASK-TEAM-0068/2026-07-11T12-20-37-656Z-close-d3327ad94327.json",
+    ".atm/history/tasks/TASK-TEAM-0068.json"
+  ],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T12-20-37-650Z-EMG-TASK-TEAM-0068-5ee7b7e5f1.json",
+  "parentEventId": "POA-4f92f130361f",
+  "repairCandidate": null
+}
