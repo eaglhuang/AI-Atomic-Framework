@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T16-02-00-747Z-close-54aff6b3468a",
+  "taskId": "TASK-TEAM-0073",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260711155859-Codex-GPT5.6-Terra-TASK-TEAM-0073-9cbbc71fb3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0073.json",
+  "taskSha256": "sha256:21e9cdf39b6e853e67def581a8627083cd8c48f99a7d47352d7e919105f8a190",
+  "createdAt": "2026-07-11T16:02:00.747Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0073 --actor \"Codex-GPT5.6 Terra\" --status done --historical-delivery 0b3ea90efce71fb0acdf4774459f137ae7fa3ff4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711155859-Codex-GPT5.6-Terra-TASK-TEAM-0073-9cbbc71fb3",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0073.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T16:02:00.739Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0073.*",
+        ".atm/history/task-events/TASK-TEAM-0073/**",
+        ".atm/history/tasks/TASK-TEAM-0073.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/team-lane.ts",
+        "packages/core/src/team-runtime/observability.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "packages/core/src/team-runtime/providers/anthropic.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "packages/core/src/team-runtime/providers/openai.ts",
+        "scripts/validate-team-agents.ts",
+        "tmp/TASK-TEAM-0073-team-proposal.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/team-lane.ts",
+        "packages/core/src/team-runtime/observability.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "packages/core/src/team-runtime/providers/anthropic.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "packages/core/src/team-runtime/providers/openai.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

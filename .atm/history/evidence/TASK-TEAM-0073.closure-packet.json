@@ -1,0 +1,184 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0073",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "0b3ea90efce71fb0acdf4774459f137ae7fa3ff4",
+  "governedTreeSha": "a23ed5f1e5d21937ec8737fea8e8702278f96852",
+  "targetCommitDelta": {
+    "currentCommitSha": "0b3ea90efce71fb0acdf4774459f137ae7fa3ff4",
+    "parentCommitShas": [
+      "0b3ea90efce71fb0acdf4774459f137ae7fa3ff4"
+    ],
+    "governedTreeSha": "a23ed5f1e5d21937ec8737fea8e8702278f96852",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0073.bundle-manifest.json",
+      ".atm/history/evidence/TASK-TEAM-0073.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/team.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/team-runtime/observability.d.ts",
+      "release/atm-root-drop/packages/core/dist/team-runtime/observability.js",
+      "release/atm-root-drop/packages/core/dist/team-runtime/permission-broker.d.ts",
+      "release/atm-root-drop/packages/core/dist/team-runtime/permission-broker.js",
+      "release/atm-root-drop/packages/core/src/team-runtime/observability.ts",
+      "release/atm-root-drop/packages/core/src/team-runtime/permission-broker.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-team-agents.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:ac60441594ff56f75a7867e2ddccb28bae7f2b85a6e19c70ba689dcbdc7d7287",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case team-handoff-context-budget",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:979f3125c325744f9e6de63849c6108807637971dcd0455b9597e5814f89a84b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-11T16:02:00.739Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0073.*",
+      ".atm/history/task-events/TASK-TEAM-0073/**",
+      ".atm/history/tasks/TASK-TEAM-0073.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "packages/core/src/team-runtime/providers/anthropic.ts",
+      "packages/core/src/team-runtime/providers/gemini-direct.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts",
+      "tmp/TASK-TEAM-0073-team-proposal.json"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/team-runtime/observability.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "packages/core/src/team-runtime/providers/anthropic.ts",
+      "packages/core/src/team-runtime/providers/gemini-direct.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0073.json",
+  "closedAt": "2026-07-11T16:02:00.739Z",
+  "closedByActor": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260711155859-Codex-GPT5.6-Terra-TASK-TEAM-0073-9cbbc71fb3",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0b3ea90efce71fb0acdf4774459f137ae7fa3ff4",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/team.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TEAM-0073.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-28-11-994Z-import-a78df34d77b0.json",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-53-26-710Z-reserve-42f4385a11e0.json",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-53-26-713Z-promote-3e7450e48165.json",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-53-27-245Z-claim-5e3ec7b80dc6.json",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-54-12-454Z-scope-amendment-ee7733a78315.json",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-55-01-052Z-scope-amendment-8e66f29cc54c.json",
+      ".atm/history/task-events/TASK-TEAM-0073/2026-07-11T15-59-00-198Z-claim-a592e4444519.json",
+      ".atm/history/tasks/TASK-TEAM-0073.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
