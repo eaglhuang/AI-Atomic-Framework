@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T11-38-56-352Z-scope-amendment-7e671c398fcc",
+  "taskId": "TASK-TEAM-0067",
+  "action": "scope-amendment",
+  "actorId": "Codex-GPT5.5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0067.json",
+  "taskSha256": "sha256:e3b513646303c010d3469c17edce8066276450ddd9da17bfbdec801a97ce4232",
+  "createdAt": "2026-07-11T11:38:56.352Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0067 --actor Codex-GPT5.5 --add \"packages/core/src/team-runtime/providers/openai.ts,packages/core/src/team-runtime/providers/anthropic.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

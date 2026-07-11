@@ -172,8 +172,30 @@ the reference names and selected surface.
 ## Provider Selection
 
 - Repo defaults provide the baseline provider, SDK, model, and runtime mode.
-- Role overrides may replace those values for implementer, reviewer, validator, planner, or other roles.
+- Explicit global CLI provider, SDK, model, and runtime-mode options override
+  implicit repo defaults.
+- Explicit role overrides replace global values for that role and remain the
+  highest-priority selection source.
 - Selection decisions must remain observable through runtime metadata and operator-facing summaries.
+
+## Runtime Backend Admission
+
+Direct HTTP providers built into the canonical Team provider contract declare
+their `real-agent` backend capability from `TEAM_DIRECT_API_PROVIDER_IDS`.
+This is derived from the existing provider contract and is not a second
+provider registry. OpenAI and Anthropic role execution uses their concrete HTTP
+bridges, loads only named local secret references, and returns normalized Team
+artifacts and observability summaries.
+
+Editor-subagent and external runtime backends remain separate: they must still
+declare `teamRuntimeCapabilities` in an installed integration manifest. An
+editor integration is not a runnable backend merely because its agent pack is
+installed.
+
+`team start --execute` is fail-closed. If no provider role executes, or any
+selected provider role fails, the command returns a non-success result rather
+than presenting a state-only Team run as completed execution. Plain `team
+start` remains the state-only lane.
 
 ## Role Skill-Pack Compatibility
 

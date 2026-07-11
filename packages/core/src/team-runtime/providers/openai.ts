@@ -369,7 +369,7 @@ function stableSessionId(taskId: string, role: string, providerId: TeamProviderI
   return `team-provider:${taskId}:${role}:${providerId}:${modelId}`;
 }
 
-async function defaultHttpJsonExecutor(input: {
+export async function defaultHttpJsonExecutor(input: {
   readonly url: string;
   readonly method: 'POST';
   readonly headers: Record<string, string>;

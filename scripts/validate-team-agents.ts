@@ -11,7 +11,7 @@ import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
-import { TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
+import { TEAM_DIRECT_API_PROVIDER_IDS, TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
 import { TeamProviderRegistry } from '../packages/core/src/team-runtime/provider-registry.ts';
 import { runProviderOrchestration } from '../packages/core/src/team-runtime/execution-orchestrator.ts';
 import { advanceBrokerConflictResolution, createBrokerConflictResolutionArtifact, createDefaultTeamPermissionPolicy, decideBrokerConflictResolutionAdmission, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
@@ -1290,6 +1290,87 @@ async function main() {
     assert.ok(atomMap.includes('scripts/validate-team-agents.ts#integration-capability-wiring'));
 
     console.log('[validate-team-agents] ok (integration-capability-wiring)');
+    return;
+  }
+
+  if (taskCase === 'direct-provider-execute-admission') {
+    const repoDefault = {
+      repoDefault: {
+        providerId: 'openai',
+        sdkId: 'responses',
+        modelId: 'gpt-5-mini',
+        runtimeMode: 'broker-only' as const
+      },
+      roleOverrides: {}
+    };
+    const explicitRuntime = buildTeamRuntimeContract({
+      runtimeMode: 'real-agent',
+      providerId: 'anthropic',
+      sdkId: 'anthropic-messages',
+      modelId: 'claude-test',
+      selectionConfig: repoDefault
+    });
+    assert.equal(explicitRuntime.runtimeMode, 'real-agent');
+    assert.equal(explicitRuntime.providerId, 'anthropic');
+    assert.equal(explicitRuntime.modelId, 'claude-test');
+
+    const roleOverrideRuntime = buildTeamRuntimeContract({
+      runtimeMode: 'real-agent',
+      providerId: 'openai',
+      sdkId: 'responses',
+      modelId: 'global-model',
+      roleName: 'implementer',
+      selectionConfig: {
+        ...repoDefault,
+        roleOverrides: {
+          implementer: {
+            providerId: 'anthropic',
+            sdkId: 'anthropic-messages',
+            modelId: 'role-model',
+            runtimeMode: 'real-agent'
+          }
+        }
+      }
+    });
+    assert.equal(roleOverrideRuntime.providerId, 'anthropic');
+    assert.equal(roleOverrideRuntime.modelId, 'role-model');
+
+    const cwd = createTempWorkspace('atm-direct-provider-admission-');
+    initializeGitRepository(cwd);
+    const readiness = inspectTeamRuntimeBackendCapabilities(cwd);
+    assert.deepEqual(readiness.capabilities.map((entry) => entry.providerId).sort(), [...TEAM_DIRECT_API_PROVIDER_IDS].sort());
+    assert.ok(readiness.capabilities.every((entry) => entry.manifestPath === 'builtin:team-provider-contract'));
+    assert.equal(readiness.startReadiness, 'runtime-backend-declared');
+
+    const taskId = 'TASK-TEAM-DIRECT-EXECUTE';
+    mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
+    mkdirSync(path.join(cwd, 'docs'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: taskId,
+      title: 'Direct provider execute admission fixture',
+      status: 'running',
+      targetRepo: 'AI-Atomic-Framework',
+      scopePaths: ['docs/direct-provider-report.md'],
+      deliverables: ['docs/direct-provider-report.md'],
+      validators: ['validator']
+    }, null, 2)}\n`, 'utf8');
+    writeFileSync(path.join(cwd, 'docs', 'direct-provider-report.md'), '# Fixture\n', 'utf8');
+
+    const zeroExecution = await runTeam(['start', '--task', taskId, '--actor', 'validator', '--cwd', cwd, '--execute', '--json']);
+    assert.equal(zeroExecution.ok, false);
+    assert.ok(zeroExecution.messages.some((entry) => entry.code === 'ATM_TEAM_EXECUTION_BLOCKED'));
+    assert.equal((zeroExecution.evidence as any)?.providerOrchestration?.results?.length, 0);
+
+    const undeclaredEditorBackend = await runTeam([
+      'start', '--task', taskId, '--actor', 'validator', '--cwd', cwd,
+      '--runtime-mode', 'editor-subagent', '--provider', 'claude-code',
+      '--role-provider', 'coordinator=claude-code:claude-test:claude-code:editor-subagent', '--json'
+    ]);
+    assert.equal(undeclaredEditorBackend.ok, false);
+    assert.ok(undeclaredEditorBackend.messages.some((entry) => entry.code === 'ATM_TEAM_RUNTIME_BACKEND_MISSING'));
+
+    console.log('[validate-team-agents] ok (direct-provider-execute-admission)');
     return;
   }
 

@@ -7,6 +7,14 @@ export const TEAM_PROVIDER_IDS = [
   'microsoft-foundry'
 ] as const;
 
+export const TEAM_DIRECT_API_PROVIDER_IDS = [
+  'openai',
+  'anthropic',
+  'azure-openai'
+] as const satisfies readonly (typeof TEAM_PROVIDER_IDS[number])[];
+
+export type TeamDirectApiProviderId = typeof TEAM_DIRECT_API_PROVIDER_IDS[number];
+
 export type TeamProviderId = typeof TEAM_PROVIDER_IDS[number];
 
 export type TeamProviderSessionLifecycle = {

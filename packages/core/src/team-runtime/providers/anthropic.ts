@@ -9,6 +9,7 @@ import {
 import {
   createOpenAIFamilyObservabilityEvents,
   createOpenAIFamilyRunArtifact,
+  defaultHttpJsonExecutor,
   type OpenAIFamilyBridgeRunResult,
   type OpenAIFamilyRunArtifact
 } from './openai.ts';
@@ -208,7 +209,7 @@ async function executeAnthropicMessages(input: {
     };
   }
   const baseUrl = normalizeBaseUrl(input.config.baseUrlEnvVar ? env[input.config.baseUrlEnvVar] : null, 'https://api.anthropic.com/v1');
-  return input.executor ? input.executor({
+  return (input.executor ?? defaultHttpJsonExecutor)({
     url: `${baseUrl}/messages`,
     method: 'POST',
     headers: {
@@ -228,13 +229,7 @@ async function executeAnthropicMessages(input: {
       }
     },
     timeoutMs: input.timeoutMs
-  }) : {
-    ok: false,
-    outputText: '',
-    retryable: false,
-    summary: 'Anthropic live execution requires an injected executor in governed tests.',
-    executionMode: 'vendor-api'
-  };
+  });
 }
 
 function blockedExecutionResult(): TeamProviderExecutionResult {

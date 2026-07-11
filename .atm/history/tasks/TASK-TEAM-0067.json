@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0067",
+  "title": "Repair direct-provider execute admission and fail-closed semantics",
+  "status": "running",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0053"
+  ],
+  "acceptance": [
+    "Explicit global CLI runtime/provider/model options override implicit repo defaults; explicit role overrides remain highest priority for that role.",
+    "Runtime readiness derives direct provider capabilities from the canonical built-in provider contract set instead of introducing a second registry.",
+    "Editor-subagent and external integration backends still require manifest capability declarations.",
+    "`team start --execute` returns a blocking, non-success result when zero roles execute for any blocked reason.",
+    "A deterministic validator proves Coordinator precedence, OpenAI and Anthropic built-in admission, editor backend strictness, and zero-execution fail-closed behavior without making paid API calls.",
+    "Public runtime documentation explains built-in direct versus integration manifest capability sources."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/integration.ts",
+    "packages/core/src/team-runtime/provider-selection.ts",
+    "scripts/validate-team-agents.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/integration.ts",
+    "packages/core/src/team-runtime/provider-selection.ts",
+    "scripts/validate-team-agents.ts",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts --case direct-provider-execute-admission",
+    "npm run validate:team-agents",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing provider HTTP request formats",
+    "Adding a second provider registry",
+    "Committing local API credentials"
+  ],
+  "nonGoals": [
+    "Do not weaken editor-subagent manifest admission",
+    "Do not treat state-only team start as provider execution"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert runtime precedence, built-in readiness derivation, fail-closed execute result, validator, docs, and map changes together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/integration.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "scripts/validate-team-agents.ts",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0067-direct-provider-execute-admission-repair.task.md",
+    "sectionTitle": "TASK-TEAM-0067",
+    "headingLine": 51,
+    "hash": "0fc14f33a0ab29e4"
+  },
+  "importedAt": "2026-07-11T11:37:39.920Z",
+  "lastTransitionId": "2026-07-11T11-45-48-806Z-claim-666d024a4982",
+  "lastTransitionAt": "2026-07-11T11:45:48.806Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Sol",
+  "reservedAt": "2026-07-11T11:45:48.332Z",
+  "promotedAt": "2026-07-11T11:45:48.335Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Sol",
+    "leaseId": "lease-033fc66c722e",
+    "claimedAt": "2026-07-11T11:45:48.339Z",
+    "heartbeatAt": "2026-07-11T11:45:48.339Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0067.json",
+      ".atm/history/evidence/TASK-TEAM-0067.*",
+      ".atm/history/task-events/TASK-TEAM-0067/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/integration.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "packages/core/src/team-runtime/providers/anthropic.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-11T11:37:41.951Z",
+  "startedByActor": "Codex-GPT5.5",
+  "startedBySessionId": "session-20260711114548-Codex-GPT5.6-Sol-TASK-TEAM-0067-e11159ef76",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0067",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0067.*",
+      ".atm/history/task-events/TASK-TEAM-0067/**",
+      ".atm/history/tasks/TASK-TEAM-0067.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/integration.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "packages/core/src/team-runtime/providers/anthropic.ts",
+      "packages/core/src/team-runtime/providers/openai.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d2535071b4b0ce1d56fe8b3d58ea84e194f6a8d80d2c095342ad1b51632ae735",
+    "actorId": "Codex-GPT5.6 Sol",
+    "createdAt": "2026-07-11T11:45:48.805Z",
+    "status": "active"
+  }
+}
