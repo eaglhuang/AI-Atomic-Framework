@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T15-53-06-887Z-close-7b2e23d39ed9",
+  "taskId": "TASK-TEAM-0072",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260711152936-Codex-GPT5.6-Terra-TASK-TEAM-0072-66c753968a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0072.json",
+  "taskSha256": "sha256:5fa1d136be2506dc0d3a37ef19b927f999550657a8cd3b88a2276f39d5ef782d",
+  "createdAt": "2026-07-11T15:53:06.887Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0072 --actor \"Codex-GPT5.6 Terra\" --status done --historical-delivery 16215e90c349b119b379a481dab65c077bd51b71",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711152936-Codex-GPT5.6-Terra-TASK-TEAM-0072-66c753968a",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0072.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T15:53:06.878Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0072.*",
+        ".atm/history/task-events/TASK-TEAM-0072/**",
+        ".atm/history/tasks/TASK-TEAM-0072.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/governance/scope-lock.ts",
+        "packages/core/src/team-runtime/handoff-ledger.ts",
+        "packages/core/src/team-runtime/observability.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/governance/scope-lock.ts",
+        "packages/core/src/team-runtime/handoff-ledger.ts",
+        "packages/core/src/team-runtime/observability.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
