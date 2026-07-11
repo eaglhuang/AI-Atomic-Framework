@@ -50,7 +50,7 @@ import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-
 import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
 import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge, launchOpenAITeamProviderRun } from '../../../core/src/team-runtime/providers/openai.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
-import { createTeamProviderContract, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
+import { createTeamProviderContract, type TeamProviderHttpExecutor, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtime/permission-broker.ts';
 import {
   mergeTeamProviderSelectionConfig,
@@ -1151,7 +1151,8 @@ export async function runTeam(argv: string[]) {
         recipe,
         runtimeContract,
         runtimePilot: teamPlan.runtimePilot,
-        roleSelections: teamPlan.roleSkillPackManifest.roles
+        roleSelections: teamPlan.roleSkillPackManifest.roles,
+        scopedPaths: deriveWritePaths(task, cwd)
       })
       : {
         requested: false,
@@ -4428,6 +4429,7 @@ async function runTeamProviderExecution(input: {
       runtimeMode: TeamRuntimeMode;
     };
   }[];
+  scopedPaths: readonly string[];
 }) {
   if (input.runtimeContract.runtimeMode === 'broker-only') {
     return {
@@ -4454,7 +4456,8 @@ async function runTeamProviderExecution(input: {
       taskId: input.taskId,
       role: roleSelection.role,
       selection: roleSelection.selectedProvider,
-      env: localSecrets.env
+      env: localSecrets.env,
+      scopedPaths: input.scopedPaths
     });
     if (result) results.push(result);
   }
@@ -4474,7 +4477,7 @@ async function runTeamProviderExecution(input: {
 
 type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>>;
 
-async function runDirectTeamProviderRole(input: {
+export async function runDirectTeamProviderRole(input: {
   taskId: string;
   role: string;
   selection: {
@@ -4484,6 +4487,8 @@ async function runDirectTeamProviderRole(input: {
     runtimeMode: TeamRuntimeMode;
   };
   env: Record<string, string | undefined>;
+  scopedPaths: readonly string[];
+  executor?: TeamProviderHttpExecutor;
 }): Promise<DirectTeamProviderRoleResult | null> {
   if (input.selection.runtimeMode !== 'real-agent') return null;
   const providerId = normalizeTeamProviderId(input.selection.providerId);
@@ -4509,8 +4514,9 @@ async function runDirectTeamProviderRole(input: {
       }),
       request: { ...request, providerId: 'openai' },
       permissionPolicy,
-      scopedPaths: [],
-      env: input.env
+      scopedPaths: input.scopedPaths,
+      env: input.env,
+      executor: input.executor
     })
     : await launchAnthropicTeamProviderRun({
       bridge: createAnthropicTeamProviderBridge({
@@ -4522,8 +4528,9 @@ async function runDirectTeamProviderRole(input: {
       }),
       request: { ...request, providerId: 'anthropic' },
       permissionPolicy,
-      scopedPaths: [],
-      env: input.env
+      scopedPaths: input.scopedPaths,
+      env: input.env,
+      executor: input.executor
     });
   return {
     ok: bridgeResult.ok,

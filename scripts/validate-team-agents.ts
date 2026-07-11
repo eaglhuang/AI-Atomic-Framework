@@ -6,7 +6,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runDirectTeamProviderRole, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
@@ -1371,6 +1371,48 @@ async function main() {
     assert.ok(undeclaredEditorBackend.messages.some((entry) => entry.code === 'ATM_TEAM_RUNTIME_BACKEND_MISSING'));
 
     console.log('[validate-team-agents] ok (direct-provider-execute-admission)');
+    return;
+  }
+
+  if (taskCase === 'direct-provider-scoped-path-forwarding') {
+    const scopedPaths = ['packages/cli/src/commands/team.ts'];
+    const requests: Array<{ url: string; body: unknown }> = [];
+    const executor = async (input: { url: string; body: unknown }) => {
+      requests.push(input);
+      return {
+        ok: true,
+        statusCode: 200,
+        outputText: input.url.includes('anthropic')
+          ? JSON.stringify({ content: [{ type: 'text', text: 'anthropic role complete' }] })
+          : JSON.stringify({ output_text: 'openai role complete' }),
+        outputArtifacts: [],
+        retryable: false,
+        summary: 'deterministic provider response',
+        executionMode: 'vendor-api' as const
+      };
+    };
+    for (const providerId of ['openai', 'anthropic'] as const) {
+      const result = await runDirectTeamProviderRole({
+        taskId: 'TASK-TEAM-0068',
+        role: providerId === 'openai' ? 'reviewAgent' : 'implementer',
+        selection: {
+          providerId,
+          sdkId: providerId === 'openai' ? 'openai-responses' : 'anthropic-messages',
+          modelId: `${providerId}-test-model`,
+          runtimeMode: 'real-agent'
+        },
+        env: {
+          OPENAI_API_KEY: 'test-openai-key',
+          ANTHROPIC_API_KEY: 'test-anthropic-key'
+        },
+        scopedPaths,
+        executor
+      });
+      assert.equal(result?.ok, true);
+    }
+    assert.equal(requests.length, 2);
+
+    console.log('[validate-team-agents] ok (direct-provider-scoped-path-forwarding)');
     return;
   }
 
