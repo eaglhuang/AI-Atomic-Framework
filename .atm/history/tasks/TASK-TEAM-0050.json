@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0050",
+  "title": "Team start provider execution wiring (real multi-bot spawn lane)",
+  "status": "running",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0045"
+  ],
+  "acceptance": [
+    "`team start --execute` (real-agent / editor-subagent modes) iterates the recipe roles and, per role, resolves provider selection, instantiates the bridge, and calls the matching `launch*Run` with the permission broker policy and observability sink attached.",
+    "Without `--execute`, behavior is unchanged (state-only, agentsSpawned:false) so the deliberate no-full-autonomy default is preserved.",
+    "`runProviderOrchestration` performs actual step execution with bounded retry from the retry-budget contract instead of the current dead loop.",
+    "Broker-only mode never spawns; broker conflict blocks still hold at start (parity with TASK-TEAM-0047).",
+    "Validator case proves at least two roles execute through two different providers in one run using injected fake executors."
+  ],
+  "deliverables": [
+    "packages/core/src/team-runtime/execution-orchestrator.ts",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/team-runtime/execution-orchestrator.ts",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts --case team-start-execution-wiring",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Provider credential storage",
+    "New provider bridges"
+  ],
+  "nonGoals": [
+    "Do not remove the human gate: execution requires explicit --execute plus coordinator authority",
+    "Do not give spawned workers lifecycle or git.write authority"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert orchestrator execution loop, team start --execute lane, and validator case together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/team-runtime/execution-orchestrator.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0050-team-start-provider-execution-wiring.task.md",
+    "sectionTitle": "TASK-TEAM-0050",
+    "headingLine": 45,
+    "hash": "48ae95b9968834fc"
+  },
+  "importedAt": "2026-07-11T01:58:55.753Z",
+  "lastTransitionId": "2026-07-11T02-13-16-532Z-claim-e791954d8702",
+  "lastTransitionAt": "2026-07-11T02:13:16.532Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "coordinator",
+  "reservedAt": "2026-07-11T02:13:14.848Z",
+  "promotedAt": "2026-07-11T02:13:14.851Z",
+  "claim": {
+    "actorId": "coordinator",
+    "leaseId": "lease-45bfd65e22a0",
+    "claimedAt": "2026-07-11T02:13:14.856Z",
+    "heartbeatAt": "2026-07-11T02:13:14.856Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0050.json",
+      ".atm/history/evidence/TASK-TEAM-0050.*",
+      ".atm/history/task-events/TASK-TEAM-0050/**",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "closeout-only"
+  },
+  "startedAt": "2026-07-11T02:07:37.921Z",
+  "startedByActor": "coordinator",
+  "startedBySessionId": "session-20260711021314-coordinator-TASK-TEAM-0050-39c3c22522",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0050",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0050.*",
+      ".atm/history/task-events/TASK-TEAM-0050/**",
+      ".atm/history/tasks/TASK-TEAM-0050.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6ef2d030ed04b26ad034efc277d8953ea54075ce5bdbfaaf315c4b2eab5af364",
+    "actorId": "coordinator",
+    "createdAt": "2026-07-11T02:13:16.531Z",
+    "status": "active"
+  }
+}
