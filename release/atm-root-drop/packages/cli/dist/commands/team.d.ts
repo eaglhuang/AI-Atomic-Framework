@@ -9,6 +9,17 @@ import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-
 import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
 import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
 import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
+type TeamVendorLocalSecretsSummary = {
+    schemaId: 'atm.teamVendorLocalSecretsSummary.v1';
+    path: string;
+    loaded: boolean;
+    providerCount: number;
+    secretRefCount: number;
+    secretRefs: string[];
+    warningCount: number;
+    warnings: string[];
+    rawSecretsLogged: false;
+};
 type TeamRecipeAgent = {
     agentId: string;
     role: string;
@@ -1323,6 +1334,10 @@ export declare function writeTeamRun(input: {
     };
     createdAt: string;
     updatedAt: string;
+};
+export declare function loadTeamVendorLocalSecrets(cwd: string): {
+    env: Record<string, string | undefined>;
+    summary: TeamVendorLocalSecretsSummary;
 };
 export declare function buildTeamStatusResult(input: {
     cwd: string;

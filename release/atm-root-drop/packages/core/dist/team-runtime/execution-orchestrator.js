@@ -12,7 +12,8 @@ export function runProviderOrchestration(provider, request) {
                     sessionId: session.sessionId,
                     input: request.input ?? request.instructions ?? `Run Team role ${request.role} for ${request.taskId}.`,
                     instructions: request.instructions,
-                    scopedPaths: []
+                    scopedPaths: [],
+                    env: request.env
                 })
                 : {
                     ok: true,

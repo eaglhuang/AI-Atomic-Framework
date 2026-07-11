@@ -50,6 +50,7 @@ export type TeamProviderExecutionInput = {
   readonly input: string;
   readonly instructions?: string;
   readonly scopedPaths: readonly string[];
+  readonly env?: Record<string, string | undefined>;
 };
 
 export type TeamProviderExecutionResult = {

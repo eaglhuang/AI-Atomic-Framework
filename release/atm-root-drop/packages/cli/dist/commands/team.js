@@ -3400,6 +3400,7 @@ async function runTeamProviderExecution(input) {
     const selectedRoles = normalizeStringArray(input.runtimePilot.selectedRoles).length > 0
         ? normalizeStringArray(input.runtimePilot.selectedRoles)
         : input.recipe.agents.slice(0, 2).map((agent) => agent.role);
+    const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
     const results = [];
     for (const role of selectedRoles) {
         results.push(await runProviderOrchestration(provider, {
@@ -3410,7 +3411,8 @@ async function runTeamProviderExecution(input) {
             sdkId: input.runtimeContract.sdkId ?? 'unknown-sdk',
             modelId: input.runtimeContract.modelId ?? 'unknown-model',
             instructions: `Run Team role ${role} for ${input.taskId}.`,
-            retries: 1
+            retries: 1,
+            env: localSecrets.env
         }));
     }
     appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
@@ -3422,8 +3424,69 @@ async function runTeamProviderExecution(input) {
     return {
         requested: true,
         blockedReason: null,
+        localSecrets: localSecrets.summary,
         results
     };
+}
+export function loadTeamVendorLocalSecrets(cwd) {
+    const relativePath = 'agent-integrations/vendors/team-secrets.local.json';
+    const secretPath = path.join(cwd, ...relativePath.split('/'));
+    const warnings = [];
+    const env = {};
+    const secretRefs = new Set();
+    let providerCount = 0;
+    if (existsSync(secretPath)) {
+        const parsed = readJsonFile(secretPath, 'ATM_TEAM_VENDOR_SECRETS_INVALID');
+        if (parsed.schemaId !== 'atm.teamVendorSecrets.local.v1') {
+            throw new CliError('ATM_TEAM_VENDOR_SECRETS_INVALID', 'Team vendor local secrets must use schemaId atm.teamVendorSecrets.local.v1.', {
+                exitCode: 2,
+                details: { path: relativePath }
+            });
+        }
+        const providerEntries = parsed.providers && typeof parsed.providers === 'object'
+            ? Object.entries(parsed.providers)
+            : [];
+        providerCount = providerEntries.length;
+        for (const [providerId, refs] of providerEntries) {
+            if (!refs || typeof refs !== 'object' || Array.isArray(refs)) {
+                warnings.push(`Provider ${providerId} does not contain a key/value object.`);
+                continue;
+            }
+            for (const [envName, value] of Object.entries(refs)) {
+                collectTeamVendorSecret(env, secretRefs, warnings, envName, value, `providers.${providerId}`);
+            }
+        }
+        for (const [envName, value] of Object.entries(parsed.env ?? {})) {
+            collectTeamVendorSecret(env, secretRefs, warnings, envName, value, 'env');
+        }
+    }
+    return {
+        env,
+        summary: {
+            schemaId: 'atm.teamVendorLocalSecretsSummary.v1',
+            path: relativePath,
+            loaded: existsSync(secretPath),
+            providerCount,
+            secretRefCount: secretRefs.size,
+            secretRefs: [...secretRefs].sort(),
+            warningCount: warnings.length,
+            warnings,
+            rawSecretsLogged: false
+        }
+    };
+}
+function collectTeamVendorSecret(env, secretRefs, warnings, envName, value, source) {
+    const normalizedEnvName = String(envName ?? '').trim();
+    if (!/^[A-Z_][A-Z0-9_]*$/.test(normalizedEnvName)) {
+        warnings.push(`Ignored invalid environment variable name ${source}.${envName}.`);
+        return;
+    }
+    if (typeof value !== 'string' || value.length === 0) {
+        warnings.push(`Ignored empty or non-string secret value for ${normalizedEnvName}.`);
+        return;
+    }
+    env[normalizedEnvName] = value;
+    secretRefs.add(normalizedEnvName);
 }
 function buildProviderOrchestrationEvents(input) {
     const role = String(input.result.stepResult.role ?? 'worker');

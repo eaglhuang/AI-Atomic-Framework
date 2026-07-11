@@ -24,6 +24,16 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 
 - Adopter repositories should place vendor configuration under `agent-integrations/vendors/**`.
 - The framework may validate layout and explain missing or malformed config, but it must not store adopter secrets in the framework repository.
+- Local operator secrets may be centralized in
+  `agent-integrations/vendors/team-secrets.local.json`. This file uses
+  `atm.teamVendorSecrets.local.v1`, is ignored by git, and is loaded into the
+  provider execution `env` map before `team start --execute` orchestration. It
+  is a cross-OS convenience layer over environment-variable references: config
+  and artifacts still record only names such as `OPENAI_API_KEY`, never raw
+  values.
+- Commit only `agent-integrations/vendors/team-secrets.example.json` with empty
+  or placeholder values. Local backups such as
+  `team-secrets.local.backup.json` must remain ignored too.
 
 ## OpenAI-Family Direct Bridges
 

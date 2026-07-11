@@ -6,7 +6,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
@@ -487,6 +487,78 @@ async function main() {
     assert.equal(orchestration.sessionId, 'TASK-TEAM-0050:implementer:openai:gpt-5-mini');
     assert.deepEqual(orchestration.stepResult.artifacts, ['agent-report', 'role-implementer']);
     console.log('[validate-team-agents] ok (team-start-execution-wiring)');
+    return;
+  }
+
+  if (taskCase === 'team-vendor-local-secrets') {
+    const workspace = createTempWorkspace('team-vendor-local-secrets');
+    const secretDir = path.join(workspace, 'agent-integrations', 'vendors');
+    mkdirSync(secretDir, { recursive: true });
+    writeFileSync(path.join(secretDir, 'team-secrets.local.json'), JSON.stringify({
+      schemaId: 'atm.teamVendorSecrets.local.v1',
+      providers: {
+        openai: {
+          OPENAI_API_KEY: 'local-openai-test-token'
+        },
+        anthropic: {
+          ANTHROPIC_API_KEY: 'anthropic-test-local-secret'
+        }
+      },
+      env: {
+        AZURE_ACCESS_TOKEN: 'azure-test-local-token'
+      }
+    }, null, 2));
+    const loaded = loadTeamVendorLocalSecrets(workspace);
+    assert.equal(loaded.summary.loaded, true);
+    assert.equal(loaded.summary.providerCount, 2);
+    assert.equal(loaded.summary.secretRefCount, 3);
+    assert.deepEqual(loaded.summary.secretRefs, ['ANTHROPIC_API_KEY', 'AZURE_ACCESS_TOKEN', 'OPENAI_API_KEY']);
+    assert.equal(loaded.summary.rawSecretsLogged, false);
+    assert.ok(!JSON.stringify(loaded.summary).includes('local-openai-test-token'));
+    assert.equal(loaded.env.OPENAI_API_KEY, 'local-openai-test-token');
+
+    let observedEnv: Record<string, string | undefined> | undefined;
+    const provider = {
+      schemaId: 'atm.teamProviderContract.v1' as const,
+      metadata: createTeamProviderMetadata('openai'),
+      sessionLifecycle: {
+        createSession: true as const,
+        closeSession: true as const,
+        cancelSession: true as const,
+        retryStep: true as const
+      },
+      openSession(request: any) {
+        return { sessionId: `${request.taskId}:${request.role}:${request.providerId}:${request.modelId}`, providerId: 'openai' as const };
+      },
+      executeStep(input: any) {
+        observedEnv = input.env;
+        return {
+          ok: true,
+          outputText: 'local secret env observed',
+          outputArtifacts: ['agent-report'],
+          retryable: false,
+          summary: 'fake provider read local secret env map',
+          executionMode: 'vendor-api' as const
+        };
+      },
+      closeSession(sessionId: string) {
+        return { closed: true as const, sessionId };
+      },
+      cancelSession(sessionId: string, reason: string) {
+        return { cancelled: true as const, sessionId, reason };
+      }
+    };
+    await runProviderOrchestration(provider, {
+      taskId: 'TASK-TEAM-SECRETS',
+      role: 'validator',
+      runtimeMode: 'real-agent',
+      providerId: 'openai',
+      sdkId: 'responses',
+      modelId: 'gpt-5-mini',
+      env: loaded.env
+    });
+    assert.equal(observedEnv?.OPENAI_API_KEY, 'local-openai-test-token');
+    console.log('[validate-team-agents] ok (team-vendor-local-secrets)');
     return;
   }
 

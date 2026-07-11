@@ -6,6 +6,7 @@ import type {
 
 export type TeamOrchestrationRequest = TeamProviderSessionRequest & {
   readonly retries?: number;
+  readonly env?: Record<string, string | undefined>;
 };
 
 export type TeamOrchestrationResult = {
@@ -35,7 +36,8 @@ export function runProviderOrchestration(
           sessionId: session.sessionId,
           input: request.input ?? request.instructions ?? `Run Team role ${request.role} for ${request.taskId}.`,
           instructions: request.instructions,
-          scopedPaths: []
+          scopedPaths: [],
+          env: request.env
         })
         : {
           ok: true,

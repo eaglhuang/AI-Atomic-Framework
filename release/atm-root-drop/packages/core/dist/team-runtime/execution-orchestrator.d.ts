@@ -1,6 +1,7 @@
 import type { TeamProviderContract, TeamProviderSessionRequest, TeamProviderStepResult } from './provider-contract.ts';
 export type TeamOrchestrationRequest = TeamProviderSessionRequest & {
     readonly retries?: number;
+    readonly env?: Record<string, string | undefined>;
 };
 export type TeamOrchestrationResult = {
     readonly ok: boolean;
