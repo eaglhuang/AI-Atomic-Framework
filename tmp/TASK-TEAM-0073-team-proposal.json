@@ -1,0 +1,18 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": { "strategy": "none", "fromVersion": null, "notes": "TASK-TEAM-0073 proposal-first admission" },
+  "proposalId": "proposal-team-0073-handoff-context",
+  "taskId": "TASK-TEAM-0073",
+  "actorId": "Codex-GPT5.6 Terra",
+  "transactionId": "txn-9456f9eb70c65945",
+  "baseCommit": "4ca6fd540663e49efad1e4b7d30a285a89607152",
+  "fileBeforeHash": "sha256:8b8c4d0dcdd6f2b0fe5705e031d00419a66f0da4d158185cc9e40a7050d76966",
+  "targetFile": "packages/cli/src/commands/team.ts",
+  "atomRefs": [{ "atomId": "atm.team-agents-runtime", "atomCid": "atm-team-agents-runtime" }],
+  "anchors": [{ "kind": "function", "hint": "runTeamProviderExecution" }, { "kind": "function", "hint": "buildDirectTeamRoleInstructions" }],
+  "intent": "Add Coordinator-mediated canonical handoff read/context commands, token-budget telemetry, and hard-gated materialization access without provider direct history access.",
+  "patch": "Add team handoff show/context/stats dispatch, validate canonical manifest and secret scan before context injection, and replace preview-only prompt context with bounded ledger envelopes.",
+  "validators": ["npm run typecheck", "node --strip-types scripts/validate-team-agents.ts --case team-handoff-context-budget"],
+  "rollback": "Revert the task-scoped Team CLI/context changes and remove the generated runtime handoff fixture."
+}

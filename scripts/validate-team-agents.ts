@@ -100,6 +100,21 @@ async function main() {
     return;
   }
 
+  if (taskCase === 'team-handoff-context-budget') {
+    const longSummary = Array.from({ length: 400 }, (_, index) => `token${index}`).join(' ');
+    const context = buildDirectTeamRoleInstructions({
+      taskId: 'TASK-TEAM-0073',
+      role: 'reviewer',
+      priorRoleArtifacts: Array.from({ length: 6 }, (_, index) => ({ role: `role${index}`, providerId: 'openai', outputTextPreview: longSummary }))
+    });
+    assert.equal(context.telemetry.priorArtifactCount, 4);
+    assert.equal(context.telemetry.tokenEstimatorId, 'whitespace-v1');
+    assert.ok(context.telemetry.actualTokenCount <= 1024 + 32, 'base instruction plus handoff must remain bounded');
+    assert.equal(context.telemetry.consumedArtifactRefs[0], 'role2/openai');
+    console.log('[validate-team-agents] ok (team-handoff-context-budget)');
+    return;
+  }
+
   if (taskCase === 'lieutenant-escalation') {
     const lowRiskTask = {
       workItemId: 'TASK-TEAM-0008-SMALL',

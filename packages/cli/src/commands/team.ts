@@ -53,7 +53,7 @@ import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createTeamProviderContract, type TeamProviderHttpExecutor, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtime/permission-broker.ts';
-import { materializeTeamRoleHandoff, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
+import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
 import {
   mergeTeamProviderSelectionConfig,
   resolveTeamProviderSelection,
@@ -928,6 +928,9 @@ const catalogReadyRosterDeferredRoles = [
 ];
 
 export async function runTeam(argv: string[]) {
+  if (String(argv[0] ?? '').toLowerCase() === 'handoff') {
+    return runTeamHandoff(argv.slice(1), path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd()));
+  }
   if (String(argv[0] ?? '').toLowerCase() === 'knowledge') {
     const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
     return runTeamKnowledge(argv.slice(1), cwd);
@@ -1234,6 +1237,23 @@ export async function runTeam(argv: string[]) {
       runtimePilot: teamPlan.runtimePilot
     }
   });
+}
+
+function runTeamHandoff(argv: string[], cwd: string) {
+  const action = String(argv[0] ?? 'show').toLowerCase();
+  const taskId = readOptionValue(argv, '--task')?.trim();
+  const teamRunId = readOptionValue(argv, '--team')?.trim();
+  const actorId = readOptionValue(argv, '--actor')?.trim() ?? '';
+  if (!taskId || !teamRunId) throw new CliError('ATM_TEAM_HANDOFF_TASK_RUN_REQUIRED', 'team handoff requires --task and --team.', { exitCode: 2 });
+  if (action === 'materialize' && actorId !== 'coordinator' && actorId !== 'system') throw new CliError('ATM_TEAM_HANDOFF_MATERIALIZE_FORBIDDEN', 'handoff.materialize is Coordinator/system-only.', { exitCode: 1 });
+  if (!['show', 'context', 'stats'].includes(action)) throw new CliError('ATM_CLI_USAGE', 'team handoff supports: show, context, stats.', { exitCode: 2 });
+  const integrity = verifyTeamHandoffLedger(cwd, taskId, teamRunId);
+  if (!integrity.ok) throw new CliError('ATM_TEAM_HANDOFF_INTEGRITY_BLOCKED', `handoff-integrity-blocked: ${integrity.reason}.`, { exitCode: 1 });
+  const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+  const artifacts = readTeamHandoffArtifacts(directory, integrity.manifest);
+  const bounded = artifacts.slice(-TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS).map((artifact) => ({ role: artifact.from.role, providerId: artifact.from.providerId, outputTextPreview: artifact.humanSummary }));
+  const context = buildDirectTeamRoleInstructions({ taskId, role: 'consumer', priorRoleArtifacts: bounded });
+  return makeResult({ ok: true, command: 'team', cwd, messages: [message('info', 'ATM_TEAM_HANDOFF_READY', `Team handoff ${action} is ready.`)], evidence: { action: `handoff.${action}`, taskId, teamRunId, manifest: integrity.manifest, artifacts: action === 'show' ? artifacts : undefined, context: action === 'context' ? context : undefined, stats: action === 'stats' ? { transitionCount: integrity.manifest.transitionCount, contextTokens: context.telemetry.actualTokenCount } : undefined } });
 }
 
 export function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEvidence) {
@@ -4542,12 +4562,18 @@ export type DirectTeamRoleHandoffArtifact = {
   readonly outputTextPreview: string;
 };
 
+export const TEAM_HANDOFF_CONTEXT_PER_ARTIFACT_TOKENS = 256;
+export const TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS = 4;
+export const TEAM_HANDOFF_CONTEXT_TOTAL_TOKENS = 1024;
+
 type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>> & {
   readonly handoffArtifact: DirectTeamRoleHandoffArtifact;
   readonly contextTelemetry: {
     readonly baseInstructionChars: number;
     readonly handoffChars: number;
     readonly totalInstructionChars: number;
+    readonly actualTokenCount: number;
+    readonly tokenEstimatorId: 'whitespace-v1';
     readonly priorArtifactCount: number;
     readonly consumedArtifactRefs: readonly string[];
   };
@@ -4559,22 +4585,27 @@ export function buildDirectTeamRoleInstructions(input: {
   priorRoleArtifacts?: readonly DirectTeamRoleHandoffArtifact[];
 }): { instructions: string; telemetry: DirectTeamProviderRoleResult['contextTelemetry'] } {
   const base = `Run Team role ${input.role} for ${input.taskId}. Return a concise role report. Do not close, commit, or exceed Coordinator authority.`;
-  const bounded = (input.priorRoleArtifacts ?? []).slice(-4).map((artifact) => ({
+  const bounded = (input.priorRoleArtifacts ?? []).slice(-TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS).map((artifact) => ({
     ...artifact,
-    outputTextPreview: artifact.outputTextPreview.slice(0, 500)
+    outputTextPreview: truncateTokenBudget(artifact.outputTextPreview, TEAM_HANDOFF_CONTEXT_PER_ARTIFACT_TOKENS)
   }));
-  const handoff = bounded.length === 0 ? '' : `\nPrior governed role artifacts (review and cite relevant source roles):\n${bounded.map((artifact) => `[${artifact.role}/${artifact.providerId}] ${artifact.outputTextPreview}`).join('\n').slice(0, 2400)}`;
+  const handoff = bounded.length === 0 ? '' : `\nPrior governed role artifacts (review and cite relevant source roles):\n${truncateTokenBudget(bounded.map((artifact) => `[${artifact.role}/${artifact.providerId}] ${artifact.outputTextPreview}`).join('\n'), TEAM_HANDOFF_CONTEXT_TOTAL_TOKENS)}`;
   return {
     instructions: `${base}${handoff}`,
     telemetry: {
       baseInstructionChars: base.length,
       handoffChars: handoff.length,
       totalInstructionChars: base.length + handoff.length,
+      actualTokenCount: estimateTokens(base) + estimateTokens(handoff),
+      tokenEstimatorId: 'whitespace-v1',
       priorArtifactCount: bounded.length,
       consumedArtifactRefs: bounded.map((artifact) => `${artifact.role}/${artifact.providerId}`)
     }
   };
 }
+
+function estimateTokens(value: string): number { return value.trim() ? value.trim().split(/\s+/).length : 0; }
+function truncateTokenBudget(value: string, budget: number): string { return value.trim().split(/\s+/).slice(0, budget).join(' '); }
 
 export async function runDirectTeamProviderRole(input: {
   taskId: string;
