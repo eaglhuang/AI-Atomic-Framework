@@ -3983,8 +3983,16 @@ async function main() {
       });
       assert.equal(blockedCommit.length, 1);
       assert.equal(blockedCommit[0].code, 'ATM_TEAM_GIT_OWNER_REQUIRED');
-      assert.deepEqual(blockedCommit[0].teamRunIds, ['team-hook-fixture', 'team-hook-fixture-secondary']);
+      assert.deepEqual(blockedCommit[0].teamRunIds, ['team-hook-fixture']);
       assert.deepEqual(blockedCommit[0].files, ['packages/cli/src/commands/team.ts']);
+      assert.deepEqual(blockedCommit[0].relevantFiles, ['packages/cli/src/commands/team.ts']);
+
+      const unrelatedCommit = evaluateTeamPreCommitGate({
+        cwd,
+        actorId: 'implementer-typescript',
+        stagedFiles: ['scripts/validate-team-agents.ts']
+      });
+      assert.equal(unrelatedCommit.length, 0, 'unrelated active Team runs must not block a framework commit outside their file.write lease');
 
       const allowedCommit = evaluateTeamPreCommitGate({
         cwd,

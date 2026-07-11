@@ -3209,7 +3209,10 @@ function extractTaskRootHintsFromPrompt(prompt: string, mentionedTaskIds: readon
 function extractTaskIdReferencesFromPrompt(prompt: string): readonly string[] {
   const references = new Set<string>();
   for (const match of prompt.matchAll(/\b(?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-\d{2,}(?:-[A-Z0-9][A-Z0-9-]*)*\b/gi)) {
-    references.add(match[0].toUpperCase());
+    const reference = match[0].toUpperCase();
+    if (!isBacklogIdentifier(reference)) {
+      references.add(reference);
+    }
   }
   for (const match of prompt.matchAll(/\b((?:TASK-|ATM-)?[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*)-(\d{2,})((?:\s*[\/,]\s*\d{2,})+)/gi)) {
     const prefix = match[1]?.toUpperCase();
@@ -3222,6 +3225,10 @@ function extractTaskIdReferencesFromPrompt(prompt: string): readonly string[] {
     }
   }
   return [...references].sort((left, right) => left.localeCompare(right));
+}
+
+function isBacklogIdentifier(reference: string): boolean {
+  return /^(?:ATM|PROJECT)-BUG-\d{4}-\d{2}-\d{2}-\d{3}$/i.test(reference.trim());
 }
 
 function expandTaskIdReferenceAliases(taskIdReference: string): readonly string[] {

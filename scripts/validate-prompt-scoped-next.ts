@@ -191,6 +191,12 @@ async function main() {
       assert(String(frameworkAction?.command ?? '').includes('framework-mode claim'), 'framework maintenance route command must use framework-mode claim');
       assert(String(frameworkAction?.playbook?.steps?.[0] ?? '').includes('framework-mode claim'), 'framework fast playbook first step must use framework-mode claim');
       assert(!String(frameworkAction?.playbook?.steps?.[0] ?? '').includes('next --claim'), 'framework fast playbook must not send no-task routes through next --claim');
+
+      const backlogCloseout = await runNext(['--cwd', frameworkRoot, '--prompt', 'Resolve ATM-BUG-2026-07-07-048 and push the fix']);
+      assert(backlogCloseout.ok === true, 'backlog closeout prompts must not be treated as missing ledger tasks');
+      assert(!backlogCloseout.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'backlog closeout prompts must not emit task-scope-not-found');
+      assert(backlogCloseout.messages.some((entry) => entry.code === 'ATM_NEXT_FRAMEWORK_TEMP_CLAIM_REQUIRED'), 'backlog closeout prompts must route to framework temp claim');
+      assert((backlogCloseout.evidence.taskIntent as any)?.taskScopeMentioned === false, 'backlog identifiers must not be normalized as ledger task ids');
     } finally {
       rmSync(frameworkRoot, { recursive: true, force: true });
     }

@@ -10,6 +10,7 @@ export type TeamRuntimeGateFinding = {
   taskIds?: string[];
   actorId: string | null;
   files: string[];
+  relevantFiles?: string[];
   requiredCommand: string;
 };
 
@@ -70,46 +71,60 @@ export function evaluateTeamPreCommitGate(input: {
   if (stagedFiles.length === 0) return [];
   const activeRuns = listActiveTeamRunProjections(input.cwd);
   const findings: TeamRuntimeGateFinding[] = [];
-  const gitOwnerBlockedRuns: TeamRunProjection[] = [];
+  const gitOwnerBlockedRuns: Array<{ run: TeamRunProjection; relevantFiles: string[] }> = [];
   for (const run of activeRuns) {
+    const relevantFiles = findTeamRunStagedScopeOverlap(run, stagedFiles);
+    if (relevantFiles.length === 0) continue;
     const gitOwners = new Set(run.permissionLeases
       .filter((lease) => lease.permission === 'git.write')
       .map((lease) => lease.agentId));
     gitOwners.add('coordinator');
     if (run.actorId) gitOwners.add(run.actorId);
     if (!actorId || !gitOwners.has(actorId)) {
-      gitOwnerBlockedRuns.push(run);
+      gitOwnerBlockedRuns.push({ run, relevantFiles });
     }
   }
   if (gitOwnerBlockedRuns.length === 1) {
-    const run = gitOwnerBlockedRuns[0];
+    const { run, relevantFiles } = gitOwnerBlockedRuns[0];
     findings.push({
       code: 'ATM_TEAM_GIT_OWNER_REQUIRED',
-      detail: `Active Team run ${run.teamRunId} only allows Coordinator/git.write owner to commit.`,
+      detail: `Active Team run ${run.teamRunId} only allows Coordinator/git.write owner to commit because staged files overlap its file.write lease: ${relevantFiles.join(', ')}.`,
       teamRunId: run.teamRunId,
       teamRunIds: [run.teamRunId],
       taskId: run.taskId,
       taskIds: normalizePaths(run.taskId ? [run.taskId] : []),
       actorId,
       files: stagedFiles,
+      relevantFiles,
       requiredCommand: `ATM_COMMIT_ACTOR_ID=coordinator git commit`
     });
   } else if (gitOwnerBlockedRuns.length > 1) {
-    const teamRunIds = normalizePaths(gitOwnerBlockedRuns.map((run) => run.teamRunId));
-    const taskIds = normalizePaths(gitOwnerBlockedRuns.map((run) => run.taskId ?? '').filter(Boolean));
+    const teamRunIds = normalizePaths(gitOwnerBlockedRuns.map(({ run }) => run.teamRunId));
+    const taskIds = normalizePaths(gitOwnerBlockedRuns.map(({ run }) => run.taskId ?? '').filter(Boolean));
+    const relevantFiles = normalizePaths(gitOwnerBlockedRuns.flatMap((entry) => entry.relevantFiles));
     findings.push({
       code: 'ATM_TEAM_GIT_OWNER_REQUIRED',
-      detail: `Multiple active Team runs only allow Coordinator/git.write owners to commit. Runs: ${teamRunIds.join(', ')}.`,
+      detail: `Multiple active Team runs only allow Coordinator/git.write owners to commit because staged files overlap their file.write leases. Runs: ${teamRunIds.join(', ')}. Overlapping files: ${relevantFiles.join(', ')}.`,
       teamRunId: teamRunIds[0],
       teamRunIds,
       taskId: taskIds[0] ?? null,
       taskIds,
       actorId,
       files: stagedFiles,
+      relevantFiles,
       requiredCommand: `ATM_COMMIT_ACTOR_ID=coordinator git commit`
     });
   }
   return findings;
+}
+
+function findTeamRunStagedScopeOverlap(run: TeamRunProjection, stagedFiles: readonly string[]): string[] {
+  const writeScope = run.permissionLeases
+    .filter((lease) => lease.permission === 'file.write')
+    .flatMap((lease) => lease.paths);
+  return writeScope.length > 0
+    ? stagedFiles.filter((file) => isPathAllowedByAny(file, writeScope))
+    : [];
 }
 
 function listActiveTeamRunProjections(cwd: string): TeamRunProjection[] {
