@@ -86,6 +86,27 @@ closing, or committing. The playbook is the short channel-specific work order.
 - For closeout review, verify deliverables and evidence before saying a task is
   complete.
 
+## Team Agents Dispatch Surface
+
+When dispatching or reviewing Team Agents work, preserve the current runtime
+surface instead of falling back to the older "manual advisory only" model:
+
+- Use L1 through L5 as the canonical crew scale. L1 is Coordinator,
+  Atomization Planner, Implementer, and Validator; L5 adds Lieutenant, Review
+  Agent, and Knowledge Scout.
+- Mention `--team-size L1..L5` when crew completeness matters, and
+  `--role-provider role=provider:model[:sdk][:mode]` when a role needs a
+  specific provider/model.
+- Treat `team start --execute` as an explicit governed execution lane. The
+  default `team start` remains state-only and does not spawn workers.
+- Preserve runtime governance fields in reports: `decisionClass`,
+  `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
+  `violationStatus`, and `escalationTarget`.
+- Treat `broker-conflict-blocked` as a hard stop. Do not tell workers to
+  self-close, self-commit, or bypass Team Broker.
+- If a task card declares `team.required: true`, closeout needs a completed Team
+  run and summary before task close can proceed.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms dispatch is the

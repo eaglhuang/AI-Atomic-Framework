@@ -76,6 +76,25 @@ When adapter parity is stale across multiple installed editors:
 3. Re-run `doctor` after the refresh and only continue once the shared parity state is green again.
 4. Treat hand-edited adapter customizations as a separate decision; do not overwrite them silently under a parity-only assumption.
 
+When `next`, `team plan`, or `team status` returns Team Agents surfaces, carry
+these fields forward instead of compressing them away:
+
+- Crew scale: `teamLevel` / `--team-size L1..L5`.
+- Provider routing: `--role-provider role=provider:model[:sdk][:mode]` and
+  provider selection source.
+- Execution lane: `team start --execute` means governed provider orchestration;
+  plain `team start` writes state only.
+- Governance fields: `decisionClass`, `decisionReason`,
+  `requiresHumanSignoff`, `requiresAdr`, `violationStatus`,
+  `escalationTarget`.
+- Evidence surfaces: `runtimeTier`, `atm.teamProviderRunArtifact.v1`,
+  `atm.reviewAgentSignature.v1`, `knowledge.query`, and real observability
+  events.
+
+If `violationStatus` is `broker-conflict-blocked`, stop write/commit/close
+progression and route through the Team Broker resolution artifact. Do not
+continue as if it were advisory text.
+
 Typical framework-repo repair route:
 
 ```bash

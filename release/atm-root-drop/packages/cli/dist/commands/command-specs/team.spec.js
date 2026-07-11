@@ -21,7 +21,7 @@ export const teamSpecCommandSurface = {
         { flag: '--sdk', value: 'id', summary: 'Optional SDK metadata recorded on the runtime contract.' },
         { flag: '--model', value: 'id', summary: 'Optional model metadata recorded on the runtime contract.' },
         { flag: '--role-provider', value: 'role=provider:model[:sdk][:mode]', repeatable: true, summary: 'Override provider/model selection for one Team role. Repeatable.' },
-        { flag: '--team-size', value: 'level', summary: 'Manual team size/level override: small, medium, large, L1, L2, L3, L4, or L5.' },
+        { flag: '--team-size', value: 'level', summary: 'Manual team size/level override: small/L1 core, medium/L2 reader+evidence, large/L3 scope, L4 lieutenant, L5 review+knowledge.' },
         { flag: '--disable-editor-bridge', summary: 'Disable the editor-subagent bridge contract for this run while preserving Team governance semantics.' },
         { flag: '--execute', summary: 'Execute governed provider orchestration for selected Team roles after runtime state is written. Defaults off.' },
         { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },

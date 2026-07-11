@@ -1656,6 +1656,22 @@ async function main() {
     }) as any;
     assert.equal(l1Plan.teamLevel, 'L1');
     assert.deepEqual(l1Plan.rosterProjection.activeRoles, ['coordinator', 'atomizationPlanner', 'implementer', 'validator']);
+    const l4Plan = buildTeamPlan({
+      task,
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: { ok: true, findings: [] },
+      brokerLane: safeBrokerLane(),
+      requestedTeamSize: 'L4',
+      providerSelectionConfig: selectionConfig
+    }) as any;
+    assert.equal(l4Plan.teamLevel, 'L4');
+    assert.deepEqual(l4Plan.rosterProjection.syntheticRoles, ['lieutenant']);
+    assert.ok(l4Plan.rosterProjection.activeRoles.includes('lieutenant'));
+    assert.ok(!l4Plan.rosterProjection.activeRoles.includes('reviewAgent'));
+    assert.ok(!l4Plan.rosterProjection.activeRoles.includes('knowledgeScout'));
+    assert.ok(plan.rosterProjection.activeRoles.includes('reviewAgent'));
+    assert.ok(plan.rosterProjection.activeRoles.includes('knowledgeScout'));
 
     console.log('[validate-team-agents] ok (per-role-provider-selection-config)');
     return;
@@ -1680,9 +1696,26 @@ async function main() {
       brokerLane: safeBrokerLane(),
       requestedTeamSize: 'L1'
     }) as any;
-    assert.equal(allowedPlan.decisionClass, 'allowed');
-    assert.equal(allowedPlan.violationStatus, 'allowed');
+    assert.equal(allowedPlan.decisionClass, 'auto-execution');
+    assert.equal(allowedPlan.violationStatus, 'none');
     assert.equal(allowedPlan.requiresHumanSignoff, false);
+    assert.equal(allowedPlan.requiresAdr, false);
+    const adrPlan = buildTeamPlan({
+      task: { workItemId: 'TASK-TEAM-0056', title: 'Governance runtime fields' },
+      recipe,
+      writePaths: ['packages/cli/src/commands/team.ts'],
+      validation: { ok: true, findings: [] },
+      brokerLane: {
+        ...safeBrokerLane(),
+        decision: { verdict: 'needs-steward', reason: 'ADR required for steward lane.' },
+        blockedReasons: ['ADR required for steward lane.']
+      },
+      requestedTeamSize: 'L1'
+    }) as any;
+    assert.equal(adrPlan.decisionClass, 'adr-required');
+    assert.equal(adrPlan.violationStatus, 'adr-required');
+    assert.equal(adrPlan.requiresHumanSignoff, true);
+    assert.equal(adrPlan.requiresAdr, true);
     const blockedPlan = buildTeamPlan({
       task: { workItemId: 'TASK-TEAM-0056', title: 'Governance runtime fields' },
       recipe,
@@ -1701,7 +1734,7 @@ async function main() {
       requestedTeamSize: 'L1'
     }) as any;
     assert.equal(blockedPlan.decisionClass, 'blocked');
-    assert.equal(blockedPlan.violationStatus, 'policy-blocked');
+    assert.equal(blockedPlan.violationStatus, 'blocked');
     assert.equal(blockedPlan.governanceRuntime.schemaId, 'atm.teamGovernanceRuntimeFields.v1');
     console.log('[validate-team-agents] ok (team-governance-runtime-fields)');
     return;

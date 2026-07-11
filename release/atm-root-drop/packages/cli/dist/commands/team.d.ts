@@ -42,11 +42,11 @@ type PermissionLease = {
 };
 type TeamGovernanceRuntimeFields = {
     schemaId: 'atm.teamGovernanceRuntimeFields.v1';
-    decisionClass: 'allowed' | 'blocked' | 'escalated';
+    decisionClass: 'auto-execution' | 'human-signoff-required' | 'adr-required' | 'blocked';
     decisionReason: string;
     requiresHumanSignoff: boolean;
     requiresAdr: boolean;
-    violationStatus: 'allowed' | 'warning' | 'broker-conflict-blocked' | 'policy-blocked' | 'escalated';
+    violationStatus: 'none' | 'warning' | 'broker-conflict-blocked' | 'human-signoff-required' | 'adr-required' | 'blocked';
     escalationTarget: string | null;
 };
 type ReviewerIdentity = {
@@ -300,7 +300,7 @@ type TeamRuntimePilot = {
     brokerConflictVocabulary: {
         decisionClass: string;
         decisionReason: string;
-        violationStatus: 'allowed' | 'proposal-submitted' | 'broker-conflict-blocked';
+        violationStatus: 'none' | 'proposal-submitted' | 'broker-conflict-blocked';
         blockedCode: 'broker-conflict-blocked' | null;
     };
     actionableRefinementFindings: Array<{
@@ -839,11 +839,11 @@ export declare function buildTeamPlan(input: {
         };
     };
     governanceRuntime: TeamGovernanceRuntimeFields;
-    decisionClass: "blocked" | "allowed" | "escalated";
+    decisionClass: "blocked" | "human-signoff-required" | "adr-required" | "auto-execution";
     decisionReason: string;
     requiresHumanSignoff: boolean;
     requiresAdr: boolean;
-    violationStatus: "warning" | "allowed" | "broker-conflict-blocked" | "escalated" | "policy-blocked";
+    violationStatus: "none" | "warning" | "blocked" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
     escalationTarget: string | null;
     providerSelectionSource: {
         schemaId: "atm.teamAgentsConfig.v1";
@@ -1210,11 +1210,11 @@ export declare function writeTeamRun(input: {
         findings: PermissionFinding[];
     };
     governanceRuntime: TeamGovernanceRuntimeFields;
-    decisionClass: "blocked" | "allowed" | "escalated";
+    decisionClass: "blocked" | "human-signoff-required" | "adr-required" | "auto-execution";
     decisionReason: string;
     requiresHumanSignoff: boolean;
     requiresAdr: boolean;
-    violationStatus: "warning" | "allowed" | "broker-conflict-blocked" | "escalated" | "policy-blocked";
+    violationStatus: "none" | "warning" | "blocked" | "broker-conflict-blocked" | "human-signoff-required" | "adr-required";
     escalationTarget: string | null;
     brokerLane: TeamBrokerLaneEvidence;
     captainDecision: {

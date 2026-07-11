@@ -2491,13 +2491,13 @@ export function buildTeamRuntimePilot(input) {
             : 'broker-conflict-blocked'
         : 'none';
     const brokerConflictVocabulary = {
-        decisionClass: blockedByBroker ? 'blocked' : 'allowed',
+        decisionClass: blockedByBroker ? 'blocked' : 'auto-execution',
         decisionReason: input.brokerLane.blockedReasons[0] ?? input.brokerLane.decision.reason ?? 'Team Broker allowed the runtime pilot lane.',
         violationStatus: blockedByBroker
             ? brokerViolationStatus === 'proposal-submitted'
                 ? 'proposal-submitted'
                 : 'broker-conflict-blocked'
-            : 'allowed',
+            : 'none',
         blockedCode: blockedByBroker && brokerViolationStatus !== 'proposal-submitted' ? 'broker-conflict-blocked' : null
     };
     const actionableRefinementFindings = [
@@ -2592,19 +2592,23 @@ function buildTeamGovernanceRuntimeFields(input) {
     const requiresHumanSignoff = escalationRequired || requiresAdr;
     const decisionClass = blockedByBroker || blockingFinding
         ? 'blocked'
-        : escalationRequired
-            ? 'escalated'
-            : 'allowed';
+        : requiresAdr
+            ? 'adr-required'
+            : requiresHumanSignoff
+                ? 'human-signoff-required'
+                : 'auto-execution';
     const decisionReason = blockingFinding?.summary
         ?? input.runtimePilot.brokerConflictVocabulary.decisionReason
         ?? input.captainDecision.reason;
     const violationStatus = blockedByBroker
         ? 'broker-conflict-blocked'
         : blockingFinding
-            ? 'policy-blocked'
-            : escalationRequired
-                ? 'escalated'
-                : 'allowed';
+            ? 'blocked'
+            : requiresAdr
+                ? 'adr-required'
+                : requiresHumanSignoff
+                    ? 'human-signoff-required'
+                    : 'none';
     return {
         schemaId: 'atm.teamGovernanceRuntimeFields.v1',
         decisionClass,
@@ -3443,10 +3447,10 @@ function buildProviderOrchestrationEvents(input) {
             providerId,
             role,
             runtimeMode: input.runtimeMode,
-            decisionClass: input.result.ok ? 'allowed' : 'blocked',
+            decisionClass: input.result.ok ? 'auto-execution' : 'blocked',
             decisionReason: input.result.stepResult.summary,
-            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
-            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'none' : 'blocked',
+            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'none' : 'provider-step-failed',
             summary: input.result.stepResult.summary
         }),
         ...input.result.stepResult.artifacts.map((artifactType) => createTeamObservabilityEvent({
@@ -3458,10 +3462,10 @@ function buildProviderOrchestrationEvents(input) {
             runtimeMode: input.runtimeMode,
             artifactType,
             artifactId: `${input.result.sessionId}:${artifactType}`,
-            decisionClass: conflictBlocked ? 'blocked' : input.result.ok ? 'allowed' : 'blocked',
+            decisionClass: conflictBlocked ? 'blocked' : input.result.ok ? 'auto-execution' : 'blocked',
             decisionReason: input.result.stepResult.summary,
-            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
-            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'none' : 'blocked',
+            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'none' : 'provider-step-failed',
             summary: `${artifactType} emitted by ${role}.`
         })),
         createTeamObservabilityEvent({
@@ -3471,10 +3475,10 @@ function buildProviderOrchestrationEvents(input) {
             providerId,
             role,
             runtimeMode: input.runtimeMode,
-            decisionClass: input.result.ok ? 'allowed' : 'blocked',
+            decisionClass: input.result.ok ? 'auto-execution' : 'blocked',
             decisionReason: input.result.stepResult.summary,
-            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'policy-blocked',
-            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'allowed' : 'provider-step-failed',
+            violationStatus: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'none' : 'blocked',
+            statusCode: conflictBlocked ? 'broker-conflict-blocked' : input.result.ok ? 'none' : 'provider-step-failed',
             summary: input.result.ok ? `Provider session completed: ${input.result.sessionId}.` : `Provider session failed: ${input.result.sessionId}.`
         })
     ];

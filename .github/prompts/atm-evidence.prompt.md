@@ -20,6 +20,26 @@ Use this ATM command only after the first command confirms it is the current gov
 node atm.mjs explain --why blocked --json
 ```
 
+## Team Agents Evidence Surface
+
+When evidence or blocked guidance involves Team Agents, recognize these as
+first-class proof surfaces:
+
+- `atm.teamProviderRunArtifact.v1` proves a governed provider role run.
+- `atm.reviewAgentSignature.v1` proves formal or advisory Review Agent output.
+- `atm.teamAgentObservabilityEvent.v1` proves runtime events such as
+  `artifact.output`, `session.failure`, and `broker.conflict.blocked`.
+- `knowledge.query` is shareable advisory read access; `knowledge.index.write`
+  is coordinator-only generated cache writing.
+- `review.signature.write` is formal Review Agent authority and requires the
+  independence/quorum checks named by the task.
+
+If `decisionClass`, `decisionReason`, `requiresHumanSignoff`, `requiresAdr`,
+`violationStatus`, or `escalationTarget` appears in plan/status/start output,
+carry those fields into the evidence explanation. If `violationStatus` is
+`broker-conflict-blocked`, explain the required Broker resolution path instead
+of treating it as a warning.
+
 ## Handoff
 
 ```bash
