@@ -972,6 +972,30 @@ export declare function buildTeamPlan(input: {
 };
 export declare function buildOpenAIFamilyRuntimeBridgeSummary(): TeamOpenAIFamilyRuntimeBridgeSummary;
 export declare function buildEditorExecutionRuntimeBridgeSummary(): TeamEditorExecutionRuntimeBridgeSummary;
+export declare function buildGeminiDirectRuntimeBridgeSummary(): {
+    schemaId: string;
+    providerIds: readonly ["gemini-direct"];
+    sharedProviderInterface: string;
+    sharedArtifactType: string;
+    coordinatorOwnedAuthority: boolean;
+    bridge: {
+        schemaId: string;
+        providerId: string;
+        bridgeSchemaId: string;
+        configSchemaId: string;
+        supportedRuntimeModes: readonly ["real-agent", "broker-only"];
+        requiredConfigRefs: readonly ["modelId", "apiKeyEnvVar"];
+        optionalConfigRefs: readonly ["baseUrlEnvVar"];
+        authModes: readonly ["api-key-env"];
+        executionReadiness: "vendor-execution-ready";
+        executionSurface: "gemini-generate-content-http";
+        brokerCheckedPermissions: readonly ["exec.validator"];
+        artifactType: string;
+        observabilityEventTypes: readonly ["session.start", "artifact.output", "session.complete"];
+        sharedBrokerVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
+        rawSecretsLogged: false;
+    };
+};
 export declare function buildMicrosoftFoundryRuntimeBridgeSummary(): TeamMicrosoftFoundryRuntimeBridgeSummary;
 export declare function buildAnthropicRuntimeBridgeSummary(): TeamAnthropicRuntimeBridgeSummary;
 export declare function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract;
@@ -1337,7 +1361,58 @@ export declare function writeTeamRun(input: {
     createdAt: string;
     updatedAt: string;
 };
-type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>>;
+export declare function runTeamProviderExecution(input: {
+    cwd: string;
+    taskId: string;
+    teamRunId: string;
+    recipe: TeamRecipe;
+    runtimeContract: TeamRuntimeContract;
+    runtimePilot: TeamRuntimePilot;
+    roleSelections: readonly {
+        role: string;
+        selectedProvider: {
+            providerId: string;
+            sdkId: string;
+            modelId: string;
+            runtimeMode: TeamRuntimeMode;
+        };
+    }[];
+    scopedPaths: readonly string[];
+    executor?: TeamProviderHttpExecutor;
+}): Promise<{
+    requested: boolean;
+    blockedReason: string;
+    results: DirectTeamProviderRoleResult[];
+    localSecrets?: undefined;
+} | {
+    requested: boolean;
+    blockedReason: null;
+    localSecrets: TeamVendorLocalSecretsSummary;
+    results: DirectTeamProviderRoleResult[];
+}>;
+export type DirectTeamRoleHandoffArtifact = {
+    readonly role: string;
+    readonly providerId: string;
+    readonly outputTextPreview: string;
+};
+type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>> & {
+    readonly handoffArtifact: DirectTeamRoleHandoffArtifact;
+    readonly contextTelemetry: {
+        readonly baseInstructionChars: number;
+        readonly handoffChars: number;
+        readonly totalInstructionChars: number;
+        readonly priorArtifactCount: number;
+        readonly consumedArtifactRefs: readonly string[];
+    };
+};
+export declare function buildDirectTeamRoleInstructions(input: {
+    taskId: string;
+    role: string;
+    priorRoleArtifacts?: readonly DirectTeamRoleHandoffArtifact[];
+}): {
+    instructions: string;
+    telemetry: DirectTeamProviderRoleResult['contextTelemetry'];
+};
 export declare function runDirectTeamProviderRole(input: {
     taskId: string;
     role: string;
@@ -1349,6 +1424,7 @@ export declare function runDirectTeamProviderRole(input: {
     };
     env: Record<string, string | undefined>;
     scopedPaths: readonly string[];
+    priorRoleArtifacts?: readonly DirectTeamRoleHandoffArtifact[];
     executor?: TeamProviderHttpExecutor;
 }): Promise<DirectTeamProviderRoleResult | null>;
 export declare function loadTeamVendorLocalSecrets(cwd: string): {

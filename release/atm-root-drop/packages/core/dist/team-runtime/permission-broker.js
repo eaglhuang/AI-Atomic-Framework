@@ -21,6 +21,7 @@ export function createDefaultTeamPermissionPolicy() {
             'azure-openai': ['file.read', 'exec.validator'],
             'claude-code': ['file.read', 'file.write', 'exec.validator'],
             gemini: ['file.read', 'exec.validator'],
+            'gemini-direct': ['file.read', 'exec.validator'],
             'microsoft-foundry': ['file.read', 'exec.validator']
         },
         defaultDecision: 'deny'

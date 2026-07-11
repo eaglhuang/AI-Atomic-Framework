@@ -5,7 +5,7 @@ This document defines the emergency-minimum vendor runtime contract used by Team
 ## Vendor-Neutral Core
 
 - The Team runtime core must keep provider registration, session lifecycle, retries, cancellation, and role orchestration vendor-neutral.
-- Provider metadata must support `openai`, `anthropic`, `azure-openai`, `claude-code`, `gemini`, and `microsoft-foundry` without changing the orchestration contract shape.
+- Provider metadata must support `openai`, `anthropic`, `azure-openai`, `claude-code`, `gemini`, `gemini-direct`, and `microsoft-foundry` without changing the orchestration contract shape.
 - Worker authority remains coordinator-owned. Provider bridges do not gain `git.write`, `task.lifecycle`, or self-close authority.
 
 ## Permission Broker
@@ -85,6 +85,22 @@ The Anthropic bridge is discoverable through `TEAM_PROVIDER_IDS`, role provider
 selection, the runtime bridge summary, and provider permission broker policy. CI
 and deterministic validators use an injected HTTP executor and must not call a
 live paid API.
+
+## Gemini Direct Bridge And Artifact Handoff
+
+`gemini-direct` is the raw GenerateContent API surface and remains distinct
+from the `gemini` CLI/editor bridge. It uses
+`atm.geminiDirectTeamProviderConfig.v1`, reads `GEMINI_API_KEY` by reference,
+and emits the same redacted provider-run artifact and observability sequence as
+the OpenAI and Anthropic direct bridges.
+
+Concrete Team execution carries only successful prior-role previews to later
+roles. Each preview is capped at 500 characters, at most four previews are
+included, and the complete handoff section is capped at 2,400 characters.
+Source labels such as `[implementer/anthropic]` let an independent reviewer tie
+its decision to the producing role without receiving the entire Captain
+context. Failed or broker-blocked role output is not promoted into the handoff;
+the sequential dispatcher continues with sibling roles.
 
 ## Runtime Tiers
 

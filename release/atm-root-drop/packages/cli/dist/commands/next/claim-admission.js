@@ -1,0 +1,92 @@
+/**
+ * TASK-RFT-0011 — next.claim.admission atom.
+ *
+ * The pre-fix bug: `broker register` returns `parallel-safe` /
+ * `lane: direct-brokered` via `packages/core/src/broker/conflict-matrix.ts`,
+ * but `next --claim` runs a separate parallel-preflight and throws
+ * `ATM_NEXT_CLAIM_BLOCKED` on the same atom overlap. The two gates should
+ * agree — one broker verdict, one CID gate — so an operator seeing "broker OK"
+ * never gets a claim block a moment later.
+ *
+ * This module owns the policy decision "should next --claim admit this
+ * candidate?" It takes two verdicts as inputs:
+ *
+ *   - the *broker verdict* — the arbitration verdict from
+ *     `evaluateConflictMatrix(newIntent, activeIntents)` in the exact same
+ *     module the `broker register` command uses. Passed in by the caller
+ *     (next.ts) so this module stays pure and testable.
+ *   - the *CID gate verdict* — the legacy diagnostic the `next --claim`
+ *     preflight computes from `parallel` findings. This module treats it as a
+ *     diagnostic wrapper: it does not gate on it, but it does surface a
+ *     divergence diagnostic when the two disagree.
+ *
+ * The final admission decision is driven by the broker verdict. This means:
+ *   - broker `allow` / `watch` → admitted
+ *   - broker `freeze` → blocked (mirrors what `broker register` already tells
+ *     the operator)
+ *   - broker `takeover` → admitted with an advisory
+ */
+/**
+ * Return true iff the broker verdict is admissible.
+ */
+export function isBrokerVerdictAdmissible(verdict) {
+    return verdict === 'allow' || verdict === 'watch' || verdict === 'takeover';
+}
+/**
+ * Classify whether the broker verdict and the CID diagnostic agree. They
+ * "agree" when both would admit or both would block; anything else is
+ * divergence and gets a diagnostic (should not happen once this atom is
+ * consulted end-to-end; we ship the diagnostic to catch future regressions).
+ */
+export function detectBrokerCidDivergence(brokerVerdict, cidVerdict) {
+    const brokerAdmits = isBrokerVerdictAdmissible(brokerVerdict);
+    const cidBlocks = cidVerdict === 'blocked-cid-conflict';
+    const cidAdmits = cidVerdict === 'parallel-safe'
+        || cidVerdict === 'parallel-safe-with-cid-overlap-advisory';
+    if (brokerAdmits && cidBlocks)
+        return true;
+    if (!brokerAdmits && cidAdmits)
+        return true;
+    return false;
+}
+export function evaluateClaimAdmission(input) {
+    const divergent = detectBrokerCidDivergence(input.brokerVerdict, input.cidVerdict);
+    const divergence = divergent
+        ? {
+            code: 'ATM_CLAIM_ADMISSION_BROKER_CID_DIVERGENCE',
+            brokerVerdict: input.brokerVerdict,
+            cidVerdict: input.cidVerdict,
+            detail: `Broker verdict '${input.brokerVerdict}' disagrees with CID gate verdict '${input.cidVerdict}' for ${input.candidateTaskId}. Broker verdict wins; investigate the parallel-preflight discrepancy.`
+        }
+        : null;
+    if (!isBrokerVerdictAdmissible(input.brokerVerdict)) {
+        return {
+            admitted: false,
+            blockCode: 'ATM_NEXT_CLAIM_BLOCKED',
+            blockReason: `Broker arbitration returned '${input.brokerVerdict}' (broker-conflict-blocked) - claim cannot proceed while the underlying conflict is unresolved`
+                + (input.conflictingTaskId ? ` (conflict with ${input.conflictingTaskId}).` : '.'),
+            divergence,
+            advisory: null
+        };
+    }
+    let advisory = null;
+    if (input.brokerVerdict === 'takeover') {
+        advisory = {
+            kind: 'takeover-required',
+            detail: 'Broker verdict is takeover; lease must be seized before write.'
+        };
+    }
+    else if ((input.overlappingAtomIds?.length ?? 0) > 0) {
+        advisory = {
+            kind: 'cid-overlap-advisory',
+            detail: `Same-atom overlap with ${input.conflictingTaskId ?? 'another task'} is admitted because the broker verdict is '${input.brokerVerdict}'.`
+        };
+    }
+    return {
+        admitted: true,
+        blockCode: null,
+        blockReason: null,
+        divergence,
+        advisory
+    };
+}

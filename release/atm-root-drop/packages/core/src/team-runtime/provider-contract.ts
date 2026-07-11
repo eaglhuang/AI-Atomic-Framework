@@ -4,13 +4,15 @@ export const TEAM_PROVIDER_IDS = [
   'azure-openai',
   'claude-code',
   'gemini',
+  'gemini-direct',
   'microsoft-foundry'
 ] as const;
 
 export const TEAM_DIRECT_API_PROVIDER_IDS = [
   'openai',
   'anthropic',
-  'azure-openai'
+  'azure-openai',
+  'gemini-direct'
 ] as const satisfies readonly (typeof TEAM_PROVIDER_IDS[number])[];
 
 export type TeamDirectApiProviderId = typeof TEAM_DIRECT_API_PROVIDER_IDS[number];

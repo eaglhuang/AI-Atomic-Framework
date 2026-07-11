@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import { runGitHeadEvidenceBackfill } from '../verbs/git-head-backfill.js';
+const actor = 'cursor-composer-rft0007';
+const first = runGitHeadEvidenceBackfill(['--actor', actor, '--json']);
+assert.equal(typeof first.ok, 'boolean');
+const withReason = runGitHeadEvidenceBackfill(['--actor', actor, '--reason', 'rft0007-spec', '--json']);
+assert.equal(typeof withReason.ok, 'boolean');
+const second = runGitHeadEvidenceBackfill(['--actor', actor, '--json']);
+assert.equal(typeof second.ok, 'boolean');
+console.log('[git-head-backfill.spec] ok');

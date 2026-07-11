@@ -1,0 +1,2 @@
+export const DEFAULT_EVIDENCE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+export const DEFAULT_POLICE_DAILY_CAP = 50;

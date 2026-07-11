@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/team-agent-observability-event.schema.json",
+  "title": "ATM Team Agent Observability Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "eventId",
+    "emittedAt",
+    "eventType",
+    "taskId",
+    "teamRunId",
+    "providerId",
+    "role",
+    "runtimeMode",
+    "artifactType",
+    "artifactId",
+    "decisionClass",
+    "decisionReason",
+    "violationStatus",
+    "statusCode",
+    "summary",
+    "redaction",
+    "evidenceBoundary"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.teamAgentObservabilityEvent.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^TAO-[a-z0-9]+$"
+    },
+    "emittedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "eventType": {
+      "enum": [
+        "session.start",
+        "step.execution",
+        "tool.invocation",
+        "artifact.output",
+        "session.complete",
+        "session.failure",
+        "broker.conflict.blocked",
+        "broker.conflict.resolution"
+      ]
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "teamRunId": {
+      "type": ["string", "null"]
+    },
+    "providerId": {
+      "enum": ["openai", "azure-openai", "claude-code", "gemini", "microsoft-foundry", "unknown"]
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runtimeMode": {
+      "enum": ["real-agent", "editor-subagent", "broker-only"]
+    },
+    "artifactType": {
+      "type": ["string", "null"]
+    },
+    "artifactId": {
+      "type": ["string", "null"]
+    },
+    "decisionClass": {
+      "type": ["string", "null"]
+    },
+    "decisionReason": {
+      "type": ["string", "null"]
+    },
+    "violationStatus": {
+      "type": ["string", "null"]
+    },
+    "statusCode": {
+      "type": ["string", "null"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawSecretsLogged", "redactedFields"],
+      "properties": {
+        "rawSecretsLogged": {
+          "const": false
+        },
+        "redactedFields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "evidenceBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["governanceEvidenceOnly", "rawSecretsAllowed"],
+      "properties": {
+        "governanceEvidenceOnly": {
+          "const": true
+        },
+        "rawSecretsAllowed": {
+          "const": false
+        }
+      }
+    }
+  }
+}

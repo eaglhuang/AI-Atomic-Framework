@@ -47,6 +47,7 @@ import { buildAnthropicTeamProviderBridgeDescriptor, createAnthropicTeamProvider
 import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
 import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/claude-code.ts';
 import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
+import { buildGeminiDirectTeamProviderBridgeDescriptor, createGeminiDirectTeamProviderBridge, launchGeminiDirectTeamProviderRun } from '../../../core/src/team-runtime/providers/gemini-direct.ts';
 import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
 import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge, launchOpenAITeamProviderRun } from '../../../core/src/team-runtime/providers/openai.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
@@ -2962,6 +2963,17 @@ export function buildEditorExecutionRuntimeBridgeSummary(): TeamEditorExecutionR
   };
 }
 
+export function buildGeminiDirectRuntimeBridgeSummary() {
+  return {
+    schemaId: 'atm.geminiDirectRuntimeBridgeSummary.v1',
+    providerIds: ['gemini-direct'] as const,
+    sharedProviderInterface: 'atm.teamProviderContract.v1',
+    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
+    coordinatorOwnedAuthority: true,
+    bridge: buildGeminiDirectTeamProviderBridgeDescriptor()
+  };
+}
+
 export function buildMicrosoftFoundryRuntimeBridgeSummary(): TeamMicrosoftFoundryRuntimeBridgeSummary {
   return {
     schemaId: 'atm.microsoftFoundryRuntimeBridgeSummary.v1',
@@ -4413,7 +4425,7 @@ export function writeTeamRun(input: {
   return teamRun;
 }
 
-async function runTeamProviderExecution(input: {
+export async function runTeamProviderExecution(input: {
   cwd: string;
   taskId: string;
   teamRunId: string;
@@ -4430,12 +4442,13 @@ async function runTeamProviderExecution(input: {
     };
   }[];
   scopedPaths: readonly string[];
+  executor?: TeamProviderHttpExecutor;
 }) {
   if (input.runtimeContract.runtimeMode === 'broker-only') {
     return {
       requested: true,
       blockedReason: 'broker-only-runtime-never-spawns',
-      results: [] as Array<Awaited<ReturnType<typeof runProviderOrchestration>>>
+      results: [] as DirectTeamProviderRoleResult[]
     };
   }
   const selectedRoles = input.roleSelections.length > 0
@@ -4450,16 +4463,22 @@ async function runTeamProviderExecution(input: {
       }
     }));
   const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
-  const results = [];
+  const results: DirectTeamProviderRoleResult[] = [];
+  const priorRoleArtifacts: DirectTeamRoleHandoffArtifact[] = [];
   for (const roleSelection of selectedRoles) {
     const result = await runDirectTeamProviderRole({
       taskId: input.taskId,
       role: roleSelection.role,
       selection: roleSelection.selectedProvider,
       env: localSecrets.env,
-      scopedPaths: input.scopedPaths
+      scopedPaths: input.scopedPaths,
+      priorRoleArtifacts,
+      executor: input.executor
     });
-    if (result) results.push(result);
+    if (result) {
+      results.push(result);
+      if (result.handoffArtifact && result.ok) priorRoleArtifacts.push(result.handoffArtifact);
+    }
   }
   appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
     taskId: input.taskId,
@@ -4475,7 +4494,45 @@ async function runTeamProviderExecution(input: {
   };
 }
 
-type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>>;
+export type DirectTeamRoleHandoffArtifact = {
+  readonly role: string;
+  readonly providerId: string;
+  readonly outputTextPreview: string;
+};
+
+type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>> & {
+  readonly handoffArtifact: DirectTeamRoleHandoffArtifact;
+  readonly contextTelemetry: {
+    readonly baseInstructionChars: number;
+    readonly handoffChars: number;
+    readonly totalInstructionChars: number;
+    readonly priorArtifactCount: number;
+    readonly consumedArtifactRefs: readonly string[];
+  };
+};
+
+export function buildDirectTeamRoleInstructions(input: {
+  taskId: string;
+  role: string;
+  priorRoleArtifacts?: readonly DirectTeamRoleHandoffArtifact[];
+}): { instructions: string; telemetry: DirectTeamProviderRoleResult['contextTelemetry'] } {
+  const base = `Run Team role ${input.role} for ${input.taskId}. Return a concise role report. Do not close, commit, or exceed Coordinator authority.`;
+  const bounded = (input.priorRoleArtifacts ?? []).slice(-4).map((artifact) => ({
+    ...artifact,
+    outputTextPreview: artifact.outputTextPreview.slice(0, 500)
+  }));
+  const handoff = bounded.length === 0 ? '' : `\nPrior governed role artifacts (review and cite relevant source roles):\n${bounded.map((artifact) => `[${artifact.role}/${artifact.providerId}] ${artifact.outputTextPreview}`).join('\n').slice(0, 2400)}`;
+  return {
+    instructions: `${base}${handoff}`,
+    telemetry: {
+      baseInstructionChars: base.length,
+      handoffChars: handoff.length,
+      totalInstructionChars: base.length + handoff.length,
+      priorArtifactCount: bounded.length,
+      consumedArtifactRefs: bounded.map((artifact) => `${artifact.role}/${artifact.providerId}`)
+    }
+  };
+}
 
 export async function runDirectTeamProviderRole(input: {
   taskId: string;
@@ -4488,11 +4545,13 @@ export async function runDirectTeamProviderRole(input: {
   };
   env: Record<string, string | undefined>;
   scopedPaths: readonly string[];
+  priorRoleArtifacts?: readonly DirectTeamRoleHandoffArtifact[];
   executor?: TeamProviderHttpExecutor;
 }): Promise<DirectTeamProviderRoleResult | null> {
   if (input.selection.runtimeMode !== 'real-agent') return null;
   const providerId = normalizeTeamProviderId(input.selection.providerId);
-  if (providerId !== 'openai' && providerId !== 'anthropic') return null;
+  if (providerId !== 'openai' && providerId !== 'anthropic' && providerId !== 'gemini-direct') return null;
+  const rolePrompt = buildDirectTeamRoleInstructions(input);
   const request = {
     taskId: input.taskId,
     role: input.role,
@@ -4500,7 +4559,7 @@ export async function runDirectTeamProviderRole(input: {
     providerId,
     sdkId: input.selection.sdkId,
     modelId: input.selection.modelId,
-    instructions: `Run Team role ${input.role} for ${input.taskId}. Return a concise role report.`
+    instructions: rolePrompt.instructions
   };
   const permissionPolicy = createDefaultTeamPermissionPolicy();
   const bridgeResult = providerId === 'openai'
@@ -4518,7 +4577,7 @@ export async function runDirectTeamProviderRole(input: {
       env: input.env,
       executor: input.executor
     })
-    : await launchAnthropicTeamProviderRun({
+    : providerId === 'anthropic' ? await launchAnthropicTeamProviderRun({
       bridge: createAnthropicTeamProviderBridge({
         schemaId: 'atm.anthropicTeamProviderConfig.v1',
         providerId: 'anthropic',
@@ -4527,6 +4586,19 @@ export async function runDirectTeamProviderRole(input: {
         apiKeyEnvVar: 'ANTHROPIC_API_KEY'
       }),
       request: { ...request, providerId: 'anthropic' },
+      permissionPolicy,
+      scopedPaths: input.scopedPaths,
+      env: input.env,
+      executor: input.executor
+    }) : await launchGeminiDirectTeamProviderRun({
+      bridge: createGeminiDirectTeamProviderBridge({
+        schemaId: 'atm.geminiDirectTeamProviderConfig.v1',
+        providerId: 'gemini-direct',
+        sdkId: 'gemini-generate-content',
+        modelId: input.selection.modelId,
+        apiKeyEnvVar: 'GEMINI_API_KEY'
+      }),
+      request: { ...request, providerId: 'gemini-direct' },
       permissionPolicy,
       scopedPaths: input.scopedPaths,
       env: input.env,
@@ -4545,7 +4617,13 @@ export async function runDirectTeamProviderRole(input: {
       artifacts: [bridgeResult.artifact.artifactType, ...bridgeResult.artifact.outputArtifacts],
       retryable: bridgeResult.artifact.execution.retryable,
       summary: `${bridgeResult.providerId} ${input.role} vendor execution ${bridgeResult.ok ? 'completed' : 'failed'}${bridgeResult.artifact.execution.statusCode ? ` with status ${bridgeResult.artifact.execution.statusCode}` : ''}.`
-    }
+    },
+    handoffArtifact: {
+      role: input.role,
+      providerId: bridgeResult.providerId,
+      outputTextPreview: bridgeResult.artifact.execution.outputTextPreview
+    },
+    contextTelemetry: rolePrompt.telemetry
   };
 }
 

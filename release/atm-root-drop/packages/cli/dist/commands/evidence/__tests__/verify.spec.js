@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { verifyTaskEvidence } from '../bundle-io.js';
+const cwd = process.cwd();
+const taskId = 'TASK-RFT-0007';
+const closeGate = verifyTaskEvidence({ cwd, taskId, gate: 'close' });
+assert.equal(typeof closeGate.ok, 'boolean');
+assert.equal(closeGate.gate, 'close');
+const commitGate = verifyTaskEvidence({ cwd, taskId, gate: 'commit' });
+assert.equal(commitGate.gate, 'commit');
+const prGate = verifyTaskEvidence({ cwd, taskId, gate: 'pr' });
+assert.equal(prGate.gate, 'pr');
+console.log('[verify.spec] ok');

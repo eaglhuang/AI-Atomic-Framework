@@ -1,0 +1,2978 @@
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, appendFileSync, unlinkSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
+import { resolveActorId } from '../actor-registry.ts';
+import { resolveActorWorkSession } from '../actor-session.ts';
+import { createFrameworkModeStatus } from '../framework-development.ts';
+import { CliError, makeResult, message, relativePathFrom } from '../shared.ts';
+import { gitHeadEvidencePath } from '../git-head-evidence.ts';
+import { resolveTaskRunnerArbitration } from '../validate.ts';
+import {
+  readTestCatalog,
+  resolveTestPlanForTask,
+  selectTestEntries,
+  type TestCatalogEntry
+} from '../test-catalog.ts';
+import {
+  generateDiffEvidence,
+  mergeDiffEvidenceWithExisting,
+  validateDiffEvidence
+} from '../../../../core/src/evidence/diff-evidence.ts';
+import { inspectHistoricalDelivery, pathMatchesTaskScope, type TaskHistoricalDeliveryReport } from '../tasks/historical-delivery.ts';
+import {
+  normalizeValidatorGateName,
+  normalizeValidatorToken,
+  canonicalizeValidatorIdentity,
+  classifyValidatorTier,
+  isClosureRequiredValidator,
+  resolveValidatorExpectedCommand,
+  looksLikeLiteralValidatorCommand,
+  detectAutoLinkedValidator,
+  type ValidatorTier,
+  type EvidenceFreshness,
+  type ValidatorEvidenceState
+} from './validator-classification.ts';
+import {
+  collectRecordCommandRuns,
+  readRecordValidationPasses,
+  readRecordFreshness,
+  hashString,
+  readCommandRunsInputFile,
+  normalizeEvidenceCommandRuns,
+  normalizeCommandRunInput,
+  normalizeRunnerKind,
+  inferRunnerKindFromCommand,
+  uniqueCommandRuns,
+  computeCommandRunCacheKey,
+  hashJson,
+  uniqueStrings,
+  readCurrentCommit,
+  type CommandRunEvidenceInput
+} from './command-runs.ts';
+import {
+  classifyValidatorEvidenceState,
+  buildMissingValidatorFinding,
+  computeMissingValidatorReport,
+  type MissingValidatorFinding,
+  type ValidatorCatalogEntry,
+  type MissingValidatorReport
+} from './missing-report.ts';
+import { isRecord, isCommandRunProof, quoteForShell } from './shared-utils.ts';
+import {
+  evidencePathForTask,
+  taskPathForEvidence,
+  readTaskDocument,
+  readEvidenceBundle
+} from './evidence-store.ts';
+
+export type EvidenceGate = 'close' | 'commit' | 'pr';
+export type { EvidenceFreshness, ValidatorTier, ValidatorEvidenceState, CommandRunEvidenceInput };
+export type { MissingValidatorFinding, ValidatorCatalogEntry, MissingValidatorReport };
+export {
+  computeMissingValidatorReport,
+  classifyValidatorEvidenceState,
+  buildMissingValidatorFinding,
+  normalizeValidatorGateName,
+  normalizeValidatorToken,
+  canonicalizeValidatorIdentity,
+  classifyValidatorTier,
+  isClosureRequiredValidator,
+  resolveValidatorExpectedCommand,
+  detectAutoLinkedValidator,
+  collectRecordCommandRuns,
+  readRecordValidationPasses,
+  readRecordFreshness,
+  hashString,
+  readCommandRunsInputFile,
+  normalizeEvidenceCommandRuns,
+  isRecord,
+  isCommandRunProof,
+  quoteForShell,
+  readCurrentCommit
+};
+
+
+type CanonicalEvidenceKind = 'test' | 'artifact' | 'attestation' | 'review' | 'commit' | 'waiver' | 'other';
+
+interface CanonicalEvidenceRecord {
+  readonly kind: CanonicalEvidenceKind;
+  readonly summary: string;
+  readonly producedBy: string | null;
+  readonly artifactPaths: readonly string[];
+  readonly createdAt: string | null;
+  readonly freshness: EvidenceFreshness;
+  readonly hasCommandRunProof: boolean;
+}
+
+interface EvidenceEnvelope {
+  readonly taskId: string;
+  readonly updatedAt: string;
+  readonly evidence: readonly Record<string, unknown>[];
+}
+
+export const EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID = 'atm.evidenceBundleManifest.v1';
+export const TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID = 'atm.teamArtifactHandoffEvidence.v1';
+export const TEAM_CLOSURE_ATTESTATION_SCHEMA_ID = 'atm.teamClosureAttestation.v1';
+
+export interface EvidenceBundleManifest {
+  readonly schemaId: typeof EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID;
+  readonly taskId: string;
+  readonly updatedAt: string;
+  readonly updatedBy: string;
+  readonly freshValidationPasses: readonly string[];
+  readonly staleValidationPasses: readonly string[];
+  readonly commandRuns: readonly Record<string, unknown>[];
+  readonly artifactPaths: readonly string[];
+}
+
+export interface TeamArtifactHandoffEvidence {
+  readonly schemaId: typeof TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID;
+  readonly producedArtifacts: readonly string[];
+  readonly missingArtifacts: readonly string[];
+  readonly retryBudgetStatus: string;
+  readonly escalationTarget: string | null;
+  readonly closeAllowed: boolean;
+}
+
+export interface TeamClosureReviewerIndependenceEvidence {
+  readonly required: boolean;
+  readonly satisfied: boolean;
+  readonly policy: string;
+  readonly reviewerProviderId: string | null;
+  readonly reviewerModelId: string | null;
+  readonly reviewerRuntimeAdapterId: string | null;
+  readonly reason: string;
+}
+
+export interface TeamClosureBrokerSubagentEvidence {
+  readonly schemaId: string | null;
+  readonly enabled: boolean;
+  readonly subagentId: string | null;
+  readonly decisionSurface: string | null;
+  readonly stewardId: string | null;
+  readonly governs: readonly string[];
+  readonly evidenceRequired: readonly string[];
+  readonly authorityBoundary: {
+    readonly fileWrite: boolean;
+    readonly gitWrite: boolean;
+    readonly taskLifecycle: boolean;
+    readonly selfClose: boolean;
+  };
+}
+
+export interface TeamClosureCommitLaneEvidence {
+  readonly schemaId: string | null;
+  readonly serializedBy: string | null;
+  readonly ownerRole: string | null;
+  readonly workerGitWrite: boolean;
+}
+
+export interface TeamClosureWorkerAuthorityBoundaryEvidence {
+  readonly gitWrite: boolean;
+  readonly taskLifecycle: boolean;
+  readonly selfClose: boolean;
+  readonly evidenceWriteOwner: string | null;
+}
+
+export interface TeamClosureAttestationEvidence {
+  readonly schemaId: typeof TEAM_CLOSURE_ATTESTATION_SCHEMA_ID;
+  readonly teamRunId: string;
+  readonly runtimeMode: string;
+  readonly runtimeLanguage: string;
+  readonly runtimeAdapterId: string | null;
+  readonly providerId: string | null;
+  readonly sdkId: string | null;
+  readonly modelId: string | null;
+  readonly runnerKind: string;
+  readonly runtimeVersion: string | null;
+  readonly sandboxPolicyHash: string;
+  readonly attestationSigner: string;
+  readonly brokerSubagent: TeamClosureBrokerSubagentEvidence;
+  readonly commitLane: TeamClosureCommitLaneEvidence;
+  readonly workerAuthorityBoundary: TeamClosureWorkerAuthorityBoundaryEvidence;
+  readonly reviewerIndependence: TeamClosureReviewerIndependenceEvidence;
+  readonly attestedAt: string;
+  readonly localRuntimeWrapperIsSecureSandboxProof: false;
+  readonly commandBackedEvidenceRequired: true;
+}
+
+export function buildTeamArtifactHandoffEvidence(input: {
+  producedArtifacts?: readonly string[];
+  missingArtifacts?: readonly string[];
+  retryBudgetStatus?: unknown;
+  escalationTarget?: unknown;
+  closeAllowed?: unknown;
+}): TeamArtifactHandoffEvidence {
+  return {
+    schemaId: TEAM_ARTIFACT_HANDOFF_EVIDENCE_SCHEMA_ID,
+    producedArtifacts: readStringArray(input.producedArtifacts),
+    missingArtifacts: readStringArray(input.missingArtifacts),
+    retryBudgetStatus: typeof input.retryBudgetStatus === 'string' && input.retryBudgetStatus.trim().length > 0
+      ? input.retryBudgetStatus.trim()
+      : 'unknown',
+    escalationTarget: typeof input.escalationTarget === 'string' && input.escalationTarget.trim().length > 0
+      ? input.escalationTarget.trim()
+      : null,
+    closeAllowed: input.closeAllowed === true
+  };
+}
+
+export function evidenceBundleManifestRelativePath(taskId: string): string {
+  return `.atm/history/evidence/${taskId}.bundle-manifest.json`;
+}
+
+export function evidenceBundleManifestPathForTask(cwd: string, taskId: string): string {
+  return path.join(cwd, evidenceBundleManifestRelativePath(taskId));
+}
+
+export function readEvidenceBundleManifest(cwd: string, taskId: string): EvidenceBundleManifest | null {
+  const manifestPath = evidenceBundleManifestPathForTask(cwd, taskId);
+  if (!existsSync(manifestPath)) return null;
+  const parsed = JSON.parse(readFileSync(manifestPath, 'utf8')) as unknown;
+  if (!isRecord(parsed) || parsed.schemaId !== EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID) return null;
+  if (typeof parsed.taskId !== 'string' || parsed.taskId !== taskId) return null;
+  return {
+    schemaId: EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
+    taskId,
+    updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : new Date(0).toISOString(),
+    updatedBy: typeof parsed.updatedBy === 'string' ? parsed.updatedBy : 'unknown',
+    freshValidationPasses: readStringArray(parsed.freshValidationPasses),
+    staleValidationPasses: readStringArray(parsed.staleValidationPasses),
+    commandRuns: Array.isArray(parsed.commandRuns)
+      ? parsed.commandRuns.filter(isRecord)
+      : [],
+    artifactPaths: readStringArray(parsed.artifactPaths).map((entry) => normalizeRelativePath(entry))
+  };
+}
+
+
+const evidenceWriteSleepBuffer = new Int32Array(new SharedArrayBuffer(4));
+const evidenceWriteLockRetryMs = 50;
+const evidenceWriteLockTimeoutMs = 5_000;
+
+export interface EvidenceGateResult {
+  readonly ok: boolean;
+  readonly gate: EvidenceGate;
+  readonly total: number;
+  readonly counts: Readonly<Record<CanonicalEvidenceKind, number>>;
+  readonly freshCount: number;
+  readonly commandRunEvidenceCount: number;
+  readonly reopenedRedteamTask: boolean;
+  readonly codeOrFrameworkTask: boolean;
+  readonly missing: readonly string[];
+}
+
+
+/** evidence validators --list --task <id> 的執行邏輯 */
+export function runEvidenceValidators(argv: string[]) {
+  let cwd = process.cwd();
+  let taskId: string | null = null;
+  let list = false;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--cwd') {
+      cwd = requireValue(argv, i, '--cwd');
+      i++;
+      continue;
+    }
+    if (arg === '--task') {
+      taskId = requireValue(argv, i, '--task');
+      i++;
+      continue;
+    }
+    if (arg === '--list') {
+      list = true;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence validators does not support option ${arg}`, { exitCode: 2 });
+  }
+
+  if (!list) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence validators requires --list', { exitCode: 2 });
+  }
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence validators --list requires --task <work-item-id>', { exitCode: 2 });
+  }
+
+  const resolvedCwd = path.resolve(cwd);
+  const resolvedTaskId = taskId.trim();
+
+  // 1. 取得 framework 必要 gates（由 criticalChangedFiles 動態決定）
+  const frameworkStatus = createFrameworkModeStatus({ cwd: resolvedCwd });
+  const frameworkGates = frameworkStatus.requiredGates;
+
+  // 2. 取得 task card 宣告的 validators（由 tasks import 時寫入 ledger）
+  // task card 裡常以完整命令字串表示（如 "npm run typecheck"），需正規化成 gate 名稱
+  const taskDocument = readTaskDocument(resolvedCwd, resolvedTaskId);
+  const taskDeclaredValidators: string[] = Array.isArray(taskDocument?.validators)
+    ? (taskDocument.validators as unknown[])
+        .filter((v): v is string => typeof v === 'string' && v.trim().length > 0)
+        .map((v) => canonicalizeValidatorIdentity(v.trim()))
+        .filter(Boolean)
+    : [];
+
+  // 3. 讀取 evidence 中已記錄的 validationPasses
+  const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
+  const recordedPasses = new Set<string>();
+  for (const record of bundle.evidence) {
+    // top-level validationPasses（部分 legacy 格式）
+    if (Array.isArray(record.validationPasses)) {
+      for (const v of record.validationPasses as unknown[]) {
+        if (typeof v === 'string' && v.trim()) recordedPasses.add(canonicalizeValidatorIdentity(v.trim()));
+      }
+    }
+    // details.validationPasses（主要格式，由 evidence add 寫入）
+    if (record.details && typeof record.details === 'object' && !Array.isArray(record.details)) {
+      const d = record.details as Record<string, unknown>;
+      if (Array.isArray(d.validationPasses)) {
+        for (const v of d.validationPasses as unknown[]) {
+          if (typeof v === 'string' && v.trim()) recordedPasses.add(canonicalizeValidatorIdentity(v.trim()));
+        }
+      }
+    }
+  }
+
+  // 4. 合併 framework gates 與 task 宣告 validators，去重後排序
+  const allGates = uniqueStrings([...frameworkGates, ...taskDeclaredValidators]);
+
+  // 5. 建立 validator catalog
+  const catalog = allGates.map((gate) => ({
+    name: gate,
+    tier: classifyValidatorTier(gate),
+    expectedCommand: resolveValidatorExpectedCommand(gate),
+    evidenceState: recordedPasses.has(gate) ? 'pass' as const : 'missing' as const
+  }));
+
+  const passedCount = catalog.filter((v) => v.evidenceState === 'pass').length;
+  const missingCount = catalog.filter((v) => v.evidenceState === 'missing').length;
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: resolvedCwd,
+    messages: [
+      message('info', 'ATM_EVIDENCE_VALIDATORS_LISTED', `Validator catalog for ${resolvedTaskId}: ${passedCount} passed, ${missingCount} missing.`, {
+        taskId: resolvedTaskId,
+        total: catalog.length,
+        passed: passedCount,
+        missing: missingCount
+      })
+    ],
+    evidence: {
+      action: 'validators',
+      taskId: resolvedTaskId,
+      catalog
+    }
+  });
+}
+
+// ===== TASK-AAO-0017: Missing-validator report (pre-close query + close-error TL;DR) =====
+
+
+// ===== TASK-AAO-0142: Auto-run declared validators into evidence before close =====
+
+export type AutoEvidenceDisposition =
+  | 'to-run'
+  | 'already-satisfied'
+  | 'skipped-out-of-scope'
+  | 'requires-approval';
+
+export interface AutoEvidencePlanEntry {
+  readonly validator: string;
+  readonly capability: 'validator' | 'integration-test';
+  readonly catalogKey: string | null;
+  readonly disposition: AutoEvidenceDisposition;
+  readonly command: string | null;
+  readonly evidenceState: ValidatorEvidenceState;
+  readonly reason: string;
+  readonly requiredCommand: string | null;
+  readonly linkedValidators: readonly string[];
+}
+
+export interface AutoEvidencePlan {
+  readonly schemaId: 'atm.autoEvidencePlan.v1';
+  readonly taskId: string;
+  readonly mode: 'dry-run' | 'execute';
+  readonly ok: boolean;
+  readonly toRun: readonly AutoEvidencePlanEntry[];
+  readonly alreadySatisfied: readonly AutoEvidencePlanEntry[];
+  readonly skippedOutOfScope: readonly AutoEvidencePlanEntry[];
+  readonly requiresApproval: readonly AutoEvidencePlanEntry[];
+  readonly remediationCommand: string | null;
+}
+
+export interface AutoEvidenceExecutionResult {
+  readonly schemaId: 'atm.autoEvidenceExecution.v1';
+  readonly taskId: string;
+  readonly ok: boolean;
+  readonly plan: AutoEvidencePlan;
+  readonly runs: ReadonlyArray<{
+    readonly validator: string;
+    readonly command: string;
+    readonly ok: boolean;
+    readonly errorCode?: string;
+  }>;
+  readonly failedValidator: string | null;
+  readonly remediationCommand: string | null;
+}
+
+function validatorRequiresOperatorApproval(gate: string, command: string): boolean {
+  if (gate === 'git-head-evidence') return true;
+  return /<[^>]+>/.test(command);
+}
+
+function readTaskDeclaredValidatorGates(cwd: string, taskId: string): string[] {
+  const taskDocument = readTaskDocument(cwd, taskId);
+  if (!taskDocument || !Array.isArray(taskDocument.validators)) return [];
+  return (taskDocument.validators as unknown[])
+    .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+    .map((entry) => canonicalizeValidatorIdentity(entry.trim()))
+    .filter(Boolean);
+}
+
+function isTaskDeclaredValidatorGate(gate: string, taskDeclared: readonly string[]): boolean {
+  return taskDeclared.includes(gate);
+}
+
+function canAutoRunDeclaredValidator(gate: string, command: string, taskDeclared: readonly string[]): boolean {
+  if (validatorRequiresOperatorApproval(gate, command)) return false;
+  if (detectAutoLinkedValidator(command)) return true;
+  if (isTaskDeclaredValidatorGate(gate, taskDeclared)) return true;
+  if (looksLikeLiteralValidatorCommand(gate)) return true;
+  return false;
+}
+
+function canAutoRunCatalogEntry(
+  entry: TestCatalogEntry,
+  label: string,
+  taskDeclared: readonly string[]
+): boolean {
+  if (!entry.command) return false;
+  if (entry.capability === 'integration-test') {
+    return !validatorRequiresOperatorApproval(label, entry.command);
+  }
+  return canAutoRunDeclaredValidator(label, entry.command, taskDeclared);
+}
+
+function resolveCatalogLinkedValidators(entry: TestCatalogEntry): string[] {
+  if (entry.capability !== 'validator') return [];
+  if (entry.validatorName && entry.validatorName.trim().length > 0) {
+    return [canonicalizeValidatorIdentity(entry.validatorName.trim())];
+  }
+  const autoLinked = entry.command ? detectAutoLinkedValidator(entry.command) : null;
+  return autoLinked ? [autoLinked] : [];
+}
+
+function buildAutoEvidenceRequiredCommand(
+  taskId: string,
+  actorId: string,
+  command: string,
+  validator: string,
+  runnerKind: 'dev-source' | 'frozen-runner',
+  validators: readonly string[] = []
+): string {
+  const escapedCommand = quoteForShell(command);
+  const linkedValidators = validators.filter(Boolean);
+  if (linkedValidators.length === 0 && detectAutoLinkedValidator(command)) {
+    return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --runner-kind ${runnerKind} --json`;
+  }
+  const escapedGate = quoteForShell((linkedValidators.length > 0 ? linkedValidators : [validator]).join(','));
+  return `node atm.mjs evidence run --task ${taskId} --actor ${actorId} --command ${escapedCommand} --validators ${escapedGate} --runner-kind ${runnerKind} --json`;
+}
+
+function readCommandRunProofCommands(cwd: string, taskId: string): Set<string> {
+  const commands = new Set<string>();
+  const manifest = readEvidenceBundleManifest(cwd, taskId);
+  for (const run of manifest?.commandRuns ?? []) {
+    const command = typeof run.command === 'string' ? normalizeValidatorToken(run.command) : '';
+    if (command) commands.add(command);
+  }
+  const bundle = readEvidenceBundle(cwd, taskId);
+  for (const record of bundle.evidence) {
+    if (!isRecord(record.details) || !Array.isArray(record.details.commandRuns)) continue;
+    for (const run of record.details.commandRuns) {
+      const normalized = normalizeCommandRunInput(run, 'bundle-command-run');
+      if (normalized.exitCode !== 0) continue;
+      const command = normalizeValidatorToken(normalized.command);
+      if (command) commands.add(command);
+    }
+  }
+  return commands;
+}
+
+function readCatalogSelectedEntries(cwd: string, taskId: string): TestCatalogEntry[] {
+  const taskDocument = readTaskDocument(cwd, taskId);
+  if (!taskDocument) return [];
+  const changedFiles = extractTaskDeclaredFiles(taskDocument);
+  const taskPlan = resolveTestPlanForTask(taskDocument, changedFiles);
+  const catalog = readTestCatalog(cwd);
+  const validatorSelection = selectTestEntries({
+    catalog,
+    capability: 'validator',
+    taskPlan,
+    changedFiles
+  });
+  const integrationSelection = selectTestEntries({
+    catalog,
+    capability: 'integration-test',
+    taskPlan,
+    changedFiles
+  });
+  return [...validatorSelection.entries, ...integrationSelection.entries];
+}
+
+function buildCatalogAutoEvidenceEntries(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  runnerKind: 'dev-source' | 'frozen-runner';
+  legacyReport: MissingValidatorReport;
+  taskDeclared: readonly string[];
+}): AutoEvidencePlanEntry[] {
+  const selectedEntries = readCatalogSelectedEntries(input.cwd, input.taskId);
+  if (selectedEntries.length === 0) return [];
+
+  const commandProofs = readCommandRunProofCommands(input.cwd, input.taskId);
+  const legacyCommands = new Set(
+    input.legacyReport.validators
+      .map((entry) => normalizeValidatorToken(entry.expectedCommand))
+      .filter(Boolean)
+  );
+  const legacyNames = new Set(
+    input.legacyReport.validators
+      .map((entry) => canonicalizeValidatorIdentity(entry.name))
+      .filter(Boolean)
+  );
+  const planEntries: AutoEvidencePlanEntry[] = [];
+
+  for (const entry of selectedEntries) {
+    const command = typeof entry.command === 'string' && entry.command.trim().length > 0 ? entry.command.trim() : null;
+    const label = entry.validatorName?.trim() || entry.key;
+    const normalizedLabel = canonicalizeValidatorIdentity(label);
+    const normalizedCommand = normalizeValidatorToken(command ?? '');
+    if (entry.capability === 'validator' && (legacyCommands.has(normalizedCommand) || legacyNames.has(normalizedLabel))) {
+      continue;
+    }
+
+    const linkedValidators = resolveCatalogLinkedValidators(entry);
+    const evidenceState: ValidatorEvidenceState = command && commandProofs.has(normalizedCommand) ? 'pass' : 'absent';
+    const requiredCommand = command && evidenceState !== 'pass'
+      ? buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, label, input.runnerKind, linkedValidators)
+      : null;
+    const base = {
+      validator: label,
+      capability: entry.capability,
+      catalogKey: entry.key,
+      command,
+      evidenceState,
+      requiredCommand,
+      linkedValidators
+    };
+
+    if (evidenceState === 'pass') {
+      planEntries.push({
+        ...base,
+        disposition: 'already-satisfied',
+        reason: 'Catalog-selected command already has command-backed evidence.'
+      });
+      continue;
+    }
+
+    if (!command || !canAutoRunCatalogEntry(entry, label, input.taskDeclared)) {
+      planEntries.push({
+        ...base,
+        disposition: 'requires-approval',
+        reason: 'Catalog-selected test requires explicit operator approval or still contains unresolved placeholders.'
+      });
+      continue;
+    }
+
+    planEntries.push({
+      ...base,
+      disposition: 'to-run',
+      reason: 'Catalog-selected test is missing command-backed evidence and can be auto-run.'
+    });
+  }
+
+  return planEntries;
+}
+
+export function buildAutoEvidencePlan(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  mode?: 'dry-run' | 'execute';
+}): AutoEvidencePlan {
+  const resolvedCwd = path.resolve(input.cwd);
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
+  const report = computeMissingValidatorReport(resolvedCwd, input.taskId, input.actorId);
+  const taskDeclared = readTaskDeclaredValidatorGates(resolvedCwd, input.taskId);
+  const toRun: AutoEvidencePlanEntry[] = [];
+  const alreadySatisfied: AutoEvidencePlanEntry[] = [];
+  const skippedOutOfScope: AutoEvidencePlanEntry[] = [];
+  const requiresApproval: AutoEvidencePlanEntry[] = [];
+
+  for (const entry of report.validators) {
+    const command = entry.expectedCommand;
+    const requiredCommand = entry.evidenceState === 'pass'
+      ? null
+      : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name, runnerArbitration.preferredRunnerKind);
+    const base = {
+      validator: entry.name,
+      capability: 'validator' as const,
+      catalogKey: null,
+      command,
+      evidenceState: entry.evidenceState,
+      requiredCommand,
+      linkedValidators: [entry.name]
+    };
+
+    if (entry.evidenceState === 'pass') {
+      alreadySatisfied.push({
+        ...base,
+        disposition: 'already-satisfied',
+        reason: 'Validator evidence is fresh and command-backed.'
+      });
+      continue;
+    }
+
+    if (!entry.closureRequired) {
+      skippedOutOfScope.push({
+        ...base,
+        disposition: 'skipped-out-of-scope',
+        reason: 'Advisory validator outside task-card closure baseline; auto-evidence does not run it without explicit operator opt-in.'
+      });
+      continue;
+    }
+
+    if (!canAutoRunDeclaredValidator(entry.name, command, taskDeclared)) {
+      requiresApproval.push({
+        ...base,
+        disposition: 'requires-approval',
+        reason: 'Validator requires explicit operator approval or cannot be mapped to a safe auto-run command.'
+      });
+      continue;
+    }
+
+    toRun.push({
+      ...base,
+      disposition: 'to-run',
+      reason: 'Declared closure-required validator is missing fresh command-backed evidence and can be auto-run.'
+    });
+  }
+
+  for (const entry of buildCatalogAutoEvidenceEntries({
+    cwd: resolvedCwd,
+    taskId: input.taskId,
+    actorId: input.actorId,
+    runnerKind: runnerArbitration.preferredRunnerKind,
+    legacyReport: report,
+    taskDeclared
+  })) {
+    if (entry.disposition === 'already-satisfied') {
+      alreadySatisfied.push(entry);
+      continue;
+    }
+    if (entry.disposition === 'requires-approval') {
+      requiresApproval.push(entry);
+      continue;
+    }
+    if (entry.disposition === 'skipped-out-of-scope') {
+      skippedOutOfScope.push(entry);
+      continue;
+    }
+    toRun.push(entry);
+  }
+
+  const remediationCommand = toRun[0]?.requiredCommand
+    ?? requiresApproval[0]?.requiredCommand
+    ?? report.blockingFindings[0]?.requiredCommand
+    ?? null;
+
+  return {
+    schemaId: 'atm.autoEvidencePlan.v1',
+    taskId: input.taskId,
+    mode: input.mode ?? 'dry-run',
+    ok: toRun.length === 0 && requiresApproval.length === 0 && report.ok,
+    toRun,
+    alreadySatisfied,
+    skippedOutOfScope,
+    requiresApproval,
+    remediationCommand
+  };
+}
+
+export function executeAutoEvidencePlan(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  /**
+   * TASK-RFT-0011: optional mapper that rewrites the command taskflow will
+   * execute for a plan entry (e.g. switching a `node --strip-types scripts/foo.ts`
+   * declaration to `npm run foo` when the two are equivalent). The mapper is
+   * pure — evidence.ts does not know about npm-script equivalence rules on its
+   * own; callers (taskflow.ts) inject one bound to the current package.json.
+   */
+  commandMapper?: (declaredCommand: string) => string;
+}): AutoEvidenceExecutionResult {
+  const resolvedCwd = path.resolve(input.cwd);
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
+  const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+  const runs: AutoEvidenceExecutionResult['runs'][number][] = [];
+  const mapper = input.commandMapper;
+
+  for (const entry of plan.toRun) {
+    if (!entry.command) continue;
+    const effectiveCommand = mapper ? mapper(entry.command) : entry.command;
+    try {
+      runEvidenceRun([
+        '--cwd', resolvedCwd,
+        '--task', input.taskId,
+        '--actor', input.actorId,
+        '--command', effectiveCommand,
+        '--runner-kind', runnerArbitration.preferredRunnerKind,
+        ...(entry.linkedValidators.length > 0 ? ['--validators', entry.linkedValidators.join(',')] : []),
+        '--json'
+      ]);
+      runs.push({ validator: entry.validator, command: effectiveCommand, ok: true });
+    } catch (error) {
+      const errorCode = error instanceof CliError ? error.code : 'ATM_AUTO_EVIDENCE_RUN_FAILED';
+      const remediationCommand = buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, effectiveCommand, entry.validator, runnerArbitration.preferredRunnerKind);
+      return {
+        schemaId: 'atm.autoEvidenceExecution.v1',
+        taskId: input.taskId,
+        ok: false,
+        plan,
+        runs: [...runs, { validator: entry.validator, command: effectiveCommand, ok: false, errorCode }],
+        failedValidator: entry.validator,
+        remediationCommand
+      };
+    }
+  }
+
+  const refreshedPlan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+  const executedValidators = new Set(runs.filter((run) => run.ok).map((run) => run.validator));
+  const pendingAutoRun = refreshedPlan.toRun.filter((entry) => !executedValidators.has(entry.validator));
+  const ok = runs.every((run) => run.ok)
+    && runs.length === plan.toRun.length
+    && pendingAutoRun.length === 0
+    && refreshedPlan.requiresApproval.length === 0;
+  return {
+    schemaId: 'atm.autoEvidenceExecution.v1',
+    taskId: input.taskId,
+    ok,
+    plan: refreshedPlan,
+    runs,
+    failedValidator: null,
+    remediationCommand: ok ? null : refreshedPlan.remediationCommand
+  };
+}
+
+/** evidence missing --task <id> --actor <actor> 的執行邏輯 */
+export function runEvidenceMissing(argv: string[]) {
+  let cwd = '.';
+  let taskId: string | null = null;
+  let actorId: string | null = null;
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--cwd') { cwd = requireValue(argv, i, '--cwd'); i++; continue; }
+    if (arg === '--task') { taskId = requireValue(argv, i, '--task'); i++; continue; }
+    if (arg === '--actor') { actorId = requireValue(argv, i, '--actor'); i++; continue; }
+    if (arg === '--json' || arg === '--pretty') continue;
+    throw new CliError('ATM_CLI_USAGE', `evidence missing does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence missing requires --task <work-item-id>', { exitCode: 2 });
+  }
+  const resolvedActor = resolveActorId(actorId ?? undefined, cwd);
+  const actor = resolvedActor?.actorId ?? actorId ?? 'unknown';
+
+  const report = computeMissingValidatorReport(cwd, taskId, actor);
+  const code = report.ok ? 'ATM_EVIDENCE_VALIDATORS_ALL_PASS' : 'ATM_EVIDENCE_VALIDATORS_MISSING';
+  const level = report.ok ? 'info' : 'error';
+  return makeResult({
+    ok: report.ok,
+    command: 'evidence',
+    cwd: path.resolve(cwd),
+    messages: [
+      message(level, code, report.tldr, {
+        taskId: report.taskId,
+        totalRequired: report.totalRequired,
+        passedCount: report.passedCount,
+        missingCount: report.missingCount,
+        categories: report.categories,
+        missingValidationPasses: report.missingValidationPasses,
+        blockingFindings: report.blockingFindings,
+        advisoryFindings: report.advisoryFindings
+      })
+    ],
+    evidence: {
+      action: 'missing',
+      ...report
+    }
+  });
+}
+
+/** evidence run --task <id> --command "<cmd>" --recent-run 的執行邏輯 */
+export function runEvidenceRun(argv: string[]) {
+  const options = parseEvidenceRunOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence run requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const resolvedCwd = path.resolve(options.cwd);
+  const resolvedTaskId = options.taskId.trim();
+  const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, resolvedTaskId);
+  const requestedRunnerKind = normalizeRunnerKind(options.runnerKind ?? inferRunnerKindFromCommand(options.command));
+  const effectiveRunnerKind = requestedRunnerKind === 'unknown'
+    ? runnerArbitration.preferredRunnerKind
+    : requestedRunnerKind;
+  if (options.validators.length === 0) {
+    options.validators = resolveEvidenceAutoValidators({
+      cwd: resolvedCwd,
+      taskId: resolvedTaskId,
+      command: options.command
+    });
+  }
+
+  // 1. 檢查是否要重用最近一次的執行結果
+  let reusedRun: CommandRunEvidenceInput | null = null;
+  if (options.recentRun) {
+    const bundle = readEvidenceBundle(resolvedCwd, resolvedTaskId);
+
+    // 從最新的 evidence 開始往回找匹配的 command run
+    for (let i = bundle.evidence.length - 1; i >= 0; i--) {
+      const record = bundle.evidence[i];
+      const runs = (isRecord(record.details) && Array.isArray(record.details.commandRuns))
+        ? (record.details.commandRuns as unknown[]).map(r => normalizeCommandRunInput(r, `evidence[${i}]/commandRuns`))
+        : [];
+
+      const match = runs.find(r => r.command === options.command && (r.runnerKind ?? 'unknown') === effectiveRunnerKind);
+      if (match) {
+        reusedRun = {
+          ...match,
+          cached: true
+        };
+        break;
+      }
+    }
+  }
+
+  let finalRun: CommandRunEvidenceInput;
+  if (reusedRun) {
+    finalRun = reusedRun;
+  } else {
+    // 2. 實際執行指令
+    const shell = process.platform === 'win32' ? 'powershell.exe' : '/bin/sh';
+    const shellArgs = process.platform === 'win32' ? ['-NoProfile', '-Command', options.command] : ['-c', options.command];
+
+    const result = spawnSync(shell, shellArgs, {
+      cwd: resolvedCwd,
+      encoding: 'utf8',
+      env: { ...process.env, ATM_ACTOR_ID: actorId, ATM_TASK_ID: resolvedTaskId }
+    });
+
+    finalRun = {
+      command: options.command,
+      exitCode: result.status ?? (result.error ? 1 : 0),
+      stdoutSha256: hashString(result.stdout ?? ''),
+      stderrSha256: hashString(result.stderr ?? ''),
+      generatedAt: new Date().toISOString(),
+      validators: options.validators,
+      runnerKind: effectiveRunnerKind
+    };
+
+    if (result.error) {
+      // 執行發生系統錯誤 (例如找不到指令)
+      throw new CliError('ATM_EVIDENCE_RUN_FAILED', `Failed to spawn command: ${options.command}`, {
+        exitCode: 1,
+        details: { error: result.error.message }
+      });
+    }
+  }
+
+  // 3. 呼叫 evidence add 邏輯 (透過建構 argv 再呼叫 runEvidenceAdd)
+  // 這樣可以確保寫入格式、sessionId、git commit 等邏輯一致
+  const addArgv = [
+    '--cwd', resolvedCwd,
+    '--task', resolvedTaskId,
+    '--actor', actorId,
+    '--kind', options.kind,
+    '--summary', options.summary ?? (reusedRun ? `Reused cached run for: ${options.command}` : `Auto-run: ${options.command}`),
+    '--exit-code', finalRun.exitCode.toString(),
+    '--stdout-sha256', finalRun.stdoutSha256,
+    '--stderr-sha256', finalRun.stderrSha256,
+    '--command', finalRun.command
+  ];
+
+  if (options.validators.length > 0) {
+    addArgv.push('--validators', options.validators.join(','));
+  }
+  if (options.artifacts.length > 0) {
+    addArgv.push('--artifacts', options.artifacts.join(','));
+  }
+  addArgv.push('--runner-kind', effectiveRunnerKind);
+  if (reusedRun) {
+    addArgv.push('--freshness', 'historical-reference');
+  }
+
+  return runEvidenceAdd(addArgv);
+}
+
+function parseEvidenceRunOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    command: '',
+    recentRun: false,
+    kind: 'test',
+    summary: null as string | null,
+    artifacts: [] as string[],
+    validators: [] as string[],
+    runnerKind: null as string | null
+  };
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, i, '--cwd');
+      i++;
+    } else if (arg === '--task') {
+      options.taskId = requireValue(argv, i, '--task');
+      i++;
+    } else if (arg === '--actor') {
+      options.actorId = requireValue(argv, i, '--actor');
+      i++;
+    } else if (arg === '--command') {
+      options.command = requireValue(argv, i, '--command');
+      i++;
+    } else if (arg === '--recent-run') {
+      options.recentRun = true;
+    } else if (arg === '--kind') {
+      options.kind = requireValue(argv, i, '--kind');
+      i++;
+    } else if (arg === '--summary') {
+      options.summary = requireValue(argv, i, '--summary');
+      i++;
+    } else if (arg === '--artifacts') {
+      options.artifacts = requireValue(argv, i, '--artifacts').split(',').map(s => s.trim()).filter(Boolean);
+      i++;
+    } else if (arg === '--validators') {
+      options.validators = requireValue(argv, i, '--validators').split(',').map(s => s.trim()).filter(Boolean);
+      i++;
+    } else if (arg === '--runner-kind') {
+      options.runnerKind = requireValue(argv, i, '--runner-kind');
+      i++;
+    }
+  }
+
+  if (!options.taskId) throw new CliError('ATM_CLI_USAGE', 'evidence run requires --task <id>', { exitCode: 2 });
+  if (!options.command) throw new CliError('ATM_CLI_USAGE', 'evidence run requires --command "<cmd>"', { exitCode: 2 });
+
+  return options;
+}
+
+
+export function runEvidenceDiff(argv: string[]) {
+  const cwd = process.cwd();
+  let taskId: string | undefined;
+  let staged = false;
+  let from: string | undefined;
+  let to: string | undefined;
+  let outputPath: string | undefined;
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if ((arg === '--task' || arg === '-t') && argv[i + 1]) {
+      taskId = argv[++i];
+    } else if (arg === '--staged') {
+      staged = true;
+    } else if (arg === '--from' && argv[i + 1]) {
+      from = argv[++i];
+    } else if (arg === '--to' && argv[i + 1]) {
+      to = argv[++i];
+    } else if (arg === '--output' && argv[i + 1]) {
+      outputPath = argv[++i];
+    }
+  }
+
+  if (!taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence diff requires --task <taskId>', { exitCode: 2 });
+  }
+
+  const draft = generateDiffEvidence({ taskId, repositoryRoot: cwd, staged, from, to });
+
+  // Merge with existing if output file already has human-written fields
+  const resolvedOutput = outputPath ? path.resolve(cwd, outputPath) : null;
+  let finalDraft = draft;
+  if (resolvedOutput && existsSync(resolvedOutput)) {
+    try {
+      const existing = JSON.parse(readFileSync(resolvedOutput, 'utf-8'));
+      if (existing.evidenceType === 'diff-as-evidence' && existing.taskId === taskId) {
+        finalDraft = mergeDiffEvidenceWithExisting(existing, draft);
+      }
+    } catch {
+      // ignore; use fresh draft
+    }
+  }
+
+  const validation = validateDiffEvidence(finalDraft);
+  finalDraft._isValid = validation.valid;
+
+  if (resolvedOutput) {
+    mkdirSync(path.dirname(resolvedOutput), { recursive: true });
+    writeFileSync(resolvedOutput, JSON.stringify(finalDraft, null, 2) + '\n');
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd,
+    messages: [
+      message('info', 'ATM_EVIDENCE_DIFF_GENERATED',
+        `Diff evidence draft generated for ${taskId}. ${finalDraft._isValid ? 'Ready to submit.' : 'Fill in intent/impact/testCoverage to validate.'}`,
+        {
+          taskId,
+          changedFiles: finalDraft.changedFiles.length,
+          linesAdded: finalDraft.linesAdded,
+          linesDeleted: finalDraft.linesDeleted,
+          affectedAtoms: finalDraft.affectedAtoms.length,
+          isValid: finalDraft._isValid,
+          validationReasons: validation.reasons,
+          writtenTo: resolvedOutput ?? null
+        }
+      )
+    ],
+    evidence: { draft: finalDraft }
+  });
+}
+
+export function verifyTaskEvidence(input: {
+  cwd: string;
+  taskId: string;
+  gate: EvidenceGate;
+  taskDocument?: Record<string, unknown> | null;
+  taskDeclaredFiles?: readonly string[];
+  frameworkTask?: boolean;
+}): EvidenceGateResult {
+  const bundle = readEvidenceBundle(input.cwd, input.taskId);
+  const canonical = bundle.evidence.map((entry) => canonicalizeEvidenceRecord(entry));
+  const counts: Record<CanonicalEvidenceKind, number> = {
+    test: 0,
+    artifact: 0,
+    attestation: 0,
+    review: 0,
+    commit: 0,
+    waiver: 0,
+    other: 0
+  };
+  for (const record of canonical) {
+    counts[record.kind] += 1;
+  }
+
+  const nonWaiver = canonical.filter((record) => record.kind !== 'waiver').length;
+  const freshCount = canonical.filter((record) => record.freshness === 'fresh').length;
+  const commandRunEvidenceCount = canonical.filter((record) => record.hasCommandRunProof).length;
+  const verificationCount = counts.test + counts.artifact + counts.attestation + counts.commit;
+  const reopenedRedteamTask = detectReopenedOrRedteamTask(input.taskDocument);
+  const codeOrFrameworkTask = Boolean(input.frameworkTask) || detectCodeOrFrameworkTask(input.taskDocument, input.taskDeclaredFiles ?? []);
+  const healthyAtomEvidence = hasHealthyAtomEvidence(input.taskDocument ?? null, bundle.evidence);
+  const hasTeamClosureAttestationRecord = bundle.evidence.some(hasTeamClosureAttestation);
+  const missing: string[] = [];
+  if (input.gate === 'close') {
+    if (nonWaiver <= 0) {
+      missing.push('at-least-one-non-waiver-evidence');
+    }
+    if (reopenedRedteamTask && freshCount <= 0) {
+      missing.push('fresh-evidence-required');
+    }
+    if (codeOrFrameworkTask && counts.artifact === nonWaiver) {
+      missing.push('artifact-only-evidence-not-allowed');
+    }
+    if (codeOrFrameworkTask && (counts.test + counts.commit + counts.attestation + commandRunEvidenceCount) <= 0) {
+      missing.push('code-or-framework-runnable-evidence');
+    }
+    if (codeOrFrameworkTask && hasTeamClosureAttestationRecord && commandRunEvidenceCount <= 0) {
+      missing.push('code-or-framework-runnable-evidence');
+    }
+    if (!healthyAtomEvidence) {
+      missing.push('atom-or-map-health-evidence');
+    }
+  } else if (input.gate === 'commit') {
+    if (nonWaiver <= 0) {
+      missing.push('at-least-one-non-waiver-evidence');
+    }
+    if (verificationCount <= 0) {
+      missing.push('commit-or-verification-evidence');
+    }
+  } else {
+    if (counts.review <= 0) {
+      missing.push('review-evidence');
+    }
+    if (verificationCount <= 0) {
+      missing.push('verification-evidence');
+    }
+  }
+
+  return {
+    ok: missing.length === 0,
+    gate: input.gate,
+    total: canonical.length,
+    counts,
+    freshCount,
+    commandRunEvidenceCount,
+    reopenedRedteamTask,
+    codeOrFrameworkTask,
+    missing
+  };
+}
+
+export function runEvidenceAdd(argv: string[]) {
+  const options = parseEvidenceAddOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence add requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const evidencePath = evidencePathForTask(options.cwd, options.taskId);
+  const nowIso = new Date().toISOString();
+  const kind = normalizeEvidenceKind(options.kind);
+  const session = resolveActorWorkSession(options.cwd, {
+    actorId,
+    taskId: options.taskId,
+    includeNonActive: true
+  });
+
+  // Auto-link logic for evidence add
+  if (options.validators.length === 0 && options.commandRun) {
+    options.validators = resolveEvidenceAutoValidators({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      command: options.commandRun.command
+    });
+  }
+
+  const commandRuns = normalizeEvidenceCommandRuns({
+    cwd: options.cwd,
+    inlineRun: options.commandRun ? {
+      ...options.commandRun,
+      validators: options.validators.length > 0 ? options.validators : undefined
+    } : null,
+    fileRuns: options.commandRuns,
+    runnerKind: options.runnerKind,
+    sourceCommit: options.sourceCommit
+  });
+  const validationPasses = uniqueStrings([
+    ...options.validators.map((entry) => canonicalizeValidatorIdentity(entry)),
+    ...commandRuns.flatMap((run) => Array.isArray(run.validators) ? run.validators.map((entry) => canonicalizeValidatorIdentity(entry)) : [])
+  ]);
+  const failedValidationRuns = commandRuns.filter((run) => run.exitCode !== 0 && (
+    validationPasses.length > 0 || (Array.isArray(run.validators) && run.validators.length > 0)
+  ));
+  if (failedValidationRuns.length > 0) {
+    throw new CliError(
+      'ATM_EVIDENCE_VALIDATION_PASS_FAILED_COMMAND',
+      'evidence add refused to record validationPasses from commandRuns with non-zero exitCode.',
+      {
+        exitCode: 2,
+        details: {
+          taskId: options.taskId,
+          failedCommands: failedValidationRuns.map((run) => ({
+            command: run.command,
+            exitCode: run.exitCode,
+            validators: run.validators ?? []
+          })),
+          remediation: 'Record failed commands as failure diagnostics, or rerun the validator successfully before adding validation pass evidence.'
+        }
+      }
+    );
+  }
+  const commandRunCache = commandRuns.length > 0
+    ? {
+      schemaId: 'atm.commandRunCache.v1',
+      cacheKey: hashJson({
+        taskId: options.taskId,
+        commandRuns: commandRuns.map((run) => ({
+          command: run.command,
+          cwd: run.cwd ?? '.',
+          exitCode: run.exitCode,
+          stdoutSha256: run.stdoutSha256,
+          stderrSha256: run.stderrSha256,
+          runnerKind: run.runnerKind ?? null,
+          sourceCommit: run.sourceCommit ?? null
+        }))
+      }),
+      reusedRunCount: commandRuns.filter((run) => run.cached === true).length,
+      runCount: commandRuns.length,
+      sourcePath: options.commandRunsPath ? normalizeRelativePath(relativePathFrom(options.cwd, options.commandRunsPath)) : null
+    }
+    : null;
+  const taskDocument = readTaskDocument(options.cwd, options.taskId);
+  const atomHealthClaims = buildGenericAtomHealthClaims(taskDocument, validationPasses);
+  const evidenceRecord: Record<string, unknown> = {
+    evidenceKind: kind === 'waiver' ? 'waiver' : 'validation',
+    evidenceType: kind,
+    summary: options.summary ?? `${kind} evidence for ${options.taskId}.`,
+    artifactPaths: options.artifacts,
+    evidenceFreshness: options.freshness,
+    producedBy: actorId,
+    sessionId: session?.sessionId ?? null,
+    createdAt: nowIso,
+    details: {
+      actorId,
+      sessionId: session?.sessionId ?? null,
+      kind,
+      freshness: options.freshness,
+      ...(validationPasses.length > 0 ? { validationPasses } : {}),
+      ...(atomHealthClaims.length > 0 ? { atomHealthClaims } : {}),
+      ...(commandRuns.length > 0 ? { commandRuns } : {}),
+      ...(commandRunCache ? { commandRunCache } : {})
+    }
+  };
+  const nextEvidence = withTaskEvidenceWriteLock(options.cwd, options.taskId, actorId, () => {
+    const bundle = readEvidenceBundle(options.cwd, options.taskId);
+    maybeHoldEvidenceWriteLockForTests();
+    const mergedEvidence = [...bundle.evidence, evidenceRecord];
+    const envelope: EvidenceEnvelope = {
+      taskId: options.taskId,
+      updatedAt: nowIso,
+      evidence: mergedEvidence
+    };
+    writeEvidenceEnvelope(evidencePath, envelope);
+    const bundleManifest = upsertEvidenceBundleManifest({
+      cwd: options.cwd,
+      taskId: options.taskId,
+      actorId,
+      updatedAt: nowIso,
+      freshness: options.freshness,
+      validationPasses,
+      commandRuns,
+      artifactPaths: options.artifacts
+    });
+    return { mergedEvidence, bundleManifest };
+  });
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_EVIDENCE_ADDED', `Added ${kind} evidence for ${options.taskId}.`, {
+      taskId: options.taskId,
+      actorId,
+      sessionId: session?.sessionId ?? null,
+      kind
+    })],
+    evidence: {
+      action: 'add',
+      taskId: options.taskId,
+      actorId,
+      kind,
+      freshness: options.freshness,
+      sessionId: session?.sessionId ?? null,
+      evidencePath: relativePathFrom(options.cwd, evidencePath),
+      evidenceCount: nextEvidence.mergedEvidence.length,
+      commandRunCount: commandRuns.length,
+      commandRunCache,
+      bundleManifestPath: nextEvidence.bundleManifest
+        ? relativePathFrom(options.cwd, evidenceBundleManifestPathForTask(options.cwd, options.taskId))
+        : null,
+      bundleManifest: nextEvidence.bundleManifest
+    }
+  });
+}
+
+interface HistoricalBatchValidatorRun {
+  readonly command: string;
+  readonly cwd: string;
+  readonly exitCode: number;
+  readonly stdoutSha256: string;
+  readonly stderrSha256: string;
+  readonly validators: readonly string[];
+  readonly generatedAt: string;
+  readonly runnerKind: string;
+}
+
+type HistoricalBatchCoverageStatus = 'complete' | 'partial' | 'blocked';
+type HistoricalBatchValidatorKind = 'taskSpecific' | 'batchWide' | 'advisory';
+type HistoricalBatchFinalizeDisposition = 'keep-diagnostic' | 'abandon' | 'remove-evidence';
+
+interface HistoricalBatchValidatorClaim {
+  readonly gate: string;
+  readonly kind: HistoricalBatchValidatorKind;
+  readonly satisfied: boolean;
+  readonly requiredForClose: boolean;
+}
+
+interface HistoricalBatchAtomHealthClaim {
+  readonly atomOrMapId: string;
+  readonly kind: 'owner' | 'map-update';
+  readonly generatedByTask: boolean;
+  readonly validatorHealthy: boolean;
+}
+
+interface HistoricalBatchTaskSlice {
+  readonly taskId: string;
+  readonly ok: boolean;
+  readonly matchedCommits: readonly string[];
+  readonly matchedFiles: readonly string[];
+  readonly outOfScopeFiles: readonly string[];
+  readonly declaredDeliverables: readonly string[];
+  readonly declaredScopeFiles: readonly string[];
+  readonly matchedDeliverables: readonly string[];
+  readonly missingCoverage: readonly string[];
+  readonly coverageStatus: HistoricalBatchCoverageStatus;
+  readonly validatorClaims: readonly HistoricalBatchValidatorClaim[];
+  readonly taskSpecificValidationPasses: readonly string[];
+  readonly batchWideValidationPasses: readonly string[];
+  readonly advisoryValidationPasses: readonly string[];
+  readonly atomHealthClaims: readonly HistoricalBatchAtomHealthClaim[];
+  readonly okToRecordEvidence: boolean;
+  readonly okToCloseTask: boolean;
+  readonly diagnosticOnly: boolean;
+  readonly reports: readonly TaskHistoricalDeliveryReport[];
+  readonly evidencePath: string | null;
+}
+
+interface HistoricalBatchFinalizeOptions {
+  readonly cwd: string;
+  readonly actorId: string | null;
+  readonly taskId: string;
+  readonly batchRef: string;
+  readonly disposition: HistoricalBatchFinalizeDisposition;
+  readonly reason: string;
+  readonly write: boolean;
+}
+
+export function runEvidenceHistoricalBatch(argv: string[]) {
+  const options = parseEvidenceHistoricalBatchOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence historical-batch requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const nowIso = new Date().toISOString();
+  const batchId = `hist-batch-${nowIso.replace(/[:.]/g, '-')}`;
+  const validatorRuns = options.validatorCommands.map((command) => runHistoricalBatchValidator({
+    cwd: options.cwd,
+    command,
+    validators: options.validators
+  }));
+  const failedValidators = validatorRuns.filter((run) => run.exitCode !== 0);
+  if (failedValidators.length > 0) {
+    throw new CliError('ATM_HISTORICAL_BATCH_VALIDATOR_FAILED', 'historical batch evidence refused to write because one or more validator commands failed.', {
+      exitCode: 1,
+      details: {
+        failedValidators: failedValidators.map((run) => ({
+          command: run.command,
+          exitCode: run.exitCode,
+          stdoutSha256: run.stdoutSha256,
+          stderrSha256: run.stderrSha256
+        }))
+      }
+    });
+  }
+
+  const slices = options.taskIds.map((taskId) => buildHistoricalBatchTaskSlice({
+    cwd: options.cwd,
+    deliveryRepo: options.deliveryRepo,
+    taskId,
+    commits: options.commits,
+    validatorRuns,
+    allowUnmatched: options.allowUnmatched,
+    approvedBy: options.approvedBy,
+    approvalReason: options.approvalReason
+  }));
+  const unmatchedTasks = slices.filter((slice) => !slice.ok);
+  if (unmatchedTasks.length > 0 && !options.allowUnmatched) {
+    throw new CliError('ATM_HISTORICAL_BATCH_TASK_UNMATCHED', 'historical batch evidence refused to write because at least one task had no scoped delivery files in the supplied commits.', {
+      exitCode: 1,
+      details: {
+        unmatchedTasks: unmatchedTasks.map((slice) => ({
+          taskId: slice.taskId,
+          coverageStatus: slice.coverageStatus,
+          reports: slice.reports.map((report) => ({
+            requestedRef: report.requestedRef,
+            commitSha: report.commitSha,
+            reason: report.reason
+          }))
+        })),
+        remediation: 'Supply the correct commit range or pass --allow-unmatched for a diagnostic-only batch.'
+      }
+    });
+  }
+
+  const batchEnvelope = {
+    schemaId: 'atm.historicalBatchEvidence.v1',
+    batchId,
+    createdAt: nowIso,
+    producedBy: actorId,
+    cwd: options.cwd,
+    deliveryRepo: options.deliveryRepo,
+    commits: options.commits,
+    validators: options.validators,
+    validatorRuns,
+    tasks: slices.map((slice) => ({
+      taskId: slice.taskId,
+      ok: slice.ok,
+      coverageStatus: slice.coverageStatus,
+      okToRecordEvidence: slice.okToRecordEvidence,
+      okToCloseTask: slice.okToCloseTask,
+      diagnosticOnly: slice.diagnosticOnly,
+      declaredDeliverables: slice.declaredDeliverables,
+      matchedDeliverables: slice.matchedDeliverables,
+      missingCoverage: slice.missingCoverage,
+      validatorClaims: slice.validatorClaims,
+      atomHealthClaims: slice.atomHealthClaims,
+      matchedCommits: slice.matchedCommits,
+      matchedFiles: slice.matchedFiles,
+      outOfScopeFiles: slice.outOfScopeFiles,
+      reports: slice.reports.map((report) => ({
+        requestedRef: report.requestedRef,
+        commitSha: report.commitSha,
+        ok: report.ok,
+        reason: report.reason,
+        changedFiles: report.changedFiles,
+        deliverableFiles: report.deliverableFiles,
+        fileBuckets: report.fileBuckets,
+        waiverApplied: report.waiverApplied
+      }))
+    }))
+  };
+
+  const batchPath = path.join(options.cwd, '.atm', 'history', 'evidence', 'historical-batches', `${batchId}.json`);
+  if (options.write) {
+    mkdirSync(path.dirname(batchPath), { recursive: true });
+    writeFileSync(batchPath, `${JSON.stringify(batchEnvelope, null, 2)}\n`, 'utf8');
+    for (const slice of slices) {
+      appendHistoricalBatchTaskEvidence({
+        cwd: options.cwd,
+        actorId,
+        nowIso,
+        batchId,
+        batchPath,
+        slice,
+        commits: options.commits,
+        validatorRuns
+      });
+    }
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: options.cwd,
+    mode: options.write ? 'write' : 'dry-run',
+    messages: [
+      message('info', options.write ? 'ATM_HISTORICAL_BATCH_EVIDENCE_WRITTEN' : 'ATM_HISTORICAL_BATCH_EVIDENCE_READY',
+        options.write
+          ? `Historical batch evidence ${batchId} written for ${slices.length} task(s).`
+          : `Historical batch evidence ${batchId} planned for ${slices.length} task(s).`,
+        {
+          batchId,
+          tasks: slices.length,
+          commits: options.commits,
+          validatorCommands: options.validatorCommands,
+          unmatchedTasks: unmatchedTasks.map((slice) => slice.taskId),
+          approval: options.allowUnmatched ? {
+            approvedBy: options.approvedBy,
+            approvalReason: options.approvalReason
+          } : null
+        })
+    ],
+    evidence: {
+      action: 'historical-batch',
+      batchId,
+      batchPath: relativePathFrom(options.cwd, batchPath),
+      write: options.write,
+      commits: options.commits,
+      validators: options.validators,
+      validatorRuns,
+      taskSlices: slices.map((slice) => ({
+        taskId: slice.taskId,
+        ok: slice.ok,
+        coverageStatus: slice.coverageStatus,
+        okToRecordEvidence: slice.okToRecordEvidence,
+        okToCloseTask: slice.okToCloseTask,
+        diagnosticOnly: slice.diagnosticOnly,
+        taskSpecificValidationPasses: slice.taskSpecificValidationPasses,
+        batchWideValidationPasses: slice.batchWideValidationPasses,
+        advisoryValidationPasses: slice.advisoryValidationPasses,
+        atomHealthClaims: slice.atomHealthClaims,
+        matchedCommits: slice.matchedCommits,
+        matchedFiles: slice.matchedFiles,
+        outOfScopeFiles: slice.outOfScopeFiles,
+        evidencePath: slice.evidencePath
+      }))
+    }
+  });
+}
+
+function parseEvidenceHistoricalBatchOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    deliveryRepo: null as string | null,
+    actorId: null as string | null,
+    taskIds: [] as string[],
+    commits: [] as string[],
+    validators: [] as string[],
+    validatorCommands: [] as string[],
+    write: false,
+    allowUnmatched: false,
+    approvedBy: null as string | null,
+    approvalReason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--delivery-repo') {
+      options.deliveryRepo = requireValue(argv, index, '--delivery-repo');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--tasks') {
+      options.taskIds.push(...splitCsv(requireValue(argv, index, '--tasks')));
+      index += 1;
+      continue;
+    }
+    if (arg === '--commits') {
+      options.commits.push(...splitCsv(requireValue(argv, index, '--commits')));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validators') {
+      options.validators.push(...splitCsv(requireValue(argv, index, '--validators')).map((entry) => canonicalizeValidatorIdentity(entry)));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validator-command') {
+      options.validatorCommands.push(requireValue(argv, index, '--validator-command').trim());
+      index += 1;
+      continue;
+    }
+    if (arg === '--write') {
+      options.write = true;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      options.write = false;
+      continue;
+    }
+    if (arg === '--allow-unmatched') {
+      options.allowUnmatched = true;
+      continue;
+    }
+    if (arg === '--approved-by') {
+      options.approvedBy = requireValue(argv, index, '--approved-by');
+      index += 1;
+      continue;
+    }
+    if (arg === '--approval-reason') {
+      options.approvalReason = requireValue(argv, index, '--approval-reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence historical-batch does not support option ${arg}`, { exitCode: 2 });
+  }
+  const cwd = path.resolve(options.cwd);
+  const deliveryRepo = path.resolve(options.deliveryRepo ?? cwd);
+  const taskIds = uniqueStrings(options.taskIds);
+  const commits = uniqueStrings(options.commits);
+  const validators = uniqueStrings(options.validators);
+  const validatorCommands = uniqueStrings(options.validatorCommands);
+  if (taskIds.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires --tasks <csv>.', { exitCode: 2 });
+  if (commits.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires --commits <csv>.', { exitCode: 2 });
+  if (validatorCommands.length === 0) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch requires at least one --validator-command.', { exitCode: 2 });
+  if (options.allowUnmatched && (!options.approvedBy?.trim() || !options.approvalReason?.trim())) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch --allow-unmatched requires both --approved-by and --approval-reason.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd,
+    deliveryRepo,
+    taskIds,
+    commits,
+    validators,
+    validatorCommands
+  };
+}
+
+export function runEvidenceHistoricalBatchFinalize(argv: string[]) {
+  const options = parseEvidenceHistoricalBatchFinalizeOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence historical-batch-finalize requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const batchPath = resolveHistoricalBatchPath(options.cwd, options.batchRef);
+  if (!existsSync(batchPath)) {
+    throw new CliError('ATM_HISTORICAL_BATCH_NOT_FOUND', 'historical-batch-finalize could not find the requested batch envelope.', {
+      exitCode: 1,
+      details: { batchRef: options.batchRef, batchPath: relativePathFrom(options.cwd, batchPath) }
+    });
+  }
+  const batchEnvelope = JSON.parse(readFileSync(batchPath, 'utf8')) as unknown;
+  if (!isRecord(batchEnvelope) || batchEnvelope.schemaId !== 'atm.historicalBatchEvidence.v1') {
+    throw new CliError('ATM_HISTORICAL_BATCH_INVALID', 'historical-batch-finalize requires an atm.historicalBatchEvidence.v1 envelope.', {
+      exitCode: 1,
+      details: { batchPath: relativePathFrom(options.cwd, batchPath) }
+    });
+  }
+  const batchId = typeof batchEnvelope.batchId === 'string' ? batchEnvelope.batchId : path.basename(batchPath, '.json');
+  const tasks = Array.isArray(batchEnvelope.tasks) ? batchEnvelope.tasks.filter(isRecord) : [];
+  const slice = tasks.find((entry) => entry.taskId === options.taskId);
+  if (!slice) {
+    throw new CliError('ATM_HISTORICAL_BATCH_TASK_SLICE_NOT_FOUND', 'historical-batch-finalize could not find the requested task slice in the batch envelope.', {
+      exitCode: 1,
+      details: { batchId, taskId: options.taskId }
+    });
+  }
+  const okToCloseTask = slice.okToCloseTask === true;
+  const diagnosticOnly = slice.diagnosticOnly === true || okToCloseTask === false;
+  if (okToCloseTask) {
+    throw new CliError('ATM_HISTORICAL_BATCH_FINALIZE_CLOSE_READY_REFUSED', 'historical-batch-finalize only handles partial or diagnostic-only slices; close-ready slices must go through taskflow close.', {
+      exitCode: 1,
+      details: {
+        batchId,
+        taskId: options.taskId,
+        remediation: 'Run node atm.mjs taskflow close --task <task> --historical-batch <batch> instead of finalizing diagnostic residue.'
+      }
+    });
+  }
+  if (!diagnosticOnly) {
+    throw new CliError('ATM_HISTORICAL_BATCH_FINALIZE_UNSAFE_SLICE', 'historical-batch-finalize refused a slice that is neither diagnostic-only nor explicitly not close-ready.', {
+      exitCode: 1,
+      details: { batchId, taskId: options.taskId }
+    });
+  }
+
+  const nowIso = new Date().toISOString();
+  const evidencePath = evidencePathForTask(options.cwd, options.taskId);
+  const plan = {
+    batchId,
+    taskId: options.taskId,
+    disposition: options.disposition,
+    reason: options.reason,
+    batchPath: relativePathFrom(options.cwd, batchPath),
+    evidencePath: relativePathFrom(options.cwd, evidencePath),
+    write: options.write,
+    closeReady: okToCloseTask,
+    diagnosticOnly
+  };
+
+  let removedEvidenceRecords = 0;
+  let wroteDispositionRecord = false;
+  if (options.write) {
+    const existingFinalizations = Array.isArray(batchEnvelope.finalizedTaskSlices)
+      ? batchEnvelope.finalizedTaskSlices.filter(isRecord)
+      : [];
+    const finalizedTaskSlices = [
+      ...existingFinalizations.filter((entry) => !(entry.taskId === options.taskId && entry.batchId === batchId)),
+      {
+        schemaId: 'atm.historicalBatchTaskSliceDisposition.v1',
+        batchId,
+        taskId: options.taskId,
+        disposition: options.disposition,
+        reason: options.reason,
+        finalizedBy: actorId,
+        finalizedAt: nowIso,
+        closeReady: okToCloseTask,
+        diagnosticOnly
+      }
+    ];
+    writeFileSync(batchPath, `${JSON.stringify({ ...batchEnvelope, finalizedTaskSlices }, null, 2)}\n`, 'utf8');
+
+    if (options.disposition === 'remove-evidence') {
+      removedEvidenceRecords = removeHistoricalBatchTaskEvidenceRecords({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        batchId
+      });
+    } else {
+      appendHistoricalBatchDispositionEvidence({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        actorId,
+        nowIso,
+        batchId,
+        batchPath,
+        disposition: options.disposition,
+        reason: options.reason
+      });
+      wroteDispositionRecord = true;
+    }
+  }
+
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: options.cwd,
+    mode: options.write ? 'write' : 'dry-run',
+    messages: [
+      message('info', options.write ? 'ATM_HISTORICAL_BATCH_SLICE_FINALIZED' : 'ATM_HISTORICAL_BATCH_SLICE_FINALIZE_READY',
+        options.write
+          ? `Historical batch slice ${batchId}/${options.taskId} finalized as ${options.disposition}.`
+          : `Historical batch slice ${batchId}/${options.taskId} can be finalized as ${options.disposition}.`,
+        plan)
+    ],
+    evidence: {
+      action: 'historical-batch-finalize',
+      ...plan,
+      removedEvidenceRecords,
+      wroteDispositionRecord
+    }
+  });
+}
+
+function parseEvidenceHistoricalBatchFinalizeOptions(argv: string[]): HistoricalBatchFinalizeOptions {
+  const options = {
+    cwd: process.cwd(),
+    actorId: null as string | null,
+    taskId: '',
+    batchRef: '',
+    disposition: '' as HistoricalBatchFinalizeDisposition | '',
+    reason: '',
+    write: false
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task').trim();
+      index += 1;
+      continue;
+    }
+    if (arg === '--batch' || arg === '--historical-batch') {
+      options.batchRef = requireValue(argv, index, arg).trim();
+      index += 1;
+      continue;
+    }
+    if (arg === '--disposition') {
+      const disposition = requireValue(argv, index, '--disposition').trim();
+      if (!isHistoricalBatchFinalizeDisposition(disposition)) {
+        throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize --disposition must be keep-diagnostic, abandon, or remove-evidence.', { exitCode: 2 });
+      }
+      options.disposition = disposition;
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason').trim();
+      index += 1;
+      continue;
+    }
+    if (arg === '--write') {
+      options.write = true;
+      continue;
+    }
+    if (arg === '--dry-run') {
+      options.write = false;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence historical-batch-finalize does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --task <id>.', { exitCode: 2 });
+  if (!options.batchRef) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --batch <id-or-path>.', { exitCode: 2 });
+  if (!options.disposition) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --disposition keep-diagnostic|abandon|remove-evidence.', { exitCode: 2 });
+  if (!options.reason) throw new CliError('ATM_CLI_USAGE', 'evidence historical-batch-finalize requires --reason <text>.', { exitCode: 2 });
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    disposition: options.disposition
+  };
+}
+
+function isHistoricalBatchFinalizeDisposition(value: string): value is HistoricalBatchFinalizeDisposition {
+  return value === 'keep-diagnostic' || value === 'abandon' || value === 'remove-evidence';
+}
+
+function resolveHistoricalBatchPath(cwd: string, batchRef: string) {
+  const trimmed = batchRef.trim();
+  if (path.isAbsolute(trimmed)) return trimmed;
+  const normalized = normalizeRelativePath(trimmed);
+  if (normalized.includes('/') || normalized.endsWith('.json')) {
+    return path.resolve(cwd, normalized);
+  }
+  return path.join(cwd, '.atm', 'history', 'evidence', 'historical-batches', `${trimmed}.json`);
+}
+
+function appendHistoricalBatchDispositionEvidence(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly nowIso: string;
+  readonly batchId: string;
+  readonly batchPath: string;
+  readonly disposition: HistoricalBatchFinalizeDisposition;
+  readonly reason: string;
+}) {
+  const evidencePath = evidencePathForTask(input.cwd, input.taskId);
+  const record: Record<string, unknown> = {
+    evidenceKind: 'attestation',
+    evidenceType: 'attestation',
+    summary: `Historical batch diagnostic disposition ${input.batchId} for ${input.taskId}: ${input.disposition}.`,
+    artifactPaths: [normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath))],
+    evidenceFreshness: 'historical-reference',
+    producedBy: input.actorId,
+    sessionId: null,
+    createdAt: input.nowIso,
+    details: {
+      actorId: input.actorId,
+      sessionId: null,
+      kind: 'attestation',
+      freshness: 'historical-reference',
+      historicalBatchDisposition: {
+        schemaId: 'atm.historicalBatchTaskSliceDisposition.v1',
+        batchId: input.batchId,
+        taskId: input.taskId,
+        disposition: input.disposition,
+        reason: input.reason,
+        finalizedBy: input.actorId,
+        finalizedAt: input.nowIso,
+        closeReady: false,
+        diagnosticOnly: true
+      }
+    }
+  };
+  withTaskEvidenceWriteLock(input.cwd, input.taskId, input.actorId, () => {
+    const bundle = readEvidenceBundle(input.cwd, input.taskId);
+    writeEvidenceEnvelope(evidencePath, {
+      taskId: input.taskId,
+      updatedAt: input.nowIso,
+      evidence: [...bundle.evidence, record]
+    });
+  });
+}
+
+function removeHistoricalBatchTaskEvidenceRecords(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly batchId: string;
+}) {
+  const evidencePath = evidencePathForTask(input.cwd, input.taskId);
+  if (!existsSync(evidencePath)) return 0;
+  const bundle = readEvidenceBundle(input.cwd, input.taskId);
+  const retained = bundle.evidence.filter((entry) => !evidenceRecordReferencesHistoricalBatch(entry, input.batchId));
+  const removed = bundle.evidence.length - retained.length;
+  if (removed === 0) return 0;
+  if (retained.length === 0) {
+    unlinkSync(evidencePath);
+    return removed;
+  }
+  writeEvidenceEnvelope(evidencePath, {
+    taskId: input.taskId,
+    updatedAt: new Date().toISOString(),
+    evidence: retained
+  });
+  return removed;
+}
+
+function evidenceRecordReferencesHistoricalBatch(record: Record<string, unknown>, batchId: string) {
+  if (!isRecord(record.details)) return false;
+  const details = record.details;
+  if (isRecord(details.historicalBatch) && details.historicalBatch.batchId === batchId) return true;
+  if (isRecord(details.historicalBatchValidatorAttestation) && details.historicalBatchValidatorAttestation.batchId === batchId) return true;
+  if (isRecord(details.historicalBatchDisposition) && details.historicalBatchDisposition.batchId === batchId) return true;
+  return false;
+}
+
+function splitCsv(value: string): string[] {
+  return value.split(',').map((entry) => entry.trim()).filter(Boolean);
+}
+
+function resolveHistoricalBatchRunValidators(command: string, requestedValidators: readonly string[]) {
+  const autoLinked = detectAutoLinkedValidator(command);
+  if (autoLinked) return [autoLinked];
+  const normalized = canonicalizeValidatorIdentity(command);
+  if (requestedValidators.includes(normalized)) return [normalized];
+  if (/^npm(?:\s+run)?\s+test$/i.test(command.trim()) && requestedValidators.includes('test')) return ['test'];
+  return [];
+}
+
+function runHistoricalBatchValidator(input: {
+  readonly cwd: string;
+  readonly command: string;
+  readonly validators: readonly string[];
+}): HistoricalBatchValidatorRun {
+  const shell = process.platform === 'win32' ? 'powershell.exe' : '/bin/sh';
+  const shellArgs = process.platform === 'win32' ? ['-NoProfile', '-Command', input.command] : ['-c', input.command];
+  const result = spawnSync(shell, shellArgs, {
+    cwd: input.cwd,
+    encoding: 'utf8',
+    env: { ...process.env }
+  });
+  return {
+    command: input.command,
+    cwd: '.',
+    exitCode: result.status ?? (result.error ? 1 : 0),
+    stdoutSha256: hashString(result.stdout ?? ''),
+    stderrSha256: hashString([result.stderr ?? '', result.error?.message ?? ''].filter(Boolean).join('\n')),
+    validators: resolveHistoricalBatchRunValidators(input.command, input.validators),
+    generatedAt: new Date().toISOString(),
+    runnerKind: inferRunnerKindFromCommand(input.command)
+  };
+}
+
+function buildHistoricalBatchTaskSlice(input: {
+  readonly cwd: string;
+  readonly deliveryRepo: string;
+  readonly taskId: string;
+  readonly commits: readonly string[];
+  readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
+  readonly allowUnmatched: boolean;
+  readonly approvedBy: string | null;
+  readonly approvalReason: string | null;
+}): HistoricalBatchTaskSlice {
+  const taskDocument = readTaskDocument(input.cwd, input.taskId);
+  const declaredFiles = extractHistoricalBatchDeclaredFiles(taskDocument);
+  const declaredDeliverables = extractHistoricalBatchDeclaredDeliverables(taskDocument, declaredFiles);
+  const declaredValidators = extractHistoricalBatchDeclaredValidators(taskDocument);
+  const reports = input.commits.map((commit) => inspectHistoricalDelivery({
+    cwd: input.deliveryRepo,
+    taskId: input.taskId,
+    requestedRef: commit,
+    declaredFiles,
+    enforceDeclaredScope: true,
+    waiverOutOfScopeDelivery: true,
+    waiverReason: 'historical batch evidence envelope isolates scoped task slices from a mixed delivery package'
+  }));
+  const matchedReports = reports.filter((report) => report.commitSha && report.fileBuckets.taskMatchedFiles.length > 0);
+  const matchedFiles = uniqueStrings(matchedReports.flatMap((report) => report.fileBuckets.taskMatchedFiles));
+  const outOfScopeFiles = uniqueStrings(matchedReports.flatMap((report) => report.fileBuckets.outOfScopeSourceFiles));
+  const matchedDeliverables = declaredDeliverables.filter((entry) =>
+    matchedFiles.some((filePath) => pathMatchesTaskScope(filePath, entry))
+  );
+  const missingCoverage = declaredDeliverables.filter((entry) => !matchedDeliverables.includes(entry));
+  const coverageStatus: HistoricalBatchCoverageStatus = declaredDeliverables.length === 0
+    ? (matchedFiles.length > 0 ? 'complete' : 'blocked')
+    : (missingCoverage.length === 0
+      ? 'complete'
+      : matchedDeliverables.length > 0 ? 'partial' : 'blocked');
+  const validatorClaims = buildHistoricalBatchValidatorClaims({
+    requestedValidators: input.validatorRuns.flatMap((run) => run.validators),
+    declaredValidators,
+    validatorRuns: input.validatorRuns
+  });
+  const taskSpecificValidationPasses = validatorClaims
+    .filter((claim) => claim.kind === 'taskSpecific' && claim.satisfied)
+    .map((claim) => claim.gate);
+  const batchWideValidationPasses = validatorClaims
+    .filter((claim) => claim.kind === 'batchWide' && claim.satisfied)
+    .map((claim) => claim.gate);
+  const advisoryValidationPasses = validatorClaims
+    .filter((claim) => claim.kind === 'advisory' && claim.satisfied)
+    .map((claim) => claim.gate);
+  const atomHealthClaims = extractHistoricalBatchAtomHealthClaims({
+    taskDocument,
+    coverageStatus,
+    validatorClaims
+  });
+  const okToRecordEvidence = matchedFiles.length > 0 || (input.allowUnmatched && Boolean(input.approvedBy?.trim()) && Boolean(input.approvalReason?.trim()));
+  const okToCloseTask = matchedFiles.length > 0
+    && coverageStatus === 'complete'
+    && validatorClaims.filter((claim) => claim.requiredForClose).every((claim) => claim.satisfied)
+    && atomHealthClaims.every((claim) => claim.generatedByTask && claim.validatorHealthy);
+  return {
+    taskId: input.taskId,
+    ok: matchedFiles.length > 0,
+    matchedCommits: uniqueStrings(matchedReports.map((report) => report.commitSha ?? '').filter(Boolean)),
+    matchedFiles,
+    outOfScopeFiles,
+    declaredDeliverables,
+    declaredScopeFiles: declaredFiles,
+    matchedDeliverables,
+    missingCoverage,
+    coverageStatus,
+    validatorClaims,
+    taskSpecificValidationPasses,
+    batchWideValidationPasses,
+    advisoryValidationPasses,
+    atomHealthClaims,
+    okToRecordEvidence,
+    okToCloseTask,
+    diagnosticOnly: !okToCloseTask,
+    reports,
+    evidencePath: relativePathFrom(input.cwd, evidencePathForTask(input.cwd, input.taskId))
+  };
+}
+
+function extractHistoricalBatchDeclaredFiles(taskDocument: Record<string, unknown> | null): string[] {
+  if (!taskDocument) return [];
+  const files = new Set<string>();
+  for (const key of ['scopePaths', 'deliverables', 'targetAllowedFiles', 'files', 'changedFiles', 'targetFiles']) {
+    collectTaskFileValues(taskDocument[key], files);
+  }
+  return [...files].map(normalizeRelativePath).filter(Boolean);
+}
+
+function extractHistoricalBatchDeclaredDeliverables(taskDocument: Record<string, unknown> | null, declaredFiles: readonly string[]) {
+  if (!taskDocument) return [...declaredFiles];
+  const deliverables = new Set<string>();
+  collectTaskFileValues(taskDocument.deliverables, deliverables);
+  const normalized = [...deliverables].map(normalizeRelativePath).filter(Boolean);
+  return normalized.length > 0 ? normalized : [...declaredFiles];
+}
+
+function extractHistoricalBatchDeclaredValidators(taskDocument: Record<string, unknown> | null) {
+  if (!taskDocument || !Array.isArray(taskDocument.validators)) return [];
+  return uniqueStrings(
+    taskDocument.validators
+      .filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+      .map((entry) => canonicalizeValidatorIdentity(entry))
+  );
+}
+
+function extractHistoricalBatchAtomHealthClaims(input: {
+  readonly taskDocument: Record<string, unknown> | null;
+  readonly coverageStatus: HistoricalBatchCoverageStatus;
+  readonly validatorClaims: readonly HistoricalBatchValidatorClaim[];
+}) {
+  if (!input.taskDocument || !isRecord(input.taskDocument.atomizationImpact)) return [] as HistoricalBatchAtomHealthClaim[];
+  const atomizationImpact = input.taskDocument.atomizationImpact as Record<string, unknown>;
+  const ownerAtomOrMap = typeof atomizationImpact.ownerAtomOrMap === 'string' ? atomizationImpact.ownerAtomOrMap.trim() : '';
+  const mapUpdates = Array.isArray(atomizationImpact.mapUpdates)
+    ? atomizationImpact.mapUpdates.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => entry.trim())
+    : [];
+  const validatorHealthy = input.validatorClaims.filter((claim) => claim.requiredForClose).every((claim) => claim.satisfied);
+  const generatedByTask = input.coverageStatus !== 'blocked';
+  const claims: HistoricalBatchAtomHealthClaim[] = [];
+  if (ownerAtomOrMap) {
+    claims.push({ atomOrMapId: ownerAtomOrMap, kind: 'owner', generatedByTask, validatorHealthy });
+  }
+  for (const mapUpdate of mapUpdates) {
+    claims.push({ atomOrMapId: mapUpdate, kind: 'map-update', generatedByTask, validatorHealthy });
+  }
+  return claims;
+}
+
+function buildHistoricalBatchValidatorClaims(input: {
+  readonly requestedValidators: readonly string[];
+  readonly declaredValidators: readonly string[];
+  readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
+}) {
+  const allValidators = uniqueStrings([...input.requestedValidators, ...input.declaredValidators]);
+  return allValidators.map((gate): HistoricalBatchValidatorClaim => {
+    const requiredForClose = input.declaredValidators.includes(gate);
+    const tier = classifyValidatorTier(gate);
+    const kind: HistoricalBatchValidatorKind = requiredForClose
+      ? 'taskSpecific'
+      : (gate === 'doctor' || gate === 'framework-development' || gate === 'tasks-audit' || gate === 'git-head-evidence' || tier === 'batch')
+        ? 'advisory'
+        : 'batchWide';
+    const satisfied = input.validatorRuns.some((run) => run.exitCode === 0 && run.validators.includes(gate));
+    return {
+      gate,
+      kind,
+      satisfied,
+      requiredForClose
+    };
+  });
+}
+
+function appendHistoricalBatchTaskEvidence(input: {
+  readonly cwd: string;
+  readonly actorId: string;
+  readonly nowIso: string;
+  readonly batchId: string;
+  readonly batchPath: string;
+  readonly slice: HistoricalBatchTaskSlice;
+  readonly commits: readonly string[];
+  readonly validatorRuns: readonly HistoricalBatchValidatorRun[];
+}) {
+  const evidencePath = evidencePathForTask(input.cwd, input.slice.taskId);
+  const evidenceRecord: Record<string, unknown> = {
+    evidenceKind: 'validation',
+    evidenceType: 'test',
+    summary: `Historical batch evidence ${input.batchId} for ${input.slice.taskId}.`,
+    artifactPaths: [normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath)), ...input.slice.matchedFiles],
+    evidenceFreshness: 'historical-reference',
+    producedBy: input.actorId,
+    sessionId: null,
+    createdAt: input.nowIso,
+    details: {
+      actorId: input.actorId,
+      sessionId: null,
+      kind: 'test',
+      freshness: 'historical-reference',
+      historicalBatch: {
+        schemaId: 'atm.historicalBatchTaskSlice.v1',
+        batchId: input.batchId,
+        commits: input.commits,
+        matchedCommits: input.slice.matchedCommits,
+        matchedFiles: input.slice.matchedFiles,
+        outOfScopeFiles: input.slice.outOfScopeFiles,
+        taskSliceOk: input.slice.ok,
+        declaredDeliverables: input.slice.declaredDeliverables,
+        declaredScopeFiles: input.slice.declaredScopeFiles,
+        matchedDeliverables: input.slice.matchedDeliverables,
+        missingCoverage: input.slice.missingCoverage,
+        coverageStatus: input.slice.coverageStatus,
+        validatorClaims: input.slice.validatorClaims,
+        atomHealthClaims: input.slice.atomHealthClaims,
+        okToRecordEvidence: input.slice.okToRecordEvidence,
+        okToCloseTask: input.slice.okToCloseTask,
+        diagnosticOnly: input.slice.diagnosticOnly
+      },
+      validationPasses: input.slice.taskSpecificValidationPasses,
+      batchWideValidationPasses: input.slice.batchWideValidationPasses,
+      advisoryValidationPasses: input.slice.advisoryValidationPasses,
+      commandRuns: input.validatorRuns
+    }
+  };
+  const reusableValidationPasses = uniqueStrings([
+    ...input.slice.taskSpecificValidationPasses,
+    ...input.slice.batchWideValidationPasses,
+    ...input.slice.advisoryValidationPasses
+  ]);
+  const freshValidatorAttestationRecord: Record<string, unknown> | null = reusableValidationPasses.length > 0 && input.validatorRuns.length > 0
+    ? {
+      evidenceKind: 'validation',
+      evidenceType: 'test',
+      summary: `Fresh validator attestation slice ${input.batchId} for ${input.slice.taskId}.`,
+      artifactPaths: [normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath))],
+      evidenceFreshness: 'fresh',
+      producedBy: input.actorId,
+      sessionId: null,
+      createdAt: input.nowIso,
+      details: {
+        actorId: input.actorId,
+        sessionId: null,
+        kind: 'test',
+        freshness: 'fresh',
+        validationPasses: reusableValidationPasses,
+        historicalBatchValidatorAttestation: {
+          schemaId: 'atm.historicalBatchValidatorAttestation.v1',
+          batchId: input.batchId,
+          batchPath: normalizeRelativePath(relativePathFrom(input.cwd, input.batchPath)),
+          taskId: input.slice.taskId,
+          taskSpecificValidationPasses: input.slice.taskSpecificValidationPasses,
+          batchWideValidationPasses: input.slice.batchWideValidationPasses,
+          advisoryValidationPasses: input.slice.advisoryValidationPasses
+        },
+        commandRuns: input.validatorRuns
+      }
+    }
+    : null;
+  withTaskEvidenceWriteLock(input.cwd, input.slice.taskId, input.actorId, () => {
+    const bundle = readEvidenceBundle(input.cwd, input.slice.taskId);
+    const envelope: EvidenceEnvelope = {
+      taskId: input.slice.taskId,
+      updatedAt: input.nowIso,
+      evidence: freshValidatorAttestationRecord
+        ? [...bundle.evidence, evidenceRecord, freshValidatorAttestationRecord]
+        : [...bundle.evidence, evidenceRecord]
+    };
+    writeEvidenceEnvelope(evidencePath, envelope);
+  });
+}
+
+export function runEvidenceVerify(argv: string[]) {
+  const options = parseEvidenceVerifyOptions(argv);
+  const taskDocument = readTaskDocument(options.cwd, options.taskId);
+  const result = verifyTaskEvidence({
+    cwd: options.cwd,
+    taskId: options.taskId,
+    gate: options.gate,
+    taskDocument,
+    taskDeclaredFiles: extractTaskDeclaredFiles(taskDocument),
+    frameworkTask: false
+  });
+  return makeResult({
+    ok: result.ok,
+    command: 'evidence',
+    cwd: options.cwd,
+    messages: [result.ok
+      ? message('info', 'ATM_EVIDENCE_VERIFY_OK', `Evidence gate ${result.gate} passed for ${options.taskId}.`, {
+        taskId: options.taskId,
+        gate: result.gate
+      })
+      : message('error', 'ATM_EVIDENCE_VERIFY_FAILED', `Evidence gate ${result.gate} failed for ${options.taskId}.`, {
+        taskId: options.taskId,
+        gate: result.gate,
+        missing: result.missing
+      })],
+    evidence: {
+      action: 'verify',
+      taskId: options.taskId,
+    gate: result.gate,
+    total: result.total,
+    counts: result.counts,
+    freshCount: result.freshCount,
+    commandRunEvidenceCount: result.commandRunEvidenceCount,
+    reopenedRedteamTask: result.reopenedRedteamTask,
+    codeOrFrameworkTask: result.codeOrFrameworkTask,
+    missing: result.missing,
+    evidencePath: relativePathFrom(options.cwd, evidencePathForTask(options.cwd, options.taskId))
+  }
+  });
+}
+
+export function runGitHeadEvidenceBackfill(argv: string[]) {
+  const options = parseGitHeadBackfillOptions(argv);
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'evidence git-head-backfill requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
+  }
+  const actorId = resolvedActor.actorId;
+  const head = runGitScalar(options.cwd, ['rev-parse', '--verify', 'HEAD']);
+  if (!head) {
+    throw new CliError('ATM_GIT_HEAD_MISSING', 'evidence git-head-backfill requires an existing HEAD commit.', { exitCode: 2 });
+  }
+  const treeSha = readGovernedCommitTreeWithoutEvidence(options.cwd, head) ?? runGitScalar(options.cwd, ['rev-parse', `${head}^{tree}`]);
+  if (!treeSha) {
+    throw new CliError('ATM_GIT_TREE_MISSING', 'ATM could not resolve the HEAD tree for git-head evidence backfill.', { exitCode: 2 });
+  }
+  const nowIso = new Date().toISOString();
+  const evidenceAbsolute = path.join(options.cwd, gitHeadEvidencePath);
+  const payload = {
+    schemaVersion: 'atm.gitHeadEvidence.v0.1',
+    evidence: [
+      {
+        evidenceKind: 'validation',
+        evidenceType: 'commit',
+        summary: options.summary ?? 'Git HEAD is covered by ATM git-head backfill evidence.',
+        artifactPaths: [],
+        createdAt: nowIso,
+        producedBy: actorId,
+        evidenceFreshness: 'fresh',
+        commandRuns: [],
+        details: {
+          actorId,
+          kind: 'commit',
+          freshness: 'fresh',
+          git: {
+            commitSha: head,
+            treeSha,
+            parentCommitShas: [head],
+            stagedPathCount: 1,
+            evidencePath: gitHeadEvidencePath,
+            generatedAt: nowIso
+          },
+          backfill: {
+            mode: 'head-commit-evidence',
+            coveredCommitSha: head,
+            reason: options.reason ?? 'Backfill git-head evidence for an existing HEAD commit.'
+          }
+        }
+      }
+    ]
+  };
+  mkdirSync(path.dirname(evidenceAbsolute), { recursive: true });
+  appendFileSync(evidenceAbsolute, `${JSON.stringify(payload)}\n`, 'utf8');
+  const addResult = runGitCommand(options.cwd, ['add', '--', gitHeadEvidencePath]);
+  if (!addResult.ok) {
+    throw new CliError('ATM_GIT_ADD_FAILED', 'ATM wrote git-head backfill evidence but could not stage it.', {
+      exitCode: 1,
+      details: {
+        stderr: addResult.stderr || addResult.stdout
+      }
+    });
+  }
+  return makeResult({
+    ok: true,
+    command: 'evidence',
+    cwd: options.cwd,
+    messages: [
+      message('info', 'ATM_GIT_HEAD_EVIDENCE_BACKFILLED', 'ATM wrote git-head evidence for the current HEAD. Commit the staged evidence file as the next commit.', {
+        actorId,
+        commitSha: head,
+        treeSha,
+        evidencePath: normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute))
+      })
+    ],
+    evidence: {
+      action: 'git-head-backfill',
+      actorId,
+      commitSha: head,
+      treeSha,
+      evidencePath: normalizeRelativePath(relativePathFrom(options.cwd, evidenceAbsolute))
+    }
+  });
+}
+
+function parseEvidenceAddOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    kind: '',
+    summary: null as string | null,
+    artifacts: [] as string[],
+    freshness: 'fresh' as EvidenceFreshness,
+    validators: [] as string[],
+    commandRun: null as null | CommandRunEvidenceInput,
+    commandRuns: [] as CommandRunEvidenceInput[],
+    commandRunsPath: null as string | null,
+    commandRunsInputPath: null as string | null,
+    runnerKind: null as string | null,
+    sourceCommit: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--kind') {
+      options.kind = requireValue(argv, index, '--kind');
+      index += 1;
+      continue;
+    }
+    if (arg === '--summary') {
+      options.summary = requireValue(argv, index, '--summary');
+      index += 1;
+      continue;
+    }
+    if (arg === '--artifacts') {
+      options.artifacts = requireValue(argv, index, '--artifacts').split(',').map((entry) => normalizeRelativePath(entry)).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--freshness') {
+      options.freshness = normalizeEvidenceFreshness(requireValue(argv, index, '--freshness'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--validators') {
+      options.validators = requireValue(argv, index, '--validators').split(',').map((entry) => canonicalizeValidatorIdentity(entry)).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--command') {
+      const command = requireValue(argv, index, '--command');
+      const exitCode = parseIntegerFlag(argv, '--exit-code');
+      const stdoutSha256 = readOptionalFlag(argv, '--stdout-sha256');
+      const stderrSha256 = readOptionalFlag(argv, '--stderr-sha256');
+      if (exitCode === null || !isSha256(stdoutSha256) || !isSha256(stderrSha256)) {
+        throw new CliError('ATM_CLI_USAGE', 'evidence add --command also requires --exit-code, --stdout-sha256, and --stderr-sha256.', { exitCode: 2 });
+      }
+      options.commandRun = {
+        command,
+        exitCode,
+        stdoutSha256,
+        stderrSha256
+      };
+      index += 1;
+      continue;
+    }
+    if (arg === '--command-runs') {
+      options.commandRunsInputPath = requireValue(argv, index, '--command-runs');
+      index += 1;
+      continue;
+    }
+    if (arg === '--runner-kind') {
+      options.runnerKind = normalizeRunnerKind(requireValue(argv, index, '--runner-kind'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--source-commit') {
+      options.sourceCommit = requireValue(argv, index, '--source-commit').trim();
+      index += 1;
+      continue;
+    }
+    if (arg === '--exit-code' || arg === '--stdout-sha256' || arg === '--stderr-sha256') {
+      requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence add does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence add requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  if (!options.kind) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence add requires --kind <test|artifact|attestation|review|commit|waiver>.', { exitCode: 2 });
+  }
+  const cwd = path.resolve(options.cwd);
+  const commandRunsPath = options.commandRunsInputPath ? path.resolve(cwd, options.commandRunsInputPath) : null;
+  return {
+    ...options,
+    cwd,
+    taskId: options.taskId.trim(),
+    kind: options.kind.trim().toLowerCase(),
+    commandRunsPath,
+    commandRuns: commandRunsPath ? readCommandRunsInputFile(commandRunsPath) : []
+  };
+}
+
+function parseGitHeadBackfillOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    actorId: null as string | null,
+    summary: null as string | null,
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--summary') {
+      options.summary = requireValue(argv, index, '--summary');
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence git-head-backfill does not support option ${arg}`, { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd)
+  };
+}
+
+
+
+function parseEvidenceVerifyOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    gate: 'close' as EvidenceGate
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd') {
+      options.cwd = requireValue(argv, index, '--cwd');
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--gate') {
+      const gate = requireValue(argv, index, '--gate').trim().toLowerCase();
+      if (gate !== 'close' && gate !== 'commit' && gate !== 'pr') {
+        throw new CliError('ATM_CLI_USAGE', 'evidence verify --gate supports only: close, commit, pr.', { exitCode: 2 });
+      }
+      options.gate = gate;
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `evidence verify does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'evidence verify requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim()
+  };
+}
+
+function readParentCommitShas(cwd: string, commitSha: string) {
+  const result = runGitCommand(cwd, ['rev-list', '--parents', '-n', '1', commitSha]);
+  if (!result.ok) return [];
+  return result.stdout.trim().split(/\s+/).slice(1).filter(Boolean);
+}
+
+function runGitScalar(cwd: string, args: string[]) {
+  const result = runGitCommand(cwd, args);
+  return result.ok ? result.stdout.trim() : null;
+}
+
+function runGitCommand(cwd: string, args: string[], env: Record<string, string> = {}) {
+  const result = spawnSync('git', args, {
+    cwd,
+    env: {
+      ...process.env,
+      ...env
+    },
+    encoding: 'utf8'
+  });
+  return {
+    ok: !result.error && result.status === 0,
+    exitCode: result.status ?? 1,
+    stdout: result.stdout ?? '',
+    stderr: [result.stderr ?? '', result.error?.message ?? ''].filter(Boolean).join('\n')
+  };
+}
+
+function readGovernedCommitTreeWithoutEvidence(cwd: string, commitSha: string) {
+  const tempDir = mkdirTempDir();
+  const tempIndex = path.join(tempDir, 'index');
+  try {
+    const readTree = runGitCommand(cwd, ['read-tree', commitSha], {
+      GIT_INDEX_FILE: tempIndex
+    });
+    if (!readTree.ok) return null;
+    runGitCommand(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--', '.atm/history/evidence/git-head.json', '.atm/history/evidence/git-head.jsonl'], {
+      GIT_INDEX_FILE: tempIndex
+    });
+    const writeTree = runGitCommand(cwd, ['write-tree'], {
+      GIT_INDEX_FILE: tempIndex
+    });
+    return writeTree.ok ? writeTree.stdout.trim() : null;
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+function mkdirTempDir() {
+  return path.resolve(mkdtempSync(path.join(os.tmpdir(), 'atm-evidence-backfill-')));
+}
+
+function withTaskEvidenceWriteLock<T>(cwd: string, taskId: string, actorId: string, operation: () => T): T {
+  const lockPath = evidenceWriteLockPath(cwd, taskId);
+  mkdirSync(path.dirname(lockPath), { recursive: true });
+  const startedAt = Date.now();
+  while (true) {
+    try {
+      mkdirSync(lockPath, { recursive: false });
+      break;
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? String((error as { code?: unknown }).code ?? '') : '';
+      if (code !== 'EEXIST' && code !== 'EACCES') {
+        throw error;
+      }
+      if ((Date.now() - startedAt) >= evidenceWriteLockTimeoutMs) {
+        throw new CliError(
+          'ATM_EVIDENCE_WRITE_LOCK_CONFLICT',
+          `Evidence write for ${taskId} is already in progress. Retry after the active writer finishes.`,
+          {
+            exitCode: 2,
+            details: {
+              taskId,
+              actorId,
+              lockPath: relativePathFrom(cwd, lockPath),
+              retryable: true,
+              remediation: `Retry the same evidence command for ${taskId} after the current write completes.`
+            }
+          }
+        );
+      }
+      sleepMs(evidenceWriteLockRetryMs);
+    }
+  }
+
+  try {
+    return operation();
+  } finally {
+    rmSync(lockPath, { recursive: true, force: true });
+  }
+}
+
+
+function writeEvidenceEnvelope(evidencePath: string, envelope: EvidenceEnvelope) {
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  writeFileSync(evidencePath, `${JSON.stringify(envelope, null, 2)}\n`, 'utf8');
+}
+
+function canonicalizeEvidenceRecord(value: Record<string, unknown>): CanonicalEvidenceRecord {
+  const evidenceType = typeof value.evidenceType === 'string' ? value.evidenceType : '';
+  const evidenceKind = typeof value.evidenceKind === 'string' ? value.evidenceKind : '';
+  const detailKind = isRecord(value.details) && typeof value.details.kind === 'string' ? value.details.kind : '';
+  const detailFreshness = isRecord(value.details) && typeof value.details.freshness === 'string' ? value.details.freshness : '';
+  const topFreshness = typeof value.evidenceFreshness === 'string'
+    ? value.evidenceFreshness
+    : typeof value.freshness === 'string'
+      ? value.freshness
+      : '';
+  const kind = normalizeEvidenceKind(evidenceType || detailKind || evidenceKind);
+  return {
+    kind,
+    summary: typeof value.summary === 'string' ? value.summary : '',
+    producedBy: typeof value.producedBy === 'string' ? value.producedBy : null,
+    artifactPaths: Array.isArray(value.artifactPaths)
+      ? value.artifactPaths.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0).map((entry) => normalizeRelativePath(entry))
+      : [],
+    createdAt: typeof value.createdAt === 'string' ? value.createdAt : null,
+    freshness: normalizeEvidenceFreshness(topFreshness || detailFreshness),
+    hasCommandRunProof: hasCommandRunProof(value)
+  };
+}
+
+function normalizeEvidenceKind(value: string): CanonicalEvidenceKind {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'test' || normalized === 'validation') return 'test';
+  if (normalized === 'artifact') return 'artifact';
+  if (normalized === 'attestation') return 'attestation';
+  if (normalized === 'review') return 'review';
+  if (normalized === 'commit') return 'commit';
+  if (normalized === 'waiver') return 'waiver';
+  return 'other';
+}
+
+function normalizeEvidenceFreshness(value: string): EvidenceFreshness {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'historical-reference' || normalized === 'historical_reference' || normalized === 'reference-only') {
+    return 'historical-reference';
+  }
+  if (normalized === 'draft') return 'draft';
+  return 'fresh';
+}
+
+
+function readStringArray(value: unknown): readonly string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0);
+}
+
+function hasCommandRunProofForBundle(run: CommandRunEvidenceInput): boolean {
+  return typeof run.exitCode === 'number'
+    && run.exitCode === 0
+    && typeof run.stdoutSha256 === 'string'
+    && run.stdoutSha256.length > 0
+    && typeof run.stderrSha256 === 'string'
+    && run.stderrSha256.length > 0;
+}
+
+function serializeBundleCommandRun(run: CommandRunEvidenceInput): Record<string, unknown> {
+  return {
+    command: run.command,
+    exitCode: run.exitCode,
+    stdoutSha256: run.stdoutSha256,
+    stderrSha256: run.stderrSha256,
+    validators: Array.isArray(run.validators) ? [...run.validators] : [],
+    generatedAt: run.generatedAt ?? null,
+    runnerKind: run.runnerKind ?? null,
+    sourceCommit: run.sourceCommit ?? null,
+    cached: run.cached === true
+  };
+}
+
+function upsertEvidenceBundleManifest(input: {
+  cwd: string;
+  taskId: string;
+  actorId: string;
+  updatedAt: string;
+  freshness: EvidenceFreshness;
+  validationPasses: readonly string[];
+  commandRuns: readonly CommandRunEvidenceInput[];
+  artifactPaths: readonly string[];
+}): EvidenceBundleManifest | null {
+  if (input.validationPasses.length === 0 && input.commandRuns.length === 0 && input.artifactPaths.length === 0) {
+    return readEvidenceBundleManifest(input.cwd, input.taskId);
+  }
+
+  const existing = readEvidenceBundleManifest(input.cwd, input.taskId);
+  const freshValidationPasses = new Set(existing?.freshValidationPasses ?? []);
+  const staleValidationPasses = new Set(existing?.staleValidationPasses ?? []);
+  const commandRuns = [...(existing?.commandRuns ?? [])];
+  const artifactPaths = new Set([
+    ...(existing?.artifactPaths ?? []),
+    ...input.artifactPaths.map((entry) => normalizeRelativePath(entry)).filter(Boolean)
+  ]);
+
+  const proofBackedRuns = input.commandRuns.filter(hasCommandRunProofForBundle);
+  const treatAsFresh = input.freshness === 'fresh' && proofBackedRuns.length > 0;
+
+  for (const pass of input.validationPasses) {
+    const canonical = canonicalizeValidatorIdentity(pass);
+    if (treatAsFresh) {
+      freshValidationPasses.add(canonical);
+      staleValidationPasses.delete(canonical);
+      continue;
+    }
+    if (!freshValidationPasses.has(canonical)) {
+      staleValidationPasses.add(canonical);
+    }
+  }
+
+  for (const run of proofBackedRuns) {
+    commandRuns.push(serializeBundleCommandRun(run));
+  }
+
+  const manifest: EvidenceBundleManifest = {
+    schemaId: EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID,
+    taskId: input.taskId,
+    updatedAt: input.updatedAt,
+    updatedBy: input.actorId,
+    freshValidationPasses: uniqueStrings([...freshValidationPasses]),
+    staleValidationPasses: uniqueStrings([...staleValidationPasses]),
+    commandRuns,
+    artifactPaths: uniqueStrings([...artifactPaths])
+  };
+  writeEvidenceBundleManifest(input.cwd, manifest);
+  return manifest;
+}
+
+function writeEvidenceBundleManifest(cwd: string, manifest: EvidenceBundleManifest) {
+  const manifestPath = evidenceBundleManifestPathForTask(cwd, manifest.taskId);
+  mkdirSync(path.dirname(manifestPath), { recursive: true });
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+}
+
+function evidenceWriteLockPath(cwd: string, taskId: string) {
+  return path.join(cwd, '.atm', 'runtime', 'evidence-write-locks', `${taskId}.lock`);
+}
+
+
+function normalizeRelativePath(value: string) {
+  return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+
+function requireValue(argv: string[], index: number, flag: string) {
+  const value = argv[index + 1];
+  if (!value || value.startsWith('--')) {
+    throw new CliError('ATM_CLI_USAGE', `evidence requires a value for ${flag}`, { exitCode: 2 });
+  }
+  return value;
+}
+
+
+
+function extractAtomizationTargets(taskDocument: Record<string, unknown> | null) {
+  if (!taskDocument || !isRecord(taskDocument.atomizationImpact)) return [] as Array<{ atomOrMapId: string; kind: 'owner' | 'map-update' }>;
+  const atomizationImpact = taskDocument.atomizationImpact as Record<string, unknown>;
+  const output: Array<{ atomOrMapId: string; kind: 'owner' | 'map-update' }> = [];
+  const ownerAtomOrMap = typeof atomizationImpact.ownerAtomOrMap === 'string' ? atomizationImpact.ownerAtomOrMap.trim() : '';
+  if (ownerAtomOrMap) {
+    output.push({ atomOrMapId: ownerAtomOrMap, kind: 'owner' });
+  }
+  if (Array.isArray(atomizationImpact.mapUpdates)) {
+    for (const entry of atomizationImpact.mapUpdates) {
+      if (typeof entry === 'string' && entry.trim()) {
+        output.push({ atomOrMapId: entry.trim(), kind: 'map-update' });
+      }
+    }
+  }
+  return output;
+}
+
+function buildGenericAtomHealthClaims(taskDocument: Record<string, unknown> | null, validationPasses: readonly string[]) {
+  const targets = extractAtomizationTargets(taskDocument);
+  const validatorHealthy = validationPasses.length > 0;
+  return targets.map((target) => ({
+    atomOrMapId: target.atomOrMapId,
+    kind: target.kind,
+    generatedByTask: true,
+    validatorHealthy
+  }));
+}
+
+function hasHealthyAtomEvidence(taskDocument: Record<string, unknown> | null, bundle: readonly Record<string, unknown>[]) {
+  const targets = extractAtomizationTargets(taskDocument);
+  if (targets.length === 0) return true;
+  const requiredIds = new Set(targets.map((target) => target.atomOrMapId));
+  const healthyIds = new Set<string>();
+  for (const record of bundle) {
+    const details = isRecord(record.details) ? record.details : null;
+    const candidates = details && Array.isArray(details.atomHealthClaims)
+      ? details.atomHealthClaims
+      : details && isRecord(details.historicalBatch) && Array.isArray(details.historicalBatch.atomHealthClaims)
+        ? details.historicalBatch.atomHealthClaims
+        : [];
+    for (const entry of candidates) {
+      if (!isRecord(entry)) continue;
+      const atomOrMapId = typeof entry.atomOrMapId === 'string' ? entry.atomOrMapId.trim() : '';
+      if (!atomOrMapId || !requiredIds.has(atomOrMapId)) continue;
+      if (entry.generatedByTask === true && entry.validatorHealthy === true) {
+        healthyIds.add(atomOrMapId);
+      }
+    }
+  }
+  return targets.every((target) => healthyIds.has(target.atomOrMapId));
+}
+
+function extractTaskDeclaredFiles(taskDocument: Record<string, unknown> | null) {
+  if (!taskDocument) return [];
+  const files = new Set<string>();
+  for (const key of ['scope', 'files', 'changedFiles', 'criticalChangedFiles', 'guardPaths', 'targetFiles']) {
+    collectTaskFileValues(taskDocument[key], files);
+  }
+  const source = taskDocument.source;
+  if (source && typeof source === 'object' && !Array.isArray(source)) {
+    const sourceRecord = source as Record<string, unknown>;
+    collectTaskFileValues(sourceRecord.path, files);
+    collectTaskFileValues(sourceRecord.planPath, files);
+  }
+  return [...files].sort((left, right) => left.localeCompare(right));
+}
+
+function collectTaskFileValues(value: unknown, files: Set<string>) {
+  if (typeof value === 'string') {
+    const normalized = normalizeRelativePath(value);
+    if (normalized) files.add(normalized);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      collectTaskFileValues(entry, files);
+    }
+  }
+}
+
+function detectReopenedOrRedteamTask(taskDocument: Record<string, unknown> | null | undefined) {
+  if (!taskDocument) return false;
+  for (const field of ['audit_status', 'auditStatus', 'notes', 'summary', 'description']) {
+    const text = typeof taskDocument[field] === 'string' ? taskDocument[field] : '';
+    if (/(reopened|clean[_ -]?redo|redteam|invalid completion claim|historical draft evidence|draft evidence)/i.test(text)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function detectCodeOrFrameworkTask(taskDocument: Record<string, unknown> | null | undefined, declaredFiles: readonly string[]) {
+  if (!taskDocument) return declaredFiles.some(isCodeLikePath);
+  const closureAuthority = typeof taskDocument.closureAuthority === 'string'
+    ? taskDocument.closureAuthority
+    : typeof taskDocument.closure_authority === 'string'
+      ? taskDocument.closure_authority
+      : '';
+  const targetRepo = typeof taskDocument.targetRepo === 'string'
+    ? taskDocument.targetRepo
+    : typeof taskDocument.target_repo === 'string'
+      ? taskDocument.target_repo
+      : '';
+  if (closureAuthority.trim().toLowerCase() === 'target_repo' || targetRepo.trim().length > 0) {
+    return true;
+  }
+  const source = taskDocument.source && typeof taskDocument.source === 'object' && !Array.isArray(taskDocument.source)
+    ? taskDocument.source as Record<string, unknown>
+    : {};
+  if (typeof source.planPath === 'string' && source.planPath.trim().length > 0) {
+    return true;
+  }
+  if (declaredFiles.some(isCodeLikePath)) return true;
+  const notes = typeof taskDocument.notes === 'string' ? taskDocument.notes : '';
+  return isCodeLikePath(notes);
+}
+
+function isCodeLikePath(value: string) {
+  return /(^|[/\s])(packages|scripts|schemas|specs|templates|integrations|examples|tests)\//i.test(value)
+    || /\.(?:ts|tsx|js|jsx|mjs|cjs|mts|cts|py|go|rs|java|cs|cpp|c|h|json|ya?ml|sh|ps1)\b/i.test(value);
+}
+
+function hasCommandRunProof(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  if (Array.isArray(candidate.commandRuns)) {
+    return candidate.commandRuns.some((entry) => isCommandRunProof(entry));
+  }
+  if (isRecord(candidate.details) && Array.isArray(candidate.details.commandRuns)) {
+    return candidate.details.commandRuns.some((entry) => isCommandRunProof(entry));
+  }
+  return false;
+}
+
+
+function hasTeamClosureAttestation(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (isRecord(value.details)) {
+    if (value.details.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID) return true;
+    if (isRecord(value.details.teamClosureAttestation) && value.details.teamClosureAttestation.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID) return true;
+  }
+  if (isRecord(value.teamClosureAttestation) && value.teamClosureAttestation.schemaId === TEAM_CLOSURE_ATTESTATION_SCHEMA_ID) return true;
+  return false;
+}
+
+function isSha256(value: unknown): value is string {
+  return typeof value === 'string' && /^sha256:[a-f0-9]{64}$/i.test(value.trim());
+}
+
+function readOptionalFlag(argv: string[], flag: string) {
+  const index = argv.indexOf(flag);
+  if (index < 0 || index + 1 >= argv.length) return null;
+  const value = argv[index + 1];
+  return value && !value.startsWith('--') ? value.trim() : null;
+}
+
+function parseIntegerFlag(argv: string[], flag: string) {
+  const raw = readOptionalFlag(argv, flag);
+  if (raw === null) return null;
+  const value = Number.parseInt(raw, 10);
+  return Number.isFinite(value) ? value : null;
+}
+
+function maybeHoldEvidenceWriteLockForTests() {
+  const holdMs = Number.parseInt(process.env.ATM_EVIDENCE_TEST_HOLD_LOCK_MS ?? '', 10);
+  if (Number.isFinite(holdMs) && holdMs > 0) {
+    sleepMs(holdMs);
+  }
+}
+
+function sleepMs(ms: number) {
+  if (!Number.isFinite(ms) || ms <= 0) return;
+  Atomics.wait(evidenceWriteSleepBuffer, 0, 0, ms);
+}
+
+
+
+function resolveEvidenceAutoValidators(input: {
+  readonly cwd: string;
+  readonly taskId: string;
+  readonly command: string;
+}): string[] {
+  const autoLinked = detectAutoLinkedValidator(input.command);
+  if (autoLinked) return [autoLinked];
+
+  const taskDocument = readTaskDocument(input.cwd, input.taskId);
+  if (!taskDocument || !Array.isArray(taskDocument.validators)) return [];
+
+  const commandCanonical = canonicalizeValidatorIdentity(input.command);
+  const commandNormalized = normalizeValidatorToken(input.command);
+  for (const entry of taskDocument.validators) {
+    if (typeof entry !== 'string' || !entry.trim()) continue;
+    const declaredCanonical = canonicalizeValidatorIdentity(entry);
+    if (declaredCanonical && declaredCanonical === commandCanonical) return [declaredCanonical];
+    if (normalizeValidatorToken(entry) === commandNormalized) return [declaredCanonical || entry.trim()];
+  }
+
+  return [];
+}
+

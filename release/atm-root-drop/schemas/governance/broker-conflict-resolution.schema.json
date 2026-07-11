@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/governance/broker-conflict-resolution.schema.json",
+  "title": "ATM Broker Conflict Resolution v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "resolutionId",
+    "createdAt",
+    "primaryTaskId",
+    "conflictingTaskIds",
+    "sharedPaths",
+    "decisionClass",
+    "decisionReason",
+    "violationStatus",
+    "releaseOrder",
+    "currentAllowedTaskId",
+    "blockedTaskIds",
+    "artifactType",
+    "statusCode"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.brokerConflictResolution.v1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "resolutionId": {
+      "type": "string",
+      "pattern": "^BCR-[a-z0-9]+$"
+    },
+    "createdAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "primaryTaskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "conflictingTaskIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "sharedPaths": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "decisionClass": {
+      "enum": ["serial-release", "human-signoff-required", "adr-required", "blocked"]
+    },
+    "decisionReason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "violationStatus": {
+      "enum": ["broker-conflict-blocked", "resolution-issued", "resolved"]
+    },
+    "releaseOrder": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "currentAllowedTaskId": {
+      "type": ["string", "null"]
+    },
+    "blockedTaskIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "artifactType": {
+      "const": "atm.brokerConflictResolution.v1"
+    },
+    "statusCode": {
+      "const": "broker-conflict-blocked"
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
