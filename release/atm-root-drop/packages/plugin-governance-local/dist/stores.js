@@ -116,7 +116,10 @@ export function createLocalGovernanceStores(config) {
         },
         getLock(workItemId) {
             const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
-            return existsSync(filePath) ? readJsonFile(filePath) : null;
+            if (!existsSync(filePath))
+                return null;
+            const record = readJsonFile(filePath);
+            return isReleasedLockRecord(record) ? null : record;
         },
         releaseLock(workItemId, actor) {
             const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
@@ -638,6 +641,9 @@ function renderContextSummaryMarkdown(summary) {
 }
 function isReleasedLockRecord(value) {
     if (value.released === true) {
+        return true;
+    }
+    if (value.status === 'released') {
         return true;
     }
     if (value.claim && typeof value.claim === 'object') {

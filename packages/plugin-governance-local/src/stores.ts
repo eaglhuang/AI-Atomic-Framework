@@ -151,7 +151,9 @@ export function createLocalGovernanceStores(config: LocalGovernanceConfig): Gove
     },
     getLock(workItemId) {
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
-      return existsSync(filePath) ? readJsonFile(filePath) as ScopeLockRecord : null;
+      if (!existsSync(filePath)) return null;
+      const record = readJsonFile(filePath) as Record<string, unknown>;
+      return isReleasedLockRecord(record) ? null : record as unknown as ScopeLockRecord;
     },
     releaseLock(workItemId, actor) {
       const filePath = path.join(absoluteLayout.lockStorePath, `${workItemId}.lock.json`);
@@ -712,6 +714,9 @@ function renderContextSummaryMarkdown(summary: ContextSummaryRecord): string {
 
 function isReleasedLockRecord(value: Record<string, unknown>) {
   if (value.released === true) {
+    return true;
+  }
+  if (value.status === 'released') {
     return true;
   }
   if (value.claim && typeof value.claim === 'object') {
