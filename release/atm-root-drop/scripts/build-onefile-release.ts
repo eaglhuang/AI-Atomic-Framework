@@ -234,6 +234,7 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
+import { pathToFileURL } from 'node:url';
 
 const payloadBase64 = ${JSON.stringify(payloadBase64)};
 const payloadSha256 = ${JSON.stringify(payloadSha256)};
@@ -422,7 +423,7 @@ function firstPositionalCommand(args) {
   return null;
 }
 
-function run() {
+async function run() {
   try {
     const extractedRoot = ensureExtractedRoot();
     const distEntrypoint = path.join(extractedRoot, 'packages', 'cli', 'dist', 'atm.js');
@@ -444,19 +445,38 @@ function run() {
     const forwardedArgs = shouldUseExtractedFrameworkCwd
       ? [...userArgs, '--cwd', extractedRoot]
       : userArgs;
+    Object.assign(process.env, {
+      ATM_ONEFILE_RUNTIME: '1',
+      ATM_ONEFILE_LAUNCHER_PATH: path.resolve(process.argv[1] || ''),
+      ATM_ONEFILE_PAYLOAD_SHA256: payloadSha256,
+      ATM_ONEFILE_EXTRACTED_ROOT: extractedRoot
+    });
+
+    if (entrypoint === distEntrypoint) {
+      // The extracted dist is already a valid ESM CLI. Running it in-process
+      // removes one Node startup from every warm onefile invocation.
+      const previousCwd = process.cwd();
+      try {
+        if (shouldUseExtractedFrameworkCwd) {
+          process.chdir(extractedRoot);
+        }
+        const { runCli } = await import(pathToFileURL(distEntrypoint).href);
+        process.exitCode = await runCli(forwardedArgs);
+      } finally {
+        if (process.cwd() !== previousCwd) {
+          process.chdir(previousCwd);
+        }
+      }
+      return;
+    }
+
     const nodeArgs = entrypoint === sourceEntrypoint
       ? ['--strip-types', entrypoint, ...forwardedArgs]
       : [entrypoint, ...forwardedArgs];
     const child = spawnSync(process.execPath, nodeArgs, {
       cwd: shouldUseExtractedFrameworkCwd ? extractedRoot : process.cwd(),
       stdio: 'inherit',
-      env: {
-        ...process.env,
-        ATM_ONEFILE_RUNTIME: '1',
-        ATM_ONEFILE_LAUNCHER_PATH: path.resolve(process.argv[1] || ''),
-        ATM_ONEFILE_PAYLOAD_SHA256: payloadSha256,
-        ATM_ONEFILE_EXTRACTED_ROOT: extractedRoot
-      },
+      env: process.env,
       windowsHide: true
     });
     if (child.error) {
@@ -469,7 +489,7 @@ function run() {
   }
 }
 
-run();
+await run();
 `;
 }
 

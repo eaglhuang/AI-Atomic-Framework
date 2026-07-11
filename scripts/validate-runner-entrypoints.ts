@@ -16,6 +16,10 @@ assert.match(stableRunner, /npm run build/, 'atm.mjs should tell contributors ho
 assert.match(stableRunner, /atm\.dev\.mjs/, 'atm.mjs should point source-development users to atm.dev.mjs.');
 assert.doesNotMatch(stableRunner, /cliArgs\.includes\(['"]--json['"]\)/, 'atm.mjs stale-runner warning must still be visible to JSON-mode agents via stderr.');
 
+const onefileBuilder: string = readFileSync('scripts/build-onefile-release.ts', 'utf8');
+assert.match(onefileBuilder, /await import\(pathToFileURL\(distEntrypoint\)/, 'onefile runtime should execute cached dist in-process to avoid a second Node startup.');
+assert.doesNotMatch(onefileBuilder, /const child = spawnSync\(process\.execPath, nodeArgs, \{[\s\S]*entrypoint === distEntrypoint/, 'onefile runtime should not spawn a child process for the cached dist entrypoint.');
+
 assert.match(devRunner, /packages['"], ['"]cli['"], ['"]src['"], ['"]atm\.ts/, 'atm.dev.mjs should load source-first for framework development.');
 assert.match(devRunner, /packages['"], ['"]cli['"], ['"]dist['"], ['"]atm\.js/, 'atm.dev.mjs should fall back to the built dist runner.');
 assert.equal(cliFixture.entrypoint, 'atm.dev.mjs', 'source CLI validation should use the source-first development runner.');
