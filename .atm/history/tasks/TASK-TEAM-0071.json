@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0071",
+  "title": "Three-vendor direct execution, artifact handoff, and context benchmark",
+  "status": "running",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0053",
+    "TASK-TEAM-0070"
+  ],
+  "acceptance": [
+    "Concrete `team start --execute` supports OpenAI, Anthropic, and `gemini-direct` role selections in one L5 run.",
+    "Later roles receive bounded, redacted prior-role artifacts according to role order; an OpenAI Review Agent prompt is demonstrably tied to an Anthropic Implementer output.",
+    "Deterministic coverage proves OpenAI-only, Anthropic-only, Gemini-direct-only, mixed three-provider, and one-role `broker-conflict-blocked` while sibling roles proceed.",
+    "Manual low-cost live probes prove all three credentials and direct provider generation surfaces; a low-cost L5 run records redacted role outcomes.",
+    "A reproducible benchmark compares monolithic context bytes with bounded role-context bytes and reports savings, limitations, and whether quality evidence supports the claim."
+  ],
+  "deliverables": [
+    "agent-integrations/vendors/team-secrets.example.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/core/src/team-runtime/provider-contract.ts",
+    "packages/core/src/team-runtime/providers/gemini-direct.ts",
+    "scripts/validate-team-agents.ts",
+    "docs/governance/team-agents/three-vendor-l5-context-benchmark.md"
+  ],
+  "scopePaths": [
+    "agent-integrations/vendors/team-secrets.example.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "packages/cli/src/commands/team.ts",
+    "packages/core/src/team-runtime/permission-broker.ts",
+    "packages/core/src/team-runtime/provider-contract.ts",
+    "packages/core/src/team-runtime/providers/gemini-direct.ts",
+    "scripts/validate-team-agents.ts",
+    "docs/governance/team-agents/three-vendor-l5-context-benchmark.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts --case three-vendor-direct-artifact-handoff",
+    "node --strip-types scripts/validate-team-agents.ts --case heterogeneous-multi-bot-team-run",
+    "npm run validate:team-agents",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing the existing Gemini CLI/editor-subagent bridge",
+    "Committing provider credentials or full provider responses",
+    "Live paid API calls in CI"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert Gemini direct orchestration, bounded artifact handoff, telemetry, and evidence report together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "proposalAdmission": {
+    "trigger": "hot-file",
+    "summarySubmitted": true,
+    "hotFiles": [
+      "packages/cli/src/commands/team.ts"
+    ],
+    "notes": "Bounded three-provider dispatcher, artifact-handoff, and context-telemetry changes are fully described by this task card."
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0071-three-vendor-artifact-handoff-and-context-benchmark.task.md",
+    "sectionTitle": "TASK-TEAM-0071",
+    "headingLine": 62,
+    "hash": "490255e9d8a404b3"
+  },
+  "importedAt": "2026-07-11T13:23:30.645Z",
+  "lastTransitionId": "2026-07-11T13-36-51-703Z-scope-amendment-24c91cbaeae8",
+  "lastTransitionAt": "2026-07-11T13:36:51.703Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Sol",
+  "reservedAt": "2026-07-11T13:23:32.940Z",
+  "promotedAt": "2026-07-11T13:23:32.943Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Sol",
+    "leaseId": "lease-09c660736ece",
+    "claimedAt": "2026-07-11T13:23:32.947Z",
+    "heartbeatAt": "2026-07-11T13:23:32.947Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-TEAM-0071.*",
+      ".atm/history/protected-override-audit/2026-07-11T13-23-30-628Z-POA-7998874e1358.json",
+      ".atm/history/task-events/TASK-TEAM-0071/**",
+      ".atm/history/tasks/TASK-TEAM-0071.json",
+      "agent-integrations/vendors/team-secrets.example.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/providers/gemini-direct.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-11T13:23:32.947Z",
+  "startedByActor": "Codex-GPT5.6 Sol",
+  "startedBySessionId": "session-20260711132332-Codex-GPT5.6-Sol-TASK-TEAM-0071-e67ff86718",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0071",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0071.*",
+      ".atm/history/protected-override-audit/2026-07-11T13-23-30-628Z-POA-7998874e1358.json",
+      ".atm/history/task-events/TASK-TEAM-0071/**",
+      ".atm/history/tasks/TASK-TEAM-0071.json",
+      "agent-integrations/vendors/team-secrets.example.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/providers/gemini-direct.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0071-three-vendor-artifact-handoff-and-context-benchmark.task.md",
+      "C:/Users/User/AI-Atomic-Framework/agent-integrations/vendors/team-secrets.example.json"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/team-agents/",
+      "docs/ai_atomic_framework/team-agents/tasks/",
+      "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0071-three-vendor-artifact-handoff-and-context-benchmark.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "654ceca5af573f5184e8d5516789c670b6e450e692cefc1ac7f175c63ac77b13",
+    "actorId": "Codex-GPT5.6 Sol",
+    "createdAt": "2026-07-11T13:23:34.292Z",
+    "status": "active"
+  }
+}
