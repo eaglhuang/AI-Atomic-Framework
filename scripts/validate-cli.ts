@@ -23,6 +23,7 @@ const mode = process.argv.includes('--mode')
 const profile = process.argv.includes('--profile')
   ? process.argv[process.argv.indexOf('--profile') + 1]
   : null;
+const fastOnly = mode === 'fast' || profile === 'fast' || process.argv.includes('--fast');
 const surfaceOnly = mode === 'surface' || profile === 'surface' || process.argv.includes('--surface');
 const childProcessSmokeEnabled = process.env.ATM_VALIDATE_CLI_CHILD_SMOKE !== '0';
 for (const key of Object.keys(process.env)) {
@@ -527,6 +528,26 @@ await runNodeScriptTestsInParallel([
   {
     name: 'protected-override-audit-staging',
     scriptPath: path.join(root, 'tests/cli/protected-override-audit-staging.test.ts')
+  },
+  {
+    name: 'planning-root-preference',
+    scriptPath: path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')
+  },
+  {
+    name: 'planning-root-canonical-preference',
+    scriptPath: path.join(root, 'scripts/validate-planning-root-canonical-preference.ts')
+  },
+  {
+    name: 'residue-diagnostics',
+    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')
+  },
+  {
+    name: 'validate-cli-historical-delivery',
+    scriptPath: path.join(root, 'tests/cli/validate-cli-historical-delivery.test.ts')
+  },
+  {
+    name: 'validate-cli-close-gate',
+    scriptPath: path.join(root, 'tests/cli/validate-cli-close-gate.test.ts')
   }
 ]);
 
@@ -564,29 +585,6 @@ try {
   safeRmSync(protectedForeignStagedWorkspace);
 }
 
-await runNodeScriptTestsInParallel([
-  {
-    name: 'planning-root-preference',
-    scriptPath: path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')
-  },
-  {
-    name: 'planning-root-canonical-preference',
-    scriptPath: path.join(root, 'scripts/validate-planning-root-canonical-preference.ts')
-  },
-  {
-    name: 'residue-diagnostics',
-    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')
-  },
-  {
-    name: 'validate-cli-historical-delivery',
-    scriptPath: path.join(root, 'tests/cli/validate-cli-historical-delivery.test.ts')
-  },
-  {
-    name: 'validate-cli-close-gate',
-    scriptPath: path.join(root, 'tests/cli/validate-cli-close-gate.test.ts')
-  }
-]);
-
 const nextHelp = await runAtm(['next', '--help'], root);
 const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
 assert(nextUsageText.includes('prefers the explicit --task'), 'next --help must explain that the recommended claim command prefers --task TASK-XXX form when the task is already known');
@@ -610,10 +608,11 @@ assert(rescueUsageText.includes('closure-packet'), 'rescue --help CLI surface mu
 assert(rescueUsageText.includes('node atm.mjs rescue closure-packet'), 'rescue --help examples must show rescue closure-packet usage');
 assert(rescueUsageText.includes('--amend'), 'rescue --help must document explicit closure-packet amend opt-in');
 
-if (surfaceOnly) {
+if (fastOnly || surfaceOnly) {
   clearInterval(progressHeartbeat);
   if (!process.exitCode) {
-    console.log(`[cli:${mode}] ok surface (${publicCommandNames.length} public commands, ${internalCommandNames.length} internal commands, in-process help checks, ${formatDuration(Date.now() - validateStartedAt)})`);
+    const label = fastOnly ? 'fast' : 'surface';
+    console.error(`[cli:${mode}] ok ${label} (${publicCommandNames.length} public commands, ${internalCommandNames.length} internal commands, focused regressions verified, ${formatDuration(Date.now() - validateStartedAt)})`);
   }
   process.exit(process.exitCode ?? 0);
 }
