@@ -65,6 +65,7 @@ import {
   releaseCloseWindowStagedIndexLock,
   type CloseWindowStagedIndexLockReport
 } from './tasks/close-window-lock.ts';
+import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../core/src/team-runtime/handoff-ledger.ts';
 
 interface DeferredGovernanceDirtyFile {
   file: string;
@@ -991,6 +992,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         planningIndexAdvisory
       ));
     }
+    promoteTaskRuntimeHandoffs(cwd, taskId, 'completed');
     const commitBundleInput = buildTaskflowCommitBundle({
       cwd,
       taskId,
@@ -1160,6 +1162,18 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     schemaId: 'atm.taskflowCloseResult.v1',
     writeEnabled: false
   };
+}
+
+function promoteTaskRuntimeHandoffs(cwd: string, taskId: string, runOutcome: 'completed' | 'aborted' | 'failed'): void {
+  const root = path.join(cwd, '.atm', 'runtime', 'handoff', taskId.replace(/[^A-Za-z0-9._-]/g, '_'));
+  if (!existsSync(root)) return;
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const runPath = teamHandoffRuntimeDirectory(cwd, taskId, entry.name);
+    if (existsSync(path.join(runPath, 'manifest.json'))) {
+      promoteTeamHandoffArchive({ cwd, taskId, teamRunId: entry.name, runOutcome });
+    }
+  }
 }
 
 export async function runTaskflow(argv: string[] = []) {

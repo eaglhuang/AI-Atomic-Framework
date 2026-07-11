@@ -136,7 +136,8 @@ function listCurrentTaskGovernanceFiles(root: string, taskId: string): string[] 
     `.atm/history/evidence/${taskId}.closure-packet.json`
   ].filter((filePath) => existsSync(path.join(root, filePath)));
   const taskEvents = listExistingFilesRecursively(root, `.atm/history/task-events/${taskId}`);
-  return uniqueSorted([...taskFiles, ...taskEvents]);
+  const handoffHistory = listExistingFilesRecursively(root, `.atm/history/handoff/${taskId}`);
+  return uniqueSorted([...taskFiles, ...taskEvents, ...handoffHistory]);
 }
 
 function tryGitScalar(cwd: string, args: readonly string[]): string | null {

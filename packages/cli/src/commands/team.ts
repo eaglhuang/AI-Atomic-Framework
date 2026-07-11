@@ -53,6 +53,7 @@ import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createTeamProviderContract, type TeamProviderHttpExecutor, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtime/permission-broker.ts';
+import { materializeTeamRoleHandoff, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
 import {
   mergeTeamProviderSelectionConfig,
   resolveTeamProviderSelection,
@@ -66,6 +67,8 @@ type TeamPermissionDefinition = {
   id: string;
   mode: TeamPermissionMode;
   scopeRequired?: boolean;
+  /** Permission leases are always enforced by a fail-closed hard gate. */
+  hardGate: true;
 };
 
 type TeamVendorLocalSecrets = {
@@ -626,22 +629,22 @@ type TeamPatrolFinding = {
 };
 
 const teamPermissionCatalog: TeamPermissionDefinition[] = [
-  { id: 'task.lifecycle', mode: 'exclusive' },
-  { id: 'git.write', mode: 'exclusive' },
-  { id: 'file.read', mode: 'shareable', scopeRequired: true },
-  { id: 'file.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'web.query', mode: 'exclusive' },
-  { id: 'web.download', mode: 'exclusive', scopeRequired: true },
-  { id: 'exec.validator', mode: 'shareable', scopeRequired: true },
-  { id: 'exec.mutating', mode: 'exclusive', scopeRequired: true },
-  { id: 'sandbox.write', mode: 'exclusive' },
-  { id: 'pipeline.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'database.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'ci.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'evidence.write', mode: 'exclusive' },
-  { id: 'knowledge.query', mode: 'shareable' },
-  { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'review.signature.write', mode: 'exclusive' }
+  { id: 'task.lifecycle', mode: 'exclusive', hardGate: true },
+  { id: 'git.write', mode: 'exclusive', hardGate: true },
+  { id: 'file.read', mode: 'shareable', scopeRequired: true, hardGate: true },
+  { id: 'file.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'web.query', mode: 'exclusive', hardGate: true },
+  { id: 'web.download', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'exec.validator', mode: 'shareable', scopeRequired: true, hardGate: true },
+  { id: 'exec.mutating', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'sandbox.write', mode: 'exclusive', hardGate: true },
+  { id: 'pipeline.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'database.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'ci.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'evidence.write', mode: 'exclusive', hardGate: true },
+  { id: 'knowledge.query', mode: 'shareable', hardGate: true },
+  { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'review.signature.write', mode: 'exclusive', hardGate: true }
 ];
 
 const coordinatorExclusivePermissions = ['task.lifecycle', 'git.write', 'evidence.write'] as const;
@@ -4465,7 +4468,8 @@ export async function runTeamProviderExecution(input: {
   const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
   const results: DirectTeamProviderRoleResult[] = [];
   const priorRoleArtifacts: DirectTeamRoleHandoffArtifact[] = [];
-  for (const roleSelection of selectedRoles) {
+  const handoffEvents: ReturnType<typeof createTeamObservabilityEvent>[] = [];
+  for (const [roleIndex, roleSelection] of selectedRoles.entries()) {
     const result = await runDirectTeamProviderRole({
       taskId: input.taskId,
       role: roleSelection.role,
@@ -4477,7 +4481,45 @@ export async function runTeamProviderExecution(input: {
     });
     if (result) {
       results.push(result);
-      if (result.handoffArtifact && result.ok) priorRoleArtifacts.push(result.handoffArtifact);
+      if (result.handoffArtifact && result.ok) {
+        const next = selectedRoles[roleIndex + 1];
+        const materialized = materializeTeamRoleHandoff({
+          cwd: input.cwd,
+          taskId: input.taskId,
+          teamRunId: input.teamRunId,
+          fromRole: result.handoffArtifact.role,
+          fromProviderId: result.handoffArtifact.providerId,
+          fromModelId: roleSelection.selectedProvider.modelId,
+          toRole: next?.role ?? 'coordinator',
+          toProviderId: next?.selectedProvider.providerId ?? null,
+          sourceArtifactId: result.sessionId,
+          redactedPreview: result.handoffArtifact.outputTextPreview,
+          leaseEpoch: roleIndex + 1
+        });
+        const integrity = verifyTeamHandoffLedger(input.cwd, input.taskId, input.teamRunId);
+        if (!integrity.ok) {
+          throw new CliError('ATM_TEAM_HANDOFF_INTEGRITY_BLOCKED', `Team handoff integrity check failed: ${integrity.reason}.`, { exitCode: 1 });
+        }
+        priorRoleArtifacts.push({
+          role: materialized.artifact.from.role,
+          providerId: materialized.artifact.from.providerId,
+          outputTextPreview: materialized.artifact.humanSummary
+        });
+        handoffEvents.push(createTeamObservabilityEvent({
+          eventType: 'handoff.materialized',
+          taskId: input.taskId,
+          teamRunId: input.teamRunId,
+          providerId: normalizeTeamProviderId(materialized.artifact.from.providerId) ?? 'unknown',
+          role: materialized.artifact.from.role,
+          runtimeMode: input.runtimeContract.runtimeMode,
+          artifactType: materialized.artifact.schemaId,
+          artifactId: materialized.artifact.handoffId,
+          decisionClass: materialized.artifact.decision.decisionClass,
+          decisionReason: materialized.artifact.decision.decisionReason,
+          violationStatus: materialized.artifact.decision.violationStatus,
+          summary: `Handoff ${materialized.artifact.handoffId} materialized.`
+        }));
+      }
     }
   }
   appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
@@ -4485,7 +4527,7 @@ export async function runTeamProviderExecution(input: {
     teamRunId: input.teamRunId,
     runtimeMode: input.runtimeContract.runtimeMode,
     result
-  })));
+  })).concat(handoffEvents));
   return {
     requested: true,
     blockedReason: null,
@@ -5071,6 +5113,32 @@ function runTeamLifecycleAction(input: {
   }
   if ((input.action === 'lease' || input.action === 'release') && !input.permission) {
     throw new CliError('ATM_TEAM_PERMISSION_REQUIRED', `team ${input.action} requires --permission <id>.`, { exitCode: 2 });
+  }
+
+  if (input.action === 'lease' || input.action === 'release') {
+    const definition = teamPermissionCatalog.find((entry) => entry.id === input.permission);
+    if (!definition || definition.hardGate !== true) {
+      throw new CliError('ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED', `Permission ${input.permission || '<missing>'} is not registered with a hard gate.`, {
+        exitCode: 1,
+        details: {
+          teamRunId: input.teamRunId,
+          permission: input.permission || null,
+          gateId: 'ATM_TEAM_PERMISSION_HARD_GATE',
+          requiredCommand: 'node atm.mjs team validate --json'
+        }
+      });
+    }
+    if (input.action === 'lease' && definition.scopeRequired && input.paths.length === 0) {
+      throw new CliError('ATM_TEAM_PERMISSION_SCOPE_REQUIRED', `Permission ${input.permission} requires explicit scoped paths.`, {
+        exitCode: 1,
+        details: {
+          teamRunId: input.teamRunId,
+          permission: input.permission,
+          gateId: 'ATM_TEAM_PERMISSION_HARD_GATE',
+          requiredCommand: `node atm.mjs team lease --team ${input.teamRunId} --actor ${input.actorId} --permission ${input.permission} --paths <scoped-paths> --json`
+        }
+      });
+    }
   }
 
   const run = readTeamRun(input.cwd, input.teamRunId) as Record<string, unknown>;

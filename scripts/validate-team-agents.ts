@@ -33,6 +33,7 @@ import {
 import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
+import { materializeTeamRoleHandoff, promoteTeamHandoffArchive, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../packages/core/src/team-runtime/handoff-ledger.ts';
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
@@ -53,6 +54,51 @@ async function main() {
   // TASK-MAO-0027: Team Agents Wave Mode runtime self-check. Runs on every
   // invocation so any caller of this validator also asserts wave behavior.
   validateWaveMode();
+
+  if (taskCase === 'team-handoff-materialize') {
+    const cwd = createTempWorkspace('atm-team-handoff-');
+    const input = {
+      cwd,
+      taskId: 'TASK-TEAM-0072',
+      teamRunId: 'handoff-test',
+      fromRole: 'implementer',
+      fromProviderId: 'openai',
+      fromModelId: 'gpt-5-mini',
+      toRole: 'reviewer',
+      toProviderId: 'anthropic',
+      sourceArtifactId: 'provider-session-1',
+      redactedPreview: 'Implemented the runtime ledger. sk-live-secret-must-not-persist',
+      leaseEpoch: 1,
+      createdAt: '2026-07-11T00:00:00.000Z'
+    } as const;
+    const first = materializeTeamRoleHandoff(input);
+    const second = materializeTeamRoleHandoff({ ...input, sourceArtifactId: 'provider-session-2', fromRole: 'reviewer', fromProviderId: 'anthropic', fromModelId: 'claude-haiku', toRole: 'validator', leaseEpoch: 2, createdAt: '2026-07-11T00:01:00.000Z' });
+    const directory = teamHandoffRuntimeDirectory(cwd, input.taskId, input.teamRunId);
+    const verified = verifyTeamHandoffLedger(cwd, input.taskId, input.teamRunId);
+    assert.equal(verified.ok, true, verified.reason ?? 'handoff ledger must verify');
+    assert.equal(second.artifact.previousHandoffSha256, first.manifest.rootHandoffSha256);
+    const index = readFileSync(path.join(directory, 'index.md'), 'utf8');
+    assert.equal(index, renderTeamHandoffIndex(second.manifest, [first.artifact, second.artifact]));
+    assert.equal(index.includes('sk-live-secret-must-not-persist'), false);
+    assert.equal(readFileSync(path.join(directory, '0001-implementer.json'), 'utf8').includes('sk-live-secret-must-not-persist'), false);
+    writeFileSync(path.join(directory, '0001-implementer.json'), '{}\n', 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, input.taskId, input.teamRunId).ok, false);
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-materialize)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-aborted-promotion') {
+    const cwd = createTempWorkspace('atm-team-handoff-archive-');
+    materializeTeamRoleHandoff({ cwd, taskId: 'TASK-TEAM-0072', teamRunId: 'aborted', fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'session', redactedPreview: 'Stopped after provider failure.', leaseEpoch: 1 });
+    const archived = promoteTeamHandoffArchive({ cwd, taskId: 'TASK-TEAM-0072', teamRunId: 'aborted', runOutcome: 'aborted' });
+    assert.equal(archived.manifest.runOutcome, 'aborted');
+    assert.ok(existsSync(path.join(teamHandoffHistoryDirectory(cwd, 'TASK-TEAM-0072', 'aborted'), 'index.md')));
+    assert.equal(verifyTeamHandoffLedger(cwd, 'TASK-TEAM-0072', 'aborted').ok, true);
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-aborted-promotion)');
+    return;
+  }
 
   if (taskCase === 'lieutenant-escalation') {
     const lowRiskTask = {
