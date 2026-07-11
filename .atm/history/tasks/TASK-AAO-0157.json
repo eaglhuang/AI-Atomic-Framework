@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0157",
+  "title": "Framework auto-stage must honor claim globs and include dirty release mirrors",
+  "status": "running",
+  "milestone": "Backlog-P0",
+  "dependencies": [],
+  "acceptance": [
+    "Claim globs (`release/**`, `packages/cli/src/**`, etc.) match concrete dirty paths during framework auto-stage and staging-required inspection.",
+    "`release/atm-root-drop/<claimed-source>` continues to match claimed sources.",
+    "Manifest `generatedFiles` remain allowed when any active claim exists.",
+    "A regression proves: claim includes `release/**`, dirty tracked release mirrors exist, `--auto-stage` commits those mirrors (not only git-head), and post-commit status for those paths is clean.",
+    "Auto-stage success must fail closed if claim-scoped dirty files remain after staging (excluding ignorable evidence side effects).",
+    "Backlog row `ATM-BUG-2026-07-11-108` is updated to Fixed with this task id."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "scripts/validate-governance-commands.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "scripts/validate-governance-commands.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-governance-commands.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Team Agents provider orchestration or packages/cli/src/commands/team.ts behavior",
+    "Broad auto-stage of arbitrary .atm/runtime residue",
+    "Changing protected push or same-commit provenance semantics"
+  ],
+  "nonGoals": [
+    "Do not silently commit out-of-claim dirty files",
+    "Do not weaken staging-required fail-closed diagnostics"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the framework auto-stage claim-glob matching and the focused release-mirror regression.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance.ts",
+        "scripts/validate-governance-commands.ts",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0157-framework-auto-stage-claim-glob-and-release-mirrors.task.md",
+    "sectionTitle": "TASK-AAO-0157",
+    "headingLine": 46,
+    "hash": "10b6393e0c67d96b"
+  },
+  "importedAt": "2026-07-11T16:23:35.888Z",
+  "lastTransitionId": "2026-07-11T17-22-42-299Z-scope-amendment-a6b345f1ee00",
+  "lastTransitionAt": "2026-07-11T17:22:42.299Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-11T16:48:56.924Z",
+  "promotedAt": "2026-07-11T16:48:56.926Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-07a1449995a3",
+    "claimedAt": "2026-07-11T17:20:50.936Z",
+    "heartbeatAt": "2026-07-11T17:20:50.936Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-0157.*",
+      ".atm/history/protected-override-audit/2026-07-11T16-23-22-678Z-POA-85a9ab0d7c4f.json",
+      ".atm/history/protected-override-audit/2026-07-11T16-23-35-884Z-POA-7716723bf824.json",
+      ".atm/history/task-events/TASK-AAO-0157/**",
+      ".atm/history/tasks/TASK-AAO-0157.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-11T16:23:42.544Z",
+  "startedByActor": "cursor-captain-backlog",
+  "startedBySessionId": "session-20260711172050-codex-backlog-captain-TASK-AAO-0157-7c538a8549",
+  "owner": "codex-backlog-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0157",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0157.*",
+      ".atm/history/protected-override-audit/2026-07-11T16-23-22-678Z-POA-85a9ab0d7c4f.json",
+      ".atm/history/protected-override-audit/2026-07-11T16-23-35-884Z-POA-7716723bf824.json",
+      ".atm/history/task-events/TASK-AAO-0157/**",
+      ".atm/history/tasks/TASK-AAO-0157.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0157-framework-auto-stage-claim-glob-and-release-mirrors.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0157-framework-auto-stage-claim-glob-and-release-mirrors.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "3e7b8c43ce4715a4ae0ca63098a48a99247c62ca71c67d687aa797b8e70fd42d",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-11T17:20:51.247Z",
+    "status": "active"
+  }
+}

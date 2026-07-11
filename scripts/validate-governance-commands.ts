@@ -805,6 +805,58 @@ try {
   assert(frameworkAutoStageTouched.includes('release/atm-onefile/atm.mjs'), 'framework auto-stage commit must include generated onefile artifact');
   assert(frameworkAutoStageTouched.includes('.atm/history/evidence/git-head.jsonl'), 'framework auto-stage commit must still include git-head evidence');
 
+  // ATM-BUG-2026-07-11-108 / TASK-AAO-0157: claim globs such as release/** must auto-stage
+  // dirty tracked release mirrors even when they are absent from release-manifest generatedFiles.
+  assert(runGit(repo, ['reset']).exitCode === 0, 'release-glob auto-stage fixture must start with an empty index');
+  const releaseGlobClaim = runAtm([
+    'framework-mode',
+    'claim',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--files',
+    'release/**',
+    '--reason',
+    'framework auto-stage release glob regression',
+    '--json'
+  ]);
+  assert(releaseGlobClaim.exitCode === 0, 'release-glob framework claim must exit 0');
+  const orphanReleaseMirror = 'release/atm-root-drop/packages/cli/src/commands/orphan-release-mirror.ts';
+  mkdirSync(path.join(repo, 'release', 'atm-root-drop', 'packages', 'cli', 'src', 'commands'), { recursive: true });
+  writeFileSync(path.join(repo, orphanReleaseMirror), 'export const orphanReleaseMirror = true;\n', 'utf8');
+  // Intentionally omit orphanReleaseMirror from release-manifest generatedFiles so the only
+  // admission path is claim-glob matching (release/**).
+  writeJson(path.join(repo, 'release', 'atm-root-drop', 'release-manifest.json'), {
+    generatedFiles: ['release/atm-root-drop/packages/cli/src/commands/framework-auto-stage.ts']
+  });
+  const releaseGlobAutoStage = runAtm([
+    'git',
+    'commit',
+    '--cwd',
+    repo,
+    '--actor',
+    'fixture-agent',
+    '--message',
+    'chore(release): sync orphan mirror via claim glob',
+    '--auto-stage',
+    '--json'
+  ]);
+  assert(releaseGlobAutoStage.exitCode === 0, 'framework claim auto-stage with release/** must succeed');
+  const releaseGlobSha = String(releaseGlobAutoStage.parsed.evidence?.commitSha ?? '').trim();
+  assert(Boolean(releaseGlobSha), 'release-glob auto-stage commit must return a commit sha');
+  const releaseGlobTouched = runGit(repo, ['show', '--name-only', '--pretty=format:', releaseGlobSha]).stdout
+    .split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  assert(releaseGlobTouched.includes(orphanReleaseMirror), 'release/** auto-stage must include dirty release mirrors not listed in generatedFiles');
+  assert(
+    runGit(repo, ['status', '--short', '--', orphanReleaseMirror]).stdout.trim() === '',
+    'release/** auto-stage must leave claimed release mirrors clean after commit'
+  );
+  assert(
+    releaseGlobTouched.length > 1 || releaseGlobTouched.includes('.atm/history/evidence/git-head.jsonl'),
+    'release-glob commit must not be an empty evidence-only success without the release mirror'
+  );
+
   writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "safe-residue";\n', 'utf8');
   writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl'), '{"fixture":true}\n', 'utf8');
   const residueAutoCleanCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: safe generated residue', '--auto-stage', '--json']);

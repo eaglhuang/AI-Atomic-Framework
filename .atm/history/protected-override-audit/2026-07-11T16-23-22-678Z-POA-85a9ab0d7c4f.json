@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-85a9ab0d7c4f",
+  "recordedAt": "2026-07-11T16:23:22.678Z",
+  "actorId": "cursor-captain-backlog",
+  "taskId": "TASK-AAO-0157",
+  "surface": "tasks reset",
+  "command": "node atm.mjs tasks reset --task TASK-AAO-0157 --actor cursor-captain-backlog --to open --json",
+  "flags": [],
+  "permission": "backend.tasks.reset",
+  "leaseId": "EMG-TASK-AAO-0157-fd9b24c760",
+  "reason": "Unclaimable in_progress-without-claim after planning-card status import; reset to open for next --claim",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.reset"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T16-23-22-677Z-EMG-TASK-AAO-0157-fd9b24c760.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

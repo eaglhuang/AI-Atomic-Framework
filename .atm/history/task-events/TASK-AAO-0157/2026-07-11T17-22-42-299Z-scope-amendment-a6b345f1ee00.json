@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T17-22-42-299Z-scope-amendment-a6b345f1ee00",
+  "taskId": "TASK-AAO-0157",
+  "action": "scope-amendment",
+  "actorId": "codex-backlog-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0157.json",
+  "taskSha256": "sha256:e681258da173a821e73273ba00fdba011fc93986e93b4fec78ff56464550ac6d",
+  "createdAt": "2026-07-11T17:22:42.299Z",
+  "command": "node atm.mjs tasks scope repair --task TASK-AAO-0157 --actor codex-backlog-captain --add \".atm/history/protected-override-audit/2026-07-11T16-23-22-678Z-POA-85a9ab0d7c4f.json,.atm/history/protected-override-audit/2026-07-11T16-23-35-884Z-POA-7716723bf824.json\" --reason \"Emergency scope repair: task-owned protected override audit evidence blocked governed commit because it was omitted from the active direction lock.\" --emergency-approval EMG-TASK-AAO-0157-79c56a2965 --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "repair",
+    "reason": "Emergency scope repair: task-owned protected override audit evidence blocked governed commit because it was omitted from the active direction lock."
+  }
+}

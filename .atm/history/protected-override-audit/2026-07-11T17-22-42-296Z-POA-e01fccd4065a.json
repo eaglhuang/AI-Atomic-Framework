@@ -1,0 +1,26 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-e01fccd4065a",
+  "recordedAt": "2026-07-11T17:22:42.296Z",
+  "actorId": "codex-backlog-captain",
+  "taskId": "TASK-AAO-0157",
+  "surface": "tasks scope repair",
+  "command": "node atm.mjs tasks scope repair --task TASK-AAO-0157 --actor codex-backlog-captain --add .atm/history/protected-override-audit/2026-07-11T16-23-22-678Z-POA-85a9ab0d7c4f.json,.atm/history/protected-override-audit/2026-07-11T16-23-35-884Z-POA-7716723bf824.json --reason \"Emergency scope repair: task-owned protected override audit evidence blocked governed commit because it was omitted from the active direction lock.\" --emergency-approval EMG-TASK-AAO-0157-79c56a2965 --json",
+  "flags": [
+    "--add",
+    "--reason"
+  ],
+  "permission": "backend.tasks.scopeAmend",
+  "leaseId": "EMG-TASK-AAO-0157-79c56a2965",
+  "reason": "Emergency scope repair: task-owned protected override audit evidence blocked governed commit because it was omitted from the active direction lock.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.scopeAmend"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T17-22-42-294Z-EMG-TASK-AAO-0157-79c56a2965.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
