@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TEAM-0050",
   "title": "Team start provider execution wiring (real multi-bot spawn lane)",
-  "status": "running",
+  "status": "done",
   "milestone": "M10X",
   "dependencies": [
     "TASK-TEAM-0045"
@@ -78,8 +78,8 @@
     "hash": "48ae95b9968834fc"
   },
   "importedAt": "2026-07-11T01:58:55.753Z",
-  "lastTransitionId": "2026-07-11T02-13-16-532Z-claim-e791954d8702",
-  "lastTransitionAt": "2026-07-11T02:13:16.532Z",
+  "lastTransitionId": "2026-07-11T02-14-45-906Z-close-97247a38dedd",
+  "lastTransitionAt": "2026-07-11T02:14:45.906Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "coordinator",
   "reservedAt": "2026-07-11T02:13:14.848Z",
@@ -88,7 +88,7 @@
     "actorId": "coordinator",
     "leaseId": "lease-45bfd65e22a0",
     "claimedAt": "2026-07-11T02:13:14.856Z",
-    "heartbeatAt": "2026-07-11T02:13:14.856Z",
+    "heartbeatAt": "2026-07-11T02:14:45.904Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-TEAM-0050.json",
@@ -99,8 +99,8 @@
       "packages/core/src/team-runtime/execution-orchestrator.ts",
       "scripts/validate-team-agents.ts"
     ],
-    "state": "active",
-    "intent": "closeout-only"
+    "state": "released",
+    "reason": "Historical delivery 072cadf4 is a shared Team Agents closeback commit; TASK-TEAM-0050 scoped deliverables are matched and unrelated files belong to sibling closeback tasks."
   },
   "startedAt": "2026-07-11T02:07:37.921Z",
   "startedByActor": "coordinator",
@@ -129,5 +129,10 @@
     "actorId": "coordinator",
     "createdAt": "2026-07-11T02:13:16.531Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-11T02:14:45.904Z",
+  "closedByActor": "coordinator",
+  "closedBySessionId": "session-20260711021314-coordinator-TASK-TEAM-0050-39c3c22522",
+  "closeReason": "Historical delivery 072cadf4 is a shared Team Agents closeback commit; TASK-TEAM-0050 scoped deliverables are matched and unrelated files belong to sibling closeback tasks.",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0050.closure-packet.json"
 }

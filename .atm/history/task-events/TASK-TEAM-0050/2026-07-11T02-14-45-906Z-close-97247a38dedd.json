@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T02-14-45-906Z-close-97247a38dedd",
+  "taskId": "TASK-TEAM-0050",
+  "action": "close",
+  "actorId": "coordinator",
+  "sessionId": "session-20260711021314-coordinator-TASK-TEAM-0050-39c3c22522",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0050.json",
+  "taskSha256": "sha256:94b734dea30752fbae6ba5989c09fc428125e513d7bdfc011f0b18ef9b3b33c3",
+  "createdAt": "2026-07-11T02:14:45.906Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0050 --actor coordinator --status done --historical-delivery 072cadf4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711021314-coordinator-TASK-TEAM-0050-39c3c22522",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0050.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T02:14:45.901Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0050.*",
+        ".atm/history/task-events/TASK-TEAM-0050/**",
+        ".atm/history/tasks/TASK-TEAM-0050.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/execution-orchestrator.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/execution-orchestrator.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
