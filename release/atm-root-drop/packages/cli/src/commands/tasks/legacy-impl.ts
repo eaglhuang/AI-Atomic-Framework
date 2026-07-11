@@ -1216,6 +1216,25 @@ async function cleanupTaskLock(input: {
       }
     }
   }
+  if (taskDocument) {
+    const canonicalDirectionLock = taskDocument.taskDirectionLock;
+    if (canonicalDirectionLock && typeof canonicalDirectionLock === 'object' && !Array.isArray(canonicalDirectionLock)) {
+      const directionLock = canonicalDirectionLock as Record<string, unknown>;
+      if (directionLock.status !== 'released') {
+        writeFileSync(taskPath, `${JSON.stringify({
+          ...taskDocument,
+          taskDirectionLock: {
+            ...directionLock,
+            status: 'released',
+            released: true,
+            releasedAt: nowIso,
+            releasedBy: actorId
+          }
+        }, null, 2)}\n`, 'utf8');
+        cleanupActions.push('released-canonical-direction-lock');
+      }
+    }
+  }
   if (existsSync(sidecarPath)) {
     rmSync(sidecarPath, { force: true });
     cleanupActions.push('removed-direction-sidecar');

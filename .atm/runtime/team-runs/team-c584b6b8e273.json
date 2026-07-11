@@ -6,7 +6,7 @@
   "batchId": null,
   "actorId": "cursor-gpt-5.2",
   "recipeId": "atm.default.normal.typescript",
-  "status": "active",
+  "status": "abandoned",
   "executionMode": "manual-team",
   "executionSurface": "broker-governance",
   "runtimeMode": "broker-only",
@@ -967,15 +967,18 @@
   "leases": [
     {
       "permission": "task.lifecycle",
-      "agentId": "coordinator"
+      "agentId": "coordinator",
+      "paths": []
     },
     {
       "permission": "git.write",
-      "agentId": "coordinator"
+      "agentId": "coordinator",
+      "paths": []
     },
     {
       "permission": "evidence.write",
-      "agentId": "coordinator"
+      "agentId": "coordinator",
+      "paths": []
     },
     {
       "permission": "file.write",
@@ -999,15 +1002,18 @@
   "permissionLeases": [
     {
       "permission": "task.lifecycle",
-      "agentId": "coordinator"
+      "agentId": "coordinator",
+      "paths": []
     },
     {
       "permission": "git.write",
-      "agentId": "coordinator"
+      "agentId": "coordinator",
+      "paths": []
     },
     {
       "permission": "evidence.write",
-      "agentId": "coordinator"
+      "agentId": "coordinator",
+      "paths": []
     },
     {
       "permission": "file.write",
@@ -1412,5 +1418,20 @@
     "closeReady": false
   },
   "createdAt": "2026-06-20T12:30:18.521Z",
-  "updatedAt": "2026-06-20T12:30:18.521Z"
+  "updatedAt": "2026-07-11T11:48:41.271Z",
+  "abandonedAt": "2026-07-11T11:48:41.271Z",
+  "abandonedBy": "Codex-GPT5.6 Sol",
+  "abandonReason": "Stale active run for already-closed TASK-AAO-0043 blocked unrelated governed commit",
+  "lifecycleEvents": [
+    {
+      "schemaId": "atm.teamRuntimeLifecycleEvent.v1",
+      "type": "team.abandoned",
+      "teamRunId": "team-c584b6b8e273",
+      "actorId": "Codex-GPT5.6 Sol",
+      "permission": null,
+      "paths": [],
+      "reason": "Stale active run for already-closed TASK-AAO-0043 blocked unrelated governed commit",
+      "occurredAt": "2026-07-11T11:48:41.271Z"
+    }
+  ]
 }

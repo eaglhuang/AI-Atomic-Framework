@@ -6,6 +6,11 @@ export const TEAM_PROVIDER_IDS = [
     'gemini',
     'microsoft-foundry'
 ];
+export const TEAM_DIRECT_API_PROVIDER_IDS = [
+    'openai',
+    'anthropic',
+    'azure-openai'
+];
 export function createTeamProviderMetadata(providerId) {
     return {
         providerId,

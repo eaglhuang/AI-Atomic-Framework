@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-d20aade64378",
+  "recordedAt": "2026-07-11T12:09:12.016Z",
+  "actorId": "Codex-GPT5.6 Sol",
+  "taskId": null,
+  "surface": "tasks lock cleanup --all-stale",
+  "command": "node atm.mjs tasks lock cleanup --all-stale --actor Codex-GPT5.6 Sol --json",
+  "flags": [
+    "--all-stale"
+  ],
+  "permission": "backend.tasks.lockCleanupGlobal",
+  "leaseId": "EMG-GLOBAL-cfce487d5b",
+  "reason": "Global stale lock cleanup.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.lockCleanupGlobal"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T12-09-12-014Z-EMG-GLOBAL-cfce487d5b.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

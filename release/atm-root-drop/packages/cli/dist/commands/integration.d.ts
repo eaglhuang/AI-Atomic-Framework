@@ -79,7 +79,7 @@ export declare function checkIntegrationHealth(repositoryRoot: string): Promise<
             evidence: any;
         }[];
         missingBackendSummary: string | null;
-        startReadiness: "broker-only-only" | "runtime-backend-declared";
+        startReadiness: "runtime-backend-declared" | "broker-only-only";
     };
 }>;
 export declare function inspectTeamRuntimeBackendCapabilities(repositoryRoot: string): {
@@ -98,7 +98,7 @@ export declare function inspectTeamRuntimeBackendCapabilities(repositoryRoot: st
         evidence: any;
     }[];
     missingBackendSummary: string | null;
-    startReadiness: "broker-only-only" | "runtime-backend-declared";
+    startReadiness: "runtime-backend-declared" | "broker-only-only";
 };
 export declare function inspectIntegrationBootstrap(repositoryRoot: string): {
     repoBootstrapped: boolean;

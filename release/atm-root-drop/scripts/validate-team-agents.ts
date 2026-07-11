@@ -6,12 +6,12 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
-import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
+import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runDirectTeamProviderRole, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
-import { TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
+import { TEAM_DIRECT_API_PROVIDER_IDS, TEAM_PROVIDER_IDS, createTeamProviderMetadata, supportsVendorNeutralProviders } from '../packages/core/src/team-runtime/provider-contract.ts';
 import { TeamProviderRegistry } from '../packages/core/src/team-runtime/provider-registry.ts';
 import { runProviderOrchestration } from '../packages/core/src/team-runtime/execution-orchestrator.ts';
 import { advanceBrokerConflictResolution, createBrokerConflictResolutionArtifact, createDefaultTeamPermissionPolicy, decideBrokerConflictResolutionAdmission, decideTeamPermission } from '../packages/core/src/team-runtime/permission-broker.ts';
@@ -845,6 +845,9 @@ async function main() {
       },
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
+    const openaiMetadata = httpCalls[0]?.body?.metadata;
+    assert.equal(openaiMetadata?.scopedPathCount, '1');
+    assert.ok(Object.values(openaiMetadata ?? {}).every((value) => typeof value === 'string'));
     for (const run of [openaiRun, azureRun]) {
       assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
       assert.equal(run.ok, true);
@@ -1290,6 +1293,129 @@ async function main() {
     assert.ok(atomMap.includes('scripts/validate-team-agents.ts#integration-capability-wiring'));
 
     console.log('[validate-team-agents] ok (integration-capability-wiring)');
+    return;
+  }
+
+  if (taskCase === 'direct-provider-execute-admission') {
+    const repoDefault = {
+      repoDefault: {
+        providerId: 'openai',
+        sdkId: 'responses',
+        modelId: 'gpt-5-mini',
+        runtimeMode: 'broker-only' as const
+      },
+      roleOverrides: {}
+    };
+    const explicitRuntime = buildTeamRuntimeContract({
+      runtimeMode: 'real-agent',
+      providerId: 'anthropic',
+      sdkId: 'anthropic-messages',
+      modelId: 'claude-test',
+      selectionConfig: repoDefault
+    });
+    assert.equal(explicitRuntime.runtimeMode, 'real-agent');
+    assert.equal(explicitRuntime.providerId, 'anthropic');
+    assert.equal(explicitRuntime.modelId, 'claude-test');
+
+    const roleOverrideRuntime = buildTeamRuntimeContract({
+      runtimeMode: 'real-agent',
+      providerId: 'openai',
+      sdkId: 'responses',
+      modelId: 'global-model',
+      roleName: 'implementer',
+      selectionConfig: {
+        ...repoDefault,
+        roleOverrides: {
+          implementer: {
+            providerId: 'anthropic',
+            sdkId: 'anthropic-messages',
+            modelId: 'role-model',
+            runtimeMode: 'real-agent'
+          }
+        }
+      }
+    });
+    assert.equal(roleOverrideRuntime.providerId, 'anthropic');
+    assert.equal(roleOverrideRuntime.modelId, 'role-model');
+
+    const cwd = createTempWorkspace('atm-direct-provider-admission-');
+    initializeGitRepository(cwd);
+    const readiness = inspectTeamRuntimeBackendCapabilities(cwd);
+    assert.deepEqual(readiness.capabilities.map((entry) => entry.providerId).sort(), [...TEAM_DIRECT_API_PROVIDER_IDS].sort());
+    assert.ok(readiness.capabilities.every((entry) => entry.manifestPath === 'builtin:team-provider-contract'));
+    assert.equal(readiness.startReadiness, 'runtime-backend-declared');
+
+    const taskId = 'TASK-TEAM-DIRECT-EXECUTE';
+    mkdirSync(path.join(cwd, '.atm', 'history', 'tasks'), { recursive: true });
+    mkdirSync(path.join(cwd, 'docs'), { recursive: true });
+    writeFileSync(path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`), `${JSON.stringify({
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: taskId,
+      title: 'Direct provider execute admission fixture',
+      status: 'running',
+      targetRepo: 'AI-Atomic-Framework',
+      scopePaths: ['docs/direct-provider-report.md'],
+      deliverables: ['docs/direct-provider-report.md'],
+      validators: ['validator']
+    }, null, 2)}\n`, 'utf8');
+    writeFileSync(path.join(cwd, 'docs', 'direct-provider-report.md'), '# Fixture\n', 'utf8');
+
+    const zeroExecution = await runTeam(['start', '--task', taskId, '--actor', 'validator', '--cwd', cwd, '--execute', '--json']);
+    assert.equal(zeroExecution.ok, false);
+    assert.ok(zeroExecution.messages.some((entry) => entry.code === 'ATM_TEAM_EXECUTION_BLOCKED'));
+    assert.equal((zeroExecution.evidence as any)?.providerOrchestration?.results?.length, 0);
+
+    const undeclaredEditorBackend = await runTeam([
+      'start', '--task', taskId, '--actor', 'validator', '--cwd', cwd,
+      '--runtime-mode', 'editor-subagent', '--provider', 'claude-code',
+      '--role-provider', 'coordinator=claude-code:claude-test:claude-code:editor-subagent', '--json'
+    ]);
+    assert.equal(undeclaredEditorBackend.ok, false);
+    assert.ok(undeclaredEditorBackend.messages.some((entry) => entry.code === 'ATM_TEAM_RUNTIME_BACKEND_MISSING'));
+
+    console.log('[validate-team-agents] ok (direct-provider-execute-admission)');
+    return;
+  }
+
+  if (taskCase === 'direct-provider-scoped-path-forwarding') {
+    const scopedPaths = ['packages/cli/src/commands/team.ts'];
+    const requests: Array<{ url: string; body: unknown }> = [];
+    const executor = async (input: { url: string; body: unknown }) => {
+      requests.push(input);
+      return {
+        ok: true,
+        statusCode: 200,
+        outputText: input.url.includes('anthropic')
+          ? JSON.stringify({ content: [{ type: 'text', text: 'anthropic role complete' }] })
+          : JSON.stringify({ output_text: 'openai role complete' }),
+        outputArtifacts: [],
+        retryable: false,
+        summary: 'deterministic provider response',
+        executionMode: 'vendor-api' as const
+      };
+    };
+    for (const providerId of ['openai', 'anthropic'] as const) {
+      const result = await runDirectTeamProviderRole({
+        taskId: 'TASK-TEAM-0068',
+        role: providerId === 'openai' ? 'reviewAgent' : 'implementer',
+        selection: {
+          providerId,
+          sdkId: providerId === 'openai' ? 'openai-responses' : 'anthropic-messages',
+          modelId: `${providerId}-test-model`,
+          runtimeMode: 'real-agent'
+        },
+        env: {
+          OPENAI_API_KEY: 'test-openai-key',
+          ANTHROPIC_API_KEY: 'test-anthropic-key'
+        },
+        scopedPaths,
+        executor
+      });
+      assert.equal(result?.ok, true);
+    }
+    assert.equal(requests.length, 2);
+
+    console.log('[validate-team-agents] ok (direct-provider-scoped-path-forwarding)');
     return;
   }
 

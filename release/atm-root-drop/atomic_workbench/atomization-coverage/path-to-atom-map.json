@@ -103,6 +103,13 @@
       "source_task": "TASK-TEAM-0045"
     },
     {
+      "path_pattern": "packages/core/src/team-runtime/provider-contract.ts#TEAM_DIRECT_API_PROVIDER_IDS",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Canonical built-in direct API provider capability set used to derive real-agent backend readiness without a second provider registry",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0067"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/doctor.ts#team-runtime-backend-capabilities",
       "atom_id": "atm.integration-capability-manifest-map",
       "capability": "Doctor readiness check that reports declared Team runtime backend capabilities without failing clean broker-only repositories",
@@ -909,6 +916,20 @@
       "capability": "Repo default and role override provider selection contract for Team runtime metadata and observability.",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0041"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeamProviderExecution",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Role-selected concrete direct provider execution with fail-closed zero-result and provider-failure semantics",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0067"
+    },
+    {
+      "path_pattern": "scripts/validate-team-agents.ts#direct-provider-execute-admission",
+      "atom_id": "atm.team-agents-runtime",
+      "capability": "Deterministic regression for CLI selection precedence, built-in direct backend admission, editor backend strictness, and zero-execution failure",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0067"
     },
     {
       "path_pattern": "packages/cli/src/commands/team.ts#buildEditorSubagentBridgeContract",

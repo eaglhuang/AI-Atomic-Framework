@@ -1,4 +1,6 @@
 export declare const TEAM_PROVIDER_IDS: readonly ["openai", "anthropic", "azure-openai", "claude-code", "gemini", "microsoft-foundry"];
+export declare const TEAM_DIRECT_API_PROVIDER_IDS: readonly ["openai", "anthropic", "azure-openai"];
+export type TeamDirectApiProviderId = typeof TEAM_DIRECT_API_PROVIDER_IDS[number];
 export type TeamProviderId = typeof TEAM_PROVIDER_IDS[number];
 export type TeamProviderSessionLifecycle = {
     readonly createSession: true;

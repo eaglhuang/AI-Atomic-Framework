@@ -25,6 +25,12 @@ writeJson(taskPath, {
   claim: {
     state: 'released',
     actorId: 'coordinator'
+  },
+  taskDirectionLock: {
+    schemaId: 'atm.taskDirectionLock.v1',
+    taskId,
+    status: 'active',
+    allowedFiles: ['src/app.ts']
   }
 });
 writeJson(lockPath, {
@@ -45,10 +51,14 @@ const cleanup = await runTasks(['lock', 'cleanup', '--cwd', repo, '--task', task
 assert.equal(cleanup.ok, true, 'released lock cleanup should succeed');
 assert.ok(cleanup.evidence.staleReasons.includes('released-lock'), 'released lock must be recognized as stale');
 assert.ok(cleanup.evidence.cleanupActions.includes('released-embedded-direction-lock'), 'cleanup must report embedded direction lock release');
+assert.ok(cleanup.evidence.cleanupActions.includes('released-canonical-direction-lock'), 'cleanup must report canonical direction lock release');
 
 const lockAfter = readJson(lockPath);
+const taskAfter = readJson(taskPath);
 assert.equal(lockAfter.status, 'released', 'outer lock remains a release marker');
 assert.equal(lockAfter.taskDirectionLock.status, 'released', 'embedded direction lock must no longer remain active');
 assert.equal(lockAfter.taskDirectionLock.released, true, 'embedded direction lock release must be explicit');
+assert.equal(taskAfter.taskDirectionLock.status, 'released', 'canonical direction lock must no longer remain active');
+assert.equal(taskAfter.taskDirectionLock.released, true, 'canonical direction lock release must be explicit');
 
 console.log('[lock-cleanup.spec] ok');

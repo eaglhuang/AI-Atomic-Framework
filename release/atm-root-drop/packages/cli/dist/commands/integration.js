@@ -8,6 +8,7 @@ import { createAntigravityIntegrationAdapter, createGeminiIntegrationAdapter } f
 import { CliError, ensureAtmDirectory, makeResult, message, parseArgsForCommand, readJsonFile, resolveValue } from './shared.js';
 import { getCommandSpec } from './command-specs.js';
 import { installAtmPrePushHook, uninstallAtmPrePushHook, verifyAtmPrePushHook } from './git.js';
+import { TEAM_DIRECT_API_PROVIDER_IDS } from '../../../core/dist/team-runtime/provider-contract.js';
 export function discoverGovernedVendorConfigSurface(repositoryRoot) {
     const rootDir = path.join(repositoryRoot, 'agent-integrations', 'vendors');
     return {
@@ -63,18 +64,7 @@ export async function checkIntegrationHealth(repositoryRoot) {
 }
 export function inspectTeamRuntimeBackendCapabilities(repositoryRoot) {
     const manifestDirectory = path.join(repositoryRoot, '.atm', 'integrations');
-    if (!existsSync(manifestDirectory)) {
-        return {
-            schemaId: 'atm.integrationTeamRuntimeBackendReadiness.v1',
-            ok: true,
-            manifestDir: '.atm/integrations',
-            declaredBackendCount: 0,
-            capabilities: [],
-            missingBackendSummary: 'No installed integration manifest declares Team runtime backend capability.',
-            startReadiness: 'broker-only-only'
-        };
-    }
-    const capabilities = readdirSync(manifestDirectory)
+    const manifestCapabilities = existsSync(manifestDirectory) ? readdirSync(manifestDirectory)
         .filter((entryName) => entryName.endsWith('.manifest.json'))
         .sort((left, right) => left.localeCompare(right))
         .flatMap((entryName) => {
@@ -86,7 +76,18 @@ export function inspectTeamRuntimeBackendCapabilities(repositoryRoot) {
         catch {
             return [];
         }
-    });
+    }) : [];
+    const builtInCapabilities = TEAM_DIRECT_API_PROVIDER_IDS.map((providerId) => ({
+        manifestPath: 'builtin:team-provider-contract',
+        adapterId: 'atm.builtin.direct-api',
+        providerId,
+        runtimeModes: ['real-agent'],
+        executionSurfaces: ['agent-runtime'],
+        roles: ['*'],
+        status: 'supported',
+        evidence: `Canonical built-in direct API provider contract: ${providerId}`
+    }));
+    const capabilities = [...builtInCapabilities, ...manifestCapabilities];
     return {
         schemaId: 'atm.integrationTeamRuntimeBackendReadiness.v1',
         ok: true,
@@ -94,7 +95,7 @@ export function inspectTeamRuntimeBackendCapabilities(repositoryRoot) {
         declaredBackendCount: capabilities.length,
         capabilities,
         missingBackendSummary: capabilities.length === 0
-            ? 'No installed integration manifest declares Team runtime backend capability.'
+            ? 'No built-in direct provider or installed integration manifest declares Team runtime backend capability.'
             : null,
         startReadiness: capabilities.some((capability) => capability.status !== 'unavailable')
             ? 'runtime-backend-declared'

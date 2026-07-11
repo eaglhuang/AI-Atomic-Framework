@@ -8,7 +8,9 @@ import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/t
 import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
 import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
 import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
+import { type TeamProviderHttpExecutor } from '../../../core/src/team-runtime/provider-contract.ts';
 import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
+import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
 type TeamVendorLocalSecretsSummary = {
     schemaId: 'atm.teamVendorLocalSecretsSummary.v1';
     path: string;
@@ -1335,6 +1337,20 @@ export declare function writeTeamRun(input: {
     createdAt: string;
     updatedAt: string;
 };
+type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>>;
+export declare function runDirectTeamProviderRole(input: {
+    taskId: string;
+    role: string;
+    selection: {
+        providerId: string;
+        sdkId: string;
+        modelId: string;
+        runtimeMode: TeamRuntimeMode;
+    };
+    env: Record<string, string | undefined>;
+    scopedPaths: readonly string[];
+    executor?: TeamProviderHttpExecutor;
+}): Promise<DirectTeamProviderRoleResult | null>;
 export declare function loadTeamVendorLocalSecrets(cwd: string): {
     env: Record<string, string | undefined>;
     summary: TeamVendorLocalSecretsSummary;

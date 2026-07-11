@@ -14,16 +14,15 @@ import { buildTeamBrokerEvidence, brokerLaneToFindings, evaluateTeamBrokerLane }
 import { resolveNodejsTeamWorkerAdapter } from '../../../core/dist/team-runtime/nodejs-worker-adapter.js';
 import { createBrokerConflictResolutionArtifact } from '../../../core/dist/team-runtime/permission-broker.js';
 import { buildTeamObservabilityContract, createBrokerConflictObservabilityEvents, createTeamObservabilityEvent, queryTeamObservabilityEvents } from '../../../core/dist/team-runtime/observability.js';
-import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/anthropic.js';
+import { buildAnthropicTeamProviderBridgeDescriptor, createAnthropicTeamProviderBridge, launchAnthropicTeamProviderRun } from '../../../core/dist/team-runtime/providers/anthropic.js';
 import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/azure-openai.js';
 import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/claude-code.js';
 import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/gemini.js';
 import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/microsoft-foundry.js';
-import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/dist/team-runtime/providers/openai.js';
+import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge, launchOpenAITeamProviderRun } from '../../../core/dist/team-runtime/providers/openai.js';
 import { TEAM_PROVIDER_IDS } from '../../../core/dist/team-runtime/provider-contract.js';
-import { createTeamProviderContract } from '../../../core/dist/team-runtime/provider-contract.js';
+import { createDefaultTeamPermissionPolicy } from '../../../core/dist/team-runtime/permission-broker.js';
 import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../../core/dist/team-runtime/provider-selection.js';
-import { runProviderOrchestration } from '../../../core/dist/team-runtime/execution-orchestrator.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive' },
     { id: 'git.write', mode: 'exclusive' },
@@ -492,21 +491,27 @@ export async function runTeam(argv) {
                 cwd,
                 recipe,
                 runtimeContract,
-                runtimePilot: teamPlan.runtimePilot
+                runtimePilot: teamPlan.runtimePilot,
+                roleSelections: teamPlan.roleSkillPackManifest.roles,
+                scopedPaths: deriveWritePaths(task, cwd)
             })
             : {
                 requested: false,
                 blockedReason: null,
                 results: []
             };
+        const executionBlocked = executeRequested && (providerOrchestration.results.length === 0
+            || providerOrchestration.results.some((result) => !result.ok));
         return makeResult({
-            ok: true,
+            ok: !executionBlocked,
             command: 'team',
             cwd,
             messages: [
-                message('info', executeRequested && providerOrchestration.results.length > 0 ? 'ATM_TEAM_STARTED_EXECUTED' : 'ATM_TEAM_STARTED', executeRequested && providerOrchestration.results.length > 0
+                message(executionBlocked ? 'error' : 'info', executeRequested && providerOrchestration.results.length > 0 ? 'ATM_TEAM_STARTED_EXECUTED' : executionBlocked ? 'ATM_TEAM_EXECUTION_BLOCKED' : 'ATM_TEAM_STARTED', executeRequested && providerOrchestration.results.length > 0
                     ? 'Team run started and governed provider orchestration executed.'
-                    : 'Team run started. Runtime state was written, but no agents were spawned.', {
+                    : executionBlocked
+                        ? 'Team run state was written, but the explicit provider execution request was blocked or at least one provider role failed.'
+                        : 'Team run started. Runtime state was written, but no agents were spawned.', {
                     teamRunId: teamRun.teamRunId,
                     taskId,
                     recipeId: recipe.recipeId,
@@ -902,29 +907,45 @@ export function buildTeamRuntimeContract(input) {
     const selectionDecision = input.selectionConfig
         ? resolveTeamProviderSelection(roleName, input.selectionConfig)
         : null;
+    const selectionIsRoleOverride = selectionDecision?.source === 'role-override'
+        || selectionDecision?.source === 'cli-role-override';
+    const effectiveRuntimeMode = selectionIsRoleOverride
+        ? selectionDecision.runtimeMode
+        : normalizeOptionalRuntimeString(input.runtimeMode)
+            ? runtimeMode
+            : selectionDecision?.runtimeMode ?? runtimeMode;
+    const effectiveProviderId = selectionIsRoleOverride
+        ? selectionDecision.providerId
+        : providerId ?? selectionDecision?.providerId;
+    const effectiveSdkId = selectionIsRoleOverride
+        ? selectionDecision.sdkId
+        : sdkId ?? selectionDecision?.sdkId;
+    const effectiveModelId = selectionIsRoleOverride
+        ? selectionDecision.modelId
+        : modelId ?? selectionDecision?.modelId;
     const editorBridgeDisabled = Boolean(input.editorBridgeDisabled);
     const workerAdapter = resolveNodejsTeamWorkerAdapter({
-        runtimeMode: selectionDecision?.runtimeMode ?? runtimeMode,
+        runtimeMode: effectiveRuntimeMode,
         runtimeLanguage,
         runtimeAdapterId,
-        providerId: providerId ?? selectionDecision?.providerId,
-        sdkId: sdkId ?? selectionDecision?.sdkId,
-        modelId: modelId ?? selectionDecision?.modelId
+        providerId: effectiveProviderId,
+        sdkId: effectiveSdkId,
+        modelId: effectiveModelId
     });
     const agentsSpawned = workerAdapter.agentsSpawned;
     const executionSurface = workerAdapter.executionSurface;
     return {
         schemaId: 'atm.teamRuntimeContract.v1',
-        runtimeMode: selectionDecision?.runtimeMode ?? runtimeMode,
+        runtimeMode: effectiveRuntimeMode,
         runtimeLanguage,
         runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId,
-        providerId: providerId ?? selectionDecision?.providerId ?? workerAdapter.providerId,
-        sdkId: sdkId ?? selectionDecision?.sdkId ?? workerAdapter.sdkId,
-        modelId: modelId ?? selectionDecision?.modelId ?? workerAdapter.modelId,
+        providerId: effectiveProviderId ?? workerAdapter.providerId,
+        sdkId: effectiveSdkId ?? workerAdapter.sdkId,
+        modelId: effectiveModelId ?? workerAdapter.modelId,
         agentsSpawned,
         executionSurface,
         selectionReason: describeRuntimeSelection({
-            runtimeMode: selectionDecision?.runtimeMode ?? runtimeMode,
+            runtimeMode: effectiveRuntimeMode,
             runtimeLanguage,
             runtimeAdapterId: runtimeAdapterId ?? workerAdapter.adapterId,
             selectionSource: selectionDecision?.source ?? null,
@@ -3388,32 +3409,29 @@ async function runTeamProviderExecution(input) {
             results: []
         };
     }
-    const providerId = normalizeTeamProviderId(input.runtimeContract.providerId);
-    if (!providerId) {
-        return {
-            requested: true,
-            blockedReason: 'provider-not-selected',
-            results: []
-        };
-    }
-    const provider = createTeamProviderContract(providerId);
-    const selectedRoles = normalizeStringArray(input.runtimePilot.selectedRoles).length > 0
-        ? normalizeStringArray(input.runtimePilot.selectedRoles)
-        : input.recipe.agents.slice(0, 2).map((agent) => agent.role);
+    const selectedRoles = input.roleSelections.length > 0
+        ? input.roleSelections
+        : input.recipe.agents.map((agent) => ({
+            role: agent.role,
+            selectedProvider: {
+                providerId: input.runtimeContract.providerId ?? '',
+                sdkId: input.runtimeContract.sdkId ?? 'unknown-sdk',
+                modelId: input.runtimeContract.modelId ?? 'unknown-model',
+                runtimeMode: input.runtimeContract.runtimeMode
+            }
+        }));
     const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
     const results = [];
-    for (const role of selectedRoles) {
-        results.push(await runProviderOrchestration(provider, {
+    for (const roleSelection of selectedRoles) {
+        const result = await runDirectTeamProviderRole({
             taskId: input.taskId,
-            role,
-            runtimeMode: input.runtimeContract.runtimeMode,
-            providerId,
-            sdkId: input.runtimeContract.sdkId ?? 'unknown-sdk',
-            modelId: input.runtimeContract.modelId ?? 'unknown-model',
-            instructions: `Run Team role ${role} for ${input.taskId}.`,
-            retries: 1,
-            env: localSecrets.env
-        }));
+            role: roleSelection.role,
+            selection: roleSelection.selectedProvider,
+            env: localSecrets.env,
+            scopedPaths: input.scopedPaths
+        });
+        if (result)
+            results.push(result);
     }
     appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
         taskId: input.taskId,
@@ -3426,6 +3444,67 @@ async function runTeamProviderExecution(input) {
         blockedReason: null,
         localSecrets: localSecrets.summary,
         results
+    };
+}
+export async function runDirectTeamProviderRole(input) {
+    if (input.selection.runtimeMode !== 'real-agent')
+        return null;
+    const providerId = normalizeTeamProviderId(input.selection.providerId);
+    if (providerId !== 'openai' && providerId !== 'anthropic')
+        return null;
+    const request = {
+        taskId: input.taskId,
+        role: input.role,
+        runtimeMode: 'real-agent',
+        providerId,
+        sdkId: input.selection.sdkId,
+        modelId: input.selection.modelId,
+        instructions: `Run Team role ${input.role} for ${input.taskId}. Return a concise role report.`
+    };
+    const permissionPolicy = createDefaultTeamPermissionPolicy();
+    const bridgeResult = providerId === 'openai'
+        ? await launchOpenAITeamProviderRun({
+            bridge: createOpenAITeamProviderBridge({
+                schemaId: 'atm.openaiTeamProviderConfig.v1',
+                providerId: 'openai',
+                sdkId: 'openai-responses',
+                modelId: input.selection.modelId,
+                apiKeyEnvVar: 'OPENAI_API_KEY'
+            }),
+            request: { ...request, providerId: 'openai' },
+            permissionPolicy,
+            scopedPaths: input.scopedPaths,
+            env: input.env,
+            executor: input.executor
+        })
+        : await launchAnthropicTeamProviderRun({
+            bridge: createAnthropicTeamProviderBridge({
+                schemaId: 'atm.anthropicTeamProviderConfig.v1',
+                providerId: 'anthropic',
+                sdkId: 'anthropic-messages',
+                modelId: input.selection.modelId,
+                apiKeyEnvVar: 'ANTHROPIC_API_KEY'
+            }),
+            request: { ...request, providerId: 'anthropic' },
+            permissionPolicy,
+            scopedPaths: input.scopedPaths,
+            env: input.env,
+            executor: input.executor
+        });
+    return {
+        ok: bridgeResult.ok,
+        attempts: 1,
+        sessionId: bridgeResult.sessionId,
+        providerId: bridgeResult.providerId,
+        coordinatorOwnedAuthority: true,
+        stepResult: {
+            ok: bridgeResult.ok,
+            providerId: bridgeResult.providerId,
+            role: input.role,
+            artifacts: [bridgeResult.artifact.artifactType, ...bridgeResult.artifact.outputArtifacts],
+            retryable: bridgeResult.artifact.execution.retryable,
+            summary: `${bridgeResult.providerId} ${input.role} vendor execution ${bridgeResult.ok ? 'completed' : 'failed'}${bridgeResult.artifact.execution.statusCode ? ` with status ${bridgeResult.artifact.execution.statusCode}` : ''}.`
+        }
     };
 }
 export function loadTeamVendorLocalSecrets(cwd) {

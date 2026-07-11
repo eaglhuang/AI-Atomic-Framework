@@ -1,0 +1,29 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-213e1cf6a7ee",
+  "recordedAt": "2026-07-11T12:36:57.140Z",
+  "actorId": "Codex-GPT5.6 Sol",
+  "taskId": "TASK-TEAM-0070",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0070 --actor Codex-GPT5.6 Sol --status done --json",
+  "flags": [],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-TEAM-0070-bac9d787d3",
+  "reason": "Direct close backend historical-delivery path.",
+  "skippedChecks": [
+    "protected-backend-surface"
+  ],
+  "touchedFiles": [],
+  "outcome": "failed",
+  "failureCode": "ATM_RUNNER_STALE_WRITE_REFUSED",
+  "emergencyUsePath": null,
+  "parentEventId": null,
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Authorized protected override failed before completion; inspect failureCode and retry through the normal lane when possible.",
+    "suggestedCommand": "node atm.mjs tasks close --task TASK-TEAM-0070 --actor Codex-GPT5.6 Sol --status done --json",
+    "deferredChecks": [
+      "protected-backend-surface"
+    ]
+  }
+}
