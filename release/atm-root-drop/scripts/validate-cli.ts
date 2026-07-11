@@ -488,6 +488,9 @@ assert(teamUsageText.includes('team knowledge query'), 'team --help examples mus
 assert(teamUsageText.includes('--dry-run'), 'team --help must document advisory knowledge dry-run');
 
 logProgress('focused regression subprocess tests');
+// Keep new spawned/temp-workspace CLI regressions in this parallel batch when
+// they do not require shared integration state. The default validate:cli budget
+// is under 30 seconds; long sequential fixtures belong in validate:cli:full.
 await runNodeScriptTestsInParallel([
   {
     name: 'lifecycle-state',

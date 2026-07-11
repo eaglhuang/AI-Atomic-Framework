@@ -38,7 +38,7 @@ ATM classifies validators into distinct scopes to control close gating:
 |---|---|---|
 | unit | < 50 ms | < 5 s |
 | validator | < 5 s | `validate:standard` < 3 min |
-| release-smoke | < 30 s | `validate:cli` < 2 min |
+| release-smoke | < 30 s | default `validate:cli` < 30 s; `validate:cli:full` < 2 min |
 | self-host alpha | < 120 s | full smoke < 5 min |
 
 If a test exceeds its layer budget by more than 2×, either move it down a
@@ -56,6 +56,13 @@ layer (faster) or accept it as a layer up (slower but higher coverage).
   one stable field of the JSON shape. Result-contract fields (`severity`,
   `exitCode`, `blocking`, `diagnostics`) are part of that shape; see
   `tests/cli/cli-result-contract.test.ts` and [`docs/cli-error-policy.md`](./cli-error-policy.md).
+- **validate:cli authoring** keeps the default command fast. Add new spawned or
+  temp-workspace CLI regressions as standalone focused tests and register them
+  in the parallel focused-test batch in
+  [`scripts/validate-cli.ts`](../scripts/validate-cli.ts). Do not add long
+  sequential fixture blocks to the default path. If a scenario needs shared
+  integration state or naturally exceeds the 30-second default budget, gate it
+  behind `npm run validate:cli:full` and include phase timing in stderr.
 - **self-host alpha** lives behind a single command; do not duplicate its
   setup into other test directories.
 

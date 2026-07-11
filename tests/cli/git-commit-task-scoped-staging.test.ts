@@ -372,6 +372,31 @@ try {
   rmSync(path.join(tempDir, foreignClosurePacket), { force: true });
   rmSync(path.join(tempDir, foreignTaskEvent), { force: true });
 
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer-governance-dirty";\n', 'utf8');
+  writeJson(path.join(tempDir, foreignBundleManifest), { taskId: foreignTaskId, taskEventPaths: [foreignTaskEvent] });
+  writeJson(path.join(tempDir, foreignClosurePacket), { taskId: foreignTaskId });
+  writeJson(path.join(tempDir, foreignTaskEvent), { taskId: foreignTaskId, action: 'close' });
+  const deferredDirtyGovernanceBundle = resolveTaskScopedCommitBundle({
+    cwd: tempDir,
+    taskId,
+    taskDocument,
+    apply: false,
+    autoStage: false,
+    deferForeignStaged: true,
+    message: 'feat: defer foreign governance dirty',
+    actorId: 'fixture-agent',
+    trailers: [`ATM-Actor: fixture-agent`, `ATM-Task: ${taskId}`]
+  });
+  assert.equal(deferredDirtyGovernanceBundle.ok, true, 'dry-run must tolerate deferrable dirty foreign governance residue');
+  assert.equal(deferredDirtyGovernanceBundle.blockedCode, null, 'deferrable dirty foreign governance residue must not block');
+  assert.ok(
+    deferredDirtyGovernanceBundle.governanceBundleWarnings.some((entry) => entry.includes('Deferred foreign generated governance residue')),
+    'deferrable dirty foreign governance residue must leave an explicit warning'
+  );
+  rmSync(path.join(tempDir, foreignBundleManifest), { force: true });
+  rmSync(path.join(tempDir, foreignClosurePacket), { force: true });
+  rmSync(path.join(tempDir, foreignTaskEvent), { force: true });
+
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "residue-safe";\n', 'utf8');
   const gitHeadResiduePath = path.join(tempDir, '.atm/history/evidence/git-head.jsonl');
   writeFileSync(gitHeadResiduePath, '{"fixture":true}\n', 'utf8');
