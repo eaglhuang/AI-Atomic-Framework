@@ -13,7 +13,11 @@ export function buildTeamObservabilityContract() {
             'session.complete',
             'session.failure',
             'broker.conflict.blocked',
-            'broker.conflict.resolution'
+            'broker.conflict.resolution',
+            'handoff.materialized',
+            'handoff.consumed',
+            'handoff.integrity-blocked',
+            'handoff.archived'
         ],
         brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
         redactionPolicy: {

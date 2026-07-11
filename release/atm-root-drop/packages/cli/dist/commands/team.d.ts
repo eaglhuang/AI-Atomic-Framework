@@ -944,7 +944,7 @@ export declare function buildTeamPlan(input: {
         readonly queryResultSchemaId: "atm.teamAgentObservabilityQueryResult.v1";
         readonly providerNeutral: true;
         readonly queryKeys: readonly ["taskId", "teamRunId", "providerId", "role", "artifactType", "eventType"];
-        readonly eventTypes: readonly ["session.start", "step.execution", "tool.invocation", "artifact.output", "session.complete", "session.failure", "broker.conflict.blocked", "broker.conflict.resolution"];
+        readonly eventTypes: readonly ["session.start", "step.execution", "tool.invocation", "artifact.output", "session.complete", "session.failure", "broker.conflict.blocked", "broker.conflict.resolution", "handoff.materialized", "handoff.consumed", "handoff.integrity-blocked", "handoff.archived"];
         readonly brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
         readonly redactionPolicy: {
             readonly rawSecretsLogged: false;
@@ -1395,12 +1395,17 @@ export type DirectTeamRoleHandoffArtifact = {
     readonly providerId: string;
     readonly outputTextPreview: string;
 };
+export declare const TEAM_HANDOFF_CONTEXT_PER_ARTIFACT_TOKENS = 256;
+export declare const TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS = 4;
+export declare const TEAM_HANDOFF_CONTEXT_TOTAL_TOKENS = 1024;
 type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>> & {
     readonly handoffArtifact: DirectTeamRoleHandoffArtifact;
     readonly contextTelemetry: {
         readonly baseInstructionChars: number;
         readonly handoffChars: number;
         readonly totalInstructionChars: number;
+        readonly actualTokenCount: number;
+        readonly tokenEstimatorId: 'whitespace-v1';
         readonly priorArtifactCount: number;
         readonly consumedArtifactRefs: readonly string[];
     };

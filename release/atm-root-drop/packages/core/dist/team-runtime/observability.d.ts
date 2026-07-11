@@ -1,6 +1,6 @@
 import type { BrokerConflictResolutionArtifact } from './permission-broker.ts';
 import type { TeamProviderId } from './provider-contract.ts';
-export type TeamObservabilityEventType = 'session.start' | 'step.execution' | 'tool.invocation' | 'artifact.output' | 'session.complete' | 'session.failure' | 'broker.conflict.blocked' | 'broker.conflict.resolution';
+export type TeamObservabilityEventType = 'session.start' | 'step.execution' | 'tool.invocation' | 'artifact.output' | 'session.complete' | 'session.failure' | 'broker.conflict.blocked' | 'broker.conflict.resolution' | 'handoff.materialized' | 'handoff.consumed' | 'handoff.integrity-blocked' | 'handoff.archived';
 export type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
 export type TeamObservabilityEvent = {
     readonly schemaId: 'atm.teamAgentObservabilityEvent.v1';
@@ -50,7 +50,7 @@ export declare function buildTeamObservabilityContract(): {
     readonly queryResultSchemaId: "atm.teamAgentObservabilityQueryResult.v1";
     readonly providerNeutral: true;
     readonly queryKeys: readonly ["taskId", "teamRunId", "providerId", "role", "artifactType", "eventType"];
-    readonly eventTypes: readonly ["session.start", "step.execution", "tool.invocation", "artifact.output", "session.complete", "session.failure", "broker.conflict.blocked", "broker.conflict.resolution"];
+    readonly eventTypes: readonly ["session.start", "step.execution", "tool.invocation", "artifact.output", "session.complete", "session.failure", "broker.conflict.blocked", "broker.conflict.resolution", "handoff.materialized", "handoff.consumed", "handoff.integrity-blocked", "handoff.archived"];
     readonly brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
     readonly redactionPolicy: {
         readonly rawSecretsLogged: false;

@@ -7,6 +7,7 @@ export function createDefaultTeamPermissionPolicy() {
     return {
         schemaId: 'atm.teamPermissionPolicy.v1',
         repoPolicyId: 'default-governed-policy',
+        hardGate: true,
         allowedPermissions: [
             'task.lifecycle',
             'git.write',
@@ -91,9 +92,11 @@ export function decideTeamPermission(policy, request) {
     const globallyAllowed = policy.allowedPermissions.includes(request.permission);
     const vendorAllowed = (policy.vendorPermissions[request.providerId] ?? []).includes(request.permission);
     const inScope = request.scopedPaths.length > 0 || request.permission === 'task.lifecycle' || request.permission === 'git.write';
-    const ok = globallyAllowed && vendorAllowed && inScope;
+    const ok = policy.hardGate === true && globallyAllowed && vendorAllowed && inScope;
     return {
         ok,
+        hardGate: true,
+        gateId: 'ATM_TEAM_PERMISSION_HARD_GATE',
         reason: ok
             ? 'Permission granted through governed broker policy.'
             : 'Permission denied by governed broker policy or missing scoped paths.',

@@ -115,6 +115,23 @@ async function main() {
     return;
   }
 
+  if (taskCase === 'team-handoff-narrative-whitelist') {
+    const cwd = createTempWorkspace('atm-team-handoff-whitelist-');
+    const first = materializeTeamRoleHandoff({
+      cwd, taskId: 'TASK-TEAM-0074', teamRunId: 'whitelist', fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', toRole: 'reviewer', sourceArtifactId: 'provider-artifact', redactedPreview: 'Implemented the bounded handoff. sk-hidden-secret', leaseEpoch: 1, routeNote: 'needs-rework -> implementer (round 1/2)'
+    });
+    const directory = teamHandoffRuntimeDirectory(cwd, 'TASK-TEAM-0074', 'whitelist');
+    const index = readFileSync(path.join(directory, 'index.md'), 'utf8');
+    assert.equal(index, renderTeamHandoffIndex(first.manifest, [first.artifact]));
+    assert.equal(index.includes('sk-hidden-secret'), false);
+    assert.ok(index.includes(first.artifact.humanSummary));
+    assert.ok(index.includes(first.artifact.routeNote!));
+    assert.equal(verifyTeamHandoffLedger(cwd, 'TASK-TEAM-0074', 'whitelist').ok, true);
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-narrative-whitelist)');
+    return;
+  }
+
   if (taskCase === 'lieutenant-escalation') {
     const lowRiskTask = {
       workItemId: 'TASK-TEAM-0008-SMALL',

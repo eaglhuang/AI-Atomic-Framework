@@ -53,12 +53,14 @@ import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createTeamProviderContract, type TeamProviderHttpExecutor, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtime/permission-broker.ts';
+import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
 import {
   mergeTeamProviderSelectionConfig,
   resolveTeamProviderSelection,
   type TeamProviderSelectionConfig
 } from '../../../core/src/team-runtime/provider-selection.ts';
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
+import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/src/broker/proposal.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -66,6 +68,8 @@ type TeamPermissionDefinition = {
   id: string;
   mode: TeamPermissionMode;
   scopeRequired?: boolean;
+  /** Permission leases are always enforced by a fail-closed hard gate. */
+  hardGate: true;
 };
 
 type TeamVendorLocalSecrets = {
@@ -626,22 +630,22 @@ type TeamPatrolFinding = {
 };
 
 const teamPermissionCatalog: TeamPermissionDefinition[] = [
-  { id: 'task.lifecycle', mode: 'exclusive' },
-  { id: 'git.write', mode: 'exclusive' },
-  { id: 'file.read', mode: 'shareable', scopeRequired: true },
-  { id: 'file.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'web.query', mode: 'exclusive' },
-  { id: 'web.download', mode: 'exclusive', scopeRequired: true },
-  { id: 'exec.validator', mode: 'shareable', scopeRequired: true },
-  { id: 'exec.mutating', mode: 'exclusive', scopeRequired: true },
-  { id: 'sandbox.write', mode: 'exclusive' },
-  { id: 'pipeline.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'database.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'ci.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'evidence.write', mode: 'exclusive' },
-  { id: 'knowledge.query', mode: 'shareable' },
-  { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true },
-  { id: 'review.signature.write', mode: 'exclusive' }
+  { id: 'task.lifecycle', mode: 'exclusive', hardGate: true },
+  { id: 'git.write', mode: 'exclusive', hardGate: true },
+  { id: 'file.read', mode: 'shareable', scopeRequired: true, hardGate: true },
+  { id: 'file.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'web.query', mode: 'exclusive', hardGate: true },
+  { id: 'web.download', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'exec.validator', mode: 'shareable', scopeRequired: true, hardGate: true },
+  { id: 'exec.mutating', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'sandbox.write', mode: 'exclusive', hardGate: true },
+  { id: 'pipeline.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'database.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'ci.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'evidence.write', mode: 'exclusive', hardGate: true },
+  { id: 'knowledge.query', mode: 'shareable', hardGate: true },
+  { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
+  { id: 'review.signature.write', mode: 'exclusive', hardGate: true }
 ];
 
 const coordinatorExclusivePermissions = ['task.lifecycle', 'git.write', 'evidence.write'] as const;
@@ -925,6 +929,9 @@ const catalogReadyRosterDeferredRoles = [
 ];
 
 export async function runTeam(argv: string[]) {
+  if (String(argv[0] ?? '').toLowerCase() === 'handoff') {
+    return runTeamHandoff(argv.slice(1), path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd()));
+  }
   if (String(argv[0] ?? '').toLowerCase() === 'knowledge') {
     const cwd = path.resolve(readOptionValue(argv, '--cwd') ?? process.cwd());
     return runTeamKnowledge(argv.slice(1), cwd);
@@ -1006,6 +1013,7 @@ export async function runTeam(argv: string[]) {
     requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
     actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim(),
     requestedTeamSize: String(parsed.options.teamSize ?? '').trim(),
+    brokerProposalFile: String(parsed.options.brokerProposalFile ?? '').trim(),
     providerSelectionConfig: loadTeamProviderSelectionConfig(cwd, normalizeStringArray(parsed.options.roleProvider))
   });
   const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
@@ -1231,6 +1239,23 @@ export async function runTeam(argv: string[]) {
       runtimePilot: teamPlan.runtimePilot
     }
   });
+}
+
+function runTeamHandoff(argv: string[], cwd: string) {
+  const action = String(argv[0] ?? 'show').toLowerCase();
+  const taskId = readOptionValue(argv, '--task')?.trim();
+  const teamRunId = readOptionValue(argv, '--team')?.trim();
+  const actorId = readOptionValue(argv, '--actor')?.trim() ?? '';
+  if (!taskId || !teamRunId) throw new CliError('ATM_TEAM_HANDOFF_TASK_RUN_REQUIRED', 'team handoff requires --task and --team.', { exitCode: 2 });
+  if (action === 'materialize' && actorId !== 'coordinator' && actorId !== 'system') throw new CliError('ATM_TEAM_HANDOFF_MATERIALIZE_FORBIDDEN', 'handoff.materialize is Coordinator/system-only.', { exitCode: 1 });
+  if (!['show', 'context', 'stats'].includes(action)) throw new CliError('ATM_CLI_USAGE', 'team handoff supports: show, context, stats.', { exitCode: 2 });
+  const integrity = verifyTeamHandoffLedger(cwd, taskId, teamRunId);
+  if (!integrity.ok) throw new CliError('ATM_TEAM_HANDOFF_INTEGRITY_BLOCKED', `handoff-integrity-blocked: ${integrity.reason}.`, { exitCode: 1 });
+  const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+  const artifacts = readTeamHandoffArtifacts(directory, integrity.manifest);
+  const bounded = artifacts.slice(-TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS).map((artifact) => ({ role: artifact.from.role, providerId: artifact.from.providerId, outputTextPreview: artifact.humanSummary }));
+  const context = buildDirectTeamRoleInstructions({ taskId, role: 'consumer', priorRoleArtifacts: bounded });
+  return makeResult({ ok: true, command: 'team', cwd, messages: [message('info', 'ATM_TEAM_HANDOFF_READY', `Team handoff ${action} is ready.`)], evidence: { action: `handoff.${action}`, taskId, teamRunId, manifest: integrity.manifest, artifacts: action === 'show' ? artifacts : undefined, context: action === 'context' ? context : undefined, stats: action === 'stats' ? { transitionCount: integrity.manifest.transitionCount, contextTokens: context.telemetry.actualTokenCount } : undefined } });
 }
 
 export function buildBrokerConflictSharedVocabulary(brokerLane: TeamBrokerLaneEvidence) {
@@ -2205,12 +2230,22 @@ async function buildTeamPlanningContext(input: {
   requestedRecipeId: string;
   actorId: string;
   requestedTeamSize?: string;
+  brokerProposalFile?: string;
   providerSelectionConfig?: {
     config: TeamProviderSelectionConfig;
     source: { schemaId: 'atm.teamAgentsConfig.v1'; path: string | null; loaded: boolean; cliOverrideCount: number };
   };
 }) {
-  const task = readTask(input.cwd, input.taskId);
+  let task = readTask(input.cwd, input.taskId);
+  if (input.brokerProposalFile) {
+    task = applyTeamBrokerProposalAdmission({
+      cwd: input.cwd,
+      task,
+      taskId: input.taskId,
+      actorId: input.actorId,
+      proposalFile: input.brokerProposalFile
+    });
+  }
   const recipes = loadTeamRecipes(input.cwd);
   const recipe = selectRecipe({
     recipes,
@@ -2300,6 +2335,42 @@ async function buildTeamPlanningContext(input: {
       ...finalTeamPlan,
       validation,
       brokerLane
+    }
+  };
+}
+
+function applyTeamBrokerProposalAdmission(input: {
+  cwd: string;
+  task: Record<string, unknown>;
+  taskId: string;
+  actorId: string;
+  proposalFile: string;
+}): Record<string, unknown> {
+  const proposalPath = path.resolve(input.cwd, input.proposalFile);
+  let proposal: ReturnType<typeof readBrokerProposalFile>;
+  try {
+    proposal = readBrokerProposalFile(proposalPath);
+  } catch (error) {
+    throw new CliError('ATM_TEAM_BROKER_PROPOSAL_INVALID', `Team start could not read broker proposal: ${(error as Error).message}`, { exitCode: 1 });
+  }
+  const validation = validateBrokerProposal(proposal, { cwd: input.cwd });
+  const allowed = new Set(deriveWritePaths(input.task, input.cwd));
+  const hashOnlyMismatch = validation.issues.length === 1
+    && validation.issues[0]?.kind === 'file-hash-mismatch'
+    && String(validation.currentFileHash ?? '').replace(/^sha256:/, '') === String(proposal.fileBeforeHash ?? '').replace(/^sha256:/, '');
+  if ((!validation.ok && !hashOnlyMismatch) || proposal.taskId !== input.taskId || proposal.actorId !== input.actorId || !allowed.has(proposal.targetFile.replace(/\\/g, '/'))) {
+    throw new CliError('ATM_TEAM_BROKER_PROPOSAL_INVALID', 'Team start requires a current validated proposal owned by its task/actor and target write scope.', {
+      exitCode: 1,
+      details: { proposalFile: input.proposalFile, proposalId: proposal.proposalId, issues: validation.issues }
+    });
+  }
+  return {
+    ...input.task,
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: true,
+      hotFiles: [proposal.targetFile.replace(/\\/g, '/')],
+      notes: `Validated broker proposal ${proposal.proposalId} consumed by team start.`
     }
   };
 }
@@ -4465,7 +4536,8 @@ export async function runTeamProviderExecution(input: {
   const localSecrets = loadTeamVendorLocalSecrets(input.cwd);
   const results: DirectTeamProviderRoleResult[] = [];
   const priorRoleArtifacts: DirectTeamRoleHandoffArtifact[] = [];
-  for (const roleSelection of selectedRoles) {
+  const handoffEvents: ReturnType<typeof createTeamObservabilityEvent>[] = [];
+  for (const [roleIndex, roleSelection] of selectedRoles.entries()) {
     const result = await runDirectTeamProviderRole({
       taskId: input.taskId,
       role: roleSelection.role,
@@ -4477,7 +4549,45 @@ export async function runTeamProviderExecution(input: {
     });
     if (result) {
       results.push(result);
-      if (result.handoffArtifact && result.ok) priorRoleArtifacts.push(result.handoffArtifact);
+      if (result.handoffArtifact && result.ok) {
+        const next = selectedRoles[roleIndex + 1];
+        const materialized = materializeTeamRoleHandoff({
+          cwd: input.cwd,
+          taskId: input.taskId,
+          teamRunId: input.teamRunId,
+          fromRole: result.handoffArtifact.role,
+          fromProviderId: result.handoffArtifact.providerId,
+          fromModelId: roleSelection.selectedProvider.modelId,
+          toRole: next?.role ?? 'coordinator',
+          toProviderId: next?.selectedProvider.providerId ?? null,
+          sourceArtifactId: result.sessionId,
+          redactedPreview: result.handoffArtifact.outputTextPreview,
+          leaseEpoch: roleIndex + 1
+        });
+        const integrity = verifyTeamHandoffLedger(input.cwd, input.taskId, input.teamRunId);
+        if (!integrity.ok) {
+          throw new CliError('ATM_TEAM_HANDOFF_INTEGRITY_BLOCKED', `Team handoff integrity check failed: ${integrity.reason}.`, { exitCode: 1 });
+        }
+        priorRoleArtifacts.push({
+          role: materialized.artifact.from.role,
+          providerId: materialized.artifact.from.providerId,
+          outputTextPreview: materialized.artifact.humanSummary
+        });
+        handoffEvents.push(createTeamObservabilityEvent({
+          eventType: 'handoff.materialized',
+          taskId: input.taskId,
+          teamRunId: input.teamRunId,
+          providerId: normalizeTeamProviderId(materialized.artifact.from.providerId) ?? 'unknown',
+          role: materialized.artifact.from.role,
+          runtimeMode: input.runtimeContract.runtimeMode,
+          artifactType: materialized.artifact.schemaId,
+          artifactId: materialized.artifact.handoffId,
+          decisionClass: materialized.artifact.decision.decisionClass,
+          decisionReason: materialized.artifact.decision.decisionReason,
+          violationStatus: materialized.artifact.decision.violationStatus,
+          summary: `Handoff ${materialized.artifact.handoffId} materialized.`
+        }));
+      }
     }
   }
   appendTeamRuntimeObservabilityEvents(input.cwd, input.teamRunId, results.flatMap((result) => buildProviderOrchestrationEvents({
@@ -4485,7 +4595,7 @@ export async function runTeamProviderExecution(input: {
     teamRunId: input.teamRunId,
     runtimeMode: input.runtimeContract.runtimeMode,
     result
-  })));
+  })).concat(handoffEvents));
   return {
     requested: true,
     blockedReason: null,
@@ -4500,12 +4610,18 @@ export type DirectTeamRoleHandoffArtifact = {
   readonly outputTextPreview: string;
 };
 
+export const TEAM_HANDOFF_CONTEXT_PER_ARTIFACT_TOKENS = 256;
+export const TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS = 4;
+export const TEAM_HANDOFF_CONTEXT_TOTAL_TOKENS = 1024;
+
 type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>> & {
   readonly handoffArtifact: DirectTeamRoleHandoffArtifact;
   readonly contextTelemetry: {
     readonly baseInstructionChars: number;
     readonly handoffChars: number;
     readonly totalInstructionChars: number;
+    readonly actualTokenCount: number;
+    readonly tokenEstimatorId: 'whitespace-v1';
     readonly priorArtifactCount: number;
     readonly consumedArtifactRefs: readonly string[];
   };
@@ -4517,22 +4633,27 @@ export function buildDirectTeamRoleInstructions(input: {
   priorRoleArtifacts?: readonly DirectTeamRoleHandoffArtifact[];
 }): { instructions: string; telemetry: DirectTeamProviderRoleResult['contextTelemetry'] } {
   const base = `Run Team role ${input.role} for ${input.taskId}. Return a concise role report. Do not close, commit, or exceed Coordinator authority.`;
-  const bounded = (input.priorRoleArtifacts ?? []).slice(-4).map((artifact) => ({
+  const bounded = (input.priorRoleArtifacts ?? []).slice(-TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS).map((artifact) => ({
     ...artifact,
-    outputTextPreview: artifact.outputTextPreview.slice(0, 500)
+    outputTextPreview: truncateTokenBudget(artifact.outputTextPreview, TEAM_HANDOFF_CONTEXT_PER_ARTIFACT_TOKENS)
   }));
-  const handoff = bounded.length === 0 ? '' : `\nPrior governed role artifacts (review and cite relevant source roles):\n${bounded.map((artifact) => `[${artifact.role}/${artifact.providerId}] ${artifact.outputTextPreview}`).join('\n').slice(0, 2400)}`;
+  const handoff = bounded.length === 0 ? '' : `\nPrior governed role artifacts (review and cite relevant source roles):\n${truncateTokenBudget(bounded.map((artifact) => `[${artifact.role}/${artifact.providerId}] ${artifact.outputTextPreview}`).join('\n'), TEAM_HANDOFF_CONTEXT_TOTAL_TOKENS)}`;
   return {
     instructions: `${base}${handoff}`,
     telemetry: {
       baseInstructionChars: base.length,
       handoffChars: handoff.length,
       totalInstructionChars: base.length + handoff.length,
+      actualTokenCount: estimateTokens(base) + estimateTokens(handoff),
+      tokenEstimatorId: 'whitespace-v1',
       priorArtifactCount: bounded.length,
       consumedArtifactRefs: bounded.map((artifact) => `${artifact.role}/${artifact.providerId}`)
     }
   };
 }
+
+function estimateTokens(value: string): number { return value.trim() ? value.trim().split(/\s+/).length : 0; }
+function truncateTokenBudget(value: string, budget: number): string { return value.trim().split(/\s+/).slice(0, budget).join(' '); }
 
 export async function runDirectTeamProviderRole(input: {
   taskId: string;
@@ -4978,6 +5099,10 @@ export function buildTeamPatrolReport(input: {
     }));
   }
 
+  if (teamRun?.teamRunId) {
+    findings.push(...buildTeamHandoffPatrolFindings(input.cwd, input.taskId, String(teamRun.teamRunId), input.mode));
+  }
+
   const severity = summarizePatrolSeverity(findings);
   return {
     schemaId: 'atm.teamPatrolReport.v1',
@@ -5007,6 +5132,62 @@ export function buildTeamPatrolReport(input: {
       historyRoot: '.atm/history'
     }
   };
+}
+
+function buildTeamHandoffPatrolFindings(cwd: string, taskId: string, teamRunId: string, mode: TeamPatrolMode): TeamPatrolFinding[] {
+  const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+  if (!existsSync(directory)) return [];
+  const findings: TeamPatrolFinding[] = [];
+  const integrity = verifyTeamHandoffLedger(cwd, taskId, teamRunId);
+  if (!integrity.ok) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_INTEGRITY_BLOCKED', category: 'artifact-gap',
+      summary: `Handoff ledger integrity is blocked: ${integrity.reason ?? 'unknown reason'}.`,
+      suggestedCommand: `node atm.mjs team handoff show --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, reason: integrity.reason, canonicalReason: 'handoff-integrity-blocked' }
+    }));
+    return findings;
+  }
+  const indexPath = path.join(directory, 'index.md');
+  const index = existsSync(indexPath) ? readFileSync(indexPath, 'utf8') : '';
+  const expected = renderCanonicalTeamHandoffIndex(integrity.manifest, directory);
+  if (!index || index !== expected) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_NARRATIVE_DRIFT', category: 'artifact-gap',
+      summary: 'Handoff Markdown is not the deterministic JSON-whitelist projection.',
+      suggestedCommand: `node atm.mjs team handoff show --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, canonicalReason: 'handoff-integrity-blocked' }
+    }));
+  }
+  if (/\uFFFD/.test(index) || Buffer.from(index, 'utf8').toString('utf8') !== index) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_ENCODING_INVALID', category: 'artifact-gap',
+      summary: 'Handoff Markdown is not valid stable UTF-8 text.',
+      suggestedCommand: `node atm.mjs team handoff show --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, canonicalReason: 'handoff-integrity-blocked' }
+    }));
+  }
+  const bytes = integrity.manifest.artifacts.reduce((total, entry) => total + readFileSync(path.join(directory, entry.file)).byteLength, 0);
+  if (integrity.manifest.transitionCount >= 64 || bytes >= 512 * 1024) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_HARD_LIMIT', category: 'runtime-mode',
+      summary: 'Handoff retention hard limit requires Captain sign-off before another transition.',
+      suggestedCommand: `node atm.mjs team handoff stats --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, transitionCount: integrity.manifest.transitionCount, bytes, decisionClass: 'human-signoff-required' }
+    }));
+  } else if (integrity.manifest.transitionCount >= 48 || bytes >= 384 * 1024) {
+    findings.push(teamPatrolFinding({
+      level: mode === 'close-preflight' ? 'warning' : 'info', code: 'ATM_TEAM_PATROL_HANDOFF_SOFT_LIMIT', category: 'runtime-mode',
+      summary: 'Handoff retention soft limit reached; Captain should prepare to split or archive the run.',
+      suggestedCommand: `node atm.mjs team handoff stats --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, transitionCount: integrity.manifest.transitionCount, bytes }
+    }));
+  }
+  return findings;
+}
+
+function renderCanonicalTeamHandoffIndex(manifest: Parameters<typeof renderTeamHandoffIndex>[0], directory: string) {
+  return renderTeamHandoffIndex(manifest, readTeamHandoffArtifacts(directory, manifest));
 }
 
 function listTeamRuns(cwd: string) {
@@ -5071,6 +5252,32 @@ function runTeamLifecycleAction(input: {
   }
   if ((input.action === 'lease' || input.action === 'release') && !input.permission) {
     throw new CliError('ATM_TEAM_PERMISSION_REQUIRED', `team ${input.action} requires --permission <id>.`, { exitCode: 2 });
+  }
+
+  if (input.action === 'lease' || input.action === 'release') {
+    const definition = teamPermissionCatalog.find((entry) => entry.id === input.permission);
+    if (!definition || definition.hardGate !== true) {
+      throw new CliError('ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED', `Permission ${input.permission || '<missing>'} is not registered with a hard gate.`, {
+        exitCode: 1,
+        details: {
+          teamRunId: input.teamRunId,
+          permission: input.permission || null,
+          gateId: 'ATM_TEAM_PERMISSION_HARD_GATE',
+          requiredCommand: 'node atm.mjs team validate --json'
+        }
+      });
+    }
+    if (input.action === 'lease' && definition.scopeRequired && input.paths.length === 0) {
+      throw new CliError('ATM_TEAM_PERMISSION_SCOPE_REQUIRED', `Permission ${input.permission} requires explicit scoped paths.`, {
+        exitCode: 1,
+        details: {
+          teamRunId: input.teamRunId,
+          permission: input.permission,
+          gateId: 'ATM_TEAM_PERMISSION_HARD_GATE',
+          requiredCommand: `node atm.mjs team lease --team ${input.teamRunId} --actor ${input.actorId} --permission ${input.permission} --paths <scoped-paths> --json`
+        }
+      });
+    }
   }
 
   const run = readTeamRun(input.cwd, input.teamRunId) as Record<string, unknown>;

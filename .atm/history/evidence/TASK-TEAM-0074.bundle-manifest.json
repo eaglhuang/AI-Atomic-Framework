@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TEAM-0074",
+  "updatedAt": "2026-07-11T16:14:21.722Z",
+  "updatedBy": "Codex-GPT5.6 Terra",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:team-agents"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-11T16:14:05.040Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "19a5681419a7ae4b808fc0492b182ca0ab84a167",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-11T16:14:12.823Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "19a5681419a7ae4b808fc0492b182ca0ab84a167",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:ac60441594ff56f75a7867e2ddccb28bae7f2b85a6e19c70ba689dcbdc7d7287",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-11T16:14:19.422Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "19a5681419a7ae4b808fc0492b182ca0ab84a167",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:team-agents",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:98a93eabbafa8011cf3a2f16b9622a6c9bc77a0aaea26aa38aed9bd0088cb273",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-agents"
+      ],
+      "generatedAt": "2026-07-11T16:14:21.777Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "19a5681419a7ae4b808fc0492b182ca0ab84a167",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -9,7 +9,11 @@ export type TeamObservabilityEventType =
   | 'session.complete'
   | 'session.failure'
   | 'broker.conflict.blocked'
-  | 'broker.conflict.resolution';
+  | 'broker.conflict.resolution'
+  | 'handoff.materialized'
+  | 'handoff.consumed'
+  | 'handoff.integrity-blocked'
+  | 'handoff.archived';
 
 export type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
 
@@ -73,7 +77,11 @@ export function buildTeamObservabilityContract() {
       'session.complete',
       'session.failure',
       'broker.conflict.blocked',
-      'broker.conflict.resolution'
+      'broker.conflict.resolution',
+      'handoff.materialized',
+      'handoff.consumed',
+      'handoff.integrity-blocked',
+      'handoff.archived'
     ] as const,
     brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'] as const,
     redactionPolicy: {

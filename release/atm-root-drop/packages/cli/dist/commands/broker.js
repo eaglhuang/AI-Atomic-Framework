@@ -429,6 +429,22 @@ export async function runBroker(argv) {
             });
         }
         const task = JSON.parse(readFileSync(taskPath, 'utf8'));
+        const activationProposal = options.proposalFiles.length === 1
+            ? readBrokerProposalFile(path.resolve(options.cwd, options.proposalFiles[0]))
+            : null;
+        if (activationProposal) {
+            const validation = validateBrokerProposal(activationProposal, { cwd: options.cwd });
+            const requestedScope = new Set(options.scopeFiles.map((entry) => entry.replace(/\\/g, '/')));
+            if (!validation.ok || activationProposal.taskId !== options.task || activationProposal.actorId !== options.actorId || !requestedScope.has(activationProposal.targetFile)) {
+                throw new CliError('ATM_BROKER_RUNTIME_PROPOSAL_INVALID', 'Runtime activation requires one validated proposal owned by the task/actor and covering the requested scope.', { exitCode: 1 });
+            }
+            task.proposalAdmission = {
+                trigger: 'hot-file',
+                summarySubmitted: true,
+                hotFiles: [activationProposal.targetFile],
+                notes: `Validated broker proposal ${activationProposal.proposalId} admitted for runtime activation.`
+            };
+        }
         const handshake = buildTeamBrokerRuntimeActivationHandshake({
             cwd: options.cwd,
             taskId: options.task,

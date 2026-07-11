@@ -15,6 +15,7 @@ import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './taskflow/commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from './tasks/close-window-lock.js';
+import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../core/dist/team-runtime/handoff-ledger.js';
 function buildTasksNewCommand(input) {
     const parts = ['node atm.mjs tasks new'];
     if (input.template) {
@@ -776,6 +777,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     ? 'taskflow close succeeded; planning roster/index sync still needs an explicit follow-up command.'
                     : 'taskflow close synced the planning roster/index and recorded the closeback fields.', planningIndexAdvisory));
             }
+            promoteTaskRuntimeHandoffs(cwd, taskId, 'completed');
             const commitBundleInput = buildTaskflowCommitBundle({
                 cwd,
                 taskId,
@@ -927,6 +929,19 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         schemaId: 'atm.taskflowCloseResult.v1',
         writeEnabled: false
     };
+}
+function promoteTaskRuntimeHandoffs(cwd, taskId, runOutcome) {
+    const root = path.join(cwd, '.atm', 'runtime', 'handoff', taskId.replace(/[^A-Za-z0-9._-]/g, '_'));
+    if (!existsSync(root))
+        return;
+    for (const entry of readdirSync(root, { withFileTypes: true })) {
+        if (!entry.isDirectory())
+            continue;
+        const runPath = teamHandoffRuntimeDirectory(cwd, taskId, entry.name);
+        if (existsSync(path.join(runPath, 'manifest.json'))) {
+            promoteTeamHandoffArchive({ cwd, taskId, teamRunId: entry.name, runOutcome });
+        }
+    }
 }
 export async function runTaskflow(argv = []) {
     const spec = getCommandSpec('taskflow');

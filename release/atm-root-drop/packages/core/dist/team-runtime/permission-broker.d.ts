@@ -1,6 +1,8 @@
 export type TeamPermissionPolicy = {
     readonly schemaId: 'atm.teamPermissionPolicy.v1';
     readonly repoPolicyId: string;
+    /** Every provider permission decision is fail-closed and must pass this gate. */
+    readonly hardGate: true;
     readonly allowedPermissions: readonly string[];
     readonly vendorPermissions: Readonly<Record<string, readonly string[]>>;
     readonly defaultDecision: 'deny' | 'allow';
@@ -12,6 +14,8 @@ export type TeamPermissionRequest = {
 };
 export type TeamPermissionDecision = {
     readonly ok: boolean;
+    readonly hardGate: true;
+    readonly gateId: 'ATM_TEAM_PERMISSION_HARD_GATE';
     readonly reason: string;
     readonly permission: string;
     readonly providerId: string;

@@ -94,13 +94,14 @@ from the `gemini` CLI/editor bridge. It uses
 and emits the same redacted provider-run artifact and observability sequence as
 the OpenAI and Anthropic direct bridges.
 
-Concrete Team execution carries only successful prior-role previews to later
-roles. Each preview is capped at 500 characters, at most four previews are
-included, and the complete handoff section is capped at 2,400 characters.
-Source labels such as `[implementer/anthropic]` let an independent reviewer tie
-its decision to the producing role without receiving the entire Captain
-context. Failed or broker-blocked role output is not promoted into the handoff;
-the sequential dispatcher continues with sibling roles.
+Concrete Team execution carries only successful canonical handoff summaries to
+later roles. The single token budget source caps each artifact at 256 tokens,
+the set at four artifacts, and the handoff at 1,024 tokens. Source labels such
+as `[implementer/anthropic]` preserve provenance without sending the entire
+Captain context. Failed or broker-blocked output is not promoted; the
+sequential dispatcher continues with sibling roles. See
+`cross-vendor-handoff-ledger.md` for the JSON authority, Markdown projection,
+archive, continuation, and integrity contract.
 
 ## Runtime Tiers
 

@@ -1,0 +1,17 @@
+{
+  "schemaId": "atm.patchProposal.v1",
+  "specVersion": "0.1.0",
+  "migration": { "strategy": "none", "fromVersion": null, "notes": "TASK-TEAM-0074 paid L5 dogfood admission" },
+  "proposalId": "proposal-team-0074-l5-dogfood",
+  "taskId": "TASK-TEAM-0074",
+  "actorId": "Codex-GPT5.6 Terra",
+  "baseCommit": "19a5681419a7ae4b808fc0492b182ca0ab84a167",
+  "fileBeforeHash": "sha256:cd58417203d05d886ff9c0ec978460c69290b5b6b9f9ca91f47e42cf3ceb0720",
+  "targetFile": "packages/cli/src/commands/team.ts",
+  "atomRefs": [{ "atomId": "atm.team-agents-runtime", "atomCid": "atm-team-agents-runtime" }],
+  "anchors": [{ "kind": "function", "hint": "runTeamProviderExecution" }],
+  "intent": "Run the approved L5 sequential OpenAI, Anthropic, and Gemini Direct paid dogfood through the governed Team CLI without source mutation.",
+  "patch": "No source patch; bounded runtime execution only, with canonical handoff, redaction, token telemetry, and aborted-run archive evidence.",
+  "validators": ["node atm.mjs team patrol --task TASK-TEAM-0074 --mode close-preflight --json"],
+  "rollback": "Archive the aborted run and release the broker intent; no provider credentials or raw output are persisted."
+}

@@ -36,6 +36,15 @@ The live mixed run proves the same built dispatcher reached all three paid
 vendor APIs. Full vendor output is deliberately not retained, so deterministic
 request capture remains the authoritative evidence for exact prompt contents.
 
+TASK-TEAM-0074 additionally ran a paid sequential low-cost smoke through the
+three direct bridges: OpenAI `gpt-5-mini`, Anthropic
+`claude-haiku-4-5-20251001`, and Gemini Direct `gemini-2.5-flash` each returned
+HTTP 200. The later roles consumed only the redacted, bounded predecessor
+summaries (39 and 107 estimated tokens in the Anthropic and Gemini calls), not
+full output. The smoke recorded no raw keys or provider text. A rejected
+initial model probe returned HTTP 404 for unavailable IDs and was retained as
+configuration evidence, not success evidence.
+
 ## Context Measurement
 
 The source handoff is 13,876 bytes. A monolithic strategy that sends it in full
@@ -46,8 +55,8 @@ to every L5 role consumes a 138,760-byte serialized-input baseline:
 ```
 
 The reproducible worst-case bounded calculation calls
-`buildDirectTeamRoleInstructions` for the ordered L5 roster with a 500-character
-preview from every prior role. The per-role character counts are:
+`buildDirectTeamRoleInstructions` for the ordered L5 roster with bounded
+summaries from every prior role. The per-role character counts are:
 
 ```text
 130, 733, 1253, 1780, 2305, 2303, 2302, 2306, 2304, 2307

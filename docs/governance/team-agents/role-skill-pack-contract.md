@@ -28,6 +28,13 @@ one oversized "do everything" skill.
 Coordinator authority remains primary. A role pack must not invent a second task
 lifecycle, commit lane, or closeout authority.
 
+Cross-vendor role output first becomes `atm.teamProviderRunArtifact.v1`.
+Only the Coordinator/system materialization lane may derive a
+`atm.teamRoleHandoffArtifact.v1` reference envelope. The envelope expresses
+handoff producers, consumers, rework routes, and permitted same-task
+continuations through `consumesFrom`, `producesTo`, and `requiredArtifacts`;
+it never duplicates vendor output or grants a role direct history access.
+
 ## Recommended baseline roles
 
 The default Team Agent vocabulary should support at least:

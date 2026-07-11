@@ -53,13 +53,14 @@ import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createTeamProviderContract, type TeamProviderHttpExecutor, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtime/permission-broker.ts';
-import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
+import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
 import {
   mergeTeamProviderSelectionConfig,
   resolveTeamProviderSelection,
   type TeamProviderSelectionConfig
 } from '../../../core/src/team-runtime/provider-selection.ts';
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
+import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/src/broker/proposal.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -1012,6 +1013,7 @@ export async function runTeam(argv: string[]) {
     requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
     actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim(),
     requestedTeamSize: String(parsed.options.teamSize ?? '').trim(),
+    brokerProposalFile: String(parsed.options.brokerProposalFile ?? '').trim(),
     providerSelectionConfig: loadTeamProviderSelectionConfig(cwd, normalizeStringArray(parsed.options.roleProvider))
   });
   const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
@@ -2228,12 +2230,22 @@ async function buildTeamPlanningContext(input: {
   requestedRecipeId: string;
   actorId: string;
   requestedTeamSize?: string;
+  brokerProposalFile?: string;
   providerSelectionConfig?: {
     config: TeamProviderSelectionConfig;
     source: { schemaId: 'atm.teamAgentsConfig.v1'; path: string | null; loaded: boolean; cliOverrideCount: number };
   };
 }) {
-  const task = readTask(input.cwd, input.taskId);
+  let task = readTask(input.cwd, input.taskId);
+  if (input.brokerProposalFile) {
+    task = applyTeamBrokerProposalAdmission({
+      cwd: input.cwd,
+      task,
+      taskId: input.taskId,
+      actorId: input.actorId,
+      proposalFile: input.brokerProposalFile
+    });
+  }
   const recipes = loadTeamRecipes(input.cwd);
   const recipe = selectRecipe({
     recipes,
@@ -2323,6 +2335,42 @@ async function buildTeamPlanningContext(input: {
       ...finalTeamPlan,
       validation,
       brokerLane
+    }
+  };
+}
+
+function applyTeamBrokerProposalAdmission(input: {
+  cwd: string;
+  task: Record<string, unknown>;
+  taskId: string;
+  actorId: string;
+  proposalFile: string;
+}): Record<string, unknown> {
+  const proposalPath = path.resolve(input.cwd, input.proposalFile);
+  let proposal: ReturnType<typeof readBrokerProposalFile>;
+  try {
+    proposal = readBrokerProposalFile(proposalPath);
+  } catch (error) {
+    throw new CliError('ATM_TEAM_BROKER_PROPOSAL_INVALID', `Team start could not read broker proposal: ${(error as Error).message}`, { exitCode: 1 });
+  }
+  const validation = validateBrokerProposal(proposal, { cwd: input.cwd });
+  const allowed = new Set(deriveWritePaths(input.task, input.cwd));
+  const hashOnlyMismatch = validation.issues.length === 1
+    && validation.issues[0]?.kind === 'file-hash-mismatch'
+    && String(validation.currentFileHash ?? '').replace(/^sha256:/, '') === String(proposal.fileBeforeHash ?? '').replace(/^sha256:/, '');
+  if ((!validation.ok && !hashOnlyMismatch) || proposal.taskId !== input.taskId || proposal.actorId !== input.actorId || !allowed.has(proposal.targetFile.replace(/\\/g, '/'))) {
+    throw new CliError('ATM_TEAM_BROKER_PROPOSAL_INVALID', 'Team start requires a current validated proposal owned by its task/actor and target write scope.', {
+      exitCode: 1,
+      details: { proposalFile: input.proposalFile, proposalId: proposal.proposalId, issues: validation.issues }
+    });
+  }
+  return {
+    ...input.task,
+    proposalAdmission: {
+      trigger: 'hot-file',
+      summarySubmitted: true,
+      hotFiles: [proposal.targetFile.replace(/\\/g, '/')],
+      notes: `Validated broker proposal ${proposal.proposalId} consumed by team start.`
     }
   };
 }
@@ -5051,6 +5099,10 @@ export function buildTeamPatrolReport(input: {
     }));
   }
 
+  if (teamRun?.teamRunId) {
+    findings.push(...buildTeamHandoffPatrolFindings(input.cwd, input.taskId, String(teamRun.teamRunId), input.mode));
+  }
+
   const severity = summarizePatrolSeverity(findings);
   return {
     schemaId: 'atm.teamPatrolReport.v1',
@@ -5080,6 +5132,62 @@ export function buildTeamPatrolReport(input: {
       historyRoot: '.atm/history'
     }
   };
+}
+
+function buildTeamHandoffPatrolFindings(cwd: string, taskId: string, teamRunId: string, mode: TeamPatrolMode): TeamPatrolFinding[] {
+  const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+  if (!existsSync(directory)) return [];
+  const findings: TeamPatrolFinding[] = [];
+  const integrity = verifyTeamHandoffLedger(cwd, taskId, teamRunId);
+  if (!integrity.ok) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_INTEGRITY_BLOCKED', category: 'artifact-gap',
+      summary: `Handoff ledger integrity is blocked: ${integrity.reason ?? 'unknown reason'}.`,
+      suggestedCommand: `node atm.mjs team handoff show --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, reason: integrity.reason, canonicalReason: 'handoff-integrity-blocked' }
+    }));
+    return findings;
+  }
+  const indexPath = path.join(directory, 'index.md');
+  const index = existsSync(indexPath) ? readFileSync(indexPath, 'utf8') : '';
+  const expected = renderCanonicalTeamHandoffIndex(integrity.manifest, directory);
+  if (!index || index !== expected) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_NARRATIVE_DRIFT', category: 'artifact-gap',
+      summary: 'Handoff Markdown is not the deterministic JSON-whitelist projection.',
+      suggestedCommand: `node atm.mjs team handoff show --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, canonicalReason: 'handoff-integrity-blocked' }
+    }));
+  }
+  if (/\uFFFD/.test(index) || Buffer.from(index, 'utf8').toString('utf8') !== index) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_ENCODING_INVALID', category: 'artifact-gap',
+      summary: 'Handoff Markdown is not valid stable UTF-8 text.',
+      suggestedCommand: `node atm.mjs team handoff show --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, canonicalReason: 'handoff-integrity-blocked' }
+    }));
+  }
+  const bytes = integrity.manifest.artifacts.reduce((total, entry) => total + readFileSync(path.join(directory, entry.file)).byteLength, 0);
+  if (integrity.manifest.transitionCount >= 64 || bytes >= 512 * 1024) {
+    findings.push(teamPatrolFinding({
+      level: 'blocker', code: 'ATM_TEAM_PATROL_HANDOFF_HARD_LIMIT', category: 'runtime-mode',
+      summary: 'Handoff retention hard limit requires Captain sign-off before another transition.',
+      suggestedCommand: `node atm.mjs team handoff stats --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, transitionCount: integrity.manifest.transitionCount, bytes, decisionClass: 'human-signoff-required' }
+    }));
+  } else if (integrity.manifest.transitionCount >= 48 || bytes >= 384 * 1024) {
+    findings.push(teamPatrolFinding({
+      level: mode === 'close-preflight' ? 'warning' : 'info', code: 'ATM_TEAM_PATROL_HANDOFF_SOFT_LIMIT', category: 'runtime-mode',
+      summary: 'Handoff retention soft limit reached; Captain should prepare to split or archive the run.',
+      suggestedCommand: `node atm.mjs team handoff stats --task ${quoteCliValue(taskId)} --team ${quoteCliValue(teamRunId)} --json`,
+      details: { teamRunId, transitionCount: integrity.manifest.transitionCount, bytes }
+    }));
+  }
+  return findings;
+}
+
+function renderCanonicalTeamHandoffIndex(manifest: Parameters<typeof renderTeamHandoffIndex>[0], directory: string) {
+  return renderTeamHandoffIndex(manifest, readTeamHandoffArtifacts(directory, manifest));
 }
 
 function listTeamRuns(cwd: string) {

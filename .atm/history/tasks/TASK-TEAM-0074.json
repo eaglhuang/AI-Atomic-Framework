@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0074",
+  "title": "Cross-vendor Team Markdown Handoff patrol, documentation, and three-vendor dogfood",
+  "status": "running",
+  "milestone": "Cross-Vendor Team Markdown Handoff",
+  "dependencies": [
+    "TASK-TEAM-0073"
+  ],
+  "acceptance": [
+    "close-preflight and daily-noon Patrol detect handoff chain, frontmatter, encoding, retention, archive, and narrative-whitelist drift.",
+    "Documentation states that adopter repos retain handoff history while the ATM framework distributes only contracts and tooling.",
+    "Deterministic tests prove narrative whitelist enforcement and terminal-run archive promotion.",
+    "Paid dogfood records redacted three-vendor sequential handoff and one aborted run archive without exposing credentials or full provider responses.",
+    "`ATM-BUG-2026-07-11-111` is updated with final task/evidence references."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "docs/governance/team-agents/cross-vendor-handoff-ledger.md",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+    "docs/governance/team-agents/role-skill-pack-contract.md",
+    "docs/governance/permission-hard-gate-matrix.md",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/command-specs/team.spec.ts",
+    "scripts/validate-team-agents.ts",
+    "docs/governance/team-agents/cross-vendor-handoff-ledger.md",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+    "docs/governance/team-agents/role-skill-pack-contract.md",
+    "docs/governance/permission-hard-gate-matrix.md",
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts --case team-handoff-narrative-whitelist",
+    "node --strip-types scripts/validate-team-agents.ts --case team-handoff-aborted-promotion",
+    "npm run validate:team-agents",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Live paid API calls in CI",
+    "Closing TASK-TEAM-0072 or TASK-TEAM-0073 without their command-backed evidence"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert patrol, documentation, validator, and dogfood evidence changes with the handoff feature if acceptance fails.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "scripts/validate-team-agents.ts",
+        "docs/governance/team-agents/cross-vendor-handoff-ledger.md",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+        "docs/governance/team-agents/role-skill-pack-contract.md",
+        "docs/governance/permission-hard-gate-matrix.md",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0074-cross-vendor-team-markdown-handoff-assurance.task.md",
+    "sectionTitle": "TASK-TEAM-0074",
+    "headingLine": 56,
+    "hash": "48b053d5148e8e3e"
+  },
+  "importedAt": "2026-07-11T15:28:13.869Z",
+  "lastTransitionId": "2026-07-11T16-09-54-427Z-scope-amendment-649432400f5d",
+  "lastTransitionAt": "2026-07-11T16:09:54.427Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Terra",
+  "reservedAt": "2026-07-11T16:02:24.489Z",
+  "promotedAt": "2026-07-11T16:02:24.491Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Terra",
+    "leaseId": "lease-ab9822403e16",
+    "claimedAt": "2026-07-11T16:02:24.494Z",
+    "heartbeatAt": "2026-07-11T16:02:24.494Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-TEAM-0074.*",
+      ".atm/history/task-events/TASK-TEAM-0074/**",
+      ".atm/history/tasks/TASK-TEAM-0074.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/permission-hard-gate-matrix.md",
+      "docs/governance/team-agents/cross-vendor-handoff-ledger.md",
+      "docs/governance/team-agents/role-skill-pack-contract.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "release/**",
+      "scripts/validate-team-agents.ts",
+      "tmp/TASK-TEAM-0074-dogfood-proposal.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-11T16:02:24.494Z",
+  "startedByActor": "Codex-GPT5.6 Terra",
+  "startedBySessionId": "session-20260711160224-Codex-GPT5.6-Terra-TASK-TEAM-0074-04f22bc5d5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0074",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0074.*",
+      ".atm/history/task-events/TASK-TEAM-0074/**",
+      ".atm/history/tasks/TASK-TEAM-0074.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/permission-hard-gate-matrix.md",
+      "docs/governance/team-agents/cross-vendor-handoff-ledger.md",
+      "docs/governance/team-agents/role-skill-pack-contract.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "release/**",
+      "scripts/validate-team-agents.ts",
+      "tmp/TASK-TEAM-0074-dogfood-proposal.json"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0074-cross-vendor-team-markdown-handoff-assurance.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/team-agents/",
+      "docs/ai_atomic_framework/team-agents/tasks/",
+      "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0074-cross-vendor-team-markdown-handoff-assurance.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "33c028142ecf62858a71c4a583e1180f17c7ad1a8d18bf7cbe2db920a9611e94",
+    "actorId": "Codex-GPT5.6 Terra",
+    "createdAt": "2026-07-11T16:02:25.002Z",
+    "status": "active"
+  }
+}

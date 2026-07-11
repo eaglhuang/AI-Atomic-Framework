@@ -6,7 +6,7 @@ export const teamSpecCommandSurface = {
     positional: [
         {
             name: 'action',
-            summary: 'Team action. Supports: plan, start, status, validate, patrol, lease, release, complete, abandon, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
+            summary: 'Team action. Supports: plan, start, status, validate, patrol, lease, release, complete, abandon, handoff show|context|stats, wave, knowledge. Plan and start evaluate broker lanes plus task claim dependency gates, and fail closed before a run starts.'
         }
     ],
     options: [
@@ -25,6 +25,7 @@ export const teamSpecCommandSurface = {
         { flag: '--disable-editor-bridge', summary: 'Disable the editor-subagent bridge contract for this run while preserving Team governance semantics.' },
         { flag: '--execute', summary: 'Execute governed provider orchestration for selected Team roles after runtime state is written. Defaults off.' },
         { flag: '--team', value: 'id', summary: 'Team run id for status or patrol.' },
+        { flag: '--broker-proposal-file', value: 'path', summary: 'Validated broker proposal consumed by a matching hot Team start; mismatched, stale, or out-of-scope proposals fail closed.' },
         { flag: '--permission', value: 'id', summary: 'Permission id for team lease or release.' },
         { flag: '--paths', value: 'csv', summary: 'Comma-separated lease paths for team lease.' },
         { flag: '--reason', value: 'text', summary: 'Reason recorded for team lease, release, complete, or abandon.' },
