@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T16-17-35-898Z-close-2a643dbb5de9",
+  "taskId": "TASK-TEAM-0074",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260711160224-Codex-GPT5.6-Terra-TASK-TEAM-0074-04f22bc5d5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0074.json",
+  "taskSha256": "sha256:1a5bfe5c4df20ea01042072b21187443d84cdcf147e5ef9aaf47b1817ad68daf",
+  "createdAt": "2026-07-11T16:17:35.898Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0074 --actor \"Codex-GPT5.6 Terra\" --status done --historical-delivery 1c2fdf96ef17bf377bbfc819a034ba636c913a39",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711160224-Codex-GPT5.6-Terra-TASK-TEAM-0074-04f22bc5d5",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0074.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T16:17:35.892Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0074.*",
+        ".atm/history/task-events/TASK-TEAM-0074/**",
+        ".atm/history/tasks/TASK-TEAM-0074.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/permission-hard-gate-matrix.md",
+        "docs/governance/team-agents/cross-vendor-handoff-ledger.md",
+        "docs/governance/team-agents/role-skill-pack-contract.md",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "release/**",
+        "scripts/validate-team-agents.ts",
+        "tmp/TASK-TEAM-0074-dogfood-proposal.json"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
