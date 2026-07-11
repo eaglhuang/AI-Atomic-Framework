@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T17-25-59-405Z-close-c76d8c6f011f",
+  "taskId": "TASK-AAO-0157",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260711172050-codex-backlog-captain-TASK-AAO-0157-7c538a8549",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0157.json",
+  "taskSha256": "sha256:59f190af302cba67bc09cfba8a7e0b98458f1f31ff2a5d777d29c110508035e7",
+  "createdAt": "2026-07-11T17:25:59.405Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0157 --actor codex-backlog-captain --status done --historical-delivery 322b02cd28f86df2614e8eec1a246c0a935b1f2d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711172050-codex-backlog-captain-TASK-AAO-0157-7c538a8549",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0157.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-commands"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T17:25:59.397Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0157.*",
+        ".atm/history/protected-override-audit/2026-07-11T16-23-22-678Z-POA-85a9ab0d7c4f.json",
+        ".atm/history/protected-override-audit/2026-07-11T16-23-35-884Z-POA-7716723bf824.json",
+        ".atm/history/task-events/TASK-AAO-0157/**",
+        ".atm/history/tasks/TASK-AAO-0157.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

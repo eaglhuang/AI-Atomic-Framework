@@ -1,0 +1,357 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0157",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7617d9d1a7d06cf80cf458cbf0064b7cc00087f5",
+  "governedTreeSha": "0603d48851ef318e8040f6be56878dcc911da8b7",
+  "targetCommitDelta": {
+    "currentCommitSha": "7617d9d1a7d06cf80cf458cbf0064b7cc00087f5",
+    "parentCommitShas": [
+      "7617d9d1a7d06cf80cf458cbf0064b7cc00087f5"
+    ],
+    "governedTreeSha": "0603d48851ef318e8040f6be56878dcc911da8b7",
+    "changedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/conflict-matrix.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:0994a07ea2daef242589caa5b1a424f7eb135651d05c7924b82b9a9fd3eff999",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-commands",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0198d67b654c6c29fa7cb81aabf19eea6d88162e3035b92851db89233f0faaa",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-commands"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-11T17:25:59.397Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0157.*",
+      ".atm/history/protected-override-audit/2026-07-11T16-23-22-678Z-POA-85a9ab0d7c4f.json",
+      ".atm/history/protected-override-audit/2026-07-11T16-23-35-884Z-POA-7716723bf824.json",
+      ".atm/history/task-events/TASK-AAO-0157/**",
+      ".atm/history/tasks/TASK-AAO-0157.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0157.json",
+  "closedAt": "2026-07-11T17:25:59.397Z",
+  "closedByActor": "codex-backlog-captain",
+  "sessionId": "session-20260711172050-codex-backlog-captain-TASK-AAO-0157-7c538a8549",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "322b02cd28f86df2614e8eec1a246c0a935b1f2d",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0157.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-21-38-221Z-import-fb7d393802ac.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-35-894Z-import-1dada0aa6f8d.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-42-538Z-reserve-59349f749465.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-42-541Z-promote-cfedd6e296de.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-42-836Z-claim-6a562645da3b.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-49-757Z-release-5577fecd4ff5.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-57-072Z-reserve-d257b83ee122.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-57-074Z-promote-d15a1426895b.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-23-57-364Z-claim-aceb72d8e6fe.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-37-54-465Z-renew-2c7cb1baffae.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-47-19-715Z-handoff-31b1e2cafb32.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-48-56-924Z-reserve-7cecdcc7e5af.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-48-56-926Z-promote-dea3857f2dea.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T16-48-57-266Z-claim-3aae77fe2a1c.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T17-20-39-873Z-repair-claim-2db79bfe81af.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T17-20-51-245Z-claim-14b1ba20662c.json",
+      ".atm/history/task-events/TASK-AAO-0157/2026-07-11T17-22-42-299Z-scope-amendment-a6b345f1ee00.json",
+      ".atm/history/tasks/TASK-AAO-0157.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-07-11T17:25:59.400Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-b55f3d248543.json"
+    },
+    "teamRunId": "team-b55f3d248543",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "TASK-AAO-0157",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamLevel": "L5",
+      "teamLevelSource": "manual",
+      "teamSize": "large",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "Manual team size override L5 selected by CLI/config.",
+      "confidence": "high",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "recipeId": "atm.default.normal.typescript"
+        },
+        "languageMatch": "typescript",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+        "confidence": "high",
+        "deterministicHints": {
+          "scopePaths": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/git-governance.ts",
+            "scripts/validate-governance-commands.ts"
+          ],
+          "deliverables": [
+            "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "packages/cli/src/commands/git-governance.ts",
+            "scripts/validate-governance-commands.ts"
+          ],
+          "fileExtensions": [
+            ".json",
+            ".ts"
+          ],
+          "pathHints": [
+            "typescript-file",
+            "typescript-heavy"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": true,
+      "escalationReason": "Scope spans 3 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Closure, evidence, or git signals are present and should be tracked by a lieutenant boundary. Validator fan-out is 9, which merits lieutenant tracking.",
+      "needLieutenant": true,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": true,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "medium",
+        "coordinationBoundary": "captain+lieutenant",
+        "signals": {
+          "scopeCount": 3,
+          "crossRepoScope": true,
+          "validatorCount": 9,
+          "largeScriptRisk": false,
+          "closureSignals": true,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "low",
+          "threshold": 3,
+          "reasons": []
+        },
+        "mapUpdateNeed": true,
+        "escalationRequired": true,
+        "needLieutenant": true,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "Manual team size override L5 selected by CLI/config.",
+      "implementationSummary": "broker-only selected; no agents are spawned, language=node, atm.node.broker, selection=repo-default role=coordinator; closure remains governed by command-backed evidence.",
+      "validators": [
+        "npm run typecheck",
+        "node --strip-types scripts/validate-governance-commands.ts",
+        "git diff --check"
+      ],
+      "evidence": [],
+      "brokerGovernance": {
+        "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+        "brokerSubagentEnabled": true,
+        "brokerDecisionSurface": "brokerLane",
+        "brokerStewardId": "neutral-write-steward",
+        "brokerGoverns": [
+          "write-intents",
+          "scope-conflicts",
+          "steward-apply",
+          "commit-lane"
+        ],
+        "brokerEvidenceRequired": [
+          "atm.teamBrokerLaneEvidence.v1",
+          "atm.stewardApplyEvidence.v1",
+          "atm.brokerOperationRunRecordEnvelope.v1"
+        ],
+        "commitLaneSerializedBy": "branch-commit-queue",
+        "commitLaneOwnerRole": "coordinator",
+        "workerGitWrite": false,
+        "workerTaskLifecycle": false,
+        "workerSelfClose": false
+      },
+      "risk": "medium",
+      "closeReady": true
+    }
+  }
+}

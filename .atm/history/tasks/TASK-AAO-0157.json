@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0157",
   "title": "Framework auto-stage must honor claim globs and include dirty release mirrors",
-  "status": "running",
+  "status": "done",
   "milestone": "Backlog-P0",
   "dependencies": [],
   "acceptance": [
@@ -78,8 +78,8 @@
     "hash": "10b6393e0c67d96b"
   },
   "importedAt": "2026-07-11T16:23:35.888Z",
-  "lastTransitionId": "2026-07-11T17-22-42-299Z-scope-amendment-a6b345f1ee00",
-  "lastTransitionAt": "2026-07-11T17:22:42.299Z",
+  "lastTransitionId": "2026-07-11T17-25-59-405Z-close-c76d8c6f011f",
+  "lastTransitionAt": "2026-07-11T17:25:59.405Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-07-11T16:48:56.924Z",
   "promotedAt": "2026-07-11T16:48:56.926Z",
@@ -87,7 +87,7 @@
     "actorId": "codex-backlog-captain",
     "leaseId": "lease-07a1449995a3",
     "claimedAt": "2026-07-11T17:20:50.936Z",
-    "heartbeatAt": "2026-07-11T17:20:50.936Z",
+    "heartbeatAt": "2026-07-11T17:25:59.404Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-AAO-0157.*",
@@ -100,8 +100,8 @@
       "packages/cli/src/commands/git-governance.ts",
       "scripts/validate-governance-commands.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "Emergency closeback repair: use the governed delivery commit containing TASK-AAO-0157 scoped non-.atm deliverables after taskflow retained an obsolete evidence-only ref."
   },
   "startedAt": "2026-07-11T16:23:42.544Z",
   "startedByActor": "cursor-captain-backlog",
@@ -140,5 +140,10 @@
     "actorId": "codex-backlog-captain",
     "createdAt": "2026-07-11T17:20:51.247Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-11T17:25:59.404Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260711172050-codex-backlog-captain-TASK-AAO-0157-7c538a8549",
+  "closeReason": "Emergency closeback repair: use the governed delivery commit containing TASK-AAO-0157 scoped non-.atm deliverables after taskflow retained an obsolete evidence-only ref.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0157.closure-packet.json"
 }
