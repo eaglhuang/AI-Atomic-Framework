@@ -64,19 +64,24 @@ function extractRuntimeScopeFiles(taskDocument: Record<string, unknown>, cwd: st
 
 export function resolveTaskflowDeclaredFiles(cwd: string, taskId: string, taskDocument: Record<string, unknown>): readonly string[] {
   const planningScopedFiles = extractPlanningScopedFiles(taskDocument, cwd);
-  return normalizeTaskScopePaths(cwd, [
+  const declaredTargetFiles = normalizeTaskScopePaths(cwd, [
     ...extractTaskStringList(taskDocument, 'deliverables'),
     ...extractTaskStringList(taskDocument, 'scopePaths'),
-    ...extractTaskStringList(taskDocument, 'targetAllowedFiles'),
-    ...extractRuntimeScopeFiles(taskDocument, cwd, taskId)
-  ]).filter((entry) => !isPlanningScopedPath(cwd, entry, planningScopedFiles));
+    ...extractTaskStringList(taskDocument, 'targetAllowedFiles')
+  ]);
+  const runtimeTargetFiles = extractRuntimeScopeFiles(taskDocument, cwd, taskId)
+    .filter((entry) => !isPlanningScopedPath(cwd, entry, planningScopedFiles));
+  return normalizeTaskScopePaths(cwd, [...declaredTargetFiles, ...runtimeTargetFiles]);
 }
 
 export function resolveTaskflowEffectiveDeliverables(cwd: string, taskId: string, taskDocument: Record<string, unknown>): readonly string[] {
   const planningScopedFiles = extractPlanningScopedFiles(taskDocument, cwd);
-  return normalizeTaskScopePaths(cwd, [
+  const declaredTargetFiles = normalizeTaskScopePaths(cwd, [
     ...extractTaskStringList(taskDocument, 'deliverables'),
-    ...extractTaskStringList(taskDocument, 'targetAllowedFiles'),
-    ...extractRuntimeScopeFiles(taskDocument, cwd, taskId)
-  ]).filter((entry) => !entry.startsWith('.atm/') && !isPlanningScopedPath(cwd, entry, planningScopedFiles));
+    ...extractTaskStringList(taskDocument, 'targetAllowedFiles')
+  ]);
+  const runtimeTargetFiles = extractRuntimeScopeFiles(taskDocument, cwd, taskId)
+    .filter((entry) => !isPlanningScopedPath(cwd, entry, planningScopedFiles));
+  return normalizeTaskScopePaths(cwd, [...declaredTargetFiles, ...runtimeTargetFiles])
+    .filter((entry) => !entry.startsWith('.atm/'));
 }

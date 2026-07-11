@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-d668f2aa8536",
+  "recordedAt": "2026-07-11T02:11:37.655Z",
+  "actorId": "coordinator",
+  "taskId": null,
+  "surface": "tasks lock cleanup --all-stale",
+  "command": "node atm.mjs tasks lock cleanup --all-stale --actor coordinator --json",
+  "flags": [
+    "--all-stale"
+  ],
+  "permission": "backend.tasks.lockCleanupGlobal",
+  "leaseId": "EMG-GLOBAL-ebee74b1f4",
+  "reason": "Global stale lock cleanup.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.lockCleanupGlobal"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T02-11-37-652Z-EMG-GLOBAL-ebee74b1f4.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

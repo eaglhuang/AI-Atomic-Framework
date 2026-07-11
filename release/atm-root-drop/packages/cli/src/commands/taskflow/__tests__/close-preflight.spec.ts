@@ -21,6 +21,28 @@ assert.deepEqual(extractTaskflowDeclaredFiles(process.cwd(), 'TASK-PLAN-0001', t
   'src/app.ts'
 ]);
 
+const targetPlanningOverlapTask = {
+  workItemId: 'TASK-PLAN-0002',
+  closureAuthority: 'target_repo',
+  scopePaths: ['agent-integrations/vendors/team-secrets.example.json'],
+  deliverables: ['agent-integrations/vendors/team-secrets.example.json'],
+  targetAllowedFiles: ['agent-integrations/vendors/team-secrets.example.json'],
+  planningReadOnlyPaths: ['agent-integrations/vendors/team-secrets.example.json'],
+  taskDirectionLock: {
+    allowedFiles: ['agent-integrations/vendors/team-secrets.example.json'],
+    planningReadOnlyPaths: ['agent-integrations/vendors/team-secrets.example.json']
+  },
+  source: {
+    planPath: 'C:/repo/planning/docs/tasks/TASK-PLAN-0002.task.md'
+  }
+};
+
+assert.deepEqual(
+  extractTaskflowDeclaredFiles(process.cwd(), 'TASK-PLAN-0002', targetPlanningOverlapTask),
+  ['agent-integrations/vendors/team-secrets.example.json'],
+  'explicit targetAllowedFiles/deliverables must take precedence over planningReadOnly overlap'
+);
+
 const gate = inspectPlanningAuthorityDelivery({
   cwd: process.cwd(),
   taskDocument,
