@@ -845,6 +845,9 @@ async function main() {
       },
       emittedAt: '2026-07-10T00:00:00.000Z'
     });
+    const openaiMetadata = httpCalls[0]?.body?.metadata;
+    assert.equal(openaiMetadata?.scopedPathCount, '1');
+    assert.ok(Object.values(openaiMetadata ?? {}).every((value) => typeof value === 'string'));
     for (const run of [openaiRun, azureRun]) {
       assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
       assert.equal(run.ok, true);
