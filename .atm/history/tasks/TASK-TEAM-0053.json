@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0053",
+  "title": "Gemini direct API bridge for Team provider matrix",
+  "status": "done",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0050",
+    "TASK-TEAM-0051",
+    "TASK-TEAM-0052"
+  ],
+  "acceptance": [
+    "`TEAM_PROVIDER_IDS`, provider metadata, selection config, Team runtime summaries, and integration capability discovery can distinguish the Gemini direct API bridge from the existing Gemini CLI bridge.",
+    "`agent-integrations/vendors/team-secrets.example.json` documents the `GEMINI_API_KEY` slot for the direct bridge while keeping placeholder values empty.",
+    "`team-vendor-runtime.md` documents both Gemini surfaces:",
+    "Gemini CLI / editor-subagent bridge from TASK-TEAM-0043;",
+    "Gemini direct API bridge from this task.",
+    "`validateGeminiDirectTeamProviderConfig` rejects missing `modelId` or `apiKeyEnvVar`.",
+    "`launchGeminiDirectTeamProviderRun` produces the shared provider artifact, permission decision, observability events, and redaction summary with `rawSecretsLogged: false`.",
+    "The validator case `gemini-direct-api-bridge` uses a deterministic fake HTTP executor and proves request shape, secret reference usage, artifact output, and redaction without calling a live paid API.",
+    "The heterogeneous multi-bot proof can include OpenAI direct API, Anthropic direct API, and Gemini direct API in the same matrix without relying on the Gemini CLI bridge.",
+    "`atm doctor` / integration verification can list the Gemini direct backend or capability surface when provider discovery is requested."
+  ],
+  "deliverables": [
+    "agent-integrations/vendors/team-secrets.example.json",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "packages/core/src/team-runtime/provider-contract.ts",
+    "packages/core/src/team-runtime/provider-selection.ts",
+    "packages/core/src/team-runtime/providers/gemini-direct.ts",
+    "packages/cli/src/commands/integration.ts",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts"
+  ],
+  "scopePaths": [
+    "agent-integrations/vendors/team-secrets.example.json",
+    "docs/governance/team-agents/team-vendor-runtime.md",
+    "packages/core/src/team-runtime/provider-contract.ts",
+    "packages/core/src/team-runtime/provider-selection.ts",
+    "packages/core/src/team-runtime/providers/gemini-direct.ts",
+    "packages/cli/src/commands/integration.ts",
+    "packages/cli/src/commands/team.ts",
+    "scripts/validate-team-agents.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts --case gemini-direct-api-bridge",
+    "node --strip-types scripts/validate-team-agents.ts --case team-vendor-local-secrets",
+    "node --strip-types scripts/validate-team-agents.ts --case heterogeneous-multi-bot-team-run",
+    "npm run validate:team-agents",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing the existing gemini CLI/editor-subagent bridge semantics from TASK-TEAM-0043",
+    "Committing local GEMINI_API_KEY or any raw provider secret",
+    "Live paid API calls in CI",
+    "Azure OpenAI or Microsoft Foundry credential work"
+  ],
+  "nonGoals": [
+    "Do not make Gemini direct API the default provider for all roles",
+    "Do not grant spawned Gemini workers git.write, task.lifecycle, final evidence.write, or self-close authority"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert Gemini direct provider, provider registry/selection wiring, validator case, docs, and example secret reference together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "agent-integrations/vendors/team-secrets.example.json",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0053-gemini-direct-api-bridge.task.md",
+    "sectionTitle": "TASK-TEAM-0053",
+    "headingLine": 61,
+    "hash": "0224993cb5035c65"
+  },
+  "importedAt": "2026-07-11T01:50:33.631Z",
+  "lastTransitionId": "2026-07-11T02-43-30-305Z-close-ae185b91cbef",
+  "lastTransitionAt": "2026-07-11T02:43:30.305Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "coordinator",
+  "reservedAt": "2026-07-11T02:33:26.009Z",
+  "promotedAt": "2026-07-11T02:33:26.012Z",
+  "claim": {
+    "actorId": "coordinator",
+    "leaseId": "lease-a87b77e2ad1b",
+    "claimedAt": "2026-07-11T02:33:26.015Z",
+    "heartbeatAt": "2026-07-11T02:43:30.303Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0053.json",
+      ".atm/history/evidence/TASK-TEAM-0053.*",
+      ".atm/history/task-events/TASK-TEAM-0053/**",
+      "agent-integrations/vendors/team-secrets.example.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/integration.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "packages/core/src/team-runtime/providers/gemini-direct.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "Historical delivery 38fdb423 is a shared Gemini direct provider/runtime closeback commit; TASK-TEAM-0053 scoped deliverables are matched and unrelated release/root-drop files belong to the broader framework release mirror."
+  },
+  "startedAt": "2026-07-11T02:32:15.616Z",
+  "startedByActor": "coordinator",
+  "startedBySessionId": "session-20260711023326-coordinator-TASK-TEAM-0053-503781d01f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0053",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0053.*",
+      ".atm/history/task-events/TASK-TEAM-0053/**",
+      ".atm/history/tasks/TASK-TEAM-0053.json",
+      "agent-integrations/vendors/team-secrets.example.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "packages/cli/src/commands/integration.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "packages/core/src/team-runtime/providers/gemini-direct.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "67dfa2b8788bbf460331ecbcf511661f73678bc0978112dd30ad576b34da6754",
+    "actorId": "coordinator",
+    "createdAt": "2026-07-11T02:33:27.052Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-11T02:43:30.303Z",
+  "closedByActor": "coordinator",
+  "closedBySessionId": "session-20260711023326-coordinator-TASK-TEAM-0053-503781d01f",
+  "closeReason": "Historical delivery 38fdb423 is a shared Gemini direct provider/runtime closeback commit; TASK-TEAM-0053 scoped deliverables are matched and unrelated release/root-drop files belong to the broader framework release mirror.",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0053.closure-packet.json"
+}

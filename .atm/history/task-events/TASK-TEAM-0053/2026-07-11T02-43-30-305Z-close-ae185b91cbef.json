@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T02-43-30-305Z-close-ae185b91cbef",
+  "taskId": "TASK-TEAM-0053",
+  "action": "close",
+  "actorId": "coordinator",
+  "sessionId": "session-20260711023326-coordinator-TASK-TEAM-0053-503781d01f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0053.json",
+  "taskSha256": "sha256:79579a6159a6d2cb245630005d316c874a1d67ea07dc0193ce5727d0cf41770b",
+  "createdAt": "2026-07-11T02:43:30.305Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0053 --actor coordinator --status done --historical-delivery 38fdb423",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711023326-coordinator-TASK-TEAM-0053-503781d01f",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0053.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T02:43:30.300Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0053.*",
+        ".atm/history/task-events/TASK-TEAM-0053/**",
+        ".atm/history/tasks/TASK-TEAM-0053.json",
+        "agent-integrations/vendors/team-secrets.example.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
