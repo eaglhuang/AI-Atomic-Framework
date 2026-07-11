@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T12-26-59-365Z-close-4cf6010512e1",
+  "taskId": "TASK-TEAM-0069",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Sol",
+  "sessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0069.json",
+  "taskSha256": "sha256:4f7d7b37e2c0ce146510bf8f3081cfb2ba1260ba44f0df53b4a4dadaaf767ca6",
+  "createdAt": "2026-07-11T12:26:59.365Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0069 --actor \"Codex-GPT5.6 Sol\" --status done --historical-delivery d67fa47d8a1627ec642fd0d829e8f2a174caae14",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0069.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T12:26:59.354Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0069.*",
+        ".atm/history/task-events/TASK-TEAM-0069/**",
+        ".atm/history/tasks/TASK-TEAM-0069.json",
+        "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

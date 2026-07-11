@@ -1,0 +1,259 @@
+{
+  "taskId": "TASK-TEAM-0069",
+  "updatedAt": "2026-07-11T12:26:27.813Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Sol",
+      "sessionId": "session-20260711121122-Codex-GPT5.6-Sol-TASK-TEAM-0069-4dc672977a",
+      "createdAt": "2026-07-11T12:12:13.525Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Sol",
+        "sessionId": "session-20260711121122-Codex-GPT5.6-Sol-TASK-TEAM-0069-4dc672977a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-lock-cleanup",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "43f59df711b6e9251735ce28c31363654d9f1f48",
+            "cacheKey": "sha256:502558efdff9397fffabd9587812195d48484b41892dc0dd2f9fa7b892a168fe",
+            "cached": false,
+            "generatedAt": "2026-07-11T12:12:13.574Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:66792aeae6e61f17f05cc162b80601d76951fbbcb227834e034f07cbb25fec1b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Sol",
+      "sessionId": "session-20260711121122-Codex-GPT5.6-Sol-TASK-TEAM-0069-4dc672977a",
+      "createdAt": "2026-07-11T12:12:16.260Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Sol",
+        "sessionId": "session-20260711121122-Codex-GPT5.6-Sol-TASK-TEAM-0069-4dc672977a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-lock-cleanup",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:62058fc601616706fa20c713d06393cc4b8d4278e0c76fa6e1748b62d4e2e075",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "43f59df711b6e9251735ce28c31363654d9f1f48",
+            "cacheKey": "sha256:227be48a6f5d1bfdf0c0c9d557af95424123599c8b9b16510a375fbd50fd11e4",
+            "cached": false,
+            "generatedAt": "2026-07-11T12:12:16.310Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:055dd87e80c67dd85a58ae6b60f4290faf248609ec770bf82df45764304af8b4",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Sol",
+      "sessionId": "session-20260711121122-Codex-GPT5.6-Sol-TASK-TEAM-0069-4dc672977a",
+      "createdAt": "2026-07-11T12:12:21.581Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Sol",
+        "sessionId": "session-20260711121122-Codex-GPT5.6-Sol-TASK-TEAM-0069-4dc672977a",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-lock-cleanup",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "43f59df711b6e9251735ce28c31363654d9f1f48",
+            "cacheKey": "sha256:de5a5849010565a7e971783e3223c03099081da7e53ff1ab4cbd2bcccc0b2af1",
+            "cached": false,
+            "generatedAt": "2026-07-11T12:12:21.651Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:16f6586cce94780b5efde1957328eb4ffbb90dad5231eef77b4e03d52edb0b7f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Sol",
+      "sessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+      "createdAt": "2026-07-11T12:25:40.342Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Sol",
+        "sessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-lock-cleanup",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-11T12:25:40.416Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0a79b9765a88c3629a11cc14aa6ac5fd35e335e4ea2269c79bfaf06eec54e2f5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Sol",
+      "sessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+      "createdAt": "2026-07-11T12:26:27.813Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Sol",
+        "sessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-lock-cleanup",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:5ef4c463e16041c02cd19699b0d75bce2abe40b4cbac9ec51fb45edd9bccd5b1",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:fe6fe200e17e1fe54b0956aad34367e35a16cca4d13c7d5dda9e3eeac416c8ad",
+            "cached": false,
+            "generatedAt": "2026-07-11T12:26:27.926Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ed15b3f9281792ceb28481c04e0dba894bf1d75029b56c191b03bedb1adfbd86",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

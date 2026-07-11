@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0069",
+  "title": "Release canonical direction lock during stale lock cleanup",
+  "status": "done",
+  "milestone": "M10X",
+  "dependencies": [
+    "TASK-TEAM-0067"
+  ],
+  "acceptance": [
+    "Stale lock cleanup releases the canonical task document direction lock as well as runtime lock and sidecar state.",
+    "The cleanup report names the canonical cleanup action.",
+    "Regression coverage proves a terminal released task no longer retains an active canonical direction lock after cleanup."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing emergency approval policy",
+    "Changing active lock admission"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert canonical direction-lock cleanup and its regression together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-lock-cleanup",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0069-lock-cleanup-canonical-direction-lock.task.md",
+    "sectionTitle": "TASK-TEAM-0069",
+    "headingLine": 36,
+    "hash": "23f8de83b38c1da3"
+  },
+  "importedAt": "2026-07-11T12:11:14.227Z",
+  "lastTransitionId": "2026-07-11T12-26-59-365Z-close-4cf6010512e1",
+  "lastTransitionAt": "2026-07-11T12:26:59.365Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Sol",
+  "reservedAt": "2026-07-11T12:21:49.946Z",
+  "promotedAt": "2026-07-11T12:21:49.949Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Sol",
+    "leaseId": "lease-a82a2fa90e36",
+    "claimedAt": "2026-07-11T12:21:49.952Z",
+    "heartbeatAt": "2026-07-11T12:26:59.363Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0069.json",
+      ".atm/history/evidence/TASK-TEAM-0069.*",
+      ".atm/history/task-events/TASK-TEAM-0069/**",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-11T12:11:22.014Z",
+  "startedByActor": "Codex-GPT5.6 Sol",
+  "startedBySessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0069",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0069.*",
+      ".atm/history/task-events/TASK-TEAM-0069/**",
+      ".atm/history/tasks/TASK-TEAM-0069.json",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "04acaec8b1d2c68a728779830a964ef99bdf42398d2265d975829ef91f11eca6",
+    "actorId": "Codex-GPT5.6 Sol",
+    "createdAt": "2026-07-11T12:21:50.318Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-11T12:26:59.363Z",
+  "closedByActor": "Codex-GPT5.6 Sol",
+  "closedBySessionId": "session-20260711122149-Codex-GPT5.6-Sol-TASK-TEAM-0069-87d060d5d0",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0069.closure-packet.json"
+}
