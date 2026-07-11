@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { computeDecisionSnapshotHash } from '../packages/plugin-human-review/src/index.ts';
@@ -36,6 +36,26 @@ for (const key of ['AGENT_IDENTITY', 'ATM_EDITOR_ID', 'CODEX_HOME']) {
 for (const key of ['GIT_INDEX_FILE', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_PREFIX', 'GIT_COMMON_DIR', 'GIT_NAMESPACE']) {
   delete process.env[key];
 }
+
+const validateStartedAt = Date.now();
+let currentProgressPhase = 'initializing fixtures';
+
+function formatDuration(durationMs: number) {
+  const totalSeconds = Math.max(0, Math.round(durationMs / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `${minutes}m${seconds.toString().padStart(2, '0')}s` : `${seconds}s`;
+}
+
+function logProgress(phase: string) {
+  currentProgressPhase = phase;
+  console.error(`[cli:${mode}] phase: ${phase} (${formatDuration(Date.now() - validateStartedAt)} elapsed)`);
+}
+
+const progressHeartbeat = setInterval(() => {
+  console.error(`[cli:${mode}] still running: ${currentProgressPhase} (${formatDuration(Date.now() - validateStartedAt)} elapsed)`);
+}, 30000);
+progressHeartbeat.unref();
 
 const fixture = readJson('tests/cli-fixtures/cli-mvp.fixture.json');
 const helpCommandSnapshot = readJson('tests/cli-fixtures/help-snapshots/command-list.json');
@@ -171,6 +191,75 @@ async function runAtmSpawned(args: any, cwd = root, env: Record<string, string> 
     stderr: result.stderr,
     parsed
   };
+}
+
+type NodeScriptTestSpec = {
+  name: string;
+  scriptPath: string;
+};
+
+type NodeScriptTestResult = {
+  name: string;
+  status: number | null;
+  stdout: string;
+  stderr: string;
+  durationMs: number;
+  errorMessage: string | null;
+};
+
+async function runNodeScriptTest(spec: NodeScriptTestSpec): Promise<NodeScriptTestResult> {
+  const startedAt = Date.now();
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, ['--strip-types', spec.scriptPath], {
+      cwd: root,
+      env: process.env,
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout?.on('data', (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr?.on('data', (chunk) => {
+      stderr += String(chunk);
+    });
+    child.on('error', (error) => {
+      resolve({
+        name: spec.name,
+        status: null,
+        stdout,
+        stderr,
+        durationMs: Date.now() - startedAt,
+        errorMessage: error.message
+      });
+    });
+    child.on('close', (status) => {
+      resolve({
+        name: spec.name,
+        status,
+        stdout,
+        stderr,
+        durationMs: Date.now() - startedAt,
+        errorMessage: null
+      });
+    });
+  });
+}
+
+async function runNodeScriptTestsInParallel(specs: NodeScriptTestSpec[]) {
+  const results = await Promise.all(specs.map((spec) => runNodeScriptTest(spec)));
+  const failed = results.filter((result) => result.status !== 0 || result.errorMessage);
+  if (failed.length > 0) {
+    for (const result of failed) {
+      const output = (result.stderr || result.stdout || result.errorMessage || '').trim();
+      fail(`${result.name} focused test failed after ${formatDuration(result.durationMs)}: ${output}`);
+    }
+    return;
+  }
+  const timings = results
+    .map((result) => `${result.name}=${formatDuration(result.durationMs)}`)
+    .join(', ');
+  console.error(`[cli:${mode}] parallel focused tests ok: ${timings}`);
 }
 
 async function runAtmFrozenSpawned(args: any, cwd = root, env: Record<string, string> = {}) {
@@ -309,6 +398,7 @@ for (const commandName of fixture.commands) {
   assert(cliIndex.includes(`commandName: '${commandName}'`), `index.ts missing command descriptor: ${commandName}`);
 }
 
+logProgress('bootstrap and command registry smoke');
 const packageManifest = readJson('package.json');
 if (childProcessSmokeEnabled) {
   const spawnedVersion = await runAtmSpawned(['--version'], root);
@@ -325,6 +415,7 @@ assert(version.parsed.command === 'version', '--version must report version comm
 assert(version.parsed.evidence?.frameworkVersion === packageManifest.version, '--version must report package.json version');
 assertMessageCode(version, 'ATM_CLI_VERSION');
 
+logProgress('global and per-command help snapshots');
 const globalHelp = await runAtm(['--help'], root);
 assert(globalHelp.exitCode === 0, '--help must exit 0');
 assertReadable(globalHelp, '--help');
@@ -373,6 +464,7 @@ assert(tasksUsageText.includes('runtime synchronization surface'), 'tasks --help
 assert(tasksHelp.parsed.evidence?.usage?.help?.deprecatedGuidance?.length > 0, 'tasks --help must expose deprecated guidance for legacy lifecycle surfaces');
 assert(tasksHelp.parsed.evidence?.usage?.help?.maintainerNotes?.length > 0, 'tasks --help must expose maintainer/backend guidance');
 
+logProgress('task lifecycle help surfaces');
 const taskflowHelp = await runAtm(['taskflow', '--help'], root);
 const taskflowUsageText = JSON.stringify(taskflowHelp.parsed.evidence?.usage ?? {});
 assert(taskflowUsageText.includes('Official operator lane'), 'taskflow --help must identify taskflow as the official operator lane');
@@ -394,93 +486,49 @@ assert(teamUsageText.includes('team knowledge build'), 'team --help examples mus
 assert(teamUsageText.includes('team knowledge query'), 'team --help examples must show team knowledge query usage');
 assert(teamUsageText.includes('--dry-run'), 'team --help must document advisory knowledge dry-run');
 
-const lifecycleStateTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(lifecycleStateTest.status === 0, `lifecycle-state focused test must pass: ${lifecycleStateTest.stderr || lifecycleStateTest.stdout}`);
-
-const historicalDeliveryTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(historicalDeliveryTest.status === 0, `historical-delivery focused test must pass: ${historicalDeliveryTest.stderr || historicalDeliveryTest.stdout}`);
-
-const emergencyGateTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'packages/cli/src/commands/emergency/__tests__/gate.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(emergencyGateTest.status === 0, `emergency gate focused test must pass: ${emergencyGateTest.stderr || emergencyGateTest.stdout}`);
-
-const scopeLockDiagnosticsTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(scopeLockDiagnosticsTest.status === 0, `scope-lock-diagnostics focused test must pass: ${scopeLockDiagnosticsTest.stderr || scopeLockDiagnosticsTest.stdout}`);
-
-// ATM-BUG-2026-07-07-047 (OPT-07): a failed `git commit --auto-stage` must roll
-// back the live-index provenance residue it staged for this attempt.
-const gitCommitFailureResidueRollbackTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'tests/cli/git-commit-failure-residue-rollback.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(gitCommitFailureResidueRollbackTest.status === 0, `git-commit-failure-residue-rollback focused test must pass: ${gitCommitFailureResidueRollbackTest.stderr || gitCommitFailureResidueRollbackTest.stdout}`);
-
-// ATM-BUG-2026-07-07-043: a closeout-only task claim must reject source
-// mutations during commit-bundle preflight, before auto-stage or pre-commit
-// hooks can turn the mistake into a slow recovery loop.
-const gitCommitCloseoutOnlyPreflightTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'tests/cli/git-commit-closeout-only-preflight.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(gitCommitCloseoutOnlyPreflightTest.status === 0, `git-commit-closeout-only-preflight focused test must pass: ${gitCommitCloseoutOnlyPreflightTest.stderr || gitCommitCloseoutOnlyPreflightTest.stdout}`);
-
-// ATM-BUG-2026-07-07-048 (OPT-08): `git commit` must bound a hung pre-commit
-// hook with --timeout-ms and expose a `commit-status` query for the last
-// governed commit attempt.
-const gitCommitTimeoutAndStatusTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'tests/cli/git-commit-timeout-and-status.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(gitCommitTimeoutAndStatusTest.status === 0, `git-commit-timeout-and-status focused test must pass: ${gitCommitTimeoutAndStatusTest.stderr || gitCommitTimeoutAndStatusTest.stdout}`);
-
-// ATM-BUG-2026-07-08-058: record-only .atm/history maintenance should have a
-// narrow official commit lane without borrowing a task-bound delivery session.
-const gitRecordCommitTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'tests/cli/git-record-commit.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(gitRecordCommitTest.status === 0, `git-record-commit focused test must pass: ${gitRecordCommitTest.stderr || gitRecordCommitTest.stdout}`);
-
-// ATM-BUG-2026-07-07-054 (OPT-11): `run-validators.ts` must expose a
-// read-only `--status` query, bound hung validators with
-// `--validator-timeout-ms`, and resume an interrupted run by only
-// re-executing outstanding validators.
-const validatorRunResumeAndStatusTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'tests/cli/validator-run-resume-and-status.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(validatorRunResumeAndStatusTest.status === 0, `validator-run-resume-and-status focused test must pass: ${validatorRunResumeAndStatusTest.stderr || validatorRunResumeAndStatusTest.stdout}`);
-
-// ATM-BUG-2026-07-07-052 (OPT-14): a this-task-owned protected-override-audit
-// event must survive the task-scoped commit bundle resolver and be staged
-// into the commit; a different task's pending audit event must be left
-// alone (neither deleted nor swept into an unrelated commit).
-const protectedOverrideAuditStagingTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'tests/cli/protected-override-audit-staging.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(protectedOverrideAuditStagingTest.status === 0, `protected-override-audit-staging focused test must pass: ${protectedOverrideAuditStagingTest.stderr || protectedOverrideAuditStagingTest.stdout}`);
+logProgress('focused regression subprocess tests');
+await runNodeScriptTestsInParallel([
+  {
+    name: 'lifecycle-state',
+    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts')
+  },
+  {
+    name: 'historical-delivery',
+    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts')
+  },
+  {
+    name: 'emergency-gate',
+    scriptPath: path.join(root, 'packages/cli/src/commands/emergency/__tests__/gate.test.ts')
+  },
+  {
+    name: 'scope-lock-diagnostics',
+    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts')
+  },
+  {
+    name: 'git-commit-failure-residue-rollback',
+    scriptPath: path.join(root, 'tests/cli/git-commit-failure-residue-rollback.test.ts')
+  },
+  {
+    name: 'git-commit-closeout-only-preflight',
+    scriptPath: path.join(root, 'tests/cli/git-commit-closeout-only-preflight.test.ts')
+  },
+  {
+    name: 'git-commit-timeout-and-status',
+    scriptPath: path.join(root, 'tests/cli/git-commit-timeout-and-status.test.ts')
+  },
+  {
+    name: 'git-record-commit',
+    scriptPath: path.join(root, 'tests/cli/git-record-commit.test.ts')
+  },
+  {
+    name: 'validator-run-resume-and-status',
+    scriptPath: path.join(root, 'tests/cli/validator-run-resume-and-status.test.ts')
+  },
+  {
+    name: 'protected-override-audit-staging',
+    scriptPath: path.join(root, 'tests/cli/protected-override-audit-staging.test.ts')
+  }
+]);
 
 // TASK-AAO-0156: --defer-foreign-staged must not evict another task's
 // staged .atm/history ownership from the shared index.
@@ -516,26 +564,20 @@ try {
   safeRmSync(protectedForeignStagedWorkspace);
 }
 
-const planningRootPreferenceTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(planningRootPreferenceTest.status === 0, `planning-root-preference focused test must pass: ${planningRootPreferenceTest.stderr || planningRootPreferenceTest.stdout}`);
-
-const planningRootCanonicalPreferenceValidator = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'scripts/validate-planning-root-canonical-preference.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(planningRootCanonicalPreferenceValidator.status === 0, `planning-root canonical preference validator must pass: ${planningRootCanonicalPreferenceValidator.stderr || planningRootCanonicalPreferenceValidator.stdout}`);
-
-const residueDiagnosticsTest = spawnSync(
-  process.execPath,
-  ['--strip-types', path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')],
-  { cwd: root, encoding: 'utf8' }
-);
-assert(residueDiagnosticsTest.status === 0, `residue-diagnostics focused test must pass: ${residueDiagnosticsTest.stderr || residueDiagnosticsTest.stdout}`);
+await runNodeScriptTestsInParallel([
+  {
+    name: 'planning-root-preference',
+    scriptPath: path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')
+  },
+  {
+    name: 'planning-root-canonical-preference',
+    scriptPath: path.join(root, 'scripts/validate-planning-root-canonical-preference.ts')
+  },
+  {
+    name: 'residue-diagnostics',
+    scriptPath: path.join(root, 'packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts')
+  }
+]);
 
 const nextHelp = await runAtm(['next', '--help'], root);
 const nextUsageText = JSON.stringify(nextHelp.parsed.evidence?.usage ?? {});
@@ -561,12 +603,14 @@ assert(rescueUsageText.includes('node atm.mjs rescue closure-packet'), 'rescue -
 assert(rescueUsageText.includes('--amend'), 'rescue --help must document explicit closure-packet amend opt-in');
 
 if (surfaceOnly) {
+  clearInterval(progressHeartbeat);
   if (!process.exitCode) {
-    console.log(`[cli:${mode}] ok surface (${publicCommandNames.length} public commands, ${internalCommandNames.length} internal commands, in-process help checks)`);
+    console.log(`[cli:${mode}] ok surface (${publicCommandNames.length} public commands, ${internalCommandNames.length} internal commands, in-process help checks, ${formatDuration(Date.now() - validateStartedAt)})`);
   }
   process.exit(process.exitCode ?? 0);
 }
 
+logProgress('full fixture workspace setup');
 const tempRoot = createCliTempWorkspace('atm-cli-');
 try {
   const emergencyPermissions = await runAtm(['emergency', 'permissions', '--json'], tempRoot);
@@ -1518,6 +1562,7 @@ try {
     return args;
   }
 
+  logProgress('evidence command quoting and auto-link fixtures');
   const testCases = [
     'npm run typecheck',
     'npm run validate:cli',
@@ -1977,6 +2022,7 @@ try {
     const finalizeDiagRes = await runAtm(['tasks', 'finalize', 'diagnose', '--task', 'TASK-REGRESS-IMPORT-DONE', '--json'], autoLinkTempWorkspace);
     assert(finalizeDiagRes.parsed.evidence.bucket === 'source-done-governance-incomplete', 'finalize diagnose must agree with residue bucket for import-done');
 
+    logProgress('historical delivery scope fixtures');
     // Test 5.2: historical-delivery scope and commit provenance hard gate (TASK-CID-0049)
     const declaredFiles = ['src/task-owned.ts', 'release/atm-onefile/atm.mjs'];
     const bucketsNoOverlap = categorizeHistoricalCommitFiles({
@@ -2068,6 +2114,7 @@ try {
     safeRmSync(autoLinkTempWorkspace);
   }
 
+  logProgress('task close gate fixtures');
   // Test 5.2: tasks close state machine and closure metadata hard gate regression check
   const closeGateWorkspace = createCliTempWorkspace('close-gate');
   initializeGitRepository(closeGateWorkspace);
@@ -2206,6 +2253,7 @@ try {
   safeRmSync(tempRoot);
 }
 
+clearInterval(progressHeartbeat);
 if (!process.exitCode) {
-  console.log(`[cli:${mode}] ok (${fixture.commands.length} commands, standalone fixture verified)`);
+  console.log(`[cli:${mode}] ok (${fixture.commands.length} commands, standalone fixture verified, ${formatDuration(Date.now() - validateStartedAt)})`);
 }
