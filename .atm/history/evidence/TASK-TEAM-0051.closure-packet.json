@@ -1,0 +1,196 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0051",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "80f31df28ad97bb772bdd73ed0abaae85e3054a7",
+  "governedTreeSha": "8adf3885fbacad2b440affdea986dd427205508c",
+  "targetCommitDelta": {
+    "currentCommitSha": "80f31df28ad97bb772bdd73ed0abaae85e3054a7",
+    "parentCommitShas": [
+      "80f31df28ad97bb772bdd73ed0abaae85e3054a7"
+    ],
+    "governedTreeSha": "8adf3885fbacad2b440affdea986dd427205508c",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0051.json",
+      ".atm/history/task-events/TASK-TEAM-0051/2026-07-11T01-58-58-613Z-import-4fb983ffe88a.json",
+      ".atm/history/task-events/TASK-TEAM-0051/2026-07-11T02-15-36-034Z-reserve-bf894955e7e2.json",
+      ".atm/history/task-events/TASK-TEAM-0051/2026-07-11T02-15-36-036Z-promote-b974ae0d4836.json",
+      ".atm/history/task-events/TASK-TEAM-0051/2026-07-11T02-15-36-804Z-claim-e03ca46fb378.json",
+      ".atm/history/tasks/TASK-TEAM-0051.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:team-agents",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:98a93eabbafa8011cf3a2f16b9622a6c9bc77a0aaea26aa38aed9bd0088cb273",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2364b403522c93b2da3bae86da7282b67c9a7cb4f2d69ad38ad10b69ac7ddb8a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-11T02:26:23.870Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0051.*",
+      ".atm/history/task-events/TASK-TEAM-0051/**",
+      ".atm/history/tasks/TASK-TEAM-0051.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "schemas/governance/team-provider-selection-config.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "schemas/governance/team-provider-selection-config.schema.json",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0051.json",
+  "closedAt": "2026-07-11T02:26:23.871Z",
+  "closedByActor": "coordinator",
+  "sessionId": "session-20260711021536-coordinator-TASK-TEAM-0051-a690db4f68",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "072cadf43f8ad07fc920674ba35024ff18de179b",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/team-runtime/provider-selection.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/team-plan-vocabulary-and-roster-drift.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "examples/team-agents-minimal/QUICK_START_WALK_THROUGH.md",
+      "examples/team-agents-minimal/README.md",
+      "examples/team-agents-minimal/agent-report.md",
+      "examples/team-agents-minimal/captain-decision.md",
+      "examples/team-agents-minimal/patrol-report.md",
+      "examples/team-agents-minimal/team-brief.md",
+      "examples/team-agents-minimal/team-memory-shard.md",
+      "examples/team-agents-minimal/team-summary.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/integration-hooks.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/team-knowledge.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/providers/anthropic.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/team-plan-vocabulary-and-roster-drift.md",
+      "docs/governance/team-agents/team-vendor-runtime.md",
+      "examples/team-agents-minimal/QUICK_START_WALK_THROUGH.md",
+      "examples/team-agents-minimal/README.md",
+      "examples/team-agents-minimal/agent-report.md",
+      "examples/team-agents-minimal/captain-decision.md",
+      "examples/team-agents-minimal/patrol-report.md",
+      "examples/team-agents-minimal/team-brief.md",
+      "examples/team-agents-minimal/team-memory-shard.md",
+      "examples/team-agents-minimal/team-summary.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/integration-hooks.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "packages/cli/src/commands/team-knowledge.ts",
+      "packages/cli/src/commands/team-runtime-gates.ts",
+      "packages/core/src/team-runtime/execution-orchestrator.ts",
+      "packages/core/src/team-runtime/permission-broker.ts",
+      "packages/core/src/team-runtime/provider-contract.ts",
+      "packages/core/src/team-runtime/providers/anthropic.ts"
+    ],
+    "waiverReason": "Historical delivery 072cadf4 is a shared Team Agents closeback commit; TASK-TEAM-0051 scoped deliverables are matched and unrelated files belong to sibling closeback tasks."
+  },
+  "teamSummary": null
+}

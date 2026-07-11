@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T02-26-23-876Z-close-26e3bc62461d",
+  "taskId": "TASK-TEAM-0051",
+  "action": "close",
+  "actorId": "coordinator",
+  "sessionId": "session-20260711021536-coordinator-TASK-TEAM-0051-a690db4f68",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0051.json",
+  "taskSha256": "sha256:0151e8957de7cb77c154c8f903d24ab6148f7d3e2d443964f75eacbccb120655",
+  "createdAt": "2026-07-11T02:26:23.876Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0051 --actor coordinator --status done --historical-delivery 072cadf4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711021536-coordinator-TASK-TEAM-0051-a690db4f68",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0051.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T02:26:23.870Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0051.*",
+        ".atm/history/task-events/TASK-TEAM-0051/**",
+        ".atm/history/tasks/TASK-TEAM-0051.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "schemas/governance/team-provider-selection-config.schema.json",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "schemas/governance/team-provider-selection-config.schema.json",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
