@@ -52,6 +52,35 @@ try {
     assert(noResidue.bucket === 'no-residue', 'done/done with provenance must classify as no-residue');
     assert(noResidue.nextCommand === 'node atm.mjs tasks status --task TASK-RES --json', 'no-residue command must materialize task id');
     assert(noResidue.autoMutationAllowed === false, 'residue diagnostics must never auto-mutate');
+    const sameRepoPlanningDone = buildResidueClassification({
+        cwd: repo,
+        taskId: 'TASK-RES',
+        taskDocument: taskDocument({
+            planningRepo: 'SameRepo',
+            targetRepo: 'SameRepo',
+            closureAuthority: 'planning_repo'
+        }),
+        liveLedger: {
+            status: 'done',
+            claimState: 'released',
+            lastTransitionId: 'planning-mirror-reconcile-1',
+            lastTransitionAt: '2026-07-11T00:00:00.000Z'
+        },
+        planningFrontmatter: {
+            status: 'done',
+            source: 'docs/tasks/TASK-RES.task.md'
+        },
+        lastTransitionEvent: {
+            action: 'planning-mirror-reconcile',
+            actorId: 'captain',
+            createdAt: '2026-07-11T00:00:00.000Z',
+            fromStatus: 'done',
+            toStatus: 'done'
+        },
+        divergence: []
+    });
+    assert(sameRepoPlanningDone.bucket === 'no-residue', 'ATM-BUG-2026-07-11-090: done/done same-repo planning authority must not stay planning-mirror-only');
+    assert(sameRepoPlanningDone.nextCommand === 'node atm.mjs tasks status --task TASK-RES --json', 'done/done same-repo status should stay diagnostic-only');
 }
 finally {
     rmSync(repo, { recursive: true, force: true });

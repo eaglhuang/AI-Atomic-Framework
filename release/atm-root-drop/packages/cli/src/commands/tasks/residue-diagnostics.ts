@@ -215,15 +215,18 @@ function classifyTaskResidue(input: {
     planningDone
     && liveDone
     && input.divergence.length === 0
-    && !planningMirrorOnly
     && verifyCloseoutProvenance(input.cwd, input.taskId, input.taskDocument)
   ) {
     return {
       bucket: 'no-residue',
-      truth: 'planning mirror and live ledger agree on governed done',
+      truth: planningMirrorOnly
+        ? 'planning mirror and live ledger align as governed done'
+        : 'planning mirror and live ledger agree on governed done',
       residue: 'No closeback residue remains for this task.',
       nextCommand: 'node atm.mjs tasks status --task <id> --json',
-      reason: 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and no status divergence remains.'
+      reason: planningMirrorOnly
+        ? 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and same-repo planning authority does not require another mirror import.'
+        : 'The live ledger is done, the planning mirror is done, closeout provenance is complete, and no status divergence remains.'
     };
   }
 
