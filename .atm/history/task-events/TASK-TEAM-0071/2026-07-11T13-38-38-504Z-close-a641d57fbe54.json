@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-11T13-38-38-504Z-close-a641d57fbe54",
+  "taskId": "TASK-TEAM-0071",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Sol",
+  "sessionId": "session-20260711132332-Codex-GPT5.6-Sol-TASK-TEAM-0071-e67ff86718",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0071.json",
+  "taskSha256": "sha256:fac9f0f571aa7a48700658fd50f3eecedda85ad878ffa6490358124b8221baba",
+  "createdAt": "2026-07-11T13:38:38.504Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0071 --actor \"Codex-GPT5.6 Sol\" --status done --historical-delivery f1dc0abda261d16171ad8cfbd43522e685f15bf1",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260711132332-Codex-GPT5.6-Sol-TASK-TEAM-0071-e67ff86718",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0071.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-11T13:38:38.495Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0071.*",
+        ".atm/history/protected-override-audit/2026-07-11T13-23-30-628Z-POA-7998874e1358.json",
+        ".atm/history/task-events/TASK-TEAM-0071/**",
+        ".atm/history/tasks/TASK-TEAM-0071.json",
+        "agent-integrations/vendors/team-secrets.example.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/team-agents/team-vendor-runtime.md",
+        "docs/governance/team-agents/three-vendor-l5-context-benchmark.md",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/team-runtime/permission-broker.ts",
+        "packages/core/src/team-runtime/provider-contract.ts",
+        "packages/core/src/team-runtime/providers/gemini-direct.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
