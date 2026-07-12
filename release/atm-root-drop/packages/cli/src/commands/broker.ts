@@ -36,6 +36,8 @@ import {
 import { defaultAdapterRegistry, resolveAdapter } from '../../../core/src/broker/adapters/registry.ts';
 import { planMutationBatch } from '../../../core/src/broker/adapters/batch-planner.ts';
 import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
+import { enqueueSharedSurface, planSharedSurfaceAcquisition, releaseSharedSurfaceHead, type SharedSurfaceQueue } from '../../../core/src/broker/shared-surface-queue.ts';
+import type { ActiveWriteIntent } from '../../../core/src/broker/types.ts';
 import type {
   BrokerMutationEvidenceEntry,
   MergePlan,
@@ -59,6 +61,7 @@ const defaultFallbackBrokerRunEvidenceRelativeDir = path.join(
 export async function runBroker(argv: string[]) {
   const options = parseBrokerArgs(argv);
   const registryPath = path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json');
+  const sharedQueuePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
 
   if (options.action === 'register') {
     if (!options.task) {
@@ -83,6 +86,12 @@ export async function runBroker(argv: string[]) {
 
     // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
     registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds, decision.admission);
+    const queueState = updateSharedSurfaceQueues({
+      queuePath: sharedQueuePath,
+      intent: newIntent,
+      registry,
+      shouldQueue: shouldQueueSharedSurface(decision)
+    });
     saveRegistry(registryPath, registry);
     syncTeamRunRearbitrationSnapshots(options.cwd, registry, newIntent.taskId, newIntent.actorId);
 
@@ -100,7 +109,8 @@ export async function runBroker(argv: string[]) {
       ],
       evidence: {
         decision,
-        registryPath: '.atm/runtime/write-broker.registry.json'
+        registryPath: '.atm/runtime/write-broker.registry.json',
+        sharedSurfaceQueues: queueState
       }
     });
   }
@@ -159,6 +169,7 @@ export async function runBroker(argv: string[]) {
 
   if (options.action === 'status') {
     const registry = cleanupStale(loadRegistry(registryPath));
+    const sharedSurfaceQueues = readSharedSurfaceQueues(sharedQueuePath);
     const effectiveIntents = registry.activeIntents.map((activeIntent) =>
       projectTeamBrokerRearbitrationSnapshot({
         activeIntent,
@@ -184,7 +195,9 @@ export async function runBroker(argv: string[]) {
           lane: intent.lane,
           admissionState: intent.admission?.state ?? 'not-required',
           admissionTrigger: intent.admission?.trigger ?? 'not-required'
-        }))
+        })),
+        sharedSurfaceQueues,
+        sharedSurfaceAcquisitionPlans: registry.activeIntents.map((intent) => planSharedSurfaceAcquisition(sharedSurfaceQueues, intent.taskId))
       }
     });
   }
@@ -196,6 +209,13 @@ export async function runBroker(argv: string[]) {
     let registry = cleanupStale(loadRegistry(registryPath));
     registry = releaseTask(registry, options.task);
     saveRegistry(registryPath, registry);
+    const queues = readSharedSurfaceQueues(sharedQueuePath);
+    const updatedQueues = queues.flatMap((queue) => {
+      if (queue.entries[0]?.taskId !== options.task) return [queue];
+      const released = releaseSharedSurfaceHead({ queue, taskId: options.task });
+      return released.entries.length === 0 ? [] : [released];
+    });
+    writeSharedSurfaceQueues(sharedQueuePath, updatedQueues);
 
     return makeResult({
       ok: true,
@@ -206,7 +226,8 @@ export async function runBroker(argv: string[]) {
       ],
       evidence: {
         registryPath: '.atm/runtime/write-broker.registry.json',
-        releasedTask: options.task
+        releasedTask: options.task,
+        sharedSurfaceQueues: updatedQueues
       }
     });
   }
@@ -864,6 +885,90 @@ export async function runBroker(argv: string[]) {
   }
 
   throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+
+function readSharedSurfaceQueues(filePath: string): SharedSurfaceQueue[] {
+  if (!existsSync(filePath)) return [];
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8')) as { queues?: SharedSurfaceQueue[] };
+    return Array.isArray(parsed.queues) ? parsed.queues : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSharedSurfaceQueues(filePath: string, queues: readonly SharedSurfaceQueue[]) {
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify({ schemaId: 'atm.brokerSharedSurfaceQueues.v1', queues }, null, 2)}\n`, 'utf8');
+}
+
+function updateSharedSurfaceQueues(input: {
+  queuePath: string;
+  intent: WriteIntent;
+  registry: { activeIntents: readonly ActiveWriteIntent[] };
+  shouldQueue: boolean;
+}) {
+  const queues = readSharedSurfaceQueues(input.queuePath);
+  if (!input.shouldQueue) return queues;
+  const activeOwnersByPath = new Map<string, ActiveWriteIntent[]>();
+  for (const active of input.registry.activeIntents) {
+    if (active.taskId === input.intent.taskId) continue;
+    for (const filePath of active.resourceKeys.files) {
+      const normalized = filePath.replace(/\\/g, '/');
+      if (!input.intent.targetFiles.map((value) => value.replace(/\\/g, '/')).includes(normalized)) continue;
+      activeOwnersByPath.set(normalized, [...(activeOwnersByPath.get(normalized) ?? []), active]);
+    }
+  }
+  const sharedPaths = [...activeOwnersByPath.keys()].sort();
+  if (sharedPaths.length === 0) return queues;
+  const next = queues.slice();
+  for (const surfacePath of sharedPaths) {
+    const index = next.findIndex((queue) => queue.surfacePath === surfacePath);
+    let queue = index >= 0 ? next[index] : null;
+    for (const owner of activeOwnersByPath.get(surfacePath) ?? []) {
+      const seeded = enqueueSharedSurface({
+        queue,
+        entry: sharedQueueEntry(owner, surfacePath, 'Broker queue head owns this shared path until governed release.')
+      });
+      if (!seeded.ok) throw new CliError('ATM_BROKER_SHARED_QUEUE_BLOCKED', seeded.reason, { exitCode: 1, details: { surfacePath, code: seeded.code } });
+      queue = seeded.queue;
+    }
+    const result = enqueueSharedSurface({
+      queue,
+      entry: {
+        taskId: input.intent.taskId,
+        actorId: input.intent.actorId,
+        surfacePath,
+        leaseEpoch: input.registry.activeIntents.find((entry) => entry.taskId === input.intent.taskId)?.leaseEpoch ?? Date.now(),
+        baseHash: input.intent.baseCommit,
+        reason: 'Broker admitted private-path progress while this shared surface is queued.',
+        releaseCondition: 'Prior queue head releases its broker intent after governed delivery.',
+        queuedAt: new Date().toISOString()
+      }
+    });
+    if (!result.ok) throw new CliError('ATM_BROKER_SHARED_QUEUE_BLOCKED', result.reason, { exitCode: 1, details: { surfacePath, code: result.code } });
+    if (index >= 0) next[index] = result.queue; else next.push(result.queue);
+  }
+  writeSharedSurfaceQueues(input.queuePath, next);
+  return next;
+}
+
+function sharedQueueEntry(owner: ActiveWriteIntent, surfacePath: string, reason: string) {
+  return {
+    taskId: owner.taskId,
+    actorId: owner.actorId,
+    surfacePath,
+    leaseEpoch: owner.leaseEpoch,
+    baseHash: owner.baseCommit,
+    reason,
+    releaseCondition: 'Release the broker intent after the governed delivery or terminal archive.',
+    queuedAt: owner.heartbeatAt
+  };
+}
+
+function shouldQueueSharedSurface(decision: ReturnType<typeof calculateBrokerDecision>): boolean {
+  if (decision.verdict !== 'blocked-shared-surface' && decision.verdict !== 'needs-physical-split') return false;
+  return decision.conflictMatrix?.gateResults.some((gate) => gate.status === 'block') ?? false;
 }
 
 function assertBrokerRegisterCliParity(intent: WriteIntent, options: Pick<ParsedBrokerOptions, 'task' | 'actorId' | 'intentFile'>): void {

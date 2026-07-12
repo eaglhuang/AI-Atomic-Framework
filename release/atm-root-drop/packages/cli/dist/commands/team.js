@@ -26,6 +26,7 @@ import { createDefaultTeamPermissionPolicy } from '../../../core/dist/team-runti
 import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../core/dist/team-runtime/handoff-ledger.js';
 import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../../core/dist/team-runtime/provider-selection.js';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/dist/broker/proposal.js';
+import { planSharedSurfaceAcquisition } from '../../../core/dist/broker/shared-surface-queue.js';
 const teamPermissionCatalog = [
     { id: 'task.lifecycle', mode: 'exclusive', hardGate: true },
     { id: 'git.write', mode: 'exclusive', hardGate: true },
@@ -3821,6 +3822,11 @@ export function buildTeamStatusResult(input) {
     const runs = input.requestedTeamRunId
         ? [readTeamRun(input.cwd, input.requestedTeamRunId)]
         : listTeamRuns(input.cwd).filter((run) => typeof run === 'object' && run !== null && run.status === 'active');
+    const sharedSurfaceQueues = readTeamSharedSurfaceQueues(input.cwd);
+    const sharedSurfaceAcquisitionPlans = runs
+        .map((run) => String(run?.taskId ?? '').trim())
+        .filter(Boolean)
+        .map((taskId) => planSharedSurfaceAcquisition(sharedSurfaceQueues, taskId));
     return makeResult({
         ok: true,
         command: 'team',
@@ -3834,9 +3840,23 @@ export function buildTeamStatusResult(input) {
         evidence: {
             action: 'status',
             teamRunCount: runs.length,
-            teamRuns: input.compact ? runs.map(compactTeamRun) : runs
+            teamRuns: input.compact ? runs.map(compactTeamRun) : runs,
+            sharedSurfaceQueues,
+            sharedSurfaceAcquisitionPlans
         }
     });
+}
+function readTeamSharedSurfaceQueues(cwd) {
+    const queuePath = path.join(cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
+    if (!existsSync(queuePath))
+        return [];
+    try {
+        const parsed = readJsonFile(queuePath, 'ATM_TEAM_SHARED_QUEUE_INVALID');
+        return Array.isArray(parsed.queues) ? parsed.queues : [];
+    }
+    catch {
+        return [];
+    }
 }
 export function evaluateTeamRequiredCompletionGate(input) {
     const required = isTeamRequiredTask(input.taskDocument);

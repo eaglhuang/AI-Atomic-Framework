@@ -229,6 +229,13 @@ export interface WriteBrokerRegistryDocument {
     readonly activeIntents: readonly ActiveWriteIntent[];
 }
 export type BrokerArbitrationVerdict = 'allow' | 'watch' | 'freeze' | 'takeover';
+export type BrokerConflictGateName = 'intent-shape' | 'lease-fencing' | 'shared-surface' | 'atom-id' | 'atom-cid' | 'read-set' | 'file-range';
+export interface BrokerConflictGateResult {
+    readonly gate: BrokerConflictGateName;
+    readonly status: 'clear' | 'watch' | 'block';
+    readonly detail: string;
+    readonly blockingTasks: readonly string[];
+}
 export interface BrokerConflictClassResult {
     readonly kind: 'shared-surface' | 'cid' | 'read-set' | 'file-range' | 'intent-shape' | 'lease';
     readonly detail: string;
@@ -241,6 +248,7 @@ export interface BrokerConflictMatrix {
     readonly taskId: string;
     readonly arbitrationVerdict: BrokerArbitrationVerdict;
     readonly conflicts: readonly BrokerConflictClassResult[];
+    readonly gateResults: readonly BrokerConflictGateResult[];
 }
 /**
  * Describes the file a mutation targets. `content` is the current on-disk text

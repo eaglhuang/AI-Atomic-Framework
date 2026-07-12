@@ -18,17 +18,41 @@ export function evaluateConflictMatrix(newIntent, activeIntents, options = {}) {
     const leaseConflicts = detectLeaseConflicts(newIntent, activeIntents, options.currentEpoch);
     conflicts.push(...leaseConflicts);
     const arbitrationVerdict = chooseArbitrationVerdict(conflicts);
+    const dedupedConflicts = dedupeConflictResults(conflicts);
     return {
         schemaId: conflictMatrixSchemaId,
         specVersion: conflictMatrixSpecVersion,
         migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
         taskId: newIntent.taskId,
         arbitrationVerdict,
-        conflicts: dedupeConflictResults(conflicts)
+        conflicts: dedupedConflicts,
+        gateResults: buildSevenLayerGateResults(dedupedConflicts)
     };
 }
+function buildSevenLayerGateResults(conflicts) {
+    const gates = [
+        { gate: 'intent-shape', kinds: ['intent-shape'], blocking: true, detail: 'Intent contains task, actor, targets, and well-formed atom references.' },
+        { gate: 'lease-fencing', kinds: ['lease'], blocking: true, detail: 'Active lease epochs and ownership are valid.' },
+        { gate: 'shared-surface', kinds: ['shared-surface'], blocking: true, detail: 'Shared generators, projections, registries, validators, and artifacts are exclusive.' },
+        { gate: 'atom-id', kinds: ['cid'], blocking: true, detail: 'Atom IDs do not overlap an active write owner.' },
+        { gate: 'atom-cid', kinds: ['cid'], blocking: true, detail: 'Atom CIDs do not overlap an active write owner.' },
+        { gate: 'read-set', kinds: ['read-set'], blocking: false, detail: 'Read/write dependencies are visible before mutation.' },
+        { gate: 'file-range', kinds: ['file-range'], blocking: true, detail: 'Same-file source ranges are either disjoint or routed to a bounded compose/steward lane.' }
+    ];
+    return gates.map(({ gate, kinds, blocking, detail }) => {
+        const matching = conflicts.filter((conflict) => kinds.includes(conflict.kind));
+        const taskNames = [...new Set(matching.map((conflict) => conflict.blockingTask))].sort();
+        const hasOverlap = matching.some((conflict) => conflict.detail.includes('overlap'));
+        return {
+            gate,
+            status: matching.length === 0 ? 'clear' : (blocking && (gate !== 'file-range' || hasOverlap) ? 'block' : 'watch'),
+            detail: matching.length === 0 ? detail : matching.map((conflict) => conflict.detail).join(' '),
+            blockingTasks: taskNames
+        };
+    });
+}
 function isWellFormedIntent(intent) {
-    if (!intent.taskId || !intent.actorId || intent.targetFiles.length === 0 || intent.atomRefs.length === 0) {
+    if (!intent.taskId || !intent.actorId || intent.targetFiles.length === 0) {
         return false;
     }
     for (const ref of intent.atomRefs) {

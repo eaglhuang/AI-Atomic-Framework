@@ -1,24 +1,8 @@
-import type { ActiveWriteIntent, BrokerDecision, ConflictDetail, WriteIntent, WriteIntentAtomRef } from './types.ts';
+import type { ActiveWriteIntent, BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix, BrokerDecision, WriteIntent, WriteIntentAtomRef } from './types.ts';
+export type { BrokerArbitrationVerdict, BrokerConflictClassResult, BrokerConflictGateResult, BrokerConflictMatrix } from './types.ts';
 
 const conflictMatrixSchemaId = 'atm.brokerConflictMatrix.v1' as const;
 const conflictMatrixSpecVersion = '0.1.0' as const;
-
-export type BrokerArbitrationVerdict = 'allow' | 'watch' | 'freeze' | 'takeover';
-
-export interface BrokerConflictClassResult {
-  readonly kind: 'shared-surface' | 'cid' | 'read-set' | 'file-range' | 'intent-shape' | 'lease';
-  readonly detail: string;
-  readonly blockingTask: string;
-}
-
-export interface BrokerConflictMatrix {
-  readonly schemaId: 'atm.brokerConflictMatrix.v1';
-  readonly specVersion: '0.1.0';
-  readonly migration: BrokerDecision['migration'];
-  readonly taskId: string;
-  readonly arbitrationVerdict: BrokerArbitrationVerdict;
-  readonly conflicts: readonly BrokerConflictClassResult[];
-}
 
 export function evaluateConflictMatrix(
   newIntent: WriteIntent,
@@ -50,6 +34,7 @@ export function evaluateConflictMatrix(
   conflicts.push(...leaseConflicts);
 
   const arbitrationVerdict = chooseArbitrationVerdict(conflicts);
+  const dedupedConflicts = dedupeConflictResults(conflicts);
 
   return {
     schemaId: conflictMatrixSchemaId,
@@ -57,12 +42,36 @@ export function evaluateConflictMatrix(
     migration: { strategy: 'none', fromVersion: null, notes: 'generated' },
     taskId: newIntent.taskId,
     arbitrationVerdict,
-    conflicts: dedupeConflictResults(conflicts)
+    conflicts: dedupedConflicts,
+    gateResults: buildSevenLayerGateResults(dedupedConflicts)
   };
 }
 
+function buildSevenLayerGateResults(conflicts: readonly BrokerConflictClassResult[]): readonly BrokerConflictGateResult[] {
+  const gates: Array<{ gate: BrokerConflictGateResult['gate']; kinds: readonly BrokerConflictClassResult['kind'][]; blocking: boolean; detail: string }> = [
+    { gate: 'intent-shape', kinds: ['intent-shape'], blocking: true, detail: 'Intent contains task, actor, targets, and well-formed atom references.' },
+    { gate: 'lease-fencing', kinds: ['lease'], blocking: true, detail: 'Active lease epochs and ownership are valid.' },
+    { gate: 'shared-surface', kinds: ['shared-surface'], blocking: true, detail: 'Shared generators, projections, registries, validators, and artifacts are exclusive.' },
+    { gate: 'atom-id', kinds: ['cid'], blocking: true, detail: 'Atom IDs do not overlap an active write owner.' },
+    { gate: 'atom-cid', kinds: ['cid'], blocking: true, detail: 'Atom CIDs do not overlap an active write owner.' },
+    { gate: 'read-set', kinds: ['read-set'], blocking: false, detail: 'Read/write dependencies are visible before mutation.' },
+    { gate: 'file-range', kinds: ['file-range'], blocking: true, detail: 'Same-file source ranges are either disjoint or routed to a bounded compose/steward lane.' }
+  ];
+  return gates.map(({ gate, kinds, blocking, detail }) => {
+    const matching = conflicts.filter((conflict) => kinds.includes(conflict.kind));
+    const taskNames = [...new Set(matching.map((conflict) => conflict.blockingTask))].sort();
+    const hasOverlap = matching.some((conflict) => conflict.detail.includes('overlap'));
+    return {
+      gate,
+      status: matching.length === 0 ? 'clear' : (blocking && (gate !== 'file-range' || hasOverlap) ? 'block' : 'watch'),
+      detail: matching.length === 0 ? detail : matching.map((conflict) => conflict.detail).join(' '),
+      blockingTasks: taskNames
+    };
+  });
+}
+
 function isWellFormedIntent(intent: WriteIntent): boolean {
-  if (!intent.taskId || !intent.actorId || intent.targetFiles.length === 0 || intent.atomRefs.length === 0) {
+  if (!intent.taskId || !intent.actorId || intent.targetFiles.length === 0) {
     return false;
   }
 

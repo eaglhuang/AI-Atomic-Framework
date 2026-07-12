@@ -4,6 +4,8 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, wri
 import path from 'node:path';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
+import { runBroker } from '../packages/cli/src/commands/broker.ts';
+import { composeBrokerProposals } from '../packages/core/src/broker/compose.ts';
 import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/commands/framework-development.ts';
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
 import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildDirectTeamRoleInstructions, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runDirectTeamProviderRole, runTeamProviderExecution, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
@@ -129,6 +131,56 @@ async function main() {
     assert.equal(verifyTeamHandoffLedger(cwd, 'TASK-TEAM-0074', 'whitelist').ok, true);
     rmSync(cwd, { recursive: true, force: true });
     console.log('[validate-team-agents] ok (team-handoff-narrative-whitelist)');
+    return;
+  }
+
+  if (taskCase === 'broker-shared-surface-queue') {
+    const cwd = createTempWorkspace('atm-broker-shared-queue-');
+    mkdirSync(path.join(cwd, '.atm', 'runtime'), { recursive: true });
+    const firstIntentPath = path.join(cwd, 'first.intent.json');
+    const secondIntentPath = path.join(cwd, 'second.intent.json');
+    const makeIntent = (taskId: string, actorId: string, atomId: string, atomCid: string, baseCommit = 'same-base') => ({
+      schemaId: 'atm.writeIntent.v1', specVersion: '0.1.0', migration: { strategy: 'none', fromVersion: null, notes: 'shared queue fixture' },
+      taskId, actorId, baseCommit, targetFiles: ['docs/governance/atm-bug-and-optimization-backlog.md', `src/${taskId}.ts`],
+      atomRefs: [{ atomId, atomCid, operation: 'modify', sourceRange: { filePath: 'docs/governance/atm-bug-and-optimization-backlog.md', lineStart: 10, lineEnd: 12 } }],
+      sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] }, requestedLane: 'auto'
+    });
+    writeFileSync(firstIntentPath, `${JSON.stringify(makeIntent('TASK-QUEUE-ONE', 'agent-one', 'atom-one', 'cid-one'), null, 2)}\n`, 'utf8');
+    writeFileSync(secondIntentPath, `${JSON.stringify(makeIntent('TASK-QUEUE-TWO', 'agent-two', 'atom-two', 'cid-two'), null, 2)}\n`, 'utf8');
+    const first = await runBroker(['register', '--cwd', cwd, '--task', 'TASK-QUEUE-ONE', '--actor', 'agent-one', '--intent-file', firstIntentPath]);
+    assert.equal(first.ok, true);
+    const second = await runBroker(['register', '--cwd', cwd, '--task', 'TASK-QUEUE-TWO', '--actor', 'agent-two', '--intent-file', secondIntentPath]);
+    assert.equal(second.ok, true, 'shared path must preserve private-path progress instead of globally blocking the task');
+    const status = await runBroker(['status', '--cwd', cwd]);
+    const queues = (status.evidence as { sharedSurfaceQueues?: Array<{ surfacePath: string; entries: Array<{ taskId: string }> }> }).sharedSurfaceQueues ?? [];
+    assert.equal(queues.length, 1);
+    assert.deepEqual(queues[0]?.entries.map((entry) => entry.taskId), ['TASK-QUEUE-ONE', 'TASK-QUEUE-TWO']);
+    const teamStatus = await runTeam(['status', '--cwd', cwd]);
+    assert.equal(((teamStatus.evidence as { sharedSurfaceQueues?: unknown[] }).sharedSurfaceQueues ?? []).length, 1);
+    await runBroker(['release', '--cwd', cwd, '--task', 'TASK-QUEUE-ONE']);
+    const afterRelease = await runBroker(['status', '--cwd', cwd]);
+    const afterQueues = (afterRelease.evidence as { sharedSurfaceQueues?: Array<{ entries: Array<{ taskId: string }> }> }).sharedSurfaceQueues ?? [];
+    assert.deepEqual(afterQueues[0]?.entries.map((entry) => entry.taskId), ['TASK-QUEUE-TWO']);
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (broker-shared-surface-queue)');
+    return;
+  }
+
+  if (taskCase === 'broker-shared-surface-compose') {
+    const base = {
+      schemaId: 'atm.patchProposal.v1' as const, specVersion: '0.1.0' as const, migration: { strategy: 'none' as const, fromVersion: null, notes: 'shared compose fixture' },
+      taskId: 'TASK-COMPOSE', actorId: 'steward-fixture', baseCommit: 'base-1', fileBeforeHash: 'sha256:file-1', targetFile: 'docs/governance/atm-bug-and-optimization-backlog.md',
+      validators: ['npm run typecheck'], rollback: 'revert fixture'
+    };
+    const first = { ...base, proposalId: 'proposal-one', atomRefs: [{ atomId: 'atom-one', atomCid: 'cid-one' }], anchors: [{ kind: 'line', hint: 'row-one' }], intent: 'bounded first row', patch: '@@ -1,1 +1,1 @@\n-one\n+one-a\n' };
+    const second = { ...base, proposalId: 'proposal-two', atomRefs: [{ atomId: 'atom-two', atomCid: 'cid-two' }], anchors: [{ kind: 'line', hint: 'row-two' }], intent: 'bounded second row', patch: '@@ -4,1 +4,1 @@\n-two\n+two-b\n' };
+    const compatible = composeBrokerProposals([second, first]);
+    assert.equal(compatible.ok, true);
+    assert.equal(compatible.mergePlan.verdict, 'parallel-safe');
+    assert.deepEqual(compatible.mergePlan.inputProposals, ['proposal-one', 'proposal-two']);
+    const semanticConflict = composeBrokerProposals([{ ...first, proposalId: 'proposal-three', atomRefs: [{ atomId: 'atom-three', atomCid: 'cid-three' }], anchors: [{ kind: 'markdown-heading', hint: 'same-row' }] }, { ...second, proposalId: 'proposal-four', atomRefs: [{ atomId: 'atom-four', atomCid: 'cid-four' }], anchors: [{ kind: 'markdown-heading', hint: 'same-row' }] }]);
+    assert.equal(semanticConflict.mergePlan.verdict, 'needs-steward', 'Semantic Markdown anchors must never be auto-applied.');
+    console.log('[validate-team-agents] ok (broker-shared-surface-compose)');
     return;
   }
 

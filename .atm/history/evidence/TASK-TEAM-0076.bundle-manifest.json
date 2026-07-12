@@ -1,0 +1,173 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-TEAM-0076",
+  "updatedAt": "2026-07-12T02:03:12.082Z",
+  "updatedBy": "Codex-GPT5.6 Terra",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/compose.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+    "typecheck",
+    "validate:team-agents"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T02:00:38.493Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/compose.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0cdb8a54776d6097c172a9433ad28bdbf0f77ecb7e0ce26167630723262feeb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/compose.test.ts"
+      ],
+      "generatedAt": "2026-07-12T02:00:40.197Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:626a97ff94d21bd0a9696c65e9e19fddb249264ae5369d29bb588551058052b6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts"
+      ],
+      "generatedAt": "2026-07-12T02:00:41.762Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-shared-surface-queue",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:749475f0899b610104bf15866db2c591456a468c1850d7e420a3b1202376a1c4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-agents"
+      ],
+      "generatedAt": "2026-07-12T02:00:43.798Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-shared-surface-compose",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:55b3b495486353dbb67133ef7e7c71952f890326a630287f2ba7af43aaf8d9d4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-agents"
+      ],
+      "generatedAt": "2026-07-12T02:00:45.823Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-12T02:00:47.414Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T02:03:03.283Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/compose.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0cdb8a54776d6097c172a9433ad28bdbf0f77ecb7e0ce26167630723262feeb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/compose.test.ts"
+      ],
+      "generatedAt": "2026-07-12T02:03:04.815Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:626a97ff94d21bd0a9696c65e9e19fddb249264ae5369d29bb588551058052b6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts"
+      ],
+      "generatedAt": "2026-07-12T02:03:06.324Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-shared-surface-queue",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:749475f0899b610104bf15866db2c591456a468c1850d7e420a3b1202376a1c4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-agents"
+      ],
+      "generatedAt": "2026-07-12T02:03:08.371Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-shared-surface-compose",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:55b3b495486353dbb67133ef7e7c71952f890326a630287f2ba7af43aaf8d9d4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-agents"
+      ],
+      "generatedAt": "2026-07-12T02:03:10.481Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-12T02:03:12.142Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "12fc14326a79dfad78772bc7b80d46eaf0f1cf4b",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

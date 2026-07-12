@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T01-50-24-536Z-scope-amendment-983bf6e10150",
+  "taskId": "TASK-TEAM-0076",
+  "action": "scope-amendment",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0076.json",
+  "taskSha256": "sha256:c822f7bf51194872791918be2be9820c81bed71e895e980ccddee140b9684436",
+  "createdAt": "2026-07-12T01:50:24.536Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0076 --actor \"Codex-GPT5.6 Terra\" --add \"packages/cli/dist/**,release/**\" --class linked-surface --reason \"Frozen runner and release mirrors must be rebuilt to validate the scoped Broker queue implementation through the production CLI.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Frozen runner and release mirrors must be rebuilt to validate the scoped Broker queue implementation through the production CLI."
+  }
+}

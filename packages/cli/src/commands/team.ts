@@ -61,6 +61,7 @@ import {
 } from '../../../core/src/team-runtime/provider-selection.ts';
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/src/broker/proposal.ts';
+import { planSharedSurfaceAcquisition, type SharedSurfaceQueue } from '../../../core/src/broker/shared-surface-queue.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -4921,6 +4922,11 @@ export function buildTeamStatusResult(input: {
   const runs = input.requestedTeamRunId
     ? [readTeamRun(input.cwd, input.requestedTeamRunId)]
     : listTeamRuns(input.cwd).filter((run: unknown) => typeof run === 'object' && run !== null && (run as Record<string, unknown>).status === 'active');
+  const sharedSurfaceQueues = readTeamSharedSurfaceQueues(input.cwd);
+  const sharedSurfaceAcquisitionPlans = runs
+    .map((run: any) => String(run?.taskId ?? '').trim())
+    .filter(Boolean)
+    .map((taskId) => planSharedSurfaceAcquisition(sharedSurfaceQueues, taskId));
   return makeResult({
     ok: true,
     command: 'team',
@@ -4934,9 +4940,22 @@ export function buildTeamStatusResult(input: {
     evidence: {
       action: 'status',
       teamRunCount: runs.length,
-      teamRuns: input.compact ? runs.map(compactTeamRun) : runs
+      teamRuns: input.compact ? runs.map(compactTeamRun) : runs,
+      sharedSurfaceQueues,
+      sharedSurfaceAcquisitionPlans
     }
   });
+}
+
+function readTeamSharedSurfaceQueues(cwd: string): SharedSurfaceQueue[] {
+  const queuePath = path.join(cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
+  if (!existsSync(queuePath)) return [];
+  try {
+    const parsed = readJsonFile(queuePath, 'ATM_TEAM_SHARED_QUEUE_INVALID') as { queues?: unknown };
+    return Array.isArray(parsed.queues) ? parsed.queues as SharedSurfaceQueue[] : [];
+  } catch {
+    return [];
+  }
 }
 
 export function evaluateTeamRequiredCompletionGate(input: {

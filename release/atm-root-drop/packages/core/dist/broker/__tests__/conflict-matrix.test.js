@@ -63,6 +63,8 @@ function testAllow() {
     const matrix = evaluateConflictMatrix(newIntent, []);
     assert.equal(matrix.arbitrationVerdict, 'allow');
     assert.equal(matrix.conflicts.length, 0);
+    assert.equal(matrix.gateResults.length, 7, 'Broker admission must expose the complete seven-layer CID gate trace.');
+    assert.ok(matrix.gateResults.every((gate) => gate.status === 'clear'), 'A disjoint intent must clear all seven gates.');
     console.log('ok: baseline intent yields allow');
 }
 function testWatchForSharedSurface() {
@@ -74,6 +76,7 @@ function testWatchForSharedSurface() {
     const matrix = evaluateConflictMatrix(newIntent, [active]);
     assert.equal(matrix.arbitrationVerdict, 'freeze');
     assert.ok(matrix.conflicts.some((conflict) => conflict.kind === 'shared-surface'));
+    assert.equal(matrix.gateResults.find((gate) => gate.gate === 'shared-surface')?.status, 'block');
     console.log('ok: shared-surface overlap maps to freeze');
 }
 function testWatchForFileRangeOverlap() {
@@ -186,6 +189,13 @@ function testTakeoverForMalformedIntent() {
     assert.equal(matrix.arbitrationVerdict, 'takeover');
     assert.equal(matrix.conflicts[0].kind, 'intent-shape');
     console.log('ok: malformed intent maps to takeover');
+}
+function testAllowForTaskScopedFileOnlyIntent() {
+    const newIntent = makeIntent({ atomRefs: [] });
+    const matrix = evaluateConflictMatrix(newIntent, []);
+    assert.equal(matrix.arbitrationVerdict, 'allow');
+    assert.equal(matrix.conflicts.length, 0);
+    console.log('ok: file-scoped task intent without atom refs yields allow');
 }
 function testTakeoverForStaleLease() {
     const stale = asActive(makeIntent({
@@ -335,6 +345,7 @@ testWatchForDisjointFileRange();
 testReadSetConflict();
 testActiveReadSetConflict();
 testTakeoverForMalformedIntent();
+testAllowForTaskScopedFileOnlyIntent();
 testTakeoverForStaleLease();
 testTakeoverForStaleLeaseEpoch();
 testFreezeForSameAtomCidWriteWrite();

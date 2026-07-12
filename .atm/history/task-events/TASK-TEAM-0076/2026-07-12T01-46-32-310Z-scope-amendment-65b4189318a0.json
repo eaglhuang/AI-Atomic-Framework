@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T01-46-32-310Z-scope-amendment-65b4189318a0",
+  "taskId": "TASK-TEAM-0076",
+  "action": "scope-amendment",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0076.json",
+  "taskSha256": "sha256:44c4136fcfea8ea189631ac54e6c1b67ef1028a8aafa4ee596daaca3c68dca51",
+  "createdAt": "2026-07-12T01:46:32.310Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0076 --actor \"Codex-GPT5.6 Terra\" --add packages/core/src/broker/shared-surface-queue.ts --class linked-surface --reason \"Shared-surface queue requires a focused core contract instead of duplicating queue state across CLI and conflict-matrix.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Shared-surface queue requires a focused core contract instead of duplicating queue state across CLI and conflict-matrix."
+  }
+}

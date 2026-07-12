@@ -2851,11 +2851,12 @@ function readReleaseGeneratedArtifactPaths(cwd) {
 }
 function isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts) {
     const normalized = normalizeRelativePath(filePath);
-    if (claimedFiles.has(normalized)) {
+    const claimedScopes = [...claimedFiles];
+    if (claimedScopes.some((scope) => pathMatchesTaskScope(normalized, scope))) {
         return true;
     }
-    for (const claimedFile of claimedFiles) {
-        if (normalized === `release/atm-root-drop/${claimedFile}`) {
+    for (const claimedFile of claimedScopes) {
+        if (pathMatchesTaskScope(normalized, `release/atm-root-drop/${claimedFile}`)) {
             return true;
         }
     }
