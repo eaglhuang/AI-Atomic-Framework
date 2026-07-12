@@ -2525,6 +2525,10 @@ function isScopedTerminalCloseEventDeletion(input: {
   readonly taskDocument: Record<string, unknown> | null;
   readonly status: string | null;
 }): boolean {
+  // ATM-BUG-2026-07-12-126: a done/released task's stale terminal close
+  // event is repairable in the main worktree when the operator explicitly
+  // scopes the repair to that task. Unrelated active delivery remains a
+  // warning; it must never be deleted or made part of the repair bundle.
   if (input.scopeTaskId !== input.taskId || input.taskDocument?.status !== 'done' || input.status !== 'D') {
     return false;
   }
