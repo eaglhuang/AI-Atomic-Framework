@@ -15,6 +15,25 @@ function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
+function stripMatchingOuterQuotes(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.length >= 2) {
+    const first = trimmed[0];
+    const last = trimmed[trimmed.length - 1];
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      return trimmed.slice(1, -1).trim();
+    }
+  }
+  return trimmed;
+}
+
+function parseCsvPathList(value: string): string[] {
+  return stripMatchingOuterQuotes(value)
+    .split(',')
+    .map((pathValue) => stripMatchingOuterQuotes(pathValue))
+    .filter(Boolean);
+}
+
 function uniqueStrings(values: readonly string[]): readonly string[] {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
 }
@@ -246,7 +265,7 @@ export function parseScopeAddOptions(argv: string[]) {
     }
     if (arg === '--add') {
       const raw = requireValue(argv, index, '--add');
-      options.addPaths = raw.split(',').map((p) => p.trim()).filter(Boolean);
+      options.addPaths = parseCsvPathList(raw);
       index += 1;
       continue;
     }
@@ -321,7 +340,7 @@ export function parseScopeRepairOptions(argv: string[]) {
     }
     if (arg === '--add') {
       const raw = requireValue(argv, index, '--add');
-      options.addPaths = raw.split(',').map((p) => p.trim()).filter(Boolean);
+      options.addPaths = parseCsvPathList(raw);
       index += 1;
       continue;
     }

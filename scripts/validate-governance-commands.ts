@@ -461,6 +461,39 @@ try {
   assert(scopeEvent.action === 'scope-amendment', 'tasks scope add must persist a scope-amendment event action');
   assert(scopeEvent.taskSha256 === sha256(readFileSync(scopeTaskPath)), 'scope-amendment event sha must match the persisted task document');
 
+  const quotedScopeAdd = await runAtm([
+    'tasks', 'scope', 'add',
+    '--cwd', repo,
+    '--task', 'ATM-GOV-0115',
+    '--actor', 'fixture-agent',
+    '--add', '"notes/quoted-scope-a.txt,notes/quoted-scope-b.txt"',
+    '--json'
+  ]);
+  assert(quotedScopeAdd.exitCode === 0, 'tasks scope add with quoted CSV must exit 0');
+  assert(quotedScopeAdd.parsed.ok === true, 'tasks scope add with quoted CSV must report ok=true');
+  const quotedAddedPaths = quotedScopeAdd.parsed.evidence?.addedPaths ?? [];
+  assert(
+    quotedAddedPaths.includes('notes/quoted-scope-a.txt') && quotedAddedPaths.includes('notes/quoted-scope-b.txt'),
+    `quoted scope add must strip outer shell quotes from addedPaths: ${JSON.stringify(quotedAddedPaths)}`
+  );
+  assert(
+    quotedAddedPaths.every((value: string) => !value.startsWith('"') && !value.endsWith('"') && !value.startsWith("'") && !value.endsWith("'")),
+    `quoted scope add must not preserve shell quotes in addedPaths: ${JSON.stringify(quotedAddedPaths)}`
+  );
+  const quotedScopeTaskDocument = JSON.parse(readFileSync(scopeTaskPath, 'utf8'));
+  const quotedScopeTransitionId = String(quotedScopeTaskDocument.lastTransitionId ?? '');
+  const quotedScopeEventPath = path.join(repo, '.atm', 'history', 'task-events', 'ATM-GOV-0115', `${quotedScopeTransitionId}.json`);
+  const quotedScopeEvent = JSON.parse(readFileSync(quotedScopeEventPath, 'utf8'));
+  const quotedScopeCommand = String(quotedScopeEvent.command ?? '');
+  assert(
+    quotedScopeCommand.includes('notes/quoted-scope-a.txt,notes/quoted-scope-b.txt')
+      && !quotedScopeCommand.includes('\\"notes/quoted-scope-a.txt')
+      && !quotedScopeCommand.includes("'notes/quoted-scope-a.txt")
+      && !quotedScopeCommand.includes('notes/quoted-scope-b.txt\\"')
+      && !quotedScopeCommand.includes("notes/quoted-scope-b.txt'"),
+    `scope-amendment event command must not preserve nested shell quote characters around path tokens: ${quotedScopeCommand}`
+  );
+
   writeFixtureTask(repo, 'ATM-GOV-0109', 'stale-agent', 'Takeover test');
   const takeoverClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--files', '.atm/history/tasks/ATM-GOV-0109.json', '--ttl-seconds', '30', '--json']);
   assert(takeoverClaim.exitCode === 0, 'takeover tasks claim must exit 0');

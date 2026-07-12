@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0162",
+  "updatedAt": "2026-07-12T10:48:27.714Z",
+  "updatedBy": "codex-backlog-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:governance-commands",
+    "validate:task-import"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-12T10:46:48.873Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6b1843ee2bdb8571991421adbb50a2e0b04db38d",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T10:47:01.867Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6b1843ee2bdb8571991421adbb50a2e0b04db38d",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:governance-commands",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0198d67b654c6c29fa7cb81aabf19eea6d88162e3035b92851db89233f0faaa",
+      "stderrSha256": "sha256:7ac92426becdb17ec5a37bcd9b4478669153f657bd0c1cfdf573eb2b34c1f8dd",
+      "validators": [
+        "validate:governance-commands"
+      ],
+      "generatedAt": "2026-07-12T10:47:37.275Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6b1843ee2bdb8571991421adbb50a2e0b04db38d",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:task-import",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c74527929f56be89b65ca3bfbc997c0e2a804076d707ebb288b08fe5711c557",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:task-import"
+      ],
+      "generatedAt": "2026-07-12T10:48:27.783Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6b1843ee2bdb8571991421adbb50a2e0b04db38d",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
