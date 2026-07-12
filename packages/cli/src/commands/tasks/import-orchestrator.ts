@@ -29,7 +29,10 @@ import {
 export async function runTasksImport(argv: string[]) {
   const options = parseImportOptions(argv);
   if (!options.from) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks import requires --from <plan.md>.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', importPathUsageMessage(), {
+      exitCode: 2,
+      details: importPathUsageDetails()
+    });
   }
   if (options.dryRun === options.write) {
     throw new CliError('ATM_CLI_USAGE', 'tasks import requires exactly one of --dry-run or --write.', { exitCode: 2 });
@@ -99,9 +102,9 @@ export async function runTasksImport(argv: string[]) {
 
   const planAbsolute = resolvePlanAbsoluteFromStored(options.cwd, options.from);
   if (!existsSync(planAbsolute) || !statSync(planAbsolute).isFile()) {
-    throw new CliError('ATM_TASKS_PLAN_NOT_FOUND', `Plan markdown file not found: ${options.from}`, {
+    throw new CliError('ATM_TASKS_PLAN_NOT_FOUND', importPlanNotFoundMessage(options.from), {
       exitCode: 2,
-      details: { planPath: options.from }
+      details: importPathUsageDetails(options.from)
     });
   }
 
@@ -294,4 +297,28 @@ export async function runTasksImport(argv: string[]) {
       emergencyUse
     }
   });
+}
+
+function importPathUsageMessage(): string {
+  return 'tasks import requires --from <path-to-task-card.md>. Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json';
+}
+
+function importPlanNotFoundMessage(from: string): string {
+  if (isLiteralPlanToken(from)) {
+    return `tasks import --from expects a markdown task-card path, not the literal value "${from}". Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json`;
+  }
+  return `Plan markdown file not found: ${from}. tasks import --from expects a markdown task-card path. Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json`;
+}
+
+function importPathUsageDetails(from?: string): Record<string, unknown> {
+  return {
+    ...(from ? { planPath: from } : {}),
+    expectedFlag: '--from <path-to-task-card.md>',
+    exampleCommand: 'node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json',
+    literalPlanValue: from ? isLiteralPlanToken(from) : false
+  };
+}
+
+function isLiteralPlanToken(from: string): boolean {
+  return from.trim().toLowerCase() === 'plan';
 }

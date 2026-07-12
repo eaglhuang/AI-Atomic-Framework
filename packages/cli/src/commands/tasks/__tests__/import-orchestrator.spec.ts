@@ -26,7 +26,7 @@ function assert(condition: unknown, message: string) {
 assert(typeof runTasksImport === 'function', 'runTasksImport export must be a function');
 assert(runTasksImport.constructor.name === 'AsyncFunction', 'runTasksImport must be async');
 
-async function expectCliError(argv: string[], branch: string): Promise<void> {
+async function expectCliError(argv: string[], branch: string): Promise<CliError> {
   try {
     await runTasksImport(argv);
     fail(`branch ${branch}: expected CliError, got success`);
@@ -34,17 +34,37 @@ async function expectCliError(argv: string[], branch: string): Promise<void> {
     if (!(err instanceof CliError)) {
       fail(`branch ${branch}: expected CliError, got ${err instanceof Error ? err.constructor.name : typeof err}`);
     }
+    return err;
   }
 }
 
 // fresh-open branch: missing --from is a usage error
-await expectCliError(['--dry-run'], 'fresh-open');
+const missingFrom = await expectCliError(['--dry-run'], 'fresh-open');
+assert(missingFrom.code === 'ATM_CLI_USAGE', 'missing --from must be a usage error');
+assert(missingFrom.message.includes('--from <path-to-task-card.md>'), 'missing --from message must explain expected path form');
+assert(missingFrom.message.includes('node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json'), 'missing --from message must include copyable example');
+assert(missingFrom.details.expectedFlag === '--from <path-to-task-card.md>', 'missing --from details must include expectedFlag');
+assert(typeof missingFrom.details.exampleCommand === 'string', 'missing --from details must include exampleCommand');
 // drift branch: both --dry-run and --write are contradictory
 await expectCliError(['--from', 'docs/plan.md', '--dry-run', '--write'], 'drift');
 // reset-open branch: --write --reset-open triggers classification/emergency path
 await expectCliError(['--from', 'docs/nonexistent-plan.md', '--write', '--reset-open'], 'reset-open');
 // emergency-lease branch: --force without approval token
 await expectCliError(['--from', 'docs/nonexistent-plan.md', '--write', '--force'], 'emergency-lease');
+
+const literalPlan = await expectCliError(['--from', 'plan', '--dry-run'], 'literal-plan');
+assert(literalPlan.code === 'ATM_TASKS_PLAN_NOT_FOUND', 'literal plan must be rejected as missing plan path');
+assert(literalPlan.message.includes('not the literal value "plan"'), 'literal plan message must explain that plan is not a path');
+assert(literalPlan.message.includes('--from .atm/task-plans/TASK-EXAMPLE-0001.md'), 'literal plan message must include copyable path example');
+assert(literalPlan.details.planPath === 'plan', 'literal plan details must preserve requested path');
+assert(literalPlan.details.literalPlanValue === true, 'literal plan details must flag literalPlanValue');
+assert(literalPlan.details.expectedFlag === '--from <path-to-task-card.md>', 'literal plan details must include expectedFlag');
+
+const missingMarkdown = await expectCliError(['--from', 'docs/nonexistent-plan.md', '--dry-run'], 'missing-markdown');
+assert(missingMarkdown.code === 'ATM_TASKS_PLAN_NOT_FOUND', 'missing markdown path must remain plan-not-found');
+assert(missingMarkdown.message.includes('tasks import --from expects a markdown task-card path'), 'missing markdown message must explain expected --from path');
+assert(missingMarkdown.details.planPath === 'docs/nonexistent-plan.md', 'missing markdown details must preserve requested path');
+assert(missingMarkdown.details.literalPlanValue === false, 'missing markdown details must not flag literalPlanValue');
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -109,4 +129,4 @@ function readdirFirstJson(directory: string): string {
   return readdirSync(directory).find((entry) => entry.endsWith('.json')) ?? fail('expected transition event json');
 }
 
-console.log('[import-orchestrator.spec] ok (4 branches + reconcile-mirror)');
+console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror)');
