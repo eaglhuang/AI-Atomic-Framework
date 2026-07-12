@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0167
 task_id: TASK-AAO-0167
 title: "Record taskflow close friction from abandoned task residue"
-status: planned
+status: done
 owner: atm-core
 priority: P1
 milestone: RFT-M
@@ -28,6 +28,15 @@ atomizationImpact:
   mapUpdates: []
 outOfScope: []
 nonGoals: []
+completed_at: "2026-07-12T12:11:36.962Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T12:11:36.962Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T12-11-36-962Z-close-12313f32d6f0"
+lastTransitionAt: "2026-07-12T12:11:36.962Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "955b53ac1b3f03db264d87185a6b0d7ac1ff938f"
 ---
 
 # TASK-AAO-0167 - Record taskflow close friction from abandoned task residue
