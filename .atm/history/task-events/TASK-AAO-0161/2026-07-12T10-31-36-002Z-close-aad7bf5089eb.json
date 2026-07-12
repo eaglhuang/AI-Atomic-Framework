@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T10-31-36-002Z-close-aad7bf5089eb",
+  "taskId": "TASK-AAO-0161",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712102301-codex-backlog-captain-TASK-AAO-0161-9033afd0f4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0161.json",
+  "taskSha256": "sha256:978120e20f581471d233ce2c9dccc971a218104d981939c75b4016fbee0dcae2",
+  "createdAt": "2026-07-12T10:31:36.002Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0161 --actor codex-backlog-captain --status done --historical-delivery 6ac05e8175111a1d80a244f3aec5b62607cae633",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712102301-codex-backlog-captain-TASK-AAO-0161-9033afd0f4",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0161.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:broker-lifecycle",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-commands"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T10:31:35.994Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0161.*",
+        ".atm/history/task-events/TASK-AAO-0161/**",
+        ".atm/history/tasks/TASK-AAO-0161.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/core/src/broker/**",
+        "scripts/validate-broker-lifecycle.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/**",
+        "packages/core/src/broker/**",
+        "scripts/validate-broker-lifecycle.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

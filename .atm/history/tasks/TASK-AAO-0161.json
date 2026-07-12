@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0161",
   "title": "Broker close release and runtime snapshot cleanup",
-  "status": "running",
+  "status": "done",
   "milestone": "Backlog-P0",
   "dependencies": [],
   "acceptance": [
@@ -65,8 +65,8 @@
     "hash": "c5c3d315d5136300"
   },
   "importedAt": "2026-07-12T10:22:56.164Z",
-  "lastTransitionId": "2026-07-12T10-27-58-640Z-scope-amendment-3c0f44211026",
-  "lastTransitionAt": "2026-07-12T10:27:58.640Z",
+  "lastTransitionId": "2026-07-12T10-31-36-002Z-close-aad7bf5089eb",
+  "lastTransitionAt": "2026-07-12T10:31:36.002Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-backlog-captain",
   "reservedAt": "2026-07-12T10:23:01.949Z",
@@ -75,7 +75,7 @@
     "actorId": "codex-backlog-captain",
     "leaseId": "lease-452b4d0345f0",
     "claimedAt": "2026-07-12T10:23:01.954Z",
-    "heartbeatAt": "2026-07-12T10:23:01.954Z",
+    "heartbeatAt": "2026-07-12T10:31:36.000Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-AAO-0161.*",
@@ -89,8 +89,8 @@
       "scripts/validate-broker-lifecycle.ts",
       "scripts/validate-governance-commands.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-12T10:23:01.954Z",
   "startedByActor": "codex-backlog-captain",
@@ -129,5 +129,9 @@
     "actorId": "codex-backlog-captain",
     "createdAt": "2026-07-12T10:23:02.255Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-12T10:31:36.000Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712102301-codex-backlog-captain-TASK-AAO-0161-9033afd0f4",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0161.closure-packet.json"
 }
