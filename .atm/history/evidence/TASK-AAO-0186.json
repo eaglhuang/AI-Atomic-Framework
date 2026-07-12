@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0186",
-  "updatedAt": "2026-07-12T14:11:06.267Z",
+  "updatedAt": "2026-07-12T14:15:18.309Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -168,6 +168,48 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:8db07d13e59df94a8a59a7fa508ba390043259fc206527de33e5d2fbb225dbb5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712140706-codex-backlog-captain-TASK-AAO-0186-ecc968a4fa",
+      "createdAt": "2026-07-12T14:15:18.309Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712140706-codex-backlog-captain-TASK-AAO-0186-ecc968a4fa",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:15:18.364Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a4f4cb4875a3d2ed61845fe0c64af902f7cb355254a2cc33de4b8610aa3b7112",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

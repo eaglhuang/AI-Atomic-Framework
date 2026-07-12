@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T14-15-32-468Z-close-011fafd8ba32",
+  "taskId": "TASK-AAO-0186",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712140706-codex-backlog-captain-TASK-AAO-0186-ecc968a4fa",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0186.json",
+  "taskSha256": "sha256:3b47f531826f22cbec3fbb06b1160a4051855461ed6b1cc60c70034420b29112",
+  "createdAt": "2026-07-12T14:15:32.468Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0186 --actor codex-backlog-captain --status done --historical-delivery 9453a56519b894d8909a9a52875284823eda941e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712140706-codex-backlog-captain-TASK-AAO-0186-ecc968a4fa",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0186.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T14:15:32.457Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0186.*",
+        ".atm/history/task-events/TASK-AAO-0186/**",
+        ".atm/history/tasks/TASK-AAO-0186.json",
+        "packages/cli/src/commands/team.ts",
+        "tests/cli/team-plan-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "tests/cli/team-plan-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
