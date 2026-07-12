@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0180",
+  "updatedAt": "2026-07-12T13:35:58.267Z",
+  "updatedBy": "codex-backlog-captain",
+  "freshValidationPasses": [
+    "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md .atm/task-plans/TASK-AAO-0180.md",
+    "git diff --check",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-12T13:35:50.513Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "37c9c535f7ebcf3ea8197f5aa2f7a9936b2c46fb",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md .atm/task-plans/TASK-AAO-0180.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e6c430f75032eef009b9ea9adbd98e6dda21ad51e5d6478dfddda09f3271e3a7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md .atm/task-plans/TASK-AAO-0180.md"
+      ],
+      "generatedAt": "2026-07-12T13:35:52.478Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "37c9c535f7ebcf3ea8197f5aa2f7a9936b2c46fb",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T13:35:58.332Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "37c9c535f7ebcf3ea8197f5aa2f7a9936b2c46fb",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
