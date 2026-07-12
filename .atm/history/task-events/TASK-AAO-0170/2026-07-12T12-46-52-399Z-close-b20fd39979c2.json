@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T12-46-52-399Z-close-b20fd39979c2",
+  "taskId": "TASK-AAO-0170",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712122317-codex-backlog-captain-TASK-AAO-0170-e39d9cde0f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0170.json",
+  "taskSha256": "sha256:8bad32bb31a137ec0f7f0cbd862e4c94f1adcddf3cfa4c0888b93616ef395c75",
+  "createdAt": "2026-07-12T12:46:52.399Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0170 --actor codex-backlog-captain --status done --historical-delivery 6795f7e785d887e7a9ae1336cb86410b820230e7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712122317-codex-backlog-captain-TASK-AAO-0170-e39d9cde0f",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0170.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-ledger-governance"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T12:46:52.394Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0170.*",
+        ".atm/history/task-events/TASK-AAO-0170/**",
+        ".atm/history/tasks/TASK-AAO-0170.json",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "scripts/validators/task-ledger/suite-impl.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "scripts/validators/task-ledger/suite-impl.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

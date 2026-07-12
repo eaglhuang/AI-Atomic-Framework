@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0170
 task_id: TASK-AAO-0170
 title: "Harden scoped stale closure residue recovery"
-status: planned
+status: done
 owner: atm-core
 priority: P1
 milestone: RFT-M
@@ -30,6 +30,15 @@ atomizationImpact:
   mapUpdates: []
 outOfScope: []
 nonGoals: []
+completed_at: "2026-07-12T12:46:52.470Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T12:46:52.470Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T12-46-52-470Z-close-fbcf40f13056"
+lastTransitionAt: "2026-07-12T12:46:52.470Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "6795f7e785d887e7a9ae1336cb86410b820230e7"
 ---
 
 # TASK-AAO-0170 - Harden scoped stale closure residue recovery
