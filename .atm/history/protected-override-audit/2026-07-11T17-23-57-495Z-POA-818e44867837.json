@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-818e44867837",
+  "recordedAt": "2026-07-11T17:23:57.495Z",
+  "actorId": "codex-backlog-captain",
+  "taskId": "TASK-AAO-0157",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-backlog-captain --task TASK-AAO-0157 --message \"fix(governance): honor claim globs for generated release mirrors\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-AAO-0157-7ccf54fe45",
+  "reason": "Emergency recovery for self-generated protected audit scope-drift loop; all required command-backed validators passed before the normal commit attempts.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T17-23-54-436Z-EMG-TASK-AAO-0157-7ccf54fe45.json",
+  "parentEventId": "POA-ec0dd541801e",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

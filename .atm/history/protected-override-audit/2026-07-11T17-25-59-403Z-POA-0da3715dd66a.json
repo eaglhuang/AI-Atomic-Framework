@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-0da3715dd66a",
+  "recordedAt": "2026-07-11T17:25:59.403Z",
+  "actorId": "codex-backlog-captain",
+  "taskId": "TASK-AAO-0157",
+  "surface": "tasks close historical-delivery backend",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0157 --actor codex-backlog-captain --status done --json",
+  "flags": [
+    "--historical-delivery"
+  ],
+  "permission": "backend.tasks.close",
+  "leaseId": "EMG-TASK-AAO-0157-463424455c",
+  "reason": "Emergency closeback repair: use the governed delivery commit containing TASK-AAO-0157 scoped non-.atm deliverables after taskflow retained an obsolete evidence-only ref.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.tasks.close"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-11T17-25-59-401Z-EMG-TASK-AAO-0157-463424455c.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
