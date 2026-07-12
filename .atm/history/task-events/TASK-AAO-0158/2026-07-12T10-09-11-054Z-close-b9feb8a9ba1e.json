@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T10-09-11-054Z-close-b9feb8a9ba1e",
+  "taskId": "TASK-AAO-0158",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712100430-codex-backlog-captain-TASK-AAO-0158-cdd7a68aec",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0158.json",
+  "taskSha256": "sha256:5015b712376dbe6aa990b759630385b41d2692a5506c32a23f31f543e4cb89c0",
+  "createdAt": "2026-07-12T10:09:11.054Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0158 --actor codex-backlog-captain --status done --historical-delivery 831030ff5c1216fc93a2bd613338a879c86ac7a2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712100430-codex-backlog-captain-TASK-AAO-0158-cdd7a68aec",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0158.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-commands"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T10:09:11.048Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0158.*",
+        ".atm/history/task-events/TASK-AAO-0158/**",
+        ".atm/history/tasks/TASK-AAO-0158.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "package.json",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-governance-commands/**"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-governance-commands/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
