@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0163",
+  "title": "Encoding temp artifact backlog closeback",
+  "status": "running",
+  "milestone": "Backlog-P2",
+  "dependencies": [],
+  "acceptance": [
+    "`ATM-BUG-2026-07-12-123` status becomes `Fixed in TASK-AAO-0159`.",
+    "Evidence / follow-up text names the isolation behavior delivered by `TASK-AAO-0159`.",
+    "No implementation files are changed.",
+    "Encoding and backlog duplicate-ID validation still pass."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run check:encoding:touched",
+    "npm run validate:task-import"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing encoding guard implementation",
+    "Deleting or quarantining another actor's tmp files",
+    "Changing Team Agents files or shared atom maps"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the canonical backlog closeback row if the historical TASK-AAO-0159 linkage is disproved.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.bug-backlog",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0163-encoding-temp-artifact-backlog-closeback.task.md",
+    "sectionTitle": "TASK-AAO-0163",
+    "headingLine": 36,
+    "hash": "9fcfdefd2f42a922"
+  },
+  "importedAt": "2026-07-12T10:51:47.713Z",
+  "lastTransitionId": "2026-07-12T10-51-56-713Z-claim-5f0ca92ba107",
+  "lastTransitionAt": "2026-07-12T10:51:56.713Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T10:51:56.504Z",
+  "promotedAt": "2026-07-12T10:51:56.506Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-312e54f7b76d",
+    "claimedAt": "2026-07-12T10:51:56.509Z",
+    "heartbeatAt": "2026-07-12T10:51:56.509Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0163.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T10:51:56.509Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0163",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0163.*",
+      ".atm/history/task-events/TASK-AAO-0163/**",
+      ".atm/history/tasks/TASK-AAO-0163.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "64e0644960ac3e5d4aa4a13068c4d793b36b92e9a9706416ebcf79f81aca2f1f",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T10:51:56.712Z",
+    "status": "active"
+  }
+}
