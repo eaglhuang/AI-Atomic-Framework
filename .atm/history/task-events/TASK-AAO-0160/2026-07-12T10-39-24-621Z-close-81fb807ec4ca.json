@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T10-39-24-621Z-close-81fb807ec4ca",
+  "taskId": "TASK-AAO-0160",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712103233-codex-backlog-captain-TASK-AAO-0160-8d7b692a63",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0160.json",
+  "taskSha256": "sha256:0011f21b2cb3760d6f9594279ace97502d8ed5d56a959629d15eabee09d39483",
+  "createdAt": "2026-07-12T10:39:24.621Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0160 --actor codex-backlog-captain --status done --historical-delivery c2835c9ff56028b32c6b16ad93f13f0b0c3f7c3a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712103233-codex-backlog-captain-TASK-AAO-0160-8d7b692a63",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0160.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-commands"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T10:39:24.615Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0160.*",
+        ".atm/history/task-events/TASK-AAO-0160/**",
+        ".atm/history/tasks/TASK-AAO-0160.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
