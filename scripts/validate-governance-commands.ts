@@ -775,6 +775,41 @@ try {
   const stagedScopedCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable', '--json']);
   assert(stagedScopedCommit.exitCode === 0, 'git commit must succeed once scoped files are staged');
   assert(stagedScopedCommit.parsed.ok === true, 'staged scoped git commit must report ok=true');
+
+  writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "protected-audit-deferral";\n', 'utf8');
+  const protectedAuditDir = path.join(repo, '.atm', 'history', 'protected-override-audit');
+  mkdirSync(protectedAuditDir, { recursive: true });
+  const foreignProtectedAudit = '.atm/history/protected-override-audit/2026-07-12T00-00-00-000Z-POA-foreign.json';
+  const ownedProtectedAudit = '.atm/history/protected-override-audit/2026-07-12T00-00-01-000Z-POA-owned.json';
+  writeJson(path.join(repo, foreignProtectedAudit), {
+    schemaId: 'atm.protectedOverrideAuditEvent.v1',
+    eventId: 'POA-foreign',
+    taskId: 'TASK-FOREIGN-AUDIT-0001',
+    actorId: 'other-agent',
+    outcome: 'failed'
+  });
+  writeJson(path.join(repo, ownedProtectedAudit), {
+    schemaId: 'atm.protectedOverrideAuditEvent.v1',
+    eventId: 'POA-owned',
+    taskId: stagingTaskId,
+    actorId: 'fixture-agent',
+    outcome: 'failed'
+  });
+  assert(runGit(repo, ['add', foreignProtectedAudit]).exitCode === 0, 'foreign protected audit fixture must stage');
+  const protectedAuditCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: protected audit deferral', '--auto-stage', '--defer-foreign-staged', '--json']);
+  assert(protectedAuditCommit.exitCode === 0, 'git commit must defer foreign protected audit and admit task-owned protected audit');
+  assert(protectedAuditCommit.parsed.ok === true, 'protected audit deferral commit must report ok=true');
+  const protectedAuditSha = String(protectedAuditCommit.parsed.evidence?.commitSha ?? '').trim();
+  assert(Boolean(protectedAuditSha), 'protected audit deferral commit must return a commit sha');
+  const protectedAuditTouched = runGit(repo, ['show', '--name-only', '--pretty=format:', protectedAuditSha]).stdout
+    .split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  assert(protectedAuditTouched.includes(stagingScopedFile), 'protected audit deferral commit must include the task deliverable');
+  assert(protectedAuditTouched.includes(ownedProtectedAudit), 'protected audit deferral commit must include task-owned protected audit');
+  assert(!protectedAuditTouched.includes(foreignProtectedAudit), 'protected audit deferral commit must exclude foreign protected audit');
+  assert(runGit(repo, ['diff', '--cached', '--name-only', '--', foreignProtectedAudit]).stdout.trim() === '', 'foreign protected audit must not remain staged after deferral commit');
+  assert(existsSync(path.join(repo, foreignProtectedAudit)), 'foreign protected audit worktree file must remain available for its owner');
+  rmSync(path.join(repo, foreignProtectedAudit), { force: true });
+
   assert(runGit(repo, ['reset']).exitCode === 0, 'framework auto-stage fixture must start with an empty index');
 
   const frameworkClaimFiles = [
