@@ -1,0 +1,210 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-FABLE-003",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c1e6b5cd2d5458bc11b7b35db58072cfd7940fa2",
+  "governedTreeSha": "ca95f1cab0aa15115034753052894ca431a11723",
+  "targetCommitDelta": {
+    "currentCommitSha": "c1e6b5cd2d5458bc11b7b35db58072cfd7940fa2",
+    "parentCommitShas": [
+      "c1e6b5cd2d5458bc11b7b35db58072cfd7940fa2"
+    ],
+    "governedTreeSha": "ca95f1cab0aa15115034753052894ca431a11723",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-003.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-01-41-215Z-import-7a5a2b46baa0.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-03-46-912Z-reserve-aa1083f248da.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-03-46-914Z-promote-8332b5e917c3.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-03-47-454Z-claim-1c4bd71fc00a.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-16-27-596Z-release-b30cd1ea7664.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-17-35-990Z-reserve-16575a547c51.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-17-35-992Z-promote-b592672a1cea.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-17-36-698Z-claim-dd7ece2f9e43.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T14-34-31-861Z-renew-97b0c022e9ec.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T15-21-31-278Z-repair-claim-59c3176d236d.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/2026-07-12T15-55-07-367Z-claim-0e8002057c7c.json",
+      ".atm/history/tasks/TASK-AAO-FABLE-003.json",
+      ".atm/task-plans/TASK-AAO-0188.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/integration-plugin-matrix.md",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/integration-hooks.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/docs/governance/integration-plugin-matrix.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/evidence/missing-report.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit.js",
+      "release/atm-root-drop/packages/cli/dist/commands/integration-hooks.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-intent.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/actor-registry.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/evidence/missing-report.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit.ts",
+      "release/atm-root-drop/packages/cli/src/commands/integration-hooks.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-intent.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/team-runtime/provider-selection.js",
+      "release/atm-root-drop/packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/team-runtime/provider-selection.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/check-encoding-touched.ts",
+      "release/atm-root-drop/scripts/validate-broker-lifecycle.ts",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-script-parity.ts",
+      "release/atm-root-drop/scripts/validate-task-import.ts",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
+      "release/atm-root-drop/tests/cli/tasks-claim-auto-intent.test.ts",
+      "release/atm-root-drop/tests/cli/team-plan-contract.test.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/task-ledger-fixture-isolation.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:60594fbe45db37caece15c84f864e5a104a0670a3cdea2e3563c13db8d013a6c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:179b0c5d40f046914e9e92825e6620f95bb46e8dcbb65863847692061c89231c",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-12T16:11:31.117Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-003.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/evidence/validator-classification.ts",
+      "packages/cli/src/commands/taskflow.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/evidence/validator-classification.ts",
+      "packages/cli/src/commands/taskflow.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-FABLE-003.json",
+  "closedAt": "2026-07-12T16:11:31.118Z",
+  "closedByActor": "claude-fable-5",
+  "sessionId": "session-20260712155506-claude-fable-5-TASK-AAO-FABLE-003-0c59e91311",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "4fbf35c32d958c23fff69af956acebf2e7972005",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/evidence/missing-report.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-FABLE-003",
+  "title": "Unify taskflow closure required-validator readiness",
+  "status": "done",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "One shared required-validator calculation drives pre-close, dry-run, write.",
+    "Dry-run lists every write-required validator with copyable commands.",
+    "Regression proves dry-run and write required sets are identical.",
+    "Backlog row 155 (and 148 if covered) marked fixed after evidence."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/evidence/missing-report.ts",
+    "packages/cli/src/commands/evidence/validator-classification.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run typecheck",
+    "npm run validate:cli",
+    "npm run validate:git-head-evidence"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert shared readiness wiring; write-path closure packet validation stays authoritative.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.taskflow-orchestration",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-FABLE-003-unify-closure-required-validator-readiness.task.md",
+    "sectionTitle": "TASK-AAO-FABLE-003",
+    "headingLine": 36,
+    "hash": "7701ef9ec47e9847"
+  },
+  "importedAt": "2026-07-12T14:01:41.206Z",
+  "lastTransitionId": "2026-07-12T16-11-31-126Z-close-400212ae6054",
+  "lastTransitionAt": "2026-07-12T16:11:31.126Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-12T14:17:35.990Z",
+  "promotedAt": "2026-07-12T14:17:35.992Z",
+  "claim": {
+    "actorId": "claude-fable-5",
+    "leaseId": "lease-be5642398616",
+    "claimedAt": "2026-07-12T15:55:06.882Z",
+    "heartbeatAt": "2026-07-12T16:11:31.122Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-FABLE-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/evidence/validator-classification.ts",
+      "packages/cli/src/commands/taskflow.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-12T14:03:46.918Z",
+  "startedByActor": "claude-fable-5",
+  "startedBySessionId": "session-20260712155506-claude-fable-5-TASK-AAO-FABLE-003-0c59e91311",
+  "owner": "claude-fable-5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-FABLE-003",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-003.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-003/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-003.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/evidence/missing-report.ts",
+      "packages/cli/src/commands/evidence/validator-classification.ts",
+      "packages/cli/src/commands/taskflow.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c12352df76836aaf2c97a628a706d8816c611fbb4aed5cffa6757bb09f5bf8cf",
+    "actorId": "claude-fable-5",
+    "createdAt": "2026-07-12T15:55:07.366Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-12T16:11:31.122Z",
+  "closedByActor": "claude-fable-5",
+  "closedBySessionId": "session-20260712155506-claude-fable-5-TASK-AAO-FABLE-003-0c59e91311",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-FABLE-003.closure-packet.json"
+}
