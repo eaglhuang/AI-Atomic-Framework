@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0172",
-  "updatedAt": "2026-07-12T12:51:14.822Z",
+  "updatedAt": "2026-07-12T12:53:22.404Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -149,6 +149,106 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:d5b5eb53881b3ebdffc8bbccbf96558a719cee500152c8a55a6ec5d400c8db16",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712125029-codex-backlog-captain-TASK-AAO-0172-c83d99fe14",
+      "createdAt": "2026-07-12T12:52:41.387Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712125029-codex-backlog-captain-TASK-AAO-0172-c83d99fe14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-governance-backlog",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:b30f0882c17ae80fb7e6958d87301e92cfc20b63fd765a0bc5a4cd597877ba26",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8e9561a01ec017cbbb5db3c63c5f5af4aae96c7857080a779f208404f398257b",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:52:41.482Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6d351accbef903baa8e28c009a55af0647202d327c3dd92b621866c0e23a4121",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712125029-codex-backlog-captain-TASK-AAO-0172-c83d99fe14",
+      "createdAt": "2026-07-12T12:53:22.404Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712125029-codex-backlog-captain-TASK-AAO-0172-c83d99fe14",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-governance-backlog",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:53:22.492Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5b2e47166314ff28221866fa838aa572449e7ffaa6466798960351f86e7ba4ad",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
