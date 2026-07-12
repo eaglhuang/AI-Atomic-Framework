@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-AAO-0163",
-  "updatedAt": "2026-07-12T10:54:12.692Z",
+  "updatedAt": "2026-07-12T10:57:20.963Z",
   "updatedBy": "codex-backlog-captain",
   "freshValidationPasses": [
     "check:encoding:touched",
     "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:task-import"
   ],
   "staleValidationPasses": [],
@@ -47,6 +50,45 @@
       "generatedAt": "2026-07-12T10:54:12.756Z",
       "runnerKind": "dev-source",
       "sourceCommit": "5a999a97fe42c5a8ee32fd2dbc40d29e260f739a",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T10:56:18.512Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "90361542b04b6299bfeb649e027968c08df1e141",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:306241feb02a2ebd7c447fedd2ece9da430a5e083a31a876a713ca65480058ad",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-12T10:56:52.217Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "90361542b04b6299bfeb649e027968c08df1e141",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-12T10:57:21.026Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "90361542b04b6299bfeb649e027968c08df1e141",
       "cached": false
     }
   ],

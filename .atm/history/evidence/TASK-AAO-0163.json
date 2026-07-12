@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0163",
-  "updatedAt": "2026-07-12T10:54:12.692Z",
+  "updatedAt": "2026-07-12T10:57:20.963Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -149,6 +149,159 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:5b7b2ed569b9d6e1246a23da9b76edfb41398a578a3e9559676ceb3054644a1c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+      "createdAt": "2026-07-12T10:56:18.451Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.bug-backlog",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "90361542b04b6299bfeb649e027968c08df1e141",
+            "cacheKey": "sha256:64df0eb0bd34350d7e0fc35c8523820107c9086c82451dd50d583c23970d0f7f",
+            "cached": false,
+            "generatedAt": "2026-07-12T10:56:18.512Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e0620a50e2e422acc7b5b07f618a0fc6fe5e43caa4dc48acb86558a67427c76f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+      "createdAt": "2026-07-12T10:56:52.146Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.bug-backlog",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:306241feb02a2ebd7c447fedd2ece9da430a5e083a31a876a713ca65480058ad",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "90361542b04b6299bfeb649e027968c08df1e141",
+            "cacheKey": "sha256:ed792d58eaff742abc0c779d6f5c9a3eaaf4bc29929a7978ecc17c09ad6ddf38",
+            "cached": false,
+            "generatedAt": "2026-07-12T10:56:52.217Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7e15cff6a220f747e9867a290aca8017c8b4d8344aebf2736dba90ec60bf3162",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+      "createdAt": "2026-07-12T10:57:20.963Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712105156-codex-backlog-captain-TASK-AAO-0163-dc1de72f67",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.bug-backlog",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "90361542b04b6299bfeb649e027968c08df1e141",
+            "cacheKey": "sha256:ec9d9c756b5b31067d7433a15fed050f066d9e4f990c3d870162a17592b2f5a2",
+            "cached": false,
+            "generatedAt": "2026-07-12T10:57:21.026Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:09d5f1584cb30dce100005d363290da3292688896d7443e823ba564a700c8485",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
