@@ -1,0 +1,53 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T09-29-30-040Z-close-cc29ab543283",
+  "taskId": "TASK-TEAM-0085",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260712092709-Codex-GPT5.6-Terra-TASK-TEAM-0085-c43dd450b4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0085.json",
+  "taskSha256": "sha256:60f840ce3ceaf395bf7da896d9cde61c0f2e8ccbd6b85872b198aae43f76faf4",
+  "createdAt": "2026-07-12T09:29:30.040Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0085 --actor \"Codex-GPT5.6 Terra\" --status done --historical-delivery 6d72a6d9195ab59efea30a09d6d8b9edd195b0bd",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712092709-Codex-GPT5.6-Terra-TASK-TEAM-0085-c43dd450b4",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0085.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T09:29:30.033Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0085.*",
+        ".atm/history/task-events/TASK-TEAM-0085/**",
+        ".atm/history/tasks/TASK-TEAM-0085.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
