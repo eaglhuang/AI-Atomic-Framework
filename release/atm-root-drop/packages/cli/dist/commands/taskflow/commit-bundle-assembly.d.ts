@@ -80,6 +80,7 @@ export declare function commitTaskflowDeliveryFiles(input: {
     bundle: TaskflowGovernedCommitBundle;
     actorId: string;
     taskId: string;
+    deferForeignStaged?: boolean;
 }): Promise<TaskflowDeliveryCommit | null>;
 export declare function finalizeTaskflowCommitBundle(input: {
     bundle: TaskflowGovernedCommitBundle;

@@ -867,7 +867,8 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     const preCloseDeliveryCommit = await commitTaskflowDeliveryFiles({
       bundle: previewCommitBundle,
       actorId,
-      taskId
+      taskId,
+      deferForeignStaged
     });
     const effectiveHistoricalDeliveryRefs = preCloseDeliveryCommit?.commitSha
       ? uniqueSorted([...historicalDeliveryRefs, preCloseDeliveryCommit.commitSha])

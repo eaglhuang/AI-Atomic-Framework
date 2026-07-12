@@ -68,4 +68,29 @@ export declare function isBrokerVerdictAdmissible(verdict: BrokerArbitrationVerd
  * consulted end-to-end; we ship the diagnostic to catch future regressions).
  */
 export declare function detectBrokerCidDivergence(brokerVerdict: BrokerArbitrationVerdict, cidVerdict: ClaimAdmissionCidVerdict): boolean;
+/**
+ * TASK-TEAM-0078 — derive the legacy CID gate verdict from the
+ * parallel-preflight finding signals. Extracted from next.ts so the queue/CID
+ * policy has a single owner module.
+ */
+export declare function deriveCidVerdict(input: {
+    readonly claimIntent: string;
+    readonly activeWriteConflict: boolean;
+    readonly confirmedBrokerConflict: boolean;
+    readonly insufficientMutationIntent: boolean;
+    readonly overlappingAtomIdCount: number;
+}): {
+    readonly shouldBlockPerCid: boolean;
+    readonly cidVerdict: ClaimAdmissionCidVerdict;
+};
+/**
+ * TASK-TEAM-0078 — map the claim-path signals onto the broker arbitration
+ * verdict. The parallel-preflight is broker-authoritative for this path:
+ * queued private work maps to `watch`, a confirmed CID block maps to
+ * `freeze`, anything else the CID gate would admit maps to `allow`.
+ */
+export declare function deriveBrokerVerdict(input: {
+    readonly queuedPrivateWork: boolean;
+    readonly shouldBlockPerCid: boolean;
+}): BrokerArbitrationVerdict;
 export declare function evaluateClaimAdmission(input: ClaimAdmissionInput): ClaimAdmissionDecision;

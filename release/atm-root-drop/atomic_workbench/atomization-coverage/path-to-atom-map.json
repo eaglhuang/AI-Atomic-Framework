@@ -587,6 +587,13 @@
       "source_task": "TASK-TEAM-0027"
     },
     {
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeamHandoff",
+      "atom_id": "team.handoff-governed-read",
+      "capability": "Coordinator-mediated canonical handoff show, context, stats, and materialization hard-gate entry.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0075"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
       "atom_id": "team.recipe-permission-model",
       "capability": "Recipe catalog validation and scoped permission lease planning.",
@@ -1014,6 +1021,24 @@
       "path_pattern": "templates/agent-pack/**",
       "atom_id": "atom-integration-playbook",
       "capability": "Reusable playbook fragments included by every editor adapter skill manifest",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/claim-admission.ts",
+      "atom_id": "atom-next-claim-admission",
+      "capability": "claim admission policy: unify broker arbitration verdict with the legacy CID gate and surface divergence (TASK-RFT-0011, TASK-TEAM-0078).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/broker-queue-admission.ts",
+      "atom_id": "atom-next-broker-queue-admission",
+      "capability": "canonical shared-surface queue adapter: queue-head / queued-private-work / queued-blocked admission for next --claim (TASK-TEAM-0079, TASK-TEAM-0078).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "atom_id": "atom-next-claim-conflict-log",
+      "capability": "structured claim admission decision log: seven-gate result, shared path order, queue position, private-path allowance, block reason (TASK-TEAM-0078).",
       "coverage_status": "active"
     }
   ],

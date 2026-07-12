@@ -185,7 +185,10 @@ export function parseCommitRangeArgs(argv) {
     };
 }
 export function readGitObjectText(cwd, ref) {
-    const result = runGit(cwd, ['show', ref]);
+    // Git invokes hooks with a temporary index for path-limited commits. Keep
+    // that index so staged-content guards inspect the exact pending commit.
+    const hookIndex = process.env.GIT_INDEX_FILE?.trim();
+    const result = runGit(cwd, ['show', ref], hookIndex ? { GIT_INDEX_FILE: hookIndex } : undefined);
     return result.exitCode === 0 ? result.stdout : null;
 }
 export function findFutureCommitEvidenceMatchInWorktree(cwd, treeSha, parentCommitShas) {

@@ -49,6 +49,35 @@ export function detectBrokerCidDivergence(brokerVerdict, cidVerdict) {
         return true;
     return false;
 }
+/**
+ * TASK-TEAM-0078 — derive the legacy CID gate verdict from the
+ * parallel-preflight finding signals. Extracted from next.ts so the queue/CID
+ * policy has a single owner module.
+ */
+export function deriveCidVerdict(input) {
+    const shouldBlockPerCid = input.claimIntent !== 'closeout-only'
+        && input.activeWriteConflict
+        && (input.confirmedBrokerConflict || input.insufficientMutationIntent);
+    const cidVerdict = shouldBlockPerCid
+        ? 'blocked-cid-conflict'
+        : (input.insufficientMutationIntent
+            ? 'insufficient-mutation-intent'
+            : input.overlappingAtomIdCount > 0
+                ? 'parallel-safe-with-cid-overlap-advisory'
+                : 'parallel-safe');
+    return { shouldBlockPerCid, cidVerdict };
+}
+/**
+ * TASK-TEAM-0078 — map the claim-path signals onto the broker arbitration
+ * verdict. The parallel-preflight is broker-authoritative for this path:
+ * queued private work maps to `watch`, a confirmed CID block maps to
+ * `freeze`, anything else the CID gate would admit maps to `allow`.
+ */
+export function deriveBrokerVerdict(input) {
+    if (input.queuedPrivateWork)
+        return 'watch';
+    return input.shouldBlockPerCid ? 'freeze' : 'allow';
+}
 export function evaluateClaimAdmission(input) {
     const divergent = detectBrokerCidDivergence(input.brokerVerdict, input.cidVerdict);
     const divergence = divergent

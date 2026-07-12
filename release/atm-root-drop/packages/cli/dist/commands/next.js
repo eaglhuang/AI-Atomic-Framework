@@ -1,12 +1,15 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/dist/guidance/index.js';
 import { loadHumanReviewQueueDocument } from '../../../plugin-human-review/dist/index.js';
 import { buildFirstUseUserNotice } from './first-use-notice.js';
 import { compareScoredTasks, compareGuidedLegacyQueuePriority, compareIsoDesc, looksLikeTaskArtifact, isLikelyPromptPathHint, pathFieldMatches, looksLikeNamedPlanPrompt, allowsPlanningMirror, statusQueueWeight, decisionResultForStatus, countTokenOverlap } from './next/match-and-sort.js';
 import { runDoctor } from './doctor.js';
-import { evaluateClaimAdmission } from './next/claim-admission.js';
+import { deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission } from './next/claim-admission.js';
+import { evaluateBrokerQueueAdmission } from './next/broker-queue-admission.js';
+import { buildClaimAdmissionDecisionLog } from './next/claim-conflict-log.js';
+import { runBroker } from './broker.js';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, decideRuntimeNextAction, selectPostClaimChannel, selectQuickfixChannel } from './next/channel-strategy.js';
 import { buildTaskScopedClaimCommand } from './next/task-scoped-claim-command.js';
 import { withRunnerMode } from './next/runner-mode.js';
@@ -748,6 +751,8 @@ async function claimNextImportedTask(input) {
         });
     }
     let parallelAdvisory = undefined;
+    let brokerQueueAdmission = undefined;
+    let claimAllowedFiles = buildAllowedFilesForTask(claimableTask);
     // Parallel preflight check
     const parallelStartedAt = Date.now();
     try {
@@ -765,7 +770,13 @@ async function claimNextImportedTask(input) {
                 const finding = candidate.finding;
                 if (finding) {
                     const overlappingAtomIds = Array.isArray(finding.overlappingAtomIds) ? finding.overlappingAtomIds : [];
-                    if (finding.verdict === 'blocked-cid-conflict' || overlappingAtomIds.length > 0) {
+                    const overlappingFiles = Array.isArray(finding.overlappingFiles)
+                        ? finding.overlappingFiles.map((entry) => String(entry).trim()).filter(Boolean)
+                        : [];
+                    // Queue admission is driven by concrete writable surfaces, not only
+                    // CID overlap. A CID-disjoint same-file finding still needs the
+                    // shared file removed from the waiter's direction lock.
+                    if (finding.verdict === 'blocked-cid-conflict' || overlappingAtomIds.length > 0 || overlappingFiles.length > 0) {
                         // TASK-CID-0024: same-file / same-atom overlap only blocks the
                         // claim when the overlapping task is actively write-claimed by
                         // another actor. Queued-but-idle overlaps and closeout-only
@@ -792,19 +803,35 @@ async function claimNextImportedTask(input) {
                         const confirmedBrokerConflict = brokerAdmission?.confirmedConflict === true;
                         const insufficientMutationIntent = finding.verdict === 'insufficient-mutation-intent'
                             || brokerAdmission?.mutationIntentStatus === 'missing';
-                        const shouldBlockPerCid = claimIntent !== 'closeout-only'
-                            && activeWriteConflict
-                            && (confirmedBrokerConflict || insufficientMutationIntent);
-                        const cidVerdict = shouldBlockPerCid
-                            ? 'blocked-cid-conflict'
-                            : (insufficientMutationIntent
-                                ? 'insufficient-mutation-intent'
-                                : overlappingAtomIds.length > 0
-                                    ? 'parallel-safe-with-cid-overlap-advisory'
-                                    : 'parallel-safe');
-                        const overlappingFiles = Array.isArray(finding.overlappingFiles)
-                            ? finding.overlappingFiles.map((entry) => String(entry).trim()).filter(Boolean)
-                            : [];
+                        const { shouldBlockPerCid, cidVerdict } = deriveCidVerdict({
+                            claimIntent,
+                            activeWriteConflict,
+                            confirmedBrokerConflict,
+                            insufficientMutationIntent,
+                            overlappingAtomIdCount: overlappingAtomIds.length
+                        });
+                        const queueAdmission = evaluateBrokerQueueAdmission({
+                            cwd: input.cwd,
+                            taskId: claimableTask.workItemId,
+                            allowedFiles: claimAllowedFiles,
+                            overlappingFiles
+                        });
+                        if (queueAdmission.status === 'invalid') {
+                            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
+                                exitCode: 1,
+                                details: { taskId: claimableTask.workItemId, brokerQueueAdmission: queueAdmission }
+                            });
+                        }
+                        if (queueAdmission.status === 'queued-blocked') {
+                            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
+                                exitCode: 1,
+                                details: { taskId: claimableTask.workItemId, brokerQueueAdmission: queueAdmission }
+                            });
+                        }
+                        if (queueAdmission.status === 'queued-private-work') {
+                            brokerQueueAdmission = queueAdmission;
+                            claimAllowedFiles = queueAdmission.allowedFiles;
+                        }
                         const sharedConflictSurfaces = overlappingFiles.length > 0
                             ? overlappingFiles
                             : (overlappingAtomIds.length > 0 ? overlappingAtomIds : ['<shared-path>']);
@@ -831,13 +858,39 @@ async function claimNextImportedTask(input) {
                         // maps to broker `allow`. When broker's separate authoritative
                         // registry adds a distinct verdict feed here in a follow-up, the
                         // divergence detector will start firing.
-                        const brokerVerdict = shouldBlockPerCid ? 'freeze' : 'allow';
+                        const brokerVerdict = deriveBrokerVerdict({
+                            queuedPrivateWork: queueAdmission.status === 'queued-private-work',
+                            shouldBlockPerCid
+                        });
                         const admission = evaluateClaimAdmission({
                             brokerVerdict,
                             cidVerdict,
                             candidateTaskId: claimableTask.workItemId,
                             conflictingTaskId: candidate.taskId,
                             overlappingAtomIds
+                        });
+                        const admissionReason = admission.admitted
+                            ? (queueAdmission.status === 'queued-private-work'
+                                ? 'broker-shared-surface-queue-private-work'
+                                : insufficientMutationIntent
+                                    ? 'broker-conflict-not-confirmed'
+                                    : claimIntent === 'closeout-only'
+                                        ? 'closeout-only-claim-intent'
+                                        : 'cid-overlap-without-active-write-claim')
+                            : null;
+                        const claimAdmissionDecisionLog = buildClaimAdmissionDecisionLog({
+                            taskId: claimableTask.workItemId,
+                            conflictTaskId: candidate.taskId,
+                            claimIntent,
+                            activeWriteConflict,
+                            confirmedBrokerConflict,
+                            insufficientMutationIntent,
+                            cidVerdict,
+                            brokerVerdict,
+                            queueAdmission,
+                            overlappingFiles,
+                            decision: admission,
+                            admissionReason
                         });
                         if (!admission.admitted) {
                             throw new CliError(admission.blockCode ?? 'ATM_NEXT_CLAIM_BLOCKED', admission.blockReason
@@ -860,6 +913,7 @@ async function claimNextImportedTask(input) {
                                     requiredResolutionArtifact: 'atm.brokerConflictResolution.v1',
                                     requiredCommand,
                                     conflictUx,
+                                    claimAdmissionDecisionLog,
                                     admissionDivergence: admission.divergence,
                                     closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
                                 }
@@ -874,13 +928,10 @@ async function claimNextImportedTask(input) {
                                 conflictWithTaskId: candidate.taskId,
                                 conflictClaimActorId: conflictActorId,
                                 admitted: true,
-                                admissionReason: insufficientMutationIntent
-                                    ? 'broker-conflict-not-confirmed'
-                                    : claimIntent === 'closeout-only'
-                                        ? 'closeout-only-claim-intent'
-                                        : 'cid-overlap-without-active-write-claim',
+                                admissionReason,
                                 brokerVerdict,
                                 cidVerdict,
+                                claimAdmissionDecisionLog,
                                 ...(admission.divergence ? { admissionDivergence: admission.divergence } : {})
                             };
                         }
@@ -964,6 +1015,28 @@ async function claimNextImportedTask(input) {
     const activeClaimIntent = claimableTask.activeClaimIntent ?? 'write';
     const shouldReuseActiveClaim = alreadyClaimedByActor
         && (autoIntent || activeClaimIntent === claimIntent);
+    let preClaimBrokerTransaction = undefined;
+    if (!shouldReuseActiveClaim) {
+        const transaction = await registerPreClaimBrokerTransaction({
+            cwd: input.cwd,
+            taskId: claimableTask.workItemId,
+            actorId: resolvedActor.actorId,
+            targetFiles: claimAllowedFiles
+        });
+        preClaimBrokerTransaction = transaction;
+        const queueAdmission = transaction.queueAdmission;
+        if (queueAdmission.status === 'queued-blocked') {
+            await runBroker(['release', '--cwd', input.cwd, '--task', claimableTask.workItemId]);
+            throw new CliError('ATM_NEXT_CLAIM_BLOCKED', `broker-conflict-blocked: ${queueAdmission.reason}`, {
+                exitCode: 1,
+                details: { taskId: claimableTask.workItemId, brokerQueueAdmission: queueAdmission }
+            });
+        }
+        if (queueAdmission.status === 'queued-private-work') {
+            brokerQueueAdmission = queueAdmission;
+            claimAllowedFiles = queueAdmission.allowedFiles;
+        }
+    }
     const claimPreparationStartedAt = Date.now();
     const claimPreparation = shouldReuseActiveClaim
         ? {
@@ -1061,7 +1134,7 @@ async function claimNextImportedTask(input) {
         queue: queueForDirection,
         batchId: batchRun?.batchId ?? null,
         scopeKey: batchRun?.scopeKey ?? null,
-        allowedFiles: buildAllowedFilesForTask(claimableTask),
+        allowedFiles: claimAllowedFiles,
         planningReadOnlyPaths: claimableTask.planningReadOnlyPaths,
         planningMirrorPaths: claimableTask.planningMirrorPaths,
         allowPlanningMirror: claimableTask.allowPlanningMirror,
@@ -1097,14 +1170,16 @@ async function claimNextImportedTask(input) {
         guidanceSessionId: null
     }).session;
     const recommendedChannel = selectPostClaimChannel(batchRun?.status === 'active').recommendedChannel;
-    recordBrokerClaimIntent({
-        cwd: input.cwd,
-        taskId: claimableTask.workItemId,
-        actorId: resolvedActor.actorId,
-        lane: recommendedChannel === 'batch' ? 'serial' : 'direct-brokered',
-        targetFiles: directionLock.allowedFiles,
-        ttlSeconds: 1800
-    });
+    if (shouldReuseActiveClaim) {
+        recordBrokerClaimIntent({
+            cwd: input.cwd,
+            taskId: claimableTask.workItemId,
+            actorId: resolvedActor.actorId,
+            lane: recommendedChannel === 'batch' ? 'serial' : 'direct-brokered',
+            targetFiles: directionLock.allowedFiles,
+            ttlSeconds: 1800
+        });
+    }
     const nextActionBase = {
         status: 'ready',
         command: `node atm.mjs start --cwd . --goal ${quoteCliValue(claimableTask.title)} --json`,
@@ -1151,6 +1226,7 @@ async function claimNextImportedTask(input) {
             sourcePlanPath: claimableTask.sourcePlanPath
         },
         taskDirectionLock: directionLock,
+        ...(brokerQueueAdmission ? { brokerQueueAdmission } : {}),
         taskQueue: activeQueue,
         batchRun,
         sessionId: actorSession.sessionId,
@@ -1203,6 +1279,7 @@ async function claimNextImportedTask(input) {
             claimIntent: resolvedClaimIntent,
             claimPreparation,
             claimResult: claimResult.evidence,
+            ...(preClaimBrokerTransaction ? { preClaimBrokerTransaction } : {}),
             taskDirectionLock: directionLock,
             taskQueue: activeQueue,
             batchRun,
@@ -2358,6 +2435,44 @@ async function prepareImportedTaskForClaim(input) {
                 importEvidencePath: step.importEvidencePath ?? null
             }
         }))
+    };
+}
+async function registerPreClaimBrokerTransaction(input) {
+    const head = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: input.cwd, encoding: 'utf8' });
+    const baseCommit = head.status === 0 ? head.stdout.trim() : '';
+    if (!baseCommit) {
+        throw new CliError('ATM_BROKER_TRANSACTION_BASE_MISSING', 'next --claim requires a resolvable HEAD before registering its Broker transaction.', { exitCode: 1 });
+    }
+    const intent = {
+        schemaId: 'atm.writeIntent.v1',
+        specVersion: '0.1.0',
+        migration: { strategy: 'none', fromVersion: null, notes: 'next pre-claim Broker transaction' },
+        taskId: input.taskId,
+        actorId: input.actorId,
+        baseCommit,
+        targetFiles: input.targetFiles,
+        atomRefs: [],
+        sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] },
+        requestedLane: 'auto'
+    };
+    const intentPath = path.join(input.cwd, '.atm', 'runtime', 'broker-intents', `${input.taskId}.json`);
+    mkdirSync(path.dirname(intentPath), { recursive: true });
+    writeFileSync(intentPath, `${JSON.stringify(intent, null, 2)}\n`, 'utf8');
+    const result = await runBroker([
+        'register', '--cwd', input.cwd, '--task', input.taskId, '--actor', input.actorId, '--intent-file', intentPath
+    ]);
+    const evidence = result && typeof result === 'object' && 'evidence' in result
+        ? result.evidence
+        : null;
+    const queueAdmission = evidence?.queueAdmission;
+    if (!queueAdmission || typeof queueAdmission !== 'object' || !('status' in queueAdmission)) {
+        throw new CliError('ATM_BROKER_TRANSACTION_INVALID', 'Broker pre-claim registration returned no canonical queue admission.', { exitCode: 1 });
+    }
+    return {
+        intentPath: path.relative(input.cwd, intentPath).replace(/\\/g, '/'),
+        baseCommit,
+        queueAdmission,
+        brokerDecision: evidence.decision ?? null
     };
 }
 export function resolvePromptScopedTaskContext(cwd, input) {

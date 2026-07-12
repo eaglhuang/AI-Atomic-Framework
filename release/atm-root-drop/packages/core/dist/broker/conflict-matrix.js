@@ -145,10 +145,11 @@ function detectCidConflictClasses(newIntent, activeIntents) {
     for (const active of activeIntents) {
         if (active.taskId === newIntent.taskId)
             continue;
+        const materialCidWrite = hasSharedWriteSurface(newIntent, active);
         const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
         const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
         for (const activeAtomId of active.resourceKeys.atomIds) {
-            if (newAtomIds.has(activeAtomId)) {
+            if (materialCidWrite && newAtomIds.has(activeAtomId)) {
                 const key = `cid:${active.taskId}:${activeAtomId}`;
                 if (!seen.has(key)) {
                     conflicts.push({
@@ -185,7 +186,7 @@ function detectCidConflictClasses(newIntent, activeIntents) {
             }
         }
         for (const activeAtomCid of active.resourceKeys.atomCids) {
-            if (newAtomCids.has(activeAtomCid)) {
+            if (materialCidWrite && newAtomCids.has(activeAtomCid)) {
                 const key = `cid-c:${active.taskId}:${activeAtomCid}`;
                 if (!seen.has(key)) {
                     conflicts.push({
@@ -223,6 +224,20 @@ function detectCidConflictClasses(newIntent, activeIntents) {
         }
     }
     return conflicts;
+}
+function hasSharedWriteSurface(intent, active) {
+    const files = new Set(intent.targetFiles.map((file) => file.trim().replace(/\\/g, '/')));
+    if (active.resourceKeys.files.some((file) => files.has(file.trim().replace(/\\/g, '/'))))
+        return true;
+    return intersects(intent.sharedSurfaces.generators, active.resourceKeys.generators)
+        || intersects(intent.sharedSurfaces.projections, active.resourceKeys.projections)
+        || intersects(intent.sharedSurfaces.registries, active.resourceKeys.registries)
+        || intersects(intent.sharedSurfaces.validators, active.resourceKeys.validators)
+        || intersects(intent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
+}
+function intersects(left, right) {
+    const values = new Set(left);
+    return right.some((value) => values.has(value));
 }
 function detectFileRangeConflictClasses(newIntent, activeIntents) {
     const conflicts = [];
@@ -315,10 +330,13 @@ function detectLeaseConflicts(newIntent, activeIntents, currentEpoch) {
     for (const active of activeIntents) {
         if (!hasResourceOverlap(newIntent, active))
             continue;
-        if (active.taskId !== newIntent.taskId && typeof currentEpoch === 'number' && Number.isFinite(currentEpoch) && active.leaseEpoch < currentEpoch) {
+        // `currentEpoch` is a registry watermark, not a global lease generation.
+        // Independent active tasks naturally have different epochs; comparing each
+        // one to the watermark would make every older, still-live task look stale.
+        if (!Number.isInteger(active.leaseEpoch) || active.leaseEpoch < 1) {
             conflicts.push({
                 kind: 'lease',
-                detail: `Active lease epoch stale for '${active.taskId}'; leaseEpoch ${active.leaseEpoch} is behind registry currentEpoch ${currentEpoch}.`,
+                detail: `Active lease epoch is invalid for '${active.taskId}'; explicit takeover is required.`,
                 blockingTask: active.taskId
             });
             continue;

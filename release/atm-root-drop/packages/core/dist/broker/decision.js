@@ -113,11 +113,14 @@ export function calculateBrokerDecision(newIntent, registry) {
         if (active.taskId === taskId) {
             continue;
         }
+        // CID write ownership is a second-layer semantic check for a common
+        // write surface. Read dependencies retain their independent visibility.
+        const materialCidWrite = hasSharedWriteSurface(newIntent, active);
         const allowProposalScopedCidRefinement = shouldRefineProposalScopedCidConflict(newIntent, active, baseAdmission);
         const activeReadAtomIds = active.resourceKeys.readAtomIds ?? [];
         const activeReadAtomCids = active.resourceKeys.readAtomCids ?? [];
         for (const refId of active.resourceKeys.atomIds) {
-            if (newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
+            if (materialCidWrite && newAtomIds.has(refId) && !allowProposalScopedCidRefinement) {
                 pushCidConflict('write', 'ID', refId, active.taskId);
             }
             if (newReadAtomIds.has(refId)) {
@@ -130,7 +133,7 @@ export function calculateBrokerDecision(newIntent, registry) {
             }
         }
         for (const refCid of active.resourceKeys.atomCids) {
-            if (newAtomCids.has(refCid) && !allowProposalScopedCidRefinement) {
+            if (materialCidWrite && newAtomCids.has(refCid) && !allowProposalScopedCidRefinement) {
                 pushCidConflict('write', 'CID', refCid, active.taskId);
             }
             if (newReadAtomCids.has(refCid)) {
@@ -216,6 +219,23 @@ export function calculateBrokerDecision(newIntent, registry) {
                 : 'No proposal-first trigger is active; direct brokered write is admitted.'
         })
     });
+}
+function hasSharedWriteSurface(intent, active) {
+    const normalizedFiles = new Set(intent.targetFiles.map(normalizeBrokerPath));
+    if (active.resourceKeys.files.some((file) => normalizedFiles.has(normalizeBrokerPath(file))))
+        return true;
+    return hasIntersection(intent.sharedSurfaces.generators, active.resourceKeys.generators)
+        || hasIntersection(intent.sharedSurfaces.projections, active.resourceKeys.projections)
+        || hasIntersection(intent.sharedSurfaces.registries, active.resourceKeys.registries)
+        || hasIntersection(intent.sharedSurfaces.validators, active.resourceKeys.validators)
+        || hasIntersection(intent.sharedSurfaces.artifacts, active.resourceKeys.artifacts);
+}
+function hasIntersection(left, right) {
+    const values = new Set(left);
+    return right.some((value) => values.has(value));
+}
+function normalizeBrokerPath(value) {
+    return value.trim().replace(/\\/g, '/');
 }
 function withFailureReason(decision) {
     const failureReason = buildBrokerDecisionFailureReason(decision);

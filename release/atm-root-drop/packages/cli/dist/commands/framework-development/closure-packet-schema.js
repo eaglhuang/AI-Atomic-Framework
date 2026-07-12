@@ -1844,11 +1844,24 @@ export function repairClosurePacketForTask(input) {
     const upstreamEvidence = normalizeUpstreamEvidenceForTask(cwd, taskId);
     const scopeTaskId = normalizeOptionalString(input.scopeTaskId);
     const scopeFiles = scopeTaskId ? collectTaskScopeFiles(cwd, scopeTaskId) : null;
+    const terminalTargetScopedRepair = scopeTaskId === taskId && taskDocument?.status === 'done';
     const trackedDirtyFiles = readTrackedChangedFiles(cwd).filter((entry) => entry !== packetPath && entry !== gitHeadEvidencePath && !entry.startsWith('.atm/runtime/'));
+    const trackedChangeStatuses = readTrackedChangeStatuses(cwd);
+    const terminalCloseEventDeletions = trackedDirtyFiles.filter((entry) => isScopedTerminalCloseEventDeletion({
+        entry,
+        taskId,
+        scopeTaskId,
+        taskDocument,
+        status: trackedChangeStatuses.get(entry) ?? null
+    }));
     const scopeWarnings = [];
     const blockingDirtyFiles = scopeFiles
         ? trackedDirtyFiles.filter((entry) => {
-            if (pathOverlapsTaskScope(entry, scopeFiles) || isTaskCloseGovernanceCriticalPath(entry, taskId)) {
+            if (terminalCloseEventDeletions.includes(entry)) {
+                return false;
+            }
+            if (isTaskCloseGovernanceCriticalPath(entry, taskId)
+                || (!terminalTargetScopedRepair && pathOverlapsTaskScope(entry, scopeFiles))) {
                 return true;
             }
             scopeWarnings.push(entry);
@@ -1975,6 +1988,9 @@ export function repairClosurePacketForTask(input) {
     }
     writeFileSync(packetAbsolutePath, after, 'utf8');
     stageGitPath(cwd, packetPath);
+    for (const staleEventPath of terminalCloseEventDeletions) {
+        stageGitPath(cwd, staleEventPath);
+    }
     let repairedTaskPath = null;
     if (taskDocument) {
         let taskChanged = false;
@@ -2019,7 +2035,7 @@ export function repairClosurePacketForTask(input) {
         repairedHead: headDetails.commitSha,
         targetCommit,
         governedTreeSha,
-        changedFiles: repairedPacket.targetCommitDelta.changedFiles,
+        changedFiles: uniqueSorted([...repairedPacket.targetCommitDelta.changedFiles, ...terminalCloseEventDeletions]),
         gitHeadEvidencePath,
         amended: false,
         dryRun: false,
@@ -2030,6 +2046,12 @@ export function repairClosurePacketForTask(input) {
         remediation,
         ...repairExtras
     };
+}
+function isScopedTerminalCloseEventDeletion(input) {
+    if (input.scopeTaskId !== input.taskId || input.taskDocument?.status !== 'done' || input.status !== 'D') {
+        return false;
+    }
+    return normalizeRelativePath(input.entry).startsWith(`.atm/history/task-events/${input.taskId}/`);
 }
 export function requireTargetRepoClosureAuthority(input) {
     if (input.status !== 'done')
@@ -2802,6 +2824,18 @@ function readTrackedChangedFiles(cwd) {
         ...runGitLines(cwd, ['diff', '--cached', '--name-only'])
     ];
     return uniqueSorted(changed.map(normalizeRelativePath).filter(Boolean));
+}
+function readTrackedChangeStatuses(cwd) {
+    const statuses = new Map();
+    for (const args of [['diff', '--name-status'], ['diff', '--cached', '--name-status']]) {
+        for (const line of runGitLines(cwd, args)) {
+            const [status, rawPath] = line.split('\t', 2);
+            const filePath = normalizeRelativePath(rawPath ?? '');
+            if (status && filePath)
+                statuses.set(filePath, status.charAt(0));
+        }
+    }
+    return statuses;
 }
 function runGitProcess(cwd, args) {
     const result = spawnSync('git', args, { cwd, encoding: 'utf8' });

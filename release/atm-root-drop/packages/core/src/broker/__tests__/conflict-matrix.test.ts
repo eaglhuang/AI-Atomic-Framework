@@ -72,6 +72,27 @@ function testAllow() {
   console.log('ok: baseline intent yields allow');
 }
 
+function testSameCidOnDisjointFilesRemainsParallel() {
+  const active = asActive(makeIntent({
+    taskId: 'TASK-TEAM-0075',
+    actorId: 'captain-a',
+    targetFiles: ['packages/cli/src/commands/team.ts'],
+    atomRefs: [{ atomId: 'atom-cli-router', atomCid: 'cid-broad-router', operation: 'modify' }],
+    sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] }
+  }), 'TASK-TEAM-0075');
+  const newIntent = makeIntent({
+    taskId: 'TASK-AAO-0160',
+    actorId: 'captain-b',
+    targetFiles: ['packages/cli/src/commands/git-governance.ts'],
+    atomRefs: [{ atomId: 'atom-validator-framework', atomCid: 'cid-broad-router', operation: 'modify' }],
+    sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] }
+  });
+  const matrix = evaluateConflictMatrix(newIntent, [active]);
+  assert.equal(matrix.arbitrationVerdict, 'allow');
+  assert.equal(matrix.conflicts.some((conflict) => conflict.kind === 'cid'), false);
+  console.log('ok: broad CID without a shared write surface remains parallel');
+}
+
 function testWatchForSharedSurface() {
   const active = asActive(
     makeIntent({ taskId: 'TASK-B', actorId: 'actor-b' }),
@@ -247,7 +268,7 @@ function testTakeoverForStaleLease() {
   console.log('ok: stale lease maps to takeover');
 }
 
-function testTakeoverForStaleLeaseEpoch() {
+function testIndependentActiveLeaseEpochsDoNotStaleEachOther() {
   const active = asActive(
     makeIntent({
       taskId: 'TASK-B',
@@ -265,10 +286,8 @@ function testTakeoverForStaleLeaseEpoch() {
     { leaseEpoch: 1, expiresAt: '2099-01-01T00:00:00.000Z' }
   );
   const matrix = evaluateConflictMatrix(makeIntent({ taskId: 'TASK-C' }), [active], { currentEpoch: 2 });
-  assert.equal(matrix.arbitrationVerdict, 'takeover');
-  assert.equal(matrix.conflicts[0].kind, 'lease');
-  assert.match(matrix.conflicts[0].detail, /currentEpoch 2/);
-  console.log('ok: stale lease epoch maps to takeover');
+  assert.equal(matrix.conflicts.some((conflict) => conflict.kind === 'lease'), false);
+  console.log('ok: independent active lease epochs do not stale each other');
 }
 
 function testFreezeForSameAtomCidWriteWrite() {
@@ -276,18 +295,18 @@ function testFreezeForSameAtomCidWriteWrite() {
     makeIntent({
       taskId: 'TASK-B',
       actorId: 'actor-b',
-      targetFiles: ['src/two.ts'],
+      targetFiles: ['src/shared.ts'],
       sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] },
-      atomRefs: [{ atomId: 'atom-shared', atomCid: 'cid-shared', operation: 'modify', sourceRange: { filePath: 'src/two.ts', lineStart: 100, lineEnd: 110 } }]
+      atomRefs: [{ atomId: 'atom-shared', atomCid: 'cid-shared', operation: 'modify', sourceRange: { filePath: 'src/shared.ts', lineStart: 100, lineEnd: 110 } }]
     }),
     'TASK-B'
   );
   const newIntent = makeIntent({
     taskId: 'TASK-C',
     actorId: 'actor-c',
-    targetFiles: ['src/three.ts'],
+    targetFiles: ['src/shared.ts'],
     sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] },
-    atomRefs: [{ atomId: 'atom-shared', atomCid: 'cid-shared', operation: 'modify', sourceRange: { filePath: 'src/three.ts', lineStart: 1, lineEnd: 10 } }]
+    atomRefs: [{ atomId: 'atom-shared', atomCid: 'cid-shared', operation: 'modify', sourceRange: { filePath: 'src/shared.ts', lineStart: 1, lineEnd: 10 } }]
   });
   const matrix = evaluateConflictMatrix(newIntent, [active]);
   assert.equal(matrix.arbitrationVerdict, 'freeze');
@@ -396,6 +415,7 @@ function testFreezeForSharedProjection() {
 }
 
 testAllow();
+testSameCidOnDisjointFilesRemainsParallel();
 testWatchForSharedSurface();
 testWatchForFileRangeOverlap();
 testWatchForDisjointFileRange();
@@ -404,7 +424,7 @@ testActiveReadSetConflict();
 testTakeoverForMalformedIntent();
 testAllowForTaskScopedFileOnlyIntent();
 testTakeoverForStaleLease();
-testTakeoverForStaleLeaseEpoch();
+testIndependentActiveLeaseEpochsDoNotStaleEachOther();
 testFreezeForSameAtomCidWriteWrite();
 testFreezeForSharedArtifactDrift();
 testFreezeForSharedRegistry();

@@ -69,6 +69,7 @@ export declare function resolveTaskScopedCommitBundle(input: {
     apply: boolean;
     autoStage: boolean;
     deferForeignStaged: boolean;
+    brokerConflictResolutionPath?: string | null;
     message: string;
     actorId: string;
     trailers: readonly string[];

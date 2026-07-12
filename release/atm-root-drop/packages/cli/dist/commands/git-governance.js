@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { actorIdEnvVar, actorRegistryRelativePath, findActorByResolvedId, inspectTrackedActorRegistryState, readRuntimeIdentityDefault, readRuntimeIdentityForActor, resolveActorId, writeRuntimeIdentityForActor } from './actor-registry.js';
@@ -1278,6 +1278,7 @@ function runGitCommit(options) {
             apply: !options.dryRun && (options.autoStage || options.deferForeignStaged),
             autoStage: options.autoStage,
             deferForeignStaged: options.deferForeignStaged,
+            brokerConflictResolutionPath: options.brokerConflictResolutionPath,
             message: options.message,
             actorId,
             trailers: [
@@ -1537,6 +1538,7 @@ function runGitCommit(options) {
                 ATM_COMMIT_TASK_ID: options.taskId ?? '',
                 ATM_COMMIT_CLAIM_LEASE_ID: claimForTrailers?.leaseId ?? '',
                 ATM_COMMIT_SESSION_ID: session?.sessionId ?? '',
+                ATM_COMMIT_BROKER_CONFLICT_RESOLUTION: options.brokerConflictResolutionPath ?? '',
                 ATM_COMMIT_TRAILERS: trailers.join('\n')
             });
             const bundleFiles = options.taskId !== null && taskDocument && !bypassesActiveSession
@@ -1547,6 +1549,7 @@ function runGitCommit(options) {
                     apply: false,
                     autoStage: options.autoStage,
                     deferForeignStaged: options.deferForeignStaged,
+                    brokerConflictResolutionPath: options.brokerConflictResolutionPath,
                     message: options.message,
                     actorId,
                     trailers
@@ -2372,7 +2375,7 @@ function buildUnexpectedStagedTasksForGitCommit(cwd, taskId, declaredScope, stag
     for (const filePath of stagedFiles) {
         if (isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope))
             continue;
-        const foreignTaskId = extractGovernanceTaskIdFromPath(filePath);
+        const foreignTaskId = extractGovernanceTaskIdFromPath(filePath) ?? inferActiveTaskOwnerForPath(cwd, filePath);
         if (!foreignTaskId || foreignTaskId === taskId.toUpperCase())
             continue;
         const bucket = grouped.get(foreignTaskId) ?? [];
@@ -2389,6 +2392,32 @@ function buildUnexpectedStagedTasksForGitCommit(cwd, taskId, declaredScope, stag
         };
     });
 }
+function inferActiveTaskOwnerForPath(cwd, filePath) {
+    const taskDirectory = path.join(cwd, '.atm', 'history', 'tasks');
+    if (!existsSync(taskDirectory))
+        return null;
+    const normalizedFile = normalizeRelativePath(filePath);
+    if (!normalizedFile)
+        return null;
+    const owners = readdirSync(taskDirectory, { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+        .flatMap((entry) => {
+        try {
+            const task = JSON.parse(readFileSync(path.join(taskDirectory, entry.name), 'utf8'));
+            const taskId = String(task.workItemId ?? task.taskId ?? '').trim().toUpperCase();
+            const status = String(task.status ?? '').trim().toLowerCase();
+            const scopes = Array.isArray(task.scopePaths) ? task.scopePaths.map((value) => String(value).trim()).filter(Boolean) : [];
+            const claim = task.claim && typeof task.claim === 'object' && !Array.isArray(task.claim) ? task.claim : null;
+            const claimFiles = Array.isArray(claim?.files) ? claim.files.map((value) => String(value).trim()).filter(Boolean) : [];
+            const ownsPath = [...scopes, ...claimFiles].some((scope) => pathMatchesTaskScope(normalizedFile, scope));
+            return taskId && (status === 'running' || status === 'active') && ownsPath ? [taskId] : [];
+        }
+        catch {
+            return [];
+        }
+    });
+    return owners.length === 1 ? owners[0] : null;
+}
 function isProtectedStagedGovernanceOwnershipPath(filePath) {
     const normalized = normalizeRelativePath(filePath).toLowerCase();
     if (/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized)) {
@@ -2397,6 +2426,28 @@ function isProtectedStagedGovernanceOwnershipPath(filePath) {
     return normalized.startsWith('.atm/history/tasks/')
         || normalized.startsWith('.atm/history/task-events/')
         || normalized.startsWith('.atm/history/evidence/');
+}
+function readResolutionAuthorizedForeignTaskIds(cwd, artifactPath, taskId) {
+    if (!artifactPath?.trim())
+        return new Set();
+    const absolutePath = path.resolve(cwd, artifactPath);
+    if (!existsSync(absolutePath))
+        return new Set();
+    try {
+        const artifact = JSON.parse(readFileSync(absolutePath, 'utf8'));
+        const primaryTaskId = String(artifact.primaryTaskId ?? '').trim().toUpperCase();
+        const currentAllowedTaskId = String(artifact.currentAllowedTaskId ?? '').trim().toUpperCase();
+        const blockedTaskIds = Array.isArray(artifact.blockedTaskIds)
+            ? artifact.blockedTaskIds.map((value) => String(value).trim().toUpperCase()).filter(Boolean)
+            : [];
+        if (artifact.schemaId !== 'atm.brokerConflictResolution.v1' || primaryTaskId !== taskId.toUpperCase() || currentAllowedTaskId !== taskId.toUpperCase()) {
+            return new Set();
+        }
+        return new Set(blockedTaskIds);
+    }
+    catch {
+        return new Set();
+    }
 }
 function buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks) {
     return uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles.filter((filePath) => isProtectedStagedGovernanceOwnershipPath(filePath))));
@@ -2450,7 +2501,7 @@ function withTaskScopedCommitIndex(cwd, files, actorId, run) {
     };
     try {
         runGitCommandWithEnv(cwd, ['read-tree', 'HEAD'], env, ['ignore', 'pipe', 'pipe']);
-        stageTaskScopedBundleFiles(cwd, normalizedFiles, env);
+        stageTaskScopedBundleFilesFromLiveIndex(cwd, normalizedFiles, env);
         if (actorId) {
             ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, normalizedFiles, env);
         }
@@ -2458,6 +2509,27 @@ function withTaskScopedCommitIndex(cwd, files, actorId, run) {
     }
     finally {
         rmSync(tempDir, { recursive: true, force: true });
+    }
+}
+/**
+ * Copy the exact live-index entries for a task bundle into the isolated commit
+ * index. Re-running `git add` here would read the complete worktree version
+ * and silently discard a Broker composer partial-staging projection.
+ */
+function stageTaskScopedBundleFilesFromLiveIndex(cwd, files, env) {
+    const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+    if (normalizedFiles.length === 0)
+        return;
+    // Clear HEAD entries first so a live staged deletion stays a deletion in the
+    // task-scoped tree. Missing paths are intentional: they may be generated
+    // evidence staged by the caller immediately afterwards.
+    runGitCommandWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...normalizedFiles], env, ['ignore', 'pipe', 'pipe']);
+    const liveEntries = runGitCommand(cwd, ['ls-files', '-s', '--', ...normalizedFiles])
+        .split(/\r?\n/)
+        .map((line) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
+        .filter((match) => match !== null);
+    for (const [, mode, objectId, filePath] of liveEntries) {
+        runGitCommandWithEnv(cwd, ['update-index', '--add', '--cacheinfo', `${mode},${objectId},${filePath}`], env, ['ignore', 'pipe', 'pipe']);
     }
 }
 function stageTaskScopedBundleFiles(cwd, files, env) {
@@ -2478,9 +2550,12 @@ export function resolveTaskScopedCommitBundle(input) {
     let stagedFiles = readStagedFiles(input.cwd);
     let unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
     let protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
+    const resolutionAuthorizedForeignTaskIds = readResolutionAuthorizedForeignTaskIds(input.cwd, input.brokerConflictResolutionPath ?? null, input.taskId);
+    const protectedForeignDeferAuthorized = unexpectedStagedTasks.length > 0
+        && unexpectedStagedTasks.every((entry) => resolutionAuthorizedForeignTaskIds.has(entry.taskId.toUpperCase()));
     let deferredForeignStagedSnapshot = null;
     let deferredForeignStagedFiles = [];
-    if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply && protectedForeignStagedOwnershipFiles.length === 0) {
+    if (input.deferForeignStaged && unexpectedStagedTasks.length > 0 && input.apply && (protectedForeignStagedOwnershipFiles.length === 0 || protectedForeignDeferAuthorized)) {
         deferredForeignStagedFiles = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
         deferredForeignStagedSnapshot = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedTasks);
         stagedFiles = readStagedFiles(input.cwd);

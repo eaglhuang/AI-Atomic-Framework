@@ -765,6 +765,7 @@ export async function commitTaskflowDeliveryFiles(input) {
         '--actor', input.actorId,
         '--task', input.taskId,
         '--message', deliveryBundle.commitMessage,
+        ...(input.deferForeignStaged ? ['--defer-foreign-staged'] : []),
         '--json'
     ]);
     const commitSha = String(targetResult.evidence?.commitSha ?? '') || null;

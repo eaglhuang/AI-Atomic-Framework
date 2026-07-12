@@ -11,12 +11,14 @@ import { defaultBrokerProposalStoreRelativePath, findBrokerProposal, listBrokerP
 import { defaultAdapterRegistry, resolveAdapter } from '../../../core/dist/broker/adapters/registry.js';
 import { planMutationBatch } from '../../../core/dist/broker/adapters/batch-planner.js';
 import { computeCasResult, hashContent } from '../../../core/dist/broker/adapters/cas.js';
-import { enqueueSharedSurface, planSharedSurfaceAcquisition, releaseSharedSurfaceHead } from '../../../core/dist/broker/shared-surface-queue.js';
+import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry } from '../../../core/dist/broker/shared-surface-queue.js';
+import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision } from '../../../core/dist/broker/freeze.js';
 const defaultFallbackBrokerRunEvidenceRelativeDir = path.join('.atm', 'runtime', 'broker-collision-evidence', 'runs');
 export async function runBroker(argv) {
     const options = parseBrokerArgs(argv);
     const registryPath = path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json');
     const sharedQueuePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
+    const sharedFreezePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-freezes.json');
     if (options.action === 'register') {
         if (!options.task) {
             throw new CliError('ATM_CLI_USAGE', 'broker register requires --task <task-id>.', { exitCode: 2 });
@@ -33,17 +35,26 @@ export async function runBroker(argv) {
         let registry = cleanupStale(loadRegistry(registryPath));
         const decision = calculateBrokerDecision(newIntent, registry);
         const conflictMatrix = decision.conflictMatrix;
-        const isBrokerSafe = decision.verdict !== 'blocked-cid-conflict'
-            && decision.verdict !== 'blocked-shared-surface'
-            && decision.verdict !== 'blocked-active-lease';
+        const isDecisionSafe = decision.verdict === 'parallel-safe' || decision.verdict === 'serial';
         // 即使決策是 blocked，我們依然將其以 blocked 狀態註冊進去
         registry = registerIntent(registry, newIntent, decision.lane, options.ttlSeconds, decision.admission);
-        const queueState = updateSharedSurfaceQueues({
+        const queueUpdate = updateSharedSurfaceQueues({
             queuePath: sharedQueuePath,
             intent: newIntent,
             registry,
             shouldQueue: shouldQueueSharedSurface(decision)
         });
+        const queueAdmission = resolveSharedSurfaceQueueAdmission({ intent: newIntent, queues: queueUpdate.queues });
+        const isBrokerSafe = isDecisionSafe || queueAdmission.status === 'queue-head' || queueAdmission.status === 'queued-private-work';
+        if (queueAdmission.status === 'queued-private-work' || queueAdmission.status === 'queue-head') {
+            registry = replaceIntentLane(registry, newIntent.taskId, 'direct-brokered');
+        }
+        const freezes = createSharedSurfaceFreezeRecords({
+            existing: readSharedSurfaceFreezeRecords(sharedFreezePath),
+            queueUpdate,
+            waitingIntent: newIntent
+        });
+        writeSharedSurfaceFreezeRecords(sharedFreezePath, freezes);
         saveRegistry(registryPath, registry);
         syncTeamRunRearbitrationSnapshots(options.cwd, registry, newIntent.taskId, newIntent.actorId);
         return makeResult({
@@ -51,12 +62,14 @@ export async function runBroker(argv) {
             command: 'broker',
             cwd: options.cwd,
             messages: [
-                message(isBrokerSafe ? 'info' : 'error', 'ATM_BROKER_REGISTERED', `Write intent registered with verdict '${decision.verdict}', lane '${decision.lane}', and admission '${decision.admission?.state ?? 'not-required'}'. Arbitration matrix verdict: '${conflictMatrix?.arbitrationVerdict ?? 'n/a'}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`, { decision })
+                message(isBrokerSafe ? 'info' : 'error', 'ATM_BROKER_REGISTERED', `Write intent registered with verdict '${decision.verdict}', lane '${decision.lane}', queue '${queueAdmission.status}', and admission '${decision.admission?.state ?? 'not-required'}'. Arbitration matrix verdict: '${conflictMatrix?.arbitrationVerdict ?? 'n/a'}'. Broker verdicts override Coordinator decisions inside broker-governed conflict domains; Coordinator remains local outside them.`, { decision, queueAdmission })
             ],
             evidence: {
                 decision,
+                queueAdmission,
                 registryPath: '.atm/runtime/write-broker.registry.json',
-                sharedSurfaceQueues: queueState
+                sharedSurfaceQueues: queueUpdate.queues,
+                sharedSurfaceFreezes: freezes
             }
         });
     }
@@ -110,6 +123,7 @@ export async function runBroker(argv) {
     if (options.action === 'status') {
         const registry = cleanupStale(loadRegistry(registryPath));
         const sharedSurfaceQueues = readSharedSurfaceQueues(sharedQueuePath);
+        const sharedSurfaceFreezes = readSharedSurfaceFreezeRecords(sharedFreezePath);
         const effectiveIntents = registry.activeIntents.map((activeIntent) => projectTeamBrokerRearbitrationSnapshot({
             activeIntent,
             registry,
@@ -135,6 +149,7 @@ export async function runBroker(argv) {
                     admissionTrigger: intent.admission?.trigger ?? 'not-required'
                 })),
                 sharedSurfaceQueues,
+                sharedSurfaceFreezes,
                 sharedSurfaceAcquisitionPlans: registry.activeIntents.map((intent) => planSharedSurfaceAcquisition(sharedSurfaceQueues, intent.taskId))
             }
         });
@@ -143,17 +158,22 @@ export async function runBroker(argv) {
         if (!options.task) {
             throw new CliError('ATM_CLI_USAGE', 'broker release requires --task <task-id>.', { exitCode: 2 });
         }
+        const releaseTaskId = options.task;
         let registry = cleanupStale(loadRegistry(registryPath));
-        registry = releaseTask(registry, options.task);
+        registry = releaseTask(registry, releaseTaskId);
         saveRegistry(registryPath, registry);
         const queues = readSharedSurfaceQueues(sharedQueuePath);
         const updatedQueues = queues.flatMap((queue) => {
-            if (queue.entries[0]?.taskId !== options.task)
-                return [queue];
-            const released = releaseSharedSurfaceHead({ queue, taskId: options.task });
+            const released = removeSharedSurfaceEntry({ queue, taskId: releaseTaskId });
             return released.entries.length === 0 ? [] : [released];
         });
         writeSharedSurfaceQueues(sharedQueuePath, updatedQueues);
+        const freezes = markReleasedSharedSurfaceFreezes({
+            records: readSharedSurfaceFreezeRecords(sharedFreezePath),
+            releasedTaskId: releaseTaskId,
+            queues: updatedQueues
+        });
+        writeSharedSurfaceFreezeRecords(sharedFreezePath, freezes);
         return makeResult({
             ok: true,
             command: 'broker',
@@ -163,9 +183,33 @@ export async function runBroker(argv) {
             ],
             evidence: {
                 registryPath: '.atm/runtime/write-broker.registry.json',
-                releasedTask: options.task,
-                sharedSurfaceQueues: updatedQueues
+                releasedTask: releaseTaskId,
+                sharedSurfaceQueues: updatedQueues,
+                sharedSurfaceFreezes: freezes
             }
+        });
+    }
+    if (options.action === 'acknowledge') {
+        if (!options.task || !options.actorId || !options.freezeId) {
+            throw new CliError('ATM_CLI_USAGE', 'broker acknowledge requires --task <task-id>, --actor <actor-id>, and --freeze-id <freeze-id>.', { exitCode: 2 });
+        }
+        const records = readSharedSurfaceFreezeRecords(sharedFreezePath);
+        const record = records.find((candidate) => candidate.signal.freezeId === options.freezeId);
+        if (!record || record.signal.taskId !== options.task || record.signal.actorId !== options.actorId) {
+            throw new CliError('ATM_BROKER_FREEZE_ACK_FORBIDDEN', 'Only the notified queue head may acknowledge this Broker freeze.', { exitCode: 1 });
+        }
+        const ack = acknowledgeFreeze(record.signal);
+        const resolution = resolveFreezeDecision({ signal: record.signal, acknowledgedAt: ack.acknowledgedAt });
+        const next = records.map((candidate) => candidate.signal.freezeId === options.freezeId
+            ? { ...candidate, ack, resolution, status: 'acknowledged', updatedAt: ack.acknowledgedAt }
+            : candidate);
+        writeSharedSurfaceFreezeRecords(sharedFreezePath, next);
+        return makeResult({
+            ok: true,
+            command: 'broker',
+            cwd: options.cwd,
+            messages: [message('info', 'ATM_BROKER_FREEZE_ACKNOWLEDGED', `Acknowledged Broker freeze ${options.freezeId}; publish a patch proposal or release the shared surface when ready.`)],
+            evidence: { freeze: next.find((candidate) => candidate.signal.freezeId === options.freezeId) }
         });
     }
     if (options.action === 'cleanup') {
@@ -742,7 +786,22 @@ export async function runBroker(argv) {
             }
         });
     }
-    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+}
+function readSharedSurfaceFreezeRecords(filePath) {
+    if (!existsSync(filePath))
+        return [];
+    try {
+        const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+        return Array.isArray(parsed.records) ? parsed.records : [];
+    }
+    catch {
+        return [];
+    }
+}
+function writeSharedSurfaceFreezeRecords(filePath, records) {
+    mkdirSync(path.dirname(filePath), { recursive: true });
+    writeFileSync(filePath, `${JSON.stringify({ schemaId: 'atm.brokerSharedSurfaceFreezes.v1', records }, null, 2)}\n`, 'utf8');
 }
 function readSharedSurfaceQueues(filePath) {
     if (!existsSync(filePath))
@@ -762,7 +821,7 @@ function writeSharedSurfaceQueues(filePath, queues) {
 function updateSharedSurfaceQueues(input) {
     const queues = readSharedSurfaceQueues(input.queuePath);
     if (!input.shouldQueue)
-        return queues;
+        return { queues, newlyQueued: [] };
     const activeOwnersByPath = new Map();
     for (const active of input.registry.activeIntents) {
         if (active.taskId === input.intent.taskId)
@@ -776,8 +835,9 @@ function updateSharedSurfaceQueues(input) {
     }
     const sharedPaths = [...activeOwnersByPath.keys()].sort();
     if (sharedPaths.length === 0)
-        return queues;
+        return { queues, newlyQueued: [] };
     const next = queues.slice();
+    const newlyQueued = [];
     for (const surfacePath of sharedPaths) {
         const index = next.findIndex((queue) => queue.surfacePath === surfacePath);
         let queue = index >= 0 ? next[index] : null;
@@ -805,13 +865,59 @@ function updateSharedSurfaceQueues(input) {
         });
         if (!result.ok)
             throw new CliError('ATM_BROKER_SHARED_QUEUE_BLOCKED', result.reason, { exitCode: 1, details: { surfacePath, code: result.code } });
+        const queueHead = (activeOwnersByPath.get(surfacePath) ?? [])[0];
+        if (result.position && result.position > 1 && queueHead)
+            newlyQueued.push({ surfacePath, queueHead });
         if (index >= 0)
             next[index] = result.queue;
         else
             next.push(result.queue);
     }
     writeSharedSurfaceQueues(input.queuePath, next);
-    return next;
+    return { queues: next, newlyQueued };
+}
+function createSharedSurfaceFreezeRecords(input) {
+    const records = [...input.existing];
+    for (const [index, queued] of input.queueUpdate.newlyQueued.entries()) {
+        const duplicate = records.some((record) => record.surfacePath === queued.surfacePath
+            && record.signal.taskId === queued.queueHead.taskId
+            && record.waitingTaskId === input.waitingIntent.taskId
+            && record.status !== 'released');
+        if (duplicate)
+            continue;
+        const signal = createFreezeSignal({
+            taskId: queued.queueHead.taskId,
+            actorId: queued.queueHead.actorId,
+            blockingTask: input.waitingIntent.taskId,
+            blockingRoute: 'broker-shared-surface-queue',
+            conflictingResource: queued.surfacePath,
+            now: Date.now() + index
+        });
+        records.push({
+            schemaId: 'atm.brokerSharedSurfaceFreeze.v1',
+            surfacePath: queued.surfacePath,
+            waitingTaskId: input.waitingIntent.taskId,
+            waitingActorId: input.waitingIntent.actorId,
+            signal,
+            status: 'pending',
+            requiredNextAction: 'publish-patch-proposal-or-release',
+            createdAt: signal.issuedAt,
+            updatedAt: signal.issuedAt
+        });
+    }
+    return records;
+}
+function markReleasedSharedSurfaceFreezes(input) {
+    const now = new Date().toISOString();
+    return input.records.map((record) => {
+        if (record.signal.taskId !== input.releasedTaskId || record.status === 'released')
+            return record;
+        const queue = input.queues.find((candidate) => candidate.surfacePath === record.surfacePath);
+        const waitingIsHead = queue?.entries[0]?.taskId === record.waitingTaskId;
+        if (!waitingIsHead)
+            return record;
+        return { ...record, status: 'released', updatedAt: now };
+    });
 }
 function sharedQueueEntry(owner, surfacePath, reason) {
     return {
@@ -826,9 +932,53 @@ function sharedQueueEntry(owner, surfacePath, reason) {
     };
 }
 function shouldQueueSharedSurface(decision) {
-    if (decision.verdict !== 'blocked-shared-surface' && decision.verdict !== 'needs-physical-split')
-        return false;
-    return decision.conflictMatrix?.gateResults.some((gate) => gate.status === 'block') ?? false;
+    // `needs-physical-split` is the file-scoped queue path. Its conflict matrix
+    // may remain `allow` because the Composer can safely serialize the shared
+    // files; requiring a matrix block here accidentally suppresses the queue.
+    if (decision.verdict === 'needs-physical-split')
+        return decision.conflicts.some((conflict) => conflict.kind === 'file-range');
+    // A CID conflict remains fail-closed at the decision layer. When the
+    // registry can also identify concrete shared files, updateSharedSurfaceQueues
+    // will materialize the bounded queue; semantic-only CID conflicts find no
+    // shared paths and remain a global block.
+    if (decision.verdict === 'blocked-cid-conflict')
+        return true;
+    return decision.verdict === 'blocked-shared-surface'
+        && (decision.conflictMatrix?.gateResults.some((gate) => gate.status === 'block') ?? false);
+}
+function resolveSharedSurfaceQueueAdmission(input) {
+    const existingEntries = input.queues.flatMap((queue) => queue.entries.filter((entry) => entry.taskId === input.intent.taskId));
+    if (existingEntries.some((entry) => entry.baseHash !== input.intent.baseCommit)) {
+        return {
+            status: 'queued-blocked',
+            queuedSharedPaths: [...new Set(existingEntries.map((entry) => entry.surfacePath))].sort(),
+            allowedFiles: [],
+            reason: 'Canonical shared-surface queue base hash differs from the pre-claim transaction; re-arbitration is required.'
+        };
+    }
+    const waitingQueues = input.queues.filter((queue) => {
+        const position = queue.entries.findIndex((entry) => entry.taskId === input.intent.taskId);
+        return position > 0;
+    });
+    if (waitingQueues.length === 0) {
+        const heads = input.queues.filter((queue) => queue.entries[0]?.taskId === input.intent.taskId);
+        return heads.length > 0
+            ? { status: 'queue-head', queuedSharedPaths: [], allowedFiles: input.intent.targetFiles, reason: 'Task owns every queued shared surface.' }
+            : { status: 'not-queued', queuedSharedPaths: [], allowedFiles: input.intent.targetFiles, reason: 'No bounded shared-surface queue applies.' };
+    }
+    const queuedSharedPaths = [...new Set(waitingQueues.map((queue) => queue.surfacePath))].sort();
+    const allowedFiles = input.intent.targetFiles
+        .map((filePath) => filePath.replace(/\\/g, '/'))
+        .filter((filePath) => !queuedSharedPaths.includes(filePath));
+    return allowedFiles.length > 0
+        ? { status: 'queued-private-work', queuedSharedPaths, allowedFiles, reason: 'Shared paths are queued; disjoint private paths may proceed.' }
+        : { status: 'queued-blocked', queuedSharedPaths, allowedFiles: [], reason: 'Every requested write path is behind a shared-surface queue head.' };
+}
+function replaceIntentLane(registry, taskId, lane) {
+    return {
+        ...registry,
+        activeIntents: registry.activeIntents.map((intent) => intent.taskId === taskId ? { ...intent, lane } : intent)
+    };
 }
 function assertBrokerRegisterCliParity(intent, options) {
     const mismatches = [];
@@ -1035,6 +1185,7 @@ function parseBrokerArgs(argv) {
         task: null,
         actorId: null,
         intentFile: null,
+        freezeId: null,
         ttlSeconds: 1800,
         proposalFiles: [],
         proposalIds: [],
@@ -1068,6 +1219,11 @@ function parseBrokerArgs(argv) {
         }
         if (arg === '--intent-file') {
             state.intentFile = requireValue(argv, index, '--intent-file');
+            index += 1;
+            continue;
+        }
+        if (arg === '--freeze-id') {
+            state.freezeId = requireValue(argv, index, '--freeze-id');
             index += 1;
             continue;
         }
@@ -1168,6 +1324,7 @@ function parseBrokerArgs(argv) {
         task: state.task,
         actorId: state.actorId,
         intentFile: state.intentFile,
+        freezeId: state.freezeId,
         ttlSeconds: state.ttlSeconds,
         proposalFiles: state.proposalFiles,
         proposalIds,

@@ -91,6 +91,24 @@ function testParallelSafeScenario() {
     assert.equal(decision.admission?.state, 'not-required');
     console.log('ok: parallel-safe scenario (disjoint files, CIDs, and read-set)');
 }
+function testBroadCidWithoutSharedWriteSurfaceRemainsParallel() {
+    const active = makeIntent({
+        taskId: 'TASK-TEAM-0075',
+        actorId: 'captain-a',
+        targetFiles: ['packages/cli/src/commands/team.ts'],
+        atomRefs: [{ atomId: 'atom-cli-router', atomCid: 'cid-broad-router', operation: 'modify' }]
+    });
+    const incoming = makeIntent({
+        taskId: 'TASK-AAO-0160',
+        actorId: 'captain-b',
+        targetFiles: ['packages/cli/src/commands/git-governance.ts'],
+        atomRefs: [{ atomId: 'atom-validator-framework', atomCid: 'cid-broad-router', operation: 'modify' }]
+    });
+    const decision = calculateBrokerDecision(incoming, registryWith([toActiveIntent(active, 'intent-0075')]));
+    assert.equal(decision.verdict, 'parallel-safe');
+    assert.equal(decision.conflicts.some((conflict) => conflict.kind === 'cid'), false);
+    console.log('ok: broad CID without shared write surface does not block admission');
+}
 function testReadSetConflictScenario() {
     const active = makeIntent();
     const readSetIntent = makeIntent({
@@ -180,7 +198,7 @@ function testCidConflictScenario() {
     const conflictingIntent = makeIntent({
         taskId: 'TASK-B',
         actorId: 'agent-b',
-        targetFiles: ['src/file-b.ts'],
+        targetFiles: ['src/file-a.ts'],
         atomRefs: [{ atomId: 'atom-a', atomCid: 'cid-a', operation: 'modify' }]
     });
     const decision = calculateBrokerDecision(conflictingIntent, registryWith([toActiveIntent(active, 'intent-a')]));
@@ -189,7 +207,7 @@ function testCidConflictScenario() {
     assert.ok(decision.conflicts.some((conflict) => conflict.kind === 'cid'));
     assert.equal(decision.failureReason?.blockingLayer, 'cid');
     assert.equal(decision.failureReason?.recommendedRoute, 'serialize');
-    console.log('ok: CID conflict scenario (same atom identity is blocked)');
+    console.log('ok: CID conflict on the same write surface is blocked');
 }
 function testFileOverlapScenario() {
     const active = makeIntent({
@@ -428,6 +446,7 @@ function testProposalOverlapParksFirstWriterForRearbitration() {
     console.log('ok: overlapping proposal regions park first writer and block before write');
 }
 testParallelSafeScenario();
+testBroadCidWithoutSharedWriteSurfaceRemainsParallel();
 testReadSetConflictScenario();
 testActiveReadSetConflictScenario();
 testLegacyActiveIntentWithoutReadSetKeysRemainsCompatible();
