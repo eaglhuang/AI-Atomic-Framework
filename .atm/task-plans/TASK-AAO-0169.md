@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0169
 task_id: TASK-AAO-0169
 title: "Close source-first runner backlog evidence"
-status: planned
+status: done
 owner: atm-core
 priority: P1
 milestone: RFT-M
@@ -28,6 +28,15 @@ atomizationImpact:
   mapUpdates: []
 outOfScope: []
 nonGoals: []
+completed_at: "2026-07-12T12:21:24.043Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T12:21:24.043Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T12-21-24-043Z-close-1bb4db185534"
+lastTransitionAt: "2026-07-12T12:21:24.043Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "55092cc3a94f812a7e23c23ff93c639b166e20e4"
 ---
 
 # TASK-AAO-0169 - Close source-first runner backlog evidence

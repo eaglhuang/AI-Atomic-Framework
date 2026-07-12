@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0169",
-  "updatedAt": "2026-07-12T12:19:00.256Z",
+  "updatedAt": "2026-07-12T12:21:08.476Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -149,6 +149,108 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:f5b4265f8ead27ac21be949169560f6633891e6b5f028f77c4f3afe429f2663b",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712121804-codex-backlog-captain-TASK-AAO-0169-9fbea71080",
+      "createdAt": "2026-07-12T12:20:28.285Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712121804-codex-backlog-captain-TASK-AAO-0169-9fbea71080",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-next",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:b30f0882c17ae80fb7e6958d87301e92cfc20b63fd765a0bc5a4cd597877ba26",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "55092cc3a94f812a7e23c23ff93c639b166e20e4",
+            "cacheKey": "sha256:5035a7a3e8e38026a8626032a4e0264735c3bb82ff08d2440bc575afe1d1531a",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:20:28.358Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b071a23dd841321fc5257b09c0da9264ea6dcfc1521f11e4cee83a996e32aa6d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712121804-codex-backlog-captain-TASK-AAO-0169-9fbea71080",
+      "createdAt": "2026-07-12T12:21:08.476Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712121804-codex-backlog-captain-TASK-AAO-0169-9fbea71080",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-next",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "55092cc3a94f812a7e23c23ff93c639b166e20e4",
+            "cacheKey": "sha256:34f7273fc2e3af276f6fbc5dbfb8394bffc98799b1552fc1e0b5fc370daf2f8f",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:21:08.577Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:816128f3cc89909c98523e668d445da8c2f5d19e9537c79cfa250f6636efbc57",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
