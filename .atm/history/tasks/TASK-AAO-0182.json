@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0182",
+  "title": "Mark auto-intent claim backlog row fixed",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "TASK-AAO-0181"
+  ],
+  "acceptance": [
+    "Mark `ATM-BUG-2026-07-12-153` as fixed in TASK-AAO-0181.",
+    "Include delivery commit `973f854025b7c5390e16a51d51ae07543e9449e6`, close commit `551507b7f428d3beef2c3ec99c2c6b359d433a82`, and validator evidence in the row.",
+    "Run the declared text/encoding validators and close through governed taskflow."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md .atm/task-plans/TASK-AAO-0182.md"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the backlog status sync if TASK-AAO-0181 does not fully cover ATM-BUG-2026-07-12-153.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-governance-backlog",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0182.md",
+    "sectionTitle": "TASK-AAO-0182",
+    "headingLine": 31,
+    "hash": "498d1ce2dc350461"
+  },
+  "importedAt": "2026-07-12T13:47:20.488Z",
+  "lastTransitionId": "2026-07-12T13-50-17-743Z-close-a812f11f1a7b",
+  "lastTransitionAt": "2026-07-12T13:50:17.743Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T13:47:21.890Z",
+  "promotedAt": "2026-07-12T13:47:21.893Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-e1f19a90e6c3",
+    "claimedAt": "2026-07-12T13:47:21.896Z",
+    "heartbeatAt": "2026-07-12T13:50:17.741Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0182.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-12T13:47:21.896Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712134721-codex-backlog-captain-TASK-AAO-0182-ae374fa701",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0182",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0182.*",
+      ".atm/history/task-events/TASK-AAO-0182/**",
+      ".atm/history/tasks/TASK-AAO-0182.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e3b72e7487b27b1c3efb3865e8f9bcff494087edfb8b54da15289b3512211bd2",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T13:47:22.598Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-12T13:50:17.741Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712134721-codex-backlog-captain-TASK-AAO-0182-ae374fa701",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0182.closure-packet.json"
+}
