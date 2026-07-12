@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-7db4e761a788-0002",
+  "sequence": 2,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-7db4e761a788",
+  "from": {
+    "role": "scopeGuardian",
+    "providerId": "openai",
+    "modelId": "gpt-5-nano"
+  },
+  "to": {
+    "role": "implementer",
+    "providerId": "anthropic"
+  },
+  "createdAt": "2026-07-12T06:40:07.475Z",
+  "leaseEpoch": 4,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:scopeGuardian:openai:gpt-5-nano",
+    "sha256": "dc3e58a59412a26b73efbc6f1842439955fe3491f9d36b233206cd8b9b8f3bf5"
+  },
+  "humanSummary": "I can’t run scopeGuardian for TASK-TEAM-0083 because I don’t have direct access to your TASK-TEAM-0083 data or the coordinator execution environment.",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "e54ecb493744c8d4003b519c06fcbd02ab04f7fa96bd4e9f10639e96a1d32a4e"
+}

@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-11a640967ca6-0009",
+  "sequence": 9,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-11a640967ca6",
+  "from": {
+    "role": "reviewAgent",
+    "providerId": "gemini-direct",
+    "modelId": "gemini-2.5-flash-lite"
+  },
+  "to": {
+    "role": "knowledgeScout",
+    "providerId": "openai"
+  },
+  "createdAt": "2026-07-12T06:44:48.444Z",
+  "leaseEpoch": 9,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:reviewAgent:gemini-direct:gemini-2.5-flash-lite",
+    "sha256": "6c5a708da10561980dfcf226afaf6d7b57153c1f085a3f751f2cba7ba8b112c9"
+  },
+  "humanSummary": "**Role Report: TASK-TEAM-0083** **Status:** UNABLE TO EXECUTE **Role Analysis:** The `implementer/anthropic`, `validator/gemini-direct`, `evidenceCollector/openai`, and `lieutenant/anthropic` roles have all previously reported an inability to execute for TASK-TEAM-0083. The core constraints identified across these roles are: * **Authority Limitations:** These roles operate as subordinate to the Coordinator and lack the necessary permissions to directly execute tasks, invoke task runners, o",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "f3a16fc11db01d44bc2955ca4e1fcabb56754f7557679b4e823fd528f7807690"
+}

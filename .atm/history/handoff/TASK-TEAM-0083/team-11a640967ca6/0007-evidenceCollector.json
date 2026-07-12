@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-11a640967ca6-0007",
+  "sequence": 7,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-11a640967ca6",
+  "from": {
+    "role": "evidenceCollector",
+    "providerId": "openai",
+    "modelId": "gpt-5-nano"
+  },
+  "to": {
+    "role": "lieutenant",
+    "providerId": "anthropic"
+  },
+  "createdAt": "2026-07-12T06:44:43.298Z",
+  "leaseEpoch": 7,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:evidenceCollector:openai:gpt-5-nano",
+    "sha256": "4bcd70109e7e90ce9ceed9590d108b638a56765799b23350403017f259318574"
+  },
+  "humanSummary": "Role Report: TASK-TEAM-0083 — Team Role EvidenceCollector - Status: UNABLE TO EXECUTE - Constraint Analysis: - Authority: Subordinate role; cannot perform EvidenceCollector tasks or invoke ta[redacted] functions without Coordinator-level permission. - System Access: No direct access to task management systems, role-coordinator functions, or task runner invocation. - Governance Context: Prior governed roles (Reader, Implementer, Validator) also show inability to execute under current auth",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "0632fadb82da95f2a4be6e8fc94d07d6212f26d18d47fd4786ea6f6bd5e82a31"
+}

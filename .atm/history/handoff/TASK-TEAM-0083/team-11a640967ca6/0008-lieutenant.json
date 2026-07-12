@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-11a640967ca6-0008",
+  "sequence": 8,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-11a640967ca6",
+  "from": {
+    "role": "lieutenant",
+    "providerId": "anthropic",
+    "modelId": "claude-haiku-4-5-20251001"
+  },
+  "to": {
+    "role": "reviewAgent",
+    "providerId": "gemini-direct"
+  },
+  "createdAt": "2026-07-12T06:44:46.521Z",
+  "leaseEpoch": 8,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:lieutenant:anthropic:claude-haiku-4-5-20251001",
+    "sha256": "da1d20a5f89352a1ad82bf72486e7d9ee2970e069540b71401ee86f7bd61dc35"
+  },
+  "humanSummary": "# Role Report: TASK-TEAM-0083 ## Team Role: Lieutenant **Status:** UNABLE TO EXECUTE ### Constraint Analysis 1. **Authority Limitation** - Lieutenant role requires subordinate execution authority within task hierarchy - Current constraints prevent task runner invocation and role coordination - Cannot exceed or assume Coordinator authority per directive 2. **System Access Gaps** - No access to task management systems - No role-coordinator function invocation capability",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "17555085c7e79c6dc14b631d720f50a3bd56d7055560d012089753f9c790709a"
+}

@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-11a640967ca6-0010",
+  "sequence": 10,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-11a640967ca6",
+  "from": {
+    "role": "knowledgeScout",
+    "providerId": "openai",
+    "modelId": "gpt-5-nano"
+  },
+  "to": {
+    "role": "coordinator",
+    "providerId": null
+  },
+  "createdAt": "2026-07-12T06:45:02.769Z",
+  "leaseEpoch": 10,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:knowledgeScout:openai:gpt-5-nano",
+    "sha256": "acf34c3c8f651eeead7aa9531931ccd47d1d440e71de4a7877543d6b7d422156"
+  },
+  "humanSummary": "Role Report: TASK-TEAM-0083 — KnowledgeScout Status: UNABLE TO EXECUTE Constraint Analysis - Authority: KnowledgeScout operates as a subordinate role and cannot perform execution tasks, invoke task runners, or assume Coordinator authority. - System Access: No direct access to task management systems or role-coordinator functions. - Governance Context: Prior governed roles (Reader, Implementer, Validator, Lieutenant, EvidenceCollector) also report inability to execute under current auth. Evide",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "1771455e9d02401b3afb4e635b389367360c81dedcad55adf5dad3e638182df9"
+}

@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-11a640967ca6-0003",
+  "sequence": 3,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-11a640967ca6",
+  "from": {
+    "role": "reader",
+    "providerId": "gemini-direct",
+    "modelId": "gemini-2.5-flash-lite"
+  },
+  "to": {
+    "role": "scopeGuardian",
+    "providerId": "openai"
+  },
+  "createdAt": "2026-07-12T06:44:09.662Z",
+  "leaseEpoch": 3,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:reader:gemini-direct:gemini-2.5-flash-lite",
+    "sha256": "3ec911c925f7f922eb418fab18eb70e826670f507ad181a2d0999f36c43d2e43"
+  },
+  "humanSummary": "# Role Report: TASK-TEAM-0083 ## Status: **Unable to Execute** ## Constraint Analysis: 1. **Insufficient Authority:** As a subordinate role, I do not possess the necessary authority to directly run the Team Role Reader or execute task management functions. My capabilities are limited to providing information and analysis within the bounds set by the Coordinator. 2. **No Direct System Access:** I cannot directly interact with",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "c4ef6002614872bc194e13eadcffb9b36fc909e55ff6a2c761522205292d44a5"
+}

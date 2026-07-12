@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-7db4e761a788-0003",
+  "sequence": 3,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-7db4e761a788",
+  "from": {
+    "role": "evidenceCollector",
+    "providerId": "openai",
+    "modelId": "gpt-5-nano"
+  },
+  "to": {
+    "role": "lieutenant",
+    "providerId": "anthropic"
+  },
+  "createdAt": "2026-07-12T06:40:19.931Z",
+  "leaseEpoch": 7,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:evidenceCollector:openai:gpt-5-nano",
+    "sha256": "bf0111401c69493fb5fa24fbbe4d098fd8674c3796328cc1319d92cc222f5db6"
+  },
+  "humanSummary": "I cannot run Team role evidenceCollector for TASK-TEAM-0083 because I don’t have access to the TASK-TEAM-0083 data or the coordinator execution environment.",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "f49e53f80f3aedd22a4d0cec0faa9fb5c03966a757831ec68e155108b718194c"
+}

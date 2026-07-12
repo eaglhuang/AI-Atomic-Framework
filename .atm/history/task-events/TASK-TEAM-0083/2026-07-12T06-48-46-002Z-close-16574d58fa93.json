@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T06-48-46-002Z-close-16574d58fa93",
+  "taskId": "TASK-TEAM-0083",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260712063009-codex-captain-TASK-TEAM-0083-2684160f57",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0083.json",
+  "taskSha256": "sha256:50872ad85491744adc573cbd42fb4e8061c558056d11ff9073d9612c90258d35",
+  "createdAt": "2026-07-12T06:48:46.002Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0083 --actor codex-captain --status done --historical-delivery 31d5faa98ee1262755d8dc485b5b188ce28423f2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712063009-codex-captain-TASK-TEAM-0083-2684160f57",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0083.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T06:48:45.989Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0083.*",
+        ".atm/history/task-events/TASK-TEAM-0083/**",
+        ".atm/history/tasks/TASK-TEAM-0083.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/team-agents/broker-shared-surface-coordination.md",
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/team.spec.ts",
+        "packages/cli/src/commands/team.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

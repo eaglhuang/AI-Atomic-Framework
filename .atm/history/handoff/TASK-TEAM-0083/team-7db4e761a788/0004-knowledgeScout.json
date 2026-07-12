@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-7db4e761a788-0004",
+  "sequence": 4,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-7db4e761a788",
+  "from": {
+    "role": "knowledgeScout",
+    "providerId": "openai",
+    "modelId": "gpt-5-nano"
+  },
+  "to": {
+    "role": "coordinator",
+    "providerId": null
+  },
+  "createdAt": "2026-07-12T06:40:36.260Z",
+  "leaseEpoch": 10,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:knowledgeScout:openai:gpt-5-nano",
+    "sha256": "0a0a63efb4b35688ae6c58ebf23130a4800cd5d42410d3b87e7749e92befe9a2"
+  },
+  "humanSummary": "KnowledgeScout Report — TASK-TEAM-0083 Role: knowledgeScout (Team Role) Current status - Unable to run knowledgeScout for TASK-TEAM-0083 due to lack of direct access to TASK-TEAM-0083 data and coordinator execution environment. - This aligns with prior governed role artifacts: - coordinator/openai: I don’t have direct access to your TASK-TEAM-0083 data to run the coordinator. - scopeGuardian/openai: I can’t run scopeGuardian for TASK-TEAM-0083 because I don’t",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "23139d8663f6a4d213b23d0fd812813dde4aeaff5a29236c95c7fbe9c1c45b8f"
+}

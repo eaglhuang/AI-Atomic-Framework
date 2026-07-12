@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-11a640967ca6-0006",
+  "sequence": 6,
+  "taskId": "TASK-TEAM-0083",
+  "teamRunId": "team-11a640967ca6",
+  "from": {
+    "role": "validator",
+    "providerId": "gemini-direct",
+    "modelId": "gemini-2.5-flash-lite"
+  },
+  "to": {
+    "role": "evidenceCollector",
+    "providerId": "openai"
+  },
+  "createdAt": "2026-07-12T06:44:33.152Z",
+  "leaseEpoch": 6,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0083:validator:gemini-direct:gemini-2.5-flash-lite",
+    "sha256": "6ed0dd5c84139be94214a2ff1c35cb0b61bb483f0f3b6261109920f0b9f4cc1f"
+  },
+  "humanSummary": "## Role Report: TASK-TEAM-0083 **Status:** Unable to Execute **Constraint Analysis:** The Team Role Validator cannot execute due to a lack of direct system access and insufficient authority. It cannot invoke task runners, interact with task management systems, or assume Coordinator authority. Therefore, it is unable to perform the role validation for TASK-TEAM-0083.",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "b6fe1cf6334553f7e684bafd2ca111abbf204eb72211d66f75964d5a22ac132d"
+}
