@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0168
 task_id: TASK-AAO-0168
 title: "Guard source-first runner lifecycle mutations"
-status: planned
+status: done
 owner: atm-core
 priority: P1
 milestone: RFT-M
@@ -30,6 +30,15 @@ atomizationImpact:
   mapUpdates: []
 outOfScope: []
 nonGoals: []
+completed_at: "2026-07-12T12:17:02.019Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T12:17:02.019Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T12-17-02-019Z-close-bff62318fde7"
+lastTransitionAt: "2026-07-12T12:17:02.019Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "0245f6b989d35549390b1c41d11da3cce38aad08"
 ---
 
 # TASK-AAO-0168 - Guard source-first runner lifecycle mutations

@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T12-17-01-948Z-close-9434446839ae",
+  "taskId": "TASK-AAO-0168",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712121237-codex-backlog-captain-TASK-AAO-0168-3dc1d359af",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0168.json",
+  "taskSha256": "sha256:6e53788ba5ba41b2582dafe186171b1c84bd700a8b3ed425f8b58f8ecbd8fe9d",
+  "createdAt": "2026-07-12T12:17:01.948Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0168 --actor codex-backlog-captain --status done --historical-delivery 0245f6b989d35549390b1c41d11da3cce38aad08",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712121237-codex-backlog-captain-TASK-AAO-0168-3dc1d359af",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0168.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T12:17:01.938Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0168.*",
+        ".atm/history/task-events/TASK-AAO-0168/**",
+        ".atm/history/tasks/TASK-AAO-0168.json",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/next.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
