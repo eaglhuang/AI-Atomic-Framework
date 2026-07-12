@@ -23,7 +23,7 @@ import { getCanonicalAllowedFilesForTask, sanitizeTaskDirectionAllowedFiles } fr
 import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
-import { detectCrossTaskMutation, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
 
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
@@ -457,6 +457,44 @@ function appendGitHeadEvidenceJsonl(evidenceAbsolute: string, payload: Record<st
   const nextLine = `${JSON.stringify(payload)}\n`;
   const existingText = existsSync(evidenceAbsolute) ? readFileSync(evidenceAbsolute, 'utf8') : '';
   writeFileSync(evidenceAbsolute, `${existingText}${nextLine}`, 'utf8');
+}
+
+interface GitHeadEvidencePreparationSnapshot {
+  readonly evidenceAbsolute: string;
+  readonly existed: boolean;
+  readonly content: string | null;
+}
+
+export function captureGitHeadEvidencePreparation(cwd: string): GitHeadEvidencePreparationSnapshot {
+  const evidenceAbsolute = path.join(cwd, gitHeadEvidencePath);
+  const existed = existsSync(evidenceAbsolute);
+  return {
+    evidenceAbsolute,
+    existed,
+    content: existed ? readFileSync(evidenceAbsolute, 'utf8') : null
+  };
+}
+
+// A failed commit must not leave the wrapper's prepared line behind as tracked
+// history. The commit lane serializes writers, so this restores only the state
+// captured before the failed attempt.
+export function rollbackFailedGitHeadEvidencePreparation(snapshot: GitHeadEvidencePreparationSnapshot): boolean {
+  const currentContent = existsSync(snapshot.evidenceAbsolute) ? readFileSync(snapshot.evidenceAbsolute, 'utf8') : null;
+  if (snapshot.existed) {
+    if (currentContent === snapshot.content) return false;
+    writeFileSync(snapshot.evidenceAbsolute, snapshot.content ?? '', 'utf8');
+    return true;
+  }
+  if (currentContent === null) return false;
+  rmSync(snapshot.evidenceAbsolute, { force: true });
+  return true;
+}
+
+export function reconcileResolvedCrossTaskMutationIncident(cwd: string, taskId: string | null): boolean {
+  if (detectCrossTaskMutation(cwd, taskId, 'git check')) return false;
+  if (!readIncidentFlag(cwd)) return false;
+  clearIncidentFlags(cwd);
+  return true;
 }
 
 function hasMatchingWorktreeGitHeadEvidence(cwd: string, treeSha: string, parentCommitShas: readonly string[]): boolean {
@@ -1058,6 +1096,8 @@ export function evaluateGitGovernanceCheck(input: {
       code: 'cross-task-mutation-incident',
       detail: `Cross-task mutation incident detected: files owned by active task ${crossTaskBlock.conflictTaskId} are mutated. File(s): ${crossTaskBlock.conflictFiles.join(', ')}. Recovery: ${crossTaskBlock.recoveryLane}`
     });
+  } else {
+    reconcileResolvedCrossTaskMutationIncident(cwd, input.taskId);
   }
   if (!profile.gitName || !profile.gitEmail) {
     violations.push({
@@ -1714,6 +1754,7 @@ function runGitCommit(options: ParsedGitOptions) {
   // rejection), nothing previously unstaged that residue. Snapshot the live
   // index now so the catch block can restore exactly what this attempt added.
   const liveIndexSnapshotBeforeCommitAttempt = readStagedFiles(options.cwd);
+  const gitHeadEvidenceSnapshotBeforeCommitAttempt = captureGitHeadEvidencePreparation(options.cwd);
   const commitTimeoutMs = resolveGitCommitTimeoutMs(options.timeoutMs);
   const commitAttemptStatusPath = gitCommitAttemptStatusRelativePath(actorId, options.taskId);
   const commitAttemptStartedAt = new Date().toISOString();
@@ -1865,6 +1906,9 @@ function runGitCommit(options: ParsedGitOptions) {
       && headShaBeforeCommit
       && headShaAfterFailure !== headShaBeforeCommit
     );
+    const gitHeadEvidenceRollback = headAdvancedDuringAttempt
+      ? false
+      : rollbackFailedGitHeadEvidencePreparation(gitHeadEvidenceSnapshotBeforeCommitAttempt);
     writeGitCommitAttemptStatus(options.cwd, commitAttemptStatusPath, {
       schemaId: 'atm.gitCommitAttemptStatus.v1',
       actorId,
@@ -1943,7 +1987,8 @@ function runGitCommit(options: ParsedGitOptions) {
             copyableCommitCommand: rawCopyableCommitCommand
           }),
           protectedOverrideOutcome,
-          liveIndexResidueRollback
+          liveIndexResidueRollback,
+          gitHeadEvidenceRollback
         }
       });
     }
@@ -1973,7 +2018,8 @@ function runGitCommit(options: ParsedGitOptions) {
           copyableCommitCommand: rawCopyableCommitCommand
         }),
         protectedOverrideOutcome,
-        liveIndexResidueRollback
+        liveIndexResidueRollback,
+        gitHeadEvidenceRollback
       }
     });
   }

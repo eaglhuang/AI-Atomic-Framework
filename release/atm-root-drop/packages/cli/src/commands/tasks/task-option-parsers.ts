@@ -357,6 +357,64 @@ export function parseScopeRepairOptions(argv: string[]) {
   };
 }
 
+export function parseMetadataRepairDeliverablesOptions(argv: string[]) {
+  const options = {
+    cwd: process.cwd(),
+    taskId: '',
+    actorId: null as string | null,
+    setPaths: [] as string[],
+    reason: null as string | null
+  };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === '--cwd' || arg === '--repo') {
+      options.cwd = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--task') {
+      options.taskId = requireValue(argv, index, '--task');
+      index += 1;
+      continue;
+    }
+    if (arg === '--actor') {
+      options.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--set') {
+      const raw = requireValue(argv, index, '--set');
+      options.setPaths = raw.split(',').map((p) => p.trim()).filter(Boolean);
+      index += 1;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
+    if (arg === '--json' || arg === '--pretty') {
+      continue;
+    }
+    throw new CliError('ATM_CLI_USAGE', `tasks scope repair-deliverables does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (!options.taskId) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope repair-deliverables requires --task <work-item-id>.', { exitCode: 2 });
+  }
+  if (options.setPaths.length === 0) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope repair-deliverables requires --set <paths> (comma-separated).', { exitCode: 2 });
+  }
+  if (!options.reason) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope repair-deliverables requires --reason <text>.', { exitCode: 2 });
+  }
+  return {
+    ...options,
+    cwd: path.resolve(options.cwd),
+    taskId: options.taskId.trim(),
+    reason: options.reason.trim()
+  };
+}
+
 export function parseCreateOptions(argv: string[]) {
   const options = {
     cwd: process.cwd(),

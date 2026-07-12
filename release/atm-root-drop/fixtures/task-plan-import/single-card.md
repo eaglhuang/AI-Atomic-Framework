@@ -45,7 +45,7 @@ markdown document with YAML front matter.
 
 ## Deliverables
 
-- imported task JSON
-- import evidence JSON
+- .atm/history/tasks/TASK-FIXTURE-0001.json
+- .atm/history/evidence/TASK-FIXTURE-0001.json
 - packages/cli/src/commands/tasks.ts
 - scripts/validate-task-import.ts

@@ -1,6 +1,6 @@
 import { type TeamClosureAttestationEvidence, type TeamClosureReviewerIndependenceEvidence } from './evidence.ts';
 import { type TeamKnowledgeSummary } from './team-knowledge.ts';
-import { type TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
+import { evaluateTeamBrokerLane, type TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import { type TeamWorkerAdapterContract } from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
 import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/anthropic.ts';
 import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
@@ -739,6 +739,17 @@ export declare function planTeamBrokerLane(input: {
     evidence: TeamBrokerLaneEvidence;
     findings: PermissionFinding[];
 };
+/**
+ * TASK-TEAM-0083 (backlog ATM-BUG-2026-07-12-133) — when the Broker lane
+ * blocks on a proposal-first admission, the plan response must tell the
+ * operator exactly which proposal contract to author and how to feed it back,
+ * instead of a dead-end `proposal-submitted` status. `team plan` and
+ * `team start` both accept `--broker-proposal-file` with the same validation.
+ */
+export declare function buildProposalFirstParityFindings(input: {
+    taskId: string;
+    brokerLaneResult: ReturnType<typeof evaluateTeamBrokerLane>;
+}): PermissionFinding[];
 export declare function buildTeamPlan(input: {
     task: Record<string, unknown> | null | undefined;
     recipe: TeamRecipe;

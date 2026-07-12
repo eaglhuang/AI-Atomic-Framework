@@ -1758,16 +1758,40 @@ export function validateTeamPermissionModel(recipe, writePaths, options = {}) {
 }
 export function planTeamBrokerLane(input) {
     const brokerLaneResult = evaluateTeamBrokerLane(input);
+    const findings = brokerLaneToFindings(brokerLaneResult).map((finding) => buildPermissionFinding({
+        level: finding.level,
+        code: finding.code,
+        detail: finding.detail,
+        paths: finding.paths
+    }));
     return {
         result: brokerLaneResult,
         evidence: buildTeamBrokerEvidence(brokerLaneResult),
-        findings: brokerLaneToFindings(brokerLaneResult).map((finding) => buildPermissionFinding({
-            level: finding.level,
-            code: finding.code,
-            detail: finding.detail,
-            paths: finding.paths
-        }))
+        findings: [
+            ...findings,
+            ...buildProposalFirstParityFindings({ taskId: input.taskId, brokerLaneResult })
+        ]
     };
+}
+/**
+ * TASK-TEAM-0083 (backlog ATM-BUG-2026-07-12-133) — when the Broker lane
+ * blocks on a proposal-first admission, the plan response must tell the
+ * operator exactly which proposal contract to author and how to feed it back,
+ * instead of a dead-end `proposal-submitted` status. `team plan` and
+ * `team start` both accept `--broker-proposal-file` with the same validation.
+ */
+export function buildProposalFirstParityFindings(input) {
+    const admission = input.brokerLaneResult.evidence?.decision?.admission;
+    if (input.brokerLaneResult.ok || admission?.state !== 'proposal-submitted') {
+        return [];
+    }
+    const hotFiles = Array.isArray(admission.hotFiles) ? admission.hotFiles.map((entry) => String(entry)) : [];
+    return [buildPermissionFinding({
+            level: 'error',
+            code: 'proposal-first-required',
+            detail: `Hot shared surface requires a validated bounded proposal (schema atm.patchProposal.v1) before this team may plan or start. Author the proposal, then rerun: node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json (readiness preview) and node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json (fail-closed execution). To pre-activate through the Broker instead: node atm.mjs broker runtime activate --proposal-file <proposal.json> --json.`,
+            paths: hotFiles
+        })];
 }
 function buildPermissionFinding(input) {
     return {

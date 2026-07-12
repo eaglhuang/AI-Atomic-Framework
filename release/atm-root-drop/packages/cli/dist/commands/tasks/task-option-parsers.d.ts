@@ -56,6 +56,13 @@ export declare function parseScopeRepairOptions(argv: string[]): {
     emergencyApproval: string | null;
     addPaths: string[];
 };
+export declare function parseMetadataRepairDeliverablesOptions(argv: string[]): {
+    cwd: string;
+    taskId: string;
+    reason: string;
+    actorId: string | null;
+    setPaths: string[];
+};
 export declare function parseCreateOptions(argv: string[]): {
     cwd: string;
     taskId: string;

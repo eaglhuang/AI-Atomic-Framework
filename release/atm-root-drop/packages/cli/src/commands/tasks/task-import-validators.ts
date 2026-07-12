@@ -259,24 +259,28 @@ export function validateStrictPathHeuristic(entry: string): string | null {
   const trimmed = entry.trim();
   if (!trimmed) return 'empty-path';
 
-  // CJK 安全豁免：路徑包含 CJK 字元則跳過啟發式判斷
-  if (/[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u3000-\u303F]/.test(trimmed)) return null;
-
   // markdown 符號：行首 "- " / "* " / "# "
   if (/^[-*#]\s/.test(trimmed)) return 'markdown-prefix';
 
   // 行尾標點
   if (/[,.:?]$/.test(trimmed)) return 'trailing-punctuation';
 
-  // 英文虛詞整詞匹配（大小寫不限）
-  if (/\b(the|for|of|closure|packet|and|with)\b/i.test(trimmed)) return 'english-sentence-word';
+  // A deliverable is a repository path declaration, not a narrative label.
+  // CJK is valid in file names, so path shape rather than language determines
+  // whether the declaration is safe to import.
+  if (/\s/.test(trimmed)) return 'whitespace-narrative';
+  if (/[/\\]/.test(trimmed) || /[*?\[\]]/.test(trimmed)) return null;
+  if (/^\.?[A-Za-z0-9_@][A-Za-z0-9_.@-]*\.[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(trimmed)) return null;
+  if (/^(?:Dockerfile|Makefile|LICENSE|NOTICE|README)$/i.test(trimmed)) return null;
 
-  return null;
+  return 'not-path-shaped';
 }
 
 /**
  * 批次驗證 deliverables 陣列，回傳違規條目清單。
- * 非 strict 模式回傳 severity='warning'；strict 模式回傳 severity='error'。
+ * Deliverable declarations are authoritative close metadata, so malformed
+ * values always produce an import-blocking error. `strictMode` remains in the
+ * signature for caller compatibility while legacy plans are migrated.
  */
 export function validateDeliverablesList(
   deliverables: readonly string[],
@@ -286,7 +290,7 @@ export function validateDeliverablesList(
   for (const entry of deliverables) {
     const reason = validateStrictPathHeuristic(entry);
     if (reason) {
-      violations.push({ entry, reason, severity: strictMode ? 'error' : 'warning' });
+      violations.push({ entry, reason, severity: 'error' });
     }
   }
   return violations;

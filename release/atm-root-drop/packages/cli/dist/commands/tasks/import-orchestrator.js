@@ -158,35 +158,37 @@ export async function runTasksImport(argv) {
     }
     const writtenPaths = [];
     let evidencePath = null;
-    // TASK-AAO-0064 L1 #4: strict path 驗證
-    // 收集所有 parsed tasks 的 deliverables，執行啟發式路徑污染檢測
+    // Deliverables participate in governed close bundles, so prose declarations
+    // must be rejected at import rather than failing later during close.
     const strictPathViolations = [];
     for (const task of parsed.tasks) {
         const violations = validateDeliverablesList(task.deliverables ?? [], options.strictPaths);
+        if (violations.length > 0) {
+            const normalizedScopeDeliverables = (task.scopePaths ?? [])
+                .filter((entry) => validateDeliverablesList([entry], options.strictPaths).length === 0);
+            if (normalizedScopeDeliverables.length > 0 && !options.strictPaths) {
+                task.deliverables = [...normalizedScopeDeliverables];
+                parsed.diagnostics.push({
+                    level: 'warning',
+                    code: 'ATM_TASK_IMPORT_DELIVERABLES_NORMALIZED',
+                    text: `Task ${task.workItemId}: replaced non-path deliverable declarations with ${normalizedScopeDeliverables.length} canonical scope path(s).`,
+                    workItemId: task.workItemId
+                });
+                continue;
+            }
+        }
         for (const violation of violations) {
             strictPathViolations.push({ taskId: task.workItemId, ...violation });
         }
     }
     if (strictPathViolations.length > 0) {
-        if (options.strictPaths) {
-            // strict mode → ok=false，回傳 STRICT_PATH_VIOLATION error
-            throw new CliError('STRICT_PATH_VIOLATION', 'tasks import --strict-paths detected contaminated deliverable paths.', {
-                exitCode: 1,
-                details: {
-                    violations: strictPathViolations,
-                    planPath: relativePathFrom(options.cwd, planAbsolute)
-                }
-            });
-        }
-        // 非 strict → 加 warning diagnostics，繼續執行
-        for (const violation of strictPathViolations) {
-            parsed.diagnostics.push({
-                level: 'warning',
-                code: 'STRICT_PATH_VIOLATION',
-                text: `Task ${violation.taskId}: deliverable entry "${violation.entry}" matched strict-path heuristic (${violation.reason}). Use --strict-paths to escalate to error.`,
-                workItemId: violation.taskId
-            });
-        }
+        throw new CliError('ATM_TASK_IMPORT_DELIVERABLE_PATH_INVALID', 'tasks import rejected deliverables that are not repository path declarations.', {
+            exitCode: 1,
+            details: {
+                violations: strictPathViolations,
+                planPath: relativePathFrom(options.cwd, planAbsolute)
+            }
+        });
     }
     if (options.write) {
         assertLocalTaskLedgerEnabled(options.cwd, 'import --write');

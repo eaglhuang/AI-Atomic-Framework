@@ -40,8 +40,8 @@ import { extractTaskCloseDeclaredFiles as delegatedExtractTaskCloseDeclaredFiles
 import { writeTaskDocumentWithTransition as delegatedWriteTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
 import { collectKeyValue as delegatedCollectKeyValue, collectKeyValueFromLines as delegatedCollectKeyValueFromLines, createTaskFromTableMetadata as delegatedCreateTaskFromTableMetadata, parseDispatchMetadataFromPlanText } from './task-markdown-helpers.js';
 import { safeTaskFileReadDir, safeTaskFileStat, readJsonRecord, taskPathFor, collectTaskFileValues, normalizeRelativePath, legacyTaskRequiresBaseline } from './task-file-io-helpers.js';
-import { coerceStatus, extractFrontMatter, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, parseMarkdownTableCells, parseYamlList, parseContextMap } from './task-import-validators.js';
-import { parseCreateOptions, parseMirrorOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './task-option-parsers.js';
+import { coerceStatus, extractFrontMatter, hashSection, normalizeOptionalString, normalizeYamlScalar, normalizeTaskId, parseMarkdownTableCells, parseYamlList, validateDeliverablesList, parseContextMap } from './task-import-validators.js';
+import { parseCreateOptions, parseMirrorOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseMetadataRepairDeliverablesOptions, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './task-option-parsers.js';
 import { buildTaskStatusTriangulation as buildTaskStatusTriangulationDelegated, readScopeAmendmentEvents as readScopeAmendmentEventsDelegated, readLastTransitionEventRecord as readLastTransitionEventRecordDelegated, resolvePlanningCardPath as resolvePlanningCardPathDelegated } from './status-triangulation.js';
 import { recordStaleRunnerOverride as recordStaleRunnerOverrideDelegated, recordFailedEmergencyUseAttempt as recordFailedEmergencyUseAttemptDelegated, isCliErrorWithCode as isCliErrorWithCodeDelegated } from './close-governance.js';
 export const validStatuses = new Set(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
@@ -487,13 +487,126 @@ async function runTasksScope(argv) {
     if (subAction === 'repair') {
         return runTasksScopeRepair(argv.slice(1));
     }
+    if (subAction === 'repair-deliverables') {
+        return runTasksMetadataRepairDeliverables(argv.slice(1));
+    }
     if (subAction === 'remove') {
         return runTasksScopeRemove(argv.slice(1));
     }
     if (!subAction) {
-        throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add | remove | repair', { exitCode: 2 });
+        throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add | remove | repair | repair-deliverables', { exitCode: 2 });
     }
-    throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add, remove, repair`, { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add, remove, repair, repair-deliverables`, { exitCode: 2 });
+}
+function buildMetadataRepairNoClaimMessage(precondition) {
+    return [
+        `tasks scope repair-deliverables requires an active claim held by ${precondition.actorId}.`,
+        `Current claimState=${precondition.claimState}; claimActorId=${precondition.claimActorId ?? '<none>'}; leaseState=${precondition.leaseState}.`,
+        `Claim the task first, then rerun: node atm.mjs tasks scope repair-deliverables --task ${precondition.taskId} --actor ${precondition.actorId} --set <paths> --reason "<why the card metadata changed>" --json`
+    ].join('\n');
+}
+async function runTasksMetadataRepairDeliverables(argv) {
+    const options = parseMetadataRepairDeliverablesOptions(argv);
+    const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+    if (!resolvedActor) {
+        throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks metadata repair-deliverables requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+    }
+    const actorId = resolvedActor.actorId;
+    const precondition = inspectScopeAmendmentPreconditions(options.cwd, options.taskId, actorId);
+    if (precondition.claimState !== 'active' || precondition.claimActorId !== actorId || precondition.leaseState !== 'active') {
+        throw new CliError('ATM_TASK_METADATA_REPAIR_ACTIVE_CLAIM_REQUIRED', buildMetadataRepairNoClaimMessage(precondition), {
+            exitCode: 1,
+            details: precondition
+        });
+    }
+    const rawDeliverables = options.setPaths.map((entry) => entry.trim()).filter(Boolean);
+    const rawDeliverableViolations = validateDeliverablesList(rawDeliverables, true);
+    const candidateDeliverables = sanitizeTaskDirectionAllowedFiles(rawDeliverables);
+    if (rawDeliverableViolations.length > 0 || candidateDeliverables.length !== rawDeliverables.length) {
+        const droppedEntries = rawDeliverables.filter((entry) => !candidateDeliverables.includes(normalizeRelativePath(entry)));
+        const violations = rawDeliverableViolations.length > 0
+            ? rawDeliverableViolations
+            : droppedEntries.map((entry) => ({ entry, reason: 'not-path-shaped', severity: 'error' }));
+        throw new CliError('ATM_TASK_METADATA_REPAIR_DELIVERABLE_PATH_INVALID', `tasks scope repair-deliverables rejected non-path deliverables for ${options.taskId}: ${violations.map((entry) => entry.entry).join(', ')}`, { exitCode: 1, details: { taskId: options.taskId, violations } });
+    }
+    const taskPath = taskPathFor(options.cwd, options.taskId);
+    const taskDocument = readJsonRecord(taskPath);
+    const previousDeliverables = sanitizeTaskDirectionAllowedFiles(Array.isArray(taskDocument.deliverables) ? taskDocument.deliverables : []);
+    taskDocument.deliverables = [...candidateDeliverables];
+    const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
+    let allowedFiles = [];
+    if (existsSync(lockPath)) {
+        const outerLock = JSON.parse(readFileSync(lockPath, 'utf8'));
+        const embeddedLock = outerLock.taskDirectionLock;
+        if (embeddedLock && typeof embeddedLock === 'object' && !Array.isArray(embeddedLock)) {
+            const embeddedLockRecord = embeddedLock;
+            const existingAllowed = sanitizeTaskDirectionAllowedFiles(Array.isArray(embeddedLockRecord.allowedFiles) ? embeddedLockRecord.allowedFiles : []);
+            const mergedAllowed = sanitizeTaskDirectionAllowedFiles([...existingAllowed, ...candidateDeliverables]);
+            syncScopeAmendmentRuntimeLock({ outerLock, embeddedLockRecord, mergedAllowed });
+            writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
+            allowedFiles = mergedAllowed;
+        }
+    }
+    const createdAt = new Date().toISOString();
+    const transitionSeedDocument = {
+        ...taskDocument,
+        lastTransitionId: 'pending-metadata-repair',
+        lastTransitionAt: createdAt
+    };
+    const transitionId = createTaskTransitionId({
+        createdAt,
+        taskId: options.taskId,
+        action: 'metadata-repair',
+        taskDocument: transitionSeedDocument
+    });
+    taskDocument.lastTransitionId = transitionId;
+    taskDocument.lastTransitionAt = createdAt;
+    taskDocument.ledgerContractVersion = 'task-ledger/v1';
+    appendTaskTransitionEvent({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        action: 'metadata-repair',
+        actorId,
+        fromStatus: String(taskDocument.status ?? 'running'),
+        toStatus: String(taskDocument.status ?? 'running'),
+        taskPath,
+        taskDocument,
+        command: `node atm.mjs tasks scope repair-deliverables --task ${options.taskId} --actor ${actorId} --set ${candidateDeliverables.join(',')} --reason "${options.reason}" --json`,
+        createdAt,
+        transitionId,
+        amendmentMetadata: {
+            amendmentClass: 'task-metadata',
+            amendmentPhase: 'during-implementation',
+            amendmentMode: 'normal',
+            reason: options.reason
+        }
+    });
+    writeTaskDocument(taskPath, taskDocument);
+    return makeResult({
+        ok: true,
+        command: 'tasks metadata repair-deliverables',
+        cwd: options.cwd,
+        messages: [
+            message('info', 'ATM_TASK_METADATA_REPAIR_DELIVERABLES_APPLIED', `Deliverable metadata repaired for ${options.taskId}: ${candidateDeliverables.length} path(s).`, {
+                taskId: options.taskId,
+                actorId,
+                previousDeliverables,
+                deliverables: candidateDeliverables,
+                allowedFiles,
+                transitionId
+            })
+        ],
+        evidence: {
+            action: 'metadata-repair',
+            metadataField: 'deliverables',
+            taskId: options.taskId,
+            actorId,
+            previousDeliverables,
+            deliverables: candidateDeliverables,
+            allowedFiles,
+            transitionId
+        }
+    });
 }
 function inspectScopeAmendmentPreconditions(cwd, taskId, actorId) {
     const taskPath = taskPathFor(cwd, taskId);

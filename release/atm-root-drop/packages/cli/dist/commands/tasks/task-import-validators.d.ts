@@ -80,7 +80,9 @@ export declare function extractTaskDeclaredFiles(taskDocument: Record<string, un
 export declare function validateStrictPathHeuristic(entry: string): string | null;
 /**
  * 批次驗證 deliverables 陣列，回傳違規條目清單。
- * 非 strict 模式回傳 severity='warning'；strict 模式回傳 severity='error'。
+ * Deliverable declarations are authoritative close metadata, so malformed
+ * values always produce an import-blocking error. `strictMode` remains in the
+ * signature for caller compatibility while legacy plans are migrated.
  */
 export declare function validateDeliverablesList(deliverables: readonly string[], strictMode: boolean): readonly {
     readonly entry: string;
