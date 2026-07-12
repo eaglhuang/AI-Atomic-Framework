@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0176",
+  "title": "Synchronize fixed backlog rows 119 and 144",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Mark row 119 fixed in TASK-AAO-0173 with its focused identity regression and typecheck evidence.",
+    "Mark row 144 fixed in TASK-AAO-0175 with handoff route integration and ambiguity regression evidence.",
+    "Preserve the existing follow-up wording where it remains useful and keep row 154/155 open as separate follow-up items."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert only the two status rows if their fix evidence is later found insufficient.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-governance-backlog",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0176.md",
+    "sectionTitle": "TASK-AAO-0176",
+    "headingLine": 28,
+    "hash": "466becb60ee1f565"
+  },
+  "importedAt": "2026-07-12T13:17:01.676Z",
+  "lastTransitionId": "2026-07-12T13-17-09-619Z-claim-68a7cc042b85",
+  "lastTransitionAt": "2026-07-12T13:17:09.619Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T13:17:09.334Z",
+  "promotedAt": "2026-07-12T13:17:09.336Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-3cb56c0c1438",
+    "claimedAt": "2026-07-12T13:17:09.339Z",
+    "heartbeatAt": "2026-07-12T13:17:09.339Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0176.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T13:17:09.339Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712131709-codex-backlog-captain-TASK-AAO-0176-0e8224eb92",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0176",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0176.*",
+      ".atm/history/task-events/TASK-AAO-0176/**",
+      ".atm/history/tasks/TASK-AAO-0176.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "55fdbfbf38deaf1868298fdeda34b6306e17c228cc7d36493966440a792bf934",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T13:17:09.619Z",
+    "status": "active"
+  }
+}
