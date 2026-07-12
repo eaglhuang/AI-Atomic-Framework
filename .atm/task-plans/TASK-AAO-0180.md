@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0180
 task_id: TASK-AAO-0180
 title: "Sync role-provider parser backlog status"
-status: planned
+status: done
 owner: atm-core
 priority: P2
 planning_repo: AI-Atomic-Framework
@@ -23,6 +23,15 @@ rollback:
 atomizationImpact:
   ownerAtomOrMap: "atom-governance-backlog"
   mapUpdates: []
+completed_at: "2026-07-12T13:37:21.680Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T13:37:21.680Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T13-37-21-680Z-close-f2920fcf3358"
+lastTransitionAt: "2026-07-12T13:37:21.680Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "a71a0d18878a669961c851f35eb8ce15e35cf690"
 ---
 
 # TASK-AAO-0180 - Sync role-provider parser backlog status
