@@ -1,0 +1,158 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0162",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "708a3e42437f0047388e2654ecf74759a02debca",
+  "governedTreeSha": "dbeb9257bb4f4d4d92e658e2f04623056fd97118",
+  "targetCommitDelta": {
+    "currentCommitSha": "708a3e42437f0047388e2654ecf74759a02debca",
+    "parentCommitShas": [
+      "708a3e42437f0047388e2654ecf74759a02debca"
+    ],
+    "governedTreeSha": "dbeb9257bb4f4d4d92e658e2f04623056fd97118",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0162.bundle-manifest.json",
+      ".atm/history/evidence/TASK-AAO-0162.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-import.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-commands",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0198d67b654c6c29fa7cb81aabf19eea6d88162e3035b92851db89233f0faaa",
+      "stderrSha256": "sha256:7ac92426becdb17ec5a37bcd9b4478669153f657bd0c1cfdf573eb2b34c1f8dd",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:task-import",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9c74527929f56be89b65ca3bfbc997c0e2a804076d707ebb288b08fe5711c557",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:99c3789dff23d8ba31feb6881482a78c49a0918e0f4fec35425d822685738f38",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-commands",
+    "validate:task-import"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-12T10:50:47.465Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0162.*",
+      ".atm/history/task-events/TASK-AAO-0162/**",
+      ".atm/history/tasks/TASK-AAO-0162.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-import.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-import.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0162.json",
+  "closedAt": "2026-07-12T10:50:47.466Z",
+  "closedByActor": "codex-backlog-captain",
+  "sessionId": "session-20260712104110-codex-backlog-captain-TASK-AAO-0162-5efd78c35e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "708a3e42437f0047388e2654ecf74759a02debca",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-task-import.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0162.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0162/2026-07-12T10-41-05-390Z-import-da22541207bb.json",
+      ".atm/history/task-events/TASK-AAO-0162/2026-07-12T10-41-10-613Z-reserve-bd6b62c687c1.json",
+      ".atm/history/task-events/TASK-AAO-0162/2026-07-12T10-41-10-615Z-promote-33a010353a60.json",
+      ".atm/history/task-events/TASK-AAO-0162/2026-07-12T10-41-10-924Z-claim-89867e36cc57.json",
+      ".atm/history/tasks/TASK-AAO-0162.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

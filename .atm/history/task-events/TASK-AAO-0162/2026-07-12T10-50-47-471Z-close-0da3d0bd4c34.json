@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T10-50-47-471Z-close-0da3d0bd4c34",
+  "taskId": "TASK-AAO-0162",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712104110-codex-backlog-captain-TASK-AAO-0162-5efd78c35e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0162.json",
+  "taskSha256": "sha256:701f5cbc795fd0b5175a8a790cac68d3ae189a7ffbe3de6211f4b64b8d19779f",
+  "createdAt": "2026-07-12T10:50:47.471Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0162 --actor codex-backlog-captain --status done --historical-delivery 708a3e42437f0047388e2654ecf74759a02debca",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712104110-codex-backlog-captain-TASK-AAO-0162-5efd78c35e",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0162.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-commands",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T10:50:47.465Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0162.*",
+        ".atm/history/task-events/TASK-AAO-0162/**",
+        ".atm/history/tasks/TASK-AAO-0162.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-task-import.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-task-import.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
