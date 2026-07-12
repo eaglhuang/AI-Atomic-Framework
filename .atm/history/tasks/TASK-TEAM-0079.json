@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-TEAM-0079",
   "title": "Queue-aware next claim admission",
-  "status": "running",
+  "status": "done",
   "milestone": "Team Broker Parallel Delivery",
   "dependencies": [
     "TASK-TEAM-0076"
@@ -85,8 +85,8 @@
     "hash": "b48b57dd65828daa"
   },
   "importedAt": "2026-07-12T02:33:07.174Z",
-  "lastTransitionId": "2026-07-12T03-30-38-687Z-scope-amendment-f40cb06a5baf",
-  "lastTransitionAt": "2026-07-12T03:30:38.687Z",
+  "lastTransitionId": "2026-07-12T04-44-39-337Z-close-d3e923abcabb",
+  "lastTransitionAt": "2026-07-12T04:44:39.337Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "Codex-GPT5.6 Terra",
   "reservedAt": "2026-07-12T02:33:30.198Z",
@@ -95,7 +95,7 @@
     "actorId": "Codex-GPT5.6 Terra",
     "leaseId": "lease-cd577b504bb7",
     "claimedAt": "2026-07-12T02:33:30.203Z",
-    "heartbeatAt": "2026-07-12T02:33:30.203Z",
+    "heartbeatAt": "2026-07-12T04:44:39.336Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-TEAM-0079.*",
@@ -108,10 +108,18 @@
       "packages/cli/src/commands/broker.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
       "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard.ts",
       "packages/cli/src/commands/hook/pre-commit.ts",
       "packages/cli/src/commands/next.ts",
       "packages/cli/src/commands/next/broker-queue-admission.ts",
       "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts",
       "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
       "packages/core/src/broker/__tests__/decision.test.ts",
       "packages/core/src/broker/conflict-matrix.ts",
@@ -123,8 +131,8 @@
       "scripts/validate-team-agents.ts",
       "scripts/validators/task-ledger/suite-impl.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-12T02:33:30.203Z",
   "startedByActor": "Codex-GPT5.6 Terra",
@@ -148,10 +156,18 @@
       "packages/cli/src/commands/broker.ts",
       "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
       "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/hook/commit-range-guard.ts",
       "packages/cli/src/commands/hook/pre-commit.ts",
       "packages/cli/src/commands/next.ts",
       "packages/cli/src/commands/next/broker-queue-admission.ts",
       "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-queue.spec.ts",
+      "packages/cli/src/commands/tasks/command-dispatch.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/scope-queue.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts",
       "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
       "packages/core/src/broker/__tests__/decision.test.ts",
       "packages/core/src/broker/conflict-matrix.ts",
@@ -177,5 +193,9 @@
     "actorId": "Codex-GPT5.6 Terra",
     "createdAt": "2026-07-12T02:33:30.471Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-12T04:44:39.336Z",
+  "closedByActor": "Codex-GPT5.6 Terra",
+  "closedBySessionId": "session-20260712023330-Codex-GPT5.6-Terra-TASK-TEAM-0079-63469186bf",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0079.closure-packet.json"
 }
