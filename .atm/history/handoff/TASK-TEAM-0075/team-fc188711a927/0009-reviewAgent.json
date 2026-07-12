@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-fc188711a927-0009",
+  "sequence": 9,
+  "taskId": "TASK-TEAM-0075",
+  "teamRunId": "team-fc188711a927",
+  "from": {
+    "role": "reviewAgent",
+    "providerId": "gemini-direct",
+    "modelId": "gemini-2.5-flash-lite"
+  },
+  "to": {
+    "role": "knowledgeScout",
+    "providerId": "openai"
+  },
+  "createdAt": "2026-07-12T02:24:38.945Z",
+  "leaseEpoch": 9,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0075:reviewAgent:gemini-direct:gemini-2.5-flash-lite",
+    "sha256": "2b8836e8bf85ed0d103f611807fc3c0e659f4b2b2b8e79d42a6293b953c7ba24"
+  },
+  "humanSummary": "# Team Role Review Agent Report: TASK-TEAM-0075 **Status:** Incomplete - Insufficient Data **Analysis:** Prior governed role artifacts consistently indicate that TASK-TEAM-0075 cannot be executed due to a critical lack of foundational data. This includes missing task specifications, team composition, live task artifacts, and acceptance criteria. Roles such as `implementer/anthropic`, `validator/gemini-direct`, and `lieutenant/anthropic` have all reported this inability to proceed. **Cited Pri",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "e0127d760d638b09deac8bc711a0968e1ffc05884cb77a045545a6de3aa6fde2"
+}

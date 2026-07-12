@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-fc188711a927-0007",
+  "sequence": 7,
+  "taskId": "TASK-TEAM-0075",
+  "teamRunId": "team-fc188711a927",
+  "from": {
+    "role": "evidenceCollector",
+    "providerId": "openai",
+    "modelId": "gpt-5-nano"
+  },
+  "to": {
+    "role": "lieutenant",
+    "providerId": "anthropic"
+  },
+  "createdAt": "2026-07-12T02:24:35.055Z",
+  "leaseEpoch": 7,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0075:evidenceCollector:openai:gpt-5-nano",
+    "sha256": "1887b164f952c17dacc2edcdebc718ba8a3192c4b93ded55c74f951bfbb91e31"
+  },
+  "humanSummary": "Role Report: TASK-TEAM-0075 Status: Incomplete - Insufficient Data Evidence Collected (based on prior governed role artifacts): - coordinator/openai: No live data accessible; unable to generate a concise role report under current context. - scopeGuardian/openai: ScopeGuardian note reiterating no live data accessible for TASK-TEAM-0075. - implementer/anthropic: CannotExecute — Insufficient Context. - reader/gemini-direct: Role Report: TASK-TEAM-0075 incomplete due to insufficient data. - validat",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "d12b197d86b7dbfda38bb8160754b4f3157a38fc36ca21749e02746f00b14953"
+}

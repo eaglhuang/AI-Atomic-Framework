@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-fc188711a927-0003",
+  "sequence": 3,
+  "taskId": "TASK-TEAM-0075",
+  "teamRunId": "team-fc188711a927",
+  "from": {
+    "role": "reader",
+    "providerId": "gemini-direct",
+    "modelId": "gemini-2.5-flash-lite"
+  },
+  "to": {
+    "role": "scopeGuardian",
+    "providerId": "openai"
+  },
+  "createdAt": "2026-07-12T02:24:00.439Z",
+  "leaseEpoch": 3,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0075:reader:gemini-direct:gemini-2.5-flash-lite",
+    "sha256": "cfee3d87d53a6ed69206a99a038a292ee175b5bb923e65dabc4eb86047fc0975"
+  },
+  "humanSummary": "## Role Report for TASK-TEAM-0075 **Status:** Incomplete - Unable to access live task data. **Analysis:** Based on the provided prior role artifacts, TASK-TEAM-0075 is currently unable to execute a full role analysis due to a lack of live task data. Both the `coordinator/openai` and `atomizationPlanner/anthropic` roles indicate this limitation. **Cited Prior Roles & Findings:** * **`coordinator/openai`**: Stated inability to \"generate a concise role report\"",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "511f07d9cc441465e6314d091528a8d330fe0bd5e44dd5500fe24fefcb8c5988"
+}

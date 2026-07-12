@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-fc188711a927-0008",
+  "sequence": 8,
+  "taskId": "TASK-TEAM-0075",
+  "teamRunId": "team-fc188711a927",
+  "from": {
+    "role": "lieutenant",
+    "providerId": "anthropic",
+    "modelId": "claude-haiku-4-5-20251001"
+  },
+  "to": {
+    "role": "reviewAgent",
+    "providerId": "gemini-direct"
+  },
+  "createdAt": "2026-07-12T02:24:37.453Z",
+  "leaseEpoch": 8,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0075:lieutenant:anthropic:claude-haiku-4-5-20251001",
+    "sha256": "30e133ead9aa964525ddc6ae16558c079298808ac0111e0c653762881c40c12b"
+  },
+  "humanSummary": "# Team Role Lieutenant Report: TASK-TEAM-0075 **Status:** Incomplete — Insufficient Context ## Finding TASK-TEAM-0075 lacks required foundational data for role execution. Prior governed artifacts consistently identify missing: - Task specification and objectives - Team composition and role assignments - Live task artifact access - Acceptance criteria and scope boundaries ## Constraint Acknowledgment This report operates within Lieutenant authority limits—no resource commitment, status modific",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "085b1e839f46a1f08a308e9167eb953ab5693de433e52560ad69707b0e4a83f3"
+}

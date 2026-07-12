@@ -1,0 +1,38 @@
+{
+  "schemaId": "atm.teamRoleHandoffArtifact.v1",
+  "handoffId": "team-fc188711a927-0006",
+  "sequence": 6,
+  "taskId": "TASK-TEAM-0075",
+  "teamRunId": "team-fc188711a927",
+  "from": {
+    "role": "validator",
+    "providerId": "gemini-direct",
+    "modelId": "gemini-2.5-flash-lite"
+  },
+  "to": {
+    "role": "evidenceCollector",
+    "providerId": "openai"
+  },
+  "createdAt": "2026-07-12T02:24:19.323Z",
+  "leaseEpoch": 6,
+  "sourceArtifact": {
+    "schemaId": "atm.teamProviderRunArtifact.v1",
+    "artifactId": "team-provider:TASK-TEAM-0075:validator:gemini-direct:gemini-2.5-flash-lite",
+    "sha256": "485e4111dfbc50c10dd0e20708868640e52d37db5acf8b5b306db26ef2d2baf2"
+  },
+  "humanSummary": "## Role Report: TASK-TEAM-0075 **Status:** Incomplete - Insufficient Data **Analysis:** The provided prior role artifacts indicate a persistent inability to execute a full role analysis for TASK-TEAM-0075 due to a lack of essential task data. This includes missing task specifications, team composition details, and live task artifacts. The roles of `coordinator/openai`, `scopeGuardian/openai`, and `implementer/anthropic` all highlight this critical dependency for proceeding. **Cited Prior Role",
+  "routeNote": null,
+  "decision": {
+    "decisionClass": "auto-execution",
+    "decisionReason": null,
+    "violationStatus": null
+  },
+  "redaction": {
+    "rawSecretsStored": false,
+    "source": "provider-preview",
+    "redactedFields": [
+      "provider-output"
+    ]
+  },
+  "previousHandoffSha256": "b45403f714d7e616099ce74604f0c3f4a55839129e6958ee04ccab13d8ba44a2"
+}
