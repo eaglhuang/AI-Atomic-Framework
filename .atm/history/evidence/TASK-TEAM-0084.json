@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-TEAM-0084",
-  "updatedAt": "2026-07-12T07:57:16.270Z",
+  "updatedAt": "2026-07-12T07:58:52.677Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -98,6 +98,106 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:4aee03ab0892a0e6e8ce4865590e42e6e05d430d94821702d89cc799c9ed1727",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Terra",
+      "sessionId": "session-20260712075737-Codex-GPT5.6-Terra-TASK-TEAM-0084-c78ee792ae",
+      "createdAt": "2026-07-12T07:58:22.395Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Terra",
+        "sessionId": "session-20260712075737-Codex-GPT5.6-Terra-TASK-TEAM-0084-c78ee792ae",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-shared-surface",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:99c3789dff23d8ba31feb6881482a78c49a0918e0f4fec35425d822685738f38",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:94087d26f2485ba18c54cd2f164e2d4328cee469ce08789b9f60b551f116e14f",
+            "cached": false,
+            "generatedAt": "2026-07-12T07:58:22.468Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5fec4f708ea5cf217baacfaf9a561c3a88eb8f269fdaea6b92864a977320a21f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Terra",
+      "sessionId": "session-20260712075737-Codex-GPT5.6-Terra-TASK-TEAM-0084-c78ee792ae",
+      "createdAt": "2026-07-12T07:58:52.677Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Terra",
+        "sessionId": "session-20260712075737-Codex-GPT5.6-Terra-TASK-TEAM-0084-c78ee792ae",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-shared-surface",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-12T07:58:52.736Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:99e61e655d32486d44b1ee3416b44cc90af8210be3d5ee8a613d5afe46e43d2a",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
