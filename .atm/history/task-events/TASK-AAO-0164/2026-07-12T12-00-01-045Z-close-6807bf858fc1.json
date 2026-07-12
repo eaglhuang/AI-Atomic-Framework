@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T12-00-01-045Z-close-6807bf858fc1",
+  "taskId": "TASK-AAO-0164",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712110036-codex-backlog-captain-TASK-AAO-0164-8091fb2098",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0164.json",
+  "taskSha256": "sha256:cb604d23642c5a93d5e08ea5fd4efae2672c33a6a7704aa08aab6c85f56cb029",
+  "createdAt": "2026-07-12T12:00:01.045Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0164 --actor codex-backlog-captain --status done --historical-delivery 6372d8fce086a3e9434e404a869a079d02fd9f85",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712110036-codex-backlog-captain-TASK-AAO-0164-8091fb2098",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0164.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement",
+      "validate:governance-commands",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T12:00:01.035Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0164.*",
+        ".atm/history/task-events/TASK-AAO-0164/**",
+        ".atm/history/tasks/TASK-AAO-0164.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/hook.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook.ts",
+        "packages/core/src/broker/cross-task-mutation-guard.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
