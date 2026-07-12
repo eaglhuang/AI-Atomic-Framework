@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T14-02-26-643Z-close-5dcde8bf8a1c",
+  "taskId": "TASK-AAO-0184",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0184.json",
+  "taskSha256": "sha256:1f96a53f6d4e751cfee654c8f5af1eda62fab583074b364995a100ee240d2769",
+  "createdAt": "2026-07-12T14:02:26.643Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0184 --actor codex-backlog-captain --status done --historical-delivery a9173920806bb243be2d339cf023540168437f8c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0184.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T14:02:26.633Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0184.*",
+        ".atm/history/task-events/TASK-AAO-0184/**",
+        ".atm/history/tasks/TASK-AAO-0184.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

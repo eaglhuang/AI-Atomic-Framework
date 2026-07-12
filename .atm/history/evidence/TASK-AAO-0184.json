@@ -1,0 +1,254 @@
+{
+  "taskId": "TASK-AAO-0184",
+  "updatedAt": "2026-07-12T14:02:07.991Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check -- docs/governance/atm-bug-and-optimization-backlog.md",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+      "createdAt": "2026-07-12T14:00:00.234Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+        "kind": "test",
+        "freshness": "fresh",
+        "commandRuns": [
+          {
+            "command": "git diff --check -- docs/governance/atm-bug-and-optimization-backlog.md",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "def6460850214e094ed00aabec550bfe64ea62eb",
+            "cacheKey": "sha256:39b7583741b02e8d26c6f0691ae930695b8a0afcc29b89f2cedc06ff1a5cb7fe",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:00:00.367Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:974bf528720195feb0aa9385bdeb7f2ca097051db58ac23466262ae337e494bf",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run check:encoding:touched",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+      "createdAt": "2026-07-12T14:00:03.339Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "check:encoding:touched"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run check:encoding:touched",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:0ce2cec5d815c9d8d5f30785e073ab4b242d80c8523bcfef79a4059919b71a59",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "check:encoding:touched"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "def6460850214e094ed00aabec550bfe64ea62eb",
+            "cacheKey": "sha256:d7f72ddbceb782250232c4f7a72ca7774002d7e1f795c5b7ee22514de3014ecf",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:00:03.410Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b6af42d1cce102582a69c4b05d39ac786589d9ef9e91824edaf4e8b7369cf64e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+      "createdAt": "2026-07-12T14:00:37.389Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:00:37.509Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7bed416e12f8d41a09850722dc7ecce296d84f95f834a5ab2a3aa1aed03b3ce2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+      "createdAt": "2026-07-12T14:00:47.406Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:00:47.484Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:475d602f5af91dd0e7b6ab3997e04aa64a2c474a85fe637405aa7b182ed9d0a5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+      "createdAt": "2026-07-12T14:01:30.938Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:60594fbe45db37caece15c84f864e5a104a0670a3cdea2e3563c13db8d013a6c",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:587c2ee15c03c4dd4a900b19a86d355f489714cdfab3bf78167b1aeb4c519604",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:01:31.035Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:48783be67462e79b64cdc1e6b3d365db029c9dda07117c1012f81ebb983647b8",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+      "createdAt": "2026-07-12T14:02:07.991Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712135925-codex-backlog-captain-TASK-AAO-0184-ff58b61123",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-12T14:02:08.098Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:814539258a89de31f7794298bac7028ef1a8f520fa4cbbad220b2d74f1a2c2cf",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
