@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0176
 task_id: TASK-AAO-0176
 title: "Synchronize fixed backlog rows 119 and 144"
-status: planned
+status: done
 owner: atm-governance
 priority: P1
 planning_repo: AI-Atomic-Framework
@@ -23,6 +23,15 @@ rollback:
 atomizationImpact:
   ownerAtomOrMap: "atom-governance-backlog"
   mapUpdates: []
+completed_at: "2026-07-12T13:19:45.826Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T13:19:45.826Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T13-19-45-826Z-close-e99bfb65997d"
+lastTransitionAt: "2026-07-12T13:19:45.826Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "b0fd2a9f63fd0caa4be7de12241932a6d0e5d431"
 ---
 
 # TASK-AAO-0176 - Synchronize fixed backlog rows 119 and 144
