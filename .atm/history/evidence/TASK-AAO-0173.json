@@ -1,0 +1,159 @@
+{
+  "taskId": "TASK-AAO-0173",
+  "updatedAt": "2026-07-12T12:59:40.339Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+      "createdAt": "2026-07-12T12:59:04.955Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/identity-per-actor-routing.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-identity-routing",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:675b7d3044987517e27b960abe2bc50634fbe0491649312eb32e7bfd771ebbe7",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/identity-per-actor-routing.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "a572bfb431fc0da16d12d3aedf94cc3c000de3d1",
+            "cacheKey": "sha256:f910b24b04bec62d2ef4760b6048a066eea030ef24d9be3d17270a10d20cd707",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:59:05.060Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a0b89c1fc3fc2528ac006ef875b15a39557802c51389446777fe960ccfbaaf7e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+      "createdAt": "2026-07-12T12:59:14.461Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-identity-routing",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "a572bfb431fc0da16d12d3aedf94cc3c000de3d1",
+            "cacheKey": "sha256:e8d72dd02f0f0560e71701f7cc6a99a49e8ab060898c4345d8ef0d1e8cb8da67",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:59:14.536Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a4ec2d11d6daa18f9dbccd7d3ae868da73976ee32196b7f98912652115f38baa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+      "createdAt": "2026-07-12T12:59:40.339Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-identity-routing",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:ac60441594ff56f75a7867e2ddccb28bae7f2b85a6e19c70ba689dcbdc7d7287",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "a572bfb431fc0da16d12d3aedf94cc3c000de3d1",
+            "cacheKey": "sha256:d3656cdfe0ba9495458aadd110d581226ae3f8deb59daebd80bbbb65c05f8571",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:59:40.420Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a6eccec43b113e1eecc9529ba493632613ad6d2b975f95bcee86a06d62f8651c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

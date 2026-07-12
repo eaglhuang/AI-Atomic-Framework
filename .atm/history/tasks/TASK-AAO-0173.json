@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0173",
+  "title": "Fix durable actor identity precedence over legacy environment",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Repo default identity wins over legacy environment identity when no explicit actor or `ATM_ACTOR_ID` is supplied.",
+    "Explicit actor and `ATM_ACTOR_ID` precedence remains unchanged.",
+    "Focused regression and typecheck pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/actor-registry.ts",
+    "tests/cli/identity-per-actor-routing.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/actor-registry.ts",
+    "tests/cli/identity-per-actor-routing.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if actor resolution precedence breaks explicit actor or environment overrides.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-cli-identity-routing",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0173.md",
+    "sectionTitle": "TASK-AAO-0173",
+    "headingLine": 30,
+    "hash": "dfa6a833c0ccf697"
+  },
+  "importedAt": "2026-07-12T12:56:22.013Z",
+  "lastTransitionId": "2026-07-12T12-56-42-339Z-claim-59f89f01f927",
+  "lastTransitionAt": "2026-07-12T12:56:42.339Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T12:56:41.986Z",
+  "promotedAt": "2026-07-12T12:56:41.988Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-c2766ded4692",
+    "claimedAt": "2026-07-12T12:56:41.991Z",
+    "heartbeatAt": "2026-07-12T12:56:41.991Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0173.json",
+      ".atm/history/evidence/TASK-AAO-0173.*",
+      ".atm/history/task-events/TASK-AAO-0173/**",
+      "packages/cli/src/commands/actor-registry.ts",
+      "tests/cli/identity-per-actor-routing.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T12:56:28.932Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0173",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0173.*",
+      ".atm/history/task-events/TASK-AAO-0173/**",
+      ".atm/history/tasks/TASK-AAO-0173.json",
+      "packages/cli/src/commands/actor-registry.ts",
+      "tests/cli/identity-per-actor-routing.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "22e66b0eb3eca9ca1eafa383140665870de7cc9cc1e8e8bebbc2b4ef6eb2eb3f",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T12:56:42.338Z",
+    "status": "active"
+  }
+}

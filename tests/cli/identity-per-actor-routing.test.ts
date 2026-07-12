@@ -137,16 +137,20 @@ try {
   });
 
   const identityShow = JSON.parse(runAtm(tempDir, ['identity', 'show', '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: '' })) as Record<string, any>;
-  assert.equal(identityShow.evidence.actorResolution.resolved.actorId, 'actor-c');
-  assert.equal(identityShow.evidence.actorResolution.resolved.source, 'legacy-env');
+  assert.equal(identityShow.evidence.actorResolution.resolved.actorId, 'repo-default-actor');
+  assert.equal(identityShow.evidence.actorResolution.resolved.source, 'repo-default');
   assert.equal(identityShow.evidence.actorResolution.repoDefaultActorId, 'repo-default-actor');
-  assert(String(identityShow.evidence.actorResolution.warning).includes('overrides repo default actor'), 'identity show must explain env/default precedence');
+  assert.equal(identityShow.evidence.actorResolution.warning, null, 'stale legacy environment must not override the durable repo default');
+
+  const explicitEnvIdentityShow = JSON.parse(runAtm(tempDir, ['identity', 'show', '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: 'actor-env' })) as Record<string, any>;
+  assert.equal(explicitEnvIdentityShow.evidence.actorResolution.resolved.actorId, 'actor-env');
+  assert.equal(explicitEnvIdentityShow.evidence.actorResolution.resolved.source, 'env');
 
   const nextClaim = JSON.parse(runAtm(tempDir, ['next', '--claim', '--task', taskC, '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: '' })) as Record<string, any>;
-  assert.equal(nextClaim.evidence.actorResolution.resolved.actorId, 'actor-c');
-  assert.equal(nextClaim.evidence.actorResolution.resolved.source, 'legacy-env');
+  assert.equal(nextClaim.evidence.actorResolution.resolved.actorId, 'repo-default-actor');
+  assert.equal(nextClaim.evidence.actorResolution.resolved.source, 'repo-default');
   assert.equal(nextClaim.evidence.actorResolution.repoDefaultActorId, 'repo-default-actor');
-  assert(nextClaim.messages.some((entry: any) => entry.code === 'ATM_NEXT_CLAIMED' && entry.data.actorSource === 'legacy-env'), 'next --claim output must expose actor source');
+  assert(nextClaim.messages.some((entry: any) => entry.code === 'ATM_NEXT_CLAIMED' && entry.data.actorSource === 'repo-default'), 'next --claim output must expose durable repo-default actor source');
 
   const actorAIdentity = readJson(path.join(tempDir, '.atm/runtime/identity/actors/actor-a.json'));
   const actorBIdentity = readJson(path.join(tempDir, '.atm/runtime/identity/actors/actor-b.json'));
