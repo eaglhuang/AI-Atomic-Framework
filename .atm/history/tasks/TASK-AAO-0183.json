@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0183",
+  "title": "Improve tasks import path guidance",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Missing or malformed task import paths emit targeted usage guidance with `--from <path-to-task-card.md>`.",
+    "A literal `plan` value receives a specific hint instead of only a generic file-not-found message.",
+    "Nonexistent markdown-like paths still report the requested path and include a copyable example.",
+    "Existing valid import behavior remains unchanged.",
+    "Focused import-orchestrator regression and declared validation commands pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the import guidance and regression changes if the diagnostics become noisy or misleading.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-tasks-import",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0183.md",
+    "sectionTitle": "TASK-AAO-0183",
+    "headingLine": 33,
+    "hash": "9f345699752b6aeb"
+  },
+  "importedAt": "2026-07-12T13:51:37.893Z",
+  "lastTransitionId": "2026-07-12T13-58-44-731Z-close-0b80583e806c",
+  "lastTransitionAt": "2026-07-12T13:58:44.731Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T13:51:39.361Z",
+  "promotedAt": "2026-07-12T13:51:39.364Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-889ce005dd75",
+    "claimedAt": "2026-07-12T13:51:39.367Z",
+    "heartbeatAt": "2026-07-12T13:58:44.728Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0183.json",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-12T13:51:39.367Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712135139-codex-backlog-captain-TASK-AAO-0183-f0096810a2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0183",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0183.*",
+      ".atm/history/task-events/TASK-AAO-0183/**",
+      ".atm/history/tasks/TASK-AAO-0183.json",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "45516890f6e6d2a85acaf3b049f663078677518d88e3ed204c594ea6cb9dabab",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T13:51:42.651Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-12T13:58:44.728Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712135139-codex-backlog-captain-TASK-AAO-0183-f0096810a2",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0183.closure-packet.json"
+}

@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T13-58-44-731Z-close-0b80583e806c",
+  "taskId": "TASK-AAO-0183",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712135139-codex-backlog-captain-TASK-AAO-0183-f0096810a2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0183.json",
+  "taskSha256": "sha256:8b9e8cf32810667001dc0b66d220974840d81e54fdf12e89eeafa91b9afbd4f8",
+  "createdAt": "2026-07-12T13:58:44.731Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0183 --actor codex-backlog-captain --status done --historical-delivery dba70e92a882e33c0a0e7a3b9e706cc9ebbc0288",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712135139-codex-backlog-captain-TASK-AAO-0183-f0096810a2",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0183.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T13:58:44.724Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0183.*",
+        ".atm/history/task-events/TASK-AAO-0183/**",
+        ".atm/history/tasks/TASK-AAO-0183.json",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

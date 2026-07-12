@@ -1,0 +1,361 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0183",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "dba70e92a882e33c0a0e7a3b9e706cc9ebbc0288",
+  "governedTreeSha": "a1439a6512c32f40243573d80b185ede12d94644",
+  "targetCommitDelta": {
+    "currentCommitSha": "dba70e92a882e33c0a0e7a3b9e706cc9ebbc0288",
+    "parentCommitShas": [
+      "dba70e92a882e33c0a0e7a3b9e706cc9ebbc0288"
+    ],
+    "governedTreeSha": "a1439a6512c32f40243573d80b185ede12d94644",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0183.json",
+      ".atm/history/task-events/TASK-AAO-0183/2026-07-12T13-51-37-900Z-import-2b2ebc4240aa.json",
+      ".atm/history/task-events/TASK-AAO-0183/2026-07-12T13-51-39-361Z-reserve-b88d6662efa3.json",
+      ".atm/history/task-events/TASK-AAO-0183/2026-07-12T13-51-39-364Z-promote-4d46a94fe4ab.json",
+      ".atm/history/task-events/TASK-AAO-0183/2026-07-12T13-51-42-652Z-claim-04ed95426c0d.json",
+      ".atm/history/tasks/TASK-AAO-0183.json",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/actor-registry.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/claim-intent.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/src/commands/actor-registry.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/claim-intent.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/lifecycle.js",
+      "release/atm-root-drop/packages/core/dist/team-runtime/provider-selection.js",
+      "release/atm-root-drop/packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-root-drop/packages/core/src/broker/lifecycle.ts",
+      "release/atm-root-drop/packages/core/src/team-runtime/provider-selection.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/check-encoding-touched.ts",
+      "release/atm-root-drop/scripts/validate-broker-lifecycle.ts",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-script-parity.ts",
+      "release/atm-root-drop/scripts/validate-task-import.ts",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/identity-per-actor-routing.test.ts",
+      "release/atm-root-drop/tests/cli/tasks-claim-auto-intent.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7b0d66bcdde91ea0f8a84731ad1560498c26715f477f4f9b47bcfb8dd5e83888",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:ee476e053aad92a83007d0ece924d3ae3bd9a8654704c0eb9211dfa4b6486794",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-12T13:58:44.724Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0183.*",
+      ".atm/history/task-events/TASK-AAO-0183/**",
+      ".atm/history/tasks/TASK-AAO-0183.json",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0183.json",
+  "closedAt": "2026-07-12T13:58:44.724Z",
+  "closedByActor": "codex-backlog-captain",
+  "sessionId": "session-20260712135139-codex-backlog-captain-TASK-AAO-0183-f0096810a2",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "dba70e92a882e33c0a0e7a3b9e706cc9ebbc0288",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-07-12T13:58:44.728Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-1ca1c12ad842.json"
+    },
+    "teamRunId": "team-1ca1c12ad842",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "TASK-AAO-0183",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamLevel": "L5",
+      "teamLevelSource": "manual",
+      "teamSize": "large",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "Manual team size override L5 selected by CLI/config.",
+      "confidence": "high",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "recipeId": "atm.default.normal.typescript"
+        },
+        "languageMatch": "typescript",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+        "confidence": "high",
+        "deterministicHints": {
+          "scopePaths": [
+            "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+            "packages/cli/src/commands/tasks/import-orchestrator.ts"
+          ],
+          "deliverables": [
+            "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+            "packages/cli/src/commands/tasks/import-orchestrator.ts"
+          ],
+          "fileExtensions": [
+            ".ts"
+          ],
+          "pathHints": [
+            "typescript-file",
+            "typescript-heavy"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": false,
+      "escalationReason": "The task remains small enough for a captain-only crew, so lieutenant escalation is not required.",
+      "needLieutenant": false,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": false,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "small",
+        "coordinationBoundary": "captain-only",
+        "signals": {
+          "scopeCount": 2,
+          "crossRepoScope": false,
+          "validatorCount": 8,
+          "largeScriptRisk": false,
+          "closureSignals": false,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "low",
+          "threshold": 3,
+          "reasons": []
+        },
+        "mapUpdateNeed": false,
+        "escalationRequired": false,
+        "needLieutenant": false,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "Manual team size override L5 selected by CLI/config.",
+      "implementationSummary": "broker-only selected; no agents are spawned, language=node, atm.node.broker-only-fallback, selection=repo-default role=coordinator; closure remains governed by command-backed evidence.",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "npm run typecheck",
+        "npm run validate:cli"
+      ],
+      "evidence": [],
+      "brokerGovernance": {
+        "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+        "brokerSubagentEnabled": true,
+        "brokerDecisionSurface": "brokerLane",
+        "brokerStewardId": "neutral-write-steward",
+        "brokerGoverns": [
+          "write-intents",
+          "scope-conflicts",
+          "steward-apply",
+          "commit-lane"
+        ],
+        "brokerEvidenceRequired": [
+          "atm.teamBrokerLaneEvidence.v1",
+          "atm.stewardApplyEvidence.v1",
+          "atm.brokerOperationRunRecordEnvelope.v1"
+        ],
+        "commitLaneSerializedBy": "branch-commit-queue",
+        "commitLaneOwnerRole": "coordinator",
+        "workerGitWrite": false,
+        "workerTaskLifecycle": false,
+        "workerSelfClose": false
+      },
+      "risk": "low",
+      "closeReady": false
+    }
+  }
+}
