@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -36,7 +37,7 @@ import {
 import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
-import { materializeTeamRoleHandoff, promoteTeamHandoffArchive, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../packages/core/src/team-runtime/handoff-ledger.ts';
+import { buildTeamHandoffRetentionDecision, materializeTeamRoleHandoff, promoteTeamHandoffArchive, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../packages/core/src/team-runtime/handoff-ledger.ts';
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
@@ -88,6 +89,86 @@ async function main() {
     assert.equal(verifyTeamHandoffLedger(cwd, input.taskId, input.teamRunId).ok, false);
     rmSync(cwd, { recursive: true, force: true });
     console.log('[validate-team-agents] ok (team-handoff-materialize)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-integrity') {
+    const cwd = createTempWorkspace('atm-team-handoff-integrity-');
+    const taskId = 'TASK-TEAM-0075';
+    const teamRunId = 'integrity';
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId, fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'source-1', redactedPreview: 'First.', leaseEpoch: 1 });
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId, fromRole: 'reviewer', fromProviderId: 'anthropic', fromModelId: 'haiku', sourceArtifactId: 'source-2', redactedPreview: 'Second.', leaseEpoch: 2 });
+    const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+    const manifestPath = path.join(directory, 'manifest.json');
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    manifest.artifacts[1].sequence = 4;
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, taskId, teamRunId).ok, false, 'sequence gap must fail closed');
+    const restoredManifest = { ...manifest, artifacts: manifest.artifacts.map((entry: any, index: number) => ({ ...entry, sequence: index + 1 })) };
+    writeFileSync(manifestPath, `${JSON.stringify(restoredManifest, null, 2)}\n`, 'utf8');
+    const secondPath = path.join(directory, restoredManifest.artifacts[1].file);
+    const secondArtifact = JSON.parse(readFileSync(secondPath, 'utf8'));
+    secondArtifact.previousHandoffSha256 = 'tampered-chain';
+    const secondContent = `${JSON.stringify(secondArtifact, null, 2)}\n`;
+    writeFileSync(secondPath, secondContent, 'utf8');
+    const chainManifest = {
+      ...restoredManifest,
+      artifacts: restoredManifest.artifacts.map((entry: any, index: number) => index === 1 ? { ...entry, sha256: createHash('sha256').update(secondContent, 'utf8').digest('hex') } : entry)
+    };
+    chainManifest.rootHandoffSha256 = chainManifest.artifacts[1].sha256;
+    writeFileSync(manifestPath, `${JSON.stringify(chainManifest, null, 2)}\n`, 'utf8');
+    writeFileSync(path.join(directory, 'index.md'), renderTeamHandoffIndex(chainManifest, [JSON.parse(readFileSync(path.join(directory, chainManifest.artifacts[0].file), 'utf8')), secondArtifact]), 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, taskId, teamRunId).ok, false, 'hash-valid chain tamper must fail closed');
+    assert.equal(verifyTeamHandoffLedger(cwd, 'TASK-TEAM-OTHER', teamRunId).ok, false, 'cross-task reads must fail closed');
+    writeFileSync(path.join(directory, 'index.md'), '---\ntask_id: wrong\n---\n', 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, taskId, teamRunId).ok, false, 'frontmatter drift must fail closed');
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-integrity)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-hard-gate') {
+    const cwd = createTempWorkspace('atm-team-handoff-gate-');
+    const taskId = 'TASK-TEAM-0075';
+    const teamRunId = 'bound-coordinator';
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId, fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'source', redactedPreview: 'Bound coordinator only.', leaseEpoch: 1 });
+    writeTeamRunForHandoffGate(cwd, taskId, teamRunId);
+    await assert.rejects(
+      () => runTeam(['handoff', 'show', '--task', taskId, '--team', teamRunId, '--actor', 'coordinator', '--cwd', cwd]),
+      (error: unknown) => error instanceof CliError && error.code === 'ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED'
+    );
+    const authorized = await runTeam(['handoff', 'show', '--task', taskId, '--team', teamRunId, '--actor', 'bound-captain', '--cwd', cwd]) as any;
+    assert.equal(authorized.ok, true);
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-hard-gate)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-continuation') {
+    const cwd = createTempWorkspace('atm-team-handoff-continuation-');
+    const taskId = 'TASK-TEAM-0075';
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId: 'prior', fromRole: 'reviewer', fromProviderId: 'anthropic', fromModelId: 'claude-haiku', sourceArtifactId: 'prior-source', redactedPreview: 'Prior terminal review.', leaseEpoch: 1 });
+    promoteTeamHandoffArchive({ cwd, taskId, teamRunId: 'prior', runOutcome: 'aborted' });
+    assert.equal(verifyTeamHandoffHistory(cwd, taskId, 'prior').ok, true);
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId: 'current', fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'current-source', redactedPreview: 'Current retry.', leaseEpoch: 1 });
+    writeTeamRunForHandoffGate(cwd, taskId, 'current');
+    const result = await runTeam(['handoff', 'context', '--task', taskId, '--team', 'current', '--actor', 'bound-captain', '--continuation-from', 'prior', '--cwd', cwd]) as any;
+    assert.equal(result.ok, true);
+    const events = readFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', 'current', 'observability-events.jsonl'), 'utf8');
+    assert.ok(events.includes('handoff.consumed'));
+    await assert.rejects(
+      () => runTeam(['handoff', 'context', '--task', 'TASK-TEAM-OTHER', '--team', 'current', '--actor', 'bound-captain', '--continuation-from', 'prior', '--cwd', cwd]),
+      (error: unknown) => error instanceof CliError && error.code === 'ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED'
+    );
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-continuation)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-retention') {
+    assert.equal(buildTeamHandoffRetentionDecision({ transitionCount: 48, bytes: 1, softLimitReached: true, hardLimitReached: false }).statusCode, 'handoff-soft-limit-warning');
+    assert.equal(buildTeamHandoffRetentionDecision({ transitionCount: 64, bytes: 1, softLimitReached: true, hardLimitReached: true }).decisionClass, 'human-signoff-required');
+    console.log('[validate-team-agents] ok (team-handoff-retention)');
     return;
   }
 
@@ -5017,6 +5098,23 @@ function assertBrokerRunScanIndex(): void {
   }
 
   rmSync(cwd, { recursive: true, force: true });
+}
+
+function writeTeamRunForHandoffGate(cwd: string, taskId: string, teamRunId: string): void {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(path.join(directory, `${teamRunId}.json`), `${JSON.stringify({
+    schemaId: 'atm.teamRun.v1',
+    taskId,
+    teamRunId,
+    actorId: 'bound-captain',
+    status: 'active',
+    roles: [{ agentId: 'coordinator', role: 'coordinator', permissions: ['handoff.read', 'handoff.materialize'] }],
+    permissionLeases: [
+      { permission: 'handoff.read', agentId: 'coordinator', paths: ['packages/core/src/team-runtime/handoff-ledger.ts'] },
+      { permission: 'handoff.materialize', agentId: 'coordinator', paths: ['packages/core/src/team-runtime/handoff-ledger.ts'] }
+    ]
+  }, null, 2)}\n`, 'utf8');
 }
 
 function fail(message: string): never {

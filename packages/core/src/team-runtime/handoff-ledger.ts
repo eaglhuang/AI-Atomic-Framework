@@ -48,6 +48,19 @@ export type TeamHandoffStats = {
   readonly hardLimitReached: boolean;
 };
 
+export type TeamHandoffRetentionDecision = {
+  readonly decisionClass: 'auto-execution' | 'human-signoff-required';
+  readonly violationStatus: 'none' | 'warning' | 'human-signoff-required';
+  readonly statusCode: 'none' | 'handoff-soft-limit-warning' | 'handoff-hard-limit-reached';
+  readonly summary: string;
+};
+
+export function buildTeamHandoffRetentionDecision(stats: TeamHandoffStats): TeamHandoffRetentionDecision {
+  if (stats.hardLimitReached) return { decisionClass: 'human-signoff-required', violationStatus: 'human-signoff-required', statusCode: 'handoff-hard-limit-reached', summary: 'Handoff hard retention limit reached; Captain must split the run or continue without recording further handoffs.' };
+  if (stats.softLimitReached) return { decisionClass: 'auto-execution', violationStatus: 'warning', statusCode: 'handoff-soft-limit-warning', summary: 'Handoff soft retention limit reached; Patrol warning emitted before the hard stop.' };
+  return { decisionClass: 'auto-execution', violationStatus: 'none', statusCode: 'none', summary: 'Handoff retention is within budget.' };
+}
+
 export function teamHandoffRuntimeDirectory(cwd: string, taskId: string, teamRunId: string): string {
   return path.join(cwd, '.atm', 'runtime', 'handoff', safeSegment(taskId), safeSegment(teamRunId));
 }
@@ -98,7 +111,12 @@ export function materializeTeamRoleHandoff(input: {
   mkdirSync(directory, { recursive: true });
   const manifest = readTeamHandoffManifest(directory, input.taskId, input.teamRunId);
   const stats = computeTeamHandoffStats(directory, manifest);
-  if (stats.hardLimitReached) throw new Error('ATM_TEAM_HANDOFF_HARD_LIMIT: Captain sign-off is required before recording another handoff.');
+  if (stats.hardLimitReached) {
+    const decision = buildTeamHandoffRetentionDecision(stats);
+    const error = new Error(`ATM_TEAM_HANDOFF_HARD_LIMIT: ${decision.summary}`) as Error & { decision?: TeamHandoffRetentionDecision };
+    error.decision = decision;
+    throw error;
+  }
   const sequence = manifest.transitionCount + 1;
   const previous = manifest.artifacts.at(-1)?.sha256 ?? null;
   const preview = redactPreview(input.redactedPreview);
@@ -129,18 +147,36 @@ export function materializeTeamRoleHandoff(input: {
 
 export function verifyTeamHandoffLedger(cwd: string, taskId: string, teamRunId: string): { ok: boolean; reason: string | null; manifest: TeamHandoffManifest } {
   const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+  return verifyTeamHandoffDirectory(directory, taskId, teamRunId);
+}
+
+export function verifyTeamHandoffHistory(cwd: string, taskId: string, teamRunId: string): { ok: boolean; reason: string | null; manifest: TeamHandoffManifest } {
+  return verifyTeamHandoffDirectory(teamHandoffHistoryDirectory(cwd, taskId, teamRunId), taskId, teamRunId);
+}
+
+export function verifyTeamHandoffDirectory(directory: string, taskId: string, teamRunId: string): { ok: boolean; reason: string | null; manifest: TeamHandoffManifest } {
   const manifest = readTeamHandoffManifest(directory, taskId, teamRunId);
+  if (manifest.taskId !== taskId || manifest.teamRunId !== teamRunId) return { ok: false, reason: 'manifest task/run mismatch', manifest };
   let previous: string | null = null;
-  for (const entry of manifest.artifacts) {
+  for (const [index, entry] of manifest.artifacts.entries()) {
+    if (entry.sequence !== index + 1) return { ok: false, reason: `sequence gap at ${entry.file}`, manifest };
     const filePath = path.join(directory, entry.file);
     if (!existsSync(filePath)) return { ok: false, reason: `missing ${entry.file}`, manifest };
     const content = readFileSync(filePath, 'utf8');
     if (sha256(content) !== entry.sha256) return { ok: false, reason: `hash mismatch ${entry.file}`, manifest };
     const artifact = JSON.parse(content) as TeamRoleHandoffArtifact;
     if (artifact.sequence !== entry.sequence || artifact.previousHandoffSha256 !== previous) return { ok: false, reason: `chain mismatch ${entry.file}`, manifest };
+    if (artifact.taskId !== taskId || artifact.teamRunId !== teamRunId) return { ok: false, reason: `artifact task/run mismatch ${entry.file}`, manifest };
     previous = entry.sha256;
   }
-  return { ok: previous === manifest.rootHandoffSha256, reason: previous === manifest.rootHandoffSha256 ? null : 'root hash mismatch', manifest };
+  if (manifest.transitionCount !== manifest.artifacts.length) return { ok: false, reason: 'transition count mismatch', manifest };
+  if (previous !== manifest.rootHandoffSha256) return { ok: false, reason: 'root hash mismatch', manifest };
+  const indexPath = path.join(directory, 'index.md');
+  if (!existsSync(indexPath)) return { ok: false, reason: 'missing index.md', manifest };
+  const index = readFileSync(indexPath, 'utf8');
+  const expectedFrontmatter = `manifest_sha256: ${sha256(JSON.stringify(manifest))}`;
+  if (!index.includes(`task_id: ${taskId}`) || !index.includes(`team_run_id: ${teamRunId}`) || !index.includes(expectedFrontmatter)) return { ok: false, reason: 'frontmatter mismatch', manifest };
+  return { ok: true, reason: null, manifest };
 }
 
 export function readTeamHandoffArtifacts(directory: string, manifest: TeamHandoffManifest): TeamRoleHandoffArtifact[] {

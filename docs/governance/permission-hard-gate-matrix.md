@@ -11,8 +11,8 @@ ATM team permissions are fail-closed. A permission is usable only when it is pre
 
 The hard gate is enforced at recipe validation, team lease/release mutation, provider execution permission brokerage, and the existing task/emergency governance paths. Host controls such as Git hooks, CI, branch protection, and review policy remain additional deployment-layer gates; they do not replace ATM's internal gate.
 
-| `handoff.materialize` | `ATM_TEAM_PERMISSION_HARD_GATE` | Exact task/run and current lease epoch | Exclusive; Coordinator/system only. Provider bridges and workers are denied. |
-| `handoff.read` | `ATM_TEAM_PERMISSION_HARD_GATE` | Exact task/run; continuation additionally requires same-task terminal prior run | Shareable only through the Coordinator context builder; providers never read history directly. |
+| `handoff.materialize` | `ATM_TEAM_PERMISSION_HARD_GATE` | Exact task/run and runtime-bound Coordinator actor | Exclusive; Provider bridges and workers are denied. |
+| `handoff.read` | `ATM_TEAM_PERMISSION_HARD_GATE` | Exact task/run and runtime-bound Coordinator actor; continuation additionally requires same-task terminal prior run | Shareable only through the Coordinator context builder; providers never read history directly. |
 
 Both handoff gates are fail-closed. Integrity failures resolve to the canonical
 `handoff-integrity-blocked` reason and do not degrade to advisory Markdown.

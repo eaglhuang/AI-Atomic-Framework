@@ -36,11 +36,14 @@ Coordinator from canonical JSON after scope, manifest/hash, and secret checks.
 
 ## Gates And Context
 
-`handoff.materialize` is exclusive and Coordinator/system-only. Provider
-bridges, workers, reviewers, and validators cannot write handoff JSON or
-Markdown. `handoff.read` is shareable but scope-required and Coordinator
-mediated: the builder injects only role-limited envelopes. Cross-task paths,
-unfinished prior runs, and direct provider history access fail closed.
+`handoff.materialize` is exclusive and Coordinator/system-only. The hard gate
+requires the exact task/run plus the Team run's bound actor and Coordinator
+role; a caller cannot obtain either gate merely by passing `--actor
+coordinator`. Provider bridges, workers, reviewers, and validators cannot
+write handoff JSON or Markdown. `handoff.read` is shareable but scope-required
+and Coordinator mediated: the builder injects only role-limited envelopes.
+Cross-task paths, unfinished prior runs, and direct provider history access
+fail closed.
 
 Continuation reads require the same task, a terminal prior run, an explicit
 Coordinator selection, and the `handoff.continuation-consumed` event. The
@@ -49,8 +52,8 @@ single context budget source is 256 tokens per artifact, four artifacts, and
 or an estimator identifier and estimate otherwise.
 
 Sequence allocation is Coordinator/system serialized and lease-epoch fenced.
-Missing artifacts, hash/chain/sequence/frontmatter mismatches, encoding
-failure, or secret-scan failure use the canonical
+Missing artifacts, hash/chain/sequence/task-run/frontmatter mismatches,
+encoding failure, or secret-scan failure use the canonical
 `handoff-integrity-blocked` reason and block consumption.
 
 ## Retention And Patrol
@@ -58,7 +61,9 @@ failure, or secret-scan failure use the canonical
 At 48 transitions or 384 KiB, patrol emits a soft retention warning. At 64
 transitions or 512 KiB, materialization stops with
 `decisionClass=human-signoff-required`; a Captain must choose a no-more-handoff
-continuation or split the task/run. `team handoff stats` exposes the diagnostic.
+continuation or split the task/run. The hard stop carries the controlled
+`handoff-hard-limit-reached` status code rather than an unstructured error.
+`team handoff stats` exposes the diagnostic.
 
 Close-preflight and daily-noon patrol verify the manifest, chain, sequence,
 frontmatter, deterministic whitelist projection, UTF-8 encoding, retention,
