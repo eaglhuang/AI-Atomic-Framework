@@ -15,7 +15,7 @@ This fixture covers a synthetic plan with multiple tasks and explicit dependenci
 - [ ] Initial governance config is committed.
 
 ### Outputs
-- atm bootstrap evidence
+- .atm/history/evidence/TASK-EXAMPLE-0001.json
 
 ### Notes
 Used as the entrypoint for synthetic adopter onboarding tests.
@@ -33,8 +33,8 @@ Used as the entrypoint for synthetic adopter onboarding tests.
 - [ ] Police family report passes the standard profile.
 
 ### Deliverables
-- ranked-candidates JSON
-- police-family JSON
+- artifacts/ranked-candidates.json
+- artifacts/police-family.json
 
 ### Notes
 Verifies that the imported tasks remain inert until the adopter chooses to act.

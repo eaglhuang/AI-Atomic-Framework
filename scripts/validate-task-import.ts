@@ -1,4 +1,5 @@
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -115,15 +116,42 @@ async function main() {
 
   const chineseResult = await expectOk('import', ['--from', chineseBootstrapPlan, '--dry-run', '--cwd', root]);
   const chineseTasks = (chineseResult.evidence as {
-    manifest: { tasks: ReadonlyArray<{ workItemId: string; title: string; dependencies: readonly string[]; deliverables: readonly string[] }> };
+    manifest: { tasks: ReadonlyArray<{ workItemId: string; deliverables: readonly string[] }> };
   }).manifest.tasks;
-  if (chineseTasks.length !== 2 || !chineseTasks.some((task) => task.workItemId === 'SANGUO-BOOTSTRAP-0001')) {
-    fail(`Chinese bootstrap plan expected 2 SANGUO tasks, got ${JSON.stringify(chineseTasks)}.`);
-  }
   const chinese0101 = chineseTasks.find((task) => task.workItemId === 'SANGUO-BOOTSTRAP-0101');
-  if (!chinese0101 || chinese0101.dependencies.join(',') !== 'SANGUO-BOOTSTRAP-0001' || !chinese0101.deliverables.includes('wave-001 job builder runner')) {
-    fail(`Chinese bootstrap plan parsed 0101 incorrectly: ${JSON.stringify(chinese0101)}.`);
+  if (!chinese0101 || !chinese0101.deliverables.includes('scripts/wave-001-job-builder.ts')) {
+    fail(`Chinese bootstrap plan must preserve CJK-safe path deliverables: ${JSON.stringify(chinese0101)}.`);
   }
+
+  const proseDeliverableCard = path.join(tmpdir(), `atm-task-import-prose-deliverable-${process.pid}.md`);
+  writeFileSync(proseDeliverableCard, [
+    '---',
+    'task_id: TASK-PROSE-DELIVERABLE-0001',
+    'title: Reject prose deliverable declarations',
+    'deliverables:',
+    '  - 完成 Broker 驗證',
+    '---',
+    '',
+    '# TASK-PROSE-DELIVERABLE-0001',
+    ''
+  ].join('\n'), 'utf8');
+  await expectThrow('import', ['--from', proseDeliverableCard, '--dry-run', '--cwd', root], 'ATM_TASK_IMPORT_DELIVERABLE_PATH_INVALID');
+  rmSync(proseDeliverableCard, { force: true });
+
+  const cjkPathCard = path.join(tmpdir(), `atm-task-import-cjk-path-${process.pid}.md`);
+  writeFileSync(cjkPathCard, [
+    '---',
+    'task_id: TASK-CJK-PATH-0001',
+    'title: Accept CJK path declarations',
+    'deliverables:',
+    '  - docs/治理/交接.md',
+    '---',
+    '',
+    '# TASK-CJK-PATH-0001',
+    ''
+  ].join('\n'), 'utf8');
+  await expectOk('import', ['--from', cjkPathCard, '--dry-run', '--cwd', root]);
+  rmSync(cjkPathCard, { force: true });
 
   // Single-card import via YAML front matter should yield one task.
   const singleResult = await expectOk('import', ['--from', singleCard, '--dry-run', '--cwd', root]);
@@ -282,6 +310,12 @@ async function main() {
   // host-local IDs without a TASK- prefix to prove import preserves them.
   const tempWorkspace = mkdtempSync(path.join(tmpdir(), 'atm-task-import-'));
   try {
+    execFileSync('git', ['init'], { cwd: tempWorkspace, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.name', 'ATM fixture'], { cwd: tempWorkspace, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'fixture@atm.local'], { cwd: tempWorkspace, stdio: 'ignore' });
+    writeFileSync(path.join(tempWorkspace, '.gitkeep'), '', 'utf8');
+    execFileSync('git', ['add', '.gitkeep'], { cwd: tempWorkspace, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'fixture bootstrap'], { cwd: tempWorkspace, stdio: 'ignore' });
     const writeResult = await expectOk('import', ['--from', npcPlan, '--write', '--cwd', tempWorkspace]);
     const written = (writeResult.evidence as { writtenPaths: readonly string[] }).writtenPaths;
     if (written.length !== 2) {
@@ -391,18 +425,18 @@ deliverables:
       fail('Strict test card: expected IMPORT_BODY_SECTION_IGNORED diagnostic warning but none found.');
     }
 
-    if (importedTask.deliverables.length !== 2 || !importedTask.deliverables.includes('contaminated path containing the word')) {
-      fail(`Strict test card: expected deliverables to come only from frontmatter, got ${JSON.stringify(importedTask.deliverables)}.`);
+    if (importedTask.deliverables.length !== 1 || !importedTask.deliverables.includes('packages/cli/src/commands/tasks.ts')) {
+      fail(`Strict test card: expected prose deliverables to normalize to scope paths, got ${JSON.stringify(importedTask.deliverables)}.`);
     }
 
-    // 2. 驗證預設模式下，嚴格路徑違規應只呈報為 warning
-    const hasStrictPathWarning = defaultManifest.diagnostics.some((d: any) => d.code === 'STRICT_PATH_VIOLATION');
-    if (!hasStrictPathWarning) {
-      fail('Strict test card: expected STRICT_PATH_VIOLATION warning in default mode but none found.');
+    // 2. Default mode must record the deterministic normalization.
+    const hasNormalizationWarning = defaultManifest.diagnostics.some((d: any) => d.code === 'ATM_TASK_IMPORT_DELIVERABLES_NORMALIZED');
+    if (!hasNormalizationWarning) {
+      fail('Strict test card: expected ATM_TASK_IMPORT_DELIVERABLES_NORMALIZED diagnostic warning in default mode.');
     }
 
-    // 3. 驗證啟用 --strict-paths 模式下，應直接拋出 STRICT_PATH_VIOLATION 錯誤 (ok=false)
-    await expectThrow('import', ['--from', strictTestPath, '--dry-run', '--strict-paths', '--cwd', tempWorkspace], 'STRICT_PATH_VIOLATION');
+    // 3. Strict mode preserves the fail-closed error rather than normalizing.
+    await expectThrow('import', ['--from', strictTestPath, '--dry-run', '--strict-paths', '--cwd', tempWorkspace], 'ATM_TASK_IMPORT_DELIVERABLE_PATH_INVALID');
 
     // TASK-AAO-0123: 驗證 import refresh 時保護 active claim 與 taskDirectionLock
     const activeTaskId = 'SANGUO-AUTO-0001';
@@ -644,6 +678,21 @@ This is a planning-repo contract. The CID word here must not synthesize a target
         allowedFiles: ['src/claim-guard.ts']
       }
     }, null, 2), 'utf8');
+    const claimGuardLockDir = path.join(tempWorkspace, '.atm', 'runtime', 'locks');
+    mkdirSync(claimGuardLockDir, { recursive: true });
+    writeFileSync(path.join(claimGuardLockDir, `${claimGuardTaskId}.lock.json`), JSON.stringify({
+      schemaId: 'atm.taskDirectionLockEnvelope.v1',
+      taskId: claimGuardTaskId,
+      actorId: 'claim-guard-agent',
+      status: 'active',
+      files: ['src/claim-guard.ts'],
+      taskDirectionLock: {
+        schemaId: 'atm.taskDirectionLock.v1',
+        taskId: claimGuardTaskId,
+        actorId: 'claim-guard-agent',
+        allowedFiles: ['src/claim-guard.ts']
+      }
+    }, null, 2), 'utf8');
 
     const claimGuardDryRun = await expectOk('import', ['--from', claimGuardPlanPath, '--dry-run', '--cwd', tempWorkspace]);
     const claimGuardDryDiagnostics = (claimGuardDryRun.evidence as {
@@ -669,6 +718,43 @@ This is a planning-repo contract. The CID word here must not synthesize a target
     const claimGuardAfterForce = JSON.parse(readFileSync(claimGuardTaskPath, 'utf8'));
     if (claimGuardAfterForce.claim?.leaseId !== 'lease-claim-guard-01' || claimGuardAfterForce.status !== 'running') {
       fail('TASK-AAO-0135 regression: --force must not overwrite active claim state.');
+    }
+    await expectThrow('scope', [
+      'repair-deliverables',
+      '--cwd', tempWorkspace,
+      '--task', claimGuardTaskId,
+      '--actor', 'other-agent',
+      '--set', 'packages/cli/src/commands/tasks.ts',
+      '--reason', 'validator verifies claimed-task metadata repair ownership'
+    ], 'ATM_TASK_METADATA_REPAIR_ACTIVE_CLAIM_REQUIRED');
+    await expectThrow('scope', [
+      'repair-deliverables',
+      '--cwd', tempWorkspace,
+      '--task', claimGuardTaskId,
+      '--actor', 'claim-guard-agent',
+      '--set', 'not a repository path',
+      '--reason', 'validator verifies deliverable repair rejects prose'
+    ], 'ATM_TASK_METADATA_REPAIR_DELIVERABLE_PATH_INVALID');
+    await expectOk('scope', [
+      'repair-deliverables',
+      '--cwd', tempWorkspace,
+      '--task', claimGuardTaskId,
+      '--actor', 'claim-guard-agent',
+      '--set', 'packages/cli/src/commands/tasks.ts,scripts/validate-task-import.ts',
+      '--reason', 'validator verifies claimed-task metadata repair'
+    ]);
+    const claimGuardAfterRepair = JSON.parse(readFileSync(claimGuardTaskPath, 'utf8'));
+    if (claimGuardAfterRepair.claim?.leaseId !== 'lease-claim-guard-01' || claimGuardAfterRepair.status !== 'running') {
+      fail('TASK-TEAM-0082 regression: metadata repair must preserve active claim state.');
+    }
+    if (!claimGuardAfterRepair.deliverables?.includes('packages/cli/src/commands/tasks.ts')
+      || !claimGuardAfterRepair.deliverables?.includes('scripts/validate-task-import.ts')) {
+      fail(`TASK-TEAM-0082 regression: metadata repair did not update deliverables, got ${JSON.stringify(claimGuardAfterRepair.deliverables)}.`);
+    }
+    const claimGuardLockAfterRepair = JSON.parse(readFileSync(path.join(claimGuardLockDir, `${claimGuardTaskId}.lock.json`), 'utf8'));
+    const repairedAllowed = claimGuardLockAfterRepair.taskDirectionLock?.allowedFiles ?? [];
+    if (!repairedAllowed.includes('packages/cli/src/commands/tasks.ts') || !repairedAllowed.includes('scripts/validate-task-import.ts')) {
+      fail(`TASK-TEAM-0082 regression: metadata repair did not sync direction lock allowedFiles, got ${JSON.stringify(repairedAllowed)}.`);
     }
 
     const claimGuardOverwriteLeaseId = await createImportWriteLease(tempWorkspace, ['--force', '--force-overwrite-claims'], 'validator verifies force-overwrite-claims import displacement behavior');

@@ -15,8 +15,8 @@ files.
 - [ ] Candidate ranking report exists for the same scope.
 
 ### Deliverables
-- candidate ranking JSON
-- source inventory JSON
+- artifacts/candidate-ranking.json
+- artifacts/source-inventory.json
 
 ## SANGUO-AUTO-0002 Plan dry-run atomize for ranked entrypoint
 

@@ -1,0 +1,129 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0082",
+  "title": "Validate deliverable paths at import and add a governed card metadata repair lane",
+  "status": "running",
+  "milestone": "Team Broker Maintainability",
+  "dependencies": [],
+  "acceptance": [
+    "Import fails closed (or normalizes with an explicit diagnostic) when a declared deliverable is not a repository path.",
+    "A governed, non-emergency metadata repair lane exists for claimed tasks whose card text needs correction, preserving claim state.",
+    "Close-time diagnostics name the offending deliverable strings.",
+    "Backlog 138 updated to fixed with regression references."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert validation; emergency-lease force re-import remains the manual fallback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0082-deliverable-path-validation-and-card-repair-lane.task.md",
+    "sectionTitle": "TASK-TEAM-0082",
+    "headingLine": 35,
+    "hash": "ff87f1a8e4bf09b4"
+  },
+  "importedAt": "2026-07-12T06:17:44.117Z",
+  "lastTransitionId": "2026-07-12T07-46-22-702Z-scope-amendment-305938b6712d",
+  "lastTransitionAt": "2026-07-12T07:46:22.702Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Terra",
+  "reservedAt": "2026-07-12T07:24:36.655Z",
+  "promotedAt": "2026-07-12T07:24:36.657Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Terra",
+    "leaseId": "lease-6ba9b4ddea72",
+    "claimedAt": "2026-07-12T07:24:36.660Z",
+    "heartbeatAt": "2026-07-12T07:24:36.660Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-TEAM-0082.*",
+      ".atm/history/task-events/TASK-TEAM-0082/**",
+      ".atm/history/tasks/TASK-TEAM-0082.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "fixtures/task-plan-import/chinese-bootstrap-plan.md",
+      "fixtures/task-plan-import/low-automation-plan.md",
+      "fixtures/task-plan-import/sample-plan.md",
+      "fixtures/task-plan-import/single-card.md",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-task-import.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T07:24:36.660Z",
+  "startedByActor": "Codex-GPT5.6 Terra",
+  "startedBySessionId": "session-20260712072436-Codex-GPT5.6-Terra-TASK-TEAM-0082-1cc0d15ff9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0082",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0082.*",
+      ".atm/history/task-events/TASK-TEAM-0082/**",
+      ".atm/history/tasks/TASK-TEAM-0082.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "fixtures/task-plan-import/chinese-bootstrap-plan.md",
+      "fixtures/task-plan-import/low-automation-plan.md",
+      "fixtures/task-plan-import/sample-plan.md",
+      "fixtures/task-plan-import/single-card.md",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "scripts/validate-task-import.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0082-deliverable-path-validation-and-card-repair-lane.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/team-agents/",
+      "docs/ai_atomic_framework/team-agents/tasks/",
+      "docs/ai_atomic_framework/team-agents/tasks/TASK-TEAM-0082-deliverable-path-validation-and-card-repair-lane.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "b18480f519c8bbd4bc39235842ffe4b5ca2ad096fc6baae6119c564f0c6b73fe",
+    "actorId": "Codex-GPT5.6 Terra",
+    "createdAt": "2026-07-12T07:24:36.932Z",
+    "status": "active"
+  }
+}
