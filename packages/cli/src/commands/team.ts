@@ -18,6 +18,7 @@ import {
 import { getCommandSpec } from './command-specs.ts';
 import { inspectTeamRuntimeBackendCapabilities } from './integration.ts';
 import { runTasks } from './tasks.ts';
+import { evaluateBrokerQueueAdmission, restrictTeamWriteScopeForQueueAdmission } from './next/broker-queue-admission.ts';
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
 import { validateStrictPathHeuristic } from './tasks/task-import-validators.ts';
 import { buildTeamKnowledgeSummary, runTeamKnowledge, type TeamKnowledgeSummary } from './team-knowledge.ts';
@@ -1032,7 +1033,7 @@ export async function runTeam(argv: string[]) {
     selectionConfig: context.providerSelectionConfig,
     editorBridgeDisabled: parsed.options.disableEditorBridge,
     recipe,
-    allowedFiles: deriveWritePaths(task, cwd),
+    allowedFiles: [...context.writePaths],
     permissionLeases: teamPlan.suggestedPermissionLeases,
     evidenceRequired: String(task.evidenceRequired ?? 'command-backed')
   });
@@ -2298,7 +2299,34 @@ async function buildTeamPlanningContext(input: {
   const requestedRosterLevel = normalizeTeamSizeOverride(input.requestedTeamSize)?.teamLevel ?? null;
   const activeRecipe = requestedRosterLevel ? projectTeamRecipeForLevel(recipe, requestedRosterLevel).recipe : recipe;
   const writeScope = deriveTeamWriteScope(task, input.cwd);
-  const writePaths = writeScope.writePaths;
+  // TASK-TEAM-0078: project the write scope through the canonical
+  // shared-surface queue before any role or provider lease is derived, so a
+  // queued task may plan/start only against its disjoint private paths and a
+  // fully queued task is rejected instead of silently widening a lease.
+  const queueAdmission = evaluateBrokerQueueAdmission({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    allowedFiles: writeScope.writePaths,
+    overlappingFiles: []
+  });
+  const queueScopeDecision = restrictTeamWriteScopeForQueueAdmission(queueAdmission, writeScope.writePaths);
+  const queueScopeFindings: PermissionFinding[] = [];
+  if (queueScopeDecision.verdict === 'rejected') {
+    queueScopeFindings.push(buildPermissionFinding({
+      level: 'error',
+      code: 'broker-queue-blocked',
+      detail: `team plan/start rejected by canonical shared-surface queue admission (${queueAdmission.status}): ${queueScopeDecision.reason}`,
+      paths: [...queueScopeDecision.queuedSharedPaths]
+    }));
+  } else if (queueScopeDecision.verdict === 'restricted-private-work') {
+    queueScopeFindings.push(buildPermissionFinding({
+      level: 'warning',
+      code: 'broker-queue-private-work',
+      detail: 'Role write scope is restricted to disjoint private paths while shared paths remain queued; leases must not widen beyond the canonical queue projection.',
+      paths: [...queueScopeDecision.queuedSharedPaths]
+    }));
+  }
+  const writePaths = [...queueScopeDecision.writePaths];
   const permissionValidation = validateTeamPermissionModel(activeRecipe, writePaths, {
     allowedWritePaths: deriveAllowedWriteScope(task, input.cwd),
     repoRoot: input.cwd,
@@ -2344,6 +2372,7 @@ async function buildTeamPlanningContext(input: {
   const claimAdmissionFindings = buildTeamClaimAdmissionFindings(input.cwd, input.taskId, task);
   const validation = mergeValidation(
     permissionValidation,
+    { ok: queueScopeFindings.every((f) => f.level !== 'error'), findings: queueScopeFindings },
     { ok: claimAdmissionFindings.every((f) => f.level !== 'error'), findings: claimAdmissionFindings },
     { ok: parallelFindings.every((f) => f.level !== 'error'), findings: parallelFindings },
     { ok: brokerLanePlan.findings.every((f) => f.level !== 'error'), findings: brokerLanePlan.findings }
@@ -2372,6 +2401,9 @@ async function buildTeamPlanningContext(input: {
     recipe: activeRecipe,
     permissionValidation,
     validation,
+    writePaths,
+    queueAdmission,
+    queueScopeDecision,
     providerSelectionConfig: input.providerSelectionConfig?.config ?? null,
     providerSelectionSource: input.providerSelectionConfig?.source ?? null,
     teamPlan: {

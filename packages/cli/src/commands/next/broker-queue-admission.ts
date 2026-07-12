@@ -48,6 +48,53 @@ export function evaluateBrokerQueueAdmission(input: {
   };
 }
 
+export type TeamQueueScopeDecision = {
+  readonly schemaId: 'atm.teamQueueScopeDecision.v1';
+  readonly verdict: 'unrestricted' | 'restricted-private-work' | 'rejected';
+  readonly writePaths: readonly string[];
+  readonly queuedSharedPaths: readonly string[];
+  readonly reason: string;
+};
+
+/**
+ * TASK-TEAM-0078 — project a team plan/start write scope through the
+ * canonical shared-surface queue admission. `queued-private-work` restricts
+ * the role write scope to the disjoint private paths; `queued-blocked` and
+ * `invalid` reject the run. The projection never widens the input scope.
+ */
+export function restrictTeamWriteScopeForQueueAdmission(
+  admission: BrokerQueueAdmission,
+  writePaths: readonly string[]
+): TeamQueueScopeDecision {
+  const normalized = uniquePaths(writePaths);
+  if (admission.status === 'queued-blocked' || admission.status === 'invalid') {
+    return {
+      schemaId: 'atm.teamQueueScopeDecision.v1',
+      verdict: 'rejected',
+      writePaths: [],
+      queuedSharedPaths: admission.queuedSharedPaths,
+      reason: admission.reason
+    };
+  }
+  if (admission.status === 'queued-private-work') {
+    const allowed = new Set(admission.allowedFiles);
+    return {
+      schemaId: 'atm.teamQueueScopeDecision.v1',
+      verdict: 'restricted-private-work',
+      writePaths: normalized.filter((entry) => allowed.has(entry)),
+      queuedSharedPaths: admission.queuedSharedPaths,
+      reason: admission.reason
+    };
+  }
+  return {
+    schemaId: 'atm.teamQueueScopeDecision.v1',
+    verdict: 'unrestricted',
+    writePaths: normalized,
+    queuedSharedPaths: [],
+    reason: admission.reason
+  };
+}
+
 function readQueues(cwd: string): { ok: true; value: SharedSurfaceQueue[] } | { ok: false; reason: string } {
   const filePath = path.join(cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
   if (!existsSync(filePath)) return { ok: true, value: [] };

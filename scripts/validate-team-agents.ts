@@ -147,6 +147,16 @@ async function main() {
     assert.equal(blockedLog.privatePathAllowance.granted, false);
     const serialized = JSON.stringify(admittedLog) + JSON.stringify(blockedLog);
     assert.equal(serialized.includes('redactedPreview'), false, 'decision log must not leak task body content');
+    const { restrictTeamWriteScopeForQueueAdmission } = await import('../packages/cli/src/commands/next/broker-queue-admission.ts');
+    const restricted = restrictTeamWriteScopeForQueueAdmission(queueAdmission, ['src/private-a.ts', 'src/shared.ts']);
+    assert.equal(restricted.verdict, 'restricted-private-work');
+    assert.deepEqual(restricted.writePaths, ['src/private-a.ts'], 'queued-private-work must restrict team write scope to the disjoint private paths');
+    const rejected = restrictTeamWriteScopeForQueueAdmission({ ...queueAdmission, status: 'queued-blocked', allowedFiles: [] }, ['src/shared.ts']);
+    assert.equal(rejected.verdict, 'rejected');
+    assert.deepEqual(rejected.writePaths, [], 'queued-blocked must reject with an empty team write scope');
+    const unrestricted = restrictTeamWriteScopeForQueueAdmission({ ...queueAdmission, status: 'queue-head', queuedSharedPaths: [], waitingOn: [] }, ['src/shared.ts', 'src/private-a.ts']);
+    assert.equal(unrestricted.verdict, 'unrestricted');
+    assert.deepEqual(unrestricted.writePaths, ['src/private-a.ts', 'src/shared.ts'], 'queue-head must keep, and never widen, the input scope');
     console.log('[validate-team-agents] ok (next-claim-atomization)');
     return;
   }
