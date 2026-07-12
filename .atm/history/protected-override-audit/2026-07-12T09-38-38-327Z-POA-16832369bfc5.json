@@ -1,0 +1,33 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-16832369bfc5",
+  "recordedAt": "2026-07-12T09:38:38.327Z",
+  "actorId": "Codex-GPT5.6 Terra",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor Codex-GPT5.6 Terra --message \"chore(governance): retain protected override audit records\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-c53cc9452d",
+  "reason": "Commit existing protected override audit records during user-requested cleanup; normal record-commit lane rejects protected audit bundles.",
+  "skippedChecks": [
+    "pre-commit-hook",
+    "framework-development-gates"
+  ],
+  "touchedFiles": [],
+  "outcome": "succeeded",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-12T09-38-37-798Z-EMG-GLOBAL-c53cc9452d.json",
+  "parentEventId": "POA-6b80d46881e2",
+  "repairCandidate": {
+    "schemaId": "atm.protectedOverrideRepairCandidate.v1",
+    "summary": "Hook bypass succeeded; schedule a follow-up commit that passes normal pre-commit governance when recovery is complete.",
+    "suggestedCommand": "node atm.mjs doctor --json",
+    "deferredChecks": [
+      "pre-commit-hook",
+      "framework-development-gates"
+    ]
+  }
+}

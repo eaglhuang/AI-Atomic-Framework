@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-6b80d46881e2",
+  "recordedAt": "2026-07-12T09:38:37.799Z",
+  "actorId": "Codex-GPT5.6 Terra",
+  "taskId": null,
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor Codex-GPT5.6 Terra --message \"chore(governance): retain protected override audit records\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-GLOBAL-c53cc9452d",
+  "reason": "Commit existing protected override audit records during user-requested cleanup; normal record-commit lane rejects protected audit bundles.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-12T09-38-37-798Z-EMG-GLOBAL-c53cc9452d.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}
