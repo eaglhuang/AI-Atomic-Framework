@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0181",
+  "title": "Fix auto-intent claim delivery detection",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`--auto-intent` must resolve a planned/ready task with declared non-`.atm` deliverables and no task delivery commit to `write`, even when those deliverable files already exist in `HEAD`.",
+    "`--auto-intent` may resolve to `closeout-only` only when delivery evidence exists for the task and all declared deliverables are present.",
+    "Evidence must include a regression covering:",
+    "planned task with pre-existing deliverables and no delivery commit;",
+    "dirty in-scope source overriding closeout;",
+    "delivered task with an existing delivery commit;",
+    "explicit closeout-only conflict recovery for dirty in-scope source.",
+    "Run the focused claim auto-intent test and the declared validation commands before closeout."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/claim-intent.ts",
+    "tests/cli/tasks-claim-auto-intent.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/claim-intent.ts",
+    "tests/cli/tasks-claim-auto-intent.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/tasks-claim-auto-intent.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the claim intent resolver and regression test changes if auto-intent becomes too conservative for closeout-only claims.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-tasks-claim-intent",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0181.md",
+    "sectionTitle": "TASK-AAO-0181",
+    "headingLine": 33,
+    "hash": "122f6f8317202f54"
+  },
+  "importedAt": "2026-07-12T13:40:11.967Z",
+  "lastTransitionId": "2026-07-12T13-46-42-041Z-close-57ae44a0cba9",
+  "lastTransitionAt": "2026-07-12T13:46:42.041Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T13:40:20.283Z",
+  "promotedAt": "2026-07-12T13:40:20.286Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-c04592db2730",
+    "claimedAt": "2026-07-12T13:40:20.289Z",
+    "heartbeatAt": "2026-07-12T13:46:42.039Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0181.json",
+      "packages/cli/src/commands/tasks/claim-intent.ts",
+      "tests/cli/tasks-claim-auto-intent.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-12T13:40:20.289Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712134020-codex-backlog-captain-TASK-AAO-0181-4a649d091e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0181",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0181.*",
+      ".atm/history/task-events/TASK-AAO-0181/**",
+      ".atm/history/tasks/TASK-AAO-0181.json",
+      "packages/cli/src/commands/tasks/claim-intent.ts",
+      "tests/cli/tasks-claim-auto-intent.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "b293f1c3df03c73bd22a8fb2ebf2b658a1d8e31d2a2cd4b03465b3d24aa3f5ea",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T13:40:20.673Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-12T13:46:42.039Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712134020-codex-backlog-captain-TASK-AAO-0181-4a649d091e",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0181.closure-packet.json"
+}

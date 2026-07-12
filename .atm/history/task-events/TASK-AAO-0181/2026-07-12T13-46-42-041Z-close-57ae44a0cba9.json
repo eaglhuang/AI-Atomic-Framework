@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T13-46-42-041Z-close-57ae44a0cba9",
+  "taskId": "TASK-AAO-0181",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712134020-codex-backlog-captain-TASK-AAO-0181-4a649d091e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0181.json",
+  "taskSha256": "sha256:2dd9113710443194bb7c87ad443ffc9fc328aee57038f65161d00c45b80fb5c0",
+  "createdAt": "2026-07-12T13:46:42.041Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0181 --actor codex-backlog-captain --status done --historical-delivery 973f854025b7c5390e16a51d51ae07543e9449e6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712134020-codex-backlog-captain-TASK-AAO-0181-4a649d091e",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0181.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/tasks-claim-auto-intent.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T13:46:42.034Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0181.*",
+        ".atm/history/task-events/TASK-AAO-0181/**",
+        ".atm/history/tasks/TASK-AAO-0181.json",
+        "packages/cli/src/commands/tasks/claim-intent.ts",
+        "tests/cli/tasks-claim-auto-intent.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/claim-intent.ts",
+        "tests/cli/tasks-claim-auto-intent.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
