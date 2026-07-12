@@ -1,0 +1,57 @@
+{
+  "taskId": "TASK-TEAM-0085",
+  "updatedAt": "2026-07-12T09:27:57.280Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT5.6 Terra",
+      "sessionId": "session-20260712092709-Codex-GPT5.6-Terra-TASK-TEAM-0085-c43dd450b4",
+      "createdAt": "2026-07-12T09:27:57.280Z",
+      "details": {
+        "actorId": "Codex-GPT5.6 Terra",
+        "sessionId": "session-20260712092709-Codex-GPT5.6-Terra-TASK-TEAM-0085-c43dd450b4",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-agents-runtime",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "a48d60006b72062d04ad283a0ed51d4c8129d15e",
+            "cacheKey": "sha256:c7073041314c35ab58103bc1a0a7c5667cc040f09fdb8aa4551a38708e338139",
+            "cached": false,
+            "generatedAt": "2026-07-12T09:27:57.339Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0dde6808c8b109c71c7d522375cce6b4827ddaf6b0d6ee2a777450c4acf96161",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
