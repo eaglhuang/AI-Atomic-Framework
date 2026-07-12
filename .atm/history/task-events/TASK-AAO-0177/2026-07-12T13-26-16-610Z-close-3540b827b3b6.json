@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T13-26-16-610Z-close-3540b827b3b6",
+  "taskId": "TASK-AAO-0177",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712132101-codex-backlog-captain-TASK-AAO-0177-d9bcb098d7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0177.json",
+  "taskSha256": "sha256:987978934466ab6ad8948c328458edbb9ca1242b5cb72441252934c29258aea3",
+  "createdAt": "2026-07-12T13:26:16.610Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0177 --actor codex-backlog-captain --status done --historical-delivery 681c3467a49723c1a46e19accb6966cbb08c56a3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712132101-codex-backlog-captain-TASK-AAO-0177-d9bcb098d7",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0177.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-role-provider-parser.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T13:26:16.604Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0177.*",
+        ".atm/history/task-events/TASK-AAO-0177/**",
+        ".atm/history/tasks/TASK-AAO-0177.json",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "tests/cli/team-role-provider-parser.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "tests/cli/team-role-provider-parser.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
