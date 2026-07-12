@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T15-21-12-051Z-repair-claim-78f1cc329e6b",
+  "taskId": "TASK-AAO-FABLE-002",
+  "action": "repair-claim",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712142849-claude-fable-5-TASK-AAO-FABLE-002-17ac89db7d",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-AAO-FABLE-002.json",
+  "taskSha256": "sha256:2b8029cbb70b01cb0ad2c31aaaadd8bd0754a6ba4110bbc062ad69381b515722",
+  "createdAt": "2026-07-12T15:21:12.051Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-AAO-FABLE-002 --actor codex-backlog-captain --write --reason \"Expired Fable claim blocks user-authorized P0 TASK-GIT-0013 claim admission; repair stale drift through ATM before hotfix work.\" --json"
+}
