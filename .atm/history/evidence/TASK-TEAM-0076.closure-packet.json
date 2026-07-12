@@ -1,0 +1,262 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-TEAM-0076",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "dc3e1154d302c33a8cacce758b19b113b67d428c",
+  "governedTreeSha": "66da43ae85718e3bd96820bddfc5d7aa2abcc4f7",
+  "targetCommitDelta": {
+    "currentCommitSha": "dc3e1154d302c33a8cacce758b19b113b67d428c",
+    "parentCommitShas": [
+      "dc3e1154d302c33a8cacce758b19b113b67d428c"
+    ],
+    "governedTreeSha": "66da43ae85718e3bd96820bddfc5d7aa2abcc4f7",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0076.bundle-manifest.json",
+      ".atm/history/evidence/TASK-TEAM-0076.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/receipts/TASK-TEAM-0076/2026-07-12T01-58-05-464Z-broker.ts-sharedSurfaceQueue-registration.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/broker-shared-surface-coordination.md",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/compose.test.ts",
+      "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/broker/types.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/conflict-matrix.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/types.d.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-team-agents.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/compose.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b0cdb8a54776d6097c172a9433ad28bdbf0f77ecb7e0ce26167630723262feeb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:626a97ff94d21bd0a9696c65e9e19fddb249264ae5369d29bb588551058052b6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-shared-surface-queue",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:749475f0899b610104bf15866db2c591456a468c1850d7e420a3b1202376a1c4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts --case broker-shared-surface-compose",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:55b3b495486353dbb67133ef7e7c71952f890326a630287f2ba7af43aaf8d9d4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:40d231dc4e9713c809cad88daa48bdc9f17cd379887865c3694630b041544db5",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/core/src/broker/__tests__/compose.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-12T02:08:10.535Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0076.*",
+      ".atm/history/protected-override-audit/2026-07-12T01-45-43-529Z-POA-c5ec9263d851.json",
+      ".atm/history/task-events/TASK-TEAM-0076/**",
+      ".atm/history/tasks/TASK-TEAM-0076.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/receipts/TASK-TEAM-0076/**",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/broker-shared-surface-coordination.md",
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/compose.test.ts",
+      "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/types.ts",
+      "release/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/dist/**",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/compose.test.ts",
+      "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "packages/core/src/broker/compose.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/broker/steward.ts",
+      "packages/core/src/broker/types.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-TEAM-0076.json",
+  "closedAt": "2026-07-12T02:08:10.535Z",
+  "closedByActor": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260712014544-Codex-GPT5.6-Terra-TASK-TEAM-0076-44a8291790",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "9aaa51cd064de0ab9487abcb69f5646c8843a526",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/receipts/TASK-TEAM-0076/2026-07-12T01-58-05-464Z-broker.ts-sharedSurfaceQueue-registration.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/team-agents/broker-shared-surface-coordination.md",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/__tests__/compose.test.ts",
+      "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "packages/core/src/broker/conflict-matrix.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "packages/core/src/broker/types.ts",
+      "scripts/validate-team-agents.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-TEAM-0076.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-11T16-55-58-207Z-import-5f6bad5b147d.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-45-43-551Z-import-243e02656ff6.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-45-44-739Z-reserve-15324de277c1.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-45-44-741Z-promote-edf882778bcc.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-45-45-254Z-claim-0d8b1e49db66.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-46-32-310Z-scope-amendment-65b4189318a0.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-50-24-536Z-scope-amendment-983bf6e10150.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-56-08-446Z-scope-amendment-a08a0cb14b35.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T01-58-10-470Z-scope-amendment-f7388e41fb59.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T02-04-15-271Z-scope-amendment-68fe35135577.json",
+      ".atm/history/tasks/TASK-TEAM-0076.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/conflict-matrix.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/conflict-matrix.js",
+      "release/atm-root-drop/packages/core/dist/broker/types.d.ts",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/conflict-matrix.ts",
+      "release/atm-root-drop/packages/core/src/broker/types.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-governance-commands.ts",
+      "release/atm-root-drop/scripts/validate-team-agents.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
