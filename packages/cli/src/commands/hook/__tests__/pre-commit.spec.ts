@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   buildPreCommitBlockingFindings,
   buildPreCommitRepairHints,
@@ -6,6 +9,11 @@ import {
   isPreCommitEnvironmentFinding
 } from '../pre-commit.ts';
 import { inspectGitIndexAccess } from '../git-index-diagnostics.ts';
+import {
+  captureGitHeadEvidencePreparation,
+  reconcileResolvedCrossTaskMutationIncident,
+  rollbackFailedGitHeadEvidencePreparation
+} from '../../git-governance.ts';
 
 const cwd = process.cwd();
 const gitIndex = inspectGitIndexAccess(cwd);
@@ -116,5 +124,32 @@ const baselineOnly = buildPreCommitBlockingFindings({
   residueFindings: []
 });
 assert.equal(baselineOnly.filter(isPreCommitEnvironmentFinding).length, 0);
+
+const repairRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-governance-repair-'));
+try {
+  const evidencePath = path.join(repairRoot, '.atm', 'history', 'evidence', 'git-head.jsonl');
+  mkdirSync(path.dirname(evidencePath), { recursive: true });
+  writeFileSync(evidencePath, '{"prepared":"before"}\n', 'utf8');
+  const snapshot = captureGitHeadEvidencePreparation(repairRoot);
+  writeFileSync(evidencePath, '{"prepared":"before"}\n{"prepared":"orphan"}\n', 'utf8');
+  assert.equal(rollbackFailedGitHeadEvidencePreparation(snapshot), true);
+  assert.equal(readFileSync(evidencePath, 'utf8'), '{"prepared":"before"}\n');
+
+  const absentRoot = path.join(repairRoot, 'absent');
+  const absentSnapshot = captureGitHeadEvidencePreparation(absentRoot);
+  const absentEvidencePath = path.join(absentRoot, '.atm', 'history', 'evidence', 'git-head.jsonl');
+  mkdirSync(path.dirname(absentEvidencePath), { recursive: true });
+  writeFileSync(absentEvidencePath, '{"prepared":"orphan"}\n', 'utf8');
+  assert.equal(rollbackFailedGitHeadEvidencePreparation(absentSnapshot), true);
+  assert.equal(existsSync(absentEvidencePath), false);
+
+  const incidentsPath = path.join(repairRoot, '.atm', 'runtime', 'incidents');
+  mkdirSync(incidentsPath, { recursive: true });
+  writeFileSync(path.join(incidentsPath, 'stale.json'), JSON.stringify({ schemaId: 'atm.incidentReport.v1', block: {} }), 'utf8');
+  assert.equal(reconcileResolvedCrossTaskMutationIncident(repairRoot, null), true);
+  assert.equal(existsSync(path.join(incidentsPath, 'stale.json')), false);
+} finally {
+  rmSync(repairRoot, { recursive: true, force: true });
+}
 
 console.log('[pre-commit.spec] ok');

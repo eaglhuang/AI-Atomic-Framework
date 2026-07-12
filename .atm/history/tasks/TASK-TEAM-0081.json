@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0081",
+  "title": "Reconcile git-head evidence records left by failed governed commits",
+  "status": "running",
+  "milestone": "Team Broker Maintainability",
+  "dependencies": [],
+  "acceptance": [
+    "Commit-prep evidence is finalized only when the commit lands, or a failed attempt auto-reconciles/annotates its orphan record.",
+    "Close preflight no longer blocks on an orphan prep record; a regression covers the failed-attempt path.",
+    "`validate:git-head-evidence` still passes for the reconciled log."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "scripts/validate-git-head-evidence.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/tasks/close-orchestrator.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "scripts/validate-git-head-evidence.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:git-head-evidence",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert reconciliation logic; manual git restore of git-head.jsonl remains the fallback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0081-git-head-evidence-failed-commit-reconciliation.task.md",
+    "sectionTitle": "TASK-TEAM-0081",
+    "headingLine": 34,
+    "hash": "5b21641b87ec315b"
+  },
+  "importedAt": "2026-07-12T06:17:43.264Z",
+  "lastTransitionId": "2026-07-12T07-18-56-685Z-claim-04a4fef06f71",
+  "lastTransitionAt": "2026-07-12T07:18:56.685Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT5.6 Terra",
+  "reservedAt": "2026-07-12T07:18:56.415Z",
+  "promotedAt": "2026-07-12T07:18:56.418Z",
+  "claim": {
+    "actorId": "Codex-GPT5.6 Terra",
+    "leaseId": "lease-276e0b0ab6c6",
+    "claimedAt": "2026-07-12T07:18:56.420Z",
+    "heartbeatAt": "2026-07-12T07:18:56.420Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0081.json",
+      ".atm/history/evidence/TASK-TEAM-0081.*",
+      ".atm/history/task-events/TASK-TEAM-0081/**",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "scripts/validate-git-head-evidence.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T07:12:01.030Z",
+  "startedByActor": "Codex-GPT5.6 Terra",
+  "startedBySessionId": "session-20260712071856-Codex-GPT5.6-Terra-TASK-TEAM-0081-a95fdf86d4",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0081",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0081.*",
+      ".atm/history/task-events/TASK-TEAM-0081/**",
+      ".atm/history/tasks/TASK-TEAM-0081.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "scripts/validate-git-head-evidence.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6deecf6cecdacb0b4b7848e03f88d505ba56ae9bacf664c1911387f2e41e9ace",
+    "actorId": "Codex-GPT5.6 Terra",
+    "createdAt": "2026-07-12T07:18:56.684Z",
+    "status": "active"
+  }
+}
