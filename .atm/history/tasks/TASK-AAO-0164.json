@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0164",
+  "title": "Precommit evidence requiredCommand task id guard",
+  "status": "running",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "Pre-commit no longer emits a `--task` requiredCommand derived only from an arbitrary evidence filename.",
+    "Existing valid task-scoped evidence guidance still points at the real task.",
+    "A deterministic validator covers both the invalid fabricated-task case and a valid task evidence case.",
+    "`ATM-BUG-2026-07-11-114` is marked fixed with the fixing task id."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-governance-commands.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-governance-commands.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run typecheck",
+    "npm run validate:git-hooks-enforcement",
+    "npm run validate:governance-commands",
+    "npm run validate:task-import"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing Team Agents runtime or broker scheduling behavior",
+    "Changing bulk closure manifest policy beyond the incorrect requiredCommand",
+    "Editing .atm/history or .atm/runtime by hand"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert hook requiredCommand guard and focused validator assertions if the evidence-file task attribution contract changes.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-cli-hook",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0164-precommit-evidence-required-command-task-id-guard.task.md",
+    "sectionTitle": "TASK-AAO-0164",
+    "headingLine": 44,
+    "hash": "637e6758d659ab8a"
+  },
+  "importedAt": "2026-07-12T11:00:32.280Z",
+  "lastTransitionId": "2026-07-12T11-08-36-044Z-scope-amendment-4009af1ff7bd",
+  "lastTransitionAt": "2026-07-12T11:08:36.044Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T11:00:36.510Z",
+  "promotedAt": "2026-07-12T11:00:36.512Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-56ff8412793d",
+    "claimedAt": "2026-07-12T11:00:36.515Z",
+    "heartbeatAt": "2026-07-12T11:00:36.515Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-0164.*",
+      ".atm/history/task-events/TASK-AAO-0164/**",
+      ".atm/history/tasks/TASK-AAO-0164.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/hook.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T11:00:36.515Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712110036-codex-backlog-captain-TASK-AAO-0164-8091fb2098",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0164",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0164.*",
+      ".atm/history/task-events/TASK-AAO-0164/**",
+      ".atm/history/tasks/TASK-AAO-0164.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/hook.ts",
+      "packages/core/src/broker/cross-task-mutation-guard.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0164-precommit-evidence-required-command-task-id-guard.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0164-precommit-evidence-required-command-task-id-guard.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e009c808914b4a2e0e7eee9a85c35eb15fe63891fdc7e551100b3d4ff68f300b",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T11:00:36.791Z",
+    "status": "active"
+  }
+}

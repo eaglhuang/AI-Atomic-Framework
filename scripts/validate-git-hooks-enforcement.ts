@@ -10,6 +10,9 @@ const fixture = loadValidatorFixture(root, 'fixtures/validators/git-hooks-enforc
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+const childTimeoutMs = Number(process.env.ATM_VALIDATOR_CHILD_TIMEOUT_MS ?? '30000');
+const validatorStartedAt = Date.now();
+let commandSequence = 0;
 
 function writeReadyFixtureTask(repoPath: string, taskId: string, actorId: string, title: string) {
   const taskPath = path.join(repoPath, '.atm', 'history', 'tasks', `${taskId}.json`);
@@ -39,18 +42,28 @@ function assert(condition: unknown, message: string) {
 }
 
 function run(command: string, args: readonly string[], cwd: string, options: { allowFailure?: boolean; env?: Record<string, string>; input?: string } = {}) {
+  const sequence = ++commandSequence;
+  const label = `${command} ${args.join(' ')}`;
+  const startedAt = Date.now();
+  console.log(`[git-hooks-enforcement:${mode}] step ${sequence} start (${Math.round((startedAt - validatorStartedAt) / 1000)}s): ${label}`);
   const result = spawnSync(command, [...args], {
     cwd,
     encoding: 'utf8',
     input: options.input,
+    timeout: childTimeoutMs,
     env: {
       ...process.env,
       ...(options.env ?? {})
     }
   });
-  if (!options.allowFailure && (result.error || result.status !== 0)) {
-    fail(`${command} ${args.join(' ')} failed\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
+  const elapsedMs = Date.now() - startedAt;
+  if (result.error?.message?.toLowerCase().includes('timed out') || result.signal === 'SIGTERM') {
+    fail(`${label} timed out after ${childTimeoutMs}ms (step ${sequence}, elapsed ${elapsedMs}ms)`);
   }
+  if (!options.allowFailure && (result.error || result.status !== 0)) {
+    fail(`${label} failed after ${elapsedMs}ms\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
+  }
+  console.log(`[git-hooks-enforcement:${mode}] step ${sequence} done (${elapsedMs}ms): ${label}`);
   return result;
 }
 

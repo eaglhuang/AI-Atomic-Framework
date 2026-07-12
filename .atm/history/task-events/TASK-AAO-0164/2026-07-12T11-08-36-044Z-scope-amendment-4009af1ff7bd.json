@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T11-08-36-044Z-scope-amendment-4009af1ff7bd",
+  "taskId": "TASK-AAO-0164",
+  "action": "scope-amendment",
+  "actorId": "codex-backlog-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0164.json",
+  "taskSha256": "sha256:1a728a3afcdf7cf48974d22b888b332c57cea4f8c93c2afa37a423880ab99a0c",
+  "createdAt": "2026-07-12T11:08:36.044Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0164 --actor codex-backlog-captain --add packages/core/src/broker/cross-task-mutation-guard.ts --reason \"validate:git-hooks-enforcement exposes pre-commit cross-task guard ordering conflict for same-file multi-claim fixture; TASK-AAO-0164 needs a minimal guard compatibility fix to preserve required hook validation.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "validate:git-hooks-enforcement exposes pre-commit cross-task guard ordering conflict for same-file multi-claim fixture; TASK-AAO-0164 needs a minimal guard compatibility fix to preserve required hook validation."
+  }
+}

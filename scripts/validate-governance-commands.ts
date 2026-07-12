@@ -1524,6 +1524,20 @@ try {
   assert(runGit(repo, ['rm', '--cached', '--force', '--quiet', 'atomic_workbench/evidence/ATM-GOV-IMPERSONATE.json']).exitCode === 0, 'static evidence impersonation fixture must be removable from index');
   rmSync(staticEvidenceArtifactPath, { force: true });
 
+  const bogusEvidenceRelative = '.atm/history/evidence/bulk-closure-manifest-2099-01-01-mirror-sync.json';
+  const bogusEvidencePath = path.join(repo, bogusEvidenceRelative);
+  mkdirSync(path.dirname(bogusEvidencePath), { recursive: true });
+  writeFileSync(bogusEvidencePath, `${JSON.stringify({ status: 'attested-without-task-context' }, null, 2)}\n`, 'utf8');
+  assert(runGit(repo, ['add', bogusEvidenceRelative]).exitCode === 0, 'bogus evidence basename fixture must be stageable');
+  const bogusEvidencePreCommit = await runAtm(['hook', 'pre-commit', '--cwd', repo, '--json']);
+  assert(bogusEvidencePreCommit.exitCode === 1, 'pre-commit must fail for protected evidence without task context');
+  const bogusRequiredCommand = String(bogusEvidencePreCommit.parsed.evidence?.failureEnvelope?.requiredCommand ?? '');
+  assert(bogusRequiredCommand.includes('node atm.mjs git commit'), 'missing task-context evidence must still point to the governed git wrapper');
+  assert(!bogusRequiredCommand.includes('--task bulk-closure-manifest-2099-01-01-mirror-sync'), 'missing task-context evidence must not fabricate a task id from the evidence basename');
+  assert(!bogusRequiredCommand.includes('--task bulk-closure-manifest'), 'missing task-context evidence must not emit any basename-derived task id');
+  assert(runGit(repo, ['rm', '--cached', '--force', '--quiet', bogusEvidenceRelative]).exitCode === 0, 'bogus evidence basename fixture must be removable from index');
+  rmSync(bogusEvidencePath, { force: true });
+
   const closeTask = await runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(closeTask.exitCode === 0, 'tasks close done must exit 0 with evidence');
   assert(closeTask.parsed.ok === true, 'tasks close done must report ok=true with evidence');
