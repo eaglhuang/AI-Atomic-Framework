@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0173
 task_id: TASK-AAO-0173
 title: "Fix durable actor identity precedence over legacy environment"
-status: planned
+status: done
 owner: atm-core
 priority: P1
 planning_repo: AI-Atomic-Framework
@@ -25,6 +25,15 @@ rollback:
 atomizationImpact:
   ownerAtomOrMap: "atom-cli-identity-routing"
   mapUpdates: []
+completed_at: "2026-07-12T13:03:42.100Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T13:03:42.100Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T13-03-42-100Z-close-5f80b72a3c70"
+lastTransitionAt: "2026-07-12T13:03:42.100Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "195463319bb6bbfce73cc2703a7457d713ef9088"
 ---
 
 # TASK-AAO-0173 - Fix durable actor identity precedence over legacy environment

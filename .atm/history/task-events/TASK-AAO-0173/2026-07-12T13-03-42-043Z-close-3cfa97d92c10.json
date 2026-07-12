@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T13-03-42-043Z-close-3cfa97d92c10",
+  "taskId": "TASK-AAO-0173",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0173.json",
+  "taskSha256": "sha256:b94cda63cbfac3dcf37548a8ad049381fe3fc49d9bdb9599e6f3e75a0f3d0366",
+  "createdAt": "2026-07-12T13:03:42.043Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0173 --actor codex-backlog-captain --status done --historical-delivery 195463319bb6bbfce73cc2703a7457d713ef9088",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0173.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/identity-per-actor-routing.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T13:03:42.036Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0173.*",
+        ".atm/history/task-events/TASK-AAO-0173/**",
+        ".atm/history/tasks/TASK-AAO-0173.json",
+        "packages/cli/src/commands/actor-registry.ts",
+        "tests/cli/identity-per-actor-routing.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/actor-registry.ts",
+        "tests/cli/identity-per-actor-routing.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

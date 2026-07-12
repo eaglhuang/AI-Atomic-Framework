@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0173",
   "title": "Fix durable actor identity precedence over legacy environment",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -48,8 +48,8 @@
     "hash": "dfa6a833c0ccf697"
   },
   "importedAt": "2026-07-12T12:56:22.013Z",
-  "lastTransitionId": "2026-07-12T12-56-42-339Z-claim-59f89f01f927",
-  "lastTransitionAt": "2026-07-12T12:56:42.339Z",
+  "lastTransitionId": "2026-07-12T13-03-42-043Z-close-3cfa97d92c10",
+  "lastTransitionAt": "2026-07-12T13:03:42.043Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-backlog-captain",
   "reservedAt": "2026-07-12T12:56:41.986Z",
@@ -58,7 +58,7 @@
     "actorId": "codex-backlog-captain",
     "leaseId": "lease-c2766ded4692",
     "claimedAt": "2026-07-12T12:56:41.991Z",
-    "heartbeatAt": "2026-07-12T12:56:41.991Z",
+    "heartbeatAt": "2026-07-12T13:03:42.042Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0173.json",
@@ -67,8 +67,8 @@
       "packages/cli/src/commands/actor-registry.ts",
       "tests/cli/identity-per-actor-routing.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-12T12:56:28.932Z",
   "startedByActor": "codex-backlog-captain",
@@ -95,5 +95,9 @@
     "actorId": "codex-backlog-captain",
     "createdAt": "2026-07-12T12:56:42.338Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-12T13:03:42.042Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712125641-codex-backlog-captain-TASK-AAO-0173-0d2e17f248",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0173.closure-packet.json"
 }
