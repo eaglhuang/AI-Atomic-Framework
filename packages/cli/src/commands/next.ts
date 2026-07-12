@@ -49,7 +49,7 @@ import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './i
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { describeActorResolution, resolveActorId } from './actor-registry.ts';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.ts';
-import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
+import { assertSourceFirstRunnerReadOnlyAction, buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.ts';
 import { classifyTaskDelivery, type TaskDeliveryClassification } from './task-intent.ts';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/src/broker/lifecycle.ts';
 import {
@@ -659,6 +659,7 @@ async function claimNextImportedTask(input: {
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
   readonly runtimeAdapterReadiness: ReturnType<typeof inspectRuntimeAdapterReadiness>;
 }) {
+  assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
   const claimStartedAt = Date.now();
   const claimLatencyPhases: Array<{ readonly phase: string; readonly durationMs: number }> = [];
   const claimIntent: NextClaimIntent = input.claimIntent ?? 'write';

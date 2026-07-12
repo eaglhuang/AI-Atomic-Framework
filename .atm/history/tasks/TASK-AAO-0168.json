@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0168",
+  "title": "Guard source-first runner lifecycle mutations",
+  "status": "running",
+  "milestone": "RFT-M",
+  "dependencies": [],
+  "acceptance": [
+    "Deliver the scoped change described by this task.",
+    "Keep edits inside the declared scope unless the task is explicitly amended.",
+    "Run the declared validator and record command-backed evidence before closeout."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts"
+  ],
+  "validators": [
+    "npm run validate:cli"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the task changes fail validation or widen the accepted governance boundary.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-cli-next",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Source-first runner lifecycle guard",
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0168.md",
+    "sectionTitle": "TASK-AAO-0168",
+    "headingLine": 35,
+    "hash": "e24b208162ca5854"
+  },
+  "importedAt": "2026-07-12T12:12:36.379Z",
+  "lastTransitionId": "2026-07-12T12-12-38-218Z-claim-1e7b26a8beef",
+  "lastTransitionAt": "2026-07-12T12:12:38.218Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T12:12:37.933Z",
+  "promotedAt": "2026-07-12T12:12:37.936Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-f09c02361aa7",
+    "claimedAt": "2026-07-12T12:12:37.939Z",
+    "heartbeatAt": "2026-07-12T12:12:37.939Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0168.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/next.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T12:12:37.939Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712121237-codex-backlog-captain-TASK-AAO-0168-3dc1d359af",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0168",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0168.*",
+      ".atm/history/task-events/TASK-AAO-0168/**",
+      ".atm/history/tasks/TASK-AAO-0168.json",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/next.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "27e1cb0c4ebe1701d2a99e316d3ab038a4130cf163b7910e3bbb8c4a63e82383",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T12:12:38.217Z",
+    "status": "active"
+  }
+}
