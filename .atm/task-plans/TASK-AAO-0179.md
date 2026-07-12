@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0179
 task_id: TASK-AAO-0179
 title: "Record backlog continuation process friction"
-status: planned
+status: done
 owner: atm-core
 priority: P1
 planning_repo: AI-Atomic-Framework
@@ -23,6 +23,15 @@ rollback:
 atomizationImpact:
   ownerAtomOrMap: "atom-governance-backlog"
   mapUpdates: []
+completed_at: "2026-07-12T13:34:33.089Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T13:34:33.089Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T13-34-33-089Z-close-366911500f29"
+lastTransitionAt: "2026-07-12T13:34:33.089Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "970924586a48c2a316ccecb578c6b27e59ea6b3f"
 ---
 
 # TASK-AAO-0179 - Record backlog continuation process friction
