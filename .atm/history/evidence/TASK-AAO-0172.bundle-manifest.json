@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0172",
+  "updatedAt": "2026-07-12T12:51:14.822Z",
+  "updatedBy": "codex-backlog-captain",
+  "freshValidationPasses": [
+    "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md",
+    "git diff --check",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-12T12:50:37.323Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e19154c26c5f12ceaa8db2451ba8a5e5e620fbb2",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:799be10d37ee6f79a30071dd5844a851f966cd9af061f8de1f48a6bf3c5c37e4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "generatedAt": "2026-07-12T12:50:40.852Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e19154c26c5f12ceaa8db2451ba8a5e5e620fbb2",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T12:51:14.895Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e19154c26c5f12ceaa8db2451ba8a5e5e620fbb2",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

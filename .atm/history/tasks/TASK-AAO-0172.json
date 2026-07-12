@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0172",
+  "title": "Record validator and workflow friction in backlog",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "Record every newly observed validator or workflow friction item in the canonical ATM backlog.",
+    "Keep backlog entries actionable with reproduction, expected behavior, and follow-up.",
+    "Run the declared checks and close through taskflow."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the backlog delivery commit if the new entries are inaccurate.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-governance-backlog",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0172.md",
+    "sectionTitle": "TASK-AAO-0172",
+    "headingLine": 28,
+    "hash": "30570dc6cfb5d215"
+  },
+  "importedAt": "2026-07-12T12:50:21.208Z",
+  "lastTransitionId": "2026-07-12T12-50-29-700Z-claim-fa71a5381ba1",
+  "lastTransitionAt": "2026-07-12T12:50:29.700Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T12:50:29.383Z",
+  "promotedAt": "2026-07-12T12:50:29.386Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-7640b1dcddd6",
+    "claimedAt": "2026-07-12T12:50:29.389Z",
+    "heartbeatAt": "2026-07-12T12:50:29.389Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0172.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T12:50:29.389Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712125029-codex-backlog-captain-TASK-AAO-0172-c83d99fe14",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0172",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0172.*",
+      ".atm/history/task-events/TASK-AAO-0172/**",
+      ".atm/history/tasks/TASK-AAO-0172.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "990ff9aa829fdc464904e4c97c5bb31413a2e02943c5371f43c9b382359c7587",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T12:50:29.699Z",
+    "status": "active"
+  }
+}
