@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0159",
+  "updatedAt": "2026-07-12T10:17:09.894Z",
+  "updatedBy": "codex-backlog-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types scripts/check-encoding-touched.ts --mode touched --files scripts/check-encoding-touched.ts",
+    "typecheck",
+    "validate:script-parity"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run check:encoding:touched",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:750bd442eaf44673937a6cf938f50fe463ec8bd014d91e9095f675db255e7aa0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-12T10:16:33.124Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf560c2e024e619b4a7b83c416c12bb3ea8caa5",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-12T10:16:42.067Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf560c2e024e619b4a7b83c416c12bb3ea8caa5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:script-parity",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:36cb0aec9eabb9c9fc23981778242a15b397c5d36290a2e70f8eaa2b8f9db5d0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:script-parity"
+      ],
+      "generatedAt": "2026-07-12T10:16:52.632Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf560c2e024e619b4a7b83c416c12bb3ea8caa5",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-12T10:17:08.821Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf560c2e024e619b4a7b83c416c12bb3ea8caa5",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/check-encoding-touched.ts --mode touched --files scripts/check-encoding-touched.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8c83b2b0b3d87820694fdc37ee79a25e96075735882e17931724582cfc9a4e12",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/check-encoding-touched.ts --mode touched --files scripts/check-encoding-touched.ts"
+      ],
+      "generatedAt": "2026-07-12T10:17:09.971Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "aaf560c2e024e619b4a7b83c416c12bb3ea8caa5",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

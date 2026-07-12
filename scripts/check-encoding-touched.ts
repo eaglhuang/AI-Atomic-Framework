@@ -6,7 +6,8 @@ type Mode = 'touched' | 'staged';
 const cwd = process.cwd();
 const args = process.argv.slice(2);
 const mode = readOption('--mode') === 'staged' ? 'staged' : 'touched';
-const files = resolveFiles(args, mode);
+const explicitFiles = readFilesOption(args);
+const files = resolveFiles(explicitFiles, mode);
 
 if (files.length === 0) {
   console.log(`[check-encoding-${mode}] ok (no text files to check)`);
@@ -21,9 +22,9 @@ const result = spawnSync(process.execPath, ['atm.mjs', 'guard', 'encoding', '--f
 
 process.exit(typeof result.status === 'number' ? result.status : 1);
 
-function resolveFiles(argv: string[], currentMode: Mode): string[] {
-  const explicitFiles = readFilesOption(argv);
-  const candidates = explicitFiles.length > 0 ? explicitFiles : gitChangedFiles(currentMode);
+function resolveFiles(explicitFileArgs: string[], currentMode: Mode): string[] {
+  const hasExplicitFiles = explicitFileArgs.length > 0;
+  const candidates = hasExplicitFiles ? explicitFileArgs : gitChangedFiles(currentMode);
   return uniqueStrings(candidates.map(normalizePath).filter(isTextFile));
 }
 
@@ -64,7 +65,7 @@ function gitChangedFiles(currentMode: Mode): string[] {
   return uniqueStrings([
     ...tracked,
     ...runGit(['ls-files', '--others', '--exclude-standard'])
-  ]);
+  ]).filter((file) => !isDiagnosticArtifact(file));
 }
 
 function runGit(gitArgs: string[]): string[] {
@@ -85,6 +86,12 @@ function splitFileList(value: string): string[] {
 
 function normalizePath(value: string): string {
   return path.normalize(value).replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function isDiagnosticArtifact(filePath: string): boolean {
+  const normalized = normalizePath(filePath);
+  return normalized.startsWith('tmp/')
+    || normalized.startsWith('.atm/runtime/');
 }
 
 function isTextFile(filePath: string): boolean {
