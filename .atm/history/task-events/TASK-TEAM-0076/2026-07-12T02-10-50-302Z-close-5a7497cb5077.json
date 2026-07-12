@@ -1,0 +1,93 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T02-10-50-302Z-close-5a7497cb5077",
+  "taskId": "TASK-TEAM-0076",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0076.json",
+  "taskSha256": "sha256:f25db6aa896ab6d780e73f59f10e9f1b6bc6a9ca97cbbb61b001e134e787762e",
+  "createdAt": "2026-07-12T02:10:50.302Z",
+  "command": "node atm.mjs tasks reconcile --task TASK-TEAM-0076 --actor Codex-GPT5.6 Terra --delivery-commit 9aaa51cd064de0ab9487abcb69f5646c8843a526 --json",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": null,
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0076.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/core/src/broker/__tests__/compose.test.ts",
+      "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T02:10:50.296Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0076.*",
+        ".atm/history/protected-override-audit/2026-07-12T01-45-43-529Z-POA-c5ec9263d851.json",
+        ".atm/history/task-events/TASK-TEAM-0076/**",
+        ".atm/history/tasks/TASK-TEAM-0076.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "atomic_workbench/atomization-coverage/receipts/TASK-TEAM-0076/**",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/team-agents/broker-shared-surface-coordination.md",
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/__tests__/compose.test.ts",
+        "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/shared-surface-queue.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts",
+        "release/**",
+        "scripts/validate-team-agents.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/dist/**",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/__tests__/compose.test.ts",
+        "packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+        "packages/core/src/broker/compose.ts",
+        "packages/core/src/broker/conflict-matrix.ts",
+        "packages/core/src/broker/shared-surface-queue.ts",
+        "packages/core/src/broker/steward.ts",
+        "packages/core/src/broker/types.ts",
+        "scripts/validate-team-agents.ts"
+      ],
+      "requiredGates": [
+        "doctor",
+        "framework-development",
+        "git-head-evidence",
+        "tasks-audit",
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

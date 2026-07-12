@@ -15,17 +15,18 @@
       "workspace:packages/*"
     ]
   },
-  "targetCommit": "dc3e1154d302c33a8cacce758b19b113b67d428c",
-  "governedTreeSha": "66da43ae85718e3bd96820bddfc5d7aa2abcc4f7",
+  "targetCommit": "44de5eec4533fb7c3a02121a4e56efedc0591d2e",
+  "governedTreeSha": "d22728480a6d1d6b5deeae43d3d937125c7d9a6f",
   "targetCommitDelta": {
-    "currentCommitSha": "dc3e1154d302c33a8cacce758b19b113b67d428c",
+    "currentCommitSha": "44de5eec4533fb7c3a02121a4e56efedc0591d2e",
     "parentCommitShas": [
-      "dc3e1154d302c33a8cacce758b19b113b67d428c"
+      "44de5eec4533fb7c3a02121a4e56efedc0591d2e"
     ],
-    "governedTreeSha": "66da43ae85718e3bd96820bddfc5d7aa2abcc4f7",
+    "governedTreeSha": "d22728480a6d1d6b5deeae43d3d937125c7d9a6f",
     "changedFiles": [
-      ".atm/history/evidence/TASK-TEAM-0076.bundle-manifest.json",
-      ".atm/history/evidence/TASK-TEAM-0076.json",
+      ".atm/history/evidence/TASK-TEAM-0076.closure-packet.json",
+      ".atm/history/task-events/TASK-TEAM-0076/2026-07-12T02-08-10-541Z-close-dd98ae0ab059.json",
+      ".atm/history/tasks/TASK-TEAM-0076.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
       "atomic_workbench/atomization-coverage/path-to-atom-map.json",
       "atomic_workbench/atomization-coverage/receipts/TASK-TEAM-0076/2026-07-12T01-58-05-464Z-broker.ts-sharedSurfaceQueue-registration.json",
@@ -140,13 +141,17 @@
   ],
   "evidenceFreshness": "fresh",
   "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
     "typecheck",
     "validate:cli",
     "validate:git-head-evidence"
   ],
   "requiredGatesSnapshot": {
     "schemaId": "atm.requiredGatesSnapshot.v1",
-    "generatedAt": "2026-07-12T02:08:10.535Z",
+    "generatedAt": "2026-07-12T02:10:50.296Z",
     "source": "frameworkStatus.requiredGates",
     "ruleVersion": "0.1.0",
     "frameworkMode": "required",
@@ -188,16 +193,26 @@
       "scripts/validate-team-agents.ts"
     ],
     "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
       "typecheck",
       "validate:cli",
       "validate:git-head-evidence"
     ]
   },
   "evidencePath": ".atm/history/evidence/TASK-TEAM-0076.json",
-  "closedAt": "2026-07-12T02:08:10.535Z",
+  "closedAt": "2026-07-12T02:10:50.296Z",
   "closedByActor": "Codex-GPT5.6 Terra",
-  "sessionId": "session-20260712014544-Codex-GPT5.6-Terra-TASK-TEAM-0076-44a8291790",
-  "attestation": null,
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "9aaa51cd064de0ab9487abcb69f5646c8843a526",
+    "reconciledAt": "2026-07-12T02:10:48.956Z",
+    "reconciledByActor": "Codex-GPT5.6 Terra",
+    "reason": "Historical reconcile sync against commit 9aaa51cd064de0ab9487abcb69f5646c8843a526"
+  },
   "historicalDeliveryProvenance": {
     "schemaId": "atm.historicalDeliveryProvenance.v1",
     "deliveryCommitSha": "9aaa51cd064de0ab9487abcb69f5646c8843a526",
