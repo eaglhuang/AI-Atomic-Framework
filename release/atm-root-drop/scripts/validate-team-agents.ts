@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -10,6 +11,7 @@ import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
 import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildDirectTeamRoleInstructions, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runDirectTeamProviderRole, runTeamProviderExecution, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
+import { evaluateBrokerQueueAdmission } from '../packages/cli/src/commands/next/broker-queue-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
@@ -35,7 +37,7 @@ import {
 import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
-import { materializeTeamRoleHandoff, promoteTeamHandoffArchive, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../packages/core/src/team-runtime/handoff-ledger.ts';
+import { buildTeamHandoffRetentionDecision, materializeTeamRoleHandoff, promoteTeamHandoffArchive, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../packages/core/src/team-runtime/handoff-ledger.ts';
 import { assertCoordinatorOnly, type WaveRole } from '../packages/cli/src/commands/team-wave.ts';
 import { teamSpecBrokerLane, teamSpecPatrolReport, teamSpecRuntimeStatus } from '../packages/cli/src/commands/command-specs/team.spec.ts';
 import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
@@ -87,6 +89,86 @@ async function main() {
     assert.equal(verifyTeamHandoffLedger(cwd, input.taskId, input.teamRunId).ok, false);
     rmSync(cwd, { recursive: true, force: true });
     console.log('[validate-team-agents] ok (team-handoff-materialize)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-integrity') {
+    const cwd = createTempWorkspace('atm-team-handoff-integrity-');
+    const taskId = 'TASK-TEAM-0075';
+    const teamRunId = 'integrity';
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId, fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'source-1', redactedPreview: 'First.', leaseEpoch: 1 });
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId, fromRole: 'reviewer', fromProviderId: 'anthropic', fromModelId: 'haiku', sourceArtifactId: 'source-2', redactedPreview: 'Second.', leaseEpoch: 2 });
+    const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
+    const manifestPath = path.join(directory, 'manifest.json');
+    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+    manifest.artifacts[1].sequence = 4;
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, taskId, teamRunId).ok, false, 'sequence gap must fail closed');
+    const restoredManifest = { ...manifest, artifacts: manifest.artifacts.map((entry: any, index: number) => ({ ...entry, sequence: index + 1 })) };
+    writeFileSync(manifestPath, `${JSON.stringify(restoredManifest, null, 2)}\n`, 'utf8');
+    const secondPath = path.join(directory, restoredManifest.artifacts[1].file);
+    const secondArtifact = JSON.parse(readFileSync(secondPath, 'utf8'));
+    secondArtifact.previousHandoffSha256 = 'tampered-chain';
+    const secondContent = `${JSON.stringify(secondArtifact, null, 2)}\n`;
+    writeFileSync(secondPath, secondContent, 'utf8');
+    const chainManifest = {
+      ...restoredManifest,
+      artifacts: restoredManifest.artifacts.map((entry: any, index: number) => index === 1 ? { ...entry, sha256: createHash('sha256').update(secondContent, 'utf8').digest('hex') } : entry)
+    };
+    chainManifest.rootHandoffSha256 = chainManifest.artifacts[1].sha256;
+    writeFileSync(manifestPath, `${JSON.stringify(chainManifest, null, 2)}\n`, 'utf8');
+    writeFileSync(path.join(directory, 'index.md'), renderTeamHandoffIndex(chainManifest, [JSON.parse(readFileSync(path.join(directory, chainManifest.artifacts[0].file), 'utf8')), secondArtifact]), 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, taskId, teamRunId).ok, false, 'hash-valid chain tamper must fail closed');
+    assert.equal(verifyTeamHandoffLedger(cwd, 'TASK-TEAM-OTHER', teamRunId).ok, false, 'cross-task reads must fail closed');
+    writeFileSync(path.join(directory, 'index.md'), '---\ntask_id: wrong\n---\n', 'utf8');
+    assert.equal(verifyTeamHandoffLedger(cwd, taskId, teamRunId).ok, false, 'frontmatter drift must fail closed');
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-integrity)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-hard-gate') {
+    const cwd = createTempWorkspace('atm-team-handoff-gate-');
+    const taskId = 'TASK-TEAM-0075';
+    const teamRunId = 'bound-coordinator';
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId, fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'source', redactedPreview: 'Bound coordinator only.', leaseEpoch: 1 });
+    writeTeamRunForHandoffGate(cwd, taskId, teamRunId);
+    await assert.rejects(
+      () => runTeam(['handoff', 'show', '--task', taskId, '--team', teamRunId, '--actor', 'coordinator', '--cwd', cwd]),
+      (error: unknown) => error instanceof CliError && error.code === 'ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED'
+    );
+    const authorized = await runTeam(['handoff', 'show', '--task', taskId, '--team', teamRunId, '--actor', 'bound-captain', '--cwd', cwd]) as any;
+    assert.equal(authorized.ok, true);
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-hard-gate)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-continuation') {
+    const cwd = createTempWorkspace('atm-team-handoff-continuation-');
+    const taskId = 'TASK-TEAM-0075';
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId: 'prior', fromRole: 'reviewer', fromProviderId: 'anthropic', fromModelId: 'claude-haiku', sourceArtifactId: 'prior-source', redactedPreview: 'Prior terminal review.', leaseEpoch: 1 });
+    promoteTeamHandoffArchive({ cwd, taskId, teamRunId: 'prior', runOutcome: 'aborted' });
+    assert.equal(verifyTeamHandoffHistory(cwd, taskId, 'prior').ok, true);
+    materializeTeamRoleHandoff({ cwd, taskId, teamRunId: 'current', fromRole: 'implementer', fromProviderId: 'openai', fromModelId: 'gpt-5-mini', sourceArtifactId: 'current-source', redactedPreview: 'Current retry.', leaseEpoch: 1 });
+    writeTeamRunForHandoffGate(cwd, taskId, 'current');
+    const result = await runTeam(['handoff', 'context', '--task', taskId, '--team', 'current', '--actor', 'bound-captain', '--continuation-from', 'prior', '--cwd', cwd]) as any;
+    assert.equal(result.ok, true);
+    const events = readFileSync(path.join(cwd, '.atm', 'runtime', 'team-runs', 'current', 'observability-events.jsonl'), 'utf8');
+    assert.ok(events.includes('handoff.consumed'));
+    await assert.rejects(
+      () => runTeam(['handoff', 'context', '--task', 'TASK-TEAM-OTHER', '--team', 'current', '--actor', 'bound-captain', '--continuation-from', 'prior', '--cwd', cwd]),
+      (error: unknown) => error instanceof CliError && error.code === 'ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED'
+    );
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (team-handoff-continuation)');
+    return;
+  }
+
+  if (taskCase === 'team-handoff-retention') {
+    assert.equal(buildTeamHandoffRetentionDecision({ transitionCount: 48, bytes: 1, softLimitReached: true, hardLimitReached: false }).statusCode, 'handoff-soft-limit-warning');
+    assert.equal(buildTeamHandoffRetentionDecision({ transitionCount: 64, bytes: 1, softLimitReached: true, hardLimitReached: true }).decisionClass, 'human-signoff-required');
+    console.log('[validate-team-agents] ok (team-handoff-retention)');
     return;
   }
 
@@ -163,6 +245,34 @@ async function main() {
     assert.deepEqual(afterQueues[0]?.entries.map((entry) => entry.taskId), ['TASK-QUEUE-TWO']);
     rmSync(cwd, { recursive: true, force: true });
     console.log('[validate-team-agents] ok (broker-shared-surface-queue)');
+    return;
+  }
+
+  if (taskCase === 'next-claim-shared-surface-queue') {
+    const cwd = createTempWorkspace('atm-next-queue-admission-');
+    const runtime = path.join(cwd, '.atm', 'runtime');
+    mkdirSync(runtime, { recursive: true });
+    writeFileSync(path.join(runtime, 'broker-shared-surface-queues.json'), `${JSON.stringify({
+      schemaId: 'atm.brokerSharedSurfaceQueues.v1',
+      queues: [
+        { schemaId: 'atm.brokerSharedSurfaceQueue.v1', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', entries: [
+          { taskId: 'TASK-OWNER', actorId: 'owner', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', leaseEpoch: 1, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:00:00.000Z' },
+          { taskId: 'TASK-WAITER', actorId: 'waiter', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', leaseEpoch: 2, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:01:00.000Z' }
+        ] },
+        { schemaId: 'atm.brokerSharedSurfaceQueue.v1', surfacePath: 'atomic_workbench/atomization-coverage/path-to-atom-map.json', entries: [
+          { taskId: 'TASK-OWNER', actorId: 'owner', surfacePath: 'atomic_workbench/atomization-coverage/path-to-atom-map.json', leaseEpoch: 1, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:00:00.000Z' },
+          { taskId: 'TASK-WAITER', actorId: 'waiter', surfacePath: 'atomic_workbench/atomization-coverage/path-to-atom-map.json', leaseEpoch: 2, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:01:00.000Z' }
+        ] }
+      ]
+    }, null, 2)}\n`, 'utf8');
+    const privateWork = evaluateBrokerQueueAdmission({ cwd, taskId: 'TASK-WAITER', allowedFiles: ['docs/governance/atm-bug-and-optimization-backlog.md', 'atomic_workbench/atomization-coverage/path-to-atom-map.json', 'packages/cli/src/commands/next.ts'], overlappingFiles: ['docs/governance/atm-bug-and-optimization-backlog.md', 'atomic_workbench/atomization-coverage/path-to-atom-map.json'] });
+    assert.equal(privateWork.status, 'queued-private-work');
+    assert.deepEqual(privateWork.allowedFiles, ['packages/cli/src/commands/next.ts']);
+    assert.equal(privateWork.waitingOn.length, 2);
+    const blocked = evaluateBrokerQueueAdmission({ cwd, taskId: 'TASK-WAITER', allowedFiles: ['docs/governance/atm-bug-and-optimization-backlog.md'], overlappingFiles: ['docs/governance/atm-bug-and-optimization-backlog.md'] });
+    assert.equal(blocked.status, 'queued-blocked');
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (next-claim-shared-surface-queue)');
     return;
   }
 
@@ -4988,6 +5098,23 @@ function assertBrokerRunScanIndex(): void {
   }
 
   rmSync(cwd, { recursive: true, force: true });
+}
+
+function writeTeamRunForHandoffGate(cwd: string, taskId: string, teamRunId: string): void {
+  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(path.join(directory, `${teamRunId}.json`), `${JSON.stringify({
+    schemaId: 'atm.teamRun.v1',
+    taskId,
+    teamRunId,
+    actorId: 'bound-captain',
+    status: 'active',
+    roles: [{ agentId: 'coordinator', role: 'coordinator', permissions: ['handoff.read', 'handoff.materialize'] }],
+    permissionLeases: [
+      { permission: 'handoff.read', agentId: 'coordinator', paths: ['packages/core/src/team-runtime/handoff-ledger.ts'] },
+      { permission: 'handoff.materialize', agentId: 'coordinator', paths: ['packages/core/src/team-runtime/handoff-ledger.ts'] }
+    ]
+  }, null, 2)}\n`, 'utf8');
 }
 
 function fail(message: string): never {

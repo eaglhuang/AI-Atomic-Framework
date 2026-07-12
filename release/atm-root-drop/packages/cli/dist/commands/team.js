@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { CliError, makeResult, message, parseArgsForCommand, quoteCliValue, readJsonFile, writeJsonFile } from './shared.js';
 import { TEAM_CLOSURE_ATTESTATION_SCHEMA_ID } from './evidence.js';
@@ -23,7 +23,7 @@ import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core
 import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge, launchOpenAITeamProviderRun } from '../../../core/dist/team-runtime/providers/openai.js';
 import { TEAM_PROVIDER_IDS } from '../../../core/dist/team-runtime/provider-contract.js';
 import { createDefaultTeamPermissionPolicy } from '../../../core/dist/team-runtime/permission-broker.js';
-import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffRuntimeDirectory, verifyTeamHandoffLedger } from '../../../core/dist/team-runtime/handoff-ledger.js';
+import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../core/dist/team-runtime/handoff-ledger.js';
 import { mergeTeamProviderSelectionConfig, resolveTeamProviderSelection } from '../../../core/dist/team-runtime/provider-selection.js';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/dist/broker/proposal.js';
 import { planSharedSurfaceAcquisition } from '../../../core/dist/broker/shared-surface-queue.js';
@@ -43,7 +43,9 @@ const teamPermissionCatalog = [
     { id: 'evidence.write', mode: 'exclusive', hardGate: true },
     { id: 'knowledge.query', mode: 'shareable', hardGate: true },
     { id: 'knowledge.index.write', mode: 'exclusive', scopeRequired: true, hardGate: true },
-    { id: 'review.signature.write', mode: 'exclusive', hardGate: true }
+    { id: 'review.signature.write', mode: 'exclusive', hardGate: true },
+    { id: 'handoff.read', mode: 'shareable', scopeRequired: true, hardGate: true },
+    { id: 'handoff.materialize', mode: 'exclusive', scopeRequired: true, hardGate: true }
 ];
 const coordinatorExclusivePermissions = ['task.lifecycle', 'git.write', 'evidence.write'];
 const readOnlyTeamRoles = new Set([
@@ -229,7 +231,7 @@ const builtInRecipes = [
         recipeId: 'atm.default.fast',
         appliesTo: ['fast'],
         agents: [
-            { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write', 'file.write'] },
+            { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write', 'file.write', 'handoff.read', 'handoff.materialize'] },
             { agentId: 'atomization-planner', role: 'atomizationPlanner', profile: 'atm.atomizationPlanner.v1', permissions: ['file.read'] },
             { agentId: 'scope-guardian', role: 'scopeGuardian', profile: 'atm.scopeGuardian.v1', permissions: ['file.read'] },
             { agentId: 'validator', role: 'validator', profile: 'atm.validator.v1', permissions: ['exec.validator'] }
@@ -241,7 +243,7 @@ const builtInRecipes = [
         appliesTo: ['normal'],
         language: 'typescript',
         agents: [
-            { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write'] },
+            { agentId: 'coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write', 'handoff.read', 'handoff.materialize'] },
             { agentId: 'atomization-planner', role: 'atomizationPlanner', profile: 'atm.atomizationPlanner.v1', permissions: ['file.read'] },
             { agentId: 'reader', role: 'reader', profile: 'atm.reader.v1', permissions: ['file.read'] },
             { agentId: 'scope-guardian', role: 'scopeGuardian', profile: 'atm.scopeGuardian.v1', permissions: ['file.read'] },
@@ -255,7 +257,7 @@ const builtInRecipes = [
         recipeId: 'atm.default.batch',
         appliesTo: ['batch'],
         agents: [
-            { agentId: 'batch-coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write'] },
+            { agentId: 'batch-coordinator', role: 'coordinator', profile: 'atm.coordinator.v1', permissions: ['task.lifecycle', 'git.write', 'evidence.write', 'handoff.read', 'handoff.materialize'] },
             { agentId: 'atomization-planner', role: 'atomizationPlanner', profile: 'atm.atomizationPlanner.v1', permissions: ['file.read'] },
             { agentId: 'current-task-reader', role: 'reader', profile: 'atm.reader.v1', permissions: ['file.read'] },
             { agentId: 'current-task-scope-guardian', role: 'scopeGuardian', profile: 'atm.scopeGuardian.v1', permissions: ['file.read'] },
@@ -581,21 +583,54 @@ function runTeamHandoff(argv, cwd) {
     const action = String(argv[0] ?? 'show').toLowerCase();
     const taskId = readOptionValue(argv, '--task')?.trim();
     const teamRunId = readOptionValue(argv, '--team')?.trim();
+    const continuationFrom = readOptionValue(argv, '--continuation-from')?.trim() ?? '';
     const actorId = readOptionValue(argv, '--actor')?.trim() ?? '';
-    if (!taskId || !teamRunId)
-        throw new CliError('ATM_TEAM_HANDOFF_TASK_RUN_REQUIRED', 'team handoff requires --task and --team.', { exitCode: 2 });
-    if (action === 'materialize' && actorId !== 'coordinator' && actorId !== 'system')
-        throw new CliError('ATM_TEAM_HANDOFF_MATERIALIZE_FORBIDDEN', 'handoff.materialize is Coordinator/system-only.', { exitCode: 1 });
-    if (!['show', 'context', 'stats'].includes(action))
-        throw new CliError('ATM_CLI_USAGE', 'team handoff supports: show, context, stats.', { exitCode: 2 });
+    if (!taskId || !teamRunId || !actorId)
+        throw new CliError('ATM_TEAM_HANDOFF_TASK_RUN_REQUIRED', 'team handoff requires --task, --team, and --actor.', { exitCode: 2 });
+    if (!['show', 'context', 'stats', 'materialize'].includes(action))
+        throw new CliError('ATM_CLI_USAGE', 'team handoff supports: show, context, stats, materialize.', { exitCode: 2 });
+    const permission = action === 'materialize' ? 'handoff.materialize' : 'handoff.read';
+    assertTeamHandoffHardGate({ cwd, taskId, teamRunId, actorId, permission });
     const integrity = verifyTeamHandoffLedger(cwd, taskId, teamRunId);
     if (!integrity.ok)
         throw new CliError('ATM_TEAM_HANDOFF_INTEGRITY_BLOCKED', `handoff-integrity-blocked: ${integrity.reason}.`, { exitCode: 1 });
     const directory = teamHandoffRuntimeDirectory(cwd, taskId, teamRunId);
-    const artifacts = readTeamHandoffArtifacts(directory, integrity.manifest);
+    let sourceDirectory = directory;
+    let sourceManifest = integrity.manifest;
+    if (continuationFrom) {
+        if (action !== 'context')
+            throw new CliError('ATM_TEAM_HANDOFF_CONTINUATION_CONTEXT_ONLY', 'Continuation is only available through team handoff context.', { exitCode: 1 });
+        const prior = verifyTeamHandoffHistory(cwd, taskId, continuationFrom);
+        if (!prior.ok || prior.manifest.runOutcome === 'running')
+            throw new CliError('ATM_TEAM_HANDOFF_CONTINUATION_BLOCKED', `handoff-integrity-blocked: terminal same-task continuation is required (${prior.reason ?? 'prior run is not terminal'}).`, { exitCode: 1 });
+        sourceDirectory = teamHandoffHistoryDirectory(cwd, taskId, continuationFrom);
+        sourceManifest = prior.manifest;
+        appendTeamRuntimeObservabilityEvents(cwd, teamRunId, [createTeamObservabilityEvent({ eventType: 'handoff.consumed', taskId, teamRunId, providerId: 'unknown', role: 'coordinator', runtimeMode: 'broker-only', artifactType: 'atm.teamRoleHandoffArtifact.v1', artifactId: continuationFrom, decisionClass: 'auto-execution', decisionReason: 'same-task terminal continuation consumed through Coordinator context builder', violationStatus: 'none', statusCode: 'none', summary: `Continuation from terminal run ${continuationFrom} consumed.` })]);
+    }
+    const artifacts = readTeamHandoffArtifacts(sourceDirectory, sourceManifest);
     const bounded = artifacts.slice(-TEAM_HANDOFF_CONTEXT_MAX_ARTIFACTS).map((artifact) => ({ role: artifact.from.role, providerId: artifact.from.providerId, outputTextPreview: artifact.humanSummary }));
     const context = buildDirectTeamRoleInstructions({ taskId, role: 'consumer', priorRoleArtifacts: bounded });
-    return makeResult({ ok: true, command: 'team', cwd, messages: [message('info', 'ATM_TEAM_HANDOFF_READY', `Team handoff ${action} is ready.`)], evidence: { action: `handoff.${action}`, taskId, teamRunId, manifest: integrity.manifest, artifacts: action === 'show' ? artifacts : undefined, context: action === 'context' ? context : undefined, stats: action === 'stats' ? { transitionCount: integrity.manifest.transitionCount, contextTokens: context.telemetry.actualTokenCount } : undefined } });
+    return makeResult({ ok: true, command: 'team', cwd, messages: [message('info', 'ATM_TEAM_HANDOFF_READY', `Team handoff ${action} is ready.`)], evidence: { action: `handoff.${action}`, taskId, teamRunId, continuationFrom: continuationFrom || null, permission, manifest: sourceManifest, artifacts: action === 'show' ? artifacts : undefined, context: action === 'context' ? context : undefined, stats: action === 'stats' ? { transitionCount: sourceManifest.transitionCount, contextTokens: context.telemetry.actualTokenCount } : undefined } });
+}
+function assertTeamHandoffHardGate(input) {
+    const definition = teamPermissionCatalog.find((entry) => entry.id === input.permission);
+    const run = readTeamRun(input.cwd, input.teamRunId);
+    const runActorId = String(run.actorId ?? '').trim();
+    const runTaskId = String(run.taskId ?? '').trim();
+    const roles = Array.isArray(run.roles) ? run.roles : Array.isArray(run.agents) ? run.agents : [];
+    const coordinator = roles.find((entry) => entry?.role === 'coordinator');
+    const coordinatorAgentId = String(coordinator?.agentId ?? '').trim();
+    const coordinatorPermissions = Array.isArray(coordinator?.permissions) ? coordinator.permissions.map(String) : [];
+    const leases = normalizePermissionLeaseRecords(run.permissionLeases ?? run.leases);
+    const matchingLease = leases.find((lease) => lease.permission === input.permission && lease.agentId === coordinatorAgentId && Array.isArray(lease.paths) && lease.paths.length > 0);
+    const hasCoordinator = Boolean(coordinatorAgentId);
+    const authorizedActor = input.actorId === 'system' || (input.actorId === runActorId && hasCoordinator);
+    if (!definition || definition.hardGate !== true || definition.scopeRequired !== true || runTaskId !== input.taskId || !authorizedActor || !coordinatorPermissions.includes(input.permission) || !matchingLease) {
+        throw new CliError('ATM_TEAM_PERMISSION_HARD_GATE_BLOCKED', `handoff-integrity-blocked: ${input.permission} requires the bound Coordinator/system authority for this task and run.`, {
+            exitCode: 1,
+            details: { gateId: 'ATM_TEAM_PERMISSION_HARD_GATE', permission: input.permission, taskId: input.taskId, teamRunId: input.teamRunId, runTaskId, runActorId, coordinatorAgentId, hasCoordinator, coordinatorPermissionGranted: coordinatorPermissions.includes(input.permission), scopedLeaseGranted: Boolean(matchingLease) }
+        });
+    }
 }
 export function buildBrokerConflictSharedVocabulary(brokerLane) {
     if (brokerLane.safeToStart) {
@@ -840,6 +875,12 @@ export function runTeamBrokerConflictResolve(argv, defaultCwd) {
         releaseOrder: releaseOrder.length ? releaseOrder : undefined,
         createdAt
     });
+    const requestedOutput = readOptionValue(argv, '--output')?.trim();
+    const artifactPath = requestedOutput
+        ? path.resolve(cwd, requestedOutput)
+        : path.join(cwd, '.atm', 'runtime', 'broker-conflict-resolutions', `${artifact.resolutionId}.json`);
+    mkdirSync(path.dirname(artifactPath), { recursive: true });
+    writeFileSync(artifactPath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
     const conflictUx = buildBrokerConflictUxProjection({
         primaryTaskId: artifact.primaryTaskId,
         conflictingTaskIds: artifact.conflictingTaskIds,
@@ -872,10 +913,11 @@ export function runTeamBrokerConflictResolve(argv, defaultCwd) {
         ],
         evidence: {
             action: 'broker.resolve',
-            dryRun: true,
-            runtimeWritten: false,
+            dryRun: false,
+            runtimeWritten: true,
             agentsSpawned: false,
             artifact,
+            artifactPath: path.relative(cwd, artifactPath).replace(/\\/g, '/'),
             conflictUx,
             sharedVocabulary: {
                 decisionClass: artifact.decisionClass,
@@ -2017,7 +2059,9 @@ function buildSuggestedPermissionLeases(recipe, writePaths, options = {}) {
         ...(coordinator ? [
             { permission: 'task.lifecycle', agentId: coordinator.agentId },
             { permission: 'git.write', agentId: coordinator.agentId },
-            { permission: 'evidence.write', agentId: coordinator.agentId }
+            { permission: 'evidence.write', agentId: coordinator.agentId },
+            { permission: 'handoff.read', agentId: coordinator.agentId, paths: writePaths },
+            { permission: 'handoff.materialize', agentId: coordinator.agentId, paths: writePaths }
         ] : []),
         ...(fileWriteOwner && (writePaths.length > 0 || !options.allowEmptyWriteScope) ? [{
                 permission: 'file.write',
