@@ -3,12 +3,44 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { runCli } from '../packages/cli/src/atm.ts';
 import { createTempWorkspace } from './temp-root.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+const startedAt = Date.now();
+const phaseIds = [
+  'fixture-bootstrap',
+  'lock-budget-guard',
+  'task-lifecycle',
+  'broker-git-governance',
+  'evidence-closeout',
+  'cleanup'
+] as const;
+const completedPhases = new Set<string>();
+let currentPhase = 'startup';
+
+function elapsedMs() {
+  return Date.now() - startedAt;
+}
+
+function phaseStart(phaseId: typeof phaseIds[number]) {
+  currentPhase = phaseId;
+  console.error(`[governance-commands:${mode}] phase:start ${phaseId} elapsedMs=${elapsedMs()}`);
+}
+
+function phaseDone(phaseId: typeof phaseIds[number]) {
+  completedPhases.add(phaseId);
+  console.error(`[governance-commands:${mode}] phase:done ${phaseId} elapsedMs=${elapsedMs()}`);
+}
+
+process.once('SIGINT', () => {
+  const unfinished = phaseIds.filter((phaseId) => !completedPhases.has(phaseId));
+  console.error(`[governance-commands:${mode}] cancelled currentPhase=${currentPhase} unfinished=${unfinished.join(',') || 'none'} elapsedMs=${elapsedMs()}`);
+  process.exit(130);
+});
 
 function fail(message: any) {
   console.error(`[governance-commands:${mode}] ${message}`);
@@ -21,17 +53,34 @@ function assert(condition: any, message: any) {
   }
 }
 
-function runAtm(args: any, env: Record<string, string> = {}) {
-  const result = spawnSync(process.execPath, [path.join(root, 'atm.dev.mjs'), ...args], {
-    cwd: root,
-    encoding: 'utf8',
-    env: { ...process.env, ...env }
-  });
-  const payload = (result.stdout || result.stderr || '').trim();
-  return {
-    exitCode: result.status ?? 0,
-    parsed: payload ? JSON.parse(payload) : {}
-  };
+async function runAtm(args: any, env: Record<string, string> = {}) {
+  let stdout = '';
+  let stderr = '';
+  const previousEnv = new Map(Object.keys(env).map((key) => [key, process.env[key]]));
+  const previousCwd = process.cwd();
+  const cwdIndex = args.indexOf('--cwd');
+  const cwd = cwdIndex >= 0 && args[cwdIndex + 1] ? String(args[cwdIndex + 1]) : root;
+  try {
+    process.chdir(cwd);
+    for (const [key, value] of Object.entries(env)) {
+      process.env[key] = value;
+    }
+    const exitCode = await runCli(args, {
+      stdout: { write(chunk: unknown) { stdout += String(chunk); return true; } } as any,
+      stderr: { write(chunk: unknown) { stderr += String(chunk); return true; } } as any
+    });
+    const payload = (stdout || stderr || '').trim();
+    return {
+      exitCode,
+      parsed: payload ? JSON.parse(payload) : {}
+    };
+  } finally {
+    process.chdir(previousCwd);
+    for (const [key, value] of previousEnv) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
 }
 
 function writeFixtureTask(repoPath: string, taskId: string, actorId: string, title: string, status: 'reserved' | 'ready' = 'ready') {
@@ -214,6 +263,7 @@ function writePlanningCard(repo: string, taskId: string, title: string, scopePat
 
 const tempRoot = createTempWorkspace('atm-governance-commands-');
 try {
+  phaseStart('fixture-bootstrap');
   const repo = path.join(tempRoot, 'repo');
   mkdirSync(repo, { recursive: true });
   const gitInit = runGit(repo, ['init']);
@@ -221,7 +271,7 @@ try {
   assert(runGit(repo, ['config', 'user.name', 'bootstrap']).exitCode === 0, 'fixture git user.name must be configured');
   assert(runGit(repo, ['config', 'user.email', 'bootstrap@example.com']).exitCode === 0, 'fixture git user.email must be configured');
 
-  const bootstrap = runAtm(['bootstrap', '--cwd', repo, '--task', 'Bootstrap ATM in this repository', '--json']);
+  const bootstrap = await runAtm(['bootstrap', '--cwd', repo, '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(bootstrap.exitCode === 0, 'bootstrap must exit 0 for governance command validation');
   assert(bootstrap.parsed.ok === true, 'bootstrap must report ok=true for governance command validation');
   const fixtureTaskCards = [
@@ -240,29 +290,31 @@ try {
   ] as const;
   for (const [taskId, title, scopePaths] of fixtureTaskCards) {
     const cardPath = writePlanningCard(repo, taskId, title, scopePaths);
-    const imported = runAtm(['tasks', 'import', '--cwd', repo, '--from', cardPath, '--write', '--json']);
+    const imported = await runAtm(['tasks', 'import', '--cwd', repo, '--from', cardPath, '--write', '--json']);
     assert(imported.exitCode === 0, `fixture task import must exit 0 for ${taskId}`);
     assert(imported.parsed.ok === true, `fixture task import must report ok=true for ${taskId}`);
   }
   assert(runGit(repo, ['add', '.']).exitCode === 0, 'fixture bootstrap files must be stageable');
   assert(runGit(repo, ['commit', '-m', 'chore: bootstrap fixture']).exitCode === 0, 'fixture bootstrap commit must succeed');
+  phaseDone('fixture-bootstrap');
 
-  const missingLock = runAtm(['lock', 'check', '--cwd', repo, '--task', 'ATM-FIXTURE-0099', '--json']);
+  phaseStart('lock-budget-guard');
+  const missingLock = await runAtm(['lock', 'check', '--cwd', repo, '--task', 'ATM-FIXTURE-0099', '--json']);
   assert(missingLock.exitCode === 1, 'lock check on missing task must exit 1');
   assert(missingLock.parsed.ok === false, 'lock check on missing task must report ok=false');
 
   const lockTaskId = 'ATM-FIXTURE-LOCK';
 
-  const acquiredLock = runAtm(['lock', 'acquire', '--cwd', repo, '--task', lockTaskId, '--owner', 'fixture-agent', '--files', 'src/example.ts', '--json']);
+  const acquiredLock = await runAtm(['lock', 'acquire', '--cwd', repo, '--task', lockTaskId, '--owner', 'fixture-agent', '--files', 'src/example.ts', '--json']);
   assert(acquiredLock.exitCode === 0, 'lock acquire must exit 0');
   assert(acquiredLock.parsed.ok === true, 'lock acquire must report ok=true');
 
-  const checkedLock = runAtm(['lock', 'check', '--cwd', repo, '--task', lockTaskId, '--json']);
+  const checkedLock = await runAtm(['lock', 'check', '--cwd', repo, '--task', lockTaskId, '--json']);
   assert(checkedLock.exitCode === 0, 'lock check must exit 0');
   assert(checkedLock.parsed.ok === true, 'lock check must report ok=true after acquire');
   assert((checkedLock.parsed.evidence?.lock?.lockedBy ?? checkedLock.parsed.evidence?.lock?.owner) === 'fixture-agent', 'lock check must preserve owner');
 
-  const budgetPass = runAtm(['budget', 'check', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--estimated-tokens', '64', '--inline-artifacts', '1', '--json']);
+  const budgetPass = await runAtm(['budget', 'check', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--estimated-tokens', '64', '--inline-artifacts', '1', '--json']);
   assert(budgetPass.exitCode === 0, 'budget pass check must exit 0');
   assert(budgetPass.parsed.ok === true, 'budget pass check must report ok=true');
   assert(budgetPass.parsed.evidence.decision === 'pass', 'budget pass check must return pass');
@@ -280,7 +332,7 @@ try {
     defaultSummary: 'Summarize before continuing.'
   }, null, 2)}\n`, 'utf8');
 
-  const budgetStop = runAtm(['budget', 'check', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--estimated-tokens', '512', '--inline-artifacts', '3', '--requested-summary', 'Summarize before continuing.', '--json']);
+  const budgetStop = await runAtm(['budget', 'check', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--estimated-tokens', '512', '--inline-artifacts', '3', '--requested-summary', 'Summarize before continuing.', '--json']);
   assert(budgetStop.exitCode === 1, 'budget hard-stop check must exit 1');
   assert(budgetStop.parsed.ok === false, 'budget hard-stop check must report ok=false');
   assert(budgetStop.parsed.evidence.decision === 'hard-stop', 'budget hard-stop check must return hard-stop');
@@ -292,32 +344,34 @@ try {
   writeFileSync(goodFile, 'Encoding guard clean fixture.\n', 'utf8');
   writeFileSync(badFile, '\uFEFFbroken \uFFFD content\n', 'utf8');
 
-  const guardPass = runAtm(['guard', 'encoding', '--cwd', repo, '--files', 'docs/encoding-good.md', '--json']);
+  const guardPass = await runAtm(['guard', 'encoding', '--cwd', repo, '--files', 'docs/encoding-good.md', '--json']);
   assert(guardPass.exitCode === 0, 'guard encoding pass must exit 0');
   assert(guardPass.parsed.ok === true, 'guard encoding pass must report ok=true');
 
-  const guardFail = runAtm(['guard', 'encoding', '--cwd', repo, '--files', 'docs/encoding-bad.md', '--json']);
+  const guardFail = await runAtm(['guard', 'encoding', '--cwd', repo, '--files', 'docs/encoding-bad.md', '--json']);
   assert(guardFail.exitCode === 1, 'guard encoding fail must exit 1');
   assert(guardFail.parsed.ok === false, 'guard encoding fail must report ok=false');
   assert(guardFail.parsed.evidence.findings.length >= 2, 'guard encoding fail must emit findings');
+  phaseDone('lock-budget-guard');
 
-  const reserveRemoved = runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--title', 'Reservation test', '--json']);
+  phaseStart('task-lifecycle');
+  const reserveRemoved = await runAtm(['tasks', 'reserve', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--title', 'Reservation test', '--json']);
   assert(reserveRemoved.exitCode === 2, 'deleted tasks reserve action must fail as unknown action');
   assert(reserveRemoved.parsed.ok === false, 'deleted tasks reserve action must report ok=false');
   assert(reserveRemoved.parsed.messages?.[0]?.code === 'ATM_CLI_USAGE', 'deleted tasks reserve action must surface ATM_CLI_USAGE');
-  const promoteRemoved = runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  const promoteRemoved = await runAtm(['tasks', 'promote', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(promoteRemoved.exitCode === 2, 'deleted tasks promote action must fail as unknown action');
   assert(promoteRemoved.parsed.messages?.[0]?.code === 'ATM_CLI_USAGE', 'deleted tasks promote action must surface ATM_CLI_USAGE');
 
   writeFixtureTask(repo, 'ATM-GOV-0103', 'fixture-agent', 'Reservation test', 'reserved');
-  const claimBeforeReady = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
+  const claimBeforeReady = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(claimBeforeReady.exitCode === 1, 'tasks claim before ready must exit 1');
   assert(claimBeforeReady.parsed.ok === false, 'tasks claim before ready must report ok=false');
   assert(claimBeforeReady.parsed.messages?.[0]?.code === 'ATM_TASK_CLAIM_NOT_READY', 'tasks claim before ready must return ATM_TASK_CLAIM_NOT_READY');
 
   writeFixtureTask(repo, 'ATM-GOV-0103', 'fixture-agent', 'Reservation test', 'ready');
 
-  const nextClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0103', '--json']);
+  const nextClaim = await runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0103', '--json']);
   assert(nextClaim.exitCode === 0, 'next --claim must exit 0');
   assert(nextClaim.parsed.ok === true, 'next --claim must report ok=true');
   assert(nextClaim.parsed.evidence.claimResult?.action === 'claim', 'next --claim must include claim evidence');
@@ -333,16 +387,18 @@ try {
 
   const plannedRepo = makeHostRepo(tempRoot, 'planned-claim-route');
   initGitRepo(plannedRepo);
-  const plannedBootstrap = runAtm(['bootstrap', '--cwd', plannedRepo, '--task', 'Bootstrap ATM in this repository', '--json']);
+  const plannedBootstrap = await runAtm(['bootstrap', '--cwd', plannedRepo, '--task', 'Bootstrap ATM in this repository', '--json']);
   assert(plannedBootstrap.exitCode === 0, 'planned-claim fixture bootstrap must exit 0');
   assert(plannedBootstrap.parsed.ok === true, 'planned-claim fixture bootstrap must report ok=true');
   const plannedClaimCard = writePlanningCard(plannedRepo, 'ATM-GOV-0110', 'Planned next claim prep', ['docs/planned-next-claim.txt']);
-  const plannedImport = runAtm(['tasks', 'import', '--cwd', plannedRepo, '--from', plannedClaimCard, '--write', '--json']);
+  const plannedImport = await runAtm(['tasks', 'import', '--cwd', plannedRepo, '--from', plannedClaimCard, '--write', '--json']);
   assert(plannedImport.exitCode === 0, 'planned claim fixture import must exit 0');
   assert(plannedImport.parsed.ok === true, 'planned claim fixture import must report ok=true');
-  const plannedNextClaim = runAtm(['next', '--cwd', plannedRepo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0110', '--json']);
-  assert(plannedNextClaim.exitCode === 0, 'next --claim must auto-prepare a planned task');
-  assert(plannedNextClaim.parsed.ok === true, 'next --claim must report ok=true for a planned task');
+  assert(runGit(plannedRepo, ['add', '.']).exitCode === 0, 'planned claim fixture bootstrap files must be stageable');
+  assert(runGit(plannedRepo, ['commit', '-m', 'chore: bootstrap planned claim fixture']).exitCode === 0, 'planned claim fixture bootstrap commit must succeed');
+  const plannedNextClaim = await runAtm(['next', '--cwd', plannedRepo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0110', '--json']);
+  assert(plannedNextClaim.exitCode === 0, `next --claim must auto-prepare a planned task: ${JSON.stringify(plannedNextClaim.parsed)}`);
+  assert(plannedNextClaim.parsed.ok === true, `next --claim must report ok=true for a planned task: ${JSON.stringify(plannedNextClaim.parsed)}`);
   assert(!(plannedNextClaim.parsed.messages ?? []).some((entry: any) => entry?.code === 'ATM_LIFECYCLE_LEGACY_LOCK'), 'next --claim planned-task prep must not leak legacy lifecycle warnings');
   const plannedPreparationSteps = plannedNextClaim.parsed.evidence?.claimPreparation?.steps ?? [];
   assert(plannedPreparationSteps.length === 2, 'planned next --claim must record reserve+promote preparation steps');
@@ -352,17 +408,17 @@ try {
   assert(plannedClaimTask.status === 'running', 'planned next --claim must leave the task in running state');
 
   writeFixtureTask(repo, 'ATM-GOV-0102', 'fixture-agent', 'Renew release test');
-  const renewClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0102.json', '--ttl-seconds', '30', '--json']);
+  const renewClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0102.json', '--ttl-seconds', '30', '--json']);
   assert(renewClaim.exitCode === 0, 'secondary tasks claim must exit 0');
   assert(renewClaim.parsed.ok === true, 'secondary tasks claim must report ok=true');
-  const renewedClaim = runAtm(['tasks', 'renew', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--ttl-seconds', '60', '--json']);
+  const renewedClaim = await runAtm(['tasks', 'renew', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--ttl-seconds', '60', '--json']);
   assert(renewedClaim.exitCode === 0, 'tasks renew must exit 0');
   assert(renewedClaim.parsed.ok === true, 'tasks renew must report ok=true');
   assert(renewedClaim.parsed.evidence.claim?.ttlSeconds === 60, 'tasks renew must update ttlSeconds when provided');
   const renewTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0102.json');
   const taskAfterRenew = JSON.parse(readFileSync(renewTaskPath, 'utf8'));
   assert(taskAfterRenew.claim?.state === 'active', 'tasks renew must preserve active claim state');
-  const releasedClaim = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--reason', 'yield to queue', '--json']);
+  const releasedClaim = await runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0102', '--actor', 'fixture-agent', '--reason', 'yield to queue', '--json']);
   assert(releasedClaim.exitCode === 0, 'tasks release must exit 0');
   assert(releasedClaim.parsed.ok === true, 'tasks release must report ok=true');
   const taskAfterRelease = JSON.parse(readFileSync(renewTaskPath, 'utf8'));
@@ -370,9 +426,9 @@ try {
   assert(taskAfterRelease.claim?.state === 'released', 'tasks release must persist released claim state');
 
   writeFixtureTask(repo, 'ATM-GOV-0108', 'fixture-agent', 'Handoff test');
-  const handoffClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0108.json', '--json']);
+  const handoffClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0108.json', '--json']);
   assert(handoffClaim.exitCode === 0, 'handoff tasks claim must exit 0');
-  const handoffTask = runAtm(['tasks', 'handoff', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--to', 'review-agent', '--reason', 'request review', '--json']);
+  const handoffTask = await runAtm(['tasks', 'handoff', '--cwd', repo, '--task', 'ATM-GOV-0108', '--actor', 'fixture-agent', '--to', 'review-agent', '--reason', 'request review', '--json']);
   assert(handoffTask.exitCode === 0, 'tasks handoff must exit 0');
   assert(handoffTask.parsed.ok === true, 'tasks handoff must report ok=true');
   const handoffTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0108.json');
@@ -382,10 +438,10 @@ try {
   assert(taskAfterHandoff.claim?.state === 'handoff', 'tasks handoff must persist handoff claim state');
   assert(taskAfterHandoff.claim?.handoffTo === 'review-agent', 'tasks handoff must record handoff target');
 
-  const scopeClaim = runAtm(['next', '--cwd', repo, '--claim', '--task', 'ATM-GOV-0115', '--actor', 'fixture-agent', '--auto-intent', '--json']);
+  const scopeClaim = await runAtm(['next', '--cwd', repo, '--claim', '--task', 'ATM-GOV-0115', '--actor', 'fixture-agent', '--auto-intent', '--json']);
   assert(scopeClaim.exitCode === 0, 'scope-amendment fixture next --claim must exit 0');
   assert(scopeClaim.parsed.ok === true, 'scope-amendment fixture next --claim must report ok=true');
-  const scopeAdd = runAtm([
+  const scopeAdd = await runAtm([
     'tasks', 'scope', 'add',
     '--cwd', repo,
     '--task', 'ATM-GOV-0115',
@@ -406,9 +462,9 @@ try {
   assert(scopeEvent.taskSha256 === sha256(readFileSync(scopeTaskPath)), 'scope-amendment event sha must match the persisted task document');
 
   writeFixtureTask(repo, 'ATM-GOV-0109', 'stale-agent', 'Takeover test');
-  const takeoverClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--files', '.atm/history/tasks/ATM-GOV-0109.json', '--ttl-seconds', '30', '--json']);
+  const takeoverClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'stale-agent', '--files', '.atm/history/tasks/ATM-GOV-0109.json', '--ttl-seconds', '30', '--json']);
   assert(takeoverClaim.exitCode === 0, 'takeover tasks claim must exit 0');
-  const missingTakeoverReason = runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--json']);
+  const missingTakeoverReason = await runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--json']);
   assert(missingTakeoverReason.exitCode === 2, 'tasks takeover without reason must exit 2');
   assert(missingTakeoverReason.parsed.ok === false, 'tasks takeover without reason must report ok=false');
   const takeoverTaskPath = path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0109.json');
@@ -416,7 +472,7 @@ try {
   expiredTakeoverTask.claim.heartbeatAt = '2020-01-01T00:00:00.000Z';
   expiredTakeoverTask.claim.ttlSeconds = 30;
   writeFileSync(takeoverTaskPath, `${JSON.stringify(expiredTakeoverTask, null, 2)}\n`, 'utf8');
-  const takeoverTask = runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--reason', 'ttl expired', '--json']);
+  const takeoverTask = await runAtm(['tasks', 'takeover', '--cwd', repo, '--task', 'ATM-GOV-0109', '--actor', 'rescuer-agent', '--reason', 'ttl expired', '--json']);
   assert(takeoverTask.exitCode === 0, 'tasks takeover must exit 0 for an expired claim');
   assert(takeoverTask.parsed.ok === true, 'tasks takeover must report ok=true for an expired claim');
   const taskAfterTakeover = JSON.parse(readFileSync(takeoverTaskPath, 'utf8'));
@@ -426,8 +482,10 @@ try {
   const takeoverEvidencePath = path.join(repo, '.atm', 'history', 'evidence', 'ATM-GOV-0109.json');
   assert(existsSync(takeoverEvidencePath), 'tasks takeover must write takeover evidence');
   assert(readFileSync(takeoverEvidencePath, 'utf8').includes('ttl expired'), 'tasks takeover evidence must preserve the explicit reason');
+  phaseDone('task-lifecycle');
 
-  const registerActor = runAtm([
+  phaseStart('broker-git-governance');
+  const registerActor = await runAtm([
     'actor',
     'register',
     '--cwd',
@@ -468,7 +526,7 @@ try {
   mkdirSync(path.join(repo, 'src'), { recursive: true });
   writeFileSync(path.join(repo, 'src', 'broker-owned.ts'), 'export const brokerOwned = true;\n', 'utf8');
   assert(runGit(repo, ['add', 'src/broker-owned.ts']).exitCode === 0, 'broker conflict fixture source must be staged');
-  const hookBypassApproval = runAtm([
+  const hookBypassApproval = await runAtm([
     'emergency',
     'approve',
     '--cwd',
@@ -488,7 +546,7 @@ try {
   assert(hookBypassApproval.exitCode === 0, 'hook bypass fixture emergency approval must exit 0');
   const hookBypassLease = String(hookBypassApproval.parsed.evidence?.lease?.leaseId ?? hookBypassApproval.parsed.evidence?.leaseId ?? '');
   assert(hookBypassLease.length > 0, 'hook bypass fixture approval must return a lease id');
-  const brokerBlockedBypass = runAtm([
+  const brokerBlockedBypass = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -510,7 +568,7 @@ try {
   rmSync(path.join(repo, 'src', 'broker-owned.ts'), { force: true });
   rmSync(brokerConflictTaskPath, { force: true });
 
-  const registerActorDrift = runAtm([
+  const registerActorDrift = await runAtm([
     'actor',
     'register',
     '--cwd',
@@ -528,7 +586,7 @@ try {
     '--json'
   ]);
   assert(registerActorDrift.exitCode === 0, 're-registering fixture actor must still exit 0');
-  const actorRegistryDriftDoctor = runAtm(['doctor', '--cwd', repo, '--json']);
+  const actorRegistryDriftDoctor = await runAtm(['doctor', '--cwd', repo, '--json']);
   assert(actorRegistryDriftDoctor.exitCode === 1, 'doctor must fail when tracked actor registry has unstaged drift');
   assert(actorRegistryDriftDoctor.parsed.ok === false, 'doctor must report ok=false for tracked actor registry drift');
   const actorRegistryGovernanceReadiness = (actorRegistryDriftDoctor.parsed.evidence?.checks ?? []).find((entry: any) => entry.name === 'governance-entry-readiness');
@@ -536,7 +594,7 @@ try {
   assert(actorRegistryGovernanceReadiness?.details?.actorRegistryState?.blocking === true, 'governance-entry-readiness must report actor registry drift details');
   writeFileSync(path.join(repo, 'docs-wrapper-payload.txt'), 'wrapper payload\n', 'utf8');
   assert(runGit(repo, ['add', 'docs-wrapper-payload.txt']).exitCode === 0, 'wrapper payload must be stageable');
-  const actorRegistryWrapperCommit = runAtm([
+  const actorRegistryWrapperCommit = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -560,12 +618,12 @@ try {
   assert(runGit(evidenceOnlyRepo, ['init']).exitCode === 0, 'evidence-only fixture git init must succeed');
   assert(runGit(evidenceOnlyRepo, ['config', 'user.name', 'bootstrap']).exitCode === 0, 'evidence-only fixture git user.name must be configured');
   assert(runGit(evidenceOnlyRepo, ['config', 'user.email', 'bootstrap@example.com']).exitCode === 0, 'evidence-only fixture git user.email must be configured');
-  const evidenceOnlyBootstrap = runAtm(['bootstrap', '--cwd', evidenceOnlyRepo, '--task', 'Bootstrap evidence-only follow-up fixture', '--json']);
+  const evidenceOnlyBootstrap = await runAtm(['bootstrap', '--cwd', evidenceOnlyRepo, '--task', 'Bootstrap evidence-only follow-up fixture', '--json']);
   assert(evidenceOnlyBootstrap.exitCode === 0, 'evidence-only fixture bootstrap must exit 0');
   assert(evidenceOnlyBootstrap.parsed.ok === true, 'evidence-only fixture bootstrap must report ok=true');
   assert(runGit(evidenceOnlyRepo, ['add', '.']).exitCode === 0, 'evidence-only fixture bootstrap files must be stageable');
   assert(runGit(evidenceOnlyRepo, ['commit', '-m', 'chore: bootstrap evidence-only fixture']).exitCode === 0, 'evidence-only fixture bootstrap commit must succeed');
-  const evidenceOnlyRegisterActor = runAtm([
+  const evidenceOnlyRegisterActor = await runAtm([
     'actor',
     'register',
     '--cwd',
@@ -590,7 +648,7 @@ try {
   assert(runGit(evidenceOnlyRepo, ['commit', '--no-verify', '-m', 'chore: register evidence-only fixture actor']).exitCode === 0, 'evidence-only fixture actor registry commit must succeed');
   const headBeforeBackfill = runGit(evidenceOnlyRepo, ['rev-parse', 'HEAD']).stdout;
   assert(Boolean(headBeforeBackfill), 'evidence-only follow-up fixture must start from an existing HEAD commit');
-  const gitHeadBackfill = runAtm([
+  const gitHeadBackfill = await runAtm([
     'evidence',
     'git-head-backfill',
     '--cwd',
@@ -604,7 +662,7 @@ try {
   assert(gitHeadBackfill.exitCode === 0, 'git-head backfill fixture must exit 0');
   assert(gitHeadBackfill.parsed.ok === true, 'git-head backfill fixture must report ok=true');
   assert(runGit(evidenceOnlyRepo, ['diff', '--cached', '--name-only']).stdout.includes('.atm/history/evidence/git-head.jsonl'), 'git-head backfill fixture must stage git-head.jsonl');
-  const evidenceOnlyCommit = runAtm([
+  const evidenceOnlyCommit = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -636,7 +694,7 @@ try {
   const coveredHeadRecord = readFileSync(path.join(evidenceOnlyRepo, '.atm', 'history', 'evidence', 'git-head.jsonl'), 'utf8');
   assert(coveredHeadRecord.includes(headBeforeBackfill), 'git-head backfill evidence must continue to reference the covered pre-follow-up HEAD commit');
 
-  const explicitIdentityPrepare = runAtm([
+  const explicitIdentityPrepare = await runAtm([
     'git',
     'prepare',
     '--cwd',
@@ -658,21 +716,21 @@ try {
   assert(preparedIdentity.gitName === 'Prepare Only', 'explicit git prepare must seed the runtime identity git name');
   assert(preparedIdentity.gitEmail === 'prepare-only@example.com', 'explicit git prepare must seed the runtime identity git email');
 
-  const mutationGuard = runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
+  const mutationGuard = await runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(mutationGuard.exitCode === 0, 'guard mutation must pass for in-scope claimed file');
   assert(mutationGuard.parsed.ok === true, 'guard mutation must report ok=true for in-scope claimed file');
 
-  const mutationGuardFailOpen = runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', 'outside/scope.ts', '--fail-open', '--json']);
+  const mutationGuardFailOpen = await runAtm(['guard', 'mutation', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--files', 'outside/scope.ts', '--fail-open', '--json']);
   assert(mutationGuardFailOpen.exitCode === 0, 'guard mutation --fail-open must exit 0 when violations exist');
   assert(mutationGuardFailOpen.parsed.ok === true, 'guard mutation --fail-open must report ok=true when violations exist');
   assert(mutationGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_MUTATION_FAIL_OPEN', 'guard mutation --fail-open must return fail-open warning code');
 
-  const conflictClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
+  const conflictClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--files', '.atm/history/tasks/ATM-GOV-0103.json', '--json']);
   assert(conflictClaim.exitCode === 1, 'tasks claim conflict must exit 1');
   assert(conflictClaim.parsed.ok === false, 'tasks claim conflict must report ok=false');
   assert(conflictClaim.parsed.messages?.[0]?.code === 'ATM_LOCK_CONFLICT', 'tasks claim conflict must return ATM_LOCK_CONFLICT');
 
-  const gitPrepare = runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  const gitPrepare = await runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitPrepare.exitCode === 0, 'git prepare must exit 0');
   assert(gitPrepare.parsed.ok === true, 'git prepare must report ok=true');
 
@@ -681,7 +739,7 @@ try {
   assert(runGit(repo, ['add', '-A']).exitCode === 0, 'staging diagnostics checkpoint must stage pending fixture work');
   assert(runGit(repo, ['commit', '--no-verify', '-m', 'chore: checkpoint before TASK-AAO-0141 staging diagnostics']).exitCode === 0, 'staging diagnostics checkpoint commit must succeed');
   writeFixtureTask(repo, stagingTaskId, 'fixture-agent', 'Task-scoped staging diagnostics');
-  const stagingClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', stagingTaskId, '--actor', 'fixture-agent', '--files', stagingScopedFile, '--json']);
+  const stagingClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', stagingTaskId, '--actor', 'fixture-agent', '--files', stagingScopedFile, '--json']);
   assert(stagingClaim.exitCode === 0, 'staging diagnostics tasks claim must exit 0');
   const stagingTaskPath = path.join(repo, '.atm', 'history', 'tasks', `${stagingTaskId}.json`);
   const stagingTaskDocument = JSON.parse(readFileSync(stagingTaskPath, 'utf8'));
@@ -692,7 +750,7 @@ try {
   mkdirSync(path.dirname(stagingSourcePath), { recursive: true });
   writeFileSync(stagingSourcePath, 'export const taskScopedStaging = true;\n', 'utf8');
   assert(runGit(repo, ['reset']).exitCode === 0, 'staging diagnostics fixture must start with an empty index');
-  const unstagedScopedCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable without staging', '--json']);
+  const unstagedScopedCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable without staging', '--json']);
   assert(unstagedScopedCommit.exitCode === 1, 'git commit with in-scope dirty files and empty index must exit 1');
   const unstagedScopedCode = unstagedScopedCommit.parsed.messages?.[0]?.code;
   assert(unstagedScopedCode === 'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED', `git commit must return task-scoped staging required diagnostic (got ${String(unstagedScopedCode)})`);
@@ -706,7 +764,7 @@ try {
   mkdirSync(path.dirname(outsideScopedFile), { recursive: true });
   writeFileSync(outsideScopedFile, 'outside scope\n', 'utf8');
   assert(runGit(repo, ['add', 'notes/outside-scope-staging.txt']).exitCode === 0, 'mixed-scope diagnostics outside file must stage');
-  const mixedScopedCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: mixed scope dirty tree', '--json']);
+  const mixedScopedCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: mixed scope dirty tree', '--json']);
   assert(mixedScopedCommit.exitCode === 1, 'git commit with mixed-scope dirty files must exit 1');
   assert(mixedScopedCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_TASK_SCOPED_STAGING_AMBIGUOUS', 'git commit must fail closed for mixed-scope dirty trees');
   assert(!mixedScopedCommit.parsed.messages?.[0]?.data?.requiredCommand, 'mixed-scope dirty tree must not fabricate a generic staging command');
@@ -714,7 +772,7 @@ try {
   assert(deferForeignStagedCommand.includes('--defer-foreign-staged'), 'mixed-scope dirty tree must recommend defer-foreign-staged remediation');
   rmSync(outsideScopedFile, { force: true });
   assert(runGit(repo, ['add', stagingScopedFile]).exitCode === 0, 'staging diagnostics scoped file must stage');
-  const stagedScopedCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable', '--json']);
+  const stagedScopedCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: scoped deliverable', '--json']);
   assert(stagedScopedCommit.exitCode === 0, 'git commit must succeed once scoped files are staged');
   assert(stagedScopedCommit.parsed.ok === true, 'staged scoped git commit must report ok=true');
   assert(runGit(repo, ['reset']).exitCode === 0, 'framework auto-stage fixture must start with an empty index');
@@ -723,7 +781,7 @@ try {
     'packages/cli/src/commands/framework-auto-stage.ts',
     'docs/governance/framework-auto-stage.md'
   ];
-  const frameworkClaim = runAtm([
+  const frameworkClaim = await runAtm([
     'framework-mode',
     'claim',
     '--cwd',
@@ -749,7 +807,7 @@ try {
   writeJson(path.join(repo, 'release', 'atm-onefile', 'release-manifest.json'), {
     generatedFiles: ['release/atm-onefile/atm.mjs', 'release/atm-onefile/release-manifest.json']
   });
-  const unstagedFrameworkCommit = runAtm([
+  const unstagedFrameworkCommit = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -766,7 +824,7 @@ try {
     `framework claim commit must return staging-required diagnostic (got ${String(unstagedFrameworkCommit.parsed.messages?.[0]?.code)})`
   );
   const frameworkDryRunHeadBefore = runGit(repo, ['rev-parse', 'HEAD']).stdout.trim();
-  const frameworkAutoStageDryRun = runAtm([
+  const frameworkAutoStageDryRun = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -783,7 +841,7 @@ try {
   assert(frameworkAutoStageDryRun.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_FRAMEWORK_DRY_RUN', 'framework claim auto-stage dry run must report the framework dry-run code');
   assert(runGit(repo, ['rev-parse', 'HEAD']).stdout.trim() === frameworkDryRunHeadBefore, 'framework claim auto-stage dry run must not create a commit');
   assert(runGit(repo, ['diff', '--cached', '--name-only']).stdout.trim() === '', 'framework claim auto-stage dry run must not mutate the index');
-  const frameworkAutoStageCommit = runAtm([
+  const frameworkAutoStageCommit = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -808,7 +866,7 @@ try {
   // ATM-BUG-2026-07-11-108 / TASK-AAO-0157: claim globs such as release/** must auto-stage
   // dirty tracked release mirrors even when they are absent from release-manifest generatedFiles.
   assert(runGit(repo, ['reset']).exitCode === 0, 'release-glob auto-stage fixture must start with an empty index');
-  const releaseGlobClaim = runAtm([
+  const releaseGlobClaim = await runAtm([
     'framework-mode',
     'claim',
     '--cwd',
@@ -830,7 +888,7 @@ try {
   writeJson(path.join(repo, 'release', 'atm-root-drop', 'release-manifest.json'), {
     generatedFiles: ['release/atm-root-drop/packages/cli/src/commands/framework-auto-stage.ts']
   });
-  const releaseGlobAutoStage = runAtm([
+  const releaseGlobAutoStage = await runAtm([
     'git',
     'commit',
     '--cwd',
@@ -859,7 +917,7 @@ try {
 
   writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "safe-residue";\n', 'utf8');
   writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'git-head.jsonl'), '{"fixture":true}\n', 'utf8');
-  const residueAutoCleanCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: safe generated residue', '--auto-stage', '--json']);
+  const residueAutoCleanCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: safe generated residue', '--auto-stage', '--json']);
   assert(residueAutoCleanCommit.exitCode === 0, 'git commit must auto-clean safe generated residue');
   assert(residueAutoCleanCommit.parsed.ok === true, 'safe generated residue commit must report ok=true');
   assert(runGit(repo, ['status', '--short', '--', '.atm/history/evidence/git-head.jsonl']).stdout === '', 'safe git-head residue must settle back to a clean status after governed commit');
@@ -880,7 +938,7 @@ try {
     files: ['src/foreign.ts']
   }, null, 2)}\n`, 'utf8');
   assert(runGit(repo, ['add', '.atm/runtime/team-runs/team-fixture.json', '.atm/runtime/snapshots/close-window-foreign-staged-TASK-FOREIGN-9999-1781880000001.json']).exitCode === 0, 'runtime residue fixture must stage');
-  const runtimeResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: runtime residue must not block scoped commit', '--auto-stage', '--json']);
+  const runtimeResidueCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: runtime residue must not block scoped commit', '--auto-stage', '--json']);
   assert(runtimeResidueCommit.exitCode === 0, 'git commit must ignore staged runtime residue when building the scoped commit bundle');
   assert(runtimeResidueCommit.parsed.ok === true, 'staged runtime residue commit must report ok=true');
   assert(existsSync(teamRunResidue), 'runtime team-run residue should remain on disk after scoped commit');
@@ -890,7 +948,7 @@ try {
   const unknownResidueSnapshot = path.join(repo, '.atm', 'runtime', 'snapshots', 'opaque-generated-residue.json');
   mkdirSync(path.dirname(unknownResidueSnapshot), { recursive: true });
   writeFileSync(unknownResidueSnapshot, `${JSON.stringify({ createdBy: 'unknown-fixture' }, null, 2)}\n`, 'utf8');
-  const manualReviewResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: manual review residue', '--auto-stage', '--json']);
+  const manualReviewResidueCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: manual review residue', '--auto-stage', '--json']);
   assert(manualReviewResidueCommit.exitCode === 1, 'git commit must stop on unclassified generated residue');
   assert(manualReviewResidueCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_GENERATED_RESIDUE_MANUAL_REVIEW', 'unknown generated residue must return the dedicated manual-review code');
   assert(existsSync(unknownResidueSnapshot), 'manual-review residue must remain on disk for operator inspection');
@@ -898,7 +956,7 @@ try {
 
   writeFileSync(path.join(repo, stagingScopedFile), 'export const stagingFixture = "foreign-governance-residue";\n', 'utf8');
   const foreignCloseResidue = writeHistoricalRestorePacket(repo, 'TASK-FOREIGN-RESIDUE-0001');
-  const foreignGovernanceResidueCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: foreign governance residue', '--auto-stage', '--json']);
+  const foreignGovernanceResidueCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', stagingTaskId, '--message', 'feat: foreign governance residue', '--auto-stage', '--json']);
   assert(foreignGovernanceResidueCommit.exitCode === 1, 'git commit must fail closed on foreign close residue history artifacts');
   assert(foreignGovernanceResidueCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED', 'foreign close residue must use the dedicated blocked code');
   const blockedResiduePaths = (foreignGovernanceResidueCommit.parsed.messages?.[0]?.data?.commitBundle?.blockedResidue ?? []).map((entry: any) => String(entry.path ?? ''));
@@ -927,19 +985,19 @@ try {
   ].join('\n');
   assert(runGit(repo, ['commit', '-m', commitMessage]).exitCode === 0, 'governance fixture commit must succeed');
 
-  const gitCheck = runAtm(['git', 'check', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  const gitCheck = await runAtm(['git', 'check', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitCheck.exitCode === 0, 'git check must exit 0 for matching trailers and identity');
   assert(gitCheck.parsed.ok === true, 'git check must report ok=true for matching trailers and identity');
 
-  const gitCheckNoTrailers = runAtm(['git', 'check', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--no-trailers', '--json']);
+  const gitCheckNoTrailers = await runAtm(['git', 'check', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--no-trailers', '--json']);
   assert(gitCheckNoTrailers.exitCode === 0, 'git check --no-trailers must exit 0 when identity and ownership are valid');
   assert(gitCheckNoTrailers.parsed.ok === true, 'git check --no-trailers must report ok=true when identity and ownership are valid');
 
-  const gitGuard = runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  const gitGuard = await runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitGuard.exitCode === 0, 'guard git must exit 0 for matching trailers and identity');
   assert(gitGuard.parsed.ok === true, 'guard git must report ok=true for matching trailers and identity');
 
-  const gitGuardFailOpen = runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--fail-open', '--json']);
+  const gitGuardFailOpen = await runAtm(['guard', 'git', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'other-agent', '--fail-open', '--json']);
   assert(gitGuardFailOpen.exitCode === 0, 'guard git --fail-open must exit 0 when violations exist');
   assert(gitGuardFailOpen.parsed.ok === true, 'guard git --fail-open must report ok=true when violations exist');
   assert(gitGuardFailOpen.parsed.messages?.[0]?.code === 'ATM_GUARD_GIT_FAIL_OPEN', 'guard git --fail-open must return fail-open warning code');
@@ -954,12 +1012,12 @@ try {
   writeFileSync(tasklessFile, 'taskless fixture\n', 'utf8');
   assert(runGit(repo, ['add', 'notes/taskless.txt']).exitCode === 0, 'taskless fixture must stage');
   assert(runGit(repo, ['commit', '--no-verify', '-m', ['chore: taskless fixture', '', 'ATM-Actor: fixture-agent'].join('\n')]).exitCode === 0, 'taskless fixture commit must succeed');
-  const tasklessGitCheck = runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--json']);
+  const tasklessGitCheck = await runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--json']);
   assert(tasklessGitCheck.exitCode === 0, 'actor-only git check must not inherit a closed prior session');
   assert(tasklessGitCheck.parsed.ok === true, 'actor-only git check must pass with actor-only trailers when no task is supplied');
   assert(tasklessGitCheck.parsed.evidence?.taskId === null, 'actor-only git check must not infer a task from closed session history');
   assert(tasklessGitCheck.parsed.evidence?.sessionId === null, 'actor-only git check must not infer a closed session');
-  const tasklessGitPrepare = runAtm(['git', 'prepare', '--cwd', repo, '--actor', 'fixture-agent', '--json']);
+  const tasklessGitPrepare = await runAtm(['git', 'prepare', '--cwd', repo, '--actor', 'fixture-agent', '--json']);
   assert(tasklessGitPrepare.exitCode === 0, 'actor-only git prepare must exit 0');
   assert(!(tasklessGitPrepare.parsed.evidence?.trailerHints ?? []).some((entry: string) => entry.startsWith('ATM-Session: ')), 'actor-only git prepare must not suggest a stale closed session trailer');
 
@@ -1005,7 +1063,7 @@ try {
     }
   }, null, 2)}\n`, 'utf8');
   assert(runGit(repo, ['add', `.atm/history/tasks/${mirrorTaskId}.json`, `.atm/history/task-events/${mirrorTaskId}/${mirrorEventId}.json`, '.atm/history/reports/task-import/2026-01-01T00-00-00-000Z.json']).exitCode === 0, 'mirror-sync fixture artifacts must stage');
-  const mirrorSyncCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', mirrorTaskId, '--message', 'atm: sync mirror fixture', '--json']);
+  const mirrorSyncCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', mirrorTaskId, '--message', 'atm: sync mirror fixture', '--json']);
   assert(mirrorSyncCommit.exitCode === 0, 'mirror-sync-only git commit must not require a fake claim or stale session');
   assert(mirrorSyncCommit.parsed.ok === true, 'mirror-sync-only git commit must report ok=true');
   assert(mirrorSyncCommit.parsed.evidence?.sessionId === null, 'mirror-sync-only git commit must not inherit a closed session');
@@ -1017,11 +1075,11 @@ try {
   const restoreTaskId = 'ATM-GOV-RESTORE';
   const restoreFiles = writeHistoricalRestorePacket(repo, restoreTaskId);
   assert(runGit(repo, ['add', ...restoreFiles]).exitCode === 0, 'historical ledger restore packet must stage');
-  const restoreCheck = runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--task', restoreTaskId, '--no-trailers', '--json']);
+  const restoreCheck = await runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--task', restoreTaskId, '--no-trailers', '--json']);
   assert(restoreCheck.exitCode === 0, 'historical ledger restore git check must accept a complete staged restore packet');
   assert(restoreCheck.parsed.ok === true, 'historical ledger restore git check must report ok=true');
   assert(restoreCheck.parsed.evidence?.sessionId === null, 'historical ledger restore git check must not require a legacy session');
-  const restoreCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', restoreTaskId, '--message', 'atm: restore closed ledger packet', '--json']);
+  const restoreCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', restoreTaskId, '--message', 'atm: restore closed ledger packet', '--json']);
   assert(restoreCommit.exitCode === 0, 'historical ledger restore git commit must not require a fake legacy claim or session');
   assert(restoreCommit.parsed.ok === true, 'historical ledger restore git commit must report ok=true');
   assert(restoreCommit.parsed.evidence?.sessionId === null, 'historical ledger restore git commit must not inherit a legacy session');
@@ -1033,7 +1091,7 @@ try {
   const reconcileSourcePath = path.join(repo, 'src', 'reconcile-close-window.ts');
   mkdirSync(path.dirname(reconcileSourcePath), { recursive: true });
   writeFileSync(reconcileSourcePath, 'export const reconcileCloseWindow = true;\n', 'utf8');
-  const reconcileClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--files', 'src/reconcile-close-window.ts', '--json']);
+  const reconcileClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--files', 'src/reconcile-close-window.ts', '--json']);
   assert(reconcileClaim.exitCode === 0, 'reconcile fixture claim must exit 0');
   const reconcileTaskPath = path.join(repo, '.atm', 'history', 'tasks', `${reconcileTaskId}.json`);
   const reconcileTaskDocument = JSON.parse(readFileSync(reconcileTaskPath, 'utf8'));
@@ -1041,11 +1099,11 @@ try {
   reconcileTaskDocument.deliverables = ['src/reconcile-close-window.ts'];
   writeFileSync(reconcileTaskPath, `${JSON.stringify(reconcileTaskDocument, null, 2)}\n`, 'utf8');
   assert(runGit(repo, ['add', 'src/reconcile-close-window.ts']).exitCode === 0, 'reconcile fixture source file must stage');
-  const reconcileDeliveryCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'feat: reconcile delivery fixture', '--json']);
+  const reconcileDeliveryCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'feat: reconcile delivery fixture', '--json']);
   assert(reconcileDeliveryCommit.exitCode === 0, 'reconcile fixture delivery commit must exit 0');
   const reconcileDeliverySha = String(reconcileDeliveryCommit.parsed.evidence?.commitSha ?? '');
   assert(reconcileDeliverySha.length > 0, 'reconcile fixture delivery commit must return commit sha');
-  const reconcileApproval = runAtm([
+  const reconcileApproval = await runAtm([
     'emergency',
     'approve',
     '--cwd',
@@ -1065,10 +1123,10 @@ try {
   assert(reconcileApproval.exitCode === 0, 'reconcile fixture emergency approval must exit 0');
   const reconcileApprovalLease = String(reconcileApproval.parsed.evidence?.lease?.leaseId ?? reconcileApproval.parsed.evidence?.leaseId ?? '');
   assert(reconcileApprovalLease.length > 0, 'reconcile fixture emergency approval must return a lease id');
-  const reconcileClose = runAtm(['tasks', 'reconcile', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--emergency-approval', reconcileApprovalLease, '--json']);
+  const reconcileClose = await runAtm(['tasks', 'reconcile', '--cwd', repo, '--task', reconcileTaskId, '--actor', 'fixture-agent', '--delivery-commit', reconcileDeliverySha, '--emergency-approval', reconcileApprovalLease, '--json']);
   assert(reconcileClose.exitCode === 0, 'tasks reconcile must exit 0 for close-commit-window regression fixture');
   assert(reconcileClose.parsed.ok === true, 'tasks reconcile must report ok=true for close-commit-window regression fixture');
-  const reconcileCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'chore: reconcile closure packet commit', '--defer-foreign-staged', '--json']);
+  const reconcileCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', reconcileTaskId, '--message', 'chore: reconcile closure packet commit', '--defer-foreign-staged', '--json']);
   assert(reconcileCommit.exitCode === 0, 'close-commit-window reconcile packet must commit without reopening a dead session');
   assert(reconcileCommit.parsed.ok === true, 'close-commit-window reconcile packet commit must report ok=true');
   assert(reconcileCommit.parsed.evidence?.sessionId === null, 'close-commit-window reconcile packet commit must not require a revived session');
@@ -1080,7 +1138,7 @@ try {
   mkdirSync(path.dirname(mixedSourcePath), { recursive: true });
   writeFileSync(mixedSourcePath, 'export const restoreBypass = true;\n', 'utf8');
   assert(runGit(repo, ['add', ...mixedRestoreFiles, 'src/restore-bypass.ts']).exitCode === 0, 'mixed historical restore fixture must stage');
-  const mixedRestoreCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', mixedRestoreTaskId, '--message', 'atm: reject mixed restore packet', '--json']);
+  const mixedRestoreCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', mixedRestoreTaskId, '--message', 'atm: reject mixed restore packet', '--json']);
   assert(mixedRestoreCommit.exitCode === 1, 'historical ledger restore must reject packets mixed with source files');
   assert(mixedRestoreCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_SESSION_REQUIRED', 'mixed restore packet must fall back to normal active-task session enforcement');
   runGit(repo, ['reset', '--mixed', 'HEAD']);
@@ -1090,11 +1148,11 @@ try {
   const openRestoreFiles = writeHistoricalRestorePacket(repo, openRestoreTaskId, { status: 'running' });
   assert(runGit(repo, ['add', ...openRestoreFiles]).exitCode === 0, 'non-done restore fixture must stage');
   writeHistoricalRestorePacket(repo, openRestoreTaskId, { status: 'done' });
-  const openRestoreCheck = runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--task', openRestoreTaskId, '--no-trailers', '--json']);
+  const openRestoreCheck = await runAtm(['git', 'check', '--cwd', repo, '--actor', 'fixture-agent', '--task', openRestoreTaskId, '--no-trailers', '--json']);
   assert(openRestoreCheck.exitCode === 0 || openRestoreCheck.exitCode === 1, 'non-done staged restore git check must return a governance result');
   assert(openRestoreCheck.parsed.ok === false, 'git check must reject non-done staged restore packets even if the working tree was later edited to done');
   assert((openRestoreCheck.parsed.evidence?.violations ?? []).some((entry: any) => entry.code === 'task-owner-mismatch' || entry.code === 'claim-owner-mismatch'), 'rejected non-done staged restore git check must fall back to normal owner/claim governance');
-  const openRestoreCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', openRestoreTaskId, '--message', 'atm: reject open restore packet', '--json']);
+  const openRestoreCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'fixture-agent', '--task', openRestoreTaskId, '--message', 'atm: reject open restore packet', '--json']);
   assert(openRestoreCommit.exitCode === 1, 'historical ledger restore must reject non-done staged task ledgers');
   assert(openRestoreCommit.parsed.messages?.[0]?.code === 'ATM_GIT_COMMIT_SESSION_REQUIRED', 'non-done restore packet must fall back to normal active-task session enforcement');
   runGit(repo, ['reset', '--mixed', 'HEAD']);
@@ -1102,10 +1160,10 @@ try {
   assert(runGit(repo, ['config', 'user.name', 'Missing Identity']).exitCode === 0, 'fixture git user.name must be configurable for identity repair command validation');
   assert(runGit(repo, ['config', 'user.email', 'missing-identity@example.com']).exitCode === 0, 'fixture git user.email must be configurable for identity repair command validation');
   const expectedIdentitySetCommand = 'node atm.mjs identity set --actor "missing-identity-agent" --git-name "Missing Identity" --git-email "missing-identity@example.com" --json';
-  const missingIdentityCommit = runAtm(['git', 'commit', '--cwd', repo, '--actor', 'missing-identity-agent', '--message', 'chore: blocked missing identity', '--json']);
+  const missingIdentityCommit = await runAtm(['git', 'commit', '--cwd', repo, '--actor', 'missing-identity-agent', '--message', 'chore: blocked missing identity', '--json']);
   assert(missingIdentityCommit.exitCode === 2, 'git commit must fail before committing when the actor identity profile is missing');
   assert(missingIdentityCommit.parsed.messages?.[0]?.data?.requiredCommand === expectedIdentitySetCommand, 'git commit missing identity must return a runnable identity set command from repo-local git config');
-  const missingIdentityPreCommit = runAtm(['hook', 'pre-commit', '--cwd', repo, '--json'], {
+  const missingIdentityPreCommit = await runAtm(['hook', 'pre-commit', '--cwd', repo, '--json'], {
     ATM_COMMIT_ACTOR_ID: 'missing-identity-agent'
   });
   assert(missingIdentityPreCommit.exitCode === 1, 'pre-commit must fail when ATM commit actor has no identity profile');
@@ -1113,11 +1171,13 @@ try {
     ...(missingIdentityPreCommit.parsed.evidence?.commitAttributionReport?.findings ?? []),
     ...(missingIdentityPreCommit.parsed.evidence?.blockingFindings ?? [])
   ].some((entry: any) => entry.code === 'ATM_COMMIT_IDENTITY_PROFILE_MISSING' && entry.requiredCommand === expectedIdentitySetCommand), 'pre-commit missing identity finding must return a runnable identity set command from repo-local git config');
-  const gitPrepareAfterMissingIdentityCheck = runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
+  const gitPrepareAfterMissingIdentityCheck = await runAtm(['git', 'prepare', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--json']);
   assert(gitPrepareAfterMissingIdentityCheck.exitCode === 0, 'git prepare must restore fixture git identity after missing identity repair command validation');
   assert(gitPrepareAfterMissingIdentityCheck.parsed.ok === true, 'git prepare restore must report ok=true');
+  phaseDone('broker-git-governance');
 
-  const addEvidence = runAtm([
+  phaseStart('evidence-closeout');
+  const addEvidence = await runAtm([
     'evidence',
     'add',
     '--cwd',
@@ -1153,7 +1213,7 @@ try {
   assert(evidenceBundle.evidence?.[0]?.evidenceFreshness === 'fresh', 'evidence add must persist fresh evidence metadata');
   assert(evidenceBundle.evidence?.[0]?.details?.commandRuns?.[0]?.command === 'npm run typecheck', 'evidence add must persist command-run proof');
 
-  const verifyCommitEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'commit', '--json']);
+  const verifyCommitEvidence = await runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'commit', '--json']);
   assert(verifyCommitEvidence.exitCode === 0, 'evidence verify commit gate must exit 0');
   assert(verifyCommitEvidence.parsed.ok === true, 'evidence verify commit gate must report ok=true');
 
@@ -1169,27 +1229,27 @@ try {
       sectionTitle: 'Legacy section'
     }
   }, null, 2)}\n`, 'utf8');
-  const legacyVerify = runAtm(['tasks', 'verify', '--cwd', repo, '--json']);
+  const legacyVerify = await runAtm(['tasks', 'verify', '--cwd', repo, '--json']);
   assert(legacyVerify.exitCode === 0, 'tasks verify must tolerate legacy historical task records');
   assert(legacyVerify.parsed.ok === true, 'tasks verify must keep legacy historical task records as warnings');
   const legacyFindingCodes = (legacyVerify.parsed.evidence?.report?.findings ?? []).map((entry: any) => entry.code);
   assert(legacyFindingCodes.includes('ATM_TASKS_VERIFY_LEGACY_STATUS_ALIAS'), 'tasks verify must warn on legacy closed status alias');
   assert(legacyFindingCodes.includes('ATM_TASKS_VERIFY_LEGACY_SOURCE_TRACE'), 'tasks verify must warn on legacy source traces missing hash metadata');
 
-  const verifyPrEvidenceFail = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
+  const verifyPrEvidenceFail = await runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
   assert(verifyPrEvidenceFail.exitCode === 1, 'evidence verify pr gate without review must exit 1');
   assert(verifyPrEvidenceFail.parsed.ok === false, 'evidence verify pr gate without review must report ok=false');
   assert(verifyPrEvidenceFail.parsed.evidence.missing.includes('review-evidence'), 'evidence verify pr gate without review must name missing review evidence');
 
-  const addReviewEvidence = runAtm(['evidence', 'add', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--kind', 'review', '--summary', 'peer review acknowledged', '--artifacts', 'notes/governance.txt', '--json']);
+  const addReviewEvidence = await runAtm(['evidence', 'add', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--kind', 'review', '--summary', 'peer review acknowledged', '--artifacts', 'notes/governance.txt', '--json']);
   assert(addReviewEvidence.exitCode === 0, 'review evidence add must exit 0');
   assert(addReviewEvidence.parsed.ok === true, 'review evidence add must report ok=true');
 
-  const verifyPrEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
+  const verifyPrEvidence = await runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'pr', '--json']);
   assert(verifyPrEvidence.exitCode === 0, 'evidence verify pr gate must exit 0 after review evidence');
   assert(verifyPrEvidence.parsed.ok === true, 'evidence verify pr gate must report ok=true after review evidence');
 
-  const verifyEvidence = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'close', '--json']);
+  const verifyEvidence = await runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0103', '--gate', 'close', '--json']);
   assert(verifyEvidence.exitCode === 0, 'evidence verify close gate must exit 0');
   assert(verifyEvidence.parsed.ok === true, 'evidence verify close gate must report ok=true');
 
@@ -1207,9 +1267,9 @@ try {
   historicalTaskDocument.scopePaths = ['src/historical-delivery.ts'];
   historicalTaskDocument.deliverables = ['src/historical-delivery.ts'];
   writeFileSync(historicalTaskPath, `${JSON.stringify(historicalTaskDocument, null, 2)}\n`, 'utf8');
-  const historicalClaim = runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0111', '--json']);
+  const historicalClaim = await runAtm(['next', '--cwd', repo, '--claim', '--actor', 'fixture-agent', '--prompt', 'ATM-GOV-0111', '--json']);
   assert(historicalClaim.exitCode === 0, 'historical delivery next --claim must exit 0');
-  const historicalEvidence = runAtm([
+  const historicalEvidence = await runAtm([
     'evidence',
     'add',
     '--cwd',
@@ -1239,10 +1299,10 @@ try {
     '--json'
   ]);
   assert(historicalEvidence.exitCode === 0, 'historical delivery evidence add must exit 0');
-  const historicalCloseWithoutCommit = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--json']);
+  const historicalCloseWithoutCommit = await runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(historicalCloseWithoutCommit.exitCode === 1, 'historical delivery close without a delivery commit must fail when there is no current deliverable diff');
   assert(historicalCloseWithoutCommit.parsed.messages?.[0]?.code === 'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED', 'historical delivery close without commit must report deliverable diff requirement');
-  const historicalCloseApproval = runAtm([
+  const historicalCloseApproval = await runAtm([
     'emergency',
     'approve',
     '--cwd',
@@ -1264,7 +1324,7 @@ try {
   assert(historicalCloseApproval.exitCode === 0, 'historical delivery close emergency approval must exit 0');
   const historicalCloseApprovalLease = String(historicalCloseApproval.parsed.evidence?.lease?.leaseId ?? historicalCloseApproval.parsed.evidence?.leaseId ?? '');
   assert(historicalCloseApprovalLease.length > 0, 'historical delivery close emergency approval must return a lease id');
-  const historicalClose = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--historical-delivery', historicalDeliveryCommit, '--emergency-approval', historicalCloseApprovalLease, '--json']);
+  const historicalClose = await runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0111', '--actor', 'fixture-agent', '--status', 'done', '--historical-delivery', historicalDeliveryCommit, '--emergency-approval', historicalCloseApprovalLease, '--json']);
   assert(historicalClose.exitCode === 0, `historical delivery close with a scoped delivery commit must exit 0: ${JSON.stringify(historicalClose.parsed)}`);
   assert(historicalClose.parsed.ok === true, `historical delivery close with a scoped delivery commit must report ok=true: ${JSON.stringify(historicalClose.parsed)}`);
   const historicalCloseGate = historicalClose.parsed.evidence?.deliverableGate ?? {};
@@ -1275,26 +1335,26 @@ try {
 
   // TASK-CID-0024: closeout-only / no-more-mutation claim intent CLI surface.
   writeFixtureTask(repo, 'ATM-GOV-0112', 'fixture-agent', 'Closeout-only claim intent surface test');
-  const invalidClaimIntent = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--claim-intent', 'sneaky-write', '--json']);
+  const invalidClaimIntent = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--claim-intent', 'sneaky-write', '--json']);
   assert(invalidClaimIntent.exitCode === 2, 'tasks claim with an unknown --claim-intent value must fail closed with a usage error');
-  const closeoutIntentClaim = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--claim-intent', 'no-more-mutation', '--json']);
+  const closeoutIntentClaim = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--claim-intent', 'no-more-mutation', '--json']);
   assert(closeoutIntentClaim.exitCode === 0, 'tasks claim --claim-intent no-more-mutation must exit 0');
   assert(closeoutIntentClaim.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim must normalize no-more-mutation to closeout-only in evidence');
   writeFixtureTask(repo, 'ATM-GOV-0113', 'fixture-agent', 'Closeout-only claim intent alias test');
-  const closeoutIntentShortAlias = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--closeout-only', '--json']);
+  const closeoutIntentShortAlias = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--closeout-only', '--json']);
   assert(closeoutIntentShortAlias.exitCode === 0, 'tasks claim --closeout-only must exit 0');
   assert(closeoutIntentShortAlias.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim --closeout-only must surface claimIntent=closeout-only');
   writeFixtureTask(repo, 'ATM-GOV-0114', 'fixture-agent', 'Closeout-only no-more-mutation alias test');
-  const closeoutIntentNoMoreMutationAlias = runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--no-more-mutation', '--json']);
+  const closeoutIntentNoMoreMutationAlias = await runAtm(['tasks', 'claim', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--files', 'src/historical-delivery.ts', '--no-more-mutation', '--json']);
   assert(closeoutIntentNoMoreMutationAlias.exitCode === 0, 'tasks claim --no-more-mutation must exit 0');
   assert(closeoutIntentNoMoreMutationAlias.parsed.evidence?.claimIntent === 'closeout-only', 'tasks claim --no-more-mutation must surface claimIntent=closeout-only');
   const closeoutIntentTask = JSON.parse(readFileSync(path.join(repo, '.atm', 'history', 'tasks', 'ATM-GOV-0112.json'), 'utf8'));
   assert(closeoutIntentTask.claim?.intent === 'closeout-only', 'tasks claim must persist claim.intent=closeout-only in the task ledger');
-  const closeoutIntentRelease = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent surface test cleanup', '--json']);
+  const closeoutIntentRelease = await runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0112', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent surface test cleanup', '--json']);
   assert(closeoutIntentRelease.exitCode === 0, 'closeout-only claim intent tasks release must exit 0');
-  const closeoutIntentAliasRelease = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent alias test cleanup', '--json']);
+  const closeoutIntentAliasRelease = await runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0113', '--actor', 'fixture-agent', '--reason', 'closeout-only claim intent alias test cleanup', '--json']);
   assert(closeoutIntentAliasRelease.exitCode === 0, 'closeout-only alias tasks release must exit 0');
-  const closeoutIntentAliasRelease2 = runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--reason', 'closeout-only alias test cleanup', '--json']);
+  const closeoutIntentAliasRelease2 = await runAtm(['tasks', 'release', '--cwd', repo, '--task', 'ATM-GOV-0114', '--actor', 'fixture-agent', '--reason', 'closeout-only alias test cleanup', '--json']);
   assert(closeoutIntentAliasRelease2.exitCode === 0, 'closeout-only alias tasks release2 must exit 0');
 
   writeFixtureTask(repo, 'ATM-GOV-0110', 'fixture-agent', 'Artifact-only closure guard');
@@ -1304,7 +1364,7 @@ try {
   artifactOnlyTask.closureAuthority = 'target_repo';
   artifactOnlyTask.notes = 'redteam reopened_for_clean_redo';
   writeFileSync(artifactOnlyTaskPath, `${JSON.stringify(artifactOnlyTask, null, 2)}\n`, 'utf8');
-  const artifactOnlyEvidence = runAtm([
+  const artifactOnlyEvidence = await runAtm([
     'evidence',
     'add',
     '--cwd',
@@ -1324,7 +1384,7 @@ try {
     '--json'
   ]);
   assert(artifactOnlyEvidence.exitCode === 0, 'artifact-only evidence add must exit 0');
-  const artifactOnlyVerify = runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0110', '--gate', 'close', '--json']);
+  const artifactOnlyVerify = await runAtm(['evidence', 'verify', '--cwd', repo, '--task', 'ATM-GOV-0110', '--gate', 'close', '--json']);
   assert(artifactOnlyVerify.exitCode === 1, 'artifact-only close evidence must exit 1 for reopened framework-like tasks');
   assert(artifactOnlyVerify.parsed.ok === false, 'artifact-only close evidence must report ok=false');
   assert(artifactOnlyVerify.parsed.evidence.missing.includes('fresh-evidence-required'), 'artifact-only close evidence must require fresh evidence');
@@ -1369,14 +1429,14 @@ try {
       hash: 'residue-status-fixture'
     }
   });
-  const residueStatus = runAtm(['tasks', 'status', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
+  const residueStatus = await runAtm(['tasks', 'status', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
   assert(residueStatus.exitCode === 0, 'tasks status residue fixture must exit 0');
   assert(residueStatus.parsed.ok === true, 'tasks status residue fixture must report ok=true');
   assert(residueStatus.parsed.evidence.residueClassification.bucket === 'complete-but-unfinalized', `tasks status residue fixture must classify complete-but-unfinalized: ${JSON.stringify(residueStatus.parsed.evidence.residueClassification)}`);
   assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('tasks reconcile'), `tasks status residue fixture must point to reconcile: ${JSON.stringify(residueStatus.parsed.evidence.residueClassification)}`);
   assert(String(residueStatus.parsed.evidence.residueClassification.nextCommand ?? '').includes('ATM-GOV-RESIDUE-0001'), 'tasks status residue fixture must materialize task id in next command');
 
-  const residueFinalize = runAtm(['tasks', 'finalize', 'diagnose', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
+  const residueFinalize = await runAtm(['tasks', 'finalize', 'diagnose', '--cwd', residueRepo, '--task', 'ATM-GOV-RESIDUE-0001', '--json']);
   assert(residueFinalize.exitCode === 0, 'tasks finalize diagnose residue fixture must exit 0');
   assert(residueFinalize.parsed.evidence.schemaId === 'atm.taskResidueDiagnosis.v1', 'tasks finalize diagnose must emit atm.taskResidueDiagnosis.v1');
   assert(residueFinalize.parsed.evidence.bucket === 'complete-but-unfinalized', `tasks finalize diagnose must classify complete-but-unfinalized: ${JSON.stringify(residueFinalize.parsed.evidence)}`);
@@ -1386,7 +1446,7 @@ try {
   mkdirSync(path.dirname(staticEvidenceArtifactPath), { recursive: true });
   writeFileSync(staticEvidenceArtifactPath, `${JSON.stringify({ status: 'done', summary: 'handwritten static evidence' }, null, 2)}\n`, 'utf8');
   assert(runGit(repo, ['add', 'atomic_workbench/evidence/ATM-GOV-IMPERSONATE.json']).exitCode === 0, 'static evidence impersonation fixture must be stageable');
-  const staticEvidencePreCommit = runAtm(['hook', 'pre-commit', '--cwd', repo, '--json']);
+  const staticEvidencePreCommit = await runAtm(['hook', 'pre-commit', '--cwd', repo, '--json']);
   assert(staticEvidencePreCommit.exitCode === 1, 'pre-commit must fail for static evidence impersonation without CLI evidence context');
   assert(staticEvidencePreCommit.parsed.ok === false, 'pre-commit must report ok=false for static evidence impersonation');
   assert([
@@ -1396,7 +1456,7 @@ try {
   assert(runGit(repo, ['rm', '--cached', '--force', '--quiet', 'atomic_workbench/evidence/ATM-GOV-IMPERSONATE.json']).exitCode === 0, 'static evidence impersonation fixture must be removable from index');
   rmSync(staticEvidenceArtifactPath, { force: true });
 
-  const closeTask = runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
+  const closeTask = await runAtm(['tasks', 'close', '--cwd', repo, '--task', 'ATM-GOV-0103', '--actor', 'fixture-agent', '--status', 'done', '--json']);
   assert(closeTask.exitCode === 0, 'tasks close done must exit 0 with evidence');
   assert(closeTask.parsed.ok === true, 'tasks close done must report ok=true with evidence');
   const closedTask = JSON.parse(readFileSync(taskPath, 'utf8'));
@@ -1410,16 +1470,19 @@ try {
     assert((closeTransition.closure.requiredGates ?? []).length === 0, 'host-repo closure transition must not fabricate framework required gates');
     assert((closeTransition.closure.validationPasses ?? []).length === 0, 'host-repo closure transition must not fabricate framework validation passes');
   }
+  phaseDone('evidence-closeout');
 
-  const handoff = runAtm(['handoff', 'summarize', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
+  phaseStart('cleanup');
+  const handoff = await runAtm(['handoff', 'summarize', '--cwd', repo, '--task', 'BOOTSTRAP-0001', '--json']);
   assert(handoff.exitCode === 0, 'handoff summarize must exit 0');
   assert(handoff.parsed.ok === true, 'handoff summarize must report ok=true');
   assert(existsSyncPortable(repo, handoff.parsed.evidence.summaryPath), 'handoff summary json must be written');
   assert(existsSyncPortable(repo, handoff.parsed.evidence.summaryMarkdownPath), 'handoff summary markdown must be written');
 
-  const releasedLock = runAtm(['lock', 'release', '--cwd', repo, '--task', lockTaskId, '--owner', 'fixture-agent', '--json']);
+  const releasedLock = await runAtm(['lock', 'release', '--cwd', repo, '--task', lockTaskId, '--owner', 'fixture-agent', '--json']);
   assert(releasedLock.exitCode === 0, 'lock release must exit 0');
   assert(releasedLock.parsed.ok === true, 'lock release must report ok=true');
+  phaseDone('cleanup');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
