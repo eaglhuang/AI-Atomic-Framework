@@ -2820,13 +2820,35 @@ function withTaskScopedCommitIndex<T>(
   };
   try {
     runGitCommandWithEnv(cwd, ['read-tree', 'HEAD'], env, ['ignore', 'pipe', 'pipe']);
-    stageTaskScopedBundleFiles(cwd, normalizedFiles, env);
+    stageTaskScopedBundleFilesFromLiveIndex(cwd, normalizedFiles, env);
     if (actorId) {
       ensureGovernedGitHeadEvidenceStagedForTaskScopedCommit(cwd, actorId, normalizedFiles, env);
     }
     return run(env);
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Copy the exact live-index entries for a task bundle into the isolated commit
+ * index. Re-running `git add` here would read the complete worktree version
+ * and silently discard a Broker composer partial-staging projection.
+ */
+function stageTaskScopedBundleFilesFromLiveIndex(cwd: string, files: readonly string[], env: NodeJS.ProcessEnv) {
+  const normalizedFiles = uniqueSorted(files.map(normalizeRelativePath).filter(Boolean));
+  if (normalizedFiles.length === 0) return;
+
+  // Clear HEAD entries first so a live staged deletion stays a deletion in the
+  // task-scoped tree. Missing paths are intentional: they may be generated
+  // evidence staged by the caller immediately afterwards.
+  runGitCommandWithEnv(cwd, ['rm', '--cached', '--quiet', '--ignore-unmatch', '--force', '--', ...normalizedFiles], env, ['ignore', 'pipe', 'pipe']);
+  const liveEntries = runGitCommand(cwd, ['ls-files', '-s', '--', ...normalizedFiles])
+    .split(/\r?\n/)
+    .map((line) => line.match(/^(\d+) ([0-9a-f]+) \d+\t(.+)$/i))
+    .filter((match): match is RegExpMatchArray => match !== null);
+  for (const [, mode, objectId, filePath] of liveEntries) {
+    runGitCommandWithEnv(cwd, ['update-index', '--add', '--cacheinfo', `${mode},${objectId},${filePath}`], env, ['ignore', 'pipe', 'pipe']);
   }
 }
 

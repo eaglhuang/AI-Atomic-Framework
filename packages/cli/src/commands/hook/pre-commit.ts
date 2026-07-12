@@ -2354,7 +2354,7 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
           }
         }
 
-        if (missingSymbols.length > 0) {
+        if (missingSymbols.length > 0 && !isBrokerResolutionAuthorizedDependencyDeferral(root, resolvedFile)) {
           findings.push({
             code: 'ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY',
             source: 'cross-file-consistency',
@@ -2370,6 +2370,23 @@ function checkStageTimeCrossFileConsistency(root: string, stagedFiles: readonly 
   }
 
   return findings;
+}
+
+/**
+ * A composer-approved release may intentionally commit one projection of a
+ * shared file while another active task keeps an unrelated projection
+ * unstaged. Keep the normal cross-file guard fail-closed unless the current
+ * task is explicitly first in a valid resolution artifact and the dependency
+ * is owned by that artifact's blocked task.
+ */
+function isBrokerResolutionAuthorizedDependencyDeferral(cwd: string, dependencyPath: string): boolean {
+  const currentTaskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID);
+  if (!currentTaskId) return false;
+  return readActiveTaskDirectionLocks(cwd).some((lock) =>
+    lock.taskId !== currentTaskId
+    && isPathAllowedByTaskDirection(dependencyPath, lock.allowedFiles)
+    && isResolutionAuthorizedCurrentTask(cwd, currentTaskId, lock.taskId)
+  );
 }
 
 function escapeRegExp(value: string): string {

@@ -10,6 +10,7 @@ import { createClosurePacket, validateClosurePacket } from '../packages/cli/src/
 import { buildTeamArtifactHandoffEvidence, verifyTaskEvidence } from '../packages/cli/src/commands/evidence.ts';
 import { TEAM_ATOM_BOUNDARIES, assessLieutenantEscalation, buildAnthropicRuntimeBridgeSummary, buildAtomizationChecklist, buildBrokerConflictSharedVocabulary, buildBrokerConflictUxProjection, buildDirectTeamRoleInstructions, buildEditorExecutionRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary, buildProviderNeutralRoleSkillPackManifest, buildReviewAgentSignature, buildTeamArtifactHandoffContract, buildTeamClosureAttestation, buildTeamPlan, buildTeamRetryBudgetContract, buildTeamReworkRouteStateMachine, buildTeamRuntimeContract, evaluateReviewQuorum, evaluateReviewerIndependence, evaluateTeamRequiredCompletionGate, loadTeamVendorLocalSecrets, runDirectTeamProviderRole, runTeamProviderExecution, runTeam, selectTeamImplementer, transitionTeamReworkRoute, validateTeamArtifactHandoff, validateTeamPermissionModel } from '../packages/cli/src/commands/team.ts';
 import { evaluateClaimAdmission } from '../packages/cli/src/commands/next/claim-admission.ts';
+import { evaluateBrokerQueueAdmission } from '../packages/cli/src/commands/next/broker-queue-admission.ts';
 import { evaluateTaskflowBrokerConflictGate } from '../packages/cli/src/commands/taskflow/broker-gate.ts';
 import { discoverGovernedVendorConfigSurface, inspectTeamRuntimeBackendCapabilities } from '../packages/cli/src/commands/integration.ts';
 import { resolveNodejsTeamWorkerAdapter } from '../packages/core/src/team-runtime/nodejs-worker-adapter.ts';
@@ -163,6 +164,34 @@ async function main() {
     assert.deepEqual(afterQueues[0]?.entries.map((entry) => entry.taskId), ['TASK-QUEUE-TWO']);
     rmSync(cwd, { recursive: true, force: true });
     console.log('[validate-team-agents] ok (broker-shared-surface-queue)');
+    return;
+  }
+
+  if (taskCase === 'next-claim-shared-surface-queue') {
+    const cwd = createTempWorkspace('atm-next-queue-admission-');
+    const runtime = path.join(cwd, '.atm', 'runtime');
+    mkdirSync(runtime, { recursive: true });
+    writeFileSync(path.join(runtime, 'broker-shared-surface-queues.json'), `${JSON.stringify({
+      schemaId: 'atm.brokerSharedSurfaceQueues.v1',
+      queues: [
+        { schemaId: 'atm.brokerSharedSurfaceQueue.v1', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', entries: [
+          { taskId: 'TASK-OWNER', actorId: 'owner', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', leaseEpoch: 1, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:00:00.000Z' },
+          { taskId: 'TASK-WAITER', actorId: 'waiter', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', leaseEpoch: 2, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:01:00.000Z' }
+        ] },
+        { schemaId: 'atm.brokerSharedSurfaceQueue.v1', surfacePath: 'atomic_workbench/atomization-coverage/path-to-atom-map.json', entries: [
+          { taskId: 'TASK-OWNER', actorId: 'owner', surfacePath: 'atomic_workbench/atomization-coverage/path-to-atom-map.json', leaseEpoch: 1, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:00:00.000Z' },
+          { taskId: 'TASK-WAITER', actorId: 'waiter', surfacePath: 'atomic_workbench/atomization-coverage/path-to-atom-map.json', leaseEpoch: 2, baseHash: 'same', reason: 'shared', releaseCondition: 'owner release', queuedAt: '2026-07-12T00:01:00.000Z' }
+        ] }
+      ]
+    }, null, 2)}\n`, 'utf8');
+    const privateWork = evaluateBrokerQueueAdmission({ cwd, taskId: 'TASK-WAITER', allowedFiles: ['docs/governance/atm-bug-and-optimization-backlog.md', 'atomic_workbench/atomization-coverage/path-to-atom-map.json', 'packages/cli/src/commands/next.ts'], overlappingFiles: ['docs/governance/atm-bug-and-optimization-backlog.md', 'atomic_workbench/atomization-coverage/path-to-atom-map.json'] });
+    assert.equal(privateWork.status, 'queued-private-work');
+    assert.deepEqual(privateWork.allowedFiles, ['packages/cli/src/commands/next.ts']);
+    assert.equal(privateWork.waitingOn.length, 2);
+    const blocked = evaluateBrokerQueueAdmission({ cwd, taskId: 'TASK-WAITER', allowedFiles: ['docs/governance/atm-bug-and-optimization-backlog.md'], overlappingFiles: ['docs/governance/atm-bug-and-optimization-backlog.md'] });
+    assert.equal(blocked.status, 'queued-blocked');
+    rmSync(cwd, { recursive: true, force: true });
+    console.log('[validate-team-agents] ok (next-claim-shared-surface-queue)');
     return;
   }
 
