@@ -867,6 +867,7 @@ export async function commitTaskflowDeliveryFiles(input: {
   bundle: TaskflowGovernedCommitBundle;
   actorId: string;
   taskId: string;
+  deferForeignStaged?: boolean;
 }): Promise<TaskflowDeliveryCommit | null> {
   const repoRoot = input.bundle.targetRepo.repoRoot;
   const stageFiles = uniqueSorted(input.bundle.targetDeliveryFiles);
@@ -898,6 +899,7 @@ export async function commitTaskflowDeliveryFiles(input: {
     '--actor', input.actorId,
     '--task', input.taskId,
     '--message', deliveryBundle.commitMessage,
+    ...(input.deferForeignStaged ? ['--defer-foreign-staged'] : []),
     '--json'
   ]);
   const commitSha = String((targetResult.evidence as Record<string, unknown>)?.commitSha ?? '') || null;

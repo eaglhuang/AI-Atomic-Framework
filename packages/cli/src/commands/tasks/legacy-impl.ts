@@ -704,10 +704,13 @@ async function runTasksScope(argv: string[]) {
   if (subAction === 'repair') {
     return runTasksScopeRepair(argv.slice(1));
   }
-  if (!subAction) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add | repair', { exitCode: 2 });
+  if (subAction === 'remove') {
+    return runTasksScopeRemove(argv.slice(1));
   }
-  throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add, repair`, { exitCode: 2 });
+  if (!subAction) {
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope requires a sub-action: add | remove | repair', { exitCode: 2 });
+  }
+  throw new CliError('ATM_CLI_USAGE', `tasks scope does not support sub-action ${subAction}. Supported: add, remove, repair`, { exitCode: 2 });
 }
 type ScopeAmendmentPreconditionResolution = {
   readonly taskId: string;
@@ -948,6 +951,37 @@ async function runTasksScopeAdd(argv: string[]) {
       amendmentMetadata
     }
   });
+}
+
+async function runTasksScopeRemove(argv: string[]) {
+  const options = parseScopeAddOptions(argv.map((value) => value === '--remove' ? '--add' : value));
+  const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
+  if (!resolvedActor) throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks scope remove requires --actor or ATM_ACTOR_ID.', { exitCode: 2 });
+  const actorId = resolvedActor.actorId;
+  const precondition = inspectScopeAmendmentPreconditions(options.cwd, options.taskId, actorId);
+  if (precondition.claimState !== 'active' || precondition.claimActorId !== actorId) {
+    throw new CliError('ATM_SCOPE_SHRINK_ACTIVE_CLAIM_REQUIRED', buildScopeAmendmentNoClaimMessage(precondition), { exitCode: 1, details: precondition });
+  }
+  const taskPath = taskPathFor(options.cwd, options.taskId);
+  const taskDocument = readJsonRecord(taskPath);
+  const requested = sanitizeTaskDirectionAllowedFiles(options.addPaths);
+  const deliverables = sanitizeTaskDirectionAllowedFiles(Array.isArray(taskDocument.deliverables) ? taskDocument.deliverables as string[] : []);
+  const protectedPaths = requested.filter((file) => deliverables.includes(file));
+  if (protectedPaths.length > 0) {
+    throw new CliError('ATM_SCOPE_SHRINK_DELIVERABLE_FORBIDDEN', `tasks scope remove cannot remove declared deliverables: ${protectedPaths.join(', ')}`, { exitCode: 1, details: { taskId: options.taskId, protectedPaths } });
+  }
+  const lockPath = path.join(options.cwd, '.atm', 'runtime', 'locks', `${options.taskId}.lock.json`);
+  if (!existsSync(lockPath)) throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', buildScopeAmendmentNoClaimMessage(precondition), { exitCode: 1, details: precondition });
+  const outerLock = JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>;
+  const embeddedLockRecord = outerLock.taskDirectionLock as Record<string, unknown>;
+  if (!embeddedLockRecord || Array.isArray(embeddedLockRecord)) throw new CliError('ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK', `Lock file for ${options.taskId} does not contain an embedded taskDirectionLock.`, { exitCode: 1 });
+  const existingAllowed = sanitizeTaskDirectionAllowedFiles(Array.isArray(embeddedLockRecord.allowedFiles) ? embeddedLockRecord.allowedFiles as string[] : []);
+  const removedPaths = requested.filter((file) => existingAllowed.includes(file));
+  const mergedAllowed = existingAllowed.filter((file) => !removedPaths.includes(file));
+  syncScopeAmendmentState({ taskDocument, outerLock, embeddedLockRecord, mergedAllowed });
+  writeFileSync(lockPath, `${JSON.stringify(outerLock, null, 2)}\n`, 'utf8');
+  persistScopeAmendmentTransition({ cwd: options.cwd, taskId: options.taskId, actorId, taskPath, taskDocument, command: `node atm.mjs tasks scope remove --task ${options.taskId} --actor ${actorId} --remove ${requested.join(',')} --json`, amendmentMetadata: { amendmentClass: 'scope-shrink', amendmentPhase: 'during-implementation', amendmentMode: 'normal', reason: options.reason ?? 'Remove an incorrect non-deliverable shared scope path.' } });
+  return makeResult({ ok: true, command: 'tasks', cwd: options.cwd, messages: [message('info', 'ATM_SCOPE_SHRINK_APPLIED', `Scope shrink applied for ${options.taskId}: ${removedPaths.length} path(s) removed.`, { taskId: options.taskId, actorId, removedPaths, allowedFiles: mergedAllowed })], evidence: { action: 'scope-shrink', taskId: options.taskId, actorId, removedPaths, allowedFiles: mergedAllowed } });
 }
 /**
  * `tasks scope repair` — 維護緊急通道（需 --emergency-approval 與 --reason）。
