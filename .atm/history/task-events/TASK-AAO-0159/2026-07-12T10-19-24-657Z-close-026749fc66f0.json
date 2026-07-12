@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T10-19-24-657Z-close-026749fc66f0",
+  "taskId": "TASK-AAO-0159",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712101317-codex-backlog-captain-TASK-AAO-0159-d82af7e96c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0159.json",
+  "taskSha256": "sha256:888c25af581060534e5c2f79bfa37462bd4d8e073811078da36fd7209d8fd503",
+  "createdAt": "2026-07-12T10:19:24.657Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0159 --actor codex-backlog-captain --status done --historical-delivery 9ef6a9661d7c5a10755656e497d8655963917bc5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712101317-codex-backlog-captain-TASK-AAO-0159-d82af7e96c",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0159.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types scripts/check-encoding-touched.ts --mode touched --files scripts/check-encoding-touched.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:script-parity"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T10:19:24.652Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0159.*",
+        ".atm/history/task-events/TASK-AAO-0159/**",
+        ".atm/history/tasks/TASK-AAO-0159.json",
+        "package.json",
+        "scripts/check-encoding-touched.ts",
+        "scripts/validate-script-parity.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/check-encoding-touched.ts",
+        "scripts/validate-script-parity.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
