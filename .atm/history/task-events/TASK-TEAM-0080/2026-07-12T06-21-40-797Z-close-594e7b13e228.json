@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T06-21-40-797Z-close-594e7b13e228",
+  "taskId": "TASK-TEAM-0080",
+  "action": "close",
+  "actorId": "codex-captain",
+  "sessionId": "session-20260712061759-codex-captain-TASK-TEAM-0080-870e07b365",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0080.json",
+  "taskSha256": "sha256:38e7c55be1e6a059aa11471e856db9edc46b0e83f97412cef7c326098dba5484",
+  "createdAt": "2026-07-12T06:21:40.797Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0080 --actor codex-captain --status done --historical-delivery 81ad10df3ca6dd7865e7f6ff417c183ad3647d32",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712061759-codex-captain-TASK-TEAM-0080-870e07b365",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0080.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types --test packages/core/src/team-runtime/__tests__/permission-broker.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T06:21:40.790Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0080.*",
+        ".atm/history/task-events/TASK-TEAM-0080/**",
+        ".atm/history/tasks/TASK-TEAM-0080.json",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/core/src/team-runtime/__tests__/permission-broker.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/core/src/team-runtime/__tests__/permission-broker.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-TEAM-0080",
+  "title": "Adopt closure-lane residue: defer-foreign-staged propagation, scope shrink, permission-broker test",
+  "status": "done",
+  "milestone": "Team Broker Maintainability",
+  "dependencies": [
+    "TASK-TEAM-0078"
+  ],
+  "acceptance": [
+    "`commitTaskflowDeliveryFiles` forwards `deferForeignStaged` and the close lane no longer fails when another task's files are staged.",
+    "`tasks scope remove` requires the active claim actor, refuses to remove declared deliverables, updates lock + task document, and records the amendment transition.",
+    "Permission-broker hard-gate regression is tracked and green."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/core/src/team-runtime/__tests__/permission-broker.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/core/src/team-runtime/__tests__/permission-broker.test.ts"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types --test packages/core/src/team-runtime/__tests__/permission-broker.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the adoption commit as one unit; the residue returns to unowned worktree state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-runtime",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "team-agents/tasks/TASK-TEAM-0080-adopt-closure-lane-residue-and-scope-shrink.task.md",
+    "sectionTitle": "TASK-TEAM-0080",
+    "headingLine": 37,
+    "hash": "ab9f8712dc4459ed"
+  },
+  "importedAt": "2026-07-12T06:17:42.468Z",
+  "lastTransitionId": "2026-07-12T06-21-40-797Z-close-594e7b13e228",
+  "lastTransitionAt": "2026-07-12T06:21:40.797Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-captain",
+  "reservedAt": "2026-07-12T06:17:59.850Z",
+  "promotedAt": "2026-07-12T06:17:59.853Z",
+  "claim": {
+    "actorId": "codex-captain",
+    "leaseId": "lease-770cfb8c3752",
+    "claimedAt": "2026-07-12T06:17:59.856Z",
+    "heartbeatAt": "2026-07-12T06:21:40.796Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-TEAM-0080.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/core/src/team-runtime/__tests__/permission-broker.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-12T06:17:59.856Z",
+  "startedByActor": "codex-captain",
+  "startedBySessionId": "session-20260712061759-codex-captain-TASK-TEAM-0080-870e07b365",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-TEAM-0080",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-TEAM-0080.*",
+      ".atm/history/task-events/TASK-TEAM-0080/**",
+      ".atm/history/tasks/TASK-TEAM-0080.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/core/src/team-runtime/__tests__/permission-broker.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "10d96961f7a6e03144ed6dfe2209f5e5f04e7d22dedb2da698e32ea8cd470cb4",
+    "actorId": "codex-captain",
+    "createdAt": "2026-07-12T06:18:00.081Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-12T06:21:40.796Z",
+  "closedByActor": "codex-captain",
+  "closedBySessionId": "session-20260712061759-codex-captain-TASK-TEAM-0080-870e07b365",
+  "closurePacket": ".atm/history/evidence/TASK-TEAM-0080.closure-packet.json"
+}
