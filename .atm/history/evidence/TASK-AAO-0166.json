@@ -1,0 +1,159 @@
+{
+  "taskId": "TASK-AAO-0166",
+  "updatedAt": "2026-07-12T12:05:32.360Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+      "createdAt": "2026-07-12T12:05:02.345Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "634a80cf0f0e57ce52fce78801bada37674fcac0",
+            "cacheKey": "sha256:c214bce663474a98372d7743bbf9397d898f0ad5c990313ba329e7717391d42f",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:05:02.405Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d55626f6a823918bb0e9953e518bec2223b1e2645882f9cbf615ab547fe8c4af",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+      "createdAt": "2026-07-12T12:05:08.498Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:799be10d37ee6f79a30071dd5844a851f966cd9af061f8de1f48a6bf3c5c37e4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "634a80cf0f0e57ce52fce78801bada37674fcac0",
+            "cacheKey": "sha256:07bf9b758559511c8cf452fde03f8e7cc1dc5b3a6044f16d84f300cc20fc811c",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:05:08.591Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:8d5a110bcd3513ba4efa724cdf3c4ce9908502dd04e37289c6e193b68cd86695",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+      "createdAt": "2026-07-12T12:05:32.360Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "634a80cf0f0e57ce52fce78801bada37674fcac0",
+            "cacheKey": "sha256:35e2433776d7bae8f7a707efba987d2cfaa19ceb9847d2d0b45fe3df74e2330d",
+            "cached": false,
+            "generatedAt": "2026-07-12T12:05:32.436Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:94e594dd592dcc75fea224d55b6522a02732a04dddef11664e86d9d374f9f2aa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

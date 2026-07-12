@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0166",
+  "title": "Close back validator timeout backlog evidence",
+  "status": "running",
+  "milestone": "RFT-M",
+  "dependencies": [],
+  "acceptance": [
+    "Deliver the scoped change described by this task.",
+    "Keep edits inside the declared scope unless the task is explicitly amended.",
+    "Run the declared validator and record command-backed evidence before closeout."
+  ],
+  "deliverables": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if the task changes fail validation or widen the accepted governance boundary.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-cli-hook",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "Backlog status and evidence closeback",
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0166.md",
+    "sectionTitle": "TASK-AAO-0166",
+    "headingLine": 33,
+    "hash": "14050075036dc3ec"
+  },
+  "importedAt": "2026-07-12T12:03:30.170Z",
+  "lastTransitionId": "2026-07-12T12-03-36-031Z-claim-4f292348e28c",
+  "lastTransitionAt": "2026-07-12T12:03:36.031Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T12:03:35.786Z",
+  "promotedAt": "2026-07-12T12:03:35.788Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-ac971d0cbca4",
+    "claimedAt": "2026-07-12T12:03:35.792Z",
+    "heartbeatAt": "2026-07-12T12:03:35.792Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0166.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T12:03:35.792Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712120335-codex-backlog-captain-TASK-AAO-0166-8b8c174af1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0166",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0166.*",
+      ".atm/history/task-events/TASK-AAO-0166/**",
+      ".atm/history/tasks/TASK-AAO-0166.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fec0240ca7ecad94ad16c032fd843e576c9b37c8ab24d2bfba87a5253ae1c63c",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T12:03:36.030Z",
+    "status": "active"
+  }
+}
