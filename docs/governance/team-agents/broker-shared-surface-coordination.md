@@ -109,3 +109,15 @@ parallel advisory. `next.ts` only orchestrates the atoms
 schema keys, gate names, and per-module line budgets (< 600 lines) are pinned
 by `node --strip-types scripts/validate-team-agents.ts --case
 next-claim-atomization`.
+
+## Proposal-First Plan/Start Parity
+
+`--broker-proposal-file` is accepted by both `team plan` and `team start`
+with the same validation contract (TASK-TEAM-0083, backlog
+ATM-BUG-2026-07-12-133). A proposal-first block no longer dead-ends at
+`proposal-submitted`: the plan response carries a `proposal-first-required`
+finding naming the hot files, the required `atm.patchProposal.v1` schema, and
+copyable commands — `team plan --broker-proposal-file` for a readiness
+preview, `team start --broker-proposal-file` for fail-closed execution, and
+`broker runtime activate --proposal-file` for Broker-side pre-activation.
+Mismatched, stale, or out-of-scope proposals fail closed on every surface.
