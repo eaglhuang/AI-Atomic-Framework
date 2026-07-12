@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import {
+  buildTeamLeaseConflictDetails,
+  buildTeamLeaseNotFoundDetails,
   buildTeamGrowthContract,
   buildTeamRuntimePilot,
   buildTeamRoleRoutingMatrix,
@@ -98,6 +100,7 @@ const runtimePilot = buildTeamRuntimePilot({
     ]
   },
   brokerLane: {
+    blockedReasons: ['Takeover required before conflict arbitration'],
     decision: {
       verdict: 'blocked-active-lease',
       reason: 'Takeover required before conflict arbitration',
@@ -119,5 +122,40 @@ assert.equal(runtimePilot.selectedSkillPackIds.includes('atm.role-pack.coordinat
 assert.equal(runtimePilot.roleConfusionReduction.length >= 3, true);
 assert.equal(runtimePilot.actionableRefinementFindings.length >= 2, true);
 assert.equal(runtimePilot.actionableRefinementFindings.every((entry) => entry.promotionTarget === 'docs/governance/team-agents/role-pack-learning-loop.md'), true);
+
+const activeLeases = [
+  { permission: 'file.write', agentId: 'implementer-typescript', paths: ['packages/cli/src/commands/team.ts'] },
+  { permission: 'exec.validator', agentId: 'validator', paths: ['tests/cli/team-plan-contract.test.ts'] }
+];
+const leaseConflictDetails = buildTeamLeaseConflictDetails({
+  teamRunId: 'team-test',
+  permission: 'file.write',
+  requestedOwner: 'implementer',
+  conflict: activeLeases[0]!,
+  currentLeases: activeLeases
+});
+assert.equal(leaseConflictDetails.currentOwner, 'implementer-typescript');
+assert.deepEqual(leaseConflictDetails.currentOwnerPaths, ['packages/cli/src/commands/team.ts']);
+assert.equal(
+  leaseConflictDetails.currentOwnerReleaseCommand,
+  'node atm.mjs team release --team team-test --actor implementer-typescript --permission file.write --json'
+);
+assert.equal(leaseConflictDetails.activeLeases.length, 1);
+assert.equal(leaseConflictDetails.activeLeases[0]?.agentId, 'implementer-typescript');
+assert.equal(leaseConflictDetails.requiredCommand, leaseConflictDetails.currentOwnerReleaseCommand);
+
+const leaseNotFoundDetails = buildTeamLeaseNotFoundDetails({
+  teamRunId: 'team-test',
+  permission: 'file.write',
+  actorId: 'implementer',
+  currentLeases: activeLeases
+});
+assert.equal(leaseNotFoundDetails.actorId, 'implementer');
+assert.equal(leaseNotFoundDetails.holderCount, 1);
+assert.equal(leaseNotFoundDetails.activeLeases[0]?.agentId, 'implementer-typescript');
+assert.equal(
+  leaseNotFoundDetails.requiredCommand,
+  'node atm.mjs team release --team team-test --actor implementer-typescript --permission file.write --json'
+);
 
 console.log('[team-plan-contract:test] ok');

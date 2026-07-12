@@ -122,10 +122,17 @@ type PermissionFinding = {
   suggestedFix: string;
 };
 
-type PermissionLease = {
+export type PermissionLease = {
   permission: string;
   agentId: string;
   paths?: string[];
+};
+
+export type TeamPermissionLeaseSummary = {
+  permission: string;
+  agentId: string;
+  paths: string[];
+  releaseCommand: string;
 };
 
 type TeamLifecycleAction = 'lease' | 'release' | 'complete' | 'abandon';
@@ -5422,13 +5429,13 @@ function runTeamLifecycleAction(input: {
     if (conflict) {
       throw new CliError('ATM_TEAM_LEASE_CONFLICT', `Permission ${input.permission} is already leased to ${conflict.agentId}.`, {
         exitCode: 1,
-        details: {
+        details: buildTeamLeaseConflictDetails({
           teamRunId: input.teamRunId,
           permission: input.permission,
-          currentOwner: conflict.agentId,
           requestedOwner: input.actorId,
-          requiredCommand: `node atm.mjs team release --team ${input.teamRunId} --actor ${conflict.agentId} --permission ${input.permission} --json`
-        }
+          conflict,
+          currentLeases
+        })
       });
     }
     const lease = {
@@ -5448,7 +5455,12 @@ function runTeamLifecycleAction(input: {
     if (matched.length === 0) {
       throw new CliError('ATM_TEAM_LEASE_NOT_FOUND', `No ${input.permission} lease owned by ${input.actorId} exists on ${input.teamRunId}.`, {
         exitCode: 1,
-        details: { teamRunId: input.teamRunId, permission: input.permission, actorId: input.actorId }
+        details: buildTeamLeaseNotFoundDetails({
+          teamRunId: input.teamRunId,
+          permission: input.permission,
+          actorId: input.actorId,
+          currentLeases
+        })
       });
     }
     nextLeases = currentLeases.filter((lease) => !(lease.permission === input.permission && lease.agentId === input.actorId));
@@ -5529,6 +5541,68 @@ function teamLifecycleEvent(type: string, input: {
     reason: input.reason || null,
     occurredAt,
     ...extra
+  };
+}
+
+export function summarizeTeamPermissionLeases(input: {
+  readonly teamRunId: string;
+  readonly permission: string;
+  readonly leases: readonly PermissionLease[];
+}): TeamPermissionLeaseSummary[] {
+  return input.leases
+    .filter((lease) => lease.permission === input.permission)
+    .map((lease) => ({
+      permission: lease.permission,
+      agentId: lease.agentId,
+      paths: [...(lease.paths ?? [])],
+      releaseCommand: `node atm.mjs team release --team ${input.teamRunId} --actor ${lease.agentId} --permission ${lease.permission} --json`
+    }));
+}
+
+export function buildTeamLeaseConflictDetails(input: {
+  readonly teamRunId: string;
+  readonly permission: string;
+  readonly requestedOwner: string;
+  readonly conflict: PermissionLease;
+  readonly currentLeases: readonly PermissionLease[];
+}) {
+  const activeLeases = summarizeTeamPermissionLeases({
+    teamRunId: input.teamRunId,
+    permission: input.permission,
+    leases: input.currentLeases
+  });
+  const currentOwnerPaths = [...(input.conflict.paths ?? [])];
+  const currentOwnerReleaseCommand = `node atm.mjs team release --team ${input.teamRunId} --actor ${input.conflict.agentId} --permission ${input.permission} --json`;
+  return {
+    teamRunId: input.teamRunId,
+    permission: input.permission,
+    currentOwner: input.conflict.agentId,
+    currentOwnerPaths,
+    currentOwnerReleaseCommand,
+    requestedOwner: input.requestedOwner,
+    activeLeases,
+    requiredCommand: currentOwnerReleaseCommand
+  };
+}
+
+export function buildTeamLeaseNotFoundDetails(input: {
+  readonly teamRunId: string;
+  readonly permission: string;
+  readonly actorId: string;
+  readonly currentLeases: readonly PermissionLease[];
+}) {
+  const activeLeases = summarizeTeamPermissionLeases({
+    teamRunId: input.teamRunId,
+    permission: input.permission,
+    leases: input.currentLeases
+  });
+  return {
+    teamRunId: input.teamRunId,
+    permission: input.permission,
+    actorId: input.actorId,
+    activeLeases,
+    holderCount: activeLeases.length,
+    requiredCommand: activeLeases[0]?.releaseCommand ?? null
   };
 }
 
