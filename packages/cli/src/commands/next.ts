@@ -2485,7 +2485,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
         const workItemId = metadata.workItemId;
         if (!workItemId) return [];
         const status = metadata.status ?? 'planned';
-        const shouldHydrateScope = isTaskRoutable(status, taskIntent) || isTaskIdMentioned(workItemId, taskIntent);
+        const shouldHydrateScope = isTaskRoutable(status, taskIntent)
+          || isTaskIdMentioned(workItemId, taskIntent)
+          || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && normalizeTaskRouteStatus(status) === 'running');
         if (!shouldHydrateScope) {
           return [buildMinimalImportedJsonTaskSummary({
             cwd,
@@ -2650,7 +2652,9 @@ function inspectImportedTaskQueue(cwd: string, taskIntent: TaskIntent | null, cl
   profile.mark('dedupe-tasks');
 
   const tasks = allTasks
-    .filter((task) => isTaskRoutable(task.status, taskIntent) || isTaskExplicitlyMentioned(task, taskIntent))
+    .filter((task) => isTaskRoutable(task.status, taskIntent)
+      || isTaskExplicitlyMentioned(task, taskIntent)
+      || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task)))
     .sort((left, right) => {
       const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
       return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
@@ -3081,6 +3085,8 @@ function resolvePromptScopedTaskRoute(
       diagnostics: ['explicit-task-range']
     };
   }
+  const handoffRoute = resolveHandoffResumeTaskRoute(cwd, tasks, taskIntent);
+  if (handoffRoute) return handoffRoute;
   const scored = tasks
     .map((task) => scoreTaskForIntent(cwd, task, taskIntent))
     .filter((task) => (task.matchScore ?? 0) > 0)
@@ -3173,6 +3179,105 @@ function resolvePromptScopedTaskRoute(
     targetRepo: resolveRouteTargetRepo(viableMatches),
     diagnostics: ['multiple-task-candidates-matched-prompt']
   };
+}
+
+/**
+ * Handoff documents are workspace-level artifacts rather than task cards, so
+ * their filename cannot score against a ledger task path. When a handoff is
+ * explicitly named, use the handoff's task references only as a constrained
+ * hint: a referenced active claim is safe, a stale reference is not, and an
+ * unqualified handoff may fall back only when exactly one active claim exists.
+ */
+export function resolveHandoffResumeTaskRoute(
+  cwd: string,
+  tasks: readonly ImportedTaskSummary[],
+  taskIntent: TaskIntent | null
+): PromptScopedTaskRoute | null {
+  if (!taskIntent?.userPrompt || !isHandoffPrompt(taskIntent.userPrompt)) return null;
+  const handoffPath = resolvePromptHandoffPath(cwd, taskIntent.userPrompt);
+  if (!handoffPath) return null;
+  const activeTasks = tasks.filter(isActiveClaimedTask);
+  if (activeTasks.length === 0) return null;
+
+  const handoffText = readFileText(handoffPath);
+  const referencedTaskIds = handoffText ? extractTaskIdReferencesFromPrompt(handoffText) : [];
+  if (referencedTaskIds.length > 0) {
+    const referencedActiveTasks = activeTasks.filter((task) =>
+      referencedTaskIds.some((taskId) => expandTaskIdReferenceAliases(taskId).includes(task.workItemId.toUpperCase()))
+    );
+    if (referencedActiveTasks.length === 1) {
+      return {
+        status: 'ready',
+        selectedTasks: referencedActiveTasks,
+        targetRepo: referencedActiveTasks[0]?.targetRepo ?? null,
+        diagnostics: ['handoff-file-task-reference', 'handoff-file-active-claim-match']
+      };
+    }
+    if (referencedActiveTasks.length > 1) {
+      return {
+        status: 'ambiguous',
+        selectedTasks: referencedActiveTasks,
+        targetRepo: resolveRouteTargetRepo(referencedActiveTasks),
+        diagnostics: ['handoff-file-multiple-active-claim-matches']
+      };
+    }
+    return {
+      status: 'not-found',
+      selectedTasks: [],
+      targetRepo: null,
+      diagnostics: ['handoff-file-references-no-active-claim']
+    };
+  }
+
+  if (activeTasks.length === 1) {
+    return {
+      status: 'ready',
+      selectedTasks: activeTasks,
+      targetRepo: activeTasks[0]?.targetRepo ?? null,
+      diagnostics: ['handoff-file-unique-active-claim-fallback']
+    };
+  }
+  return {
+    status: 'ambiguous',
+    selectedTasks: activeTasks,
+    targetRepo: resolveRouteTargetRepo(activeTasks),
+    diagnostics: ['handoff-file-multiple-active-claims']
+  };
+}
+
+function isActiveClaimedTask(task: ImportedTaskSummary): boolean {
+  return normalizeTaskRouteStatus(task.status) === 'running'
+    && typeof task.activeClaimActorId === 'string'
+    && task.activeClaimActorId.trim().length > 0;
+}
+
+function isHandoffPrompt(prompt: string): boolean {
+  return /(?:handoff|unfinished[-_ ]work)\.md\b/i.test(prompt);
+}
+
+function resolvePromptHandoffPath(cwd: string, prompt: string): string | null {
+  const candidates = new Set<string>();
+  for (const match of prompt.matchAll(/[A-Za-z]:[^\s`"'<>]+\.md/gi)) {
+    candidates.add(path.normalize(match[0].replace(/[),.;]+$/, '')));
+  }
+  for (const match of prompt.matchAll(/\b[A-Za-z0-9][A-Za-z0-9._-]*(?:handoff|unfinished[-_ ]work)[A-Za-z0-9._-]*\.md\b/gi)) {
+    const basename = match[0];
+    candidates.add(path.join(cwd, '.atm', 'history', 'handoff', basename));
+  }
+  for (const candidate of extractPathLikeStringsFromPrompt(prompt)) {
+    if (/(?:handoff|unfinished[-_ ]work)\.md$/i.test(candidate)) {
+      candidates.add(path.isAbsolute(candidate) ? candidate : path.resolve(cwd, candidate));
+    }
+  }
+  return [...candidates].find((candidate) => existsSync(candidate) && statSync(candidate).isFile()) ?? null;
+}
+
+function readFileText(filePath: string): string | null {
+  try {
+    return readFileSync(filePath, 'utf8');
+  } catch {
+    return null;
+  }
 }
 
 function findTaskByTaskIdReference(tasks: readonly ImportedTaskSummary[], taskIdReference: string): ImportedTaskSummary | null {

@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0175",
+  "title": "Resolve handoff prompts to a unique active task",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "When a handoff document is explicitly named and exactly one imported task has a running status with an active claim, route to that task with a diagnostic explaining the fallback.",
+    "If the handoff document names one or more task ids, prefer the matching active claim; never attach to a completed or non-active task.",
+    "When multiple active claims remain possible, return task-selection-required rather than choosing one.",
+    "Add focused regression coverage for unique active, stale completed task, and multiple active claim cases."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next.ts",
+    "tests/cli/handoff-resume-route.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next.ts",
+    "tests/cli/handoff-resume-route.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/handoff-resume-route.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "AI-Atomic-Framework",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit if handoff prompts can attach to the wrong task or bypass multi-claim ambiguity.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-cli-next-routing",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0175.md",
+    "sectionTitle": "TASK-AAO-0175",
+    "headingLine": 30,
+    "hash": "c174037a5fc5e0b1"
+  },
+  "importedAt": "2026-07-12T13:09:38.319Z",
+  "lastTransitionId": "2026-07-12T13-10-15-159Z-claim-582ed83bfafa",
+  "lastTransitionAt": "2026-07-12T13:10:15.159Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T13:10:14.832Z",
+  "promotedAt": "2026-07-12T13:10:14.834Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-58fd070d0cf2",
+    "claimedAt": "2026-07-12T13:10:14.838Z",
+    "heartbeatAt": "2026-07-12T13:10:14.838Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0175.json",
+      "packages/cli/src/commands/next.ts",
+      "tests/cli/handoff-resume-route.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T13:10:14.838Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712131014-codex-backlog-captain-TASK-AAO-0175-50626af4b7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0175",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0175.*",
+      ".atm/history/task-events/TASK-AAO-0175/**",
+      ".atm/history/tasks/TASK-AAO-0175.json",
+      "packages/cli/src/commands/next.ts",
+      "tests/cli/handoff-resume-route.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6ffa8a1d7b5d7aafc372a0eb843252f5ba520ec9422831bb8f485f3330de6cd9",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T13:10:15.158Z",
+    "status": "active"
+  }
+}
