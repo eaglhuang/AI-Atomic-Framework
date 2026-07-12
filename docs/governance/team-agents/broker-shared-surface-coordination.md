@@ -13,6 +13,21 @@ serializing work. A real `block` never permits direct mutation of the affected
 surface. It either routes a bounded same-file proposal through compose and the
 neutral steward, or creates a queue for the conflicting surface.
 
+The atom ID and CID entries remain the fourth and fifth gates; they are not
+global mutexes. A CID write conflict is material only when identity overlap is
+paired with a common writable surface (the same target file or a shared
+generator, projection, registry, validator, or artifact). Identity overlap
+without that surface is retained as an observable relation and does not freeze
+independent files. Read-set dependencies remain their own gate.
+
+`next --claim` creates a canonical `atm.writeIntent.v1` transaction before it
+claims task lifecycle state or writes a direction lock. The transaction is
+stored under `.atm/runtime/broker-intents/` and carries the current `HEAD` as
+its base hash. A `queued-private-work` result narrows the later direction lock
+to private paths; a `queued-blocked`, malformed, stale, or base-mismatched
+result releases the provisional transaction and fails before claim. This keeps
+claim, queue position, and writable scope in one admission order.
+
 ## Queue Behaviour
 
 The queue is runtime state at `.atm/runtime/broker-shared-surface-queues.json`.
@@ -26,10 +41,29 @@ shared surface it needs. Surface keys are acquired in lexical order and no
 partial shared-write lease is issued; this removes the hold-and-wait cycle that
 causes database deadlocks.
 
-Broker rejects a queue when base hashes differ, a non-head task tries to
-release, or the seven-layer gate cannot identify a bounded shared surface.
-Those cases require re-arbitration or human resolution. Queue state is visible
-through `broker status` and `team status`.
+Broker rejects a queue when base hashes differ or the seven-layer gate cannot
+identify a bounded shared surface. Re-registration also compares the task's
+existing queue entry against its pre-claim transaction base hash; drift fails
+closed and requires re-arbitration. Normal delivery release advances only the
+head. A terminal abandon/recovery release may remove its own non-head entry,
+but may never advance another task's position. Queue state is visible through
+`broker status` and `team status`.
+
+## Holder Notification And Handoff
+
+Queueing a later transaction creates one `atm.brokerSharedSurfaceFreeze.v1`
+sidecar for each affected current holder. This is a persistence adapter for the
+existing `FreezeSignal` / `FreezeAck` protocol, not a second notification or
+mailbox contract. The signal names the waiting task, shared path, and the only
+two governed next actions: publish an existing `atm.patchProposal.v1` handoff
+or release the Broker intent after delivery or terminal archive.
+
+The holder acknowledges with `broker acknowledge --task <holder-task> --actor
+<holder-actor> --freeze-id <freeze-id>`. Broker verifies the task and actor
+against the signal before recording the canonical ack. Acknowledgement does
+not transfer a write lease and does not unlock the path. `broker release` by
+the queue head advances the per-file queue; only then may the next task claim
+that shared path. Private paths remain independently claimable throughout.
 
 ## Compose And Steward
 
@@ -45,9 +79,10 @@ merge.
 1. Run `team plan` or `broker decision` and inspect the seven-layer trace.
 2. Work directly when every relevant gate is clear.
 3. When a bounded shared path blocks, continue private-path work and observe
-   its queue position with `team status`.
-4. Submit proposals for compatible bounded changes, then use Broker compose and
-   the neutral steward.
-5. Release only the queue head after governed delivery or terminal archive.
-6. Escalate semantic conflicts, base drift, and stale leases rather than
+   its queue position and freeze sidecar with `broker status`.
+4. The queue head acknowledges its freeze, then publishes a bounded patch
+   proposal or completes its governed delivery.
+5. Submit compatible proposals to Broker compose and the neutral steward.
+6. Release only the queue head after governed delivery or terminal archive.
+7. Escalate semantic conflicts, base drift, and stale leases rather than
    bypassing the queue.

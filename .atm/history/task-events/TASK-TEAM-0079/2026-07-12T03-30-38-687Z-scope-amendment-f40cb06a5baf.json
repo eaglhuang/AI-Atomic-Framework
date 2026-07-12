@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T03-30-38-687Z-scope-amendment-f40cb06a5baf",
+  "taskId": "TASK-TEAM-0079",
+  "action": "scope-amendment",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0079.json",
+  "taskSha256": "sha256:228fb5e021bc3e74f079390d0501dcae8bd4b3d21439d1371dca18b0cfb01e3a",
+  "createdAt": "2026-07-12T03:30:38.687Z",
+  "command": "node atm.mjs tasks scope add --task TASK-TEAM-0079 --actor \"Codex-GPT5.6 Terra\" --add \"packages/cli/src/commands/git-governance.ts,scripts/validate-governance-commands.ts\" --reason \"Resolution-authorized protected foreign staged bundle defer is required to break the broker/taskflow main-worktree commit deadlock recorded as ATM-BUG-2026-07-12-134.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Resolution-authorized protected foreign staged bundle defer is required to break the broker/taskflow main-worktree commit deadlock recorded as ATM-BUG-2026-07-12-134."
+  }
+}

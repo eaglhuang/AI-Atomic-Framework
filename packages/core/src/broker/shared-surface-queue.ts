@@ -86,6 +86,16 @@ export function releaseSharedSurfaceHead(input: { readonly queue: SharedSurfaceQ
   return { ...input.queue, entries: input.queue.entries.slice(1) };
 }
 
+// Terminal abandon/recovery must be able to remove a non-head waiter. This is
+// deliberately separate from normal head release so an active writer cannot
+// skip the deterministic acquisition order by mistake.
+export function removeSharedSurfaceEntry(input: { readonly queue: SharedSurfaceQueue; readonly taskId: string }): SharedSurfaceQueue {
+  return {
+    ...input.queue,
+    entries: input.queue.entries.filter((entry) => entry.taskId !== input.taskId)
+  };
+}
+
 function normalizeEntry(value: SharedSurfaceQueueEntry): SharedSurfaceQueueEntry | null {
   const taskId = String(value?.taskId ?? '').trim();
   const actorId = String(value?.actorId ?? '').trim();
