@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0175
 task_id: TASK-AAO-0175
 title: "Resolve handoff prompts to a unique active task"
-status: planned
+status: done
 owner: atm-governance
 priority: P1
 planning_repo: AI-Atomic-Framework
@@ -25,6 +25,15 @@ rollback:
 atomizationImpact:
   ownerAtomOrMap: "atom-cli-next-routing"
   mapUpdates: []
+completed_at: "2026-07-12T13:16:27.618Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T13:16:27.618Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T13-16-27-618Z-close-9ddf829e8d9e"
+lastTransitionAt: "2026-07-12T13:16:27.618Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "79c89383717daee571a77e1c5db1c2d4e26f1a9f"
 ---
 
 # TASK-AAO-0175 - Resolve handoff prompts to a unique active task

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0175",
   "title": "Resolve handoff prompts to a unique active task",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -49,8 +49,8 @@
     "hash": "c174037a5fc5e0b1"
   },
   "importedAt": "2026-07-12T13:09:38.319Z",
-  "lastTransitionId": "2026-07-12T13-10-15-159Z-claim-582ed83bfafa",
-  "lastTransitionAt": "2026-07-12T13:10:15.159Z",
+  "lastTransitionId": "2026-07-12T13-16-27-528Z-close-7f954fa28d87",
+  "lastTransitionAt": "2026-07-12T13:16:27.528Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-backlog-captain",
   "reservedAt": "2026-07-12T13:10:14.832Z",
@@ -59,15 +59,15 @@
     "actorId": "codex-backlog-captain",
     "leaseId": "lease-58fd070d0cf2",
     "claimedAt": "2026-07-12T13:10:14.838Z",
-    "heartbeatAt": "2026-07-12T13:10:14.838Z",
+    "heartbeatAt": "2026-07-12T13:16:27.526Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-AAO-0175.json",
       "packages/cli/src/commands/next.ts",
       "tests/cli/handoff-resume-route.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-12T13:10:14.838Z",
   "startedByActor": "codex-backlog-captain",
@@ -94,5 +94,9 @@
     "actorId": "codex-backlog-captain",
     "createdAt": "2026-07-12T13:10:15.158Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-12T13:16:27.527Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712131014-codex-backlog-captain-TASK-AAO-0175-50626af4b7",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0175.closure-packet.json"
 }

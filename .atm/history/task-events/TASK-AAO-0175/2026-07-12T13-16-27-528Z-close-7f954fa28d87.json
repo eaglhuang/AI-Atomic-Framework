@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T13-16-27-528Z-close-7f954fa28d87",
+  "taskId": "TASK-AAO-0175",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712131014-codex-backlog-captain-TASK-AAO-0175-50626af4b7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0175.json",
+  "taskSha256": "sha256:a0bfc9b9d0654ebc7d64c0919c49029f8fcadc86915f8d1d58e9d1636144ef17",
+  "createdAt": "2026-07-12T13:16:27.528Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0175 --actor codex-backlog-captain --status done --historical-delivery 79c89383717daee571a77e1c5db1c2d4e26f1a9f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712131014-codex-backlog-captain-TASK-AAO-0175-50626af4b7",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0175.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/handoff-resume-route.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T13:16:27.522Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0175.*",
+        ".atm/history/task-events/TASK-AAO-0175/**",
+        ".atm/history/tasks/TASK-AAO-0175.json",
+        "packages/cli/src/commands/next.ts",
+        "tests/cli/handoff-resume-route.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "tests/cli/handoff-resume-route.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
