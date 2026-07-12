@@ -10,6 +10,7 @@ import {
   releaseTask,
   cleanupStale
 } from '../../../core/src/broker/registry.ts';
+import { cleanupBrokerRuntimeSnapshots } from '../../../core/src/broker/lifecycle.ts';
 import { calculateBrokerDecision } from '../../../core/src/broker/decision.ts';
 import { composeBrokerProposals } from '../../../core/src/broker/compose.ts';
 import {
@@ -244,6 +245,11 @@ export async function runBroker(argv: string[]) {
       queues: updatedQueues
     });
     writeSharedSurfaceFreezeRecords(sharedFreezePath, freezes);
+    const runtimeCleanup = cleanupBrokerRuntimeSnapshots({
+      cwd: options.cwd,
+      releasedTaskIds: [releaseTaskId],
+      activeTaskIds: registry.activeIntents.map((intent) => intent.taskId)
+    });
 
     return makeResult({
       ok: true,
@@ -256,7 +262,8 @@ export async function runBroker(argv: string[]) {
         registryPath: '.atm/runtime/write-broker.registry.json',
         releasedTask: releaseTaskId,
         sharedSurfaceQueues: updatedQueues,
-        sharedSurfaceFreezes: freezes
+        sharedSurfaceFreezes: freezes,
+        runtimeCleanup
       }
     });
   }
@@ -289,6 +296,10 @@ export async function runBroker(argv: string[]) {
     let registry = cleanupStale(loadRegistry(registryPath));
     registry = cleanupStale(registry);
     saveRegistry(registryPath, registry);
+    const runtimeCleanup = cleanupBrokerRuntimeSnapshots({
+      cwd: options.cwd,
+      activeTaskIds: registry.activeIntents.map((intent) => intent.taskId)
+    });
 
     return makeResult({
       ok: true,
@@ -298,7 +309,8 @@ export async function runBroker(argv: string[]) {
         message('info', 'ATM_BROKER_CLEANED', 'Cleaned up stale write intents from registry')
       ],
       evidence: {
-        registryPath: '.atm/runtime/write-broker.registry.json'
+        registryPath: '.atm/runtime/write-broker.registry.json',
+        runtimeCleanup
       }
     });
   }

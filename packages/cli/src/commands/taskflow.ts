@@ -66,6 +66,7 @@ import {
   type CloseWindowStagedIndexLockReport
 } from './tasks/close-window-lock.ts';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../core/src/team-runtime/handoff-ledger.ts';
+import { clearBrokerRuntimeStateForTask } from '../../../core/src/broker/lifecycle.ts';
 
 interface DeferredGovernanceDirtyFile {
   file: string;
@@ -1038,6 +1039,9 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         }
       };
     const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+    const brokerRuntimeCleanup = writeOk
+      ? clearBrokerRuntimeStateForTask({ cwd, taskId }).runtimeCleanup ?? null
+      : null;
     const residueAdvisory = writeOk ? buildTaskflowCloseResidueAdvisory(enrichedDiagnosis) : null;
     if (residueAdvisory) {
       closeMessages.push(message(
@@ -1095,6 +1099,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           closeWriteTransaction,
           closeWindowLock,
           releasedCloseWindowLock,
+          brokerRuntimeCleanup,
           deferredGovernanceDirty,
           residueDiagnosis: enrichedDiagnosis,
           residueAdvisory,
