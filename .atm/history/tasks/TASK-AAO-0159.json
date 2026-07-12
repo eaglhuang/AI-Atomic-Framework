@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0159",
+  "title": "Scope-aware encoding guard and temporary artifact isolation",
+  "status": "planned",
+  "milestone": "Backlog-P0",
+  "dependencies": [],
+  "acceptance": [
+    "`--files` remains the exact explicit check surface.",
+    "The touched default prefers task/claim or staged delivery paths when an ATM task context is available, and reports excluded untracked temporary files as diagnostics with no mutation.",
+    "A deliberate whole-worktree mode remains available and preserves the current broad scan behavior for repository health audits.",
+    "Text files outside a task scope are never silently ignored when explicitly supplied or when whole-worktree mode is selected.",
+    "Output distinguishes `checked`, `quarantined-temporary`, and `unsupported` candidates so a later agent can understand why a file was excluded.",
+    "Regressions cover a claimed clean source file beside foreign malformed `tmp/` text, an explicit malformed file failure, staged-only operation, and whole-worktree failure.",
+    "Package scripts preserve existing explicit `--files` usage and expose the selected candidate policy in their output."
+  ],
+  "deliverables": [
+    "scripts/check-encoding-touched.ts",
+    "scripts/validate-script-parity.ts",
+    "package.json"
+  ],
+  "scopePaths": [
+    "scripts/check-encoding-touched.ts",
+    "scripts/validate-script-parity.ts",
+    "package.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/check-encoding-touched.ts --mode touched --files scripts/check-encoding-touched.ts",
+    "node --strip-types scripts/validate-script-parity.ts --mode validate",
+    "npm run typecheck",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Deleting, moving, or rewriting another actor's tmp artifacts",
+    "Changing ATM task lifecycle or Broker admission semantics",
+    "Writing shared canonical backlog/map paths while another active task owns them"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the scope-aware candidate resolver, parity regression, and package-script argument forwarding together.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.encoding-guard",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/check-encoding-touched.ts",
+        "scripts/validate-script-parity.ts",
+        "package.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0159-scope-aware-encoding-guard-and-temp-artifact-isolation.task.md",
+    "sectionTitle": "TASK-AAO-0159",
+    "headingLine": 41,
+    "hash": "c88ebea90e6541f3"
+  },
+  "importedAt": "2026-07-12T02:34:18.129Z",
+  "lastTransitionId": "2026-07-12T02-34-18-135Z-import-f707e2e2702a",
+  "lastTransitionAt": "2026-07-12T02:34:18.135Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}
