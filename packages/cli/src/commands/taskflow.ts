@@ -46,6 +46,7 @@ import {
   preflightBlockersToWriteReadinessBlockers
 } from './taskflow/close-preflight.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
+import { isRunnerSyncRequired } from './framework-development.ts';
 import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.ts';
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.ts';
 import {
@@ -698,9 +699,23 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     waiverReason: waiver.waiverReason,
     planningAuthorityDeliveryGate
   });
-  if (historicalClosePreflight.blockers.length > 0) {
+  // ATM-BUG-2026-07-12-154 (TASK-AAO-FABLE-002): the frozen-runner staleness
+  // guard used to fire only inside the write path (ATM_RUNNER_STALE_WRITE_REFUSED),
+  // after pre-close and dry-run had already reported ready. Surface it here as
+  // a write-readiness blocker with the exact sync command so the operator
+  // discovers it before any write attempt. The write-path guard stays
+  // authoritative and unchanged.
+  const staleRunnerBlockers = isRunnerSyncRequired(cwd)
+    ? [{
+      code: 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER',
+      summary: 'The frozen runner (release/atm-onefile/atm.mjs) is older than framework source files; taskflow close --write will be refused with ATM_RUNNER_STALE_WRITE_REFUSED until the runner is rebuilt.',
+      requiredCommand: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'
+    }]
+    : [];
+  if (historicalClosePreflight.blockers.length > 0 || staleRunnerBlockers.length > 0) {
     const mergedBlockers = [
       ...writeReadinessHint.blockers,
+      ...staleRunnerBlockers,
       ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
     ];
     writeReadinessHint = {
