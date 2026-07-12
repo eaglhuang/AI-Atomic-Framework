@@ -86,3 +86,26 @@ merge.
 6. Release only the queue head after governed delivery or terminal archive.
 7. Escalate semantic conflicts, base drift, and stale leases rather than
    bypassing the queue.
+
+## Structured Admission Decision Logs
+
+`next --claim` renders every candidate conflict decision into one
+`atm.nextClaimAdmissionDecisionLog.v1` record owned by
+`packages/cli/src/commands/next/claim-conflict-log.ts` (TASK-TEAM-0078). The
+record explains, without echoing task body content:
+
+- the seven-layer gate result, in fixed order: claim-intent,
+  active-write-conflict, broker-confirmation, mutation-intent, cid-verdict,
+  queue-admission, broker-verdict;
+- the deterministic, sorted shared-path evaluation order;
+- the queue status and waiting position against each shared-surface queue;
+- whether a private-path allowance was granted and how many files it covers;
+- the block reason on freeze, or the admission reason when admitted.
+
+Blocked claims carry the record in the `ATM_NEXT_CLAIM_BLOCKED` details as
+`claimAdmissionDecisionLog`; admitted-with-advisory claims carry it inside the
+parallel advisory. `next.ts` only orchestrates the atoms
+(`claim-admission.ts`, `broker-queue-admission.ts`, `claim-conflict-log.ts`);
+schema keys, gate names, and per-module line budgets (< 600 lines) are pinned
+by `node --strip-types scripts/validate-team-agents.ts --case
+next-claim-atomization`.

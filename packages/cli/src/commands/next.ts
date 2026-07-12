@@ -28,10 +28,12 @@ import {
 } from './next/match-and-sort.ts';
 import { runDoctor } from './doctor.ts';
 import {
-  evaluateClaimAdmission,
-  type ClaimAdmissionCidVerdict
+  deriveBrokerVerdict,
+  deriveCidVerdict,
+  evaluateClaimAdmission
 } from './next/claim-admission.ts';
 import { evaluateBrokerQueueAdmission, type BrokerQueueAdmission } from './next/broker-queue-admission.ts';
+import { buildClaimAdmissionDecisionLog } from './next/claim-conflict-log.ts';
 import { runBroker } from './broker.ts';
 import {
   allowedGuidanceBootstrapCommands,
@@ -42,7 +44,6 @@ import {
 } from './next/channel-strategy.ts';
 import { buildTaskScopedClaimCommand } from './next/task-scoped-claim-command.ts';
 import { withRunnerMode } from './next/runner-mode.ts';
-import type { BrokerArbitrationVerdict } from '../../../core/src/broker/conflict-matrix.ts';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.ts';
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.ts';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
@@ -992,16 +993,13 @@ async function claimNextImportedTask(input: {
             const confirmedBrokerConflict = brokerAdmission?.confirmedConflict === true;
             const insufficientMutationIntent = finding.verdict === 'insufficient-mutation-intent'
               || brokerAdmission?.mutationIntentStatus === 'missing';
-            const shouldBlockPerCid = claimIntent !== 'closeout-only'
-              && activeWriteConflict
-              && (confirmedBrokerConflict || insufficientMutationIntent);
-            const cidVerdict: ClaimAdmissionCidVerdict = shouldBlockPerCid
-              ? 'blocked-cid-conflict'
-              : (insufficientMutationIntent
-                ? 'insufficient-mutation-intent'
-                : overlappingAtomIds.length > 0
-                ? 'parallel-safe-with-cid-overlap-advisory'
-                : 'parallel-safe');
+            const { shouldBlockPerCid, cidVerdict } = deriveCidVerdict({
+              claimIntent,
+              activeWriteConflict,
+              confirmedBrokerConflict,
+              insufficientMutationIntent,
+              overlappingAtomIdCount: overlappingAtomIds.length
+            });
             const queueAdmission = evaluateBrokerQueueAdmission({
               cwd: input.cwd,
               taskId: claimableTask.workItemId,
@@ -1050,15 +1048,39 @@ async function claimNextImportedTask(input: {
             // maps to broker `allow`. When broker's separate authoritative
             // registry adds a distinct verdict feed here in a follow-up, the
             // divergence detector will start firing.
-            const brokerVerdict: BrokerArbitrationVerdict = queueAdmission.status === 'queued-private-work'
-              ? 'watch'
-              : shouldBlockPerCid ? 'freeze' : 'allow';
+            const brokerVerdict = deriveBrokerVerdict({
+              queuedPrivateWork: queueAdmission.status === 'queued-private-work',
+              shouldBlockPerCid
+            });
             const admission = evaluateClaimAdmission({
               brokerVerdict,
               cidVerdict,
               candidateTaskId: claimableTask.workItemId,
               conflictingTaskId: candidate.taskId,
               overlappingAtomIds
+            });
+            const admissionReason = admission.admitted
+              ? (queueAdmission.status === 'queued-private-work'
+                ? 'broker-shared-surface-queue-private-work'
+                : insufficientMutationIntent
+                ? 'broker-conflict-not-confirmed'
+                : claimIntent === 'closeout-only'
+                ? 'closeout-only-claim-intent'
+                : 'cid-overlap-without-active-write-claim')
+              : null;
+            const claimAdmissionDecisionLog = buildClaimAdmissionDecisionLog({
+              taskId: claimableTask.workItemId,
+              conflictTaskId: candidate.taskId,
+              claimIntent,
+              activeWriteConflict,
+              confirmedBrokerConflict,
+              insufficientMutationIntent,
+              cidVerdict,
+              brokerVerdict,
+              queueAdmission,
+              overlappingFiles,
+              decision: admission,
+              admissionReason
             });
             if (!admission.admitted) {
               throw new CliError(admission.blockCode ?? 'ATM_NEXT_CLAIM_BLOCKED', admission.blockReason
@@ -1081,6 +1103,7 @@ async function claimNextImportedTask(input: {
                   requiredResolutionArtifact: 'atm.brokerConflictResolution.v1',
                   requiredCommand,
                   conflictUx,
+                  claimAdmissionDecisionLog,
                   admissionDivergence: admission.divergence,
                   closeoutOnlyHint: `If ${claimableTask.workItemId} already delivered its scoped files and only needs governed closeout, rerun next --claim with --claim-intent closeout-only.`
                 }
@@ -1095,15 +1118,10 @@ async function claimNextImportedTask(input: {
                 conflictWithTaskId: candidate.taskId,
                 conflictClaimActorId: conflictActorId,
                 admitted: true,
-                admissionReason: queueAdmission.status === 'queued-private-work'
-                  ? 'broker-shared-surface-queue-private-work'
-                  : insufficientMutationIntent
-                  ? 'broker-conflict-not-confirmed'
-                  : claimIntent === 'closeout-only'
-                  ? 'closeout-only-claim-intent'
-                  : 'cid-overlap-without-active-write-claim',
+                admissionReason,
                 brokerVerdict,
                 cidVerdict,
+                claimAdmissionDecisionLog,
                 ...(admission.divergence ? { admissionDivergence: admission.divergence } : {})
               };
             }
