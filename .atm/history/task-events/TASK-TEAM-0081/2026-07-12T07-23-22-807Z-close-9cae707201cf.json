@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T07-23-22-807Z-close-9cae707201cf",
+  "taskId": "TASK-TEAM-0081",
+  "action": "close",
+  "actorId": "Codex-GPT5.6 Terra",
+  "sessionId": "session-20260712071856-Codex-GPT5.6-Terra-TASK-TEAM-0081-a95fdf86d4",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-TEAM-0081.json",
+  "taskSha256": "sha256:c786586fbb682a932860b6ba73b1112b93889c78520ac48f4c93a95b57f1dbac",
+  "createdAt": "2026-07-12T07:23:22.807Z",
+  "command": "node atm.mjs tasks close --task TASK-TEAM-0081 --actor \"Codex-GPT5.6 Terra\" --status done --historical-delivery 573ac3cf7fb03cef459f37358d46270716c2d2b3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712071856-Codex-GPT5.6-Terra-TASK-TEAM-0081-a95fdf86d4",
+    "closurePacketPath": ".atm/history/evidence/TASK-TEAM-0081.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T07:23:22.791Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-TEAM-0081.*",
+        ".atm/history/task-events/TASK-TEAM-0081/**",
+        ".atm/history/tasks/TASK-TEAM-0081.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "scripts/validate-git-head-evidence.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "scripts/validate-git-head-evidence.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
