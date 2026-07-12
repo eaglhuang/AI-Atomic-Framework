@@ -2,7 +2,7 @@
 doc_id: doc_TASK-AAO-0174
 task_id: TASK-AAO-0174
 title: "Record closeout routing and validator readiness friction"
-status: planned
+status: done
 owner: atm-governance
 priority: P1
 planning_repo: AI-Atomic-Framework
@@ -23,6 +23,15 @@ rollback:
 atomizationImpact:
   ownerAtomOrMap: "atom-governance-backlog"
   mapUpdates: []
+completed_at: "2026-07-12T13:07:05.660Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-12T13:07:05.660Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-12T13-07-05-660Z-close-a751bf7e9f22"
+lastTransitionAt: "2026-07-12T13:07:05.660Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "7c4cd2fa752b34cb5ca7edc3aac61ce197f6272c"
 ---
 
 # TASK-AAO-0174 - Record closeout routing and validator readiness friction

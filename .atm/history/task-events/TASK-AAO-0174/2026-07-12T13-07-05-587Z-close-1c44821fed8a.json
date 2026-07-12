@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T13-07-05-587Z-close-1c44821fed8a",
+  "taskId": "TASK-AAO-0174",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712130424-codex-backlog-captain-TASK-AAO-0174-cdcdcc94ed",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0174.json",
+  "taskSha256": "sha256:096580396b2aa12d2de267913da7fd19776de1adf2affca87fab36c1c2040e07",
+  "createdAt": "2026-07-12T13:07:05.587Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0174 --actor codex-backlog-captain --status done --historical-delivery 7c4cd2fa752b34cb5ca7edc3aac61ce197f6272c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260712130424-codex-backlog-captain-TASK-AAO-0174-cdcdcc94ed",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0174.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md",
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-12T13:07:05.578Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0174.*",
+        ".atm/history/task-events/TASK-AAO-0174/**",
+        ".atm/history/tasks/TASK-AAO-0174.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
