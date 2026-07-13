@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-12T15-47-10-502Z-repair-claim-9867aa751778",
+  "taskId": "TASK-AAO-FABLE-005",
+  "action": "repair-claim",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260712150808-claude-fable-5-TASK-AAO-FABLE-005-64799e7ecf",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-AAO-FABLE-005.json",
+  "taskSha256": "sha256:0b7ae732ae80ddd44b1d9aa70dadf8261f904977946f7d762c5909567d5fd912",
+  "createdAt": "2026-07-12T15:47:10.502Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-AAO-FABLE-005 --actor codex-backlog-captain --write --reason \"Expired Fable-005 claim blocks P0 Git hard-gate routing; repair stale claim drift through ATM while preserving staged pre-commit content.\" --json"
+}

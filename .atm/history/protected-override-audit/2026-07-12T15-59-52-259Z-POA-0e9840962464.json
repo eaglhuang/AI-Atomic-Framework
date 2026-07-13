@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-0e9840962464",
+  "recordedAt": "2026-07-12T15:59:52.259Z",
+  "actorId": "codex-backlog-captain",
+  "taskId": "TASK-AAO-FABLE-005",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-backlog-captain --task TASK-AAO-FABLE-005 --message \"fix(hook): allow active foreign residue during parallel commits\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-AAO-FABLE-005-053fd3f44f",
+  "reason": "Bypass pre-commit only for FABLE-005 scoped bundle because foreign generated residue from FABLE-002/FABLE-003 blocks normal hook while content/typecheck passed.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-12T15-59-52-257Z-EMG-TASK-AAO-FABLE-005-053fd3f44f.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

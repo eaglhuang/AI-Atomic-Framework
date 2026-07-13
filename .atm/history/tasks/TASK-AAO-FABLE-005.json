@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-FABLE-005",
+  "title": "Resolve residue ownership from the committing task id under multi-claim parallelism",
+  "status": "running",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "The committing task id from `ATM_COMMIT_TASK_ID` is the primary residue ownership context; staged-file inference and the single-lock heuristic remain as fallbacks.",
+    "Foreign-owned governance artifacts still block when the committing task is genuinely unknown.",
+    "Two active claims plus a foreign untracked bundle-manifest no longer block an unrelated task's governed commit."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/hook/pre-commit.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/hook/pre-commit.ts"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert to lock-count heuristic; single-claim behavior is unchanged either way.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-FABLE-005-multi-claim-residue-task-resolution.task.md",
+    "sectionTitle": "TASK-AAO-FABLE-005",
+    "headingLine": 30,
+    "hash": "7fc2a1f70816aec1"
+  },
+  "importedAt": "2026-07-12T15:07:47.273Z",
+  "lastTransitionId": "2026-07-12T15-58-53-669Z-claim-ba5819f3502f",
+  "lastTransitionAt": "2026-07-12T15:58:53.669Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "reservedAt": "2026-07-12T15:58:46.858Z",
+  "promotedAt": "2026-07-12T15:58:46.861Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-f2a78e643f77",
+    "claimedAt": "2026-07-12T15:58:53.186Z",
+    "heartbeatAt": "2026-07-12T15:58:53.186Z",
+    "ttlSeconds": 1800,
+    "files": [
+      "packages/cli/src/commands/hook/pre-commit.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T15:08:08.840Z",
+  "startedByActor": "claude-fable-5",
+  "startedBySessionId": "session-20260712155853-codex-backlog-captain-TASK-AAO-FABLE-005-f55449aa28",
+  "owner": "codex-backlog-captain",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-FABLE-005",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-005.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-005/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-005.json",
+      "packages/cli/src/commands/hook/pre-commit.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e2953a8349eb16e017cb85bc638f9a7f3f1ef54d33643ba583c3afcb83bdaa8d",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T15:58:53.668Z",
+    "status": "active"
+  }
+}
