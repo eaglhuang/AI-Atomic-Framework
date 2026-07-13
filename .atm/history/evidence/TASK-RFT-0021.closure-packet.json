@@ -1,0 +1,189 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0021",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "8ddc2f45c9adfd5cf4ca4adb9108e786082fdbad",
+  "governedTreeSha": "a9c54f1b7dc7e2f70db644d6aa4e7056c3080292",
+  "targetCommitDelta": {
+    "currentCommitSha": "8ddc2f45c9adfd5cf4ca4adb9108e786082fdbad",
+    "parentCommitShas": [
+      "8ddc2f45c9adfd5cf4ca4adb9108e786082fdbad"
+    ],
+    "governedTreeSha": "a9c54f1b7dc7e2f70db644d6aa4e7056c3080292",
+    "changedFiles": [
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/TASK-RFT-0021.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0021.json",
+      ".atm/history/task-events/TASK-RFT-0021/2026-07-13T16-37-51-113Z-import-7bceb447c597.json",
+      ".atm/history/task-events/TASK-RFT-0021/2026-07-13T17-14-29-178Z-reserve-2da986694738.json",
+      ".atm/history/task-events/TASK-RFT-0021/2026-07-13T17-14-29-182Z-promote-d0b311d04fb2.json",
+      ".atm/history/task-events/TASK-RFT-0021/2026-07-13T17-14-35-187Z-claim-7eeb7ef84b2b.json",
+      ".atm/history/tasks/TASK-RFT-0021.json",
+      "docs/reports/team-command-atomic-map.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-route-map.spec.ts",
+      "packages/cli/src/commands/team/role-provider-resolution.ts",
+      "packages/cli/src/commands/team/team-execution-lane.ts",
+      "packages/cli/src/commands/team/team-route-map.ts",
+      "packages/core/src/broker/__tests__/registry-stale-cleanup.test.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/import-orchestrator.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/cross-task-mutation-guard.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/cross-task-mutation-guard.js",
+      "release/atm-root-drop/packages/core/dist/broker/registry.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/registry.js",
+      "release/atm-root-drop/packages/core/dist/team-runtime/providers/azure-openai.js",
+      "release/atm-root-drop/packages/core/dist/team-runtime/providers/microsoft-foundry.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/cross-task-mutation-guard.ts",
+      "release/atm-root-drop/packages/core/src/broker/registry.ts",
+      "release/atm-root-drop/packages/core/src/team-runtime/providers/azure-openai.ts",
+      "release/atm-root-drop/packages/core/src/team-runtime/providers/microsoft-foundry.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-team-agents.ts",
+      "scripts/validate-team-agents.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/team/__tests__/team-route-map.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5ee1951e9b59d44b8cb3cebd3127bb800b588213fcf6f5f09fd21927ce1829f2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/team/team-route-map.ts,packages/cli/src/commands/team/team-execution-lane.ts,packages/cli/src/commands/team/role-provider-resolution.ts,packages/cli/src/commands/team/__tests__/team-route-map.spec.ts,docs/reports/team-command-atomic-map.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:181b8c83a035bbe8793177a50c379a11ec6d12b41bd46d1f527d8de380ce7903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-agents.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:76c323cd44aa9a39c73b14c1480eae607b4129eb94c095551f6864cbaed011d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:1acd15c23d4c12505ebfdf42d63405f554209d8885034172aebd49fe0f99b6b0",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:06d5eccb9bc347afdda904e921fb60277543800d8a9d235ab08989230abd8807",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/team/__tests__/team-route-map.spec.ts",
+    "typecheck",
+    "validate:atom-file-size",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-13T17:31:17.244Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/TASK-RFT-0021.*",
+      ".atm/history/task-events/TASK-RFT-0021/**",
+      ".atm/history/tasks/TASK-RFT-0021.json",
+      "docs/reports/team-command-atomic-map.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/**",
+      "packages/cli/src/commands/team/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/**",
+      "packages/cli/src/commands/team/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0021.json",
+  "closedAt": "2026-07-13T17:31:17.244Z",
+  "closedByActor": "Codex-GPT 5.5",
+  "sessionId": "session-20260713171429-Codex-GPT-5.5-TASK-RFT-0021-e1101de5fc",
+  "attestation": null,
+  "historicalDeliveryProvenance": null,
+  "teamSummary": null
+}

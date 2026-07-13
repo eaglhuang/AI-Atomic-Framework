@@ -212,3 +212,18 @@ Owner modules:
 Proof: focused `commit-scope-policy.spec.ts`, 600-line atom validator, `typecheck`, `validate:cli`, governance command validation, git-hook enforcement validation, and `git diff --check`.
 
 Lesson: start giant command refactors by extracting pure policy atoms whose inputs are strings and contracts, not live repository state. Add a line-budget validator immediately; otherwise "atomized" helper files can silently become the next oversized command.
+
+## TASK-RFT-0021 - team command route and execution map
+
+Problem: `packages/cli/src/commands/team.ts` carried CLI action routing, start execution message branching, runtime backend admission, and role-provider selection inside the main command facade. The file is a hot Team Agent governance surface, so small behavior changes can accidentally affect plan/start/status/lifecycle paths at once.
+
+Pattern: Strategy Map plus small provider Policy helper.
+
+Owner modules:
+- `packages/cli/src/commands/team/team-route-map.ts`;
+- `packages/cli/src/commands/team/team-execution-lane.ts`;
+- `packages/cli/src/commands/team/role-provider-resolution.ts`.
+
+Proof: focused `team-route-map.spec.ts`, parameterized 600-line atom validator, Team broker proposal preview with explicit `--actor "Codex-GPT 5.5"`, and Team Agents validator. Full `typecheck` may be blocked by unrelated dirty broker registry test files; record that separately instead of widening the RFT scope.
+
+Lesson: route classification should be pure and tested without booting the Team runtime. For hot files, proposal-first gates must be paired with explicit actor identity because stale environment identity can still poison proposal ownership.

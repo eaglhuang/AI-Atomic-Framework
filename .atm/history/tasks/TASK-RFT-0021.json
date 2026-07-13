@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0021",
+  "title": "team.ts route and execution strategy map extraction",
+  "status": "done",
+  "milestone": "RFT-M7",
+  "dependencies": [
+    "TASK-RFT-0020"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/team-route-map.ts",
+    "packages/cli/src/commands/team/team-execution-lane.ts",
+    "packages/cli/src/commands/team/role-provider-resolution.ts",
+    "packages/cli/src/commands/team/__tests__/team-route-map.spec.ts",
+    "docs/reports/team-command-atomic-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/**",
+    "packages/cli/src/commands/team/__tests__/**",
+    "scripts/validate-team-agents.ts",
+    "docs/reports/team-command-atomic-map.md",
+    ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "node --strip-types packages/cli/src/commands/team/__tests__/team-route-map.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Making Team Agents mandatory for ordinary work.",
+    "Creating a second scheduler or task lifecycle.",
+    "Changing broker authority or permission lease semantics."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if team start, team start --execute, role-provider routing, or broker-conflict-blocked semantics regress.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-command-strategy-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/team-command-atomic-map.md",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team.route-map",
+        "pattern": "Strategy Map",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0021-team-command-strategy-map.task.md",
+    "sectionTitle": "TASK-RFT-0021",
+    "headingLine": 63,
+    "hash": "5fd7376881c41944"
+  },
+  "importedAt": "2026-07-13T16:37:51.099Z",
+  "lastTransitionId": "2026-07-13T17-31-17-250Z-close-e2064e29d5e7",
+  "lastTransitionAt": "2026-07-13T17:31:17.250Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT 5.5",
+  "reservedAt": "2026-07-13T17:14:29.178Z",
+  "promotedAt": "2026-07-13T17:14:29.182Z",
+  "claim": {
+    "actorId": "Codex-GPT 5.5",
+    "leaseId": "lease-5599da5e9023",
+    "claimedAt": "2026-07-13T17:14:29.187Z",
+    "heartbeatAt": "2026-07-13T17:31:17.248Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0021.json",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      "docs/reports/team-command-atomic-map.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/**",
+      "packages/cli/src/commands/team/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T17:14:29.187Z",
+  "startedByActor": "Codex-GPT 5.5",
+  "startedBySessionId": "session-20260713171429-Codex-GPT-5.5-TASK-RFT-0021-e1101de5fc",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0021",
+    "batchId": "batch-711cb1cf0136",
+    "scopeKey": "TASK-RFT",
+    "queueId": "queue-884994a6ce44f17e",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/TASK-RFT-0021.*",
+      ".atm/history/task-events/TASK-RFT-0021/**",
+      ".atm/history/tasks/TASK-RFT-0021.json",
+      "docs/reports/team-command-atomic-map.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/**",
+      "packages/cli/src/commands/team/**",
+      "scripts/validate-team-agents.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "712d91ab8d83502a1385761bb2ad1c642c6422e903edd55f42bb991c9306cb06",
+    "actorId": "Codex-GPT 5.5",
+    "createdAt": "2026-07-13T17:14:35.186Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-13T17:31:17.248Z",
+  "closedByActor": "Codex-GPT 5.5",
+  "closedBySessionId": "session-20260713171429-Codex-GPT-5.5-TASK-RFT-0021-e1101de5fc",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0021.closure-packet.json"
+}
