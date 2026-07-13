@@ -105,3 +105,17 @@ export interface ContextMap {
     readonly patterns?: readonly ContextPattern[];
 }
 export declare function parseContextMap(raw: unknown): ContextMap | undefined;
+import type { TaskCardImportDiagnostic } from './result-contracts.ts';
+export declare const EXTRACTION_FIRST_LINE_BUDGET = 600;
+/**
+ * Extraction-first patrol (TASK-AAO-FABLE-006/007): when a card's scopePaths
+ * touch an existing module over EXTRACTION_FIRST_LINE_BUDGET lines and the
+ * card declares no `atomizationImpact.extractionCandidates`, emit an advisory
+ * warning. Never blocking — the human may still choose inline, but the choice
+ * must be visible on the card.
+ */
+export declare function buildExtractionFirstPatrolDiagnostics(input: {
+    readonly scopePaths: readonly string[];
+    readonly hasExtractionCandidates: boolean;
+    readonly resolveLineCount: (relativePath: string) => number | null;
+}): TaskCardImportDiagnostic[];

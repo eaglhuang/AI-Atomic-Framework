@@ -47,6 +47,7 @@ assert(closureOnlyGuard.regenerableArtifactFiles.length === 2, 'both regenerable
 assert(dirtyGuard.generatedArtifactFiles.includes('release/atm-onefile/atm.mjs'), 'release runner output must be generated artifact bucket');
 assert(dirtyGuard.advisoryTrackedDirtyFiles.includes('scripts/unrelated.ts'), 'unrelated source must be advisory bucket');
 assert(dirtyGuard.remediation.requiredCommand?.includes('node atm.mjs git commit'), 'blocking guard must expose governed commit command');
+assert(dirtyGuard.remediation.requiredCommand?.includes('--auto-stage'), 'blocking guard commit remediation must include --auto-stage');
 assert(dirtyGuard.remediation.safeToAutoStage === false, 'diagnostic atom must never authorize auto-staging');
 const cleanGuard = evaluateFrameworkCloseDirtyGuard({
     cwd: process.cwd(),

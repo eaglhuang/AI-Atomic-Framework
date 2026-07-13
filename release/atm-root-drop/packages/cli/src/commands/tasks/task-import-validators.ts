@@ -66,7 +66,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
     if (currentObjectKey && currentObjectListKey && objectListObjectMatch) {
       const objectRecord = data[currentObjectKey] as Record<string, unknown>;
       const key = objectListObjectMatch[1];
-      const value = objectListObjectMatch[2].trim();
+      const value = normalizeYamlScalar(objectListObjectMatch[2]);
       const item: Record<string, unknown> = { [key]: value };
       const existing = objectRecord[currentObjectListKey];
       objectRecord[currentObjectListKey] = Array.isArray(existing) ? [...existing, item] : [item];
@@ -77,7 +77,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
     const objectListObjectFieldMatch = /^ {6}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
     if (currentObjectKey && currentObjectListKey && currentObjectListItem && objectListObjectFieldMatch) {
       const key = objectListObjectFieldMatch[1];
-      const value = objectListObjectFieldMatch[2].trim();
+      const value = normalizeYamlScalar(objectListObjectFieldMatch[2]);
       currentObjectListItem[key] = value;
       continue;
     }
@@ -409,4 +409,38 @@ function parseContextPatterns(val: unknown): ContextPattern[] | undefined {
     }
   }
   return items;
+}
+
+// ─── TASK-AAO-FABLE-007：extraction-first 匯入巡邏（純 policy，I/O 由呼叫端注入） ──
+
+import type { TaskCardImportDiagnostic } from './result-contracts.ts';
+
+export const EXTRACTION_FIRST_LINE_BUDGET = 600;
+
+/**
+ * Extraction-first patrol (TASK-AAO-FABLE-006/007): when a card's scopePaths
+ * touch an existing module over EXTRACTION_FIRST_LINE_BUDGET lines and the
+ * card declares no `atomizationImpact.extractionCandidates`, emit an advisory
+ * warning. Never blocking — the human may still choose inline, but the choice
+ * must be visible on the card.
+ */
+export function buildExtractionFirstPatrolDiagnostics(input: {
+  readonly scopePaths: readonly string[];
+  readonly hasExtractionCandidates: boolean;
+  readonly resolveLineCount: (relativePath: string) => number | null;
+}): TaskCardImportDiagnostic[] {
+  if (input.hasExtractionCandidates) return [];
+  const oversized = input.scopePaths
+    .map((entry) => String(entry).trim().replace(/\\/g, '/'))
+    .filter((entry) => entry && /\.[A-Za-z0-9]+$/.test(entry) && !/[*{}]/.test(entry))
+    .map((entry) => ({ path: entry, lines: input.resolveLineCount(entry) }))
+    .filter((entry): entry is { path: string; lines: number } => typeof entry.lines === 'number' && entry.lines > EXTRACTION_FIRST_LINE_BUDGET);
+  if (oversized.length === 0) return [];
+  return [{
+    code: 'ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE',
+    severity: 'warning',
+    field: 'atomizationImpact',
+    message: `Scope touches ${oversized.length} module(s) over ${EXTRACTION_FIRST_LINE_BUDGET} lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition "inline" with an inlineReason approved by a human.`,
+    candidates: oversized.map((entry) => `${entry.path} (${entry.lines} lines)`)
+  }];
 }

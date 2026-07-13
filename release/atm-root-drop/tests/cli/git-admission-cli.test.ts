@@ -66,6 +66,18 @@ async function runAdmission(local: string, extraArgs: string[] = []) {
   ]);
 }
 
+async function runPush(local: string, extraArgs: string[] = []) {
+  return runAtmGit([
+    'push',
+    '--cwd', local,
+    '--actor', 'fixture-agent',
+    '--branch', 'main',
+    '--remote', 'origin',
+    ...extraArgs,
+    '--json'
+  ]);
+}
+
 async function runPostPushFailRecovery(local: string, extraArgs: string[] = []) {
   return runAtmGit([
     'recover-push-fail',
@@ -76,6 +88,10 @@ async function runPostPushFailRecovery(local: string, extraArgs: string[] = []) 
     ...extraArgs,
     '--json'
   ]);
+}
+
+function remoteHead(remote: string) {
+  return runGit(path.dirname(remote), ['ls-remote', remote, 'refs/heads/main']).split(/\s+/)[0] ?? '';
 }
 
 try {
@@ -105,6 +121,28 @@ try {
   }
 
   {
+    const { remote, local } = setupRemoteScenario('push-wrapper');
+    const beforeRemote = remoteHead(remote);
+    writeText(path.join(local, 'pushed-by-wrapper.txt'), 'governed push\n');
+    runGit(local, ['add', 'pushed-by-wrapper.txt']);
+    runGit(local, ['commit', '-m', 'feat: governed push wrapper']);
+    const localHead = runGit(local, ['rev-parse', 'HEAD']);
+
+    const dryRun = await runPush(local, ['--dry-run']);
+    assert.equal(dryRun.ok, true);
+    assert.equal((dryRun.evidence as any).action, 'push');
+    assert.equal((dryRun.evidence as any).dryRun, true);
+    assert.equal((dryRun.evidence as any).hostPush, null);
+    assert.equal(remoteHead(remote), beforeRemote, 'dry-run must not mutate the remote branch');
+
+    const pushed = await runPush(local);
+    assert.equal(pushed.ok, true);
+    assert.equal((pushed.evidence as any).action, 'push');
+    assert.equal((pushed.evidence as any).hostPush?.exitCode, 0);
+    assert.equal(remoteHead(remote), localHead, 'governed push must publish local HEAD to the remote branch');
+  }
+
+  {
     const { seed, local } = setupRemoteScenario('block');
     writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockBase);
     runGit(seed, ['add', 'data.json']);
@@ -128,6 +166,34 @@ try {
     assert.equal(result.ok, false);
     assert.equal((result.evidence as any).outcome, 'block');
     assert.deepEqual((result.evidence as any).conflictingFiles, ['data.json']);
+  }
+
+  {
+    const { seed, remote, local } = setupRemoteScenario('push-wrapper-block');
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockBase);
+    runGit(seed, ['add', 'data.json']);
+    runGit(seed, ['commit', '-m', 'feat: add data']);
+    runGit(seed, ['push', 'origin', 'main']);
+
+    runGit(local, ['pull', '--ff-only', 'origin', 'main']);
+    writeText(path.join(seed, 'data.json'), gitBoundaryFixtures.json.blockRemote);
+    runGit(seed, ['add', 'data.json']);
+    runGit(seed, ['commit', '-m', 'feat: remote alpha']);
+    runGit(seed, ['push', 'origin', 'main']);
+    const remoteAfterDrift = remoteHead(remote);
+
+    runGit(local, ['fetch', 'origin', 'main']);
+    writeText(path.join(local, 'data.json'), gitBoundaryFixtures.json.blockLocal);
+    runGit(local, ['add', 'data.json']);
+    runGit(local, ['commit', '-m', 'feat: local alpha']);
+
+    const blocked = await runPush(local);
+    assert.equal(blocked.ok, false);
+    assert.equal((blocked.evidence as any).action, 'push');
+    assert.equal((blocked.evidence as any).hostPush, null);
+    assert.equal((blocked.evidence as any).admission.outcome, 'block');
+    assert.deepEqual((blocked.evidence as any).admission.conflictingFiles, ['data.json']);
+    assert.equal(remoteHead(remote), remoteAfterDrift, 'blocked governed push must not call host git push');
   }
 
   {

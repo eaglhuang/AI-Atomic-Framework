@@ -26,6 +26,7 @@
  * before calling `executeAutoEvidencePlan`.
  */
 const NODE_STRIP_TYPES_RE = /^node\s+--strip-types\s+scripts\/([A-Za-z0-9_.-]+)\.ts(\s+.*)?$/;
+const ATM_PSEUDO_SUBCOMMAND_RE = /^node\s+atm\.mjs\s+([A-Za-z0-9_.:-]+)\s+--json$/;
 function normalizeInvocation(raw) {
     return raw.trim().replace(/\s+/g, ' ');
 }
@@ -57,6 +58,18 @@ function parseNodeStripTypesInvocation(raw) {
  */
 export function mapAutoEvidenceCommand(declaredCommand, packageJson) {
     const declared = normalizeInvocation(declaredCommand);
+    const atmPseudoMatch = ATM_PSEUDO_SUBCOMMAND_RE.exec(declared);
+    if (atmPseudoMatch) {
+        const scriptName = atmPseudoMatch[1];
+        const scriptCommand = packageJson?.scripts?.[scriptName];
+        if (typeof scriptCommand === 'string' && scriptCommand.trim().length > 0) {
+            return {
+                command: `npm run ${scriptName}`,
+                source: 'npm-script-for-atm-pseudo-command',
+                matchedScriptName: scriptName
+            };
+        }
+    }
     const parsed = parseNodeStripTypesInvocation(declared);
     if (!parsed) {
         return {

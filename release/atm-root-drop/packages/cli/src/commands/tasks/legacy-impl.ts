@@ -842,6 +842,7 @@ type ScopeAmendmentPreconditionResolution = {
   readonly leaseId: string | null;
   readonly resolvedBy: 'none' | 'claim-first';
   readonly claimCommand: string;
+  readonly claimFirstScopeAddCommand: string;
 };
 function inspectScopeAmendmentPreconditions(cwd: string, taskId: string, actorId: string): ScopeAmendmentPreconditionResolution {
   const taskPath = taskPathFor(cwd, taskId);
@@ -867,7 +868,8 @@ function inspectScopeAmendmentPreconditions(cwd: string, taskId: string, actorId
     claimActorId: claim?.actorId ?? null,
     leaseId: claim?.leaseId ?? null,
     resolvedBy: 'none',
-    claimCommand: `node atm.mjs next --claim --task ${taskId} --actor ${actorId} --auto-intent --json`
+    claimCommand: `node atm.mjs next --claim --task ${taskId} --actor ${actorId} --auto-intent --json`,
+    claimFirstScopeAddCommand: `node atm.mjs tasks scope add --task ${taskId} --actor ${actorId} --claim-first --add <paths> --json`
   };
 }
 function buildScopeAmendmentNoClaimMessage(input: ScopeAmendmentPreconditionResolution): string {
@@ -875,7 +877,8 @@ function buildScopeAmendmentNoClaimMessage(input: ScopeAmendmentPreconditionReso
     `Scope amendment for ${input.taskId} requires an active claim, not a bare lock or renewed lease.`,
     `Current state: lock=${input.lockState}, claim=${input.claimState}, lease=${input.leaseState}.`,
     'Run one of:',
-    `  - ${input.claimCommand} (recommended)`,
+    `  - ${input.claimFirstScopeAddCommand} (recommended when claim and scope expansion are blocking each other)`,
+    `  - ${input.claimCommand} (claim first when no scope expansion is needed)`,
     `  - node atm.mjs tasks renew --task ${input.taskId} --actor ${input.actorId} --json (if lease only)`,
     'Then retry the scope amendment.'
   ].join('\n');
@@ -934,7 +937,8 @@ async function runTasksScopeAdd(argv: string[]) {
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
@@ -947,17 +951,19 @@ async function runTasksScopeAdd(argv: string[]) {
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
   if (outerLock.released === true || outerLock.status === 'released') {
-    throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; claim the task first.`, {
+    throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; use tasks scope add --claim-first when claim and scope expansion are blocking each other.`, {
       exitCode: 1,
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
@@ -968,7 +974,8 @@ async function runTasksScopeAdd(argv: string[]) {
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
@@ -2372,7 +2379,9 @@ export function parseImportOptions(argv: string[]) {
     // TASK-AAO-0064: --strict-paths flag
     strictPaths: false,
     emergencyApproval: null as string | null,
-    allowStaleRunner: parseAllowStaleRunnerFlag(argv)
+    allowStaleRunner: parseAllowStaleRunnerFlag(argv),
+    waivePlanningRoot: false,
+    reason: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -2418,6 +2427,15 @@ export function parseImportOptions(argv: string[]) {
       options.strictPaths = true;
       continue;
     }
+    if (arg === '--waive-planning-root') {
+      options.waivePlanningRoot = true;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
     if (arg === '--emergency-approval') {
       options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
@@ -2427,6 +2445,13 @@ export function parseImportOptions(argv: string[]) {
       continue;
     }
     throw new CliError('ATM_CLI_USAGE', `tasks import does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (options.waivePlanningRoot && !options.reason?.trim()) {
+    throw new CliError(
+      'ATM_CLI_USAGE',
+      'tasks import --waive-planning-root requires --reason "<why target-only .atm/task-plans import is allowed>".',
+      { exitCode: 2 }
+    );
   }
   return { ...options, cwd: path.resolve(options.cwd) };
 }
@@ -2896,7 +2921,11 @@ function parseSingleCard(input: {
         ?? atomizationImpactFrontMatter.atomCid
         ?? atomizationImpactFrontMatter.atom_cid
       ),
-      mapUpdates
+      mapUpdates,
+      ...(parseExtractionCandidates(
+        atomizationImpactFrontMatter.extractionCandidates
+        ?? atomizationImpactFrontMatter.extraction_candidates
+      ) ?? {})
     },
     ...(proposalAdmission ? { proposalAdmission } : {}),
     legacyImportAliases: {
@@ -2915,6 +2944,25 @@ function parseSingleCard(input: {
     },
     importedAt: input.importedAt
   };
+}
+
+/**
+ * TASK-AAO-FABLE-007 — preserve the extraction-first contract field
+ * `atomizationImpact.extractionCandidates` through import so the patrol and
+ * downstream tools read a structured record instead of re-parsing markdown.
+ */
+function parseExtractionCandidates(value: unknown): { extractionCandidates: readonly Record<string, unknown>[] } | null {
+  if (!Array.isArray(value)) return null;
+  const entries = value
+    .filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry))
+    .map((entry) => ({
+      ...(typeof entry.atom === 'string' ? { atom: entry.atom.trim() } : {}),
+      ...(typeof entry.pattern === 'string' ? { pattern: entry.pattern.trim() } : {}),
+      ...(typeof entry.source === 'string' ? { source: entry.source.trim() } : {}),
+      ...(typeof entry.disposition === 'string' ? { disposition: entry.disposition.trim() } : {}),
+      inlineReason: typeof entry.inlineReason === 'string' ? entry.inlineReason : null
+    }));
+  return entries.length > 0 ? { extractionCandidates: entries } : null;
 }
 
 function buildMechanicalSplitScopeDiagnostics(input: {
@@ -3241,6 +3289,11 @@ export function writeTaskFiles(input: {
           });
           continue;
         }
+        // ATM-BUG-2026-07-13-178: explicit --reopen/--reset-open may overwrite an
+        // inert/abandoned ledger without --force; writing happens in the second pass.
+        if (input.resetOpen || input.reopen) {
+          continue;
+        }
         diagnostics.push({
           level: 'error',
           code: 'ATM_TASKS_IMPORT_DRIFT',
@@ -3264,7 +3317,7 @@ export function writeTaskFiles(input: {
   }
   for (const task of input.tasks) {
     const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
-    if (existsSync(filePath) && !input.force && !reconcileMirror) {
+    if (existsSync(filePath) && !input.force && !reconcileMirror && !input.resetOpen && !input.reopen) {
       continue;
     }
     let existingDocument: Record<string, unknown> | null = null;
@@ -3639,7 +3692,11 @@ export function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt
         ?? atomizationImpactFrontMatter.atomCid
         ?? atomizationImpactFrontMatter.atom_cid
       ),
-      mapUpdates
+      mapUpdates,
+      ...(parseExtractionCandidates(
+        atomizationImpactFrontMatter.extractionCandidates
+        ?? atomizationImpactFrontMatter.extraction_candidates
+      ) ?? {})
     },
     ...(proposalAdmission ? { proposalAdmission } : {}),
     legacyImportAliases: {

@@ -21,6 +21,7 @@ import orientSpec from './command-specs/orient.spec.js';
 import mapCapsuleSpec from './command-specs/map-capsule.spec.js';
 import policeSpec from './command-specs/police.spec.js';
 import quickfixSpec from './command-specs/quickfix.spec.js';
+import residueSpec from './command-specs/residue.spec.js';
 import rescueSpec from './command-specs/rescue.spec.js';
 import startSpec from './command-specs/start.spec.js';
 import explainSpec from './command-specs/explain.spec.js';
@@ -106,6 +107,7 @@ export const commandSpecs = Object.freeze({
     orient: orientSpec,
     police: policeSpec,
     quickfix: quickfixSpec,
+    residue: residueSpec,
     rescue: withVisibility(rescueSpec, 'internal'),
     registry: registrySpec,
     'registry-diff': registryDiffSpec,

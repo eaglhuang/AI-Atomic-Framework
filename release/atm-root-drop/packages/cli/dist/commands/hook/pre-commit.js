@@ -31,7 +31,8 @@ export function runPreCommitHook(cwd) {
     const root = path.resolve(cwd);
     const committingTaskIdForHook = typeof process.env.ATM_COMMIT_TASK_ID === 'string' ? process.env.ATM_COMMIT_TASK_ID.trim() : null;
     const crossTaskBlock = detectCrossTaskMutation(root, committingTaskIdForHook, 'pre-commit');
-    if (crossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId)) {
+    const hasTaskHistoryCrossTaskBlock = crossTaskBlock?.conflicts.some((entry) => entry.surface === 'task-history') ?? false;
+    if (crossTaskBlock && hasTaskHistoryCrossTaskBlock && !isResolutionAuthorizedCurrentTask(root, committingTaskIdForHook, crossTaskBlock.conflictTaskId)) {
         recordIncidentFlag(root, crossTaskBlock);
         throw new CliError('ATM_CROSS_TASK_MUTATION_BLOCKED', `Cross-task mutation incident detected: files owned by active task ${crossTaskBlock.conflictTaskId} are mutated. File(s): ${crossTaskBlock.conflictFiles.join(', ')}. Recovery: ${crossTaskBlock.recoveryLane}`, {
             exitCode: 1,
@@ -55,7 +56,30 @@ export function runPreCommitHook(cwd) {
     const actionableResidueFindings = selectActionableResidueFindings({
         findings: [...residueReport.blockAndExplain, ...residueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path))],
         stagedFiles,
-        committingTaskId: residueTaskId
+        committingTaskId: residueTaskId,
+        activeLockTaskIds: new Set(readActiveTaskDirectionLocks(root).map((lock) => lock.taskId.trim().toUpperCase())),
+        hasActiveClaim: (ownerTaskId) => {
+            try {
+                const taskDocument = JSON.parse(readFileSync(path.join(root, '.atm', 'history', 'tasks', `${ownerTaskId}.json`), 'utf8'));
+                const claim = taskDocument.claim;
+                return Boolean(claim) && String(claim.state ?? '') === 'active';
+            }
+            catch {
+                return false;
+            }
+        },
+        hasTerminalOwner: (ownerTaskId) => {
+            try {
+                const taskDocument = JSON.parse(readFileSync(path.join(root, '.atm', 'history', 'tasks', `${ownerTaskId}.json`), 'utf8'));
+                const status = String(taskDocument.status ?? '').trim().toLowerCase();
+                const claim = taskDocument.claim;
+                const claimState = claim ? String(claim.state ?? '').trim().toLowerCase() : '';
+                return (status === 'done' || status === 'abandoned') && claimState !== 'active';
+            }
+            catch {
+                return false;
+            }
+        }
     });
     const gitIndexDiagnostic = inspectGitIndexAccess(root);
     const encodingReport = scanEncoding(root, stagedFiles);
@@ -169,7 +193,12 @@ export function runPreCommitHook(cwd) {
             ]
         });
     const taskAudit = auditTasks(root);
-    const commandRuns = frameworkStatus.criticalChangedFiles.length > 0
+    // Governance/attribution blockers are decisive and must be reported before
+    // entering the expensive framework-validator lane. In particular, a mixed
+    // historical-restore packet plus source files must fail closed without
+    // recursively invoking validators through the same hook surface.
+    const canRunFrameworkValidators = commitAttributionReport.ok && protectedStateReport.ok;
+    const commandRuns = frameworkStatus.criticalChangedFiles.length > 0 && canRunFrameworkValidators
         ? runRequiredFrameworkValidators(root, frameworkStatus.requiredGates)
         : [];
     const validatorRunTriage = triageForeignTaskflowValidatorRuns({
@@ -588,14 +617,48 @@ export function buildPreCommitBlockingFindings(input) {
     }
     return findings;
 }
-function selectActionableResidueFindings(input) {
+export function selectActionableResidueFindings(input) {
     const staged = new Set(input.stagedFiles.map(normalizeRelativePath));
     const taskId = input.committingTaskId?.trim().toUpperCase() ?? null;
+    const ownersWithNonDeferrableForeignResidue = new Set();
+    for (const finding of input.findings) {
+        if (finding.verdict !== 'block-and-explain')
+            continue;
+        const owner = finding.ownerTaskId?.trim().toUpperCase() ?? null;
+        if (!owner || owner === taskId)
+            continue;
+        if (!isDeferrableForeignGovernanceResidue(finding)) {
+            ownersWithNonDeferrableForeignResidue.add(owner);
+        }
+    }
     return input.findings.filter((finding) => {
+        if (finding.verdict === 'block-and-explain') {
+            // TASK-AAO-FABLE-005: an unstaged governance artifact owned by a
+            // DIFFERENT task with a live direction lock is another agent's
+            // in-flight close state, not orphaned residue. Blocking here made two
+            // captains mutually unable to commit while either had uncommitted
+            // evidence. Live foreign ownership is the safety proof; orphaned
+            // artifacts (owner without an active lock) stay fail-closed, and
+            // anything actually staged into this commit still blocks.
+            const owner = finding.ownerTaskId?.trim().toUpperCase() ?? null;
+            const stagedHere = staged.has(normalizeRelativePath(finding.path));
+            if (!stagedHere && owner && owner !== taskId
+                && !ownersWithNonDeferrableForeignResidue.has(owner)
+                && isDeferrableForeignGovernanceResidue(finding)
+                && (input.activeLockTaskIds.has(owner) || input.hasActiveClaim(owner) || input.hasTerminalOwner(owner))) {
+                return false;
+            }
+            return true;
+        }
         if (staged.has(normalizeRelativePath(finding.path)))
             return true;
         return taskId !== null && finding.ownerTaskId?.trim().toUpperCase() === taskId;
     });
+}
+function isDeferrableForeignGovernanceResidue(finding) {
+    const normalized = normalizeRelativePath(finding.path).toLowerCase();
+    return /^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized)
+        || /^\.atm\/history\/task-events\/[^/]+\/.+(?:close|reconcile|repair-closure).+\.json$/.test(normalized);
 }
 export function buildPreCommitFailureEnvelope(input) {
     const requiredCommand = input.blockingFindings.find((entry) => entry.requiredCommand)?.requiredCommand
@@ -1198,14 +1261,16 @@ export function inspectProtectedAtmStateChanges(cwd, stagedFiles) {
                 continue;
             }
             const event = readJsonFile(path.join(cwd, stagedEventPath));
-            const expectedSha = sha256(readFileSync(absolutePath));
+            const taskBytes = readFileSync(absolutePath);
+            const expectedSha = sha256(taskBytes);
+            const releaseOnlyExpectedSha = taskReleaseOnlyTransitionSha(task, event);
             const owningBatch = activeBatches.find((batchRun) => taskIdsInclude(batchRun.taskIds, taskId)) ?? null;
             if (event?.schemaId !== 'atm.taskTransition.v1'
                 || event?.transitionId !== lastTransitionId
                 || typeof event?.taskId !== 'string'
                 || !taskIdsEqual(event.taskId, taskId)
                 || event?.taskPath !== normalized
-                || event?.taskSha256 !== expectedSha
+                || (event?.taskSha256 !== expectedSha && event?.taskSha256 !== releaseOnlyExpectedSha)
                 || typeof event?.command !== 'string'
                 || !event.command.startsWith('node atm.mjs ')) {
                 findings.push({
@@ -1355,10 +1420,12 @@ function inspectCommitAttribution(cwd, stagedFiles) {
     const taskId = normalizeOptionalText(process.env.ATM_COMMIT_TASK_ID);
     const claimLeaseId = normalizeOptionalText(process.env.ATM_COMMIT_CLAIM_LEASE_ID);
     const sessionId = normalizeOptionalText(process.env.ATM_COMMIT_SESSION_ID);
+    const stagedSet = new Set(stagedFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
     const stagedTaskIds = inferTaskIdsFromStagedFiles(stagedFiles);
+    const knownStagedTaskIds = stagedTaskIds.filter((candidate) => taskLedgerEntryExistsOrIsStaged(cwd, candidate, stagedSet));
     const pendingBatchCheckpointTaskId = resolvePendingBatchCheckpointTaskId(cwd, stagedFiles);
     const findings = [];
-    const suggestedTaskId = pendingBatchCheckpointTaskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : stagedTaskIds[0] ?? null);
+    const suggestedTaskId = pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : knownStagedTaskIds[0] ?? null);
     const actorRegistryState = inspectTrackedActorRegistryState(cwd);
     if (actorRegistryState.blocking) {
         const governedRecoveryCommand = suggestedTaskId
@@ -1397,7 +1464,7 @@ function inspectCommitAttribution(cwd, stagedFiles) {
             findings
         };
     }
-    const effectiveTaskId = taskId ?? pendingBatchCheckpointTaskId ?? (stagedTaskIds.length === 1 ? stagedTaskIds[0] : null);
+    const effectiveTaskId = taskId ?? pendingBatchCheckpointTaskId ?? (knownStagedTaskIds.length === 1 ? knownStagedTaskIds[0] : null);
     if (!actorId || (stagedTaskIds.length > 0 && !effectiveTaskId)) {
         findings.push({
             code: 'ATM_GIT_COMMIT_WRAPPER_REQUIRED',
@@ -1535,6 +1602,13 @@ function inspectCommitAttribution(cwd, stagedFiles) {
         ok: findings.length === 0,
         findings
     };
+}
+function taskLedgerEntryExistsOrIsStaged(cwd, taskId, stagedSet) {
+    const normalizedTaskId = normalizeRelativePath(taskId);
+    if (!normalizedTaskId)
+        return false;
+    const taskPath = `.atm/history/tasks/${normalizedTaskId}.json`;
+    return stagedSet.has(taskPath.toLowerCase()) || existsSync(path.join(cwd, taskPath));
 }
 function inspectCloseCommitWindowStagedArtifacts(cwd, taskId, stagedFiles) {
     if (stagedFiles.length === 0) {
@@ -1706,6 +1780,17 @@ function inspectPendingBatchCheckpointStagedArtifacts(cwd, taskId, stagedFiles) 
     return { ok: true, reason: 'pending-batch-checkpoint-window' };
 }
 function resolveResidueTaskId(cwd) {
+    // TASK-AAO-FABLE-005: the governed commit wrapper exports the committing
+    // task through ATM_COMMIT_TASK_ID; that is the authoritative residue
+    // ownership context. The lock-count heuristic below assumed a single
+    // active claim, so two-captain parallelism resolved to null and every
+    // foreign-owned governance artifact blocked every governed commit.
+    const committingTaskId = typeof process.env.ATM_COMMIT_TASK_ID === 'string'
+        ? process.env.ATM_COMMIT_TASK_ID.trim()
+        : '';
+    if (committingTaskId) {
+        return committingTaskId;
+    }
     const stagedTaskIds = inferTaskIdsFromStagedFiles(readStagedFiles(cwd));
     if (stagedTaskIds.length === 1) {
         return stagedTaskIds[0];
@@ -1997,6 +2082,33 @@ function uniqueSorted(values) {
 }
 function sha256(value) {
     return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+function taskReleaseOnlyTransitionSha(task, event) {
+    if (!task || typeof task !== 'object' || Array.isArray(task))
+        return null;
+    if (!event || typeof event !== 'object' || Array.isArray(event))
+        return null;
+    const eventRecord = event;
+    if (eventRecord.action !== 'close')
+        return null;
+    const taskRecord = task;
+    const lock = taskRecord.taskDirectionLock;
+    if (!lock || typeof lock !== 'object' || Array.isArray(lock))
+        return null;
+    const lockRecord = lock;
+    if (lockRecord.status !== 'released' || lockRecord.released !== true)
+        return null;
+    const normalizedTask = {
+        ...taskRecord,
+        taskDirectionLock: {
+            ...lockRecord,
+            status: 'active'
+        }
+    };
+    delete normalizedTask.taskDirectionLock.released;
+    delete normalizedTask.taskDirectionLock.releasedAt;
+    delete normalizedTask.taskDirectionLock.releasedBy;
+    return sha256(`${JSON.stringify(normalizedTask, null, 2)}\n`);
 }
 function sameStringSet(left, right) {
     const normalize = (values) => [...new Set(values.map((value) => String(value).trim()).filter(Boolean))].sort();

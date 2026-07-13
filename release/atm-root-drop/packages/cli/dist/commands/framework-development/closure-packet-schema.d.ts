@@ -302,6 +302,10 @@ export declare function writeClosurePacket(cwd: string, taskId: string, packet: 
 export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-repair-closure-write';
 export declare function isRunnerSyncRequired(cwd: string): boolean;
 export declare function runnerStaleWarningMessage(): string;
+export declare function assertSourceFirstRunnerReadOnlyAction(input: {
+    readonly cwd: string;
+    readonly action: string;
+}): void;
 export declare function assertRunnerFreshForWriteAction(input: {
     readonly cwd: string;
     readonly action: AtmTasksWriteAction;

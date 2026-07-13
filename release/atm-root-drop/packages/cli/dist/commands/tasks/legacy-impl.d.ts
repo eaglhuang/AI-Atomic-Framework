@@ -123,6 +123,8 @@ export declare function parseImportOptions(argv: string[]): {
     strictPaths: boolean;
     emergencyApproval: string | null;
     allowStaleRunner: boolean;
+    waivePlanningRoot: boolean;
+    reason: string | null;
 };
 export declare function parseVerifyOptions(argv: string[]): {
     cwd: string;

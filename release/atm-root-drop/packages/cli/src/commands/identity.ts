@@ -226,11 +226,11 @@ function parseIdentityOptions(argv: string[]): ParsedIdentityOptions {
     if (state.action) {
       throw new CliError('ATM_CLI_USAGE', 'identity accepts only one action.', { exitCode: 2 });
     }
-    state.action = arg as ParsedIdentityOptions['action'];
+    state.action = arg === 'status' ? 'show' : arg as ParsedIdentityOptions['action'];
   }
 
   if (!state.action || (state.action !== 'set' && state.action !== 'show' && state.action !== 'clear')) {
-    throw new CliError('ATM_CLI_USAGE', 'identity supports: set, show, clear', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'identity supports: set, show, status, clear', { exitCode: 2 });
   }
 
   return {

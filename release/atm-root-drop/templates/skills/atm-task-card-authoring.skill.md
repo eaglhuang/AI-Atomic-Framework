@@ -53,6 +53,12 @@ atomizationImpact:
   ownerAtomOrMap: atm.cli-command-router-map
   mapUpdates:
     - atomic_workbench/maps/atm-cli-command-router-map.json
+  extractionCandidates:
+    - atom: atm.example-admission-policy
+      pattern: Policy Object
+      source: packages/cli/src/commands/example.ts
+      disposition: extract   # extract | follow-up-card | inline
+      inlineReason: null     # required when disposition is inline
 ```
 
 ## Authoring Rules
@@ -76,6 +82,20 @@ atomizationImpact:
   - script path in `deliverables`;
   - owner atom/map update in `atomizationImpact`;
   - validation command in `validators`.
+- Extraction-first (TASK-AAO-FABLE-006 — core ATM intent): prefer extracting
+  the change as an atom or atom map over inline-editing a large module.
+  - Any card whose `scopePaths` touch a module over 600 lines must declare
+    `atomizationImpact.extractionCandidates`, with each candidate's
+    `disposition`: `extract` (in this card), `follow-up-card`, or `inline`.
+  - `extract` / `follow-up-card` is the default; `inline` requires an
+    `inlineReason` recorded on the card and is a human decision — the human
+    declining extraction is the only normal reason to stay inline.
+  - Use the `atm-atom-map-refactor` skill to pick the owner atom and
+    extraction pattern; the implementing agent must restate the proposal in
+    its dispatch report when it touches a >600-line module.
+  - ATM patrols this at import time: a >600-line scope without
+    `extractionCandidates` receives the advisory diagnostic
+    `ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE` (warning-only).
 
 ## Follow-up Task Pattern
 

@@ -1791,7 +1791,7 @@ const preCloseNonBundle = await runTaskflow([
 assert.equal(preCloseNonBundle.ok, false, 'non-bundle staged source files must block pre-close');
 assert.ok(preCloseNonBundle.evidence.historicalClosePreflight.blockers.some((entry) => entry.id === 'unexpectedStagedNonBundleFiles'));
 assert.ok(preCloseNonBundle.evidence.writeReadinessHint.blockers.some((entry) => entry.code === 'ATM_TASKFLOW_PRECLOSE_UNEXPECTED_STAGED_FILES'), 'dry-run writeReadinessHint must surface non-bundle staged blockers');
-assert.ok(preCloseNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.restoreCommand?.includes('restore --staged'), 'non-bundle staged remediation must include git restore --staged command');
+assert.ok(preCloseNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.restoreCommand?.includes('git lease stage-override'), 'non-bundle staged remediation must route through ATM stage-override lease, not raw git restore --staged');
 const preCloseMixed = await runTaskflow([
     'pre-close',
     '--cwd', outOfScopeFixture.targetRepo,

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { relativePathFrom } from '../shared.ts';
 import { sanitizeTaskDirectionAllowedFiles } from '../task-direction.ts';
 import { extractTaskCloseDeclaredFiles } from './close-helpers/close-artifact-staging.ts';
-import { pathMatchesTaskScope } from './historical-delivery.ts';
+import { detectHistoricalDeliveryCommit, pathMatchesTaskScope } from './historical-delivery.ts';
 import { normalizeRelativePath } from './task-file-io-helpers.ts';
 
 export interface TaskClaimIntentResolution {
@@ -42,6 +42,16 @@ export function resolveTaskClaimIntent(input: {
     .filter((filePath) => Boolean(filePath) && !filePath.startsWith('.atm/'));
   const deliverablesTrackedInHead = declaredDeliverableFiles.filter((filePath) => isTaskClaimDeliverableTrackedInHead(input.cwd, filePath));
   const missingDeliverables = declaredDeliverableFiles.filter((filePath) => !deliverablesTrackedInHead.includes(filePath));
+  const deliveryEvidence = declaredDeliverableFiles.length > 0
+    ? detectHistoricalDeliveryCommit({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      declaredFiles: declaredDeliverableFiles,
+      planningRepoRoot: input.cwd,
+      planningRelativePath: planPath || null
+    })
+    : { ref: null, commitSha: null, source: null };
+  const hasScopedDeliveryEvidence = Boolean(deliveryEvidence.commitSha);
   if (!input.autoIntent) {
     return {
       requestedClaimIntent: input.requestedClaimIntent,
@@ -57,7 +67,7 @@ export function resolveTaskClaimIntent(input: {
   }
   const resolvedClaimIntent = dirtyFiles.length > 0
     ? 'write'
-    : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0
+    : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0 && hasScopedDeliveryEvidence
       ? 'closeout-only'
       : 'write';
   return {
@@ -69,8 +79,10 @@ export function resolveTaskClaimIntent(input: {
       ? deliverablesTrackedInHead.length > 0
         ? 'dirty-in-scope-source-overrides-closeout'
         : 'dirty-in-scope-source'
-      : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0
+      : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0 && hasScopedDeliveryEvidence
         ? 'deliverables-already-in-head'
+        : declaredDeliverableFiles.length > 0 && missingDeliverables.length === 0
+          ? 'delivery-evidence-not-found'
         : 'deliverables-not-yet-landed',
     dirtyInScopeFiles: dirtyFiles,
     declaredDeliverableFiles,

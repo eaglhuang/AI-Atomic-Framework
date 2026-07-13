@@ -1902,6 +1902,24 @@ export function runnerStaleWarningMessage(): string {
   return `ATM_RUNNER_SYNC_REQUIRED: stable atm.mjs is older than framework source files. Run \`${releaseHygienePolicy.runnerSyncCommand}\` before using the frozen runner, or use \`node atm.dev.mjs ...\` for source-first framework validation.`;
 }
 
+export function assertSourceFirstRunnerReadOnlyAction(input: {
+  readonly cwd: string;
+  readonly action: string;
+}): void {
+  const entrypoint = classifyCliEntrypoint(path.resolve(input.cwd))?.toLowerCase().replace(/\\/g, '/');
+  if (entrypoint !== 'atm.dev.mjs' && !entrypoint?.endsWith('/atm.dev.mjs')) return;
+  throw new CliError('ATM_SOURCE_FIRST_WRITE_REFUSED', `ATM refused ${input.action} through the source-first runner.`, {
+    exitCode: 1,
+    details: {
+      action: input.action,
+      sourceFirstOnly: true,
+      guidance: 'Use node atm.dev.mjs only for explicit source-first validation; use node atm.mjs after rebuilding for governed lifecycle mutations.',
+      sourceFirstCommand: 'node atm.dev.mjs ...',
+      governedCommand: 'node atm.mjs ...'
+    }
+  });
+}
+
 export function assertRunnerFreshForWriteAction(input: {
   readonly cwd: string;
   readonly action: AtmTasksWriteAction;
@@ -2507,6 +2525,10 @@ function isScopedTerminalCloseEventDeletion(input: {
   readonly taskDocument: Record<string, unknown> | null;
   readonly status: string | null;
 }): boolean {
+  // ATM-BUG-2026-07-12-126: a done/released task's stale terminal close
+  // event is repairable in the main worktree when the operator explicitly
+  // scopes the repair to that task. Unrelated active delivery remains a
+  // warning; it must never be deleted or made part of the repair bundle.
   if (input.scopeTaskId !== input.taskId || input.taskDocument?.status !== 'done' || input.status !== 'D') {
     return false;
   }

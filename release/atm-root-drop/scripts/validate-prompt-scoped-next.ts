@@ -110,6 +110,12 @@ async function main() {
     writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-0046-validator-baseline-noise-diagnostics.task.md'), 'TASK-AAO-0046', 'AAO validator noise diagnostics', {
       relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
     });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-FABLE-004-backlog-continuation-prompt-routing.task.md'), 'TASK-AAO-FABLE-004', 'Fable backlog continuation routing', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
+    writeTaskCard(path.join(externalTaskDir, 'TASK-AAO-FABLE-005-claim-conflict-closeout.task.md'), 'TASK-AAO-FABLE-005', 'Fable claim conflict closeout', {
+      relatedPlan: 'docs/ai_atomic_framework/atm-agent-first-operability/ATM Agent-First 可操作性優化計畫書.md'
+    });
 
     mkdirSync(path.join(tempRoot, 'release'), { recursive: true });
     mkdirSync(path.join(tempRoot, 'notes'), { recursive: true });
@@ -276,6 +282,33 @@ async function main() {
     assert(!((familyQueue.evidence.nextAction as any).selectedTasks ?? []).some((task: any) => task.workItemId.includes('APO')), 'task family prompt must not fall back to unrelated root task cards');
     const familyTrail = assertDecisionTrail(familyQueue.evidence.nextAction as any, 'task family queue');
     assert(familyTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-AAO-0001')), 'task family decisionTrail must record the matching queue head');
+
+    const fableShorthand = await runNext(['--cwd', tempRoot, '--prompt', '回報 Fable5 交接的 FABLE-004 是否完成']);
+    assert((fableShorthand.evidence.nextAction as any)?.selectedTask?.workItemId === 'TASK-AAO-FABLE-004', 'FABLE-004 shorthand must resolve to the unique imported AAO FABLE task');
+    assert(!fableShorthand.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'FABLE-004 shorthand must not be reported as task-scope-not-found');
+
+    const aaoFableShorthand = await runNext(['--cwd', tempRoot, '--prompt', 'check AAO-FABLE-005 status']);
+    assert((aaoFableShorthand.evidence.nextAction as any)?.selectedTask?.workItemId === 'TASK-AAO-FABLE-005', 'AAO-FABLE-005 shorthand must resolve to the matching TASK-AAO-FABLE-005 ledger task');
+    assert(!aaoFableShorthand.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_SCOPE_NOT_FOUND'), 'AAO-FABLE-005 shorthand must not be reported as task-scope-not-found');
+
+    const zhBacklogContinuationPrompt = '\u8acb\u7e7c\u7e8c\u4fee\u5fa9\u6240\u6709 backlog\uff0c\u904e\u7a0b\u4e2d\u5361\u4f4f\u7684\u5730\u65b9\u90fd\u56de\u5beb backlog';
+    const zhBacklogContinuation = await runNext(['--cwd', tempRoot, '--prompt', zhBacklogContinuationPrompt]);
+    assert((zhBacklogContinuation.evidence.taskIntent as any)?.queueRequested === true, 'zh-TW backlog continuation prompt must set taskIntent.queueRequested');
+    assert(zhBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'zh-TW backlog continuation prompt must route to the task queue');
+    assert((zhBacklogContinuation.evidence.nextAction as any).recommendedChannel === 'batch', 'zh-TW backlog continuation prompt must recommend batch channel');
+    assert(!zhBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'zh-TW backlog continuation prompt must not fall back to prompt guidance/create-atom');
+
+    const englishBacklogContinuation = await runNext(['--cwd', tempRoot, '--prompt', 'continue backlog fixes and record any workflow friction']);
+    assert((englishBacklogContinuation.evidence.taskIntent as any)?.queueRequested === true, 'English backlog fixes continuation prompt must set taskIntent.queueRequested');
+    assert(englishBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'English backlog fixes continuation prompt must route to the task queue');
+    assert((englishBacklogContinuation.evidence.nextAction as any).recommendedChannel === 'batch', 'English backlog fixes continuation prompt must recommend batch channel');
+    assert(!englishBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'English backlog fixes continuation prompt must not fall back to prompt guidance/create-atom');
+
+    const captainBacklogContinuation = await runNext(['--cwd', tempRoot, '--prompt', 'Captain mode: continue backlog repairs one by one']);
+    assert((captainBacklogContinuation.evidence.taskIntent as any)?.queueRequested === true, 'Captain backlog repair continuation prompt must set taskIntent.queueRequested');
+    assert(captainBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'Captain backlog repair continuation prompt must route to the task queue');
+    assert((captainBacklogContinuation.evidence.nextAction as any).recommendedChannel === 'batch', 'Captain backlog repair continuation prompt must recommend batch channel');
+    assert(!captainBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'Captain backlog repair continuation prompt must not fall back to prompt guidance/create-atom');
 
     const isolatedRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-planning-root-missing-'));
     mkdirSync(path.join(isolatedRoot, '.atm'), { recursive: true });

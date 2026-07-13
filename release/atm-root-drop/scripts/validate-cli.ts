@@ -509,6 +509,10 @@ const fastFocusedRegressionTests: NodeScriptTestSpec[] = [
     scriptPath: path.join(root, 'tests/cli/protected-override-audit-staging.test.ts')
   },
   {
+    name: 'integration-raw-git-command-guard',
+    scriptPath: path.join(root, 'tests/cli/integration-raw-git-command-guard.test.ts')
+  },
+  {
     name: 'planning-root-preference',
     scriptPath: path.join(root, 'packages/cli/src/commands/next/__tests__/planning-root-preference.test.ts')
   },

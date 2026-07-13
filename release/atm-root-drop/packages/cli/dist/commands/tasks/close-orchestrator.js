@@ -55,9 +55,12 @@ export async function runTasksClose(argv) {
         effectiveHistoricalDeliveryRefs = uniqueStrings([...effectiveHistoricalDeliveryRefs, ...historicalBatchSlice.matchedCommits]);
     }
     const allowHistoricalCloseback = effectiveHistoricalDeliveryRefs.length > 0 || Boolean(options.historicalBatchRef);
+    const governedHistoricalBatchCheckpoint = options.fromBatchCheckpoint === true
+        && historicalBatchSlice?.okToCloseTask === true
+        && options.historicalDeliveryRefs.length === 0;
     const protectedCloseFlags = [
-        ...(effectiveHistoricalDeliveryRefs.length > 0 ? ['--historical-delivery'] : []),
-        ...(options.historicalBatchRef ? ['--historical-batch'] : []),
+        ...(effectiveHistoricalDeliveryRefs.length > 0 && !governedHistoricalBatchCheckpoint ? ['--historical-delivery'] : []),
+        ...(options.historicalBatchRef && !governedHistoricalBatchCheckpoint ? ['--historical-batch'] : []),
         ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
         ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
         ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
@@ -390,6 +393,15 @@ export async function runTasksClose(argv) {
                 claim: parseClaimRecord(taskDocument.claim),
                 historicalDeliveryRefs: effectiveHistoricalDeliveryRefs,
                 historicalDeliveryRepo: options.historicalDeliveryRepo,
+                historicalBatchCloseReadySlice: historicalBatchSlice?.okToCloseTask === true
+                    ? {
+                        batchId: historicalBatchSlice.batchId,
+                        matchedCommits: historicalBatchSlice.matchedCommits,
+                        matchedFiles: historicalBatchSlice.matchedFiles,
+                        taskSpecificValidationPasses: historicalBatchSlice.taskSpecificValidationPasses,
+                        batchWideValidationPasses: historicalBatchSlice.batchWideValidationPasses
+                    }
+                    : null,
                 waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
                 waiverReason: options.reason
             })

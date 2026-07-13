@@ -11,6 +11,7 @@ import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-
 import { type TeamProviderHttpExecutor } from '../../../core/src/team-runtime/provider-contract.ts';
 import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
+import { type GitIndexOwnershipReport } from './git-index-ownership.ts';
 type TeamVendorLocalSecretsSummary = {
     schemaId: 'atm.teamVendorLocalSecretsSummary.v1';
     path: string;
@@ -48,10 +49,16 @@ type PermissionFinding = {
     paths?: string[];
     suggestedFix: string;
 };
-type PermissionLease = {
+export type PermissionLease = {
     permission: string;
     agentId: string;
     paths?: string[];
+};
+export type TeamPermissionLeaseSummary = {
+    permission: string;
+    agentId: string;
+    paths: string[];
+    releaseCommand: string;
 };
 type TeamGovernanceRuntimeFields = {
     schemaId: 'atm.teamGovernanceRuntimeFields.v1';
@@ -759,6 +766,7 @@ export declare function buildTeamPlan(input: {
         findings: PermissionFinding[];
     };
     brokerLane: TeamBrokerLaneEvidence;
+    gitIndexOwnership?: GitIndexOwnershipReport;
     allowEmptyWriteScope?: boolean;
     requestedTeamSize?: string;
     providerSelectionConfig?: TeamProviderSelectionConfig | null;
@@ -876,6 +884,14 @@ export declare function buildTeamPlan(input: {
         cliOverrideCount: number;
     } | null;
     brokerLane: TeamBrokerLaneEvidence;
+    indexLane: {
+        readonly schemaId: "atm.gitIndexLane.v1";
+        readonly status: import("./git-index-ownership.ts").GitIndexLaneStatus;
+        readonly ownerTaskId: string | null;
+        readonly ownerActorId: string | null;
+        readonly reason: string;
+    };
+    gitIndexOwnership: GitIndexOwnershipReport | null;
     agents: TeamRecipeAgent[];
     captainDecision: {
         schemaId: string;
@@ -1581,5 +1597,39 @@ export declare function buildTeamPatrolReport(input: {
         runtimeRoot: string;
         historyRoot: string;
     };
+};
+export declare function summarizeTeamPermissionLeases(input: {
+    readonly teamRunId: string;
+    readonly permission: string;
+    readonly leases: readonly PermissionLease[];
+}): TeamPermissionLeaseSummary[];
+export declare function buildTeamLeaseConflictDetails(input: {
+    readonly teamRunId: string;
+    readonly permission: string;
+    readonly requestedOwner: string;
+    readonly conflict: PermissionLease;
+    readonly currentLeases: readonly PermissionLease[];
+}): {
+    teamRunId: string;
+    permission: string;
+    currentOwner: string;
+    currentOwnerPaths: string[];
+    currentOwnerReleaseCommand: string;
+    requestedOwner: string;
+    activeLeases: TeamPermissionLeaseSummary[];
+    requiredCommand: string;
+};
+export declare function buildTeamLeaseNotFoundDetails(input: {
+    readonly teamRunId: string;
+    readonly permission: string;
+    readonly actorId: string;
+    readonly currentLeases: readonly PermissionLease[];
+}): {
+    teamRunId: string;
+    permission: string;
+    actorId: string;
+    activeLeases: TeamPermissionLeaseSummary[];
+    holderCount: number;
+    requiredCommand: string;
 };
 export {};

@@ -4,6 +4,14 @@ export interface BrokerLifecycleState {
     readonly registryPath: string;
     readonly registry: WriteBrokerRegistryDocument;
     readonly activeIntents: readonly ActiveWriteIntent[];
+    readonly runtimeCleanup?: BrokerRuntimeCleanupReport;
+}
+export interface BrokerRuntimeCleanupReport {
+    readonly removedIntentSnapshots: readonly string[];
+    readonly removedSharedQueueSnapshot: boolean;
+    readonly removedSharedFreezeSnapshot: boolean;
+    readonly prunedSharedQueueEntries: number;
+    readonly prunedSharedFreezeRecords: number;
 }
 export interface BrokerLifecycleClaimCheck {
     readonly ok: boolean;
@@ -32,6 +40,11 @@ export declare function clearBrokerRuntimeStateForTask(input: {
     readonly cwd: string;
     readonly taskId: string;
 }): BrokerLifecycleState;
+export declare function cleanupBrokerRuntimeSnapshots(input: {
+    readonly cwd: string;
+    readonly releasedTaskIds?: readonly string[];
+    readonly activeTaskIds?: readonly string[];
+}): BrokerRuntimeCleanupReport;
 export declare function renewBrokerClaimIntent(input: {
     readonly cwd: string;
     readonly taskId: string;

@@ -169,6 +169,9 @@ export function detectCrossTaskMutation(
 ): CrossTaskMutationBlock | null {
   const normCurrentTaskId = currentTaskId?.trim().toUpperCase() ?? null;
   const activeTasks = getActiveTasks(cwd);
+  const currentTask = normCurrentTaskId
+    ? activeTasks.find((task) => task.taskId === normCurrentTaskId) ?? null
+    : null;
   
   const includeUnstaged = shouldIncludeUnstaged(commandFamily);
   let modifiedFiles: string[] = [];
@@ -234,8 +237,10 @@ export function detectCrossTaskMutation(
     }
     if (taskHistoryConflict) continue;
 
+    const currentTaskOwnsFile = currentTask?.allowedFiles.some((pattern) => globLikeMatch(file, pattern)) ?? false;
     for (const task of activeTasks) {
       if (task.taskId === normCurrentTaskId) continue;
+      if (currentTaskOwnsFile) continue;
       const isMatch = task.allowedFiles.some((pattern) => globLikeMatch(file, pattern));
       if (isMatch) {
         addConflict({

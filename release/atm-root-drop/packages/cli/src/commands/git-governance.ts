@@ -24,6 +24,12 @@ import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
 import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+import {
+  ATM_INDEX_FOREIGN_ACTIVE_STAGED,
+  buildForeignActiveStagedDiagnostic,
+  inspectGitIndexOwnership,
+  type GitIndexOwnershipReport
+} from './git-index-ownership.ts';
 
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
@@ -625,6 +631,7 @@ export interface TaskScopedCommitBundleReport {
   readonly commitFiles: readonly string[];
   readonly skippedExternalDirtyFiles: readonly string[];
   readonly unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[];
+  readonly gitIndexOwnership: GitIndexOwnershipReport;
   readonly outOfScopeStagedFiles: readonly string[];
   readonly governanceBundleWarnings: readonly string[];
   readonly blockedCode: string | null;
@@ -724,8 +731,14 @@ export async function runAtmGit(argv: string[]) {
   if (options.action === 'admit') {
     return runGitAdmission(options);
   }
+  if (options.action === 'push') {
+    return runGitPush(options);
+  }
   if (options.action === 'recover-push-fail') {
     return runGitPostPushFailRecovery(options);
+  }
+  if (options.action === 'lease') {
+    return runGitLease(options);
   }
   if (options.action === 'commit') {
     return runGitCommit(options);
@@ -835,6 +848,252 @@ function runGitAdmission(options: ParsedGitOptions) {
   });
 }
 
+function gitPushAttemptStatusRelativePath(actorId: string, branch: string, remote: string): string {
+  const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, '_');
+  const safeTarget = `${remote}__${branch}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+  return `.atm/runtime/git-push-attempts/${safeActor}__${safeTarget}.json`;
+}
+
+function writeGitPushAttemptStatus(cwd: string, statusRelativePath: string, status: Record<string, unknown>) {
+  try {
+    const absolutePath = path.join(cwd, statusRelativePath);
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, `${JSON.stringify(status, null, 2)}\n`, 'utf8');
+  } catch {
+    // best-effort observability write; never let this block push outcome reporting.
+  }
+}
+
+function runGitPush(options: ParsedGitOptions) {
+  if (!options.actorId?.trim()) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', `git push requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
+  }
+  const branch = options.branch?.trim() || resolveCurrentBranchName(options.cwd);
+  const remote = options.remote?.trim() || 'origin';
+  const statusPath = gitPushAttemptStatusRelativePath(options.actorId, branch, remote);
+  const startedAt = new Date().toISOString();
+  const headShaBeforePush = readHeadCommitSha(options.cwd);
+  writeGitPushAttemptStatus(options.cwd, statusPath, {
+    schemaId: 'atm.gitPushAttemptStatus.v1',
+    actorId: options.actorId,
+    taskId: options.taskId,
+    branch,
+    remote,
+    status: 'in-progress',
+    phase: 'admission',
+    dryRun: options.dryRun,
+    startedAt,
+    updatedAt: startedAt,
+    headShaBeforePush,
+    requiredCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+  });
+
+  const admission = evaluateGitAdmission({
+    cwd: options.cwd,
+    actorId: options.actorId,
+    taskId: options.taskId,
+    branch,
+    remote,
+    fetch: !options.noFetch,
+    gitExecutable: resolveGitExecutable()
+  });
+  const admissionOk = admission.outcome === 'allow' || admission.outcome === 'no-op';
+  const gitBoundaryEvidence = buildGitBoundaryEvidenceEnvelope({
+    actorId: options.actorId,
+    taskId: options.taskId,
+    result: admission
+  });
+  if (!admissionOk) {
+    const updatedAt = new Date().toISOString();
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status: 'blocked',
+      phase: 'admission',
+      dryRun: options.dryRun,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome,
+      conflictingFiles: admission.conflictingFiles,
+      retryCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
+      recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+    });
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('error', `ATM_GIT_PUSH_ADMISSION_${admission.outcome.toUpperCase().replace(/-/g, '_')}`, `ATM git push blocked before host git push: admission outcome '${admission.outcome}'.`, {
+        branch,
+        remote,
+        outcome: admission.outcome,
+        conflictingFiles: admission.conflictingFiles,
+        recommendedNextStep: admission.recommendedNextStep
+      })],
+      evidence: {
+        action: 'push',
+        dryRun: options.dryRun,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: null,
+        recommendedNextStep: admission.recommendedNextStep
+      }
+    });
+  }
+
+  if (options.dryRun || admission.outcome === 'no-op') {
+    const updatedAt = new Date().toISOString();
+    const status = options.dryRun ? 'dry-run' : 'no-op';
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status,
+      phase: 'complete',
+      dryRun: options.dryRun,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome
+    });
+    return makeResult({
+      ok: true,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('info', options.dryRun ? 'ATM_GIT_PUSH_DRY_RUN_ALLOW' : 'ATM_GIT_PUSH_NO_OP', options.dryRun
+        ? 'ATM git push dry-run passed admission; no host git push was executed.'
+        : 'ATM git push found no local commits to publish; no host git push was needed.', {
+          branch,
+          remote,
+          outcome: admission.outcome
+        })],
+      evidence: {
+        action: 'push',
+        dryRun: options.dryRun,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: null
+      }
+    });
+  }
+
+  try {
+    const stdout = runGitCommand(options.cwd, ['push', remote, `HEAD:${branch}`], ['ignore', 'pipe', 'pipe']);
+    const updatedAt = new Date().toISOString();
+    const remoteShaAfterPush = readRevisionIfExists(options.cwd, `${remote}/${branch}`);
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status: 'pushed',
+      phase: 'complete',
+      dryRun: false,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome,
+      remoteShaAfterPush
+    });
+    return makeResult({
+      ok: true,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_GIT_PUSH_OK', 'ATM git push completed after governed admission.', {
+        branch,
+        remote,
+        headSha: headShaBeforePush,
+        remoteShaAfterPush
+      })],
+      evidence: {
+        action: 'push',
+        dryRun: false,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: {
+          command: `git push ${remote} HEAD:${branch}`,
+          exitCode: 0,
+          stdout
+        }
+      }
+    });
+  } catch (error) {
+    const updatedAt = new Date().toISOString();
+    const stderr = error && typeof error === 'object' && 'stderr' in error
+      ? String((error as { stderr?: unknown }).stderr ?? '')
+      : String(error);
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status: 'failed',
+      phase: 'host-push',
+      dryRun: false,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome,
+      errorSummary: stderr.slice(0, 4000),
+      recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+    });
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_GIT_PUSH_FAILED', 'Host git push failed after governed admission; rerun recover-push-fail for refreshed guidance.', {
+        branch,
+        remote,
+        recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
+        stderr: stderr.slice(0, 4000)
+      })],
+      evidence: {
+        action: 'push',
+        dryRun: false,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: {
+          command: `git push ${remote} HEAD:${branch}`,
+          exitCode: 1,
+          stderr
+        },
+        recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+      }
+    });
+  }
+}
+
 function runGitPostPushFailRecovery(options: ParsedGitOptions) {
   if (!options.actorId?.trim()) {
     throw new CliError('ATM_ACTOR_ID_MISSING', `git recover-push-fail requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
@@ -938,6 +1197,77 @@ function runGitPostPushFailRecovery(options: ParsedGitOptions) {
       }
     )],
     evidence
+  });
+}
+
+function runGitLease(options: ParsedGitOptions) {
+  if (!options.actorId?.trim()) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'git lease requires --actor.', { exitCode: 2 });
+  }
+  if (!options.taskId?.trim()) {
+    throw new CliError('ATM_TASK_ID_MISSING', 'git lease requires --task.', { exitCode: 2 });
+  }
+  if (!options.leaseKind) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires stage-override or destructive-override.', { exitCode: 2 });
+  }
+  if (options.paths.length === 0) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires --paths.', { exitCode: 2 });
+  }
+  if (!options.overrideReason?.trim()) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires --reason with the human-approved safety rationale.', { exitCode: 2 });
+  }
+  const phrase = options.leaseKind === 'stage-override'
+    ? 'ATM-STAGE-OVERRIDE-I-UNDERSTAND-THIS-MAY-DISRUPT-ANOTHER-ACTIVE-AGENT'
+    : 'ATM-DESTRUCTIVE-GIT-OVERRIDE-I-UNDERSTAND-THIS-CAN-DESTROY-ANOTHER-ACTIVE-AGENT-WORK';
+  const ttlSeconds = Math.max(1, Math.floor(options.ttlSeconds ?? 900));
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
+  const leaseId = `git-${options.leaseKind}-${shortHash([
+    options.actorId,
+    options.taskId,
+    options.paths.join('\n'),
+    now.toISOString()
+  ].join('\n'))}`;
+  const leasePath = `.atm/runtime/git-index-leases/${leaseId}.json`;
+  const lease = {
+    schemaId: 'atm.gitIndexOverrideLease.v1',
+    leaseId,
+    kind: options.leaseKind,
+    permission: options.leaseKind === 'stage-override'
+      ? 'git.index.stageOverride'
+      : 'git.index.destructiveOverride',
+    actorId: options.actorId,
+    taskId: options.taskId.toUpperCase(),
+    paths: uniqueSorted(options.paths),
+    phrase,
+    chatTextAccepted: false,
+    ttlSeconds,
+    singleUse: true,
+    used: false,
+    createdAt: now.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+    reason: options.overrideReason,
+    auditRequirement: options.leaseKind === 'stage-override'
+      ? 'Write stage override audit before mutating any foreign-active staged entry.'
+      : 'Write destructive override audit before worktree/index mutation; include before/after status, index hash, blob IDs, rollback result, and human reason.'
+  };
+  mkdirSync(path.dirname(path.join(options.cwd, leasePath)), { recursive: true });
+  writeFileSync(path.join(options.cwd, leasePath), `${JSON.stringify(lease, null, 2)}\n`, 'utf8');
+  return makeResult({
+    ok: true,
+    command: 'git',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_GIT_INDEX_OVERRIDE_LEASE_CREATED', `Created ${options.leaseKind} Git index override lease.`, {
+      leaseId,
+      leasePath,
+      expiresAt: lease.expiresAt,
+      chatTextAccepted: false
+    })],
+    evidence: {
+      action: 'lease',
+      lease,
+      leasePath
+    }
   });
 }
 
@@ -1049,7 +1379,7 @@ function buildGitAdmissionComposerInput(options: ParsedGitOptions, result: Retur
     intent: `Merge remote composer-routed JSON mutations for ${filePath} into the local working tree without auto-commit.`,
     patch,
     validators: [],
-    rollback: `git restore -- ${quoteCliValue(filePath)}`
+    rollback: `node atm.mjs git lease destructive-override --task ${quoteCliValue(options.taskId ?? `git-admit-${result.topology.branch}`)} --actor ${quoteCliValue(options.actorId!)} --paths ${quoteCliValue(filePath)} --reason "<human-approved rollback reason>" --json`
   };
   return { proposal };
 }
@@ -1647,19 +1977,21 @@ function runGitCommit(options: ParsedGitOptions) {
   const autoStagedFrameworkPaths = options.taskId === null && options.autoStage
     ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun)
     : [];
+  let frameworkClaimCommitFiles: readonly string[] = [];
   if (options.taskId === null) {
     const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId);
     if (options.dryRun && options.autoStage) {
-      if (frameworkStagingInspection?.kind === 'mixed-scope') {
+      if (frameworkStagingInspection?.kind === 'mixed-scope' && !options.deferForeignStaged) {
         throw new CliError(
           'ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS',
-          'git commit found unstaged framework-claim changes mixed with already staged out-of-claim files; stage only the claim scope or reset the foreign staged files before retrying.',
+          'git commit found staged out-of-claim files on a framework claim; pass --defer-foreign-staged to commit only the claim scope while leaving foreign staged files untouched, or stage only the claim scope before retrying.',
           {
             exitCode: 1,
             details: {
               actorId,
               inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
-              outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles
+              outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles,
+              requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --message ${quoteCliValue(options.message)} --auto-stage --defer-foreign-staged --json`
             }
           }
         );
@@ -1671,7 +2003,10 @@ function runGitCommit(options: ParsedGitOptions) {
         messages: [message('info', 'ATM_GIT_COMMIT_FRAMEWORK_DRY_RUN', 'git commit dry-run for the active framework claim resolved the governed commit surface without mutating the index.', {
           actorId,
           frameworkClaimFiles: readActiveFrameworkClaimFiles(options.cwd, actorId),
-          autoStageCandidates: autoStagedFrameworkPaths
+          autoStageCandidates: autoStagedFrameworkPaths,
+          outOfScopeStagedFiles: frameworkStagingInspection?.kind === 'mixed-scope'
+            ? frameworkStagingInspection.outOfScopeStagedFiles
+            : []
         })],
         evidence: {
           action: 'commit',
@@ -1705,18 +2040,33 @@ function runGitCommit(options: ParsedGitOptions) {
         }
       );
     }
-    if (frameworkStagingInspection?.kind === 'mixed-scope') {
+    if (frameworkStagingInspection?.kind === 'mixed-scope' && !options.deferForeignStaged) {
+      // ATM-BUG-2026-07-13-177: fail closed on ordinary-unowned / out-of-claim staged
+      // files unless the operator explicitly opts into claim-isolated commit.
       throw new CliError(
         'ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS',
-        'git commit found unstaged framework-claim changes mixed with already staged out-of-claim files; stage only the claim scope or reset the foreign staged files before retrying.',
+        'git commit found staged out-of-claim files on a framework claim; pass --defer-foreign-staged to commit only the claim scope while leaving foreign staged files untouched, or stage only the claim scope before retrying.',
         {
           exitCode: 1,
           details: {
             actorId,
             inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
-            outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles
+            outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles,
+            requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --message ${quoteCliValue(options.message)} --auto-stage --defer-foreign-staged --json`
           }
         }
+      );
+    }
+    const claimedFiles = new Set(readActiveFrameworkClaimFiles(options.cwd, actorId));
+    if (claimedFiles.size > 0) {
+      // Always isolate framework-claim commits to claim-allowed staged files so the
+      // live index cannot absorb ordinary-unowned or out-of-claim staged residue.
+      const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(options.cwd);
+      frameworkClaimCommitFiles = uniqueSorted(
+        readStagedFiles(options.cwd).filter((filePath) =>
+          isIgnorableFrameworkCommitStagingSideEffect(filePath)
+          || isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)
+        )
       );
     }
   }
@@ -1830,18 +2180,19 @@ function runGitCommit(options: ParsedGitOptions) {
           actorId,
           trailers
         }).commitFiles
-        : [];
+        : frameworkClaimCommitFiles;
       const autoStagedActorRegistryPath = options.taskId === null
         ? stageTrackedActorRegistryIfNeeded(options.cwd)
         : null;
-      const preStagedEvidence = !options.noVerify && bundleFiles.length === 0
+      const scopedCommitFiles = bundleFiles.length > 0 ? bundleFiles : frameworkClaimCommitFiles;
+      const preStagedEvidence = !options.noVerify && scopedCommitFiles.length === 0
         ? ensureGovernedGitHeadEvidenceStagedForCommit(
           options.cwd,
           actorId
         )
         : null;
-      const stagedCommitSurface = bundleFiles.length > 0 ? bundleFiles : readStagedFiles(options.cwd);
-      if (!options.noVerify && bundleFiles.length === 0 && shouldStageGovernedGitHeadEvidenceBeforeCommit(stagedCommitSurface) && !preStagedEvidence) {
+      const stagedCommitSurface = scopedCommitFiles.length > 0 ? scopedCommitFiles : readStagedFiles(options.cwd);
+      if (!options.noVerify && scopedCommitFiles.length === 0 && shouldStageGovernedGitHeadEvidenceBeforeCommit(stagedCommitSurface) && !preStagedEvidence) {
         throw new CliError('ATM_GIT_COMMIT_GIT_HEAD_PREPARE_FAILED', 'ATM could not pre-stage git-head evidence for this governed commit.', {
           exitCode: 1,
           details: {
@@ -1881,8 +2232,8 @@ function runGitCommit(options: ParsedGitOptions) {
         copyableCommitCommand: rawCopyableCommitCommand,
         liveIndexResidueRollback: []
       });
-      if (bundleFiles.length > 0) {
-        withTaskScopedCommitIndex(options.cwd, bundleFiles, actorId, (scopedEnv) => {
+      if (scopedCommitFiles.length > 0) {
+        withTaskScopedCommitIndex(options.cwd, scopedCommitFiles, actorId, (scopedEnv) => {
           runCommit({
             ...commitEnv,
             ...scopedEnv
@@ -2118,7 +2469,8 @@ function runGitCommit(options: ParsedGitOptions) {
 
 interface ParsedGitOptions {
   readonly cwd: string;
-  readonly action: 'prepare' | 'admit' | 'recover-push-fail' | 'check' | 'commit' | 'record-commit' | 'commit-status';
+  readonly action: 'prepare' | 'admit' | 'push' | 'recover-push-fail' | 'check' | 'commit' | 'record-commit' | 'commit-status' | 'lease';
+  readonly leaseKind: 'stage-override' | 'destructive-override' | null;
   readonly actorId: string | null;
   readonly taskId: string | null;
   readonly branch: string | null;
@@ -2141,12 +2493,15 @@ interface ParsedGitOptions {
   readonly applyToWorkingTree: boolean;
   readonly extraTrailers: readonly string[];
   readonly timeoutMs: number | null;
+  readonly paths: readonly string[];
+  readonly ttlSeconds: number | null;
 }
 
 function parseGitOptions(argv: string[]): ParsedGitOptions {
   const options = {
     cwd: process.cwd(),
     action: null as ParsedGitOptions['action'] | null,
+    leaseKind: null as ParsedGitOptions['leaseKind'],
     actorId: null as string | null,
     taskId: null as string | null,
     branch: null as string | null,
@@ -2168,7 +2523,9 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     stewardPlan: false,
     applyToWorkingTree: false,
     extraTrailers: [] as string[],
-    timeoutMs: null as number | null
+    timeoutMs: null as number | null,
+    paths: [] as string[],
+    ttlSeconds: null as number | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -2254,6 +2611,21 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
       index += 1;
       continue;
     }
+    if (arg === '--paths') {
+      options.paths = splitCsvPaths(requireValue(argv, index, '--paths'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--ttl-seconds') {
+      const rawTtl = requireValue(argv, index, '--ttl-seconds');
+      const parsedTtl = Number(rawTtl);
+      if (!Number.isFinite(parsedTtl) || parsedTtl <= 0) {
+        throw new CliError('ATM_CLI_USAGE', '--ttl-seconds requires a positive number.', { exitCode: 2 });
+      }
+      options.ttlSeconds = parsedTtl;
+      index += 1;
+      continue;
+    }
     if (arg === '--no-trailers') {
       options.checkTrailers = false;
       continue;
@@ -2299,16 +2671,23 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `git does not support option ${arg}`, { exitCode: 2 });
     }
+    if (options.action === 'lease' && !options.leaseKind && (arg === 'stage-override' || arg === 'destructive-override')) {
+      options.leaseKind = arg;
+      continue;
+    }
     if (options.action) {
       throw new CliError('ATM_CLI_USAGE', 'git accepts only one action.', { exitCode: 2 });
     }
-    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status') {
-      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit, record-commit, commit-status', { exitCode: 2 });
+    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'push' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status' && arg !== 'lease') {
+      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, push, recover-push-fail, check, commit, record-commit, commit-status, lease', { exitCode: 2 });
     }
     options.action = arg;
   }
   if (!options.action) {
-    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | recover-push-fail | check | commit | record-commit | commit-status).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status | lease).', { exitCode: 2 });
+  }
+  if (options.action === 'lease' && !options.leaseKind) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires stage-override or destructive-override.', { exitCode: 2 });
   }
   return {
     ...options,
@@ -2679,6 +3058,7 @@ function isAllowedGovernanceArtifactPath(cwd: string, filePath: string, taskId: 
   if (lower === `.atm/history/evidence/${normalizedTaskId}.bundle-manifest.json`) return true;
   if (lower === `.atm/history/evidence/${normalizedTaskId}.closure-packet.json`) return true;
   if (lower.startsWith(`.atm/history/task-events/${normalizedTaskId}/`) && lower.endsWith('.json')) return true;
+  if (isTaskOwnedProtectedOverrideAuditPath(cwd, normalized, normalizedTaskId)) return true;
   return isIgnorableCommitStagingSideEffect(cwd, normalized, taskId);
 }
 
@@ -2742,13 +3122,15 @@ function buildUnexpectedStagedTasksForGitCommit(
     return {
       taskId: foreignTaskId,
       stagedFiles: uniqueFiles,
-      restoreChoice: `Do not silently unstage ${foreignTaskId}. Either wait for that agent to commit, or defer foreign staged files through --defer-foreign-staged and confirm the other agent can restage afterward.`,
-      deferCommand: `${quoteCliValue(resolveGitExecutable())} restore --staged -- ${uniqueFiles.map(quoteCliValue).join(' ')}`
+      restoreChoice: `Do not silently unstage ${foreignTaskId}. Wait for that agent to commit, request a Broker index lane, or use an explicit ATM stage-override lease if the human approved disrupting another active agent.`,
+      deferCommand: `node atm.mjs git lease stage-override --task ${quoteCliValue(taskId)} --actor <actor-id> --paths ${uniqueFiles.map(quoteCliValue).join(',')} --reason "<human-approved reason>" --json`
     };
   });
 }
 
 function inferActiveTaskOwnerForPath(cwd: string, filePath: string): string | null {
+  const protectedOverrideAuditTaskId = readProtectedOverrideAuditTaskId(cwd, filePath);
+  if (protectedOverrideAuditTaskId) return protectedOverrideAuditTaskId;
   const taskDirectory = path.join(cwd, '.atm', 'history', 'tasks');
   if (!existsSync(taskDirectory)) return null;
   const normalizedFile = normalizeRelativePath(filePath);
@@ -2770,6 +3152,21 @@ function inferActiveTaskOwnerForPath(cwd: string, filePath: string): string | nu
       }
     });
   return owners.length === 1 ? owners[0] : null;
+}
+
+function readProtectedOverrideAuditTaskId(cwd: string, filePath: string): string | null {
+  const normalized = normalizeRelativePath(filePath);
+  const lower = normalized.toLowerCase();
+  if (!lower.startsWith('.atm/history/protected-override-audit/') || !lower.endsWith('.json')) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(readFileSync(path.join(cwd, normalized), 'utf8')) as { taskId?: unknown };
+    const taskId = typeof parsed.taskId === 'string' ? parsed.taskId.trim().toUpperCase() : '';
+    return taskId || null;
+  } catch {
+    return null;
+  }
 }
 
 function isProtectedStagedGovernanceOwnershipPath(filePath: string): boolean {
@@ -2818,13 +3215,43 @@ function isDeferrableForeignGovernanceResidue(taskId: string, finding: AutoGener
     || /^\.atm\/history\/task-events\/[^/]+\/.+(?:close|reconcile|repair-closure).+\.json$/.test(normalized);
 }
 
+function isActiveForeignGovernanceResidueOwner(
+  cwd: string,
+  taskId: string,
+  finding: AutoGeneratedResidueFinding
+): boolean {
+  const ownerTaskId = finding.ownerTaskId?.trim().toUpperCase() ?? null;
+  if (!ownerTaskId || ownerTaskId === taskId.trim().toUpperCase()) return false;
+  if (!isDeferrableForeignGovernanceResidue(taskId, finding)) return false;
+  try {
+    const taskDocument = readTaskDocument(cwd, ownerTaskId);
+    const claim = parseTaskClaim(taskDocument?.claim);
+    if (claim?.state === 'active') return true;
+    const taskDirectionLock = taskDocument?.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
+      ? taskDocument.taskDirectionLock as Record<string, unknown>
+      : null;
+    return String(taskDirectionLock?.status ?? '').trim().toLowerCase() === 'active';
+  } catch {
+    return false;
+  }
+}
+
 function deferForeignStagedFiles(
   cwd: string,
   taskId: string,
   unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[]
 ): string | null {
-  if (unexpectedStagedTasks.length === 0) return null;
   const files = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
+  return deferStagedFilePaths(cwd, taskId, files);
+}
+
+function deferStagedFilePaths(
+  cwd: string,
+  taskId: string,
+  filesInput: readonly string[]
+): string | null {
+  const files = uniqueSorted(filesInput.map(normalizeRelativePath).filter(Boolean));
+  if (files.length === 0) return null;
   const snapshotPath = `.atm/runtime/snapshots/foreign-staged-${taskId}-${Date.now()}.json`;
   mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
   writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
@@ -2926,6 +3353,11 @@ export function resolveTaskScopedCommitBundle(input: {
     trailers: input.trailers
   });
   let stagedFiles = readStagedFiles(input.cwd);
+  let gitIndexOwnership = inspectGitIndexOwnership({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    stagedFiles
+  });
   let unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
   let protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   const resolutionAuthorizedForeignTaskIds = readResolutionAuthorizedForeignTaskIds(input.cwd, input.brokerConflictResolutionPath ?? null, input.taskId);
@@ -2937,6 +3369,11 @@ export function resolveTaskScopedCommitBundle(input: {
     deferredForeignStagedFiles = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
     deferredForeignStagedSnapshot = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedTasks);
     stagedFiles = readStagedFiles(input.cwd);
+    gitIndexOwnership = inspectGitIndexOwnership({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      stagedFiles
+    });
     unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
     protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   }
@@ -2950,10 +3387,12 @@ export function resolveTaskScopedCommitBundle(input: {
   const blockedResidue = residueReport.blockAndExplain.filter((entry) =>
     !deferredForeignStagedSet.has(normalizeRelativePath(entry.path))
     && !(input.deferForeignStaged && isDeferrableForeignGovernanceResidue(input.taskId, entry))
+    && !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry)
   );
   const manualReviewResidue = residueReport.manualReview.filter((entry) =>
     isActionableManualResidue(entry.path)
     && !(input.deferForeignStaged && isDeferrableForeignGovernanceResidue(input.taskId, entry))
+    && !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry)
   );
   const effectiveDirtyFiles = autoCleanedResidue.length > 0
     ? listTaskScopedWorktreeDirtyFiles(input.cwd)
@@ -3023,9 +3462,13 @@ export function resolveTaskScopedCommitBundle(input: {
   let blockedCode: string | null = null;
   let blockedSummary: string | null = null;
 
-  if (input.deferForeignStaged && protectedForeignStagedOwnershipFiles.length > 0) {
+  if (input.deferForeignStaged && gitIndexOwnership.foreignActiveStaged.length > 0 && !protectedForeignDeferAuthorized) {
+    const diagnostic = buildForeignActiveStagedDiagnostic(gitIndexOwnership);
+    blockedCode = ATM_INDEX_FOREIGN_ACTIVE_STAGED;
+    blockedSummary = `Refusing to unstage/defer foreign-active staged files owned by ${diagnostic.ownerTaskIds.join(', ')}: ${diagnostic.stagedPaths.join(', ')}. Wait for the owner, request a Broker index lane, or use an explicit stage-override lease with human approval.`;
+  } else if (input.deferForeignStaged && protectedForeignStagedOwnershipFiles.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP';
-    blockedSummary = `Refusing to unstage protected .atm/history files that belong to another task: ${protectedForeignStagedOwnershipFiles.join(', ')}. Wait for that task owner to commit/release, or commit this task through the task-scoped bundle without --defer-foreign-staged.`;
+    blockedSummary = `Refusing to unstage protected .atm/history files that belong to another task: ${protectedForeignStagedOwnershipFiles.join(', ')}. Wait for that task owner to commit/release, request a Broker index lane, or use an explicit stage-override lease with human approval.`;
   } else if (blockedResidue.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED';
     blockedSummary = `Generated residue belongs to another task/run and must be cleared explicitly: ${blockedResidue.map((entry) => entry.path).join(', ')}`;
@@ -3040,6 +3483,11 @@ export function resolveTaskScopedCommitBundle(input: {
   if (!blockedCode && input.apply && stageCandidates.length > 0) {
     stageTaskScopedBundleFiles(input.cwd, stageCandidates);
     stagedFiles = readStagedFiles(input.cwd);
+    gitIndexOwnership = inspectGitIndexOwnership({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      stagedFiles
+    });
   }
 
   if (unexpectedStagedTasks.length > 0) {
@@ -3063,6 +3511,7 @@ export function resolveTaskScopedCommitBundle(input: {
     commitFiles: commitFilesWithGovernanceEvidence,
     skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
     unexpectedStagedTasks,
+    gitIndexOwnership,
     outOfScopeStagedFiles: uniqueSorted([...outOfScopeStagedFiles, ...outOfScopeStagedDeletions]),
     governanceBundleWarnings,
     blockedCode,
@@ -3236,13 +3685,7 @@ function isTaskOwnedProtectedOverrideAuditPath(cwd: string, filePath: string, no
   if (!normalized.startsWith('.atm/history/protected-override-audit/') || !normalized.endsWith('.json')) {
     return false;
   }
-  try {
-    const absolutePath = path.join(cwd, filePath);
-    const parsed = JSON.parse(readFileSync(absolutePath, 'utf8')) as { taskId?: unknown };
-    return typeof parsed.taskId === 'string' && parsed.taskId.toLowerCase() === normalizedTaskId;
-  } catch {
-    return false;
-  }
+  return readProtectedOverrideAuditTaskId(cwd, normalized)?.toLowerCase() === normalizedTaskId;
 }
 
 function cleanupAutoGeneratedResidue(cwd: string, findings: readonly AutoGeneratedResidueFinding[]): readonly AutoGeneratedResidueFinding[] {
@@ -3410,13 +3853,22 @@ function inspectFrameworkScopedUnstagedCommit(cwd: string, actorId: string): Fra
     isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)
   ));
   const unstagedInScopeDirtyFiles = inScopeDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
-  if (unstagedInScopeDirtyFiles.length === 0) {
-    return null;
-  }
+  // ATM-BUG-2026-07-13-177: even when claim dirty files are already staged, still
+  // surface already-staged out-of-claim files so live-index commits cannot absorb them.
   const outOfScopeStagedFiles = stagedFiles.filter((filePath) =>
     !isIgnorableFrameworkCommitStagingSideEffect(filePath)
     && !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)
   );
+  if (unstagedInScopeDirtyFiles.length === 0) {
+    if (outOfScopeStagedFiles.length > 0) {
+      return {
+        kind: 'mixed-scope',
+        inScopeDirtyFiles: [],
+        outOfScopeStagedFiles: uniqueSorted(outOfScopeStagedFiles)
+      };
+    }
+    return null;
+  }
   if (outOfScopeStagedFiles.length > 0) {
     return {
       kind: 'mixed-scope',
@@ -3484,6 +3936,13 @@ function extractStringList(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
     : [];
+}
+
+function splitCsvPaths(value: string): string[] {
+  return [...uniqueSorted(value
+    .split(',')
+    .map((entry) => entry.trim().replace(/^"|"$/g, '').replace(/^'|'$/g, ''))
+    .filter(Boolean))];
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {

@@ -1,10 +1,9 @@
 import path from 'node:path';
-import { createFrameworkModeStatus } from '../framework-development.ts';
+import { createFrameworkModeStatus, requiredValidationPassesForClosure } from '../framework-development.ts';
 import { resolveTaskRunnerArbitration } from '../validate.ts';
 import {
   canonicalizeValidatorIdentity,
   classifyValidatorTier,
-  isClosureRequiredValidator,
   resolveValidatorExpectedCommand,
   type ValidatorEvidenceState,
   type ValidatorTier
@@ -185,10 +184,27 @@ export function computeMissingValidatorReport(
     ? (taskDocument.scopePaths as unknown[]).filter((p): p is string => typeof p === 'string')
     : [];
 
+  // ATM-BUG-2026-07-12-155 (TASK-AAO-FABLE-003): the close --write closure
+  // packet requires `requiredValidationPassesForClosure(frameworkGates,
+  // changedFiles)` unconditionally, while this readiness report previously
+  // applied scope-conditional exemptions (validate:cli / git-head-evidence)
+  // via isClosureRequiredValidator. That drift let pre-close and close
+  // dry-run report "ready" and then fail at write with
+  // ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID. Readiness now consumes the exact
+  // same write-side set so both surfaces expose one validator contract; the
+  // write path stays authoritative and is not weakened.
+  const declaredChangedFiles = uniqueStrings([
+    ...scopePaths,
+    ...(Array.isArray(taskDocument?.deliverables)
+      ? (taskDocument.deliverables as unknown[]).filter((p): p is string => typeof p === 'string')
+      : [])
+  ]);
+  const writeRequiredSet = new Set(requiredValidationPassesForClosure(frameworkGates, declaredChangedFiles));
+
   for (const gate of allGates) {
     const state = classifyValidatorEvidenceState(bundleRecords, gate);
     const tier = classifyValidatorTier(gate);
-    const closureRequired = isClosureRequiredValidator(gate, taskDeclaredValidators, scopePaths);
+    const closureRequired = taskDeclaredValidators.includes(gate) || writeRequiredSet.has(gate);
     catalogEntries.push({
       name: gate,
       tier,

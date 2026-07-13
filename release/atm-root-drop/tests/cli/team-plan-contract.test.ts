@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import {
+  buildTeamLeaseConflictDetails,
+  buildTeamLeaseNotFoundDetails,
   buildTeamGrowthContract,
+  buildTeamPlan,
   buildTeamRuntimePilot,
   buildTeamRoleRoutingMatrix,
   buildTeamRoleSkillPackContract
@@ -98,6 +101,7 @@ const runtimePilot = buildTeamRuntimePilot({
     ]
   },
   brokerLane: {
+    blockedReasons: ['Takeover required before conflict arbitration'],
     decision: {
       verdict: 'blocked-active-lease',
       reason: 'Takeover required before conflict arbitration',
@@ -119,5 +123,72 @@ assert.equal(runtimePilot.selectedSkillPackIds.includes('atm.role-pack.coordinat
 assert.equal(runtimePilot.roleConfusionReduction.length >= 3, true);
 assert.equal(runtimePilot.actionableRefinementFindings.length >= 2, true);
 assert.equal(runtimePilot.actionableRefinementFindings.every((entry) => entry.promotionTarget === 'docs/governance/team-agents/role-pack-learning-loop.md'), true);
+
+const teamPlanWithIndexLane = buildTeamPlan({
+  task: { workItemId: 'TASK-GIT-0015', title: 'Broker-owned staging index arbitration' },
+  recipe: recipe as any,
+  writePaths: ['packages/cli/src/commands/git-governance.ts'],
+  validation: { ok: true, findings: [] },
+  brokerLane: {
+    safeToStart: true,
+    blockedReasons: [],
+    chosenLane: 'parallel',
+    decision: {
+      verdict: 'parallel-safe',
+      reason: 'fixture'
+    }
+  } as any,
+  gitIndexOwnership: {
+    schemaId: 'atm.gitIndexOwnership.v1',
+    taskId: 'TASK-GIT-0015',
+    generatedAt: '2026-07-13T00:00:00.000Z',
+    entries: [],
+    foreignActiveStaged: [],
+    indexLane: {
+      schemaId: 'atm.gitIndexLane.v1',
+      status: 'free',
+      ownerTaskId: null,
+      ownerActorId: null,
+      reason: 'fixture free index'
+    }
+  }
+});
+assert.equal(teamPlanWithIndexLane.indexLane.status, 'free');
+assert.equal(teamPlanWithIndexLane.gitIndexOwnership?.schemaId, 'atm.gitIndexOwnership.v1');
+
+const activeLeases = [
+  { permission: 'file.write', agentId: 'implementer-typescript', paths: ['packages/cli/src/commands/team.ts'] },
+  { permission: 'exec.validator', agentId: 'validator', paths: ['tests/cli/team-plan-contract.test.ts'] }
+];
+const leaseConflictDetails = buildTeamLeaseConflictDetails({
+  teamRunId: 'team-test',
+  permission: 'file.write',
+  requestedOwner: 'implementer',
+  conflict: activeLeases[0]!,
+  currentLeases: activeLeases
+});
+assert.equal(leaseConflictDetails.currentOwner, 'implementer-typescript');
+assert.deepEqual(leaseConflictDetails.currentOwnerPaths, ['packages/cli/src/commands/team.ts']);
+assert.equal(
+  leaseConflictDetails.currentOwnerReleaseCommand,
+  'node atm.mjs team release --team team-test --actor implementer-typescript --permission file.write --json'
+);
+assert.equal(leaseConflictDetails.activeLeases.length, 1);
+assert.equal(leaseConflictDetails.activeLeases[0]?.agentId, 'implementer-typescript');
+assert.equal(leaseConflictDetails.requiredCommand, leaseConflictDetails.currentOwnerReleaseCommand);
+
+const leaseNotFoundDetails = buildTeamLeaseNotFoundDetails({
+  teamRunId: 'team-test',
+  permission: 'file.write',
+  actorId: 'implementer',
+  currentLeases: activeLeases
+});
+assert.equal(leaseNotFoundDetails.actorId, 'implementer');
+assert.equal(leaseNotFoundDetails.holderCount, 1);
+assert.equal(leaseNotFoundDetails.activeLeases[0]?.agentId, 'implementer-typescript');
+assert.equal(
+  leaseNotFoundDetails.requiredCommand,
+  'node atm.mjs team release --team team-test --actor implementer-typescript --permission file.write --json'
+);
 
 console.log('[team-plan-contract:test] ok');

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { CliError, makeResult, message } from './shared.js';
 import { loadRegistry, saveRegistry, registerIntent, renewIntentLease, releaseTask, cleanupStale } from '../../../core/dist/broker/registry.js';
+import { cleanupBrokerRuntimeSnapshots } from '../../../core/dist/broker/lifecycle.js';
 import { calculateBrokerDecision } from '../../../core/dist/broker/decision.js';
 import { composeBrokerProposals } from '../../../core/dist/broker/compose.js';
 import { applyStewardPlan, executeBrokerScopedWrite, planStewardApply } from '../../../core/dist/broker/steward.js';
@@ -174,6 +175,11 @@ export async function runBroker(argv) {
             queues: updatedQueues
         });
         writeSharedSurfaceFreezeRecords(sharedFreezePath, freezes);
+        const runtimeCleanup = cleanupBrokerRuntimeSnapshots({
+            cwd: options.cwd,
+            releasedTaskIds: [releaseTaskId],
+            activeTaskIds: registry.activeIntents.map((intent) => intent.taskId)
+        });
         return makeResult({
             ok: true,
             command: 'broker',
@@ -185,7 +191,8 @@ export async function runBroker(argv) {
                 registryPath: '.atm/runtime/write-broker.registry.json',
                 releasedTask: releaseTaskId,
                 sharedSurfaceQueues: updatedQueues,
-                sharedSurfaceFreezes: freezes
+                sharedSurfaceFreezes: freezes,
+                runtimeCleanup
             }
         });
     }
@@ -216,6 +223,10 @@ export async function runBroker(argv) {
         let registry = cleanupStale(loadRegistry(registryPath));
         registry = cleanupStale(registry);
         saveRegistry(registryPath, registry);
+        const runtimeCleanup = cleanupBrokerRuntimeSnapshots({
+            cwd: options.cwd,
+            activeTaskIds: registry.activeIntents.map((intent) => intent.taskId)
+        });
         return makeResult({
             ok: true,
             command: 'broker',
@@ -224,7 +235,8 @@ export async function runBroker(argv) {
                 message('info', 'ATM_BROKER_CLEANED', 'Cleaned up stale write intents from registry')
             ],
             evidence: {
-                registryPath: '.atm/runtime/write-broker.registry.json'
+                registryPath: '.atm/runtime/write-broker.registry.json',
+                runtimeCleanup
             }
         });
     }

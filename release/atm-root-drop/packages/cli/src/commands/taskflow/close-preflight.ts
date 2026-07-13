@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { detectHistoricalDeliveryCommit } from '../tasks/historical-delivery.ts';
+import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
 import { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers, type HistoricalClosePreflightSummary } from './historical-close-preflight.ts';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { resolveTaskflowDeclaredFiles } from './task-scope.ts';
@@ -155,8 +156,8 @@ export function buildTaskflowClosePreflight(input: {
       blockers: [
         {
           id: 'unexpectedStagedTasks',
-          code: 'ATM_TASKFLOW_PRECLOSE_FOREIGN_STAGED_TASKS',
-          summary: `Git index contains staged governance files for other tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless foreign bundles are deferred or committed separately.`,
+          code: ATM_INDEX_FOREIGN_ACTIVE_STAGED,
+          summary: `Git index contains staged governance files for other active tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless the owner commits, Broker grants an index lane, or an explicit stage-override lease is supplied.`,
           files,
           taskIds,
           remediationChoices: summary.unexpectedStagedTasks.map((entry) => ({
@@ -171,8 +172,8 @@ export function buildTaskflowClosePreflight(input: {
       operationalBlockers: [
         {
           id: 'unexpectedStagedTasks',
-          code: 'ATM_TASKFLOW_PRECLOSE_FOREIGN_STAGED_TASKS',
-          summary: `Git index contains staged governance files for other tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless foreign bundles are deferred or committed separately.`,
+          code: ATM_INDEX_FOREIGN_ACTIVE_STAGED,
+          summary: `Git index contains staged governance files for other active tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless the owner commits, Broker grants an index lane, or an explicit stage-override lease is supplied.`,
           files,
           taskIds,
           remediationChoices: summary.unexpectedStagedTasks.map((entry) => ({

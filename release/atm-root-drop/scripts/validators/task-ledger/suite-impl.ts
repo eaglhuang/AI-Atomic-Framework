@@ -261,6 +261,42 @@ export function initGitRepo(repo: string) {
   execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
+  try {
+    execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, stdio: 'ignore' });
+    return;
+  } catch {
+    // An unborn fixture repository still needs its first commit below.
+  }
+  // next --claim registers a Broker transaction against HEAD. Fixture repos
+  // must therefore start from a real commit instead of relying on an
+  // unborn branch, otherwise the governance validator fails before reaching
+  // the behavior it intends to exercise.
+  const seedPath = path.join(repo, '.atm', 'validator-fixture-root.txt');
+  writeFileSync(seedPath, 'ATM validator fixture root\n', 'utf8');
+  execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed ATM validator fixture'], { cwd: repo, stdio: 'ignore' });
+}
+
+export function clearBrokerRuntimeState(repo: string) {
+  const runtimeDir = path.join(repo, '.atm', 'runtime');
+  for (const relativePath of [
+    'write-broker.registry.json',
+    'broker-shared-surface-queues.json',
+    'broker-shared-surface-freezes.json',
+    'broker-intents'
+  ]) {
+    rmSync(path.join(runtimeDir, relativePath), { recursive: true, force: true });
+  }
+}
+
+export function prepareIsolatedTaskLedgerFixtureRepo(parent: string, name: string, config: Record<string, unknown> = {}) {
+  const repo = makeHostRepo(parent, name, config);
+  clearBrokerRuntimeState(repo);
+  initGitRepo(repo);
+  clearBrokerRuntimeState(repo);
+  const head = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+  assert(/^[0-9a-f]{40}$/i.test(head), `${name} fixture must have a resolvable seed HEAD`);
+  return { repo, head };
 }
 
 export function evidenceReport(result: Awaited<ReturnType<typeof runTasks>>): Record<string, any> {
@@ -290,8 +326,10 @@ export function makeHostRepo(parent: string, name: string, config: Record<string
   return repo;
 }
 
-export function makeFrameworkRepo(parent: string) {
-  const repo = path.join(parent, 'ai-atomic-framework');
+let frameworkRepoSequence = 0;
+
+export function makeFrameworkRepo(parent: string, name?: string) {
+  const repo = path.join(parent, name ?? `ai-atomic-framework-${++frameworkRepoSequence}`);
   mkdirSync(path.join(repo, 'packages', 'core', 'src'), { recursive: true });
   mkdirSync(path.join(repo, 'packages', 'cli', 'src'), { recursive: true });
   writeJson(path.join(repo, 'package.json'), {
@@ -523,8 +561,7 @@ try {
   assert(manualMirrorAudit.ok === false, 'hand-edited mirror done task must fail audit');
   assert(manualMirrorAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING'), 'missing transition evidence must be reported');
 
-  const deliverableRepo = makeHostRepo(tempRoot, 'deliverable-gate');
-  initGitRepo(deliverableRepo);
+  const { repo: deliverableRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'deliverable-gate');
   const pipelineFixtureTaskId = 'TEST-TASK-0001';
   const committedFixtureTaskId = 'TEST-TASK-0002';
   const pipelineTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', pipelineFixtureTaskId, '--actor', 'validator', '--title', 'Build pipeline runner test fixture']);
@@ -639,10 +676,8 @@ try {
   // TASK-CID-0076: a task already in review must not require reset/open/import
   // hacks when the real delivery already landed. Only the closeout-only lane can
   // reclaim it, and done still requires command-backed historical delivery proof.
-  const reviewCloseoutRepo = makeHostRepo(tempRoot, 'review-closeout-target');
-  initGitRepo(reviewCloseoutRepo);
-  const reviewPlanningRepo = makeHostRepo(tempRoot, 'review-closeout-planning');
-  initGitRepo(reviewPlanningRepo);
+  const { repo: reviewCloseoutRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'review-closeout-target');
+  const { repo: reviewPlanningRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'review-closeout-planning');
   mkdirSync(path.join(reviewPlanningRepo, 'docs'), { recursive: true });
   const reviewCloseoutDeliverable = 'docs/review-closeout-deliverable.md';
   writeFileSync(path.join(reviewPlanningRepo, reviewCloseoutDeliverable), '# review closeout delivery\n', 'utf8');
@@ -816,8 +851,6 @@ try {
 
   const frameworkBatchRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(frameworkBatchRepo);
-  execFileSync('git', ['add', '.'], { cwd: frameworkBatchRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial framework fixture'], { cwd: frameworkBatchRepo, stdio: 'ignore' });
   const frameworkBatchTaskId = 'TEST-TASK-BATCH-0052';
   const frameworkBatchTask = await runTasks(['create', '--cwd', frameworkBatchRepo, '--task', frameworkBatchTaskId, '--actor', 'validator', '--title', 'Framework batch delivery runner']);
   assert(frameworkBatchTask.ok === true, 'framework batch dogfood task create must succeed');
@@ -860,10 +893,8 @@ try {
   // framework critical files outside the task scope must be isolated as advisory
   // and must not raise ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE. The task's own scoped
   // deliverable diff still has to be governed (here via --historical-delivery).
-  const isolationRepo = makeFrameworkRepo(tempRoot);
+  const isolationRepo = makeFrameworkRepo(tempRoot, 'ai-atomic-framework-isolation');
   initGitRepo(isolationRepo);
-  execFileSync('git', ['add', '.'], { cwd: isolationRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial framework fixture'], { cwd: isolationRepo, stdio: 'ignore' });
   const isolationTaskId = 'TEST-TASK-ISOLATION-0057';
   const isolationTaskCreate = await runTasks(['create', '--cwd', isolationRepo, '--task', isolationTaskId, '--actor', 'validator', '--title', 'Scoped diff isolation fixture']);
   assert(isolationTaskCreate.ok === true, 'isolation fixture task create must succeed');
@@ -924,8 +955,6 @@ try {
   // so tracked dirty framework files must fail before close can write a packet.
   const dirtyCloseRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(dirtyCloseRepo);
-  execFileSync('git', ['add', '.'], { cwd: dirtyCloseRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial dirty-close fixture'], { cwd: dirtyCloseRepo, stdio: 'ignore' });
   const dirtyCloseTaskId = 'TEST-TASK-MRP-0028-DIRTY-CLOSE';
   const dirtyCloseTaskCreate = await runTasks(['create', '--cwd', dirtyCloseRepo, '--task', dirtyCloseTaskId, '--actor', 'validator', '--title', 'Dirty framework close fixture']);
   assert(dirtyCloseTaskCreate.ok === true, 'dirty-close fixture task create must succeed');
@@ -982,8 +1011,6 @@ try {
 
   const historicalEvidenceRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(historicalEvidenceRepo);
-  execFileSync('git', ['add', '.'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial historical evidence fixture'], { cwd: historicalEvidenceRepo, stdio: 'ignore' });
   const historicalEvidenceTaskId = 'TASK-HIST-EVIDENCE-0001';
   const historicalEvidenceCreate = await runTasks(['create', '--cwd', historicalEvidenceRepo, '--task', historicalEvidenceTaskId, '--actor', 'validator', '--title', 'Historical evidence close fixture']);
   assert(historicalEvidenceCreate.ok === true, 'historical evidence fixture task create must succeed');
@@ -1062,8 +1089,6 @@ try {
 
   const repairRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(repairRepo);
-  execFileSync('git', ['add', '.'], { cwd: repairRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial repair fixture'], { cwd: repairRepo, stdio: 'ignore' });
   const repairTaskId = 'TASK-REPAIR-CLOSURE-0001';
   const repairTaskPath = path.join(repairRepo, '.atm', 'history', 'tasks', `${repairTaskId}.json`);
   writeJson(repairTaskPath, {
@@ -1658,6 +1683,56 @@ try {
   const normalizedRun = normalizedEvidence.evidence?.[0]?.commandRuns?.[0];
   assert(normalizedRun?.stdoutSha256 === lowerStdout, 'repair-closure must normalize upstream evidence sha256 to lowercase');
 
+  // ATM-BUG-2026-07-12-126: a terminal close event deletion for a done
+  // task must be repairable in the main worktree while unrelated active
+  // delivery remains dirty and is downgraded to a warning.
+  const staleCloseTaskId = 'TASK-REPAIR-0126';
+  const staleCloseRepo = makeHostRepo(tempRoot, 'repair-stale-close-0126-repo');
+  initGitRepo(staleCloseRepo);
+  const staleCloseTaskPath = path.join(staleCloseRepo, '.atm', 'history', 'tasks', `${staleCloseTaskId}.json`);
+  const staleClosePacketPath = path.join(staleCloseRepo, '.atm', 'history', 'evidence', `${staleCloseTaskId}.closure-packet.json`);
+  const staleCloseEventPath = path.join(staleCloseRepo, '.atm', 'history', 'task-events', staleCloseTaskId, '2026-07-12T00-00-00.000Z-close-fixture.json');
+  mkdirSync(path.dirname(staleCloseTaskPath), { recursive: true });
+  mkdirSync(path.dirname(staleClosePacketPath), { recursive: true });
+  mkdirSync(path.dirname(staleCloseEventPath), { recursive: true });
+  writeJson(staleCloseTaskPath, {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: staleCloseTaskId,
+    status: 'done',
+    scopePaths: ['src/stale-close.ts'],
+    deliverables: ['src/stale-close.ts']
+  });
+  writeJson(staleClosePacketPath, {
+    ...legacyPacket,
+    taskId: staleCloseTaskId,
+    targetCommit: '1111111111111111111111111111111111111111',
+    targetCommitDelta: {
+      currentCommitSha: '1111111111111111111111111111111111111111',
+      parentCommitShas: [],
+      governedTreeSha: '2222222222222222222222222222222222222222',
+      changedFiles: [staleCloseTaskPath]
+    }
+  });
+  writeFileSync(staleCloseEventPath, '{"schemaId":"atm.taskClosureTransition.v1"}\n', 'utf8');
+  execFileSync('git', ['add', '.'], { cwd: staleCloseRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed stale terminal close event'], { cwd: staleCloseRepo, stdio: 'ignore' });
+  execFileSync('git', ['rm', '--', path.relative(staleCloseRepo, staleCloseEventPath)], { cwd: staleCloseRepo, stdio: 'ignore' });
+  const unrelatedActivePath = path.join(staleCloseRepo, 'src', 'active-delivery.ts');
+  mkdirSync(path.dirname(unrelatedActivePath), { recursive: true });
+  writeFileSync(unrelatedActivePath, 'export const activeDelivery = 1;\n', 'utf8');
+  execFileSync('git', ['add', path.relative(staleCloseRepo, unrelatedActivePath)], { cwd: staleCloseRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed unrelated active delivery'], { cwd: staleCloseRepo, stdio: 'ignore' });
+  writeFileSync(unrelatedActivePath, 'export const activeDelivery = 2;\n', 'utf8');
+
+  const staleCloseRepair = repairClosurePacketForTask({
+    cwd: staleCloseRepo,
+    taskId: staleCloseTaskId,
+    dryRun: true,
+    scopeTaskId: staleCloseTaskId
+  });
+  assert(staleCloseRepair.changedFiles.includes(`.atm/history/task-events/${staleCloseTaskId}/2026-07-12T00-00-00.000Z-close-fixture.json`), 'scoped repair must retain the stale terminal close event deletion in its repair diff');
+  assert((staleCloseRepair.scopeWarnings ?? []).includes('src/active-delivery.ts'), 'scoped repair must downgrade unrelated active delivery to a warning');
+
   // 驗證 evidence 檔案已補齊
   const evidencePath = path.join(reconcileRepo, '.atm', 'history', 'evidence', `${reconcileTaskId}.json`);
   assert(existsSync(evidencePath), 'reconciled task evidence must exist');
@@ -2005,8 +2080,6 @@ export async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) 
 export async function validateClosurePacketDirtyTreeHygieneGuard(tempRoot: string) {
   const hygieneRepo = makeFrameworkRepo(tempRoot);
   initGitRepo(hygieneRepo);
-  execFileSync('git', ['add', '.'], { cwd: hygieneRepo, stdio: 'ignore' });
-  execFileSync('git', ['commit', '-m', 'initial hygiene repo'], { cwd: hygieneRepo, stdio: 'ignore' });
 
   const taskId = 'TASK-HYGIENE-0001';
   const taskPath = path.join(hygieneRepo, '.atm', 'history', 'tasks', `${taskId}.json`);
@@ -2239,7 +2312,6 @@ export async function validateTaskResidueClassification(tempRoot: string) {
     status: 'done',
     planningRepo: 'AI-Atomic-Framework',
     targetRepo: 'AI-Atomic-Framework',
-    closureAuthority: 'planning_repo',
     source: {
       planPath: mirrorPlanPath,
       sectionTitle: mirrorTaskId,
@@ -2250,8 +2322,9 @@ export async function validateTaskResidueClassification(tempRoot: string) {
   const mirrorStatus = await runTasks(['status', '--cwd', repo, '--task', mirrorTaskId, '--json']);
   assert(mirrorStatus.ok === true, 'planning-mirror-only status must succeed');
   const mirrorResidue = mirrorStatus.evidence.residueClassification as any;
-  assert(mirrorResidue.bucket === 'planning-mirror-only', 'planning-mirror-only bucket must be reported');
-  assert(String(mirrorResidue.nextCommand).includes('tasks import'), 'planning-mirror-only next command must point to import');
+  // Done without governed closeout must fail closed before mirror-only advice.
+  assert(mirrorResidue.bucket === 'source-done-governance-incomplete', `done mirror residue must fail closed: ${JSON.stringify(mirrorResidue)}`);
+  assert(String(mirrorResidue.nextCommand).includes('repair-closure'), 'done mirror residue must point to repair-closure');
 
   const interruptedTaskId = 'TASK-RESIDUE-0003';
   const interruptedPlanPath = writePlanningCard('docs/fixtures/residue-interrupted.task.md', interruptedTaskId, 'done');
@@ -2311,7 +2384,7 @@ export async function validateTaskResidueClassification(tempRoot: string) {
   assert(staleStatus.ok === true, 'stale-import status must succeed');
   const staleResidue = staleStatus.evidence.residueClassification as any;
   assert(staleResidue.bucket === 'stale-import', 'stale-import bucket must be reported');
-  assert(String(staleResidue.nextCommand).includes('--force'), 'stale-import next command must point to force import');
+  assert(String(staleResidue.nextCommand).includes('tasks import') && String(staleResidue.nextCommand).includes('--reconcile-mirror'), 'stale-import next command must point to governed mirror import');
 
   const noResidueTaskId = 'TASK-RESIDUE-0005';
   const noResiduePlanPath = writePlanningCard('docs/fixtures/residue-none.task.md', noResidueTaskId, 'done');

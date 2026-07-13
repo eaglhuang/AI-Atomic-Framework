@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -170,6 +170,36 @@ try {
   const encodingJson = parseCliJson(encodingProbe, 'encoding touched multi-file probe');
   const encodedFiles = encodingJson.evidence?.files ?? [];
   assert(Array.isArray(encodedFiles) && encodedFiles.includes('encoding-first.ts') && encodedFiles.includes('encoding-second.ts'), 'encoding touched probe must report every explicit --files token');
+
+  run('git', ['init'], tempRoot);
+  writeFileSync(path.join(tempRoot, '.git', 'info', 'exclude'), '*\n!src/\n!src/**\n!tmp/\n!tmp/**\n', 'utf8');
+  mkdirSync(path.join(tempRoot, 'src'), { recursive: true });
+  writeFileSync(path.join(tempRoot, 'src', 'clean-untracked.ts'), 'export const clean = true;\n', 'utf8');
+  mkdirSync(path.join(tempRoot, 'tmp'), { recursive: true });
+  const replacementChar = String.fromCharCode(0xfffd);
+  writeFileSync(path.join(tempRoot, 'tmp', 'foreign-transcript.json'), `{"note":"bad replacement char: ${replacementChar}"}\n`, 'utf8');
+  const touchedWithTempArtifact = run(process.execPath, [
+    '--strip-types',
+    'check-encoding-touched.ts',
+    '--mode',
+    'touched'
+  ], tempRoot);
+  const touchedWithTempJson = parseCliJson(touchedWithTempArtifact, 'encoding touched temp artifact isolation probe');
+  const touchedFiles = touchedWithTempJson.evidence?.files ?? [];
+  assert(touchedWithTempJson.ok === true, 'touched encoding guard must ignore untracked tmp diagnostic artifacts by default');
+  assert(Array.isArray(touchedFiles) && touchedFiles.includes('src/clean-untracked.ts'), 'touched encoding guard must still scan normal untracked text files');
+  assert(Array.isArray(touchedFiles) && !touchedFiles.includes('tmp/foreign-transcript.json'), 'touched encoding guard must not report isolated tmp artifacts in default scan');
+
+  const explicitTempArtifact = run(process.execPath, [
+    '--strip-types',
+    'check-encoding-touched.ts',
+    '--mode',
+    'touched',
+    '--files',
+    'tmp/foreign-transcript.json'
+  ], tempRoot, { allowFailure: true });
+  const explicitTempJson = parseCliJson(explicitTempArtifact, 'encoding touched explicit temp artifact probe');
+  assert(explicitTempArtifact.status === 1 && explicitTempJson.ok === false, 'explicit tmp artifact encoding checks must still fail closed');
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }

@@ -12,10 +12,13 @@ export async function runBatch(argv) {
     const batchHistoricalDeliveryRefs = action === 'checkpoint'
         ? parseBatchHistoricalDeliveryRefs(argv)
         : [];
+    const batchHistoricalBatchRefs = action === 'checkpoint'
+        ? parseBatchHistoricalBatchRefs(argv)
+        : [];
     const batchDeliverAndCloseExtras = action === 'deliver-and-close'
         ? parseBatchDeliverAndCloseExtras(argv)
         : null;
-    const { options } = parseOptions(action === 'checkpoint' ? stripBatchHistoricalDeliveryArgs(argv)
+    const { options } = parseOptions(action === 'checkpoint' ? stripBatchCheckpointCloseArgs(argv)
         : action === 'deliver-and-close' ? stripBatchDeliverAndCloseExtras(argv)
             : argv, 'batch');
     if (action === 'status' || action === 'current') {
@@ -178,6 +181,7 @@ export async function runBatch(argv) {
             '--batch',
             active.batchId,
             ...batchHistoricalDeliveryRefs.flatMap((ref) => ['--historical-delivery', ref]),
+            ...batchHistoricalBatchRefs.flatMap((ref) => ['--historical-batch', ref]),
             '--json'
         ]);
         // TASK-AAO-0013: close 失敗時傳回帶 category + requiredCommand 的錯誤訊息，
@@ -205,6 +209,7 @@ export async function runBatch(argv) {
                     closedTaskId: currentTaskId,
                     held: holdNextClaim,
                     historicalDeliveryRefs: batchHistoricalDeliveryRefs,
+                    historicalBatchRefs: batchHistoricalBatchRefs,
                     closeResult: closeResult.evidence,
                     failureCategory: closeCategory
                 }
@@ -310,6 +315,7 @@ export async function runBatch(argv) {
                 closedTaskId: currentTaskId,
                 held: holdNextClaim,
                 historicalDeliveryRefs: batchHistoricalDeliveryRefs,
+                historicalBatchRefs: batchHistoricalBatchRefs,
                 commitInstruction: {
                     timing: 'single-commit-after-checkpoint',
                     beforeCheckpoint: [
@@ -771,11 +777,14 @@ function buildBatchSelector(options) {
         selector.scopeKey = options.scope.trim();
     return selector;
 }
-function stripBatchHistoricalDeliveryArgs(argv) {
+function stripBatchCheckpointCloseArgs(argv) {
     const stripped = [];
     for (let index = 0; index < argv.length; index += 1) {
         const arg = argv[index];
-        if (arg === '--historical-delivery' || arg === '--historical-delivery-commit' || arg === '--delivery-commit') {
+        if (arg === '--historical-delivery' ||
+            arg === '--historical-delivery-commit' ||
+            arg === '--delivery-commit' ||
+            arg === '--historical-batch') {
             index += 1;
             continue;
         }
@@ -829,6 +838,21 @@ function parseBatchHistoricalDeliveryRefs(argv) {
         const value = argv[index + 1];
         if (!value || value.startsWith('--')) {
             throw new CliError('ATM_CLI_USAGE', `batch checkpoint ${arg} requires a commit ref.`, { exitCode: 2 });
+        }
+        refs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
+        index += 1;
+    }
+    return uniqueStrings(refs);
+}
+function parseBatchHistoricalBatchRefs(argv) {
+    const refs = [];
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg !== '--historical-batch')
+            continue;
+        const value = argv[index + 1];
+        if (!value || value.startsWith('--')) {
+            throw new CliError('ATM_CLI_USAGE', `batch checkpoint ${arg} requires a batch id or path.`, { exitCode: 2 });
         }
         refs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
         index += 1;

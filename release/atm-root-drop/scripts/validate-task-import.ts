@@ -18,6 +18,27 @@ function fail(text: string): void {
   process.exitCode = 1;
 }
 
+function findDuplicateAtmBacklogIds(markdown: string): string[] {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+  for (const match of markdown.matchAll(/\|\s*(ATM-BUG-\d{4}-\d{2}-\d{2}-\d{3})\s*\|/g)) {
+    const id = match[1];
+    if (seen.has(id)) {
+      duplicates.add(id);
+    } else {
+      seen.add(id);
+    }
+  }
+  return [...duplicates].sort();
+}
+
+function assertNoDuplicateAtmBacklogIds(markdown: string, label: string): void {
+  const duplicates = findDuplicateAtmBacklogIds(markdown);
+  if (duplicates.length > 0) {
+    fail(`${label} contains duplicate ATM backlog ID(s): ${duplicates.join(', ')}`);
+  }
+}
+
 async function expectOk(action: string, argv: string[]) {
   const result = await runTasks([action, ...argv]);
   if (!result.ok) {
@@ -64,12 +85,25 @@ async function main() {
   const governanceTablePlan = path.join(root, 'fixtures/task-plan-import/governance-table-plan.md');
   const chineseBootstrapPlan = path.join(root, 'fixtures/task-plan-import/chinese-bootstrap-plan.md');
   const dispatchMetadataCard = path.join(root, 'fixtures/task-plan-import/dispatch-metadata-card.md');
+  const canonicalAtmBacklog = path.join(root, 'docs/governance/atm-bug-and-optimization-backlog.md');
 
-  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan, chineseBootstrapPlan, dispatchMetadataCard]) {
+  for (const fixturePath of [samplePlan, npcPlan, singleCard, duplicatePlan, governanceTablePlan, chineseBootstrapPlan, dispatchMetadataCard, canonicalAtmBacklog]) {
     if (!existsSync(fixturePath)) {
       fail(`missing fixture: ${path.relative(root, fixturePath)}`);
       return;
     }
+  }
+
+  assertNoDuplicateAtmBacklogIds(readFileSync(canonicalAtmBacklog, 'utf8'), 'canonical ATM bug backlog');
+  const duplicateBacklogFixture = [
+    '| ID | Date | Repo | Type | Severity | Status | Area | Finding | Expected behavior | Evidence / Repro | Follow-up |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| ATM-BUG-2099-01-01-001 | 2099-01-01 | AI-Atomic-Framework | Bug | Medium | Open | Fixture | First | Expected | Evidence | Follow-up |',
+    '| ATM-BUG-2099-01-01-001 | 2099-01-01 | AI-Atomic-Framework | Bug | Medium | Open | Fixture | Duplicate | Expected | Evidence | Follow-up |'
+  ].join('\n');
+  const duplicateFixtureIds = findDuplicateAtmBacklogIds(duplicateBacklogFixture);
+  if (duplicateFixtureIds.join(',') !== 'ATM-BUG-2099-01-01-001') {
+    fail(`duplicate backlog fixture must report its duplicate ID, got ${duplicateFixtureIds.join(',') || '<none>'}.`);
   }
 
   // Dry-run on sample plan should succeed and detect both tasks.

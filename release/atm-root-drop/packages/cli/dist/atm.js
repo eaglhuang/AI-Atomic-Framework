@@ -29,6 +29,7 @@ import { runNext } from './commands/next.js';
 import { runOrient } from './commands/orient.js';
 import { runPolice } from './commands/police.js';
 import { runQuickfix } from './commands/quickfix.js';
+import { runResidue } from './commands/residue.js';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.js';
 import { runSpec } from './commands/spec.js';
 import { runStart } from './commands/start.js';
@@ -96,6 +97,7 @@ export const cliCommandRunners = {
     orient: runOrient,
     police: runPolice,
     quickfix: runQuickfix,
+    residue: runResidue,
     'self-host-alpha': runSelfHostAlphaAsync,
     spec: runSpec,
     start: runStart,

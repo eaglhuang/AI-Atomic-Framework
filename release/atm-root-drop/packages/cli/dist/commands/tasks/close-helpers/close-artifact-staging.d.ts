@@ -13,6 +13,13 @@ export declare function evaluateTaskDeliverableGate(input: {
     readonly claim: TaskClaimRecord | null;
     readonly historicalDeliveryRefs?: readonly string[];
     readonly historicalDeliveryRepo?: string | null;
+    readonly historicalBatchCloseReadySlice?: {
+        readonly batchId: string;
+        readonly matchedCommits: readonly string[];
+        readonly matchedFiles: readonly string[];
+        readonly taskSpecificValidationPasses: readonly string[];
+        readonly batchWideValidationPasses: readonly string[];
+    } | null;
     readonly waiverOutOfScopeDelivery?: boolean;
     readonly waiverReason?: string | null;
 }): TaskDeliverableGateReport;

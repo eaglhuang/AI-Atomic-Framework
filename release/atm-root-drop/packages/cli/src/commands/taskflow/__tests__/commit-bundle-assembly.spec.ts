@@ -1,9 +1,15 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildTaskflowCommitBundle, finalizeTaskflowCommitBundle } from '../commit-bundle-assembly.ts';
+import {
+  buildTaskflowCommitBundle,
+  deferGovernanceDirtyFiles,
+  finalizeTaskflowCommitBundle,
+  isDeferrableGovernanceDirtyFile,
+  restoreDeferredGovernanceDirtyFiles
+} from '../commit-bundle-assembly.ts';
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -499,6 +505,82 @@ try {
 } finally {
   if (savedAtmGitName === undefined) delete process.env.ATM_GIT_NAME; else process.env.ATM_GIT_NAME = savedAtmGitName;
   if (savedAtmGitEmail === undefined) delete process.env.ATM_GIT_EMAIL; else process.env.ATM_GIT_EMAIL = savedAtmGitEmail;
+}
+
+{
+  assert.equal(
+    isDeferrableGovernanceDirtyFile('.atm/history/evidence/git-head.jsonl', 'TASK-AAO-0194'),
+    true,
+    'git-head evidence remains deferrable'
+  );
+  assert.equal(
+    isDeferrableGovernanceDirtyFile('.atm/history/evidence/TASK-AAO-0194.bundle-manifest.json', 'TASK-AAO-0194'),
+    true,
+    'current-task bundle-manifest is deferrable'
+  );
+  assert.equal(
+    isDeferrableGovernanceDirtyFile('.atm/history/evidence/TASK-AAO-0192.bundle-manifest.json', 'TASK-AAO-0194'),
+    false,
+    'foreign-task bundle-manifest must not be deferred/restored during another close'
+  );
+  assert.equal(
+    isDeferrableGovernanceDirtyFile('.atm/history/evidence/TASK-AAO-0192.bundle-manifest.json', null),
+    false,
+    'without task binding, only git-head is safe'
+  );
+
+  const dirtyRepo = path.join(mkdtempSync(path.join(os.tmpdir(), 'atm-gov-dirty-')), 'repo');
+  initGitRepo(dirtyRepo);
+  const foreignManifest = '.atm/history/evidence/TASK-AAO-0192.bundle-manifest.json';
+  const currentManifest = '.atm/history/evidence/TASK-AAO-0194.bundle-manifest.json';
+  writeJson(path.join(dirtyRepo, foreignManifest), { taskId: 'TASK-AAO-0192', dirty: true });
+  writeJson(path.join(dirtyRepo, currentManifest), { taskId: 'TASK-AAO-0194', dirty: false });
+  execFileSync('git', ['add', '--', foreignManifest, currentManifest], { cwd: dirtyRepo, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'seed manifests'], { cwd: dirtyRepo, stdio: 'ignore' });
+  writeJson(path.join(dirtyRepo, foreignManifest), { taskId: 'TASK-AAO-0192', dirty: 'foreign' });
+  writeJson(path.join(dirtyRepo, currentManifest), { taskId: 'TASK-AAO-0194', dirty: 'current' });
+
+  const deferred = deferGovernanceDirtyFiles(dirtyRepo, true, 'TASK-AAO-0194');
+  assert.deepEqual(
+    deferred.files.map((entry) => entry.file),
+    [currentManifest],
+    'defer must keep foreign-task dirty manifests untouched'
+  );
+  assert.equal(
+    JSON.parse(readFileSync(path.join(dirtyRepo, foreignManifest), 'utf8')).dirty,
+    'foreign',
+    'foreign dirty content must remain after current-task defer'
+  );
+  assert.equal(
+    JSON.parse(readFileSync(path.join(dirtyRepo, currentManifest), 'utf8')).dirty,
+    false,
+    'current-task manifest should be restored to HEAD during defer'
+  );
+
+  const missingSnapshotReport = restoreDeferredGovernanceDirtyFiles(dirtyRepo, {
+    schemaId: 'atm.deferredGovernanceDirty.v1',
+    requested: true,
+    restored: false,
+    files: [{
+      file: currentManifest,
+      snapshotPath: '.atm/runtime/snapshots/missing-close-window-snapshot.json',
+      originalSha256: 'deadbeef',
+      restoredAt: null
+    }]
+  });
+  assert.equal(missingSnapshotReport.restored, true);
+  assert.deepEqual(missingSnapshotReport.skippedMissingSnapshots, [
+    '.atm/runtime/snapshots/missing-close-window-snapshot.json'
+  ]);
+  assert.equal(missingSnapshotReport.files[0]?.skipReason, 'snapshot-missing');
+
+  // Keep a successful restore path covered too.
+  const restored = restoreDeferredGovernanceDirtyFiles(dirtyRepo, deferred);
+  assert.equal(restored.restored, true);
+  assert.equal(JSON.parse(readFileSync(path.join(dirtyRepo, currentManifest), 'utf8')).dirty, 'current');
+  for (const entry of deferred.files) {
+    assert.equal(existsSync(path.join(dirtyRepo, entry.snapshotPath)), true);
+  }
 }
 
 console.log('ok: commit bundle assembly spec passed');

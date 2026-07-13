@@ -1,4 +1,4 @@
-import { normalizeSearchText, normalizeTaskRouteStatus } from './intent-normalizers.js';
+import { isQueueRequestedPrompt, normalizeSearchText, normalizeTaskRouteStatus } from './intent-normalizers.js';
 function isFrameworkMaintenancePrompt(prompt) {
     const normalized = normalizeSearchText(prompt);
     return [
@@ -49,7 +49,7 @@ function isClosedTaskStatus(status) {
 function hasRequiredPromptScopeMatch(task, intent) {
     const reasons = task.matchReasons ?? [];
     if (intent.mentionedTaskIds.length > 0) {
-        if (reasons.includes('task-id-exact'))
+        if (reasons.includes('task-id-exact') || reasons.includes('task-id-suffix-match'))
             return true;
         if (intent.queueRequested || intent.ordinalScope) {
             return reasons.includes('task-root-hint-match')
@@ -81,9 +81,6 @@ function isTaskRoutable(status, intent) {
         return normalized !== 'abandoned' && normalized !== 'cancelled';
     }
     return ['ready', 'open', 'planned', 'blocked', 'waiting_target_evidence', 'reserved'].includes(normalized);
-}
-function isQueueRequestedPrompt(prompt) {
-    return /\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u6240\u6709(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9|\u5f8c\u9762(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u5f8c\u7e8c(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u5269\u9918(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u63a5\u4e0b\u4f86(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u9010\u4e00(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u4e00\u5f35\u5f35(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all(?:[\s\S]{0,80})task\s+cards|all(?:[\s\S]{0,80})tasks|remaining(?:[\s\S]{0,80})(?:task\s+cards|tasks)|later(?:[\s\S]{0,80})(?:task\s+cards|tasks)|one\s+by\s+one(?:[\s\S]{0,80})(?:task\s+cards|tasks)|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
 }
 function isTaskExplicitlyMentioned(task, intent) {
     if (!intent || intent.mentionedTaskIds.length === 0)

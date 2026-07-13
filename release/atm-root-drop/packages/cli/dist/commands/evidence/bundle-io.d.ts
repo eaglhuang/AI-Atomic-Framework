@@ -150,6 +150,7 @@ export declare function buildAutoEvidencePlan(input: {
     taskId: string;
     actorId: string;
     mode?: 'dry-run' | 'execute';
+    commandMapper?: (declaredCommand: string) => string;
 }): AutoEvidencePlan;
 export declare function executeAutoEvidencePlan(input: {
     cwd: string;

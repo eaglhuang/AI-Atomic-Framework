@@ -70,17 +70,24 @@ export function parseRoleProviderOverride(value: string): { role: string; overri
   const role = rolePart?.trim();
   const providerSpec = providerPart?.trim();
   if (!role || !providerSpec) return null;
-  const [providerId, modelId, sdkId, runtimeMode] = providerSpec.split(':').map((entry) => entry.trim()).filter(Boolean);
+  const segments = providerSpec.split(':').map((entry) => entry.trim());
+  if (segments.length > 4) return null;
+  const [providerId, modelId, sdkSegment, runtimeSegment] = segments;
   if (!providerId || !modelId) return null;
+  if (runtimeSegment && !isRuntimeMode(runtimeSegment)) return null;
   return {
     role,
     override: {
       providerId,
       modelId,
-      sdkId: sdkId ?? providerId,
-      runtimeMode: normalizeRuntimeMode(runtimeMode)
+      sdkId: sdkSegment || providerId,
+      runtimeMode: normalizeRuntimeMode(runtimeSegment)
     }
   };
+}
+
+function isRuntimeMode(value: string): value is TeamRoleProviderOverride['runtimeMode'] {
+  return value === 'real-agent' || value === 'editor-subagent' || value === 'broker-only';
 }
 
 function normalizeOverride(value: unknown): TeamRoleProviderOverride | null {
@@ -100,7 +107,7 @@ function normalizeOverride(value: unknown): TeamRoleProviderOverride | null {
 
 function normalizeRuntimeMode(value: unknown): TeamRoleProviderOverride['runtimeMode'] {
   const normalized = String(value ?? '').trim();
-  if (normalized === 'real-agent' || normalized === 'editor-subagent' || normalized === 'broker-only') {
+  if (isRuntimeMode(normalized)) {
     return normalized;
   }
   return 'broker-only';

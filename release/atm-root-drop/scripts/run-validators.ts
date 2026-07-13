@@ -300,6 +300,13 @@ function parseCliArgs(argv: any) {
       index += 1;
       continue;
     }
+    if (arg === '--grep' || arg.startsWith('--grep=')) {
+      const valueText = arg.includes('=')
+        ? arg.slice('--grep='.length)
+        : String(argv[index + 1] ?? '');
+      const hintValue = valueText && !valueText.startsWith('--') ? valueText : '<name-or-tag>';
+      throw new Error(`Unsupported option: ${arg}. This validator facade uses --filter ${JSON.stringify(hintValue)} for validator names/tags, or --focus-path <path> for path-scoped selection.`);
+    }
     if (arg === '--focus-path') {
       const value = argv[index + 1];
       const valueText = String(value ?? '');

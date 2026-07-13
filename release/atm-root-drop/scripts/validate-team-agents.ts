@@ -4356,6 +4356,72 @@ async function main() {
       ]);
       assert.equal(afterLease.lifecycleEvents[0].type, 'lease.granted');
 
+      await assert.rejects(
+        () => runTeam([
+          'lease',
+          '--team',
+          teamRunId,
+          '--actor',
+          'implementer',
+          '--permission',
+          'file.write',
+          '--paths',
+          'packages/cli/src/commands/team.ts',
+          '--reason',
+          'conflicting lease fixture',
+          '--cwd',
+          cwd,
+          '--json'
+        ]),
+        (error: unknown) => {
+          assert.ok(error instanceof CliError);
+          assert.equal(error.code, 'ATM_TEAM_LEASE_CONFLICT');
+          const details = error.details as any;
+          assert.equal(details.currentOwner, 'implementer-typescript');
+          assert.deepEqual(details.currentOwnerPaths, [
+            'packages/cli/src/commands/team.ts',
+            'scripts/validate-team-agents.ts'
+          ]);
+          assert.equal(
+            details.currentOwnerReleaseCommand,
+            `node atm.mjs team release --team ${teamRunId} --actor implementer-typescript --permission file.write --json`
+          );
+          assert.equal(details.activeLeases[0].agentId, 'implementer-typescript');
+          assert.equal(details.requiredCommand, details.currentOwnerReleaseCommand);
+          return true;
+        }
+      );
+
+      await assert.rejects(
+        () => runTeam([
+          'release',
+          '--team',
+          teamRunId,
+          '--actor',
+          'implementer',
+          '--permission',
+          'file.write',
+          '--reason',
+          'wrong holder release fixture',
+          '--cwd',
+          cwd,
+          '--json'
+        ]),
+        (error: unknown) => {
+          assert.ok(error instanceof CliError);
+          assert.equal(error.code, 'ATM_TEAM_LEASE_NOT_FOUND');
+          const details = error.details as any;
+          assert.equal(details.actorId, 'implementer');
+          assert.equal(details.holderCount, 1);
+          assert.equal(details.activeLeases[0].agentId, 'implementer-typescript');
+          assert.equal(
+            details.requiredCommand,
+            `node atm.mjs team release --team ${teamRunId} --actor implementer-typescript --permission file.write --json`
+          );
+          return true;
+        }
+      );
+
       const release = await runTeam([
         'release',
         '--team',

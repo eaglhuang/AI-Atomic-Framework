@@ -282,9 +282,10 @@ function buildCatalogAutoEvidenceEntries(input) {
             continue;
         }
         const linkedValidators = resolveCatalogLinkedValidators(entry);
+        const effectiveCommand = command && input.commandMapper ? input.commandMapper(command) : command;
         const evidenceState = command && commandProofs.has(normalizedCommand) ? 'pass' : 'absent';
         const requiredCommand = command && evidenceState !== 'pass'
-            ? buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, label, input.runnerKind, linkedValidators)
+            ? buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, effectiveCommand ?? command, label, input.runnerKind, linkedValidators)
             : null;
         const base = {
             validator: label,
@@ -330,9 +331,10 @@ export function buildAutoEvidencePlan(input) {
     const requiresApproval = [];
     for (const entry of report.validators) {
         const command = entry.expectedCommand;
+        const effectiveCommand = input.commandMapper ? input.commandMapper(command) : command;
         const requiredCommand = entry.evidenceState === 'pass'
             ? null
-            : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, command, entry.name, runnerArbitration.preferredRunnerKind);
+            : buildAutoEvidenceRequiredCommand(input.taskId, input.actorId, effectiveCommand, entry.name, runnerArbitration.preferredRunnerKind);
         const base = {
             validator: entry.name,
             capability: 'validator',
@@ -378,7 +380,8 @@ export function buildAutoEvidencePlan(input) {
         actorId: input.actorId,
         runnerKind: runnerArbitration.preferredRunnerKind,
         legacyReport: report,
-        taskDeclared
+        taskDeclared,
+        commandMapper: input.commandMapper
     })) {
         if (entry.disposition === 'already-satisfied') {
             alreadySatisfied.push(entry);
@@ -413,7 +416,7 @@ export function buildAutoEvidencePlan(input) {
 export function executeAutoEvidencePlan(input) {
     const resolvedCwd = path.resolve(input.cwd);
     const runnerArbitration = resolveTaskRunnerArbitration(resolvedCwd, input.taskId);
-    const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+    const plan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute', commandMapper: input.commandMapper });
     const runs = [];
     const mapper = input.commandMapper;
     for (const entry of plan.toRun) {
@@ -446,7 +449,7 @@ export function executeAutoEvidencePlan(input) {
             };
         }
     }
-    const refreshedPlan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute' });
+    const refreshedPlan = buildAutoEvidencePlan({ cwd: resolvedCwd, taskId: input.taskId, actorId: input.actorId, mode: 'execute', commandMapper: input.commandMapper });
     const executedValidators = new Set(runs.filter((run) => run.ok).map((run) => run.validator));
     const pendingAutoRun = refreshedPlan.toRun.filter((entry) => !executedValidators.has(entry.validator));
     const ok = runs.every((run) => run.ok)

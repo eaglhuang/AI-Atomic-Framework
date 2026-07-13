@@ -251,7 +251,7 @@ function verifyRepoIndexIsolation(repo, phase, strict = true) {
     const nextRepo = { ...repo, indexIsolation: isolation };
     if (strict && !isolation.verified) {
         const restoreCommand = isolation.unexpectedStagedFiles.length > 0
-            ? `git restore --staged -- ${isolation.unexpectedStagedFiles.map((entry) => JSON.stringify(entry)).join(' ')}`
+            ? `node atm.mjs git lease stage-override --task <task-id> --actor <actor-id> --paths ${isolation.unexpectedStagedFiles.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`
             : null;
         throw new CliError('ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED', `taskflow close ${phase} index isolation failed; unexpected staged files would be included in the governed commit.`, {
             exitCode: 1,
@@ -272,7 +272,7 @@ function commitCommandFor(input) {
     if (!input.repoRoot)
         return '';
     if (input.repoKind === 'target') {
-        return `node atm.mjs git commit --cwd ${quoteCliValue(input.repoRoot)} --actor ${quoteCliValue(input.actorId ?? '<actor>')} --task ${input.taskId} --message ${quoteCliValue(input.commitMessage)} --json`;
+        return `node atm.mjs git commit --cwd ${quoteCliValue(input.repoRoot)} --actor ${quoteCliValue(input.actorId ?? '<actor>')} --task ${input.taskId} --message ${quoteCliValue(input.commitMessage)} --auto-stage --json`;
     }
     const messageParts = [
         input.commitMessage,
@@ -320,28 +320,34 @@ function resolveExistingHistoricalBatchStageFile(cwd, batchRef) {
 function resolvePlanningPath(cwd, planningMirrorPath) {
     return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
-export function isDeferrableGovernanceDirtyFile(filePath) {
+export function isDeferrableGovernanceDirtyFile(filePath, taskId) {
     const normalized = filePath.replace(/\\/g, '/').toLowerCase();
     if (normalized === '.atm/history/evidence/git-head.jsonl')
         return true;
-    if (/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized))
-        return true;
-    return false;
+    // Foreign-task bundle-manifest dirt must never be restored away during another
+    // task's close window; only the active task's own manifest is safe to defer.
+    if (!taskId)
+        return false;
+    const taskLower = taskId.trim().toLowerCase();
+    if (!taskLower)
+        return false;
+    return normalized === `.atm/history/evidence/${taskLower}.bundle-manifest.json`;
 }
 function listUnstagedDirtyFiles(repoRoot) {
     const output = tryGitScalar(repoRoot, ['diff', '--name-only']) ?? '';
     return uniqueSorted(output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean));
 }
-export function deferGovernanceDirtyFiles(repoRoot, requested) {
+export function deferGovernanceDirtyFiles(repoRoot, requested, taskId) {
     const report = {
         schemaId: 'atm.deferredGovernanceDirty.v1',
         requested,
         files: [],
-        restored: false
+        restored: false,
+        skippedMissingSnapshots: []
     };
     if (!requested)
         return report;
-    const candidates = listUnstagedDirtyFiles(repoRoot).filter(isDeferrableGovernanceDirtyFile);
+    const candidates = listUnstagedDirtyFiles(repoRoot).filter((file) => isDeferrableGovernanceDirtyFile(file, taskId));
     if (candidates.length === 0) {
         report.restored = true;
         return report;
@@ -373,11 +379,19 @@ export function deferGovernanceDirtyFiles(repoRoot, requested) {
 }
 export function restoreDeferredGovernanceDirtyFiles(repoRoot, report) {
     if (report.restored || report.files.length === 0) {
-        return { ...report, restored: true };
+        return { ...report, restored: true, skippedMissingSnapshots: report.skippedMissingSnapshots ?? [] };
     }
     const restoredAt = new Date().toISOString();
+    const skippedMissingSnapshots = [];
     const files = report.files.map((entry) => {
         const snapshotPath = path.join(repoRoot, entry.snapshotPath);
+        if (!existsSync(snapshotPath)) {
+            skippedMissingSnapshots.push(entry.snapshotPath);
+            return {
+                ...entry,
+                skipReason: 'snapshot-missing'
+            };
+        }
         const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
         const file = typeof snapshot.file === 'string' ? snapshot.file : entry.file;
         const content = typeof snapshot.content === 'string' ? snapshot.content : '';
@@ -385,12 +399,13 @@ export function restoreDeferredGovernanceDirtyFiles(repoRoot, report) {
         mkdirSync(path.dirname(absolutePath), { recursive: true });
         writeFileSync(absolutePath, content, 'utf8');
         writeFileSync(snapshotPath, `${JSON.stringify({ ...snapshot, restoredAt }, null, 2)}\n`, 'utf8');
-        return { ...entry, restoredAt };
+        return { ...entry, restoredAt, skipReason: null };
     });
     return {
         ...report,
         files,
-        restored: true
+        restored: true,
+        skippedMissingSnapshots
     };
 }
 export function buildTaskflowCommitBundle(input) {

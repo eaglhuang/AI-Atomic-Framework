@@ -11,11 +11,13 @@ import { buildDelegationContract, buildTaskflowOpenDiagnostics, loadProfile, res
 import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './taskflow/host-opener-policy.js';
 import { buildTaskflowClosePreflight, inspectPlanningAuthorityDelivery, preflightBlockersToWriteReadinessBlockers } from './taskflow/close-preflight.js';
 import { withTaskflowOperatorLane } from './emergency/context.js';
+import { isRunnerSyncRequired } from './framework-development.js';
 import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.js';
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './taskflow/commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from './tasks/close-window-lock.js';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../core/dist/team-runtime/handoff-ledger.js';
+import { clearBrokerRuntimeStateForTask } from '../../../core/dist/broker/lifecycle.js';
 function buildTasksNewCommand(input) {
     const parts = ['node atm.mjs tasks new'];
     if (input.template) {
@@ -513,9 +515,23 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         waiverReason: waiver.waiverReason,
         planningAuthorityDeliveryGate
     });
-    if (historicalClosePreflight.blockers.length > 0) {
+    // ATM-BUG-2026-07-12-154 (TASK-AAO-FABLE-002): the frozen-runner staleness
+    // guard used to fire only inside the write path (ATM_RUNNER_STALE_WRITE_REFUSED),
+    // after pre-close and dry-run had already reported ready. Surface it here as
+    // a write-readiness blocker with the exact sync command so the operator
+    // discovers it before any write attempt. The write-path guard stays
+    // authoritative and unchanged.
+    const staleRunnerBlockers = isRunnerSyncRequired(cwd)
+        ? [{
+                code: 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER',
+                summary: 'The frozen runner (release/atm-onefile/atm.mjs) is older than framework source files; taskflow close --write will be refused with ATM_RUNNER_STALE_WRITE_REFUSED until the runner is rebuilt.',
+                requiredCommand: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'
+            }]
+        : [];
+    if (historicalClosePreflight.blockers.length > 0 || staleRunnerBlockers.length > 0) {
         const mergedBlockers = [
             ...writeReadinessHint.blockers,
+            ...staleRunnerBlockers,
             ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
         ];
         writeReadinessHint = {
@@ -526,12 +542,14 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             nextCommand: mergedBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand
         };
     }
+    const packageJsonForAutoEvidencePlan = actorId ? readPackageJsonForAutoEvidence(cwd) : null;
     const autoEvidencePlan = actorId
         ? buildAutoEvidencePlan({
             cwd,
             taskId,
             actorId,
-            mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run'
+            mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run',
+            commandMapper: (declared) => mapAutoEvidenceCommand(declared, packageJsonForAutoEvidencePlan).command
         })
         : null;
     if (surface === 'pre-close') {
@@ -639,7 +657,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
         ]);
         let closeWindowLock = null;
         let closeWindowLockReleased = false;
-        let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty);
+        let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty, taskId);
         let deferredGovernanceDirtyRestored = false;
         try {
             closeWindowLock = acquireCloseWindowStagedIndexLock({
@@ -823,6 +841,9 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                     }
                 };
             const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+            const brokerRuntimeCleanup = writeOk
+                ? clearBrokerRuntimeStateForTask({ cwd, taskId }).runtimeCleanup ?? null
+                : null;
             const residueAdvisory = writeOk ? buildTaskflowCloseResidueAdvisory(enrichedDiagnosis) : null;
             if (residueAdvisory) {
                 closeMessages.push(message('warn', 'ATM_TASKFLOW_CLOSE_RESIDUE_ADVISORY', 'taskflow close succeeded; remaining planning mirror residue is advisory and should be reconciled separately.', residueAdvisory));
@@ -867,6 +888,7 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
                         closeWriteTransaction,
                         closeWindowLock,
                         releasedCloseWindowLock,
+                        brokerRuntimeCleanup,
                         deferredGovernanceDirty,
                         residueDiagnosis: enrichedDiagnosis,
                         residueAdvisory,

@@ -25,7 +25,7 @@ export interface ResolvedActorId {
 
 export interface ActorResolutionDiagnostic {
   readonly resolved: ResolvedActorId | null;
-  readonly precedence: readonly ['option', 'env', 'legacy-env', 'repo-default'];
+  readonly precedence: readonly ['option', 'env', 'repo-default', 'legacy-env'];
   readonly envActorId: string | null;
   readonly legacyEnvActorId: string | null;
   readonly repoDefaultActorId: string | null;
@@ -241,13 +241,13 @@ export function resolveActorId(inputActorId?: string | null, cwd?: string | null
   if (envActor) {
     return { actorId: envActor, source: 'env' };
   }
-  const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]);
-  if (legacyEnvActor) {
-    return { actorId: legacyEnvActor, source: 'legacy-env' };
-  }
   const defaultIdentity = cwd ? readRuntimeIdentityDefault(cwd) : null;
   if (defaultIdentity?.actorId) {
     return { actorId: defaultIdentity.actorId, source: 'repo-default' };
+  }
+  const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]);
+  if (legacyEnvActor) {
+    return { actorId: legacyEnvActor, source: 'legacy-env' };
   }
   return null;
 }
@@ -263,7 +263,7 @@ export function describeActorResolution(inputActorId?: string | null, cwd?: stri
     : null;
   return {
     resolved,
-    precedence: ['option', 'env', 'legacy-env', 'repo-default'],
+    precedence: ['option', 'env', 'repo-default', 'legacy-env'],
     envActorId: envActor,
     legacyEnvActorId: legacyEnvActor,
     repoDefaultActorId: repoDefaultActor,

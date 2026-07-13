@@ -69,8 +69,8 @@ export function inspectForeignStagedTasksForCloseWindow(input) {
         return {
             taskId: foreignTaskId,
             stagedFiles: uniqueFiles,
-            restoreChoice: `Do not silently unstage ${foreignTaskId}. Either wait for that agent to commit, or defer foreign staged files through --defer-foreign-staged and confirm they can restage afterward.`,
-            deferCommand: `${quoteCliValue(resolveGitExecutable())} restore --staged -- ${uniqueFiles.map(quoteCliValue).join(' ')}`
+            restoreChoice: `Do not silently unstage ${foreignTaskId}. Wait for that agent to commit, request a Broker index lane, or use an explicit ATM stage-override lease if the human approved disrupting another active agent.`,
+            deferCommand: `node atm.mjs git lease stage-override --task ${input.taskId} --actor <actor-id> --paths ${uniqueFiles.map(quoteCliValue).join(',')} --reason "<human-approved reason>" --json`
         };
     });
 }

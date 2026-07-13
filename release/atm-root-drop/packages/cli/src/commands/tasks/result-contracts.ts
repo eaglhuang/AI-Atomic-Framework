@@ -75,6 +75,14 @@ export interface TaskImportRecord {
     readonly ownerAtomOrMap?: string | null;
     readonly atomCid?: string | null;
     readonly mapUpdates?: readonly string[];
+    /** TASK-AAO-FABLE-006/007 — extraction-first contract: atoms this card could extract in passing. */
+    readonly extractionCandidates?: readonly {
+      readonly atom?: string;
+      readonly pattern?: string;
+      readonly source?: string;
+      readonly disposition?: string;
+      readonly inlineReason?: string | null;
+    }[];
   };
   readonly proposalAdmission?: {
     readonly trigger: 'not-required' | 'hot-file' | 'same-file-overlap-risk' | 'shared-surface-risk' | 'manual-review-surface';
@@ -184,6 +192,13 @@ export interface TaskDeliverableGateReport {
   readonly deliverableFiles: readonly string[];
   readonly declaredFiles: readonly string[];
   readonly historicalDeliveries: readonly TaskHistoricalDeliveryReport[];
+  readonly historicalBatchCloseReady?: {
+    readonly batchId: string;
+    readonly matchedCommits: readonly string[];
+    readonly matchedFiles: readonly string[];
+    readonly taskSpecificValidationPasses: readonly string[];
+    readonly batchWideValidationPasses: readonly string[];
+  } | null;
   readonly notAllowedAsCompletion: readonly string[];
   readonly remediation: string;
   readonly requiredCommand: string | null;

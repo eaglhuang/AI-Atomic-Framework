@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { inspectBrokerClaimLifecycle, clearBrokerRuntimeStateForTask, recordBrokerClaimIntent } from '../packages/core/src/broker/lifecycle.ts';
+import { inspectBrokerClaimLifecycle, clearBrokerRuntimeStateForTask, cleanupBrokerRuntimeSnapshots, recordBrokerClaimIntent } from '../packages/core/src/broker/lifecycle.ts';
 
 const mode = process.argv.includes('--mode') ? (process.argv[process.argv.indexOf('--mode') + 1] ?? 'validate') : 'validate';
 const tempRoot = mkdtempSync(path.join(process.cwd(), '.atm-temp', 'broker-lifecycle-'));
@@ -55,6 +55,40 @@ try {
   assert.equal(clearedState.activeIntents.length, 0, 'clearBrokerRuntimeStateForTask must remove the task intent');
   const clearedText = readFileSync(blockedRegistryPath, 'utf8');
   assert(!clearedText.includes('TASK-CID-0022'), 'cleared registry must not retain the task intent');
+
+  const intentDir = path.join(tempRoot, '.atm', 'runtime', 'broker-intents');
+  mkdirSync(intentDir, { recursive: true });
+  writeFileSync(path.join(intentDir, 'TASK-CID-LIVE.json'), `${JSON.stringify({ taskId: 'TASK-CID-LIVE' }, null, 2)}\n`, 'utf8');
+  writeFileSync(path.join(intentDir, 'TASK-CID-STALE.json'), `${JSON.stringify({ taskId: 'TASK-CID-STALE' }, null, 2)}\n`, 'utf8');
+  writeFileSync(path.join(tempRoot, '.atm', 'runtime', 'broker-shared-surface-queues.json'), `${JSON.stringify({
+    schemaId: 'atm.brokerSharedSurfaceQueues.v1',
+    queues: [
+      {
+        surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md',
+        entries: [
+          { taskId: 'TASK-CID-LIVE', actorId: '001', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', leaseEpoch: 1, baseHash: 'sha256:live', reason: 'live', releaseCondition: 'release', queuedAt: new Date().toISOString() },
+          { taskId: 'TASK-CID-STALE', actorId: '002', surfacePath: 'docs/governance/atm-bug-and-optimization-backlog.md', leaseEpoch: 2, baseHash: 'sha256:stale', reason: 'stale', releaseCondition: 'release', queuedAt: new Date().toISOString() }
+        ]
+      }
+    ]
+  }, null, 2)}\n`, 'utf8');
+  writeFileSync(path.join(tempRoot, '.atm', 'runtime', 'broker-shared-surface-freezes.json'), `${JSON.stringify({
+    schemaId: 'atm.brokerSharedSurfaceFreezes.v1',
+    records: [
+      { status: 'pending', signal: { taskId: 'TASK-CID-LIVE' } },
+      { status: 'released', signal: { taskId: 'TASK-CID-STALE' } }
+    ]
+  }, null, 2)}\n`, 'utf8');
+
+  const snapshotCleanup = cleanupBrokerRuntimeSnapshots({
+    cwd: tempRoot,
+    activeTaskIds: ['TASK-CID-LIVE']
+  });
+  assert.deepEqual(snapshotCleanup.removedIntentSnapshots, ['broker-intents/TASK-CID-STALE.json'], 'cleanup must remove stale per-task intent snapshots only');
+  assert.equal(existsSync(path.join(intentDir, 'TASK-CID-LIVE.json')), true, 'cleanup must preserve live per-task intent snapshots');
+  assert.equal(existsSync(path.join(intentDir, 'TASK-CID-STALE.json')), false, 'cleanup must remove stale per-task intent snapshots');
+  assert.equal(snapshotCleanup.prunedSharedQueueEntries, 1, 'cleanup must prune stale shared queue entries');
+  assert.equal(snapshotCleanup.prunedSharedFreezeRecords, 1, 'cleanup must prune released shared freeze records');
 
   const recorded = recordBrokerClaimIntent({
     cwd: tempRoot,

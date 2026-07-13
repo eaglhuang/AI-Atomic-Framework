@@ -18,7 +18,7 @@ import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './i
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { describeActorResolution, resolveActorId } from './actor-registry.js';
 import { resolveActorWorkSession, upsertActorWorkSession } from './actor-session.js';
-import { buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.js';
+import { assertSourceFirstRunnerReadOnlyAction, buildFrameworkTempClaimCommand, createFrameworkModeStatus } from './framework-development.js';
 import { classifyTaskDelivery } from './task-intent.js';
 import { inspectBrokerClaimLifecycle, recordBrokerClaimIntent } from '../../../core/dist/broker/lifecycle.js';
 import { abandonTaskQueue, buildAllowedFilesForTask, createOrRefreshTaskQueue, findActiveTaskQueue, isTaskDirectionPathCandidate, partitionTaskScope, readActiveTaskDirectionLocks, writeTaskDirectionLock } from './task-direction.js';
@@ -35,6 +35,7 @@ import { dedupeStrings, quoteCliValue, sha256, toTaskCandidateView, uniqueInOrde
 import { readConfiguredPlanningRoots, shouldReportPlanningRootMissing } from './planning-repo-root.js';
 import { resolveCandidatePlanningRoots } from './next/planning-root-preference.js';
 const NEXT_LARGE_ARRAY_TRUNCATION_LIMIT = 20;
+const NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS = 30 * 60;
 const NEXT_TRUNCATABLE_FRAMEWORK_STATUS_FIELDS = ['changedFiles', 'criticalChangedFiles', 'docsOnlyChangedFiles'];
 const NEXT_DUPLICATED_TOP_LEVEL_KEYS = [
     'nextAction',
@@ -189,6 +190,8 @@ async function runNextRoute(argv) {
             actor: options.agent,
             claimIntent,
             autoIntent,
+            forceClaim: Boolean(options.force),
+            claimFiles: options.files,
             taskIntent,
             importedTaskQueue,
             integrationBootstrap,
@@ -209,6 +212,7 @@ async function runNextRoute(argv) {
     }
     const promptScopeResult = buildPromptScopedNextResult({
         cwd: options.cwd,
+        actor: options.agent,
         taskIntent,
         importedTaskQueue,
         integrationBootstrap,
@@ -221,6 +225,7 @@ async function runNextRoute(argv) {
     }
     const promptGuidanceResult = buildPromptGuidanceNextResult({
         cwd: options.cwd,
+        actor: options.agent,
         taskIntent,
         integrationBootstrap,
         runtimeAdapterReadiness
@@ -482,6 +487,7 @@ function buildCrossRepoFrameworkNextResult(input) {
     });
 }
 async function claimNextImportedTask(input) {
+    assertSourceFirstRunnerReadOnlyAction({ cwd: input.cwd, action: 'next --claim' });
     const claimStartedAt = Date.now();
     const claimLatencyPhases = [];
     const claimIntent = input.claimIntent ?? 'write';
@@ -716,6 +722,29 @@ async function claimNextImportedTask(input) {
             claimableTask = activeBatchClaimDecision.task;
         }
     }
+    const freshForeignReservation = inspectFreshTaskReservationForTask(input.cwd, claimableTask, resolvedActor.actorId, Date.now());
+    if (freshForeignReservation && !input.forceClaim) {
+        const activeWorkSummary = buildActiveWorkSummary(input.cwd, resolvedActor.actorId, buildAllowedFilesForTask(claimableTask));
+        const overrideCommand = `node atm.mjs next --claim --actor ${resolvedActor.actorId} --task ${claimableTask.workItemId} --auto-intent --force --json`;
+        throw new CliError('ATM_NEXT_FRESH_FOREIGN_TASK_RESERVED', `Task ${claimableTask.workItemId} was freshly created or imported by ${freshForeignReservation.actorId}; do not auto-claim it as ${resolvedActor.actorId}.`, {
+            exitCode: 1,
+            details: {
+                taskId: claimableTask.workItemId,
+                reservedByActorId: freshForeignReservation.actorId,
+                createdAt: freshForeignReservation.createdAt,
+                importedAt: freshForeignReservation.importedAt,
+                ageSeconds: freshForeignReservation.ageSeconds,
+                ttlSeconds: freshForeignReservation.ttlSeconds,
+                leaseFresh: freshForeignReservation.leaseFresh,
+                files: freshForeignReservation.files,
+                teamLevelRecommendation: activeWorkSummary.teamLevelRecommendation,
+                brokerRecommendation: activeWorkSummary.brokerRecommendation,
+                requiredCommand: `node atm.mjs next --claim --actor ${freshForeignReservation.actorId} --task ${claimableTask.workItemId} --auto-intent --json`,
+                overrideCommand,
+                recoveryHint: 'Ask the creating captain to hand off, wait for the fresh-task reservation TTL to expire, or use Team Broker override before forcing takeover.'
+            }
+        });
+    }
     if (normalizeTaskRouteStatus(claimableTask.status) === 'reserved' && !claimableTask.activeClaimActorId) {
         await runTasks([
             'release',
@@ -752,7 +781,9 @@ async function claimNextImportedTask(input) {
     }
     let parallelAdvisory = undefined;
     let brokerQueueAdmission = undefined;
-    let claimAllowedFiles = buildAllowedFilesForTask(claimableTask);
+    let claimAllowedFiles = (input.claimFiles && input.claimFiles.length > 0)
+        ? uniqueSorted(input.claimFiles.map(normalizeWorkPath).filter(Boolean))
+        : buildAllowedFilesForTask(claimableTask);
     // Parallel preflight check
     const parallelStartedAt = Date.now();
     try {
@@ -1075,7 +1106,7 @@ async function claimNextImportedTask(input) {
             '--files',
             Array.from(new Set([
                 claimableTask.taskPath,
-                ...(Array.isArray(claimableTask.targetAllowedFiles) ? claimableTask.targetAllowedFiles : [])
+                ...claimAllowedFiles
             ])).join(','),
             '--json'
         ]);
@@ -1560,6 +1591,7 @@ function buildPromptScopedNextResult(input) {
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'batch',
                 prompt: queuePrompt,
+                actorId: input.actor,
                 taskId: queueHeadTaskId
             }),
             allowedCommands: allowedGuidanceBootstrapCommands(),
@@ -1828,6 +1860,7 @@ function buildPromptScopedNextResult(input) {
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'batch',
                 prompt: activeBatch.sourcePrompt,
+                actorId: input.actor,
                 taskId: queueHeadTaskId ?? selectedTask.workItemId
             }),
             allowedCommands: allowedGuidanceBootstrapCommands(),
@@ -1884,6 +1917,7 @@ function buildPromptScopedNextResult(input) {
     const governanceReadiness = buildGovernanceReadinessHint(input.cwd, {
         channel: 'normal',
         prompt: input.taskIntent?.userPrompt ?? selectedTask.workItemId,
+        actorId: input.actor,
         taskId: selectedTask.workItemId
     });
     profile.mark('build-governance-readiness');
@@ -1989,7 +2023,9 @@ function buildPromptGuidanceNextResult(input) {
             }),
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'fast',
-                prompt
+                prompt,
+                actorId: input.actor,
+                ownFiles: quickfixScope
             }),
             allowedFiles: quickfixScope,
             allowedCommands: allowedGuidanceBootstrapCommands(),
@@ -2030,6 +2066,7 @@ function buildPromptGuidanceNextResult(input) {
             governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
                 channel: 'fast',
                 prompt,
+                actorId: input.actor,
                 frameworkClaimRequired: true
             }),
             allowedCommands: [
@@ -2068,7 +2105,8 @@ function buildPromptGuidanceNextResult(input) {
         riskLevel: 'medium',
         governanceReadiness: buildGovernanceReadinessHint(input.cwd, {
             channel: null,
-            prompt
+            prompt,
+            actorId: input.actor
         }),
         allowedCommands: allowedGuidanceBootstrapCommands(),
         blockedCommands: blockedMutationCommands(),
@@ -2150,7 +2188,9 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
             if (!workItemId)
                 return [];
             const status = metadata.status ?? 'planned';
-            const shouldHydrateScope = isTaskRoutable(status, taskIntent) || isTaskIdMentioned(workItemId, taskIntent);
+            const shouldHydrateScope = isTaskRoutable(status, taskIntent)
+                || isTaskIdMentioned(workItemId, taskIntent)
+                || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && normalizeTaskRouteStatus(status) === 'running');
             if (!shouldHydrateScope) {
                 return [buildMinimalImportedJsonTaskSummary({
                         cwd,
@@ -2316,7 +2356,9 @@ function inspectImportedTaskQueue(cwd, taskIntent, claimIntent = 'write') {
     const allTasks = dedupeTasks([...jsonTasks, ...markdownTasks]);
     profile.mark('dedupe-tasks');
     const tasks = allTasks
-        .filter((task) => isTaskRoutable(task.status, taskIntent) || isTaskExplicitlyMentioned(task, taskIntent))
+        .filter((task) => isTaskRoutable(task.status, taskIntent)
+        || isTaskExplicitlyMentioned(task, taskIntent)
+        || (isHandoffPrompt(taskIntent?.userPrompt ?? '') && isActiveClaimedTask(task)))
         .sort((left, right) => {
         const statusWeight = statusQueueWeight(left.status) - statusQueueWeight(right.status);
         return statusWeight !== 0 ? statusWeight : left.workItemId.localeCompare(right.workItemId);
@@ -2699,6 +2741,9 @@ function resolvePromptScopedTaskRoute(cwd, tasks, taskIntent, planningRootResolu
             diagnostics: ['explicit-task-range']
         };
     }
+    const handoffRoute = resolveHandoffResumeTaskRoute(cwd, tasks, taskIntent);
+    if (handoffRoute)
+        return handoffRoute;
     const scored = tasks
         .map((task) => scoreTaskForIntent(cwd, task, taskIntent))
         .filter((task) => (task.matchScore ?? 0) > 0)
@@ -2788,6 +2833,96 @@ function resolvePromptScopedTaskRoute(cwd, tasks, taskIntent, planningRootResolu
         diagnostics: ['multiple-task-candidates-matched-prompt']
     };
 }
+/**
+ * Handoff documents are workspace-level artifacts rather than task cards, so
+ * their filename cannot score against a ledger task path. When a handoff is
+ * explicitly named, use the handoff's task references only as a constrained
+ * hint: a referenced active claim is safe, a stale reference is not, and an
+ * unqualified handoff may fall back only when exactly one active claim exists.
+ */
+export function resolveHandoffResumeTaskRoute(cwd, tasks, taskIntent) {
+    if (!taskIntent?.userPrompt || !isHandoffPrompt(taskIntent.userPrompt))
+        return null;
+    const handoffPath = resolvePromptHandoffPath(cwd, taskIntent.userPrompt);
+    if (!handoffPath)
+        return null;
+    const activeTasks = tasks.filter(isActiveClaimedTask);
+    if (activeTasks.length === 0)
+        return null;
+    const handoffText = readFileText(handoffPath);
+    const referencedTaskIds = handoffText ? extractTaskIdReferencesFromPrompt(handoffText) : [];
+    if (referencedTaskIds.length > 0) {
+        const referencedActiveTasks = activeTasks.filter((task) => referencedTaskIds.some((taskId) => expandTaskIdReferenceAliases(taskId).includes(task.workItemId.toUpperCase())));
+        if (referencedActiveTasks.length === 1) {
+            return {
+                status: 'ready',
+                selectedTasks: referencedActiveTasks,
+                targetRepo: referencedActiveTasks[0]?.targetRepo ?? null,
+                diagnostics: ['handoff-file-task-reference', 'handoff-file-active-claim-match']
+            };
+        }
+        if (referencedActiveTasks.length > 1) {
+            return {
+                status: 'ambiguous',
+                selectedTasks: referencedActiveTasks,
+                targetRepo: resolveRouteTargetRepo(referencedActiveTasks),
+                diagnostics: ['handoff-file-multiple-active-claim-matches']
+            };
+        }
+        return {
+            status: 'not-found',
+            selectedTasks: [],
+            targetRepo: null,
+            diagnostics: ['handoff-file-references-no-active-claim']
+        };
+    }
+    if (activeTasks.length === 1) {
+        return {
+            status: 'ready',
+            selectedTasks: activeTasks,
+            targetRepo: activeTasks[0]?.targetRepo ?? null,
+            diagnostics: ['handoff-file-unique-active-claim-fallback']
+        };
+    }
+    return {
+        status: 'ambiguous',
+        selectedTasks: activeTasks,
+        targetRepo: resolveRouteTargetRepo(activeTasks),
+        diagnostics: ['handoff-file-multiple-active-claims']
+    };
+}
+function isActiveClaimedTask(task) {
+    return normalizeTaskRouteStatus(task.status) === 'running'
+        && typeof task.activeClaimActorId === 'string'
+        && task.activeClaimActorId.trim().length > 0;
+}
+function isHandoffPrompt(prompt) {
+    return /(?:handoff|unfinished[-_ ]work)\.md\b/i.test(prompt);
+}
+function resolvePromptHandoffPath(cwd, prompt) {
+    const candidates = new Set();
+    for (const match of prompt.matchAll(/[A-Za-z]:[^\s`"'<>]+\.md/gi)) {
+        candidates.add(path.normalize(match[0].replace(/[),.;]+$/, '')));
+    }
+    for (const match of prompt.matchAll(/\b[A-Za-z0-9][A-Za-z0-9._-]*(?:handoff|unfinished[-_ ]work)[A-Za-z0-9._-]*\.md\b/gi)) {
+        const basename = match[0];
+        candidates.add(path.join(cwd, '.atm', 'history', 'handoff', basename));
+    }
+    for (const candidate of extractPathLikeStringsFromPrompt(prompt)) {
+        if (/(?:handoff|unfinished[-_ ]work)\.md$/i.test(candidate)) {
+            candidates.add(path.isAbsolute(candidate) ? candidate : path.resolve(cwd, candidate));
+        }
+    }
+    return [...candidates].find((candidate) => existsSync(candidate) && statSync(candidate).isFile()) ?? null;
+}
+function readFileText(filePath) {
+    try {
+        return readFileSync(filePath, 'utf8');
+    }
+    catch {
+        return null;
+    }
+}
 function findTaskByTaskIdReference(tasks, taskIdReference) {
     const aliases = expandTaskIdReferenceAliases(taskIdReference);
     return tasks.find((task) => aliases.includes(task.workItemId.toUpperCase())) ?? null;
@@ -2842,6 +2977,10 @@ function scoreTaskForIntent(cwd, task, intent) {
     if (intent.mentionedTaskIds.includes(task.workItemId.toUpperCase())) {
         score += 120;
         reasons.push('task-id-exact');
+    }
+    else if (isTaskIdSuffixMentioned(task.workItemId, intent)) {
+        score += 110;
+        reasons.push('task-id-suffix-match');
     }
     const pathFields = [
         task.taskPath,
@@ -4012,6 +4151,379 @@ function readActiveClaimedTasks(cwd) {
         }
     });
 }
+export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
+    const now = Date.now();
+    const currentActor = currentActorId?.trim() || null;
+    const normalizedOwnFiles = uniqueSorted(ownFiles.map(normalizeWorkPath).filter(Boolean));
+    const activeClaims = readActiveClaimRecords(cwd, now);
+    const activeLocks = readActiveLockRecords(cwd, now);
+    const freshReservations = readFreshTaskReservations(cwd, now);
+    const stagedFiles = readStagedFiles(cwd);
+    const actorMap = new Map();
+    for (const claim of activeClaims) {
+        const bucket = actorMap.get(claim.actorId) ?? { taskIds: new Set(), files: new Set() };
+        bucket.taskIds.add(claim.taskId);
+        for (const file of claim.files)
+            bucket.files.add(file);
+        actorMap.set(claim.actorId, bucket);
+    }
+    for (const lock of activeLocks) {
+        const bucket = actorMap.get(lock.actorId) ?? { taskIds: new Set(), files: new Set() };
+        bucket.taskIds.add(lock.workItemId);
+        for (const file of lock.files)
+            bucket.files.add(file);
+        actorMap.set(lock.actorId, bucket);
+    }
+    for (const reservation of freshReservations) {
+        const bucket = actorMap.get(reservation.actorId) ?? { taskIds: new Set(), files: new Set() };
+        bucket.taskIds.add(reservation.taskId);
+        for (const file of reservation.files)
+            bucket.files.add(file);
+        actorMap.set(reservation.actorId, bucket);
+    }
+    const activeActors = [...actorMap.entries()]
+        .map(([actorId, value]) => ({
+        actorId,
+        taskIds: [...value.taskIds].sort((left, right) => left.localeCompare(right)),
+        fileCount: value.files.size
+    }))
+        .sort((left, right) => left.actorId.localeCompare(right.actorId));
+    const foreignActors = activeActors.filter((actor) => !currentActor || actor.actorId !== currentActor);
+    const hasForeignActiveWork = foreignActors.length > 0 || stagedFiles.length > 0;
+    const teamLevelRecommendation = buildTeamLevelRecommendation({
+        ownFiles: normalizedOwnFiles,
+        activeClaims,
+        activeLocks,
+        freshReservations,
+        stagedFiles,
+        foreignActorIds: foreignActors.map((actor) => actor.actorId)
+    });
+    const reasonParts = [
+        ...(foreignActors.length > 0 ? [`${foreignActors.length} other active actor(s): ${foreignActors.map((entry) => entry.actorId).join(', ')}`] : []),
+        ...(freshReservations.length > 0 ? [`${freshReservations.length} fresh task reservation(s) visible`] : []),
+        ...(stagedFiles.length > 0 ? [`${stagedFiles.length} staged file(s) present in the shared index`] : [])
+    ];
+    return {
+        schemaId: 'atm.activeWorkSummary.v1',
+        generatedAt: new Date(now).toISOString(),
+        activeClaimCount: activeClaims.length,
+        activeActors,
+        activeClaims,
+        activeLocks,
+        freshReservationCount: freshReservations.length,
+        freshReservations,
+        stagedFiles,
+        hasForeignActiveWork,
+        teamLevelRecommendation,
+        brokerRecommendation: {
+            enabled: hasForeignActiveWork,
+            reason: reasonParts.length > 0 ? reasonParts.join('; ') : null,
+            statusCommand: 'node atm.mjs tasks status --json',
+            brokerStatusCommand: 'node atm.mjs broker status --json',
+            teamStatusCommand: 'node atm.mjs team status --compact --json'
+        }
+    };
+}
+function buildTeamLevelRecommendation(input) {
+    const ownSet = new Set(input.ownFiles);
+    const foreignFiles = uniqueSorted([
+        ...input.activeClaims.filter((claim) => input.foreignActorIds.includes(claim.actorId)).flatMap((claim) => claim.files),
+        ...input.activeLocks.filter((lock) => input.foreignActorIds.includes(lock.actorId)).flatMap((lock) => lock.files),
+        ...input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).flatMap((reservation) => reservation.files)
+    ]);
+    const overlappingFiles = input.ownFiles.length > 0
+        ? foreignFiles.filter((file) => ownSet.has(file))
+        : [];
+    const stagedOverlap = input.ownFiles.length > 0
+        ? input.stagedFiles.filter((file) => ownSet.has(file))
+        : [];
+    const foreignActorCount = new Set(input.foreignActorIds).size;
+    const freshForeignReservationCount = input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).length;
+    const sharedIndexActive = input.stagedFiles.length > 0;
+    const overlapCount = uniqueSorted([...overlappingFiles, ...stagedOverlap]).length;
+    const frameworkFoundationRisk = input.ownFiles.some(isFrameworkFoundationPath);
+    if (frameworkFoundationRisk && (foreignActorCount > 0 || sharedIndexActive || overlapCount > 0)) {
+        return {
+            level: 'L5',
+            reason: 'Framework foundation files are in scope while other active work or shared-index state exists; use the full Team Agent Broker lane.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    if (frameworkFoundationRisk) {
+        return {
+            level: 'L4',
+            reason: 'Framework foundation files are in scope; use elevated coordination even without visible overlap.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    if (foreignActorCount >= 3 || (overlapCount > 0 && sharedIndexActive && foreignActorCount >= 2)) {
+        return {
+            level: 'L5',
+            reason: 'Multiple active actors plus overlapping files or shared staged index require full Broker coordination with review and validation roles.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    if (overlapCount > 1 || (overlapCount > 0 && sharedIndexActive)) {
+        return {
+            level: 'L4',
+            reason: 'Active foreign work overlaps this scope across multiple files or the shared index, so add a coordinator plus review/validation coverage.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    if (overlapCount === 1 || sharedIndexActive) {
+        return {
+            level: 'L3',
+            reason: 'A concrete same-file or shared-index risk is present; use Broker arbitration with an implementer and validator lane.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    if (freshForeignReservationCount > 0) {
+        return {
+            level: 'L3',
+            reason: 'Fresh foreign-created task reservations are visible; use Broker arbitration before claiming another captain\'s newly opened work.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: [],
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    if (foreignActorCount > 0) {
+        return {
+            level: 'L2',
+            reason: 'Other active actors exist but no file overlap is visible for this scope; keep coordination light and monitor Broker status.',
+            ownFiles: input.ownFiles,
+            overlappingFiles: [],
+            foreignActors: uniqueSorted(input.foreignActorIds)
+        };
+    }
+    return {
+        level: 'L1',
+        reason: 'No foreign active work or shared-index risk is visible; a single coordinator/implementer path is enough.',
+        ownFiles: input.ownFiles,
+        overlappingFiles: [],
+        foreignActors: []
+    };
+}
+function isFrameworkFoundationPath(filePath) {
+    const normalized = normalizeWorkPath(filePath);
+    return normalized.startsWith('packages/core/')
+        || /^packages\/cli\/src\/commands\/(?:next(?:\.ts|\/)|broker\.ts|team\.ts|taskflow\.ts|git-governance\.ts|integration-hooks\.ts|hook\/pre-commit\.ts|tasks\/(?:claim-intent|close-window-lock|import-orchestrator|legacy-impl|task-option-parsers)\.ts)/.test(normalized)
+        || normalized.startsWith('packages/cli/src/commands/next/')
+        || normalized.startsWith('packages/cli/src/commands/taskflow/')
+        || normalized.startsWith('packages/cli/src/commands/framework-development/')
+        || normalized.startsWith('packages/integrations-core/src/compiler/')
+        || normalized.startsWith('packages/core/src/broker/')
+        || normalized.startsWith('packages/core/src/team-runtime/');
+}
+function inspectFreshTaskReservationForTask(cwd, task, currentActorId, now) {
+    const reservations = readFreshTaskReservations(cwd, now);
+    const currentActor = currentActorId?.trim() || null;
+    return reservations.find((reservation) => reservation.taskId === task.workItemId
+        && (!currentActor || reservation.actorId !== currentActor)) ?? null;
+}
+function readFreshTaskReservations(cwd, now) {
+    const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
+    if (!existsSync(taskStorePath))
+        return [];
+    return readdirSync(taskStorePath)
+        .filter((entry) => entry.endsWith('.json'))
+        .flatMap((entry) => {
+        const filePath = path.join(taskStorePath, entry);
+        try {
+            const parsed = parseJsonText(readFileSync(filePath, 'utf8'));
+            const workItemId = normalizeOptionalString(parsed.workItemId ?? parsed.id);
+            if (!workItemId)
+                return [];
+            if (!isTaskFreshReservationCandidate(parsed))
+                return [];
+            const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+                ? parsed.claim
+                : {};
+            if (claimRecord.state === 'active')
+                return [];
+            const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
+                ? parsed.source
+                : {};
+            const sourcePlanPath = normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path);
+            const sourceOwner = readPlanningCardOwner(cwd, sourcePlanPath);
+            const actorId = sourceOwner
+                ?? normalizeOptionalString(parsed.owner ?? parsed.ownerActorId ?? parsed.createdByActor ?? parsed.createdBy ?? parsed.importedByActor ?? parsed.importedBy ?? source.owner ?? source.actorId);
+            if (!actorId)
+                return [];
+            const createdAt = normalizeOptionalString(parsed.createdAt ?? parsed.created_at ?? source.createdAt ?? source.created_at);
+            const importedAt = normalizeOptionalString(parsed.importedAt ?? parsed.imported_at ?? source.importedAt ?? source.imported_at);
+            const referenceAt = parseIsoMillis(importedAt) ?? parseIsoMillis(createdAt) ?? parseIsoMillis(normalizeOptionalString(parsed.lastTransitionAt ?? parsed.last_transition_at));
+            if (referenceAt === null)
+                return [];
+            const ageSeconds = Math.max(0, Math.floor((now - referenceAt) / 1000));
+            if (ageSeconds > NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS)
+                return [];
+            const files = uniqueSorted([
+                ...readStringArray(parsed.scope),
+                ...readStringArray(parsed.scopePaths),
+                ...readStringArray(parsed.files),
+                ...readStringArray(parsed.deliverables),
+                ...readStringArray(parsed.targetAllowedFiles),
+                ...readStringArray(claimRecord.files)
+            ].map((file) => {
+                const normalized = normalizeWorkPath(file);
+                return path.isAbsolute(normalized) ? path.relative(cwd, normalized).replace(/\\/g, '/') : normalized;
+            }).filter(Boolean));
+            return [{
+                    taskId: workItemId,
+                    title: normalizeOptionalString(parsed.title) ?? workItemId,
+                    actorId,
+                    createdAt,
+                    importedAt,
+                    ageSeconds,
+                    ttlSeconds: NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS,
+                    leaseFresh: true,
+                    files
+                }];
+        }
+        catch {
+            return [];
+        }
+    });
+}
+function isTaskFreshReservationCandidate(parsed) {
+    const status = normalizeTaskRouteStatus(normalizeOptionalString(parsed.status) ?? 'planned');
+    return status === 'planned' || status === 'ready' || status === 'open' || status === 'reserved';
+}
+function readPlanningCardOwner(cwd, sourcePlanPath) {
+    if (!sourcePlanPath)
+        return null;
+    const candidate = path.isAbsolute(sourcePlanPath) ? sourcePlanPath : path.resolve(cwd, sourcePlanPath);
+    if (!existsSync(candidate))
+        return null;
+    try {
+        const rawText = readFileSync(candidate, 'utf8');
+        const frontmatter = parseMarkdownFrontmatter(rawText);
+        const owner = frontmatter && typeof frontmatter === 'object' && !Array.isArray(frontmatter)
+            ? normalizeOptionalString(frontmatter.owner ?? frontmatter.actor ?? frontmatter.captain)
+            : null;
+        return owner ?? readFrontmatterScalar(rawText, 'owner') ?? readFrontmatterScalar(rawText, 'actor') ?? readFrontmatterScalar(rawText, 'captain');
+    }
+    catch {
+        return null;
+    }
+}
+function readFrontmatterScalar(rawText, key) {
+    const match = /^---\s*\r?\n([\s\S]*?)\r?\n---/m.exec(rawText);
+    if (!match)
+        return null;
+    const line = match[1].split(/\r?\n/).find((entry) => entry.trim().startsWith(`${key}:`));
+    if (!line)
+        return null;
+    return normalizeOptionalString(line.slice(line.indexOf(':') + 1).replace(/^['"]|['"]$/g, ''));
+}
+function parseIsoMillis(value) {
+    if (!value)
+        return null;
+    const millis = Date.parse(value);
+    return Number.isFinite(millis) ? millis : null;
+}
+function readActiveClaimRecords(cwd, now) {
+    const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
+    if (!existsSync(taskStorePath))
+        return [];
+    return readdirSync(taskStorePath)
+        .filter((entry) => entry.endsWith('.json'))
+        .flatMap((entry) => {
+        const filePath = path.join(taskStorePath, entry);
+        try {
+            const parsed = parseJsonText(readFileSync(filePath, 'utf8'));
+            const workItemId = normalizeOptionalString(parsed.workItemId ?? parsed.id);
+            if (!workItemId)
+                return [];
+            const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+                ? parsed.claim
+                : {};
+            if (claimRecord.state !== 'active')
+                return [];
+            const actorId = normalizeOptionalString(claimRecord.actorId);
+            if (!actorId)
+                return [];
+            const heartbeatAt = normalizeOptionalString(claimRecord.heartbeatAt);
+            const ttlSeconds = normalizeOptionalNumber(claimRecord.ttlSeconds);
+            return [{
+                    taskId: workItemId,
+                    title: normalizeOptionalString(parsed.title) ?? workItemId,
+                    actorId,
+                    intent: normalizeOptionalString(claimRecord.intent) ?? 'write',
+                    claimedAt: normalizeOptionalString(claimRecord.claimedAt),
+                    heartbeatAt,
+                    heartbeatAgeSeconds: heartbeatAt ? Math.max(0, Math.floor((now - Date.parse(heartbeatAt)) / 1000)) : null,
+                    ttlSeconds,
+                    leaseFresh: heartbeatAt && ttlSeconds !== null ? now - Date.parse(heartbeatAt) <= ttlSeconds * 1000 : null,
+                    files: uniqueSorted(readStringArray(claimRecord.files).map(normalizeWorkPath))
+                }];
+        }
+        catch {
+            return [];
+        }
+    });
+}
+function readActiveLockRecords(cwd, now) {
+    const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
+    if (!existsSync(lockRoot))
+        return [];
+    return readdirSync(lockRoot)
+        .filter((entry) => entry.endsWith('.lock.json'))
+        .flatMap((entry) => {
+        try {
+            const parsed = parseJsonText(readFileSync(path.join(lockRoot, entry), 'utf8'));
+            if (normalizeOptionalString(parsed.status) === 'released')
+                return [];
+            const workItemId = normalizeOptionalString(parsed.workItemId);
+            const actorId = normalizeOptionalString(parsed.actorId ?? parsed.lockedBy);
+            if (!workItemId || !actorId)
+                return [];
+            const heartbeatAt = normalizeOptionalString(parsed.heartbeatAt ?? parsed.lockedAt);
+            const ttlSeconds = normalizeOptionalNumber(parsed.ttlSeconds);
+            return [{
+                    workItemId,
+                    actorId,
+                    heartbeatAt,
+                    heartbeatAgeSeconds: heartbeatAt ? Math.max(0, Math.floor((now - Date.parse(heartbeatAt)) / 1000)) : null,
+                    ttlSeconds,
+                    leaseFresh: heartbeatAt && ttlSeconds !== null ? now - Date.parse(heartbeatAt) <= ttlSeconds * 1000 : null,
+                    files: uniqueSorted(readStringArray(parsed.files).map(normalizeWorkPath))
+                }];
+        }
+        catch {
+            return [];
+        }
+    });
+}
+function normalizeOptionalNumber(value) {
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+function normalizeWorkPath(value) {
+    return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
+}
+function readStagedFiles(cwd) {
+    const result = spawnSync('git', ['diff', '--name-only', '--cached'], {
+        cwd,
+        encoding: 'utf8',
+        windowsHide: true
+    });
+    if (result.status !== 0)
+        return [];
+    return uniqueSorted(String(result.stdout ?? '')
+        .split(/\r?\n/)
+        .map(normalizeWorkPath)
+        .filter(Boolean));
+}
 function mentionsNotCurrentTask(prompt) {
     const normalized = normalizeSearchText(prompt);
     return /\bnot\s+(?:the\s+)?current\s+task\b|\bnot\s+(?:this\s+)?active\s+task\b/.test(normalized)
@@ -4321,7 +4833,19 @@ function readQueueHeadTaskId(value) {
 function isTaskIdMentioned(workItemId, intent) {
     if (!intent || intent.mentionedTaskIds.length === 0)
         return false;
-    return intent.mentionedTaskIds.includes(workItemId.trim().toUpperCase());
+    return intent.mentionedTaskIds.includes(workItemId.trim().toUpperCase())
+        || isTaskIdSuffixMentioned(workItemId, intent);
+}
+function isTaskIdSuffixMentioned(workItemId, intent) {
+    if (!intent || intent.mentionedTaskIds.length === 0)
+        return false;
+    const normalizedWorkItemId = workItemId.trim().toUpperCase();
+    return intent.mentionedTaskIds.some((taskId) => {
+        const normalizedTaskId = taskId.trim().toUpperCase();
+        return normalizedTaskId.length > 0
+            && normalizedTaskId !== normalizedWorkItemId
+            && normalizedWorkItemId.endsWith(`-${normalizedTaskId}`);
+    });
 }
 function extractJsonTaskMetadata(rawText) {
     const pick = (key) => {
@@ -4455,6 +4979,26 @@ function buildNextMessages(nextAction, userNotice, integrationBootstrap, runtime
         }));
     }
     if (nextAction.governanceReadiness) {
+        const readinessRecord = nextAction.governanceReadiness;
+        const activeWorkSummary = readinessRecord.activeWorkSummary && typeof readinessRecord.activeWorkSummary === 'object' && !Array.isArray(readinessRecord.activeWorkSummary)
+            ? readinessRecord.activeWorkSummary
+            : null;
+        const brokerRecommendation = activeWorkSummary?.brokerRecommendation && typeof activeWorkSummary.brokerRecommendation === 'object' && !Array.isArray(activeWorkSummary.brokerRecommendation)
+            ? activeWorkSummary.brokerRecommendation
+            : null;
+        const teamLevelRecommendation = activeWorkSummary?.teamLevelRecommendation && typeof activeWorkSummary.teamLevelRecommendation === 'object' && !Array.isArray(activeWorkSummary.teamLevelRecommendation)
+            ? activeWorkSummary.teamLevelRecommendation
+            : null;
+        if (brokerRecommendation?.enabled === true) {
+            messages.push(message('warning', 'ATM_ACTIVE_WORK_BROKER_RECOMMENDED', `ATM detected active concurrent work; consider Team Agent Broker ${teamLevelRecommendation?.level ?? 'L3'} before editing.`, {
+                schemaId: activeWorkSummary?.schemaId ?? 'atm.activeWorkSummary.v1',
+                brokerRecommendation,
+                teamLevelRecommendation,
+                activeActors: activeWorkSummary?.activeActors ?? [],
+                activeClaims: activeWorkSummary?.activeClaims ?? [],
+                stagedFiles: activeWorkSummary?.stagedFiles ?? []
+            }));
+        }
         messages.push(message('info', 'ATM_NEXT_GOVERNANCE_READINESS_HINT', 'ATM surfaced the governance prerequisites early so the agent can prepare claim, evidence, and protected-push checks before reaching commit or push.', nextAction.governanceReadiness));
     }
     messages.push(routeMessage);
@@ -4468,6 +5012,11 @@ function buildGovernanceReadinessHint(cwd, input) {
     const protectedBranchTarget = Boolean(currentBranch && isProtectedFrameworkBranchTarget(currentBranch));
     const needsFrameworkStatus = Boolean(input.frameworkClaimRequired) || isFrameworkMaintenancePrompt(input.prompt);
     const frameworkStatus = needsFrameworkStatus ? createFrameworkModeStatus({ cwd }) : null;
+    const ownFiles = uniqueSorted([
+        ...(input.ownFiles ?? []),
+        ...(input.taskId ? readTaskWorkFiles(cwd, input.taskId) : [])
+    ]);
+    const activeWorkSummary = buildActiveWorkSummary(cwd, input.actorId, ownFiles);
     const earlyPreparation = [
         'Read evidence.nextAction.playbook before editing, closing, or committing.',
         'Resolve explicit actor identity before claim, commit, or report.',
@@ -4489,6 +5038,7 @@ function buildGovernanceReadinessHint(cwd, input) {
         protectedBranchTarget,
         aheadCount,
         frameworkClaimRequired: Boolean(input.frameworkClaimRequired),
+        activeWorkSummary,
         earlyPreparation,
         queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'],
         perCriticalCommitGitHeadEvidence: {
@@ -4499,6 +5049,31 @@ function buildGovernanceReadinessHint(cwd, input) {
             ? 'Protected framework branches no longer require per-critical-commit git-head evidence; same-commit governed provenance and high-risk closeout evidence remain strict.'
             : null
     };
+}
+function readTaskWorkFiles(cwd, taskId) {
+    const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+    if (!existsSync(taskPath))
+        return [];
+    try {
+        const parsed = parseJsonText(readFileSync(taskPath, 'utf8'));
+        const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+            ? parsed.claim
+            : {};
+        const directionLock = parsed.taskDirectionLock && typeof parsed.taskDirectionLock === 'object' && !Array.isArray(parsed.taskDirectionLock)
+            ? parsed.taskDirectionLock
+            : {};
+        return uniqueSorted([
+            ...readStringArray(parsed.scope),
+            ...readStringArray(parsed.scopePaths),
+            ...readStringArray(parsed.files),
+            ...readStringArray(parsed.deliverables),
+            ...readStringArray(claimRecord.files),
+            ...readStringArray(directionLock.allowedFiles)
+        ].map(normalizeWorkPath).filter(Boolean));
+    }
+    catch {
+        return [];
+    }
 }
 function readFastGitReadiness(cwd) {
     const gitDirectory = resolveGitDirectory(cwd);

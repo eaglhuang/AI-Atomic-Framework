@@ -10,6 +10,42 @@ const fixture = loadValidatorFixture(root, 'fixtures/validators/git-hooks-enforc
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
+// TASK-AAO-FABLE-001 (ATM-BUG-2026-07-12-152): the full suite takes ~200s and
+// looks like a timeout risk in interactive windows. Bounded lanes reuse the
+// same linear scenario flow but stop at a named boundary; `--lane list`
+// enumerates them without executing anything.
+const VALIDATOR_LANES = {
+  install: { summary: 'bootstrap + integration/git-hooks install + hook template verification', expectedSeconds: 40 },
+  'pre-commit': { summary: 'install lane plus deferred-governance, docs-only, and foreign-residue pre-commit scenarios', expectedSeconds: 80 },
+  full: { summary: 'entire enforcement suite including commit-range bypass detection (~168 steps)', expectedSeconds: 210 }
+} as const;
+type ValidatorLane = keyof typeof VALIDATOR_LANES;
+const laneArgValue = process.argv.includes('--lane')
+  ? String(process.argv[process.argv.indexOf('--lane') + 1] ?? '').trim()
+  : 'full';
+if (laneArgValue === 'list') {
+  console.log(JSON.stringify({
+    schemaId: 'atm.validatorLaneCatalog.v1',
+    validator: 'validate:git-hooks-enforcement',
+    fullSuiteCommand: 'npm run validate:git-hooks-enforcement',
+    lanes: Object.entries(VALIDATOR_LANES).map(([name, lane]) => ({
+      lane: name,
+      command: `npm run validate:git-hooks-enforcement -- --lane ${name}`,
+      expectedSeconds: lane.expectedSeconds,
+      summary: lane.summary
+    }))
+  }, null, 2));
+  process.exit(0);
+}
+if (!(laneArgValue in VALIDATOR_LANES)) {
+  console.error(`[git-hooks-enforcement] unknown --lane ${laneArgValue}; use --lane list to enumerate lanes.`);
+  process.exit(2);
+}
+const selectedLane = laneArgValue as ValidatorLane;
+console.log(`[git-hooks-enforcement:${mode}] lane=${selectedLane} expected duration ~${VALIDATOR_LANES[selectedLane].expectedSeconds}s (${VALIDATOR_LANES[selectedLane].summary}). Full suite: ~${VALIDATOR_LANES.full.expectedSeconds}s.`);
+const childTimeoutMs = Number(process.env.ATM_VALIDATOR_CHILD_TIMEOUT_MS ?? '30000');
+const validatorStartedAt = Date.now();
+let commandSequence = 0;
 
 function writeReadyFixtureTask(repoPath: string, taskId: string, actorId: string, title: string) {
   const taskPath = path.join(repoPath, '.atm', 'history', 'tasks', `${taskId}.json`);
@@ -39,18 +75,28 @@ function assert(condition: unknown, message: string) {
 }
 
 function run(command: string, args: readonly string[], cwd: string, options: { allowFailure?: boolean; env?: Record<string, string>; input?: string } = {}) {
+  const sequence = ++commandSequence;
+  const label = `${command} ${args.join(' ')}`;
+  const startedAt = Date.now();
+  console.log(`[git-hooks-enforcement:${mode}] step ${sequence} start (${Math.round((startedAt - validatorStartedAt) / 1000)}s): ${label}`);
   const result = spawnSync(command, [...args], {
     cwd,
     encoding: 'utf8',
     input: options.input,
+    timeout: childTimeoutMs,
     env: {
       ...process.env,
       ...(options.env ?? {})
     }
   });
-  if (!options.allowFailure && (result.error || result.status !== 0)) {
-    fail(`${command} ${args.join(' ')} failed\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
+  const elapsedMs = Date.now() - startedAt;
+  if (result.error?.message?.toLowerCase().includes('timed out') || result.signal === 'SIGTERM') {
+    fail(`${label} timed out after ${childTimeoutMs}ms (step ${sequence}, elapsed ${elapsedMs}ms)`);
   }
+  if (!options.allowFailure && (result.error || result.status !== 0)) {
+    fail(`${label} failed after ${elapsedMs}ms\nerror:\n${result.error?.message || ''}\nstdout:\n${result.stdout || ''}\nstderr:\n${result.stderr || ''}`);
+  }
+  console.log(`[git-hooks-enforcement:${mode}] step ${sequence} done (${elapsedMs}ms): ${label}`);
   return result;
 }
 
@@ -177,6 +223,12 @@ assert(examplePreCommit.includes('runner="atm.dev.mjs"'), 'example pre-commit ho
 assert(examplePreCommit.includes('node "$runner" hook pre-commit --json'), 'example pre-commit hook must use hook pre-commit through the selected runner');
 
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-hooks-'));
+function completeLaneBoundary(boundary: ValidatorLane) {
+  if (selectedLane !== boundary) return;
+  rmSync(tempRoot, { recursive: true, force: true });
+  console.log(`[git-hooks-enforcement:${mode}] ok (bounded lane '${boundary}' completed in ${Math.round((Date.now() - validatorStartedAt) / 1000)}s)`);
+  process.exit(0);
+}
 try {
   const repo = path.join(tempRoot, 'host');
   mkdirSync(repo, { recursive: true });
@@ -208,6 +260,7 @@ try {
   assert(existsSync(path.join(repo, '.atm', 'git-hooks', 'pre-commit')), 'git-hooks install must write .atm/git-hooks/pre-commit');
   assert(existsSync(path.join(repo, '.atm', 'git-hooks', 'pre-push')), 'git-hooks install must write .atm/git-hooks/pre-push');
   assert(runGit(repo, ['config', '--get', 'core.hooksPath']).stdout.trim() === '.atm/git-hooks', 'git-hooks install must configure core.hooksPath to .atm/git-hooks');
+  completeLaneBoundary('install');
   rewritePackageScripts(repo, {
     typecheck: 'node -e "process.exit(0)"',
     'validate:cli': 'node -e "process.exit(0)"',
@@ -250,6 +303,7 @@ try {
   rmSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-HOOK-FOREIGN-0001.json'), { force: true });
   rmSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-HOOK-FOREIGN-0001.closure-packet.json'), { force: true });
   rmSync(path.join(repo, '.atm', 'history', 'task-events', 'TASK-HOOK-FOREIGN-0001'), { recursive: true, force: true });
+  completeLaneBoundary('pre-commit');
 
   writeFileSync(path.join(repo, 'packages', 'core', 'src', 'index.ts'), 'export const foreignStagedCritical = true;\n', 'utf8');
   runGit(repo, ['add', 'packages/core/src/index.ts']);

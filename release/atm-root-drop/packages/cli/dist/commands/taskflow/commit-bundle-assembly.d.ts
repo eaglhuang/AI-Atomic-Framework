@@ -51,16 +51,18 @@ export interface DeferredGovernanceDirtyFile {
     snapshotPath: string;
     originalSha256: string;
     restoredAt: string | null;
+    skipReason?: 'snapshot-missing' | null;
 }
 export interface DeferredGovernanceDirtyReport {
     schemaId: 'atm.deferredGovernanceDirty.v1';
     requested: boolean;
     files: DeferredGovernanceDirtyFile[];
     restored: boolean;
+    skippedMissingSnapshots?: readonly string[];
 }
 export declare function readStagedFiles(repoRoot: string): string[];
-export declare function isDeferrableGovernanceDirtyFile(filePath: string): boolean;
-export declare function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean): DeferredGovernanceDirtyReport;
+export declare function isDeferrableGovernanceDirtyFile(filePath: string, taskId?: string | null): boolean;
+export declare function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean, taskId?: string | null): DeferredGovernanceDirtyReport;
 export declare function restoreDeferredGovernanceDirtyFiles(repoRoot: string, report: DeferredGovernanceDirtyReport): DeferredGovernanceDirtyReport;
 export declare function buildTaskflowCommitBundle(input: {
     cwd: string;

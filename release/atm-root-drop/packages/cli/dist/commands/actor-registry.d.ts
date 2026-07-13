@@ -18,7 +18,7 @@ export interface ResolvedActorId {
 }
 export interface ActorResolutionDiagnostic {
     readonly resolved: ResolvedActorId | null;
-    readonly precedence: readonly ['option', 'env', 'legacy-env', 'repo-default'];
+    readonly precedence: readonly ['option', 'env', 'repo-default', 'legacy-env'];
     readonly envActorId: string | null;
     readonly legacyEnvActorId: string | null;
     readonly repoDefaultActorId: string | null;

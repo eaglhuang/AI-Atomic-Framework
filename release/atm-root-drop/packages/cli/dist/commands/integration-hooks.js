@@ -341,6 +341,33 @@ function runPreToolHook(options) {
     const staticEvidenceArtifactFiles = mutatingIntent && !gitCommitIntent
         ? toolFiles.map((entry) => normalizePathForRepoRoot(entry, options.cwd)).filter(isStaticEvidenceArtifactPath)
         : [];
+    const rawGitMutation = classifyRawGitMutationCommand(toolCommand);
+    if (rawGitMutation) {
+        return makeResult({
+            ok: false,
+            command: 'integration',
+            cwd: options.cwd,
+            messages: [message('error', 'ATM_RAW_GIT_MUTATION_BLOCKED', 'Raw Git mutation is blocked for AI agents in supported integrations. Use ATM-governed Git tools or a scoped Broker lease instead.', {
+                    editor: options.editor,
+                    command: toolCommand,
+                    gitAction: rawGitMutation.action,
+                    riskLevel: rawGitMutation.riskLevel,
+                    requiredCommand: rawGitMutation.requiredCommand,
+                    overridePolicy: rawGitMutation.overridePolicy
+                })],
+            evidence: {
+                action: 'hook pre-tool',
+                editor: options.editor,
+                toolName: options.toolName,
+                toolFiles,
+                toolCommand,
+                rawGitMutation,
+                frameworkStatus: status,
+                relatedBacklog: 'ATM-BUG-2026-07-12-161',
+                relatedTask: 'TASK-AAO-0189'
+            }
+        });
+    }
     if (status.mode === 'cross-repo-target-required' && gitCommitIntent) {
         return makeResult({
             ok: false,
@@ -1206,6 +1233,128 @@ function isStaticEvidenceArtifactPath(value) {
         return true;
     }
     return false;
+}
+const stageOnlyOverridePhrase = 'ATM-STAGE-OVERRIDE-I-UNDERSTAND-THIS-MAY-DISRUPT-ANOTHER-ACTIVE-AGENT';
+const destructiveOverridePhrase = 'ATM-DESTRUCTIVE-GIT-OVERRIDE-I-UNDERSTAND-THIS-CAN-DESTROY-ANOTHER-ACTIVE-AGENT-WORK';
+function classifyRawGitMutationCommand(command) {
+    const tokens = tokenizeShellLike(command);
+    const gitIndex = tokens.findIndex((token) => /^git(?:\.exe)?$/i.test(token));
+    if (gitIndex < 0)
+        return null;
+    if (tokens.slice(0, gitIndex).some((token) => /(?:^|[\\/])atm(?:\.dev)?\.mjs$/i.test(token))) {
+        return null;
+    }
+    const gitArgs = stripGitGlobalOptions(tokens.slice(gitIndex + 1));
+    const action = (gitArgs[0] ?? '').toLowerCase();
+    if (!action)
+        return null;
+    if (isReadOnlyGitAction(action))
+        return null;
+    if (!isGuardedRawGitAction(action))
+        return null;
+    const args = gitArgs.slice(1);
+    const riskLevel = classifyRawGitRisk(action, args);
+    return {
+        action,
+        args,
+        riskLevel,
+        requiredCommand: requiredAtmGitCommandForRisk(riskLevel, action),
+        overridePolicy: {
+            chatTextAccepted: false,
+            stageOnlyPhrase: stageOnlyOverridePhrase,
+            destructivePhrase: destructiveOverridePhrase,
+            requiredLease: riskLevel === 'stage-only'
+                ? 'atm git lease stage-override'
+                : riskLevel === 'destructive'
+                    ? 'atm git lease destructive-override'
+                    : 'atm git governed-action'
+        }
+    };
+}
+function tokenizeShellLike(command) {
+    if (!command?.trim())
+        return [];
+    const tokens = [];
+    const pattern = /"([^"]*)"|'([^']*)'|([^\s]+)/g;
+    for (const match of command.matchAll(pattern)) {
+        tokens.push(match[1] ?? match[2] ?? match[3] ?? '');
+    }
+    return tokens.filter(Boolean);
+}
+function stripGitGlobalOptions(args) {
+    const output = [...args];
+    while (output.length > 0) {
+        const head = output[0];
+        if (head === '-C' || head === '-c' || head === '--git-dir' || head === '--work-tree' || head === '--namespace') {
+            output.splice(0, 2);
+            continue;
+        }
+        if (head.startsWith('-c') && head.length > 2) {
+            output.shift();
+            continue;
+        }
+        break;
+    }
+    return output;
+}
+function isReadOnlyGitAction(action) {
+    return [
+        'status',
+        'diff',
+        'log',
+        'show',
+        'branch',
+        'rev-parse',
+        'symbolic-ref',
+        'ls-files',
+        'merge-base',
+        'cat-file',
+        'config'
+    ].includes(action);
+}
+function isGuardedRawGitAction(action) {
+    return [
+        'add',
+        'restore',
+        'reset',
+        'checkout',
+        'switch',
+        'clean',
+        'rm',
+        'update-index',
+        'read-tree',
+        'commit',
+        'push'
+    ].includes(action);
+}
+function classifyRawGitRisk(action, args) {
+    if (action === 'commit' || action === 'push')
+        return 'governed-git-required';
+    if (action === 'add')
+        return 'stage-only';
+    if (action === 'restore')
+        return args.includes('--staged') && !args.includes('--worktree') ? 'stage-only' : 'destructive';
+    if (action === 'reset')
+        return args.includes('--hard') || args.includes('--merge') || args.includes('--keep') ? 'destructive' : 'stage-only';
+    if (action === 'checkout' || action === 'switch' || action === 'clean' || action === 'rm' || action === 'update-index' || action === 'read-tree') {
+        return 'destructive';
+    }
+    return 'governed-git-required';
+}
+function requiredAtmGitCommandForRisk(riskLevel, action) {
+    if (riskLevel === 'stage-only') {
+        return 'node atm.mjs git stage|unstage --task <task-id> --actor <actor-id> ... or node atm.mjs git lease stage-override ...';
+    }
+    if (riskLevel === 'destructive') {
+        return 'node atm.mjs git lease destructive-override --task <task-id> --actor <actor-id> --paths <paths> --reason <reason> ...';
+    }
+    if (action === 'push') {
+        return 'node atm.mjs git push --task <task-id> --actor <actor-id> --branch <branch> --remote <remote> --json';
+    }
+    if (action === 'commit') {
+        return 'node atm.mjs git commit --task <task-id> --actor <actor-id> --message <message> --json';
+    }
+    return 'node atm.mjs git admit|push|commit --task <task-id> --actor <actor-id> ...';
 }
 function isAuthorizedAtmStateMutationCommand(command) {
     const normalized = String(command ?? '').trim().toLowerCase();

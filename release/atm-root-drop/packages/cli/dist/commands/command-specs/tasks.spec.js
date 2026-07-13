@@ -14,6 +14,8 @@ export default defineCommandSpec({
         { flag: '--write', summary: 'Write canonical task JSON files to .atm/history/tasks/ and persist import evidence.' },
         { flag: '--force', summary: 'Overwrite existing task files even when the source hash differs. Active claims are still preserved unless --force-overwrite-claims is set.' },
         { flag: '--force-overwrite-claims', summary: 'Allow tasks import --write to overwrite tasks with active or handoff claims and emit claim-displaced-by-import transition events.' },
+        { flag: '--waive-planning-root', summary: 'For framework-repo AAO/TEAM imports from .atm/task-plans: explicitly waive the canonical planning-root authorship preflight; requires --reason.' },
+        { flag: '--reason', value: 'text', summary: 'Required rationale when --waive-planning-root is set.' },
         { flag: '--reset-open', summary: 'Rebuild matching imported tasks as open during tasks import --write.' },
         { flag: '--apply', summary: 'Apply tasks migrate-legacy-ledger changes instead of reporting a dry-run.' },
         { flag: '--all-stale', summary: 'Clean every stale runtime task lock candidate for tasks lock cleanup.' },

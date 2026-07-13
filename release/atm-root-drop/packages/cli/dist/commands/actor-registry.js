@@ -186,13 +186,13 @@ export function resolveActorId(inputActorId, cwd) {
     if (envActor) {
         return { actorId: envActor, source: 'env' };
     }
-    const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]);
-    if (legacyEnvActor) {
-        return { actorId: legacyEnvActor, source: 'legacy-env' };
-    }
     const defaultIdentity = cwd ? readRuntimeIdentityDefault(cwd) : null;
     if (defaultIdentity?.actorId) {
         return { actorId: defaultIdentity.actorId, source: 'repo-default' };
+    }
+    const legacyEnvActor = sanitizeOptional(process.env[legacyActorIdEnvVar]);
+    if (legacyEnvActor) {
+        return { actorId: legacyEnvActor, source: 'legacy-env' };
     }
     return null;
 }
@@ -207,7 +207,7 @@ export function describeActorResolution(inputActorId, cwd) {
         : null;
     return {
         resolved,
-        precedence: ['option', 'env', 'legacy-env', 'repo-default'],
+        precedence: ['option', 'env', 'repo-default', 'legacy-env'],
         envActorId: envActor,
         legacyEnvActorId: legacyEnvActor,
         repoDefaultActorId: repoDefaultActor,

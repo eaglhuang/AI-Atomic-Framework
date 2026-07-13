@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'status',
-  summary: 'Inspect ATM status in framework or adopted repositories.',
+  summary: 'Inspect ATM status in framework or adopted repositories, including active worker claims for one-glance coordination.',
   options: [
     commonCwdOption,
     commonJsonOption,
@@ -16,6 +16,7 @@ export default defineCommandSpec({
     commonHelpOption
   ],
   examples: [
-    'node atm.mjs status --json'
+    'node atm.mjs status --json',
+    'node atm.mjs status --pretty'
   ]
 });

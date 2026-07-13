@@ -234,7 +234,7 @@ export function evaluateFrameworkCloseDirtyGuard(input: {
     foreignActiveDirtyFiles,
     generatedArtifactFiles,
     remediation: {
-      requiredCommand: ok ? null : `node atm.mjs git commit --actor <actor> --task ${input.taskId} --message "<delivery message>" --json`,
+      requiredCommand: ok ? null : `node atm.mjs git commit --actor <actor> --task ${input.taskId} --message "<delivery message>" --auto-stage --json`,
       safeToAutoStage: false,
       operatorSummary: ok
         ? 'No in-scope or closure-governance tracked dirty files block close. Same-task regenerable artifacts (bundle manifests, closure packets) and correct planning-mirror pre-edits are close-owned transient state until the final governed bundle lands.'

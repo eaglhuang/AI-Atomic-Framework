@@ -15,6 +15,29 @@ function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
+function stripMatchingOuterQuotes(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.length >= 2) {
+    const first = trimmed[0];
+    const last = trimmed[trimmed.length - 1];
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      return trimmed.slice(1, -1).trim();
+    }
+  }
+  return trimmed;
+}
+
+function stripBoundaryQuoteArtifacts(value: string): string {
+  return stripMatchingOuterQuotes(value).replace(/^["']+|["']+$/g, '').trim();
+}
+
+function parseCsvPathList(value: string): string[] {
+  return stripBoundaryQuoteArtifacts(value)
+    .split(',')
+    .map((pathValue) => stripBoundaryQuoteArtifacts(pathValue))
+    .filter(Boolean);
+}
+
 function uniqueStrings(values: readonly string[]): readonly string[] {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
 }
@@ -244,9 +267,9 @@ export function parseScopeAddOptions(argv: string[]) {
       index += 1;
       continue;
     }
-    if (arg === '--add') {
-      const raw = requireValue(argv, index, '--add');
-      options.addPaths = raw.split(',').map((p) => p.trim()).filter(Boolean);
+    if (arg === '--add' || arg === '--paths') {
+      const raw = requireValue(argv, index, arg);
+      options.addPaths = parseCsvPathList(raw);
       index += 1;
       continue;
     }
@@ -274,7 +297,7 @@ export function parseScopeAddOptions(argv: string[]) {
     throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --task <work-item-id>.', { exitCode: 2 });
   }
   if (options.addPaths.length === 0) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --add <paths> (comma-separated).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --add <paths> (comma-separated). Alias: --paths <paths>.', { exitCode: 2 });
   }
   return {
     ...options,
@@ -321,7 +344,7 @@ export function parseScopeRepairOptions(argv: string[]) {
     }
     if (arg === '--add') {
       const raw = requireValue(argv, index, '--add');
-      options.addPaths = raw.split(',').map((p) => p.trim()).filter(Boolean);
+      options.addPaths = parseCsvPathList(raw);
       index += 1;
       continue;
     }

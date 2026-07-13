@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -24,13 +25,19 @@ function makeTask(taskId) {
 }
 const repo = mkdtempSync(path.join(os.tmpdir(), 'batch-skip-resume-'));
 try {
+    execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.name', 'batch-test'], { cwd: repo, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'batch-test@example.test'], { cwd: repo, stdio: 'ignore' });
+    writeFileSync(path.join(repo, 'README.md'), 'batch fixture\n', 'utf8');
+    execFileSync('git', ['add', 'README.md'], { cwd: repo, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'init'], { cwd: repo, stdio: 'ignore' });
     const tasks = [makeTask('TASK-SKIP-A'), makeTask('TASK-SKIP-B')];
     for (const task of tasks) {
         writeJson(path.join(repo, task.taskPath), {
             schemaVersion: 'atm.workItem.v0.2',
             workItemId: task.workItemId,
             title: task.title,
-            status: 'running',
+            status: 'ready',
             scopePaths: task.scopePaths,
             deliverables: task.scopePaths,
             validators: ['npm run typecheck']
@@ -95,6 +102,25 @@ try {
     const skipEventDir = path.join(repo, '.atm', 'history', 'task-events', 'TASK-SKIP-A');
     const skipEvent = readFileSync(path.join(skipEventDir, readdirName(skipEventDir, 'batch-skip')), 'utf8');
     assert.match(skipEvent, /"action": "batch-skip"/);
+    const emptyRepo = mkdtempSync(path.join(os.tmpdir(), 'batch-historical-batch-usage-'));
+    let historicalBatchCheckpointCode = null;
+    try {
+        await runBatch([
+            'checkpoint',
+            '--cwd',
+            emptyRepo,
+            '--actor',
+            'validator',
+            '--historical-batch',
+            'hist-batch-missing',
+            '--json'
+        ]);
+    }
+    catch (error) {
+        historicalBatchCheckpointCode = error?.code ?? null;
+    }
+    rmSync(emptyRepo, { recursive: true, force: true });
+    assert.equal(historicalBatchCheckpointCode, 'ATM_BATCH_RUN_MISSING', 'batch checkpoint should parse --historical-batch before batch selection');
     console.log('[batch-skip-resume.spec] ok');
 }
 finally {

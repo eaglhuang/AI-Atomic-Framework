@@ -35,7 +35,7 @@ export interface AutoEvidenceCommandMapping {
      * How the mapping decision was reached. Callers may surface this in
      * diagnostics; it is not part of any wire schema.
      */
-    readonly source: 'declared-verbatim' | 'declared-verbatim-no-matching-npm-script' | 'declared-verbatim-npm-script-mismatch' | 'npm-script-equivalent' | 'declared-verbatim-unrecognized-shape';
+    readonly source: 'declared-verbatim' | 'npm-script-for-atm-pseudo-command' | 'declared-verbatim-no-matching-npm-script' | 'declared-verbatim-npm-script-mismatch' | 'npm-script-equivalent' | 'declared-verbatim-unrecognized-shape';
     /** The npm script name we matched, if any. */
     readonly matchedScriptName: string | null;
 }

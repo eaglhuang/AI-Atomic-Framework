@@ -7,6 +7,7 @@ import {
   buildAutoEvidencePlan,
   executeAutoEvidencePlan
 } from '../../packages/cli/src/commands/evidence.ts';
+import { mapAutoEvidenceCommand } from '../../packages/cli/src/commands/taskflow/auto-evidence-mapper.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempDir = path.resolve(root, '.atm-temp-test-taskflow-auto-evidence');
@@ -34,7 +35,8 @@ try {
     scripts: {
       typecheck: 'node -e "process.exit(0)"',
       'validate:cli': 'node -e "process.exit(0)"',
-      'validate:git-head-evidence': 'node -e "process.exit(0)"'
+      'validate:git-head-evidence': 'node -e "process.exit(0)"',
+      'check:encoding:touched': 'node --strip-types scripts/check-encoding-touched.ts --mode touched'
     }
   });
   runGit(tempDir, ['add', 'README.md']);
@@ -182,6 +184,60 @@ try {
   });
   assert.equal(integrationExecution.ok, true, JSON.stringify(integrationExecution, null, 2));
   assert.ok(integrationExecution.runs.some((run) => run.validator === 'integration.fixture.quick' && run.ok));
+
+  writeJson(path.join(tempDir, 'scripts/test-catalog.config.json'), {
+    schemaId: 'atm.testCatalog.v1',
+    specVersion: '0.1.0',
+    entries: [
+      {
+        key: 'validator.fixture.encoding',
+        capability: 'validator',
+        family: 'fixture-validator',
+        source: 'fixture',
+        scope: 'task-local',
+        tiers: ['quick'],
+        validatorName: 'check:encoding:touched',
+        command: 'node --strip-types scripts/check-encoding-touched.ts --mode touched',
+        dedupeKeys: ['validator:fixture:encoding']
+      }
+    ]
+  });
+
+  const mappedTaskId = 'TASK-AUTO-EVIDENCE-MAPPED-COMMAND';
+  writeJson(path.join(tempDir, '.atm/history/tasks', `${mappedTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: mappedTaskId,
+    title: 'auto evidence mapped command fixture',
+    status: 'running',
+    owner: 'fixture-agent',
+    validators: ['check:encoding:touched'],
+    testPlan: {
+      validators: {
+        requiredKeys: ['validator.fixture.encoding'],
+        defaultTier: 'quick'
+      }
+    }
+  });
+  writeJson(path.join(tempDir, '.atm/history/evidence', `${mappedTaskId}.json`), {
+    taskId: mappedTaskId,
+    updatedAt: '2026-06-18T00:00:00.000Z',
+    evidence: []
+  });
+
+  const mappedPlan = buildAutoEvidencePlan({
+    cwd: tempDir,
+    taskId: mappedTaskId,
+    actorId: 'fixture-agent',
+    commandMapper: (declared) => mapAutoEvidenceCommand(declared, {
+      scripts: {
+        'check:encoding:touched': 'node --strip-types scripts/check-encoding-touched.ts --mode touched'
+      }
+    }).command
+  });
+  const mappedEntry = mappedPlan.toRun.find((entry) => entry.validator === 'check:encoding:touched');
+  assert.ok(mappedEntry, 'mapped catalog validator must be selected');
+  assert.ok(mappedEntry.requiredCommand?.includes('npm run check:encoding:touched'), 'remediation command must use executable package script');
+  assert.ok(!mappedEntry.requiredCommand?.includes('node atm.mjs check:encoding:touched'), 'remediation command must not invent an ATM subcommand');
 } finally {
   if (existsSync(tempDir)) {
     rmSync(tempDir, { recursive: true, force: true });

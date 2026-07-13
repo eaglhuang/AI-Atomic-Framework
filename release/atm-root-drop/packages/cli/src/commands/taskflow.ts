@@ -46,6 +46,7 @@ import {
   preflightBlockersToWriteReadinessBlockers
 } from './taskflow/close-preflight.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
+import { isRunnerSyncRequired } from './framework-development.ts';
 import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.ts';
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.ts';
 import {
@@ -66,6 +67,7 @@ import {
   type CloseWindowStagedIndexLockReport
 } from './tasks/close-window-lock.ts';
 import { promoteTeamHandoffArchive, teamHandoffRuntimeDirectory } from '../../../core/src/team-runtime/handoff-ledger.ts';
+import { clearBrokerRuntimeStateForTask } from '../../../core/src/broker/lifecycle.ts';
 
 interface DeferredGovernanceDirtyFile {
   file: string;
@@ -697,9 +699,23 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     waiverReason: waiver.waiverReason,
     planningAuthorityDeliveryGate
   });
-  if (historicalClosePreflight.blockers.length > 0) {
+  // ATM-BUG-2026-07-12-154 (TASK-AAO-FABLE-002): the frozen-runner staleness
+  // guard used to fire only inside the write path (ATM_RUNNER_STALE_WRITE_REFUSED),
+  // after pre-close and dry-run had already reported ready. Surface it here as
+  // a write-readiness blocker with the exact sync command so the operator
+  // discovers it before any write attempt. The write-path guard stays
+  // authoritative and unchanged.
+  const staleRunnerBlockers = isRunnerSyncRequired(cwd)
+    ? [{
+      code: 'ATM_TASKFLOW_PRECLOSE_STALE_RUNNER',
+      summary: 'The frozen runner (release/atm-onefile/atm.mjs) is older than framework source files; taskflow close --write will be refused with ATM_RUNNER_STALE_WRITE_REFUSED until the runner is rebuilt.',
+      requiredCommand: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build'
+    }]
+    : [];
+  if (historicalClosePreflight.blockers.length > 0 || staleRunnerBlockers.length > 0) {
     const mergedBlockers = [
       ...writeReadinessHint.blockers,
+      ...staleRunnerBlockers,
       ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
     ];
     writeReadinessHint = {
@@ -711,12 +727,14 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     };
   }
 
+  const packageJsonForAutoEvidencePlan = actorId ? readPackageJsonForAutoEvidence(cwd) : null;
   const autoEvidencePlan = actorId
     ? buildAutoEvidencePlan({
       cwd,
       taskId,
       actorId,
-      mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run'
+      mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run',
+      commandMapper: (declared) => mapAutoEvidenceCommand(declared, packageJsonForAutoEvidencePlan).command
     })
     : null;
 
@@ -842,7 +860,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     ]);
     let closeWindowLock: CloseWindowStagedIndexLockReport | null = null;
     let closeWindowLockReleased = false;
-    let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty);
+    let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty, taskId);
     let deferredGovernanceDirtyRestored = false;
     try {
       closeWindowLock = acquireCloseWindowStagedIndexLock({
@@ -1038,6 +1056,9 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
         }
       };
     const writeOk = backendResult.ok && closeWriteTransaction.ok && !governedCommitBundle.failClosed;
+    const brokerRuntimeCleanup = writeOk
+      ? clearBrokerRuntimeStateForTask({ cwd, taskId }).runtimeCleanup ?? null
+      : null;
     const residueAdvisory = writeOk ? buildTaskflowCloseResidueAdvisory(enrichedDiagnosis) : null;
     if (residueAdvisory) {
       closeMessages.push(message(
@@ -1095,6 +1116,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
           closeWriteTransaction,
           closeWindowLock,
           releasedCloseWindowLock,
+          brokerRuntimeCleanup,
           deferredGovernanceDirty,
           residueDiagnosis: enrichedDiagnosis,
           residueAdvisory,

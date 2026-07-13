@@ -1,13 +1,15 @@
 // TASK-RFT-0012: extracted verbatim from packages/cli/src/commands/tasks.ts.
 // The body of runTasksImport lives here; tasks.ts router re-exports it.
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
 import type { ParsedExternalTask } from '@ai-atomic-framework/plugin-sdk';
 import { CliError, makeResult, message, relativePathFrom } from '../shared.ts';
 import { readPluginRegistry } from '../../plugin-registry.ts';
 import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning-repo-root.ts';
 import { assertRunnerFreshForWriteAction } from '../framework-development.ts';
 import { assertEmergencyApproval } from '../emergency/gate.ts';
-import { validateDeliverablesList } from './task-import-validators.ts';
+import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.ts';
+import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import {
   type TaskImportManifest,
@@ -29,7 +31,10 @@ import {
 export async function runTasksImport(argv: string[]) {
   const options = parseImportOptions(argv);
   if (!options.from) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks import requires --from <plan.md>.', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', importPathUsageMessage(), {
+      exitCode: 2,
+      details: importPathUsageDetails()
+    });
   }
   if (options.dryRun === options.write) {
     throw new CliError('ATM_CLI_USAGE', 'tasks import requires exactly one of --dry-run or --write.', { exitCode: 2 });
@@ -99,9 +104,9 @@ export async function runTasksImport(argv: string[]) {
 
   const planAbsolute = resolvePlanAbsoluteFromStored(options.cwd, options.from);
   if (!existsSync(planAbsolute) || !statSync(planAbsolute).isFile()) {
-    throw new CliError('ATM_TASKS_PLAN_NOT_FOUND', `Plan markdown file not found: ${options.from}`, {
+    throw new CliError('ATM_TASKS_PLAN_NOT_FOUND', importPlanNotFoundMessage(options.from), {
       exitCode: 2,
-      details: { planPath: options.from }
+      details: importPathUsageDetails(options.from)
     });
   }
 
@@ -153,6 +158,30 @@ export async function runTasksImport(argv: string[]) {
     parsed,
     importedAt: generatedAt
   });
+
+  // TASK-AAO-FABLE-007: extraction-first patrol — advisory only.
+  parsed = {
+    ...parsed,
+    tasks: parsed.tasks.map((task) => {
+      const patrol = buildExtractionFirstPatrolDiagnostics({
+        scopePaths: task.scopePaths ?? [],
+        hasExtractionCandidates: Array.isArray(task.atomizationImpact?.extractionCandidates)
+          && task.atomizationImpact.extractionCandidates.length > 0,
+        resolveLineCount: (relativePath) => {
+          try {
+            const absolute = path.join(options.cwd, relativePath);
+            if (!existsSync(absolute) || !statSync(absolute).isFile()) return null;
+            return readFileSync(absolute, 'utf8').split('\n').length;
+          } catch {
+            return null;
+          }
+        }
+      });
+      return patrol.length === 0
+        ? task
+        : { ...task, importDiagnostics: [...(task.importDiagnostics ?? []), ...patrol] };
+    })
+  };
 
   if (parsed.diagnostics.some((entry) => entry.level === 'error') || parsed.tasks.length === 0) {
     if (parsed.tasks.length === 0) {
@@ -218,6 +247,50 @@ export async function runTasksImport(argv: string[]) {
         planPath: relativePathFrom(options.cwd, planAbsolute)
       }
     });
+  }
+
+  // ATM-BUG-2026-07-13-176: AAO/TEAM imports from target .atm/task-plans must
+  // point at a canonical planning-root card unless explicitly waived.
+  const planningRootAuthorship = inspectPlanningRootAuthorship({
+    cwd: options.cwd,
+    planAbsolute,
+    planRelativePath: toStoredPlanningPath(options.cwd, planAbsolute),
+    taskIds: parsed.tasks.map((task) => task.workItemId),
+    waivePlanningRoot: options.waivePlanningRoot === true
+  });
+  if (planningRootAuthorship.applies) {
+    if (!planningRootAuthorship.ok) {
+      parsed.diagnostics.push({
+        level: options.write ? 'error' : 'warning',
+        code: planningRootAuthorship.code ?? 'ATM_TASKS_IMPORT_PLANNING_ROOT_REQUIRED',
+        text: planningRootAuthorship.detail ?? 'Planning-root authorship is required for this import.',
+        workItemId: planningRootAuthorship.missingTaskIds[0]
+      });
+      if (options.write) {
+        throw new CliError(
+          'ATM_TASKS_IMPORT_PLANNING_ROOT_REQUIRED',
+          planningRootAuthorship.detail ?? 'Planning-root authorship is required for this import.',
+          {
+            exitCode: 1,
+            details: {
+              ...planningRootAuthorship
+            }
+          }
+        );
+      }
+    } else if (planningRootAuthorship.waived) {
+      parsed.diagnostics.push({
+        level: 'warning',
+        code: 'ATM_TASKS_IMPORT_PLANNING_ROOT_WAIVED',
+        text: `${planningRootAuthorship.detail} reason=${options.reason?.trim() ?? ''}`
+      });
+    } else {
+      parsed.diagnostics.push({
+        level: 'info',
+        code: 'ATM_TASKS_IMPORT_PLANNING_ROOT_OK',
+        text: planningRootAuthorship.detail ?? 'Planning-root authorship confirmed.'
+      });
+    }
   }
 
   if (options.write) {
@@ -294,4 +367,28 @@ export async function runTasksImport(argv: string[]) {
       emergencyUse
     }
   });
+}
+
+function importPathUsageMessage(): string {
+  return 'tasks import requires --from <path-to-task-card.md>. Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json';
+}
+
+function importPlanNotFoundMessage(from: string): string {
+  if (isLiteralPlanToken(from)) {
+    return `tasks import --from expects a markdown task-card path, not the literal value "${from}". Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json`;
+  }
+  return `Plan markdown file not found: ${from}. tasks import --from expects a markdown task-card path. Example: node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json`;
+}
+
+function importPathUsageDetails(from?: string): Record<string, unknown> {
+  return {
+    ...(from ? { planPath: from } : {}),
+    expectedFlag: '--from <path-to-task-card.md>',
+    exampleCommand: 'node atm.mjs tasks import --from .atm/task-plans/TASK-EXAMPLE-0001.md --write --json',
+    literalPlanValue: from ? isLiteralPlanToken(from) : false
+  };
+}
+
+function isLiteralPlanToken(from: string): boolean {
+  return from.trim().toLowerCase() === 'plan';
 }

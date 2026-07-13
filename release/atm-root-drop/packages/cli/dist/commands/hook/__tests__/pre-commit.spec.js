@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildPreCommitBlockingFindings, buildPreCommitRepairHints, isPreCommitBaselineFinding, isPreCommitEnvironmentFinding } from '../pre-commit.js';
+import { buildPreCommitBlockingFindings, buildPreCommitRepairHints, isPreCommitBaselineFinding, isPreCommitEnvironmentFinding, selectActionableResidueFindings } from '../pre-commit.js';
 import { inspectGitIndexAccess } from '../git-index-diagnostics.js';
 import { captureGitHeadEvidencePreparation, reconcileResolvedCrossTaskMutationIncident, rollbackFailedGitHeadEvidencePreparation } from '../../git-governance.js';
 const cwd = process.cwd();
@@ -108,6 +108,29 @@ const baselineOnly = buildPreCommitBlockingFindings({
     residueFindings: []
 });
 assert.equal(baselineOnly.filter(isPreCommitEnvironmentFinding).length, 0);
+const terminalForeignResidue = {
+    path: '.atm/history/evidence/TASK-DONE.bundle-manifest.json',
+    verdict: 'block-and-explain',
+    reason: 'bundle-manifest belongs to another task.',
+    ownerTaskId: 'TASK-DONE',
+    cleanupAction: null
+};
+assert.equal(selectActionableResidueFindings({
+    findings: [terminalForeignResidue],
+    stagedFiles: [],
+    committingTaskId: 'TASK-CURRENT',
+    activeLockTaskIds: new Set(),
+    hasActiveClaim: () => false,
+    hasTerminalOwner: () => true
+}).length, 0);
+assert.equal(selectActionableResidueFindings({
+    findings: [terminalForeignResidue],
+    stagedFiles: ['.atm/history/evidence/TASK-DONE.bundle-manifest.json'],
+    committingTaskId: 'TASK-CURRENT',
+    activeLockTaskIds: new Set(),
+    hasActiveClaim: () => false,
+    hasTerminalOwner: () => true
+}).length, 1);
 const repairRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-git-governance-repair-'));
 try {
     const evidencePath = path.join(repairRoot, '.atm', 'history', 'evidence', 'git-head.jsonl');

@@ -49,25 +49,39 @@ try {
   runAtm(['tasks', 'release', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0001', '--actor', 'captain', '--reason', 'fixture reset', '--json']);
   runGit(['restore', '--source=HEAD', '--worktree', '--staged', '--', 'src/dirty-write.ts']);
 
-  const landedPlan = path.join(planning, 'docs', 'ai_atomic_framework', 'multi-agent-orchestration', 'tasks', 'TASK-MAO-AUTO-0002.task.md');
-  writeTaskCard(landedPlan, 'TASK-MAO-AUTO-0002', 'Already landed auto-intent', ['src/already-landed.ts']);
-  importAndPrepareTask('TASK-MAO-AUTO-0002', landedPlan);
+  const preexistingPlan = path.join(planning, 'docs', 'ai_atomic_framework', 'multi-agent-orchestration', 'tasks', 'TASK-MAO-AUTO-0002.task.md');
+  writeTaskCard(preexistingPlan, 'TASK-MAO-AUTO-0002', 'Preexisting deliverable auto-intent', ['src/already-landed.ts']);
+  importAndPrepareTask('TASK-MAO-AUTO-0002', preexistingPlan);
 
-  const landedClaim = runAtm(['tasks', 'claim', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--auto-intent', '--files', 'src/already-landed.ts', '--json']);
+  const preexistingClaim = runAtm(['tasks', 'claim', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--auto-intent', '--files', 'src/already-landed.ts', '--json']);
+  assert.equal(preexistingClaim.exitCode, 0, preexistingClaim.stderr || preexistingClaim.stdout);
+  assert.equal(preexistingClaim.parsed.evidence.claimIntent, 'write');
+  assert.equal(preexistingClaim.parsed.evidence.claimIntentResolution.reason, 'delivery-evidence-not-found');
+  assert.deepEqual(preexistingClaim.parsed.evidence.claimIntentResolution.deliverablesTrackedInHead, ['src/already-landed.ts']);
+  runAtm(['tasks', 'release', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--reason', 'fixture reset', '--json']);
+
+  const deliveredPlan = path.join(planning, 'docs', 'ai_atomic_framework', 'multi-agent-orchestration', 'tasks', 'TASK-MAO-AUTO-0004.task.md');
+  writeTaskCard(deliveredPlan, 'TASK-MAO-AUTO-0004', 'Delivered auto-intent', ['src/already-landed.ts']);
+  importAndPrepareTask('TASK-MAO-AUTO-0004', deliveredPlan);
+  writeFileSync(path.join(workspace, 'src', 'already-landed.ts'), 'export const alreadyLanded = "delivered";\n');
+  runGit(['add', 'src/already-landed.ts']);
+  runGit(['commit', '-m', 'deliver TASK-MAO-AUTO-0004\n\nATM-Task: TASK-MAO-AUTO-0004']);
+
+  const landedClaim = runAtm(['tasks', 'claim', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0004', '--actor', 'captain', '--auto-intent', '--files', 'src/already-landed.ts', '--json']);
   assert.equal(landedClaim.exitCode, 0, landedClaim.stderr || landedClaim.stdout);
   assert.equal(landedClaim.parsed.evidence.claimIntent, 'closeout-only');
   assert.equal(landedClaim.parsed.evidence.claimIntentResolution.reason, 'deliverables-already-in-head');
   assert.deepEqual(landedClaim.parsed.evidence.claimIntentResolution.deliverablesTrackedInHead, ['src/already-landed.ts']);
-  runAtm(['tasks', 'release', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--reason', 'fixture reset', '--json']);
+  runAtm(['tasks', 'release', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0004', '--actor', 'captain', '--reason', 'fixture reset', '--json']);
 
   writeFileSync(path.join(workspace, 'src', 'already-landed.ts'), 'export const alreadyLanded = false;\n');
   const reclaimedTaskPath = path.join(workspace, '.atm', 'history', 'tasks', 'TASK-MAO-AUTO-0002.json');
   const reclaimedTaskBefore = JSON.parse(readFileSync(reclaimedTaskPath, 'utf8'));
   reclaimedTaskBefore.status = 'ready';
   writeFileSync(reclaimedTaskPath, `${JSON.stringify(reclaimedTaskBefore, null, 2)}\n`);
-  const reclaimedWrite = runAtm(['next', '--cwd', workspace, '--claim', '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--claim-intent', 'write', '--json']);
+  const reclaimedWrite = runAtm(['tasks', 'claim', '--cwd', workspace, '--task', 'TASK-MAO-AUTO-0002', '--actor', 'captain', '--claim-intent', 'write', '--files', 'src/already-landed.ts', '--json']);
   assert.equal(reclaimedWrite.exitCode, 0, reclaimedWrite.stderr || reclaimedWrite.stdout);
-  assert.equal(reclaimedWrite.parsed.evidence.nextAction.claimIntent, 'write');
+  assert.equal(reclaimedWrite.parsed.evidence.claimIntent, 'write');
   const reclaimedTask = JSON.parse(readFileSync(reclaimedTaskPath, 'utf8'));
   assert.equal(reclaimedTask.claim?.intent, 'write');
 
@@ -125,10 +139,10 @@ function writeTaskCard(targetPath: string, taskId: string, title: string, delive
 function importAndPrepareTask(taskId: string, taskPath: string) {
   const imported = runAtm(['tasks', 'import', '--cwd', workspace, '--from', relativePathFrom(workspace, taskPath), '--write', '--json']);
   assert.equal(imported.exitCode, 0, imported.stderr || imported.stdout);
-  const reserved = runAtm(['tasks', 'reserve', '--cwd', workspace, '--task', taskId, '--actor', 'captain', '--json']);
-  assert.equal(reserved.exitCode, 0, reserved.stderr || reserved.stdout);
-  const promoted = runAtm(['tasks', 'promote', '--cwd', workspace, '--task', taskId, '--actor', 'captain', '--json']);
-  assert.equal(promoted.exitCode, 0, promoted.stderr || promoted.stdout);
+  const taskLedgerPath = path.join(workspace, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const taskDocument = JSON.parse(readFileSync(taskLedgerPath, 'utf8'));
+  taskDocument.status = 'ready';
+  writeFileSync(taskLedgerPath, `${JSON.stringify(taskDocument, null, 2)}\n`);
 }
 
 function relativePathFrom(fromRoot: string, targetPath: string): string {

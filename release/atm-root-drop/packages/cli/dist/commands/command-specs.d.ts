@@ -46,6 +46,7 @@ export declare const commandSpecs: Readonly<{
     orient: import("./shared.ts").CommandSpec;
     police: import("./shared.ts").CommandSpec;
     quickfix: import("./shared.ts").CommandSpec;
+    residue: import("./shared.ts").CommandSpec;
     rescue: Readonly<import("./shared.ts").CommandSpec & {
         visibility: "public" | "internal";
     }>;

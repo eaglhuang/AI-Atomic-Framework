@@ -186,7 +186,7 @@ function normalizeWorkspaceResidueFinding(cwd: string, filePath: string, finding
       cleanupAction: 'remove'
     };
   }
-  if (/^\.atm\/runtime\/(?:git-push-attempts|broker-conflict-resolutions)\//i.test(normalized)
+  if (/^\.atm\/runtime\/(?:git-push-attempts|broker-conflict-resolutions|broker-intents)\//i.test(normalized)
     || /^\.atm\/runtime\/(?:broker-shared-surface-freezes\.json|framework-lock-auto-reconcile\.jsonl)$/i.test(normalized)) {
     return {
       path: normalized,

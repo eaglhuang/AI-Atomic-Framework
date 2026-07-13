@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { computeMissingValidatorReport } from '../evidence.ts';
+import { ATM_INDEX_FOREIGN_ACTIVE_STAGED } from '../git-index-ownership.ts';
 import { readActiveTaskDirectionLocks } from '../task-direction.ts';
 import { normalizeTaskId } from '../tasks/task-import-validators.ts';
 import { normalizeRelativePath } from '../tasks/task-file-io-helpers.ts';
@@ -184,8 +185,8 @@ function buildUnexpectedStagedTasks(input: {
   return [...grouped.entries()].map(([foreignTaskId, files]) => ({
     taskId: foreignTaskId,
     stagedFiles: uniqueStrings(files),
-    restoreChoice: `Do not silently unstage ${foreignTaskId}. Either wait for that agent to commit, or run git restore --staged on only those paths and confirm the other agent can restage their close bundle afterward.`,
-    deferCommand: `git restore --staged ${files.map((entry) => JSON.stringify(entry)).join(' ')}`
+    restoreChoice: `Do not silently unstage ${foreignTaskId}. Wait for the owner, request a Broker index lane, or use an explicit ATM stage-override lease if the human approved disrupting another active agent.`,
+    deferCommand: `node atm.mjs git lease stage-override --task ${input.taskId} --actor <actor-id> --paths ${files.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`
   }));
 }
 
@@ -226,7 +227,7 @@ function buildUnexpectedNonBundleStagedFiles(input: {
       repoRoot: repo.repoRoot,
       repoKind: repo.repoKind,
       stagedFiles: uniqueStrings(unexpected),
-      restoreCommand: `git -C ${JSON.stringify(repo.repoRoot)} restore --staged -- ${unexpected.map((entry) => JSON.stringify(entry)).join(' ')}`,
+      restoreCommand: `node atm.mjs git lease stage-override --task ${input.taskId} --actor <actor-id> --paths ${unexpected.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`,
       deferredForeignFiles
     });
   }
@@ -293,8 +294,8 @@ function buildScopeDirtyBlocker(input: {
       },
       {
         id: 'restore-accidental-drift',
-        summary: 'If the drift is accidental, restore only the listed in-scope files with a scoped git restore (never broad checkout -- .).',
-        requiredCommand: `git restore -- ${input.dirtyGuard.scopeTrackedDirtyFiles.map((entry) => JSON.stringify(entry)).join(' ')}`
+        summary: 'If the drift is accidental, do not run raw git restore; request an explicit ATM destructive-override lease before any worktree mutation.',
+        requiredCommand: `node atm.mjs git lease destructive-override --task ${input.taskId} --actor ${input.actorId} --paths ${input.dirtyGuard.scopeTrackedDirtyFiles.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`
       }
     ],
     requiredCommand: input.dirtyGuard.remediation.requiredCommand
@@ -307,8 +308,8 @@ function buildUnexpectedStagedBlocker(unexpectedStagedTasks: readonly Unexpected
   const files = uniqueStrings(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
   return {
     id: 'unexpectedStagedTasks',
-    code: 'ATM_TASKFLOW_PRECLOSE_FOREIGN_STAGED_TASKS',
-    summary: `Git index contains staged governance files for other tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless foreign bundles are deferred or committed separately.`,
+    code: ATM_INDEX_FOREIGN_ACTIVE_STAGED,
+    summary: `Git index contains staged governance files for other active tasks (${taskIds.join(', ')}). taskflow close --write will fail index isolation unless the owner commits, Broker grants an index lane, or an explicit stage-override lease is supplied.`,
     files,
     taskIds,
     remediationChoices: unexpectedStagedTasks.map((entry) => ({

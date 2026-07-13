@@ -178,6 +178,7 @@ export declare function parseOptions(argv: string[], commandName: string): {
         evidence?: string;
         verify: boolean;
         claim: boolean;
+        apply: boolean;
         dryRun: boolean;
         force: boolean;
         adopt?: string;
