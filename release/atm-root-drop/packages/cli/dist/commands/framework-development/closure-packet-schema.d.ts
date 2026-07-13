@@ -301,6 +301,17 @@ export declare function createClosurePacket(input: {
 export declare function writeClosurePacket(cwd: string, taskId: string, packet: ClosurePacket): string;
 export type AtmTasksWriteAction = 'tasks-close' | 'tasks-reconcile' | 'tasks-import-write' | 'tasks-repair-closure-write';
 export declare function isRunnerSyncRequired(cwd: string): boolean;
+export declare function inspectRunnerSourceDrift(cwd: string): {
+    schemaId: string;
+    entrypoint: string | null;
+    frozenEntrypoint: boolean;
+    runnerPath: string | null;
+    runnerMtime: string | null;
+    newestSourceMtime: string | null;
+    syncRequired: boolean;
+    advisory: string;
+    syncCommand: "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build";
+};
 export declare function runnerStaleWarningMessage(): string;
 export declare function assertSourceFirstRunnerReadOnlyAction(input: {
     readonly cwd: string;

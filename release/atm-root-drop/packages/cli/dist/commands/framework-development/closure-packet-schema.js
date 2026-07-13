@@ -1497,16 +1497,32 @@ function classifyCliEntrypoint(cwd) {
     return entrypointPath.replace(/\\/g, '/');
 }
 export function isRunnerSyncRequired(cwd) {
+    return inspectRunnerSourceDrift(cwd).syncRequired;
+}
+export function inspectRunnerSourceDrift(cwd) {
     const rootDir = path.resolve(cwd);
     const entrypoint = classifyCliEntrypoint(rootDir);
-    if (!entrypoint || !FROZEN_RUNNER_ENTRYPOINTS.has(entrypoint))
-        return false;
+    const releaseHygienePolicy = describeBuildReleaseHygienePolicy();
+    const nonFrozen = !entrypoint || !FROZEN_RUNNER_ENTRYPOINTS.has(entrypoint);
     const runnerPath = resolveFrozenRunnerPath(rootDir);
-    if (!runnerPath)
-        return false;
-    const newestSource = newestFrameworkSourceMtime(rootDir);
-    const runnerMtime = statSync(runnerPath).mtimeMs;
-    return newestSource > runnerMtime;
+    const newestSourceMtimeMs = newestFrameworkSourceMtime(rootDir);
+    const runnerMtimeMs = runnerPath ? statSync(runnerPath).mtimeMs : 0;
+    const syncRequired = !nonFrozen && Boolean(runnerPath) && newestSourceMtimeMs > runnerMtimeMs;
+    return {
+        schemaId: 'atm.runnerSourceDrift.v1',
+        entrypoint,
+        frozenEntrypoint: !nonFrozen,
+        runnerPath: runnerPath ? relativePathFrom(rootDir, runnerPath) : null,
+        runnerMtime: runnerMtimeMs > 0 ? new Date(runnerMtimeMs).toISOString() : null,
+        newestSourceMtime: newestSourceMtimeMs > 0 ? new Date(newestSourceMtimeMs).toISOString() : null,
+        syncRequired,
+        advisory: syncRequired
+            ? 'Frozen runner is older than framework source files; live CLI behavior may lag source until the runner is rebuilt.'
+            : nonFrozen
+                ? 'Current entrypoint is not the frozen runner; source-first/source-import diagnostics may differ from node atm.mjs.'
+                : 'Frozen runner is not older than framework source files.',
+        syncCommand: releaseHygienePolicy.runnerSyncCommand
+    };
 }
 export function runnerStaleWarningMessage() {
     const releaseHygienePolicy = describeBuildReleaseHygienePolicy();

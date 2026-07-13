@@ -67,6 +67,8 @@ import { checkStartupIntegrity, resolveBundledIntegrityRoot } from './startup-in
 import { runIdentity } from './commands/identity.js';
 import { runBroker } from './commands/broker.js';
 import { runRoute } from './commands/route.js';
+import { inspectRunnerSourceDrift } from './commands/framework-development/closure-packet-schema.js';
+import { describeRunnerMode } from './commands/next/runner-mode.js';
 export const cliCommandRunners = {
     atomize: runAtomize,
     'atm-chart': runATMChart,
@@ -273,13 +275,22 @@ function createGlobalHelpResult(cwd) {
 }
 function createVersionResult(cwd) {
     const version = readFrameworkVersion();
+    const runnerMode = describeRunnerMode(cwd);
+    const runnerSourceDrift = inspectRunnerSourceDrift(cwd);
     return makeResult({
         ok: true,
         command: 'version',
         cwd,
-        messages: [message('info', 'ATM_CLI_VERSION', `ATM framework version ${version}.`)],
+        messages: [
+            message('info', 'ATM_CLI_VERSION', `ATM framework version ${version}.`),
+            ...(runnerSourceDrift.syncRequired
+                ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
+                : [])
+        ],
         evidence: {
-            frameworkVersion: version
+            frameworkVersion: version,
+            runnerMode,
+            runnerSourceDrift
         }
     });
 }

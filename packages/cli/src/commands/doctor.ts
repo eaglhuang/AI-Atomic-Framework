@@ -15,6 +15,7 @@ import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.ts';
 import { inspectTrackedActorRegistryState } from './actor-registry.ts';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 import { detectCrossTaskMutation, readIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+import { inspectRunnerSourceDrift } from './framework-development/closure-packet-schema.ts';
 
 
 const legacyBehaviorPackageNames = [
@@ -91,6 +92,7 @@ export async function runDoctor(argv: readonly string[]) {
   const gitWorktreeReadiness = inspectGitWorktreeReadiness(root);
   const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
   const versionSummary = createATMVersionSummary(root);
+  const runnerSourceDrift = inspectRunnerSourceDrift(root);
   const versionWarnings = createVersionSummaryMessages(versionSummary);
   const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
   const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
@@ -197,6 +199,9 @@ export async function runDoctor(argv: readonly string[]) {
       : 'npm run validate:full';
   const messages = [
     ...versionWarnings,
+    ...(runnerSourceDrift.syncRequired
+      ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
+      : []),
     ...(integrationInstallHint
       ? [message(
         'warning',
@@ -323,6 +328,7 @@ export async function runDoctor(argv: readonly string[]) {
       missingPaths: runtime.missingPaths,
       migrationNeeded: runtime.migrationNeeded,
       versionSummary,
+      runnerSourceDrift,
       integrationBootstrap,
       integrationDriftRemediation: integrationDriftRemediation.failedAdapters.length > 0 ? integrationDriftRemediation : undefined,
       frameworkHookReadiness,

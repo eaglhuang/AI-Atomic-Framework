@@ -405,6 +405,9 @@ assertReadable(version, '--version');
 assert(version.parsed.ok === true, '--version must report ok=true');
 assert(version.parsed.command === 'version', '--version must report version command identity');
 assert(version.parsed.evidence?.frameworkVersion === packageManifest.version, '--version must report package.json version');
+assert(version.parsed.evidence?.runnerMode?.schemaId === 'atm.runnerMode.v1', '--version must include runner mode evidence');
+assert(version.parsed.evidence?.runnerSourceDrift?.schemaId === 'atm.runnerSourceDrift.v1', '--version must include runner source drift evidence');
+assert(typeof version.parsed.evidence?.runnerSourceDrift?.syncCommand === 'string', '--version runner drift evidence must include sync command');
 assertMessageCode(version, 'ATM_CLI_VERSION');
 
 logProgress('global and per-command help snapshots');

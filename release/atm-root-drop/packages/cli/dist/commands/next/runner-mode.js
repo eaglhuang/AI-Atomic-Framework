@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { describeBuildReleaseHygienePolicy } from '../build-release-hygiene.js';
+import { inspectRunnerSourceDrift } from '../framework-development/closure-packet-schema.js';
 import { message } from '../shared.js';
 export function normalizeRelativePath(root, entryPath) {
     const relative = path.relative(root, entryPath).replace(/\\/g, '/');
@@ -29,10 +30,12 @@ export function describeRunnerMode(cwd) {
     const entrypointPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
     const entrypoint = entrypointPath ? normalizeRelativePath(root, entrypointPath) : null;
     const mode = classifyRunnerMode(entrypoint);
+    const sourceDrift = inspectRunnerSourceDrift(cwd);
     return {
         schemaId: 'atm.runnerMode.v1',
         mode,
         entrypoint,
+        sourceDrift,
         normalGovernanceCommand: 'node atm.mjs ...',
         sourceFirstCommand: 'node atm.dev.mjs ...',
         sourceFirstOnlyWhen: 'explicit source-first framework validation is requested for unbuilt source changes',

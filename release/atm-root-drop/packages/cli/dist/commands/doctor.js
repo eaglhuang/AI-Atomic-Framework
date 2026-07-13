@@ -15,6 +15,7 @@ import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
 import { inspectTrackedActorRegistryState } from './actor-registry.js';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.js';
 import { detectCrossTaskMutation, readIncidentFlag } from '../../../core/dist/broker/cross-task-mutation-guard.js';
+import { inspectRunnerSourceDrift } from './framework-development/closure-packet-schema.js';
 const legacyBehaviorPackageNames = [
     'plugin-behavior-atomize',
     'plugin-behavior-compose',
@@ -68,6 +69,7 @@ export async function runDoctor(argv) {
     const gitWorktreeReadiness = inspectGitWorktreeReadiness(root);
     const onboardingLifecycle = checkOnboardingLifecycle(root, runtime);
     const versionSummary = createATMVersionSummary(root);
+    const runnerSourceDrift = inspectRunnerSourceDrift(root);
     const versionWarnings = createVersionSummaryMessages(versionSummary);
     const trustIntegrity = trustMode ? checkStartupIntegrity(resolveBundledIntegrityRoot()) : null;
     const knownBadStatus = knownBadMode ? checkStartupKnownBadVersion() : null;
@@ -163,6 +165,9 @@ export async function runDoctor(argv) {
                                                         : 'npm run validate:full';
     const messages = [
         ...versionWarnings,
+        ...(runnerSourceDrift.syncRequired
+            ? [message('warning', 'ATM_RUNNER_SOURCE_DRIFT', runnerSourceDrift.advisory, runnerSourceDrift)]
+            : []),
         ...(integrationInstallHint
             ? [message('warning', 'ATM_DOCTOR_INTEGRATION_INSTALL_RECOMMENDED', integrationInstallHint.text, integrationInstallHint.data)]
             : []),
@@ -279,6 +284,7 @@ export async function runDoctor(argv) {
             missingPaths: runtime.missingPaths,
             migrationNeeded: runtime.migrationNeeded,
             versionSummary,
+            runnerSourceDrift,
             integrationBootstrap,
             integrationDriftRemediation: integrationDriftRemediation.failedAdapters.length > 0 ? integrationDriftRemediation : undefined,
             frameworkHookReadiness,

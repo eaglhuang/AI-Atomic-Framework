@@ -5,6 +5,17 @@ export declare function describeRunnerMode(cwd: string): {
     schemaId: string;
     mode: RunnerModeClass;
     entrypoint: string | null;
+    sourceDrift: {
+        schemaId: string;
+        entrypoint: string | null;
+        frozenEntrypoint: boolean;
+        runnerPath: string | null;
+        runnerMtime: string | null;
+        newestSourceMtime: string | null;
+        syncRequired: boolean;
+        advisory: string;
+        syncCommand: "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build";
+    };
     normalGovernanceCommand: string;
     sourceFirstCommand: string;
     sourceFirstOnlyWhen: string;
