@@ -24,6 +24,12 @@ import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
 import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+import {
+  ATM_INDEX_FOREIGN_ACTIVE_STAGED,
+  buildForeignActiveStagedDiagnostic,
+  inspectGitIndexOwnership,
+  type GitIndexOwnershipReport
+} from './git-index-ownership.ts';
 
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.ts';
 
@@ -625,6 +631,7 @@ export interface TaskScopedCommitBundleReport {
   readonly commitFiles: readonly string[];
   readonly skippedExternalDirtyFiles: readonly string[];
   readonly unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[];
+  readonly gitIndexOwnership: GitIndexOwnershipReport;
   readonly outOfScopeStagedFiles: readonly string[];
   readonly governanceBundleWarnings: readonly string[];
   readonly blockedCode: string | null;
@@ -729,6 +736,9 @@ export async function runAtmGit(argv: string[]) {
   }
   if (options.action === 'recover-push-fail') {
     return runGitPostPushFailRecovery(options);
+  }
+  if (options.action === 'lease') {
+    return runGitLease(options);
   }
   if (options.action === 'commit') {
     return runGitCommit(options);
@@ -1190,6 +1200,77 @@ function runGitPostPushFailRecovery(options: ParsedGitOptions) {
   });
 }
 
+function runGitLease(options: ParsedGitOptions) {
+  if (!options.actorId?.trim()) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', 'git lease requires --actor.', { exitCode: 2 });
+  }
+  if (!options.taskId?.trim()) {
+    throw new CliError('ATM_TASK_ID_MISSING', 'git lease requires --task.', { exitCode: 2 });
+  }
+  if (!options.leaseKind) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires stage-override or destructive-override.', { exitCode: 2 });
+  }
+  if (options.paths.length === 0) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires --paths.', { exitCode: 2 });
+  }
+  if (!options.overrideReason?.trim()) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires --reason with the human-approved safety rationale.', { exitCode: 2 });
+  }
+  const phrase = options.leaseKind === 'stage-override'
+    ? 'ATM-STAGE-OVERRIDE-I-UNDERSTAND-THIS-MAY-DISRUPT-ANOTHER-ACTIVE-AGENT'
+    : 'ATM-DESTRUCTIVE-GIT-OVERRIDE-I-UNDERSTAND-THIS-CAN-DESTROY-ANOTHER-ACTIVE-AGENT-WORK';
+  const ttlSeconds = Math.max(1, Math.floor(options.ttlSeconds ?? 900));
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + ttlSeconds * 1000);
+  const leaseId = `git-${options.leaseKind}-${shortHash([
+    options.actorId,
+    options.taskId,
+    options.paths.join('\n'),
+    now.toISOString()
+  ].join('\n'))}`;
+  const leasePath = `.atm/runtime/git-index-leases/${leaseId}.json`;
+  const lease = {
+    schemaId: 'atm.gitIndexOverrideLease.v1',
+    leaseId,
+    kind: options.leaseKind,
+    permission: options.leaseKind === 'stage-override'
+      ? 'git.index.stageOverride'
+      : 'git.index.destructiveOverride',
+    actorId: options.actorId,
+    taskId: options.taskId.toUpperCase(),
+    paths: uniqueSorted(options.paths),
+    phrase,
+    chatTextAccepted: false,
+    ttlSeconds,
+    singleUse: true,
+    used: false,
+    createdAt: now.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+    reason: options.overrideReason,
+    auditRequirement: options.leaseKind === 'stage-override'
+      ? 'Write stage override audit before mutating any foreign-active staged entry.'
+      : 'Write destructive override audit before worktree/index mutation; include before/after status, index hash, blob IDs, rollback result, and human reason.'
+  };
+  mkdirSync(path.dirname(path.join(options.cwd, leasePath)), { recursive: true });
+  writeFileSync(path.join(options.cwd, leasePath), `${JSON.stringify(lease, null, 2)}\n`, 'utf8');
+  return makeResult({
+    ok: true,
+    command: 'git',
+    cwd: options.cwd,
+    messages: [message('info', 'ATM_GIT_INDEX_OVERRIDE_LEASE_CREATED', `Created ${options.leaseKind} Git index override lease.`, {
+      leaseId,
+      leasePath,
+      expiresAt: lease.expiresAt,
+      chatTextAccepted: false
+    })],
+    evidence: {
+      action: 'lease',
+      lease,
+      leasePath
+    }
+  });
+}
+
 function resolveGitAdmissionStewardAction(options: ParsedGitOptions, result: ReturnType<typeof evaluateGitAdmission>) {
   if (!options.stewardPlan && !options.applyToWorkingTree) {
     return null;
@@ -1298,7 +1379,7 @@ function buildGitAdmissionComposerInput(options: ParsedGitOptions, result: Retur
     intent: `Merge remote composer-routed JSON mutations for ${filePath} into the local working tree without auto-commit.`,
     patch,
     validators: [],
-    rollback: `git restore -- ${quoteCliValue(filePath)}`
+    rollback: `node atm.mjs git lease destructive-override --task ${quoteCliValue(options.taskId ?? `git-admit-${result.topology.branch}`)} --actor ${quoteCliValue(options.actorId!)} --paths ${quoteCliValue(filePath)} --reason "<human-approved rollback reason>" --json`
   };
   return { proposal };
 }
@@ -2367,7 +2448,8 @@ function runGitCommit(options: ParsedGitOptions) {
 
 interface ParsedGitOptions {
   readonly cwd: string;
-  readonly action: 'prepare' | 'admit' | 'push' | 'recover-push-fail' | 'check' | 'commit' | 'record-commit' | 'commit-status';
+  readonly action: 'prepare' | 'admit' | 'push' | 'recover-push-fail' | 'check' | 'commit' | 'record-commit' | 'commit-status' | 'lease';
+  readonly leaseKind: 'stage-override' | 'destructive-override' | null;
   readonly actorId: string | null;
   readonly taskId: string | null;
   readonly branch: string | null;
@@ -2390,12 +2472,15 @@ interface ParsedGitOptions {
   readonly applyToWorkingTree: boolean;
   readonly extraTrailers: readonly string[];
   readonly timeoutMs: number | null;
+  readonly paths: readonly string[];
+  readonly ttlSeconds: number | null;
 }
 
 function parseGitOptions(argv: string[]): ParsedGitOptions {
   const options = {
     cwd: process.cwd(),
     action: null as ParsedGitOptions['action'] | null,
+    leaseKind: null as ParsedGitOptions['leaseKind'],
     actorId: null as string | null,
     taskId: null as string | null,
     branch: null as string | null,
@@ -2417,7 +2502,9 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     stewardPlan: false,
     applyToWorkingTree: false,
     extraTrailers: [] as string[],
-    timeoutMs: null as number | null
+    timeoutMs: null as number | null,
+    paths: [] as string[],
+    ttlSeconds: null as number | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -2503,6 +2590,21 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
       index += 1;
       continue;
     }
+    if (arg === '--paths') {
+      options.paths = splitCsvPaths(requireValue(argv, index, '--paths'));
+      index += 1;
+      continue;
+    }
+    if (arg === '--ttl-seconds') {
+      const rawTtl = requireValue(argv, index, '--ttl-seconds');
+      const parsedTtl = Number(rawTtl);
+      if (!Number.isFinite(parsedTtl) || parsedTtl <= 0) {
+        throw new CliError('ATM_CLI_USAGE', '--ttl-seconds requires a positive number.', { exitCode: 2 });
+      }
+      options.ttlSeconds = parsedTtl;
+      index += 1;
+      continue;
+    }
     if (arg === '--no-trailers') {
       options.checkTrailers = false;
       continue;
@@ -2548,16 +2650,23 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     if (arg.startsWith('--')) {
       throw new CliError('ATM_CLI_USAGE', `git does not support option ${arg}`, { exitCode: 2 });
     }
+    if (options.action === 'lease' && !options.leaseKind && (arg === 'stage-override' || arg === 'destructive-override')) {
+      options.leaseKind = arg;
+      continue;
+    }
     if (options.action) {
       throw new CliError('ATM_CLI_USAGE', 'git accepts only one action.', { exitCode: 2 });
     }
-    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'push' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status') {
-      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, push, recover-push-fail, check, commit, record-commit, commit-status', { exitCode: 2 });
+    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'push' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status' && arg !== 'lease') {
+      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, push, recover-push-fail, check, commit, record-commit, commit-status, lease', { exitCode: 2 });
     }
     options.action = arg;
   }
   if (!options.action) {
-    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status | lease).', { exitCode: 2 });
+  }
+  if (options.action === 'lease' && !options.leaseKind) {
+    throw new CliError('ATM_CLI_USAGE', 'git lease requires stage-override or destructive-override.', { exitCode: 2 });
   }
   return {
     ...options,
@@ -2992,8 +3101,8 @@ function buildUnexpectedStagedTasksForGitCommit(
     return {
       taskId: foreignTaskId,
       stagedFiles: uniqueFiles,
-      restoreChoice: `Do not silently unstage ${foreignTaskId}. Either wait for that agent to commit, or defer foreign staged files through --defer-foreign-staged and confirm the other agent can restage afterward.`,
-      deferCommand: `${quoteCliValue(resolveGitExecutable())} restore --staged -- ${uniqueFiles.map(quoteCliValue).join(' ')}`
+      restoreChoice: `Do not silently unstage ${foreignTaskId}. Wait for that agent to commit, request a Broker index lane, or use an explicit ATM stage-override lease if the human approved disrupting another active agent.`,
+      deferCommand: `node atm.mjs git lease stage-override --task ${quoteCliValue(taskId)} --actor <actor-id> --paths ${uniqueFiles.map(quoteCliValue).join(',')} --reason "<human-approved reason>" --json`
     };
   });
 }
@@ -3214,6 +3323,11 @@ export function resolveTaskScopedCommitBundle(input: {
     trailers: input.trailers
   });
   let stagedFiles = readStagedFiles(input.cwd);
+  let gitIndexOwnership = inspectGitIndexOwnership({
+    cwd: input.cwd,
+    taskId: input.taskId,
+    stagedFiles
+  });
   let unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
   let protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   const resolutionAuthorizedForeignTaskIds = readResolutionAuthorizedForeignTaskIds(input.cwd, input.brokerConflictResolutionPath ?? null, input.taskId);
@@ -3225,6 +3339,11 @@ export function resolveTaskScopedCommitBundle(input: {
     deferredForeignStagedFiles = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
     deferredForeignStagedSnapshot = deferForeignStagedFiles(input.cwd, input.taskId, unexpectedStagedTasks);
     stagedFiles = readStagedFiles(input.cwd);
+    gitIndexOwnership = inspectGitIndexOwnership({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      stagedFiles
+    });
     unexpectedStagedTasks = buildUnexpectedStagedTasksForGitCommit(input.cwd, input.taskId, declaredScope, stagedFiles);
     protectedForeignStagedOwnershipFiles = buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks);
   }
@@ -3313,9 +3432,13 @@ export function resolveTaskScopedCommitBundle(input: {
   let blockedCode: string | null = null;
   let blockedSummary: string | null = null;
 
-  if (input.deferForeignStaged && protectedForeignStagedOwnershipFiles.length > 0) {
+  if (input.deferForeignStaged && gitIndexOwnership.foreignActiveStaged.length > 0 && !protectedForeignDeferAuthorized) {
+    const diagnostic = buildForeignActiveStagedDiagnostic(gitIndexOwnership);
+    blockedCode = ATM_INDEX_FOREIGN_ACTIVE_STAGED;
+    blockedSummary = `Refusing to unstage/defer foreign-active staged files owned by ${diagnostic.ownerTaskIds.join(', ')}: ${diagnostic.stagedPaths.join(', ')}. Wait for the owner, request a Broker index lane, or use an explicit stage-override lease with human approval.`;
+  } else if (input.deferForeignStaged && protectedForeignStagedOwnershipFiles.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP';
-    blockedSummary = `Refusing to unstage protected .atm/history files that belong to another task: ${protectedForeignStagedOwnershipFiles.join(', ')}. Wait for that task owner to commit/release, or commit this task through the task-scoped bundle without --defer-foreign-staged.`;
+    blockedSummary = `Refusing to unstage protected .atm/history files that belong to another task: ${protectedForeignStagedOwnershipFiles.join(', ')}. Wait for that task owner to commit/release, request a Broker index lane, or use an explicit stage-override lease with human approval.`;
   } else if (blockedResidue.length > 0) {
     blockedCode = 'ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED';
     blockedSummary = `Generated residue belongs to another task/run and must be cleared explicitly: ${blockedResidue.map((entry) => entry.path).join(', ')}`;
@@ -3330,6 +3453,11 @@ export function resolveTaskScopedCommitBundle(input: {
   if (!blockedCode && input.apply && stageCandidates.length > 0) {
     stageTaskScopedBundleFiles(input.cwd, stageCandidates);
     stagedFiles = readStagedFiles(input.cwd);
+    gitIndexOwnership = inspectGitIndexOwnership({
+      cwd: input.cwd,
+      taskId: input.taskId,
+      stagedFiles
+    });
   }
 
   if (unexpectedStagedTasks.length > 0) {
@@ -3353,6 +3481,7 @@ export function resolveTaskScopedCommitBundle(input: {
     commitFiles: commitFilesWithGovernanceEvidence,
     skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),
     unexpectedStagedTasks,
+    gitIndexOwnership,
     outOfScopeStagedFiles: uniqueSorted([...outOfScopeStagedFiles, ...outOfScopeStagedDeletions]),
     governanceBundleWarnings,
     blockedCode,
@@ -3768,6 +3897,13 @@ function extractStringList(value: unknown): readonly string[] {
   return Array.isArray(value)
     ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
     : [];
+}
+
+function splitCsvPaths(value: string): string[] {
+  return [...uniqueSorted(value
+    .split(',')
+    .map((entry) => entry.trim().replace(/^"|"$/g, '').replace(/^'|'$/g, ''))
+    .filter(Boolean))];
 }
 
 function uniqueSorted(values: readonly string[]): readonly string[] {

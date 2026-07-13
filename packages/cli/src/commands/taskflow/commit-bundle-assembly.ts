@@ -335,7 +335,7 @@ function verifyRepoIndexIsolation(
   const nextRepo = { ...repo, indexIsolation: isolation };
   if (strict && !isolation.verified) {
     const restoreCommand = isolation.unexpectedStagedFiles.length > 0
-      ? `git restore --staged -- ${isolation.unexpectedStagedFiles.map((entry) => JSON.stringify(entry)).join(' ')}`
+      ? `node atm.mjs git lease stage-override --task <task-id> --actor <actor-id> --paths ${isolation.unexpectedStagedFiles.map((entry) => JSON.stringify(entry)).join(',')} --reason "<human-approved reason>" --json`
       : null;
     throw new CliError('ATM_TASKFLOW_CLOSE_INDEX_NOT_ISOLATED', `taskflow close ${phase} index isolation failed; unexpected staged files would be included in the governed commit.`, {
       exitCode: 1,

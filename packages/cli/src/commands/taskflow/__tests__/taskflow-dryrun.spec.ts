@@ -2009,8 +2009,8 @@ assert.ok(
   'dry-run writeReadinessHint must surface non-bundle staged blockers'
 );
 assert.ok(
-  preCloseNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.restoreCommand?.includes('restore --staged'),
-  'non-bundle staged remediation must include git restore --staged command'
+  preCloseNonBundle.evidence.historicalClosePreflight.unexpectedNonBundleStaged[0]?.restoreCommand?.includes('git lease stage-override'),
+  'non-bundle staged remediation must route through ATM stage-override lease, not raw git restore --staged'
 );
 
 const preCloseMixed = await runTaskflow([

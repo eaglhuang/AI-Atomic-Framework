@@ -63,6 +63,7 @@ import {
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/src/broker/proposal.ts';
 import { planSharedSurfaceAcquisition, type SharedSurfaceQueue } from '../../../core/src/broker/shared-surface-queue.ts';
+import { inspectGitIndexOwnership, type GitIndexOwnershipReport } from './git-index-ownership.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -2376,6 +2377,10 @@ async function buildTeamPlanningContext(input: {
     writePaths
   });
   const brokerLane = brokerLanePlan.evidence;
+  const gitIndexOwnership = inspectGitIndexOwnership({
+    cwd: input.cwd,
+    taskId: input.taskId
+  });
   const claimAdmissionFindings = buildTeamClaimAdmissionFindings(input.cwd, input.taskId, task);
   const validation = mergeValidation(
     permissionValidation,
@@ -2391,6 +2396,7 @@ async function buildTeamPlanningContext(input: {
     writePaths,
     validation,
     brokerLane,
+    gitIndexOwnership,
     allowEmptyWriteScope: writeScope.allowEmptyWriteScope,
     requestedTeamSize: input.requestedTeamSize,
     providerSelectionConfig: input.providerSelectionConfig?.config ?? null,
@@ -3021,6 +3027,7 @@ export function buildTeamPlan(input: {
   writePaths: string[];
   validation: { ok: boolean; findings: PermissionFinding[] };
   brokerLane: TeamBrokerLaneEvidence;
+  gitIndexOwnership?: GitIndexOwnershipReport;
   allowEmptyWriteScope?: boolean;
   requestedTeamSize?: string;
   providerSelectionConfig?: TeamProviderSelectionConfig | null;
@@ -3076,6 +3083,14 @@ export function buildTeamPlan(input: {
     escalationTarget: governanceRuntime.escalationTarget,
     providerSelectionSource: input.providerSelectionSource ?? null,
     brokerLane: input.brokerLane,
+    indexLane: input.gitIndexOwnership?.indexLane ?? {
+      schemaId: 'atm.gitIndexLane.v1',
+      status: 'free',
+      ownerTaskId: null,
+      ownerActorId: null,
+      reason: 'Git index ownership was not inspected for this team plan.'
+    },
+    gitIndexOwnership: input.gitIndexOwnership ?? null,
     agents: activeRecipe.agents,
     captainDecision,
     implementerSelector,

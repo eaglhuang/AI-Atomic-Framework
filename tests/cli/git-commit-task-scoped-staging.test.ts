@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import { resolveTaskScopedCommitBundle, runAtmGit } from '../../packages/cli/src/commands/git-governance.ts';
+import { inspectGitIndexOwnership } from '../../packages/cli/src/commands/git-index-ownership.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const tempDir = path.resolve(root, '.atm-temp-test-git-commit-task-scoped-staging');
@@ -65,6 +66,7 @@ try {
 
   const taskId = 'TASK-GIT-STAGING-0141';
   const foreignTaskId = 'TASK-FOREIGN-0001';
+  const foreignActiveTaskId = 'TASK-FOREIGN-ACTIVE-0002';
   const scopedFile = 'src/task-scoped-staging.ts';
   const sessionId = 'session-git-staging-0141';
   const leaseId = 'lease-git-staging-0141';
@@ -126,6 +128,7 @@ try {
       status: 'active'
     }
   });
+
   runGit(tempDir, ['add', '.atm/runtime/locks/TASK-UNRELATED-LOCK.lock.json']);
   runGit(tempDir, ['commit', '-m', 'chore: add unrelated active direction lock fixture']);
 
@@ -300,6 +303,7 @@ try {
   runGit(tempDir, ['restore', '--staged', '--', foreignEvidence]);
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer";\n', 'utf8');
+  runGit(tempDir, ['add', scopedFile]);
   const bundle = resolveTaskScopedCommitBundle({
     cwd: tempDir,
     taskId,
@@ -487,6 +491,85 @@ try {
   assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(scopedFile), true);
   assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(unrelatedStagedFile), false);
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(unrelatedStagedFile), true);
+
+  runGit(tempDir, ['restore', '--staged', '--', unrelatedStagedFile]);
+  const foreignActiveFile = 'src/foreign-active.ts';
+  mkdirSync(path.join(tempDir, path.dirname(foreignActiveFile)), { recursive: true });
+  writeFileSync(path.join(tempDir, foreignActiveFile), 'export const foreignActive = true;\n', 'utf8');
+  writeJson(path.join(tempDir, `.atm/history/tasks/${foreignActiveTaskId}.json`), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: foreignActiveTaskId,
+    status: 'running',
+    claim: {
+      actorId: 'other-agent',
+      leaseId: 'lease-foreign-active',
+      state: 'active',
+      files: [foreignActiveFile]
+    }
+  });
+  writeJson(path.join(tempDir, `.atm/runtime/locks/${foreignActiveTaskId}.lock.json`), {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: foreignActiveTaskId,
+    lockedBy: 'other-agent',
+    actorId: 'other-agent',
+    leaseId: 'lease-foreign-active',
+    lockedAt: '2026-06-18T00:00:00.000Z',
+    heartbeatAt: '2026-06-18T00:00:00.000Z',
+    ttlSeconds: 999999999,
+    status: 'active',
+    files: [foreignActiveFile],
+    taskDirectionLock: {
+      schemaId: 'atm.taskDirectionLock.v1',
+      specVersion: '0.1.0',
+      taskId: foreignActiveTaskId,
+      batchId: null,
+      scopeKey: null,
+      queueId: null,
+      queueIndex: null,
+      allowedFiles: [foreignActiveFile],
+      planningReadOnlyPaths: [],
+      planningMirrorPaths: [],
+      allowPlanningMirror: false,
+      promptHash: null,
+      actorId: 'other-agent',
+      createdAt: '2026-06-18T00:00:00.000Z',
+      status: 'active'
+    }
+  });
+  runGit(tempDir, ['add', foreignActiveFile]);
+  const ownership = inspectGitIndexOwnership({ cwd: tempDir, taskId, stagedFiles: [foreignActiveFile] });
+  assert.equal(ownership.indexLane.status, 'blocked-foreign-active-staged');
+  assert.equal(ownership.foreignActiveStaged[0]?.ownerTaskId, foreignActiveTaskId);
+  assert.equal(ownership.foreignActiveStaged[0]?.ownerActorId, 'other-agent');
+  const foreignActiveBundle = resolveTaskScopedCommitBundle({
+    cwd: tempDir,
+    taskId,
+    taskDocument,
+    apply: false,
+    autoStage: false,
+    deferForeignStaged: true,
+    message: 'feat: refuse foreign active defer',
+    actorId: 'fixture-agent',
+    trailers: []
+  });
+  assert.equal(foreignActiveBundle.ok, false);
+  assert.equal(foreignActiveBundle.blockedCode, 'ATM_INDEX_FOREIGN_ACTIVE_STAGED');
+  assert.equal(foreignActiveBundle.gitIndexOwnership.indexLane.status, 'blocked-foreign-active-staged');
+  const stageOverrideLease = await runAtmGit([
+    'lease',
+    'stage-override',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--paths', foreignActiveFile,
+    '--reason', 'Human approved fixture-only staged index lease.',
+    '--json'
+  ]) as any;
+  assert.equal(stageOverrideLease.ok, true);
+  assert.equal(stageOverrideLease.evidence.lease.chatTextAccepted, false);
+  assert.equal(stageOverrideLease.evidence.lease.kind, 'stage-override');
+  assert.equal(existsSync(path.join(tempDir, stageOverrideLease.evidence.leasePath)), true);
 
   console.log('[git-commit-task-scoped-staging] ok');
 } finally {

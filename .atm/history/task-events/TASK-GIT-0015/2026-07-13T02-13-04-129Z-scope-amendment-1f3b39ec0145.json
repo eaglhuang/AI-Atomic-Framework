@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T02-13-04-129Z-scope-amendment-1f3b39ec0145",
+  "taskId": "TASK-GIT-0015",
+  "action": "scope-amendment",
+  "actorId": "codex-backlog-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0015.json",
+  "taskSha256": "sha256:c8124f75b3a99ea91a487d3fe7004cce584265595efdbeef970e6a5b02380509",
+  "createdAt": "2026-07-13T02:13:04.129Z",
+  "command": "node atm.mjs tasks scope add --task TASK-GIT-0015 --actor codex-backlog-captain --add \"packages/cli/src/commands/taskflow/close-preflight.ts,packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts\" --reason \"Update taskflow pre-close staged-index remediation and regression for TASK-GIT-0015.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Update taskflow pre-close staged-index remediation and regression for TASK-GIT-0015."
+  }
+}
