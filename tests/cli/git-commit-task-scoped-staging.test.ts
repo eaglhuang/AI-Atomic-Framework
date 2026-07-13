@@ -249,6 +249,62 @@ try {
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
   rmSync(path.join(tempDir, outsideFile), { force: true });
 
+  // ATM-BUG-2026-07-13-177: framework temp-claim commits must not absorb ordinary-unowned staged files.
+  const frameworkClaimedFile = 'docs/framework-claimed.md';
+  const frameworkForeignStagedFile = 'packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts';
+  writeJson(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: 'ATM-FRAMEWORK-TEMP-fixture-agent',
+    lockedBy: 'fixture-agent',
+    actorId: 'fixture-agent',
+    leaseId: 'lease-framework-fixture',
+    lockedAt: '2026-07-13T00:00:00.000Z',
+    heartbeatAt: '2026-07-13T00:00:00.000Z',
+    ttlSeconds: 999999999,
+    status: 'active',
+    files: [frameworkClaimedFile]
+  });
+  mkdirSync(path.join(tempDir, path.dirname(frameworkClaimedFile)), { recursive: true });
+  mkdirSync(path.join(tempDir, path.dirname(frameworkForeignStagedFile)), { recursive: true });
+  writeFileSync(path.join(tempDir, frameworkClaimedFile), '# framework claim\n', 'utf8');
+  writeFileSync(path.join(tempDir, frameworkForeignStagedFile), 'export const frameworkForeignStaged = true;\n', 'utf8');
+  runGit(tempDir, ['add', frameworkClaimedFile, frameworkForeignStagedFile]);
+  const frameworkAmbiguous = expectCliError(
+    runAtmGit([
+      'commit',
+      '--cwd', tempDir,
+      '--actor', 'fixture-agent',
+      '--message', 'docs: framework claim without defer',
+      '--auto-stage',
+      '--json'
+    ]),
+    'ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS'
+  );
+  const frameworkAmbiguousDetails = (await frameworkAmbiguous).details ?? {};
+  assert.ok(String(frameworkAmbiguousDetails.requiredCommand).includes('--defer-foreign-staged'));
+  assert.ok(
+    Array.isArray(frameworkAmbiguousDetails.outOfScopeStagedFiles)
+    && frameworkAmbiguousDetails.outOfScopeStagedFiles.includes(frameworkForeignStagedFile)
+  );
+  const frameworkCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--message', 'docs: framework scoped claim',
+    '--auto-stage',
+    '--defer-foreign-staged',
+    '--json'
+  ]);
+  assert.equal(frameworkCommit.ok, true);
+  const frameworkClaimHead = runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.equal(frameworkClaimHead.includes(frameworkClaimedFile), true, 'framework claim file must be included');
+  assert.equal(frameworkClaimHead.includes(frameworkForeignStagedFile), false, 'framework claim commits must exclude ordinary out-of-claim staged files');
+  assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(frameworkForeignStagedFile), true, 'framework claim commits must leave out-of-claim staged files staged for their owner');
+  runGit(tempDir, ['restore', '--staged', '--', frameworkForeignStagedFile]);
+  rmSync(path.join(tempDir, frameworkForeignStagedFile), { force: true });
+  rmSync(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), { force: true });
+
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "queue";\n', 'utf8');
   const branchRef = runGit(tempDir, ['symbolic-ref', '-q', 'HEAD']).trim();
   const branchQueueLockPath = path.join(tempDir, '.atm/runtime/locks', `git-commit-queue-${branchRef.replace(/[^A-Za-z0-9._-]+/g, '-')}.lock`);
@@ -301,6 +357,29 @@ try {
   assert.equal(runGit(tempDir, ['show', '--stat', '--oneline', 'HEAD']).includes(foreignEvidence), false);
   assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(foreignEvidence), true);
   runGit(tempDir, ['restore', '--staged', '--', foreignEvidence]);
+
+  writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "ordinary-unowned-staged";\n', 'utf8');
+  const ordinaryUnownedStagedFile = 'packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts';
+  mkdirSync(path.join(tempDir, path.dirname(ordinaryUnownedStagedFile)), { recursive: true });
+  writeFileSync(path.join(tempDir, ordinaryUnownedStagedFile), 'export const unrelatedStagedResidue = true;\n', 'utf8');
+  runGit(tempDir, ['add', ordinaryUnownedStagedFile]);
+  const ordinaryUnownedCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--task', taskId,
+    '--session', sessionId,
+    '--message', 'feat: exclude ordinary unowned staged residue',
+    '--auto-stage',
+    '--defer-foreign-staged',
+    '--json'
+  ]);
+  assert.equal(ordinaryUnownedCommit.ok, true);
+  const ordinaryUnownedHead = runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.equal(ordinaryUnownedHead.includes(ordinaryUnownedStagedFile), false, 'ordinary-unowned staged files must stay out of scoped commits even with --defer-foreign-staged');
+  assert.equal(runGit(tempDir, ['diff', '--cached', '--name-only']).includes(ordinaryUnownedStagedFile), true, 'ordinary-unowned staged files must remain staged for the original owner after scoped commit');
+  runGit(tempDir, ['restore', '--staged', '--', ordinaryUnownedStagedFile]);
+  rmSync(path.join(tempDir, ordinaryUnownedStagedFile), { force: true });
 
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "defer";\n', 'utf8');
   runGit(tempDir, ['add', scopedFile]);

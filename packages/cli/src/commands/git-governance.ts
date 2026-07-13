@@ -1977,19 +1977,21 @@ function runGitCommit(options: ParsedGitOptions) {
   const autoStagedFrameworkPaths = options.taskId === null && options.autoStage
     ? autoStageFrameworkClaimFiles(options.cwd, actorId, !options.dryRun)
     : [];
+  let frameworkClaimCommitFiles: readonly string[] = [];
   if (options.taskId === null) {
     const frameworkStagingInspection = inspectFrameworkScopedUnstagedCommit(options.cwd, actorId);
     if (options.dryRun && options.autoStage) {
-      if (frameworkStagingInspection?.kind === 'mixed-scope') {
+      if (frameworkStagingInspection?.kind === 'mixed-scope' && !options.deferForeignStaged) {
         throw new CliError(
           'ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS',
-          'git commit found unstaged framework-claim changes mixed with already staged out-of-claim files; stage only the claim scope or reset the foreign staged files before retrying.',
+          'git commit found staged out-of-claim files on a framework claim; pass --defer-foreign-staged to commit only the claim scope while leaving foreign staged files untouched, or stage only the claim scope before retrying.',
           {
             exitCode: 1,
             details: {
               actorId,
               inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
-              outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles
+              outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles,
+              requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --message ${quoteCliValue(options.message)} --auto-stage --defer-foreign-staged --json`
             }
           }
         );
@@ -2001,7 +2003,10 @@ function runGitCommit(options: ParsedGitOptions) {
         messages: [message('info', 'ATM_GIT_COMMIT_FRAMEWORK_DRY_RUN', 'git commit dry-run for the active framework claim resolved the governed commit surface without mutating the index.', {
           actorId,
           frameworkClaimFiles: readActiveFrameworkClaimFiles(options.cwd, actorId),
-          autoStageCandidates: autoStagedFrameworkPaths
+          autoStageCandidates: autoStagedFrameworkPaths,
+          outOfScopeStagedFiles: frameworkStagingInspection?.kind === 'mixed-scope'
+            ? frameworkStagingInspection.outOfScopeStagedFiles
+            : []
         })],
         evidence: {
           action: 'commit',
@@ -2035,18 +2040,33 @@ function runGitCommit(options: ParsedGitOptions) {
         }
       );
     }
-    if (frameworkStagingInspection?.kind === 'mixed-scope') {
+    if (frameworkStagingInspection?.kind === 'mixed-scope' && !options.deferForeignStaged) {
+      // ATM-BUG-2026-07-13-177: fail closed on ordinary-unowned / out-of-claim staged
+      // files unless the operator explicitly opts into claim-isolated commit.
       throw new CliError(
         'ATM_GIT_COMMIT_FRAMEWORK_STAGING_AMBIGUOUS',
-        'git commit found unstaged framework-claim changes mixed with already staged out-of-claim files; stage only the claim scope or reset the foreign staged files before retrying.',
+        'git commit found staged out-of-claim files on a framework claim; pass --defer-foreign-staged to commit only the claim scope while leaving foreign staged files untouched, or stage only the claim scope before retrying.',
         {
           exitCode: 1,
           details: {
             actorId,
             inScopeDirtyFiles: frameworkStagingInspection.inScopeDirtyFiles,
-            outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles
+            outOfScopeStagedFiles: frameworkStagingInspection.outOfScopeStagedFiles,
+            requiredCommand: `node atm.mjs git commit --actor ${quoteCliValue(actorId)} --message ${quoteCliValue(options.message)} --auto-stage --defer-foreign-staged --json`
           }
         }
+      );
+    }
+    const claimedFiles = new Set(readActiveFrameworkClaimFiles(options.cwd, actorId));
+    if (claimedFiles.size > 0) {
+      // Always isolate framework-claim commits to claim-allowed staged files so the
+      // live index cannot absorb ordinary-unowned or out-of-claim staged residue.
+      const releaseGeneratedArtifacts = readReleaseGeneratedArtifactPaths(options.cwd);
+      frameworkClaimCommitFiles = uniqueSorted(
+        readStagedFiles(options.cwd).filter((filePath) =>
+          isIgnorableFrameworkCommitStagingSideEffect(filePath)
+          || isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)
+        )
       );
     }
   }
@@ -2160,18 +2180,19 @@ function runGitCommit(options: ParsedGitOptions) {
           actorId,
           trailers
         }).commitFiles
-        : [];
+        : frameworkClaimCommitFiles;
       const autoStagedActorRegistryPath = options.taskId === null
         ? stageTrackedActorRegistryIfNeeded(options.cwd)
         : null;
-      const preStagedEvidence = !options.noVerify && bundleFiles.length === 0
+      const scopedCommitFiles = bundleFiles.length > 0 ? bundleFiles : frameworkClaimCommitFiles;
+      const preStagedEvidence = !options.noVerify && scopedCommitFiles.length === 0
         ? ensureGovernedGitHeadEvidenceStagedForCommit(
           options.cwd,
           actorId
         )
         : null;
-      const stagedCommitSurface = bundleFiles.length > 0 ? bundleFiles : readStagedFiles(options.cwd);
-      if (!options.noVerify && bundleFiles.length === 0 && shouldStageGovernedGitHeadEvidenceBeforeCommit(stagedCommitSurface) && !preStagedEvidence) {
+      const stagedCommitSurface = scopedCommitFiles.length > 0 ? scopedCommitFiles : readStagedFiles(options.cwd);
+      if (!options.noVerify && scopedCommitFiles.length === 0 && shouldStageGovernedGitHeadEvidenceBeforeCommit(stagedCommitSurface) && !preStagedEvidence) {
         throw new CliError('ATM_GIT_COMMIT_GIT_HEAD_PREPARE_FAILED', 'ATM could not pre-stage git-head evidence for this governed commit.', {
           exitCode: 1,
           details: {
@@ -2211,8 +2232,8 @@ function runGitCommit(options: ParsedGitOptions) {
         copyableCommitCommand: rawCopyableCommitCommand,
         liveIndexResidueRollback: []
       });
-      if (bundleFiles.length > 0) {
-        withTaskScopedCommitIndex(options.cwd, bundleFiles, actorId, (scopedEnv) => {
+      if (scopedCommitFiles.length > 0) {
+        withTaskScopedCommitIndex(options.cwd, scopedCommitFiles, actorId, (scopedEnv) => {
           runCommit({
             ...commitEnv,
             ...scopedEnv
@@ -3220,8 +3241,17 @@ function deferForeignStagedFiles(
   taskId: string,
   unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[]
 ): string | null {
-  if (unexpectedStagedTasks.length === 0) return null;
   const files = uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles));
+  return deferStagedFilePaths(cwd, taskId, files);
+}
+
+function deferStagedFilePaths(
+  cwd: string,
+  taskId: string,
+  filesInput: readonly string[]
+): string | null {
+  const files = uniqueSorted(filesInput.map(normalizeRelativePath).filter(Boolean));
+  if (files.length === 0) return null;
   const snapshotPath = `.atm/runtime/snapshots/foreign-staged-${taskId}-${Date.now()}.json`;
   mkdirSync(path.dirname(path.join(cwd, snapshotPath)), { recursive: true });
   writeFileSync(path.join(cwd, snapshotPath), `${JSON.stringify({
@@ -3823,13 +3853,22 @@ function inspectFrameworkScopedUnstagedCommit(cwd: string, actorId: string): Fra
     isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)
   ));
   const unstagedInScopeDirtyFiles = inScopeDirtyFiles.filter((filePath) => !stagedFiles.includes(filePath));
-  if (unstagedInScopeDirtyFiles.length === 0) {
-    return null;
-  }
+  // ATM-BUG-2026-07-13-177: even when claim dirty files are already staged, still
+  // surface already-staged out-of-claim files so live-index commits cannot absorb them.
   const outOfScopeStagedFiles = stagedFiles.filter((filePath) =>
     !isIgnorableFrameworkCommitStagingSideEffect(filePath)
     && !isFrameworkGeneratedArtifactAllowed(filePath, claimedFiles, releaseGeneratedArtifacts)
   );
+  if (unstagedInScopeDirtyFiles.length === 0) {
+    if (outOfScopeStagedFiles.length > 0) {
+      return {
+        kind: 'mixed-scope',
+        inScopeDirtyFiles: [],
+        outOfScopeStagedFiles: uniqueSorted(outOfScopeStagedFiles)
+      };
+    }
+    return null;
+  }
   if (outOfScopeStagedFiles.length > 0) {
     return {
       kind: 'mixed-scope',
