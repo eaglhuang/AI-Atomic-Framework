@@ -129,4 +129,36 @@ function readdirFirstJson(directory: string): string {
   return readdirSync(directory).find((entry) => entry.endsWith('.json')) ?? fail('expected transition event json');
 }
 
-console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror)');
+// TASK-AAO-FABLE-007 — extraction-first import patrol (pure policy regression).
+{
+  const { buildExtractionFirstPatrolDiagnostics, EXTRACTION_FIRST_LINE_BUDGET } = await import('../task-import-validators.ts');
+  const lineCounts: Record<string, number> = {
+    'packages/cli/src/commands/big-module.ts': EXTRACTION_FIRST_LINE_BUDGET + 1,
+    'packages/cli/src/commands/small-module.ts': 42
+  };
+  const resolveLineCount = (relativePath: string) => lineCounts[relativePath] ?? null;
+  const flagged = buildExtractionFirstPatrolDiagnostics({
+    scopePaths: ['packages/cli/src/commands/big-module.ts', 'packages/cli/src/commands/small-module.ts', 'docs/**'],
+    hasExtractionCandidates: false,
+    resolveLineCount
+  });
+  assert(flagged.length === 1, 'oversized scope without extraction candidates must emit exactly one advisory');
+  assert(flagged[0].code === 'ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE', 'patrol must use the dedicated diagnostic code');
+  assert(flagged[0].severity === 'warning', 'extraction-first patrol must stay advisory, never blocking');
+  assert((flagged[0].candidates ?? []).some((entry) => entry.includes('big-module.ts')), 'advisory must name the oversized module');
+  assert(!(flagged[0].candidates ?? []).some((entry) => entry.includes('small-module.ts')), 'modules within budget must not be flagged');
+  const declared = buildExtractionFirstPatrolDiagnostics({
+    scopePaths: ['packages/cli/src/commands/big-module.ts'],
+    hasExtractionCandidates: true,
+    resolveLineCount
+  });
+  assert(declared.length === 0, 'declared extractionCandidates (any disposition) must silence the patrol');
+  const smallOnly = buildExtractionFirstPatrolDiagnostics({
+    scopePaths: ['packages/cli/src/commands/small-module.ts'],
+    hasExtractionCandidates: false,
+    resolveLineCount
+  });
+  assert(smallOnly.length === 0, 'small-module scope must not trigger the patrol');
+}
+
+console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror + extraction-first patrol)');

@@ -1,13 +1,14 @@
 // TASK-RFT-0012: extracted verbatim from packages/cli/src/commands/tasks.ts.
 // The body of runTasksImport lives here; tasks.ts router re-exports it.
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
 import type { ParsedExternalTask } from '@ai-atomic-framework/plugin-sdk';
 import { CliError, makeResult, message, relativePathFrom } from '../shared.ts';
 import { readPluginRegistry } from '../../plugin-registry.ts';
 import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning-repo-root.ts';
 import { assertRunnerFreshForWriteAction } from '../framework-development.ts';
 import { assertEmergencyApproval } from '../emergency/gate.ts';
-import { validateDeliverablesList } from './task-import-validators.ts';
+import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import {
   type TaskImportManifest,
@@ -156,6 +157,30 @@ export async function runTasksImport(argv: string[]) {
     parsed,
     importedAt: generatedAt
   });
+
+  // TASK-AAO-FABLE-007: extraction-first patrol — advisory only.
+  parsed = {
+    ...parsed,
+    tasks: parsed.tasks.map((task) => {
+      const patrol = buildExtractionFirstPatrolDiagnostics({
+        scopePaths: task.scopePaths ?? [],
+        hasExtractionCandidates: Array.isArray(task.atomizationImpact?.extractionCandidates)
+          && task.atomizationImpact.extractionCandidates.length > 0,
+        resolveLineCount: (relativePath) => {
+          try {
+            const absolute = path.join(options.cwd, relativePath);
+            if (!existsSync(absolute) || !statSync(absolute).isFile()) return null;
+            return readFileSync(absolute, 'utf8').split('\n').length;
+          } catch {
+            return null;
+          }
+        }
+      });
+      return patrol.length === 0
+        ? task
+        : { ...task, importDiagnostics: [...(task.importDiagnostics ?? []), ...patrol] };
+    })
+  };
 
   if (parsed.diagnostics.some((entry) => entry.level === 'error') || parsed.tasks.length === 0) {
     if (parsed.tasks.length === 0) {

@@ -75,6 +75,14 @@ export interface TaskImportRecord {
     readonly ownerAtomOrMap?: string | null;
     readonly atomCid?: string | null;
     readonly mapUpdates?: readonly string[];
+    /** TASK-AAO-FABLE-006/007 — extraction-first contract: atoms this card could extract in passing. */
+    readonly extractionCandidates?: readonly {
+      readonly atom?: string;
+      readonly pattern?: string;
+      readonly source?: string;
+      readonly disposition?: string;
+      readonly inlineReason?: string | null;
+    }[];
   };
   readonly proposalAdmission?: {
     readonly trigger: 'not-required' | 'hot-file' | 'same-file-overlap-risk' | 'shared-surface-risk' | 'manual-review-surface';

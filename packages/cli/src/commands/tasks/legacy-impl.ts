@@ -2896,7 +2896,11 @@ function parseSingleCard(input: {
         ?? atomizationImpactFrontMatter.atomCid
         ?? atomizationImpactFrontMatter.atom_cid
       ),
-      mapUpdates
+      mapUpdates,
+      ...(parseExtractionCandidates(
+        atomizationImpactFrontMatter.extractionCandidates
+        ?? atomizationImpactFrontMatter.extraction_candidates
+      ) ?? {})
     },
     ...(proposalAdmission ? { proposalAdmission } : {}),
     legacyImportAliases: {
@@ -2915,6 +2919,25 @@ function parseSingleCard(input: {
     },
     importedAt: input.importedAt
   };
+}
+
+/**
+ * TASK-AAO-FABLE-007 — preserve the extraction-first contract field
+ * `atomizationImpact.extractionCandidates` through import so the patrol and
+ * downstream tools read a structured record instead of re-parsing markdown.
+ */
+function parseExtractionCandidates(value: unknown): { extractionCandidates: readonly Record<string, unknown>[] } | null {
+  if (!Array.isArray(value)) return null;
+  const entries = value
+    .filter((entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object' && !Array.isArray(entry))
+    .map((entry) => ({
+      ...(typeof entry.atom === 'string' ? { atom: entry.atom.trim() } : {}),
+      ...(typeof entry.pattern === 'string' ? { pattern: entry.pattern.trim() } : {}),
+      ...(typeof entry.source === 'string' ? { source: entry.source.trim() } : {}),
+      ...(typeof entry.disposition === 'string' ? { disposition: entry.disposition.trim() } : {}),
+      inlineReason: typeof entry.inlineReason === 'string' ? entry.inlineReason : null
+    }));
+  return entries.length > 0 ? { extractionCandidates: entries } : null;
 }
 
 function buildMechanicalSplitScopeDiagnostics(input: {
@@ -3639,7 +3662,11 @@ export function parseSingleCardFromPlugin(parsed: ParsedExternalTask, importedAt
         ?? atomizationImpactFrontMatter.atomCid
         ?? atomizationImpactFrontMatter.atom_cid
       ),
-      mapUpdates
+      mapUpdates,
+      ...(parseExtractionCandidates(
+        atomizationImpactFrontMatter.extractionCandidates
+        ?? atomizationImpactFrontMatter.extraction_candidates
+      ) ?? {})
     },
     ...(proposalAdmission ? { proposalAdmission } : {}),
     legacyImportAliases: {
