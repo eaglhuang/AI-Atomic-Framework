@@ -136,6 +136,7 @@ import {
 } from './next/planning-root-preference.ts';
 
 const NEXT_LARGE_ARRAY_TRUNCATION_LIMIT = 20;
+const NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS = 30 * 60;
 const NEXT_TRUNCATABLE_FRAMEWORK_STATUS_FIELDS = ['changedFiles', 'criticalChangedFiles', 'docsOnlyChangedFiles'] as const;
 const NEXT_DUPLICATED_TOP_LEVEL_KEYS = [
   'nextAction',
@@ -295,6 +296,7 @@ async function runNextRoute(argv: string[]) {
       actor: options.agent,
       claimIntent,
       autoIntent,
+      forceClaim: Boolean(options.force),
       claimFiles: options.files,
       taskIntent,
       importedTaskQueue,
@@ -657,6 +659,7 @@ async function claimNextImportedTask(input: {
   readonly actor: string | undefined;
   readonly claimIntent?: NextClaimIntent | null;
   readonly autoIntent?: boolean;
+  readonly forceClaim?: boolean;
   readonly claimFiles?: readonly string[];
   readonly taskIntent: TaskIntent | null;
   readonly importedTaskQueue: ImportedTaskQueue;
@@ -910,6 +913,29 @@ async function claimNextImportedTask(input: {
     if (activeBatchClaimDecision?.kind === 'use-queue-head') {
       claimableTask = activeBatchClaimDecision.task;
     }
+  }
+  const freshForeignReservation = inspectFreshTaskReservationForTask(input.cwd, claimableTask, resolvedActor.actorId, Date.now());
+  if (freshForeignReservation && !input.forceClaim) {
+    const activeWorkSummary = buildActiveWorkSummary(input.cwd, resolvedActor.actorId, buildAllowedFilesForTask(claimableTask));
+    const overrideCommand = `node atm.mjs next --claim --actor ${resolvedActor.actorId} --task ${claimableTask.workItemId} --auto-intent --force --json`;
+    throw new CliError('ATM_NEXT_FRESH_FOREIGN_TASK_RESERVED', `Task ${claimableTask.workItemId} was freshly created or imported by ${freshForeignReservation.actorId}; do not auto-claim it as ${resolvedActor.actorId}.`, {
+      exitCode: 1,
+      details: {
+        taskId: claimableTask.workItemId,
+        reservedByActorId: freshForeignReservation.actorId,
+        createdAt: freshForeignReservation.createdAt,
+        importedAt: freshForeignReservation.importedAt,
+        ageSeconds: freshForeignReservation.ageSeconds,
+        ttlSeconds: freshForeignReservation.ttlSeconds,
+        leaseFresh: freshForeignReservation.leaseFresh,
+        files: freshForeignReservation.files,
+        teamLevelRecommendation: activeWorkSummary.teamLevelRecommendation,
+        brokerRecommendation: activeWorkSummary.brokerRecommendation,
+        requiredCommand: `node atm.mjs next --claim --actor ${freshForeignReservation.actorId} --task ${claimableTask.workItemId} --auto-intent --json`,
+        overrideCommand,
+        recoveryHint: 'Ask the creating captain to hand off, wait for the fresh-task reservation TTL to expire, or use Team Broker override before forcing takeover.'
+      }
+    });
   }
   if (normalizeTaskRouteStatus(claimableTask.status) === 'reserved' && !claimableTask.activeClaimActorId) {
     await runTasks([
@@ -4705,6 +4731,18 @@ export interface ActiveWorkSummary {
     readonly leaseFresh: boolean | null;
     readonly files: readonly string[];
   }[];
+  readonly freshReservationCount: number;
+  readonly freshReservations: readonly {
+    readonly taskId: string;
+    readonly title: string;
+    readonly actorId: string;
+    readonly createdAt: string | null;
+    readonly importedAt: string | null;
+    readonly ageSeconds: number;
+    readonly ttlSeconds: number;
+    readonly leaseFresh: boolean;
+    readonly files: readonly string[];
+  }[];
   readonly stagedFiles: readonly string[];
   readonly hasForeignActiveWork: boolean;
   readonly teamLevelRecommendation: {
@@ -4729,6 +4767,7 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
   const normalizedOwnFiles = uniqueSorted(ownFiles.map(normalizeWorkPath).filter(Boolean));
   const activeClaims = readActiveClaimRecords(cwd, now);
   const activeLocks = readActiveLockRecords(cwd, now);
+  const freshReservations = readFreshTaskReservations(cwd, now);
   const stagedFiles = readStagedFiles(cwd);
   const actorMap = new Map<string, { taskIds: Set<string>; files: Set<string> }>();
   for (const claim of activeClaims) {
@@ -4743,6 +4782,12 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
     for (const file of lock.files) bucket.files.add(file);
     actorMap.set(lock.actorId, bucket);
   }
+  for (const reservation of freshReservations) {
+    const bucket = actorMap.get(reservation.actorId) ?? { taskIds: new Set<string>(), files: new Set<string>() };
+    bucket.taskIds.add(reservation.taskId);
+    for (const file of reservation.files) bucket.files.add(file);
+    actorMap.set(reservation.actorId, bucket);
+  }
   const activeActors = [...actorMap.entries()]
     .map(([actorId, value]) => ({
       actorId,
@@ -4756,11 +4801,13 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
     ownFiles: normalizedOwnFiles,
     activeClaims,
     activeLocks,
+    freshReservations,
     stagedFiles,
     foreignActorIds: foreignActors.map((actor) => actor.actorId)
   });
   const reasonParts = [
     ...(foreignActors.length > 0 ? [`${foreignActors.length} other active actor(s): ${foreignActors.map((entry) => entry.actorId).join(', ')}`] : []),
+    ...(freshReservations.length > 0 ? [`${freshReservations.length} fresh task reservation(s) visible`] : []),
     ...(stagedFiles.length > 0 ? [`${stagedFiles.length} staged file(s) present in the shared index`] : [])
   ];
   return {
@@ -4770,6 +4817,8 @@ export function buildActiveWorkSummary(cwd: string, currentActorId?: string | nu
     activeActors,
     activeClaims,
     activeLocks,
+    freshReservationCount: freshReservations.length,
+    freshReservations,
     stagedFiles,
     hasForeignActiveWork,
     teamLevelRecommendation,
@@ -4787,13 +4836,15 @@ function buildTeamLevelRecommendation(input: {
   readonly ownFiles: readonly string[];
   readonly activeClaims: ActiveWorkSummary['activeClaims'];
   readonly activeLocks: ActiveWorkSummary['activeLocks'];
+  readonly freshReservations: ActiveWorkSummary['freshReservations'];
   readonly stagedFiles: readonly string[];
   readonly foreignActorIds: readonly string[];
 }): ActiveWorkSummary['teamLevelRecommendation'] {
   const ownSet = new Set(input.ownFiles);
   const foreignFiles = uniqueSorted([
     ...input.activeClaims.filter((claim) => input.foreignActorIds.includes(claim.actorId)).flatMap((claim) => claim.files),
-    ...input.activeLocks.filter((lock) => input.foreignActorIds.includes(lock.actorId)).flatMap((lock) => lock.files)
+    ...input.activeLocks.filter((lock) => input.foreignActorIds.includes(lock.actorId)).flatMap((lock) => lock.files),
+    ...input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).flatMap((reservation) => reservation.files)
   ]);
   const overlappingFiles = input.ownFiles.length > 0
     ? foreignFiles.filter((file) => ownSet.has(file))
@@ -4802,6 +4853,7 @@ function buildTeamLevelRecommendation(input: {
     ? input.stagedFiles.filter((file) => ownSet.has(file))
     : [];
   const foreignActorCount = new Set(input.foreignActorIds).size;
+  const freshForeignReservationCount = input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).length;
   const sharedIndexActive = input.stagedFiles.length > 0;
   const overlapCount = uniqueSorted([...overlappingFiles, ...stagedOverlap]).length;
   const frameworkFoundationRisk = input.ownFiles.some(isFrameworkFoundationPath);
@@ -4850,6 +4902,15 @@ function buildTeamLevelRecommendation(input: {
       foreignActors: uniqueSorted(input.foreignActorIds)
     };
   }
+  if (freshForeignReservationCount > 0) {
+    return {
+      level: 'L3',
+      reason: 'Fresh foreign-created task reservations are visible; use Broker arbitration before claiming another captain\'s newly opened work.',
+      ownFiles: input.ownFiles,
+      overlappingFiles: [],
+      foreignActors: uniqueSorted(input.foreignActorIds)
+    };
+  }
   if (foreignActorCount > 0) {
     return {
       level: 'L2',
@@ -4875,8 +4936,116 @@ function isFrameworkFoundationPath(filePath: string): boolean {
     || normalized.startsWith('packages/cli/src/commands/next/')
     || normalized.startsWith('packages/cli/src/commands/taskflow/')
     || normalized.startsWith('packages/cli/src/commands/framework-development/')
+    || normalized.startsWith('packages/integrations-core/src/compiler/')
     || normalized.startsWith('packages/core/src/broker/')
     || normalized.startsWith('packages/core/src/team-runtime/');
+}
+
+function inspectFreshTaskReservationForTask(
+  cwd: string,
+  task: ImportedTaskSummary,
+  currentActorId: string | null | undefined,
+  now: number
+): ActiveWorkSummary['freshReservations'][number] | null {
+  const reservations = readFreshTaskReservations(cwd, now);
+  const currentActor = currentActorId?.trim() || null;
+  return reservations.find((reservation) =>
+    reservation.taskId === task.workItemId
+    && (!currentActor || reservation.actorId !== currentActor)
+  ) ?? null;
+}
+
+function readFreshTaskReservations(cwd: string, now: number): ActiveWorkSummary['freshReservations'] {
+  const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
+  if (!existsSync(taskStorePath)) return [];
+  return readdirSync(taskStorePath)
+    .filter((entry) => entry.endsWith('.json'))
+    .flatMap((entry): ActiveWorkSummary['freshReservations'] => {
+      const filePath = path.join(taskStorePath, entry);
+      try {
+        const parsed = parseJsonText(readFileSync(filePath, 'utf8')) as Record<string, unknown>;
+        const workItemId = normalizeOptionalString(parsed.workItemId ?? parsed.id);
+        if (!workItemId) return [];
+        if (!isTaskFreshReservationCandidate(parsed)) return [];
+        const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+          ? parsed.claim as Record<string, unknown>
+          : {};
+        if (claimRecord.state === 'active') return [];
+        const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
+          ? parsed.source as Record<string, unknown>
+          : {};
+        const sourcePlanPath = normalizeOptionalString(source.planPath ?? parsed.planPath ?? parsed.plan_path);
+        const sourceOwner = readPlanningCardOwner(cwd, sourcePlanPath);
+        const actorId = sourceOwner
+          ?? normalizeOptionalString(parsed.owner ?? parsed.ownerActorId ?? parsed.createdByActor ?? parsed.createdBy ?? parsed.importedByActor ?? parsed.importedBy ?? source.owner ?? source.actorId);
+        if (!actorId) return [];
+        const createdAt = normalizeOptionalString(parsed.createdAt ?? parsed.created_at ?? source.createdAt ?? source.created_at);
+        const importedAt = normalizeOptionalString(parsed.importedAt ?? parsed.imported_at ?? source.importedAt ?? source.imported_at);
+        const referenceAt = parseIsoMillis(importedAt) ?? parseIsoMillis(createdAt) ?? parseIsoMillis(normalizeOptionalString(parsed.lastTransitionAt ?? parsed.last_transition_at));
+        if (referenceAt === null) return [];
+        const ageSeconds = Math.max(0, Math.floor((now - referenceAt) / 1000));
+        if (ageSeconds > NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS) return [];
+        const files = uniqueSorted([
+          ...readStringArray(parsed.scope),
+          ...readStringArray(parsed.scopePaths),
+          ...readStringArray(parsed.files),
+          ...readStringArray(parsed.deliverables),
+          ...readStringArray(parsed.targetAllowedFiles),
+          ...readStringArray(claimRecord.files)
+        ].map((file) => {
+          const normalized = normalizeWorkPath(file);
+          return path.isAbsolute(normalized) ? path.relative(cwd, normalized).replace(/\\/g, '/') : normalized;
+        }).filter(Boolean));
+        return [{
+          taskId: workItemId,
+          title: normalizeOptionalString(parsed.title) ?? workItemId,
+          actorId,
+          createdAt,
+          importedAt,
+          ageSeconds,
+          ttlSeconds: NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS,
+          leaseFresh: true,
+          files
+        }];
+      } catch {
+        return [];
+      }
+    });
+}
+
+function isTaskFreshReservationCandidate(parsed: Record<string, unknown>): boolean {
+  const status = normalizeTaskRouteStatus(normalizeOptionalString(parsed.status) ?? 'planned');
+  return status === 'planned' || status === 'ready' || status === 'open' || status === 'reserved';
+}
+
+function readPlanningCardOwner(cwd: string, sourcePlanPath: string | null): string | null {
+  if (!sourcePlanPath) return null;
+  const candidate = path.isAbsolute(sourcePlanPath) ? sourcePlanPath : path.resolve(cwd, sourcePlanPath);
+  if (!existsSync(candidate)) return null;
+  try {
+    const rawText = readFileSync(candidate, 'utf8');
+    const frontmatter = parseMarkdownFrontmatter(rawText);
+    const owner = frontmatter && typeof frontmatter === 'object' && !Array.isArray(frontmatter)
+      ? normalizeOptionalString((frontmatter as Record<string, unknown>).owner ?? (frontmatter as Record<string, unknown>).actor ?? (frontmatter as Record<string, unknown>).captain)
+      : null;
+    return owner ?? readFrontmatterScalar(rawText, 'owner') ?? readFrontmatterScalar(rawText, 'actor') ?? readFrontmatterScalar(rawText, 'captain');
+  } catch {
+    return null;
+  }
+}
+
+function readFrontmatterScalar(rawText: string, key: string): string | null {
+  const match = /^---\s*\r?\n([\s\S]*?)\r?\n---/m.exec(rawText);
+  if (!match) return null;
+  const line = match[1].split(/\r?\n/).find((entry) => entry.trim().startsWith(`${key}:`));
+  if (!line) return null;
+  return normalizeOptionalString(line.slice(line.indexOf(':') + 1).replace(/^['"]|['"]$/g, ''));
+}
+
+function parseIsoMillis(value: string | null | undefined): number | null {
+  if (!value) return null;
+  const millis = Date.parse(value);
+  return Number.isFinite(millis) ? millis : null;
 }
 
 function readActiveClaimRecords(cwd: string, now: number): ActiveWorkSummary['activeClaims'] {

@@ -57,13 +57,24 @@ try {
     ttlSeconds: 1800,
     files: [ownFoundationFile]
   });
+  writeJson(path.join(repo, '.atm', 'history', 'tasks', 'TASK-FRESH-FABLE.json'), {
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-FRESH-FABLE',
+    title: 'Fresh Fable task',
+    status: 'open',
+    owner: 'claude-fable-5',
+    importedAt: new Date().toISOString(),
+    scopePaths: ['packages/integrations-core/src/compiler/compile.ts']
+  });
 
-  const summary = buildActiveWorkSummary(repo, 'codex-captain', [ownFoundationFile]);
+  const summary = buildActiveWorkSummary(repo, 'codex-captain', [ownFoundationFile, 'packages/integrations-core/src/compiler/compile.ts']);
   assert(summary.activeClaimCount === 1, 'active claim count must include foreign task claim');
+  assert(summary.freshReservationCount === 1, 'fresh reservation count must include newly opened foreign task');
   assert(summary.hasForeignActiveWork === true, 'foreign active work must enable the broker recommendation');
   assert(summary.brokerRecommendation.enabled === true, 'broker recommendation must be enabled');
   assert(summary.teamLevelRecommendation.level === 'L5', 'framework foundation overlap plus staged index must recommend L5');
   assert(summary.teamLevelRecommendation.overlappingFiles.includes(ownFoundationFile), 'overlapping file must be reported');
+  assert(summary.freshReservations.some((reservation) => reservation.actorId === 'claude-fable-5'), 'fresh reservation owner must be visible');
   assert(summary.activeActors.some((actor) => actor.actorId === 'claude-fable-5'), 'foreign actor must be visible');
   assert(summary.stagedFiles.includes(stagedFile), 'shared staged index files must be visible');
 } finally {
