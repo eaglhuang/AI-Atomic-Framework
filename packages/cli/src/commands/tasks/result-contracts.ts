@@ -192,6 +192,13 @@ export interface TaskDeliverableGateReport {
   readonly deliverableFiles: readonly string[];
   readonly declaredFiles: readonly string[];
   readonly historicalDeliveries: readonly TaskHistoricalDeliveryReport[];
+  readonly historicalBatchCloseReady?: {
+    readonly batchId: string;
+    readonly matchedCommits: readonly string[];
+    readonly matchedFiles: readonly string[];
+    readonly taskSpecificValidationPasses: readonly string[];
+    readonly batchWideValidationPasses: readonly string[];
+  } | null;
   readonly notAllowedAsCompletion: readonly string[];
   readonly remediation: string;
   readonly requiredCommand: string | null;

@@ -194,6 +194,13 @@ export function evaluateTaskDeliverableGate(input: {
   readonly claim: TaskClaimRecord | null;
   readonly historicalDeliveryRefs?: readonly string[];
   readonly historicalDeliveryRepo?: string | null;
+  readonly historicalBatchCloseReadySlice?: {
+    readonly batchId: string;
+    readonly matchedCommits: readonly string[];
+    readonly matchedFiles: readonly string[];
+    readonly taskSpecificValidationPasses: readonly string[];
+    readonly batchWideValidationPasses: readonly string[];
+  } | null;
   readonly waiverOutOfScopeDelivery?: boolean;
   readonly waiverReason?: string | null;
 }): TaskDeliverableGateReport {
@@ -214,7 +221,11 @@ export function evaluateTaskDeliverableGate(input: {
   const scopedDeliverables = enforceDeclaredScope
     ? deliverableFiles.filter((filePath) => declaredFiles.some((declared) => pathMatchesTaskScope(filePath, declared)))
     : deliverableFiles;
-  const historicalDeliveries = (input.historicalDeliveryRefs ?? []).map((ref) => inspectHistoricalDelivery({
+  const historicalBatchCloseReady = input.historicalBatchCloseReadySlice ?? null;
+  const historicalDeliveryRefs = historicalBatchCloseReady
+    ? (input.historicalDeliveryRefs ?? []).filter((ref) => !historicalBatchCloseReady.matchedCommits.includes(ref))
+    : (input.historicalDeliveryRefs ?? []);
+  const historicalDeliveries = historicalDeliveryRefs.map((ref) => inspectHistoricalDelivery({
     cwd: input.historicalDeliveryRepo ?? input.cwd,
     taskId: input.taskId,
     requestedRef: ref,
@@ -224,7 +235,10 @@ export function evaluateTaskDeliverableGate(input: {
     waiverReason: input.waiverReason ?? null
   }));
   const historicalDeliveryErrors = historicalDeliveries.filter((entry) => !entry.ok);
-  const historicalDeliverableFiles = uniqueStrings(historicalDeliveries.flatMap((entry) => entry.deliverableFiles));
+  const historicalDeliverableFiles = uniqueStrings([
+    ...historicalDeliveries.flatMap((entry) => entry.deliverableFiles),
+    ...(historicalBatchCloseReady?.matchedFiles ?? [])
+  ]);
   const allDeliverableFiles = uniqueStrings([...scopedDeliverables, ...historicalDeliverableFiles]);
   const ok = !required || (allDeliverableFiles.length > 0 && historicalDeliveryErrors.length === 0);
   const reason = required
@@ -248,6 +262,7 @@ export function evaluateTaskDeliverableGate(input: {
     deliverableFiles: allDeliverableFiles,
     declaredFiles,
     historicalDeliveries,
+    historicalBatchCloseReady,
     notAllowedAsCompletion: [
       'only changing .atm/history task JSON, evidence JSON, task-events, runtime locks, or queue state',
       'text-only evidence without a real deliverable file diff',

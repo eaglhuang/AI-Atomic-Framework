@@ -11,6 +11,7 @@ export default defineCommandSpec({
     { flag: '--compact', summary: 'Return only the current queue head, progress, allowed files, validators, and next commands for fast agent routing.' },
     { flag: '--delivery-commit', value: 'commit', summary: 'For checkpoint: verify a scoped delivery commit, equivalent to tasks close --historical-delivery.' },
     { flag: '--hold', summary: 'For checkpoint: close and advance the current task, but do not auto-claim the next queue head before the commit window.' },
+    { flag: '--historical-batch', value: 'id-or-path', summary: 'For checkpoint: consume a close-ready historical-batch slice for the current queue head.' },
     { flag: '--historical-delivery', value: 'commit', summary: 'For checkpoint: verify an earlier scoped delivery commit before closing the queue head.' },
     { flag: '--reason', value: 'text', summary: 'For skip: required blocker reason recorded in the batch audit trail.' },
     { flag: '--scope', value: 'key', summary: 'Select a specific active batch run by scopeKey when batchId is not available.' },
@@ -28,6 +29,7 @@ export default defineCommandSpec({
     'node atm.mjs batch resume --actor codex-main --batch batch-abc123 --task TASK-AAO-0044 --json',
     'node atm.mjs batch resume --actor codex-main --scope TASK-ASA --json',
     'node atm.mjs batch checkpoint --actor codex-main --batch batch-abc123 --delivery-commit abc123 --json',
+    'node atm.mjs batch checkpoint --actor codex-main --batch batch-abc123 --historical-batch hist-batch-2026-06-16T01-40-43-634Z --json',
     'node atm.mjs batch checkpoint --actor codex-main --batch batch-abc123 --hold --json',
     'node atm.mjs batch checkpoint --actor codex-main --batch batch-abc123 --json',
     'node atm.mjs batch abandon --actor codex-main --batch batch-abc123 --json'

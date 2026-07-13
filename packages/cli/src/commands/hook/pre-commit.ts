@@ -1466,14 +1466,16 @@ export function inspectProtectedAtmStateChanges(cwd: string, stagedFiles: readon
         continue;
       }
       const event = readJsonFile(path.join(cwd, stagedEventPath));
-      const expectedSha = sha256(readFileSync(absolutePath));
+      const taskBytes = readFileSync(absolutePath);
+      const expectedSha = sha256(taskBytes);
+      const releaseOnlyExpectedSha = taskReleaseOnlyTransitionSha(task, event);
       const owningBatch = activeBatches.find((batchRun) => taskIdsInclude(batchRun.taskIds, taskId)) ?? null;
       if (event?.schemaId !== 'atm.taskTransition.v1'
         || event?.transitionId !== lastTransitionId
         || typeof event?.taskId !== 'string'
         || !taskIdsEqual(event.taskId, taskId)
         || event?.taskPath !== normalized
-        || event?.taskSha256 !== expectedSha
+        || (event?.taskSha256 !== expectedSha && event?.taskSha256 !== releaseOnlyExpectedSha)
         || typeof event?.command !== 'string'
         || !event.command.startsWith('node atm.mjs ')) {
         findings.push({
@@ -2321,6 +2323,31 @@ function uniqueSorted(values: readonly string[]): readonly string[] {
 
 function sha256(value: string | Uint8Array): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function taskReleaseOnlyTransitionSha(task: unknown, event: unknown): string | null {
+  if (!task || typeof task !== 'object' || Array.isArray(task)) return null;
+  if (!event || typeof event !== 'object' || Array.isArray(event)) return null;
+  const eventRecord = event as Record<string, unknown>;
+  if (eventRecord.action !== 'close') return null;
+  const taskRecord = task as Record<string, unknown>;
+  const lock = taskRecord.taskDirectionLock;
+  if (!lock || typeof lock !== 'object' || Array.isArray(lock)) return null;
+  const lockRecord = lock as Record<string, unknown>;
+  if (lockRecord.status !== 'released' || lockRecord.released !== true) return null;
+
+  const normalizedTask = {
+    ...taskRecord,
+    taskDirectionLock: {
+      ...lockRecord,
+      status: 'active'
+    }
+  } as Record<string, unknown>;
+  delete (normalizedTask.taskDirectionLock as Record<string, unknown>).released;
+  delete (normalizedTask.taskDirectionLock as Record<string, unknown>).releasedAt;
+  delete (normalizedTask.taskDirectionLock as Record<string, unknown>).releasedBy;
+
+  return sha256(`${JSON.stringify(normalizedTask, null, 2)}\n`);
 }
 
 function sameStringSet(left: readonly string[], right: readonly string[]) {
