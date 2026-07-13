@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T18-20-07-584Z-close-d8b4f6276296",
+  "taskId": "TASK-RFT-0025",
+  "action": "close",
+  "actorId": "Codex-GPT 5.5",
+  "sessionId": "session-20260713181317-Codex-GPT-5.5-TASK-RFT-0025-37f8927ad0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0025.json",
+  "taskSha256": "sha256:6bc5a4dd49cb9d90586b7b21554c548adb4a942c14d7fba19087654fc81535da",
+  "createdAt": "2026-07-13T18:20:07.584Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0025 --actor \"Codex-GPT 5.5\" --status done --from-batch-checkpoint --batch batch-711cb1cf0136",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-711cb1cf0136",
+    "sessionId": "session-20260713181317-Codex-GPT-5.5-TASK-RFT-0025-37f8927ad0",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0025.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts",
+      "typecheck",
+      "validate-atom-file-size",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T18:20:07.574Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+        ".atm/history/evidence/TASK-RFT-0025.*",
+        ".atm/history/task-events/TASK-RFT-0025/**",
+        ".atm/history/tasks/TASK-RFT-0025.json",
+        "docs/reports/closure-packet-schema-map.md",
+        "packages/cli/src/commands/framework-development/__tests__/**",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/closure-packet/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/__tests__/**",
+        "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "packages/cli/src/commands/framework-development/closure-packet/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -273,3 +273,18 @@ Owner modules:
 Proof: focused `legacy-compat-command-map.spec.ts`, parameterized `validate-atom-file-size --max-lines 600`, task import validator, task-ledger suite, `typecheck`, `validate:cli`, and `git diff --check`.
 
 Lesson: compatibility facades should first expose a tiny route map owner before moving parser or lifecycle bodies. Keep Chinese parsing and legacy import semantics in place until a separate card can isolate them with dedicated fixtures.
+
+## TASK-RFT-0025 - closure packet schema fragments
+
+Problem: `packages/cli/src/commands/framework-development/closure-packet-schema.ts` owned closure packet result types, validator result types, sha256 diagnostics, packet creation, repair, runner drift, and audit logic in one large framework module. Schema edits were hard to review because contract changes and operational closeout logic lived together.
+
+Pattern: Result Contract Object with a small diagnostics helper.
+
+Owner modules:
+- `packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts`;
+- `packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts`;
+- `packages/cli/src/commands/framework-development/closure-packet/diagnostics.ts`.
+
+Proof: focused `closure-packet-schema-fragments.spec.ts`, parameterized `validate-atom-file-size --max-lines 600`, `typecheck`, `validate:cli`, and `git diff --check`.
+
+Lesson: move closure packet contracts before moving close transaction behavior. Preserve public re-exports from the facade so downstream imports do not become part of the refactor risk.

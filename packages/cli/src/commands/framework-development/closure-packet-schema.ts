@@ -23,6 +23,18 @@ import {
 import { isClaimExpired, parseClaimRecord } from '../tasks/task-ledger-readers.ts';
 import { isAtmCriticalNonDocSurface, isDocOnlyPath } from './path-classification.ts';
 import { describeBuildReleaseHygienePolicy } from '../build-release-hygiene.ts';
+import { pushSha256ValidationIssue } from './closure-packet/diagnostics.ts';
+import type {
+  ClosurePacket,
+  ClosurePacketCommandRun,
+  ClosurePacketReconcileAttestation,
+  ClosurePacketRepairMetadata,
+  ClosurePacketRequiredGatesSnapshot,
+  ClosurePacketTargetCommitDelta,
+  ClosurePacketTeamSummary,
+  HistoricalDeliveryProvenance
+} from './closure-packet/schema-fragments.ts';
+import type { ClosurePacketValidationIssue } from './closure-packet/validator-contract.ts';
 
 export type FrameworkMode = 'inactive' | 'suspected' | 'required' | 'cross-repo-target-required';
 export type ClosureAuthority = 'local' | 'target_repo' | 'none';
@@ -111,101 +123,16 @@ export interface PinnedRunnerStatus {
   readonly reason: string | null;
 }
 
-export interface ClosurePacketCommandRun {
-  readonly command: string;
-  readonly cwd: string;
-  readonly exitCode: number;
-  readonly stdoutSha256: string;
-  readonly stderrSha256: string;
-  readonly runnerVersion: string;
-}
-
-export interface ClosurePacketTargetCommitDelta {
-  readonly currentCommitSha: string | null;
-  readonly parentCommitShas: readonly string[];
-  readonly governedTreeSha: string | null;
-  readonly changedFiles: readonly string[];
-}
-
-export interface ClosurePacketRequiredGatesSnapshot {
-  readonly schemaId: 'atm.requiredGatesSnapshot.v1';
-  readonly generatedAt: string;
-  readonly source: 'frameworkStatus.requiredGates';
-  readonly ruleVersion: string;
-  readonly frameworkMode: FrameworkMode;
-  readonly repoRole: 'framework' | 'host';
-  readonly changedFiles: readonly string[];
-  readonly criticalChangedFiles: readonly string[];
-  readonly requiredGates: readonly string[];
-}
-
-export interface ClosurePacketReconcileAttestation {
-  readonly schemaId: 'atm.reconcileAttestation.v1';
-  readonly deliveryCommit: string;
-  readonly reconciledAt: string;
-  readonly reconciledByActor: string;
-  readonly reason: string;
-}
-
-export interface ClosurePacketRepairMetadata {
-  readonly schemaId: 'atm.closurePacketRepair.v1';
-  readonly repairedAt: string;
-  readonly repairedByCommand: 'atm tasks repair-closure';
-  readonly originalPacketCommitSha: string | null;
-  readonly repairedTargetCommitSha: string | null;
-  readonly evidencePath: string;
-}
-
-export interface HistoricalDeliveryProvenance {
-  readonly schemaId: 'atm.historicalDeliveryProvenance.v1';
-  readonly deliveryCommitSha: string;
-  readonly taskMatchedFiles: readonly string[];
-  readonly governanceFiles: readonly string[];
-  readonly allowedRunnerOutputFiles: readonly string[];
-  readonly outOfScopeSourceFiles: readonly string[];
-  readonly waivedOutOfScopeFiles: readonly string[];
-  readonly waiverReason: string | null;
-}
-
-export interface ClosurePacketTeamSummary {
-  readonly schemaId: 'atm.closurePacketTeamSummary.v1';
-  readonly capturedAt: string;
-  readonly source: {
-    readonly kind: 'team-run';
-    readonly teamRunPath: string;
-  };
-  readonly teamRunId: string;
-  readonly captainDecision: unknown;
-  readonly agentReports: readonly unknown[];
-  readonly patrolFindings: readonly unknown[];
-  readonly evidenceCuratorSummary: unknown;
-  readonly teamSummary: unknown;
-}
-
-export interface ClosurePacket {
-  readonly schemaId: 'atm.closurePacket.v1';
-  readonly specVersion: '0.1.0';
-  readonly taskId: string;
-  readonly targetRepoIdentity: FrameworkRepoIdentity;
-  readonly targetCommit: string | null;
-  readonly governedTreeSha: string | null;
-  readonly targetCommitDelta: ClosurePacketTargetCommitDelta;
-  readonly closedByCommand: 'atm tasks close';
-  readonly commandRuns: readonly ClosurePacketCommandRun[];
-  readonly validationPasses: readonly string[];
-  readonly evidenceFreshness: 'fresh' | 'historical-reference' | 'draft';
-  readonly requiredGates: readonly string[];
-  readonly requiredGatesSnapshot: ClosurePacketRequiredGatesSnapshot;
-  readonly evidencePath: string;
-  readonly closedAt: string;
-  readonly closedByActor: string;
-  readonly sessionId: string | null;
-  readonly attestation?: ClosurePacketReconcileAttestation | null;
-  readonly repair?: ClosurePacketRepairMetadata | null;
-  readonly historicalDeliveryProvenance?: HistoricalDeliveryProvenance | null;
-  readonly teamSummary?: ClosurePacketTeamSummary | null;
-  readonly recoveredFromMissingPacket?: boolean;
-}
+export type {
+  ClosurePacket,
+  ClosurePacketCommandRun,
+  ClosurePacketReconcileAttestation,
+  ClosurePacketRepairMetadata,
+  ClosurePacketRequiredGatesSnapshot,
+  ClosurePacketTargetCommitDelta,
+  ClosurePacketTeamSummary,
+  HistoricalDeliveryProvenance
+} from './closure-packet/schema-fragments.ts';
 
 export interface FrameworkCloseWorktreeReport {
   readonly ok: boolean;
@@ -405,12 +332,10 @@ export type ClosureRepairUpstreamStatus =
   | 'ahead-of-upstream'
   | 'published-head-blocked';
 
-export interface ClosurePacketValidationIssue {
-  readonly path: string;
-  readonly kind: 'missing' | 'invalidFormat';
-  readonly formatExpected?: string;
-  readonly actualValue?: string;
-}
+export type {
+  ClosurePacketValidationIssue,
+  ClosurePacketValidationResult
+} from './closure-packet/validator-contract.ts';
 
 export interface ClosurePacketRepairResult {
   readonly taskId: string;
@@ -434,8 +359,6 @@ export interface ClosurePacketRepairResult {
 }
 
 const SHA256_DIGEST_PATTERN = /^sha256:([a-fA-F0-9]{64})$/;
-const SHA256_LOWER_PATTERN = /^sha256:[a-f0-9]{64}$/;
-const SHA256_FORMAT_EXPECTED = '^sha256:[a-f0-9]{64}$';
 
 export function normalizeSha256DigestValue(value: string): string {
   const trimmed = value.trim();
@@ -459,40 +382,6 @@ export function normalizeSha256FieldsDeep<T>(value: T): T {
     return normalizeSha256DigestValue(value) as T;
   }
   return value;
-}
-
-function summarizeSha256ActualValue(value: unknown): string {
-  const text = String(value ?? '');
-  return text.length > 80 ? `${text.slice(0, 77)}...` : text;
-}
-
-function pushSha256ValidationIssue(
-  issues: { missing: string[]; invalidFormat: ClosurePacketValidationIssue[] },
-  fieldPath: string,
-  raw: unknown
-) {
-  if (raw === undefined || raw === null || (typeof raw === 'string' && raw.trim() === '')) {
-    issues.missing.push(fieldPath);
-    return;
-  }
-  const text = String(raw).trim();
-  if (!SHA256_DIGEST_PATTERN.test(text)) {
-    issues.invalidFormat.push({
-      path: fieldPath,
-      kind: 'invalidFormat',
-      formatExpected: SHA256_FORMAT_EXPECTED,
-      actualValue: summarizeSha256ActualValue(text)
-    });
-    return;
-  }
-  if (!SHA256_LOWER_PATTERN.test(text)) {
-    issues.invalidFormat.push({
-      path: fieldPath,
-      kind: 'invalidFormat',
-      formatExpected: SHA256_FORMAT_EXPECTED,
-      actualValue: summarizeSha256ActualValue(text)
-    });
-  }
 }
 
 export interface TaskAuditFinding {

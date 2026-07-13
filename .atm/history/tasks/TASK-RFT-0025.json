@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0025",
+  "title": "closure packet schema fragment and diagnostics map",
+  "status": "done",
+  "milestone": "RFT-M7",
+  "dependencies": [
+    "TASK-RFT-0024"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts",
+    "packages/cli/src/commands/framework-development/closure-packet/diagnostics.ts",
+    "packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts",
+    "packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts",
+    "docs/reports/closure-packet-schema-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/framework-development/closure-packet/**",
+    "packages/cli/src/commands/framework-development/__tests__/**",
+    "docs/reports/closure-packet-schema-map.md",
+    ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing closure authority.",
+    "Relaxing schema validation.",
+    "Renaming public closure packet fields."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if closure packet schema validation, diagnostics, or framework close evidence contracts drift.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.framework-closure-packet-schema-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/closure-packet-schema-map.md",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.framework-closure-packet.schema-fragments",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0025-closure-packet-schema-fragment-map.task.md",
+    "sectionTitle": "TASK-RFT-0025",
+    "headingLine": 59,
+    "hash": "1d23ba38ccf7bd41"
+  },
+  "importedAt": "2026-07-13T16:37:58.619Z",
+  "lastTransitionId": "2026-07-13T18-20-07-584Z-close-d8b4f6276296",
+  "lastTransitionAt": "2026-07-13T18:20:07.584Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT 5.5",
+  "reservedAt": "2026-07-13T18:13:17.614Z",
+  "promotedAt": "2026-07-13T18:13:17.617Z",
+  "claim": {
+    "actorId": "Codex-GPT 5.5",
+    "leaseId": "lease-112f1302b15f",
+    "claimedAt": "2026-07-13T18:13:17.620Z",
+    "heartbeatAt": "2026-07-13T18:20:07.579Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0025.json",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      "docs/reports/closure-packet-schema-map.md",
+      "packages/cli/src/commands/framework-development/__tests__/**",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T18:13:17.620Z",
+  "startedByActor": "Codex-GPT 5.5",
+  "startedBySessionId": "session-20260713181317-Codex-GPT-5.5-TASK-RFT-0025-37f8927ad0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0025",
+    "batchId": "batch-711cb1cf0136",
+    "scopeKey": "TASK-RFT",
+    "queueId": "queue-7226f984937a705d",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/TASK-RFT-0025.*",
+      ".atm/history/task-events/TASK-RFT-0025/**",
+      ".atm/history/tasks/TASK-RFT-0025.json",
+      "docs/reports/closure-packet-schema-map.md",
+      "packages/cli/src/commands/framework-development/__tests__/**",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "12ce51a1119f19a8c3f9ea311de0481ef43575e12b8ca2d98e0d335dc031a8d6",
+    "actorId": "Codex-GPT 5.5",
+    "createdAt": "2026-07-13T18:13:21.578Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-13T18:20:07.664Z",
+    "releasedBy": "Codex-GPT 5.5"
+  },
+  "closedAt": "2026-07-13T18:20:07.579Z",
+  "closedByActor": "Codex-GPT 5.5",
+  "closedBySessionId": "session-20260713181317-Codex-GPT-5.5-TASK-RFT-0025-37f8927ad0",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0025.closure-packet.json"
+}

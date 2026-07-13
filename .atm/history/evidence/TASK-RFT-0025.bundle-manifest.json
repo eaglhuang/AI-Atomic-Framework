@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0025",
+  "updatedAt": "2026-07-13T18:19:08.859Z",
+  "updatedBy": "Codex-GPT 5.5",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts",
+    "typecheck",
+    "validate-atom-file-size",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/framework-development/closure-packet/schema-fragments.ts,packages/cli/src/commands/framework-development/closure-packet/diagnostics.ts,packages/cli/src/commands/framework-development/closure-packet/validator-contract.ts,packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts,docs/reports/closure-packet-schema-map.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:181b8c83a035bbe8793177a50c379a11ec6d12b41bd46d1f527d8de380ce7903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate-atom-file-size"
+      ],
+      "generatedAt": "2026-07-13T18:18:07.790Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ee65c657cb1bc2bff3244e765693c45cdb26d608",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2a053b744cb224ac9e6031e3367c6f1e6dd31737ffc75308504843a5ffaf445d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/framework-development/__tests__/closure-packet-schema-fragments.spec.ts"
+      ],
+      "generatedAt": "2026-07-13T18:18:07.867Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ee65c657cb1bc2bff3244e765693c45cdb26d608",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-13T18:18:15.329Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ee65c657cb1bc2bff3244e765693c45cdb26d608",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-13T18:18:25.644Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ee65c657cb1bc2bff3244e765693c45cdb26d608",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:969b42881c3cf2de7d5dd34d785656c8c181ed9040db50cd44d7d1f53bb12cd1",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-13T18:18:38.571Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ee65c657cb1bc2bff3244e765693c45cdb26d608",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-13T18:19:08.974Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ee65c657cb1bc2bff3244e765693c45cdb26d608",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
