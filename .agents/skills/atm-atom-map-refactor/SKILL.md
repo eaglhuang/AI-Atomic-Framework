@@ -17,10 +17,11 @@ contract before moving code.
 Extraction-first is a core ATM intent: prefer proposing the change as a new
 atom or atom map over inline-editing the large module. The owner/pattern
 selection below IS the extraction proposal — record it in the card's
-`atomizationImpact.extractionCandidates` (see
-`.agents/skills/atm-task-card-authoring`) and restate it in the implementing
-agent's dispatch report. Staying inline is a human decision and requires a
-recorded `inlineReason` on the card.
+`atomizationImpact.extractionCandidates` (see the `atm-task-card-authoring`
+skill) and restate it in the implementing agent's dispatch report. Staying
+inline is a human decision and requires a recorded `inlineReason` on the
+card. ATM patrols this at import time via the advisory diagnostic
+`ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE`.
 
 ## First Command
 

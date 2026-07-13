@@ -8,9 +8,20 @@ charter-invariants-injected: true
 
 # ATM Atom Map Refactor
 
-Use this skill before editing ATM framework code for a refactor, extraction, or
-governance-invariant cleanup. The goal is to choose a small atom owner and a
-testable contract before moving code.
+Use this skill before editing ATM framework code for a refactor, extraction,
+governance-invariant cleanup — and for ANY task card whose scope touches a
+large governance module (over 600 lines), not only cards labeled as refactors
+(TASK-AAO-FABLE-006). The goal is to choose a small atom owner and a testable
+contract before moving code.
+
+Extraction-first is a core ATM intent: prefer proposing the change as a new
+atom or atom map over inline-editing the large module. The owner/pattern
+selection below IS the extraction proposal — record it in the card's
+`atomizationImpact.extractionCandidates` (see the `atm-task-card-authoring`
+skill) and restate it in the implementing agent's dispatch report. Staying
+inline is a human decision and requires a recorded `inlineReason` on the
+card. ATM patrols this at import time via the advisory diagnostic
+`ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE`.
 
 ## First Command
 
@@ -33,9 +44,11 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 5. Extract only the atom already in task scope.
 6. Record adjacent refactors as follow-up work instead of widening the task.
 
-If the task is not a refactor or extraction task, use this skill only to
-identify a future atom candidate. Do not turn an unrelated bug fix into a broad
-cleanup.
+If the task is not a refactor or extraction task, still run steps 2-4 to
+produce an extraction candidate whenever the touched module exceeds 600 lines,
+then record it as `extract`, `follow-up-card`, or human-approved `inline` on
+the card. Do not turn an unrelated bug fix into a broad cleanup — propose,
+let the Captain/human decide, and default to opening the follow-up card.
 
 ## Pattern Selection
 
