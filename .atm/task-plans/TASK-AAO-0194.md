@@ -1,7 +1,7 @@
 ---
 task_id: TASK-AAO-0194
 title: Make taskflow close tolerate deferred foreign governance-dirty snapshots
-status: ready
+status: done
 priority: P1
 owner: cursor-grok-4.5
 milestone: Backlog-P1
@@ -26,6 +26,15 @@ validators:
   - node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts
   - npm run check:encoding:touched
   - git diff --check
+completed_at: "2026-07-13T12:30:03.345Z"
+completed_by_agent: "cursor-grok-4.5"
+closedAt: "2026-07-13T12:30:03.345Z"
+closedByActor: "cursor-grok-4.5"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-13T12-30-03-345Z-close-3f762714ab3b"
+lastTransitionAt: "2026-07-13T12:30:03.345Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "aa4744c24"
 ---
 
 # TASK-AAO-0194

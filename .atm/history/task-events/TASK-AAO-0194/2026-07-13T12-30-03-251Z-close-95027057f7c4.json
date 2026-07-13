@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T12-30-03-251Z-close-95027057f7c4",
+  "taskId": "TASK-AAO-0194",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260713122651-cursor-grok-4.5-TASK-AAO-0194-aabebb1611",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0194.json",
+  "taskSha256": "sha256:afcb67defd06b2dc8a3f80935b30a129a41bcb4cfcd26eb3d3c190798442b047",
+  "createdAt": "2026-07-13T12:30:03.251Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0194 --actor cursor-grok-4.5 --status done --historical-delivery aa4744c24",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713122651-cursor-grok-4.5-TASK-AAO-0194-aabebb1611",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0194.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T12:30:03.240Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0194.*",
+        ".atm/history/task-events/TASK-AAO-0194/**",
+        ".atm/history/tasks/TASK-AAO-0194.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
