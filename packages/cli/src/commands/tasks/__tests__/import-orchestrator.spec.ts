@@ -129,6 +129,30 @@ function readdirFirstJson(directory: string): string {
   return readdirSync(directory).find((entry) => entry.endsWith('.json')) ?? fail('expected transition event json');
 }
 
+// TASK-AAO-FABLE-008 — frontmatter nested object-list values must strip quotes.
+{
+  const { extractFrontMatter } = await import('../task-import-validators.ts');
+  const front = extractFrontMatter([
+    '---',
+    'title: "Quoted title"',
+    'atomizationImpact:',
+    '  ownerAtomOrMap: atm.example',
+    '  extractionCandidates:',
+    '    - atom: "atm.quoted-atom"',
+    '      pattern: "Policy Object"',
+    '      disposition: extract',
+    '---',
+    '',
+    '# body'
+  ].join('\n'));
+  assert(front !== null, 'frontmatter must parse');
+  const candidates = (front!.data.atomizationImpact as Record<string, unknown>).extractionCandidates as Record<string, unknown>[];
+  assert(candidates.length === 1, 'nested object-list must produce exactly one item');
+  assert(candidates[0].atom === 'atm.quoted-atom', `quoted nested scalar must strip quotes, got: ${JSON.stringify(candidates[0].atom)}`);
+  assert(candidates[0].pattern === 'Policy Object', `quoted nested field must strip quotes, got: ${JSON.stringify(candidates[0].pattern)}`);
+  assert(candidates[0].disposition === 'extract', 'unquoted nested field must be unaffected');
+}
+
 // TASK-AAO-FABLE-007 — extraction-first import patrol (pure policy regression).
 {
   const { buildExtractionFirstPatrolDiagnostics, EXTRACTION_FIRST_LINE_BUDGET } = await import('../task-import-validators.ts');

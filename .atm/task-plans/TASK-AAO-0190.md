@@ -4,10 +4,15 @@ title: Fix taskflow close UX for auto-stage and --status migration
 status: done
 priority: P2
 owner: cursor-grok-4.5
+milestone: Backlog-P1
 depends_on: []
-target_repo: C:\Users\User\AI-Atomic-Framework
+related_plan: docs/governance/atm-bug-and-optimization-backlog.md
+related_backlog: ATM-BUG-2026-07-12-151
+planning_repo: 3KLife
+planning_card: docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0190-taskflow-close-auto-stage-and-status-migration.task.md
+target_repo: AI-Atomic-Framework
 closure_authority: target_repo
-scope:
+scopePaths:
   - packages/cli/src/commands/tasks/scope-lock-diagnostics.ts
   - packages/cli/src/commands/taskflow/commit-bundle-assembly.ts
   - packages/cli/src/commands/shared.ts
@@ -15,7 +20,14 @@ scope:
   - packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts
   - tests/cli/taskflow-status-migration-hint.test.ts
   - docs/governance/atm-bug-and-optimization-backlog.md
-out_of_scope:
+deliverables:
+  - packages/cli/src/commands/tasks/scope-lock-diagnostics.ts
+  - packages/cli/src/commands/taskflow/commit-bundle-assembly.ts
+  - packages/cli/src/commands/shared.ts
+  - packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts
+  - tests/cli/taskflow-status-migration-hint.test.ts
+  - docs/governance/atm-bug-and-optimization-backlog.md
+outOfScope:
   - release/**
   - scripts/run-validators.ts
   - tools_node/**
@@ -27,8 +39,16 @@ evidence:
   required: command-backed
 rollback:
   strategy: revert-commit
-backlog:
-  - ATM-BUG-2026-07-12-151
+atomizationImpact:
+  ownerAtomOrMap: atm.cli-command-router-map
+  mapUpdates: []
+  extractionCandidates:
+    - disposition: inline
+      path: packages/cli/src/commands/shared.ts
+      inlineReason: Targeted ATM_CLI_USAGE migration hint for taskflow --status only.
+    - disposition: inline
+      path: packages/cli/src/commands/taskflow/commit-bundle-assembly.ts
+      inlineReason: One-line --auto-stage hint alignment.
 completed_at: "2026-07-13T09:14:51.015Z"
 completed_by_agent: "cursor-grok-4.5"
 closedAt: "2026-07-13T09:14:51.015Z"
@@ -38,9 +58,17 @@ lastTransitionId: "2026-07-13T09-14-51-015Z-close-196d4154d238"
 lastTransitionAt: "2026-07-13T09:14:51.015Z"
 ledgerContractVersion: task-ledger/v1
 delivery_commit: "f69b2a17424b5a844898219b0a0812a2fda06ead"
+closure_commit: "ae1532abaf455220747365b847490c6365668455"
 ---
 
 # TASK-AAO-0190 — Fix taskflow close UX for auto-stage and --status migration
+
+Planning canonical card:
+
+`C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0190-taskflow-close-auto-stage-and-status-migration.task.md`
+
+This file is the framework-local planning mirror / task-plan copy. Prefer the
+3KLife AAO card as the human-facing source of truth.
 
 ## Problem
 
