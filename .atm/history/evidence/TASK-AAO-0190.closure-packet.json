@@ -1,0 +1,166 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0190",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "9fcc7baa7f441bc1bc63f8a88f4a6fa91faebe27",
+  "governedTreeSha": "e9c736832968eaace4eaa320de0830df58f652cb",
+  "targetCommitDelta": {
+    "currentCommitSha": "9fcc7baa7f441bc1bc63f8a88f4a6fa91faebe27",
+    "parentCommitShas": [
+      "9fcc7baa7f441bc1bc63f8a88f4a6fa91faebe27"
+    ],
+    "governedTreeSha": "e9c736832968eaace4eaa320de0830df58f652cb",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0190.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "tests/cli/taskflow-status-migration-hint.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:62a2b267d47ab9fec9c128a5cee0d1b6d071f4dd91ae247185d38a868dee6a0c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-status-migration-hint.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:70aa0362455e31f5d20f825986eefcb705364c956b3386397c256fc5c6090131",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/commands/tasks/scope-lock-diagnostics.ts packages/cli/src/commands/taskflow/commit-bundle-assembly.ts packages/cli/src/commands/shared.ts packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts tests/cli/taskflow-status-migration-hint.test.ts docs/governance/atm-bug-and-optimization-backlog.md",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e353b1d9fb59bf72ef498c2e9bf6c5ef190312f718a14b1299fa75d96c2fedb9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:44e83542f89c0aa5a704e720b884a7c489a767bcca03eddd375be0b553c99a8e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "check:encoding:touched",
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+    "node --strip-types tests/cli/taskflow-status-migration-hint.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-13T09:14:50.912Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0190.*",
+      ".atm/history/task-events/TASK-AAO-0190/**",
+      ".atm/history/tasks/TASK-AAO-0190.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "tests/cli/taskflow-status-migration-hint.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "tests/cli/taskflow-status-migration-hint.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0190.json",
+  "closedAt": "2026-07-13T09:14:50.913Z",
+  "closedByActor": "cursor-grok-4.5",
+  "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f69b2a17424b5a844898219b0a0812a2fda06ead",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/shared.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+      "tests/cli/taskflow-status-migration-hint.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0190.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0190/2026-07-13T09-06-29-612Z-import-5c4b4af800f1.json",
+      ".atm/history/task-events/TASK-AAO-0190/2026-07-13T09-07-17-746Z-reserve-5f1346dd4d87.json",
+      ".atm/history/task-events/TASK-AAO-0190/2026-07-13T09-07-17-770Z-promote-6a4b4c25d08d.json",
+      ".atm/history/task-events/TASK-AAO-0190/2026-07-13T09-07-20-452Z-claim-75b16fd08d47.json",
+      ".atm/history/tasks/TASK-AAO-0190.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

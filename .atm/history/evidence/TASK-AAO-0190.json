@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0190",
-  "updatedAt": "2026-07-13T09:08:48.905Z",
+  "updatedAt": "2026-07-13T09:14:22.735Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -119,6 +119,174 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:fb35ac6423a11b551e546ee22390020b28b95ef0d1a058dbdcd73472dfa3d707",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run check:encoding:touched -- --files packages/cli/src/commands/tasks/scope-lock-diagnostics.ts packages/cli/src/commands/taskflow/commit-bundle-assembly.ts packages/cli/src/commands/shared.ts packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts tests/cli/taskflow-status-migration-hint.test.ts docs/governance/atm-bug-and-optimization-backlog.md",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+      "createdAt": "2026-07-13T09:13:00.319Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "check:encoding:touched"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run check:encoding:touched -- --files packages/cli/src/commands/tasks/scope-lock-diagnostics.ts packages/cli/src/commands/taskflow/commit-bundle-assembly.ts packages/cli/src/commands/shared.ts packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts tests/cli/taskflow-status-migration-hint.test.ts docs/governance/atm-bug-and-optimization-backlog.md",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e353b1d9fb59bf72ef498c2e9bf6c5ef190312f718a14b1299fa75d96c2fedb9",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "check:encoding:touched"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:ebadf264090973188734e5630793a8dccac68d8bb2b01d6d28899fc7f75693ae",
+            "cached": false,
+            "generatedAt": "2026-07-13T09:13:00.412Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:96965fa1119e784e7a8da53109d316f974b21da581255ef872a5a764417e79e3",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+      "createdAt": "2026-07-13T09:13:15.691Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-07-13T09:13:15.780Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d22a71da7f9162977e7ce34e54fe3f7de957eb6ddbf24ab6104dfdc91f8272d1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+      "createdAt": "2026-07-13T09:13:29.336Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:44e83542f89c0aa5a704e720b884a7c489a767bcca03eddd375be0b553c99a8e",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:8d0639196bd4edc3ee827a3f9147b0de966541cd60eac28424b1cca4460c30ea",
+            "cached": false,
+            "generatedAt": "2026-07-13T09:13:29.465Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1054c9b4591f29909a38e56961de633748089884b4b96896db9ee6e92bd41746",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+      "createdAt": "2026-07-13T09:14:22.735Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-13T09:14:22.902Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:66c867d1941e3ee76c27dcbd6537d214471a868a4466bfe8215d413684c017a4",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

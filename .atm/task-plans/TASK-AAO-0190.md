@@ -1,7 +1,7 @@
 ---
 task_id: TASK-AAO-0190
 title: Fix taskflow close UX for auto-stage and --status migration
-status: planned
+status: done
 priority: P2
 owner: cursor-grok-4.5
 depends_on: []
@@ -29,6 +29,15 @@ rollback:
   strategy: revert-commit
 backlog:
   - ATM-BUG-2026-07-12-151
+completed_at: "2026-07-13T09:14:51.015Z"
+completed_by_agent: "cursor-grok-4.5"
+closedAt: "2026-07-13T09:14:51.015Z"
+closedByActor: "cursor-grok-4.5"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-13T09-14-51-015Z-close-196d4154d238"
+lastTransitionAt: "2026-07-13T09:14:51.015Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "f69b2a17424b5a844898219b0a0812a2fda06ead"
 ---
 
 # TASK-AAO-0190 — Fix taskflow close UX for auto-stage and --status migration

@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T09-14-50-924Z-close-b85c7f839112",
+  "taskId": "TASK-AAO-0190",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0190.json",
+  "taskSha256": "sha256:ef9d59af4ebdc25f5c69be02acb013404426d0ee8cb133467728720d00d13f1a",
+  "createdAt": "2026-07-13T09:14:50.924Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0190 --actor cursor-grok-4.5 --status done --historical-delivery f69b2a17424b5a844898219b0a0812a2fda06ead",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713090717-cursor-grok-4.5-TASK-AAO-0190-c378a4ab65",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0190.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "node --strip-types tests/cli/taskflow-status-migration-hint.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T09:14:50.912Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0190.*",
+        ".atm/history/task-events/TASK-AAO-0190/**",
+        ".atm/history/tasks/TASK-AAO-0190.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "tests/cli/taskflow-status-migration-hint.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+        "packages/cli/src/commands/tasks/scope-lock-diagnostics.ts",
+        "tests/cli/taskflow-status-migration-hint.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
