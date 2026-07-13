@@ -550,7 +550,30 @@ export function parseArgsForCommand(
           continue;
         }
         const allowedFlags = [...new Set([...(spec.options ?? []).map((o) => o.flag), '--json', '--pretty', '--output-json'])].sort();
-        throw new CliError('ATM_CLI_USAGE', `${spec.name || 'command'} does not support option ${arg}`, {
+        const commandName = spec.name || 'command';
+        // ATM-BUG-2026-07-12-151: low-level tasks close uses --status; taskflow close does not.
+        if (commandName === 'taskflow' && arg === '--status') {
+          const suggestedCommand = 'node atm.mjs taskflow close --task <id> --actor <actor> --write --json';
+          throw new CliError(
+            'ATM_CLI_USAGE',
+            'taskflow does not support --status; omit it for taskflow close, or use `node atm.mjs tasks close --task <id> --actor <actor> --status done --json` for the low-level backend lane.',
+            {
+              exitCode: 2,
+              details: {
+                invalidFlags: [arg],
+                missingRequired: [],
+                allowedFlags,
+                suggestedCommand,
+                migrationHint: {
+                  from: 'taskflow close --status done',
+                  toTaskflow: suggestedCommand,
+                  toLowLevel: 'node atm.mjs tasks close --task <id> --actor <actor> --status done --json'
+                }
+              }
+            }
+          );
+        }
+        throw new CliError('ATM_CLI_USAGE', `${commandName} does not support option ${arg}`, {
           exitCode: 2,
           details: {
             invalidFlags: [arg],

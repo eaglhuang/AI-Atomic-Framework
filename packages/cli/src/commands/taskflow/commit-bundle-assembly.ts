@@ -362,7 +362,7 @@ function commitCommandFor(input: {
 }): string {
   if (!input.repoRoot) return '';
   if (input.repoKind === 'target') {
-    return `node atm.mjs git commit --cwd ${quoteCliValue(input.repoRoot)} --actor ${quoteCliValue(input.actorId ?? '<actor>')} --task ${input.taskId} --message ${quoteCliValue(input.commitMessage)} --json`;
+    return `node atm.mjs git commit --cwd ${quoteCliValue(input.repoRoot)} --actor ${quoteCliValue(input.actorId ?? '<actor>')} --task ${input.taskId} --message ${quoteCliValue(input.commitMessage)} --auto-stage --json`;
   }
   const messageParts = [
     input.commitMessage,

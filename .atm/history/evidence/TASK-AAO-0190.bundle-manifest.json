@@ -1,0 +1,51 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0190",
+  "updatedAt": "2026-07-13T09:08:48.905Z",
+  "updatedBy": "cursor-grok-4.5",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+    "node --strip-types tests/cli/taskflow-status-migration-hint.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:62a2b267d47ab9fec9c128a5cee0d1b6d071f4dd91ae247185d38a868dee6a0c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts"
+      ],
+      "generatedAt": "2026-07-13T09:08:41.564Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0ead4def40638ed28e1163b4078a64bffc2beed8",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/taskflow-status-migration-hint.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:70aa0362455e31f5d20f825986eefcb705364c956b3386397c256fc5c6090131",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/taskflow-status-migration-hint.test.ts"
+      ],
+      "generatedAt": "2026-07-13T09:08:45.176Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0ead4def40638ed28e1163b4078a64bffc2beed8",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched -- --files packages/cli/src/commands/tasks/scope-lock-diagnostics.ts packages/cli/src/commands/taskflow/commit-bundle-assembly.ts packages/cli/src/commands/shared.ts packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts tests/cli/taskflow-status-migration-hint.test.ts docs/governance/atm-bug-and-optimization-backlog.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e353b1d9fb59bf72ef498c2e9bf6c5ef190312f718a14b1299fa75d96c2fedb9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-13T09:08:48.995Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0ead4def40638ed28e1163b4078a64bffc2beed8",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
