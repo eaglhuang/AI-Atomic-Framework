@@ -9,10 +9,9 @@ import {
   describeBlockingRegistryIntent,
   loadRegistry,
   resolveConflictBlockingIntent,
-  saveRegistry,
-  type WriteBrokerRegistryDocument
+  saveRegistry
 } from '../registry.ts';
-import type { ActiveWriteIntent, WriteIntent } from '../types.ts';
+import type { ActiveWriteIntent, WriteBrokerRegistryDocument, WriteIntent } from '../types.ts';
 
 function emptyRegistry(): WriteBrokerRegistryDocument {
   return {
