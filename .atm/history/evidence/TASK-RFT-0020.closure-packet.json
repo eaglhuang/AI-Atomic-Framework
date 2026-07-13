@@ -16,21 +16,24 @@
     ]
   },
   "targetCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
-  "governedTreeSha": "c782034e95c500b50fdc845465c346ef26fbe112",
+  "governedTreeSha": "a366dcbc1bef2119b481ad866283d245ea335a6c",
   "targetCommitDelta": {
-    "currentCommitSha": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+    "currentCommitSha": "c47c771feb70795a696fcdb5b02ad942ecf8a3a1",
     "parentCommitShas": [
       "6500e5f1567649f1a1bf6ed41cf9954dee78cde4"
     ],
-    "governedTreeSha": "c782034e95c500b50fdc845465c346ef26fbe112",
+    "governedTreeSha": "a366dcbc1bef2119b481ad866283d245ea335a6c",
     "changedFiles": [
       ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/git-head.jsonl",
       ".atm/history/evidence/TASK-RFT-0020.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0020.closure-packet.json",
       ".atm/history/evidence/TASK-RFT-0020.json",
       ".atm/history/task-events/TASK-RFT-0020/2026-07-13T16-37-51-071Z-import-90cece8334f3.json",
       ".atm/history/task-events/TASK-RFT-0020/2026-07-13T16-38-14-052Z-reserve-5eb1249cbb41.json",
       ".atm/history/task-events/TASK-RFT-0020/2026-07-13T16-38-14-055Z-promote-b67d628161a6.json",
       ".atm/history/task-events/TASK-RFT-0020/2026-07-13T16-38-17-586Z-claim-b50bd37e9afe.json",
+      ".atm/history/task-events/TASK-RFT-0020/2026-07-13T17-10-14-806Z-close-393d4223cbc6.json",
       ".atm/history/tasks/TASK-RFT-0020.json",
       "docs/reports/git-governance-atomic-map.md",
       "packages/cli/src/commands/git-governance.ts",
@@ -38,13 +41,7 @@
       "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
       "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
       "packages/cli/src/commands/git-governance/governance-residue-policy.ts",
-      "packages/cli/src/commands/git-governance/validate-atom-file-size.ts",
-      "release/atm-onefile/atm.mjs",
-      "release/atm-onefile/release-manifest.json",
-      "release/atm-root-drop/integrations/codex-skills/atm-atom-map-refactor/SKILL.md",
-      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
-      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
-      "release/atm-root-drop/release-manifest.json"
+      "packages/cli/src/commands/git-governance/validate-atom-file-size.ts"
     ]
   },
   "closedByCommand": "atm tasks close",
@@ -373,5 +370,13 @@
       "risk": "medium",
       "closeReady": false
     }
+  },
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-07-13T18:32:01.940Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "c47c771feb70795a696fcdb5b02ad942ecf8a3a1",
+    "repairedTargetCommitSha": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
   }
 }
