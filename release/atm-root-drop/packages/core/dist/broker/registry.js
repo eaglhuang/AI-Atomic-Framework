@@ -1,6 +1,9 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-export function loadRegistry(filePath) {
+import { classifyLeasePhase } from './orphan-cleanup.js';
+export const DEFAULT_BROKER_CLEANUP_COMMAND = 'node atm.mjs broker cleanup --json';
+export function loadRegistry(filePath, options = {}) {
+    const persistCleanup = options.persistCleanup !== false;
     if (!existsSync(filePath)) {
         return {
             schemaId: 'atm.writeBrokerRegistry.v1',
@@ -14,11 +17,12 @@ export function loadRegistry(filePath) {
     try {
         const raw = readFileSync(filePath, 'utf8');
         const parsed = JSON.parse(raw);
-        const cleaned = cleanupStale(parsed);
-        if (cleaned.activeIntents.length !== parsed.activeIntents.length || cleaned.currentEpoch !== parsed.currentEpoch) {
-            saveRegistry(filePath, cleaned);
+        const cleaned = cleanupStaleWithEvidence(parsed, { registryPath: filePath });
+        if (persistCleanup
+            && (cleaned.removedCount > 0 || cleaned.registry.currentEpoch !== parsed.currentEpoch)) {
+            saveRegistry(filePath, cleaned.registry);
         }
-        return cleaned;
+        return cleaned.registry;
     }
     catch {
         return {
@@ -133,24 +137,193 @@ export function releaseTask(doc, taskId) {
         activeIntents: doc.activeIntents.filter((entry) => entry.taskId !== taskId)
     };
 }
-export function cleanupStale(doc) {
-    const now = Date.now();
-    const validIntents = doc.activeIntents.filter((entry) => {
-        if (!entry.expiresAt)
-            return true;
-        const exp = Date.parse(entry.expiresAt);
-        return exp > now;
-    });
+export function cleanupStale(doc, options = {}) {
+    return cleanupStaleWithEvidence(doc, options).registry;
+}
+export function cleanupStaleWithEvidence(doc, options = {}) {
+    const now = options.now ?? Date.now();
+    const registryPath = options.registryPath ?? null;
+    const removed = [];
+    const validIntents = [];
+    for (const entry of doc.activeIntents) {
+        const phase = classifyLeasePhase(entry, now);
+        if (phase === 'stale') {
+            removed.push(describeStaleRegistryEntry(entry, { now, registryPath }));
+            continue;
+        }
+        validIntents.push(entry);
+    }
     const validEpochs = validIntents
         .map((entry) => entry.leaseEpoch)
         .filter((epoch) => Number.isFinite(epoch));
     const preservedEpoch = validEpochs.length > 0
         ? Math.max(...validEpochs)
         : (typeof doc.currentEpoch === 'number' && Number.isFinite(doc.currentEpoch) ? doc.currentEpoch : now);
+    const cleanupCommand = buildBrokerCleanupCommand(registryPath ?? undefined);
+    const guidance = removed.length > 0
+        ? formatRegistryResidueGuidance({ registryPath: registryPath ?? '.atm/runtime/write-broker.registry.json', removed })
+        : 'No stale broker registry entries were removed.';
     return {
-        ...doc,
-        currentEpoch: preservedEpoch,
-        activeIntents: validIntents
+        registry: {
+            ...doc,
+            currentEpoch: preservedEpoch,
+            activeIntents: validIntents
+        },
+        removed,
+        removedCount: removed.length,
+        cleanupCommand,
+        guidance
+    };
+}
+export function buildBrokerCleanupCommand(registryPath = '.atm/runtime/write-broker.registry.json') {
+    void registryPath;
+    return DEFAULT_BROKER_CLEANUP_COMMAND;
+}
+export function formatIntentAgeLabel(ageMs) {
+    const seconds = Math.max(0, Math.floor(ageMs / 1000));
+    if (seconds < 60) {
+        return `${seconds}s`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) {
+        return `${minutes}m`;
+    }
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return `${hours}h ${minutes % 60}m`;
+    }
+    const days = Math.floor(hours / 24);
+    return `${days}d ${hours % 24}h`;
+}
+export function computeIntentAgeMs(intent, now = Date.now()) {
+    const heartbeatAtMs = Date.parse(intent.heartbeatAt ?? '');
+    if (Number.isFinite(heartbeatAtMs)) {
+        return Math.max(0, now - heartbeatAtMs);
+    }
+    const leaseEpoch = intent.leaseEpoch;
+    if (Number.isFinite(leaseEpoch)) {
+        return Math.max(0, now - leaseEpoch);
+    }
+    return 0;
+}
+export function classifyStaleRegistryEntry(intent, now = Date.now()) {
+    if (intent.expiresAt) {
+        const expiresAtMs = Date.parse(intent.expiresAt);
+        if (Number.isFinite(expiresAtMs) && expiresAtMs <= now) {
+            return 'expired-lease';
+        }
+    }
+    return 'stale-heartbeat';
+}
+export function describeStaleRegistryEntry(intent, options = {}) {
+    const now = options.now ?? Date.now();
+    const classification = classifyStaleRegistryEntry(intent, now);
+    const ageMs = computeIntentAgeMs(intent, now);
+    const reason = classification === 'expired-lease'
+        ? 'lease expired without explicit release'
+        : 'heartbeat exceeded stale renewal window without explicit release';
+    return {
+        intentId: intent.intentId,
+        taskId: intent.taskId,
+        actorId: intent.actorId,
+        owner: intent.actorId,
+        registryPath: options.registryPath ?? null,
+        expiresAt: intent.expiresAt ?? null,
+        heartbeatAt: intent.heartbeatAt ?? null,
+        ageMs,
+        ageLabel: formatIntentAgeLabel(ageMs),
+        classification,
+        reason,
+        terminalResidue: true
+    };
+}
+export function describeBlockingRegistryIntent(intent, options) {
+    const now = options.now ?? Date.now();
+    const phase = classifyLeasePhase(intent, now);
+    const classification = phase === 'stale'
+        ? classifyStaleRegistryEntry(intent, now)
+        : phase === 'suspect'
+            ? 'suspect-heartbeat'
+            : 'active-lease';
+    const ageMs = computeIntentAgeMs(intent, now);
+    const reason = phase === 'stale'
+        ? (classification === 'expired-lease'
+            ? 'blocking registry entry has an expired lease'
+            : 'blocking registry entry exceeded stale heartbeat window')
+        : phase === 'suspect'
+            ? 'blocking registry entry missed renewal threshold'
+            : 'blocking registry entry is still active';
+    return {
+        intentId: intent.intentId,
+        taskId: intent.taskId,
+        actorId: intent.actorId,
+        owner: intent.actorId,
+        registryPath: options.registryPath,
+        expiresAt: intent.expiresAt ?? null,
+        heartbeatAt: intent.heartbeatAt ?? null,
+        ageMs,
+        ageLabel: formatIntentAgeLabel(ageMs),
+        classification,
+        reason,
+        terminalResidue: phase === 'stale',
+        isStale: phase === 'stale'
+    };
+}
+export function resolveConflictBlockingIntent(decision, registry) {
+    const preservedIntentId = decision.failureReason?.preservedIntentId;
+    if (preservedIntentId?.startsWith('active:')) {
+        const taskId = preservedIntentId.slice('active:'.length);
+        return registry.activeIntents.find((intent) => intent.taskId === taskId) ?? null;
+    }
+    for (const conflict of decision.conflicts) {
+        const taskMatch = /task '([^']+)'/.exec(conflict.detail) ?? /task "([^"]+)"/.exec(conflict.detail);
+        if (!taskMatch?.[1]) {
+            continue;
+        }
+        const match = registry.activeIntents.find((intent) => intent.taskId === taskMatch[1]);
+        if (match) {
+            return match;
+        }
+    }
+    return registry.activeIntents[0] ?? null;
+}
+export function formatRegistryResidueGuidance(input) {
+    const cleanupCommand = buildBrokerCleanupCommand(input.registryPath);
+    const lines = [];
+    if (input.blocking) {
+        const staleHint = input.blocking.terminalResidue ? 'terminal stale residue' : 'active blocking lease';
+        lines.push(`Broker registry entry at ${input.registryPath}: task ${input.blocking.taskId} owned by ${input.blocking.owner} (${input.blocking.ageLabel} old, ${staleHint}).`);
+    }
+    for (const entry of input.removed ?? []) {
+        lines.push(`Removed stale registry entry ${entry.intentId}: task ${entry.taskId} owned by ${entry.owner} (${entry.ageLabel} old, ${entry.classification}).`);
+    }
+    if (lines.length === 0) {
+        return 'No stale broker registry residue detected.';
+    }
+    lines.push(`Run governed cleanup: ${cleanupCommand}`);
+    return lines.join(' ');
+}
+export function buildBlockingRegistryFindingEvidence(input) {
+    const blocking = describeBlockingRegistryIntent(input.blockingIntent, {
+        registryPath: input.registryPath,
+        now: input.now
+    });
+    const cleanupCommand = buildBrokerCleanupCommand(input.registryPath);
+    const residueSummary = `registry=${input.registryPath}; task=${blocking.taskId}; owner=${blocking.owner}; age=${blocking.ageLabel}; intent=${blocking.intentId}`;
+    const staleSuffix = blocking.isStale
+        ? ` Classified as terminal stale residue (${blocking.classification}).`
+        : '';
+    const detail = `${input.baseReason} Blocking entry: ${residueSummary}.${staleSuffix}`;
+    const guidance = blocking.isStale
+        ? formatRegistryResidueGuidance({ registryPath: input.registryPath, blocking })
+        : `${detail} If the lane finished, release with node atm.mjs broker release --task ${blocking.taskId} --json or run ${cleanupCommand}.`;
+    return {
+        registryPath: input.registryPath,
+        blocking,
+        detail,
+        cleanupCommand,
+        guidance,
+        isStale: blocking.isStale
     };
 }
 export function buildVirtualAtomInUseRegistry(doc) {

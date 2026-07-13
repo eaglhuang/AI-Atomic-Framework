@@ -139,7 +139,7 @@ export async function executeMicrosoftFoundryProvider(input) {
             metadata: {
                 taskId: input.request.taskId,
                 sessionId: input.sessionId,
-                scopedPathCount: input.scopedPaths.length
+                scopedPathCount: String(input.scopedPaths.length)
             }
         };
     const result = await (input.executor ?? defaultFoundryHttpExecutor)({

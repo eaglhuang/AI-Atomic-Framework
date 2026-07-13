@@ -18,6 +18,8 @@ export interface ActiveTaskInfo {
 }
 export declare function getActiveTasks(cwd: string): readonly ActiveTaskInfo[];
 export declare function detectCrossTaskMutation(cwd: string, currentTaskId: string | null, commandFamily: string): CrossTaskMutationBlock | null;
+export declare function isIncidentStillActive(cwd: string, block: CrossTaskMutationBlock, currentTaskId?: string | null): boolean;
+export declare function reconcileStaleIncidents(cwd: string, currentTaskId?: string | null): boolean;
 export declare function recordIncidentFlag(cwd: string, block: CrossTaskMutationBlock): void;
-export declare function readIncidentFlag(cwd: string): CrossTaskMutationBlock | null;
+export declare function readIncidentFlag(cwd: string, currentTaskId?: string | null): CrossTaskMutationBlock | null;
 export declare function clearIncidentFlags(cwd: string): void;

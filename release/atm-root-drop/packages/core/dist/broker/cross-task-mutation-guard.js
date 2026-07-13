@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { readBrokerLifecycleState } from './lifecycle.js';
 function normalizeRelativePath(value) {
     return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
@@ -225,6 +226,131 @@ export function detectCrossTaskMutation(cwd, currentTaskId, commandFamily) {
     }
     return null;
 }
+function collectIncidentConflictTaskIds(block) {
+    const taskIds = new Set([block.conflictTaskId.trim().toUpperCase()]);
+    for (const conflict of block.conflicts) {
+        taskIds.add(conflict.conflictTaskId.trim().toUpperCase());
+    }
+    return taskIds;
+}
+function isReleasedLockRecord(value) {
+    if (value.released === true)
+        return true;
+    if (value.status === 'released')
+        return true;
+    if (value.claim && typeof value.claim === 'object' && !Array.isArray(value.claim)) {
+        const claimState = String(value.claim.state ?? '');
+        if (claimState === 'released')
+            return true;
+    }
+    return false;
+}
+function hasActiveLockForTask(cwd, taskId) {
+    const lockPath = path.join(cwd, '.atm', 'runtime', 'locks', `${taskId}.lock.json`);
+    if (!existsSync(lockPath))
+        return false;
+    try {
+        const record = JSON.parse(readFileSync(lockPath, 'utf8'));
+        return !isReleasedLockRecord(record);
+    }
+    catch {
+        return false;
+    }
+}
+function hasActiveBrokerIntentForTasks(cwd, taskIds) {
+    try {
+        const state = readBrokerLifecycleState(cwd);
+        if (state.activeIntents.some((intent) => taskIds.has(intent.taskId.trim().toUpperCase()))) {
+            return true;
+        }
+    }
+    catch {
+        // ignore broker registry read failures
+    }
+    const intentDir = path.join(cwd, '.atm', 'runtime', 'broker-intents');
+    if (!existsSync(intentDir))
+        return false;
+    try {
+        for (const fileName of readdirSync(intentDir)) {
+            if (!fileName.endsWith('.json'))
+                continue;
+            const taskId = fileName.slice(0, -'.json'.length).trim().toUpperCase();
+            if (taskIds.has(taskId))
+                return true;
+        }
+    }
+    catch {
+        // ignore broker snapshot read failures
+    }
+    return false;
+}
+export function isIncidentStillActive(cwd, block, currentTaskId = null) {
+    if (detectCrossTaskMutation(cwd, currentTaskId, 'incident-review')) {
+        return true;
+    }
+    const conflictTaskIds = collectIncidentConflictTaskIds(block);
+    if (hasActiveBrokerIntentForTasks(cwd, conflictTaskIds)) {
+        return true;
+    }
+    for (const taskId of conflictTaskIds) {
+        if (hasActiveLockForTask(cwd, taskId)) {
+            return true;
+        }
+    }
+    return false;
+}
+function archiveResolvedIncident(cwd, fileName, report) {
+    const incidentsDir = path.join(cwd, '.atm', 'runtime', 'incidents');
+    const archiveDir = path.join(incidentsDir, 'archive');
+    mkdirSync(archiveDir, { recursive: true });
+    const sourcePath = path.join(incidentsDir, fileName);
+    const archivePath = path.join(archiveDir, fileName);
+    writeFileSync(archivePath, JSON.stringify({
+        ...report,
+        resolvedAt: new Date().toISOString()
+    }, null, 2), 'utf8');
+    unlinkSync(sourcePath);
+}
+function listActiveIncidentFiles(cwd) {
+    const incidentsDir = path.join(cwd, '.atm', 'runtime', 'incidents');
+    if (!existsSync(incidentsDir))
+        return [];
+    try {
+        return readdirSync(incidentsDir)
+            .filter((fileName) => fileName.endsWith('.json'))
+            .sort();
+    }
+    catch {
+        return [];
+    }
+}
+export function reconcileStaleIncidents(cwd, currentTaskId = null) {
+    const incidentsDir = path.join(cwd, '.atm', 'runtime', 'incidents');
+    if (!existsSync(incidentsDir))
+        return false;
+    let reconciled = false;
+    for (const fileName of listActiveIncidentFiles(cwd)) {
+        const filePath = path.join(incidentsDir, fileName);
+        try {
+            const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+            const block = parsed.block ?? null;
+            if (!block || !isIncidentStillActive(cwd, block, currentTaskId)) {
+                archiveResolvedIncident(cwd, fileName, parsed);
+                reconciled = true;
+            }
+        }
+        catch {
+            try {
+                unlinkSync(filePath);
+                reconciled = true;
+            }
+            catch {
+                // ignore malformed incident cleanup failures
+            }
+        }
+    }
+    return reconciled;
+}
 export function recordIncidentFlag(cwd, block) {
     const incidentsDir = path.join(cwd, '.atm', 'runtime', 'incidents');
     try {
@@ -240,22 +366,20 @@ export function recordIncidentFlag(cwd, block) {
         // ignore write errors
     }
 }
-export function readIncidentFlag(cwd) {
+export function readIncidentFlag(cwd, currentTaskId = null) {
+    reconcileStaleIncidents(cwd, currentTaskId);
     const incidentsDir = path.join(cwd, '.atm', 'runtime', 'incidents');
-    if (!existsSync(incidentsDir))
+    const sorted = listActiveIncidentFiles(cwd);
+    if (sorted.length === 0)
         return null;
+    const latestFile = sorted[sorted.length - 1];
     try {
-        const files = readdirSync(incidentsDir);
-        if (files.length === 0)
-            return null;
-        // Read the latest incident
-        const sorted = files.filter(f => f.endsWith('.json')).sort();
-        if (sorted.length === 0)
-            return null;
-        const latestFile = sorted[sorted.length - 1];
         const content = readFileSync(path.join(incidentsDir, latestFile), 'utf8');
         const parsed = JSON.parse(content);
-        return parsed.block || null;
+        const block = parsed.block ?? null;
+        if (!block)
+            return null;
+        return isIncidentStillActive(cwd, block, currentTaskId) ? block : null;
     }
     catch {
         return null;

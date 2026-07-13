@@ -12,7 +12,6 @@ import { abandonTaskQueue, findActiveTaskQueue, sanitizeTaskDirectionAllowedFile
 import { isPathAllowedByScope } from '../work-channels.js';
 import { evaluateTaskResetAdmission } from './lifecycle-state.js';
 import { buildResidueDiagnosisEvidenceFromTriangulation } from './residue-diagnostics.js';
-import { dispatchTasksAction } from './command-dispatch.js';
 import { runTasksClose } from './close-orchestrator.js';
 import { runTasksImport } from './import-orchestrator.js';
 import { runTasksVerify } from './verify-orchestrator.js';
@@ -44,6 +43,9 @@ import { coerceStatus, extractFrontMatter, hashSection, normalizeOptionalString,
 import { parseCreateOptions, parseMirrorOptions, parseStatusOptions, parseFinalizeDiagnoseOptions, parseResetOptions, parseLockCleanupOptions, parseMetadataRepairDeliverablesOptions, parseScopeAddOptions, parseScopeRepairOptions, parseQueueOptions, parseAuditOptions, parseLegacyLedgerMigrationOptions, parseAllowStaleRunnerFlag } from './task-option-parsers.js';
 import { buildTaskStatusTriangulation as buildTaskStatusTriangulationDelegated, readScopeAmendmentEvents as readScopeAmendmentEventsDelegated, readLastTransitionEventRecord as readLastTransitionEventRecordDelegated, resolvePlanningCardPath as resolvePlanningCardPathDelegated } from './status-triangulation.js';
 import { recordStaleRunnerOverride as recordStaleRunnerOverrideDelegated, recordFailedEmergencyUseAttempt as recordFailedEmergencyUseAttemptDelegated, isCliErrorWithCode as isCliErrorWithCodeDelegated } from './close-governance.js';
+import { runTasksCompatCommandMap } from './legacy/compat-command-map.js';
+import { createRepairReconcileLane } from './legacy/repair-reconcile-lane.js';
+import { createTransitionCompatLane } from './legacy/transition-compat.js';
 export const validStatuses = new Set(['planned', 'open', 'in_progress', 'reserved', 'ready', 'running', 'review', 'blocked', 'abandoned', 'done']);
 const acceptanceHeaders = ['acceptance criteria', 'acceptance', 'acceptance tests', 'criteria', '驗收', '驗收條件'];
 const deliverablesHeaders = ['deliverables', 'outputs', 'outcomes', '交付物', '產物', '輸出'];
@@ -72,7 +74,16 @@ function inferLegacyDeliverablesFromScope(scopePaths) {
     return inferred;
 }
 export async function runTasks(argv) {
-    return dispatchTasksAction(argv, {
+    const repairReconcileLane = createRepairReconcileLane({
+        reconcile: runTasksReconcile,
+        repairClosure: runTasksRepairClosure,
+        repairClaim: runTasksRepairClaim
+    });
+    const transitionCompatLane = createTransitionCompatLane({
+        claimLifecycle: runTasksClaimLifecycle,
+        deliverAndClose: runTasksDeliverAndClose
+    });
+    return runTasksCompatCommandMap(argv, {
         close: runTasksClose,
         reset: runTasksReset,
         create: runTasksCreate,
@@ -82,14 +93,14 @@ export async function runTasks(argv) {
         parallel: runTasksParallel,
         lock: runTasksLock,
         migrateLegacyLedger: runTasksMigrateLegacyLedger,
-        claimLifecycle: runTasksClaimLifecycle,
-        reconcile: runTasksReconcile,
-        repairClosure: runTasksRepairClosure,
-        repairClaim: runTasksRepairClaim,
+        claimLifecycle: transitionCompatLane.claimLifecycle,
+        reconcile: repairReconcileLane.reconcile,
+        repairClosure: repairReconcileLane.repairClosure,
+        repairClaim: repairReconcileLane.repairClaim,
         show: runTasksShow,
         status: runTasksStatus,
         finalize: runTasksFinalize,
-        deliverAndClose: runTasksDeliverAndClose,
+        deliverAndClose: transitionCompatLane.deliverAndClose,
         roster: runTasksRoster,
         newTask: runTasksNew,
         importTask: runTasksImport,
@@ -1112,43 +1123,24 @@ async function cleanupTaskLock(input) {
         await resolveValue(adapter.stores.lockStore.releaseLock(taskId, actorId));
         cleanupActions.push('released-governance-lock');
     }
-    if (governanceLock && releasedLock) {
-        const embeddedLock = governanceLock.taskDirectionLock;
-        if (embeddedLock && typeof embeddedLock === 'object' && !Array.isArray(embeddedLock)) {
-            const embedded = embeddedLock;
-            if (embedded.status !== 'released') {
-                writeFileSync(lockPath, `${JSON.stringify({
-                    ...governanceLock,
-                    taskDirectionLock: {
-                        ...embedded,
-                        status: 'released',
-                        released: true,
-                        releasedAt: nowIso,
-                        releasedBy: actorId
-                    }
-                }, null, 2)}\n`, 'utf8');
-                cleanupActions.push('released-embedded-direction-lock');
-            }
-        }
+    const lockRecordAfterRelease = existsSync(lockPath)
+        ? JSON.parse(readFileSync(lockPath, 'utf8'))
+        : governanceLock;
+    if (lockRecordAfterRelease && releaseEmbeddedDirectionLock({
+        lockPath,
+        lockRecord: lockRecordAfterRelease,
+        actorId,
+        nowIso
+    })) {
+        cleanupActions.push('released-embedded-direction-lock');
     }
-    if (taskDocument) {
-        const canonicalDirectionLock = taskDocument.taskDirectionLock;
-        if (canonicalDirectionLock && typeof canonicalDirectionLock === 'object' && !Array.isArray(canonicalDirectionLock)) {
-            const directionLock = canonicalDirectionLock;
-            if (directionLock.status !== 'released') {
-                writeFileSync(taskPath, `${JSON.stringify({
-                    ...taskDocument,
-                    taskDirectionLock: {
-                        ...directionLock,
-                        status: 'released',
-                        released: true,
-                        releasedAt: nowIso,
-                        releasedBy: actorId
-                    }
-                }, null, 2)}\n`, 'utf8');
-                cleanupActions.push('released-canonical-direction-lock');
-            }
-        }
+    if (taskDocument && releaseCanonicalDirectionLock({
+        taskPath,
+        taskDocument,
+        actorId,
+        nowIso
+    })) {
+        cleanupActions.push('released-canonical-direction-lock');
     }
     if (existsSync(sidecarPath)) {
         rmSync(sidecarPath, { force: true });
@@ -2762,6 +2754,59 @@ function hasProtectedActiveClaim(document) {
     const claim = parseClaimRecord(document.claim);
     return Boolean(claim && (claim.state === 'active' || claim.state === 'handoff'));
 }
+function isCreatePlaceholderLedger(document) {
+    if (normalizeTaskStatus(document.status) !== 'planned')
+        return false;
+    const source = document.source;
+    const sourceHash = source && typeof source === 'object' && !Array.isArray(source)
+        ? String(source.hash ?? '').trim()
+        : '';
+    const legacyHash = typeof document.hash === 'string' ? document.hash.trim() : '';
+    if (sourceHash.length > 0 || legacyHash.length > 0)
+        return false;
+    if (typeof document.importedAt === 'string' && document.importedAt.trim().length > 0)
+        return false;
+    return true;
+}
+function releaseEmbeddedDirectionLock(input) {
+    const embeddedLock = input.lockRecord.taskDirectionLock;
+    if (!embeddedLock || typeof embeddedLock !== 'object' || Array.isArray(embeddedLock))
+        return false;
+    const embedded = embeddedLock;
+    if (embedded.status === 'released')
+        return false;
+    writeFileSync(input.lockPath, `${JSON.stringify({
+        ...input.lockRecord,
+        taskDirectionLock: {
+            ...embedded,
+            status: 'released',
+            released: true,
+            releasedAt: input.nowIso,
+            releasedBy: input.actorId
+        }
+    }, null, 2)}\n`, 'utf8');
+    return true;
+}
+function releaseCanonicalDirectionLock(input) {
+    const canonicalDirectionLock = input.taskDocument.taskDirectionLock;
+    if (!canonicalDirectionLock || typeof canonicalDirectionLock !== 'object' || Array.isArray(canonicalDirectionLock)) {
+        return false;
+    }
+    const directionLock = canonicalDirectionLock;
+    if (directionLock.status === 'released')
+        return false;
+    writeFileSync(input.taskPath, `${JSON.stringify({
+        ...input.taskDocument,
+        taskDirectionLock: {
+            ...directionLock,
+            status: 'released',
+            released: true,
+            releasedAt: input.nowIso,
+            releasedBy: input.actorId
+        }
+    }, null, 2)}\n`, 'utf8');
+    return true;
+}
 function importWouldOverwriteTask(input) {
     const currentHash = input.current.source?.hash ?? input.current.hash ?? '';
     if (input.resetOpen || input.reopen)
@@ -2890,7 +2935,12 @@ export function writeTaskFiles(input) {
                 }
                 // ATM-BUG-2026-07-13-178: explicit --reopen/--reset-open may overwrite an
                 // inert/abandoned ledger without --force; writing happens in the second pass.
+                // ATM-BUG-2026-07-12-159: tasks create placeholder ledgers (planned, no
+                // source hash) may be replaced by the first import without --force.
                 if (input.resetOpen || input.reopen) {
+                    continue;
+                }
+                if (isCreatePlaceholderLedger(existingDocument) && !hasProtectedActiveClaim(existingDocument)) {
                     continue;
                 }
                 diagnostics.push({
@@ -2917,9 +2967,6 @@ export function writeTaskFiles(input) {
     }
     for (const task of input.tasks) {
         const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
-        if (existsSync(filePath) && !input.force && !reconcileMirror && !input.resetOpen && !input.reopen) {
-            continue;
-        }
         let existingDocument = null;
         if (existsSync(filePath)) {
             try {
@@ -2928,6 +2975,12 @@ export function writeTaskFiles(input) {
             catch {
                 // ignore
             }
+        }
+        const placeholderOverwrite = existingDocument
+            ? isCreatePlaceholderLedger(existingDocument) && !hasProtectedActiveClaim(existingDocument)
+            : false;
+        if (existsSync(filePath) && !input.force && !reconcileMirror && !input.resetOpen && !input.reopen && !placeholderOverwrite) {
+            continue;
         }
         const wouldOverwrite = existingDocument
             ? importWouldOverwriteTask({

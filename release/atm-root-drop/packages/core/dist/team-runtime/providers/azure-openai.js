@@ -141,7 +141,7 @@ export async function executeAzureOpenAIResponses(input) {
                 taskId: input.request.taskId,
                 role: input.request.role,
                 sessionId: input.sessionId,
-                scopedPathCount: input.scopedPaths.length
+                scopedPathCount: String(input.scopedPaths.length)
             }
         },
         timeoutMs: input.timeoutMs

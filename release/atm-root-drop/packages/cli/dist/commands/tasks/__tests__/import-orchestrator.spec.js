@@ -225,4 +225,59 @@ function readdirFirstJson(directory) {
         rmSync(reopenRoot, { recursive: true, force: true });
     }
 }
-console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror + extraction-first patrol + abandoned-reopen)');
+// ATM-BUG-2026-07-12-159 — tasks create placeholder must import without --force.
+{
+    const placeholderRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-import-create-placeholder-'));
+    try {
+        writeJson(path.join(placeholderRoot, '.atm/config.json'), {
+            schemaVersion: 'atm.config.v0.1',
+            taskLedger: { enabled: true, mode: 'auto', mirrorExternalTasks: true, requireCliTransitions: true, provider: 'atm-local' }
+        });
+        const placeholderId = 'TASK-IMPORT-159';
+        const placeholderPlan = path.join(placeholderRoot, 'docs/tasks/TASK-IMPORT-159.task.md');
+        mkdirSync(path.dirname(placeholderPlan), { recursive: true });
+        writeFileSync(placeholderPlan, [
+            '---',
+            `task_id: ${placeholderId}`,
+            'title: Create placeholder import fixture',
+            'status: ready',
+            'planning_repo: PlanningRepo',
+            'target_repo: TargetRepo',
+            'closure_authority: target-repo',
+            'deliverables:',
+            '  - src/placeholder.ts',
+            '---',
+            `# ${placeholderId}`,
+            ''
+        ].join('\n'), 'utf8');
+        const placeholderTaskPath = path.join(placeholderRoot, '.atm/history/tasks', `${placeholderId}.json`);
+        writeJson(placeholderTaskPath, {
+            schemaVersion: 'atm.workItem.v0.2',
+            workItemId: placeholderId,
+            title: placeholderId,
+            status: 'planned',
+            owner: 'coordinator',
+            dependencies: [],
+            acceptance: [],
+            deliverables: [],
+            tags: [],
+            createdAt: '2026-07-12T00:00:00.000Z',
+            createdByActor: 'coordinator'
+        });
+        const importResult = await runTasksImport([
+            '--cwd', placeholderRoot,
+            '--from', placeholderPlan,
+            '--write',
+            '--json'
+        ]);
+        assert(importResult.ok === true, 'create placeholder import without --force must succeed');
+        const imported = JSON.parse(readFileSync(placeholderTaskPath, 'utf8'));
+        assert(imported.status === 'ready', `placeholder import must adopt planning status, got ${imported.status}`);
+        assert(typeof imported.source?.hash === 'string' && imported.source.hash.length > 0, 'placeholder import must stamp source hash');
+        assert(imported.source?.planPath === 'docs/tasks/TASK-IMPORT-159.task.md', 'placeholder import must refresh source planPath');
+    }
+    finally {
+        rmSync(placeholderRoot, { recursive: true, force: true });
+    }
+}
+console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror + extraction-first patrol + abandoned-reopen + create-placeholder-import)');

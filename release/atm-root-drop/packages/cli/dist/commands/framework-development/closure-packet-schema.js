@@ -15,6 +15,7 @@ import { externalTaskKey, readTaskLedgerPolicy, resolveTaskLedgerMode, transitio
 import { isClaimExpired, parseClaimRecord } from '../tasks/task-ledger-readers.js';
 import { isAtmCriticalNonDocSurface } from './path-classification.js';
 import { describeBuildReleaseHygienePolicy } from '../build-release-hygiene.js';
+import { pushSha256ValidationIssue } from './closure-packet/diagnostics.js';
 export function isTaskCloseGovernanceCriticalPath(filePath, taskId) {
     const relativePath = normalizeRelativePath(filePath);
     const normalizedTaskId = taskId.trim();
@@ -171,8 +172,6 @@ function classifyGovernanceHistoryArtifact(filePath) {
     return null;
 }
 const SHA256_DIGEST_PATTERN = /^sha256:([a-fA-F0-9]{64})$/;
-const SHA256_LOWER_PATTERN = /^sha256:[a-f0-9]{64}$/;
-const SHA256_FORMAT_EXPECTED = '^sha256:[a-f0-9]{64}$';
 export function normalizeSha256DigestValue(value) {
     const trimmed = value.trim();
     const match = SHA256_DIGEST_PATTERN.exec(trimmed);
@@ -195,34 +194,6 @@ export function normalizeSha256FieldsDeep(value) {
         return normalizeSha256DigestValue(value);
     }
     return value;
-}
-function summarizeSha256ActualValue(value) {
-    const text = String(value ?? '');
-    return text.length > 80 ? `${text.slice(0, 77)}...` : text;
-}
-function pushSha256ValidationIssue(issues, fieldPath, raw) {
-    if (raw === undefined || raw === null || (typeof raw === 'string' && raw.trim() === '')) {
-        issues.missing.push(fieldPath);
-        return;
-    }
-    const text = String(raw).trim();
-    if (!SHA256_DIGEST_PATTERN.test(text)) {
-        issues.invalidFormat.push({
-            path: fieldPath,
-            kind: 'invalidFormat',
-            formatExpected: SHA256_FORMAT_EXPECTED,
-            actualValue: summarizeSha256ActualValue(text)
-        });
-        return;
-    }
-    if (!SHA256_LOWER_PATTERN.test(text)) {
-        issues.invalidFormat.push({
-            path: fieldPath,
-            kind: 'invalidFormat',
-            formatExpected: SHA256_FORMAT_EXPECTED,
-            actualValue: summarizeSha256ActualValue(text)
-        });
-    }
 }
 const frameworkModeSpecVersion = '0.1.0';
 const defaultRequiredGates = [

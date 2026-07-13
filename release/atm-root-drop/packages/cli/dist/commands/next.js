@@ -4,7 +4,7 @@ import path from 'node:path';
 import { readActiveGuidanceSession, toGuidanceNextAction } from '../../../core/dist/guidance/index.js';
 import { loadHumanReviewQueueDocument } from '../../../plugin-human-review/dist/index.js';
 import { buildFirstUseUserNotice } from './first-use-notice.js';
-import { compareScoredTasks, compareGuidedLegacyQueuePriority, compareIsoDesc, looksLikeTaskArtifact, isLikelyPromptPathHint, pathFieldMatches, looksLikeNamedPlanPrompt, allowsPlanningMirror, statusQueueWeight, decisionResultForStatus, countTokenOverlap } from './next/match-and-sort.js';
+import { compareScoredTasks, compareGuidedLegacyQueuePriority, compareIsoDesc, looksLikeTaskArtifact, isLikelyPromptPathHint, pathFieldMatches, looksLikeNamedPlanPrompt, allowsPlanningMirror, statusQueueWeight, countTokenOverlap } from './next/match-and-sort.js';
 import { runDoctor } from './doctor.js';
 import { deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission } from './next/claim-admission.js';
 import { evaluateBrokerQueueAdmission } from './next/broker-queue-admission.js';
@@ -13,6 +13,9 @@ import { runBroker } from './broker.js';
 import { allowedGuidanceBootstrapCommands, blockedMutationCommands, decideRuntimeNextAction, selectPostClaimChannel, selectQuickfixChannel } from './next/channel-strategy.js';
 import { buildTaskScopedClaimCommand } from './next/task-scoped-claim-command.js';
 import { withRunnerMode } from './next/runner-mode.js';
+import { ensureDecisionTrail, readTaskId } from './next/next-action-assembly.js';
+import { buildPromptScopedQueueClaimCommand } from './next/prompt-scope-resolution.js';
+import { shouldEmitPromptWorktreeHint } from './next/worktree-hints.js';
 import { bootstrapTaskId, detectGovernanceRuntime } from './governance-runtime.js';
 import { describeIntegrationInstallHint, inspectIntegrationBootstrap } from './integration.js';
 import { inspectRuntimeAdapterReadiness } from './runtime-adapter-readiness.js';
@@ -1556,17 +1559,18 @@ function buildPromptScopedNextResult(input) {
             queueHeadTaskId
         };
         const queueHeadImport = queueHeadTask ? buildPlanningCardImportRequirement(queueHeadTask) : null;
+        const queueClaimCommand = buildPromptScopedQueueClaimCommand({
+            queueHeadTaskPresent: Boolean(queueHeadTask),
+            queuePrompt,
+            planningCardImportCommand: queueHeadImport?.requiredCommand ?? null
+        });
         const nextAction = embedTeamRecommendation({
             status: 'task-queue-ready',
-            command: queueHeadImport?.requiredCommand ?? (queueHeadTask
-                ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
-                : 'node atm.mjs next --prompt "<current user prompt>" --json'),
+            command: queueClaimCommand,
             reason: 'the prompt resolves to a scoped task queue; claim one task at a time',
             recommendedChannel: 'batch',
             riskLevel: 'high',
-            requiredCommand: queueHeadImport?.requiredCommand ?? (queueHeadTask
-                ? `node atm.mjs next --claim --actor <id> --prompt ${quoteCliValue(queuePrompt)} --auto-intent --json`
-                : 'node atm.mjs next --prompt "<current user prompt>" --json'),
+            requiredCommand: queueClaimCommand,
             planningCardImport: queueHeadImport,
             batchInstruction: 'This is a batch run. Do not switch to per-task normal flow. After next --claim, deliver only the current queue head and run node atm.mjs batch checkpoint --actor <id> --json. Do not manually loop over tasks claim/close.',
             playbook: buildChannelPlaybook({
@@ -4713,123 +4717,6 @@ function embedTeamRecommendation(nextAction, input) {
         playbook
     };
 }
-function ensureDecisionTrail(nextAction) {
-    if (Array.isArray(nextAction.decisionTrail) && nextAction.decisionTrail.length > 0) {
-        return nextAction;
-    }
-    nextAction.decisionTrail = buildDecisionTrail(nextAction);
-    return nextAction;
-}
-function buildDecisionTrail(nextAction) {
-    const entries = [{
-            check: 'route-status',
-            result: decisionResultForStatus(nextAction.status),
-            reason: nextAction.reason ?? `ATM selected route status ${nextAction.status}.`,
-            ...(nextAction.command ? { nextCommand: nextAction.command } : {})
-        }];
-    const selectedTaskId = readTaskId(nextAction.selectedTask);
-    if (selectedTaskId) {
-        entries.push({
-            check: 'task-selection',
-            result: 'pass',
-            reason: `Selected task ${selectedTaskId}.`
-        });
-    }
-    else if (Array.isArray(nextAction.selectedTasks)) {
-        entries.push({
-            check: 'task-selection',
-            result: nextAction.selectedTasks.length > 0 ? 'pass' : 'blocked',
-            reason: `Selected ${nextAction.selectedTasks.length} task candidate(s).`
-        });
-    }
-    if (nextAction.status === 'task-scope-not-found') {
-        entries.push({
-            check: 'prompt-scope-resolution',
-            result: 'blocked',
-            reason: 'No matching task scope was found; ATM did not fall back to unrelated task cards.'
-        });
-    }
-    if (nextAction.status === 'task-no-work') {
-        entries.push({
-            check: 'prompt-scope-resolution',
-            result: 'pass',
-            reason: 'The scoped prompt resolved cleanly, but no open imported work remains for that scope.'
-        });
-    }
-    if (nextAction.status === 'task-selection-required') {
-        entries.push({
-            check: 'prompt-scope-resolution',
-            result: 'blocked',
-            reason: 'Multiple task scopes matched; ATM requires a more specific prompt before routing.'
-        });
-    }
-    if (nextAction.recommendedChannel) {
-        entries.push({
-            check: 'work-channel',
-            result: 'info',
-            reason: `Recommended ${nextAction.recommendedChannel} channel with ${nextAction.riskLevel ?? 'unknown'} risk.`
-        });
-    }
-    const queueHeadTaskId = nextAction.queueHeadTaskId ?? readQueueHeadTaskId(nextAction.taskQueue);
-    if (queueHeadTaskId) {
-        entries.push({
-            check: 'queue-head',
-            result: 'pass',
-            reason: `Current queue head is ${queueHeadTaskId}.`
-        });
-    }
-    if (nextAction.taskDirectionLock?.schemaId === 'atm.taskDirectionLock.v1') {
-        const taskId = nextAction.taskDirectionLock.taskId ?? selectedTaskId ?? queueHeadTaskId ?? '<task>';
-        entries.push({
-            check: 'task-direction-lock',
-            result: 'pass',
-            reason: `Task direction lock is active for ${taskId}.`,
-            evidencePath: `.atm/runtime/locks/${taskId}.lock.json`
-        });
-    }
-    if (Array.isArray(nextAction.missingEvidence) && nextAction.missingEvidence.length > 0) {
-        entries.push({
-            check: 'missing-evidence',
-            result: 'blocked',
-            reason: `Missing evidence: ${nextAction.missingEvidence.join(', ')}.`
-        });
-    }
-    if (nextAction.closure?.closurePacketPath) {
-        entries.push({
-            check: 'closure-state',
-            result: 'pass',
-            reason: 'Task closure packet is available.',
-            evidencePath: nextAction.closure.closurePacketPath
-        });
-    }
-    if (Array.isArray(nextAction.allowedCommands) && nextAction.allowedCommands.length > 0) {
-        entries.push({
-            check: 'allowed-commands',
-            result: 'info',
-            reason: `${nextAction.allowedCommands.length} allowed command(s) are exposed for the route.`
-        });
-    }
-    if (Array.isArray(nextAction.blockedCommands) && nextAction.blockedCommands.length > 0) {
-        entries.push({
-            check: 'blocked-commands',
-            result: 'info',
-            reason: `${nextAction.blockedCommands.length} blocked command pattern(s) are exposed for the route.`
-        });
-    }
-    return entries;
-}
-function readTaskId(value) {
-    if (!value || typeof value !== 'object' || Array.isArray(value))
-        return null;
-    const candidate = value.workItemId;
-    return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate.trim() : null;
-}
-function readQueueHeadTaskId(value) {
-    if (!value || typeof value !== 'object' || Array.isArray(value))
-        return null;
-    const candidate = value.queueHeadTaskId;
-    return typeof candidate === 'string' && candidate.trim().length > 0 ? candidate.trim() : null;
-}
 function isTaskIdMentioned(workItemId, intent) {
     if (!intent || intent.mentionedTaskIds.length === 0)
         return false;
@@ -4950,14 +4837,7 @@ function buildNextMessages(nextAction, userNotice, integrationBootstrap, runtime
         }));
     }
     const promptWorktreeHint = nextAction.promptWorktreeHint;
-    if (promptWorktreeHint
-        && (promptWorktreeHint.promptMatchedFiles.length > 0
-            || promptWorktreeHint.atmManagedFiles.length > 0
-            || promptWorktreeHint.generatedArtifactFiles.length > 0
-            || promptWorktreeHint.releaseMirrorFiles.length > 0
-            || promptWorktreeHint.unrelatedTrackedFiles.length > 0
-            || promptWorktreeHint.unrelatedUntrackedFiles.length > 0
-            || promptWorktreeHint.ignoredArtifactCount > 0)) {
+    if (shouldEmitPromptWorktreeHint(promptWorktreeHint)) {
         messages.push(message('info', 'ATM_NEXT_WORKTREE_SCOPE_HINT', 'ATM classified current dirty files before task selection so you can distinguish prompt-matched hints from unrelated or generated residue.', promptWorktreeHint));
     }
     const deliveryPrinciple = nextAction.deliveryPrinciple

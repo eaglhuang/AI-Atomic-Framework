@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { CliError } from '../packages/cli/src/commands/shared.ts';
@@ -31,10 +31,9 @@ import { createAnthropicTeamProviderBridge, launchAnthropicTeamProviderRun, vali
 import {
   validateScopeLeaseEpoch,
   validateScopeLeaseFencing,
-  type ScopeLeaseRegistryEntry,
   type ScopeLeaseRunMode
 } from '../packages/core/src/governance/scope-lock.ts';
-import { planWaves, type WaveCandidateCard } from '../packages/core/src/broker/team-wave-planner.ts';
+import { planWaves } from '../packages/core/src/broker/team-wave-planner.ts';
 import { admitWave } from '../packages/core/src/broker/team-wave-admission.ts';
 import { createTeamWaveEnvelope, validateTeamWaveEnvelope } from '../packages/core/src/broker/team-wave-envelope.ts';
 import { buildTeamHandoffRetentionDecision, materializeTeamRoleHandoff, promoteTeamHandoffArchive, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../packages/core/src/team-runtime/handoff-ledger.ts';
@@ -44,6 +43,15 @@ import { createTempWorkspace, initializeGitRepository } from './temp-root.ts';
 import { runBrokerConflictResolutionReplayFixture } from './validate-mao-event-replay.ts';
 import { evaluateTeamPreCommitGate, evaluateTeamPreToolGate } from '../packages/cli/src/commands/team-runtime-gates.ts';
 import { runIntegrationHookInvocationInProcess } from '../packages/cli/src/commands/integration-hooks.ts';
+import { assertRejectsCliError, fail } from './validators/team-agents/assertions.ts';
+import {
+  cleanupNewSourceTeamRunFiles,
+  listRelativeFiles,
+  snapshotSourceTeamRunFiles,
+  writeTeamRunForHandoffGate
+} from './validators/team-agents/artifact-fixtures.ts';
+import { reportTeamAgentsCaseOk } from './validators/team-agents/reporter.ts';
+import { scopeLease, waveCard } from './validators/team-agents/scenario-matrix.ts';
 
 const taskCase = getArg('--case') ?? 'lieutenant-escalation';
 
@@ -157,7 +165,7 @@ async function main() {
     const unrestricted = restrictTeamWriteScopeForQueueAdmission({ ...queueAdmission, status: 'queue-head', queuedSharedPaths: [], waitingOn: [] }, ['src/shared.ts', 'src/private-a.ts']);
     assert.equal(unrestricted.verdict, 'unrestricted');
     assert.deepEqual(unrestricted.writePaths, ['src/private-a.ts', 'src/shared.ts'], 'queue-head must keep, and never widen, the input scope');
-    console.log('[validate-team-agents] ok (next-claim-atomization)');
+    reportTeamAgentsCaseOk('next-claim-atomization');
     return;
   }
 
@@ -1225,6 +1233,9 @@ async function main() {
     const openaiMetadata = httpCalls[0]?.body?.metadata;
     assert.equal(openaiMetadata?.scopedPathCount, '1');
     assert.ok(Object.values(openaiMetadata ?? {}).every((value) => typeof value === 'string'));
+    const azureMetadata = httpCalls[1]?.body?.metadata;
+    assert.equal(azureMetadata?.scopedPathCount, '1');
+    assert.ok(Object.values(azureMetadata ?? {}).every((value) => typeof value === 'string'));
     for (const run of [openaiRun, azureRun]) {
       assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
       assert.equal(run.ok, true);
@@ -1588,6 +1599,9 @@ async function main() {
     assert.ok(foundryCalls[0].url.includes('/openai/deployments/team-runtime-chat/chat/completions?api-version='));
     assert.ok(foundryCalls[1].url.includes('/assistants/agent-123/messages?api-version='));
     assert.ok(foundryCalls.every((call) => call.headers.Authorization.startsWith('Bearer ')));
+    const agentMetadata = foundryCalls[1]?.body?.metadata;
+    assert.equal(agentMetadata?.scopedPathCount, '1');
+    assert.ok(Object.values(agentMetadata ?? {}).every((value) => typeof value === 'string'));
 
     const bridgeSummary = buildMicrosoftFoundryRuntimeBridgeSummary();
     assert.equal(bridgeSummary.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');
@@ -4971,35 +4985,6 @@ function getArg(flag: string): string | undefined {
   return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
-function waveCard(over: Partial<WaveCandidateCard> & { taskId: string }): WaveCandidateCard {
-  return {
-    taskId: over.taskId,
-    dependencies: over.dependencies ?? [],
-    scopePaths: over.scopePaths ?? [`src/${over.taskId}.ts`],
-    deliverables: over.deliverables ?? [`src/${over.taskId}.ts`],
-    validators: over.validators ?? ['npm run typecheck'],
-    targetRepo: over.targetRepo ?? 'repo-x',
-    closureAuthority: over.closureAuthority ?? 'target_repo',
-    ownerAtomOrMap: over.ownerAtomOrMap ?? null
-  };
-}
-
-function scopeLease(over: Partial<ScopeLeaseRegistryEntry> & { leaseId: string }): ScopeLeaseRegistryEntry {
-  return {
-    leaseId: over.leaseId,
-    taskId: over.taskId ?? 'TASK-TEAM-0018',
-    resourceKey: over.resourceKey ?? 'packages/cli/src/commands/team.ts',
-    owner: over.owner ?? { instanceId: 'agent-a', worktreeId: 'wt-a' },
-    runMode: over.runMode ?? 'real-agent',
-    leaseEpoch: over.leaseEpoch ?? 1,
-    status: over.status ?? 'active',
-    allowedFiles: over.allowedFiles ?? ['packages/cli/src/commands/team.ts'],
-    writeSet: over.writeSet ?? ['packages/cli/src/commands/team.ts'],
-    ...(over.waitsFor ? { waitsFor: over.waitsFor } : {}),
-    ...(over.releasedAt ? { releasedAt: over.releasedAt } : {})
-  };
-}
-
 function validateWaveMode(): void {
   // Safe wave: disjoint cards plan into one wave and admit fully.
   const safePlan = planWaves({ cards: [waveCard({ taskId: 'T-A' }), waveCard({ taskId: 'T-B' })] });
@@ -5066,25 +5051,6 @@ function safeBrokerLane(): any {
     stewardId: null,
     composerPath: null
   };
-}
-
-function listRelativeFiles(root: string): string[] {
-  if (!existsSync(root)) return [];
-  const files: string[] = [];
-  const visit = (current: string) => {
-    for (const entry of readdirSync(current)) {
-      const fullPath = path.join(current, entry);
-      const relative = path.relative(root, fullPath).replace(/\\/g, '/');
-      const stat = statSync(fullPath);
-      if (stat.isDirectory()) {
-        visit(fullPath);
-      } else {
-        files.push(relative);
-      }
-    }
-  };
-  visit(root);
-  return files.sort((left, right) => left.localeCompare(right));
 }
 
 function assertBrokerRunScanIndex(): void {
@@ -5300,56 +5266,4 @@ function assertBrokerRunScanIndex(): void {
   }
 
   rmSync(cwd, { recursive: true, force: true });
-}
-
-function writeTeamRunForHandoffGate(cwd: string, taskId: string, teamRunId: string): void {
-  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
-  mkdirSync(directory, { recursive: true });
-  writeFileSync(path.join(directory, `${teamRunId}.json`), `${JSON.stringify({
-    schemaId: 'atm.teamRun.v1',
-    taskId,
-    teamRunId,
-    actorId: 'bound-captain',
-    status: 'active',
-    roles: [{ agentId: 'coordinator', role: 'coordinator', permissions: ['handoff.read', 'handoff.materialize'] }],
-    permissionLeases: [
-      { permission: 'handoff.read', agentId: 'coordinator', paths: ['packages/core/src/team-runtime/handoff-ledger.ts'] },
-      { permission: 'handoff.materialize', agentId: 'coordinator', paths: ['packages/core/src/team-runtime/handoff-ledger.ts'] }
-    ]
-  }, null, 2)}\n`, 'utf8');
-}
-
-function fail(message: string): never {
-  console.error(`[validate-team-agents] ${message}`);
-  process.exit(1);
-}
-
-function snapshotSourceTeamRunFiles(cwd: string): Set<string> {
-  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
-  if (!existsSync(directory)) return new Set();
-  return new Set(readdirSync(directory)
-    .filter((entry) => entry.endsWith('.json'))
-    .map((entry) => path.join(directory, entry)));
-}
-
-function cleanupNewSourceTeamRunFiles(cwd: string, before: Set<string>): void {
-  const directory = path.join(cwd, '.atm', 'runtime', 'team-runs');
-  if (!existsSync(directory)) return;
-  for (const entry of readdirSync(directory)) {
-    if (!entry.endsWith('.json')) continue;
-    const filePath = path.join(directory, entry);
-    if (before.has(filePath)) continue;
-    rmSync(filePath, { force: true });
-  }
-}
-
-async function assertRejectsCliError(action: () => Promise<unknown>, code: string): Promise<CliError> {
-  try {
-    await action();
-  } catch (error) {
-    assert.ok(error instanceof CliError, `expected CliError ${code}, got ${String(error)}`);
-    assert.equal(error.code, code);
-    return error;
-  }
-  assert.fail(`expected CliError ${code}`);
 }
