@@ -83,7 +83,6 @@ import {
   type TaskScopeAmendmentSnapshot,
   type TaskStatusTriangulation
 } from './residue-diagnostics.ts';
-import { dispatchTasksAction } from './command-dispatch.ts';
 import { runTasksClose } from './close-orchestrator.ts';
 import { runTasksImport } from './import-orchestrator.ts';
 import { runTasksVerify } from './verify-orchestrator.ts';
@@ -217,6 +216,9 @@ import {
   recordFailedEmergencyUseAttempt as recordFailedEmergencyUseAttemptDelegated,
   isCliErrorWithCode as isCliErrorWithCodeDelegated
 } from './close-governance.ts';
+import { runTasksCompatCommandMap } from './legacy/compat-command-map.ts';
+import { createRepairReconcileLane } from './legacy/repair-reconcile-lane.ts';
+import { createTransitionCompatLane } from './legacy/transition-compat.ts';
 // ---------------------------------------------------------------------------
 // Public result-contract types are re-exported from `./tasks/result-contracts.ts`
 // so existing import paths keep working. New code should import from
@@ -271,7 +273,16 @@ function inferLegacyDeliverablesFromScope(scopePaths: readonly string[]): readon
   return inferred;
 }
 export async function runTasks(argv: string[]): Promise<CommandResult> {
-  return dispatchTasksAction(argv, {
+  const repairReconcileLane = createRepairReconcileLane({
+    reconcile: runTasksReconcile,
+    repairClosure: runTasksRepairClosure,
+    repairClaim: runTasksRepairClaim
+  });
+  const transitionCompatLane = createTransitionCompatLane({
+    claimLifecycle: runTasksClaimLifecycle,
+    deliverAndClose: runTasksDeliverAndClose
+  });
+  return runTasksCompatCommandMap(argv, {
     close: runTasksClose,
     reset: runTasksReset,
     create: runTasksCreate,
@@ -281,14 +292,14 @@ export async function runTasks(argv: string[]): Promise<CommandResult> {
     parallel: runTasksParallel,
     lock: runTasksLock,
     migrateLegacyLedger: runTasksMigrateLegacyLedger,
-    claimLifecycle: runTasksClaimLifecycle,
-    reconcile: runTasksReconcile,
-    repairClosure: runTasksRepairClosure,
-    repairClaim: runTasksRepairClaim,
+    claimLifecycle: transitionCompatLane.claimLifecycle,
+    reconcile: repairReconcileLane.reconcile,
+    repairClosure: repairReconcileLane.repairClosure,
+    repairClaim: repairReconcileLane.repairClaim,
     show: runTasksShow,
     status: runTasksStatus,
     finalize: runTasksFinalize,
-    deliverAndClose: runTasksDeliverAndClose,
+    deliverAndClose: transitionCompatLane.deliverAndClose,
     roster: runTasksRoster,
     newTask: runTasksNew,
     importTask: runTasksImport,

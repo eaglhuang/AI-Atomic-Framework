@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T18-11-21-049Z-close-b9b5e956ad3c",
+  "taskId": "TASK-RFT-0024",
+  "action": "close",
+  "actorId": "Codex-GPT 5.5",
+  "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0024.json",
+  "taskSha256": "sha256:efec62fe873244241a8cbdea8b37ac06e1a796838f61687fea3f5b844049aa9a",
+  "createdAt": "2026-07-13T18:11:21.049Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0024 --actor \"Codex-GPT 5.5\" --status done --from-batch-checkpoint --batch batch-711cb1cf0136",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-711cb1cf0136",
+    "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0024.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "legacy-compat-command-map.spec",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts",
+      "node --strip-types scripts/validators/task-ledger/suite-impl.ts",
+      "typecheck",
+      "validate-atom-file-size",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T18:11:21.043Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+        ".atm/history/evidence/TASK-RFT-0024.*",
+        ".atm/history/task-events/TASK-RFT-0024/**",
+        ".atm/history/tasks/TASK-RFT-0024.json",
+        "docs/reports/tasks-legacy-compat-map.md",
+        "packages/cli/src/commands/tasks/__tests__/**",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/legacy/**",
+        "scripts/validate-task-import.ts",
+        "scripts/validators/task-ledger/suite-impl.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/**",
+        "packages/cli/src/commands/tasks/legacy-impl.ts",
+        "packages/cli/src/commands/tasks/legacy/**",
+        "scripts/validate-task-import.ts",
+        "scripts/validators/task-ledger/suite-impl.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

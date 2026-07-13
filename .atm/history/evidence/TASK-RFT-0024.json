@@ -1,0 +1,573 @@
+{
+  "taskId": "TASK-RFT-0024",
+  "updatedAt": "2026-07-13T18:11:09.052Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:07:24.372Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "legacy-compat-command-map.spec"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3ef475749441cc84a847316900f96fa1f78939c7bdbf1db9fb8d05101ee9788b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "legacy-compat-command-map.spec"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:0487f9fd02a928c91ee9119c9fd7e4f4647f253973a14127fd4e0e33bb272c92",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:07:24.471Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4a182cffaaf6c092dc58197951a89c3d08fd275f0b19a55ae4f0893569615d0c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/tasks/legacy/compat-command-map.ts,packages/cli/src/commands/tasks/legacy/repair-reconcile-lane.ts,packages/cli/src/commands/tasks/legacy/transition-compat.ts,packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts,docs/reports/tasks-legacy-compat-map.md",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:07:34.475Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate-atom-file-size"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/tasks/legacy/compat-command-map.ts,packages/cli/src/commands/tasks/legacy/repair-reconcile-lane.ts,packages/cli/src/commands/tasks/legacy/transition-compat.ts,packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts,docs/reports/tasks-legacy-compat-map.md",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:181b8c83a035bbe8793177a50c379a11ec6d12b41bd46d1f527d8de380ce7903",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate-atom-file-size"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:0ad783ccdfb7e74fd1b30184bddac7e35ea5bf0a51b83afed0b67fc45d04f2ce",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:07:34.570Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:69d71c942c06bec321d3bb9e6efbb5f55756436246350c783e340a7db9c36910",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validators/task-ledger/suite-impl.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:07:44.025Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types scripts/validators/task-ledger/suite-impl.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validators/task-ledger/suite-impl.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types scripts/validators/task-ledger/suite-impl.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:e0b7a9e8cb4ce3161cad35074e711e3a61fa0b16cb92d68e3bad46918946d48c",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:07:44.158Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:818953a34415779dbb7e0f28f153b0628454b23840f499b0f7b73ea70b3a21ee",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:07:51.534Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:262201067ccd0dab47edf29b29b08a8cf4c63445ddd5868036229aac59ec5dba",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:07:51.634Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f80e57faa4c7e3e3b3fdcb6c050860107f2d6b175f7cc8c133b93005c420510e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-task-import.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:08:50.874Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:task-import"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-task-import.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5978a12bcfbed4dcaf96038554055174138e5b209731fc37dd0b772d23f28d6f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:task-import"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:b0e9dcd8679e4b477e44d0d8abf1df1844b1e9285d3b3dad265b8a3ee5340f48",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:08:50.973Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:dc6d6fbd6b13306c96ceb045266a8ef5d6aa64c5f5aecadedd065cbcecebb4fd",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:08:59.635Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:4db9afa8e8216e9ae4df9f1e9df9dc819019483de802c10bae3d5812c94806d2",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:08:59.749Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:92ade90c75db84735aba36d618e45b6468fdd683f3dd7e63e02b6b834c49fcac",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:09:11.649Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:1adc995a2081cc0e53e0e70c0648ea2aa55eb18499047fe0694ad5bcd5567854",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:0b0d2be1d9c8853b9363af7ed44cdc3753b65661eb5b2a26c63ea8837573af2b",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:09:11.730Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7cf8ff62a824cdb2b9073da308d03aa70a0fa92c8074393c31aeba60800cdc93",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:10:27.083Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3ef475749441cc84a847316900f96fa1f78939c7bdbf1db9fb8d05101ee9788b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/tasks/__tests__/legacy-compat-command-map.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:0487f9fd02a928c91ee9119c9fd7e4f4647f253973a14127fd4e0e33bb272c92",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:10:27.210Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4a182cffaaf6c092dc58197951a89c3d08fd275f0b19a55ae4f0893569615d0c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "Codex-GPT 5.5",
+      "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+      "createdAt": "2026-07-13T18:11:09.052Z",
+      "details": {
+        "actorId": "Codex-GPT 5.5",
+        "sessionId": "session-20260713180400-Codex-GPT-5.5-TASK-RFT-0024-bb112bb5b2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.tasks-legacy-compat-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "docs/reports/tasks-legacy-compat-map.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "648ea16c0773daf995cafd9e28f66ed1d369dc13",
+            "cacheKey": "sha256:ad7d7452af6250b64f231bf3bc8f685adb8017b11e78bee10e818e95fade2600",
+            "cached": false,
+            "generatedAt": "2026-07-13T18:11:09.168Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3b54ccca168a3ebc4c378521f9a4de971887f4c8806198080ee721ba923f86ba",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

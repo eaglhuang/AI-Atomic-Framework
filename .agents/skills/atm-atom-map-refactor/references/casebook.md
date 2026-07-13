@@ -258,3 +258,18 @@ Owner modules:
 Proof: focused `--case next-claim-atomization`, parameterized `validate-atom-file-size --max-lines 600`, full Team Agents validator, `typecheck`, and `git diff --check`.
 
 Lesson: validator-suite splits should start with pure fixture and helper atoms. Leave the long case bodies in the facade until a later card can move one case family at a time with focused fixtures.
+
+## TASK-RFT-0024 - tasks legacy compatibility map
+
+Problem: `packages/cli/src/commands/tasks/legacy-impl.ts` remains the historical compatibility facade for task commands, parser helpers, lifecycle helpers, and emergency surfaces. Editing route behavior inline risks changing operator-facing verbs while also disturbing legacy import and Chinese task-card parsing code.
+
+Pattern: Strategy Map with small compatibility lanes.
+
+Owner modules:
+- `packages/cli/src/commands/tasks/legacy/compat-command-map.ts`;
+- `packages/cli/src/commands/tasks/legacy/repair-reconcile-lane.ts`;
+- `packages/cli/src/commands/tasks/legacy/transition-compat.ts`.
+
+Proof: focused `legacy-compat-command-map.spec.ts`, parameterized `validate-atom-file-size --max-lines 600`, task import validator, task-ledger suite, `typecheck`, `validate:cli`, and `git diff --check`.
+
+Lesson: compatibility facades should first expose a tiny route map owner before moving parser or lifecycle bodies. Keep Chinese parsing and legacy import semantics in place until a separate card can isolate them with dedicated fixtures.
