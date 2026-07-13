@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-FABLE-005",
   "title": "Resolve residue ownership from the committing task id under multi-claim parallelism",
-  "status": "running",
+  "status": "done",
   "milestone": "Backlog-P1",
   "dependencies": [],
   "acceptance": [
@@ -47,8 +47,8 @@
     "hash": "7fc2a1f70816aec1"
   },
   "importedAt": "2026-07-12T15:07:47.273Z",
-  "lastTransitionId": "2026-07-12T15-58-53-669Z-claim-ba5819f3502f",
-  "lastTransitionAt": "2026-07-12T15:58:53.669Z",
+  "lastTransitionId": "2026-07-13T00-23-36-669Z-close-daa6bf266d60",
+  "lastTransitionAt": "2026-07-13T00:23:36.669Z",
   "ledgerContractVersion": "task-ledger/v1",
   "reservedAt": "2026-07-12T15:58:46.858Z",
   "promotedAt": "2026-07-12T15:58:46.861Z",
@@ -56,13 +56,17 @@
     "actorId": "codex-backlog-captain",
     "leaseId": "lease-f2a78e643f77",
     "claimedAt": "2026-07-12T15:58:53.186Z",
-    "heartbeatAt": "2026-07-12T15:58:53.186Z",
+    "heartbeatAt": "2026-07-13T00:23:36.665Z",
     "ttlSeconds": 1800,
     "files": [
+      ".atm/history/evidence/TASK-AAO-FABLE-005.*",
+      ".atm/history/protected-override-audit/2026-07-12T15-59-52-259Z-POA-0e9840962464.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-005/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-005.json",
       "packages/cli/src/commands/hook/pre-commit.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-12T15:08:08.840Z",
   "startedByActor": "claude-fable-5",
@@ -78,6 +82,7 @@
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/TASK-AAO-FABLE-005.*",
+      ".atm/history/protected-override-audit/2026-07-12T15-59-52-259Z-POA-0e9840962464.json",
       ".atm/history/task-events/TASK-AAO-FABLE-005/**",
       ".atm/history/tasks/TASK-AAO-FABLE-005.json",
       "packages/cli/src/commands/hook/pre-commit.ts"
@@ -89,5 +94,9 @@
     "actorId": "codex-backlog-captain",
     "createdAt": "2026-07-12T15:58:53.668Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-13T00:23:36.665Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712155853-codex-backlog-captain-TASK-AAO-FABLE-005-f55449aa28",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-FABLE-005.closure-packet.json"
 }
