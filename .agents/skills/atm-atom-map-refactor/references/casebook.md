@@ -196,3 +196,19 @@ Suggested owner modules:
 Proof to require: commit-messages spec covering default templates, override behavior, and format-string-injection refusal. Tripwire spec asserting current line count is under 2,200.
 
 Lesson to validate: refactor cards do not have to do a refactor. They can also be "lock in the current behavior + add an explicit cliff warning" cards. These are the cheapest insurance policy in the system.
+
+## TASK-RFT-0020 - git-governance commit-scope policy map
+
+Problem: `packages/cli/src/commands/git-governance.ts` carried task-scope matching, governance task-id extraction, foreign staged filtering, and generated-residue policy inside the commit command facade. Those rules are exactly where recent governed commit bugs clustered, and inline edits risked absorbing unrelated staged work or release residue.
+
+Pattern: Policy Object plus Result Contract helper.
+
+Owner modules:
+- `packages/cli/src/commands/git-governance/commit-scope-policy.ts`;
+- `packages/cli/src/commands/git-governance/commit-bundle-filter.ts`;
+- `packages/cli/src/commands/git-governance/governance-residue-policy.ts`;
+- `packages/cli/src/commands/git-governance/validate-atom-file-size.ts`.
+
+Proof: focused `commit-scope-policy.spec.ts`, 600-line atom validator, `typecheck`, `validate:cli`, governance command validation, git-hook enforcement validation, and `git diff --check`.
+
+Lesson: start giant command refactors by extracting pure policy atoms whose inputs are strings and contracts, not live repository state. Add a line-budget validator immediately; otherwise "atomized" helper files can silently become the next oversized command.

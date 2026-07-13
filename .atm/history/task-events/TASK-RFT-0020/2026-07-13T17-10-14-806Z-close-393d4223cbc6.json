@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T17-10-14-806Z-close-393d4223cbc6",
+  "taskId": "TASK-RFT-0020",
+  "action": "close",
+  "actorId": "Codex-GPT 5.5",
+  "sessionId": "session-20260713163814-Codex-GPT-5.5-TASK-RFT-0020-b75eda49c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0020.json",
+  "taskSha256": "sha256:a5d8c1846933b8ddacce05b046ca6fede715b42d659384ba62f105acbedcdc10",
+  "createdAt": "2026-07-13T17:10:14.806Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0020 --actor \"Codex-GPT 5.5\" --status done --from-batch-checkpoint --batch batch-711cb1cf0136",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-711cb1cf0136",
+    "sessionId": "session-20260713163814-Codex-GPT-5.5-TASK-RFT-0020-b75eda49c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0020.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "atom-file-size-600",
+      "commit-scope-policy.spec",
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement",
+      "validate:governance-commands"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T17:10:14.797Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+        ".atm/history/evidence/TASK-RFT-0020.*",
+        ".atm/history/task-events/TASK-RFT-0020/**",
+        ".atm/history/tasks/TASK-RFT-0020.json",
+        "docs/reports/git-governance-atomic-map.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/__tests__/**",
+        "packages/cli/src/commands/git-governance/**",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/__tests__/**",
+        "packages/cli/src/commands/git-governance/**",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-governance-commands.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

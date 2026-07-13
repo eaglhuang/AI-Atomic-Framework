@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0020",
+  "title": "git-governance.ts commit-scope policy map extraction",
+  "status": "done",
+  "milestone": "RFT-M7",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/commit-scope-policy.ts",
+    "packages/cli/src/commands/git-governance/commit-bundle-filter.ts",
+    "packages/cli/src/commands/git-governance/governance-residue-policy.ts",
+    "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+    "docs/reports/git-governance-atomic-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/**",
+    "packages/cli/src/commands/git-governance/__tests__/**",
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "docs/reports/git-governance-atomic-map.md",
+    ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+    "node --strip-types scripts/validate-git-hooks-enforcement.ts",
+    "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing task lifecycle closure semantics.",
+    "Rewriting git command names or public CLI JSON fields except additive diagnostics.",
+    "Touching release mirror artifacts as source deliverables."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if governed commit, protected branch, foreign staged, or release mirror residue handling changes outside the task's asserted regression coverage.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-commit-scope-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/git-governance-atomic-map.md",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-governance.commit-scope-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.git-governance.commit-scope-result",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/git-governance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0020-git-governance-commit-scope-policy-map.task.md",
+    "sectionTitle": "TASK-RFT-0020",
+    "headingLine": 69,
+    "hash": "ca2ee54a97cff975"
+  },
+  "importedAt": "2026-07-13T16:37:51.060Z",
+  "lastTransitionId": "2026-07-13T17-10-14-806Z-close-393d4223cbc6",
+  "lastTransitionAt": "2026-07-13T17:10:14.806Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT 5.5",
+  "reservedAt": "2026-07-13T16:38:14.052Z",
+  "promotedAt": "2026-07-13T16:38:14.055Z",
+  "claim": {
+    "actorId": "Codex-GPT 5.5",
+    "leaseId": "lease-75756ef38202",
+    "claimedAt": "2026-07-13T16:38:14.058Z",
+    "heartbeatAt": "2026-07-13T17:10:14.801Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0020.json",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      "docs/reports/git-governance-atomic-map.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/__tests__/**",
+      "packages/cli/src/commands/git-governance/**",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T16:38:14.058Z",
+  "startedByActor": "Codex-GPT 5.5",
+  "startedBySessionId": "session-20260713163814-Codex-GPT-5.5-TASK-RFT-0020-b75eda49c7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0020",
+    "batchId": null,
+    "scopeKey": "TASK-RFT",
+    "queueId": "queue-1cc4ef7defb31620",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/TASK-RFT-0020.*",
+      ".atm/history/task-events/TASK-RFT-0020/**",
+      ".atm/history/tasks/TASK-RFT-0020.json",
+      "docs/reports/git-governance-atomic-map.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/__tests__/**",
+      "packages/cli/src/commands/git-governance/**",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-governance-commands.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f05401441eff044a76e6877a984f37aceaa8f2c7eb57c9fe7a0d94f7e15d2569",
+    "actorId": "Codex-GPT 5.5",
+    "createdAt": "2026-07-13T16:38:17.586Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-13T17:10:14.801Z",
+  "closedByActor": "Codex-GPT 5.5",
+  "closedBySessionId": "session-20260713163814-Codex-GPT-5.5-TASK-RFT-0020-b75eda49c7",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0020.closure-packet.json"
+}

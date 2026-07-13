@@ -1,0 +1,138 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0020",
+  "updatedAt": "2026-07-13T17:10:01.005Z",
+  "updatedBy": "Codex-GPT 5.5",
+  "freshValidationPasses": [
+    "atom-file-size-600",
+    "commit-scope-policy.spec",
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:git-hooks-enforcement",
+    "validate:governance-commands"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1728cba2a458dc8958b5879a8d20e343a29289923a67a00b79a3a8fe61ee714e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "commit-scope-policy.spec"
+      ],
+      "generatedAt": "2026-07-13T17:00:49.989Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/git-governance/commit-scope-policy.ts,packages/cli/src/commands/git-governance/commit-bundle-filter.ts,packages/cli/src/commands/git-governance/governance-residue-policy.ts,packages/cli/src/commands/git-governance/validate-atom-file-size.ts,packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts,docs/reports/git-governance-atomic-map.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:04f1800168499b973af71f061e11ee2da1abdbf0b8f5f6741892809b3e1d8903",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "atom-file-size-600"
+      ],
+      "generatedAt": "2026-07-13T17:00:52.226Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-13T17:01:03.012Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:d7800d000a5b5aae697a736510b0af4771e168eeb77a7f199523862cd0e99e72",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-13T17:01:19.575Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-commands.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75a57b566263de48753fb22c99048185a8116e74b374b7b697f13bc1ba6a2b2e",
+      "stderrSha256": "sha256:d06a18a66db7cab90b8fb4f84599035c9d7955eb9838687b7ec314d907d8979f",
+      "validators": [
+        "validate:governance-commands"
+      ],
+      "generatedAt": "2026-07-13T17:02:14.402Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-13T17:02:17.361Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-git-hooks-enforcement.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:edbbeeb8f2c5f3a5f92431a54f62a36a8f504311f2bc1c0de15652dfff40c6a8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-hooks-enforcement"
+      ],
+      "generatedAt": "2026-07-13T17:07:06.615Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1728cba2a458dc8958b5879a8d20e343a29289923a67a00b79a3a8fe61ee714e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts"
+      ],
+      "generatedAt": "2026-07-13T17:08:53.744Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-13T17:10:01.139Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6500e5f1567649f1a1bf6ed41cf9954dee78cde4",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
