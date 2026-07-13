@@ -43,7 +43,7 @@ function expandTaskIdReferenceAliases(taskIdReference: string): readonly string[
   return [...aliases];
 }
 
-function isQueueRequestedPrompt(prompt: string): boolean {
+export function isQueueRequestedPrompt(prompt: string): boolean {
   if (/\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b/i.test(prompt)
     && !/(?:backlog|continue|continuation|remaining|all|through\s+all|\u7e7c\u7e8c|\u5168\u90e8|\u6240\u6709|\u5269\u9918|\u5f8c\u7e8c)/i.test(prompt)) {
     return false;
