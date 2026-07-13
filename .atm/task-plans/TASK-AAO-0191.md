@@ -1,7 +1,7 @@
 ---
 task_id: TASK-AAO-0191
 title: Prevent defer-foreign-staged from absorbing ordinary-unowned staged files
-status: in-progress
+status: done
 priority: P1
 owner: cursor-grok-4.5
 milestone: Backlog-P1
