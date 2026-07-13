@@ -2800,14 +2800,35 @@ function readEvidenceDocuments(root: string): ReadonlyArray<{ relativePath: stri
 function inspectLatestCommitForBulkTaskClose(root: string) {
   const commitSha = runGitLines(root, ['rev-parse', '--verify', 'HEAD'])[0] ?? null;
   const changed = runGitLines(root, ['show', '--name-only', '--format=', 'HEAD'])
-    .filter((entry) => entry.endsWith('.task.md'));
+    .filter(Boolean)
+    .map((entry) => normalizeRelativePath(entry));
+  const changedSet = new Set(changed);
   const changedDoneTaskFiles = changed.filter((relativePath) => {
+    if (!relativePath.endsWith('.task.md')) return false;
     const absolutePath = path.join(root, relativePath);
     if (!existsSync(absolutePath)) return false;
     const frontmatter = parseMarkdownFrontmatter(readFileSync(absolutePath, 'utf8'));
-    return normalizeStatus(frontmatter.status) === 'done';
+    if (normalizeStatus(frontmatter.status) !== 'done') return false;
+    return !hasPreExistingClosurePacketForTaskCard(root, frontmatter, changedSet);
   });
   return { commitSha, changedDoneTaskFiles };
+}
+
+function hasPreExistingClosurePacketForTaskCard(root: string, frontmatter: Record<string, unknown>, changedSet: ReadonlySet<string>): boolean {
+  const candidates = closurePacketCandidatesForTaskCard(frontmatter);
+  return candidates.some((candidate) => {
+    const relativePath = normalizeRelativePath(candidate);
+    return existsSync(path.join(root, relativePath)) && !changedSet.has(relativePath);
+  });
+}
+
+function closurePacketCandidatesForTaskCard(frontmatter: Record<string, unknown>): readonly string[] {
+  const explicit = normalizeOptionalString(frontmatter.closure_packet ?? frontmatter.closurePacket);
+  const taskId = normalizeOptionalString(frontmatter.task_id ?? frontmatter.taskId ?? frontmatter.id);
+  const candidates: string[] = [];
+  if (explicit) candidates.push(explicit);
+  if (taskId) candidates.push(`.atm/history/evidence/${taskId}.closure-packet.json`);
+  return [...new Set(candidates)];
 }
 
 function hasBulkClosureManifest(root: string): boolean {
