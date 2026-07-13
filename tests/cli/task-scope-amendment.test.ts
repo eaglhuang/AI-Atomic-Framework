@@ -76,6 +76,34 @@ console.log('Test B scope add required flags: PASS');
   console.log('Test B2 scope add --paths alias: PASS');
 }
 
+// === Test B3: scope add strips shell quote artifacts around CSV path tokens ===
+{
+  const options = parseScopeAddOptions([
+    '--task', 'TASK-MAO-0049',
+    '--actor', 'augment-code',
+    '--add', '"docs/audit/first.json,docs/audit/second.json"',
+    '--reason', 'PowerShell JSON surface quote normalization'
+  ]);
+  assert.deepEqual(options.addPaths, ['docs/audit/first.json', 'docs/audit/second.json']);
+
+  const splitArtifact = parseScopeAddOptions([
+    '--task', 'TASK-MAO-0049',
+    '--actor', 'augment-code',
+    '--add', '"docs/audit/first.json,docs/audit/second.json',
+    '--reason', 'leading quote artifact'
+  ]);
+  assert.deepEqual(splitArtifact.addPaths, ['docs/audit/first.json', 'docs/audit/second.json']);
+
+  const trailingArtifact = parseScopeAddOptions([
+    '--task', 'TASK-MAO-0049',
+    '--actor', 'augment-code',
+    '--add', 'docs/audit/first.json,docs/audit/second.json"',
+    '--reason', 'trailing quote artifact'
+  ]);
+  assert.deepEqual(trailingArtifact.addPaths, ['docs/audit/first.json', 'docs/audit/second.json']);
+  console.log('Test B3 scope add quote artifact normalization: PASS');
+}
+
 // === Test C: repair lane refuses without emergency approval ===
 expectCliError(
   () => parseScopeRepairOptions([

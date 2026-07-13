@@ -27,10 +27,14 @@ function stripMatchingOuterQuotes(value: string): string {
   return trimmed;
 }
 
+function stripBoundaryQuoteArtifacts(value: string): string {
+  return stripMatchingOuterQuotes(value).replace(/^["']+|["']+$/g, '').trim();
+}
+
 function parseCsvPathList(value: string): string[] {
-  return stripMatchingOuterQuotes(value)
+  return stripBoundaryQuoteArtifacts(value)
     .split(',')
-    .map((pathValue) => stripMatchingOuterQuotes(pathValue))
+    .map((pathValue) => stripBoundaryQuoteArtifacts(pathValue))
     .filter(Boolean);
 }
 
