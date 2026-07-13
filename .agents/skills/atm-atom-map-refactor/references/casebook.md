@@ -242,3 +242,19 @@ Owner modules:
 Proof: focused `next-action-assembly.spec.ts`, parameterized `validate-atom-file-size --max-lines 600`, `typecheck`, prompt-scoped next validator, guidance validator, `validate:cli`, and `git diff --check`.
 
 Lesson: nextAction helpers should be pure and structural. Keep route selection in the facade until a Strategy Map card owns it, but move evidence-contract assembly into small atoms that can be checked with a future-smaller line budget.
+
+## TASK-RFT-0023 - Team Agents validator suite map
+
+Problem: `scripts/validate-team-agents.ts` carried scenario fixtures, artifact setup helpers, assertion helpers, and reporting strings inline with dozens of validator cases. This made fixture edits risky because a small support change sat inside a 5k-line validator facade.
+
+Pattern: Strategy Map plus helper atoms.
+
+Owner modules:
+- `scripts/validators/team-agents/scenario-matrix.ts`;
+- `scripts/validators/team-agents/assertions.ts`;
+- `scripts/validators/team-agents/artifact-fixtures.ts`;
+- `scripts/validators/team-agents/reporter.ts`.
+
+Proof: focused `--case next-claim-atomization`, parameterized `validate-atom-file-size --max-lines 600`, full Team Agents validator, `typecheck`, and `git diff --check`.
+
+Lesson: validator-suite splits should start with pure fixture and helper atoms. Leave the long case bodies in the facade until a later card can move one case family at a time with focused fixtures.

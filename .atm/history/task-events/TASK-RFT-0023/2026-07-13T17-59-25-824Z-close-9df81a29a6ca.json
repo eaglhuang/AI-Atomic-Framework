@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T17-59-25-824Z-close-9df81a29a6ca",
+  "taskId": "TASK-RFT-0023",
+  "action": "close",
+  "actorId": "Codex-GPT 5.5",
+  "sessionId": "session-20260713174909-Codex-GPT-5.5-TASK-RFT-0023-2909a46af7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0023.json",
+  "taskSha256": "sha256:ea5fcd68abb66b83c5837e9dec30a26d67ccef042714b328e38d36f5882e9320",
+  "createdAt": "2026-07-13T17:59:25.824Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0023 --actor \"Codex-GPT 5.5\" --status done --from-batch-checkpoint --batch batch-711cb1cf0136",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-711cb1cf0136",
+    "sessionId": "session-20260713174909-Codex-GPT-5.5-TASK-RFT-0023-2909a46af7",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0023.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:atom-file-size",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-agents"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T17:59:25.818Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0023.*",
+        ".atm/history/task-events/TASK-RFT-0023/**",
+        ".atm/history/tasks/TASK-RFT-0023.json",
+        "docs/reports/team-agents-validator-map.md",
+        "scripts/validate-team-agents.ts",
+        "scripts/validators/team-agents/**"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-team-agents.ts",
+        "scripts/validators/team-agents/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0023",
+  "title": "validate-team-agents.ts validator suite map extraction",
+  "status": "done",
+  "milestone": "RFT-M7",
+  "dependencies": [
+    "TASK-RFT-0021"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/validate-team-agents.ts",
+    "scripts/validators/team-agents/scenario-matrix.ts",
+    "scripts/validators/team-agents/assertions.ts",
+    "scripts/validators/team-agents/artifact-fixtures.ts",
+    "scripts/validators/team-agents/reporter.ts",
+    "docs/reports/team-agents-validator-map.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-team-agents.ts",
+    "scripts/validators/team-agents/**",
+    "docs/reports/team-agents-validator-map.md",
+    ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "node --strip-types scripts/validate-team-agents.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing Team Agents product behavior.",
+    "Deleting validator scenarios.",
+    "Relaxing assertions to make the split pass."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if validate-team-agents output coverage or failure diagnostics lose scenario detail.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-validator-suite-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/team-agents-validator-map.md",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-agents-validator.scenario-map",
+        "pattern": "Strategy Map",
+        "source": "scripts/validate-team-agents.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0023-team-agents-validator-suite-map.task.md",
+    "sectionTitle": "TASK-RFT-0023",
+    "headingLine": 58,
+    "hash": "2b1aa4e5937d99c1"
+  },
+  "importedAt": "2026-07-13T16:37:51.113Z",
+  "lastTransitionId": "2026-07-13T17-59-25-824Z-close-9df81a29a6ca",
+  "lastTransitionAt": "2026-07-13T17:59:25.824Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT 5.5",
+  "reservedAt": "2026-07-13T17:49:09.490Z",
+  "promotedAt": "2026-07-13T17:49:09.492Z",
+  "claim": {
+    "actorId": "Codex-GPT 5.5",
+    "leaseId": "lease-f2274156e025",
+    "claimedAt": "2026-07-13T17:49:09.495Z",
+    "heartbeatAt": "2026-07-13T17:59:25.822Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0023.json",
+      "docs/reports/team-agents-validator-map.md",
+      "scripts/validate-team-agents.ts",
+      "scripts/validators/team-agents/**"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T17:49:09.495Z",
+  "startedByActor": "Codex-GPT 5.5",
+  "startedBySessionId": "session-20260713174909-Codex-GPT-5.5-TASK-RFT-0023-2909a46af7",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0023",
+    "batchId": "batch-711cb1cf0136",
+    "scopeKey": "TASK-RFT",
+    "queueId": "queue-4dd07b8fdf73cda8",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0023.*",
+      ".atm/history/task-events/TASK-RFT-0023/**",
+      ".atm/history/tasks/TASK-RFT-0023.json",
+      "docs/reports/team-agents-validator-map.md",
+      "scripts/validate-team-agents.ts",
+      "scripts/validators/team-agents/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "15eb3a52a458d15d882ed54387b2dc8c92cf03359ee704d279075a777d6203f0",
+    "actorId": "Codex-GPT 5.5",
+    "createdAt": "2026-07-13T17:49:13.116Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-13T17:59:25.905Z",
+    "releasedBy": "Codex-GPT 5.5"
+  },
+  "closedAt": "2026-07-13T17:59:25.822Z",
+  "closedByActor": "Codex-GPT 5.5",
+  "closedBySessionId": "session-20260713174909-Codex-GPT-5.5-TASK-RFT-0023-2909a46af7",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0023.closure-packet.json"
+}
