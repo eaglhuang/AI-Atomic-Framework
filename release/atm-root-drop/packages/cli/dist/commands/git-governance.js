@@ -19,6 +19,9 @@ import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emerg
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.js';
 import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag } from '../../../core/dist/broker/cross-task-mutation-guard.js';
 import { ATM_INDEX_FOREIGN_ACTIVE_STAGED, buildForeignActiveStagedDiagnostic, inspectGitIndexOwnership } from './git-index-ownership.js';
+import { extractGovernanceTaskIdFromPath, isProtectedStagedGovernanceOwnershipPath, normalizeRelativePath, normalizeTaskClaimIntent, pathMatchesTaskScope, uniqueSorted } from './git-governance/commit-scope-policy.js';
+import { buildTaskScopedCommitFileSet, isFileAllowedInTaskBundle as isTaskBundleAllowedByPolicy } from './git-governance/commit-bundle-filter.js';
+import { isActionableManualResidue, isDeferrableForeignGovernanceResidue } from './git-governance/governance-residue-policy.js';
 import { CliError, makeResult, message, quoteCliValue, relativePathFrom } from './shared.js';
 export function resolveGitExecutable() {
     const configured = process.env.ATM_GIT_EXECUTABLE?.trim();
@@ -2714,21 +2717,6 @@ function readStagedDiffNames(cwd, diffFilter) {
         return [];
     }
 }
-function extractGovernanceTaskIdFromPath(filePath) {
-    const normalized = normalizeRelativePath(filePath);
-    if (!normalized.startsWith('.atm/history/'))
-        return null;
-    const tasksMatch = normalized.match(/^\.atm\/history\/tasks\/([^/]+)\.json$/i);
-    if (tasksMatch)
-        return tasksMatch[1].toUpperCase();
-    const evidenceMatch = normalized.match(/^\.atm\/history\/evidence\/([^/.]+)(?:\.[^/]+)?$/i);
-    if (evidenceMatch)
-        return evidenceMatch[1].toUpperCase();
-    const eventMatch = normalized.match(/^\.atm\/history\/task-events\/([^/]+)\//i);
-    if (eventMatch)
-        return eventMatch[1].toUpperCase();
-    return null;
-}
 function isAllowedGovernanceArtifactPath(cwd, filePath, taskId) {
     const normalized = normalizeRelativePath(filePath);
     const normalizedTaskId = taskId.toLowerCase();
@@ -2748,9 +2736,11 @@ function isAllowedGovernanceArtifactPath(cwd, filePath, taskId) {
     return isIgnorableCommitStagingSideEffect(cwd, normalized, taskId);
 }
 function isFileAllowedInTaskBundle(cwd, filePath, taskId, declaredScope) {
-    if (isAllowedGovernanceArtifactPath(cwd, filePath, taskId))
-        return true;
-    return declaredScope.some((scope) => pathMatchesTaskScope(filePath, scope));
+    return isTaskBundleAllowedByPolicy({
+        filePath,
+        declaredScope,
+        allowedGovernanceArtifact: isAllowedGovernanceArtifactPath(cwd, filePath, taskId)
+    });
 }
 function buildHostGitCompatibilityGuidance(input) {
     const lines = [
@@ -2841,15 +2831,6 @@ function readProtectedOverrideAuditTaskId(cwd, filePath) {
         return null;
     }
 }
-function isProtectedStagedGovernanceOwnershipPath(filePath) {
-    const normalized = normalizeRelativePath(filePath).toLowerCase();
-    if (/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized)) {
-        return false;
-    }
-    return normalized.startsWith('.atm/history/tasks/')
-        || normalized.startsWith('.atm/history/task-events/')
-        || normalized.startsWith('.atm/history/evidence/');
-}
 function readResolutionAuthorizedForeignTaskIds(cwd, artifactPath, taskId) {
     if (!artifactPath?.trim())
         return new Set();
@@ -2874,14 +2855,6 @@ function readResolutionAuthorizedForeignTaskIds(cwd, artifactPath, taskId) {
 }
 function buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks) {
     return uniqueSorted(unexpectedStagedTasks.flatMap((entry) => entry.stagedFiles.filter((filePath) => isProtectedStagedGovernanceOwnershipPath(filePath))));
-}
-function isDeferrableForeignGovernanceResidue(taskId, finding) {
-    const ownerTaskId = finding.ownerTaskId?.trim().toUpperCase() ?? null;
-    if (!ownerTaskId || ownerTaskId === taskId.trim().toUpperCase())
-        return false;
-    const normalized = normalizeRelativePath(finding.path).toLowerCase();
-    return /^\.atm\/history\/evidence\/[^/]+\.(?:bundle-manifest|closure-packet)\.json$/.test(normalized)
-        || /^\.atm\/history\/task-events\/[^/]+\/.+(?:close|reconcile|repair-closure).+\.json$/.test(normalized);
 }
 function isActiveForeignGovernanceResidueOwner(cwd, taskId, finding) {
     const ownerTaskId = finding.ownerTaskId?.trim().toUpperCase() ?? null;
@@ -3027,8 +3000,8 @@ export function resolveTaskScopedCommitBundle(input) {
         : [];
     const deferredForeignStagedSet = new Set(deferredForeignStagedFiles.map(normalizeRelativePath));
     const blockedResidue = residueReport.blockAndExplain.filter((entry) => !deferredForeignStagedSet.has(normalizeRelativePath(entry.path))
-        && !(input.deferForeignStaged && isDeferrableForeignGovernanceResidue(input.taskId, entry))
-        && !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry));
+        && (isDeferrableForeignGovernanceResidue(input.taskId, entry)
+            || !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry)));
     const manualReviewResidue = residueReport.manualReview.filter((entry) => isActionableManualResidue(entry.path)
         && !(input.deferForeignStaged && isDeferrableForeignGovernanceResidue(input.taskId, entry))
         && !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry));
@@ -3067,11 +3040,12 @@ export function resolveTaskScopedCommitBundle(input) {
             ? inScopeUnstagedDirty.filter((filePath) => !isCommitAttributionSideEffectPath(filePath))
             : [])
     ]);
-    const commitFiles = uniqueSorted([
-        ...inScopeStagedFiles,
-        ...inScopeStagedDeletions,
-        ...stageCandidates
-    ]);
+    const commitFiles = buildTaskScopedCommitFileSet({
+        inScopeStagedFiles,
+        inScopeStagedDeletions,
+        stageCandidates,
+        uniqueSorted
+    });
     const commitFilesWithGovernanceEvidence = shouldStageGovernedGitHeadEvidenceBeforeCommit(commitFiles)
         ? uniqueSorted([...commitFiles, gitHeadEvidencePath])
         : commitFiles;
@@ -3152,12 +3126,6 @@ export function resolveTaskScopedCommitBundle(input) {
         blockedResidue,
         manualReviewResidue
     };
-}
-function normalizeTaskClaimIntent(value) {
-    if (typeof value !== 'string')
-        return 'write';
-    const normalized = value.trim().toLowerCase();
-    return normalized === 'closeout-only' || normalized === 'no-more-mutation' ? 'closeout-only' : 'write';
 }
 function inspectTaskScopedStagedGovernanceBundle(cwd, taskId, taskDocument) {
     const stagedFiles = readStagedFiles(cwd);
@@ -3324,15 +3292,6 @@ function cleanupAutoGeneratedResidue(cwd, findings) {
     }
     return cleaned;
 }
-function isActionableManualResidue(filePath) {
-    const lower = normalizeRelativePath(filePath).toLowerCase();
-    return lower.startsWith('.atm/runtime/snapshots/')
-        || /^\.atm\/history\/reports\/.+\.json$/.test(lower)
-        || /^\.atm\/history\/protected-override-audit\/.+\.json$/.test(lower)
-        || /^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(lower)
-        || /^\.atm\/history\/evidence\/[^/]+\.closure-packet\.json$/.test(lower)
-        || /^\.atm\/history\/task-events\/[^/]+\/.+(?:close|reconcile|repair-closure).+\.json$/.test(lower);
-}
 function resolveTaskDeclaredScope(cwd, taskId, taskDocument) {
     const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
         ? taskDocument.taskDirectionLock
@@ -3481,25 +3440,6 @@ function buildTaskScopedStagingRequiredCommand(cwd, files) {
         : ` -C ${quoteCliValue(cwd)}`;
     return `${quoteCliValue(resolveGitExecutable())}${cwdFlag} add -- ${normalizedFiles.map(quoteCliValue).join(' ')}`;
 }
-function pathMatchesTaskScope(filePath, scope) {
-    const file = normalizeRelativePath(filePath).toLowerCase();
-    const candidate = normalizeRelativePath(scope).toLowerCase();
-    if (!candidate)
-        return false;
-    if (candidate.includes('*')) {
-        const escaped = candidate
-            .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-            .replace(/\*\*/g, '__ATM_DOUBLE_STAR__')
-            .replace(/\*/g, '[^/]*')
-            .replace(/__ATM_DOUBLE_STAR__/g, '.*');
-        return new RegExp(`^${escaped}$`).test(file);
-    }
-    if (file === candidate)
-        return true;
-    if (candidate.endsWith('/'))
-        return file.startsWith(candidate);
-    return file.startsWith(`${candidate}/`);
-}
 function readGitNameOnly(cwd, args) {
     try {
         return runGitCommand(cwd, args)
@@ -3520,9 +3460,6 @@ function splitCsvPaths(value) {
             .map((entry) => entry.trim().replace(/^"|"$/g, '').replace(/^'|'$/g, ''))
             .filter(Boolean))];
 }
-function uniqueSorted(values) {
-    return [...new Set(values.map((entry) => entry.trim()).filter(Boolean))].sort((left, right) => left.localeCompare(right));
-}
 function taskImportReportReferencesTask(cwd, file, taskId) {
     try {
         const content = readFileSync(path.join(cwd, file), 'utf8');
@@ -3532,9 +3469,6 @@ function taskImportReportReferencesTask(cwd, file, taskId) {
     catch {
         return false;
     }
-}
-function normalizeRelativePath(value) {
-    return value.trim().replace(/\\/g, '/').replace(/^\.\//, '');
 }
 function readGitConfig(cwd, key) {
     try {
