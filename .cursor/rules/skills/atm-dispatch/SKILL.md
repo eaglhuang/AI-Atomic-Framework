@@ -125,3 +125,23 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - Use ATM as the only governance route for this action.
 - Do not create a second registry, task state, or approval workflow.
 - Preserve user-edited integration files; manifest hashes decide uninstall safety.
+
+## Captain Dogfood Lessons (2026-07-14)
+
+Token / speed:
+
+- Prefer **internal sidecars** for backlog ranking and disjoint bug re-implements; they beat full Team `start --execute` when scopes collide or Frozen is stale.
+- Cap batch size (e.g. 5 bugs) before writing the optimization report; unbounded queues burn tokens on governance thrash.
+- Validate with `node --strip-types <focused-spec>` instead of live `team plan` against a dirty shared worktree.
+
+ATM flow:
+
+- When another captain owns `git-governance` / RFT work, pick **core/scripts-only** bugs first; `packages/cli/src/**` often collapses to `atom-cli-router` and false-freezes claims.
+- `team broker resolve` emits BCR artifacts but **does not unblock** `next --claim` CID freeze by itself (record backlog if still true).
+- Frozen prefer + source delivery: `ATM_RUNNER_STALE_WRITE_REFUSED` vs `ATM_SOURCE_FIRST_WRITE_REFUSED` is a deadlock; rebuild only when foreign release WIP is absent, else park and switch scopes.
+- After any foreign `build(release): sync`, **re-diff your deliverables immediately**; uncommitted source can vanish (ATM-BUG-184).
+
+Team Agents efficiency:
+
+- Parallel subagents helped **re-apply wiped fixes** (159/097/102) in one turn; they did **not** accelerate 0195 while CID-frozen against RFT-0020.
+- Live `team plan` as validator preflight is slow and flaky under foreign broker intents; keep body-shape asserts independent of plan admission.

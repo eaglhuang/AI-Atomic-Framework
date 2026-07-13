@@ -1225,6 +1225,9 @@ async function main() {
     const openaiMetadata = httpCalls[0]?.body?.metadata;
     assert.equal(openaiMetadata?.scopedPathCount, '1');
     assert.ok(Object.values(openaiMetadata ?? {}).every((value) => typeof value === 'string'));
+    const azureMetadata = httpCalls[1]?.body?.metadata;
+    assert.equal(azureMetadata?.scopedPathCount, '1');
+    assert.ok(Object.values(azureMetadata ?? {}).every((value) => typeof value === 'string'));
     for (const run of [openaiRun, azureRun]) {
       assert.equal(run.schemaId, 'atm.teamProviderBridgeRunResult.v1');
       assert.equal(run.ok, true);
@@ -1588,6 +1591,9 @@ async function main() {
     assert.ok(foundryCalls[0].url.includes('/openai/deployments/team-runtime-chat/chat/completions?api-version='));
     assert.ok(foundryCalls[1].url.includes('/assistants/agent-123/messages?api-version='));
     assert.ok(foundryCalls.every((call) => call.headers.Authorization.startsWith('Bearer ')));
+    const agentMetadata = foundryCalls[1]?.body?.metadata;
+    assert.equal(agentMetadata?.scopedPathCount, '1');
+    assert.ok(Object.values(agentMetadata ?? {}).every((value) => typeof value === 'string'));
 
     const bridgeSummary = buildMicrosoftFoundryRuntimeBridgeSummary();
     assert.equal(bridgeSummary.schemaId, 'atm.microsoftFoundryRuntimeBridgeSummary.v1');

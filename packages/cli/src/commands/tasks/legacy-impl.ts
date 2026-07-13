@@ -1358,43 +1358,24 @@ async function cleanupTaskLock(input: {
     await resolveValue(adapter.stores.lockStore.releaseLock(taskId, actorId));
     cleanupActions.push('released-governance-lock');
   }
-  if (governanceLock && releasedLock) {
-    const embeddedLock = governanceLock.taskDirectionLock;
-    if (embeddedLock && typeof embeddedLock === 'object' && !Array.isArray(embeddedLock)) {
-      const embedded = embeddedLock as Record<string, unknown>;
-      if (embedded.status !== 'released') {
-        writeFileSync(lockPath, `${JSON.stringify({
-          ...governanceLock,
-          taskDirectionLock: {
-            ...embedded,
-            status: 'released',
-            released: true,
-            releasedAt: nowIso,
-            releasedBy: actorId
-          }
-        }, null, 2)}\n`, 'utf8');
-        cleanupActions.push('released-embedded-direction-lock');
-      }
-    }
+  const lockRecordAfterRelease = existsSync(lockPath)
+    ? JSON.parse(readFileSync(lockPath, 'utf8')) as Record<string, unknown>
+    : governanceLock;
+  if (lockRecordAfterRelease && releaseEmbeddedDirectionLock({
+    lockPath,
+    lockRecord: lockRecordAfterRelease,
+    actorId,
+    nowIso
+  })) {
+    cleanupActions.push('released-embedded-direction-lock');
   }
-  if (taskDocument) {
-    const canonicalDirectionLock = taskDocument.taskDirectionLock;
-    if (canonicalDirectionLock && typeof canonicalDirectionLock === 'object' && !Array.isArray(canonicalDirectionLock)) {
-      const directionLock = canonicalDirectionLock as Record<string, unknown>;
-      if (directionLock.status !== 'released') {
-        writeFileSync(taskPath, `${JSON.stringify({
-          ...taskDocument,
-          taskDirectionLock: {
-            ...directionLock,
-            status: 'released',
-            released: true,
-            releasedAt: nowIso,
-            releasedBy: actorId
-          }
-        }, null, 2)}\n`, 'utf8');
-        cleanupActions.push('released-canonical-direction-lock');
-      }
-    }
+  if (taskDocument && releaseCanonicalDirectionLock({
+    taskPath,
+    taskDocument,
+    actorId,
+    nowIso
+  })) {
+    cleanupActions.push('released-canonical-direction-lock');
   }
   if (existsSync(sidecarPath)) {
     rmSync(sidecarPath, { force: true });
@@ -3137,6 +3118,63 @@ function hasProtectedActiveClaim(document: Record<string, unknown> | null): bool
   const claim = parseClaimRecord(document.claim);
   return Boolean(claim && (claim.state === 'active' || claim.state === 'handoff'));
 }
+function isCreatePlaceholderLedger(document: Record<string, unknown>): boolean {
+  if (normalizeTaskStatus(document.status) !== 'planned') return false;
+  const source = document.source;
+  const sourceHash = source && typeof source === 'object' && !Array.isArray(source)
+    ? String((source as Record<string, unknown>).hash ?? '').trim()
+    : '';
+  const legacyHash = typeof document.hash === 'string' ? document.hash.trim() : '';
+  if (sourceHash.length > 0 || legacyHash.length > 0) return false;
+  if (typeof document.importedAt === 'string' && document.importedAt.trim().length > 0) return false;
+  return true;
+}
+function releaseEmbeddedDirectionLock(input: {
+  readonly lockPath: string;
+  readonly lockRecord: Record<string, unknown>;
+  readonly actorId: string;
+  readonly nowIso: string;
+}): boolean {
+  const embeddedLock = input.lockRecord.taskDirectionLock;
+  if (!embeddedLock || typeof embeddedLock !== 'object' || Array.isArray(embeddedLock)) return false;
+  const embedded = embeddedLock as Record<string, unknown>;
+  if (embedded.status === 'released') return false;
+  writeFileSync(input.lockPath, `${JSON.stringify({
+    ...input.lockRecord,
+    taskDirectionLock: {
+      ...embedded,
+      status: 'released',
+      released: true,
+      releasedAt: input.nowIso,
+      releasedBy: input.actorId
+    }
+  }, null, 2)}\n`, 'utf8');
+  return true;
+}
+function releaseCanonicalDirectionLock(input: {
+  readonly taskPath: string;
+  readonly taskDocument: Record<string, unknown>;
+  readonly actorId: string;
+  readonly nowIso: string;
+}): boolean {
+  const canonicalDirectionLock = input.taskDocument.taskDirectionLock;
+  if (!canonicalDirectionLock || typeof canonicalDirectionLock !== 'object' || Array.isArray(canonicalDirectionLock)) {
+    return false;
+  }
+  const directionLock = canonicalDirectionLock as Record<string, unknown>;
+  if (directionLock.status === 'released') return false;
+  writeFileSync(input.taskPath, `${JSON.stringify({
+    ...input.taskDocument,
+    taskDirectionLock: {
+      ...directionLock,
+      status: 'released',
+      released: true,
+      releasedAt: input.nowIso,
+      releasedBy: input.actorId
+    }
+  }, null, 2)}\n`, 'utf8');
+  return true;
+}
 function importWouldOverwriteTask(input: {
   readonly current: Record<string, unknown>;
   readonly task: TaskImportRecord;
@@ -3291,7 +3329,12 @@ export function writeTaskFiles(input: {
         }
         // ATM-BUG-2026-07-13-178: explicit --reopen/--reset-open may overwrite an
         // inert/abandoned ledger without --force; writing happens in the second pass.
+        // ATM-BUG-2026-07-12-159: tasks create placeholder ledgers (planned, no
+        // source hash) may be replaced by the first import without --force.
         if (input.resetOpen || input.reopen) {
+          continue;
+        }
+        if (isCreatePlaceholderLedger(existingDocument) && !hasProtectedActiveClaim(existingDocument)) {
           continue;
         }
         diagnostics.push({
@@ -3317,9 +3360,6 @@ export function writeTaskFiles(input: {
   }
   for (const task of input.tasks) {
     const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
-    if (existsSync(filePath) && !input.force && !reconcileMirror && !input.resetOpen && !input.reopen) {
-      continue;
-    }
     let existingDocument: Record<string, unknown> | null = null;
     if (existsSync(filePath)) {
       try {
@@ -3327,6 +3367,12 @@ export function writeTaskFiles(input: {
       } catch {
         // ignore
       }
+    }
+    const placeholderOverwrite = existingDocument
+      ? isCreatePlaceholderLedger(existingDocument) && !hasProtectedActiveClaim(existingDocument)
+      : false;
+    if (existsSync(filePath) && !input.force && !reconcileMirror && !input.resetOpen && !input.reopen && !placeholderOverwrite) {
+      continue;
     }
     const wouldOverwrite = existingDocument
       ? importWouldOverwriteTask({
