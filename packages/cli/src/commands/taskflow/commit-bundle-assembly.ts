@@ -74,6 +74,7 @@ export interface DeferredGovernanceDirtyFile {
   snapshotPath: string;
   originalSha256: string;
   restoredAt: string | null;
+  skipReason?: 'snapshot-missing' | null;
 }
 
 export interface DeferredGovernanceDirtyReport {
@@ -81,6 +82,7 @@ export interface DeferredGovernanceDirtyReport {
   requested: boolean;
   files: DeferredGovernanceDirtyFile[];
   restored: boolean;
+  skippedMissingSnapshots?: readonly string[];
 }
 
 function uniqueSorted(values: readonly string[]): string[] {
@@ -408,11 +410,15 @@ function resolvePlanningPath(cwd: string, planningMirrorPath: string | null): { 
   return resolvePlanningPathFromStored(cwd, planningMirrorPath);
 }
 
-export function isDeferrableGovernanceDirtyFile(filePath: string): boolean {
+export function isDeferrableGovernanceDirtyFile(filePath: string, taskId?: string | null): boolean {
   const normalized = filePath.replace(/\\/g, '/').toLowerCase();
   if (normalized === '.atm/history/evidence/git-head.jsonl') return true;
-  if (/^\.atm\/history\/evidence\/[^/]+\.bundle-manifest\.json$/.test(normalized)) return true;
-  return false;
+  // Foreign-task bundle-manifest dirt must never be restored away during another
+  // task's close window; only the active task's own manifest is safe to defer.
+  if (!taskId) return false;
+  const taskLower = taskId.trim().toLowerCase();
+  if (!taskLower) return false;
+  return normalized === `.atm/history/evidence/${taskLower}.bundle-manifest.json`;
 }
 
 function listUnstagedDirtyFiles(repoRoot: string): string[] {
@@ -420,15 +426,20 @@ function listUnstagedDirtyFiles(repoRoot: string): string[] {
   return uniqueSorted(output.split(/\r?\n/).map((line) => line.trim()).filter(Boolean));
 }
 
-export function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean): DeferredGovernanceDirtyReport {
+export function deferGovernanceDirtyFiles(
+  repoRoot: string,
+  requested: boolean,
+  taskId?: string | null
+): DeferredGovernanceDirtyReport {
   const report: DeferredGovernanceDirtyReport = {
     schemaId: 'atm.deferredGovernanceDirty.v1',
     requested,
     files: [],
-    restored: false
+    restored: false,
+    skippedMissingSnapshots: []
   };
   if (!requested) return report;
-  const candidates = listUnstagedDirtyFiles(repoRoot).filter(isDeferrableGovernanceDirtyFile);
+  const candidates = listUnstagedDirtyFiles(repoRoot).filter((file) => isDeferrableGovernanceDirtyFile(file, taskId));
   if (candidates.length === 0) {
     report.restored = true;
     return report;
@@ -461,11 +472,19 @@ export function deferGovernanceDirtyFiles(repoRoot: string, requested: boolean):
 
 export function restoreDeferredGovernanceDirtyFiles(repoRoot: string, report: DeferredGovernanceDirtyReport): DeferredGovernanceDirtyReport {
   if (report.restored || report.files.length === 0) {
-    return { ...report, restored: true };
+    return { ...report, restored: true, skippedMissingSnapshots: report.skippedMissingSnapshots ?? [] };
   }
   const restoredAt = new Date().toISOString();
+  const skippedMissingSnapshots: string[] = [];
   const files = report.files.map((entry) => {
     const snapshotPath = path.join(repoRoot, entry.snapshotPath);
+    if (!existsSync(snapshotPath)) {
+      skippedMissingSnapshots.push(entry.snapshotPath);
+      return {
+        ...entry,
+        skipReason: 'snapshot-missing' as const
+      };
+    }
     const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8')) as Record<string, unknown>;
     const file = typeof snapshot.file === 'string' ? snapshot.file : entry.file;
     const content = typeof snapshot.content === 'string' ? snapshot.content : '';
@@ -473,12 +492,13 @@ export function restoreDeferredGovernanceDirtyFiles(repoRoot: string, report: De
     mkdirSync(path.dirname(absolutePath), { recursive: true });
     writeFileSync(absolutePath, content, 'utf8');
     writeFileSync(snapshotPath, `${JSON.stringify({ ...snapshot, restoredAt }, null, 2)}\n`, 'utf8');
-    return { ...entry, restoredAt };
+    return { ...entry, restoredAt, skipReason: null };
   });
   return {
     ...report,
     files,
-    restored: true
+    restored: true,
+    skippedMissingSnapshots
   };
 }
 

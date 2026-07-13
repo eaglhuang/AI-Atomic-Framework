@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0194",
+  "title": "Make taskflow close tolerate deferred foreign governance-dirty snapshots",
+  "status": "running",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "npm run check:encoding:touched",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts (1033 lines)",
+        "packages/cli/src/commands/taskflow.ts (1555 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0194.md",
+    "sectionTitle": "TASK-AAO-0194",
+    "headingLine": 31,
+    "hash": "654229654940180e"
+  },
+  "importedAt": "2026-07-13T12:26:38.673Z",
+  "lastTransitionId": "2026-07-13T12-26-52-397Z-claim-d46ff2dc72a9",
+  "lastTransitionAt": "2026-07-13T12:26:52.397Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "cursor-grok-4.5",
+    "leaseId": "lease-016953a05428",
+    "claimedAt": "2026-07-13T12:26:51.827Z",
+    "heartbeatAt": "2026-07-13T12:26:51.827Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0194.json"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "owner": "cursor-grok-4.5",
+  "startedAt": "2026-07-13T12:26:51.827Z",
+  "startedByActor": "cursor-grok-4.5",
+  "startedBySessionId": "session-20260713122651-cursor-grok-4.5-TASK-AAO-0194-aabebb1611",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0194",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0194.*",
+      ".atm/history/task-events/TASK-AAO-0194/**",
+      ".atm/history/tasks/TASK-AAO-0194.json"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5d82bf12f70b26edac794473e6f234222ab81afdb09cebc3d7585e258eaf7714",
+    "actorId": "cursor-grok-4.5",
+    "createdAt": "2026-07-13T12:26:52.396Z",
+    "status": "active"
+  }
+}

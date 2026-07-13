@@ -860,7 +860,7 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     ]);
     let closeWindowLock: CloseWindowStagedIndexLockReport | null = null;
     let closeWindowLockReleased = false;
-    let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty);
+    let deferredGovernanceDirty = deferGovernanceDirtyFiles(cwd, deferGovernanceDirty, taskId);
     let deferredGovernanceDirtyRestored = false;
     try {
       closeWindowLock = acquireCloseWindowStagedIndexLock({
