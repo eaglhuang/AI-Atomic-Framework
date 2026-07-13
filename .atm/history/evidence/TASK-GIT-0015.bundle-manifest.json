@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-GIT-0015",
+  "updatedAt": "2026-07-13T02:37:46.102Z",
+  "updatedBy": "codex-backlog-captain",
+  "freshValidationPasses": [
+    "check:encoding:touched",
+    "typecheck",
+    "validate:broker-lifecycle",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:git-hooks-enforcement"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "npm run check:encoding:touched -- --files docs/governance/atm-bug-and-optimization-backlog.md packages/cli/src/commands/git-governance.ts packages/cli/src/commands/git-index-ownership.ts packages/cli/src/commands/team.ts packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts packages/cli/src/commands/taskflow/historical-close-preflight.ts packages/cli/src/commands/taskflow/close-preflight.ts packages/cli/src/commands/taskflow/commit-bundle-assembly.ts packages/cli/src/commands/tasks/close-window-lock.ts packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts tests/cli/git-commit-task-scoped-staging.test.ts tests/cli/team-plan-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:df29ee707746dce94480175968720b4a17e528e6c841a1ad1adae83618e35bc2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched"
+      ],
+      "generatedAt": "2026-07-13T02:32:25.939Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-13T02:32:39.391Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:broker-lifecycle",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e4c06fc3f1d912ae1cec0648210dd3da69e664bb75c21d1789e6b46637ceb8c1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:broker-lifecycle"
+      ],
+      "generatedAt": "2026-07-13T02:32:49.493Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:fa13200b997f2180865d7971835a6a3a615fd494e36814662425bb0e3b732c5e",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-13T02:33:14.280Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-13T02:34:05.429Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-hooks-enforcement",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9e56a4dc9428e89eeb535e48b106dd9acadb8a1ee45ac242726120c626ce354a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-hooks-enforcement"
+      ],
+      "generatedAt": "2026-07-13T02:37:46.197Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

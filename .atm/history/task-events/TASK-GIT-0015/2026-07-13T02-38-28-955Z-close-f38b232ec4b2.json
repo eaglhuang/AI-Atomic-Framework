@@ -1,0 +1,91 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T02-38-28-955Z-close-f38b232ec4b2",
+  "taskId": "TASK-GIT-0015",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260713023003-codex-backlog-captain-TASK-GIT-0015-8e80a01ff0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0015.json",
+  "taskSha256": "sha256:7c0873ea249e76991485d88a4a13bb3aa415110dba471d9389a6f05583b60de4",
+  "createdAt": "2026-07-13T02:38:28.955Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0015 --actor codex-backlog-captain --status done --historical-delivery 329890f7f8fd24b8e6d4083d3c378ef63658e7a9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713023003-codex-backlog-captain-TASK-GIT-0015-8e80a01ff0",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0015.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "typecheck",
+      "validate:broker-lifecycle",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T02:38:28.948Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0015.*",
+        ".atm/history/task-events/TASK-GIT-0015/**",
+        ".atm/history/tasks/TASK-GIT-0015.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/integration-plugin-matrix.md",
+        "packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/tasks/close-window-lock.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/lifecycle.ts",
+        "scripts/validate-broker-lifecycle.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "tests/cli/team-plan-contract.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/build-release-hygiene-hints.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-index-ownership.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+        "packages/cli/src/commands/taskflow/close-preflight.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+        "packages/cli/src/commands/tasks/close-window-lock.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/lifecycle.ts",
+        "scripts/validate-broker-lifecycle.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "tests/cli/team-plan-contract.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
