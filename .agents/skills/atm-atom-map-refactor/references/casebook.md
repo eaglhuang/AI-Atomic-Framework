@@ -227,3 +227,18 @@ Owner modules:
 Proof: focused `team-route-map.spec.ts`, parameterized 600-line atom validator, Team broker proposal preview with explicit `--actor "Codex-GPT 5.5"`, and Team Agents validator. Full `typecheck` may be blocked by unrelated dirty broker registry test files; record that separately instead of widening the RFT scope.
 
 Lesson: route classification should be pure and tested without booting the Team runtime. For hot files, proposal-first gates must be paired with explicit actor identity because stale environment identity can still poison proposal ownership.
+
+## TASK-RFT-0022 - nextAction assembly contract
+
+Problem: `packages/cli/src/commands/next.ts` still assembled decision trails, prompt-scoped queue commands, and dirty-worktree hint emission inline. These fields are reused by batch, prompt-scope, and message surfaces, so small edits can distort operator guidance or duplicate playbook data.
+
+Pattern: Result Contract Object with a small Policy helper.
+
+Owner modules:
+- `packages/cli/src/commands/next/next-action-assembly.ts`;
+- `packages/cli/src/commands/next/prompt-scope-resolution.ts`;
+- `packages/cli/src/commands/next/worktree-hints.ts`.
+
+Proof: focused `next-action-assembly.spec.ts`, parameterized `validate-atom-file-size --max-lines 600`, `typecheck`, prompt-scoped next validator, guidance validator, `validate:cli`, and `git diff --check`.
+
+Lesson: nextAction helpers should be pure and structural. Keep route selection in the facade until a Strategy Map card owns it, but move evidence-contract assembly into small atoms that can be checked with a future-smaller line budget.

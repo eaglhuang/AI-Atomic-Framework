@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T17-49-08-714Z-close-452a564ed969",
+  "taskId": "TASK-RFT-0022",
+  "action": "close",
+  "actorId": "Codex-GPT 5.5",
+  "sessionId": "session-20260713173519-Codex-GPT-5.5-TASK-RFT-0022-7d31651a07",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0022.json",
+  "taskSha256": "sha256:df1c6b2ed8e8df4d41399b0e0679daab11351c4d5efcefd48e33b105ab8529be",
+  "createdAt": "2026-07-13T17:49:08.714Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0022 --actor \"Codex-GPT 5.5\" --status done --from-batch-checkpoint --batch batch-711cb1cf0136",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-711cb1cf0136",
+    "sessionId": "session-20260713173519-Codex-GPT-5.5-TASK-RFT-0022-7d31651a07",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0022.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts",
+      "typecheck",
+      "validate:atom-file-size",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:guidance",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T17:49:08.708Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+        ".atm/history/evidence/TASK-RFT-0022.*",
+        ".atm/history/task-events/TASK-RFT-0022/**",
+        ".atm/history/tasks/TASK-RFT-0022.json",
+        "docs/reports/next-command-atomic-map.md",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/**",
+        "packages/cli/src/commands/next/**",
+        "scripts/validate-guidance.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/**",
+        "packages/cli/src/commands/next/**",
+        "scripts/validate-guidance.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -12,6 +12,9 @@ Read-only inventory for `packages/cli/src/commands/next.ts` and the TASK-RFT-000
 | `next.claim.admission` | Policy Object | `packages/cli/src/commands/next/claim-admission.ts` | `packages/cli/src/commands/next/__tests__/claim-admission.spec.ts` |
 | `next.task-scoped-claim-command` | Result Contract Object | `packages/cli/src/commands/next/task-scoped-claim-command.ts` | `packages/cli/src/commands/next/__tests__/task-scoped-claim-command.spec.ts` |
 | `next.runner-mode` | Facade | `packages/cli/src/commands/next/runner-mode.ts` | `packages/cli/src/commands/next/__tests__/runner-mode.spec.ts` |
+| `next.next-action-assembly` | Result Contract Object | `packages/cli/src/commands/next/next-action-assembly.ts` | `packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts` |
+| `next.prompt-scope-resolution` | Result Contract Object | `packages/cli/src/commands/next/prompt-scope-resolution.ts` | `packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts` |
+| `next.worktree-hints` | Policy Object | `packages/cli/src/commands/next/worktree-hints.ts` | `packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts` |
 
 Sibling modules already present before TASK-RFT-0001 (`next/intent-normalizers.ts`, `next/match-and-sort.ts`, `next/route-predicates.ts`, `next/view-projections.ts`, `next/planning-root-preference.ts`) are out of scope for this card.
 
@@ -24,6 +27,10 @@ Sibling modules already present before TASK-RFT-0001 (`next/intent-normalizers.t
 | `packages/cli/src/commands/next/claim-admission.ts` | 139 | 139 | 600 |
 | `packages/cli/src/commands/next/task-scoped-claim-command.ts` | — | 42 | 600 |
 | `packages/cli/src/commands/next/runner-mode.ts` | — | 101 | 600 |
+| `packages/cli/src/commands/next/next-action-assembly.ts` | new | 243 | parameterized `--max-lines 600` |
+| `packages/cli/src/commands/next/prompt-scope-resolution.ts` | new | 20 | parameterized `--max-lines 600` |
+| `packages/cli/src/commands/next/worktree-hints.ts` | new | 21 | parameterized `--max-lines 600` |
+| `packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts` | new | 84 | parameterized `--max-lines 600` |
 
 ## Governance Invariants
 
@@ -40,6 +47,20 @@ Residual inline owners still in `next.ts` (follow-up extraction candidates):
 - `buildPromptScopedNextResult` channel orchestration
 - `claimNextImportedTask` claim orchestration
 - `buildChannelPlaybook` / `buildNextMessages`
+
+## TASK-RFT-0022 Second-Wave Extraction
+
+`TASK-RFT-0022` extracted the nextAction assembly contract without changing route selection:
+
+- `next-action-assembly.ts` now owns `NextActionLike`, decision trail construction, selected task id extraction, and queue-head id extraction.
+- `prompt-scope-resolution.ts` owns prompt-scoped queue claim command construction, including the planning-card import override and JSON-safe prompt quoting.
+- `worktree-hints.ts` owns the predicate for emitting dirty-worktree scope hints from `buildNextMessages`.
+
+The 600-line atom limit is intentionally enforced through the parameterized validator:
+
+```powershell
+node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/next/next-action-assembly.ts,packages/cli/src/commands/next/prompt-scope-resolution.ts,packages/cli/src/commands/next/worktree-hints.ts,packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts,docs/reports/next-command-atomic-map.md
+```
 
 ## Caller Surfaces
 

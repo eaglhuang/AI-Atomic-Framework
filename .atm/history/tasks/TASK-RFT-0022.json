@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0022",
+  "title": "next.ts nextAction assembly second-wave extraction",
+  "status": "done",
+  "milestone": "RFT-M7",
+  "dependencies": [
+    "TASK-RFT-0020"
+  ],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/next-action-assembly.ts",
+    "packages/cli/src/commands/next/prompt-scope-resolution.ts",
+    "packages/cli/src/commands/next/worktree-hints.ts",
+    "packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts",
+    "docs/reports/next-command-atomic-map.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next.ts",
+    "packages/cli/src/commands/next/**",
+    "packages/cli/src/commands/next/__tests__/**",
+    "scripts/validate-prompt-scoped-next.ts",
+    "scripts/validate-guidance.ts",
+    "docs/reports/next-command-atomic-map.md",
+    ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node --strip-types scripts/validate-prompt-scoped-next.ts",
+    "node --strip-types scripts/validate-guidance.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/next-action-assembly.spec.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing task selection authority.",
+    "Changing current editor detection semantics.",
+    "Rewriting unrelated guidance/create-atom behavior."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if prompt-scoped task routing, no-work, scope-not-found, or runner-mode diagnostics regress.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-command-atomic-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "docs/reports/next-command-atomic-map.md",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.next.next-action-assembly",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/next.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.next.route-strategy-map",
+        "pattern": "Strategy Map",
+        "source": "packages/cli/src/commands/next.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "rft-hardening/tasks/TASK-RFT-0022-next-action-assembly-map.task.md",
+    "sectionTitle": "TASK-RFT-0022",
+    "headingLine": 69,
+    "hash": "38e37b3e40372ac8"
+  },
+  "importedAt": "2026-07-13T16:37:51.115Z",
+  "lastTransitionId": "2026-07-13T17-49-08-714Z-close-452a564ed969",
+  "lastTransitionAt": "2026-07-13T17:49:08.714Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "Codex-GPT 5.5",
+  "reservedAt": "2026-07-13T17:35:19.037Z",
+  "promotedAt": "2026-07-13T17:35:19.039Z",
+  "claim": {
+    "actorId": "Codex-GPT 5.5",
+    "leaseId": "lease-303c5f6107e2",
+    "claimedAt": "2026-07-13T17:35:19.042Z",
+    "heartbeatAt": "2026-07-13T17:49:08.712Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0022.json",
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      "docs/reports/next-command-atomic-map.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/**",
+      "packages/cli/src/commands/next/**",
+      "scripts/validate-guidance.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T17:35:19.042Z",
+  "startedByActor": "Codex-GPT 5.5",
+  "startedBySessionId": "session-20260713173519-Codex-GPT-5.5-TASK-RFT-0022-7d31651a07",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0022",
+    "batchId": "batch-711cb1cf0136",
+    "scopeKey": "TASK-RFT",
+    "queueId": "queue-bd1e2d0fd45483b8",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".agents/skills/atm-atom-map-refactor/references/casebook.md",
+      ".atm/history/evidence/TASK-RFT-0022.*",
+      ".atm/history/task-events/TASK-RFT-0022/**",
+      ".atm/history/tasks/TASK-RFT-0022.json",
+      "docs/reports/next-command-atomic-map.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/__tests__/**",
+      "packages/cli/src/commands/next/**",
+      "scripts/validate-guidance.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a48d95b973b692146070e55a5e899169a07a593f1e4ff29075e0c74f5e3d546f",
+    "actorId": "Codex-GPT 5.5",
+    "createdAt": "2026-07-13T17:35:22.876Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-13T17:49:08.793Z",
+    "releasedBy": "Codex-GPT 5.5"
+  },
+  "closedAt": "2026-07-13T17:49:08.712Z",
+  "closedByActor": "Codex-GPT 5.5",
+  "closedBySessionId": "session-20260713173519-Codex-GPT-5.5-TASK-RFT-0022-7d31651a07",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0022.closure-packet.json"
+}
