@@ -30,10 +30,10 @@ All six task cards are closed with closure packets. Delivery commits are:
 The target line budget is intentionally parameterized, not hard-coded:
 
 ```bash
-node scripts/audit-file-sizes.mjs --max-lines 600 --json
+node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files <comma-separated-files>
 ```
 
-For this wave, newly extracted atom map, helper, and command modules were kept below `--max-lines 600`. Future RFT waves can tighten the same budget, for example to `--max-lines 500`, without changing the inspection workflow.
+For this wave, newly extracted atom map, helper, and command modules were kept below `--max-lines 600`. Future RFT waves can tighten the same budget, for example to `--max-lines 500`, without changing the validator source.
 
 ## Validation Pattern
 
@@ -76,8 +76,7 @@ The post-close claim release residue is recorded as `ATM-BUG-2026-07-14-185`.
 Next atomization candidates should be ranked with the same configurable line budget:
 
 ```bash
-node scripts/audit-file-sizes.mjs --max-lines 600 --json
+node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files <comma-separated-files>
 ```
 
 Prioritize files that combine command routing, state mutation, and user-facing diagnostics. Those files benefit most from atom-map separation because small focused scripts reduce accidental edits, technical debt, and regression risk.
-
