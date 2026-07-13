@@ -263,8 +263,8 @@ export function parseScopeAddOptions(argv: string[]) {
       index += 1;
       continue;
     }
-    if (arg === '--add') {
-      const raw = requireValue(argv, index, '--add');
+    if (arg === '--add' || arg === '--paths') {
+      const raw = requireValue(argv, index, arg);
       options.addPaths = parseCsvPathList(raw);
       index += 1;
       continue;
@@ -293,7 +293,7 @@ export function parseScopeAddOptions(argv: string[]) {
     throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --task <work-item-id>.', { exitCode: 2 });
   }
   if (options.addPaths.length === 0) {
-    throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --add <paths> (comma-separated).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'tasks scope add requires --add <paths> (comma-separated). Alias: --paths <paths>.', { exitCode: 2 });
   }
   return {
     ...options,

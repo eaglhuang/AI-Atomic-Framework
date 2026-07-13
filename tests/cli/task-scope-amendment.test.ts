@@ -63,6 +63,19 @@ expectCliError(
 );
 console.log('Test B scope add required flags: PASS');
 
+// === Test B2: scope add accepts --paths as a discoverability alias ===
+{
+  const options = parseScopeAddOptions([
+    '--task', 'TASK-MAO-0049',
+    '--actor', 'augment-code',
+    '--paths', '"docs/a.md,docs/b.md"',
+    '--reason', 'sync linked docs'
+  ]);
+  assert.deepEqual(options.addPaths, ['docs/a.md', 'docs/b.md']);
+  assert.equal(options.reason, 'sync linked docs');
+  console.log('Test B2 scope add --paths alias: PASS');
+}
+
 // === Test C: repair lane refuses without emergency approval ===
 expectCliError(
   () => parseScopeRepairOptions([
