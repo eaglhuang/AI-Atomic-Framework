@@ -534,10 +534,6 @@ const fastFocusedRegressionTests: NodeScriptTestSpec[] = [
   {
     name: 'closure-required-gates-contract',
     scriptPath: path.join(root, 'tests/cli/closure-required-gates-contract.test.ts')
-  },
-  {
-    name: 'task-audit-bulk-close-mirror',
-    scriptPath: path.join(root, 'tests/cli/task-audit-bulk-close-mirror.test.ts')
   }
 ];
 

@@ -2321,38 +2321,15 @@ function readEvidenceDocuments(root) {
 function inspectLatestCommitForBulkTaskClose(root) {
     const commitSha = runGitLines(root, ['rev-parse', '--verify', 'HEAD'])[0] ?? null;
     const changed = runGitLines(root, ['show', '--name-only', '--format=', 'HEAD'])
-        .filter(Boolean)
-        .map((entry) => normalizeRelativePath(entry));
-    const changedSet = new Set(changed);
+        .filter((entry) => entry.endsWith('.task.md'));
     const changedDoneTaskFiles = changed.filter((relativePath) => {
-        if (!relativePath.endsWith('.task.md'))
-            return false;
         const absolutePath = path.join(root, relativePath);
         if (!existsSync(absolutePath))
             return false;
         const frontmatter = parseMarkdownFrontmatter(readFileSync(absolutePath, 'utf8'));
-        if (normalizeStatus(frontmatter.status) !== 'done')
-            return false;
-        return !hasPreExistingClosurePacketForTaskCard(root, frontmatter, changedSet);
+        return normalizeStatus(frontmatter.status) === 'done';
     });
     return { commitSha, changedDoneTaskFiles };
-}
-function hasPreExistingClosurePacketForTaskCard(root, frontmatter, changedSet) {
-    const candidates = closurePacketCandidatesForTaskCard(frontmatter);
-    return candidates.some((candidate) => {
-        const relativePath = normalizeRelativePath(candidate);
-        return existsSync(path.join(root, relativePath)) && !changedSet.has(relativePath);
-    });
-}
-function closurePacketCandidatesForTaskCard(frontmatter) {
-    const explicit = normalizeOptionalString(frontmatter.closure_packet ?? frontmatter.closurePacket);
-    const taskId = normalizeOptionalString(frontmatter.task_id ?? frontmatter.taskId ?? frontmatter.id);
-    const candidates = [];
-    if (explicit)
-        candidates.push(explicit);
-    if (taskId)
-        candidates.push(`.atm/history/evidence/${taskId}.closure-packet.json`);
-    return [...new Set(candidates)];
 }
 function hasBulkClosureManifest(root) {
     const candidates = [
