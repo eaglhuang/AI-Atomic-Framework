@@ -993,7 +993,7 @@ export function parseOptions(argv: string[], commandName: string) {
       continue;
     }
     if (arg === '--files') {
-      if (commandName !== 'quickfix') {
+      if (!['next', 'quickfix'].includes(commandName)) {
         throw createUsageError(commandName, `${commandName} does not support option --files`, { invalidFlags: ['--files'] });
       }
       const raw = requireOptionValue(argv, index, '--files', commandName);

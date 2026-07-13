@@ -37,6 +37,11 @@
                         "summary":  "Alias for --claim-intent closeout-only on next --claim."
                     },
                     {
+                        "flag":  "--files",
+                        "value":  "csv",
+                        "summary":  "Optional comma-separated scope files for next --claim; ATM still includes the task ledger record in the underlying claim."
+                    },
+                    {
                         "flag":  "--prompt",
                         "value":  "text",
                         "summary":  "Scope next-action routing to the current user prompt before falling back to global state."
@@ -90,6 +95,7 @@
                      "node atm.mjs next --intent .atm/runtime/task-intent.json --json",
                      "node atm.mjs next --cwd \u003chost-repo\u003e --json",
                      "node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --auto-intent --json",
+                     "node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --files packages/core/src/index.ts --claim-intent write --json",
                      "node atm.mjs next --claim --actor codex-main --prompt \"implement TASK-ABC-0001\" --auto-intent --json",
                      "node atm.mjs next --claim --actor codex-main --task TASK-ABC-0001 --claim-intent closeout-only --json"
                  ],

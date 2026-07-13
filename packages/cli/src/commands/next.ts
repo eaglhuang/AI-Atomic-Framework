@@ -295,6 +295,7 @@ async function runNextRoute(argv: string[]) {
       actor: options.agent,
       claimIntent,
       autoIntent,
+      claimFiles: options.files,
       taskIntent,
       importedTaskQueue,
       integrationBootstrap,
@@ -656,6 +657,7 @@ async function claimNextImportedTask(input: {
   readonly actor: string | undefined;
   readonly claimIntent?: NextClaimIntent | null;
   readonly autoIntent?: boolean;
+  readonly claimFiles?: readonly string[];
   readonly taskIntent: TaskIntent | null;
   readonly importedTaskQueue: ImportedTaskQueue;
   readonly integrationBootstrap: ReturnType<typeof inspectIntegrationBootstrap>;
@@ -945,7 +947,9 @@ async function claimNextImportedTask(input: {
   }
   let parallelAdvisory: Record<string, unknown> | undefined = undefined;
   let brokerQueueAdmission: BrokerQueueAdmission | undefined = undefined;
-  let claimAllowedFiles = buildAllowedFilesForTask(claimableTask);
+  let claimAllowedFiles = (input.claimFiles && input.claimFiles.length > 0)
+    ? uniqueSorted(input.claimFiles.map(normalizeWorkPath).filter(Boolean))
+    : buildAllowedFilesForTask(claimableTask);
   // Parallel preflight check
   const parallelStartedAt = Date.now();
   try {
@@ -1267,7 +1271,7 @@ async function claimNextImportedTask(input: {
       '--files',
       Array.from(new Set([
         claimableTask.taskPath,
-        ...(Array.isArray(claimableTask.targetAllowedFiles) ? claimableTask.targetAllowedFiles : [])
+        ...claimAllowedFiles
       ])).join(','),
       '--json'
     ]);
