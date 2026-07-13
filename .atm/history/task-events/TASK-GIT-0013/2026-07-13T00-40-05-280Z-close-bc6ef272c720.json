@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T00-40-05-280Z-close-bc6ef272c720",
+  "taskId": "TASK-GIT-0013",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260713001641-codex-backlog-captain-TASK-GIT-0013-eecb6b3a9f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0013.json",
+  "taskSha256": "sha256:bb14e36395c9d8860f96a8cbabb1f22f5430288455d02e2a1ded8683ac332de4",
+  "createdAt": "2026-07-13T00:40:05.280Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0013 --actor codex-backlog-captain --status done --historical-delivery 1a6968fa5d0c4d4ecf05150934cb1adee4782cc9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713001641-codex-backlog-captain-TASK-GIT-0013-eecb6b3a9f",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0013.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "typecheck",
+      "validate:broker-lifecycle",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T00:40:05.273Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0013.*",
+        ".atm/history/task-events/TASK-GIT-0013/**",
+        ".atm/history/tasks/TASK-GIT-0013.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "docs/governance/integration-plugin-matrix.md",
+        "integrations/**",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/**",
+        "scripts/validate-broker-lifecycle.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "integrations/**",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/core/src/broker/**",
+        "scripts/validate-broker-lifecycle.ts",
+        "scripts/validate-cli.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
