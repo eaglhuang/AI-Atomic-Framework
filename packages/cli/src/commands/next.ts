@@ -3356,6 +3356,9 @@ function scoreTaskForIntent(cwd: string, task: ImportedTaskSummary, intent: Task
   if (intent.mentionedTaskIds.includes(task.workItemId.toUpperCase())) {
     score += 120;
     reasons.push('task-id-exact');
+  } else if (isTaskIdSuffixMentioned(task.workItemId, intent)) {
+    score += 110;
+    reasons.push('task-id-suffix-match');
   }
   const pathFields = [
     task.taskPath,
@@ -5398,7 +5401,19 @@ function readQueueHeadTaskId(value: unknown): string | null {
 
 function isTaskIdMentioned(workItemId: string, intent: TaskIntent | null) {
   if (!intent || intent.mentionedTaskIds.length === 0) return false;
-  return intent.mentionedTaskIds.includes(workItemId.trim().toUpperCase());
+  return intent.mentionedTaskIds.includes(workItemId.trim().toUpperCase())
+    || isTaskIdSuffixMentioned(workItemId, intent);
+}
+
+function isTaskIdSuffixMentioned(workItemId: string, intent: TaskIntent | null) {
+  if (!intent || intent.mentionedTaskIds.length === 0) return false;
+  const normalizedWorkItemId = workItemId.trim().toUpperCase();
+  return intent.mentionedTaskIds.some((taskId) => {
+    const normalizedTaskId = taskId.trim().toUpperCase();
+    return normalizedTaskId.length > 0
+      && normalizedTaskId !== normalizedWorkItemId
+      && normalizedWorkItemId.endsWith(`-${normalizedTaskId}`);
+  });
 }
 
 function extractJsonTaskMetadata(rawText: string) {

@@ -118,7 +118,7 @@ function isClosedTaskStatus(status: string) {
 function hasRequiredPromptScopeMatch(task: ImportedTaskSummary, intent: TaskIntent): boolean {
   const reasons = task.matchReasons ?? [];
   if (intent.mentionedTaskIds.length > 0) {
-    if (reasons.includes('task-id-exact')) return true;
+    if (reasons.includes('task-id-exact') || reasons.includes('task-id-suffix-match')) return true;
     if (intent.queueRequested || intent.ordinalScope) {
       return reasons.includes('task-root-hint-match')
         || reasons.includes('nearby-plan-name-match')
