@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T09-50-20-886Z-close-c6409e842160",
+  "taskId": "TASK-AAO-0192",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260713094548-cursor-grok-4.5-TASK-AAO-0192-c95aefd17d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0192.json",
+  "taskSha256": "sha256:147476d447d1232010d2e221b017ead709ca28b452bf72e0587b61e7088b3d7f",
+  "createdAt": "2026-07-13T09:50:20.886Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0192 --actor cursor-grok-4.5 --status done --historical-delivery 0afd18715",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713094548-cursor-grok-4.5-TASK-AAO-0192-c95aefd17d",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0192.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T09:50:20.872Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0192.*",
+        ".atm/history/task-events/TASK-AAO-0192/**",
+        ".atm/history/tasks/TASK-AAO-0192.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+        "packages/cli/src/commands/tasks/legacy-impl.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
