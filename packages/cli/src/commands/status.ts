@@ -1,11 +1,155 @@
 import path from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { configPathFor, makeResult, message, parseOptions, readJsonFile, relativePathFrom } from './shared.ts';
 import { evaluateSeedGovernance, frameworkRepoRoot, registryFilePath, validateRegistryDocumentAgainstSchema } from './registry-shared.ts';
+
+type WorkerStatus = 'active' | 'released' | 'handoff' | 'taken_over' | 'unknown';
+
+type ActiveWorkerSummary = {
+  taskId: string;
+  actorId: string;
+  status: WorkerStatus;
+  heartbeatAt: string | null;
+  ageSeconds: number | null;
+  ttlSeconds: number | null;
+  expired: boolean | null;
+  scopePaths: string[];
+  lockPath: string;
+  teamBrokerLevel: 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+  teamBrokerReason: string;
+};
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+function stringField(record: Record<string, unknown>, keys: readonly string[]): string | null {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+  return null;
+}
+
+function stringArrayField(record: Record<string, unknown>, keys: readonly string[]): string[] {
+  for (const key of keys) {
+    const value = record[key];
+    if (Array.isArray(value)) {
+      return value.filter((entry): entry is string => typeof entry === 'string' && entry.trim().length > 0)
+        .map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '').trim());
+    }
+  }
+  return [];
+}
+
+function classifyTeamBrokerLevel(scopePaths: readonly string[]): Pick<ActiveWorkerSummary, 'teamBrokerLevel' | 'teamBrokerReason'> {
+  const normalized = scopePaths.map((entry) => entry.replace(/\\/g, '/'));
+  const touchesFrameworkCore = normalized.some((entry) => (
+    entry.startsWith('packages/core/src/') ||
+    entry.startsWith('packages/cli/src/commands/next') ||
+    entry.startsWith('packages/cli/src/commands/broker') ||
+    entry.startsWith('packages/cli/src/commands/taskflow') ||
+    entry.startsWith('packages/cli/src/commands/tasks') ||
+    entry.startsWith('.atm/runtime/')
+  ));
+  if (touchesFrameworkCore) {
+    return {
+      teamBrokerLevel: 'L5',
+      teamBrokerReason: 'Touches framework runtime, broker, task lifecycle, or protected governance internals.'
+    };
+  }
+  const touchesSharedCli = normalized.some((entry) => (
+    entry.startsWith('packages/cli/src/') ||
+    entry.startsWith('scripts/') ||
+    entry.startsWith('schemas/')
+  ));
+  if (touchesSharedCli) {
+    return {
+      teamBrokerLevel: 'L4',
+      teamBrokerReason: 'Touches shared CLI, validators, schemas, or framework source surfaces.'
+    };
+  }
+  const touchesTestsOrDocs = normalized.some((entry) => entry.startsWith('tests/') || entry.startsWith('docs/'));
+  if (touchesTestsOrDocs) {
+    return {
+      teamBrokerLevel: 'L2',
+      teamBrokerReason: 'Limited to documentation or tests.'
+    };
+  }
+  return {
+    teamBrokerLevel: 'L3',
+    teamBrokerReason: 'General source scope with no protected framework-core path detected.'
+  };
+}
+
+function collectWorkerDashboard(cwd: string, nowIso = new Date().toISOString()) {
+  const lockRoot = path.join(cwd, '.atm', 'runtime', 'locks');
+  const nowEpoch = Date.parse(nowIso);
+  const workers: ActiveWorkerSummary[] = [];
+  if (!existsSync(lockRoot)) {
+    return {
+      schemaId: 'atm.activeWorkerDashboard.v1',
+      generatedAt: nowIso,
+      activeCount: 0,
+      workers
+    };
+  }
+  for (const entry of readdirSync(lockRoot)) {
+    if (!entry.endsWith('.json')) continue;
+    const lockPath = path.join(lockRoot, entry);
+    const record = asRecord(readJsonFile(lockPath, 'ATM_STATUS_LOCK_READ_FAILED'));
+    if (!record) continue;
+    const statusRaw = stringField(record, ['status', 'state']);
+    const status: WorkerStatus = statusRaw === null
+      ? 'active'
+      : statusRaw === 'active' || statusRaw === 'released' || statusRaw === 'handoff' || statusRaw === 'taken_over'
+      ? statusRaw
+      : 'unknown';
+    if (status !== 'active') continue;
+    const taskId = stringField(record, ['taskId', 'workItemId']) ?? entry.replace(/\.lock\.json$/, '').replace(/\.json$/, '');
+    const actorId = stringField(record, ['actorId', 'lockedBy', 'owner']) ?? 'unknown';
+    const heartbeatAt = stringField(record, ['heartbeatAt', 'updatedAt', 'lockedAt', 'createdAt']);
+    const heartbeatEpoch = heartbeatAt ? Date.parse(heartbeatAt) : NaN;
+    const ttlSecondsRaw = Number(record.ttlSeconds);
+    const ttlSeconds = Number.isFinite(ttlSecondsRaw) && ttlSecondsRaw > 0 ? ttlSecondsRaw : null;
+    const ageSeconds = Number.isFinite(nowEpoch) && Number.isFinite(heartbeatEpoch)
+      ? Math.max(0, Math.floor((nowEpoch - heartbeatEpoch) / 1000))
+      : null;
+    const expired = ageSeconds !== null && ttlSeconds !== null ? ageSeconds > ttlSeconds : null;
+    const scopePaths = stringArrayField(record, ['files', 'scopePaths', 'paths']);
+    const brokerLevel = classifyTeamBrokerLevel(scopePaths);
+    workers.push({
+      taskId,
+      actorId,
+      status,
+      heartbeatAt,
+      ageSeconds,
+      ttlSeconds,
+      expired,
+      scopePaths,
+      lockPath: relativePathFrom(cwd, lockPath),
+      ...brokerLevel
+    });
+  }
+  workers.sort((left, right) => {
+    const leftTime = left.heartbeatAt ? Date.parse(left.heartbeatAt) : 0;
+    const rightTime = right.heartbeatAt ? Date.parse(right.heartbeatAt) : 0;
+    return rightTime - leftTime || left.taskId.localeCompare(right.taskId);
+  });
+  return {
+    schemaId: 'atm.activeWorkerDashboard.v1',
+    generatedAt: nowIso,
+    activeCount: workers.length,
+    workers
+  };
+}
 
 export function runStatus(argv: string[]) {
   const { options } = parseOptions(argv, 'status');
   const configPath = configPathFor(options.cwd);
+  const workerDashboard = collectWorkerDashboard(options.cwd);
   const frameworkRepository = (
     path.resolve(options.cwd) === frameworkRepoRoot ||
     existsSync(path.join(options.cwd, 'packages/core/seed.js'))
@@ -43,7 +187,8 @@ export function runStatus(argv: string[]) {
         governanceTier: governance.governanceTier,
         legacyPlanningId: governance.legacyPlanningId,
         governedByLegacyPlanningId: governance.governedByLegacyPlanningId,
-        selfVerificationOk: governance.selfVerificationOk
+        selfVerificationOk: governance.selfVerificationOk,
+        workerDashboard
       }
     });
   }
@@ -92,7 +237,8 @@ export function runStatus(argv: string[]) {
       adoptedProfile,
       projectProbePath: config.adoption?.projectProbePath ?? null,
       repositoryKind: projectProbe?.repositoryKind ?? null,
-      recommendedPrompt: projectProbe?.recommendedPrompt ?? null
+      recommendedPrompt: projectProbe?.recommendedPrompt ?? null,
+      workerDashboard
     }
   });
 }
