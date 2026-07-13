@@ -761,6 +761,7 @@ type ParsedCliOptions = {
   evidence?: string;
   verify: boolean;
   claim: boolean;
+  apply: boolean;
   dryRun: boolean;
   force: boolean;
   adopt?: string;
@@ -803,6 +804,7 @@ export function parseOptions(argv: string[], commandName: string) {
     evidence: undefined,
     verify: false,
     claim: false,
+    apply: false,
     dryRun: false,
     force: false,
     adopt: undefined,
@@ -950,6 +952,13 @@ export function parseOptions(argv: string[], commandName: string) {
         throw createUsageError(commandName, `${commandName} does not support option --claim`, { invalidFlags: ['--claim'] });
       }
       options.claim = true;
+      continue;
+    }
+    if (arg === '--apply') {
+      if (commandName !== 'residue') {
+        throw createUsageError(commandName, `${commandName} does not support option --apply`, { invalidFlags: ['--apply'] });
+      }
+      options.apply = true;
       continue;
     }
     if (arg === '--tasks') {
