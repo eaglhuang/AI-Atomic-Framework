@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T01-58-02-952Z-close-fc05b5261975",
+  "taskId": "TASK-GIT-0014",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-GIT-0014.json",
+  "taskSha256": "sha256:23302db55d2c390e809ba4b4a8073e94e74a61081f9080ed339e8b94f776fc86",
+  "createdAt": "2026-07-13T01:58:02.952Z",
+  "command": "node atm.mjs tasks close --task TASK-GIT-0014 --actor codex-backlog-captain --status done --historical-delivery 116f35fb85bce924c4c39f5fa551bb12c282e7c7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+    "closurePacketPath": ".atm/history/evidence/TASK-GIT-0014.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T01:58:02.945Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-GIT-0014.*",
+        ".atm/history/task-events/TASK-GIT-0014/**",
+        ".atm/history/tasks/TASK-GIT-0014.json",
+        "docs/governance/integration-plugin-matrix.md",
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/integration.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "tests/cli/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/git.spec.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/pre-push.ts",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/integration.ts",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "tests/cli/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
