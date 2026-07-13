@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T06-18-02-513Z-close-99636bd06f74",
+  "taskId": "TASK-AAO-FABLE-006",
+  "action": "close",
+  "actorId": "claude-fable-5",
+  "sessionId": "session-20260713061403-claude-fable-5-TASK-AAO-FABLE-006-7feee4b3e1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-FABLE-006.json",
+  "taskSha256": "sha256:6d921e1d84775188675863db6cde4e682114f04915dc38d6b07cd690b65fbfce",
+  "createdAt": "2026-07-13T06:18:02.513Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-FABLE-006 --actor claude-fable-5 --status done --historical-delivery 429f6c3ecb05481d440b166d224015de4085f580",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713061403-claude-fable-5-TASK-AAO-FABLE-006-7feee4b3e1",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-FABLE-006.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T06:18:02.506Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "suspected",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-atom-map-refactor/SKILL.md",
+        ".agents/skills/atm-task-card-authoring/SKILL.md",
+        ".atm/history/evidence/TASK-AAO-FABLE-006.*",
+        ".atm/history/task-events/TASK-AAO-FABLE-006/**",
+        ".atm/history/tasks/TASK-AAO-FABLE-006.json"
+      ],
+      "criticalChangedFiles": [],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
