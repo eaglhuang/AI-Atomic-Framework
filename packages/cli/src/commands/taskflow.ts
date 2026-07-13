@@ -727,12 +727,14 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     };
   }
 
+  const packageJsonForAutoEvidencePlan = actorId ? readPackageJsonForAutoEvidence(cwd) : null;
   const autoEvidencePlan = actorId
     ? buildAutoEvidencePlan({
       cwd,
       taskId,
       actorId,
-      mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run'
+      mode: writeRequested && autoEvidenceRequested ? 'execute' : 'dry-run',
+      commandMapper: (declared) => mapAutoEvidenceCommand(declared, packageJsonForAutoEvidencePlan).command
     })
     : null;
 
