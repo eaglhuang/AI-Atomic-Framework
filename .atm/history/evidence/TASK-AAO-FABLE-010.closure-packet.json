@@ -16,15 +16,17 @@
     ]
   },
   "targetCommit": "dabae81b41877a3d8b19f493f817f6248c3d06c2",
-  "governedTreeSha": "806cdb448da182dd9c0f10fd235bde1767e0e61a",
+  "governedTreeSha": "544ccb25e98705413cb74ca96638f029c49e6a35",
   "targetCommitDelta": {
-    "currentCommitSha": "dabae81b41877a3d8b19f493f817f6248c3d06c2",
+    "currentCommitSha": "41ae200005aca36a6a81c0ff542132fbbe4c5d47",
     "parentCommitShas": [
       "dabae81b41877a3d8b19f493f817f6248c3d06c2"
     ],
-    "governedTreeSha": "806cdb448da182dd9c0f10fd235bde1767e0e61a",
+    "governedTreeSha": "544ccb25e98705413cb74ca96638f029c49e6a35",
     "changedFiles": [
+      ".atm/history/evidence/git-head.jsonl",
       ".atm/history/evidence/TASK-AAO-FABLE-010.bundle-manifest.json",
+      ".atm/history/evidence/TASK-AAO-FABLE-010.closure-packet.json",
       ".atm/history/evidence/TASK-AAO-FABLE-010.json",
       ".atm/history/task-events/TASK-AAO-FABLE-010/2026-07-13T14-03-36-544Z-import-5d620613a703.json",
       ".atm/history/task-events/TASK-AAO-FABLE-010/2026-07-13T14-09-48-984Z-reserve-71e5c2b3931e.json",
@@ -34,6 +36,7 @@
       ".atm/history/task-events/TASK-AAO-FABLE-010/2026-07-13T14-32-05-243Z-reserve-855fea6466e3.json",
       ".atm/history/task-events/TASK-AAO-FABLE-010/2026-07-13T14-32-05-246Z-promote-9e4ec5d87b68.json",
       ".atm/history/task-events/TASK-AAO-FABLE-010/2026-07-13T14-32-08-603Z-claim-3624f4a99891.json",
+      ".atm/history/task-events/TASK-AAO-FABLE-010/2026-07-13T14-35-36-432Z-close-2103378e2891.json",
       ".atm/history/tasks/TASK-AAO-FABLE-010.json",
       "scripts/validate-skill-templates.ts"
     ]
@@ -124,5 +127,13 @@
   "sessionId": "session-20260713143205-codex-gpt-5.4-mini-TASK-AAO-FABLE-010-ad06f43fe9",
   "attestation": null,
   "historicalDeliveryProvenance": null,
-  "teamSummary": null
+  "teamSummary": null,
+  "repair": {
+    "schemaId": "atm.closurePacketRepair.v1",
+    "repairedAt": "2026-07-13T14:38:07.566Z",
+    "repairedByCommand": "atm tasks repair-closure",
+    "originalPacketCommitSha": "41ae200005aca36a6a81c0ff542132fbbe4c5d47",
+    "repairedTargetCommitSha": "dabae81b41877a3d8b19f493f817f6248c3d06c2",
+    "evidencePath": ".atm/history/evidence/git-head.jsonl"
+  }
 }

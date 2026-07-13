@@ -1,0 +1,24 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T14-40-30-000Z-rescue-closure-packet-codex-gpt-5-4-mini",
+  "taskId": "TASK-AAO-FABLE-010",
+  "action": "rescue-closure-packet",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260713143205-codex-gpt-5.4-mini-TASK-AAO-FABLE-010-ad06f43fe9",
+  "fromStatus": "done",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-FABLE-010.json",
+  "taskSha256": "sha256:e68a5a8f31a99a50129a039e1d7cf7b26d983d371dfb5176c9249b4bf4aadb0a",
+  "createdAt": "2026-07-13T14:40:30.000Z",
+  "command": "node atm.mjs rescue closure-packet --task TASK-AAO-FABLE-010 --json",
+  "closureRescue": {
+    "schemaId": "atm.taskClosurePacketRescueTransition.v1",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-FABLE-010.closure-packet.json",
+    "gitHeadEvidencePath": ".atm/history/evidence/git-head.jsonl",
+    "targetCommit": "dabae81b41877a3d8b19f493f817f6248c3d06c2",
+    "repairedHead": "41ae200005aca36a6a81c0ff542132fbbe4c5d47",
+    "governedTreeSha": "544ccb25e98705413cb74ca96638f029c49e6a35",
+    "reason": "ATM rescue closure-packet repaired stale closure metadata after pre-push rejected the initial governed commit."
+  }
+}
