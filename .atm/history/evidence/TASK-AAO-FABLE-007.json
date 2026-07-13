@@ -1,0 +1,256 @@
+{
+  "taskId": "TASK-AAO-FABLE-007",
+  "updatedAt": "2026-07-13T07:44:06.992Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-fable-5",
+      "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+      "createdAt": "2026-07-13T07:42:50.192Z",
+      "details": {
+        "actorId": "claude-fable-5",
+        "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-07-13T07:42:50.286Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:435210a3cfef3641de99625ece5e62ec02e082a219aa7a22b8613c93a8cf2d33",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-fable-5",
+      "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+      "createdAt": "2026-07-13T07:42:51.929Z",
+      "details": {
+        "actorId": "claude-fable-5",
+        "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-07-13T07:42:52.012Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:284004b6906f2853905d61f4dd06144138f72ecebe26a08a88514d17be500bd4",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types --test packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-fable-5",
+      "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+      "createdAt": "2026-07-13T07:43:14.591Z",
+      "details": {
+        "actorId": "claude-fable-5",
+        "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types --test packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types --test packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7da48d39fec443412df41eb19797a2a87eba74b857525cdd22f434334c968f2a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types --test packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:de701329bb57fee27245c74de1c936630e768d41ba39623fd89811c56240caff",
+            "cached": false,
+            "generatedAt": "2026-07-13T07:43:14.682Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:853b2eb247f76c248da201343059ba5e4f20da79cf3b392a5ded7732f2e8fe78",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-fable-5",
+      "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+      "createdAt": "2026-07-13T07:43:28.427Z",
+      "details": {
+        "actorId": "claude-fable-5",
+        "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:0efad1bb73cbef334b81abef3a2dfaaae12e29d6225004528d77a8f46a7ffcd9",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:cc7452998179d2875916bc6e886ec94728d0793b5c7fbc541ceb264494ecad7f",
+            "cached": false,
+            "generatedAt": "2026-07-13T07:43:28.515Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d3e8b4373aa2749a9488e74035c3e9c722fa104377574b5d4fc977ec554d46a6",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "claude-fable-5",
+      "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+      "createdAt": "2026-07-13T07:44:06.992Z",
+      "details": {
+        "actorId": "claude-fable-5",
+        "sessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.task-ledger",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-13T07:44:07.095Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d99f018f1e7c1f752f087c2c6beaa4cbba4f135d10de31abd8dd4edc648a4752",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

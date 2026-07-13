@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-FABLE-007",
+  "title": "Import patrol: warn when large-module scope lacks extraction candidates",
+  "status": "done",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "During import (dry-run and write), each parsed task whose `scopePaths` reference an existing repository file over 600 lines and whose card does not declare `extractionCandidates` receives a warning diagnostic `ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE` naming the oversized files and pointing at `.agents/skills/atm-atom-map-refactor`.",
+    "Warning-only: import never blocks on this diagnostic; cards that declare `extractionCandidates` (any disposition, including human-approved inline) emit nothing.",
+    "The patrol lives in its own small policy function (`buildExtractionFirstPatrolDiagnostics`) with a focused regression in the import orchestrator spec."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/task-import-validators.ts",
+    "packages/cli/src/commands/tasks/import-orchestrator.ts",
+    "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run typecheck",
+    "node --strip-types --test packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the advisory diagnostic; import behavior is otherwise unchanged (warning-only, never blocking).",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "packages/cli/src/commands/tasks/import-orchestrator.ts",
+        "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-FABLE-007-extraction-first-import-patrol.task.md",
+    "sectionTitle": "TASK-AAO-FABLE-007",
+    "headingLine": 39,
+    "hash": "b2d2d5feab360e45"
+  },
+  "importedAt": "2026-07-13T07:30:13.442Z",
+  "lastTransitionId": "2026-07-13T07-44-15-350Z-close-05c57e2b9ce5",
+  "lastTransitionAt": "2026-07-13T07:44:15.350Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-fable-5",
+  "reservedAt": "2026-07-13T07:30:14.793Z",
+  "promotedAt": "2026-07-13T07:30:14.796Z",
+  "claim": {
+    "actorId": "claude-fable-5",
+    "leaseId": "lease-54b63316db16",
+    "claimedAt": "2026-07-13T07:30:14.798Z",
+    "heartbeatAt": "2026-07-13T07:44:15.347Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-FABLE-007.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-007/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-007.json",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T07:30:14.798Z",
+  "startedByActor": "claude-fable-5",
+  "startedBySessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-FABLE-007",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-007.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-007/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-007.json",
+      "packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts",
+      "packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "packages/cli/src/commands/tasks/result-contracts.ts",
+      "packages/cli/src/commands/tasks/task-import-validators.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-FABLE-007-extraction-first-import-patrol.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-FABLE-007-extraction-first-import-patrol.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "99e9153824b8a092daad0ccee40a123a24ce214b3d5333b4dfe5bc9e079836ac",
+    "actorId": "claude-fable-5",
+    "createdAt": "2026-07-13T07:30:18.108Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-13T07:44:15.347Z",
+  "closedByActor": "claude-fable-5",
+  "closedBySessionId": "session-20260713073014-claude-fable-5-TASK-AAO-FABLE-007-ab03c5cc94",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-FABLE-007.closure-packet.json"
+}
