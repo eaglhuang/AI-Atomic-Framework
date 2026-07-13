@@ -31,9 +31,12 @@ try {
     execFileSync('git', ['config', 'user.name', 'ATM Test'], { cwd: repo, stdio: 'ignore' });
 
     const generatedPath = path.join(repo, 'release', 'atm-root-drop', 'packages', 'cli', 'dist', 'atm.js');
+    const trackedMirrorPath = path.join(repo, 'release', 'atm-root-drop', 'packages', 'cli', 'src', 'commands', 'next.ts');
     const manifestPath = path.join(repo, 'release', 'atm-root-drop', 'release-manifest.json');
     mkdirSync(path.dirname(generatedPath), { recursive: true });
+    mkdirSync(path.dirname(trackedMirrorPath), { recursive: true });
     writeFileSync(generatedPath, 'clean\n', 'utf8');
+    writeFileSync(trackedMirrorPath, 'tracked mirror clean\n', 'utf8');
     writeFileSync(manifestPath, JSON.stringify({
       generatedFiles: [
         'release/atm-root-drop/packages/cli/dist/atm.js',
@@ -46,14 +49,18 @@ try {
     execFileSync('git', ['commit', '-m', 'fixture'], { cwd: repo, stdio: 'ignore' });
 
     writeFileSync(generatedPath, 'dirty\n', 'utf8');
+    writeFileSync(trackedMirrorPath, 'tracked mirror dirty\n', 'utf8');
     const collected = collectTrackedReleaseArtifactPaths(repo);
     assert.ok(collected.includes('release/atm-root-drop/packages/cli/dist/atm.js'));
+    assert.ok(collected.includes('release/atm-root-drop/packages/cli/src/commands/next.ts'));
     assert.ok(!collected.includes('../outside.txt'));
     assert.ok(!collected.includes('release/atm-root-drop/../outside.txt'));
 
     const restored = restoreTrackedReleaseArtifacts(repo);
     assert.ok(restored.includes('release/atm-root-drop/packages/cli/dist/atm.js'));
+    assert.ok(restored.includes('release/atm-root-drop/packages/cli/src/commands/next.ts'));
     assert.equal(readFileSync(generatedPath, 'utf8').replaceAll('\r\n', '\n'), 'clean\n');
+    assert.equal(readFileSync(trackedMirrorPath, 'utf8').replaceAll('\r\n', '\n'), 'tracked mirror clean\n');
   } finally {
     rmSync(repo, { recursive: true, force: true });
   }

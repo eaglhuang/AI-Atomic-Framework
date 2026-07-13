@@ -77,6 +77,9 @@ function normalizeGeneratedReleasePath(value: unknown): string | null {
 
 export function collectTrackedReleaseArtifactPaths(repoRoot: string): readonly string[] {
   const paths = new Set<string>(trackedReleaseManifestPaths);
+  for (const trackedPath of listTrackedReleasePaths(repoRoot)) {
+    paths.add(trackedPath);
+  }
   const manifestPath = path.join(repoRoot, 'release', 'atm-root-drop', 'release-manifest.json');
   if (existsSync(manifestPath)) {
     try {
