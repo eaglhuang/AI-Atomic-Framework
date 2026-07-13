@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-FABLE-004",
+  "title": "Route backlog continuation prompts to backlog/task queue, not create-atom",
+  "status": "running",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "zh-TW backlog continuation prompts route to the existing task/batch queue.",
+    "English \"continue backlog fixes\" and Captain-mode variants route correctly.",
+    "Genuine new-capability / atom-birth prompts still route to create-atom.",
+    "Deterministic regression fixtures added; backlog row 157 marked fixed."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next/intent-normalizers.ts",
+    "scripts/validate-prompt-scoped-next.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next/intent-normalizers.ts",
+    "scripts/validate-prompt-scoped-next.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run typecheck",
+    "npm run validate:prompt-scoped-next"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert prompt classification extension; generic guide fallback remains.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-router-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-FABLE-004-backlog-continuation-prompt-routing.task.md",
+    "sectionTitle": "TASK-AAO-FABLE-004",
+    "headingLine": 35,
+    "hash": "9e28aed9e760caa2"
+  },
+  "importedAt": "2026-07-12T14:01:42.422Z",
+  "lastTransitionId": "2026-07-13T05-40-09-958Z-scope-amendment-6eaf01f9ab5d",
+  "lastTransitionAt": "2026-07-13T05:40:09.958Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-13T05:36:35.966Z",
+  "promotedAt": "2026-07-13T05:36:35.968Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-fca786c8e891",
+    "claimedAt": "2026-07-13T05:36:35.971Z",
+    "heartbeatAt": "2026-07-13T05:36:35.971Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-FABLE-004.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-004/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next/intent-normalizers.ts",
+      "packages/cli/src/commands/next/route-predicates.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T14:03:49.005Z",
+  "startedByActor": "claude-fable-5",
+  "startedBySessionId": "session-20260713053635-codex-backlog-captain-TASK-AAO-FABLE-004-9458b07f57",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-FABLE-004",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-004.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-004/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-004.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next/intent-normalizers.ts",
+      "packages/cli/src/commands/next/route-predicates.ts",
+      "scripts/validate-prompt-scoped-next.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-FABLE-004-backlog-continuation-prompt-routing.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-FABLE-004-backlog-continuation-prompt-routing.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "2f77946654dd1071b3c115eb28eb4ec4c72c5f797b6d626a1e2f01c43c6b1fcd",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-13T05:36:36.344Z",
+    "status": "active"
+  }
+}

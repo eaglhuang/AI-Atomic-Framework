@@ -277,6 +277,22 @@ async function main() {
     const familyTrail = assertDecisionTrail(familyQueue.evidence.nextAction as any, 'task family queue');
     assert(familyTrail.some((entry) => entry.check === 'queue-head' && entry.reason.includes('TASK-AAO-0001')), 'task family decisionTrail must record the matching queue head');
 
+    const zhBacklogContinuationPrompt = '\u8acb\u7e7c\u7e8c\u4fee\u5fa9\u6240\u6709 backlog\uff0c\u904e\u7a0b\u4e2d\u5361\u4f4f\u7684\u5730\u65b9\u90fd\u56de\u5beb backlog';
+    const zhBacklogContinuation = await runNext(['--cwd', tempRoot, '--prompt', zhBacklogContinuationPrompt]);
+    assert(zhBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'zh-TW backlog continuation prompt must route to the task queue');
+    assert((zhBacklogContinuation.evidence.nextAction as any).recommendedChannel === 'batch', 'zh-TW backlog continuation prompt must recommend batch channel');
+    assert(!zhBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'zh-TW backlog continuation prompt must not fall back to prompt guidance/create-atom');
+
+    const englishBacklogContinuation = await runNext(['--cwd', tempRoot, '--prompt', 'continue backlog fixes and record any workflow friction']);
+    assert(englishBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'English backlog fixes continuation prompt must route to the task queue');
+    assert((englishBacklogContinuation.evidence.nextAction as any).recommendedChannel === 'batch', 'English backlog fixes continuation prompt must recommend batch channel');
+    assert(!englishBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'English backlog fixes continuation prompt must not fall back to prompt guidance/create-atom');
+
+    const captainBacklogContinuation = await runNext(['--cwd', tempRoot, '--prompt', 'Captain mode: continue backlog repairs one by one']);
+    assert(captainBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_TASK_QUEUE_READY'), 'Captain backlog repair continuation prompt must route to the task queue');
+    assert((captainBacklogContinuation.evidence.nextAction as any).recommendedChannel === 'batch', 'Captain backlog repair continuation prompt must recommend batch channel');
+    assert(!captainBacklogContinuation.messages.some((entry) => entry.code === 'ATM_NEXT_PROMPT_GUIDANCE_REQUIRED'), 'Captain backlog repair continuation prompt must not fall back to prompt guidance/create-atom');
+
     const isolatedRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-planning-root-missing-'));
     mkdirSync(path.join(isolatedRoot, '.atm'), { recursive: true });
     writeFileSync(path.join(isolatedRoot, '.atm', 'config.json'), `${JSON.stringify({

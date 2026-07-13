@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-FABLE-004",
+  "updatedAt": "2026-07-13T05:43:30.692Z",
+  "updatedBy": "codex-backlog-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "typecheck",
+    "validate:prompt-scoped-next"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "git diff --check -- packages/cli/src/commands/next/intent-normalizers.ts packages/cli/src/commands/next/route-predicates.ts scripts/validate-prompt-scoped-next.ts docs/governance/atm-bug-and-optimization-backlog.md",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-13T05:42:56.748Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b35e25a38ca666a08b9bf54b4a255803ce2942c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-13T05:43:07.372Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b35e25a38ca666a08b9bf54b4a255803ce2942c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:prompt-scoped-next",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:75b0705115c19d98120d0e75580ee9ee500c6e57047e0fbfda5c21606efbe2dc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:prompt-scoped-next"
+      ],
+      "generatedAt": "2026-07-13T05:43:30.852Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b35e25a38ca666a08b9bf54b4a255803ce2942c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
