@@ -142,6 +142,10 @@ try {
   assert.equal(identityShow.evidence.actorResolution.repoDefaultActorId, 'repo-default-actor');
   assert.equal(identityShow.evidence.actorResolution.warning, null, 'stale legacy environment must not override the durable repo default');
 
+  const identityStatus = JSON.parse(runAtm(tempDir, ['identity', 'status', '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: '' })) as Record<string, any>;
+  assert.equal(identityStatus.messages[0].code, 'ATM_IDENTITY_SHOW');
+  assert.deepEqual(identityStatus.evidence.actorResolution, identityShow.evidence.actorResolution, 'identity status must alias identity show');
+
   const explicitEnvIdentityShow = JSON.parse(runAtm(tempDir, ['identity', 'show', '--json'], { AGENT_IDENTITY: 'actor-c', ATM_ACTOR_ID: 'actor-env' })) as Record<string, any>;
   assert.equal(explicitEnvIdentityShow.evidence.actorResolution.resolved.actorId, 'actor-env');
   assert.equal(explicitEnvIdentityShow.evidence.actorResolution.resolved.source, 'env');
