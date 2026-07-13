@@ -13,9 +13,11 @@ execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: repo });
 mkdirSync(path.join(repo, '.atm', 'history', 'evidence'), { recursive: true });
 mkdirSync(path.join(repo, '.atm', 'history', 'tasks'), { recursive: true });
 mkdirSync(path.join(repo, '.atm', 'runtime', 'locks'), { recursive: true });
+mkdirSync(path.join(repo, '.atm', 'runtime'), { recursive: true });
 
 writeFileSync(path.join(repo, '.atm', 'history', 'evidence', 'TASK-A.bundle-manifest.json'), '{}\n');
 writeFileSync(path.join(repo, '.atm', 'history', 'tasks', 'TASK-B.json'), '{}\n');
+writeFileSync(path.join(repo, '.atm', 'runtime', 'tmp-status-1234.json'), '{}\n');
 writeFileSync(path.join(repo, '.atm', 'runtime', 'locks', 'TASK-A.lock.json'), JSON.stringify({
   workItemId: 'TASK-A',
   actorId: 'worker-a',
@@ -51,5 +53,11 @@ assert(released, 'released owner residue entry must be present');
 assert.equal(released.ownerTaskId, 'TASK-B');
 assert.equal(released.ownerState, 'released');
 assert.equal(released.recommendedAction, 'manual-review');
+
+const runtimeTmp = entries.find((entry) => entry.path === '.atm/runtime/tmp-status-1234.json');
+assert(runtimeTmp, 'runtime tmp residue entry must be present');
+assert.equal(runtimeTmp.verdict, 'auto-clean-safe');
+assert.equal(runtimeTmp.cleanupAction, 'remove');
+assert.equal(runtimeTmp.recommendedAction, 'safe-auto-clean');
 
 console.log('[residue-status:test] ok');
