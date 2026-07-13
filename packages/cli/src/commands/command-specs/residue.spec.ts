@@ -32,7 +32,8 @@ export default defineCommandSpec({
       'Deleting .atm/history or .atm/runtime files directly before checking whether an active owner still holds them.'
     ],
     playbookNotes: [
-      'residue status is read-only. It classifies active-owner, auto-clean-safe, block-and-reconcile, and manual-review buckets so a later reconciler can act safely.'
+      'residue status is read-only. It classifies active-owner, auto-clean-safe, block-and-reconcile, and manual-review buckets so a later reconciler can act safely.',
+      'Each entry reports indexState/sharedIndexRisk plus governance-lock or close-commit-window owner metadata so staged residue can be triaged without raw git inspection.'
     ]
   }
 });
