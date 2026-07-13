@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-22e3a18c4fe4",
+  "recordedAt": "2026-07-12T15:57:02.417Z",
+  "actorId": "codex-backlog-captain",
+  "taskId": "TASK-AAO-0188",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-backlog-captain --task TASK-AAO-0188 --message \"fix(task-ledger): isolate broker runtime fixtures\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-AAO-0188-7673fb7fac",
+  "reason": "Bypass pre-commit only for TASK-AAO-0188 scoped bundle because wrapper defer semantics and hook residue semantics disagree on foreign FABLE bundle manifests.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-12T15-57-02-415Z-EMG-TASK-AAO-0188-7673fb7fac.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

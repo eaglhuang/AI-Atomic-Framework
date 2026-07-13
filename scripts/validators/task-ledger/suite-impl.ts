@@ -277,6 +277,28 @@ export function initGitRepo(repo: string) {
   execFileSync('git', ['commit', '-m', 'seed ATM validator fixture'], { cwd: repo, stdio: 'ignore' });
 }
 
+export function clearBrokerRuntimeState(repo: string) {
+  const runtimeDir = path.join(repo, '.atm', 'runtime');
+  for (const relativePath of [
+    'write-broker.registry.json',
+    'broker-shared-surface-queues.json',
+    'broker-shared-surface-freezes.json',
+    'broker-intents'
+  ]) {
+    rmSync(path.join(runtimeDir, relativePath), { recursive: true, force: true });
+  }
+}
+
+export function prepareIsolatedTaskLedgerFixtureRepo(parent: string, name: string, config: Record<string, unknown> = {}) {
+  const repo = makeHostRepo(parent, name, config);
+  clearBrokerRuntimeState(repo);
+  initGitRepo(repo);
+  clearBrokerRuntimeState(repo);
+  const head = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+  assert(/^[0-9a-f]{40}$/i.test(head), `${name} fixture must have a resolvable seed HEAD`);
+  return { repo, head };
+}
+
 export function evidenceReport(result: Awaited<ReturnType<typeof runTasks>>): Record<string, any> {
   return (result.evidence as Record<string, any> | undefined)?.report as Record<string, any>;
 }
@@ -539,8 +561,7 @@ try {
   assert(manualMirrorAudit.ok === false, 'hand-edited mirror done task must fail audit');
   assert(manualMirrorAudit.findings.some((finding) => finding.code === 'ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING'), 'missing transition evidence must be reported');
 
-  const deliverableRepo = makeHostRepo(tempRoot, 'deliverable-gate');
-  initGitRepo(deliverableRepo);
+  const { repo: deliverableRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'deliverable-gate');
   const pipelineFixtureTaskId = 'TEST-TASK-0001';
   const committedFixtureTaskId = 'TEST-TASK-0002';
   const pipelineTask = await runTasks(['create', '--cwd', deliverableRepo, '--task', pipelineFixtureTaskId, '--actor', 'validator', '--title', 'Build pipeline runner test fixture']);
@@ -655,10 +676,8 @@ try {
   // TASK-CID-0076: a task already in review must not require reset/open/import
   // hacks when the real delivery already landed. Only the closeout-only lane can
   // reclaim it, and done still requires command-backed historical delivery proof.
-  const reviewCloseoutRepo = makeHostRepo(tempRoot, 'review-closeout-target');
-  initGitRepo(reviewCloseoutRepo);
-  const reviewPlanningRepo = makeHostRepo(tempRoot, 'review-closeout-planning');
-  initGitRepo(reviewPlanningRepo);
+  const { repo: reviewCloseoutRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'review-closeout-target');
+  const { repo: reviewPlanningRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'review-closeout-planning');
   mkdirSync(path.join(reviewPlanningRepo, 'docs'), { recursive: true });
   const reviewCloseoutDeliverable = 'docs/review-closeout-deliverable.md';
   writeFileSync(path.join(reviewPlanningRepo, reviewCloseoutDeliverable), '# review closeout delivery\n', 'utf8');

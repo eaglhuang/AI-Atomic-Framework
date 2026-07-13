@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0188",
+  "title": "Isolate task-ledger governance fixture broker base state",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "scripts/validators/task-ledger/suite-impl.ts",
+    "tests/cli/task-ledger-fixture-isolation.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/validators/task-ledger/suite-impl.ts",
+    "tests/cli/task-ledger-fixture-isolation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-ledger-fixture-isolation.test.ts",
+    "npm run typecheck",
+    "npm run check:encoding:touched"
+  ],
+  "planningRepo": null,
+  "targetRepo": "C:\\Users\\User\\AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "docs/governance/atm-bug-and-optimization-backlog.md",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/evidence/missing-report.ts",
+    "packages/cli/src/commands/evidence/validator-classification.ts",
+    "packages/cli/src/commands/next.ts",
+    "release/**"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": null,
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Use Team Agents L5 and Broker before mutation.\n- Do not edit shared backlog docs during this code task.",
+  "source": {
+    "planPath": ".atm/task-plans/TASK-AAO-0188.md",
+    "sectionTitle": "TASK-AAO-0188",
+    "headingLine": 25,
+    "hash": "ba798967dca0807f"
+  },
+  "importedAt": "2026-07-12T14:19:19.845Z",
+  "lastTransitionId": "2026-07-12T15-49-53-263Z-claim-ebebf99ca042",
+  "lastTransitionAt": "2026-07-12T15:49:53.263Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-12T15:49:49.679Z",
+  "promotedAt": "2026-07-12T15:49:49.681Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-8a8436c2a26e",
+    "claimedAt": "2026-07-12T15:49:49.684Z",
+    "heartbeatAt": "2026-07-12T15:49:49.684Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0188.json",
+      ".atm/history/evidence/TASK-AAO-0188.*",
+      ".atm/history/task-events/TASK-AAO-0188/**",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/task-ledger-fixture-isolation.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T14:19:21.493Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260712154949-codex-backlog-captain-TASK-AAO-0188-237b78662e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0188",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0188.*",
+      ".atm/history/task-events/TASK-AAO-0188/**",
+      ".atm/history/tasks/TASK-AAO-0188.json",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/task-ledger-fixture-isolation.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3a12ae5cec3525b5cd2f07a0cd86bb41e06ef580166b78adf60cc2de1a9bea25",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-12T15:49:53.262Z",
+    "status": "active"
+  }
+}
