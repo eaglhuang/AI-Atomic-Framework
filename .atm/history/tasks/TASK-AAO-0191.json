@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0191",
+  "title": "Prevent defer-foreign-staged from absorbing ordinary-unowned staged files",
+  "status": "done",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "Regression: pre-stage an ordinary-unowned file, run framework-claim `--auto-stage --defer-foreign-staged` commit, assert the commit tree excludes that path and the staged entry is restored afterward (or remains deferred with an explicit snapshot contract).",
+    "Without `--defer-foreign-staged`, the same setup fails closed with a copyable remediation that names `--defer-foreign-staged`.",
+    "Backlog row `ATM-BUG-2026-07-13-177` is marked fixed.",
+    "Do not mutate foreign staged `residue.ts` / unrelated WIP in this lane."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "npm run check:encoding:touched",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "release/**",
+    "Changing Broker conflict resolution semantics",
+    "Editing .atm/history or .atm/runtime by hand",
+    "packages/cli/src/commands/residue.ts"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert framework/task scoped commit isolation changes if legitimate multi-file live-index commits regress.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "disposition": "inline",
+        "inlineReason": "Bounded fix to framework-claim commit isolation and deferral of ordinary-unowned staged files."
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0191-defer-foreign-staged-ordinary-unowned.task.md",
+    "sectionTitle": "TASK-AAO-0191",
+    "headingLine": 48,
+    "hash": "f1f03d2b45434eb3"
+  },
+  "importedAt": "2026-07-13T09:45:44.775Z",
+  "reopenedAt": "2026-07-13T09:45:44.784Z",
+  "lastTransitionId": "2026-07-13T12-06-28-655Z-close-521bd786df53",
+  "lastTransitionAt": "2026-07-13T12:06:28.655Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-13T10:00:38.944Z",
+  "promotedAt": "2026-07-13T10:00:38.947Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-c717520d0d24",
+    "claimedAt": "2026-07-13T10:00:38.950Z",
+    "heartbeatAt": "2026-07-13T12:06:28.651Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0191.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T10:00:38.950Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260713100038-codex-gpt-5.4-mini-TASK-AAO-0191-e9628ba17b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0191",
+    "batchId": null,
+    "scopeKey": "TASK-AAO",
+    "queueId": "queue-ac37cf878d72f3eb",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0191.*",
+      ".atm/history/task-events/TASK-AAO-0191/**",
+      ".atm/history/tasks/TASK-AAO-0191.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0644048874b7f93703037fea4f216c75f83b7153c0ebfb1752d45a36de090cf2",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-07-13T10:00:39.759Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-13T12:06:28.741Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-07-13T12:06:28.651Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260713100038-codex-gpt-5.4-mini-TASK-AAO-0191-e9628ba17b",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0191.closure-packet.json"
+}

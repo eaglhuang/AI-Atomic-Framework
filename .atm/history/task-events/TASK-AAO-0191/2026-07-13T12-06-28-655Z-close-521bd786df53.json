@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T12-06-28-655Z-close-521bd786df53",
+  "taskId": "TASK-AAO-0191",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260713100038-codex-gpt-5.4-mini-TASK-AAO-0191-e9628ba17b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0191.json",
+  "taskSha256": "sha256:1cb44efa64882b3ce718161edf237f03305bf7c614da1c43543d3aacc312eaa0",
+  "createdAt": "2026-07-13T12:06:28.655Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0191 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-29ffc6379b6a --historical-delivery 987cf7a66c6f66329504590feb2c418cb1e7e226 --historical-delivery c9d293eca7ae93ac8bd4e294b067d72937398fb3",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-29ffc6379b6a",
+    "sessionId": "session-20260713100038-codex-gpt-5.4-mini-TASK-AAO-0191-e9628ba17b",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0191.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "git diff --check",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "requiredGates": [
+      "check:encoding:touched",
+      "git diff --check",
+      "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T12:06:28.642Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0191.*",
+        ".atm/history/task-events/TASK-AAO-0191/**",
+        ".atm/history/tasks/TASK-AAO-0191.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "requiredGates": [
+        "check:encoding:touched",
+        "git diff --check",
+        "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts"
+      ]
+    }
+  }
+}
