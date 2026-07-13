@@ -1,0 +1,58 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T14-35-36-432Z-close-2103378e2891",
+  "taskId": "TASK-AAO-FABLE-010",
+  "action": "close",
+  "actorId": "codex-gpt-5.4-mini",
+  "sessionId": "session-20260713143205-codex-gpt-5.4-mini-TASK-AAO-FABLE-010-ad06f43fe9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-FABLE-010.json",
+  "taskSha256": "sha256:eabe936b24ca6eb4f65f380da1933670abd1f6de805d109ee413ccbd4ad21582",
+  "createdAt": "2026-07-13T14:35:36.432Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-FABLE-010 --actor codex-gpt-5.4-mini --status done --from-batch-checkpoint --batch batch-733157cad8df",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-733157cad8df",
+    "sessionId": "session-20260713143205-codex-gpt-5.4-mini-TASK-AAO-FABLE-010-ad06f43fe9",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-FABLE-010.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:skill-templates"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T14:35:36.425Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-FABLE-010.*",
+        ".atm/history/task-events/TASK-AAO-FABLE-010/**",
+        ".atm/history/tasks/TASK-AAO-FABLE-010.json",
+        "packages/integrations-core/src/compiler/compile.ts",
+        "scripts/validate-skill-templates.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/integrations-core/src/compiler/compile.ts",
+        "scripts/validate-skill-templates.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -88,6 +88,12 @@ const requiredTeamAgentsTermsByTemplate: Record<string, readonly string[]> = {
   ]
 };
 
+interface InstalledSkillDriftFinding {
+  readonly templateId: string;
+  readonly installedPath: string;
+  readonly summary: string;
+}
+
 function fail(message: string) {
   console.error(`[skill-templates:${mode}] ${message}`);
   process.exitCode = 1;
@@ -110,6 +116,59 @@ function isPrimaryCompiledEntry(relativePath: string): boolean {
     || normalizedPath.endsWith('.instructions.md')
     || normalizedPath.endsWith('.prompt.md')
     || normalizedPath.endsWith('.toml');
+}
+
+function normalizeSkillContentForDrift(content: string, renderedCharterText: string): string {
+  return content
+    .replaceAll('\r\n', '\n')
+    .replaceAll(renderedCharterText, '{{CHARTER_INVARIANTS}}')
+    .split('\n')
+    .map((line) => line.replace(/[ \t]+$/g, ''))
+    .join('\n')
+    .trimEnd();
+}
+
+function summarizeFirstDrift(expected: string, actual: string): string {
+  const expectedLines = expected.split('\n');
+  const actualLines = actual.split('\n');
+  const maxLength = Math.max(expectedLines.length, actualLines.length);
+  for (let index = 0; index < maxLength; index += 1) {
+    if ((expectedLines[index] ?? '') !== (actualLines[index] ?? '')) {
+      return `first differing line ${index + 1}: expected ${JSON.stringify(expectedLines[index] ?? '<missing>')}, installed ${JSON.stringify(actualLines[index] ?? '<missing>')}`;
+    }
+  }
+  return 'content differs after normalization';
+}
+
+export function collectInstalledSkillDriftFindings(input: {
+  readonly compiledClaudeFiles: readonly { readonly relativePath: string; readonly content: string }[];
+  readonly installedSkillRoot: string;
+  readonly renderedCharterText: string;
+  readonly readFile?: (filePath: string) => string;
+  readonly fileExists?: (filePath: string) => boolean;
+}): readonly InstalledSkillDriftFinding[] {
+  const readText = input.readFile ?? ((filePath: string) => readFileSync(filePath, 'utf8'));
+  const hasFile = input.fileExists ?? existsSync;
+  const findings: InstalledSkillDriftFinding[] = [];
+  for (const compiledFile of input.compiledClaudeFiles) {
+    const normalizedRelativePath = compiledFile.relativePath.replace(/\\/g, '/');
+    if (!normalizedRelativePath.endsWith('/SKILL.md')) continue;
+    const [templateId] = normalizedRelativePath.split('/');
+    if (!templateId) continue;
+    const installedPath = path.join(input.installedSkillRoot, templateId, 'SKILL.md');
+    // Scope limit: this dogfood drift patrol compares only templates that
+    // already have an installed .agents/skills copy in this repository.
+    if (!hasFile(installedPath)) continue;
+    const expected = normalizeSkillContentForDrift(compiledFile.content, input.renderedCharterText);
+    const actual = normalizeSkillContentForDrift(readText(installedPath), input.renderedCharterText);
+    if (expected === actual) continue;
+    findings.push({
+      templateId,
+      installedPath,
+      summary: summarizeFirstDrift(expected, actual)
+    });
+  }
+  return findings;
 }
 
 function readJson(relativePath: string) {
@@ -210,8 +269,36 @@ assert(claudeFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiled
 assert(codexFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter-invariants-injected: true')), 'Codex output must carry charter injection frontmatter on primary entries');
 assert(geminiFiles.filter((compiledFile: any) => isPrimaryCompiledEntry(compiledFile.relativePath)).every((compiledFile: any) => compiledFile.content.includes('charter_invariants_injected = true')), 'Gemini output must carry charter injection field on primary entries');
 
+const driftRegressionClean = collectInstalledSkillDriftFindings({
+  compiledClaudeFiles: [{ relativePath: 'atm-next/SKILL.md', content: `alpha\n${renderedCharter.text}\n` }],
+  installedSkillRoot: '.agents/skills',
+  renderedCharterText: renderedCharter.text,
+  fileExists: (filePath) => filePath.replace(/\\/g, '/').endsWith('.agents/skills/atm-next/SKILL.md'),
+  readFile: () => `alpha\n{{CHARTER_INVARIANTS}}\n`
+});
+assert(driftRegressionClean.length === 0, 'installed skill drift regression must treat matching normalized content as clean');
+const driftRegressionDirty = collectInstalledSkillDriftFindings({
+  compiledClaudeFiles: [{ relativePath: 'atm-next/SKILL.md', content: 'alpha\n' }],
+  installedSkillRoot: '.agents/skills',
+  renderedCharterText: renderedCharter.text,
+  fileExists: (filePath) => filePath.replace(/\\/g, '/').endsWith('.agents/skills/atm-next/SKILL.md'),
+  readFile: () => 'beta\n'
+});
+assert(driftRegressionDirty.length === 1, 'installed skill drift regression must report exactly one diverged installed copy');
+assert(driftRegressionDirty[0]?.templateId === 'atm-next', 'installed skill drift regression must name the diverged template id');
+
+const installedSkillDriftFindings = collectInstalledSkillDriftFindings({
+  compiledClaudeFiles: claudeFiles,
+  installedSkillRoot: path.join(root, '.agents', 'skills'),
+  renderedCharterText: renderedCharter.text
+});
+for (const finding of installedSkillDriftFindings) {
+  console.warn(`[skill-templates:${mode}] advisory installed-copy drift: ${finding.templateId} (${path.relative(root, finding.installedPath).replace(/\\/g, '/')}) ${finding.summary}`);
+}
+
 if (!process.exitCode) {
-  console.log(`[skill-templates:${mode}] ok (${templates.length} source templates, schema, and 5 adapter compilers)`);
+  const driftScope = 'installed-copy drift advisory compares only templates with .agents/skills/<id>/SKILL.md in this repo';
+  console.log(`[skill-templates:${mode}] ok (${templates.length} source templates, schema, 5 adapter compilers, ${installedSkillDriftFindings.length} installed-copy drift advisory finding(s); ${driftScope})`);
 }
 
 function countCompanionFiles(directoryPath: string): number {

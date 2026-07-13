@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-FABLE-010",
+  "title": "Detect drift between source skill templates and installed .agents/skills copies",
+  "status": "done",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [
+    "A new drift check compiles each template through `compileSkillTemplatesForAdapter('claude-code', ...)` and compares the result (normalized: trailing whitespace, `{{CHARTER_INVARIANTS}}` expansion placeholder) against the corresponding `.agents/skills/<id>/SKILL.md` when that installed copy exists in this repo.",
+    "Report drift as an advisory finding (does not fail `validate:skill-templates` by default — this is a self-hosting dogfood check, not a hard release gate) naming the diverging template id and a short diff summary.",
+    "A regression proves: matching content → no finding; deliberately diverged content → exactly one finding naming the id.",
+    "Document the check's scope limit: only compares templates that have a corresponding installed copy in `.agents/skills/`; templates with no local install are silently skipped (not every template is dogfooded in AAF itself)."
+  ],
+  "deliverables": [
+    "scripts/validate-skill-templates.ts"
+  ],
+  "scopePaths": [
+    "scripts/validate-skill-templates.ts",
+    "packages/integrations-core/src/compiler/compile.ts"
+  ],
+  "validators": [
+    "git diff --check",
+    "npm run typecheck",
+    "npm run validate:skill-templates"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the added drift check; existing template-internal validation is unaffected.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.agent-skills",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.skill-template-drift-check",
+        "pattern": "Result Contract Object",
+        "source": "scripts/validate-skill-templates.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "scripts/validate-skill-templates.ts",
+        "packages/integrations-core/src/compiler/compile.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-FABLE-010-skill-template-installed-copy-drift-detection.task.md",
+    "sectionTitle": "TASK-AAO-FABLE-010",
+    "headingLine": 37,
+    "hash": "0e36a98bea84adeb"
+  },
+  "importedAt": "2026-07-13T14:03:36.536Z",
+  "lastTransitionId": "2026-07-13T14-35-36-432Z-close-2103378e2891",
+  "lastTransitionAt": "2026-07-13T14:35:36.432Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5.4-mini",
+  "reservedAt": "2026-07-13T14:32:05.243Z",
+  "promotedAt": "2026-07-13T14:32:05.246Z",
+  "claim": {
+    "actorId": "codex-gpt-5.4-mini",
+    "leaseId": "lease-4be06a99156f",
+    "claimedAt": "2026-07-13T14:32:05.250Z",
+    "heartbeatAt": "2026-07-13T14:35:36.429Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-FABLE-010.json",
+      ".atm/history/evidence/TASK-AAO-FABLE-010.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-010/**",
+      "packages/integrations-core/src/compiler/compile.ts",
+      "scripts/validate-skill-templates.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-13T14:09:48.990Z",
+  "startedByActor": "codex-gpt-5.4-mini",
+  "startedBySessionId": "session-20260713143205-codex-gpt-5.4-mini-TASK-AAO-FABLE-010-ad06f43fe9",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-FABLE-010",
+    "batchId": "batch-733157cad8df",
+    "scopeKey": "TASK-AAO-FABLE",
+    "queueId": "queue-32805773ad6b82fb",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-FABLE-010.*",
+      ".atm/history/task-events/TASK-AAO-FABLE-010/**",
+      ".atm/history/tasks/TASK-AAO-FABLE-010.json",
+      "packages/integrations-core/src/compiler/compile.ts",
+      "scripts/validate-skill-templates.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "6c82bc2d77c65bb29ef6d1f427a8ccd505cf2e664c68048465c15599bdea1f4b",
+    "actorId": "codex-gpt-5.4-mini",
+    "createdAt": "2026-07-13T14:32:08.602Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-13T14:35:36.508Z",
+    "releasedBy": "codex-gpt-5.4-mini"
+  },
+  "closedAt": "2026-07-13T14:35:36.429Z",
+  "closedByActor": "codex-gpt-5.4-mini",
+  "closedBySessionId": "session-20260713143205-codex-gpt-5.4-mini-TASK-AAO-FABLE-010-ad06f43fe9",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-FABLE-010.closure-packet.json"
+}
