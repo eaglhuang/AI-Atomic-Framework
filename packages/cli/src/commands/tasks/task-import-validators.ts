@@ -66,7 +66,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
     if (currentObjectKey && currentObjectListKey && objectListObjectMatch) {
       const objectRecord = data[currentObjectKey] as Record<string, unknown>;
       const key = objectListObjectMatch[1];
-      const value = objectListObjectMatch[2].trim();
+      const value = normalizeYamlScalar(objectListObjectMatch[2]);
       const item: Record<string, unknown> = { [key]: value };
       const existing = objectRecord[currentObjectListKey];
       objectRecord[currentObjectListKey] = Array.isArray(existing) ? [...existing, item] : [item];
@@ -77,7 +77,7 @@ export function extractFrontMatter(text: string): FrontMatter | null {
     const objectListObjectFieldMatch = /^ {6}([A-Za-z_][A-Za-z0-9_]*)\s*:\s*(.*)$/.exec(line);
     if (currentObjectKey && currentObjectListKey && currentObjectListItem && objectListObjectFieldMatch) {
       const key = objectListObjectFieldMatch[1];
-      const value = objectListObjectFieldMatch[2].trim();
+      const value = normalizeYamlScalar(objectListObjectFieldMatch[2]);
       currentObjectListItem[key] = value;
       continue;
     }
