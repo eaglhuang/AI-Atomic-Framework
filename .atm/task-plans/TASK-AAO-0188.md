@@ -1,7 +1,7 @@
 ---
 task_id: TASK-AAO-0188
 title: Isolate task-ledger governance fixture broker base state
-status: planned
+status: done
 target_repo: C:\Users\User\AI-Atomic-Framework
 closure_authority: target_repo
 scope:
@@ -20,6 +20,15 @@ validators:
   - npm run check:encoding:touched
 backlog:
   - ATM-BUG-2026-07-12-149
+completed_at: "2026-07-13T00:24:17.785Z"
+completed_by_agent: "codex-backlog-captain"
+closedAt: "2026-07-13T00:24:17.785Z"
+closedByActor: "codex-backlog-captain"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-13T00-24-17-785Z-close-70713ffef9a8"
+lastTransitionAt: "2026-07-13T00:24:17.785Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "bb97753b6ccc4228322dfd0cef22c84e741efc22"
 ---
 
 # TASK-AAO-0188 — Isolate task-ledger governance fixture broker base state

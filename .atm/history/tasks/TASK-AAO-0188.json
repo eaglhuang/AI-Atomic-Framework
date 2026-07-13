@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-AAO-0188",
   "title": "Isolate task-ledger governance fixture broker base state",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [],
@@ -52,8 +52,8 @@
     "hash": "ba798967dca0807f"
   },
   "importedAt": "2026-07-12T14:19:19.845Z",
-  "lastTransitionId": "2026-07-12T15-49-53-263Z-claim-ebebf99ca042",
-  "lastTransitionAt": "2026-07-12T15:49:53.263Z",
+  "lastTransitionId": "2026-07-13T00-24-17-699Z-close-81cb85eef6b2",
+  "lastTransitionAt": "2026-07-13T00:24:17.699Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-backlog-captain",
   "reservedAt": "2026-07-12T15:49:49.679Z",
@@ -62,17 +62,19 @@
     "actorId": "codex-backlog-captain",
     "leaseId": "lease-8a8436c2a26e",
     "claimedAt": "2026-07-12T15:49:49.684Z",
-    "heartbeatAt": "2026-07-12T15:49:49.684Z",
+    "heartbeatAt": "2026-07-13T00:24:17.696Z",
     "ttlSeconds": 1800,
     "files": [
-      ".atm/history/tasks/TASK-AAO-0188.json",
       ".atm/history/evidence/TASK-AAO-0188.*",
+      ".atm/history/protected-override-audit/2026-07-12T15-55-52-568Z-POA-2dcf300c8c80.json",
+      ".atm/history/protected-override-audit/2026-07-12T15-57-02-417Z-POA-22e3a18c4fe4.json",
       ".atm/history/task-events/TASK-AAO-0188/**",
+      ".atm/history/tasks/TASK-AAO-0188.json",
       "scripts/validators/task-ledger/suite-impl.ts",
       "tests/cli/task-ledger-fixture-isolation.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-12T14:19:21.493Z",
   "startedByActor": "codex-backlog-captain",
@@ -87,17 +89,25 @@
     "queueIndex": null,
     "allowedFiles": [
       ".atm/history/evidence/TASK-AAO-0188.*",
+      ".atm/history/protected-override-audit/2026-07-12T15-55-52-568Z-POA-2dcf300c8c80.json",
+      ".atm/history/protected-override-audit/2026-07-12T15-57-02-417Z-POA-22e3a18c4fe4.json",
       ".atm/history/task-events/TASK-AAO-0188/**",
       ".atm/history/tasks/TASK-AAO-0188.json",
       "scripts/validators/task-ledger/suite-impl.ts",
       "tests/cli/task-ledger-fixture-isolation.test.ts"
     ],
-    "planningReadOnlyPaths": [],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/AI-Atomic-Framework/.atm/task-plans/TASK-AAO-0188.md"
+    ],
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "3a12ae5cec3525b5cd2f07a0cd86bb41e06ef580166b78adf60cc2de1a9bea25",
     "actorId": "codex-backlog-captain",
-    "createdAt": "2026-07-12T15:49:53.262Z",
+    "createdAt": "2026-07-12T15:49:53.266Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-13T00:24:17.696Z",
+  "closedByActor": "codex-backlog-captain",
+  "closedBySessionId": "session-20260712154949-codex-backlog-captain-TASK-AAO-0188-237b78662e",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0188.closure-packet.json"
 }
