@@ -842,6 +842,7 @@ type ScopeAmendmentPreconditionResolution = {
   readonly leaseId: string | null;
   readonly resolvedBy: 'none' | 'claim-first';
   readonly claimCommand: string;
+  readonly claimFirstScopeAddCommand: string;
 };
 function inspectScopeAmendmentPreconditions(cwd: string, taskId: string, actorId: string): ScopeAmendmentPreconditionResolution {
   const taskPath = taskPathFor(cwd, taskId);
@@ -867,7 +868,8 @@ function inspectScopeAmendmentPreconditions(cwd: string, taskId: string, actorId
     claimActorId: claim?.actorId ?? null,
     leaseId: claim?.leaseId ?? null,
     resolvedBy: 'none',
-    claimCommand: `node atm.mjs next --claim --task ${taskId} --actor ${actorId} --auto-intent --json`
+    claimCommand: `node atm.mjs next --claim --task ${taskId} --actor ${actorId} --auto-intent --json`,
+    claimFirstScopeAddCommand: `node atm.mjs tasks scope add --task ${taskId} --actor ${actorId} --claim-first --add <paths> --json`
   };
 }
 function buildScopeAmendmentNoClaimMessage(input: ScopeAmendmentPreconditionResolution): string {
@@ -875,7 +877,8 @@ function buildScopeAmendmentNoClaimMessage(input: ScopeAmendmentPreconditionReso
     `Scope amendment for ${input.taskId} requires an active claim, not a bare lock or renewed lease.`,
     `Current state: lock=${input.lockState}, claim=${input.claimState}, lease=${input.leaseState}.`,
     'Run one of:',
-    `  - ${input.claimCommand} (recommended)`,
+    `  - ${input.claimFirstScopeAddCommand} (recommended when claim and scope expansion are blocking each other)`,
+    `  - ${input.claimCommand} (claim first when no scope expansion is needed)`,
     `  - node atm.mjs tasks renew --task ${input.taskId} --actor ${input.actorId} --json (if lease only)`,
     'Then retry the scope amendment.'
   ].join('\n');
@@ -934,7 +937,8 @@ async function runTasksScopeAdd(argv: string[]) {
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
@@ -947,17 +951,19 @@ async function runTasksScopeAdd(argv: string[]) {
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
   if (outerLock.released === true || outerLock.status === 'released') {
-    throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; claim the task first.`, {
+    throw new CliError('ATM_SCOPE_AMENDMENT_LOCK_RELEASED', `Task ${options.taskId} direction lock is released; use tasks scope add --claim-first when claim and scope expansion are blocking each other.`, {
       exitCode: 1,
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }
@@ -968,7 +974,8 @@ async function runTasksScopeAdd(argv: string[]) {
       details: {
         ...preconditionResolution,
         taskId: options.taskId,
-        requiredCommand: preconditionResolution.claimCommand
+        requiredCommand: preconditionResolution.claimFirstScopeAddCommand,
+        claimCommand: preconditionResolution.claimCommand
       }
     });
   }

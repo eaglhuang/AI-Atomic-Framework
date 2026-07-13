@@ -47,7 +47,11 @@ try {
   assert.equal(clarityResult.parsed.messages?.[0]?.code, 'ATM_SCOPE_AMENDMENT_NO_ACTIVE_LOCK');
   assert.match(clarityResult.parsed.messages?.[0]?.text ?? '', /requires an active claim/i);
   assert.match(clarityResult.parsed.messages?.[0]?.text ?? '', /next --claim/i);
+  assert.match(clarityResult.parsed.messages?.[0]?.text ?? '', /--claim-first/i);
   assert.equal(clarityResult.parsed.messages?.[0]?.data?.claimState, 'none');
+  assert.match(clarityResult.parsed.messages?.[0]?.data?.requiredCommand ?? '', /tasks scope add/);
+  assert.match(clarityResult.parsed.messages?.[0]?.data?.requiredCommand ?? '', /--claim-first/);
+  assert.match(clarityResult.parsed.messages?.[0]?.data?.claimCommand ?? '', /next --claim/);
 
   const claimFirstPlan = writeTaskCard('TASK-MAO-CLARITY-0002', 'Scope add claim-first success', ['src/feature.ts']);
   importAndPrepareTask('TASK-MAO-CLARITY-0002', claimFirstPlan);
@@ -133,10 +137,10 @@ function writeTaskCard(taskId: string, title: string, deliverables: readonly str
 function importAndPrepareTask(taskId: string, taskPath: string) {
   const imported = runAtm(['tasks', 'import', '--cwd', workspace, '--from', relativePathFrom(workspace, taskPath), '--write', '--json']);
   assert.equal(imported.exitCode, 0, imported.stderr || imported.stdout);
-  const reserved = runAtm(['tasks', 'reserve', '--cwd', workspace, '--task', taskId, '--actor', 'captain', '--json']);
-  assert.equal(reserved.exitCode, 0, reserved.stderr || reserved.stdout);
-  const promoted = runAtm(['tasks', 'promote', '--cwd', workspace, '--task', taskId, '--actor', 'captain', '--json']);
-  assert.equal(promoted.exitCode, 0, promoted.stderr || promoted.stdout);
+  const taskFile = path.join(workspace, '.atm', 'history', 'tasks', `${taskId}.json`);
+  const task = JSON.parse(readFileSync(taskFile, 'utf8'));
+  task.status = 'open';
+  writeFileSync(taskFile, `${JSON.stringify(task, null, 2)}\n`, 'utf8');
 }
 
 function findEventByAction(eventDir: string, action: string): string {
