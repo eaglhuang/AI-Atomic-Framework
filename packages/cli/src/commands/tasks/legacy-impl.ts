@@ -3271,6 +3271,11 @@ export function writeTaskFiles(input: {
           });
           continue;
         }
+        // ATM-BUG-2026-07-13-178: explicit --reopen/--reset-open may overwrite an
+        // inert/abandoned ledger without --force; writing happens in the second pass.
+        if (input.resetOpen || input.reopen) {
+          continue;
+        }
         diagnostics.push({
           level: 'error',
           code: 'ATM_TASKS_IMPORT_DRIFT',
@@ -3294,7 +3299,7 @@ export function writeTaskFiles(input: {
   }
   for (const task of input.tasks) {
     const filePath = path.join(taskStoreDirectory, `${task.workItemId}.json`);
-    if (existsSync(filePath) && !input.force && !reconcileMirror) {
+    if (existsSync(filePath) && !input.force && !reconcileMirror && !input.resetOpen && !input.reopen) {
       continue;
     }
     let existingDocument: Record<string, unknown> | null = null;

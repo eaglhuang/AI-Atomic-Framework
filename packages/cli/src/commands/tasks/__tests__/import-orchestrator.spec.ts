@@ -185,4 +185,55 @@ function readdirFirstJson(directory: string): string {
   assert(smallOnly.length === 0, 'small-module scope must not trigger the patrol');
 }
 
-console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror + extraction-first patrol)');
+// ATM-BUG-2026-07-13-178 — abandoned ledger reopen must not require --force/emergency.
+{
+  const reopenRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-import-abandoned-reopen-'));
+  try {
+    writeJson(path.join(reopenRoot, '.atm/config.json'), {
+      schemaVersion: 'atm.config.v0.1',
+      taskLedger: { enabled: true, mode: 'auto', mirrorExternalTasks: true, requireCliTransitions: true, provider: 'atm-local' }
+    });
+    const abandonedId = 'TASK-IMPORT-178';
+    const abandonedPlan = path.join(reopenRoot, 'docs/tasks/TASK-IMPORT-178.task.md');
+    mkdirSync(path.dirname(abandonedPlan), { recursive: true });
+    writeFileSync(abandonedPlan, [
+      '---',
+      `task_id: ${abandonedId}`,
+      'title: Abandoned reopen fixture',
+      'status: ready',
+      'planning_repo: PlanningRepo',
+      'target_repo: TargetRepo',
+      'closure_authority: target-repo',
+      'deliverables:',
+      '  - src/reopen.ts',
+      '---',
+      `# ${abandonedId}`,
+      ''
+    ].join('\n'), 'utf8');
+    const abandonedTaskPath = path.join(reopenRoot, '.atm/history/tasks', `${abandonedId}.json`);
+    writeJson(abandonedTaskPath, {
+      schemaVersion: 'atm.workItem.v0.2',
+      workItemId: abandonedId,
+      title: 'Abandoned fixture',
+      status: 'abandoned',
+      source: { planPath: 'docs/tasks/TASK-IMPORT-178.task.md', hash: 'old-abandoned-hash' },
+      importedAt: '2026-07-13T00:00:00.000Z'
+    });
+    const reopenResult = await runTasksImport([
+      '--cwd', reopenRoot,
+      '--from', abandonedPlan,
+      '--write',
+      '--reopen',
+      '--json'
+    ]);
+    assert(reopenResult.ok === true, 'abandoned reopen without --force must succeed');
+    const reopened = JSON.parse(readFileSync(abandonedTaskPath, 'utf8')) as Record<string, any>;
+    assert(reopened.status === 'open', `abandoned reopen must reset status to open, got ${reopened.status}`);
+    assert(typeof reopened.reopenedAt === 'string' && reopened.reopenedAt.length > 0, 'abandoned reopen must stamp reopenedAt');
+    assert(reopened.source?.hash !== 'old-abandoned-hash', 'abandoned reopen must refresh source hash from the planning card');
+  } finally {
+    rmSync(reopenRoot, { recursive: true, force: true });
+  }
+}
+
+console.log('[import-orchestrator.spec] ok (7 branches + reconcile-mirror + extraction-first patrol + abandoned-reopen)');
