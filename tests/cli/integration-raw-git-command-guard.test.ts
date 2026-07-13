@@ -78,10 +78,20 @@ try {
   const rawNoVerify = await preTool('git commit --no-verify -m unsafe');
   assert.equal(rawNoVerify.ok, false, 'direct git commit --no-verify must be blocked before hook bypass');
   assert.equal(rawNoVerify.evidence.rawGitMutation.riskLevel, 'governed-git-required');
+  assert.match(rawNoVerify.evidence.rawGitMutation.requiredCommand, /node atm\.mjs git commit/);
+
+  const rawPush = await preTool('git push origin main');
+  assert.equal(rawPush.ok, false, 'direct git push must be blocked before bypassing ATM admission');
+  assert.equal(rawPush.evidence.rawGitMutation.riskLevel, 'governed-git-required');
+  assert.match(rawPush.evidence.rawGitMutation.requiredCommand, /node atm\.mjs git push/);
 
   const phraseDoesNotUnlock = await preTool(`git restore --staged -- packages/cli/src/commands/hook/pre-commit.ts # ${rawStage.evidence.rawGitMutation.overridePolicy.stageOnlyPhrase}`);
   assert.equal(phraseDoesNotUnlock.ok, false, 'stage override phrase in a raw shell command must not unlock without an ATM lease');
   assert.equal(phraseDoesNotUnlock.messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
+
+  const pushPhraseDoesNotUnlock = await preTool('git push origin main # ATM-GOVERNED-ACTION-I-UNDERSTAND');
+  assert.equal(pushPhraseDoesNotUnlock.ok, false, 'governed-action text in a raw shell command must not unlock direct push');
+  assert.equal(pushPhraseDoesNotUnlock.messages[0]?.code, 'ATM_RAW_GIT_MUTATION_BLOCKED');
 
   console.log('[integration-raw-git-command-guard] ok');
 } finally {

@@ -42,6 +42,8 @@ All integrations must call the same core commands and must not fork governance l
 
 Supported pre-tool integrations must treat raw Git index/worktree mutation as a hard gate, not as advisory prose. The guard rejects direct `git restore`, `git restore --staged`, `git reset`, `git checkout -- <path>`, `git switch -f`, `git clean`, `git rm`, `git update-index`, `git read-tree`, `git commit`, and `git push` from agent tool calls unless the operation is routed through ATM-governed Git commands and Broker leases.
 
+`git push` is a governed publish action, not a safe raw Git exception. Agents must use `node atm.mjs git push --actor <actor-id> --branch <branch> --remote <remote> --json`, which reruns ATM Git admission before the host push, records a push-attempt status file under `.atm/runtime/git-push-attempts/`, supports `--dry-run`, and fails before invoking host Git when remote drift or same-file conflicts require admission routing. If the host push still fails after admission, agents must use `node atm.mjs git recover-push-fail ...` for command-backed recovery guidance.
+
 | Adapter | Raw Git mutation gate | Verification |
 | --- | --- | --- |
 | Codex | Hard-gated when `integration hook pre-tool` is installed or invoked by the host surface. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |

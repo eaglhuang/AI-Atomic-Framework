@@ -1,0 +1,393 @@
+{
+  "taskId": "TASK-GIT-0014",
+  "updatedAt": "2026-07-13T01:56:16.614Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:51:58.832Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:aba74eb7a099451d0c292601cb5c724003f5ab7f1387eee6ca12e9917d0c894c",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:51:58.946Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b5d11ea8b505bc3935bd7ed6c80c30c94235e146e36ea336b4118efcf0cec212",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:51:59.490Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:800e3da90ae5e6eeacbbacd32d807eb020254f8fb2d2955b0ea70b717fd35bd0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:57fb3ebde937283a3331fd938c76abee823e7ebfbead5c42ba9710a176abd796",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:51:59.593Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7faf5f5a80a75d2a96b66058278b9fc20d3ded0a94b12af0178a8be01d0013ad",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/git-admission-cli.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:52:10.021Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/git-admission-cli.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:64dca3c81573fb924ad221042a88306e1cf225161d36b858355deac23494c799",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:96df4fcf92a79324ed8da71ad1d052838057dcfa37b322ee4fd412939bd6786f",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:52:10.109Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:70830fb808aa273d9412c7842e49ccc345a38e3728f395b10ea9d2e9dc66e73f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run check:encoding:touched",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:52:19.436Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "check:encoding:touched"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run check:encoding:touched",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:5b0f7f0b2fe3d903d00757ae386de2a360f021d9b5da952f9a43ae2e5e65ec0d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "check:encoding:touched"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:caa8e753ccb25f713512ce62f5a4bed74af494f0cbef51d298ff67c3c1633b36",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:52:19.549Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c8885e255bdd505059e47bb2627243e77a796db3150cbe363a355fcd95828b25",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:52:28.405Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:1da85065ee5cea6b4d574502bd3a05b3defd777be5a6103c18b2626d634e73fc",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:ae791e8e807b84c96502e9d2a96e660efc3517d05cc6ba2d6fe14ba0d4188620",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:52:28.485Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ace97ade8fd5c9b1c671586d2c9b2fa0ed20f4c073b82bcf14ab4ffdd4dbccda",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-hooks-enforcement",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:55:24.510Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-hooks-enforcement"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-hooks-enforcement",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:be53e3fcd9ff53d27c34fd805b084b710f848d8562ce1e7cc7e0d89066c609bc",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-hooks-enforcement"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:73f9bfff816442fa3fb9a806ac5355946a58af87adf17bba7d24b2e7fb30ee6d",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:55:24.586Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:02d4b7c750433040e585f43e54d7c6791012661f5cf9fe4aee5bdc1edb8e3f7e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-backlog-captain",
+      "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+      "createdAt": "2026-07-13T01:56:16.614Z",
+      "details": {
+        "actorId": "codex-backlog-captain",
+        "sessionId": "session-20260713014042-codex-backlog-captain-TASK-GIT-0014-960415e503",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-boundary-agent-permission",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "Add/update atom coverage for governed push wrapper, raw push denial, push attempt status, and recover-push-fail parity.",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d69d9a34fac9bc6db9a0b48c0c19ff56eabb180f",
+            "cacheKey": "sha256:d6b48348bd0a325b7b80b09c14f9b74089f41a112347f5d4faf5deb4a16c3fe7",
+            "cached": false,
+            "generatedAt": "2026-07-13T01:56:16.687Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:60c7bb239f5079492bd59566cb6c9e2d447d2b08088c8b2b1beb52359504c2d9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

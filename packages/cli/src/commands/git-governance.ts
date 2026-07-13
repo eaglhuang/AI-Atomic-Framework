@@ -724,6 +724,9 @@ export async function runAtmGit(argv: string[]) {
   if (options.action === 'admit') {
     return runGitAdmission(options);
   }
+  if (options.action === 'push') {
+    return runGitPush(options);
+  }
   if (options.action === 'recover-push-fail') {
     return runGitPostPushFailRecovery(options);
   }
@@ -833,6 +836,252 @@ function runGitAdmission(options: ParsedGitOptions) {
     )],
     evidence
   });
+}
+
+function gitPushAttemptStatusRelativePath(actorId: string, branch: string, remote: string): string {
+  const safeActor = actorId.replace(/[^a-zA-Z0-9_.-]/g, '_');
+  const safeTarget = `${remote}__${branch}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+  return `.atm/runtime/git-push-attempts/${safeActor}__${safeTarget}.json`;
+}
+
+function writeGitPushAttemptStatus(cwd: string, statusRelativePath: string, status: Record<string, unknown>) {
+  try {
+    const absolutePath = path.join(cwd, statusRelativePath);
+    mkdirSync(path.dirname(absolutePath), { recursive: true });
+    writeFileSync(absolutePath, `${JSON.stringify(status, null, 2)}\n`, 'utf8');
+  } catch {
+    // best-effort observability write; never let this block push outcome reporting.
+  }
+}
+
+function runGitPush(options: ParsedGitOptions) {
+  if (!options.actorId?.trim()) {
+    throw new CliError('ATM_ACTOR_ID_MISSING', `git push requires --actor or ${actorIdEnvVar} (legacy alias: AGENT_IDENTITY).`, { exitCode: 2 });
+  }
+  const branch = options.branch?.trim() || resolveCurrentBranchName(options.cwd);
+  const remote = options.remote?.trim() || 'origin';
+  const statusPath = gitPushAttemptStatusRelativePath(options.actorId, branch, remote);
+  const startedAt = new Date().toISOString();
+  const headShaBeforePush = readHeadCommitSha(options.cwd);
+  writeGitPushAttemptStatus(options.cwd, statusPath, {
+    schemaId: 'atm.gitPushAttemptStatus.v1',
+    actorId: options.actorId,
+    taskId: options.taskId,
+    branch,
+    remote,
+    status: 'in-progress',
+    phase: 'admission',
+    dryRun: options.dryRun,
+    startedAt,
+    updatedAt: startedAt,
+    headShaBeforePush,
+    requiredCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+  });
+
+  const admission = evaluateGitAdmission({
+    cwd: options.cwd,
+    actorId: options.actorId,
+    taskId: options.taskId,
+    branch,
+    remote,
+    fetch: !options.noFetch,
+    gitExecutable: resolveGitExecutable()
+  });
+  const admissionOk = admission.outcome === 'allow' || admission.outcome === 'no-op';
+  const gitBoundaryEvidence = buildGitBoundaryEvidenceEnvelope({
+    actorId: options.actorId,
+    taskId: options.taskId,
+    result: admission
+  });
+  if (!admissionOk) {
+    const updatedAt = new Date().toISOString();
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status: 'blocked',
+      phase: 'admission',
+      dryRun: options.dryRun,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome,
+      conflictingFiles: admission.conflictingFiles,
+      retryCommand: `node atm.mjs git push --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
+      recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+    });
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('error', `ATM_GIT_PUSH_ADMISSION_${admission.outcome.toUpperCase().replace(/-/g, '_')}`, `ATM git push blocked before host git push: admission outcome '${admission.outcome}'.`, {
+        branch,
+        remote,
+        outcome: admission.outcome,
+        conflictingFiles: admission.conflictingFiles,
+        recommendedNextStep: admission.recommendedNextStep
+      })],
+      evidence: {
+        action: 'push',
+        dryRun: options.dryRun,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: null,
+        recommendedNextStep: admission.recommendedNextStep
+      }
+    });
+  }
+
+  if (options.dryRun || admission.outcome === 'no-op') {
+    const updatedAt = new Date().toISOString();
+    const status = options.dryRun ? 'dry-run' : 'no-op';
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status,
+      phase: 'complete',
+      dryRun: options.dryRun,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome
+    });
+    return makeResult({
+      ok: true,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('info', options.dryRun ? 'ATM_GIT_PUSH_DRY_RUN_ALLOW' : 'ATM_GIT_PUSH_NO_OP', options.dryRun
+        ? 'ATM git push dry-run passed admission; no host git push was executed.'
+        : 'ATM git push found no local commits to publish; no host git push was needed.', {
+          branch,
+          remote,
+          outcome: admission.outcome
+        })],
+      evidence: {
+        action: 'push',
+        dryRun: options.dryRun,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: null
+      }
+    });
+  }
+
+  try {
+    const stdout = runGitCommand(options.cwd, ['push', remote, `HEAD:${branch}`], ['ignore', 'pipe', 'pipe']);
+    const updatedAt = new Date().toISOString();
+    const remoteShaAfterPush = readRevisionIfExists(options.cwd, `${remote}/${branch}`);
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status: 'pushed',
+      phase: 'complete',
+      dryRun: false,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome,
+      remoteShaAfterPush
+    });
+    return makeResult({
+      ok: true,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('info', 'ATM_GIT_PUSH_OK', 'ATM git push completed after governed admission.', {
+        branch,
+        remote,
+        headSha: headShaBeforePush,
+        remoteShaAfterPush
+      })],
+      evidence: {
+        action: 'push',
+        dryRun: false,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: {
+          command: `git push ${remote} HEAD:${branch}`,
+          exitCode: 0,
+          stdout
+        }
+      }
+    });
+  } catch (error) {
+    const updatedAt = new Date().toISOString();
+    const stderr = error && typeof error === 'object' && 'stderr' in error
+      ? String((error as { stderr?: unknown }).stderr ?? '')
+      : String(error);
+    writeGitPushAttemptStatus(options.cwd, statusPath, {
+      schemaId: 'atm.gitPushAttemptStatus.v1',
+      actorId: options.actorId,
+      taskId: options.taskId,
+      branch,
+      remote,
+      status: 'failed',
+      phase: 'host-push',
+      dryRun: false,
+      startedAt,
+      updatedAt,
+      headShaBeforePush,
+      headShaAfterAttempt: readHeadCommitSha(options.cwd),
+      admissionOutcome: admission.outcome,
+      errorSummary: stderr.slice(0, 4000),
+      recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+    });
+    return makeResult({
+      ok: false,
+      command: 'git',
+      cwd: options.cwd,
+      messages: [message('error', 'ATM_GIT_PUSH_FAILED', 'Host git push failed after governed admission; rerun recover-push-fail for refreshed guidance.', {
+        branch,
+        remote,
+        recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`,
+        stderr: stderr.slice(0, 4000)
+      })],
+      evidence: {
+        action: 'push',
+        dryRun: false,
+        actorId: options.actorId,
+        taskId: options.taskId,
+        branch,
+        remote,
+        statusPath,
+        admission,
+        gitBoundaryEvidence,
+        hostPush: {
+          command: `git push ${remote} HEAD:${branch}`,
+          exitCode: 1,
+          stderr
+        },
+        recoveryCommand: `node atm.mjs git recover-push-fail --actor ${quoteCliValue(options.actorId)} --branch ${quoteCliValue(branch)} --remote ${quoteCliValue(remote)} --json`
+      }
+    });
+  }
 }
 
 function runGitPostPushFailRecovery(options: ParsedGitOptions) {
@@ -2118,7 +2367,7 @@ function runGitCommit(options: ParsedGitOptions) {
 
 interface ParsedGitOptions {
   readonly cwd: string;
-  readonly action: 'prepare' | 'admit' | 'recover-push-fail' | 'check' | 'commit' | 'record-commit' | 'commit-status';
+  readonly action: 'prepare' | 'admit' | 'push' | 'recover-push-fail' | 'check' | 'commit' | 'record-commit' | 'commit-status';
   readonly actorId: string | null;
   readonly taskId: string | null;
   readonly branch: string | null;
@@ -2302,13 +2551,13 @@ function parseGitOptions(argv: string[]): ParsedGitOptions {
     if (options.action) {
       throw new CliError('ATM_CLI_USAGE', 'git accepts only one action.', { exitCode: 2 });
     }
-    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status') {
-      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, recover-push-fail, check, commit, record-commit, commit-status', { exitCode: 2 });
+    if (arg !== 'prepare' && arg !== 'admit' && arg !== 'push' && arg !== 'recover-push-fail' && arg !== 'check' && arg !== 'commit' && arg !== 'record-commit' && arg !== 'commit-status') {
+      throw new CliError('ATM_CLI_USAGE', 'git supports: prepare, admit, push, recover-push-fail, check, commit, record-commit, commit-status', { exitCode: 2 });
     }
     options.action = arg;
   }
   if (!options.action) {
-    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | recover-push-fail | check | commit | record-commit | commit-status).', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'git requires an action (prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status).', { exitCode: 2 });
   }
   return {
     ...options,

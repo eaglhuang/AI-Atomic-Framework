@@ -1338,7 +1338,7 @@ function classifyRawGitMutationCommand(command: string | null): RawGitMutationFi
     action,
     args,
     riskLevel,
-    requiredCommand: requiredAtmGitCommandForRisk(riskLevel),
+    requiredCommand: requiredAtmGitCommandForRisk(riskLevel, action),
     overridePolicy: {
       chatTextAccepted: false,
       stageOnlyPhrase: stageOnlyOverridePhrase,
@@ -1422,14 +1422,20 @@ function classifyRawGitRisk(action: string, args: readonly string[]): RawGitMuta
   return 'governed-git-required';
 }
 
-function requiredAtmGitCommandForRisk(riskLevel: RawGitMutationRiskLevel): string {
+function requiredAtmGitCommandForRisk(riskLevel: RawGitMutationRiskLevel, action?: string): string {
   if (riskLevel === 'stage-only') {
     return 'node atm.mjs git stage|unstage --task <task-id> --actor <actor-id> ... or node atm.mjs git lease stage-override ...';
   }
   if (riskLevel === 'destructive') {
     return 'node atm.mjs git lease destructive-override --task <task-id> --actor <actor-id> --paths <paths> --reason <reason> ...';
   }
-  return 'node atm.mjs git commit/admit --task <task-id> --actor <actor-id> ...';
+  if (action === 'push') {
+    return 'node atm.mjs git push --task <task-id> --actor <actor-id> --branch <branch> --remote <remote> --json';
+  }
+  if (action === 'commit') {
+    return 'node atm.mjs git commit --task <task-id> --actor <actor-id> --message <message> --json';
+  }
+  return 'node atm.mjs git admit|push|commit --task <task-id> --actor <actor-id> ...';
 }
 
 function isAuthorizedAtmStateMutationCommand(command: string | null): boolean {
