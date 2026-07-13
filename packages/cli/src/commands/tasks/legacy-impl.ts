@@ -2379,7 +2379,9 @@ export function parseImportOptions(argv: string[]) {
     // TASK-AAO-0064: --strict-paths flag
     strictPaths: false,
     emergencyApproval: null as string | null,
-    allowStaleRunner: parseAllowStaleRunnerFlag(argv)
+    allowStaleRunner: parseAllowStaleRunnerFlag(argv),
+    waivePlanningRoot: false,
+    reason: null as string | null
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -2425,6 +2427,15 @@ export function parseImportOptions(argv: string[]) {
       options.strictPaths = true;
       continue;
     }
+    if (arg === '--waive-planning-root') {
+      options.waivePlanningRoot = true;
+      continue;
+    }
+    if (arg === '--reason') {
+      options.reason = requireValue(argv, index, '--reason');
+      index += 1;
+      continue;
+    }
     if (arg === '--emergency-approval') {
       options.emergencyApproval = requireValue(argv, index, '--emergency-approval');
       index += 1;
@@ -2434,6 +2445,13 @@ export function parseImportOptions(argv: string[]) {
       continue;
     }
     throw new CliError('ATM_CLI_USAGE', `tasks import does not support option ${arg}`, { exitCode: 2 });
+  }
+  if (options.waivePlanningRoot && !options.reason?.trim()) {
+    throw new CliError(
+      'ATM_CLI_USAGE',
+      'tasks import --waive-planning-root requires --reason "<why target-only .atm/task-plans import is allowed>".',
+      { exitCode: 2 }
+    );
   }
   return { ...options, cwd: path.resolve(options.cwd) };
 }

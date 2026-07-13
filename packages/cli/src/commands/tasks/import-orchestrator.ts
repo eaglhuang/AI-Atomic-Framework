@@ -9,6 +9,7 @@ import { toStoredPlanningPath, resolvePlanAbsoluteFromStored } from '../planning
 import { assertRunnerFreshForWriteAction } from '../framework-development.ts';
 import { assertEmergencyApproval } from '../emergency/gate.ts';
 import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.ts';
+import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import {
   type TaskImportManifest,
@@ -246,6 +247,50 @@ export async function runTasksImport(argv: string[]) {
         planPath: relativePathFrom(options.cwd, planAbsolute)
       }
     });
+  }
+
+  // ATM-BUG-2026-07-13-176: AAO/TEAM imports from target .atm/task-plans must
+  // point at a canonical planning-root card unless explicitly waived.
+  const planningRootAuthorship = inspectPlanningRootAuthorship({
+    cwd: options.cwd,
+    planAbsolute,
+    planRelativePath: toStoredPlanningPath(options.cwd, planAbsolute),
+    taskIds: parsed.tasks.map((task) => task.workItemId),
+    waivePlanningRoot: options.waivePlanningRoot === true
+  });
+  if (planningRootAuthorship.applies) {
+    if (!planningRootAuthorship.ok) {
+      parsed.diagnostics.push({
+        level: options.write ? 'error' : 'warning',
+        code: planningRootAuthorship.code ?? 'ATM_TASKS_IMPORT_PLANNING_ROOT_REQUIRED',
+        text: planningRootAuthorship.detail ?? 'Planning-root authorship is required for this import.',
+        workItemId: planningRootAuthorship.missingTaskIds[0]
+      });
+      if (options.write) {
+        throw new CliError(
+          'ATM_TASKS_IMPORT_PLANNING_ROOT_REQUIRED',
+          planningRootAuthorship.detail ?? 'Planning-root authorship is required for this import.',
+          {
+            exitCode: 1,
+            details: {
+              ...planningRootAuthorship
+            }
+          }
+        );
+      }
+    } else if (planningRootAuthorship.waived) {
+      parsed.diagnostics.push({
+        level: 'warning',
+        code: 'ATM_TASKS_IMPORT_PLANNING_ROOT_WAIVED',
+        text: `${planningRootAuthorship.detail} reason=${options.reason?.trim() ?? ''}`
+      });
+    } else {
+      parsed.diagnostics.push({
+        level: 'info',
+        code: 'ATM_TASKS_IMPORT_PLANNING_ROOT_OK',
+        text: planningRootAuthorship.detail ?? 'Planning-root authorship confirmed.'
+      });
+    }
   }
 
   if (options.write) {
