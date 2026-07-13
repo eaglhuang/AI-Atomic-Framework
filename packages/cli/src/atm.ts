@@ -29,6 +29,7 @@ import { runNext } from './commands/next.ts';
 import { runOrient } from './commands/orient.ts';
 import { runPolice } from './commands/police.ts';
 import { runQuickfix } from './commands/quickfix.ts';
+import { runResidue } from './commands/residue.ts';
 import { runSelfHostAlphaAsync } from './commands/self-host-alpha.ts';
 import { runSpec } from './commands/spec.ts';
 import { runStart } from './commands/start.ts';
@@ -97,6 +98,7 @@ export const cliCommandRunners: Record<string, (argv: string[]) => Promise<Comma
   orient: runOrient,
   police: runPolice,
   quickfix: runQuickfix,
+  residue: runResidue,
   'self-host-alpha': runSelfHostAlphaAsync,
   spec: runSpec,
   start: runStart,
