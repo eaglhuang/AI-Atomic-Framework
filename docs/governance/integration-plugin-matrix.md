@@ -37,3 +37,17 @@ Hook logic must stay thin:
   - fallback to claim + git/evidence gates when hooks are unavailable.
 
 All integrations must call the same core commands and must not fork governance logic.
+
+## Raw Git Mutation Boundary
+
+Supported pre-tool integrations must treat raw Git index/worktree mutation as a hard gate, not as advisory prose. The guard rejects direct `git restore`, `git restore --staged`, `git reset`, `git checkout -- <path>`, `git switch -f`, `git clean`, `git rm`, `git update-index`, `git read-tree`, `git commit`, and `git push` from agent tool calls unless the operation is routed through ATM-governed Git commands and Broker leases.
+
+| Adapter | Raw Git mutation gate | Verification |
+| --- | --- | --- |
+| Codex | Hard-gated when `integration hook pre-tool` is installed or invoked by the host surface. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |
+| Claude Code | Hard-gated when the PreToolUse hook recipe calls `node atm.mjs integration hook pre-tool`. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |
+| Cursor | Advisory unless the MCP/wrapper recipe invokes the same pre-tool hook before shell execution. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |
+| Gemini | Advisory unless the command-template route invokes the same pre-tool hook before shell execution. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |
+| Antigravity | Advisory unless the workspace-root instruction bridge invokes the same pre-tool hook before shell execution. | `node --strip-types tests/cli/integration-raw-git-command-guard.test.ts` |
+
+Chat text or a copied override phrase is not an unlock. Stage-only and destructive Git overrides must be represented as ATM leases with actor, task, path, TTL, and audit evidence, then consumed by an ATM Git command. Raw shell commands remain blocked even when the phrase appears in the command string.

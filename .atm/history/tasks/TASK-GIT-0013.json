@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-GIT-0013",
+  "title": "Agent raw Git deny and ATM Git tool gate",
+  "status": "running",
+  "milestone": "G5",
+  "dependencies": [
+    "TASK-GIT-0010",
+    "TASK-GIT-0011"
+  ],
+  "acceptance": [
+    "A regression proves supported command guard policy rejects raw `git restore --staged <foreign-active-owned-path>` without a stage-only lease.",
+    "A regression proves supported command guard policy rejects raw `git restore <path>`, `git reset --hard`, `git checkout -- <path>`, and `git clean` without a destructive lease when they would touch foreign active or broad workspace state.",
+    "A regression proves direct `git commit --no-verify` is rejected when ATM governed commit/admission is required.",
+    "A regression proves allowed read-only Git commands remain available or are routed through ATM equivalents according to the documented policy.",
+    "A regression proves `atm git stage/unstage/commit` can perform the same intended operation when scope, actor, task, Broker lane, and evidence checks pass.",
+    "A regression proves the stage-only override phrase does not authorize destructive worktree/index mutation.",
+    "A regression proves the destructive override phrase is actor/task/path/TTL scoped and single-use.",
+    "Integration docs name which adapters are hard-gated, which are advisory-only, and how to verify installation.",
+    "The implementation links to `ATM-BUG-2026-07-12-161` and `TASK-AAO-0189` so the framework hotfix and planning mirror stay aligned."
+  ],
+  "deliverables": [
+    "integrations/**",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "packages/cli/src/commands/integration.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/core/src/broker/**",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-broker-lifecycle.ts",
+    "tests/cli/**"
+  ],
+  "scopePaths": [
+    "integrations/**",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "packages/cli/src/commands/integration.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/core/src/broker/**",
+    "scripts/validate-git-hooks-enforcement.ts",
+    "scripts/validate-broker-lifecycle.ts",
+    "tests/cli/**"
+  ],
+  "validators": [
+    "npm run validate:git-hooks-enforcement",
+    "npm run validate:broker-lifecycle",
+    "npm run typecheck",
+    "npm run check:encoding:touched"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "No server-side Git hosting policy in this card.",
+    "No promise to control unsupported shells or agent runtimes that do not install the ATM command guard.",
+    "No broad permanent raw-Git unlock after an emergency phrase."
+  ],
+  "nonGoals": [
+    "No reliance on agent self-discipline or warning-only guidance as the primary protection.",
+    "No automatic destructive rollback without an explicit scoped lease."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-boundary-agent-permission",
+    "atomCid": null,
+    "mapUpdates": [
+      "Add or update atoms for integration command policy, ATM Git tool gate, Broker index lane lease, and destructive Git audit evidence."
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "git-boundary-admission/tasks/TASK-GIT-0013-agent-raw-git-deny-and-atm-git-tool-gate.task.md",
+    "sectionTitle": "TASK-GIT-0013",
+    "headingLine": 51,
+    "hash": "8fb030b0e86cce70"
+  },
+  "importedAt": "2026-07-12T15:20:27.783Z",
+  "lastTransitionId": "2026-07-13T00-24-48-817Z-scope-amendment-b8c0e47031c3",
+  "lastTransitionAt": "2026-07-13T00:24:48.817Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-backlog-captain",
+  "reservedAt": "2026-07-13T00:16:41.245Z",
+  "promotedAt": "2026-07-13T00:16:41.248Z",
+  "claim": {
+    "actorId": "codex-backlog-captain",
+    "leaseId": "lease-cf50b36b3471",
+    "claimedAt": "2026-07-13T00:16:41.252Z",
+    "heartbeatAt": "2026-07-13T00:16:41.252Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-GIT-0013.*",
+      ".atm/history/task-events/TASK-GIT-0013/**",
+      ".atm/history/tasks/TASK-GIT-0013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/integration-plugin-matrix.md",
+      "integrations/**",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/integration-hooks.ts",
+      "packages/cli/src/commands/integration.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/**",
+      "scripts/validate-broker-lifecycle.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "tests/cli/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-12T15:47:12.326Z",
+  "startedByActor": "codex-backlog-captain",
+  "startedBySessionId": "session-20260713001641-codex-backlog-captain-TASK-GIT-0013-eecb6b3a9f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-GIT-0013",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-GIT-0013.*",
+      ".atm/history/task-events/TASK-GIT-0013/**",
+      ".atm/history/tasks/TASK-GIT-0013.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/governance/integration-plugin-matrix.md",
+      "integrations/**",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/integration-hooks.ts",
+      "packages/cli/src/commands/integration.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/core/src/broker/**",
+      "scripts/validate-broker-lifecycle.ts",
+      "scripts/validate-cli.ts",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "tests/cli/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "0395e6399904147773c7a9761a66a687fea91fa27d00fba7a30c2d3aaf998ac4",
+    "actorId": "codex-backlog-captain",
+    "createdAt": "2026-07-13T00:16:42.537Z",
+    "status": "active"
+  }
+}
