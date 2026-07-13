@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-13T05-47-24-706Z-close-6588b4b5589e",
+  "taskId": "TASK-AAO-FABLE-004",
+  "action": "close",
+  "actorId": "codex-backlog-captain",
+  "sessionId": "session-20260713053635-codex-backlog-captain-TASK-AAO-FABLE-004-9458b07f57",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-FABLE-004.json",
+  "taskSha256": "sha256:f4a84ac502ae5bcb4a71e751455aa67913e5b1710b2b4c5396c290153835b9eb",
+  "createdAt": "2026-07-13T05:47:24.706Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-FABLE-004 --actor codex-backlog-captain --status done --historical-delivery 894a106d8c6023da16c8c52b24b229d1af73b7c5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260713053635-codex-backlog-captain-TASK-AAO-FABLE-004-9458b07f57",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-FABLE-004.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-13T05:47:24.694Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-FABLE-004.*",
+        ".atm/history/task-events/TASK-AAO-FABLE-004/**",
+        ".atm/history/tasks/TASK-AAO-FABLE-004.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/next/intent-normalizers.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/intent-normalizers.ts",
+        "packages/cli/src/commands/next/route-predicates.ts",
+        "scripts/validate-prompt-scoped-next.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
