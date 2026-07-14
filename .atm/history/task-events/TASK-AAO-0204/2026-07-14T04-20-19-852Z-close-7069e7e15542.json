@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T04-20-19-852Z-close-7069e7e15542",
+  "taskId": "TASK-AAO-0204",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260714041911-cursor-grok-4.5-TASK-AAO-0204-4697095915",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0204.json",
+  "taskSha256": "sha256:96f456c5579af4dc4def0342be5ab41fd71dca312c32373c79a8cddf6a838f64",
+  "createdAt": "2026-07-14T04:20:19.852Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0204 --actor cursor-grok-4.5 --status done --historical-delivery c76526d1b45f3fcda83554bb7671b7154b140b38",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260714041911-cursor-grok-4.5-TASK-AAO-0204-4697095915",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0204.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T04:20:19.846Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0204.*",
+        ".atm/history/task-events/TASK-AAO-0204/**",
+        ".atm/history/tasks/TASK-AAO-0204.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "tests/cli/protected-override-audit-direction-lock.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "tests/cli/protected-override-audit-direction-lock.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

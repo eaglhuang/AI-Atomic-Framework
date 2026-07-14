@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0204",
+  "title": "Auto-admit task-generated protected-override audit into direction lock",
+  "status": "done",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "tests/cli/protected-override-audit-direction-lock.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "tests/cli/protected-override-audit-direction-lock.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/protected-override-audit-direction-lock.test.ts",
+    "npm run check:encoding:touched",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "release/**",
+    "Editing .atm/history or .atm/runtime by hand"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if the fix regresses governed close/commit safety.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-governance-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 3 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance.ts (4377 lines)",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts (1016 lines)",
+        "packages/cli/src/commands/hook/pre-commit.ts (2751 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0204-direction-lock-generated-protected-audit.task.md",
+    "sectionTitle": "TASK-AAO-0204",
+    "headingLine": 43,
+    "hash": "8e054f7ac23aa1e6"
+  },
+  "importedAt": "2026-07-14T04:10:00.570Z",
+  "lastTransitionId": "2026-07-14T04-20-19-852Z-close-7069e7e15542",
+  "lastTransitionAt": "2026-07-14T04:20:19.852Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "cursor-grok-4.5",
+    "leaseId": "lease-612db166a7e2",
+    "claimedAt": "2026-07-14T04:19:11.433Z",
+    "heartbeatAt": "2026-07-14T04:20:19.850Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts"
+    ],
+    "state": "released",
+    "reason": "Shared delivery commit c76526d1 intentionally bundled five related governance bugs TASK-AAO-0201..0205."
+  },
+  "owner": "cursor-grok-4.5",
+  "startedAt": "2026-07-14T04:19:11.433Z",
+  "startedByActor": "cursor-grok-4.5",
+  "startedBySessionId": "session-20260714041911-cursor-grok-4.5-TASK-AAO-0204-4697095915",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0204",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0204.*",
+      ".atm/history/task-events/TASK-AAO-0204/**",
+      ".atm/history/tasks/TASK-AAO-0204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f5e937a688f47b9d1f0b27226bea3f755dcb820c51b498fe57dff0042fdc14b8",
+    "actorId": "cursor-grok-4.5",
+    "createdAt": "2026-07-14T04:19:15.074Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-14T04:20:19.850Z",
+  "closedByActor": "cursor-grok-4.5",
+  "closedBySessionId": "session-20260714041911-cursor-grok-4.5-TASK-AAO-0204-4697095915",
+  "closeReason": "Shared delivery commit c76526d1 intentionally bundled five related governance bugs TASK-AAO-0201..0205.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0204.closure-packet.json"
+}
