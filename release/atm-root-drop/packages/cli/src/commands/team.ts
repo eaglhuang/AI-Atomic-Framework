@@ -818,6 +818,53 @@ export type TeamRecommendation = {
   readonly parallelAdvisory?: unknown;
 };
 
+export type BatchTeamAdmissionDecision = {
+  readonly schemaId: 'atm.batchTeamAdmissionDecision.v1';
+  readonly taskId: string;
+  readonly batchId: string;
+  readonly allowed: boolean;
+  readonly mode: 'team-current-head' | 'single-agent';
+  readonly reasonCodes: readonly string[];
+  readonly queueHeadOnly: true;
+  readonly structuralParallelismRequired: true;
+  readonly costTelemetryRequired: true;
+  readonly stopLossAction: 'none' | 'single-agent' | 'cheaper-qualified-model-mix';
+};
+
+export function evaluateBatchTeamAdmission(input: {
+  readonly taskId: string;
+  readonly batchId: string;
+  readonly currentQueueHeadTaskId: string | null | undefined;
+  readonly structuralParallelism: boolean;
+  readonly costTelemetryLoaded?: boolean;
+  readonly stopLossTriggered?: boolean;
+}): BatchTeamAdmissionDecision {
+  const taskId = String(input.taskId ?? '').trim();
+  const batchId = String(input.batchId ?? '').trim();
+  const isQueueHead = taskId.length > 0 && taskId === String(input.currentQueueHeadTaskId ?? '').trim();
+  const costTelemetryLoaded = input.costTelemetryLoaded === true;
+  const reasonCodes: string[] = [];
+  if (!isQueueHead) reasonCodes.push('not-current-queue-head');
+  if (input.structuralParallelism !== true) reasonCodes.push('no-structural-parallelism');
+  if (!costTelemetryLoaded) reasonCodes.push('missing-cost-telemetry');
+  if (input.stopLossTriggered === true) reasonCodes.push('stop-loss-triggered');
+  const allowed = reasonCodes.length === 0;
+  return {
+    schemaId: 'atm.batchTeamAdmissionDecision.v1',
+    taskId,
+    batchId,
+    allowed,
+    mode: allowed ? 'team-current-head' : 'single-agent',
+    reasonCodes,
+    queueHeadOnly: true,
+    structuralParallelismRequired: true,
+    costTelemetryRequired: true,
+    stopLossAction: input.stopLossTriggered === true
+      ? 'single-agent'
+      : (!costTelemetryLoaded ? 'cheaper-qualified-model-mix' : 'none')
+  };
+}
+
 export function resolveTeamRecipeIdForChannel(channel: TeamRecommendationChannel): string {
   if (channel === 'batch') {
     return 'atm.default.batch';

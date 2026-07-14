@@ -105,6 +105,30 @@ export interface ContextMap {
     readonly patterns?: readonly ContextPattern[];
 }
 export declare function parseContextMap(raw: unknown): ContextMap | undefined;
+export declare const ATOMIZATION_DEFAULT_MAX_LINES = 600;
+export interface AtomizationLineLimitWaiver {
+    readonly reason?: unknown;
+    readonly expiresAt?: unknown;
+}
+export interface AtomizationLinePolicyConfig {
+    readonly maxLines?: unknown;
+    readonly waiver?: AtomizationLineLimitWaiver | null;
+}
+export interface AtomizationLinePolicy {
+    readonly maxLines: number;
+    readonly defaultMaxLines: number;
+    readonly source: 'default' | 'config' | 'override';
+    readonly waiverRequired: boolean;
+    readonly waiverValid: boolean;
+    readonly waiverExpiresAt: string | null;
+}
+export declare function resolveAtomizationLinePolicy(input?: {
+    readonly config?: {
+        readonly atomization?: AtomizationLinePolicyConfig;
+    } | null;
+    readonly overrideMaxLines?: number | null;
+    readonly now?: Date;
+}): AtomizationLinePolicy;
 import type { TaskCardImportDiagnostic } from './result-contracts.ts';
 export declare const EXTRACTION_FIRST_LINE_BUDGET = 600;
 /**

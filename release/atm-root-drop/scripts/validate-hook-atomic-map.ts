@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAtomizationLinePolicy } from '../packages/cli/src/commands/tasks/task-import-validators.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const hookFacadePath = path.join(root, 'packages', 'cli', 'src', 'commands', 'hook.ts');
@@ -22,12 +23,18 @@ const phaseSpecs = [
   'packages/cli/src/commands/hook/__tests__/git-index-diagnostics.spec.ts'
 ] as const;
 
-const hookFacadeLineCap = 600;
+const hookFacadeLineCap = resolveAtomizationLinePolicy({ config: readRepoConfig(root) }).maxLines;
 const hookFacadeBaseline = 3429;
 
 function fail(message: string): never {
   console.error(`[hook-atomic-map] ${message}`);
   process.exit(1);
+}
+
+function readRepoConfig(cwd: string): { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } } | null {
+  const configPath = path.join(cwd, '.atm', 'config.json');
+  if (!existsSync(configPath)) return null;
+  return JSON.parse(readFileSync(configPath, 'utf8')) as { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } };
 }
 
 if (!existsSync(reportPath)) {

@@ -1,18 +1,19 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { resolveAtomizationLinePolicy } from '../tasks/task-import-validators.ts';
 
 interface ParsedArgs {
-  readonly maxLines: number;
+  readonly maxLinesOverride: number | null;
   readonly files: readonly string[];
 }
 
 function parseArgs(argv: readonly string[]): ParsedArgs {
-  let maxLines = 600;
+  let maxLinesOverride: number | null = null;
   const files: string[] = [];
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === '--max-lines') {
-      maxLines = Number(argv[index + 1]);
+      maxLinesOverride = Number(argv[index + 1]);
       index += 1;
       continue;
     }
@@ -23,13 +24,19 @@ function parseArgs(argv: readonly string[]): ParsedArgs {
     }
     files.push(value);
   }
-  if (!Number.isInteger(maxLines) || maxLines < 1) {
+  if (maxLinesOverride !== null && (!Number.isInteger(maxLinesOverride) || maxLinesOverride < 1)) {
     throw new Error('--max-lines must be a positive integer');
   }
   if (files.length === 0) {
     throw new Error('Provide files with --files a,b,c or positional paths');
   }
-  return { maxLines, files };
+  return { maxLinesOverride, files };
+}
+
+function readRepoConfig(cwd: string): { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } } | null {
+  const configPath = path.join(cwd, '.atm', 'config.json');
+  if (!existsSync(configPath)) return null;
+  return JSON.parse(readFileSync(configPath, 'utf8')) as { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } };
 }
 
 function countLines(filePath: string): number {
@@ -40,15 +47,16 @@ function countLines(filePath: string): number {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
+  const policy = resolveAtomizationLinePolicy({ config: readRepoConfig(process.cwd()), overrideMaxLines: args.maxLinesOverride });
   const failures = args.files
     .map((file) => ({ file: path.normalize(file), lines: countLines(file) }))
-    .filter((entry) => entry.lines > args.maxLines);
+    .filter((entry) => entry.lines > policy.maxLines);
   if (failures.length > 0) {
-    console.error(JSON.stringify({ ok: false, maxLines: args.maxLines, failures }, null, 2));
+    console.error(JSON.stringify({ ok: false, maxLines: policy.maxLines, policy, failures }, null, 2));
     process.exitCode = 1;
     return;
   }
-  console.log(JSON.stringify({ ok: true, maxLines: args.maxLines, files: args.files.length }, null, 2));
+  console.log(JSON.stringify({ ok: true, maxLines: policy.maxLines, policy, files: args.files.length }, null, 2));
 }
 
 main();

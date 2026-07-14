@@ -2,6 +2,7 @@ import { decideTeamPermission, type TeamPermissionPolicy } from '../permission-b
 import { createTeamObservabilityEvent, type TeamObservabilityEvent } from '../observability.ts';
 import {
   type TeamProviderContract,
+  type TeamProviderBillableUsage,
   type TeamProviderExecutionResult,
   type TeamProviderHttpExecutor,
   type TeamProviderId,
@@ -54,6 +55,7 @@ export type OpenAIFamilyRunArtifact = {
     readonly retryable: boolean;
     readonly outputTextPreview: string;
   };
+  readonly billableUsage?: TeamProviderBillableUsage;
   readonly observabilityEventCount: number;
   readonly redaction: {
     readonly rawSecretsLogged: false;
@@ -310,6 +312,7 @@ export function createOpenAIFamilyRunArtifact(input: {
       retryable: input.execution.retryable,
       outputTextPreview: redactPreview(input.execution.outputText)
     },
+    billableUsage: input.execution.billableUsage,
     observabilityEventCount: 0,
     redaction: {
       rawSecretsLogged: false,

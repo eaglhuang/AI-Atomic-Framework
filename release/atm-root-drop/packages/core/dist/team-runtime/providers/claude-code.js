@@ -173,6 +173,7 @@ export function createTeamExecutionBridgeRunArtifact(input) {
             retryable: input.execution.retryable,
             outputTextPreview: redactPreview(input.execution.outputText)
         },
+        billableUsage: input.execution.billableUsage,
         observabilityEventCount: 0,
         redaction: {
             rawSecretsLogged: false,

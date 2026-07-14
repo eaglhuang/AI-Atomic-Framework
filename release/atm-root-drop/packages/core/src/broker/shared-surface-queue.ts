@@ -23,6 +23,26 @@ export type SharedSurfaceQueueResult = {
   readonly reason: string;
 };
 
+export type SharedSurfaceQueueTransaction = {
+  readonly schemaId: 'atm.brokerSharedSurfaceQueueTransaction.v1';
+  readonly transactionId: string;
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly createdAt: string;
+  readonly baseQueueDigest: string;
+  readonly nextQueueDigest: string;
+  readonly intents: readonly SharedSurfaceQueueEntry[];
+  readonly barrierConflicts: readonly { surfacePath: string; queueHeadTaskId: string }[];
+  readonly status: 'committed' | 'idempotent-replay' | 'blocked';
+  readonly recoveryHint: string | null;
+};
+
+export type SharedSurfaceQueueTransactionResult = {
+  readonly ok: boolean;
+  readonly queues: readonly SharedSurfaceQueue[];
+  readonly transaction: SharedSurfaceQueueTransaction;
+};
+
 export type SharedSurfaceAcquisitionPlan = {
   readonly taskId: string;
   readonly orderedSurfacePaths: readonly string[];
@@ -86,6 +106,92 @@ export function releaseSharedSurfaceHead(input: { readonly queue: SharedSurfaceQ
   return { ...input.queue, entries: input.queue.entries.slice(1) };
 }
 
+export function applySharedSurfaceQueueTransaction(input: {
+  readonly queues: readonly SharedSurfaceQueue[];
+  readonly entries: readonly SharedSurfaceQueueEntry[];
+  readonly transactionId: string;
+  readonly createdAt?: string;
+}): SharedSurfaceQueueTransactionResult {
+  const normalizedEntries = input.entries.map(normalizeEntry);
+  if (normalizedEntries.some((entry) => !entry)) {
+    const transaction = buildQueueTransaction({
+      transactionId: input.transactionId,
+      entries: [],
+      baseQueues: input.queues,
+      nextQueues: input.queues,
+      status: 'blocked',
+      barrierConflicts: [],
+      recoveryHint: 'Invalid queue entry; transaction was not applied.'
+    });
+    return { ok: false, queues: input.queues, transaction };
+  }
+  const entries = normalizedEntries as SharedSurfaceQueueEntry[];
+  let nextQueues = [...input.queues];
+  const barrierConflicts: Array<{ surfacePath: string; queueHeadTaskId: string }> = [];
+  for (const entry of entries) {
+    const current = nextQueues.find((queue) => queue.surfacePath === entry.surfacePath) ?? {
+      schemaId: 'atm.brokerSharedSurfaceQueue.v1' as const,
+      surfacePath: entry.surfacePath,
+      entries: []
+    };
+    const result = enqueueSharedSurface({ queue: current, entry });
+    if (!result.ok) {
+      const transaction = buildQueueTransaction({
+        transactionId: input.transactionId,
+        entries,
+        baseQueues: input.queues,
+        nextQueues: input.queues,
+        status: 'blocked',
+        barrierConflicts,
+        recoveryHint: result.reason,
+        createdAt: input.createdAt
+      });
+      return { ok: false, queues: input.queues, transaction };
+    }
+    if (result.queue.entries[0]?.taskId !== entry.taskId) {
+      barrierConflicts.push({ surfacePath: entry.surfacePath, queueHeadTaskId: result.queue.entries[0]?.taskId ?? 'unknown' });
+    }
+    nextQueues = upsertQueue(nextQueues, result.queue);
+  }
+  const idempotent = digestQueues(input.queues) === digestQueues(nextQueues);
+  const transaction = buildQueueTransaction({
+    transactionId: input.transactionId,
+    entries,
+    baseQueues: input.queues,
+    nextQueues,
+    status: idempotent ? 'idempotent-replay' : 'committed',
+    barrierConflicts,
+    recoveryHint: barrierConflicts.length > 0
+      ? 'Shadow-first Team may continue private work; shared surfaces require barrier release before live write.'
+      : null,
+    createdAt: input.createdAt
+  });
+  return { ok: true, queues: nextQueues, transaction };
+}
+
+export function diagnoseStaleSharedSurfaceIntents(input: {
+  readonly queues: readonly SharedSurfaceQueue[];
+  readonly now: string;
+  readonly staleAfterMs: number;
+}): readonly { readonly taskId: string; readonly surfacePath: string; readonly queuedAt: string; readonly releaseable: boolean; readonly reason: string }[] {
+  const nowMs = Date.parse(input.now);
+  return input.queues.flatMap((queue) => queue.entries.map((entry, index) => {
+    const queuedMs = Date.parse(entry.queuedAt);
+    const stale = Number.isFinite(nowMs) && Number.isFinite(queuedMs) && nowMs - queuedMs > input.staleAfterMs;
+    return {
+      taskId: entry.taskId,
+      surfacePath: queue.surfacePath,
+      queuedAt: entry.queuedAt,
+      releaseable: stale && index > 0,
+      reason: stale
+        ? index === 0
+          ? 'Queue head is stale; require explicit release or re-arbitration before a waiter may advance.'
+          : 'Stale non-head waiter can be released without skipping the active queue head.'
+        : 'Intent is not stale.'
+    };
+  }));
+}
+
 // Terminal abandon/recovery must be able to remove a non-head waiter. This is
 // deliberately separate from normal head release so an active writer cannot
 // skip the deterministic acquisition order by mistake.
@@ -113,4 +219,47 @@ function compareQueueEntries(left: SharedSurfaceQueueEntry, right: SharedSurface
   const queuedAtOrder = left.queuedAt.localeCompare(right.queuedAt);
   if (queuedAtOrder !== 0) return queuedAtOrder;
   return left.taskId.localeCompare(right.taskId);
+}
+
+function upsertQueue(queues: readonly SharedSurfaceQueue[], queue: SharedSurfaceQueue): SharedSurfaceQueue[] {
+  const next = queues.filter((candidate) => candidate.surfacePath !== queue.surfacePath);
+  return [...next, queue].sort((left, right) => left.surfacePath.localeCompare(right.surfacePath));
+}
+
+function buildQueueTransaction(input: {
+  readonly transactionId: string;
+  readonly entries: readonly SharedSurfaceQueueEntry[];
+  readonly baseQueues: readonly SharedSurfaceQueue[];
+  readonly nextQueues: readonly SharedSurfaceQueue[];
+  readonly status: SharedSurfaceQueueTransaction['status'];
+  readonly barrierConflicts: SharedSurfaceQueueTransaction['barrierConflicts'];
+  readonly recoveryHint: string | null;
+  readonly createdAt?: string;
+}): SharedSurfaceQueueTransaction {
+  const first = input.entries[0];
+  return {
+    schemaId: 'atm.brokerSharedSurfaceQueueTransaction.v1',
+    transactionId: input.transactionId,
+    taskId: first?.taskId ?? '<invalid>',
+    actorId: first?.actorId ?? '<invalid>',
+    createdAt: input.createdAt ?? new Date().toISOString(),
+    baseQueueDigest: digestQueues(input.baseQueues),
+    nextQueueDigest: digestQueues(input.nextQueues),
+    intents: input.entries,
+    barrierConflicts: input.barrierConflicts,
+    status: input.status,
+    recoveryHint: input.recoveryHint
+  };
+}
+
+function digestQueues(queues: readonly SharedSurfaceQueue[]): string {
+  const normalized = [...queues]
+    .map((queue) => ({ ...queue, entries: [...queue.entries].sort(compareQueueEntries) }))
+    .sort((left, right) => left.surfacePath.localeCompare(right.surfacePath));
+  let hash = 0;
+  const text = JSON.stringify(normalized);
+  for (let index = 0; index < text.length; index += 1) {
+    hash = ((hash << 5) - hash + text.charCodeAt(index)) | 0;
+  }
+  return `hash32:${(hash >>> 0).toString(16).padStart(8, '0')}`;
 }

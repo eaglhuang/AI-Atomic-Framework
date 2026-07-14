@@ -7,6 +7,7 @@ import { runNext } from './next.js';
 import { runTasks } from './tasks.js';
 import { abandonTaskQueue, advanceTaskQueueHead, findActiveTaskQueue, partitionTaskScope, restoreTaskQueueHead } from './task-direction.js';
 import { activeBatchSelectionStatus, inspectBatchRunConsistency, isPathAllowedByScope, listActiveBatchRuns, releaseBatchRun, repairBatchRunFromQueue, updateBatchRun, writeBatchTaskAuditEvent } from './work-channels.js';
+import { evaluateBatchTeamAdmission } from './team.js';
 export async function runBatch(argv) {
     const action = String(argv[0] ?? 'status').toLowerCase();
     const batchHistoricalDeliveryRefs = action === 'checkpoint'
@@ -784,6 +785,61 @@ export async function runBatch(argv) {
     }
     throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 });
 }
+export function buildBatchTeamIntegrationReport(input) {
+    const attempts = input.attempts ?? [];
+    const usage = attempts.reduce((acc, attempt) => ({
+        attemptCount: acc.attemptCount + 1,
+        retryCount: acc.retryCount + (attempt.retry === true ? 1 : 0),
+        discardedContributionCount: acc.discardedContributionCount + (attempt.discarded === true ? 1 : 0),
+        inputTokens: acc.inputTokens + finiteNumber(attempt.inputTokens),
+        outputTokens: acc.outputTokens + finiteNumber(attempt.outputTokens),
+        cacheReadTokens: acc.cacheReadTokens + finiteNumber(attempt.cacheReadTokens),
+        fullyLoadedCostUsd: acc.fullyLoadedCostUsd + finiteNumber(attempt.fullyLoadedCostUsd)
+    }), {
+        attemptCount: 0,
+        retryCount: 0,
+        discardedContributionCount: 0,
+        inputTokens: 0,
+        outputTokens: 0,
+        cacheReadTokens: 0,
+        fullyLoadedCostUsd: 0
+    });
+    const payloadDigestMatchesEvidence = Boolean(input.evidencePayloadDigest)
+        && input.evidencePayloadDigest === input.sealedPayloadDigest;
+    const stopLossTriggered = input.stopLossTriggered === true;
+    const costTelemetryLoaded = input.costTelemetryLoaded ?? attempts.length > 0;
+    const teamAdmission = evaluateBatchTeamAdmission({
+        taskId: input.taskId,
+        batchId: input.batchId,
+        currentQueueHeadTaskId: input.currentQueueHeadTaskId,
+        structuralParallelism: input.structuralParallelism,
+        costTelemetryLoaded,
+        stopLossTriggered
+    });
+    return {
+        schemaId: 'atm.batchTeamIntegrationReport.v1',
+        taskId: input.taskId,
+        batchId: input.batchId,
+        sealedClose: {
+            usesSealAndCommitTransaction: true,
+            checkpointRefusesPayloadMismatch: true,
+            payloadDigestMatchesEvidence
+        },
+        teamAdmission,
+        usage,
+        latency: {
+            queueHeadLatencyMs: finiteNumber(input.queueHeadLatencyMs),
+            batchMakespanMs: finiteNumber(input.batchMakespanMs),
+            throughputPerMinute: calculateThroughputPerMinute(input.completedTaskCount, input.batchMakespanMs),
+            throughputIsSingleTaskLatency: false
+        },
+        stopLoss: {
+            triggered: stopLossTriggered,
+            laterQueueHeadRoute: stopLossTriggered ? 'single-agent' : 'unchanged',
+            closeSemanticsChanged: false
+        }
+    };
+}
 function buildBatchSelector(options) {
     const selector = {};
     if (typeof options.batch === 'string' && options.batch.trim())
@@ -791,6 +847,16 @@ function buildBatchSelector(options) {
     if (typeof options.scope === 'string' && options.scope.trim())
         selector.scopeKey = options.scope.trim();
     return selector;
+}
+function finiteNumber(value) {
+    return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+}
+function calculateThroughputPerMinute(completedTaskCount, batchMakespanMs) {
+    const taskCount = finiteNumber(completedTaskCount);
+    const makespanMs = finiteNumber(batchMakespanMs);
+    if (taskCount <= 0 || makespanMs <= 0)
+        return 0;
+    return taskCount / (makespanMs / 60000);
 }
 function stripBatchCheckpointCloseArgs(argv) {
     const stripped = [];

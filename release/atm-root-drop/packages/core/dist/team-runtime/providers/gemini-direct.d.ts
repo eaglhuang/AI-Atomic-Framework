@@ -51,6 +51,7 @@ export declare function launchGeminiDirectTeamProviderRun(input: {
             retryable: boolean;
             outputTextPreview: string;
         };
+        billableUsage: import("../provider-contract.ts").TeamProviderBillableUsage | undefined;
         observabilityEventCount: number;
         redaction: {
             rawSecretsLogged: false;

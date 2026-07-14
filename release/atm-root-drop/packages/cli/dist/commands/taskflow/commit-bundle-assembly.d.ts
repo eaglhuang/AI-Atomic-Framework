@@ -1,3 +1,4 @@
+import type { TeamContributionCompositionResult } from '../team/composer.ts';
 import { type GitIndexLeaseParkPlan } from '../git-index-ownership.ts';
 export type TaskflowCommitMode = 'auto-commit' | 'stage-only' | 'dry-run';
 export interface TaskflowIndexIsolation {
@@ -97,6 +98,7 @@ export declare function buildTaskflowCommitBundle(input: {
     planningAuthorityDeliveryOk?: boolean;
 }): TaskflowGovernedCommitBundle;
 export declare function assertCommitBundleReady(bundle: TaskflowGovernedCommitBundle): void;
+export declare function reconcileTeamContributionCompositionWithCommitBundle(bundle: TaskflowGovernedCommitBundle, composition: TeamContributionCompositionResult): TaskflowGovernedCommitBundle;
 export declare function commitTaskflowDeliveryFiles(input: {
     bundle: TaskflowGovernedCommitBundle;
     actorId: string;

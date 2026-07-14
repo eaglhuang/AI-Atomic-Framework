@@ -24,6 +24,10 @@ import {
   writeValidationReceipt,
   type ValidationReceiptStatus
 } from '../packages/core/src/evidence/validation-receipt.ts';
+import {
+  createSealedCommitCanaryPlan,
+  resolveValidationObligations
+} from '../packages/cli/src/commands/validation-obligations.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const configPath = path.join(root, 'scripts', 'validators.config.json');
@@ -93,6 +97,7 @@ const resolvedFocusPaths = resolveFocusPaths(parsedCli.focusPaths, parsedCli.foc
 const testCatalog = readTestCatalog(root, { validatorsConfig: config });
 const baseCatalogSelection = resolveCatalogValidatorSelection(parsedCli.profile, []);
 const focusedCatalogSelection = resolveCatalogValidatorSelection(parsedCli.profile, resolvedFocusPaths);
+const focusedValidationObligations = resolveValidationObligations(resolvedFocusPaths);
 const baseProfileValidatorNames = baseCatalogSelection.names;
 const focusedProfileValidatorNames = focusedCatalogSelection.names;
 const selectedNames = applyFilters(focusedProfileValidatorNames, parsedCli.filters);
@@ -206,12 +211,13 @@ const results = parallel
           fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
           slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
         },
-        catalog: {
-          schemaId: testCatalog.schemaId,
-          sourcePath: testCatalog.sourcePath,
-          capability: 'validator',
-          duplicateDedupeKeys
-        },
+  catalog: {
+    schemaId: testCatalog.schemaId,
+    sourcePath: testCatalog.sourcePath,
+    capability: 'validator',
+    duplicateDedupeKeys,
+    obligationMap: focusedValidationObligations
+  },
         baselineFingerprintCount: baselineFingerprints.size,
         startedAt
       }
@@ -236,12 +242,13 @@ const summary = createSummary({
     fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
     slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
   },
-  catalog: {
-    schemaId: testCatalog.schemaId,
-    sourcePath: testCatalog.sourcePath,
-    capability: 'validator',
-    duplicateDedupeKeys
-  },
+    catalog: {
+      schemaId: testCatalog.schemaId,
+      sourcePath: testCatalog.sourcePath,
+      capability: 'validator',
+      duplicateDedupeKeys,
+      obligationMap: focusedValidationObligations
+    },
   baselineFingerprintCount: baselineFingerprints.size,
   startedAt,
   results,
@@ -507,9 +514,10 @@ function applyFocusRules(validatorNames: string[], focusPaths: string[]): string
 
 function resolveCatalogValidatorSelection(profileName: string, focusPaths: string[]): { names: string[]; entries: TestCatalogEntry[]; duplicateDedupeKeys: string[] } {
   const tier = profileToCatalogTier(profileName);
+  const obligationNames = resolveExecutableObligationValidatorNames(focusPaths);
   if (!tier) {
     const names = applyFocusRules(resolveProfileValidatorNames(profileName), focusPaths);
-    return { names, entries: [], duplicateDedupeKeys: [] };
+    return { names: mergeValidatorNames(names, obligationNames), entries: [], duplicateDedupeKeys: [] };
   }
   const selection = selectTestEntries({
     catalog: testCatalog,
@@ -520,14 +528,27 @@ function resolveCatalogValidatorSelection(profileName: string, focusPaths: strin
   const executableEntries = selection.entries.filter((entry) => entry.validatorName && validatorMap.has(entry.validatorName));
   if (focusPaths.length > 0 && executableEntries.length === 0) {
     const fallbackNames = applyFocusRules(resolveProfileValidatorNames(profileName), focusPaths);
-    return { names: fallbackNames, entries: [], duplicateDedupeKeys: [] };
+    return { names: mergeValidatorNames(fallbackNames, obligationNames), entries: [], duplicateDedupeKeys: [] };
   }
-  const names = [...new Set(executableEntries.map((entry) => String(entry.validatorName)))];
+  const names = mergeValidatorNames(executableEntries.map((entry) => String(entry.validatorName)), obligationNames);
   return {
     names,
     entries: executableEntries,
     duplicateDedupeKeys: selection.duplicateDedupeKeys
   };
+}
+
+function resolveExecutableObligationValidatorNames(focusPaths: string[]): string[] {
+  if (!Array.isArray(focusPaths) || focusPaths.length === 0) {
+    return [];
+  }
+  return resolveValidationObligations(focusPaths).validators
+    .filter((name) => name !== 'typecheck')
+    .filter((name) => validatorMap.has(name));
+}
+
+function mergeValidatorNames(primary: string[], required: string[]): string[] {
+  return [...new Set([...primary, ...required])];
 }
 
 function profileToCatalogTier(profileName: string): TestTier | null {
@@ -1568,6 +1589,7 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
 
 function createSelectionReport({ profile, baseValidatorCount, focusReducedValidatorCount, focusMode, results, catalog }: any) {
   const familySummary = summarizeFamilies(results);
+  const headCommit = readGitHead();
   const dominantFamilies = familySummary
     .filter((entry: any) => entry.validatorCount > 0)
     .sort((left: any, right: any) => right.validatorCount - left.validatorCount)
@@ -1584,6 +1606,13 @@ function createSelectionReport({ profile, baseValidatorCount, focusReducedValida
     focusReducedValidatorCount,
     focusMode: focusMode ?? 'none',
     duplicateDedupeKeys: Array.isArray(catalog?.duplicateDedupeKeys) ? catalog.duplicateDedupeKeys : [],
+    obligationMap: catalog?.obligationMap ?? null,
+    sealedCommitCanary: headCommit
+      ? createSealedCommitCanaryPlan({
+          commitSha: headCommit,
+          validators: catalog?.obligationMap?.validators ?? []
+        })
+      : null,
     familyCount: familySummary.length,
     dominantFamilies,
     families: familySummary

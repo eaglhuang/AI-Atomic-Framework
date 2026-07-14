@@ -14,6 +14,7 @@ import { listTaskOwnedProtectedOverrideAuditFiles, resolveActorGitIdentityForCom
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { CliError, quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
+import type { TeamContributionCompositionResult } from '../team/composer.ts';
 import {
   buildGitIndexLeaseParkPlan,
   inspectGitIndexOwnership,
@@ -851,6 +852,49 @@ export function assertCommitBundleReady(bundle: TaskflowGovernedCommitBundle) {
       details: { governedCommitBundle: bundle }
     });
   }
+}
+
+export function reconcileTeamContributionCompositionWithCommitBundle(
+  bundle: TaskflowGovernedCommitBundle,
+  composition: TeamContributionCompositionResult
+): TaskflowGovernedCommitBundle {
+  const finalTreeFiles = composition.finalTree.files.map((file) => file.path);
+  const targetDeliveryFiles = uniqueSorted([...bundle.targetDeliveryFiles, ...finalTreeFiles]);
+  const targetStageFiles = uniqueSorted([
+    ...bundle.targetRepo.stageFiles,
+    ...targetDeliveryFiles,
+    ...bundle.targetGovernanceFiles
+  ]);
+  const scopeAmendment = composition.scopeExpansion.required
+    ? {
+      ...bundle.scopeAmendment,
+      required: true,
+      candidateFiles: uniqueSorted([
+        ...bundle.scopeAmendment.candidateFiles,
+        ...composition.scopeExpansion.candidateFiles
+      ]),
+      reason: composition.scopeExpansion.reason,
+      humanReviewRequired: true,
+      notes: uniqueSorted([
+        ...bundle.scopeAmendment.notes,
+        'Team contribution composer owns scope expansion reconciliation; worker manifests do not transfer file ownership in flight.'
+      ])
+    }
+    : bundle.scopeAmendment;
+  const reason = composition.conflicts.length > 0
+    ? `Team contribution conflict: ${composition.conflicts.map((conflict) => conflict.path).join(', ')}`
+    : composition.scopeExpansion.reason ?? bundle.targetRepo.reason ?? null;
+  return {
+    ...bundle,
+    failClosed: bundle.failClosed || composition.failClosed,
+    targetDeliveryFiles,
+    targetRepo: {
+      ...bundle.targetRepo,
+      stageFiles: targetStageFiles,
+      reason
+    },
+    scopeAmendment
+  };
 }
 
 function refreshSealAndCommitReceipt(bundle: TaskflowGovernedCommitBundle): TaskflowGovernedCommitBundle {

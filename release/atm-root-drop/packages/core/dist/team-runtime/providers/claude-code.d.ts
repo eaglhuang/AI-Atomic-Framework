@@ -40,6 +40,7 @@ export type TeamExecutionBridgeRunArtifact = {
         readonly retryable: boolean;
         readonly outputTextPreview: string;
     };
+    readonly billableUsage?: TeamProviderExecutionResult['billableUsage'];
     readonly observabilityEventCount: number;
     readonly redaction: {
         readonly rawSecretsLogged: false;

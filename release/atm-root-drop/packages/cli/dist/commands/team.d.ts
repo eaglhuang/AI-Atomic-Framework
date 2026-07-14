@@ -637,6 +637,26 @@ export type TeamRecommendation = {
     readonly knowledgeSummary?: TeamKnowledgeSummary;
     readonly parallelAdvisory?: unknown;
 };
+export type BatchTeamAdmissionDecision = {
+    readonly schemaId: 'atm.batchTeamAdmissionDecision.v1';
+    readonly taskId: string;
+    readonly batchId: string;
+    readonly allowed: boolean;
+    readonly mode: 'team-current-head' | 'single-agent';
+    readonly reasonCodes: readonly string[];
+    readonly queueHeadOnly: true;
+    readonly structuralParallelismRequired: true;
+    readonly costTelemetryRequired: true;
+    readonly stopLossAction: 'none' | 'single-agent' | 'cheaper-qualified-model-mix';
+};
+export declare function evaluateBatchTeamAdmission(input: {
+    readonly taskId: string;
+    readonly batchId: string;
+    readonly currentQueueHeadTaskId: string | null | undefined;
+    readonly structuralParallelism: boolean;
+    readonly costTelemetryLoaded?: boolean;
+    readonly stopLossTriggered?: boolean;
+}): BatchTeamAdmissionDecision;
 export declare function resolveTeamRecipeIdForChannel(channel: TeamRecommendationChannel): string;
 export declare function defaultTeamRecommendationReason(channel: TeamRecommendationChannel): string;
 export declare function buildTeamRecommendation(input: {

@@ -4,6 +4,53 @@
   "description": "Schema for ATM adoption repository-local .atm/config.json configuration",
   "type": "OBJECT",
   "properties": {
+    "atomization": {
+      "type": "OBJECT",
+      "properties": {
+        "maxLines": {
+          "type": "INTEGER",
+          "minimum": 1,
+          "default": 600,
+          "description": "Repository atom/map/script line cap. Repositories may lower this default; raising it requires an explicit expiring waiver."
+        },
+        "waiver": {
+          "type": "OBJECT",
+          "required": [
+            "reason",
+            "expiresAt"
+          ],
+          "properties": {
+            "reason": {
+              "type": "STRING",
+              "minLength": 1
+            },
+            "expiresAt": {
+              "type": "STRING",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "maxLines": {
+                "minimum": 601
+              }
+            },
+            "required": [
+              "maxLines"
+            ]
+          },
+          "then": {
+            "required": [
+              "waiver"
+            ]
+          }
+        }
+      ]
+    },
     "plugins": {
       "type": "OBJECT",
       "properties": {

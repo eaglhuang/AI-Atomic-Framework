@@ -374,6 +374,78 @@ export function parseContextMap(raw: unknown): ContextMap | undefined {
   return result;
 }
 
+export const ATOMIZATION_DEFAULT_MAX_LINES = 600;
+
+export interface AtomizationLineLimitWaiver {
+  readonly reason?: unknown;
+  readonly expiresAt?: unknown;
+}
+
+export interface AtomizationLinePolicyConfig {
+  readonly maxLines?: unknown;
+  readonly waiver?: AtomizationLineLimitWaiver | null;
+}
+
+export interface AtomizationLinePolicy {
+  readonly maxLines: number;
+  readonly defaultMaxLines: number;
+  readonly source: 'default' | 'config' | 'override';
+  readonly waiverRequired: boolean;
+  readonly waiverValid: boolean;
+  readonly waiverExpiresAt: string | null;
+}
+
+export function resolveAtomizationLinePolicy(input: {
+  readonly config?: { readonly atomization?: AtomizationLinePolicyConfig } | null;
+  readonly overrideMaxLines?: number | null;
+  readonly now?: Date;
+} = {}): AtomizationLinePolicy {
+  const now = input.now ?? new Date();
+  const overrideMaxLines = input.overrideMaxLines ?? null;
+  if (overrideMaxLines !== null) {
+    assertPositiveInteger(overrideMaxLines, 'overrideMaxLines');
+    return buildAtomizationLinePolicy(overrideMaxLines, 'override', input.config?.atomization?.waiver ?? null, now);
+  }
+  const configured = input.config?.atomization?.maxLines;
+  if (configured === undefined || configured === null) {
+    return buildAtomizationLinePolicy(ATOMIZATION_DEFAULT_MAX_LINES, 'default', input.config?.atomization?.waiver ?? null, now);
+  }
+  const maxLines = typeof configured === 'string' ? Number(configured) : configured;
+  if (!Number.isInteger(maxLines)) {
+    throw new Error('atomization.maxLines must be an integer');
+  }
+  return buildAtomizationLinePolicy(maxLines as number, 'config', input.config?.atomization?.waiver ?? null, now);
+}
+
+function buildAtomizationLinePolicy(
+  maxLines: number,
+  source: AtomizationLinePolicy['source'],
+  waiver: AtomizationLineLimitWaiver | null | undefined,
+  now: Date
+): AtomizationLinePolicy {
+  assertPositiveInteger(maxLines, 'atomization.maxLines');
+  const waiverRequired = maxLines > ATOMIZATION_DEFAULT_MAX_LINES;
+  const waiverExpiresAt = typeof waiver?.expiresAt === 'string' && waiver.expiresAt.trim() ? waiver.expiresAt.trim() : null;
+  const waiverValid = !waiverRequired || Boolean(waiverExpiresAt && Date.parse(waiverExpiresAt) > now.getTime());
+  if (waiverRequired && !waiverValid) {
+    throw new Error(`atomization.maxLines ${maxLines} exceeds default ${ATOMIZATION_DEFAULT_MAX_LINES}; raising the limit requires atomization.waiver.expiresAt in the future`);
+  }
+  return {
+    maxLines,
+    defaultMaxLines: ATOMIZATION_DEFAULT_MAX_LINES,
+    source,
+    waiverRequired,
+    waiverValid,
+    waiverExpiresAt
+  };
+}
+
+function assertPositiveInteger(value: number, label: string): void {
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error(`${label} must be a positive integer`);
+  }
+}
+
 function parseContextFiles(val: unknown): ContextFile[] | undefined {
   if (!Array.isArray(val)) {
     return undefined;
@@ -415,7 +487,7 @@ function parseContextPatterns(val: unknown): ContextPattern[] | undefined {
 
 import type { TaskCardImportDiagnostic } from './result-contracts.ts';
 
-export const EXTRACTION_FIRST_LINE_BUDGET = 600;
+export const EXTRACTION_FIRST_LINE_BUDGET = ATOMIZATION_DEFAULT_MAX_LINES;
 
 /**
  * Extraction-first patrol (TASK-AAO-FABLE-006/007): when a card's scopePaths

@@ -16,6 +16,24 @@ export interface TelemetryPayload {
     readonly commandName: string;
     readonly result: TelemetryResult;
 }
+export interface GovernanceCostTelemetry {
+    readonly schemaId: 'atm.governanceCostTelemetry.v1';
+    readonly runId: string;
+    readonly taskId: string;
+    readonly tokenDiagnostics: {
+        readonly inputTokens: number;
+        readonly outputTokens: number;
+        readonly cacheReadTokens: number;
+        readonly cacheWriteTokens: number;
+    };
+    readonly queue: {
+        readonly queuedMs: number;
+        readonly queuePosition: number;
+    };
+    readonly retries: number;
+    readonly repairs: number;
+    readonly discardedWorkCount: number;
+}
 export type TelemetrySender = (payload: TelemetryPayload, state: TelemetryState) => Promise<void> | void;
 export declare const telemetryAllowedFields: readonly string[];
 export declare function defaultTelemetryState(now?: string): TelemetryState;

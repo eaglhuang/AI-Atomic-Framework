@@ -182,6 +182,36 @@ export const TEAM_ATOM_BOUNDARIES = {
         downstreamTasks: ['TASK-TEAM-0046']
     }
 };
+export function evaluateBatchTeamAdmission(input) {
+    const taskId = String(input.taskId ?? '').trim();
+    const batchId = String(input.batchId ?? '').trim();
+    const isQueueHead = taskId.length > 0 && taskId === String(input.currentQueueHeadTaskId ?? '').trim();
+    const costTelemetryLoaded = input.costTelemetryLoaded === true;
+    const reasonCodes = [];
+    if (!isQueueHead)
+        reasonCodes.push('not-current-queue-head');
+    if (input.structuralParallelism !== true)
+        reasonCodes.push('no-structural-parallelism');
+    if (!costTelemetryLoaded)
+        reasonCodes.push('missing-cost-telemetry');
+    if (input.stopLossTriggered === true)
+        reasonCodes.push('stop-loss-triggered');
+    const allowed = reasonCodes.length === 0;
+    return {
+        schemaId: 'atm.batchTeamAdmissionDecision.v1',
+        taskId,
+        batchId,
+        allowed,
+        mode: allowed ? 'team-current-head' : 'single-agent',
+        reasonCodes,
+        queueHeadOnly: true,
+        structuralParallelismRequired: true,
+        costTelemetryRequired: true,
+        stopLossAction: input.stopLossTriggered === true
+            ? 'single-agent'
+            : (!costTelemetryLoaded ? 'cheaper-qualified-model-mix' : 'none')
+    };
+}
 export function resolveTeamRecipeIdForChannel(channel) {
     if (channel === 'batch') {
         return 'atm.default.batch';

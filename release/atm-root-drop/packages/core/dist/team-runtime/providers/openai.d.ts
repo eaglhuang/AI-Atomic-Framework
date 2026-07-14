@@ -1,6 +1,6 @@
 import { type TeamPermissionPolicy } from '../permission-broker.ts';
 import { type TeamObservabilityEvent } from '../observability.ts';
-import { type TeamProviderContract, type TeamProviderExecutionResult, type TeamProviderHttpExecutor, type TeamProviderId, type TeamProviderSessionRequest } from '../provider-contract.ts';
+import { type TeamProviderContract, type TeamProviderBillableUsage, type TeamProviderExecutionResult, type TeamProviderHttpExecutor, type TeamProviderId, type TeamProviderSessionRequest } from '../provider-contract.ts';
 export type OpenAITeamProviderConfig = {
     readonly schemaId: 'atm.openaiTeamProviderConfig.v1';
     readonly providerId: 'openai';
@@ -44,6 +44,7 @@ export type OpenAIFamilyRunArtifact = {
         readonly retryable: boolean;
         readonly outputTextPreview: string;
     };
+    readonly billableUsage?: TeamProviderBillableUsage;
     readonly observabilityEventCount: number;
     readonly redaction: {
         readonly rawSecretsLogged: false;
