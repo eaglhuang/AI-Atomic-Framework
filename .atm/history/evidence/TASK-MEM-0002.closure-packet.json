@@ -1,0 +1,136 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MEM-0002",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "cbf8a0aafa14c7e7400fc80c8ef9982853686322",
+  "governedTreeSha": "6973b6c433a641c8291425bffbf16f677dd18e70",
+  "targetCommitDelta": {
+    "currentCommitSha": "cbf8a0aafa14c7e7400fc80c8ef9982853686322",
+    "parentCommitShas": [
+      "cbf8a0aafa14c7e7400fc80c8ef9982853686322"
+    ],
+    "governedTreeSha": "6973b6c433a641c8291425bffbf16f677dd18e70",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-task-card-authoring/SKILL.md",
+      ".atm/charter/atomic-charter.md",
+      ".atm/charter/charter-invariants.json",
+      ".atm/history/evidence/TASK-MEM-0002.json",
+      ".atm/history/task-events/TASK-MEM-0002/2026-07-14T10-34-01-728Z-import-0225bed7bea7.json",
+      ".atm/history/task-events/TASK-MEM-0002/2026-07-14T10-36-35-448Z-planning-mirror-reconcile-ec75b97207b4.json",
+      ".atm/history/tasks/TASK-MEM-0002.json",
+      ".claude/skills/atm-dispatch/SKILL.md",
+      ".cursor/rules/skills/atm-dispatch/SKILL.md",
+      ".gemini/commands/atm-dispatch.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/prompts/atm-dispatch.prompt.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/keep.summary.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/reconcile-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-task-card-authoring.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md",
+      "tools_node/memory-manager.js",
+      "tools_node/tests/memory-manager.test.js"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show ddc6e95135a4d6d45a08f4c1e840445ded952bfc",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a958b8cfcff79c89046e6b7b9a239aacb7a0ea0fa71be50cbf65ad90c19ad498",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-14T10:55:27.752Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "docs/keep.summary.md",
+      "tools_node/memory-manager.js",
+      "tools_node/tests/memory-manager.test.js"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MEM-0002.json",
+  "closedAt": "2026-07-14T10:55:27.753Z",
+  "closedByActor": "claude-fable-5",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "ddc6e95135a4d6d45a08f4c1e840445ded952bfc",
+    "deliveryRepoRoot": "C:\\Users\\User\\3KLife",
+    "reconciledAt": "2026-07-14T10:55:25.701Z",
+    "reconciledByActor": "claude-fable-5",
+    "reason": "Historical reconcile sync against commit ddc6e95135a4d6d45a08f4c1e840445ded952bfc"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ddc6e95135a4d6d45a08f4c1e840445ded952bfc",
+    "taskMatchedFiles": [
+      "docs/keep.summary.md",
+      "tools_node/memory-manager.js",
+      "tools_node/tests/memory-manager.test.js"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

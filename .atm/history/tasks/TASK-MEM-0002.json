@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MEM-0002",
+  "title": "memory-manager 工具：契約驗證、索引重建、過期報告",
+  "status": "done",
+  "milestone": "MEM-M1",
+  "dependencies": [
+    "TASK-MEM-0001"
+  ],
+  "acceptance": [
+    "三個子命令對 `docs/keep-memory/` 實際目錄可用。",
+    "最小回歸測試：壞 frontmatter → validate 紅；合法目錄 → validate 綠； rebuild-index 冪等（跑兩次無 diff）；stale-report 對造假日期檔案正確分類。",
+    "rebuild-index 產物通過 encoding 檢查，summary 段落標記外零 diff。"
+  ],
+  "deliverables": [
+    "tools_node/memory-manager.js",
+    "tools_node/tests/memory-manager.test.js"
+  ],
+  "scopePaths": [
+    "tools_node/memory-manager.js",
+    "tools_node/tests/memory-manager.test.js",
+    "docs/keep.summary.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "node tools_node/tests/memory-manager.test.js",
+    "node tools_node/memory-manager.js validate docs/keep-memory"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "3KLife",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "獨立新工具檔；revert 後 keep-memory 目錄仍可手動維護。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "3klife.tools-node",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "3klife.memory-manager",
+        "pattern": "Facade",
+        "source": "tools_node/memory-manager.js",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "tools_node/memory-manager.js",
+        "tools_node/tests/memory-manager.test.js",
+        "docs/keep.summary.md"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-memory-governance/tasks/TASK-MEM-0002-memory-manager-tooling.task.md",
+    "sectionTitle": "TASK-MEM-0002",
+    "headingLine": 49,
+    "hash": "795d7d6aa560c674"
+  },
+  "importedAt": "2026-07-14T10:36:35.430Z",
+  "lastTransitionId": "2026-07-14T10-55-27-759Z-close-644bac597d12",
+  "lastTransitionAt": "2026-07-14T10:55:27.759Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-fable-5",
+  "closedAt": "2026-07-14T10:55:27.757Z",
+  "closedByActor": "claude-fable-5",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit ddc6e95135a4d6d45a08f4c1e840445ded952bfc",
+  "closurePacket": ".atm/history/evidence/TASK-MEM-0002.closure-packet.json"
+}
