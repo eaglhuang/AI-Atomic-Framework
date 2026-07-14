@@ -1,0 +1,281 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0201",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c76526d1b45f3fcda83554bb7671b7154b140b38",
+  "governedTreeSha": "4cc14e7526c8f57ac94a7608d63b231b757d762c",
+  "targetCommitDelta": {
+    "currentCommitSha": "c76526d1b45f3fcda83554bb7671b7154b140b38",
+    "parentCommitShas": [
+      "c76526d1b45f3fcda83554bb7671b7154b140b38"
+    ],
+    "governedTreeSha": "4cc14e7526c8f57ac94a7608d63b231b757d762c",
+    "changedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging.test.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed8d5423fca68aff5b3a100295b51f73d38da27da13499aaafa500cf0d0e77e4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6013deba14b125454060b4a7ec167904023ac59a6c1d09fbb8e2053afe2c17f7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/task-ledger-residue-contract.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b49b98bf907837432974cf5951b5ed22a847a52694f867c7f57de3a3908d384f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/protected-override-audit-direction-lock.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5f93c75042df1242c39c217fe1a1818905f1e6349d2257cc0c86b65f30856dae",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8f60e74f47181030fe5d009df46dc2d45187428a6bdfca0a804401e5528f2de7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:9eef5dba8b529c61eceb1d33ebaf74ec4dcf944cb4315f985c8e21a0c09843f1",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "check:encoding:touched",
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-14T04:14:55.682Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0201.*",
+      ".atm/history/task-events/TASK-AAO-0201/**",
+      ".atm/history/tasks/TASK-AAO-0201.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/**",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0201.json",
+  "closedAt": "2026-07-14T04:14:55.683Z",
+  "closedByActor": "cursor-grok-4.5",
+  "sessionId": "session-20260714041004-cursor-grok-4.5-TASK-AAO-0201-5e3a97ff3e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c76526d1b45f3fcda83554bb7671b7154b140b38",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0201.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0201/2026-07-14T04-09-56-875Z-import-1eb9a9500519.json",
+      ".atm/history/task-events/TASK-AAO-0201/2026-07-14T04-10-08-076Z-claim-5d306cb0d0ec.json",
+      ".atm/history/task-events/TASK-AAO-0201/2026-07-14T04-10-19-338Z-scope-amendment-c0e4747c3e93.json",
+      ".atm/history/tasks/TASK-AAO-0201.json"
+    ],
+    "allowedRunnerOutputFiles": [
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging.test.ts"
+    ],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
