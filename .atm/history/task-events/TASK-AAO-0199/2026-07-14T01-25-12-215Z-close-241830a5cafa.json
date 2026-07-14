@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T01-25-12-215Z-close-241830a5cafa",
+  "taskId": "TASK-AAO-0199",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260714012349-cursor-grok-4.5-TASK-AAO-0199-dcbb42e390",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0199.json",
+  "taskSha256": "sha256:9e3604d31fe287375fdbccf7bf5cd64c03a726a0e78faefe9999118031579084",
+  "createdAt": "2026-07-14T01:25:12.215Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0199 --actor cursor-grok-4.5 --status done --historical-delivery c7e3e81a11188c786dce62e0a95e586af0b61421",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260714012349-cursor-grok-4.5-TASK-AAO-0199-dcbb42e390",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0199.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T01:25:12.209Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0199.*",
+        ".atm/history/task-events/TASK-AAO-0199/**",
+        ".atm/history/tasks/TASK-AAO-0199.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "tests/cli/task-ledger-fixture-isolation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-task-ledger-governance.ts",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "tests/cli/task-ledger-fixture-isolation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
