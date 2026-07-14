@@ -18,6 +18,7 @@ import { extractTaskDeclaredFiles } from './tasks/task-import-validators.js';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.js';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.js';
 import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag } from '../../../core/dist/broker/cross-task-mutation-guard.js';
+import { readResolutionAuthorizedForeignTaskIds } from './broker-conflict-resolution.js';
 import { ATM_INDEX_FOREIGN_ACTIVE_STAGED, buildForeignActiveStagedDiagnostic, inspectGitIndexOwnership } from './git-index-ownership.js';
 import { extractGovernanceTaskIdFromPath, isProtectedStagedGovernanceOwnershipPath, normalizeRelativePath, normalizeTaskClaimIntent, pathMatchesTaskScope, uniqueSorted } from './git-governance/commit-scope-policy.js';
 import { buildTaskScopedCommitFileSet, isFileAllowedInTaskBundle as isTaskBundleAllowedByPolicy } from './git-governance/commit-bundle-filter.js';
@@ -2829,28 +2830,6 @@ function readProtectedOverrideAuditTaskId(cwd, filePath) {
     }
     catch {
         return null;
-    }
-}
-function readResolutionAuthorizedForeignTaskIds(cwd, artifactPath, taskId) {
-    if (!artifactPath?.trim())
-        return new Set();
-    const absolutePath = path.resolve(cwd, artifactPath);
-    if (!existsSync(absolutePath))
-        return new Set();
-    try {
-        const artifact = JSON.parse(readFileSync(absolutePath, 'utf8'));
-        const primaryTaskId = String(artifact.primaryTaskId ?? '').trim().toUpperCase();
-        const currentAllowedTaskId = String(artifact.currentAllowedTaskId ?? '').trim().toUpperCase();
-        const blockedTaskIds = Array.isArray(artifact.blockedTaskIds)
-            ? artifact.blockedTaskIds.map((value) => String(value).trim().toUpperCase()).filter(Boolean)
-            : [];
-        if (artifact.schemaId !== 'atm.brokerConflictResolution.v1' || primaryTaskId !== taskId.toUpperCase() || currentAllowedTaskId !== taskId.toUpperCase()) {
-            return new Set();
-        }
-        return new Set(blockedTaskIds);
-    }
-    catch {
-        return new Set();
     }
 }
 function buildProtectedForeignStagedOwnershipFiles(unexpectedStagedTasks) {

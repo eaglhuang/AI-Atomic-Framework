@@ -133,6 +133,8 @@ export declare function evaluateTeamBrokerLane(input: {
     readonly task: unknown;
     readonly writePaths: readonly string[];
     readonly registryPath?: string;
+    /** When true, never persist broker-registry cleanup during evaluation (team plan --read-only). */
+    readonly readOnly?: boolean;
 }): TeamBrokerLaneResult;
 export declare function buildTeamBrokerEvidence(result: TeamBrokerLaneResult): TeamBrokerLaneEvidence;
 export declare function buildTeamBrokerWriteTransactionEvidence(input: {

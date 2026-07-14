@@ -24,6 +24,7 @@ import { extractTaskDeclaredFiles } from './tasks/task-import-validators.ts';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from './emergency/gate.ts';
 import { buildProtectedOverrideRepairCandidate } from './emergency/protected-override-audit.ts';
 import { clearIncidentFlags, detectCrossTaskMutation, readIncidentFlag, recordIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
+import { readResolutionAuthorizedForeignTaskIds } from './broker-conflict-resolution.ts';
 import {
   ATM_INDEX_FOREIGN_ACTIVE_STAGED,
   buildForeignActiveStagedDiagnostic,
@@ -3167,26 +3168,6 @@ function readProtectedOverrideAuditTaskId(cwd: string, filePath: string): string
     return taskId || null;
   } catch {
     return null;
-  }
-}
-
-function readResolutionAuthorizedForeignTaskIds(cwd: string, artifactPath: string | null, taskId: string): ReadonlySet<string> {
-  if (!artifactPath?.trim()) return new Set();
-  const absolutePath = path.resolve(cwd, artifactPath);
-  if (!existsSync(absolutePath)) return new Set();
-  try {
-    const artifact = JSON.parse(readFileSync(absolutePath, 'utf8')) as Record<string, unknown>;
-    const primaryTaskId = String(artifact.primaryTaskId ?? '').trim().toUpperCase();
-    const currentAllowedTaskId = String(artifact.currentAllowedTaskId ?? '').trim().toUpperCase();
-    const blockedTaskIds = Array.isArray(artifact.blockedTaskIds)
-      ? artifact.blockedTaskIds.map((value) => String(value).trim().toUpperCase()).filter(Boolean)
-      : [];
-    if (artifact.schemaId !== 'atm.brokerConflictResolution.v1' || primaryTaskId !== taskId.toUpperCase() || currentAllowedTaskId !== taskId.toUpperCase()) {
-      return new Set();
-    }
-    return new Set(blockedTaskIds);
-  } catch {
-    return new Set();
   }
 }
 

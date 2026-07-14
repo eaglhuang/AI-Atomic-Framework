@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0196",
+  "title": "Fail-closed team start --execute when zero providers run",
+  "status": "running",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/team/team-execution-lane.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team/team-execution-lane.ts",
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+    "npm run check:encoding:touched",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "release/**",
+    "Changing team plan read-only projection behavior from TASK-AAO-0195",
+    "Editing .atm/history or .atm/runtime by hand"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert execute fail-closed gate if legitimate state-only team starts regress.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-execute-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/team.ts (6250 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0196-team-execute-fail-closed-zero-providers.task.md",
+    "sectionTitle": "TASK-AAO-0196",
+    "headingLine": 43,
+    "hash": "9106e7f605433a9b"
+  },
+  "importedAt": "2026-07-14T01:09:25.210Z",
+  "lastTransitionId": "2026-07-14T01-10-25-673Z-renew-537388ed1380",
+  "lastTransitionAt": "2026-07-14T01:10:25.673Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "cursor-grok-4.5",
+    "leaseId": "lease-c6fd470e3e77",
+    "claimedAt": "2026-07-14T01:09:54.601Z",
+    "heartbeatAt": "2026-07-14T01:10:25.654Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0196.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "packages/cli/src/commands/team/team-execution-lane.ts"
+    ],
+    "state": "active"
+  },
+  "owner": "cursor-grok-4.5",
+  "startedAt": "2026-07-14T01:09:54.601Z",
+  "startedByActor": "cursor-grok-4.5",
+  "startedBySessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0196",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0196.*",
+      ".atm/history/task-events/TASK-AAO-0196/**",
+      ".atm/history/tasks/TASK-AAO-0196.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "packages/cli/src/commands/team/team-execution-lane.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "350e1d3a8065b0376a72371c2ce76f1f8e49be8e760cbccc9bd3174f488ba316",
+    "actorId": "cursor-grok-4.5",
+    "createdAt": "2026-07-14T01:10:00.590Z",
+    "status": "active"
+  }
+}

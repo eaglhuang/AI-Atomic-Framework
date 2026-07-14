@@ -132,6 +132,23 @@ export function deriveBrokerVerdict(input: {
   return input.shouldBlockPerCid ? 'freeze' : 'allow';
 }
 
+/**
+ * When a matching broker conflict resolution artifact authorizes the
+ * conflicting foreign task id, claim admission must not freeze on CID overlap.
+ */
+export function resolveEffectiveShouldBlockPerCid(input: {
+  readonly shouldBlockPerCid: boolean;
+  readonly conflictingTaskId?: string | null;
+  readonly resolutionAuthorizedForeignTaskIds?: ReadonlySet<string>;
+}): boolean {
+  if (!input.shouldBlockPerCid) return false;
+  const authorized = input.resolutionAuthorizedForeignTaskIds;
+  if (!authorized || authorized.size === 0) return true;
+  const conflictId = input.conflictingTaskId?.trim().toUpperCase();
+  if (conflictId && authorized.has(conflictId)) return false;
+  return true;
+}
+
 export function evaluateClaimAdmission(input: ClaimAdmissionInput): ClaimAdmissionDecision {
   const divergent = detectBrokerCidDivergence(input.brokerVerdict, input.cidVerdict);
   const divergence = divergent

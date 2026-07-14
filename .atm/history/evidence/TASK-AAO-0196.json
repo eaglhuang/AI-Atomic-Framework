@@ -1,0 +1,108 @@
+{
+  "taskId": "TASK-AAO-0196",
+  "updatedAt": "2026-07-14T01:12:09.048Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+      "createdAt": "2026-07-14T01:10:39.859Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-execute-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:16a16d5cbe13d00b6626b316a57a971b8b6499839bc607a1d7c33440d28d8a23",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d2436a971b0b949ec30469c325e66e239191a423",
+            "cacheKey": "sha256:44d125bffe2f7411701af6a46656d9fe4147b0baf79b29e21aca8906bddf9cc1",
+            "cached": false,
+            "generatedAt": "2026-07-14T01:10:39.907Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:b234309b7dde0a0530da7d21a178320fbf1faf6345d33950cc9570d9d5ecc8ca",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run check:encoding:touched",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+      "createdAt": "2026-07-14T01:12:09.048Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "check:encoding:touched"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-execute-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run check:encoding:touched",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:be6d4bcf3896a30632a9365488d7eade0ccb33c73a322e8f95c52795953eb751",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "check:encoding:touched"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "d2436a971b0b949ec30469c325e66e239191a423",
+            "cacheKey": "sha256:8a171573ecf20e8ad1511e6f0f976edc92f8744321cf7b7a07e9eafb4ae62192",
+            "cached": false,
+            "generatedAt": "2026-07-14T01:12:09.093Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:bdd89744679ddfb39f367ec29db8e9cde614bb9eb90ea13a5052701e122f33ae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

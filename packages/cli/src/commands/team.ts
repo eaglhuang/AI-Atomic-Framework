@@ -57,7 +57,8 @@ import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtim
 import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
 import {
   resolveTeamProviderSelection,
-  type TeamProviderSelectionConfig
+  type TeamProviderSelectionConfig,
+  type TeamRoleProviderOverride
 } from '../../../core/src/team-runtime/provider-selection.ts';
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/src/broker/proposal.ts';
@@ -209,7 +210,7 @@ type TeamRoleSkillPackManifest = {
       sdkId: string;
       modelId: string;
       runtimeMode: TeamRuntimeMode;
-      source: 'repo-default' | 'role-override' | 'cli-role-override';
+      source: 'repo-default' | 'cli-global-default' | 'role-override' | 'cli-role-override';
     };
     providerCapabilities: Array<{
       providerId: string;
@@ -1041,7 +1042,11 @@ export async function runTeam(argv: string[]) {
     actorId: planningActorId || 'team-planner',
     requestedTeamSize: String(parsed.options.teamSize ?? '').trim(),
     brokerProposalFile: String(parsed.options.brokerProposalFile ?? '').trim(),
-    providerSelectionConfig: loadTeamProviderSelectionConfigFromRepo(cwd, normalizeStringArray(parsed.options.roleProvider)),
+    providerSelectionConfig: loadTeamProviderSelectionConfigFromRepo(
+      cwd,
+      normalizeStringArray(parsed.options.roleProvider),
+      buildCliGlobalProviderDefault(parsed.options)
+    ),
     readOnly: readOnlyPlan
   });
   const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
@@ -1693,16 +1698,24 @@ export function buildTeamRuntimeContract(input: {
   const sdkId = normalizeOptionalRuntimeString(input.sdkId);
   const modelId = normalizeOptionalRuntimeString(input.modelId);
   const roleName = normalizeOptionalRuntimeString(input.roleName) ?? 'coordinator';
+  const explicitRuntimeMode = Boolean(normalizeOptionalRuntimeString(input.runtimeMode));
+  const explicitProviderId = Boolean(normalizeOptionalRuntimeString(input.providerId));
+  const explicitSdkId = Boolean(normalizeOptionalRuntimeString(input.sdkId));
+  const explicitModelId = Boolean(normalizeOptionalRuntimeString(input.modelId));
   const providerSelection = resolveTeamRuntimeProviderSelection({
     roleName,
     selectionConfig: input.selectionConfig,
-    runtimeMode: normalizeOptionalRuntimeString(input.runtimeMode) ? runtimeMode : 'broker-only',
+    runtimeMode: explicitRuntimeMode ? runtimeMode : 'broker-only',
     providerId,
     sdkId,
-    modelId
+    modelId,
+    explicitRuntimeMode,
+    explicitProviderId,
+    explicitSdkId,
+    explicitModelId
   });
   const selectionDecision = providerSelection.selectionDecision;
-  const effectiveRuntimeMode = normalizeOptionalRuntimeString(input.runtimeMode)
+  const effectiveRuntimeMode = explicitRuntimeMode
     ? providerSelection.runtimeMode as TeamRuntimeMode
     : providerSelection.selectionDecision?.runtimeMode ?? runtimeMode;
   const effectiveProviderId = providerSelection.providerId;
@@ -2254,11 +2267,27 @@ function normalizeOptionalRuntimeString(value: unknown): string | null {
   return normalized.length > 0 ? normalized : null;
 }
 
+function buildCliGlobalProviderDefault(options: Record<string, unknown>): Partial<TeamRoleProviderOverride> | null {
+  const providerId = normalizeOptionalRuntimeString(options.provider);
+  const sdkId = normalizeOptionalRuntimeString(options.sdk);
+  const modelId = normalizeOptionalRuntimeString(options.model);
+  const runtimeModeRaw = normalizeOptionalRuntimeString(options.runtimeMode);
+  if (!providerId && !sdkId && !modelId && !runtimeModeRaw) {
+    return null;
+  }
+  return {
+    ...(providerId ? { providerId } : {}),
+    ...(sdkId ? { sdkId } : {}),
+    ...(modelId ? { modelId } : {}),
+    ...(runtimeModeRaw ? { runtimeMode: normalizeTeamRuntimeMode(runtimeModeRaw) } : {})
+  };
+}
+
 function describeRuntimeSelection(input: {
   runtimeMode: TeamRuntimeMode;
   runtimeLanguage: string;
   runtimeAdapterId: string | null;
-  selectionSource?: 'repo-default' | 'role-override' | 'cli-role-override' | null;
+  selectionSource?: 'repo-default' | 'cli-global-default' | 'role-override' | 'cli-role-override' | null;
   roleName?: string | null;
 }): string {
   const adapter = input.runtimeAdapterId ?? 'no adapter override';

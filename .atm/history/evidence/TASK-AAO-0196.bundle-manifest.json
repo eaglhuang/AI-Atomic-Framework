@@ -1,0 +1,40 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-AAO-0196",
+  "updatedAt": "2026-07-14T01:12:09.048Z",
+  "updatedBy": "cursor-grok-4.5",
+  "freshValidationPasses": [
+    "check:encoding:touched",
+    "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:16a16d5cbe13d00b6626b316a57a971b8b6499839bc607a1d7c33440d28d8a23",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts"
+      ],
+      "generatedAt": "2026-07-14T01:10:39.907Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d2436a971b0b949ec30469c325e66e239191a423",
+      "cached": false
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:be6d4bcf3896a30632a9365488d7eade0ccb33c73a322e8f95c52795953eb751",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "check:encoding:touched"
+      ],
+      "generatedAt": "2026-07-14T01:12:09.093Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d2436a971b0b949ec30469c325e66e239191a423",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

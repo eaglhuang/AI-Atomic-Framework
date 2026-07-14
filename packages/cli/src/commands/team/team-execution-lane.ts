@@ -16,7 +16,7 @@ export function resolveTeamStartExecutionLane(input: {
     input.providerExecutionCount === 0
     || input.providerResultOk.some((ok) => !ok)
   );
-  const executed = input.executeRequested && input.providerExecutionCount > 0;
+  const executed = input.executeRequested && input.providerExecutionCount > 0 && !executionBlocked;
   return {
     executeRequested: input.executeRequested,
     providerExecutionCount: input.providerExecutionCount,

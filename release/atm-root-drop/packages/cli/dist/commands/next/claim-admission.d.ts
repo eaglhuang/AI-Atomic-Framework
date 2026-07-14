@@ -93,4 +93,13 @@ export declare function deriveBrokerVerdict(input: {
     readonly queuedPrivateWork: boolean;
     readonly shouldBlockPerCid: boolean;
 }): BrokerArbitrationVerdict;
+/**
+ * When a matching broker conflict resolution artifact authorizes the
+ * conflicting foreign task id, claim admission must not freeze on CID overlap.
+ */
+export declare function resolveEffectiveShouldBlockPerCid(input: {
+    readonly shouldBlockPerCid: boolean;
+    readonly conflictingTaskId?: string | null;
+    readonly resolutionAuthorizedForeignTaskIds?: ReadonlySet<string>;
+}): boolean;
 export declare function evaluateClaimAdmission(input: ClaimAdmissionInput): ClaimAdmissionDecision;

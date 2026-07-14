@@ -6,7 +6,8 @@ import { loadHumanReviewQueueDocument } from '../../../plugin-human-review/dist/
 import { buildFirstUseUserNotice } from './first-use-notice.js';
 import { compareScoredTasks, compareGuidedLegacyQueuePriority, compareIsoDesc, looksLikeTaskArtifact, isLikelyPromptPathHint, pathFieldMatches, looksLikeNamedPlanPrompt, allowsPlanningMirror, statusQueueWeight, countTokenOverlap } from './next/match-and-sort.js';
 import { runDoctor } from './doctor.js';
-import { deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission } from './next/claim-admission.js';
+import { collectResolutionAuthorizedForeignTaskIds } from './broker-conflict-resolution.js';
+import { deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission, resolveEffectiveShouldBlockPerCid } from './next/claim-admission.js';
 import { evaluateBrokerQueueAdmission } from './next/broker-queue-admission.js';
 import { buildClaimAdmissionDecisionLog } from './next/claim-conflict-log.js';
 import { runBroker } from './broker.js';
@@ -844,6 +845,12 @@ async function claimNextImportedTask(input) {
                             insufficientMutationIntent,
                             overlappingAtomIdCount: overlappingAtomIds.length
                         });
+                        const resolutionAuthorizedForeignTaskIds = collectResolutionAuthorizedForeignTaskIds(input.cwd, claimableTask.workItemId);
+                        const effectiveShouldBlockPerCid = resolveEffectiveShouldBlockPerCid({
+                            shouldBlockPerCid,
+                            conflictingTaskId: candidate.taskId,
+                            resolutionAuthorizedForeignTaskIds
+                        });
                         const queueAdmission = evaluateBrokerQueueAdmission({
                             cwd: input.cwd,
                             taskId: claimableTask.workItemId,
@@ -894,7 +901,7 @@ async function claimNextImportedTask(input) {
                         // divergence detector will start firing.
                         const brokerVerdict = deriveBrokerVerdict({
                             queuedPrivateWork: queueAdmission.status === 'queued-private-work',
-                            shouldBlockPerCid
+                            shouldBlockPerCid: effectiveShouldBlockPerCid
                         });
                         const admission = evaluateClaimAdmission({
                             brokerVerdict,

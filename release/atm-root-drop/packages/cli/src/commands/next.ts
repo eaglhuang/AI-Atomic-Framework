@@ -26,10 +26,12 @@ import {
   type NextDecisionTrailEntry
 } from './next/match-and-sort.ts';
 import { runDoctor } from './doctor.ts';
+import { collectResolutionAuthorizedForeignTaskIds } from './broker-conflict-resolution.ts';
 import {
   deriveBrokerVerdict,
   deriveCidVerdict,
-  evaluateClaimAdmission
+  evaluateClaimAdmission,
+  resolveEffectiveShouldBlockPerCid
 } from './next/claim-admission.ts';
 import { evaluateBrokerQueueAdmission, type BrokerQueueAdmission } from './next/broker-queue-admission.ts';
 import { buildClaimAdmissionDecisionLog } from './next/claim-conflict-log.ts';
@@ -1040,6 +1042,15 @@ async function claimNextImportedTask(input: {
               insufficientMutationIntent,
               overlappingAtomIdCount: overlappingAtomIds.length
             });
+            const resolutionAuthorizedForeignTaskIds = collectResolutionAuthorizedForeignTaskIds(
+              input.cwd,
+              claimableTask.workItemId
+            );
+            const effectiveShouldBlockPerCid = resolveEffectiveShouldBlockPerCid({
+              shouldBlockPerCid,
+              conflictingTaskId: candidate.taskId,
+              resolutionAuthorizedForeignTaskIds
+            });
             const queueAdmission = evaluateBrokerQueueAdmission({
               cwd: input.cwd,
               taskId: claimableTask.workItemId,
@@ -1090,7 +1101,7 @@ async function claimNextImportedTask(input: {
             // divergence detector will start firing.
             const brokerVerdict = deriveBrokerVerdict({
               queuedPrivateWork: queueAdmission.status === 'queued-private-work',
-              shouldBlockPerCid
+              shouldBlockPerCid: effectiveShouldBlockPerCid
             });
             const admission = evaluateClaimAdmission({
               brokerVerdict,

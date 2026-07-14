@@ -222,8 +222,7 @@ export async function assertTasksRosterUpdateContract() {
 }
 
 export async function assertTasksNewRejectsRootOutput(tempRoot: string) {
-  const repo = makeHostRepo(tempRoot, 'tasks-new-root-output');
-  initGitRepo(repo);
+  const { repo: repo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'tasks-new-root-output');
 
   await expectTaskError([
     'new',
@@ -258,11 +257,13 @@ export function assertTaskflowHostOpenerFallbackContract() {
 }
 
 export function initGitRepo(repo: string) {
+  clearBrokerRuntimeState(repo);
   execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'validator@example.invalid'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'ATM Validator'], { cwd: repo, stdio: 'ignore' });
   try {
     execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, stdio: 'ignore' });
+    clearBrokerRuntimeState(repo);
     return;
   } catch {
     // An unborn fixture repository still needs its first commit below.
@@ -275,6 +276,7 @@ export function initGitRepo(repo: string) {
   writeFileSync(seedPath, 'ATM validator fixture root\n', 'utf8');
   execFileSync('git', ['add', '.'], { cwd: repo, stdio: 'ignore' });
   execFileSync('git', ['commit', '-m', 'seed ATM validator fixture'], { cwd: repo, stdio: 'ignore' });
+  clearBrokerRuntimeState(repo);
 }
 
 export function clearBrokerRuntimeState(repo: string) {
@@ -293,9 +295,17 @@ export function prepareIsolatedTaskLedgerFixtureRepo(parent: string, name: strin
   const repo = makeHostRepo(parent, name, config);
   clearBrokerRuntimeState(repo);
   initGitRepo(repo);
-  clearBrokerRuntimeState(repo);
   const head = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
   assert(/^[0-9a-f]{40}$/i.test(head), `${name} fixture must have a resolvable seed HEAD`);
+  return { repo, head };
+}
+
+export function prepareIsolatedFrameworkFixtureRepo(parent: string, name?: string) {
+  const repo = makeFrameworkRepo(parent, name);
+  clearBrokerRuntimeState(repo);
+  initGitRepo(repo);
+  const head = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: repo, encoding: 'utf8' }).trim();
+  assert(/^[0-9a-f]{40}$/i.test(head), `${name ?? 'framework'} fixture must have a resolvable seed HEAD`);
   return { repo, head };
 }
 
@@ -426,8 +436,7 @@ try {
   await assertTasksNewRejectsRootOutput(tempRoot);
   await assertTasksRosterUpdateContract();
 
-  const hostRepo = makeHostRepo(tempRoot, 'ordinary-adopter');
-  initGitRepo(hostRepo);
+  const { repo: hostRepo } = prepareIsolatedTaskLedgerFixtureRepo(tempRoot, 'ordinary-adopter');
   const hostStatus = createFrameworkModeStatus({ cwd: hostRepo, files: ['src/index.ts'] });
   assert(hostStatus.taskLedgerMode === 'adopter-governed', 'ordinary adopter repo must use adopter-governed task ledger mode');
 
@@ -849,8 +858,7 @@ try {
   const lockScopedClose = await runTasks(['close', '--cwd', deliverableRepo, '--task', lockScopedFixtureTaskId, '--actor', 'validator', '--status', 'done']);
   assert(lockScopedClose.ok === true, 'deliverable gate must accept absolute claim/taskDirectionLock allowed files when planning scopePaths are read-only');
 
-  const frameworkBatchRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(frameworkBatchRepo);
+  const { repo: frameworkBatchRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'framework-batch-dogfood');
   const frameworkBatchTaskId = 'TEST-TASK-BATCH-0052';
   const frameworkBatchTask = await runTasks(['create', '--cwd', frameworkBatchRepo, '--task', frameworkBatchTaskId, '--actor', 'validator', '--title', 'Framework batch delivery runner']);
   assert(frameworkBatchTask.ok === true, 'framework batch dogfood task create must succeed');
@@ -893,8 +901,7 @@ try {
   // framework critical files outside the task scope must be isolated as advisory
   // and must not raise ATM_TASK_CLOSE_FRAMEWORK_DIFF_ACTIVE. The task's own scoped
   // deliverable diff still has to be governed (here via --historical-delivery).
-  const isolationRepo = makeFrameworkRepo(tempRoot, 'ai-atomic-framework-isolation');
-  initGitRepo(isolationRepo);
+  const { repo: isolationRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'ai-atomic-framework-isolation');
   const isolationTaskId = 'TEST-TASK-ISOLATION-0057';
   const isolationTaskCreate = await runTasks(['create', '--cwd', isolationRepo, '--task', isolationTaskId, '--actor', 'validator', '--title', 'Scoped diff isolation fixture']);
   assert(isolationTaskCreate.ok === true, 'isolation fixture task create must succeed');
@@ -953,8 +960,7 @@ try {
 
   // Regression: TASK-MRP-0028 closure packets describe the delivery parent commit,
   // so tracked dirty framework files must fail before close can write a packet.
-  const dirtyCloseRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(dirtyCloseRepo);
+  const { repo: dirtyCloseRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'dirty-framework-close');
   const dirtyCloseTaskId = 'TEST-TASK-MRP-0028-DIRTY-CLOSE';
   const dirtyCloseTaskCreate = await runTasks(['create', '--cwd', dirtyCloseRepo, '--task', dirtyCloseTaskId, '--actor', 'validator', '--title', 'Dirty framework close fixture']);
   assert(dirtyCloseTaskCreate.ok === true, 'dirty-close fixture task create must succeed');
@@ -1009,8 +1015,7 @@ try {
     }
   }
 
-  const historicalEvidenceRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(historicalEvidenceRepo);
+  const { repo: historicalEvidenceRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'historical-evidence');
   const historicalEvidenceTaskId = 'TASK-HIST-EVIDENCE-0001';
   const historicalEvidenceCreate = await runTasks(['create', '--cwd', historicalEvidenceRepo, '--task', historicalEvidenceTaskId, '--actor', 'validator', '--title', 'Historical evidence close fixture']);
   assert(historicalEvidenceCreate.ok === true, 'historical evidence fixture task create must succeed');
@@ -1087,8 +1092,7 @@ try {
   assert(historicalEvidenceClosedTask.status === 'done', 'historical evidence fixture task must transition to done');
   assert(typeof historicalEvidenceClosedTask.lastTransitionId === 'string' && historicalEvidenceClosedTask.lastTransitionId.includes('-close-'), 'historical evidence fixture must write a close transition');
 
-  const repairRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(repairRepo);
+  const { repo: repairRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'repair-closure');
   const repairTaskId = 'TASK-REPAIR-CLOSURE-0001';
   const repairTaskPath = path.join(repairRepo, '.atm', 'history', 'tasks', `${repairTaskId}.json`);
   writeJson(repairTaskPath, {
@@ -1465,8 +1469,7 @@ try {
   rmSync(staleLockPath, { force: true });
 
   // Regression: TASK-AAO-0055 historical done task reconcile / reopen closure sync
-  const reconcileRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(reconcileRepo);
+  const { repo: reconcileRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'reconcile-status');
   const reconcileTaskId = 'TASK-RECONCILE-0001';
 
   const planPath = path.join(reconcileRepo, 'docs', 'plan', 'tasks', `${reconcileTaskId}.task.md`);
@@ -1991,8 +1994,7 @@ export async function validateTaskLedgerReadersAtomization(tempRoot: string) {
 }
 
 export async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) {
-  const boundaryRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(boundaryRepo);
+  const { repo: boundaryRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'boundary-guard');
 
   // 1. 測試 `planning-only` done 任務：
   // 它的 closure_authority === 'planning_repo' 且 target_repo 指向外部 '3KLife'，沒有 closure packet。
@@ -2078,8 +2080,7 @@ export async function validatePlanningOnlyLedgerAuditBoundary(tempRoot: string) 
 }
 
 export async function validateClosurePacketDirtyTreeHygieneGuard(tempRoot: string) {
-  const hygieneRepo = makeFrameworkRepo(tempRoot);
-  initGitRepo(hygieneRepo);
+  const { repo: hygieneRepo } = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'hygiene-audit');
 
   const taskId = 'TASK-HYGIENE-0001';
   const taskPath = path.join(hygieneRepo, '.atm', 'history', 'tasks', `${taskId}.json`);

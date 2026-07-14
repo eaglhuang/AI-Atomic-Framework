@@ -358,14 +358,33 @@ export async function runTeam(argv) {
             requestedTeamRunId: String(parsed.options.team ?? '').trim()
         });
     }
+    const readOnlyPlan = route.kind === 'planning' && route.action === 'plan' && Boolean(parsed.options.readOnly);
+    if (Boolean(parsed.options.readOnly) && !(route.kind === 'planning' && route.action === 'plan')) {
+        throw new CliError('ATM_TEAM_READ_ONLY_PLAN_ONLY', 'team --read-only is only valid with team plan (projection mode). team start remains fail-closed and mutable.', {
+            exitCode: 2,
+            details: { action: route.kind === 'planning' ? route.action : action, requiredCommand: `node atm.mjs team plan --task ${taskId} --read-only --json` }
+        });
+    }
+    const explicitActorId = String(parsed.options.actor ?? '').trim();
+    const envActorId = String(process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? '').trim();
+    const isStart = route.kind === 'planning' && route.action === 'start';
+    const planningActorId = isStart
+        ? (explicitActorId || envActorId)
+        : resolveTeamPlanActorId({
+            cwd,
+            taskId,
+            explicitActorId,
+            fallbackActorId: envActorId || (route.kind === 'planning' && route.action === 'plan' ? 'team-planner' : '')
+        });
     const context = await buildTeamPlanningContext({
         cwd,
         taskId,
         requestedRecipeId: String(parsed.options.recipe ?? '').trim(),
-        actorId: String(parsed.options.actor ?? process.env.ATM_ACTOR_ID ?? process.env.AGENT_IDENTITY ?? 'team-planner').trim(),
+        actorId: planningActorId || 'team-planner',
         requestedTeamSize: String(parsed.options.teamSize ?? '').trim(),
         brokerProposalFile: String(parsed.options.brokerProposalFile ?? '').trim(),
-        providerSelectionConfig: loadTeamProviderSelectionConfigFromRepo(cwd, normalizeStringArray(parsed.options.roleProvider))
+        providerSelectionConfig: loadTeamProviderSelectionConfigFromRepo(cwd, normalizeStringArray(parsed.options.roleProvider), buildCliGlobalProviderDefault(parsed.options)),
+        readOnly: readOnlyPlan
     });
     const { task, recipes, recipe, validation, permissionValidation, teamPlan } = context;
     const ok = validation.findings.every((finding) => finding.level !== 'error');
@@ -556,18 +575,24 @@ export async function runTeam(argv) {
         cwd,
         messages: [
             message(ok ? 'info' : 'error', ok ? 'ATM_TEAM_PLAN_READY' : 'ATM_TEAM_PLAN_INVALID', ok
-                ? 'Team plan dry-run completed. No runtime state was written and no agents were spawned.'
+                ? (readOnlyPlan
+                    ? 'Team plan read-only projection completed. Broker registry cleanup was not persisted and no agents were spawned.'
+                    : 'Team plan dry-run completed. No runtime state was written and no agents were spawned.')
                 : 'Team plan found permission conflicts. No runtime state was written and no agents were spawned.', {
                 taskId,
                 recipeId: recipe.recipeId,
-                findingCount: validation.findings.length
+                findingCount: validation.findings.length,
+                readOnly: readOnlyPlan,
+                actorId: planningActorId
             })
         ],
         evidence: {
             action: 'plan',
             dryRun: true,
+            readOnly: readOnlyPlan,
             runtimeWritten: false,
             agentsSpawned: false,
+            actorId: planningActorId,
             task: summarizeTask(taskId, task),
             recipe,
             recipeSources: recipes.sources,
@@ -961,16 +986,24 @@ export function buildTeamRuntimeContract(input) {
     const sdkId = normalizeOptionalRuntimeString(input.sdkId);
     const modelId = normalizeOptionalRuntimeString(input.modelId);
     const roleName = normalizeOptionalRuntimeString(input.roleName) ?? 'coordinator';
+    const explicitRuntimeMode = Boolean(normalizeOptionalRuntimeString(input.runtimeMode));
+    const explicitProviderId = Boolean(normalizeOptionalRuntimeString(input.providerId));
+    const explicitSdkId = Boolean(normalizeOptionalRuntimeString(input.sdkId));
+    const explicitModelId = Boolean(normalizeOptionalRuntimeString(input.modelId));
     const providerSelection = resolveTeamRuntimeProviderSelection({
         roleName,
         selectionConfig: input.selectionConfig,
-        runtimeMode: normalizeOptionalRuntimeString(input.runtimeMode) ? runtimeMode : 'broker-only',
+        runtimeMode: explicitRuntimeMode ? runtimeMode : 'broker-only',
         providerId,
         sdkId,
-        modelId
+        modelId,
+        explicitRuntimeMode,
+        explicitProviderId,
+        explicitSdkId,
+        explicitModelId
     });
     const selectionDecision = providerSelection.selectionDecision;
-    const effectiveRuntimeMode = normalizeOptionalRuntimeString(input.runtimeMode)
+    const effectiveRuntimeMode = explicitRuntimeMode
         ? providerSelection.runtimeMode
         : providerSelection.selectionDecision?.runtimeMode ?? runtimeMode;
     const effectiveProviderId = providerSelection.providerId;
@@ -1452,6 +1485,21 @@ function normalizeOptionalRuntimeString(value) {
     const normalized = String(value ?? '').trim();
     return normalized.length > 0 ? normalized : null;
 }
+function buildCliGlobalProviderDefault(options) {
+    const providerId = normalizeOptionalRuntimeString(options.provider);
+    const sdkId = normalizeOptionalRuntimeString(options.sdk);
+    const modelId = normalizeOptionalRuntimeString(options.model);
+    const runtimeModeRaw = normalizeOptionalRuntimeString(options.runtimeMode);
+    if (!providerId && !sdkId && !modelId && !runtimeModeRaw) {
+        return null;
+    }
+    return {
+        ...(providerId ? { providerId } : {}),
+        ...(sdkId ? { sdkId } : {}),
+        ...(modelId ? { modelId } : {}),
+        ...(runtimeModeRaw ? { runtimeMode: normalizeTeamRuntimeMode(runtimeModeRaw) } : {})
+    };
+}
 function describeRuntimeSelection(input) {
     const adapter = input.runtimeAdapterId ?? 'no adapter override';
     const selectionSource = input.selectionSource
@@ -1552,7 +1600,8 @@ async function buildTeamPlanningContext(input) {
         taskId: input.taskId,
         actorId: input.actorId,
         task,
-        writePaths
+        writePaths,
+        readOnly: input.readOnly === true
     });
     const brokerLane = brokerLanePlan.evidence;
     const gitIndexOwnership = inspectGitIndexOwnership({
@@ -1725,8 +1774,51 @@ export function validateTeamPermissionModel(recipe, writePaths, options = {}) {
     const agentRoles = new Map(recipe.agents.map((agent) => [agent.agentId, agent.role]));
     return mergeValidation(validateTeamRecipe(recipe, agentRoles), validatePermissionLeases(buildSuggestedPermissionLeases(recipe, writePaths, options), agentRoles, options));
 }
+export function resolveTeamPlanActorId(input) {
+    const explicit = String(input.explicitActorId ?? '').trim();
+    if (explicit) {
+        return explicit;
+    }
+    const claimActor = readActiveTaskClaimActorId(input.cwd, input.taskId);
+    if (claimActor) {
+        return claimActor;
+    }
+    return String(input.fallbackActorId ?? '').trim() || 'team-planner';
+}
+export function readActiveTaskClaimActorId(cwd, taskId) {
+    try {
+        const task = readTask(cwd, taskId);
+        const claim = task.claim && typeof task.claim === 'object' ? task.claim : null;
+        if (!claim || String(claim.state ?? '').trim() !== 'active') {
+            return null;
+        }
+        const actorId = String(claim.actorId ?? '').trim();
+        if (!actorId) {
+            return null;
+        }
+        const heartbeatAt = String(claim.heartbeatAt ?? claim.claimedAt ?? '').trim();
+        const ttlSeconds = Number(claim.ttlSeconds ?? 0);
+        if (heartbeatAt && Number.isFinite(ttlSeconds) && ttlSeconds > 0) {
+            const heartbeatMs = Date.parse(heartbeatAt);
+            if (Number.isFinite(heartbeatMs) && Date.now() - heartbeatMs > ttlSeconds * 1000) {
+                return null;
+            }
+        }
+        return actorId;
+    }
+    catch {
+        return null;
+    }
+}
 export function planTeamBrokerLane(input) {
-    const brokerLaneResult = evaluateTeamBrokerLane(input);
+    const brokerLaneResult = evaluateTeamBrokerLane({
+        cwd: input.cwd,
+        taskId: input.taskId,
+        actorId: input.actorId,
+        task: input.task,
+        writePaths: input.writePaths,
+        readOnly: input.readOnly === true
+    });
     const findings = brokerLaneToFindings(brokerLaneResult).map((finding) => buildPermissionFinding({
         level: finding.level,
         code: finding.code,
@@ -1738,7 +1830,11 @@ export function planTeamBrokerLane(input) {
         evidence: buildTeamBrokerEvidence(brokerLaneResult),
         findings: [
             ...findings,
-            ...buildProposalFirstParityFindings({ taskId: input.taskId, brokerLaneResult })
+            ...buildProposalFirstParityFindings({
+                taskId: input.taskId,
+                brokerLaneResult,
+                advisoryOnly: input.readOnly === true
+            })
         ]
     };
 }
@@ -1756,9 +1852,11 @@ export function buildProposalFirstParityFindings(input) {
     }
     const hotFiles = Array.isArray(admission.hotFiles) ? admission.hotFiles.map((entry) => String(entry)) : [];
     return [buildPermissionFinding({
-            level: 'error',
+            level: input.advisoryOnly ? 'warning' : 'error',
             code: 'proposal-first-required',
-            detail: `Hot shared surface requires a validated bounded proposal (schema atm.patchProposal.v1) before this team may plan or start. Author the proposal, then rerun: node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json (readiness preview) and node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json (fail-closed execution). To pre-activate through the Broker instead: node atm.mjs broker runtime activate --proposal-file <proposal.json> --json.`,
+            detail: input.advisoryOnly
+                ? `Read-only team plan projection: hot shared surface would require a validated bounded proposal (schema atm.patchProposal.v1) before team start. Author the proposal, then rerun: node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json and node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json. This read-only projection did not persist broker registry state.`
+                : `Hot shared surface requires a validated bounded proposal (schema atm.patchProposal.v1) before this team may plan or start. Author the proposal, then rerun: node atm.mjs team plan --task ${input.taskId} --broker-proposal-file <proposal.json> --json (readiness preview) and node atm.mjs team start --task ${input.taskId} --broker-proposal-file <proposal.json> --json (fail-closed execution). To pre-activate through the Broker instead: node atm.mjs broker runtime activate --proposal-file <proposal.json> --json.`,
             paths: hotFiles
         })];
 }

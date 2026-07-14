@@ -3,24 +3,27 @@ export function resolveTeamProviderSelection(role, config) {
     if (override) {
         return {
             role,
-            source: 'role-override',
+            source: config.cliRoleOverrideRoles?.has(role) ? 'cli-role-override' : 'role-override',
             ...override
         };
     }
     return {
         role,
-        source: 'repo-default',
+        source: config.defaultSource ?? 'repo-default',
         ...config.repoDefault
     };
 }
 export function mergeTeamProviderSelectionConfig(input) {
-    const repoDefault = normalizeOverride(input.repoConfig?.repoDefault) ?? {
+    const baseRepoDefault = normalizeOverride(input.repoConfig?.repoDefault) ?? {
         providerId: 'openai',
         sdkId: 'responses',
         modelId: 'gpt-5-mini',
         runtimeMode: 'broker-only'
     };
+    const cliGlobal = normalizePartialOverride(input.cliGlobalDefault);
+    const repoDefault = cliGlobal ? mergeProviderOverrides(baseRepoDefault, cliGlobal) : baseRepoDefault;
     const roleOverrides = {};
+    const cliRoleOverrideRoles = new Set();
     for (const [role, override] of Object.entries(input.repoConfig?.roleOverrides ?? {})) {
         const normalized = normalizeOverride(override);
         if (normalized)
@@ -28,12 +31,16 @@ export function mergeTeamProviderSelectionConfig(input) {
     }
     for (const rawOverride of input.cliRoleOverrides ?? []) {
         const parsed = parseRoleProviderOverride(rawOverride);
-        if (parsed)
+        if (parsed) {
             roleOverrides[parsed.role] = parsed.override;
+            cliRoleOverrideRoles.add(parsed.role);
+        }
     }
     return {
         repoDefault,
-        roleOverrides
+        roleOverrides,
+        defaultSource: cliGlobal ? 'cli-global-default' : 'repo-default',
+        cliRoleOverrideRoles
     };
 }
 export function parseRoleProviderOverride(value) {
@@ -62,6 +69,33 @@ export function parseRoleProviderOverride(value) {
 }
 function isRuntimeMode(value) {
     return value === 'real-agent' || value === 'editor-subagent' || value === 'broker-only';
+}
+function normalizePartialOverride(value) {
+    if (!value || typeof value !== 'object')
+        return null;
+    const record = value;
+    const providerId = String(record.providerId ?? '').trim();
+    const sdkId = String(record.sdkId ?? '').trim();
+    const modelId = String(record.modelId ?? '').trim();
+    const runtimeMode = String(record.runtimeMode ?? '').trim();
+    const partial = {};
+    if (providerId)
+        partial.providerId = providerId;
+    if (sdkId)
+        partial.sdkId = sdkId;
+    if (modelId)
+        partial.modelId = modelId;
+    if (runtimeMode && isRuntimeMode(runtimeMode))
+        partial.runtimeMode = runtimeMode;
+    return Object.keys(partial).length > 0 ? partial : null;
+}
+function mergeProviderOverrides(base, overlay) {
+    return {
+        providerId: overlay.providerId ?? base.providerId,
+        sdkId: overlay.sdkId ?? base.sdkId,
+        modelId: overlay.modelId ?? base.modelId,
+        runtimeMode: overlay.runtimeMode ?? base.runtimeMode
+    };
 }
 function normalizeOverride(value) {
     if (!value || typeof value !== 'object')

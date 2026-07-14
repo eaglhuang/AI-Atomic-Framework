@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   clearBrokerRuntimeState,
+  prepareIsolatedFrameworkFixtureRepo,
   prepareIsolatedTaskLedgerFixtureRepo
 } from '../../scripts/validators/task-ledger/suite-impl.ts';
 
@@ -36,5 +37,10 @@ assert.equal(existsSync(path.join(brokerRuntimeDir, 'write-broker.registry.json'
 assert.equal(existsSync(path.join(brokerRuntimeDir, 'broker-shared-surface-queues.json')), false, 'fixture cleanup must remove inherited shared queue state');
 assert.equal(existsSync(path.join(brokerRuntimeDir, 'broker-shared-surface-freezes.json')), false, 'fixture cleanup must remove inherited shared freeze state');
 assert.equal(existsSync(path.join(brokerRuntimeDir, 'broker-intents')), false, 'fixture cleanup must remove inherited broker intent directory');
+
+const frameworkFixture = prepareIsolatedFrameworkFixtureRepo(tempRoot, 'framework-fixture-isolation');
+const frameworkCommitCount = Number(execFileSync('git', ['rev-list', '--count', 'HEAD'], { cwd: frameworkFixture.repo, encoding: 'utf8' }).trim());
+assert.equal(frameworkCommitCount, 1, 'framework fixture repo must also start with exactly one seed commit');
+assert.ok(existsSync(path.join(frameworkFixture.repo, '.atm', 'validator-fixture-root.txt')), 'framework seed commit must include the validator root marker');
 
 console.log('task-ledger fixture isolation contract ok');

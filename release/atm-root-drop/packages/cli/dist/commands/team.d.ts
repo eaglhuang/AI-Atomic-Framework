@@ -125,7 +125,7 @@ type TeamRoleSkillPackManifest = {
             sdkId: string;
             modelId: string;
             runtimeMode: TeamRuntimeMode;
-            source: 'repo-default' | 'role-override' | 'cli-role-override';
+            source: 'repo-default' | 'cli-global-default' | 'role-override' | 'cli-role-override';
         };
         providerCapabilities: Array<{
             providerId: string;
@@ -735,12 +735,20 @@ export declare function validateTeamPermissionModel(recipe: TeamRecipe, writePat
     ok: boolean;
     findings: PermissionFinding[];
 };
+export declare function resolveTeamPlanActorId(input: {
+    cwd: string;
+    taskId: string;
+    explicitActorId?: string;
+    fallbackActorId?: string;
+}): string;
+export declare function readActiveTaskClaimActorId(cwd: string, taskId: string): string | null;
 export declare function planTeamBrokerLane(input: {
     cwd: string;
     taskId: string;
     actorId: string;
     task: Record<string, unknown> | null | undefined;
     writePaths: string[];
+    readOnly?: boolean;
 }): {
     result: import("@ai-atomic-framework/core").TeamBrokerLaneResult;
     evidence: TeamBrokerLaneEvidence;
@@ -756,6 +764,7 @@ export declare function planTeamBrokerLane(input: {
 export declare function buildProposalFirstParityFindings(input: {
     taskId: string;
     brokerLaneResult: ReturnType<typeof evaluateTeamBrokerLane>;
+    advisoryOnly?: boolean;
 }): PermissionFinding[];
 export declare function buildTeamPlan(input: {
     task: Record<string, unknown> | null | undefined;
