@@ -142,10 +142,13 @@ ATM flow:
 - Frozen prefer + source delivery: `ATM_RUNNER_STALE_WRITE_REFUSED` vs `ATM_SOURCE_FIRST_WRITE_REFUSED` is a deadlock; rebuild with `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` before import/close writes when Frozen lags source.
 - After any foreign `build(release): sync`, **re-diff your deliverables immediately**; uncommitted source can vanish (ATM-BUG-184).
 - Cross-file consistency will block a scoped commit when `team.ts` imports symbols changed in unstaged siblings — `tasks scope add` the coupled files **before** `git commit --auto-stage`, or expect `ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY`.
-- One shared delivery SHA for related bugs is fine: close siblings with `--historical-delivery <sha> --waiver-out-of-scope-delivery --reason "..."`; without the waiver, `MIXED_DELIVERY_COMMIT` / `OUT_OF_SCOPE_WAIVER_REQUIRED` blocks.
+- One shared delivery SHA for related bugs is fine: close siblings with `--historical-delivery <sha> --waiver-out-of-scope-delivery --reason "..."`; without the waiver, `MIXED_DELIVERY_COMMIT` / `OUT_OF_SCOPE_WAIVER_REQUIRED` blocks. TASK-AAO-0201 / ATM-BUG-186 now promotes the waiver recipe as the primary shared-delivery blocker (not "missing delivery").
+- After closing a batch under a temporary `framework-mode claim`, **release** that temp lock before the next sibling `taskflow close --write`, or framework-development gates fail with stale-lock / `ATM_TASK_CLOSE_FRAMEWORK_GATE_FAILED`.
+- Card generator scripts under `.atm/runtime/*.js` race with `package.json` `"type":"module"` — use `.cjs` (or write cards with the Write tool) so planning-card generation does not silently fail.
 
 Team Agents efficiency:
 
 - Parallel subagents helped **re-apply wiped fixes** (159/097/102) in one turn; they did **not** accelerate 0195 while CID-frozen against RFT-0020.
 - Live `team plan` as validator preflight is slow and flaky under foreign broker intents; keep body-shape asserts independent of plan admission.
 - 2026-07-14 five-bug batch (095/105/094/149/160): two parallel implement sidecars finished source+tests while Captain rebuilt Frozen; wall-clock win was real for coding, but **closeout stayed serial** (evidence + taskflow). Parallel Agents do not shorten governed close.
+- 2026-07-14 second batch (186/185/150/117/182): same pattern — two implement sidecars + one fix-up sidecar for an unrelated `blockedResidue` OR-bug exposed by the staging suite; Captain still owns serial close.
