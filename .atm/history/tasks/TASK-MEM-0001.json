@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-MEM-0001",
+  "title": "keep-memory 記憶筆記契約與目錄落地（含首批種子記憶）",
+  "status": "done",
+  "milestone": "MEM-M0",
+  "dependencies": [],
+  "acceptance": [
+    "`docs/keep-memory/README.md` 契約完整，含至少一個合法範例 frontmatter。",
+    "首批 3-5 則種子記憶落地（從 Claude Code 私有記憶遷移可共享的 ATM 操作教訓， 如 close/claim 陷阱、雙隊長並行陷阱、skill 模板同步教訓），每則過契約。",
+    "`docs/keep.summary.md` 新增「keep-memory 索引」段落（一行一則），總行數仍在 P0 Context Budget 紀律內。",
+    "中文內容全部通過 encoding 檢查。"
+  ],
+  "deliverables": [
+    "docs/keep-memory/README.md",
+    "docs/keep.summary.md"
+  ],
+  "scopePaths": [
+    "docs/keep-memory/README.md",
+    "docs/keep-memory/",
+    "docs/keep.summary.md"
+  ],
+  "validators": [
+    "git diff --check",
+    "node tools_node/check-encoding-integrity.js --staged"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "3KLife",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "純新增目錄與 summary 一個段落；revert 即回到現狀，keep-shards 不受影響。",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "3klife.docs-keep",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-memory-governance/tasks/TASK-MEM-0001-keep-memory-contract-and-directory.task.md",
+    "sectionTitle": "TASK-MEM-0001",
+    "headingLine": 41,
+    "hash": "2429fc5b76286e6e"
+  },
+  "importedAt": "2026-07-14T10:36:34.135Z",
+  "lastTransitionId": "2026-07-14T10-56-33-600Z-close-debbbe7e1277",
+  "lastTransitionAt": "2026-07-14T10:56:33.600Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "claude-fable-5",
+  "closedAt": "2026-07-14T10:56:33.597Z",
+  "closedByActor": "claude-fable-5",
+  "closedBySessionId": null,
+  "closeReason": "Historical reconcile sync against commit bea3e88510053e4c8658bdcaf20389ffa1467c5d",
+  "closurePacket": ".atm/history/evidence/TASK-MEM-0001.closure-packet.json"
+}

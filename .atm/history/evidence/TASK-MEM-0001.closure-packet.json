@@ -1,0 +1,146 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-MEM-0001",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "cbf8a0aafa14c7e7400fc80c8ef9982853686322",
+  "governedTreeSha": "423f5b7f2f3fb40ca4d0a5b9aaa8faa109e63a15",
+  "targetCommitDelta": {
+    "currentCommitSha": "cbf8a0aafa14c7e7400fc80c8ef9982853686322",
+    "parentCommitShas": [
+      "cbf8a0aafa14c7e7400fc80c8ef9982853686322"
+    ],
+    "governedTreeSha": "423f5b7f2f3fb40ca4d0a5b9aaa8faa109e63a15",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".agents/skills/atm-task-card-authoring/SKILL.md",
+      ".atm/charter/atomic-charter.md",
+      ".atm/charter/charter-invariants.json",
+      ".atm/history/evidence/TASK-MEM-0001.json",
+      ".atm/history/evidence/TASK-MEM-0002.closure-packet.json",
+      ".atm/history/evidence/TASK-MEM-0002.json",
+      ".atm/history/task-events/TASK-MEM-0001/2026-07-14T10-34-00-551Z-import-d0c44f8f1919.json",
+      ".atm/history/task-events/TASK-MEM-0001/2026-07-14T10-36-34-147Z-planning-mirror-reconcile-9f6651506731.json",
+      ".atm/history/task-events/TASK-MEM-0002/2026-07-14T10-55-27-759Z-close-644bac597d12.json",
+      ".atm/history/tasks/TASK-MEM-0001.json",
+      ".atm/history/tasks/TASK-MEM-0002.json",
+      ".claude/skills/atm-dispatch/SKILL.md",
+      ".cursor/rules/skills/atm-dispatch/SKILL.md",
+      ".gemini/commands/atm-dispatch.toml",
+      ".github/instructions/atm-dispatch.instructions.md",
+      ".github/prompts/atm-dispatch.prompt.md",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "docs/keep-memory/gotcha_atm-claim-session-traps.md",
+      "docs/keep-memory/gotcha_atm-close-sequence.md",
+      "docs/keep-memory/gotcha_atm-skill-template-sync.md",
+      "docs/keep-memory/gotcha_atm-two-captain-concurrency.md",
+      "docs/keep-memory/README.md",
+      "docs/keep.summary.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/integrations/codex-skills/atm-dispatch/SKILL.md",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/reconcile-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/task-option-parsers.js",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/reconcile-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "release/atm-root-drop/templates/skills/atm-dispatch.skill.md",
+      "release/atm-root-drop/templates/skills/atm-task-card-authoring.skill.md",
+      "templates/skills/atm-dispatch.skill.md",
+      "templates/skills/atm-task-card-authoring.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "git show bea3e88510053e4c8658bdcaf20389ffa1467c5d",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fb91f0967082635c57ba65eb47aebd59d00d334a287eede01459d6f0343b97e8",
+      "stderrSha256": "sha256:e2c30d59264829011fe7ce30b39db9705fb6ca02924bac9f15cf1ff9626b6c38",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "doctor",
+    "framework-development",
+    "git-head-evidence",
+    "tasks-audit",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-14T10:56:33.593Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "suspected",
+    "repoRole": "framework",
+    "changedFiles": [
+      "docs/keep-memory/",
+      "docs/keep-memory/README.md",
+      "docs/keep.summary.md"
+    ],
+    "criticalChangedFiles": [],
+    "requiredGates": [
+      "doctor",
+      "framework-development",
+      "git-head-evidence",
+      "tasks-audit",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-MEM-0001.json",
+  "closedAt": "2026-07-14T10:56:33.593Z",
+  "closedByActor": "claude-fable-5",
+  "sessionId": null,
+  "attestation": {
+    "schemaId": "atm.reconcileAttestation.v1",
+    "deliveryCommit": "bea3e88510053e4c8658bdcaf20389ffa1467c5d",
+    "deliveryRepoRoot": "C:\\Users\\User\\3KLife",
+    "reconciledAt": "2026-07-14T10:56:31.831Z",
+    "reconciledByActor": "claude-fable-5",
+    "reason": "Historical reconcile sync against commit bea3e88510053e4c8658bdcaf20389ffa1467c5d"
+  },
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "bea3e88510053e4c8658bdcaf20389ffa1467c5d",
+    "taskMatchedFiles": [
+      "docs/keep-memory/README.md",
+      "docs/keep-memory/gotcha_atm-claim-session-traps.md",
+      "docs/keep-memory/gotcha_atm-close-sequence.md",
+      "docs/keep-memory/gotcha_atm-skill-template-sync.md",
+      "docs/keep-memory/gotcha_atm-two-captain-concurrency.md",
+      "docs/keep.summary.md"
+    ],
+    "governanceFiles": [],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
