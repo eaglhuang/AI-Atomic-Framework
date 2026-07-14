@@ -36,6 +36,15 @@ Use this ATM command only after the first command confirms it is the current gov
 
 {{CHARTER_INVARIANTS}}
 
+## Memory Read Step (TASK-MEM-0004)
+
+Before acting in an unfamiliar repo, locate its keep entry point and memory
+directory via the keep registry (in the coordinating workspace:
+`docs/keep.registry.md`), then read the keep summary's memory index section
+and pull only the memory notes relevant to the planned work. Cold-starting
+without reading recorded gotchas repeats already-solved failures. Treat aged
+notes as point-in-time observations: verify before asserting.
+
 ## Guardrails
 
 - Stay inside ATM CLI routing and evidence contracts.

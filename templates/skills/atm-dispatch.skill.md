@@ -106,6 +106,15 @@ current governed route:
 {{handoffs}}
 ```
 
+## Memory Write Check (TASK-MEM-0004)
+
+During condition review of an agent report, run the same memory-write
+checklist as `atm-handoff` (pitfall/gotcha, closure snapshot, human feedback,
+invalidated note) against the reported work. The agent report format gains one
+required line: `keep-memory write: <file name | none + reason>`. The no-write
+rules apply unchanged: nothing that backlog/cards/shards already record;
+governance defects go to the bug backlog first.
+
 ## Charter Invariants
 
 {{CHARTER_INVARIANTS}}
