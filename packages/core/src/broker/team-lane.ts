@@ -293,10 +293,12 @@ export function evaluateTeamBrokerLane(input: {
   readonly task: unknown;
   readonly writePaths: readonly string[];
   readonly registryPath?: string;
+  /** When true, never persist broker-registry cleanup during evaluation (team plan --read-only). */
+  readonly readOnly?: boolean;
 }): TeamBrokerLaneResult {
   const registryPath = input.registryPath ?? path.join(path.resolve(input.cwd), DEFAULT_BROKER_REGISTRY_RELATIVE_PATH);
   const writeIntent = buildTeamWriteIntent(input);
-  const registry = cleanupStale(loadRegistry(registryPath));
+  const registry = cleanupStale(loadRegistry(registryPath, { persistCleanup: input.readOnly !== true }));
   const virtualAtomInUseRegistry = buildVirtualAtomInUseRegistry(registry);
   const decision = calculateBrokerDecision(writeIntent, registry);
   const resolution = resolveTeamBrokerLane(decision);
