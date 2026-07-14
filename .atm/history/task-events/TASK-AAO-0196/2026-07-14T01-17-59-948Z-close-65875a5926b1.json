@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T01-17-59-948Z-close-65875a5926b1",
+  "taskId": "TASK-AAO-0196",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0196.json",
+  "taskSha256": "sha256:5a358248f5f4ee7e238d7747bbbc8999ff781be33e94885913a1c96c9a36d17f",
+  "createdAt": "2026-07-14T01:17:59.948Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0196 --actor cursor-grok-4.5 --status done --historical-delivery c7e3e81a11188c786dce62e0a95e586af0b61421",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0196.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T01:17:59.941Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0196.*",
+        ".atm/history/task-events/TASK-AAO-0196/**",
+        ".atm/history/tasks/TASK-AAO-0196.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/team/__tests__/team-execute-defaults.spec.ts",
+        "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+        "packages/cli/src/commands/team/__tests__/team-runtime-precedence.spec.ts",
+        "packages/cli/src/commands/team/role-provider-resolution.ts",
+        "packages/cli/src/commands/team/team-execution-lane.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "release/**",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "tests/cli/task-ledger-fixture-isolation.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker-conflict-resolution.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/team/__tests__/team-execute-defaults.spec.ts",
+        "packages/cli/src/commands/team/__tests__/team-execute-fail-closed.spec.ts",
+        "packages/cli/src/commands/team/__tests__/team-runtime-precedence.spec.ts",
+        "packages/cli/src/commands/team/role-provider-resolution.ts",
+        "packages/cli/src/commands/team/team-execution-lane.ts",
+        "packages/core/src/team-runtime/provider-selection.ts",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "tests/cli/task-ledger-fixture-isolation.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

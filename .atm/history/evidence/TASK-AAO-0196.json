@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-AAO-0196",
-  "updatedAt": "2026-07-14T01:12:09.048Z",
+  "updatedAt": "2026-07-14T01:17:51.328Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -98,6 +98,206 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:bdd89744679ddfb39f367ec29db8e9cde614bb9eb90ea13a5052701e122f33ae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: git diff --check",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+      "createdAt": "2026-07-14T01:15:53.207Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "git diff --check"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-execute-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "git diff --check",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "git diff --check"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:09ef1354f7d36e2f7f472a10fa51688c3cad1ba025244379558f5288a1394a9d",
+            "cached": false,
+            "generatedAt": "2026-07-14T01:15:53.473Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a8676f841605d57bb05de497e7742976bbb7bc17b8428f8980b9d176063bcffc",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+      "createdAt": "2026-07-14T01:16:37.463Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-execute-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-07-14T01:16:37.531Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9e102afbd13100ed818559390abd9161bba4b147db247c8c760442594684dcaa",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+      "createdAt": "2026-07-14T01:16:57.053Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-execute-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:af1df0107982f3537cb0016477510280f9a22c75f41100d67a85eeae17210370",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6b8769d9892b4ddceeebc12c98a0357f27f26a3e654e52f4025c3f7be7f47fff",
+            "cached": false,
+            "generatedAt": "2026-07-14T01:16:57.115Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:be6db2a47ed5eeebe597c91ee22cfe652a7c50d8803e6ab94f408d6660273e1c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "cursor-grok-4.5",
+      "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+      "createdAt": "2026-07-14T01:17:51.328Z",
+      "details": {
+        "actorId": "cursor-grok-4.5",
+        "sessionId": "session-20260714010954-cursor-grok-4.5-TASK-AAO-0196-4ec167e313",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.team-execute-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-14T01:17:51.381Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:29d6a4b2eed864958bc1161e62444b086caa466fa9df1f6c24a24b066e2bdecb",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
