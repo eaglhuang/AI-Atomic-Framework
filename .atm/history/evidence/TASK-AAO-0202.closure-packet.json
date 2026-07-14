@@ -1,0 +1,226 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0202",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "7d5b1e5eb6e68bcae237988adcac2d7c1d2977e8",
+  "governedTreeSha": "e3a783e5be66efef6dedd55c26a373d45cb696a3",
+  "targetCommitDelta": {
+    "currentCommitSha": "7d5b1e5eb6e68bcae237988adcac2d7c1d2977e8",
+    "parentCommitShas": [
+      "7d5b1e5eb6e68bcae237988adcac2d7c1d2977e8"
+    ],
+    "governedTreeSha": "e3a783e5be66efef6dedd55c26a373d45cb696a3",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0202.json",
+      ".atm/history/task-events/TASK-AAO-0202/2026-07-14T04-09-57-957Z-import-ea4931f3a6d1.json",
+      ".atm/history/task-events/TASK-AAO-0202/2026-07-14T04-15-08-478Z-claim-e2cf0cef02f3.json",
+      ".atm/history/task-events/TASK-AAO-0202/2026-07-14T04-16-40-903Z-renew-8a9c0c22e644.json",
+      ".atm/history/tasks/TASK-AAO-0202.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:f27a6a91ac04423224e3c13721a346507fe282640404ddff3b72df0457835a70",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d339d0e78dc046749d58eff97458e5f937de6bc51fd9eeaa2388c4670feeab3e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:164dc61c7b50655d17dcdd7ef28cd71b9e0d69294ba140340207c1a8a6b2c1ff",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "check:encoding:touched",
+    "git diff --check",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-14T04:17:46.105Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0202.*",
+      ".atm/history/task-events/TASK-AAO-0202/**",
+      ".atm/history/tasks/TASK-AAO-0202.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0202.json",
+  "closedAt": "2026-07-14T04:17:46.105Z",
+  "closedByActor": "cursor-grok-4.5",
+  "sessionId": "session-20260714041504-cursor-grok-4.5-TASK-AAO-0202-8d8cfa29aa",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c76526d1b45f3fcda83554bb7671b7154b140b38",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging.test.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/git-governance.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/historical-close-preflight.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/__tests__/lock-cleanup.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy-impl.js",
+      "release/atm-root-drop/packages/cli/src/commands/git-governance.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/tests/cli/git-commit-task-scoped-staging.test.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "waiverReason": "Shared delivery commit c76526d1 intentionally bundled five related governance bugs TASK-AAO-0201..0205."
+  },
+  "teamSummary": null
+}

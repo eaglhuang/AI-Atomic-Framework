@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0202",
+  "title": "Emit task-event when claim release mutates ledger",
+  "status": "done",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/tasks/legacy-impl.ts",
+    "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+    "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+    "npm run check:encoding:touched",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "release/**",
+    "Editing .atm/history or .atm/runtime by hand"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if the fix regresses governed close/commit safety.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-governance-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/tasks/legacy-impl.ts (4219 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0202-claim-release-transition-event.task.md",
+    "sectionTitle": "TASK-AAO-0202",
+    "headingLine": 41,
+    "hash": "80659cd6a96d94dd"
+  },
+  "importedAt": "2026-07-14T04:09:57.932Z",
+  "lastTransitionId": "2026-07-14T04-17-46-110Z-close-98c39f198ccb",
+  "lastTransitionAt": "2026-07-14T04:17:46.110Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "cursor-grok-4.5",
+    "leaseId": "lease-9585998aaf66",
+    "claimedAt": "2026-07-14T04:15:04.320Z",
+    "heartbeatAt": "2026-07-14T04:17:46.109Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-AAO-0202.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "state": "released",
+    "reason": "Shared delivery commit c76526d1 intentionally bundled five related governance bugs TASK-AAO-0201..0205."
+  },
+  "owner": "cursor-grok-4.5",
+  "startedAt": "2026-07-14T04:15:04.320Z",
+  "startedByActor": "cursor-grok-4.5",
+  "startedBySessionId": "session-20260714041504-cursor-grok-4.5-TASK-AAO-0202-8d8cfa29aa",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0202",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0202.*",
+      ".atm/history/task-events/TASK-AAO-0202/**",
+      ".atm/history/tasks/TASK-AAO-0202.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bc448fe628d52eecf93deda173fcf3b33acf1bc3303887c5b7eb01d8325ff723",
+    "actorId": "cursor-grok-4.5",
+    "createdAt": "2026-07-14T04:15:08.477Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-14T04:17:46.109Z",
+  "closedByActor": "cursor-grok-4.5",
+  "closedBySessionId": "session-20260714041504-cursor-grok-4.5-TASK-AAO-0202-8d8cfa29aa",
+  "closeReason": "Shared delivery commit c76526d1 intentionally bundled five related governance bugs TASK-AAO-0201..0205.",
+  "closurePacket": ".atm/history/evidence/TASK-AAO-0202.closure-packet.json"
+}
