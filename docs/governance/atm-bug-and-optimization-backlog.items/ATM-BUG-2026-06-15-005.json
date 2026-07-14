@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-005",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in 2026-06-28 onefile extraction lock lane",
+  "area": "Runner / build UX",
+  "finding": "Running `npm run build` and a frozen-runner command in parallel can expose a transient onefile cache path failure.",
+  "expectedBehavior": "Frozen runner cache refresh should be atomic or runner commands should wait/retry when the cache is being rebuilt.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by moving the onefile launcher to an atomic extraction protocol: payload extraction now takes a per-payload lock, writes into a unique staging directory, publishes readiness only after the payload is complete, and lets concurrent runners wait/retry against the same cache root instead of crashing on a half-refreshed tree. The launcher also now honors `ATM_ONEFILE_CACHE_ROOT`, which makes isolated validation and cache hygiene deterministic. Regression coverage lives in `scripts/validate-onefile-release.ts`, and `scripts/validate-onefile-budget.ts --json` now also reports extraction-lock handoff results alongside startup timing.",
+  "followUp": "Keep extraction-lock wait coverage in `scripts/validate-onefile-release.ts` and preserve the lock-handoff summary in `scripts/validate-onefile-budget.ts`; future onefile cache changes must not reintroduce partial-tree visibility during rebuild."
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/team-agents/team-efficiency-incident.schema.json",
+  "title": "ATM Team Efficiency Incident",
+  "type": "object",
+  "required": ["schemaId", "specVersion", "migration", "incidentId", "generatedAt", "severity", "reason", "sampleId", "cohortKey", "ratios"],
+  "properties": {
+    "schemaId": { "const": "atm.teamEfficiencyIncident.v1" },
+    "specVersion": { "type": "string" },
+    "migration": { "type": "object" },
+    "incidentId": { "type": "string", "minLength": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "severity": { "enum": ["advisory", "blocking"] },
+    "reason": { "type": "string", "minLength": 1 },
+    "sampleId": { "type": "string", "minLength": 1 },
+    "cohortKey": { "type": "string", "minLength": 1 },
+    "routing": { "enum": ["promote-production", "prefer-team", "bounded-experiment", "scale-down", "single-agent"] },
+    "scaleDownAction": { "enum": ["none", "collapse-roles", "cheaper-qualified-model", "shrink-team-size", "disable-team-for-workload"] },
+    "bottleneckCause": { "type": ["string", "null"] },
+    "optimizationBacklogTarget": { "type": ["string", "null"] },
+    "tokenDiagnosticReasonCodes": { "type": "array", "items": { "type": "string" } },
+    "ratios": {
+      "type": "object",
+      "required": ["incrementalCashCostRatio", "fullyLoadedCashCostRatio", "listPriceEquivalentCostRatio", "singleTaskLatencyRatio", "batchMakespanRatio", "throughputRatio"],
+      "properties": {
+        "incrementalCashCostRatio": { "type": "number", "minimum": 0 },
+        "fullyLoadedCashCostRatio": { "type": "number", "minimum": 0 },
+        "listPriceEquivalentCostRatio": { "type": "number", "minimum": 0 },
+        "singleTaskLatencyRatio": { "type": "number", "minimum": 0 },
+        "batchMakespanRatio": { "type": "number", "minimum": 0 },
+        "throughputRatio": { "type": "number", "minimum": 0 },
+        "tokenRatio": { "type": "number", "minimum": 0 },
+        "repairResidueRatio": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

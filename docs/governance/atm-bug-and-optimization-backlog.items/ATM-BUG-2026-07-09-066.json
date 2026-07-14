@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-066",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in validator-temp cleanup lane",
+  "area": "Validator harness / temp workspace cleanup",
+  "finding": "`npm run validate:cli` can fail non-deterministically on Windows when temp regression workspaces under `.atm-temp/` are still held by descendant Node processes. During TASK-RFT-0017 this first surfaced as `EPERM` at `scripts/validate-cli.ts:1885` while removing `tasks-invariant-regressions*`, then after zombie-process cleanup the same validator changed mode and hung past a 184s caller timeout instead of exiting cleanly.",
+  "expectedBehavior": "`validate:cli` should drain or terminate its owned child processes before deleting temp workspaces, retry bounded Windows `EPERM` / `EBUSY` cleanup, and fail with actionable diagnostics instead of leaving orphaned `.atm-temp/tasks-invariant-regressions*` directories or blocking governed pre-commit indefinitely.",
+  "evidenceOrRepro": "Fixed by adding `safeRmSync()` to `scripts/validate-cli.ts` with bounded retries for `EPERM`, `EBUSY`, and `ENOTEMPTY`, applying it to the `tasks-invariant-regressions` cleanup path and other temp validator workspaces, and keeping child-process EPERM diagnostics actionable with `ATM_TEMP_ROOT` guidance. The validator runner separately tracks/kills spawned validator children on timeout/signals. Verification: `node --strip-types tests/cli/validator-run-resume-and-status.test.ts`, `node --strip-types tests/cli/git-commit-timeout-and-status.test.ts`, and `npm run typecheck` pass.",
+  "followUp": "Keep temp cleanup best-effort after bounded retries; failed cleanup now warns instead of turning a successful validator into a misleading crash."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-155",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-FABLE-003",
+  "area": "Taskflow closure packet / validator classification",
+  "finding": "`taskflow pre-close` and close dry-run treated `validate:git-head-evidence` as advisory, but close write required `validationPasses/validate:git-head-evidence` and failed with `ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID`; the validator had to be discovered and run manually. This extends row 148 from the specific `validate:cli` omission to an inconsistent validator contract.",
+  "expectedBehavior": "One shared closure-readiness calculation should drive pre-close, dry-run, and close-write; every closure-required validator must appear in the dry-run blocker/command plan, or none should be required by the write packet.",
+  "evidenceOrRepro": "Reproduced on TASK-AAO-0173: close write reported the missing git-head pass after dry-run showed no blockers; `npm run validate:git-head-evidence` then passed and close succeeded.",
+  "followUp": "Add a regression asserting identical required-validator sets and command-backed evidence requirements across pre-close, dry-run, and write."
+}

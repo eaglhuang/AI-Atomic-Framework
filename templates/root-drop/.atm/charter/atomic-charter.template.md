@@ -9,6 +9,7 @@
 **Charter version**: {{CHARTER_VERSION}}
 **Last amended**: {{LAST_AMENDED_DATE}}
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
+**First principles and Schedule A**: `.atm/charter/atm-first-principles.md`
 
 ---
 
@@ -31,6 +32,9 @@ ATM enforces this hierarchy through `atm doctor` (`charter-integrity` check),
 
 The following invariants are immutable unless a charter waiver proposal is approved.
 See `charter-invariants.json` for the machine-readable form used by ATM guards.
+Schedule A is also machine-readable through the invariants bundle; it defines
+actual monetary cost and end-to-end time as the hard economic ratios. Raw token
+counts are mandatory diagnostics, not a cross-model price proxy.
 
 | ID | Title | Enforcement |
 |----|-------|-------------|

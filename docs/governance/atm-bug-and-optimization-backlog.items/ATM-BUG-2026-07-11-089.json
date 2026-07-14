@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-089",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in taskflow target-scope precedence lane",
+  "area": "Prompt-scoped next / planning path classification",
+  "finding": "A target-repo deliverable could be projected into both `targetAllowedFiles` and `planningReadOnlyPaths` during `next --claim`, causing `taskflow pre-close` / commit-bundle preview to treat a valid declared deliverable as outside the active direction lock. This blocked historical closeback even when the task ledger `scopePaths`, `deliverables`, `claim.files`, and runtime lock `files` all included the path.",
+  "expectedBehavior": "Prompt-scoped routing must never classify the same target-repo path as planning read-only when it is also a target allowed file or declared deliverable. Planning read-only paths should be limited to external planning-card context or explicitly read-only host documents, and commit-bundle validation should prefer target scope for overlapping paths in the target repository.",
+  "evidenceOrRepro": "Fixed on 2026-07-11 by making taskflow target scope take precedence over planning read-only overlap when resolving declared files and effective deliverables. The repair was built into the frozen runner with `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build`, then verified by successfully closing `TASK-TEAM-0053` through `taskflow close --historical-delivery 38fdb423 --waiver-out-of-scope-delivery --write`; the historical delivery report now includes `agent-integrations/vendors/team-secrets.example.json` in `taskMatchedFiles`.",
+  "followUp": "Add focused regression coverage for prompt-scoped planningReadOnly/targetAllowed overlap, and consider a repair command that can recompute direction-lock planning context without hand-editing runtime JSON."
+}

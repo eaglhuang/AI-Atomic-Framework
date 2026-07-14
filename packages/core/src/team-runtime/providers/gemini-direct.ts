@@ -91,6 +91,7 @@ export async function launchGeminiDirectTeamProviderRun(input: {
     permissionDecision,
     outputArtifacts: execution.outputArtifacts ?? ['agent-report', 'evidence-summary'],
     execution: { mode: 'vendor-api' as const, statusCode: execution.statusCode, retryable: execution.retryable, outputTextPreview: preview },
+    billableUsage: execution.billableUsage,
     observabilityEventCount: 3,
     redaction: { rawSecretsLogged: false as const, secretRefFields: input.bridge.secretRefFields }
   };

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-116",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in working tree (cursor-grok-4.5)",
+  "area": "Team plan / stale broker registry residue",
+  "finding": "`team plan --task TASK-TEAM-0040` fail-closed with `blocked-broker-cid-conflict` (\"Proposal-first lane is active; broker recorded a provisional write lease\") caused by leftover `.atm/runtime/broker-parallel-0041-0042/` registry state from a finished lane; the finding named no registry entry, age, owner, or cleanup command.",
+  "expectedBehavior": "Broker conflict findings should identify the blocking registry entry (path, owner, age), classify obviously-terminal residue as stale, and emit the governed cleanup command instead of a generic rerun hint.",
+  "evidenceOrRepro": "Fixed 2026-07-14: `cleanupStaleWithEvidence()` + structured owner/age/cleanup guidance; `loadRegistry(..., { persistCleanup })` opt-out preserved. Tests: `registry-stale-cleanup.test.ts`.",
+  "followUp": "Wire findings into team-lane surfaces; keep persistCleanup default true."
+}

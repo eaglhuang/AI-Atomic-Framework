@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-106",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0195",
+  "area": "Team Agents / plan actor and mutation clarity",
+  "finding": "`team plan` without `--actor` used stale `AGENT_IDENTITY=codex-gpt-5.4-mini` instead of the active task claim actor `Codex-GPT5.6 Sol`; it also registered a proposal-first provisional write lease during a command operators reasonably read as dry-run planning.",
+  "expectedBehavior": "Team plan should prefer the active claim actor, report any identity mismatch before broker evaluation, and state clearly whether plan mutates broker leases; a truly read-only planning option should be available.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0195: `resolveTeamPlanActorId` prefers active claim; `team plan --read-only` skips registry persist and softens proposal-first.",
+  "followUp": "Covered by TASK-AAO-0195 / ATM-BUG-170."
+}

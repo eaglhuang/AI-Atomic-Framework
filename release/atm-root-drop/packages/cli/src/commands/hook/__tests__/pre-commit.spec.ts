@@ -4,9 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   buildPreCommitBlockingFindings,
+  buildPreCommitFailureEnvelope,
   buildPreCommitRepairHints,
   isPreCommitBaselineFinding,
   isPreCommitEnvironmentFinding,
+  summarizePreCommitFailureEnvelope,
   selectActionableResidueFindings
 } from '../pre-commit.ts';
 import { inspectGitIndexAccess } from '../git-index-diagnostics.ts';
@@ -81,6 +83,27 @@ assert.equal(attributionBlock[0]?.code, 'ATM_GIT_COMMIT_WRAPPER_REQUIRED');
 
 const repairHints = buildPreCommitRepairHints(attributionBlock, requiredCommand);
 assert.ok(repairHints.some((hint) => hint.includes('node atm.mjs git commit')));
+
+const rawDestructiveHints = buildPreCommitRepairHints([{
+  code: 'ATM_RAW_DESTRUCTIVE_GIT',
+  source: 'generated-residue',
+  detail: 'raw destructive remediation is not operator-safe',
+  requiredCommand: 'git reset --hard',
+  classification: 'current-task',
+  blockerKind: 'governance-state'
+}], null);
+assert.equal(rawDestructiveHints.some((hint) => /git reset --hard/i.test(hint)), false);
+assert.ok(rawDestructiveHints[0]?.includes('ATM repair/reconcile'));
+
+const summaryEnvelope = buildPreCommitFailureEnvelope({
+  blockingFindings: attributionBlock,
+  frameworkClaimCommand: null,
+  gitIndexDiagnostic: gitIndex,
+  failedValidatorRuns: []
+});
+const summary = summarizePreCommitFailureEnvelope(summaryEnvelope);
+assert.ok(summary.startsWith('ATM_GIT_COMMIT_WRAPPER_REQUIRED:'), 'pre-commit failure summary must lead with the first blocking code');
+assert.ok(summary.includes('node atm.mjs git commit'), 'summary must include governed recovery');
 
 const envFinding = {
   code: 'ATM_GIT_INDEX_PERMISSION_DENIED',
@@ -169,10 +192,32 @@ try {
   assert.equal(existsSync(absentEvidencePath), false);
 
   const incidentsPath = path.join(repairRoot, '.atm', 'runtime', 'incidents');
+  const locksPath = path.join(repairRoot, '.atm', 'runtime', 'locks');
   mkdirSync(incidentsPath, { recursive: true });
-  writeFileSync(path.join(incidentsPath, 'stale.json'), JSON.stringify({ schemaId: 'atm.incidentReport.v1', block: {} }), 'utf8');
+  mkdirSync(locksPath, { recursive: true });
+  writeFileSync(path.join(locksPath, 'TASK-FOREIGN.lock.json'), JSON.stringify({
+    schemaId: 'atm.governanceScopeLock',
+    workItemId: 'TASK-FOREIGN',
+    actorId: 'foreign-agent',
+    files: ['packages/cli/src/commands/hook/pre-commit.ts']
+  }), 'utf8');
+  writeFileSync(path.join(incidentsPath, 'active.json'), JSON.stringify({
+    schemaId: 'atm.incidentReport.v1',
+    block: {
+      conflictTaskId: 'TASK-FOREIGN',
+      conflictFiles: ['packages/cli/src/commands/hook/pre-commit.ts'],
+      commandFamily: 'pre-commit',
+      recoveryLane: 'repair-claim',
+      conflicts: [{
+        conflictTaskId: 'TASK-FOREIGN',
+        conflictFiles: ['packages/cli/src/commands/hook/pre-commit.ts'],
+        owner: 'foreign-agent',
+        surface: 'task-history'
+      }]
+    }
+  }), 'utf8');
   assert.equal(reconcileResolvedCrossTaskMutationIncident(repairRoot, null), true);
-  assert.equal(existsSync(path.join(incidentsPath, 'stale.json')), false);
+  assert.equal(existsSync(path.join(incidentsPath, 'active.json')), false);
 } finally {
   rmSync(repairRoot, { recursive: true, force: true });
 }

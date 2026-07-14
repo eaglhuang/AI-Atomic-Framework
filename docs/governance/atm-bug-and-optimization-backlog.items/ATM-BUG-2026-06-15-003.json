@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-003",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK-TEAM-0029 / 48d5b55a",
+  "area": "Git governance",
+  "finding": "Abandoned close did not open a close-commit-window, so follow-up governance commit could require emergency/no-verify paths even after close mutation succeeded.",
+  "expectedBehavior": "Abandoned close should open a short-lived commit window covering the ledger/event artifacts that exist.",
+  "evidenceOrRepro": "`TASK-APO-0029` abandoned cleanup required native `git commit --no-verify` after the ATM wrapper rejected the commit due to missing active work session.",
+  "followUp": "Add validation that abandoned close can be committed through the ATM git wrapper without a fresh claim."
+}

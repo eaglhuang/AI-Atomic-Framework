@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-23-018",
+  "date": "2026-06-23",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 hook runner routing lane",
+  "area": "Governance lifecycle / framework hook lane",
+  "finding": "Framework source can fix pre-commit protected-state logic, but the repo-local Git hook still hard-codes `node atm.mjs hook pre-commit --json`, so batch `deliver-and-close` and pending commit windows continue to execute the stale frozen hook path until a release rebuild/install step updates the hook lane.",
+  "expectedBehavior": "In the framework repo, source-first governance validation should have an explicit, governed way to run the matching hook logic for the same source tree being validated, or the hook installer should understand a framework-development mode instead of silently pinning every commit to the frozen runner.",
+  "evidenceOrRepro": "The core `.atm/git-hooks/*` generator had already been repaired to arbitrate between `atm.mjs` and `atm.dev.mjs` in framework repositories, but the surrounding install surface still drifted: `templates/enforcement/pre-commit.sh` and `examples/git-hooks-enforcement/hooks/pre-commit` continued to hard-wire `node atm.mjs hook pre-commit --json`, leaving source-first framework installs and copied examples on the stale frozen lane. Closed on 2026-06-28 by lifting the same runner arbitration contract into the enforcement template and example hook, so framework repos now select `atm.dev.mjs` whenever source markers are present while adopters still fall back to `atm.mjs`. The repair also promoted direct hook-runner routing coverage into the validator surface via `scripts/validate-hook-runner-routing.ts`, `package.json`, and `scripts/validators.config.json`, while `scripts/validate-git-hooks-enforcement.ts` now verifies the template/example entrypoints use the same selected-runner contract instead of a hard-coded frozen call. Validation: `node --strip-types scripts/validate-hook-runner-routing.ts`, `node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate`, plus post-build frozen release verification.",
+  "followUp": "Keep hook runner selection centralized around the shared framework marker contract, and preserve the new validator so future template/example or installer edits cannot drift back to a stale frozen-only hook lane."
+}

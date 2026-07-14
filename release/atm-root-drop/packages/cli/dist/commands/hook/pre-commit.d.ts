@@ -110,6 +110,7 @@ export declare function buildPreCommitFailureEnvelope(input: {
     readonly failedValidatorRuns: readonly CommandRunReport[];
 }): PreCommitFailureEnvelope;
 export declare function buildPreCommitRepairHints(findings: readonly PreCommitBlockingFinding[], requiredCommand: string | null): readonly string[];
+export declare function summarizePreCommitFailureEnvelope(envelope: PreCommitFailureEnvelope): string;
 export declare function isPreCommitBaselineFinding(finding: PreCommitBlockingFinding): boolean;
 export declare function isPreCommitEnvironmentFinding(finding: PreCommitBlockingFinding): boolean;
 declare function scanEncoding(cwd: string, files: readonly string[]): {

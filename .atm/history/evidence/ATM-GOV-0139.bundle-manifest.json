@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0139",
+  "updatedAt": "2026-07-14T15:24:45.557Z",
+  "updatedBy": "codex-gpt-5-5-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/validation-obligation-map.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/validation-obligation-map.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d1772d5561a30439e20d7ab2eb6a749313853b466ad4993dde83518e7c6bd113",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/validation-obligation-map.test.ts"
+      ],
+      "generatedAt": "2026-07-14T15:22:57.134Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "eef8671f44ea1457ee1602fa77880d68701cff1b",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-14T15:23:16.504Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "eef8671f44ea1457ee1602fa77880d68701cff1b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:683995572535d3629877387086ced50c86e816cac1b77e1c13d74b679b38a911",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-14T15:24:09.738Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "eef8671f44ea1457ee1602fa77880d68701cff1b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-14T15:24:45.681Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "eef8671f44ea1457ee1602fa77880d68701cff1b",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

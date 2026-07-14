@@ -1,4 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -41,6 +42,19 @@ const requiredPositioningPhrases = [
 ];
 
 const docsNeutralityPolicyPath = 'docs/governance/docs-neutrality-policy.json';
+const trackedFiles = new Set(
+  spawnSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' })
+    .stdout.split(/\r?\n/)
+    .filter(Boolean)
+    .map(normalizeRelative)
+);
+const governedFiles = new Set([
+  ...trackedFiles,
+  ...spawnSync('git', ['ls-files', '--others', '--exclude-standard'], { cwd: root, encoding: 'utf8' })
+    .stdout.split(/\r?\n/)
+    .filter(Boolean)
+    .map(normalizeRelative)
+]);
 
 function readRelative(relativePath: any) {
   return readFileSync(path.join(root, relativePath), 'utf8');
@@ -65,6 +79,10 @@ function listRelativeFiles(relativeDir: any) {
     results.push(relativeEntry);
   }
   return results;
+}
+
+function isGovernedFile(relativePath: any) {
+  return governedFiles.has(normalizeRelative(relativePath));
 }
 
 function basename(relativePath: any) {
@@ -151,7 +169,7 @@ if (!process.exitCode) {
   const protectedFiles = new Set(docsNeutralityPolicy.protectedFiles ?? []);
   for (const scope of docsNeutralityPolicy.protectedScopes ?? []) {
     for (const relativePath of listRelativeFiles(scopeEnumerationRoot(scope))) {
-      if (pathMatchesScope(relativePath, scope)) {
+      if (pathMatchesScope(relativePath, scope) && isGovernedFile(relativePath)) {
         protectedFiles.add(relativePath);
       }
     }

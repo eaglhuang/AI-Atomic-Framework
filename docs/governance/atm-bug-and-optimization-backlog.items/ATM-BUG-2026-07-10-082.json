@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-082",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in vendor execution backend lane",
+  "area": "Team Agents / vendor runtime execution",
+  "finding": "`TASK-TEAM-0042`, `TASK-TEAM-0043`, and `TASK-TEAM-0044` were correctly closed for the M9I minimum provider bridge contract, but the task titles and roster wording could make operators think real OpenAI/Azure OpenAI/Claude Code/Gemini/Microsoft Foundry execution backends were production-ready. The provider files previously implemented config validation, permission-broker checks, session ids, artifacts, and observability envelopes without calling vendor SDKs, making network requests, spawning editor/CLI providers, streaming outputs, or executing tool calls.",
+  "expectedBehavior": "TEAM status surfaces should distinguish contract bridge completion from real execution readiness, and provider bridges that claim execution readiness should actually call the configured vendor HTTP or command surface while preserving broker authority and redaction.",
+  "evidenceOrRepro": "2026-07-10 audit found no `fetch`, `https.request`, `child_process`, `spawn`, `execFile`, or vendor SDK calls in `packages/core/src/team-runtime/providers/{openai,azure-openai,claude-code,gemini,microsoft-foundry}.ts`. The repair adds HTTP execution for OpenAI/Azure OpenAI/Microsoft Foundry, command execution for Claude Code/Gemini, executor injection for deterministic validation, artifact execution summaries, and docs in `docs/governance/team-agents/team-vendor-runtime.md`. Validation: `npm run typecheck`; `node --strip-types scripts/validate-team-agents.ts --case openai-azure-openai-bridges`; `--case claude-gemini-bridges`; `--case microsoft-foundry-bridge`.",
+  "followUp": "Keep future TEAM roster wording precise: M9I bridge cards are contract + execution backend when validators prove the HTTP/command executor paths, not merely descriptor readiness."
+}

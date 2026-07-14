@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-137",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK-TEAM-0081",
+  "area": "Git-head evidence hygiene on failed commits",
+  "finding": "A failed governed commit attempt leaves its prepared commit record appended to `.atm/history/evidence/git-head.jsonl`; the orphan line (tree never committed) later blocks `taskflow close` as governance-tracked dirty state.",
+  "expectedBehavior": "Commit-prep evidence should be finalized only when the commit lands, or failed-attempt records should be auto-reconciled/annotated so close preflight does not require manual `git restore` of the evidence log.",
+  "evidenceOrRepro": "TASK-TEAM-0081 delivery `573ac3cf` added failed commit evidence reconciliation and close-preflight coverage; close packet `.atm/history/evidence/TASK-TEAM-0081.closure-packet.json` marks the task done.",
+  "followUp": "Closed by TASK-TEAM-0081."
+}

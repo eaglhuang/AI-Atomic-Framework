@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-105",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0197",
+  "area": "Team Agents / execute CLI defaults",
+  "finding": "`team start --execute --provider openai --runtime-mode real-agent` wrote an active run but executed zero roles unless every L1 role also received an explicit `--role-provider` override. The command then reported `ATM_TEAM_EXECUTION_BLOCKED` with `providerExecutionCount: 0`.",
+  "expectedBehavior": "Top-level provider, SDK, model, and runtime options should become the default role selection when role overrides are absent; zero selected roles should fail before writing an active run.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0197: `cliGlobalDefault` / `cli-global-default` selection source populates every active roster role; regression `team-execute-defaults.spec.ts`.",
+  "followUp": "Keep explicit `--role-provider` overrides above the global CLI default."
+}

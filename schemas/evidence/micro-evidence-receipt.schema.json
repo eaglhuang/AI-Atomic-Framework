@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/evidence/micro-evidence-receipt.schema.json",
+  "title": "ATM Micro Evidence Receipt",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "receiptId",
+    "validatorName",
+    "command",
+    "status",
+    "ok",
+    "environment",
+    "base",
+    "payloadDigest",
+    "scopeDigest",
+    "reuseKey",
+    "createdAt",
+    "result",
+    "scope"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.microEvidenceReceipt.v1" },
+    "receiptId": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "validatorName": { "type": "string", "minLength": 1 },
+    "command": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["passed", "failed", "timeout"] },
+    "ok": { "type": "boolean" },
+    "environment": {
+      "type": "object",
+      "required": ["platform", "nodeVersion"],
+      "properties": {
+        "platform": { "type": "string" },
+        "nodeVersion": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "base": {
+      "type": "object",
+      "required": ["gitHead"],
+      "properties": {
+        "gitHead": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "scopeDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "reuseKey": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "createdAt": { "type": "string" },
+    "result": { "type": "object" },
+    "scope": {
+      "type": "object",
+      "required": ["strategy", "files"],
+      "properties": {
+        "strategy": { "const": "conservative-files" },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256", "mtimeMs", "size", "missing"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "sha256": { "type": ["string", "null"], "pattern": "^sha256:[a-f0-9]{64}$" },
+              "mtimeMs": { "type": ["number", "null"] },
+              "size": { "type": ["number", "null"] },
+              "missing": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

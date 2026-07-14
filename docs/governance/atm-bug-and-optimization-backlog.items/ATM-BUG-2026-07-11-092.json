@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-092",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Fixed in Team commit relevance gate lane",
+  "area": "Team runtime commit ownership / closeout UX",
+  "finding": "After all implementation and validation gates passed, governed commit was blocked because five stale or unrelated active Team runs required Coordinator/git.write ownership, even though the current framework claim belonged to the implementing actor. The recovery hint was an environment-prefixed native Git command rather than a governed ATM actor handoff.",
+  "expectedBehavior": "A framework closeout should identify the owning Team runs, provide a governed actor handoff or cleanup command, and make the required commit route reproducible through ATM without asking an agent to impersonate another actor or manually translate an environment hint.",
+  "evidenceOrRepro": "Fixed on 2026-07-11 by making Team git-owner enforcement apply only when staged paths intersect an active run's `file.write` lease. `node --strip-types scripts/validate-team-agents.ts --case hook-team-gate` verifies an implementer is still blocked for `packages/cli/src/commands/team.ts` but is allowed to commit unrelated `scripts/validate-team-agents.ts`.",
+  "followUp": "Keep Team git.write ownership strict for matching file.write scopes and retain the focused unrelated-run regression so stale or unrelated runs cannot block framework maintenance."
+}

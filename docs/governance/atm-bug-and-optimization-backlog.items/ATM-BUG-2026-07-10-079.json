@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-079",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in mechanical split scope-checklist lane",
+  "area": "Task card authoring / mechanical split scope",
+  "finding": "RFT atom-map split cards can under-declare deliverable paths relative to the modules a mechanical extraction actually creates, forcing repeated mid-flight `tasks scope add` calls for siblings such as `types.ts`, `shared.ts`, `constants.ts`, `role-registry.ts`, and lane modules.",
+  "expectedBehavior": "Import/open playbooks for split tasks should derive or pre-expand scope from the atom map and split recipe, or surface a one-shot scope-amendment checklist before the first delivery commit.",
+  "evidenceOrRepro": "Fixed by adding `ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST` to task-card import diagnostics when a split/facade/module/atom-map task declares only one file-shaped scope/deliverable and no broad pattern. The diagnostic tells operators to review sibling `types.ts`, `shared.ts`, `constants.ts`, registry files, and lane modules before first delivery commit, and gives the one-shot `tasks scope add --paths` route. Verification: `node --strip-types packages/cli/src/commands/tasks/__tests__/task-card-writer.spec.ts` and `npm run typecheck` pass.",
+  "followUp": "Keep this as a preflight checklist rather than auto-expanding arbitrary sibling files; atom-map-derived exact expansion can build on the same diagnostic later."
+}

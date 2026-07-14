@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0135",
   "title": "Run Team workers in shadow-first contribution workspaces",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Team",
   "dependencies": [
     "ATM-GOV-0126",
@@ -78,7 +78,63 @@
     "hash": "6cc041c77c5d3248"
   },
   "importedAt": "2026-07-14T11:42:36.209Z",
-  "lastTransitionId": "2026-07-14T11-42-36-221Z-import-7e96c077d2be",
-  "lastTransitionAt": "2026-07-14T11:42:36.221Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T16-06-02-344Z-lock-cleanup-fadbeb69086c",
+  "lastTransitionAt": "2026-07-14T16:06:02.344Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T15:58:16.125Z",
+  "promotedAt": "2026-07-14T15:58:16.130Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-30898270833d",
+    "claimedAt": "2026-07-14T15:58:16.135Z",
+    "heartbeatAt": "2026-07-14T16:06:02.203Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0135.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/core/src/team-runtime/context-manifest.ts",
+      "packages/core/src/team-runtime/contribution-manifest.ts",
+      "tests/cli/team-shadow-first-scheduler.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T15:58:16.135Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714155816-codex-gpt-5-5-captain-ATM-GOV-0135-7937683b04",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0135",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-3e36b4c248e70dba",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0135.*",
+      ".atm/history/task-events/ATM-GOV-0135/**",
+      ".atm/history/tasks/ATM-GOV-0135.json",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/scheduler.ts",
+      "packages/core/src/team-runtime/context-manifest.ts",
+      "packages/core/src/team-runtime/contribution-manifest.ts",
+      "tests/cli/team-shadow-first-scheduler.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "ca214a00119651321389483b1afa84955ca8def338ad3f789657d4a0fc83a8ed",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T15:58:22.737Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T16:06:02.340Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T16:06:02.203Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714155816-codex-gpt-5-5-captain-ATM-GOV-0135-7937683b04",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0135.closure-packet.json"
 }

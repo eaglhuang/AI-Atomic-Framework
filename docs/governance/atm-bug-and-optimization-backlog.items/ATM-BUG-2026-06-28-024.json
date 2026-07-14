@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-024",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`)",
+  "area": "Framework governance / temp claim",
+  "finding": "`framework-mode claim` could reject the same actor's still-live temporary framework lock as `ATM_FRAMEWORK_STALE_LOCK_CLEANUP_REQUIRED` when the lock had no linked task context yet, blocking a normal same-session scope refresh or claim widening.",
+  "expectedBehavior": "The same actor should be allowed to reuse its active unlabeled temporary framework lock for the same framework session, instead of being forced through false stale-lock cleanup.",
+  "evidenceOrRepro": "Reproduced on 2026-06-28 while widening the staged framework merge scope on `main`: a valid temp lock for `codex-gpt-5.4-mini` existed, but a follow-up claim was blocked as `possibly-stale` only because ATM could not resolve linked task metadata. Landed in `c589f125049ad81adc146f1b78e6a5ee36b8f607` and verified by `packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts` plus successful same-actor follow-up claim flow during the `main` repair lane.",
+  "followUp": "Keep regression coverage in `packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts` for same-actor unlabeled temp-lock reuse."
+}

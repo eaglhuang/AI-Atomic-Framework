@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-27-021",
+  "date": "2026-06-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in 2026-06-28 repair lane",
+  "area": "Git governance / worktree hygiene",
+  "finding": "A normal framework worktree can carry repo-local `.git/config` state with `core.bare=true`, causing standard `git -C <repo> status` and Git-backed evidence commands to fail until the local config is repaired.",
+  "expectedBehavior": "ATM preflight, doctor, or framework-mode status should detect a bare/worktree mismatch and report or repair the safe local setting before benchmark/evidence work begins.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by adding a shared Git worktree-readiness probe used by `doctor`, `git-head-evidence`, and `framework-mode`. `doctor` now fails with `ATM_DOCTOR_GIT_WORKTREE_BARE_MISMATCH` and recommends `git config --local core.bare false`; `framework-mode status` surfaces a `git-worktree-readiness-failed` blocker; `framework-mode claim` fail-closes with `ATM_GIT_WORKTREE_READY_REQUIRED` before taking a temporary claim on a broken worktree. Regression coverage was added to `scripts/validate-git-head-evidence.ts` and `scripts/validate-framework-development-governance.ts`, and frozen-runner coverage was revalidated through `validate:root-drop-release` plus `validate:onefile-release`.",
+  "followUp": "Keep the shared readiness probe as the single source of truth for worktree-backed Git diagnostics, and route future Git-backed preflight lanes through it instead of re-implementing ad hoc `git status` probes."
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T15-00-32-519Z-scope-amendment-1c8f2d5d4a8e",
+  "taskId": "ATM-GOV-0134",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0134.json",
+  "taskSha256": "sha256:df54f52c4abf1591c5a62a3eedbdcfe0027250048babe296699a8387bdcbfe64",
+  "createdAt": "2026-07-14T15:00:32.519Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0134 --actor codex-gpt-5-5-captain --add \"docs/governance/atm-bug-and-optimization-backlog.items,docs/governance/atm-bug-and-optimization-backlog.md\" --reason \"ATM-GOV-0134 acceptance requires one physical backlog item file per record plus deterministic projection rebuild.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0134 acceptance requires one physical backlog item file per record plus deterministic projection rebuild."
+  }
+}

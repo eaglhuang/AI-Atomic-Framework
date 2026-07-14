@@ -4,6 +4,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { CliError, makeResult, message, readFrameworkVersion, relativePathFrom } from './shared.ts';
+import { assertRunnerSyncAdmission, inspectRunnerSyncAdmission } from './framework-development/runner-sync-admission.ts';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const defaultOnefileRunnerPath = 'release/atm-onefile/atm.mjs';
@@ -94,7 +95,7 @@ export function runInternalReleaseSync(options: InternalReleaseSyncOptions) {
     throw new CliError('ATM_CLI_USAGE', 'internal-release sync requires at least one --repo <path>.', { exitCode: 2 });
   }
   const buildRun = options.build
-    ? runNpmBuild(options.cwd)
+    ? runNpmBuildAfterAdmission(options.cwd)
     : null;
   if (buildRun && buildRun.exitCode !== 0) {
     throw new CliError('ATM_INTERNAL_RELEASE_BUILD_FAILED', 'npm run build failed before internal release sync.', {
@@ -113,6 +114,9 @@ export function runInternalReleaseSync(options: InternalReleaseSyncOptions) {
   const sourceSha256 = sha256File(sourceRunnerPath);
   const runId = `internal-release-${new Date().toISOString().replace(/[:.]/g, '-')}`;
   const sourceCommit = readGitScalar(options.cwd, ['rev-parse', '--verify', 'HEAD']);
+  const stewardActorId = process.env.ATM_ACTOR_ID?.trim()
+    || process.env.AGENT_IDENTITY?.trim()
+    || 'release-steward';
   const skipMatcher = createSkipMatcher(options.skips, options.cwd);
   const targets = options.repos.map((repo) => syncTarget({
     repo,
@@ -437,7 +441,16 @@ function runNodeAtm(cwd: string, args: readonly string[]): CommandRunRecord {
   return runCommand(cwd, process.execPath, ['atm.mjs', ...args]);
 }
 
-function runNpmBuild(cwd: string): CommandRunRecord {
+function runNpmBuildAfterAdmission(cwd: string): CommandRunRecord {
+  const sourceCommit = readGitScalar(cwd, ['rev-parse', '--verify', 'HEAD']);
+  const stewardActorId = process.env.ATM_ACTOR_ID?.trim()
+    || process.env.AGENT_IDENTITY?.trim()
+    || 'release-steward';
+  assertRunnerSyncAdmission(inspectRunnerSyncAdmission({
+    cwd,
+    stewardActorId,
+    sealedSourceSha: sourceCommit
+  }));
   if (process.platform === 'win32') {
     return runCommand(cwd, 'cmd.exe', ['/c', 'npm', 'run', 'build']);
   }

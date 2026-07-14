@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-174",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed",
+  "area": "Next router predicate SSOT drift",
+  "finding": "Queue-request prompt detection exists in both `packages/cli/src/commands/next/intent-normalizers.ts` and `packages/cli/src/commands/next/route-predicates.ts`; updating only the normalizer did not affect the active `next.ts` route decision, so a new regression kept failing until the second copy was updated.",
+  "expectedBehavior": "Queue-request language should have one shared predicate source consumed by both intent normalization and route selection, with tests proving the reported `taskIntent.queueRequested` and actual route decision agree.",
+  "evidenceOrRepro": "Fixed on 2026-07-13: `isQueueRequestedPrompt` now has one source in `intent-normalizers.ts`, while `route-predicates.ts` imports and re-exports that helper for the `next.ts` route decision. `validate-prompt-scoped-next` now asserts backlog continuation prompts set `taskIntent.queueRequested` and route to batch.",
+  "followUp": "Keep the prompt-scoped regression as the SSOT guard whenever queue-request language is expanded."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-120",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Planning route performance",
+  "finding": "`node atm.mjs next --prompt ... --json` in the 3KLife planning repository timed out while scanning a large task ledger, preventing normal preflight from returning a playbook in an interactive window.",
+  "expectedBehavior": "Planning-ledger discovery should use indexed or bounded task lookup and emit progress/timeout diagnostics with a recovery command.",
+  "evidenceOrRepro": "Reproduced while creating Cross-Vendor Team Markdown Handoff cards 0072-0074: 120s and 180s attempts did not return a route.",
+  "followUp": "Benchmark the planner against large ledgers, introduce task-id/path prefiltering, and add a focused timeout regression."
+}

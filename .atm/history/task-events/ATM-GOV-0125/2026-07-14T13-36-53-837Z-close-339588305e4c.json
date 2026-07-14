@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T13-36-53-837Z-close-339588305e4c",
+  "taskId": "ATM-GOV-0125",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714132902-codex-gpt-5-5-captain-ATM-GOV-0125-defa556fef",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0125.json",
+  "taskSha256": "sha256:5297bdfb521616dccfa518c13a505327e193170e21371285e6ee22acb88090cc",
+  "createdAt": "2026-07-14T13:36:53.837Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0125 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714132902-codex-gpt-5-5-captain-ATM-GOV-0125-defa556fef",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0125.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+      "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+      "node --strip-types tests/cli/team-provider-preflight.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T13:36:53.823Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0125.*",
+        ".atm/history/task-events/ATM-GOV-0125/**",
+        ".atm/history/tasks/ATM-GOV-0125.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+        "packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+        "packages/cli/src/commands/team/provider-preflight.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "tests/cli/team-provider-preflight.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/batch.spec.ts",
+        "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+        "packages/cli/src/commands/hook/pre-commit.ts",
+        "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+        "packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+        "packages/cli/src/commands/team/provider-preflight.ts",
+        "tests/cli/integration-raw-git-command-guard.test.ts",
+        "tests/cli/team-provider-preflight.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

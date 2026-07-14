@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAtomizationLinePolicy } from '../packages/cli/src/commands/tasks/task-import-validators.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const nextSourcePath = path.join(root, 'packages', 'cli', 'src', 'commands', 'next.ts');
@@ -20,13 +21,19 @@ const atomSpecs = [
   'packages/cli/src/commands/next/__tests__/runner-mode.spec.ts'
 ] as const;
 
-const atomLineCap = 600;
+const atomLineCap = resolveAtomizationLinePolicy({ config: readRepoConfig(root) }).maxLines;
 const nextFacadeLineTarget = 1200;
 const nextFacadeBaseline = 5156;
 
 function fail(message: string): never {
   console.error(`[next-atomic-map] ${message}`);
   process.exit(1);
+}
+
+function readRepoConfig(cwd: string): { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } } | null {
+  const configPath = path.join(cwd, '.atm', 'config.json');
+  if (!existsSync(configPath)) return null;
+  return JSON.parse(readFileSync(configPath, 'utf8')) as { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } };
 }
 
 if (!existsSync(reportPath)) {

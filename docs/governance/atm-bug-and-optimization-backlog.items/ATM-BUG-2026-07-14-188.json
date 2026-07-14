@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-188",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug / Optimization",
+  "severity": "Medium",
+  "status": "Fixed in ATM-GOV-0124",
+  "area": "Product charter validator / ignored residue isolation",
+  "finding": "`validate:cli` failed during ATM-GOV-0124 because `validate-product-charter` scanned `templates/skills/atm-memory-consolidate.skill.md`, an ignored/untracked residue excluded by `.git/info/exclude`, and treated its `tools_node/` text as a protected downstream-only term violation.",
+  "expectedBehavior": "Product charter validation should check governed tracked files and intentional unignored new files, while ignored/untracked residue remains outside close gates unless explicitly claimed.",
+  "evidenceOrRepro": "Repro: `npm run validate:cli` failed with `[product-charter:validate] templates/skills/atm-memory-consolidate.skill.md contains downstream-only term: tools_node/`; `git check-ignore -v` showed `.git/info/exclude:10:templates/`.",
+  "followUp": "ATM-GOV-0124 updates `scripts/validate-product-charter.ts` to filter protected-scope enumeration through git tracked/ignore state before scanning banned terms."
+}

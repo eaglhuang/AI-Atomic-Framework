@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-028",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`)",
+  "area": "Git governance / git-head evidence scope",
+  "finding": "`hook pre-commit`, `doctor`, and `framework-mode status` treated any staged or latest HEAD change as if it required git-head evidence, so small docs/backlog/fixture edits and emergency repair lanes could be blocked by a commit-boundary evidence check that was not actually needed for low-risk files.",
+  "expectedBehavior": "Git-head evidence should remain strict for critical framework commits, governed ledger/closure bundles, protected pre-push, and commit-range checks, but docs-only or low-risk maintenance changes should pass without generating or requiring git-head evidence.",
+  "evidenceOrRepro": "User correction on 2026-06-28: \"對任何 staged file 嘗試寫 git-head evidence\" is too broad because small docs or emergency maintenance changes repeatedly get stuck on missing evidence. Existing regression `scripts/validate-git-hooks-enforcement.ts` expected docs-only pre-commit to write `.atm/history/evidence/git-head.jsonl`, proving the rule had become over-broad. Landed in `c589f125049ad81adc146f1b78e6a5ee36b8f607` through shared path classification plus updated `hook`, `doctor`, and `git-head-evidence` behavior.",
+  "followUp": "Centralize framework critical path classification, make pre-commit write git-head evidence only for critical or governed ledger-boundary staged files, let `doctor` classify non-critical HEAD as `not-required-non-critical-head`, and keep protected critical commit checks strict."
+}

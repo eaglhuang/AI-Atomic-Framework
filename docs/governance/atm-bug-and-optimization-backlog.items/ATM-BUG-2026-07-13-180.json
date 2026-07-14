@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-180",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0194",
+  "area": "taskflow close / deferred foreign dirty snapshot ENOENT",
+  "finding": "`taskflow close --write --defer-foreign-state` for `TASK-AAO-0193` still created the target governance close commit (`9658f33e1`) and marked the ledger `done`, but the CLI then failed with `ATM_CLI_UNHANDLED` / `ENOENT` while opening a close-window snapshot under `.atm/runtime/snapshots/close-window-governance-dirty-...TASK-AAO-0192.bundle-manifest.json.json` for a deferred foreign dirty path. Operators cannot tell from the wrapper alone whether close already landed.",
+  "expectedBehavior": "Deferred foreign dirty files must never be required as readable snapshot sources during close finalization; if a snapshot is needed, ATM should skip missing/deferred paths or write a recoverable incident packet instead of throwing unhandled ENOENT after the close commit already exists.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0194: governance-dirty deferral is scoped to `git-head.jsonl` plus the **current task** bundle-manifest only (no foreign-task `git restore`), and `restoreDeferredGovernanceDirtyFiles` skips missing snapshots instead of throwing. Regression coverage lives in `commit-bundle-assembly.spec.ts`.",
+  "followUp": "Keep foreign evidence dirt out of another task's close-window restore path; missing snapshots must remain non-fatal after a successful close commit."
+}

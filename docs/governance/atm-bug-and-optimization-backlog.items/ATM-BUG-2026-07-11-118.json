@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-118",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in current working tree; validating for commit",
+  "area": "Frozen runner / staleness visibility",
+  "finding": "The frozen `atm.mjs` runner stayed at its 2026-06-30 build while team-runtime source advanced through M8E/M9I/M10X; `team plan`/`team start` on the stale runner silently omitted new governance fields, so live CLI probes reported features \"missing\" while source validators passed. Nothing in the runner output indicated staleness.",
+  "expectedBehavior": "The runner should self-report build-vs-source drift (advisory build timestamp or source HEAD delta) on startup or in `--version`/`doctor`, so operators know live CLI behavior may lag source before filing false feature-gap findings.",
+  "evidenceOrRepro": "On 2026-07-13, `--version`, `doctor`, and runner-mode evidence gained `atm.runnerSourceDrift.v1` with frozen/source mtimes, advisory text, `syncRequired`, and the retained release sync command. `scripts/validate-cli.ts --mode surface` now asserts the `--version` drift evidence.",
+  "followUp": "Commit the runner drift advisory repair with frozen release artifacts; keep `ATM_RUNNER_SYNC_REQUIRED` as the strict write gate."
+}

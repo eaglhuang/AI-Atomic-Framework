@@ -25,7 +25,13 @@ type ResidueReconcileAction = {
   readonly action: 'remove';
   readonly applied: boolean;
   readonly reason: string;
+  readonly attempts?: number;
+  readonly failureCode?: string | null;
+  readonly failureMessage?: string | null;
 };
+
+const RESIDUE_REMOVE_MAX_ATTEMPTS = 3;
+const RESIDUE_RETRYABLE_REMOVE_CODES = new Set(['EPERM', 'EBUSY', 'ENOTEMPTY']);
 
 function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
@@ -318,6 +324,40 @@ function removeEmptyParents(cwd: string, absolutePath: string): void {
   }
 }
 
+function removeResiduePathWithRetry(absolutePath: string): Pick<ResidueReconcileAction, 'applied' | 'attempts' | 'failureCode' | 'failureMessage'> {
+  let lastError: unknown = null;
+  for (let attempt = 1; attempt <= RESIDUE_REMOVE_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const stat = statSync(absolutePath);
+      rmSync(absolutePath, { recursive: stat.isDirectory(), force: true });
+      return {
+        applied: true,
+        attempts: attempt,
+        failureCode: null,
+        failureMessage: null
+      };
+    } catch (error) {
+      lastError = error;
+      const code = typeof (error as { code?: unknown })?.code === 'string'
+        ? String((error as { code?: unknown }).code)
+        : null;
+      if (!code || !RESIDUE_RETRYABLE_REMOVE_CODES.has(code) || attempt === RESIDUE_REMOVE_MAX_ATTEMPTS) {
+        break;
+      }
+    }
+  }
+  const code = typeof (lastError as { code?: unknown })?.code === 'string'
+    ? String((lastError as { code?: unknown }).code)
+    : null;
+  const messageText = lastError instanceof Error ? lastError.message : String(lastError ?? 'unknown remove failure');
+  return {
+    applied: false,
+    attempts: RESIDUE_REMOVE_MAX_ATTEMPTS,
+    failureCode: code,
+    failureMessage: messageText
+  };
+}
+
 export function buildResidueReconcileReport(cwd: string, apply: boolean) {
   const statusReport = buildResidueStatusReport(cwd);
   const actions: ResidueReconcileAction[] = [];
@@ -325,16 +365,26 @@ export function buildResidueReconcileReport(cwd: string, apply: boolean) {
   for (const entry of statusReport.entries.filter(isSafeReconcileEntry)) {
     const absolutePath = assertWorkspacePath(cwd, entry.path);
     const exists = existsSync(absolutePath);
+    let removal: Pick<ResidueReconcileAction, 'applied' | 'attempts' | 'failureCode' | 'failureMessage'> = {
+      applied: false,
+      attempts: 0,
+      failureCode: null,
+      failureMessage: null
+    };
     if (apply && exists) {
-      const stat = statSync(absolutePath);
-      rmSync(absolutePath, { recursive: stat.isDirectory(), force: true });
-      removeEmptyParents(cwd, absolutePath);
+      removal = removeResiduePathWithRetry(absolutePath);
+      if (removal.applied) {
+        removeEmptyParents(cwd, absolutePath);
+      }
     }
     actions.push({
       path: entry.path,
       action: 'remove',
-      applied: apply && exists,
-      reason: entry.reason
+      applied: removal.applied,
+      reason: entry.reason,
+      attempts: removal.attempts,
+      failureCode: removal.failureCode,
+      failureMessage: removal.failureMessage
     });
   }
   return {

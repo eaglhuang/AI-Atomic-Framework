@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-187",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Cross-repository planning authority is remembered but not enforced before authoring",
+  "finding": "A Captain working in the framework repository created a complete framework-local optimization plan even though the established planning authority was 3KLife and only the imported ATM ledger belonged in the framework. The mistake recurred because handoff memory and a general planning/target distinction did not force an explicit authority declaration before file creation.",
+  "expectedBehavior": "Before authoring, ATM guidance must resolve and state planning, target, and closure authority. When they differ, the full plan and source cards stay in the planning repository; the target accepts only CLI-imported ledger records and explicit neutral product deliverables.",
+  "evidenceOrRepro": "Reproduced during the 2026-07-14 governance-optimization planning turn; the local plan was removed and replaced by a Traditional Chinese plan plus `tasks/` under the coordinating planning repository.",
+  "followUp": "Guidance added to source and installed `atm-task-card-authoring` / `atm-dispatch` skills. Add a deterministic authoring/import preflight under `ATM-GOVOPT-008` so source-path authority is machine-checked rather than memory-dependent."
+}

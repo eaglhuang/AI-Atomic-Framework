@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-073",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in actor-resolution preview lane",
+  "area": "Actor identity / next claim UX",
+  "finding": "`identity set --actor codex-captain-m8e` did not affect `next --claim --task`, which claimed as the environment-projected `codex-gpt-5.4-mini`; a follow-up explicit claim with `--actor codex-captain-m8e` then failed with `ATM_LOCK_CONFLICT`. This is understandable internally, but confusing in Captain/Team Broker mode where the operator is trying to keep a stable actor label.",
+  "expectedBehavior": "`next --claim --task` should either honor the repo default identity, warn that `AGENT_IDENTITY` overrides it before claiming, or expose a pre-claim actor preview. If an explicit actor mismatch is detected immediately after same-session claim, the recovery guidance should explain whether to continue with the projected actor or release/reclaim.",
+  "evidenceOrRepro": "Fixed by adding an `actorResolution` diagnostic shared by `identity show` and `next --claim`, including precedence, winning source, env/default actors, override warning, and lock-conflict recovery hint. Verification: `node --strip-types tests/cli/identity-per-actor-routing.test.ts` covers `AGENT_IDENTITY` overriding repo default and asserts `ATM_NEXT_CLAIMED` exposes `actorSource`.",
+  "followUp": "Keep the diagnostic output stable for Captain/Team Broker UX; a future interactive confirmation can build on the same `actorResolution` payload if needed."
+}

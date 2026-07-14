@@ -23,6 +23,25 @@ export interface GitIndexOwnershipReport {
         readonly reason: string;
     };
 }
+export interface GitIndexLeaseParkEntry {
+    readonly path: string;
+    readonly ownerTaskId: string | null;
+    readonly ownerActorId: string | null;
+    readonly stagedBlobId: string | null;
+    readonly stagedMode: string | null;
+    readonly restoreIdentity: string;
+}
+export interface GitIndexLeaseParkPlan {
+    readonly schemaId: 'atm.gitIndexLeaseParkPlan.v1';
+    readonly taskId: string | null;
+    readonly leaseId: string;
+    readonly generatedAt: string;
+    readonly status: 'not-needed' | 'park-and-restore' | 'blocked-foreign-active-staged';
+    readonly parkEntries: readonly GitIndexLeaseParkEntry[];
+    readonly restoreEntries: readonly GitIndexLeaseParkEntry[];
+    readonly approvedPartialStagedBlobIds: readonly string[];
+    readonly reason: string;
+}
 export declare const ATM_INDEX_FOREIGN_ACTIVE_STAGED = "ATM_INDEX_FOREIGN_ACTIVE_STAGED";
 export declare function inspectGitIndexOwnership(input: {
     readonly cwd: string;
@@ -44,3 +63,11 @@ export declare function buildForeignActiveStagedDiagnostic(report: GitIndexOwner
     safeNextActions: string[];
     requiredCommand: string;
 };
+export declare function buildGitIndexLeaseParkPlan(input: {
+    readonly report: GitIndexOwnershipReport;
+    readonly expectedStageFiles: readonly string[];
+    readonly leaseId?: string | null;
+    readonly generatedAt?: string | null;
+}): GitIndexLeaseParkPlan;
+export declare function parkGitIndexLease(cwd: string, plan: GitIndexLeaseParkPlan): readonly string[];
+export declare function restoreGitIndexLease(cwd: string, plan: GitIndexLeaseParkPlan): readonly string[];

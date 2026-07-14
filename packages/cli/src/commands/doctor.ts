@@ -16,6 +16,7 @@ import { inspectTrackedActorRegistryState } from './actor-registry.ts';
 import { CliError, makeResult, message, parseOptions, relativePathFrom } from './shared.ts';
 import { detectCrossTaskMutation, readIncidentFlag } from '../../../core/src/broker/cross-task-mutation-guard.ts';
 import { inspectRunnerSourceDrift } from './framework-development/closure-packet-schema.ts';
+import { loadCharterAuthorityBundle } from '../../../integrations-core/src/compiler/charter-block.ts';
 
 
 const legacyBehaviorPackageNames = [
@@ -78,7 +79,7 @@ export async function runDoctor(argv: readonly string[]) {
     .map((packageDir) => ({ packageDir, js: path.join(root, packageDir, 'dist', 'index.js'), dts: path.join(root, packageDir, 'dist', 'index.d.ts') }))
     .filter((entry) => !existsSync(entry.js) || !existsSync(entry.dts))
     .map((entry) => packageDirLabel(root, entry.packageDir));
-  const charterIntegrity = checkCharterIntegrity(root);
+  const charterIntegrity = checkCharterIntegrityV2(root);
   const integrationHealth = await checkIntegrationHealth(root);
   const frameworkHookReadiness = (await import('./integration-hooks.ts')).inspectFrameworkHookReadiness(root);
   const cleanCheckoutFrameworkHookContractOk = repoIdentity.isFrameworkRepo
@@ -733,5 +734,51 @@ function checkCharterIntegrity(root: string): { ok: boolean; charterPath: string
     invariantsPresent,
     invariantsParseable,
     hashField
+  };
+}
+
+function checkCharterIntegrityV2(root: string): {
+  ok: boolean;
+  charterPath: string;
+  firstPrinciplesPath: string;
+  charterInvariantsPath: string;
+  charterPresent: boolean;
+  firstPrinciplesPresent: boolean;
+  invariantsPresent: boolean;
+  invariantsParseable: boolean;
+  hashField: string | null;
+  bundle: ReturnType<typeof loadCharterAuthorityBundle> | null;
+} {
+  const charterPath = path.join(root, '.atm', 'charter', 'atomic-charter.md');
+  const firstPrinciplesPath = path.join(root, '.atm', 'charter', 'atm-first-principles.md');
+  const invariantsPath = path.join(root, '.atm', 'charter', 'charter-invariants.json');
+  const charterPresent = existsSync(charterPath);
+  const firstPrinciplesPresent = existsSync(firstPrinciplesPath);
+  const invariantsPresent = existsSync(invariantsPath);
+  let invariantsParseable = false;
+  let hashField: string | null = null;
+  if (invariantsPresent) {
+    try {
+      const parsed = JSON.parse(readFileSync(invariantsPath, 'utf8')) as Record<string, unknown>;
+      invariantsParseable = true;
+      hashField = typeof parsed.charterHash === 'string' ? parsed.charterHash : null;
+    } catch {
+      invariantsParseable = false;
+    }
+  }
+  const charterDirExists = existsSync(path.join(root, '.atm', 'charter'));
+  const bundle = charterDirExists ? loadCharterAuthorityBundle(root) : null;
+  const ok = !charterDirExists || (charterPresent && firstPrinciplesPresent && invariantsPresent && invariantsParseable && bundle?.ok === true);
+  return {
+    ok,
+    charterPath: path.relative(root, charterPath).replace(/\\/g, '/'),
+    firstPrinciplesPath: path.relative(root, firstPrinciplesPath).replace(/\\/g, '/'),
+    charterInvariantsPath: path.relative(root, invariantsPath).replace(/\\/g, '/'),
+    charterPresent,
+    firstPrinciplesPresent,
+    invariantsPresent,
+    invariantsParseable,
+    hashField,
+    bundle
   };
 }

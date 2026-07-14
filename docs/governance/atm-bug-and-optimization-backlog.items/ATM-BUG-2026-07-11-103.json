@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-103",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Team Agents / closed-task completion fidelity",
+  "finding": "TASK-TEAM-0053 closed with a Gemini Direct bridge and deterministic provider tests, but the concrete `team start --execute` dispatcher still accepts only OpenAI and Anthropic, and direct roles do not transfer declared artifacts to downstream reviewers. The closed task therefore did not prove its Captain handoff's live three-vendor cooperation requirements.",
+  "expectedBehavior": "Closure and handoff audits must distinguish provider bridge existence from concrete orchestration reachability and cross-role artifact consumption; unproven live/manual requirements should remain explicit follow-up work.",
+  "evidenceOrRepro": "Current `runDirectTeamProviderRole` rejects `gemini-direct`; paid L5 observability shows independent generic role prompts rather than reviewer consumption of implementer output.",
+  "followUp": "`TASK-TEAM-0071` owns three-vendor execution, bounded artifact handoff, conflict continuation, and context benchmark evidence."
+}

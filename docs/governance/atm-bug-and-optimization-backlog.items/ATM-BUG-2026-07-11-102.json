@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-102",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in working tree (cursor-grok-4.5)",
+  "area": "Cross-task mutation incident recovery",
+  "finding": "`doctor` remains permanently blocked by any JSON file under `.atm/runtime/incidents` even after the conflicting tasks are done and their canonical locks and broker intents are released. Core exports `clearIncidentFlags()` but no CLI surface invokes it or verifies that the incident is resolved.",
+  "expectedBehavior": "Provide an audited `incident status/resolve` command that re-evaluates current owners, locks, broker intents, and dirty paths before clearing flags; doctor should distinguish active from resolved incidents.",
+  "evidenceOrRepro": "Fixed 2026-07-14: `readIncidentFlag()` reconciles and auto-archives resolved incidents. Regression: `packages/core/src/broker/__tests__/cross-task-mutation-guard.test.ts`.",
+  "followUp": "Optional follow-up: expose CLI `incident status/resolve` on top of core reconcile."
+}

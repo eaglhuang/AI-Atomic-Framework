@@ -7,6 +7,25 @@
   "projectName": "sample-project",
   "lastAmendedAt": "2026-05-17T00:00:00.000Z",
   "charterHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "firstPrinciplesHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "scheduleA": {
+    "scheduleId": "schedule-a-economic-thresholds",
+    "economicRatios": {
+      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.1 },
+      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 1.05 },
+      "breakthrough": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 0.8 }
+    },
+    "tokenDiagnostics": {
+      "required": true,
+      "priceProxyAllowed": false,
+      "rationale": "Raw token counts are diagnostics, not a price proxy."
+    },
+    "teamThresholds": {
+      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.0, "requiresMeasuredAcceleration": true },
+      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 0.95, "requiresMeasuredAcceleration": true },
+      "breakthrough": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 0.8, "requiresMeasuredAcceleration": true }
+    }
+  },
   "invariants": [
     {
       "id": "INV-ATM-001",

@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T15-55-03-403Z-close-c15b7a7b2cc3",
+  "taskId": "ATM-GOV-0126",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714154919-codex-gpt-5-5-captain-ATM-GOV-0126-e50a6afcc0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0126.json",
+  "taskSha256": "sha256:ffbb6d3be4c9d2349e39f2ee1309964f0b59456dab52d7b5c20a81ee2d138bc9",
+  "createdAt": "2026-07-14T15:55:03.403Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0126 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714154919-codex-gpt-5-5-captain-ATM-GOV-0126-e50a6afcc0",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0126.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/governance-cost-bench.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T15:55:03.394Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0126.*",
+        ".atm/history/task-events/ATM-GOV-0126/**",
+        ".atm/history/tasks/ATM-GOV-0126.json",
+        "packages/cli/src/telemetry/index.ts",
+        "schemas/team-agents/team-efficiency-incident.schema.json",
+        "scripts/lib/admission-bench/operational-runner.ts",
+        "scripts/lib/governance-cost-bench/paired-runner.ts",
+        "scripts/validate-schemas.ts",
+        "tests/cli/governance-cost-bench.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/telemetry/index.ts",
+        "schemas/team-agents/team-efficiency-incident.schema.json",
+        "scripts/lib/admission-bench/operational-runner.ts",
+        "scripts/lib/governance-cost-bench/paired-runner.ts",
+        "scripts/validate-schemas.ts",
+        "tests/cli/governance-cost-bench.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

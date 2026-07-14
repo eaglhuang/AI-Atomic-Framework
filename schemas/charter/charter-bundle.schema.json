@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.ai-atomic-framework.dev/charter/charter-bundle.schema.json",
+  "title": "ATM Charter Authority Bundle v0.1",
+  "description": "Content-bound authority bundle for AtomicCharter, machine-readable invariants, and Schedule A economic thresholds.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaId",
+    "schemaVersion",
+    "specVersion",
+    "migration",
+    "charterVersion",
+    "lastAmendedAt",
+    "atomicCharter",
+    "firstPrinciples",
+    "invariants",
+    "scheduleA"
+  ],
+  "properties": {
+    "schemaId": {
+      "const": "atm.charterAuthorityBundle"
+    },
+    "schemaVersion": {
+      "const": "atm.charterBundle.v0.1"
+    },
+    "specVersion": {
+      "const": "0.1.0"
+    },
+    "charterVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "lastAmendedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "atomicCharter": {
+      "$ref": "#/$defs/contentBoundDocument"
+    },
+    "firstPrinciples": {
+      "$ref": "#/$defs/contentBoundDocument"
+    },
+    "invariants": {
+      "$ref": "#/$defs/contentBoundDocument"
+    },
+    "scheduleA": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scheduleId",
+        "economicRatios",
+        "tokenDiagnostics",
+        "teamThresholds"
+      ],
+      "properties": {
+        "scheduleId": {
+          "const": "schedule-a-economic-thresholds"
+        },
+        "economicRatios": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["production", "preferred", "breakthrough"],
+          "properties": {
+            "production": { "$ref": "#/$defs/economicRatio" },
+            "preferred": { "$ref": "#/$defs/economicRatio" },
+            "breakthrough": { "$ref": "#/$defs/economicRatio" }
+          }
+        },
+        "tokenDiagnostics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "priceProxyAllowed"],
+          "properties": {
+            "required": { "const": true },
+            "priceProxyAllowed": { "const": false },
+            "rationale": { "type": "string" }
+          }
+        },
+        "teamThresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["production", "preferred", "breakthrough"],
+          "properties": {
+            "production": { "$ref": "#/$defs/teamThreshold" },
+            "preferred": { "$ref": "#/$defs/teamThreshold" },
+            "breakthrough": { "$ref": "#/$defs/teamThreshold" }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strategy", "fromVersion", "notes"],
+      "properties": {
+        "strategy": {
+          "enum": ["none", "additive", "breaking"]
+        },
+        "fromVersion": {
+          "type": ["string", "null"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "contentBoundDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        }
+      }
+    },
+    "economicRatio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxCostRatio", "maxEndToEndTimeRatio"],
+      "properties": {
+        "maxCostRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxEndToEndTimeRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "teamThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxCostRatio", "maxEndToEndTimeRatio", "requiresMeasuredAcceleration"],
+      "properties": {
+        "maxCostRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maxEndToEndTimeRatio": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "requiresMeasuredAcceleration": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

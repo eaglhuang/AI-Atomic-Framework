@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T16-59-17-802Z-close-228566b1177b",
+  "taskId": "TASK-RFT-0026",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714165433-codex-gpt-5-5-captain-TASK-RFT-0026-a886f3eece",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0026.json",
+  "taskSha256": "sha256:787da19b16fbcd70c9cf2072c36d1027f94d15355a88a41ab1200ffe4c037f26",
+  "createdAt": "2026-07-14T16:59:17.802Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0026 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714165433-codex-gpt-5-5-captain-TASK-RFT-0026-a886f3eece",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0026.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types tests/cli/atomization-max-lines.test.ts",
+      "typecheck",
+      "validate:atom-file-size",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T16:59:17.794Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0026.*",
+        ".atm/history/task-events/TASK-RFT-0026/**",
+        ".atm/history/tasks/TASK-RFT-0026.json",
+        "packages/cli/src/commands/git-governance/validate-atom-file-size.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "schemas/atm-config.schema.json",
+        "scripts/validate-hook-atomic-map.ts",
+        "scripts/validate-next-atomic-map.ts",
+        "scripts/validate-team-agents.ts",
+        "tests/cli/atomization-max-lines.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/validate-atom-file-size.ts",
+        "packages/cli/src/commands/tasks/task-import-validators.ts",
+        "schemas/atm-config.schema.json",
+        "scripts/validate-hook-atomic-map.ts",
+        "scripts/validate-next-atomic-map.ts",
+        "scripts/validate-team-agents.ts",
+        "tests/cli/atomization-max-lines.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

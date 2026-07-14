@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0127",
   "title": "Protect foreign WIP with an exclusive release steward lane",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Foundation",
   "dependencies": [],
   "acceptance": [
@@ -65,7 +65,65 @@
     "hash": "e1dc096203b03ff9"
   },
   "importedAt": "2026-07-14T11:42:25.675Z",
-  "lastTransitionId": "2026-07-14T11-42-25-686Z-import-e305db8c7279",
-  "lastTransitionAt": "2026-07-14T11:42:25.686Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T13-45-47-893Z-lock-cleanup-b7e8922edb27",
+  "lastTransitionAt": "2026-07-14T13:45:47.893Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T13:41:25.080Z",
+  "promotedAt": "2026-07-14T13:41:25.083Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-a51374c90a93",
+    "claimedAt": "2026-07-14T13:41:25.086Z",
+    "heartbeatAt": "2026-07-14T13:45:47.801Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0127.json",
+      "packages/cli/src/commands/build-release-hygiene.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/internal-release.ts",
+      "scripts/build-release-hygiene.ts",
+      "tests/cli/build-release-hygiene.test.ts",
+      "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T13:41:25.086Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714134125-codex-gpt-5-5-captain-ATM-GOV-0127-ca76a1207b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0127",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-f2c91f32d93d4d4e",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0127.*",
+      ".atm/history/task-events/ATM-GOV-0127/**",
+      ".atm/history/tasks/ATM-GOV-0127.json",
+      "packages/cli/src/commands/build-release-hygiene.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/internal-release.ts",
+      "scripts/build-release-hygiene.ts",
+      "tests/cli/build-release-hygiene.test.ts",
+      "tests/cli/runner-sync-foreign-dirty-owner.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "513e218b16d0e696f29dd8cc816bb0de707520d0df515328c4e635c6eea3afaf",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T13:41:29.026Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T13:45:47.891Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T13:45:47.801Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714134125-codex-gpt-5-5-captain-ATM-GOV-0127-ca76a1207b",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0127.closure-packet.json"
 }

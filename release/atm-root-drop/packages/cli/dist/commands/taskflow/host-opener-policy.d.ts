@@ -7,6 +7,19 @@ export interface HostOpenerPolicyDecision {
         outputPath: 'explicit' | 'host-policy';
     };
     diagnostics: string[];
+    familyDrift: HostOpenerFamilyDrift | null;
+}
+export interface HostOpenerFamilyDrift {
+    schemaId: 'atm.taskIdFamilyDrift.v1';
+    status: 'clear' | 'duplicate-semantic-family';
+    code: 'ATM_TASK_ID_FAMILY_DRIFT';
+    requestedTaskId: string;
+    requestedFamily: string;
+    requestedSemanticKey: string;
+    existingTaskId: string;
+    existingFamily: string;
+    existingPath: string;
+    message: string;
 }
 export interface HostOpenerPolicyInput {
     cwd: string;

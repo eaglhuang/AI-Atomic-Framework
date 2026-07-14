@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T14-33-17-638Z-close-51434e2f939e",
+  "taskId": "ATM-GOV-0129",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714142337-codex-gpt-5-5-captain-ATM-GOV-0129-a13241e82e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0129.json",
+  "taskSha256": "sha256:418aa6809db51d9c66dde7c3156252dc3017c19832d5c43f1a9fdd510b3333aa",
+  "createdAt": "2026-07-14T14:33:17.638Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0129 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714142337-codex-gpt-5-5-captain-ATM-GOV-0129-a13241e82e",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0129.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T14:33:17.626Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0129.*",
+        ".atm/history/task-events/ATM-GOV-0129/**",
+        ".atm/history/tasks/ATM-GOV-0129.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+        "packages/cli/src/commands/taskflow/close-orchestration.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

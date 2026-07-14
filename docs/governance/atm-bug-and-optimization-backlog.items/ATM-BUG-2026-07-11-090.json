@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-090",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK status residue classification lane",
+  "area": "Tasks status / planning mirror reconcile",
+  "finding": "ATM治理流程/收口UX自身不順：`tasks status` could continue classifying a task as `planning-mirror-only` after `tasks import --reconcile-mirror --write` succeeded and both the live ledger plus planning frontmatter reported `done` with no divergence. This left operators with a stale-looking residue recommendation even after following the official reconcile command, and the generated reconcile artifacts could then block later normal commits. This was an ATM workflow/closeout UX bug, not an adopter project feature bug.",
+  "expectedBehavior": "After a successful reconcile-mirror write, status should clear the `planning-mirror-only` residue bucket when live ledger, planning mirror, task events, and closeout provenance agree. ATM-generated reconcile/event residue should not be left as a blocker for unrelated framework fixes.",
+  "evidenceOrRepro": "Fixed on 2026-07-11 by making done/done/no-divergence status with complete closeout provenance classify as `no-residue` even when planning and target repo fields describe the same-repo planning authority shape. Verification: `node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts`, `npm run typecheck`, and frozen `node atm.mjs tasks status --task TASK-TEAM-0065 --json`, which now reports `residueBucket: no-residue` and diagnostic-only `nextCommand: node atm.mjs tasks status --task TASK-TEAM-0065 --json`.",
+  "followUp": "Keep the regression for done/done same-repo planning authority. A separate pre-commit adoption/advisory path for generated reconcile event residue remains covered by `ATM-BUG-2026-07-11-087`."
+}

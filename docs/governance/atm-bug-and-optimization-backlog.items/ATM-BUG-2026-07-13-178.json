@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-178",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0192",
+  "area": "Abandoned task re-import still requires emergency --force",
+  "finding": "After a mistaken `tasks abandon` on a freshly imported ready/in-progress card (`TASK-AAO-0191`), `tasks import --write --reopen` / `--reset-open` still fail with `ATM_TASKS_IMPORT_DRIFT` asking for `--force`, and `--force` always routes through the emergency approval lease even though the ledger is abandoned/inert with no active claim.",
+  "expectedBehavior": "Reopening an abandoned/inert task from its planning card when there is no active claim should be a normal operator path (`--reopen` or `--reset-open`) without emergency approval; emergency should remain only for overwriting active claims or protected live work.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0192: `writeTaskFiles` now allows `--reopen`/`--reset-open` to overwrite hash-drifted inert ledgers without `--force`. Regression covers abandoned reopen in `import-orchestrator.spec.ts`.",
+  "followUp": "Keep active-claim protection; do not soften emergency for live claims."
+}

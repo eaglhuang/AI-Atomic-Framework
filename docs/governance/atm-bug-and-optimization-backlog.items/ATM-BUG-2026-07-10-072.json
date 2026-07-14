@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-072",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in commit-attempt status lane",
+  "area": "Governed git / commit timeout recovery",
+  "finding": "`node atm.mjs git commit --auto-stage` can exceed the agent tool timeout while the nested git commit and pre-commit hook continue running in the background; the commit may succeed later, but the operator must inspect processes and HEAD manually to avoid duplicate commits. Existing commit-status improvements help, but the normal failure surface still leaves too much live-process ambiguity when the caller aborts.",
+  "expectedBehavior": "When the outer ATM git wrapper is interrupted or times out, it should leave a recoverable status packet with the live child process ids, hook phase, branch queue lock, staged files, and an exact `git commit-status` / wait command. Ideally the wrapper should stream or poll long pre-commit phases so the agent does not time out silently.",
+  "evidenceOrRepro": "Fixed by writing `atm.gitCommitAttemptStatus.v1` before invoking host git, updating it through `preparing-commit`, `running-git-commit`, `timeout`, `failed`, or `committed`, and including `statusCommand`, `retryCommand`, timeout budget, before/after HEAD, head-advanced signal, and live-index rollback residue. `git commit-status` also reports live branch queue owner PID/liveness and wait guidance. Verification: `node --strip-types tests/cli/git-commit-timeout-and-status.test.ts` passes.",
+  "followUp": "A future enhancement can add finer hook phase streaming, but operators now have a durable status packet and exact recovery command after timeout."
+}

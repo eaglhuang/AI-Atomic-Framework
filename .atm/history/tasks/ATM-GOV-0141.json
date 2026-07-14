@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0141",
   "title": "Integrate Batch mode with sealed close and Team admission",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Operations",
   "dependencies": [
     "ATM-GOV-0129",
@@ -68,7 +68,59 @@
     "hash": "d93f18cd2b456c14"
   },
   "importedAt": "2026-07-14T11:42:44.360Z",
-  "lastTransitionId": "2026-07-14T11-42-44-376Z-import-56a7eff78d9d",
-  "lastTransitionAt": "2026-07-14T11:42:44.376Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T16-41-24-663Z-lock-cleanup-4bd04ea4129c",
+  "lastTransitionAt": "2026-07-14T16:41:24.663Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T16:34:08.427Z",
+  "promotedAt": "2026-07-14T16:34:08.429Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-df49d7747b97",
+    "claimedAt": "2026-07-14T16:34:08.432Z",
+    "heartbeatAt": "2026-07-14T16:41:24.567Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0141.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/team.ts",
+      "tests/cli/batch-team-integration.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T16:34:08.432Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714163408-codex-gpt-5-5-captain-ATM-GOV-0141-d199199286",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0141",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-f6bbbb9bfb289c85",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0141.*",
+      ".atm/history/task-events/ATM-GOV-0141/**",
+      ".atm/history/tasks/ATM-GOV-0141.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/team.ts",
+      "tests/cli/batch-team-integration.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "170c63631b54537299a6e001aba42182121009966f995a2d6450223128b47321",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T16:34:13.675Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T16:41:24.661Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T16:41:24.567Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714163408-codex-gpt-5-5-captain-ATM-GOV-0141-d199199286",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0141.closure-packet.json"
 }

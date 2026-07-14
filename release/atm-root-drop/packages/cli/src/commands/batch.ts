@@ -192,6 +192,7 @@ export async function runBatch(argv: string[]) {
         }
       });
     }
+    const capturedHeadBeforeClose = readGitHead(options.cwd);
     const closeResult = await runTasks([
       'close',
       '--cwd',
@@ -236,6 +237,13 @@ export async function runBatch(argv: string[]) {
           held: holdNextClaim,
           historicalDeliveryRefs: batchHistoricalDeliveryRefs,
           historicalBatchRefs: batchHistoricalBatchRefs,
+          closeHeadCapture: {
+            schemaId: 'atm.batchCheckpointHeadCapture.v1',
+            taskId: currentTaskId,
+            batchId: active.batchId,
+            headBeforeClose: capturedHeadBeforeClose,
+            headAfterClose: readGitHead(options.cwd)
+          },
           closeResult: closeResult.evidence,
           failureCategory: closeCategory
         }
@@ -341,6 +349,13 @@ export async function runBatch(argv: string[]) {
         held: holdNextClaim,
         historicalDeliveryRefs: batchHistoricalDeliveryRefs,
         historicalBatchRefs: batchHistoricalBatchRefs,
+        closeHeadCapture: {
+          schemaId: 'atm.batchCheckpointHeadCapture.v1',
+          taskId: currentTaskId,
+          batchId: active.batchId,
+          headBeforeClose: capturedHeadBeforeClose,
+          headAfterClose: readGitHead(options.cwd)
+        },
         commitInstruction: {
           timing: 'single-commit-after-checkpoint',
           beforeCheckpoint: [
@@ -1137,6 +1152,14 @@ function readGitChangedFiles(cwd: string) {
     .map((line) => normalizeGitStatusPath(line.slice(3)))
     .filter(Boolean);
   return { available: true, files };
+}
+
+function readGitHead(cwd: string): string | null {
+  const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], {
+    cwd,
+    encoding: 'utf8'
+  });
+  return result.status === 0 ? result.stdout.trim() || null : null;
 }
 
 /**

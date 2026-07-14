@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-153",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0181",
+  "area": "Task intent routing / claim mode",
+  "finding": "A source-changing backlog fix with an uncommitted deliverable was classified by `next --claim --auto-intent` as `closeout-only`, forcing release and an explicit `--claim-intent write` reclaim before work could begin.",
+  "expectedBehavior": "Auto-intent now requires scoped delivery evidence before treating existing deliverables in `HEAD` as closeout-only; pre-existing deliverables without a task delivery commit resolve to `write` with reason `delivery-evidence-not-found`.",
+  "evidenceOrRepro": "Fixed by delivery commit `973f854025b7c5390e16a51d51ae07543e9449e6` and close commit `551507b7f428d3beef2c3ec99c2c6b359d433a82`. Evidence: `node --strip-types tests/cli/tasks-claim-auto-intent.test.ts`, `npm run typecheck`, `npm run validate:cli`, and `npm run validate:git-head-evidence` passed for TASK-AAO-0181.",
+  "followUp": "Regression now covers pre-existing deliverables without delivery evidence, dirty in-scope source, delivered task with scoped commit evidence, and explicit closeout-only conflict recovery."
+}

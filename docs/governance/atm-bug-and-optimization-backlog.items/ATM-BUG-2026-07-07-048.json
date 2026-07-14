@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-048",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in onefile in-process runner lane",
+  "area": "Next latency / frozen runner startup",
+  "finding": "`next --prompt ... --json` had a slow hot path from over-hydrating historical task ledgers, scanning markdown task cards even after a JSON task-id match, and recomputing full framework readiness for advisory fields. After `TASK-AAO-0150`, the dist-internal `ATM_NEXT_PROFILE=1` route is ~0.3s, but `node atm.mjs` on Windows still shows occasional >5s wrapper/import/OS IO spikes.",
+  "expectedBehavior": "The prompt-scoped `next` route should keep the semantic routing work under 5s warm, and the frozen wrapper should avoid import-time git/template scans or other startup work unrelated to `next`.",
+  "evidenceOrRepro": "`TASK-AAO-0150` profiling showed `inspectImportedTaskQueue` at ~9.7s, markdown task reads at ~6-8s when JSON had already matched, and `buildGovernanceReadinessHint` at ~2.2s due git subprocesses. The fix lazy-hydrates ledger tasks, skips markdown discovery for JSON task-id matches, fast-reads branch readiness from `.git`, and leaves `ATM_NEXT_PROFILE=1` phase diagnostics. Post-fix onefile warm-run evidence on Windows reports `cliLogicMs: 39`, `p50Ms: 1693.09`, `p95Ms: 5195.47`, and `wrapperOverheadMs: 1998.98`, all within the declared budgets.",
+  "followUp": "Keep the latency validator in the release validation set and investigate future Windows OS scheduling variance only if the declared p95 budget regresses."
+}

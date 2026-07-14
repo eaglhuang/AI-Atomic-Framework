@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-121",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in current working tree; needs governed closeout",
+  "area": "Broker intent schema parity",
+  "finding": "A file-scoped task claim registered as `parallel-safe`, but effective arbitration reinterpreted the same active intent as malformed because it required non-empty `atomRefs` even though the registry contract permits task-level file-only writes.",
+  "expectedBehavior": "Register and effective arbitration must accept the same valid intent shape; file-scoped task claims with non-empty target files must not self-block solely because atom refs are absent.",
+  "evidenceOrRepro": "TASK-AAO-0157 self intent was `parallel-safe` at registration but `blocked-active-lease` at effective status. Releasing and reclaiming reproduced it. Source fix permits file-only intents while retaining fail-closed empty target-file rejection; focused conflict-matrix regression and frozen runner status pass.",
+  "followUp": "Commit the Broker parity repair with release artifacts and retain self-intent effective-status regression coverage."
+}

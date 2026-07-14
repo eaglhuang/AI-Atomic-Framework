@@ -84,6 +84,19 @@ async function runRosterSyncFollowUp(input) {
 function buildTasksImportCommand(input) {
     return `node atm.mjs tasks import --from ${quoteCliValue(input.fromPath)} --write --json`;
 }
+function buildTaskflowOpenDryRunCommand(input) {
+    const parts = ['node atm.mjs taskflow open --dry-run'];
+    if (input.profilePath)
+        parts.push(`--profile ${quoteCliValue(input.profilePath)}`);
+    if (input.taskId)
+        parts.push(`--task-id ${quoteCliValue(input.taskId)}`);
+    if (input.outputPath)
+        parts.push(`--output ${quoteCliValue(input.outputPath)}`);
+    if (input.title)
+        parts.push(`--title ${quoteCliValue(input.title)}`);
+    parts.push('--json');
+    return parts.join(' ');
+}
 /**
  * TASK-RFT-0011: read package.json for auto-evidence npm-script mapping.
  * Returns `null` when the file is missing or malformed — the mapper degrades
@@ -153,6 +166,19 @@ function buildOrchestrationPlan(input) {
             })
             : null,
         hostOpenerInvocation: input.delegationContract.displayHint,
+        planningCard: resolvedOutputPath,
+        targetRepository: input.profile?.ownerRepo ?? 'adopter-repo',
+        nextDryRunCommand: buildTaskflowOpenDryRunCommand({
+            profilePath: input.profilePath,
+            taskId: resolvedTaskId,
+            outputPath: resolvedOutputPath,
+            title: input.title
+        }),
+        nextImportCommand: resolvedOutputPath
+            ? buildTasksImportCommand({
+                fromPath: input.outputRoot ? resolveOutputAbsolute(input.outputRoot, resolvedOutputPath) : resolvedOutputPath
+            })
+            : null,
         rosterSyncPolicy,
         rosterIndexPath,
         rosterFollowUpCommand,
@@ -1051,7 +1077,8 @@ export async function runTaskflow(argv = []) {
         template,
         title,
         rosterIndexPath,
-        hostPolicyDecision
+        hostPolicyDecision,
+        profilePath
     });
     const writeReadinessHint = buildWriteReadinessHint({
         openerMode,
@@ -1094,6 +1121,18 @@ export async function runTaskflow(argv = []) {
             outputPath,
             title
         });
+        if (resolved.familyDrift) {
+            throw new CliError('ATM_TASK_ID_FAMILY_DRIFT', resolved.familyDrift.message, {
+                exitCode: 1,
+                details: {
+                    familyDrift: resolved.familyDrift,
+                    planningCard: resolved.outputPath,
+                    targetRepository: profileData.ownerRepo,
+                    nextDryRunCommand: orchestrationPlan.nextDryRunCommand,
+                    nextImportCommand: orchestrationPlan.nextImportCommand
+                }
+            });
+        }
         const targetAbsolute = resolveOutputAbsolute(openOutputRoot, resolved.outputPath);
         const hadExistingTarget = existsSync(targetAbsolute);
         let generated = null;
@@ -1193,11 +1232,15 @@ export async function runTaskflow(argv = []) {
         cwd,
         mode: 'dry-run',
         messages: [
-            message(openerMode === 'delegated-governed' ? 'info' : 'warn', openerMode === 'delegated-governed'
-                ? 'ATM_TASKFLOW_OPEN_ORCHESTRATION_READY'
-                : 'ATM_TASKFLOW_OPEN_TEMPLATE_ONLY_FALLBACK', openerMode === 'delegated-governed'
-                ? 'taskflow open dry-run orchestration plan is ready for delegated governed entry.'
-                : 'taskflow open is in template-only-fallback mode. --write will fail closed; see writeReadinessHint for the exact missing prerequisites. tasks new (low-level generator surface) remains the explicit non-governed escape hatch.', { cwd, openerMode, writeReadinessHintStatus: writeReadinessHint.status })
+            message(hostPolicyDecision?.familyDrift ? 'warn' : openerMode === 'delegated-governed' ? 'info' : 'warn', hostPolicyDecision?.familyDrift
+                ? 'ATM_TASK_ID_FAMILY_DRIFT'
+                : openerMode === 'delegated-governed'
+                    ? 'ATM_TASKFLOW_OPEN_ORCHESTRATION_READY'
+                    : 'ATM_TASKFLOW_OPEN_TEMPLATE_ONLY_FALLBACK', hostPolicyDecision?.familyDrift
+                ? hostPolicyDecision.familyDrift.message
+                : openerMode === 'delegated-governed'
+                    ? 'taskflow open dry-run orchestration plan is ready for delegated governed entry.'
+                    : 'taskflow open is in template-only-fallback mode. --write will fail closed; see writeReadinessHint for the exact missing prerequisites. tasks new (low-level generator surface) remains the explicit non-governed escape hatch.', { cwd, openerMode, writeReadinessHintStatus: writeReadinessHint.status })
         ],
         evidence: {
             openerMode,

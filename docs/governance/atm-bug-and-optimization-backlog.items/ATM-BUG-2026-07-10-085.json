@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-085",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in team-validator runtime-cleanup lane",
+  "area": "Validator harness / Team runtime residue",
+  "finding": "A successful pre-commit run can leave an untracked active Team run under `.atm/runtime/team-runs/**` in the real repository because `validate:cli` executes a Team start smoke against the working tree instead of an isolated temp repo or guaranteed cleanup lane.",
+  "expectedBehavior": "Validators and pre-commit hooks should leave no untracked `.atm/runtime/**` residue in the operator repository; Team runtime smoke tests should run in temp fixtures or clean up through an official CLI lifecycle/cleanup command.",
+  "evidenceOrRepro": "Fixed by wrapping `scripts/validate-team-agents.ts` with a source-repo team-run snapshot/cleanup guard that removes validator-created `.atm/runtime/team-runs/*.json` files while preserving files present before the validator starts. Verification: `node --strip-types scripts/validate-team-agents.ts --case source-runtime-residue-cleanup` and `node --strip-types scripts/validate-team-agents.ts --case hook-team-gate` both pass.",
+  "followUp": "Keep Team start/status smoke tests in temp workspaces; the source-repo cleanup guard is a final safety net for validator-created runtime residue."
+}

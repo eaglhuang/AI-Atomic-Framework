@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-037",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "P0",
+  "status": "Fixed in 2026-06-28 governed commit evidence lane",
+  "area": "Git governance / commit wrapper evidence timing",
+  "finding": "Even after `doctor` and `next` surfaced governance readiness early, a critical framework change still commonly landed as one delivery commit plus one evidence-only follow-up commit because the governed `git commit` wrapper relied on later hook/push lanes to discover missing `git-head` evidence for the new commit.",
+  "expectedBehavior": "The governed `git commit` wrapper should pre-stage matching future-commit `git-head` evidence before the commit is written, and `hook pre-commit` should treat already-matching staged evidence as idempotent instead of appending duplicates. That lets one governed delivery commit satisfy protected pre-push without a mandatory second evidence-only follow-up commit.",
+  "evidenceOrRepro": "Reproduced on 2026-06-28 immediately after the governance-entry-readiness lane: commit `46b1d9b747e2524fceea670585d88d6727471126` landed through `node atm.mjs git commit`, but protected `git push origin main` still failed with `ATM_COMMIT_RANGE_GIT_HEAD_EVIDENCE_MISSING` until a second `node atm.mjs evidence git-head-backfill ...` follow-up commit was added. Repaired by teaching `packages/cli/src/commands/git-governance.ts` to pre-stage future-commit git-head evidence for governed whole-index commits and by making `packages/cli/src/commands/hook.ts` reuse matching staged future-commit evidence instead of appending duplicate records. Regression coverage now proves a governed critical commit can include `.atm/history/evidence/git-head.jsonl` in the same commit and pass `hook pre-push` immediately without a backfill-only follow-up commit.",
+  "followUp": "Keep the governed wrapper pre-stage lane and hook idempotence together; future git-governance changes must preserve the one-commit protected-push path for critical framework commits instead of reintroducing mandatory evidence-only follow-up commits."
+}

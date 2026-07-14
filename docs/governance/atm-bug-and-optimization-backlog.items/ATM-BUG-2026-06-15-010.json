@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-010",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in historical-batch evidence lane",
+  "area": "Historical evidence / taskflow close",
+  "finding": "Completed multi-task delivery packages currently force operators to close or evidence tasks one by one, even when the real delivery landed as a coherent commit bundle with shared validators. This creates noisy after-the-fact evidence work and makes it hard to distinguish historical attestation from original live evidence.",
+  "expectedBehavior": "ATM should support a governed historical batch evidence envelope: one delivery commit range, one validator set, one artifact manifest, and per-task scoped evidence slices that preserve each task acceptance boundary. The evidence must be marked historical, not fresh live execution.",
+  "evidenceOrRepro": "Source reality now satisfies this contract: `packages/cli/src/commands/evidence.ts` implements `evidence historical-batch`, `packages/cli/src/commands/taskflow.ts` and `tasks close` consume `--historical-batch`, `docs/governance/historical-batch-evidence.md` documents the operator flow, and `packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts` plus `packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts` cover complete slices, unmatched safeguards, envelope staging, and per-task close readiness.",
+  "followUp": "Keep historical-batch command/spec/docs/tests aligned; remaining partial-slice disposition is separately tracked by `ATM-BUG-2026-06-16-014`."
+}

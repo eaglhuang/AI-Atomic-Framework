@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-163",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug / Product gap",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Protected override audit scoping",
+  "finding": "Protected override audit files can be selected into a governed commit bundle as task-owned artifacts, but the active task direction lock may not automatically include them.",
+  "expectedBehavior": "Any generated task-owned protected override audit included by the commit bundle should either be automatically allowed by the direction-lock gate or trigger a precise scope-amendment flow before staging.",
+  "evidenceOrRepro": "FABLE-005 commit initially failed on `.atm/history/protected-override-audit/2026-07-12T15-59-52-259Z-POA-0e9840962464.json`; 0188 failed on two protected override audit files. Both were current-task artifacts but outside `taskDirectionLock.allowedFiles`; `tasks scope add` was required before commit.",
+  "followUp": "Add protected-override audit ownership to the direction-lock allowed-file model and cover it in pre-commit + commit-wrapper tests."
+}

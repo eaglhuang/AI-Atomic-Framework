@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-c5d53fcc9c71",
+  "recordedAt": "2026-07-14T17:03:22.962Z",
+  "actorId": "codex-gpt-5-5-captain",
+  "taskId": "TASK-RFT-0026",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5-5-captain --task TASK-RFT-0026 --message \"feat(governance): complete TASK-RFT-0026\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-TASK-RFT-0026-a24301fd74",
+  "reason": "Bypass hook only for checkpointed TASK-RFT-0026 bundle blocked by next-task direction lock after batch checkpoint.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-14T17-03-22-960Z-EMG-TASK-RFT-0026-a24301fd74.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

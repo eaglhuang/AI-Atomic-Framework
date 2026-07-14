@@ -21,6 +21,8 @@ export function describeBuildReleaseHygienePolicy(): {
   readonly runnerSyncCommand: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build';
   readonly validationSafeCommand: 'npm run build:packages';
   readonly cleanupCommand: 'node --strip-types scripts/build-release-hygiene.ts --mode cleanup';
+  readonly publicationReceiptRequired: true;
+  readonly sealedSourceStateRequired: true;
 } {
   return {
     retainEnvVar: 'ATM_RETAIN_RELEASE_ARTIFACTS',
@@ -28,7 +30,9 @@ export function describeBuildReleaseHygienePolicy(): {
     retainBehavior: 'keep-generated-release-mirrors',
     runnerSyncCommand: 'ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build',
     validationSafeCommand: 'npm run build:packages',
-    cleanupCommand: 'node --strip-types scripts/build-release-hygiene.ts --mode cleanup'
+    cleanupCommand: 'node --strip-types scripts/build-release-hygiene.ts --mode cleanup',
+    publicationReceiptRequired: true,
+    sealedSourceStateRequired: true
   };
 }
 
@@ -88,7 +92,7 @@ export function finalizeBuildReleaseHygiene(repoRoot: string): void {
   console.log(
     `[build-release-hygiene] no tracked release manifests required cleanup. `
     + `Use ${policy.validationSafeCommand} when validators only need package dist, or `
-    + `${policy.runnerSyncCommand} when publishing runner artifacts intentionally.`
+    + `${policy.runnerSyncCommand} when publishing runner artifacts intentionally with a sealed source receipt.`
   );
 }
 

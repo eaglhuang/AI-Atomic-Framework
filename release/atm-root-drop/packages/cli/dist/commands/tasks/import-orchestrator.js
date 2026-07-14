@@ -9,6 +9,7 @@ import { assertRunnerFreshForWriteAction } from '../framework-development.js';
 import { assertEmergencyApproval } from '../emergency/gate.js';
 import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.js';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.js';
+import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.js';
 import { classifyResetOpenImportForOptions, collectActiveClaimImportSkips, detectPlanHeadings, enrichParsedTasksFromSiblingTaskCards, parseImportOptions, parseSingleCardFromPlugin, parsePlanMarkdown, writeImportEvidence, writeTaskFiles, assertLocalTaskLedgerEnabled, recordStaleRunnerOverride } from '../tasks.js';
 export async function runTasksImport(argv) {
     const options = parseImportOptions(argv);
@@ -126,12 +127,22 @@ export async function runTasksImport(argv) {
             importedAt: generatedAt
         });
     }
-    parsed = enrichParsedTasksFromSiblingTaskCards({
+    const enrichedParsed = enrichParsedTasksFromSiblingTaskCards({
         cwd: options.cwd,
         planAbsolute,
         parsed,
         importedAt: generatedAt
     });
+    const planningSourceSeal = buildPlanningSourceSeal({
+        cwd: options.cwd,
+        planAbsolute,
+        planText,
+        sealedAt: generatedAt
+    });
+    parsed = {
+        ...enrichedParsed,
+        tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, planningSourceSeal))
+    };
     // TASK-AAO-FABLE-007: extraction-first patrol — advisory only.
     parsed = {
         ...parsed,

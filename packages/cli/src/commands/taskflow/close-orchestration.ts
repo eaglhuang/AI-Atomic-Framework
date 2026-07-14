@@ -30,6 +30,7 @@ import {
   type DirectoryDeliverableManifestEntry
 } from '../tasks/historical-delivery.ts';
 import { resolveStoredPlanningPath } from '../planning-repo-root.ts';
+import { assertPlanningSourceSealValid } from '../tasks/import-task.ts';
 
 export type ClosebackPlanningPathRoute =
   | 'source-plan-path'
@@ -509,6 +510,11 @@ export function resolveClosebackPlanningPath(input: {
   profileRepoRoot: string | null;
   delegationContract: TaskflowDelegationContract;
 }): ClosebackPlanningPathResolution {
+  const planningSourceSealValidation = assertPlanningSourceSealValid({
+    cwd: input.cwd,
+    taskDocument: input.taskDocument,
+    surface: 'close'
+  });
   const normalizedTaskId = normalizeTaskId(input.taskId);
   const title = typeof input.taskDocument.title === 'string' ? input.taskDocument.title : null;
   const profileFallbackAvailable = Boolean(input.profile && input.profileRepoRoot);
@@ -539,8 +545,8 @@ export function resolveClosebackPlanningPath(input: {
         profileRepoRoot: null,
         planningStatus: metadata.status,
         diagnostics: {
-          codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT'],
-          messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`]
+          codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT', ...planningSourceSealValidation.diagnostics.codes],
+          messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`, ...planningSourceSealValidation.diagnostics.messages]
         }
       };
     }

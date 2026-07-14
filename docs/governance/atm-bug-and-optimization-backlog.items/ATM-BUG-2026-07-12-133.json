@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-133",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0083",
+  "area": "Team L5 proposal-first usability",
+  "finding": "`team plan` detects a valid hot-file proposal-first gate but exposes no proposal input/creation route, while only `team start` accepts `--broker-proposal-file`. A Captain therefore cannot turn a blocked L5 plan into a ready plan without reverse-engineering a separate Broker proposal contract.",
+  "expectedBehavior": "Team plan/validate must surface the required proposal schema and a copyable create/validate command, and may accept the same proposal file for readiness preview; start remains fail-closed until that validated proposal is supplied.",
+  "evidenceOrRepro": "TASK-TEAM-0083 delivery `31d5faa98` added proposal-first plan/start parity and paid three-provider L5 regression evidence.",
+  "followUp": "Closed by TASK-TEAM-0083."
+}

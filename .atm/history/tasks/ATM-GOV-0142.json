@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0142",
   "title": "Productize release publication ownership and sealed source receipts",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Operations",
   "dependencies": [
     "ATM-GOV-0127",
@@ -54,7 +54,59 @@
     "hash": "2ff8956cc0c95652"
   },
   "importedAt": "2026-07-14T11:42:45.984Z",
-  "lastTransitionId": "2026-07-14T11-42-45-995Z-import-d55c640d52cf",
-  "lastTransitionAt": "2026-07-14T11:42:45.995Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T15-38-25-757Z-lock-cleanup-5a83aca8fb97",
+  "lastTransitionAt": "2026-07-14T15:38:25.757Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T15:32:12.959Z",
+  "promotedAt": "2026-07-14T15:32:12.962Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-ff453a2a48e1",
+    "claimedAt": "2026-07-14T15:32:12.965Z",
+    "heartbeatAt": "2026-07-14T15:38:25.571Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0142.json",
+      "packages/cli/src/commands/build-release-hygiene.ts",
+      "packages/cli/src/commands/internal-release.ts",
+      "tests/cli/release-publication-steward.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T15:32:12.965Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714153212-codex-gpt-5-5-captain-ATM-GOV-0142-ae25d60630",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0142",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-0daf94d3b24a5634",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0142.*",
+      ".atm/history/task-events/ATM-GOV-0142/**",
+      ".atm/history/tasks/ATM-GOV-0142.json",
+      "packages/cli/src/commands/build-release-hygiene.ts",
+      "packages/cli/src/commands/internal-release.ts",
+      "tests/cli/release-publication-steward.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "738e030f049d1db71590a10c870612f6fa6780204f58ff75888e560fef2b139e",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T15:32:17.858Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T15:38:25.754Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T15:38:25.571Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714153212-codex-gpt-5-5-captain-ATM-GOV-0142-ae25d60630",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0142.closure-packet.json"
 }

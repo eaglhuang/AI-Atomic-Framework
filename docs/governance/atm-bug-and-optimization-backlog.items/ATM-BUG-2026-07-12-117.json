@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-117",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0204",
+  "area": "Commit bundle / protected override audit",
+  "finding": "A task-scoped governed commit auto-staged its own generated protected-override audit record, but the active direction lock did not automatically include that record. Pre-commit then failed with `ATM_TASK_DIRECTION_SCOPE_DRIFT` even though every source file was in scope.",
+  "expectedBehavior": "When ATM generates a task-attached protected audit artifact, task bundle resolution should include it in the direction lock or omit it until the governed closure lane owns it.",
+  "evidenceOrRepro": "TASK-TEAM-0076 commit attempt was blocked after a clean bundle dry-run; the only blocker was `.atm/history/protected-override-audit/2026-07-12T01-45-43-529Z-POA-c5ec9263d851.json`.",
+  "followUp": "Fixed 2026-07-14: `listTaskOwnedProtectedOverrideAuditFiles` now feeds `resolveTaskDeclaredScope`, taskflow close bundles, and pre-commit `collectTaskGovernedCommitAllowedFiles`; regression `tests/cli/protected-override-audit-direction-lock.test.ts`."
+}

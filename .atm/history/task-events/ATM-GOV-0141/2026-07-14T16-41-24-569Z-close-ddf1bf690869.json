@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T16-41-24-569Z-close-ddf1bf690869",
+  "taskId": "ATM-GOV-0141",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714163408-codex-gpt-5-5-captain-ATM-GOV-0141-d199199286",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0141.json",
+  "taskSha256": "sha256:9289a04f0d41350c75bfe3c960a79e4792372cb715faae336be0127043934b94",
+  "createdAt": "2026-07-14T16:41:24.569Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0141 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714163408-codex-gpt-5-5-captain-ATM-GOV-0141-d199199286",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0141.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/batch-team-integration.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T16:41:24.560Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0141.*",
+        ".atm/history/task-events/ATM-GOV-0141/**",
+        ".atm/history/tasks/ATM-GOV-0141.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/team.ts",
+        "tests/cli/batch-team-integration.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/team.ts",
+        "tests/cli/batch-team-integration.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

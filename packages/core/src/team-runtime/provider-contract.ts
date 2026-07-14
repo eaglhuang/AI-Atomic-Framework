@@ -68,9 +68,35 @@ export type TeamProviderExecutionResult = {
   readonly statusCode?: number;
   readonly outputText: string;
   readonly outputArtifacts?: readonly string[];
+  readonly billableUsage?: TeamProviderBillableUsage;
   readonly retryable: boolean;
   readonly summary: string;
   readonly executionMode: 'vendor-api' | 'editor-cli';
+};
+
+export type TeamProviderBillableUsage = {
+  readonly schemaId: 'atm.teamProviderBillableUsage.v1';
+  readonly providerId: TeamProviderId;
+  readonly modelId: string;
+  readonly billingProduct: string;
+  readonly serviceTier?: string | null;
+  readonly region?: string | null;
+  readonly currency?: string | null;
+  readonly providerReportedChargedAmount?: number | null;
+  readonly providerReportedCredits?: number | null;
+  readonly inputTokens?: number;
+  readonly outputTokens?: number;
+  readonly cacheReadTokens?: number;
+  readonly cacheWriteTokens?: number;
+  readonly reasoningTokens?: number;
+  readonly toolCallCount?: number;
+  readonly requestCount?: number;
+  readonly sessionCount?: number;
+  readonly retryCount?: number;
+  readonly failedRequestCount?: number;
+  readonly cancelledRequestCount?: number;
+  readonly billedFailedOrCancelled?: boolean;
+  readonly measurementIncompleteReasons?: readonly string[];
 };
 
 export type TeamProviderHttpExecutor = (input: {

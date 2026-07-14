@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-132",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0079",
+  "area": "Broker stale queue ownership",
+  "finding": "A task that remains only `planned` with no live claim or Broker registry intent can still remain queue head, blocking a valid waiter indefinitely.",
+  "expectedBehavior": "Queue cleanup/status must identify entries without a live task claim or active Broker intent as stale and provide a governed release/re-arbitration action; planned tasks must never retain write ownership.",
+  "evidenceOrRepro": "`TASK-AAO-0158` was `planned`, had no claim and no active registry intent, but headed both backlog/map queues ahead of `TASK-TEAM-0079`. `broker release --task TASK-AAO-0158` advanced 0079 to queue head.",
+  "followUp": "Add stale queue owner detection and regression; status should name the stale task and a copyable cleanup action without silently discarding active ownership."
+}

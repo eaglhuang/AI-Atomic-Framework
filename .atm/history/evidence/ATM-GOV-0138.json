@@ -1,0 +1,210 @@
+{
+  "taskId": "ATM-GOV-0138",
+  "updatedAt": "2026-07-14T16:25:40.843Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/broker-registry-transaction.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-5-captain",
+      "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+      "createdAt": "2026-07-14T16:24:01.912Z",
+      "details": {
+        "actorId": "codex-gpt-5-5-captain",
+        "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/broker-registry-transaction.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-transaction-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/broker-registry-transaction.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e71ea534be5eb43315e18c15e8afb8da44adcfb59fd600c059784b1c4ddce636",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/broker-registry-transaction.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "be16b3730b0825dd1040c7019944ff969eb6e45b",
+            "cacheKey": "sha256:581f8805063f546835ceb74f13ff8a4f81517e9f6d6511c43eddfbab9b72082f",
+            "cached": false,
+            "generatedAt": "2026-07-14T16:24:02.032Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d266f50c67a2ce72c8d470e9505708c2d056748906e5907bc4e954788df5c703",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-5-captain",
+      "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+      "createdAt": "2026-07-14T16:24:17.580Z",
+      "details": {
+        "actorId": "codex-gpt-5-5-captain",
+        "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-transaction-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "be16b3730b0825dd1040c7019944ff969eb6e45b",
+            "cacheKey": "sha256:a50818e4567f7c88997ff063e8bd3aeef41539ae72fced4d310943a4feba9b4d",
+            "cached": false,
+            "generatedAt": "2026-07-14T16:24:17.840Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ba43c809f3f23b70a02aa2746cadd25a087d4813da5eba6d39eb190fb20ae61d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-5-captain",
+      "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+      "createdAt": "2026-07-14T16:24:41.331Z",
+      "details": {
+        "actorId": "codex-gpt-5-5-captain",
+        "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-transaction-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:57f89ab4303fe3428b15bb01d747d758403492d6bee341edc930b052a9be1364",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "be16b3730b0825dd1040c7019944ff969eb6e45b",
+            "cacheKey": "sha256:b036cf71461bb769d91840e6964489d2a3a4936788b993b845786c7c7c46b3d3",
+            "cached": false,
+            "generatedAt": "2026-07-14T16:24:41.561Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:96f0564cabf8c8140225de5e0a4f075f0811c6a30b5d0abc3469e173c4e23f69",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-5-captain",
+      "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+      "createdAt": "2026-07-14T16:25:40.843Z",
+      "details": {
+        "actorId": "codex-gpt-5-5-captain",
+        "sessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.broker-transaction-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "be16b3730b0825dd1040c7019944ff969eb6e45b",
+            "cacheKey": "sha256:14f574c11e93f9a998240e5c2710b0def7a73a4b0903029e7faf6a6fdb0f4427",
+            "cached": false,
+            "generatedAt": "2026-07-14T16:25:40.980Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:724e3cdf0ee49ebea1b4600af3bf243e15c4b789c2e4d80f4a57d4395e2b9d8a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

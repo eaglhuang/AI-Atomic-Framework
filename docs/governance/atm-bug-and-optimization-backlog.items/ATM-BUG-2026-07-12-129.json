@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-129",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0079",
+  "area": "Broker CID admission",
+  "finding": "The atom-ID and atom-CID gates treated equal strings as unconditional write/write freezes even after intent shape, lease, and shared-surface gates had established that two transactions wrote no common file or shared surface. This blocked independent work such as TASK-TEAM-0075 and TASK-AAO-0160.",
+  "expectedBehavior": "CID write ownership is a semantic refinement of a common writable surface, not a global mutex. Preserve read-set visibility, but require a common target file or shared surface before a CID write conflict can freeze admission.",
+  "evidenceOrRepro": "Source-first import/claim of TASK-AAO-0160 reported no shared paths but froze on `atom-cli-router` / `atom-validator-framework` CID overlap held by active 0075.",
+  "followUp": "Regression now proves broad CID on disjoint files is `parallel-safe`, while same CID on the same target file remains `blocked-cid-conflict`; retain both decision and seven-layer matrix cases."
+}

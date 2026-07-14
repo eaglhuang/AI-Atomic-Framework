@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-032",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in 2026-06-28 repair lane",
+  "area": "Git governance / evidence-only follow-up residue",
+  "finding": "After `node atm.mjs evidence git-head-backfill ...` and a governed evidence-only follow-up commit, the worktree can briefly report `.atm/history/evidence/git-head.jsonl` as modified again even though the evidence commit itself already succeeded. The file settles back to clean, but the transient dirty state is confusing and looks like residue or a second required evidence commit.",
+  "expectedBehavior": "Evidence-only follow-up commits should either suppress redundant post-commit git-head rewrites or surface a precise \"transient auto-refresh\" diagnostic so operators do not misread the worktree as genuinely dirty.",
+  "evidenceOrRepro": "Reproduced and then covered on 2026-06-28 by isolating evidence-only follow-up commit fixtures and sampling git status until the transient rewrite settles. The lane now has deterministic regression coverage in `scripts/validate-governance-commands.ts`, which verifies the evidence-only follow-up commit path and guards against stale mixed-scope assumptions without requiring a human to interpret brief worktree flicker.",
+  "followUp": "Keep the evidence-only follow-up fixture isolated from mixed-scope commit tests, and preserve the settle-check sampling so timing-sensitive residue regressions stay visible without turning the validator into a flaky sleep-heavy lane."
+}

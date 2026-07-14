@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-053",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in this cleanup commit",
+  "area": "Git wrapper / failed commit residue",
+  "finding": "A failed `node atm.mjs git commit --auto-stage` can leave staged governance residue, including `.atm/history/evidence/git-head.jsonl`, while the blocking hook also provides no concrete recovery command for the singleton evidence-file context failure.",
+  "expectedBehavior": "If the wrapper fails after staging generated provenance, it should roll back its own staged additions or emit an exact cleanup/retry command. Hook failures for evidence-only bundle manifests should name the supported repair path instead of leaving the operator to inspect and restore staged residue manually.",
+  "evidenceOrRepro": "After `TASK-AAO-0147` close, trying to commit the leftover `TASK-AAO-0147.bundle-manifest.json` failed with `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT`; the failed attempt left both the bundle manifest and a new `git-head.jsonl` record staged. The operator had to run a scoped `git restore --staged --worktree -- .atm/history/evidence/TASK-AAO-0147.bundle-manifest.json .atm/history/evidence/git-head.jsonl` to return to clean state. Reconfirmed on 2026-07-09 when wrapper failures exposed `liveIndexResidueRollback` but still lacked HEAD/retry context.",
+  "followUp": "Keep `tests/cli/git-commit-failure-residue-rollback.test.ts` coverage that failed attempts restore the pre-attempt index, record `headAdvancedDuringAttempt=false`, and expose exact status/retry guidance."
+}

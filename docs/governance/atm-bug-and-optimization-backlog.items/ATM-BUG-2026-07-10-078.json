@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-078",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in close residue-advisory lane",
+  "area": "Taskflow close / exit semantics",
+  "finding": "`taskflow close --write` can land delivery and closure commits, set ledger `status: done`, and push planning commits, yet still exit `1` when planning-mirror residue remains classified in target `tasks status`. Operators interpret exit `1` as a failed close and retry closeout unnecessarily.",
+  "expectedBehavior": "Close should distinguish hard failure from advisory residue: exit `0` with explicit residue warnings when ledger closure and governed commits succeeded, or return a dedicated residue status code with recovery commands instead of a generic failure exit.",
+  "evidenceOrRepro": "Fixed by adding `atm.taskflowCloseResidueAdvisory.v1` to successful close-write results when the remaining bucket is planning mirror drift (`planning-mirror-only`, `stale-import`, or `ledger-ahead-of-planning-mirror`). The warning includes the recovery command, now routed through `tasks import --write --reconcile-mirror` for done ledgers. Verification: `node --strip-types packages/cli/src/commands/taskflow/__tests__/close-residue-advisory.spec.ts`, `node --strip-types packages/cli/src/commands/tasks/__tests__/residue-diagnostics.test.ts`, and `npm run typecheck` pass.",
+  "followUp": "Keep ambiguous residue fail-closed; only post-close planning mirror drift is downgraded to advisory after backend close and commit bundle success."
+}

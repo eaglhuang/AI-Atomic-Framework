@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-176",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization / AI routing",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0193",
+  "area": "Framework-repo task open / planning-root reminder",
+  "finding": "When an agent opens or imports a framework-development task from inside `AI-Atomic-Framework`, ATM does not remind them to first author the plan MD and formal task card under the canonical 3KLife planning root (`docs/ai_atomic_framework/**/tasks/`). Agents can therefore claim/import/close using only `.atm/task-plans/` in the target repo, leaving the AAO/TEAM planning roster incomplete until someone notices later.",
+  "expectedBehavior": "For framework-repo task creation/import/open routes, ATM should detect missing planning-root authorship and emit a blocking or high-priority notice with the exact 3KLife path pattern and next command (for example write `.../atm-agent-first-operability/tasks/TASK-AAO-NNNN-....task.md`, update the roster README, then import from that path). Target-repo-only task-plans should be treated as incomplete for AAO/TEAM-style work unless an explicit waiver is recorded.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0193: framework-repo `tasks import` of AAO/TEAM cards from `.atm/task-plans/` now fail-closed on `--write` (and warn on `--dry-run`) unless a matching planning-root card exists or `--waive-planning-root --reason` is explicit. Regression: `packages/cli/src/commands/tasks/__tests__/planning-root-authorship.spec.ts`.",
+  "followUp": "Keep the same preflight visible on taskflow open guidance when AAO/TEAM work starts from target-only mirrors."
+}

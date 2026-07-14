@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-124",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Critical",
+  "status": "Fixed in TASK-AAO-0160",
+  "area": "Governed commit / protected override audit deferral and lease renewal",
+  "finding": "`git commit --auto-stage --defer-foreign-staged` could resolve a task-scoped bundle successfully while retaining pre-existing protected-override audit files in `commitFiles`; pre-commit then rejected those files as direction-lock scope drift. Long validation and the failed commit attempt could also expire the same actor's claim, forcing repair before retry.",
+  "expectedBehavior": "Bundle resolution, index deferral, and hook scope checks must agree on whether pre-existing protected audit is task-owned or foreign; foreign audit must be deferred with a durable snapshot, while owned audit must be admitted by the active direction lock. Long evidence/commit operations must renew the active self-claim or expose an automatic retry-safe renewal.",
+  "evidenceOrRepro": "TASK-AAO-0160 teaches governed commit ownership inference to read `taskId` from protected override audit JSON. Foreign protected audits can now be deferred out of the scoped commit, while current-task audit artifacts are admitted into the bundle. `validate:governance-commands` covers staged foreign audit plus task-owned audit and proves the commit includes only the deliverable and owned audit.",
+  "followUp": "Keep the protected-audit deferral regression beside task-scoped staging coverage; separately retain lease-renewal diagnostics for long-running evidence/commit lanes."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-142",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Task card atom-map scope authoring",
+  "finding": "A task card can list `atomic_workbench/atomization-coverage/path-to-atom-map.json` as a deliverable while the validator treats owner shards as the source of truth; editing only the projection makes `validate:atomization-coverage` fail with a shard-merge mismatch.",
+  "expectedBehavior": "Task cards that require atom-map updates should name the owner shard path or provide a governed projection rebuild lane; `next`/import should warn when only the generated projection is scoped.",
+  "evidenceOrRepro": "During TASK-AAO-0158, updating only `path-to-atom-map.json` produced `projection mappings=165, merged shards=161` and remediation `path-to-atom-map-shards/merge.js <repo> write-projection`; the change was reverted because the claimed scope did not include shard files.",
+  "followUp": "Add task-card authoring validation for generated atom-map projections versus owner-shard source files, and provide a safe scope amendment or rebuild command."
+}

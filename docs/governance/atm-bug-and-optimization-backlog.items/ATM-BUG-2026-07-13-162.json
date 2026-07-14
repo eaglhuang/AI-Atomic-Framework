@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-162",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Commit wrapper / pre-commit parity",
+  "finding": "`node atm.mjs git commit --dry-run` and the real pre-commit hook can disagree about active foreign governance residue ownership.",
+  "expectedBehavior": "The same ownership proof rules must be shared by the commit bundle builder and pre-commit hook: active direction lock or active ledger claim should protect non-staged foreign governance residue from blocking another active task, while orphan residue stays fail-closed.",
+  "evidenceOrRepro": "During TASK-AAO-FABLE-005 and TASK-AAO-0188, both task-scoped dry-runs became green only after the wrapper was patched, but the real pre-commit still found additional direction-lock scope drift for protected override audit files. FABLE-005 delivery commit `6a535795` and 0188 delivery commit `bb97753b` required extra scope amendments before real commits could pass.",
+  "followUp": "Fold wrapper/hook residue ownership into a shared helper under `TASK-GIT-0013`; add regression for dry-run/write parity with two active claims and foreign bundle manifests."
+}

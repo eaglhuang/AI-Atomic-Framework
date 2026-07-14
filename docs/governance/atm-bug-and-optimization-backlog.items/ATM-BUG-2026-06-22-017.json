@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-22-017",
+  "date": "2026-06-22",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 broker parity lane",
+  "area": "Broker register / payload integrity",
+  "finding": "`broker register` trusts the intent-file payload over CLI `--task` and `--actor`, so a mismatched or cross-contaminated intent file can silently register another task's write intent under the wrong operator flow.",
+  "expectedBehavior": "`broker register` should fail closed when CLI flags disagree with the payload, and the error should identify the mismatched fields before any registry mutation occurs.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by hardening `packages/cli/src/commands/broker.ts`: `broker register` now enforces payload/flag parity before arbitration or registry writes, and throws `ATM_BROKER_REGISTER_PAYLOAD_FLAG_MISMATCH` with per-field mismatch details when `--task` and/or `--actor` disagree with the intent file. A new focused regression in `scripts/validate-broker-register.ts` proves mismatched task/actor pairs fail closed without mutating `.atm/runtime/write-broker.registry.json`, while matching payloads still register cleanly. The command surface in `packages/cli/src/commands/command-specs/broker.spec.ts` now also advertises `--actor` as a register parity input, not only a runtime-activate input.",
+  "followUp": "Keep the payload/flag parity regression in `scripts/validate-broker-register.ts`; future broker register changes must preserve fail-closed behavior before any registry mutation when CLI authority and payload disagree."
+}

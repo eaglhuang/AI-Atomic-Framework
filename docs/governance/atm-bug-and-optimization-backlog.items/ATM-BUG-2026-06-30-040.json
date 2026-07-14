@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-30-040",
+  "date": "2026-06-30",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "P0",
+  "status": "Fixed in 2026-06-30 git-head-evidence downgrade lane",
+  "area": "Git governance / commit-range git-head evidence lifecycle",
+  "finding": "Protected-branch push could discover missing commit-range `git-head` evidence too late, after a normal series of local commits already existed. Recovery required historical backfill records and sometimes a separate evidence-only commit, turning ordinary delivery into governance archaeology.",
+  "expectedBehavior": "Historical per-critical commit evidence should not be a protected-push hard gate. ATM should keep strict same-commit governed provenance plus closeout/repair cross-checks, while ordinary protected push treats missing historical `git-head` records as diagnostic only.",
+  "evidenceOrRepro": "Reconfirmed on 2026-06-30 when local `main` was ahead by five valid work commits but push still failed on missing commit-range evidence, forcing a repair path through `node atm.mjs evidence git-head-backfill ...` and an evidence-only follow-up commit. Closed by downgrading `hook pre-push`, `guard commit-range`, `doctor`, and `next` so they no longer require per-critical historical `git-head` evidence, while retaining same-commit wrapper provenance plus closure packet / repair / task closeout hard checks. Validation lane: `npm run typecheck`, `npm run lint`, and `node --experimental-strip-types scripts/validate-git-hooks-enforcement.ts --mode validate`.",
+  "followUp": "Keep `node atm.mjs git commit` same-commit provenance strict, preserve closure packet / repair / task closeout hard failures, and retain `evidence git-head-backfill` only as a repair or audit trail tool rather than a normal protected-push requirement."
+}

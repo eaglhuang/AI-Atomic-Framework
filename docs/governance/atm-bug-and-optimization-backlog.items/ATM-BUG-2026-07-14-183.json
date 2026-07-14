@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-183",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Open",
+  "area": "Frozen vs source-first write deadlock under parallel captains",
+  "finding": "Frozen `node atm.mjs` refuses writes with `ATM_RUNNER_STALE_WRITE_REFUSED` when source is newer; `--allow-stale-runner` needs emergency; `node atm.dev.mjs` refuses lifecycle claim with `ATM_SOURCE_FIRST_WRITE_REFUSED`. Parallel captains told to prefer Frozen cannot sync without dirtying `release/**`. Template-only changes can also leave frozen integration source snapshots stale while `runnerMode.sourceDrift.syncRequired` remains false.",
+  "expectedBehavior": "Playbooks should offer a non-emergency source-delivery lane or a scoped runner rebuild that does not absorb foreign release WIP. Runner drift inventory must include integration templates and compiler inputs.",
+  "evidenceOrRepro": "2026-07-14 cursor-grok-4.5 dogfood on TASK-AAO-0195 before RFT-0020 completed. Reproduced again while updating `atm-dispatch`: frozen `next` reported `syncRequired: false`, frozen/source-first integration verification disagreed, and a full retained-artifact build was required before all adapter manifests could converge.",
+  "followUp": "Add an explicit next-command branch plus template-aware source drift and scoped adapter-sync coverage."
+}

@@ -18,6 +18,16 @@ import {
   type TestCatalogEntry,
   type TestTier
 } from './lib/test-catalog.ts';
+import {
+  buildValidationReceiptInput,
+  readReusableValidationReceipt,
+  writeValidationReceipt,
+  type ValidationReceiptStatus
+} from '../packages/core/src/evidence/validation-receipt.ts';
+import {
+  createSealedCommitCanaryPlan,
+  resolveValidationObligations
+} from '../packages/cli/src/commands/validation-obligations.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const configPath = path.join(root, 'scripts', 'validators.config.json');
@@ -87,6 +97,7 @@ const resolvedFocusPaths = resolveFocusPaths(parsedCli.focusPaths, parsedCli.foc
 const testCatalog = readTestCatalog(root, { validatorsConfig: config });
 const baseCatalogSelection = resolveCatalogValidatorSelection(parsedCli.profile, []);
 const focusedCatalogSelection = resolveCatalogValidatorSelection(parsedCli.profile, resolvedFocusPaths);
+const focusedValidationObligations = resolveValidationObligations(resolvedFocusPaths);
 const baseProfileValidatorNames = baseCatalogSelection.names;
 const focusedProfileValidatorNames = focusedCatalogSelection.names;
 const selectedNames = applyFilters(focusedProfileValidatorNames, parsedCli.filters);
@@ -200,12 +211,13 @@ const results = parallel
           fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
           slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
         },
-        catalog: {
-          schemaId: testCatalog.schemaId,
-          sourcePath: testCatalog.sourcePath,
-          capability: 'validator',
-          duplicateDedupeKeys
-        },
+  catalog: {
+    schemaId: testCatalog.schemaId,
+    sourcePath: testCatalog.sourcePath,
+    capability: 'validator',
+    duplicateDedupeKeys,
+    obligationMap: focusedValidationObligations
+  },
         baselineFingerprintCount: baselineFingerprints.size,
         startedAt
       }
@@ -230,12 +242,13 @@ const summary = createSummary({
     fastValidatorBudgetMs: parsedCli.fastValidatorBudgetMs,
     slowValidatorBudgetMs: parsedCli.slowValidatorBudgetMs
   },
-  catalog: {
-    schemaId: testCatalog.schemaId,
-    sourcePath: testCatalog.sourcePath,
-    capability: 'validator',
-    duplicateDedupeKeys
-  },
+    catalog: {
+      schemaId: testCatalog.schemaId,
+      sourcePath: testCatalog.sourcePath,
+      capability: 'validator',
+      duplicateDedupeKeys,
+      obligationMap: focusedValidationObligations
+    },
   baselineFingerprintCount: baselineFingerprints.size,
   startedAt,
   results,
@@ -501,9 +514,10 @@ function applyFocusRules(validatorNames: string[], focusPaths: string[]): string
 
 function resolveCatalogValidatorSelection(profileName: string, focusPaths: string[]): { names: string[]; entries: TestCatalogEntry[]; duplicateDedupeKeys: string[] } {
   const tier = profileToCatalogTier(profileName);
+  const obligationNames = resolveExecutableObligationValidatorNames(focusPaths);
   if (!tier) {
     const names = applyFocusRules(resolveProfileValidatorNames(profileName), focusPaths);
-    return { names, entries: [], duplicateDedupeKeys: [] };
+    return { names: mergeValidatorNames(names, obligationNames), entries: [], duplicateDedupeKeys: [] };
   }
   const selection = selectTestEntries({
     catalog: testCatalog,
@@ -514,14 +528,27 @@ function resolveCatalogValidatorSelection(profileName: string, focusPaths: strin
   const executableEntries = selection.entries.filter((entry) => entry.validatorName && validatorMap.has(entry.validatorName));
   if (focusPaths.length > 0 && executableEntries.length === 0) {
     const fallbackNames = applyFocusRules(resolveProfileValidatorNames(profileName), focusPaths);
-    return { names: fallbackNames, entries: [], duplicateDedupeKeys: [] };
+    return { names: mergeValidatorNames(fallbackNames, obligationNames), entries: [], duplicateDedupeKeys: [] };
   }
-  const names = [...new Set(executableEntries.map((entry) => String(entry.validatorName)))];
+  const names = mergeValidatorNames(executableEntries.map((entry) => String(entry.validatorName)), obligationNames);
   return {
     names,
     entries: executableEntries,
     duplicateDedupeKeys: selection.duplicateDedupeKeys
   };
+}
+
+function resolveExecutableObligationValidatorNames(focusPaths: string[]): string[] {
+  if (!Array.isArray(focusPaths) || focusPaths.length === 0) {
+    return [];
+  }
+  return resolveValidationObligations(focusPaths).validators
+    .filter((name) => name !== 'typecheck')
+    .filter((name) => validatorMap.has(name));
+}
+
+function mergeValidatorNames(primary: string[], required: string[]): string[] {
+  return [...new Set([...primary, ...required])];
 }
 
 function profileToCatalogTier(profileName: string): TestTier | null {
@@ -790,27 +817,24 @@ function writeValidatorReceipt(runContext: any, validatorName: string, receipt: 
   writeJsonFile(receiptPath, receipt);
 }
 
-function shouldReuseReceipt({ runContext, validator }: any): any | null {
-  if (!runContext?.resumed || runContext.receiptReuseAllowed !== true) {
-    return null;
-  }
-  const receipt = readValidatorReceipt(runContext, validator.name);
-  if (!receipt || receipt.status !== 'passed') {
-    return null;
-  }
-  const result = receipt.result;
-  if (!result || result.ok !== true) {
-    return null;
-  }
-  return {
-    ...result,
-    resumedFromReceipt: true,
-    durationMs: 0,
-    envelope: {
-      ...result.envelope,
-      durationMs: 0
+function shouldReuseReceipt({ runContext, validator, allowCanonicalReuse = true }: any): any | null {
+  const command = `node --strip-types ${normalizeCommandPath(validator.entry)} --mode ${runContext?.mode ?? ''}`.trim();
+  if (runContext?.resumed && runContext.receiptReuseAllowed === true) {
+    const receipt = readValidatorReceipt(runContext, validator.name);
+    if (receipt?.status === 'passed' && receipt.result?.ok === true) {
+      return markReceiptReuseResult(receipt.result, 'run-local');
     }
-  };
+  }
+  if (!allowCanonicalReuse) return null;
+  const canonical = readReusableValidationReceipt({
+    cwd: root,
+    validatorName: validator.name,
+    command: command || `node --strip-types ${normalizeCommandPath(validator.entry)}`,
+    gitHead: readGitHead(),
+    scopePaths: resolveValidationReceiptScopePaths(validator)
+  });
+  if (!canonical.reusable || !canonical.receipt?.result) return null;
+  return markReceiptReuseResult(canonical.receipt.result, 'canonical');
 }
 
 async function runValidatorsSequential(validators: any, mode: any, options: any) {
@@ -833,8 +857,21 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
     const validatorPath = path.join(root, validator.entry);
     const command = `node --strip-types ${normalizeCommandPath(validator.entry)} --mode ${mode}`;
     const cacheKey = buildValidatorCacheKey(validator, mode, command, validatorPath);
-    const resumed = shouldReuseReceipt({ runContext: options.runContext, validator });
+    const resumed = shouldReuseReceipt({
+      runContext: options.runContext ? { ...options.runContext, mode } : { mode },
+      validator,
+      allowCanonicalReuse: !Number.isFinite(options.validatorTimeoutMs)
+    });
     if (resumed) {
+      if (options.runContext) {
+        persistValidatorReceiptResult({
+          runContext: options.runContext,
+          validatorName: validator.name,
+          fingerprint: options.runContext?.validatorFingerprints?.[validator.name] ?? null,
+          result: resumed,
+          status: 'passed'
+        });
+      }
       resolve(resumed);
       return;
     }
@@ -865,24 +902,7 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
     if (options.cache) {
       const cached = readValidatorCache(cacheKey);
       if (cached) {
-        if (options.runContext) {
-          persistValidatorReceiptResult({
-            runContext: options.runContext,
-            validatorName: validator.name,
-            fingerprint: runFingerprint,
-            result: {
-              ...cached,
-              cached: true,
-              durationMs: 0,
-              envelope: {
-                ...cached.envelope,
-                durationMs: 0
-              }
-            },
-            status: 'passed'
-          });
-        }
-        resolve({
+        const cachedResult = {
           ...cached,
           cached: true,
           durationMs: 0,
@@ -890,7 +910,23 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
             ...cached.envelope,
             durationMs: 0
           }
+        };
+        if (options.runContext) {
+          persistValidatorReceiptResult({
+            runContext: options.runContext,
+            validatorName: validator.name,
+            fingerprint: runFingerprint,
+            result: cachedResult,
+            status: 'passed'
+          });
+        }
+        persistCanonicalValidationReceipt({
+          validator,
+          command,
+          result: cachedResult,
+          status: 'passed'
         });
+        resolve(cachedResult);
         return;
       }
     }
@@ -1010,12 +1046,71 @@ function runValidator(validator: any, mode: any, options: any): Promise<any> {
           status: timedOut ? 'timeout' : (result.ok === true ? 'passed' : 'failed')
         });
       }
+      persistCanonicalValidationReceipt({
+        validator,
+        command,
+        result,
+        status: timedOut ? 'timeout' : (result.ok === true ? 'passed' : 'failed')
+      });
       if (options.cache && result.ok === true) {
         writeValidatorCache(cacheKey, result);
       }
       resolve(result);
     }
   });
+}
+
+function markReceiptReuseResult(result: any, source: 'run-local' | 'canonical') {
+  return {
+    ...result,
+    resumedFromReceipt: source === 'run-local',
+    reusedFromCanonicalReceipt: source === 'canonical',
+    durationMs: 0,
+    cached: result.cached === true,
+    envelope: {
+      ...result.envelope,
+      durationMs: 0
+    }
+  };
+}
+
+function persistCanonicalValidationReceipt({ validator, command, result, status }: {
+  validator: any;
+  command: string;
+  result: Record<string, unknown>;
+  status: ValidationReceiptStatus;
+}) {
+  const receipt = buildValidationReceiptInput({
+    cwd: root,
+    validatorName: validator.name,
+    command,
+    status,
+    ok: result.ok === true,
+    gitHead: readGitHead(),
+    result,
+    scopePaths: resolveValidationReceiptScopePaths(validator)
+  });
+  writeValidationReceipt(root, receipt);
+}
+
+function resolveValidationReceiptScopePaths(validator: any): string[] {
+  const paths = new Set<string>();
+  if (typeof validator.entry === 'string' && validator.entry.trim()) {
+    paths.add(normalizeFocusPath(validator.entry));
+  }
+  paths.add('scripts/run-validators.ts');
+  paths.add('scripts/validators.config.json');
+  for (const entry of Array.isArray(validator.scope) ? validator.scope : []) {
+    if (typeof entry === 'string' && entry.trim()) {
+      paths.add(normalizeFocusPath(entry));
+    }
+  }
+  for (const key of Array.isArray(validator.dedupeKeys) ? validator.dedupeKeys : []) {
+    if (typeof key === 'string' && key.includes('/')) {
+      paths.add(normalizeFocusPath(key));
+    }
+  }
+  return [...paths].filter(Boolean);
 }
 
 function createSummary({ profile, mode, filters, focusPaths, focusMode, baseValidatorCount, focusReducedValidatorCount, parallel, legacy, cache, skipSlow, baselinePath, performanceBaselinePath, performanceBaselineSummary, performanceBudgetOverrides, catalog, baselineFingerprintCount, startedAt, results, runContext }: any) {
@@ -1494,6 +1589,7 @@ function createPerformanceReport({ profile, durationMs, results, profileConfig, 
 
 function createSelectionReport({ profile, baseValidatorCount, focusReducedValidatorCount, focusMode, results, catalog }: any) {
   const familySummary = summarizeFamilies(results);
+  const headCommit = readGitHead();
   const dominantFamilies = familySummary
     .filter((entry: any) => entry.validatorCount > 0)
     .sort((left: any, right: any) => right.validatorCount - left.validatorCount)
@@ -1510,6 +1606,13 @@ function createSelectionReport({ profile, baseValidatorCount, focusReducedValida
     focusReducedValidatorCount,
     focusMode: focusMode ?? 'none',
     duplicateDedupeKeys: Array.isArray(catalog?.duplicateDedupeKeys) ? catalog.duplicateDedupeKeys : [],
+    obligationMap: catalog?.obligationMap ?? null,
+    sealedCommitCanary: headCommit
+      ? createSealedCommitCanaryPlan({
+          commitSha: headCommit,
+          validators: catalog?.obligationMap?.validators ?? []
+        })
+      : null,
     familyCount: familySummary.length,
     dominantFamilies,
     families: familySummary

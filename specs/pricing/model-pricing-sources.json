@@ -1,0 +1,42 @@
+{
+  "schemaId": "atm.modelPricingSources.v1",
+  "specVersion": "0.1.0",
+  "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+  "sources": [
+    {
+      "provider": "openai",
+      "url": "https://platform.openai.com/docs/pricing",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "evidence": [
+        "gpt-5.6-terra standard short context: input 2.50, cached input 0.25, cache write 3.125, output 15.00 USD per 1M tokens",
+        "gpt-5.4-mini standard short context: input 0.75, cached input 0.075, output 4.50 USD per 1M tokens"
+      ]
+    },
+    {
+      "provider": "anthropic",
+      "url": "https://docs.anthropic.com/en/docs/about-claude/pricing",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "evidence": [
+        "Claude Fable 5: input 10.00, 5m cache write 12.50, 1h cache write 20.00, cache hit 1.00, output 50.00 USD per MTok"
+      ]
+    },
+    {
+      "provider": "gemini-direct",
+      "url": "https://ai.google.dev/gemini-api/docs/pricing",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "evidence": [
+        "Gemini 3.1 Flash-Lite paid tier: input 0.25, output 1.50, context caching 0.025 USD per 1M text/image/video tokens",
+        "Gemini 3.5 Flash paid tier: input 2.70, output 16.20, context caching 0.27 USD per 1M tokens"
+      ]
+    },
+    {
+      "provider": "claude-code",
+      "url": "https://docs.github.com/en/copilot/get-started/plans",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "evidence": [
+        "Copilot Pro is 10 USD per month; Pro+ is 39 USD; Max is 100 USD; Business is 19 USD per granted seat per month; Enterprise is 39 USD per granted seat per month",
+        "Copilot model table lists Claude Fable 5, Gemini 3.5 Flash, GPT-5.4 mini and GPT-5.6 Terra among available models"
+      ]
+    }
+  ]
+}

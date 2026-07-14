@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-175",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in current working tree; needs commit",
+  "area": "Active claim radar / Team Agent Broker auto-admission",
+  "finding": "ATM can store active task claims, direction locks, heartbeats, and staged residue, but `next --prompt`, `next --claim`, and framework temp-claim entrypoints do not present a compact \"who is active now\" actor map before another AI starts work. This makes concurrent captains depend on the human to notice that another actor such as `claude-fable-5` is already moving.",
+  "expectedBehavior": "ATM should automatically surface recent active claims, actor ids, task ids, touched files, heartbeat age, TTL, and staged/index ownership at every work-admission route. If another active actor or conflicting staged residue is present, ATM should emit a clear Team Agent Broker arbitration recommendation or required command without waiting for a human instruction.",
+  "evidenceOrRepro": "Live dogfood on 2026-07-13: Codex attempted to continue backlog work, saw `TASK-AAO-FABLE-008` already claimed by `claude-fable-5`, then `framework-mode claim` reported staged residue outside scope from another lane. The repair adds `activeWorkSummary` to `next` governance readiness, emits `ATM_ACTIVE_WORK_BROKER_RECOMMENDED`, and recommends Team levels L1-L5 from own/foreign scope, staged index state, and framework-foundation risk. Focused regression: `node --strip-types --test packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts`; static gate: `npm run typecheck`.",
+  "followUp": "Commit the active-work summary repair, then expand follow-up coverage to framework-mode status/claim and deeper broker/team planning projections if needed."
+}

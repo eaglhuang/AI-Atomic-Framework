@@ -7,6 +7,25 @@
   "projectName": "ai-atomic-framework",
   "lastAmendedAt": "2026-07-14T00:00:00.000Z",
   "charterHash": "sha256:68c052e7aba3fb68bdcaa19d45a6bff95e5faa9dafebe12a7c830f60f322a894",
+  "firstPrinciplesHash": "sha256:488d193397ed56b89f6f526aa882ebcb4fd8e9f81d2c4a5c8b30e5a3d5487f5c",
+  "scheduleA": {
+    "scheduleId": "schedule-a-economic-thresholds",
+    "economicRatios": {
+      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.1 },
+      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 1.05 },
+      "breakthrough": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 0.8 }
+    },
+    "tokenDiagnostics": {
+      "required": true,
+      "priceProxyAllowed": false,
+      "rationale": "Raw token counts are mandatory diagnostics, but actual monetary cost is the economic authority across providers and models."
+    },
+    "teamThresholds": {
+      "production": { "maxCostRatio": 0.5, "maxEndToEndTimeRatio": 0.5, "requiresMeasuredAcceleration": true },
+      "preferred": { "maxCostRatio": 0.45, "maxEndToEndTimeRatio": 0.45, "requiresMeasuredAcceleration": true },
+      "breakthrough": { "maxCostRatio": 0.4, "maxEndToEndTimeRatio": 0.4, "requiresMeasuredAcceleration": true }
+    }
+  },
   "invariants": [
     {
       "id": "INV-ATM-001",

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-148",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-FABLE-003 (same shared write-side validator set now drives readiness)",
+  "area": "Taskflow close readiness / closure packet completeness",
+  "finding": "`taskflow close` dry-run reported no blocking validator work after the delivery commit, but `taskflow close --write` then failed because the closure packet was missing `validate:cli` and `validate:git-head-evidence`; those validators had to be discovered and run manually.",
+  "expectedBehavior": "Dry-run/pre-close should enumerate every closure-required validator and either auto-run them or fail with the exact complete evidence plan before a write attempt.",
+  "evidenceOrRepro": "Reproduced on 2026-07-12 for TASK-AAO-0166: close write returned `ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID` with missing `validationPasses/validate:cli` and `validationPasses/validate:git-head-evidence`; both later passed and close succeeded.",
+  "followUp": "Add a close-readiness regression proving the dry-run and write paths expose the same closure validator set and required commands."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-049",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework / 3KLife",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in taskflow close atomicity lane",
+  "area": "Taskflow close / planning mirror index cleanup",
+  "finding": "`taskflow close --write` can report a successful planning mirror commit but leave the planning repo index staged with the inverse closeback diff, making the card look reopened/deleted in `git status` even though the just-created commit contains the correct done frontmatter and close event.",
+  "expectedBehavior": "A successful taskflow close transaction should leave both target and planning repos with no task-owned staged residue; if cleanup cannot complete, the command should fail closed or emit an explicit recovery command before reporting the transaction committed.",
+  "evidenceOrRepro": "During `TASK-AAO-0150`, close write created ATM close commit `1a9683e2` and 3KLife planning commit `cd57450b`, but `git -C C:\\Users\\User\\3KLife status --short` then showed staged deletion of `.atm/history/task-events/TASK-AAO-0150/...close...json` and mixed `TASK-AAO-0150-next-hot-path-latency.task.md`. The source fix in `commit-bundle-assembly.ts` commits taskflow bundles from a temporary index and then resets only task-owned stage files in the live index to the newly committed HEAD tree, preserving unrelated staged files while removing stale inverse diffs.",
+  "followUp": "Keep `packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts` and `validate-taskflow-close-atomicity` coverage for post-commit live-index residue cleanup in both target and planning close bundles."
+}

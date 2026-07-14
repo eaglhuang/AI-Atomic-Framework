@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-151",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0190",
+  "area": "Taskflow / governed commit operator UX",
+  "finding": "`taskflow pre-close` suggested a governed commit command without `--auto-stage`, while the wrapper rejected the first attempt with `ATM_GIT_COMMIT_TASK_SCOPED_STAGING_REQUIRED`; separately, passing low-level `--status done` to `taskflow close` produced `ATM_CLI_USAGE` because that flag belongs to `tasks close`.",
+  "expectedBehavior": "Close playbooks should emit one copy-paste-ready command sequence with the correct staging mode and taskflow-specific flags; low-level and taskflow option names should be rejected with a targeted migration hint.",
+  "evidenceOrRepro": "Reproduced during TASK-AAO-0170 on 2026-07-12. Adding `--auto-stage` made the governed delivery commit succeed; removing `--status` made taskflow close dry-run succeed. Fixed 2026-07-13 in TASK-AAO-0190: dirty-guard and commit-bundle remediation now include `--auto-stage`; `taskflow --status` returns a migration hint to omit the flag or use `tasks close --status`.",
+  "followUp": "Covered by `packages/cli/src/commands/tasks/__tests__/scope-lock-diagnostics.test.ts` and `tests/cli/taskflow-status-migration-hint.test.ts`."
+}

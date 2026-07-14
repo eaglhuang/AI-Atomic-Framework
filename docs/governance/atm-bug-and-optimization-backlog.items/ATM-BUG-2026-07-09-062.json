@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-062",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in this cleanup commit",
+  "area": "Prompt routing / framework temp claim playbook",
+  "finding": "Framework-maintenance prompts without imported tasks returned `status: framework-temp-claim-required` and a correct `framework-mode claim` command, but the shared fast playbook still instructed agents to run `node atm.mjs next --claim ...`; following the playbook immediately failed with `ATM_NEXT_CLAIM_NO_TASK`.",
+  "expectedBehavior": "A route that requires framework temp claim should make the embedded playbook first step and command sequence use the same `framework-mode claim` command; fast quickfix routes may still use `next --claim` when they are actual quickfix locks.",
+  "evidenceOrRepro": "Reproduced on 2026-07-09 with a backlog-repair prompt: `node atm.mjs next --prompt ... --json` returned `framework-temp-claim-required`, then the playbook's `next --claim` command failed with `ATM_NEXT_CLAIM_NO_TASK`. Fixed by adding a fast-claim command override to `buildChannelPlaybook` and asserting the framework-maintenance route's playbook uses `framework-mode claim`. Validation: `npm run validate:prompt-scoped-next`.",
+  "followUp": "Keep the framework-maintenance playbook regression in `scripts/validate-prompt-scoped-next.ts`; future playbook refactors must keep `nextAction.command`, `allowedCommands`, and `playbook.steps[0]` semantically aligned."
+}

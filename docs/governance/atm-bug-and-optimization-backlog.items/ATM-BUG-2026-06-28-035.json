@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-035",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 governance-entry-readiness lane",
+  "area": "Backlog governance / source reality drift",
+  "finding": "The backlog can lag behind source reality when the source fix lands first and the validator or documentation closeout lands later, but there was no quick repo-level scan to highlight open rows whose prose already sounds effectively fixed.",
+  "expectedBehavior": "`doctor` should include a lightweight backlog/source drift scan so maintainers notice when bug-tracking status needs explicit closeout or follow-up evidence.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by adding a `backlog-sync` doctor check that parses `docs/governance/atm-bug-and-optimization-backlog.md`, looks for open rows whose evidence/follow-up text already implies a landed fix, and emits a focused reminder to update the backlog status or land the missing validator/documentation closeout.",
+  "followUp": "Keep the backlog-sync scan lightweight and heuristic, and tune phrases only when they clearly indicate source reality has outrun backlog state."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-160",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Taskflow open / framework repo profile readiness",
+  "finding": "`taskflow open --write` is documented as the official operator lane, but in the framework repo it fails in template-only-fallback mode when no opener profile is loaded, then points back to `tasks new` plus `tasks import`; if import is blocked by row 159, the official lane cannot recover.",
+  "expectedBehavior": "The framework repo should ship or discover a taskflow opener profile for its own task cards, or `taskflow open` should emit a complete copy-paste-safe sequence that cannot enter create/import drift.",
+  "evidenceOrRepro": "Reproduced on 2026-07-12 for TASK-AAO-0178: `node atm.mjs taskflow open --task-id TASK-AAO-0178 --title \"Record backlog continuation routing friction\" --output .atm/task-plans/TASK-AAO-0178.md --write --json` failed with `ATM_TASKFLOW_TEMPLATE_ONLY_FALLBACK` and missing `--profile <adopter-repo>/taskflow.profile.json`.",
+  "followUp": "Add framework-repo taskflow-open readiness coverage and ship a repo-local profile or a no-profile safe fallback path."
+}

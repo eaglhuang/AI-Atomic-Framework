@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-147",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Open",
+  "area": "Taskflow close / abandoned-task residue",
+  "finding": "Abandoning malformed `TASK-AAO-0165` left its evidence, task-event records, task ledger, and bundle manifest in the worktree; the next task's pre-close and governed commit were blocked by foreign staged files and then by `ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED`. `--defer-foreign-staged` did not by itself make the subsequent hook commit admissible, so the operator had to identify and remove the orphaned bundle manifest explicitly.",
+  "expectedBehavior": "Abandon should produce a governed, complete residue disposition: either commit the abandoned task's audit packet, or remove only disposable generated artifacts and make the remaining history explicitly admissible to later taskflow/commit lanes. The next task should not inherit an unresolvable foreign residue blocker.",
+  "evidenceOrRepro": "Reproduced on 2026-07-12 while closing TASK-AAO-0166: `taskflow pre-close` found `TASK-AAO-0165` foreign staged files; the first governed commit failed on `ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED` for `.atm/history/evidence/TASK-AAO-0165.bundle-manifest.json`; targeted cleanup was required before commit succeeded.",
+  "followUp": "Add abandon -> next-task commit regression covering staged/untracked evidence, bundle-manifest cleanup, hook admission, and preservation of the abandoned task's audit trail."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-112",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in current working tree; validating for commit",
+  "area": "Tasks audit / bulk-close mirror false positive",
+  "finding": "`ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST` fired on a release-mirror commit (`31b85474`) that only added two planning-card mirrors (`TASK-AAO-0153`, `TASK-TEAM-0065`) whose governed closes and closure packets already existed individually; the audit counts changed done task files without distinguishing mirror-only additions from actual bulk closes.",
+  "expectedBehavior": "Mirror-only or planning-card additions whose closure packets pre-exist should not require a bulk closure manifest, or the finding should list the offending files and the exact manifest expectation so the operator is not left reverse-engineering the rule from source.",
+  "evidenceOrRepro": "`inspectLatestCommitForBulkTaskClose` now excludes done task-card changes when the card points to an already-existing closure packet outside the latest commit. Regression `tests/cli/task-audit-bulk-close-mirror.test.ts` creates two pre-existing closure packets, then commits two done planning mirrors and asserts no `ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST`; `validate-cli --mode surface` includes the focused test.",
+  "followUp": "Commit the mirror-only bulk-close audit repair with frozen release artifacts."
+}

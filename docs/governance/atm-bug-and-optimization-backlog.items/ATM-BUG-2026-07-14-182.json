@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-182",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0205",
+  "area": "Governed commit / framework-claim absorbs unstaged release mirror residue",
+  "finding": "After `integration add --force` refreshed adapter skill mirrors, a framework temp claim scoped only to those skill paths plus `git commit --auto-stage --defer-foreign-staged` still produced commit `abc11c61b` that included unrelated tracked `release/atm-onefile/**` and `release/atm-root-drop/**` files (backlog mirror, closure-packet-schema, validate-cli, release manifests) that were dirty in the worktree but outside the declared claim scope. This is adjacent to ATM-BUG-2026-07-13-177 (ordinary-unowned *staged* absorption) but reproduced with *unstaged* release-mirror dirt and an explicit skill-only claim file list.",
+  "expectedBehavior": "Framework-claim commits with `--defer-foreign-staged` must keep the isolated claim-allowed index closed over unstaged out-of-claim dirty files as well as staged ones; release mirrors generated or dirtied by hooks/build hygiene must not be auto-absorbed into an unrelated skill/docs commit. Prefer fail-closed with a copyable defer/widen command, or leave release dirt untouched for the owner.",
+  "evidenceOrRepro": "Reproduced 2026-07-14 by actor `cursor-grok-4.5`: claimed only `.agents/.claude/.cursor/.gemini/.github/integrations` `atm-atom-map-refactor` skill mirrors, then `node atm.dev.mjs git commit --actor cursor-grok-4.5 --auto-stage --defer-foreign-staged --json` returned `ATM_GIT_COMMIT_OK` for `abc11c61b` whose file list mixed the intended skill mirrors with `release/atm-onefile/*` and `release/atm-root-drop/*` paths. Source counterparts (`packages/.../closure-packet-schema.ts`, `scripts/validate-cli.ts`, backlog) remained dirty afterward.",
+  "followUp": "Fixed 2026-07-14: `isFrameworkGeneratedArtifactAllowed` no longer admits every release-manifest path on any active claim; regression extended in `tests/cli/git-commit-task-scoped-staging.test.ts`."
+}

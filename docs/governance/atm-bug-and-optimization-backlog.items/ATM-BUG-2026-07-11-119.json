@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-119",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0173",
+  "area": "Actor identity / environment precedence",
+  "finding": "`identity set --actor \"Codex-GPT5.6 Terra\"` writes a per-actor profile, but `identity show` still resolves the legacy environment value `codex-gpt-5.4-mini` first and reports no repo default identity. This leaves a valid active task session attributed to Terra while generic commands may select a different actor.",
+  "expectedBehavior": "Explicit identity must be durable and take precedence over stale legacy editor environment data, or commands must fail closed with an unambiguous mismatch diagnostic.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0173: repo-default identity now outranks legacy `AGENT_IDENTITY`, while explicit actor and `ATM_ACTOR_ID` remain higher precedence. `node --strip-types tests/cli/identity-per-actor-routing.test.ts` and `npm run typecheck` passed.",
+  "followUp": "Keep the precedence regression and actor-resolution diagnostic stable for Captain/Team Broker UX."
+}

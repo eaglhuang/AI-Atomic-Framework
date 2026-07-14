@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T15-26-02-448Z-close-4fb652c10c87",
+  "taskId": "ATM-GOV-0139",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714151811-codex-gpt-5-5-captain-ATM-GOV-0139-e3752774b7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0139.json",
+  "taskSha256": "sha256:9e5d1926e5e05105222caea42c390cfb564c36ed4563960ae56aed6d331a7de5",
+  "createdAt": "2026-07-14T15:26:02.448Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0139 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714151811-codex-gpt-5-5-captain-ATM-GOV-0139-e3752774b7",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0139.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/validation-obligation-map.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T15:26:02.437Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0139.*",
+        ".atm/history/task-events/ATM-GOV-0139/**",
+        ".atm/history/tasks/ATM-GOV-0139.json",
+        "packages/cli/src/commands/validation-obligations.ts",
+        "scripts/run-validators.ts",
+        "tests/cli/validation-obligation-map.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/validation-obligations.ts",
+        "scripts/run-validators.ts",
+        "tests/cli/validation-obligation-map.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

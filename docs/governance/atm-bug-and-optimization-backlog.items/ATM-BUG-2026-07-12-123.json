@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-123",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0159",
+  "area": "Encoding guard / temporary artifact isolation",
+  "finding": "`check:encoding:touched` scanned unrelated untracked `tmp/` command transcripts and blocked a governed task when those transcripts contained U+FFFD, even though the claimed source and backlog files were clean.",
+  "expectedBehavior": "Touched/staged encoding checks must isolate claimed or staged delivery scope, classify diagnostic temp transcripts separately, and offer a safe cleanup/quarantine command without requiring an agent to delete another owner's files.",
+  "evidenceOrRepro": "During TASK-AAO-0157 closeout, 13 `tmp/aao-0157-*.json` files created by another agent triggered `ATM_GUARD_ENCODING_FAILED`; TASK-AAO-0159 fixed this by isolating temporary artifacts in the touched encoding guard and validating the behavior before close.",
+  "followUp": "Keep the TASK-AAO-0159 scoped touched-encoding regression; future temp transcript handling should remain advisory unless a claimed/staged delivery file is actually dirty."
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0129",
   "title": "Make sealed commit the close transaction truth",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Foundation",
   "dependencies": [
     "ATM-GOV-0127",
@@ -77,7 +77,65 @@
     "hash": "face42c011fb5b36"
   },
   "importedAt": "2026-07-14T11:42:28.485Z",
-  "lastTransitionId": "2026-07-14T11-42-28-499Z-import-662f8529f696",
-  "lastTransitionAt": "2026-07-14T11:42:28.499Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T14-33-17-743Z-lock-cleanup-62de0f2ee484",
+  "lastTransitionAt": "2026-07-14T14:33:17.743Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T14:23:37.416Z",
+  "promotedAt": "2026-07-14T14:23:37.418Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-7de7766141e5",
+    "claimedAt": "2026-07-14T14:23:37.422Z",
+    "heartbeatAt": "2026-07-14T14:33:17.634Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0129.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T14:23:37.422Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714142337-codex-gpt-5-5-captain-ATM-GOV-0129-a13241e82e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0129",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-eb322aeff941a254",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0129.*",
+      ".atm/history/task-events/ATM-GOV-0129/**",
+      ".atm/history/tasks/ATM-GOV-0129.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-seal-and-commit.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/tasks/deliver-close-orchestrator.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "a98bdff7634366fb5c5a0fd1f26930be406f33688cabefcf94152a5f5b710999",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T14:23:41.135Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T14:33:17.740Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T14:33:17.634Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714142337-codex-gpt-5-5-captain-ATM-GOV-0129-a13241e82e",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0129.closure-packet.json"
 }

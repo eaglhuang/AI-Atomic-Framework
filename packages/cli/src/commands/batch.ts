@@ -26,6 +26,53 @@ import {
   type BatchRunRecord,
   type BatchSkippedTaskRecord
 } from './work-channels.ts';
+import {
+  evaluateBatchTeamAdmission,
+  type BatchTeamAdmissionDecision
+} from './team.ts';
+
+export type BatchTeamAttemptUsage = {
+  readonly inputTokens?: number;
+  readonly outputTokens?: number;
+  readonly cacheReadTokens?: number;
+  readonly fullyLoadedCostUsd?: number;
+  readonly retry?: boolean;
+  readonly discarded?: boolean;
+};
+
+export type BatchTeamIntegrationReport = {
+  readonly schemaId: 'atm.batchTeamIntegrationReport.v1';
+  readonly taskId: string;
+  readonly batchId: string;
+  readonly sealedClose: {
+    readonly usesSealAndCommitTransaction: true;
+    readonly checkpointRefusesPayloadMismatch: true;
+    readonly payloadDigestMatchesEvidence: boolean;
+  };
+  readonly teamAdmission: BatchTeamAdmissionDecision;
+  readonly usage: {
+    readonly attemptCount: number;
+    readonly retryCount: number;
+    readonly discardedContributionCount: number;
+    readonly inputTokens: number;
+    readonly outputTokens: number;
+    readonly cacheReadTokens: number;
+    readonly fullyLoadedCostUsd: number;
+  };
+  readonly latency: {
+    readonly queueHeadLatencyMs: number;
+    readonly batchMakespanMs: number;
+    readonly throughputPerMinute: number;
+    readonly throughputIsSingleTaskLatency: false;
+  };
+  readonly stopLoss: {
+    readonly triggered: boolean;
+    readonly laterQueueHeadRoute: 'unchanged' | 'cheaper-qualified-model-mix' | 'single-agent';
+    readonly closeSemanticsChanged: false;
+  };
+};
+
+type BatchTeamUsageAggregate = BatchTeamIntegrationReport['usage'];
 
 export async function runBatch(argv: string[]) {
   const action = String(argv[0] ?? 'status').toLowerCase();
@@ -192,6 +239,7 @@ export async function runBatch(argv: string[]) {
         }
       });
     }
+    const capturedHeadBeforeClose = readGitHead(options.cwd);
     const closeResult = await runTasks([
       'close',
       '--cwd',
@@ -236,6 +284,13 @@ export async function runBatch(argv: string[]) {
           held: holdNextClaim,
           historicalDeliveryRefs: batchHistoricalDeliveryRefs,
           historicalBatchRefs: batchHistoricalBatchRefs,
+          closeHeadCapture: {
+            schemaId: 'atm.batchCheckpointHeadCapture.v1',
+            taskId: currentTaskId,
+            batchId: active.batchId,
+            headBeforeClose: capturedHeadBeforeClose,
+            headAfterClose: readGitHead(options.cwd)
+          },
           closeResult: closeResult.evidence,
           failureCategory: closeCategory
         }
@@ -341,6 +396,13 @@ export async function runBatch(argv: string[]) {
         held: holdNextClaim,
         historicalDeliveryRefs: batchHistoricalDeliveryRefs,
         historicalBatchRefs: batchHistoricalBatchRefs,
+        closeHeadCapture: {
+          schemaId: 'atm.batchCheckpointHeadCapture.v1',
+          taskId: currentTaskId,
+          batchId: active.batchId,
+          headBeforeClose: capturedHeadBeforeClose,
+          headAfterClose: readGitHead(options.cwd)
+        },
         commitInstruction: {
           timing: 'single-commit-after-checkpoint',
           beforeCheckpoint: [
@@ -800,11 +862,91 @@ export async function runBatch(argv: string[]) {
   throw new CliError('ATM_CLI_USAGE', 'batch supports: status, current, checkpoint, repair, resume, skip, abandon', { exitCode: 2 });
 }
 
+export function buildBatchTeamIntegrationReport(input: {
+  readonly taskId: string;
+  readonly batchId: string;
+  readonly currentQueueHeadTaskId: string | null | undefined;
+  readonly structuralParallelism: boolean;
+  readonly evidencePayloadDigest: string | null | undefined;
+  readonly sealedPayloadDigest: string | null | undefined;
+  readonly attempts?: readonly BatchTeamAttemptUsage[];
+  readonly queueHeadLatencyMs: number;
+  readonly batchMakespanMs: number;
+  readonly completedTaskCount: number;
+  readonly stopLossTriggered?: boolean;
+  readonly costTelemetryLoaded?: boolean;
+}): BatchTeamIntegrationReport {
+  const attempts = input.attempts ?? [];
+  const usage = attempts.reduce<BatchTeamUsageAggregate>((acc, attempt) => ({
+    attemptCount: acc.attemptCount + 1,
+    retryCount: acc.retryCount + (attempt.retry === true ? 1 : 0),
+    discardedContributionCount: acc.discardedContributionCount + (attempt.discarded === true ? 1 : 0),
+    inputTokens: acc.inputTokens + finiteNumber(attempt.inputTokens),
+    outputTokens: acc.outputTokens + finiteNumber(attempt.outputTokens),
+    cacheReadTokens: acc.cacheReadTokens + finiteNumber(attempt.cacheReadTokens),
+    fullyLoadedCostUsd: acc.fullyLoadedCostUsd + finiteNumber(attempt.fullyLoadedCostUsd)
+  }), {
+    attemptCount: 0,
+    retryCount: 0,
+    discardedContributionCount: 0,
+    inputTokens: 0,
+    outputTokens: 0,
+    cacheReadTokens: 0,
+    fullyLoadedCostUsd: 0
+  });
+  const payloadDigestMatchesEvidence = Boolean(input.evidencePayloadDigest)
+    && input.evidencePayloadDigest === input.sealedPayloadDigest;
+  const stopLossTriggered = input.stopLossTriggered === true;
+  const costTelemetryLoaded = input.costTelemetryLoaded ?? attempts.length > 0;
+  const teamAdmission = evaluateBatchTeamAdmission({
+    taskId: input.taskId,
+    batchId: input.batchId,
+    currentQueueHeadTaskId: input.currentQueueHeadTaskId,
+    structuralParallelism: input.structuralParallelism,
+    costTelemetryLoaded,
+    stopLossTriggered
+  });
+  return {
+    schemaId: 'atm.batchTeamIntegrationReport.v1',
+    taskId: input.taskId,
+    batchId: input.batchId,
+    sealedClose: {
+      usesSealAndCommitTransaction: true,
+      checkpointRefusesPayloadMismatch: true,
+      payloadDigestMatchesEvidence
+    },
+    teamAdmission,
+    usage,
+    latency: {
+      queueHeadLatencyMs: finiteNumber(input.queueHeadLatencyMs),
+      batchMakespanMs: finiteNumber(input.batchMakespanMs),
+      throughputPerMinute: calculateThroughputPerMinute(input.completedTaskCount, input.batchMakespanMs),
+      throughputIsSingleTaskLatency: false
+    },
+    stopLoss: {
+      triggered: stopLossTriggered,
+      laterQueueHeadRoute: stopLossTriggered ? 'single-agent' : 'unchanged',
+      closeSemanticsChanged: false
+    }
+  };
+}
+
 function buildBatchSelector(options: Record<string, unknown>) {
   const selector: { batchId?: string; scopeKey?: string } = {};
   if (typeof options.batch === 'string' && options.batch.trim()) selector.batchId = options.batch.trim();
   if (typeof options.scope === 'string' && options.scope.trim()) selector.scopeKey = options.scope.trim();
   return selector;
+}
+
+function finiteNumber(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+}
+
+function calculateThroughputPerMinute(completedTaskCount: number, batchMakespanMs: number) {
+  const taskCount = finiteNumber(completedTaskCount);
+  const makespanMs = finiteNumber(batchMakespanMs);
+  if (taskCount <= 0 || makespanMs <= 0) return 0;
+  return taskCount / (makespanMs / 60000);
 }
 
 function stripBatchCheckpointCloseArgs(argv: readonly string[]) {
@@ -1137,6 +1279,14 @@ function readGitChangedFiles(cwd: string) {
     .map((line) => normalizeGitStatusPath(line.slice(3)))
     .filter(Boolean);
   return { available: true, files };
+}
+
+function readGitHead(cwd: string): string | null {
+  const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], {
+    cwd,
+    encoding: 'utf8'
+  });
+  return result.status === 0 ? result.stdout.trim() || null : null;
 }
 
 /**

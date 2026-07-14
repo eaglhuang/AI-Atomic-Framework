@@ -1,9 +1,11 @@
+import { type GitIndexLeaseParkPlan } from '../git-index-ownership.ts';
 export type TaskflowCommitMode = 'auto-commit' | 'stage-only' | 'dry-run';
 export interface TaskflowIndexIsolation {
     verified: boolean;
     expectedStageFiles: string[];
     preStagedFiles: string[];
     unexpectedStagedFiles: string[];
+    indexLease: GitIndexLeaseParkPlan;
 }
 export interface TaskflowCommitRepoBundle {
     repoRoot: string | null;
@@ -14,6 +16,22 @@ export interface TaskflowCommitRepoBundle {
     status: 'preview' | 'staged' | 'committed' | 'skipped' | 'failed' | 'uncomputed';
     reason?: string | null;
     indexIsolation?: TaskflowIndexIsolation;
+}
+export interface TaskflowSealAndCommitReceipt {
+    schemaId: 'atm.taskflowSealAndCommitReceipt.v1';
+    taskId: string;
+    actorId: string | null;
+    createdAt: string;
+    targetHeadBeforeCommit: string | null;
+    planningHeadBeforeCommit: string | null;
+    historicalDeliveryRefs: string[];
+    historicalBatchRef: string | null;
+    manifestPath: string;
+    targetPayloadDigest: string;
+    targetEvidenceDigest: string;
+    planningPayloadDigest: string;
+    planningEvidenceDigest: string;
+    sealDigest: string;
 }
 export interface TaskflowScopeAmendmentProposal {
     required: boolean;
@@ -38,6 +56,7 @@ export interface TaskflowGovernedCommitBundle {
     excludedDirtyFiles: string[];
     excludedReasons: Record<string, string>;
     scopeAmendment: TaskflowScopeAmendmentProposal;
+    sealAndCommitReceipt: TaskflowSealAndCommitReceipt;
 }
 export interface TaskflowDeliveryCommit {
     repoRoot: string;

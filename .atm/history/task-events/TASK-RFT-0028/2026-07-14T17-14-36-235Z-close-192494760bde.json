@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T17-14-36-235Z-close-192494760bde",
+  "taskId": "TASK-RFT-0028",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714170628-codex-gpt-5-5-captain-TASK-RFT-0028-7e4d165b7c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0028.json",
+  "taskSha256": "sha256:9434e027f7b8f3c595b8be54a2ed9edc7ed39c237d3ecb7521e0b2f1d9f0db25",
+  "createdAt": "2026-07-14T17:14:36.235Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0028 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714170628-codex-gpt-5-5-captain-TASK-RFT-0028-7e4d165b7c",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0028.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T17:14:36.227Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0028.*",
+        ".atm/history/task-events/TASK-RFT-0028/**",
+        ".atm/history/tasks/TASK-RFT-0028.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "tests/cli/team-agents-dogfood.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "tests/cli/team-agents-dogfood.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -36,6 +36,14 @@
       "pattern": "^sha256:[a-f0-9]{64}$",
       "description": "SHA-256 hash of the companion atomic-charter.md at the time this invariants file was generated."
     },
+    "firstPrinciplesHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the companion atm-first-principles.md at the time this invariants file was generated."
+    },
+    "scheduleA": {
+      "$ref": "#/$defs/scheduleA"
+    },
     "migration": {
       "$ref": "#/$defs/migration"
     },
@@ -63,6 +71,65 @@
         "notes": {
           "type": "string"
         }
+      }
+    },
+    "scheduleA": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheduleId", "economicRatios", "tokenDiagnostics", "teamThresholds"],
+      "properties": {
+        "scheduleId": {
+          "const": "schedule-a-economic-thresholds"
+        },
+        "economicRatios": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["production", "preferred", "breakthrough"],
+          "properties": {
+            "production": { "$ref": "#/$defs/economicRatio" },
+            "preferred": { "$ref": "#/$defs/economicRatio" },
+            "breakthrough": { "$ref": "#/$defs/economicRatio" }
+          }
+        },
+        "tokenDiagnostics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "priceProxyAllowed"],
+          "properties": {
+            "required": { "const": true },
+            "priceProxyAllowed": { "const": false },
+            "rationale": { "type": "string" }
+          }
+        },
+        "teamThresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["production", "preferred", "breakthrough"],
+          "properties": {
+            "production": { "$ref": "#/$defs/teamThreshold" },
+            "preferred": { "$ref": "#/$defs/teamThreshold" },
+            "breakthrough": { "$ref": "#/$defs/teamThreshold" }
+          }
+        }
+      }
+    },
+    "economicRatio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxCostRatio", "maxEndToEndTimeRatio"],
+      "properties": {
+        "maxCostRatio": { "type": "number", "exclusiveMinimum": 0 },
+        "maxEndToEndTimeRatio": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "teamThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxCostRatio", "maxEndToEndTimeRatio", "requiresMeasuredAcceleration"],
+      "properties": {
+        "maxCostRatio": { "type": "number", "exclusiveMinimum": 0 },
+        "maxEndToEndTimeRatio": { "type": "number", "exclusiveMinimum": 0 },
+        "requiresMeasuredAcceleration": { "type": "boolean" }
       }
     },
     "invariant": {

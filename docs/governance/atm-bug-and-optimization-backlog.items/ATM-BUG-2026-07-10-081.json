@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-081",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in planning-card import-required route lane",
+  "area": "Tasks import / next routing / planning-card ledger sync",
+  "finding": "After a planning card exists in `3KLife`, `next` can remain stuck on the previously imported task because the newer card has not yet entered the target ledger. In Captain/Team Broker mode this makes the official queue look like it is still on the old M9I task, even though the operator intends to advance to the next planning card.",
+  "expectedBehavior": "`next --prompt` should either import/register the referenced planning card into the target ledger when enough path/context exists, or emit an explicit `planning-card-not-in-target-ledger` action with the exact `tasks import --from <card> --write` command before recommending or reselecting an already-imported task.",
+  "evidenceOrRepro": "Fixed by adding `atm.planningCardImportRequirement.v1` to prompt-scoped markdown planning-card routes and queue heads. When a route resolves to a planning card that is not an imported target-ledger task, `nextAction.command` / `requiredCommand` point to `node atm.mjs tasks import --from <card> --write --json`, while the eventual task-scoped claim command remains available. Verification: `node --strip-types scripts/validate-prompt-scoped-next.ts` covers shorthand external planning-card routing and import-required evidence.",
+  "followUp": "Keep ledger JSON tasks on normal claim routes; only non-ledger planning cards receive the import-required payload."
+}

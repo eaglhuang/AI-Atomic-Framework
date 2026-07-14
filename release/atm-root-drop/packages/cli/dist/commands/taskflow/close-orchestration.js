@@ -8,6 +8,7 @@ import { releaseCloseWindowStagedIndexLock } from '../tasks/close-window-lock.js
 import { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestPathForTask, evidenceBundleManifestRelativePath, readEvidenceBundleManifest } from '../evidence.js';
 import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory } from '../tasks/historical-delivery.js';
 import { resolveStoredPlanningPath } from '../planning-repo-root.js';
+import { assertPlanningSourceSealValid } from '../tasks/import-task.js';
 function buildTasksCloseCommand(input) {
     const parts = [
         'node atm.mjs tasks close',
@@ -328,6 +329,11 @@ function normalizeComparablePath(filePath) {
     return path.resolve(filePath).replace(/\\/g, '/');
 }
 export function resolveClosebackPlanningPath(input) {
+    const planningSourceSealValidation = assertPlanningSourceSealValid({
+        cwd: input.cwd,
+        taskDocument: input.taskDocument,
+        surface: 'close'
+    });
     const normalizedTaskId = normalizeTaskId(input.taskId);
     const title = typeof input.taskDocument.title === 'string' ? input.taskDocument.title : null;
     const profileFallbackAvailable = Boolean(input.profile && input.profileRepoRoot);
@@ -358,8 +364,8 @@ export function resolveClosebackPlanningPath(input) {
                 profileRepoRoot: null,
                 planningStatus: metadata.status,
                 diagnostics: {
-                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT'],
-                    messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`]
+                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT', ...planningSourceSealValidation.diagnostics.codes],
+                    messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`, ...planningSourceSealValidation.diagnostics.messages]
                 }
             };
         }

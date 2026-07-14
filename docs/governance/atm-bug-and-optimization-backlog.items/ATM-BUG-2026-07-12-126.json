@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-126",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Cross-task closure residue recovery",
+  "finding": "A completed task's stale close event can block another task's governed commit, while the only offered `repair-closure` path refuses to run until that other task's dirty delivery is committed. This creates a circular close dependency with no governed escape hatch.",
+  "expectedBehavior": "A stale completed-task close event must be repairable in a scoped main-worktree lane, or commit bundling must classify it as known stale-import advisory residue without weakening protection for live foreign tasks.",
+  "evidenceOrRepro": "`TASK-TEAM-0075` commit returned `ATM_GIT_COMMIT_GENERATED_RESIDUE_BLOCKED` for `TASK-TEAM-0076/...close...json`; `tasks status --residue` proved 0076 is `done/released` and stale-import. With human-approved `backend.tasks.repairClosure` lease `EMG-TASK-TEAM-0076-bf05b44d7c`, `tasks repair-closure --scope TASK-TEAM-0076` still returned `ATM_CLOSURE_REPAIR_DIRTY_WORKTREE` because active 0075/0079 dirty delivery exists. Its only remediation recommends an isolated worktree, which is prohibited for this main-worktree workflow.",
+  "followUp": "Add a regression for done/released stale-import residue beside an active unrelated task; provide a scoped main-worktree repair or deterministic advisory classification, never manual history deletion or a compulsory worktree fork."
+}

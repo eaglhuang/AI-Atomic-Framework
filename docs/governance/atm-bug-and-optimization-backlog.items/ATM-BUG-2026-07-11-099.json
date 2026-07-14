@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-099",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in working tree (cursor-grok-4.5)",
+  "area": "Team Agents / OpenAI Responses metadata",
+  "finding": "Paid OpenAI Coordinator and Review Agent calls reached the Responses API but returned HTTP 400 because `metadata.scopedPathCount` was encoded as an integer; OpenAI metadata values must be strings.",
+  "expectedBehavior": "Provider request builders must conform to vendor metadata schemas, with deterministic body-shape assertions before paid dogfood.",
+  "evidenceOrRepro": "Fixed 2026-07-14: `azure-openai.ts` and `microsoft-foundry.ts` now `String(scopedPaths.length)` like `openai.ts`; validator asserts added in `validate-team-agents.ts` (live team-plan preflight may still fail on foreign broker dirt).",
+  "followUp": "Keep metadata values string-only across all OpenAI-family bridges."
+}

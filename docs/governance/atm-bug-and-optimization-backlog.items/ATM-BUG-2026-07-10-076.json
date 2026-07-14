@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-076",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in cross-file staging-hint lane",
+  "area": "Pre-commit / cross-file consistency",
+  "finding": "Governed `git commit` can fail late with `ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY` when a staged file imports or re-exports a sibling module that was created during a split but left unstaged, even though the file is already in task scope.",
+  "expectedBehavior": "Commit preflight should detect unstaged in-scope siblings referenced by staged changes and either list them in the failure message with exact `git add` paths, or offer a governed auto-stage suggestion before hooks run.",
+  "evidenceOrRepro": "Fixed by enriching `ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY` findings with `files: [<missing sibling>]` and a copyable `git add -- \"<path>\"` command for untracked, deleted, and unstaged-modified local imports. Verification: `node --strip-types packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts` asserts the missing sibling file and staging command are present.",
+  "followUp": "Keep this as the hook-level final safety net; broader pre-expansion of split task scope remains tracked by `ATM-BUG-2026-07-10-079`."
+}

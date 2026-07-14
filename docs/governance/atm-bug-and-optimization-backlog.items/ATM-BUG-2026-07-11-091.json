@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-091",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Fixed in backlog-ID maintenance route lane",
+  "area": "Prompt-scoped next / backlog closeout routing",
+  "finding": "A prompt that names an existing backlog item such as `ATM-BUG-2026-07-07-048` is interpreted as an ATM ledger task id, so `next --prompt` returns `ATM_NEXT_TASK_SCOPE_NOT_FOUND`; falling back to `start` then routes the repair as `create-atom` and asks for unrelated atom evidence. This interrupts a valid bug-closeout workflow and makes the operator recover manually before implementation can begin.",
+  "expectedBehavior": "Existing ATM backlog IDs should resolve to their canonical backlog entry and a governed maintenance/closeout route, or `next` should emit one explicit command to open a linked task card. It should not classify the backlog ID as a missing ledger task or route an existing bug fix into atom birth.",
+  "evidenceOrRepro": "Fixed on 2026-07-11 by excluding canonical `ATM-BUG-YYYY-MM-DD-NNN` and `PROJECT-BUG-YYYY-MM-DD-NNN` identifiers from ledger task-id extraction. `npm run validate:prompt-scoped-next` verifies that `Resolve ATM-BUG-2026-07-07-048 and push the fix` routes to `ATM_NEXT_FRAMEWORK_TEMP_CLAIM_REQUIRED`, with no `ATM_NEXT_TASK_SCOPE_NOT_FOUND` and `taskScopeMentioned: false`.",
+  "followUp": "Keep the backlog-ID routing regression beside prompt-scoped next coverage; a future linked task-card workflow may add richer backlog metadata, but maintenance routing must remain unblocked."
+}

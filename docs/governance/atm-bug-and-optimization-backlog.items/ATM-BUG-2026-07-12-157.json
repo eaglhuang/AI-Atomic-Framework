@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-157",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-FABLE-004",
+  "area": "Backlog intent routing / Captain continuation",
+  "finding": "A prompt explicitly asking to continue repairing all backlog items was routed by `next --prompt`/`guide` to the generic `create-atom` route, requiring bucket/title/description/logical-name evidence instead of selecting the existing backlog/task queue. This can send Captain continuation work into an unrelated atom-birth flow.",
+  "expectedBehavior": "Backlog-repair and Captain-continuation language should resolve to the existing governed backlog queue or a task-selection route; generic create-atom fallback must not be selected when the prompt names backlog repair and ongoing continuation.",
+  "evidenceOrRepro": "Reproduced on 2026-07-12 after TASK-AAO-0177 close: `node atm.mjs next --prompt \"請繼續修復所有 backlog；過程中所有不好用或卡住的地方都回寫 backlog。\" --json` returned `prompt-guidance-required`, and `node atm.mjs start --goal ...` selected `recommendedRoute: create-atom` with missing bucket/title/description/logical-name evidence. TASK-AAO-FABLE-004 extends queue-request prompt normalization for zh-TW backlog continuation, English `continue backlog fixes`, and Captain-mode backlog repairs, with `validate:prompt-scoped-next` fixtures asserting batch queue routing instead of prompt-guidance/create-atom fallback.",
+  "followUp": "Keep follow-up row 173 for task-id alias ergonomics; core backlog continuation queue routing is fixed in TASK-AAO-FABLE-004."
+}

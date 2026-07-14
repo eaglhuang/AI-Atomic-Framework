@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T16-20-25-157Z-close-3c2b22fdbf7b",
+  "taskId": "ATM-GOV-0137",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714161351-codex-gpt-5-5-captain-ATM-GOV-0137-98f8e500d2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0137.json",
+  "taskSha256": "sha256:93ecce76d3dbb5c51a2ada5e0f9a471c45a2501ed612af3a73000fdf3219c6c2",
+  "createdAt": "2026-07-14T16:20:25.157Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0137 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714161351-codex-gpt-5-5-captain-ATM-GOV-0137-98f8e500d2",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0137.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-admission-projection.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T16:20:25.146Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0137.*",
+        ".atm/history/task-events/ATM-GOV-0137/**",
+        ".atm/history/tasks/ATM-GOV-0137.json",
+        "packages/cli/src/commands/next/active-work-summary.ts",
+        "packages/cli/src/commands/team/admission.ts",
+        "tests/cli/team-admission-projection.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/active-work-summary.ts",
+        "packages/cli/src/commands/team/admission.ts",
+        "tests/cli/team-admission-projection.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

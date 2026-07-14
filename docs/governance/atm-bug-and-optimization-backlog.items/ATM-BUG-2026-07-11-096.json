@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-096",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Team Agents / direct provider permission scope",
+  "finding": "Concrete OpenAI and Anthropic Team bridge execution passed `scopedPaths: []`, so the shared permission broker rejected every paid role even though the task had a governed allowed-file scope.",
+  "expectedBehavior": "Direct provider roles must receive the normalized task allowed files; the broker must continue rejecting truly empty scopes.",
+  "evidenceOrRepro": "`TASK-TEAM-0066` runs `team-74228cfda35d` and `team-f8ef2357ca7b` reached 10 and 4 provider executions respectively but all roles failed. A direct `launchAnthropicTeamProviderRun` probe exposed `Permission denied by governed broker policy or missing scoped paths`, while the same key/model returned HTTP 200 directly.",
+  "followUp": "Fix in `TASK-TEAM-0068` with deterministic injected-executor coverage, then rerun paid dogfood."
+}

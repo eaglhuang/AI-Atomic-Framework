@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0138",
   "title": "Make Broker registry updates atomic and thin under shadow-first Team",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Team",
   "dependencies": [
     "ATM-GOV-0137"
@@ -63,7 +63,59 @@
     "hash": "11ac90ed070d00ec"
   },
   "importedAt": "2026-07-14T11:42:40.424Z",
-  "lastTransitionId": "2026-07-14T11-42-40-437Z-import-cafdf939217f",
-  "lastTransitionAt": "2026-07-14T11:42:40.437Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T16-26-38-817Z-lock-cleanup-ce44ca41ec4b",
+  "lastTransitionAt": "2026-07-14T16:26:38.817Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T16:20:29.261Z",
+  "promotedAt": "2026-07-14T16:20:29.264Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-b19c58b64dbb",
+    "claimedAt": "2026-07-14T16:20:29.269Z",
+    "heartbeatAt": "2026-07-14T16:26:38.644Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0138.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "tests/cli/broker-registry-transaction.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T16:20:29.269Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0138",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-123ffe92da5136ce",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0138.*",
+      ".atm/history/task-events/ATM-GOV-0138/**",
+      ".atm/history/tasks/ATM-GOV-0138.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/shared-surface-queue.ts",
+      "tests/cli/broker-registry-transaction.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "33753acab225f3a1cab4740080c09d160f19957c02e0dd64849d1b044ae61dc8",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T16:20:34.950Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T16:26:38.814Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T16:26:38.644Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714162029-codex-gpt-5-5-captain-ATM-GOV-0138-211668d6e0",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0138.closure-packet.json"
 }

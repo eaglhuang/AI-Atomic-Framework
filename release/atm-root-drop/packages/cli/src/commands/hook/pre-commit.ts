@@ -880,7 +880,7 @@ export function buildPreCommitRepairHints(
   requiredCommand: string | null
 ): readonly string[] {
   if (findings.length === 0) {
-    return requiredCommand ? [`Run required command: ${requiredCommand}`] : [];
+    return requiredCommand ? [`Run required command: ${sanitizeOperatorCommandHint(requiredCommand)}`] : [];
   }
   return findings.map((finding) => {
     if (finding.code === 'ATM_ENV_SANDBOX_GIT_EPERM') {
@@ -890,10 +890,35 @@ export function buildPreCommitRepairHints(
       return 'Resolve the local Git/index permission problem outside ATM, then retry the commit. This is an environment diagnostic, not task evidence.';
     }
     if (finding.requiredCommand) {
-      return `Run required command: ${finding.requiredCommand}`;
+      return `Run required command: ${sanitizeOperatorCommandHint(finding.requiredCommand)}`;
     }
-    return `Resolve ${finding.source} finding ${finding.code}, then retry the commit.`;
+    return `Resolve ${finding.source} finding ${finding.code}, then retry with the ATM governed command.`;
   });
+}
+
+export function summarizePreCommitFailureEnvelope(envelope: PreCommitFailureEnvelope): string {
+  const first = envelope.currentTaskFailures[0] ?? envelope.baselineFailures[0] ?? envelope.blockingFindings[0] ?? null;
+  const summary = first
+    ? `${first.code}: ${first.detail}`
+    : 'ATM pre-commit blocked this commit.';
+  const next = envelope.requiredCommand
+    ? ` Next: ${sanitizeOperatorCommandHint(envelope.requiredCommand)}`
+    : ' Next: inspect failureEnvelope.blockingFindings and rerun the ATM governed command.';
+  return `${summary}${next}`;
+}
+
+function sanitizeOperatorCommandHint(command: string): string {
+  const normalized = command.trim();
+  if (/\bgit\s+(reset|clean|checkout|restore|read-tree|rm|switch)\b/i.test(normalized)) {
+    return 'use the ATM repair/reconcile command shown by the blocking finding; do not run raw destructive Git remediation';
+  }
+  if (/\bgit\s+commit\b/i.test(normalized) && !/\batm\.mjs\s+git\s+commit\b/i.test(normalized)) {
+    return 'node atm.mjs git commit --actor <actor> --task <task> --message "<message>" --json';
+  }
+  if (/\bgit\s+push\b/i.test(normalized) && !/\batm\.mjs\s+git\s+push\b/i.test(normalized)) {
+    return 'node atm.mjs git push --actor <actor> --task <task> --json';
+  }
+  return normalized;
 }
 
 export function isPreCommitBaselineFinding(finding: PreCommitBlockingFinding): boolean {

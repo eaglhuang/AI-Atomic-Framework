@@ -1,0 +1,25 @@
+{
+  "schemaId": "atm.protectedOverrideAuditEvent.v1",
+  "eventId": "POA-2c28c2bd8aff",
+  "recordedAt": "2026-07-14T15:16:51.570Z",
+  "actorId": "codex-gpt-5-5-captain",
+  "taskId": "ATM-GOV-0134",
+  "surface": "git commit --no-verify",
+  "command": "node atm.mjs git commit --actor codex-gpt-5-5-captain --task ATM-GOV-0134 --message \"atm: sync ATM-GOV-0134 close records\" --no-verify --json",
+  "flags": [
+    "--no-verify"
+  ],
+  "permission": "backend.gitHookBypass",
+  "leaseId": "EMG-ATM-GOV-0134-dc33afa663",
+  "reason": "Governed git hook bypass for emergency recovery.",
+  "skippedChecks": [
+    "protected-backend-surface",
+    "backend.gitHookBypass"
+  ],
+  "touchedFiles": [],
+  "outcome": "authorized",
+  "failureCode": null,
+  "emergencyUsePath": "C:\\Users\\User\\AI-Atomic-Framework\\.atm\\runtime\\emergency\\uses\\2026-07-14T15-16-51-568Z-EMG-ATM-GOV-0134-dc33afa663.json",
+  "parentEventId": null,
+  "repairCandidate": null
+}

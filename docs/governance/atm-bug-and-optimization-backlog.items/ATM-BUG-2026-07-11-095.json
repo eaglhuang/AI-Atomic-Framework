@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-095",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0196",
+  "area": "Team Agents / execute result contract",
+  "finding": "`team start --execute` can return exit code 0 and `ATM_TEAM_STARTED` when provider execution is blocked and no provider bot ran. The success envelope can be mistaken for a completed paid live test.",
+  "expectedBehavior": "An explicit execute request must fail closed, or at least return a blocking/non-success result, when `providerExecutionCount` is zero. The message must distinguish a state-only Team run from executed provider orchestration.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0196: `resolveTeamStartExecutionLane` fail-closes zero-execution `--execute`; regression `team-execute-fail-closed.spec.ts`.",
+  "followUp": "Keep state-only `team start` (no `--execute`) as non-blocking success."
+}

@@ -116,6 +116,12 @@ export const minimumAtmEntrySkillDefinitions = [
     title: 'ATM Atom Map Refactor',
     summary: 'Plan ATM framework refactors by preserving atom/map semantics before splitting large governance modules.',
     command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
+  },
+  {
+    id: 'atm-memory-consolidate',
+    title: 'ATM Memory Consolidate',
+    summary: "Reflective consolidation pass over a repository's keep-memory notes — merge duplicates, retire stale entries, rebuild the summary index.",
+    command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
   }
 ] as const;
 

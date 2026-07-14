@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-055",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in taskflow close atomicity lane",
+  "area": "Taskflow close / staged residue",
+  "finding": "`node atm.mjs taskflow close --write` can successfully create the close commit while leaving an older version of the bundle manifest staged in the git index, producing an `MM` state that requires manual diff interpretation.",
+  "expectedBehavior": "Successful taskflow close should leave the target repo index clean, or emit an explicit cleanup command when advisory post-close evidence rewrites cannot be auto-reconciled.",
+  "evidenceOrRepro": "Fixed in `packages/cli/src/commands/taskflow/commit-bundle-assembly.ts`: close commits are built from a clean temporary index and committed paths are reset in the live index to the new HEAD, preserving unrelated staged files while removing same-task residue. Regression coverage in `packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts` now stages an older same-task `.bundle-manifest.json`, refreshes the worktree manifest before close, finalizes the close bundle, and asserts the manifest is not left staged afterward. Validation: `node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts`.",
+  "followUp": "Keep the refreshed bundle-manifest assertion in the commit-bundle assembly spec; future taskflow close changes must preserve clean live-index state after successful close commits."
+}

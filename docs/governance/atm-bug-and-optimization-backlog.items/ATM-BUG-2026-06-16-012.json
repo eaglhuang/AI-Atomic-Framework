@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-16-012",
+  "date": "2026-06-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 historical-batch validator attestation lane",
+  "area": "Historical batch evidence / validators",
+  "finding": "`taskflow close --historical-batch` can use a batch envelope slice, but each task close still needs fresh per-task `evidence run` validator records. `evidence run --recent-run` records `historical-reference`, which is useful for diagnosis but not enough for close, so a 4-card batch still reruns expensive validators multiple times.",
+  "expectedBehavior": "A batch close wave should support one fresh validator execution set with signed per-task validator slices, preserving task-specific acceptance while avoiding repeated `npm test` / `typecheck` runs for the same delivery commit.",
+  "evidenceOrRepro": "Closed on 2026-06-28 by splitting historical-batch task evidence into two coordinated records inside `packages/cli/src/commands/evidence.ts`: the delivery provenance record stays `historical-reference`, while a second `atm.historicalBatchValidatorAttestation.v1` record carries the same proof-backed `commandRuns` plus reusable fresh validator passes for that task slice. This keeps historical delivery semantics intact but lets close/evidence gates consume one shared fresh validator execution wave without rerunning the same validator per task. Regression coverage now lives in `packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts`, which proves the historical slice is still historical-reference while `verifyTaskEvidence(..., gate: 'close')` passes from the fresh attestation slice alone. Validation also re-ran `scripts/validate-governance-commands.ts --mode validate` to keep the broader evidence/governance surface green.",
+  "followUp": "Preserve the dual-record contract: historical delivery provenance must remain historical-reference, while reusable same-wave validator proof stays fresh and command-backed. Future evidence refactors must not collapse these back into one stale record or force per-task validator reruns after a batch envelope already executed them successfully."
+}

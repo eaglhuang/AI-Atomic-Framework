@@ -59,6 +59,7 @@ const schemaEntries: Record<string, string> = {
   'polymorphic-template': 'schemas/polymorphism/polymorphic-template.schema.json',
   'dimension-spec': 'schemas/polymorphism/dimension-spec.schema.json',
   'charter-invariants': 'schemas/charter/charter-invariants.schema.json',
+  'charter-bundle': 'schemas/charter/charter-bundle.schema.json',
   'integration-install-manifest': 'schemas/integrations/install-manifest.schema.json',
   'agent-pack-manifest': 'schemas/agent-pack/manifest.schema.json',
   'write-intent': 'schemas/governance/write-intent.schema.json',
@@ -83,7 +84,10 @@ const supportSchemaEntries: Record<string, string> = {
   'team-broker-lane': 'schemas/team-agents/team-broker-lane.schema.json',
   'team-broker-runtime-activation': 'schemas/team-agents/team-broker-runtime-activation.schema.json',
   'team-broker-write-transaction': 'schemas/team-agents/team-broker-write-transaction.schema.json',
+  'team-cost-receipt': 'schemas/team-agents/team-cost-receipt.schema.json',
+  'team-efficiency-incident': 'schemas/team-agents/team-efficiency-incident.schema.json',
   'team-runtime-contract': 'schemas/team-agents/team-runtime-contract.schema.json',
+  'model-price-catalog': 'schemas/team-agents/model-price-catalog.schema.json',
   'atm-operational-bench': 'schemas/bench/atm-operational-bench.schema.json'
 };
 

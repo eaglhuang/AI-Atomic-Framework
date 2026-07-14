@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-179",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed",
+  "area": "Batch checkpoint / historical-batch closeback",
+  "finding": "A close-ready `evidence historical-batch` slice can prove that a batch queue-head task's real delivery already landed, but `batch checkpoint` still ignores that slice and fails `ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED`; the only working checkpoint path is `--historical-delivery`, which routes to protected backend emergency approval.",
+  "expectedBehavior": "Batch checkpoint should consume close-ready historical-batch evidence for the current queue head, or accept `--historical-batch <id>` directly, so historical closeback can stay in the governed batch lane without human emergency approval when the slice is complete and validator-backed.",
+  "evidenceOrRepro": "Fixed in `6e7514313`: `batch checkpoint` accepts `--historical-batch`, close-artifact staging understands historical-batch close-ready slices, and related pre-commit/result-contract wiring landed with regression coverage in `batch-skip-resume.spec.ts`.",
+  "followUp": "Keep historical-batch closeback in the governed batch lane; do not route complete slices through emergency `--historical-delivery` only."
+}

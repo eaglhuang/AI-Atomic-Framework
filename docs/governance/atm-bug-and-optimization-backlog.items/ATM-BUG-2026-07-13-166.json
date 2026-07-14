@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-166",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug / UX",
+  "severity": "Medium",
+  "status": "Fixed",
+  "area": "Taskflow pre-close remediation command validity",
+  "finding": "`taskflow pre-close` can suggest validator remediation commands that are not executable in the current CLI surface.",
+  "expectedBehavior": "Every emitted `requiredCommand` should be runnable as printed, or should point to the known package script when no ATM subcommand exists.",
+  "evidenceOrRepro": "Fixed by applying the taskflow auto-evidence package-script mapper to dry-run/pre-close remediation planning, not only execution. Catalog-selected validator hints now surface the mapped executable command such as `npm run check:encoding:touched` when an equivalent package script exists. Validator: `node --strip-types tests/cli/taskflow-auto-evidence.test.ts`.",
+  "followUp": "Delivered in current fix commit."
+}

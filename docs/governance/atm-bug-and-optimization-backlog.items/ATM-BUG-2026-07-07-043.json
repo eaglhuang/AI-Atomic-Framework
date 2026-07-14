@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-043",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in this cleanup commit",
+  "area": "Claim intent / pre-commit governance",
+  "finding": "`next --claim --auto-intent` can classify a task as `closeout-only` even when the agent is about to make source or backlog delivery changes, causing pre-commit to fail later with `ATM_PRE_COMMIT_CLOSEOUT_ONLY_CLAIM_MUTATION`.",
+  "expectedBehavior": "Auto-intent should infer write intent when the task is open and delivery files are modified or when the prompt asks to implement/fix, or `git commit --task` should surface the re-claim command before staging and hook failure.",
+  "evidenceOrRepro": "During `TASK-AAO-0151`, the first claim reported `claimIntent: closeout-only`; `node atm.mjs git commit --auto-stage` then failed after running hooks because `docs/governance/atm-bug-and-optimization-backlog.md` and `packages/cli/src/commands/next.ts` were real delivery mutations. On 2026-07-09 this was closed by adding `ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION` to task-scoped commit bundle preflight, so source mutation under an active closeout-only claim fails before auto-stage and before long pre-commit hooks.",
+  "followUp": "Keep `tests/cli/git-commit-closeout-only-preflight.test.ts` in `validate:cli`; it asserts the source file is not staged and the operator receives the re-claim/write recovery path."
+}

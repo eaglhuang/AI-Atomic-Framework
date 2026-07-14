@@ -41,6 +41,27 @@ export interface GitIndexOwnershipReport {
   };
 }
 
+export interface GitIndexLeaseParkEntry {
+  readonly path: string;
+  readonly ownerTaskId: string | null;
+  readonly ownerActorId: string | null;
+  readonly stagedBlobId: string | null;
+  readonly stagedMode: string | null;
+  readonly restoreIdentity: string;
+}
+
+export interface GitIndexLeaseParkPlan {
+  readonly schemaId: 'atm.gitIndexLeaseParkPlan.v1';
+  readonly taskId: string | null;
+  readonly leaseId: string;
+  readonly generatedAt: string;
+  readonly status: 'not-needed' | 'park-and-restore' | 'blocked-foreign-active-staged';
+  readonly parkEntries: readonly GitIndexLeaseParkEntry[];
+  readonly restoreEntries: readonly GitIndexLeaseParkEntry[];
+  readonly approvedPartialStagedBlobIds: readonly string[];
+  readonly reason: string;
+}
+
 export const ATM_INDEX_FOREIGN_ACTIVE_STAGED = 'ATM_INDEX_FOREIGN_ACTIVE_STAGED';
 
 export function inspectGitIndexOwnership(input: {
@@ -120,6 +141,98 @@ export function buildForeignActiveStagedDiagnostic(report: GitIndexOwnershipRepo
     ],
     requiredCommand: 'node atm.mjs git lease stage-override --task <task-id> --actor <actor-id> --paths <paths> --reason <human-approved-reason> --json'
   };
+}
+
+export function buildGitIndexLeaseParkPlan(input: {
+  readonly report: GitIndexOwnershipReport;
+  readonly expectedStageFiles: readonly string[];
+  readonly leaseId?: string | null;
+  readonly generatedAt?: string | null;
+}): GitIndexLeaseParkPlan {
+  const expected = new Set(input.expectedStageFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+  const foreignEntries = input.report.entries
+    .filter((entry) => !expected.has(normalizeRelativePath(entry.path).toLowerCase()))
+    .map((entry): GitIndexLeaseParkEntry => ({
+      path: entry.path,
+      ownerTaskId: entry.ownerTaskId,
+      ownerActorId: entry.ownerActorId,
+      stagedBlobId: entry.stagedBlobId,
+      stagedMode: entry.stagedMode,
+      restoreIdentity: `${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`
+    }));
+  const approvedPartialStagedBlobIds = uniqueSorted(foreignEntries.map((entry) => entry.stagedBlobId ?? '').filter(Boolean));
+  const leaseId = input.leaseId?.trim()
+    || `index-lease-${shortDigest([
+      input.report.taskId ?? 'no-task',
+      ...foreignEntries.map((entry) => entry.restoreIdentity)
+    ].join('\n'))}`;
+  if (input.report.foreignActiveStaged.length > 0) {
+    return {
+      schemaId: 'atm.gitIndexLeaseParkPlan.v1',
+      taskId: input.report.taskId,
+      leaseId,
+      generatedAt: input.generatedAt ?? new Date().toISOString(),
+      status: 'blocked-foreign-active-staged',
+      parkEntries: foreignEntries,
+      restoreEntries: foreignEntries,
+      approvedPartialStagedBlobIds,
+      reason: 'Foreign active staged paths require an explicit stage-override lease before park/restore.'
+    };
+  }
+  if (foreignEntries.length === 0) {
+    return {
+      schemaId: 'atm.gitIndexLeaseParkPlan.v1',
+      taskId: input.report.taskId,
+      leaseId,
+      generatedAt: input.generatedAt ?? new Date().toISOString(),
+      status: 'not-needed',
+      parkEntries: [],
+      restoreEntries: [],
+      approvedPartialStagedBlobIds: [],
+      reason: 'Shared Git index already contains only expected close-bundle paths.'
+    };
+  }
+  return {
+    schemaId: 'atm.gitIndexLeaseParkPlan.v1',
+    taskId: input.report.taskId,
+    leaseId,
+    generatedAt: input.generatedAt ?? new Date().toISOString(),
+    status: 'park-and-restore',
+    parkEntries: foreignEntries,
+    restoreEntries: foreignEntries,
+    approvedPartialStagedBlobIds,
+    reason: 'Foreign complete bundles can be parked from the live index and restored byte-identically after close-bundle assembly.'
+  };
+}
+
+export function parkGitIndexLease(cwd: string, plan: GitIndexLeaseParkPlan): readonly string[] {
+  if (plan.status !== 'park-and-restore' || plan.parkEntries.length === 0) {
+    return [];
+  }
+  const paths = plan.parkEntries.map((entry) => entry.path);
+  execFileSync('git', ['restore', '--staged', '--', ...paths], {
+    cwd,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  return paths;
+}
+
+export function restoreGitIndexLease(cwd: string, plan: GitIndexLeaseParkPlan): readonly string[] {
+  if (plan.status !== 'park-and-restore' || plan.restoreEntries.length === 0) {
+    return [];
+  }
+  const restored: string[] = [];
+  for (const entry of plan.restoreEntries) {
+    if (!entry.stagedMode || !entry.stagedBlobId) continue;
+    execFileSync('git', ['update-index', '--add', '--cacheinfo', `${entry.stagedMode},${entry.stagedBlobId},${entry.path}`], {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+    restored.push(entry.path);
+  }
+  return uniqueSorted(restored);
 }
 
 function buildIndexLane(
@@ -223,4 +336,13 @@ function normalizeRelativePath(value: string): string {
 
 function uniqueSorted(values: readonly string[]): readonly string[] {
   return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+
+function shortDigest(value: string): string {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }

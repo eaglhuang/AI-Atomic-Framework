@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-141",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0161",
+  "area": "Broker intent lifecycle / task close",
+  "finding": "After governed task close, Broker write intents were not automatically released, so captains had to remember a separate `broker release --task <id>` step or later unrelated claims could see stale queue/intent state.",
+  "expectedBehavior": "Successful `taskflow close --write` should release the closed task's Broker intent; `broker release` and `broker cleanup` should also prune stale/empty runtime snapshots while preserving live intents.",
+  "evidenceOrRepro": "TASK-AAO-0161 adds shared Broker runtime cleanup for per-task intent snapshots, empty shared queue/freeze snapshots, and taskflow close success. Focused lifecycle validation covers live-vs-stale snapshot preservation, and real repo cleanup removed stale TASK-AAO-0158/TASK-AAO-0159 snapshots while preserving the live TASK-AAO-0161 intent.",
+  "followUp": "Keep `validate:broker-lifecycle` covering stale snapshot cleanup and live snapshot preservation; closeout evidence should show `brokerRuntimeCleanup` after successful `taskflow close --write`."
+}

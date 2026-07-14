@@ -18,6 +18,9 @@ type ResidueReconcileAction = {
     readonly action: 'remove';
     readonly applied: boolean;
     readonly reason: string;
+    readonly attempts?: number;
+    readonly failureCode?: string | null;
+    readonly failureMessage?: string | null;
 };
 export declare function buildResidueStatusReport(cwd: string): {
     schemaId: string;

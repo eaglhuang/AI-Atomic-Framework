@@ -31,6 +31,10 @@ const charterTemplateFiles = [
         target: path.join('.atm', 'charter', 'atomic-charter.md')
     },
     {
+        source: path.join('.atm', 'charter', 'atm-first-principles.template.md'),
+        target: path.join('.atm', 'charter', 'atm-first-principles.md')
+    },
+    {
         source: path.join('.atm', 'charter', 'charter-invariants.template.json'),
         target: path.join('.atm', 'charter', 'charter-invariants.json')
     }
@@ -208,9 +212,18 @@ export function adoptLocalGovernanceBundle(cwd, options = {}) {
         CHARTER_VERSION: '1.0.0',
         LAST_AMENDED_DATE: `${lastAmendedDate}T00:00:00.000Z`
     };
-    for (const charterFile of charterTemplateFiles) {
-        writeTemplate(path.join(templateRoot, charterFile.source), path.join(cwd, charterFile.target), charterTokens, cwd, force, created, unchanged);
-    }
+    const atomicCharterPath = path.join(cwd, '.atm', 'charter', 'atomic-charter.md');
+    const firstPrinciplesPath = path.join(cwd, '.atm', 'charter', 'atm-first-principles.md');
+    const invariantsPath = path.join(cwd, '.atm', 'charter', 'charter-invariants.json');
+    const renderedAtomicCharter = renderTemplate(readFileSync(path.join(templateRoot, '.atm', 'charter', 'atomic-charter.template.md'), 'utf8'), charterTokens);
+    const renderedFirstPrinciples = renderTemplate(readFileSync(path.join(templateRoot, '.atm', 'charter', 'atm-first-principles.template.md'), 'utf8'), charterTokens);
+    writeText(atomicCharterPath, renderedAtomicCharter, cwd, force, created, unchanged);
+    writeText(firstPrinciplesPath, renderedFirstPrinciples, cwd, force, created, unchanged);
+    writeTemplate(path.join(templateRoot, '.atm', 'charter', 'charter-invariants.template.json'), invariantsPath, {
+        ...charterTokens,
+        ATOMIC_CHARTER_SHA256: `sha256:${sha256Bytes(Buffer.from(renderedAtomicCharter, 'utf8'))}`,
+        ATM_FIRST_PRINCIPLES_SHA256: `sha256:${sha256Bytes(Buffer.from(renderedFirstPrinciples, 'utf8'))}`
+    }, cwd, force, created, unchanged);
     writeRootDropScripts(cwd, force, created, unchanged);
     return {
         created,

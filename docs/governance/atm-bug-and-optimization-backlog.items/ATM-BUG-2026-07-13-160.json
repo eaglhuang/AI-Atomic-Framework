@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-160",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0200",
+  "area": "Claim admission / broker resolution consumption",
+  "finding": "`next --claim` freezes on a CID-name collision (`insufficient-mutation-intent`) even when a valid `atm.brokerConflictResolution.v1` artifact authorizes the pair, and the requiredCommand it prints (team broker resolve) therefore cannot unblock the claim.",
+  "expectedBehavior": "Claim admission must consume matching broker conflict resolution artifacts the same way the governed commit lane does (`readResolutionAuthorizedForeignTaskIds`).",
+  "evidenceOrRepro": "TASK-AAO-FABLE-004 vs TASK-AAO-FABLE-005: no common writable file, resolution artifact BCR-nvfv9w recorded, claim still froze.",
+  "followUp": "Fixed in TASK-AAO-0200: extracted shared `readResolutionAuthorizedForeignTaskIds` reader, claim admission consumes matching BCR sidecars before freezing; regression `packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts`."
+}

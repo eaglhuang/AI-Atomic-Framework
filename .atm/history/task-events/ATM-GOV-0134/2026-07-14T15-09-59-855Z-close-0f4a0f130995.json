@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T15-09-59-855Z-close-0f4a0f130995",
+  "taskId": "ATM-GOV-0134",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260714145817-codex-gpt-5-5-captain-ATM-GOV-0134-5739905ec8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0134.json",
+  "taskSha256": "sha256:2ab29dce45b00bc57edfd916f57da787d9e6f1976057d7388138d0dd98822af2",
+  "createdAt": "2026-07-14T15:09:59.855Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0134 --actor codex-gpt-5-5-captain --status done --from-batch-checkpoint --batch batch-170f3cfa7b42",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": "batch-170f3cfa7b42",
+    "sessionId": "session-20260714145817-codex-gpt-5-5-captain-ATM-GOV-0134-5739905ec8",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0134.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/governance-hotfile-sharding.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T15:09:59.843Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".agents/skills/atm-bug-backlog/SKILL.md",
+        ".atm/history/evidence/ATM-GOV-0134.*",
+        ".atm/history/task-events/ATM-GOV-0134/**",
+        ".atm/history/tasks/ATM-GOV-0134.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "package.json",
+        "scripts/validate-governance-projections.ts",
+        "tests/cli/governance-hotfile-sharding.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "package.json",
+        "scripts/validate-governance-projections.ts",
+        "tests/cli/governance-hotfile-sharding.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

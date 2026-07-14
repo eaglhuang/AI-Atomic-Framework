@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-125",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0162",
+  "area": "Task scope amendment metadata",
+  "finding": "`tasks scope add --add` retains shell-level outer quotation marks in the recorded amendment path list when a CSV value is passed as one quoted argument. The effective lock can still contain normalized paths, but the immutable audit record becomes misleading. The backlog also contained duplicate canonical IDs, so numeric identity was not validated.",
+  "expectedBehavior": "Scope amendment parsing must normalize quotes before recording audit paths, and backlog validation must reject duplicate canonical IDs.",
+  "evidenceOrRepro": "TASK-TEAM-0075: `node atm.mjs tasks scope add ... --add \"docs/...,...\" --json` reported `\\\"docs/...` and `...ts\\\"` in `amendmentHistory.addedPaths` while the effective `allowedFiles` were correct. TASK-AAO-0162 also reassigned duplicate backlog IDs to unique canonical IDs without changing their row content.",
+  "followUp": "Keep quoted CSV normalization and duplicate-backlog-ID regressions; repair historical event display only through an explicit audited migration."
+}

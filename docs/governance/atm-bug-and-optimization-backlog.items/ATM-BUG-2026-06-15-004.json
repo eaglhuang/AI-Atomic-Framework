@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-004",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in this cleanup commit",
+  "area": "Closeback UX",
+  "finding": "`taskflow close --historical-delivery` used to detect out-of-scope historical delivery but could not complete the approved waiver path itself, routing the operator back to protected `tasks close` plus emergency approval.",
+  "expectedBehavior": "Operator lane should support a governed, explicit out-of-scope historical-delivery waiver path without forcing direct backend usage when dry-run already identifies the exact blocker.",
+  "evidenceOrRepro": "Verified current source supports `taskflow close --historical-delivery <ref> --waiver-out-of-scope-delivery --reason <text> --write --json` plus the `--waive-out-of-scope` alias, and `buildHistoricalDeliveryProvenance` records `waivedOutOfScopeFiles` / `waiverReason`. Validation: `node --experimental-strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts`; `node --experimental-strip-types packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts`.",
+  "followUp": "Keep the waiver and provenance coverage in the focused taskflow/historical-delivery tests; future closeback UX changes must not route approved out-of-scope historical deliveries back to emergency-only backend usage."
+}

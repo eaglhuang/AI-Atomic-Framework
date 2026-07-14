@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0144",
   "title": "Refresh the standard model-price catalog from official provider sources",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Foundation",
   "dependencies": [
     "ATM-GOV-0143"
@@ -92,7 +92,65 @@
     "hash": "1afbd34fed3655c5"
   },
   "importedAt": "2026-07-14T11:42:48.847Z",
-  "lastTransitionId": "2026-07-14T11-42-48-862Z-import-c1291ad53955",
-  "lastTransitionAt": "2026-07-14T11:42:48.862Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T16-52-46-114Z-lock-cleanup-187c7676f7b0",
+  "lastTransitionAt": "2026-07-14T16:52:46.114Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T16:44:34.840Z",
+  "promotedAt": "2026-07-14T16:44:34.843Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-0c41b004d2c5",
+    "claimedAt": "2026-07-14T16:44:34.846Z",
+    "heartbeatAt": "2026-07-14T16:52:45.957Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0144.json",
+      "schemas/team-agents/model-price-refresh-report.schema.json",
+      "scripts/pricing/parse-provider-price-page.ts",
+      "scripts/pricing/refresh-model-prices.ts",
+      "specs/pricing/model-pricing-sources.json",
+      "specs/pricing/model-standard-token-prices.json",
+      "tests/cli/model-price-refresh.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T16:44:34.846Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714164434-codex-gpt-5-5-captain-ATM-GOV-0144-496825f017",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0144",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-007241cb8ba9492e",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0144.*",
+      ".atm/history/task-events/ATM-GOV-0144/**",
+      ".atm/history/tasks/ATM-GOV-0144.json",
+      "schemas/team-agents/model-price-refresh-report.schema.json",
+      "scripts/pricing/parse-provider-price-page.ts",
+      "scripts/pricing/refresh-model-prices.ts",
+      "specs/pricing/model-pricing-sources.json",
+      "specs/pricing/model-standard-token-prices.json",
+      "tests/cli/model-price-refresh.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9b4e566962571997c53939cd9fdb2040f896f3bc42e757d540fff4a0cd7eedea",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T16:44:39.592Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T16:52:46.111Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T16:52:45.957Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714164434-codex-gpt-5-5-captain-ATM-GOV-0144-496825f017",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0144.closure-packet.json"
 }

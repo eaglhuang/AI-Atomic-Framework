@@ -6,6 +6,26 @@
   "charterVersion": "2.0.0",
   "projectName": "{{PROJECT_NAME}}",
   "lastAmendedAt": "{{LAST_AMENDED_DATE}}",
+  "charterHash": "{{ATOMIC_CHARTER_SHA256}}",
+  "firstPrinciplesHash": "{{ATM_FIRST_PRINCIPLES_SHA256}}",
+  "scheduleA": {
+    "scheduleId": "schedule-a-economic-thresholds",
+    "economicRatios": {
+      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.1 },
+      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 1.05 },
+      "breakthrough": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 0.8 }
+    },
+    "tokenDiagnostics": {
+      "required": true,
+      "priceProxyAllowed": false,
+      "rationale": "Raw token counts are required diagnostics, but actual monetary cost is the economic authority across providers and models."
+    },
+    "teamThresholds": {
+      "production": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 1.0, "requiresMeasuredAcceleration": true },
+      "preferred": { "maxCostRatio": 1.05, "maxEndToEndTimeRatio": 0.95, "requiresMeasuredAcceleration": true },
+      "breakthrough": { "maxCostRatio": 1.1, "maxEndToEndTimeRatio": 0.8, "requiresMeasuredAcceleration": true }
+    }
+  },
   "invariants": [
     {
       "id": "INV-ATM-001",

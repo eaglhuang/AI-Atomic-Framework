@@ -314,6 +314,10 @@ function seedCharterFiles(repositoryRoot: string) {
     readFileSync(path.join(root, '.atm', 'charter', 'atomic-charter.md'))
   );
   writeFileSync(
+    path.join(targetCharterDir, 'atm-first-principles.md'),
+    readFileSync(path.join(root, '.atm', 'charter', 'atm-first-principles.md'))
+  );
+  writeFileSync(
     path.join(targetCharterDir, 'charter-invariants.json'),
     readFileSync(path.join(root, '.atm', 'charter', 'charter-invariants.json'))
   );

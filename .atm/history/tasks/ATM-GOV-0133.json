@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0133",
   "title": "Seal external planning-source identity before claim and close",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Foundation",
   "dependencies": [],
   "acceptance": [
@@ -64,7 +64,61 @@
     "hash": "d89e245568eb5b91"
   },
   "importedAt": "2026-07-14T11:42:33.647Z",
-  "lastTransitionId": "2026-07-14T11-42-33-662Z-import-7fb0b21623cd",
-  "lastTransitionAt": "2026-07-14T11:42:33.662Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T14-17-02-845Z-lock-cleanup-c5fdfca24cab",
+  "lastTransitionAt": "2026-07-14T14:17:02.845Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T14:10:44.980Z",
+  "promotedAt": "2026-07-14T14:10:44.982Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-42f0e34d6705",
+    "claimedAt": "2026-07-14T14:10:44.985Z",
+    "heartbeatAt": "2026-07-14T14:17:02.755Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0133.json",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "tests/cli/planning-source-seal.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T14:10:44.985Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714141044-codex-gpt-5-5-captain-ATM-GOV-0133-b8bfa421b8",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0133",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-2a7f5bc280f87e3f",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0133.*",
+      ".atm/history/task-events/ATM-GOV-0133/**",
+      ".atm/history/tasks/ATM-GOV-0133.json",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/import-task.ts",
+      "tests/cli/planning-source-seal.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "9e7dc0ab4754a06b73c99b9a579a64f0d34712fb92a99e1fd5740610de863de6",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T14:10:48.219Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T14:17:02.841Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T14:17:02.755Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714141044-codex-gpt-5-5-captain-ATM-GOV-0133-b8bfa421b8",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0133.closure-packet.json"
 }

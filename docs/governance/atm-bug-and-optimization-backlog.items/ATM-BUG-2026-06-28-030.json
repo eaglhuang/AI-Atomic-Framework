@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-030",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "P0",
+  "status": "Fixed in 2026-06-28 repair lane",
+  "area": "Guidance UX / skill-CLI routing",
+  "finding": "Skill-first guidance and CLI JSON are much better than the old CLI-only flow, but the boundary is still easy to misread: agents can expect a playbook when none exists, treat long CLI JSON as manual prose instead of structured tool output, miss that `artifacts/` evidence requires `git add -f`, or lose track of which dirty files belong to the current task. `guide` can also overgeneralize small evidence backfill work into a heavy `create-atom` route.",
+  "expectedBehavior": "ATM should make the skill/CLI contract explicit and low-friction: tell the agent when there is no playbook, surface the one next structured action, distinguish skill authority from CLI evidence, warn when target artifacts are ignored and need force-add, and classify dirty files as in-scope versus unrelated before mutation.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by hardening prompt-scoped `next` summaries with explicit playbook-absent and structured-output hints, ignored-artifact force-add guidance, and worktree scope classification; by teaching evidence/artifact follow-up prompts to stay in docs-first guidance instead of falling through to `create-atom`; and by aligning stale frozen-runner remediation with the real retained release command (`ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build`) so shipped runner guidance no longer points to a no-op sync path for onefile refresh. Regression coverage now lives in `scripts/validate-prompt-scoped-next.ts` and `scripts/validate-guide.ts`.",
+  "followUp": "Keep prompt-scoped next hints and evidence-follow-up routing covered in the existing validators, and preserve the retained runner-sync command in runner-mode output so future guidance changes cannot quietly drift back to stale onefile behavior."
+}

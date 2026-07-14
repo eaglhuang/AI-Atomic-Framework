@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-27-022",
+  "date": "2026-06-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 backlog follow-up lane",
+  "area": "Task audit / completion report detector",
+  "finding": "`ATM_TASK_AUDIT_COMPLETION_REPORT_UNVERIFIED` can misclassify ordinary governance documents such as `docs/governance/atm-bug-and-optimization-backlog.md` as closeout reports, even when they are just bug-tracking prose and not closure evidence.",
+  "expectedBehavior": "Completion-report detection should be path-aware and structure-aware: it should target explicit closeout/completion report documents instead of scanning every Markdown file in the repository for a few completion phrases.",
+  "evidenceOrRepro": "Reproduced on 2026-06-27 when `node atm.mjs tasks audit --staged --json` and `node atm.mjs hook pre-commit --json` surfaced `docs/governance/atm-bug-and-optimization-backlog.md` as `ATM_TASK_AUDIT_COMPLETION_REPORT_UNVERIFIED`. The document is a long-lived bug backlog, not a closeout report, so asking humans or skills to avoid normal words like `done` / `completed` would be the wrong fix. Closed on 2026-06-28 by locking the path-aware behavior into `packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts`: the regression now proves a governance backlog file is ignored even if it contains `status: **all completed**`, while real `closeout-report.md` / `completion-report.md` files still trigger the audit error.",
+  "followUp": "Keep the regression in `packages/cli/src/commands/framework-development/__tests__/closure-packet-schema.spec.ts`; future detector changes must preserve basename/path gating so governance backlog prose cannot regress into false closeout evidence."
+}

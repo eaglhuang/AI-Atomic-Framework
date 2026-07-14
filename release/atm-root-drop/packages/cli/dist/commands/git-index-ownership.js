@@ -75,6 +75,91 @@ export function buildForeignActiveStagedDiagnostic(report) {
         requiredCommand: 'node atm.mjs git lease stage-override --task <task-id> --actor <actor-id> --paths <paths> --reason <human-approved-reason> --json'
     };
 }
+export function buildGitIndexLeaseParkPlan(input) {
+    const expected = new Set(input.expectedStageFiles.map((entry) => normalizeRelativePath(entry).toLowerCase()));
+    const foreignEntries = input.report.entries
+        .filter((entry) => !expected.has(normalizeRelativePath(entry.path).toLowerCase()))
+        .map((entry) => ({
+        path: entry.path,
+        ownerTaskId: entry.ownerTaskId,
+        ownerActorId: entry.ownerActorId,
+        stagedBlobId: entry.stagedBlobId,
+        stagedMode: entry.stagedMode,
+        restoreIdentity: `${entry.stagedMode ?? 'missing'}:${entry.stagedBlobId ?? 'missing'}:${entry.path}`
+    }));
+    const approvedPartialStagedBlobIds = uniqueSorted(foreignEntries.map((entry) => entry.stagedBlobId ?? '').filter(Boolean));
+    const leaseId = input.leaseId?.trim()
+        || `index-lease-${shortDigest([
+            input.report.taskId ?? 'no-task',
+            ...foreignEntries.map((entry) => entry.restoreIdentity)
+        ].join('\n'))}`;
+    if (input.report.foreignActiveStaged.length > 0) {
+        return {
+            schemaId: 'atm.gitIndexLeaseParkPlan.v1',
+            taskId: input.report.taskId,
+            leaseId,
+            generatedAt: input.generatedAt ?? new Date().toISOString(),
+            status: 'blocked-foreign-active-staged',
+            parkEntries: foreignEntries,
+            restoreEntries: foreignEntries,
+            approvedPartialStagedBlobIds,
+            reason: 'Foreign active staged paths require an explicit stage-override lease before park/restore.'
+        };
+    }
+    if (foreignEntries.length === 0) {
+        return {
+            schemaId: 'atm.gitIndexLeaseParkPlan.v1',
+            taskId: input.report.taskId,
+            leaseId,
+            generatedAt: input.generatedAt ?? new Date().toISOString(),
+            status: 'not-needed',
+            parkEntries: [],
+            restoreEntries: [],
+            approvedPartialStagedBlobIds: [],
+            reason: 'Shared Git index already contains only expected close-bundle paths.'
+        };
+    }
+    return {
+        schemaId: 'atm.gitIndexLeaseParkPlan.v1',
+        taskId: input.report.taskId,
+        leaseId,
+        generatedAt: input.generatedAt ?? new Date().toISOString(),
+        status: 'park-and-restore',
+        parkEntries: foreignEntries,
+        restoreEntries: foreignEntries,
+        approvedPartialStagedBlobIds,
+        reason: 'Foreign complete bundles can be parked from the live index and restored byte-identically after close-bundle assembly.'
+    };
+}
+export function parkGitIndexLease(cwd, plan) {
+    if (plan.status !== 'park-and-restore' || plan.parkEntries.length === 0) {
+        return [];
+    }
+    const paths = plan.parkEntries.map((entry) => entry.path);
+    execFileSync('git', ['restore', '--staged', '--', ...paths], {
+        cwd,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+    return paths;
+}
+export function restoreGitIndexLease(cwd, plan) {
+    if (plan.status !== 'park-and-restore' || plan.restoreEntries.length === 0) {
+        return [];
+    }
+    const restored = [];
+    for (const entry of plan.restoreEntries) {
+        if (!entry.stagedMode || !entry.stagedBlobId)
+            continue;
+        execFileSync('git', ['update-index', '--add', '--cacheinfo', `${entry.stagedMode},${entry.stagedBlobId},${entry.path}`], {
+            cwd,
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'pipe']
+        });
+        restored.push(entry.path);
+    }
+    return uniqueSorted(restored);
+}
 function buildIndexLane(currentTaskId, entries, foreignActiveStaged) {
     if (entries.length === 0) {
         return {
@@ -170,4 +255,12 @@ function normalizeRelativePath(value) {
 }
 function uniqueSorted(values) {
     return [...new Set(values.map(normalizeRelativePath).filter(Boolean))].sort((left, right) => left.localeCompare(right));
+}
+function shortDigest(value) {
+    let hash = 2166136261;
+    for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
 }

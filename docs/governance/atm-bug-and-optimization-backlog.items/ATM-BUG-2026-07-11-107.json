@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-107",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Team Agents / validator discoverability",
+  "finding": "`npm run validate:team-agents` completed successfully after running only the default lieutenant-escalation lane, while its name suggests the complete Team Agents suite. Focused three-provider coverage had to be invoked separately.",
+  "expectedBehavior": "Rename the script to indicate smoke scope or make the default runner enumerate all deterministic Team cases; close evidence should not treat one default case as full-suite proof.",
+  "evidenceOrRepro": "The command output contained only wave-mode setup and `ok (lieutenant-escalation)`; `three-vendor-direct-artifact-handoff` and `heterogeneous-multi-bot-team-run` required explicit `--case`.",
+  "followUp": "Add a manifest-driven all-cases runner with paid/live cases explicitly excluded."
+}

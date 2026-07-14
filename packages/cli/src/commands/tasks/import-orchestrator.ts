@@ -10,6 +10,7 @@ import { assertRunnerFreshForWriteAction } from '../framework-development.ts';
 import { assertEmergencyApproval } from '../emergency/gate.ts';
 import { buildExtractionFirstPatrolDiagnostics, validateDeliverablesList } from './task-import-validators.ts';
 import { inspectPlanningRootAuthorship } from './planning-root-authorship.ts';
+import { attachPlanningSourceSeal, buildPlanningSourceSeal } from './import-task.ts';
 import { type TaskImportResetOpenClassification } from './import-verify.ts';
 import {
   type TaskImportManifest,
@@ -152,12 +153,22 @@ export async function runTasksImport(argv: string[]) {
     });
   }
 
-  parsed = enrichParsedTasksFromSiblingTaskCards({
+  const enrichedParsed = enrichParsedTasksFromSiblingTaskCards({
     cwd: options.cwd,
     planAbsolute,
     parsed,
     importedAt: generatedAt
   });
+  const planningSourceSeal = buildPlanningSourceSeal({
+    cwd: options.cwd,
+    planAbsolute,
+    planText,
+    sealedAt: generatedAt
+  });
+  parsed = {
+    ...enrichedParsed,
+    tasks: enrichedParsed.tasks.map((task) => attachPlanningSourceSeal(task, planningSourceSeal))
+  };
 
   // TASK-AAO-FABLE-007: extraction-first patrol — advisory only.
   parsed = {

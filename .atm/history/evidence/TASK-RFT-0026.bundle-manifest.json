@@ -1,0 +1,110 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0026",
+  "updatedAt": "2026-07-14T16:58:20.100Z",
+  "updatedBy": "codex-gpt-5-5-captain",
+  "freshValidationPasses": [
+    "git diff --check",
+    "node --strip-types tests/cli/atomization-max-lines.test.ts",
+    "typecheck",
+    "validate:atom-file-size",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:schemas"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/validate-atom-file-size.ts --max-lines 600 --files packages/cli/src/commands/git-governance/validate-atom-file-size.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de8336bd13339468f0db21287e0c518c53f0bea5ca49965cd3e46db113309b70",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:atom-file-size"
+      ],
+      "generatedAt": "2026-07-14T16:57:02.769Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "git diff --check"
+      ],
+      "generatedAt": "2026-07-14T16:57:02.816Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/atomization-max-lines.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:666a880cc4c6036628ae3e3f830aac7d5753e6fced5ff89f9ad794aa55bff9df",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/atomization-max-lines.test.ts"
+      ],
+      "generatedAt": "2026-07-14T16:57:03.046Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:schemas",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:149122433effe1bc98daa38126fd7555f6cf8918cef37fb45bb4b8c89538508c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:schemas"
+      ],
+      "generatedAt": "2026-07-14T16:57:03.918Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-14T16:57:10.438Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:a86cbc3a1c470439eea7469b9e4f57492bbed8d785f2848b27ce64ef82f2eab7",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-14T16:57:49.652Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-14T16:58:20.197Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3e17cbb41afa37d487f14dbbad14236584fe6db6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -106,6 +106,76 @@ function slugifyTitle(title) {
         .replace(/^-+|-+$/g, '');
     return slug || 'task';
 }
+function taskFamilyFromId(taskId) {
+    return normalizeTaskId(taskId).replace(/-\d+$/, '');
+}
+function semanticKeyFromTitle(title) {
+    const normalized = title
+        .trim()
+        .toLowerCase()
+        .replace(/['"]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    return normalized || 'task';
+}
+function readExistingTaskTitle(filePath, frontMatter) {
+    if (typeof frontMatter?.data.title === 'string' && frontMatter.data.title.trim()) {
+        return frontMatter.data.title.trim();
+    }
+    const raw = readFileSync(filePath, 'utf8');
+    const heading = raw.split(/\r?\n/).find((line) => line.trim().startsWith('# '));
+    return heading ? heading.replace(/^#\s+/, '').trim() : null;
+}
+function detectFamilyDrift(input) {
+    const title = input.title?.trim();
+    if (!title)
+        return null;
+    const absDir = path.resolve(input.cwd, input.directory);
+    if (!existsSync(absDir))
+        return null;
+    const requestedTaskId = normalizeTaskId(input.taskId);
+    const requestedFamily = taskFamilyFromId(requestedTaskId);
+    const requestedSemanticKey = semanticKeyFromTitle(title);
+    for (const entry of readdirSync(absDir, { withFileTypes: true })) {
+        if (!entry.isFile() || (!entry.name.endsWith('.task.md') && !entry.name.endsWith('.md')))
+            continue;
+        const filePath = path.join(absDir, entry.name);
+        try {
+            const frontMatter = extractFrontMatter(readFileSync(filePath, 'utf8'));
+            const rawTaskId = typeof frontMatter?.data.task_id === 'string'
+                ? frontMatter.data.task_id
+                : typeof frontMatter?.data.id === 'string'
+                    ? frontMatter.data.id
+                    : null;
+            if (!rawTaskId)
+                continue;
+            const existingTaskId = normalizeTaskId(rawTaskId);
+            const existingFamily = taskFamilyFromId(existingTaskId);
+            if (existingFamily === requestedFamily)
+                continue;
+            const existingTitle = readExistingTaskTitle(filePath, frontMatter);
+            if (!existingTitle || semanticKeyFromTitle(existingTitle) !== requestedSemanticKey)
+                continue;
+            const existingPath = path.relative(input.cwd, filePath).replace(/\\/g, '/');
+            return {
+                schemaId: 'atm.taskIdFamilyDrift.v1',
+                status: 'duplicate-semantic-family',
+                code: 'ATM_TASK_ID_FAMILY_DRIFT',
+                requestedTaskId,
+                requestedFamily,
+                requestedSemanticKey,
+                existingTaskId,
+                existingFamily,
+                existingPath,
+                message: `Task title "${title}" already exists under semantic family ${existingFamily}; do not mint ${requestedFamily} for the same family.`
+            };
+        }
+        catch {
+            // Ignore unreadable or non-task markdown while scanning the planning directory.
+        }
+    }
+    return null;
+}
 export function resolveHostOpenerPolicyDecision(input) {
     const diagnostics = [];
     let taskId = input.taskId?.trim() || null;
@@ -130,11 +200,21 @@ export function resolveHostOpenerPolicyDecision(input) {
     if (existsSync(absoluteOutput)) {
         diagnostics.push(`Canonical output path already exists and may be reused by taskflow open: ${outputPath}.`);
     }
+    const familyDrift = detectFamilyDrift({
+        cwd: input.cwd,
+        directory: input.delegationContract.policy.resolveCanonicalOutputPath.directory ?? path.dirname(outputPath),
+        taskId,
+        title: input.title ?? null
+    });
+    if (familyDrift) {
+        diagnostics.push(`${familyDrift.code}: ${familyDrift.message}`);
+    }
     return {
         taskId: normalizeTaskId(taskId),
         outputPath: outputPath.replace(/\\/g, '/'),
         sources,
-        diagnostics
+        diagnostics,
+        familyDrift
     };
 }
 export function canResolveHostOpenerPolicy(input) {

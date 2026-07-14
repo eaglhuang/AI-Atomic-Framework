@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-120",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0168",
+  "area": "Runner-mode lifecycle guard",
+  "finding": "`atm.dev.mjs` presented source-first-only guidance but still accepted lifecycle/claim mutation attempts before failing later in routing.",
+  "expectedBehavior": "Source-first runner must fail closed for claim, commit, and close mutations unless an explicit source-first validation authorization is present.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0168 / commit `0245f6b989d35549390b1c41d11da3cce38aad08`: `assertSourceFirstRunnerReadOnlyAction(...)` now rejects `next --claim` at the command boundary with `ATM_SOURCE_FIRST_WRITE_REFUSED` before claim mutation; `npm run typecheck`, `npm run validate:cli`, and `npm run validate:git-head-evidence` passed.",
+  "followUp": "Extend the same guard to any future lifecycle mutation entrypoint added to the source-first runner, and keep the source-first regression fail-closed."
+}

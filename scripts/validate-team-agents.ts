@@ -44,6 +44,7 @@ import { runBrokerConflictResolutionReplayFixture } from './validate-mao-event-r
 import { evaluateTeamPreCommitGate, evaluateTeamPreToolGate } from '../packages/cli/src/commands/team-runtime-gates.ts';
 import { runIntegrationHookInvocationInProcess } from '../packages/cli/src/commands/integration-hooks.ts';
 import { assertRejectsCliError, fail } from './validators/team-agents/assertions.ts';
+import { resolveAtomizationLinePolicy } from '../packages/cli/src/commands/tasks/task-import-validators.ts';
 import {
   cleanupNewSourceTeamRunFiles,
   listRelativeFiles,
@@ -73,7 +74,7 @@ async function main() {
     const { buildClaimAdmissionDecisionLog, CLAIM_ADMISSION_DECISION_LOG_KEYS, CLAIM_ADMISSION_GATE_NAMES } =
       await import('../packages/cli/src/commands/next/claim-conflict-log.ts');
     const { evaluateClaimAdmission } = await import('../packages/cli/src/commands/next/claim-admission.ts');
-    const lineBudget = 600;
+    const lineBudget = resolveAtomizationLinePolicy({ config: readRepoConfig(process.cwd()) }).maxLines;
     const ownerModules = [
       'packages/cli/src/commands/next/broker-queue-admission.ts',
       'packages/cli/src/commands/next/claim-admission.ts',
@@ -4983,6 +4984,12 @@ async function main() {
 function getArg(flag: string): string | undefined {
   const index = process.argv.indexOf(flag);
   return index >= 0 ? process.argv[index + 1] : undefined;
+}
+
+function readRepoConfig(cwd: string): { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } } | null {
+  const configPath = path.join(cwd, '.atm', 'config.json');
+  if (!existsSync(configPath)) return null;
+  return JSON.parse(readFileSync(configPath, 'utf8')) as { readonly atomization?: { readonly maxLines?: unknown; readonly waiver?: { readonly expiresAt?: unknown; readonly reason?: unknown } } };
 }
 
 function validateWaveMode(): void {

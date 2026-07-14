@@ -1,5 +1,6 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   assertRootLauncherSafeForReleaseBuild,
@@ -45,12 +46,17 @@ export function buildRootDropRelease(options: any = {}) {
   rmSync(releaseRoot, { recursive: true, force: true });
   mkdirSync(releaseRoot, { recursive: true });
 
-  for (const relativePath of releaseEntries) {
-    const sourcePath = path.join(repositoryRoot, relativePath);
-    if (!existsSync(sourcePath)) {
-      throw new Error(`release bundle source is missing: ${relativePath}`);
+  const sourceFiles = listReleaseSourceFiles(repositoryRoot);
+  for (const releaseEntry of releaseEntries) {
+    if (!sourceFiles.some((relativePath) => relativePath === releaseEntry || relativePath.startsWith(`${releaseEntry}/`))) {
+      throw new Error(`release bundle source is missing: ${releaseEntry}`);
     }
-    cpSync(sourcePath, path.join(releaseRoot, relativePath), { recursive: true });
+  }
+  for (const relativePath of sourceFiles) {
+    const sourcePath = path.join(repositoryRoot, relativePath);
+    const targetPath = path.join(releaseRoot, relativePath);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    copyFileSync(sourcePath, targetPath);
   }
   const stableLauncherTemplatePath = resolveStableLauncherTemplatePath(repositoryRoot);
   writeFileSync(
@@ -102,6 +108,51 @@ export function buildRootDropRelease(options: any = {}) {
     entrypointPath: path.join(releaseRoot, 'atm.mjs'),
     entryCount: releaseEntries.length
   };
+}
+
+function listReleaseSourceFiles(repositoryRoot: string) {
+  const result = spawnSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8'
+  });
+  if ((result.status ?? 1) !== 0) {
+    throw new Error(`git ls-files failed while building root-drop release: ${result.stderr || result.stdout}`);
+  }
+  const sourceFiles = result.stdout
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((entry) => entry.replace(/\\/g, '/'))
+    .filter((relativePath) => releaseEntries.some((releaseEntry) => relativePath === releaseEntry || relativePath.startsWith(`${releaseEntry}/`)))
+  return [...new Set([
+    ...sourceFiles,
+    ...listGeneratedRuntimeFiles(repositoryRoot),
+    ...listRootDropTemplateFiles(repositoryRoot)
+  ])].sort();
+}
+
+function listGeneratedRuntimeFiles(repositoryRoot: string) {
+  const packagesRoot = path.join(repositoryRoot, 'packages');
+  if (!existsSync(packagesRoot)) {
+    return [];
+  }
+  const generated: string[] = [];
+  for (const packageEntry of readdirSync(packagesRoot, { withFileTypes: true })) {
+    if (!packageEntry.isDirectory()) continue;
+    const distRoot = path.join(packagesRoot, packageEntry.name, 'dist');
+    if (!existsSync(distRoot)) continue;
+    for (const absolutePath of walkFiles(distRoot)) {
+      generated.push(path.relative(repositoryRoot, absolutePath).replace(/\\/g, '/'));
+    }
+  }
+  return generated;
+}
+
+function listRootDropTemplateFiles(repositoryRoot: string) {
+  const templateRoot = path.join(repositoryRoot, 'templates', 'root-drop');
+  if (!existsSync(templateRoot)) {
+    return [];
+  }
+  return walkFiles(templateRoot).map((absolutePath) => path.relative(repositoryRoot, absolutePath).replace(/\\/g, '/'));
 }
 
 function resolveReleaseGeneratedAt() {

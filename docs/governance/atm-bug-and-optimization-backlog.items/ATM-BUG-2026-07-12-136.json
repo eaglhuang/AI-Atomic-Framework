@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-136",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0079",
+  "area": "Pre-commit cross-file consistency guard",
+  "finding": "The cross-file guard treated pre-existing, unmodified handoff imports in a staged validator file as a dependency on another task's uncommitted handoff changes and blocked the commit.",
+  "expectedBehavior": "Only imports added or changed by the staged patch may require the dependency to land in the same commit; untouched import contracts must not couple tasks.",
+  "evidenceOrRepro": "TASK-TEAM-0079's queue-only validator staging was blocked because `scripts/validate-team-agents.ts` already imported handoff-ledger symbols owned by in-flight TASK-TEAM-0075.",
+  "followUp": "Retain the tightened staged-patch import-drift detection plus a regression for the legitimate new-import case that must still fail closed."
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0130",
   "title": "Recover close, claim release, and residue crash states",
-  "status": "planned",
+  "status": "done",
   "milestone": "GOVOPT-Foundation",
   "dependencies": [
     "ATM-GOV-0129"
@@ -85,7 +85,65 @@
     "hash": "49ed8c9bab81779f"
   },
   "importedAt": "2026-07-14T11:42:29.620Z",
-  "lastTransitionId": "2026-07-14T11-42-29-631Z-import-937c589ee933",
-  "lastTransitionAt": "2026-07-14T11:42:29.631Z",
-  "ledgerContractVersion": "task-ledger/v1"
+  "lastTransitionId": "2026-07-14T14-40-21-443Z-lock-cleanup-a82da73edb29",
+  "lastTransitionAt": "2026-07-14T14:40:21.443Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-14T14:36:00.265Z",
+  "promotedAt": "2026-07-14T14:36:00.267Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-03aebdbfdf9a",
+    "claimedAt": "2026-07-14T14:36:00.271Z",
+    "heartbeatAt": "2026-07-14T14:40:21.263Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0130.json",
+      "packages/cli/src/commands/__tests__/residue.spec.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/reconcile-orchestrator.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-14T14:36:00.271Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260714143600-codex-gpt-5-5-captain-ATM-GOV-0130-977db6f5ac",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0130",
+    "batchId": "batch-170f3cfa7b42",
+    "scopeKey": "tasks-12c9326530d0",
+    "queueId": "queue-62c39f6e00b4a1b6",
+    "queueIndex": 0,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0130.*",
+      ".atm/history/task-events/ATM-GOV-0130/**",
+      ".atm/history/tasks/ATM-GOV-0130.json",
+      "packages/cli/src/commands/__tests__/residue.spec.ts",
+      "packages/cli/src/commands/residue.ts",
+      "packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts",
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/tasks/close-helpers/task-transition-writer.ts",
+      "packages/cli/src/commands/tasks/reconcile-orchestrator.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3dfc735cbed0022d88898022fe0c7acf4a2060f613b0b57db4f0840ce211c318",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-14T14:36:04.273Z",
+    "status": "released",
+    "released": true,
+    "releasedAt": "2026-07-14T14:40:21.441Z",
+    "releasedBy": "codex-gpt-5-5-captain"
+  },
+  "closedAt": "2026-07-14T14:40:21.263Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260714143600-codex-gpt-5-5-captain-ATM-GOV-0130-977db6f5ac",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0130.closure-packet.json"
 }

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T15-06-18-475Z-scope-amendment-2689e842289d",
+  "taskId": "ATM-GOV-0134",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0134.json",
+  "taskSha256": "sha256:0c9665f387a175a93fc9bada951b25da28219594a04597d595df82a3e0f086cf",
+  "createdAt": "2026-07-14T15:06:18.475Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0134 --actor codex-gpt-5-5-captain --add package.json --reason \"ATM-GOV-0134 required validator validate:governance-projections needs the package script to exist for evidence run and close gates.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0134 required validator validate:governance-projections needs the package script to exist for evidence run and close gates."
+  }
+}
