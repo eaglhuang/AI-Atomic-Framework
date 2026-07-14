@@ -133,15 +133,19 @@ Token / speed:
 - Prefer **internal sidecars** for backlog ranking and disjoint bug re-implements; they beat full Team `start --execute` when scopes collide or Frozen is stale.
 - Cap batch size (e.g. 5 bugs) before writing the optimization report; unbounded queues burn tokens on governance thrash.
 - Validate with `node --strip-types <focused-spec>` instead of live `team plan` against a dirty shared worktree.
+- Parallel Composer sidecars accelerate **implementation + focused tests**; Captain should keep claim/evidence/close on the Frozen lane (one authority). Do not ask write sidecars to `npm run build` or commit.
 
 ATM flow:
 
 - When another captain owns `git-governance` / RFT work, pick **core/scripts-only** bugs first; `packages/cli/src/**` often collapses to `atom-cli-router` and false-freezes claims.
-- `team broker resolve` emits BCR artifacts but **does not unblock** `next --claim` CID freeze by itself (record backlog if still true).
-- Frozen prefer + source delivery: `ATM_RUNNER_STALE_WRITE_REFUSED` vs `ATM_SOURCE_FIRST_WRITE_REFUSED` is a deadlock; rebuild only when foreign release WIP is absent, else park and switch scopes.
+- `team broker resolve` emits BCR artifacts but **does not unblock** `next --claim` CID freeze by itself — fixed in TASK-AAO-0200 / ATM-BUG-160 (claim now consumes BCR). Keep the lesson: BCR authoring ≠ automatic claim admit until the claim lane is proven.
+- Frozen prefer + source delivery: `ATM_RUNNER_STALE_WRITE_REFUSED` vs `ATM_SOURCE_FIRST_WRITE_REFUSED` is a deadlock; rebuild with `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` before import/close writes when Frozen lags source.
 - After any foreign `build(release): sync`, **re-diff your deliverables immediately**; uncommitted source can vanish (ATM-BUG-184).
+- Cross-file consistency will block a scoped commit when `team.ts` imports symbols changed in unstaged siblings — `tasks scope add` the coupled files **before** `git commit --auto-stage`, or expect `ATM_PRE_COMMIT_CROSS_FILE_INCONSISTENCY`.
+- One shared delivery SHA for related bugs is fine: close siblings with `--historical-delivery <sha> --waiver-out-of-scope-delivery --reason "..."`; without the waiver, `MIXED_DELIVERY_COMMIT` / `OUT_OF_SCOPE_WAIVER_REQUIRED` blocks.
 
 Team Agents efficiency:
 
 - Parallel subagents helped **re-apply wiped fixes** (159/097/102) in one turn; they did **not** accelerate 0195 while CID-frozen against RFT-0020.
 - Live `team plan` as validator preflight is slow and flaky under foreign broker intents; keep body-shape asserts independent of plan admission.
+- 2026-07-14 five-bug batch (095/105/094/149/160): two parallel implement sidecars finished source+tests while Captain rebuilt Frozen; wall-clock win was real for coding, but **closeout stayed serial** (evidence + taskflow). Parallel Agents do not shorten governed close.
