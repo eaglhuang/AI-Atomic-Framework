@@ -1,0 +1,188 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-AAO-0195",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "95fc26a255fb67585b9319835e67b9d7c6f0696b",
+  "governedTreeSha": "11cde0eac908b459a5c82ac651edfcdf1765c8d1",
+  "targetCommitDelta": {
+    "currentCommitSha": "95fc26a255fb67585b9319835e67b9d7c6f0696b",
+    "parentCommitShas": [
+      "95fc26a255fb67585b9319835e67b9d7c6f0696b"
+    ],
+    "governedTreeSha": "11cde0eac908b459a5c82ac651edfcdf1765c8d1",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0195.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+      "packages/core/src/broker/team-lane.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/team.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/team.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/team-lane.js",
+      "release/atm-root-drop/packages/core/src/broker/team-lane.ts",
+      "release/atm-root-drop/release-manifest.json"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6c75f946a1bf485a5d1fbf12cd560e0fc2b10792da0a9314cade2e466a6001a1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f465325623da59572d8f395cb3c18a02ac3516277b97db1c2dc6377bc3bc3981",
+      "stderrSha256": "sha256:b08cf57b62e9eb135c6ce283fa3821cb87909b4743287a442d468bd59b189f60",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "git diff --check",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:d7543df8a51760828d13342daafcc194c8b5884fecd2aeb4e838d0db6444c52c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run check:encoding:touched",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c82eda675cdda02c92e19254a4068d5367a2efc390bb77f0c453ed5a4c261c55",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "check:encoding:touched",
+    "git diff --check",
+    "node --strip-types packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+    "team-plan-readonly.spec",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-14T00:52:55.666Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-AAO-0195.*",
+      ".atm/history/task-events/TASK-AAO-0195/**",
+      ".atm/history/tasks/TASK-AAO-0195.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/team-lane.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+      "packages/core/src/broker/registry.ts",
+      "packages/core/src/broker/team-lane.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-AAO-0195.json",
+  "closedAt": "2026-07-14T00:52:55.667Z",
+  "closedByActor": "cursor-grok-4.5",
+  "sessionId": "session-20260714004510-cursor-grok-4.5-TASK-AAO-0195-d608368b4a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "95fc26a255fb67585b9319835e67b9d7c6f0696b",
+    "taskMatchedFiles": [
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/command-specs/team.spec.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/team-plan-readonly.spec.ts",
+      "packages/core/src/broker/team-lane.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-AAO-0195.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-AAO-0195/2026-07-14T00-45-09-332Z-import-fd8684405509.json",
+      ".atm/history/task-events/TASK-AAO-0195/2026-07-14T00-45-13-671Z-claim-3be8788b0fc6.json",
+      ".atm/history/tasks/TASK-AAO-0195.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
