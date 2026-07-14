@@ -1,0 +1,57 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T04-21-37-606Z-close-af867d19eaeb",
+  "taskId": "TASK-AAO-0205",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260714042028-cursor-grok-4.5-TASK-AAO-0205-b1bfe9bd8a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0205.json",
+  "taskSha256": "sha256:09e61cd9cf9ad9cff372fbc55349a8655c7db87f42e63f4b10c266edd4d69b2e",
+  "createdAt": "2026-07-14T04:21:37.606Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0205 --actor cursor-grok-4.5 --status done --historical-delivery c76526d1b45f3fcda83554bb7671b7154b140b38",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260714042028-cursor-grok-4.5-TASK-AAO-0205-b1bfe9bd8a",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0205.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T04:21:37.600Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0205.*",
+        ".atm/history/task-events/TASK-AAO-0205/**",
+        ".atm/history/tasks/TASK-AAO-0205.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
