@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T01-26-45-569Z-close-68e38d1b2bbb",
+  "taskId": "TASK-AAO-0200",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260714012520-cursor-grok-4.5-TASK-AAO-0200-73f9285600",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0200.json",
+  "taskSha256": "sha256:f3076772584bb9dfe48d982def7f1d053d59b49476398a8250b58f14aef64daa",
+  "createdAt": "2026-07-14T01:26:45.569Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0200 --actor cursor-grok-4.5 --status done --historical-delivery c7e3e81a11188c786dce62e0a95e586af0b61421",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260714012520-cursor-grok-4.5-TASK-AAO-0200-73f9285600",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0200.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T01:26:45.559Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0200.*",
+        ".atm/history/task-events/TASK-AAO-0200/**",
+        ".atm/history/tasks/TASK-AAO-0200.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/claim-admission.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/claim-admission.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
