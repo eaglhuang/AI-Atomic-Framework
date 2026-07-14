@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T01-22-07-104Z-close-b62d158aec6a",
+  "taskId": "TASK-AAO-0197",
+  "action": "close",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": "session-20260714011854-cursor-grok-4.5-TASK-AAO-0197-e7d61b0593",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0197.json",
+  "taskSha256": "sha256:db056c4127a25caf1ab4b2dcf62b7564222708a50ba1579d6a20820c9cde31cf",
+  "createdAt": "2026-07-14T01:22:07.104Z",
+  "command": "node atm.mjs tasks close --task TASK-AAO-0197 --actor cursor-grok-4.5 --status done --historical-delivery c7e3e81a11188c786dce62e0a95e586af0b61421",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260714011854-cursor-grok-4.5-TASK-AAO-0197-e7d61b0593",
+    "closurePacketPath": ".atm/history/evidence/TASK-AAO-0197.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "check:encoding:touched",
+      "git diff --check",
+      "node --strip-types packages/cli/src/commands/team/__tests__/team-execute-defaults.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-14T01:22:07.097Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-AAO-0197.*",
+        ".atm/history/task-events/TASK-AAO-0197/**",
+        ".atm/history/tasks/TASK-AAO-0197.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/team/__tests__/team-execute-defaults.spec.ts",
+        "packages/core/src/team-runtime/provider-selection.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team.ts",
+        "packages/cli/src/commands/team/__tests__/team-execute-defaults.spec.ts",
+        "packages/core/src/team-runtime/provider-selection.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
