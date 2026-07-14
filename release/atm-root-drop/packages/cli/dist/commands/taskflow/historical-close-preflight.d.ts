@@ -22,6 +22,7 @@ export interface HistoricalClosePreflightBlocker {
     readonly taskIds?: readonly string[];
     readonly remediationChoices: readonly HistoricalClosePreflightRemediationChoice[];
     readonly requiredCommand: string | null;
+    readonly multiTaskCloseRecipe?: string | null;
 }
 export interface UnexpectedStagedTaskReport {
     readonly taskId: string;
@@ -72,5 +73,6 @@ export declare function preflightBlockersToWriteReadinessBlockers(preflight: His
     code: string;
     summary: string;
     requiredCommand: string | null;
+    multiTaskCloseRecipe?: string | null;
 }>;
 export {};

@@ -5,6 +5,61 @@ import { evaluateTaskflowBranchCommitQueueGate } from './branch-commit-queue-gat
 import { evaluateTaskflowBrokerConflictGate } from './broker-gate.js';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.js';
 import { quoteCliValue } from '../shared.js';
+const SHARED_DELIVERY_WAIVER_BLOCKER_CODES = new Set([
+    'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED',
+    'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT',
+    'ATM_TASKFLOW_PRECLOSE_MISSING_APPROVAL_LEASE'
+]);
+const DEMOTED_WHEN_SHARED_HISTORICAL_DELIVERY_PRESENT = new Set([
+    'ATM_TASKFLOW_CLOSE_HISTORICAL_DELIVERY_REQUIRED',
+    'ATM_TASK_CLOSE_DELIVERABLE_DIFF_REQUIRED'
+]);
+export function buildSharedDeliveryWaiverCommand(input) {
+    return `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId)} --historical-delivery ${input.historicalRef} --waiver-out-of-scope-delivery --reason "<reason>" --write --json`;
+}
+function buildSharedDeliveryCloseRecipe(input) {
+    if (input.outOfScopeFiles.length === 0) {
+        return `Shared delivery commit ${input.historicalRef} intentionally includes sibling task files; close each co-delivered task with the same --historical-delivery and an explicit waiver reason.`;
+    }
+    const preview = input.outOfScopeFiles.slice(0, 3).join(', ');
+    const suffix = input.outOfScopeFiles.length > 3 ? ` (+${input.outOfScopeFiles.length - 3} more)` : '';
+    return `Shared delivery commit ${input.historicalRef} also touched ${preview}${suffix}. Close sibling tasks against the same --historical-delivery with --waiver-out-of-scope-delivery --reason when the batch intentionally co-delivered.`;
+}
+function enhanceSharedDeliveryWaiverBlocker(blocker, input) {
+    const requiredCommand = buildSharedDeliveryWaiverCommand({
+        taskId: input.taskId,
+        actorId: input.actorId,
+        historicalRef: input.historicalRef
+    });
+    const multiTaskCloseRecipe = blocker.multiTaskCloseRecipe
+        ?? buildSharedDeliveryCloseRecipe({
+            historicalRef: input.historicalRef,
+            outOfScopeFiles: input.outOfScopeFiles
+        });
+    return {
+        ...blocker,
+        summary: `Historical delivery ${input.historicalRef} is an intentional shared-delivery close for co-delivered siblings. Acknowledge out-of-scope files with --waiver-out-of-scope-delivery --reason; this is not a missing delivery.`,
+        requiredCommand,
+        multiTaskCloseRecipe
+    };
+}
+export function prioritizeSharedHistoricalDeliveryBlockers(blockers, input) {
+    const historicalRef = input.historicalDeliveryRef;
+    if (!historicalRef)
+        return [...blockers];
+    const waiverBlockers = blockers.filter((entry) => SHARED_DELIVERY_WAIVER_BLOCKER_CODES.has(entry.code));
+    if (waiverBlockers.length === 0)
+        return [...blockers];
+    const filtered = blockers.filter((entry) => !DEMOTED_WHEN_SHARED_HISTORICAL_DELIVERY_PRESENT.has(entry.code));
+    const enhancedWaiverBlockers = waiverBlockers.map((entry) => enhanceSharedDeliveryWaiverBlocker(entry, {
+        taskId: input.taskId,
+        actorId: input.actorId,
+        historicalRef,
+        outOfScopeFiles: input.outOfScopeFiles ?? []
+    }));
+    const remainder = filtered.filter((entry) => !SHARED_DELIVERY_WAIVER_BLOCKER_CODES.has(entry.code));
+    return [...enhancedWaiverBlockers, ...remainder];
+}
 function normalizeTaskflowLifecycleStatus(value) {
     return String(value ?? '').trim().toLowerCase().replace(/-/g, '_');
 }
@@ -137,12 +192,20 @@ export function buildTaskflowCloseWriteReadinessHint(input) {
             waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
             waiverReason: input.waiverReason ?? null
         });
-        if (historicalReport.reason === 'out-of-scope-source-files-present') {
-            blockers.push({
-                code: 'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED',
-                summary: `Historical delivery ${historicalRef} includes out-of-scope source files. taskflow close requires an explicit waiver reason to continue through the operator lane.`,
-                requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${quoteCliValue(input.actorId || '<actor>')} --historical-delivery ${historicalRef} --waiver-out-of-scope-delivery --reason \"<reason>\" --write --json`
-            });
+        if (historicalReport.reason === 'out-of-scope-source-files-present'
+            || historicalReport.reason === 'out-of-scope-waiver-reason-required') {
+            blockers.push(enhanceSharedDeliveryWaiverBlocker({
+                code: historicalReport.reason === 'out-of-scope-waiver-reason-required'
+                    ? 'ATM_TASKFLOW_PRECLOSE_MISSING_APPROVAL_LEASE'
+                    : 'ATM_TASKFLOW_CLOSE_OUT_OF_SCOPE_WAIVER_REQUIRED',
+                summary: '',
+                requiredCommand: null
+            }, {
+                taskId: input.taskId,
+                actorId: input.actorId || '<actor>',
+                historicalRef,
+                outOfScopeFiles: historicalReport.fileBuckets.outOfScopeSourceFiles
+            }));
         }
     }
     if (brokerConflictGate.verdict === 'confirmedConflict') {

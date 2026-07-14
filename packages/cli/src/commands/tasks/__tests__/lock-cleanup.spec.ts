@@ -60,6 +60,11 @@ assert.equal(lockAfter.taskDirectionLock.status, 'released', 'embedded direction
 assert.equal(lockAfter.taskDirectionLock.released, true, 'embedded direction lock release must be explicit');
 assert.equal(taskAfter.taskDirectionLock.status, 'released', 'canonical direction lock must no longer remain active');
 assert.equal(taskAfter.taskDirectionLock.released, true, 'canonical direction lock release must be explicit');
+assert.ok(taskAfter.lastTransitionId, 'direction-lock cleanup must write a governed transition');
+assert.ok(
+  existsSync(path.join(repo, '.atm/history/task-events', taskId, `${taskAfter.lastTransitionId}.json`)),
+  'direction-lock cleanup must create a matching task-event file'
+);
 
 const activeLockRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-lock-cleanup-active-spec-'));
 const activeTaskId = 'TASK-SCOPE-CLEANUP-0002';
@@ -113,6 +118,11 @@ const activeTaskAfter = readJson(activeTaskPath);
 assert.equal(activeLockAfter.status, 'released', 'active lock cleanup must leave a released governance marker');
 assert.equal(activeLockAfter.taskDirectionLock.status, 'released', 'embedded direction lock must sync after governance release');
 assert.equal(activeTaskAfter.taskDirectionLock.status, 'released', 'canonical direction lock must sync after governance release');
+assert.ok(activeTaskAfter.lastTransitionId, 'active lock cleanup must write a governed transition');
+assert.ok(
+  existsSync(path.join(activeLockRepo, '.atm/history/task-events', activeTaskId, `${activeTaskAfter.lastTransitionId}.json`)),
+  'active lock cleanup must create a matching task-event file'
+);
 assert.equal(existsSync(activeSidecarPath), false, 'direction sidecar must be removed');
 
 console.log('[lock-cleanup.spec] ok');

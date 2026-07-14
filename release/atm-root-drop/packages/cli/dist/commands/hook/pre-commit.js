@@ -12,6 +12,7 @@ import { diagnoseTaskDirectionLockAllowedFiles, isPlanningMirrorPath, isTaskDire
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from '../work-channels.js';
 import { readBrokerLifecycleState } from '../../../../core/dist/broker/lifecycle.js';
 import { buildPendingCheckpointCommitWindow } from '../batch.js';
+import { listTaskOwnedProtectedOverrideAuditFiles } from '../git-governance.js';
 import { evaluateTeamPreCommitGate } from '../team-runtime-gates.js';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../tasks/task-import-validators.js';
 import { hookContractVersion, hookProvider } from './git-hooks-installer.js';
@@ -1138,6 +1139,7 @@ function collectTaskGovernedCommitAllowedFiles(cwd, taskId) {
     if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
         files.push(actorRegistryState.path);
     }
+    files.push(...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId));
     return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
 }
 function extractCheckpointTaskScopeFiles(task) {

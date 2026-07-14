@@ -12,6 +12,7 @@ import {
 } from '../tasks/scope-lock-diagnostics.ts';
 import { evaluatePlanningMirrorDirtyFiles } from '../tasks/planning-mirror-close-diagnostics.ts';
 import { inspectHistoricalDelivery, type TaskHistoricalDeliveryReport } from '../tasks/historical-delivery.ts';
+import { buildSharedDeliveryWaiverCommand } from './write-readiness.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
 
@@ -48,6 +49,7 @@ export interface HistoricalClosePreflightBlocker {
   readonly taskIds?: readonly string[];
   readonly remediationChoices: readonly HistoricalClosePreflightRemediationChoice[];
   readonly requiredCommand: string | null;
+  readonly multiTaskCloseRecipe?: string | null;
 }
 
 export interface UnexpectedStagedTaskReport {
@@ -321,6 +323,15 @@ function buildUnexpectedStagedBlocker(unexpectedStagedTasks: readonly Unexpected
   };
 }
 
+function buildSharedDeliverySiblingHint(outOfScopeFiles: readonly string[]): string {
+  if (outOfScopeFiles.length === 0) {
+    return 'Close each intentionally co-delivered sibling with the same --historical-delivery and waiver reason.';
+  }
+  const preview = outOfScopeFiles.slice(0, 3).join(', ');
+  const suffix = outOfScopeFiles.length > 3 ? ` (+${outOfScopeFiles.length - 3} more)` : '';
+  return `Sibling/out-of-scope files in this shared delivery: ${preview}${suffix}. Close each co-delivered task with the same --historical-delivery and --waiver-out-of-scope-delivery --reason.`;
+}
+
 function buildMixedDeliveryBlocker(input: {
   taskId: string;
   actorId: string;
@@ -334,23 +345,30 @@ function buildMixedDeliveryBlocker(input: {
     return null;
   }
   const missingLease = input.report.reason === 'out-of-scope-waiver-reason-required';
+  const requiredCommand = buildSharedDeliveryWaiverCommand({
+    taskId: input.taskId,
+    actorId: input.actorId,
+    historicalRef: input.historicalRef
+  });
+  const multiTaskCloseRecipe = buildSharedDeliverySiblingHint(input.report.fileBuckets.outOfScopeSourceFiles);
   return {
     id: missingLease ? 'missingApprovalLease' : 'mixedDeliveryCommit',
     code: missingLease
       ? 'ATM_TASKFLOW_PRECLOSE_MISSING_APPROVAL_LEASE'
       : 'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT',
     summary: missingLease
-      ? `Historical delivery ${input.historicalRef} requires --waiver-out-of-scope-delivery with a non-empty --reason before close --write.`
-      : `Historical delivery ${input.historicalRef} includes out-of-scope source files from other tasks.`,
+      ? `Historical delivery ${input.historicalRef} is an intentional shared-delivery close; provide --waiver-out-of-scope-delivery with a non-empty --reason before close --write.`
+      : `Historical delivery ${input.historicalRef} is an intentional shared-delivery close with out-of-scope sibling files; acknowledge with --waiver-out-of-scope-delivery --reason instead of treating this as a failed delivery.`,
     files: input.report.fileBuckets.outOfScopeSourceFiles,
+    multiTaskCloseRecipe,
     remediationChoices: [
       {
         id: 'request-waiver',
-        summary: 'Request explicit waiver approval with a durable reason, then rerun pre-close and close --write.',
-        requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${JSON.stringify(input.actorId)} --historical-delivery ${input.historicalRef} --waiver-out-of-scope-delivery --reason "<reason>" --write --json`
+        summary: 'Acknowledge the shared delivery with a durable waiver reason, then rerun pre-close and close --write.',
+        requiredCommand
       }
     ],
-    requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${JSON.stringify(input.actorId)} --historical-delivery ${input.historicalRef} --waiver-out-of-scope-delivery --reason "<reason>" --write --json`
+    requiredCommand
   };
 }
 
@@ -531,10 +549,11 @@ export function buildHistoricalClosePreflight(input: {
 
 export function preflightBlockersToWriteReadinessBlockers(
   preflight: HistoricalClosePreflightSummary
-): Array<{ code: string; summary: string; requiredCommand: string | null }> {
+): Array<{ code: string; summary: string; requiredCommand: string | null; multiTaskCloseRecipe?: string | null }> {
   return preflight.blockers.map((blocker) => ({
     code: blocker.code,
     summary: blocker.summary,
-    requiredCommand: blocker.requiredCommand
+    requiredCommand: blocker.requiredCommand,
+    multiTaskCloseRecipe: blocker.multiTaskCloseRecipe ?? null
   }));
 }

@@ -10,7 +10,7 @@ import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.ts';
 import { validateStrictPathHeuristic } from '../tasks/task-import-validators.ts';
 import { listOptionalEvidenceBundleGovernanceArtifacts } from './closeback-orchestration.ts';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.ts';
-import { resolveActorGitIdentityForCommit, runAtmGit } from '../git-governance.ts';
+import { listTaskOwnedProtectedOverrideAuditFiles, resolveActorGitIdentityForCommit, runAtmGit } from '../git-governance.ts';
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { CliError, quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
@@ -112,23 +112,6 @@ function listExistingFilesRecursively(root: string, relativeDirectory: string): 
     }
   }
   return files;
-}
-
-// ATM-BUG-2026-07-07-052 (OPT-14): protected-override-audit events aren't
-// filed per-task by path (their directory has no owning task segment), so a
-// blanket directory sweep would risk bundling another task's pending audit
-// event into this close (and could trip governance-bundle task-mismatch
-// checks elsewhere). Match by the event's own `taskId` field instead.
-function listTaskOwnedProtectedOverrideAuditFiles(root: string, taskId: string): string[] {
-  const directory = '.atm/history/protected-override-audit';
-  return listExistingFilesRecursively(root, directory).filter((relativePath) => {
-    try {
-      const parsed = JSON.parse(readFileSync(path.join(root, relativePath), 'utf8')) as { taskId?: unknown };
-      return typeof parsed.taskId === 'string' && parsed.taskId.toLowerCase() === taskId.toLowerCase();
-    } catch {
-      return false;
-    }
-  });
 }
 
 function listCurrentTaskGovernanceFiles(root: string, taskId: string): string[] {

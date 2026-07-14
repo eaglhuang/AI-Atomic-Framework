@@ -3171,6 +3171,27 @@ function readProtectedOverrideAuditTaskId(cwd: string, filePath: string): string
   }
 }
 
+function listExistingGovernanceFilesRecursively(root: string, relativeDirectory: string): string[] {
+  const directory = path.join(root, relativeDirectory);
+  if (!existsSync(directory)) return [];
+  const files: string[] = [];
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const relativePath = path.posix.join(relativeDirectory.replace(/\\/g, '/'), entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listExistingGovernanceFilesRecursively(root, relativePath));
+    } else if (entry.isFile()) {
+      files.push(normalizeRelativePath(relativePath));
+    }
+  }
+  return files;
+}
+
+/** Task-owned protected override audit events admitted into commit/direction-lock scope. */
+export function listTaskOwnedProtectedOverrideAuditFiles(cwd: string, taskId: string): readonly string[] {
+  return listExistingGovernanceFilesRecursively(cwd, '.atm/history/protected-override-audit')
+    .filter((relativePath) => readProtectedOverrideAuditTaskId(cwd, relativePath)?.toLowerCase() === taskId.toLowerCase());
+}
+
 function buildProtectedForeignStagedOwnershipFiles(
   unexpectedStagedTasks: readonly GitUnexpectedStagedTaskReport[]
 ): readonly string[] {
@@ -3350,10 +3371,8 @@ export function resolveTaskScopedCommitBundle(input: {
   const deferredForeignStagedSet = new Set(deferredForeignStagedFiles.map(normalizeRelativePath));
   const blockedResidue = residueReport.blockAndExplain.filter((entry) =>
     !deferredForeignStagedSet.has(normalizeRelativePath(entry.path))
-    && (
-      isDeferrableForeignGovernanceResidue(input.taskId, entry)
-      || !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry)
-    )
+    && !(input.deferForeignStaged && isDeferrableForeignGovernanceResidue(input.taskId, entry))
+    && !isActiveForeignGovernanceResidueOwner(input.cwd, input.taskId, entry)
   );
   const manualReviewResidue = residueReport.manualReview.filter((entry) =>
     isActionableManualResidue(entry.path)
@@ -3702,7 +3721,10 @@ function resolveTaskDeclaredScope(cwd: string, taskId: string, taskDocument: Rec
     ...extractStringList(claim.files),
     ...extractStringList(taskDocument.targetAllowedFiles),
     ...extractTaskDeclaredFiles(taskDocument),
-    ...listCommitAttributionSideEffectPaths(cwd)
+    ...listCommitAttributionSideEffectPaths(cwd),
+    // ATM-BUG-2026-07-12-117: generated task-owned protected override audit must
+    // ride along in bundle/direction-lock scope without a manual scope-amendment.
+    ...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId)
   ]));
 }
 
@@ -3757,8 +3779,14 @@ function isFrameworkGeneratedArtifactAllowed(
     if (pathMatchesTaskScope(normalized, `release/atm-root-drop/${claimedFile}`)) {
       return true;
     }
+    if (pathMatchesTaskScope(normalized, `release/atm-onefile/${claimedFile}`)) {
+      return true;
+    }
   }
-  return releaseGeneratedArtifacts.has(normalized) && claimedFiles.size > 0;
+  // ATM-BUG-2026-07-14-182: release-manifest membership alone must not admit
+  // out-of-claim dirty release mirrors during narrow framework temp claims.
+  void releaseGeneratedArtifacts;
+  return false;
 }
 
 function isIgnorableFrameworkCommitStagingSideEffect(filePath: string): boolean {

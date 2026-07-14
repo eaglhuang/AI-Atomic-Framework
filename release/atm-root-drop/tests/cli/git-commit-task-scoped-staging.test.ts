@@ -305,6 +305,46 @@ try {
   rmSync(path.join(tempDir, frameworkForeignStagedFile), { force: true });
   rmSync(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), { force: true });
 
+  // ATM-BUG-2026-07-14-182: unstaged out-of-claim release mirrors must not be absorbed.
+  const narrowSkillClaimFile = '.cursor/rules/skills/atm-governance-router/SKILL.md';
+  const unstagedReleaseMirror = 'release/atm-root-drop/packages/cli/src/commands/git-governance.ts';
+  writeJson(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), {
+    schemaId: 'atm.governanceScopeLock',
+    specVersion: '0.1.0',
+    workItemId: 'ATM-FRAMEWORK-TEMP-fixture-agent',
+    lockedBy: 'fixture-agent',
+    actorId: 'fixture-agent',
+    leaseId: 'lease-framework-release-mirror',
+    lockedAt: '2026-07-14T00:00:00.000Z',
+    heartbeatAt: '2026-07-14T00:00:00.000Z',
+    ttlSeconds: 999999999,
+    status: 'active',
+    files: [narrowSkillClaimFile]
+  });
+  mkdirSync(path.join(tempDir, path.dirname(narrowSkillClaimFile)), { recursive: true });
+  mkdirSync(path.join(tempDir, path.dirname(unstagedReleaseMirror)), { recursive: true });
+  writeFileSync(path.join(tempDir, narrowSkillClaimFile), '# narrow skill claim\n', 'utf8');
+  writeFileSync(path.join(tempDir, unstagedReleaseMirror), 'export const foreignReleaseMirror = true;\n', 'utf8');
+  runGit(tempDir, ['add', unstagedReleaseMirror]);
+  runGit(tempDir, ['commit', '-m', 'chore: seed tracked release mirror fixture']);
+  writeFileSync(path.join(tempDir, unstagedReleaseMirror), 'export const foreignReleaseMirror = "dirty";\n', 'utf8');
+  const releaseMirrorCommit = await runAtmGit([
+    'commit',
+    '--cwd', tempDir,
+    '--actor', 'fixture-agent',
+    '--message', 'docs: narrow skill claim without release mirror absorption',
+    '--auto-stage',
+    '--defer-foreign-staged',
+    '--json'
+  ]);
+  assert.equal(releaseMirrorCommit.ok, true);
+  const releaseMirrorHead = runGit(tempDir, ['show', '--name-only', '--format=', 'HEAD']);
+  assert.equal(releaseMirrorHead.includes(narrowSkillClaimFile), true, 'claimed skill mirror must be included');
+  assert.equal(releaseMirrorHead.includes(unstagedReleaseMirror), false, 'unstaged out-of-claim release mirror must stay out of framework claim commit');
+  assert.equal(runGit(tempDir, ['diff', '--name-only', '--', unstagedReleaseMirror]).trim().length > 0, true, 'unstaged release mirror dirt must remain in the worktree');
+  runGit(tempDir, ['restore', '--worktree', '--', unstagedReleaseMirror]);
+  rmSync(path.join(tempDir, '.atm/runtime/locks/ATM-FRAMEWORK-TEMP-fixture-agent.lock.json'), { force: true });
+
   writeFileSync(path.join(tempDir, scopedFile), 'export const taskScopedStaging = "queue";\n', 'utf8');
   const branchRef = runGit(tempDir, ['symbolic-ref', '-q', 'HEAD']).trim();
   const branchQueueLockPath = path.join(tempDir, '.atm/runtime/locks', `git-commit-queue-${branchRef.replace(/[^A-Za-z0-9._-]+/g, '-')}.lock`);

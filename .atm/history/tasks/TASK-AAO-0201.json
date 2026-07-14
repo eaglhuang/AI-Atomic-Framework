@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-AAO-0201",
+  "title": "Clarify multi-task shared historical-delivery close UX",
+  "status": "running",
+  "milestone": "Backlog-P1",
+  "dependencies": [],
+  "acceptance": [],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/write-readiness.ts",
+    "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+    "packages/cli/src/commands/taskflow.ts",
+    "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+    "npm run check:encoding:touched",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "release/**",
+    "Editing .atm/history or .atm/runtime by hand"
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert if the fix regresses governed close/commit safety.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-governance-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow.ts (1561 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "atm-agent-first-operability/tasks/TASK-AAO-0201-mixed-delivery-close-ux-hint.task.md",
+    "sectionTitle": "TASK-AAO-0201",
+    "headingLine": 43,
+    "hash": "53b28678429b5e99"
+  },
+  "importedAt": "2026-07-14T04:09:56.851Z",
+  "lastTransitionId": "2026-07-14T04-10-19-338Z-scope-amendment-c0e4747c3e93",
+  "lastTransitionAt": "2026-07-14T04:10:19.338Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "claim": {
+    "actorId": "cursor-grok-4.5",
+    "leaseId": "lease-cc63f3327cd3",
+    "claimedAt": "2026-07-14T04:10:04.046Z",
+    "heartbeatAt": "2026-07-14T04:10:04.046Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-AAO-0201.*",
+      ".atm/history/task-events/TASK-AAO-0201/**",
+      ".atm/history/tasks/TASK-AAO-0201.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/**",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "owner": "cursor-grok-4.5",
+  "startedAt": "2026-07-14T04:10:04.046Z",
+  "startedByActor": "cursor-grok-4.5",
+  "startedBySessionId": "session-20260714041004-cursor-grok-4.5-TASK-AAO-0201-5e3a97ff3e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-AAO-0201",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-AAO-0201.*",
+      ".atm/history/task-events/TASK-AAO-0201/**",
+      ".atm/history/tasks/TASK-AAO-0201.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/hook/pre-commit.ts",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/cli/src/commands/taskflow/historical-close-preflight.ts",
+      "packages/cli/src/commands/taskflow/write-readiness.ts",
+      "packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts",
+      "packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts",
+      "packages/cli/src/commands/tasks/legacy-impl.ts",
+      "release/**",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/protected-override-audit-direction-lock.test.ts",
+      "tests/cli/task-ledger-residue-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0201-mixed-delivery-close-ux-hint.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/",
+      "docs/ai_atomic_framework/atm-agent-first-operability/tasks/TASK-AAO-0201-mixed-delivery-close-ux-hint.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e0113ff062898a2d44c607043c2fdbfa508d596048a7ef91e67015fe4ce891da",
+    "actorId": "cursor-grok-4.5",
+    "createdAt": "2026-07-14T04:10:08.080Z",
+    "status": "active"
+  }
+}

@@ -31,6 +31,7 @@ import {
 import { isPathAllowedByScope, listActiveBatchRuns, readActiveQuickfixLock } from '../work-channels.ts';
 import { readBrokerLifecycleState } from '../../../../core/src/broker/lifecycle.ts';
 import { buildPendingCheckpointCommitWindow } from '../batch.ts';
+import { listTaskOwnedProtectedOverrideAuditFiles } from '../git-governance.ts';
 import { evaluateTeamPreCommitGate } from '../team-runtime-gates.ts';
 import { findCaseInsensitiveRelativePath, taskIdsEqual, taskIdsInclude } from '../tasks/task-import-validators.ts';
 import { hookContractVersion, hookProvider } from './git-hooks-installer.ts';
@@ -1335,6 +1336,7 @@ function collectTaskGovernedCommitAllowedFiles(cwd: string, taskId: string | nul
   if (actorRegistryState.tracked && (actorRegistryState.staged || actorRegistryState.unstaged)) {
     files.push(actorRegistryState.path);
   }
+  files.push(...listTaskOwnedProtectedOverrideAuditFiles(cwd, taskId));
   return uniqueSorted(files.map(normalizeRelativePath).filter(isTaskDirectionPathCandidate));
 }
 

@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-14T04-10-19-338Z-scope-amendment-c0e4747c3e93",
+  "taskId": "TASK-AAO-0201",
+  "action": "scope-amendment",
+  "actorId": "cursor-grok-4.5",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-AAO-0201.json",
+  "taskSha256": "sha256:1eb69d52882935e2c4c7854d34034fe37482b5b5c1891baa026c4a85ef25193d",
+  "createdAt": "2026-07-14T04:10:19.338Z",
+  "command": "node atm.mjs tasks scope add --task TASK-AAO-0201 --actor cursor-grok-4.5 --add \"packages/cli/src/commands/taskflow.ts,packages/cli/src/commands/tasks/legacy-impl.ts,packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts,packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts,scripts/validators/task-ledger/suite-impl.ts,tests/cli/task-ledger-residue-contract.test.ts,packages/cli/src/commands/git-governance.ts,packages/cli/src/commands/taskflow/commit-bundle-assembly.ts,packages/cli/src/commands/hook/pre-commit.ts,tests/cli/protected-override-audit-direction-lock.test.ts,tests/cli/git-commit-task-scoped-staging.test.ts,release/**\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

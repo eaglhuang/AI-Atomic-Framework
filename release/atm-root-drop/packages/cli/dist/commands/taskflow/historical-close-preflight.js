@@ -9,6 +9,7 @@ import { normalizeRelativePath } from '../tasks/task-file-io-helpers.js';
 import { evaluateFrameworkCloseDirtyGuard } from '../tasks/scope-lock-diagnostics.js';
 import { evaluatePlanningMirrorDirtyFiles } from '../tasks/planning-mirror-close-diagnostics.js';
 import { inspectHistoricalDelivery } from '../tasks/historical-delivery.js';
+import { buildSharedDeliveryWaiverCommand } from './write-readiness.js';
 import { isPathAllowedByScope } from '../work-channels.js';
 import { resolveTaskflowDeclaredFiles, resolveTaskflowEffectiveDeliverables } from './task-scope.js';
 function uniqueStrings(values) {
@@ -225,6 +226,14 @@ function buildUnexpectedStagedBlocker(unexpectedStagedTasks) {
         requiredCommand: unexpectedStagedTasks[0]?.deferCommand ?? null
     };
 }
+function buildSharedDeliverySiblingHint(outOfScopeFiles) {
+    if (outOfScopeFiles.length === 0) {
+        return 'Close each intentionally co-delivered sibling with the same --historical-delivery and waiver reason.';
+    }
+    const preview = outOfScopeFiles.slice(0, 3).join(', ');
+    const suffix = outOfScopeFiles.length > 3 ? ` (+${outOfScopeFiles.length - 3} more)` : '';
+    return `Sibling/out-of-scope files in this shared delivery: ${preview}${suffix}. Close each co-delivered task with the same --historical-delivery and --waiver-out-of-scope-delivery --reason.`;
+}
 function buildMixedDeliveryBlocker(input) {
     if (!input.report || !input.historicalRef)
         return null;
@@ -232,23 +241,30 @@ function buildMixedDeliveryBlocker(input) {
         return null;
     }
     const missingLease = input.report.reason === 'out-of-scope-waiver-reason-required';
+    const requiredCommand = buildSharedDeliveryWaiverCommand({
+        taskId: input.taskId,
+        actorId: input.actorId,
+        historicalRef: input.historicalRef
+    });
+    const multiTaskCloseRecipe = buildSharedDeliverySiblingHint(input.report.fileBuckets.outOfScopeSourceFiles);
     return {
         id: missingLease ? 'missingApprovalLease' : 'mixedDeliveryCommit',
         code: missingLease
             ? 'ATM_TASKFLOW_PRECLOSE_MISSING_APPROVAL_LEASE'
             : 'ATM_TASKFLOW_PRECLOSE_MIXED_DELIVERY_COMMIT',
         summary: missingLease
-            ? `Historical delivery ${input.historicalRef} requires --waiver-out-of-scope-delivery with a non-empty --reason before close --write.`
-            : `Historical delivery ${input.historicalRef} includes out-of-scope source files from other tasks.`,
+            ? `Historical delivery ${input.historicalRef} is an intentional shared-delivery close; provide --waiver-out-of-scope-delivery with a non-empty --reason before close --write.`
+            : `Historical delivery ${input.historicalRef} is an intentional shared-delivery close with out-of-scope sibling files; acknowledge with --waiver-out-of-scope-delivery --reason instead of treating this as a failed delivery.`,
         files: input.report.fileBuckets.outOfScopeSourceFiles,
+        multiTaskCloseRecipe,
         remediationChoices: [
             {
                 id: 'request-waiver',
-                summary: 'Request explicit waiver approval with a durable reason, then rerun pre-close and close --write.',
-                requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${JSON.stringify(input.actorId)} --historical-delivery ${input.historicalRef} --waiver-out-of-scope-delivery --reason "<reason>" --write --json`
+                summary: 'Acknowledge the shared delivery with a durable waiver reason, then rerun pre-close and close --write.',
+                requiredCommand
             }
         ],
-        requiredCommand: `node atm.mjs taskflow close --task ${input.taskId} --actor ${JSON.stringify(input.actorId)} --historical-delivery ${input.historicalRef} --waiver-out-of-scope-delivery --reason "<reason>" --write --json`
+        requiredCommand
     };
 }
 function buildStaleEvidenceBlocker(input) {
@@ -406,6 +422,7 @@ export function preflightBlockersToWriteReadinessBlockers(preflight) {
     return preflight.blockers.map((blocker) => ({
         code: blocker.code,
         summary: blocker.summary,
-        requiredCommand: blocker.requiredCommand
+        requiredCommand: blocker.requiredCommand,
+        multiTaskCloseRecipe: blocker.multiTaskCloseRecipe ?? null
     }));
 }

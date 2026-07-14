@@ -2321,7 +2321,7 @@ export async function validateTaskResidueClassification(tempRoot: string) {
     }
   });
   const mirrorStatus = await runTasks(['status', '--cwd', repo, '--task', mirrorTaskId, '--json']);
-  assert(mirrorStatus.ok === true, 'planning-mirror-only status must succeed');
+  assert(mirrorStatus.ok === true, 'source-done-governance-incomplete status must succeed');
   const mirrorResidue = mirrorStatus.evidence.residueClassification as any;
   // Done without governed closeout must fail closed before mirror-only advice.
   assert(mirrorResidue.bucket === 'source-done-governance-incomplete', `done mirror residue must fail closed: ${JSON.stringify(mirrorResidue)}`);

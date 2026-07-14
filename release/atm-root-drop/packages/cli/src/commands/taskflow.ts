@@ -47,7 +47,7 @@ import {
 } from './taskflow/close-preflight.ts';
 import { withTaskflowOperatorLane } from './emergency/context.ts';
 import { isRunnerSyncRequired } from './framework-development.ts';
-import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.ts';
+import { buildTaskflowCloseWriteReadinessHint, prioritizeSharedHistoricalDeliveryBlockers } from './taskflow/write-readiness.ts';
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.ts';
 import {
   assertCommitBundleReady,
@@ -713,15 +713,21 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
     }]
     : [];
   if (historicalClosePreflight.blockers.length > 0 || staleRunnerBlockers.length > 0) {
-    const mergedBlockers = [
+    const mergedBlockers = prioritizeSharedHistoricalDeliveryBlockers([
       ...writeReadinessHint.blockers,
       ...staleRunnerBlockers,
       ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
-    ];
+    ], {
+      taskId,
+      actorId: actorId || '<actor>',
+      historicalDeliveryRef: historicalDeliveryRefs[0] ?? null,
+      outOfScopeFiles: historicalClosePreflight.mixedDeliveryCommit?.fileBuckets.outOfScopeSourceFiles ?? []
+    });
     writeReadinessHint = {
       ...writeReadinessHint,
       status: 'blocked',
-      summary: `taskflow close --write has ${mergedBlockers.length} known blocker(s) that dry-run can already disclose.`,
+      summary: mergedBlockers[0]?.summary
+        ?? `taskflow close --write has ${mergedBlockers.length} known blocker(s) that dry-run can already disclose.`,
       blockers: mergedBlockers,
       nextCommand: mergedBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand
     };

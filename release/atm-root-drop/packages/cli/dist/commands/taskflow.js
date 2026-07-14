@@ -12,7 +12,7 @@ import { canResolveHostOpenerPolicy, resolveHostOpenerPolicyDecision } from './t
 import { buildTaskflowClosePreflight, inspectPlanningAuthorityDelivery, preflightBlockersToWriteReadinessBlockers } from './taskflow/close-preflight.js';
 import { withTaskflowOperatorLane } from './emergency/context.js';
 import { isRunnerSyncRequired } from './framework-development.js';
-import { buildTaskflowCloseWriteReadinessHint } from './taskflow/write-readiness.js';
+import { buildTaskflowCloseWriteReadinessHint, prioritizeSharedHistoricalDeliveryBlockers } from './taskflow/write-readiness.js';
 import { resolveTaskflowDeclaredFiles } from './taskflow/task-scope.js';
 import { assertCommitBundleReady, buildTaskflowCommitBundle, commitTaskflowDeliveryFiles, deferGovernanceDirtyFiles, finalizeTaskflowCommitBundle, readStagedFiles, restoreDeferredGovernanceDirtyFiles } from './taskflow/commit-bundle-assembly.js';
 import { acquireCloseWindowStagedIndexLock, releaseCloseWindowStagedIndexLock } from './tasks/close-window-lock.js';
@@ -529,15 +529,21 @@ async function runTaskflowClose(parsed, cwd, surface = 'close') {
             }]
         : [];
     if (historicalClosePreflight.blockers.length > 0 || staleRunnerBlockers.length > 0) {
-        const mergedBlockers = [
+        const mergedBlockers = prioritizeSharedHistoricalDeliveryBlockers([
             ...writeReadinessHint.blockers,
             ...staleRunnerBlockers,
             ...preflightBlockersToWriteReadinessBlockers(historicalClosePreflight)
-        ];
+        ], {
+            taskId,
+            actorId: actorId || '<actor>',
+            historicalDeliveryRef: historicalDeliveryRefs[0] ?? null,
+            outOfScopeFiles: historicalClosePreflight.mixedDeliveryCommit?.fileBuckets.outOfScopeSourceFiles ?? []
+        });
         writeReadinessHint = {
             ...writeReadinessHint,
             status: 'blocked',
-            summary: `taskflow close --write has ${mergedBlockers.length} known blocker(s) that dry-run can already disclose.`,
+            summary: mergedBlockers[0]?.summary
+                ?? `taskflow close --write has ${mergedBlockers.length} known blocker(s) that dry-run can already disclose.`,
             blockers: mergedBlockers,
             nextCommand: mergedBlockers[0]?.requiredCommand ?? writeReadinessHint.nextCommand
         };

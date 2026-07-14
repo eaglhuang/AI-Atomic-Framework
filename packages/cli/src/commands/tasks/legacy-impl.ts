@@ -1331,7 +1331,7 @@ async function cleanupTaskLock(input: {
   const { cwd, taskId, actorId } = input;
   const nowIso = new Date().toISOString();
   const taskPath = taskPathFor(cwd, taskId);
-  const taskDocument = existsSync(taskPath)
+  let taskDocument = existsSync(taskPath)
     ? JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>
     : null;
   const currentStatus = normalizeTaskStatus(taskDocument?.status);
@@ -1380,13 +1380,49 @@ async function cleanupTaskLock(input: {
   })) {
     cleanupActions.push('released-embedded-direction-lock');
   }
-  if (taskDocument && releaseCanonicalDirectionLock({
-    taskPath,
-    taskDocument,
-    actorId,
-    nowIso
-  })) {
-    cleanupActions.push('released-canonical-direction-lock');
+  let taskLedgerTransitionPath: string | null = null;
+  if (taskDocument) {
+    let taskLedgerMutated = false;
+    if (
+      currentClaim
+      && currentClaim.state === 'active'
+      && (currentStatus === 'done' || currentStatus === 'abandoned' || currentStatus === 'blocked')
+    ) {
+      taskDocument.claim = {
+        ...currentClaim,
+        heartbeatAt: nowIso,
+        state: 'released',
+        reason: input.reason ?? 'lock-cleanup'
+      };
+      taskLedgerMutated = true;
+      cleanupActions.push('released-terminal-active-claim');
+    }
+    if (applyCanonicalDirectionLockRelease({ taskDocument, actorId, nowIso })) {
+      taskLedgerMutated = true;
+      cleanupActions.push('released-canonical-direction-lock');
+    }
+    if (taskLedgerMutated) {
+      const previousStatus = typeof taskDocument.status === 'string' ? taskDocument.status : null;
+      taskLedgerTransitionPath = writeTaskDocumentWithTransition({
+        cwd,
+        taskPath,
+        taskId,
+        taskDocument,
+        action: 'lock-cleanup',
+        actorId,
+        previousStatus,
+        command: `node atm.mjs tasks lock cleanup --task ${taskId} --actor ${actorId} --json`
+      });
+      cleanupActions.push(`transition:${relativePathFrom(cwd, taskLedgerTransitionPath)}`);
+      try {
+        execFileSync('git', ['add', '--', relativePathFrom(cwd, taskPath), taskLedgerTransitionPath], {
+          cwd,
+          stdio: 'ignore'
+        });
+      } catch {
+        // Staging is best-effort; governed commit can still stage the transition explicitly.
+      }
+    }
   }
   if (existsSync(sidecarPath)) {
     rmSync(sidecarPath, { force: true });
@@ -1406,7 +1442,8 @@ async function cleanupTaskLock(input: {
     actorId,
     staleReasons,
     cleanupActions,
-    reportPath
+    reportPath,
+    transitionPath: taskLedgerTransitionPath
   };
 }
 function runTasksQueue(argv: string[]) {
@@ -3162,8 +3199,7 @@ function releaseEmbeddedDirectionLock(input: {
   }, null, 2)}\n`, 'utf8');
   return true;
 }
-function releaseCanonicalDirectionLock(input: {
-  readonly taskPath: string;
+function applyCanonicalDirectionLockRelease(input: {
   readonly taskDocument: Record<string, unknown>;
   readonly actorId: string;
   readonly nowIso: string;
@@ -3174,16 +3210,13 @@ function releaseCanonicalDirectionLock(input: {
   }
   const directionLock = canonicalDirectionLock as Record<string, unknown>;
   if (directionLock.status === 'released') return false;
-  writeFileSync(input.taskPath, `${JSON.stringify({
-    ...input.taskDocument,
-    taskDirectionLock: {
-      ...directionLock,
-      status: 'released',
-      released: true,
-      releasedAt: input.nowIso,
-      releasedBy: input.actorId
-    }
-  }, null, 2)}\n`, 'utf8');
+  input.taskDocument.taskDirectionLock = {
+    ...directionLock,
+    status: 'released',
+    released: true,
+    releasedAt: input.nowIso,
+    releasedBy: input.actorId
+  };
   return true;
 }
 function importWouldOverwriteTask(input: {

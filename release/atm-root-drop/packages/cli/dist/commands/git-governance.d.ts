@@ -72,6 +72,8 @@ export declare function evaluateGitGovernanceCheck(input: {
     sessionId?: string | null;
     requireTrailers: boolean;
 }): GitGovernanceCheckResult;
+/** Task-owned protected override audit events admitted into commit/direction-lock scope. */
+export declare function listTaskOwnedProtectedOverrideAuditFiles(cwd: string, taskId: string): readonly string[];
 export declare function resolveTaskScopedCommitBundle(input: {
     cwd: string;
     taskId: string;

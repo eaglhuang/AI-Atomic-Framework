@@ -5,7 +5,19 @@ export interface TaskflowCloseKnownBlocker {
     readonly code: string;
     readonly summary: string;
     readonly requiredCommand: string | null;
+    readonly multiTaskCloseRecipe?: string | null;
 }
+export declare function buildSharedDeliveryWaiverCommand(input: {
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly historicalRef: string;
+}): string;
+export declare function prioritizeSharedHistoricalDeliveryBlockers(blockers: readonly TaskflowCloseKnownBlocker[], input: {
+    readonly taskId: string;
+    readonly actorId: string;
+    readonly historicalDeliveryRef: string | null;
+    readonly outOfScopeFiles?: readonly string[];
+}): TaskflowCloseKnownBlocker[];
 export interface TaskflowCloseWriteReadinessHint {
     readonly schemaId: 'atm.taskflowCloseWriteReadinessHint.v1';
     readonly status: 'ready' | 'blocked';
