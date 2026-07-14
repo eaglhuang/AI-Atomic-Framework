@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0141",
+  "title": "Integrate Batch mode with sealed close and Team admission",
+  "status": "planned",
+  "milestone": "GOVOPT-Operations",
+  "dependencies": [
+    "ATM-GOV-0129",
+    "ATM-GOV-0140"
+  ],
+  "acceptance": [
+    "Batch queue head uses the same seal-and-commit transaction as normal close.",
+    "Batch may use Team only for the current queue head and only when admission proves structural parallelism.",
+    "Batch checkpoint refuses commits whose evidence does not match the sealed payload.",
+    "Batch aggregates provider usage and fully-loaded monetary cost across all attempts, including retries and discarded contributions.",
+    "Queue-head latency, batch makespan and throughput are reported separately; throughput improvement cannot be presented as a single-task latency improvement.",
+    "Batch stop-loss may switch later queue heads to a cheaper qualified model mix or single Agent without changing close semantics."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "tests/cli/batch-team-integration.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/team.ts",
+    "tests/cli/batch-team-integration.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/batch-team-integration.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Unrelated refactors outside the declared scope."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "feature-flag",
+  "rollbackNotes": "Disable the new lane and keep the previous canonical behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.batch-team-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 2 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/batch.ts (1356 lines)",
+        "packages/cli/src/commands/team.ts (6250 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0141-batch-mode-integration.task.md",
+    "sectionTitle": "ATM-GOV-0141",
+    "headingLine": 37,
+    "hash": "d93f18cd2b456c14"
+  },
+  "importedAt": "2026-07-14T11:42:44.360Z",
+  "lastTransitionId": "2026-07-14T11-42-44-376Z-import-56a7eff78d9d",
+  "lastTransitionAt": "2026-07-14T11:42:44.376Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

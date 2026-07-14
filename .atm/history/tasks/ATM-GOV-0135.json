@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0135",
+  "title": "Run Team workers in shadow-first contribution workspaces",
+  "status": "planned",
+  "milestone": "GOVOPT-Team",
+  "dependencies": [
+    "ATM-GOV-0126",
+    "ATM-GOV-0129",
+    "ATM-GOV-0130",
+    "ATM-GOV-0131",
+    "ATM-GOV-0134"
+  ],
+  "acceptance": [
+    "Workers write in isolated shadow workspaces and submit ContributionManifest files instead of mutating the live worktree.",
+    "Live worktree file leases become scheduling hints; final conflict detection happens at barrier assembly.",
+    "Worker receipts bind base commit plus contribution overlay digest.",
+    "Roles that do not require independence are collapsed into one executor; new Agents open only for genuine parallelism or independent review.",
+    "Each work group receives a minimal ContextManifest and prefers the cheapest capability-qualified model; stable prompt prefixes use provider cache when available.",
+    "Scheduler binds provider/model/plan, catalog version and spending ceilings, then streams actual usage into stop-loss decisions.",
+    "Scheduler emits a TeamRosterFingerprint for every run, covering role graph, executor collapse, provider/model/plan, catalog version, ContextManifest hashes, prompt-cache policy, fan-out cap and quota probe digest.",
+    "Scheduler supports DAG streaming: it creates a reversible reservation graph and may activate dependency-free work groups as soon as their base SHA, scope epoch, ContextManifest hash and spending ceiling are sealed.",
+    "Clean-context reviewer is a first-class optional lane: the reviewer reads only base, ContributionManifest, diff, required dependencies, acceptance criteria and reviewer ContextManifest, never the worker conversation history.",
+    "Reviewer receipts are separate from validator receipts and must reach the composer barrier before the contribution can be accepted when the lane is enabled.",
+    "Provider/model cost optimization may not weaken file ownership, evidence, quality or single-closer gates."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team/scheduler.ts",
+    "packages/core/src/team-runtime/context-manifest.ts",
+    "packages/core/src/team-runtime/contribution-manifest.ts",
+    "tests/cli/team-shadow-first-scheduler.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/scheduler.ts",
+    "packages/core/src/team-runtime/context-manifest.ts",
+    "packages/core/src/team-runtime/contribution-manifest.ts",
+    "tests/cli/team-shadow-first-scheduler.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-shadow-first-scheduler.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Shared live worktree write workers."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "feature-flag",
+  "rollbackNotes": "Disable the new lane and keep the previous canonical behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-shadow-workspace-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-shadow-scheduler",
+        "pattern": "Scheduler",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0135-shadow-first-team-scheduler.task.md",
+    "sectionTitle": "ATM-GOV-0135",
+    "headingLine": 45,
+    "hash": "6cc041c77c5d3248"
+  },
+  "importedAt": "2026-07-14T11:42:36.209Z",
+  "lastTransitionId": "2026-07-14T11-42-36-221Z-import-7e96c077d2be",
+  "lastTransitionAt": "2026-07-14T11:42:36.221Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

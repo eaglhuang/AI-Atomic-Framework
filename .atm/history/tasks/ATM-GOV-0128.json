@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0128",
+  "title": "Isolate the multi-Captain close index lane",
+  "status": "planned",
+  "milestone": "GOVOPT-Foundation",
+  "dependencies": [],
+  "acceptance": [
+    "Inventory branch commit queue, close-window lock, index ownership, Broker queue, and temporary-index commit assembly before adding any new serialization primitive.",
+    "The new primitive must absorb or retire an existing primitive, or document why it cannot.",
+    "Dry-run and real hook classify foreign active state identically.",
+    "Complete foreign bundles park/restore under an index lease.",
+    "Two-Captain fixtures require no manual unstage, stash, or restore.",
+    "Approved partial-staged blobs remain byte-identical."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "tests/cli/git-index-close-isolation.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-index-ownership.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "packages/cli/src/commands/taskflow/close-orchestration.ts",
+    "tests/cli/git-index-close-isolation.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-index-close-isolation.test.ts",
+    "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "In-flight file ownership transfer or shadow Team implementation."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Serialize close under the existing branch queue and fail closed.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.foreign-index-park-restore",
+        "pattern": "Transaction Script",
+        "source": "packages/cli/src/commands/git-governance.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.close-ownership-proof",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/hook/pre-commit.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0128-multi-captain-index-isolation.task.md",
+    "sectionTitle": "ATM-GOV-0128",
+    "headingLine": 49,
+    "hash": "d12623046e015593"
+  },
+  "importedAt": "2026-07-14T11:42:27.192Z",
+  "lastTransitionId": "2026-07-14T11-42-27-205Z-import-ef2f4fee2a65",
+  "lastTransitionAt": "2026-07-14T11:42:27.205Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

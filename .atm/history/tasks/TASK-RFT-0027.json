@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0027",
+  "title": "apply configurable atomization line bound to existing RFT oversized modules",
+  "status": "planned",
+  "milestone": "RFT-M8",
+  "dependencies": [
+    "TASK-RFT-0026"
+  ],
+  "acceptance": [
+    "Inventory all ATM framework files over the configured atomic line bound.",
+    "Rank candidates by bug density, shared-surface risk, and map/facade extraction readiness.",
+    "Open follow-up RFT cards without exceeding the configured max-lines rule for new atoms, maps, or scripts."
+  ],
+  "deliverables": [
+    "tests/cli/rft-atomization-rollout.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands",
+    "scripts",
+    "tests/cli/rft-atomization-rollout.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/rft-atomization-rollout.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Actually splitting every oversized module in this card."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Disable the new lane and keep the previous canonical behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.rft-atomization-rollout-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands",
+        "scripts",
+        "tests/cli/rft-atomization-rollout.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0027-atomization-large-module-map-rollout.task.md",
+    "sectionTitle": "TASK-RFT-0027",
+    "headingLine": 36,
+    "hash": "005fe8038b210fea"
+  },
+  "importedAt": "2026-07-14T11:43:37.057Z",
+  "lastTransitionId": "2026-07-14T11-43-37-067Z-import-ee9684a380e5",
+  "lastTransitionAt": "2026-07-14T11:43:37.067Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

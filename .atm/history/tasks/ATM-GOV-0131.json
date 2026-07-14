@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0131",
+  "title": "Unify wrapper-generated content-addressed validation receipts",
+  "status": "planned",
+  "milestone": "GOVOPT-Foundation",
+  "dependencies": [
+    "ATM-GOV-0129"
+  ],
+  "acceptance": [
+    "Agents reference receipt IDs but cannot author canonical receipts; only the ATM validator wrapper writes canonical receipt storage.",
+    "Reuse binds validator, command, environment, base, payload, and scope.",
+    "Any changed file in the conservative package or directory scope invalidates reuse until import graph or fs-trace support exists.",
+    "Legacy validator cache either becomes authenticated by the new receipt contract or is retired from canonical close gates.",
+    "Receipt storage has atomic writes, retention/GC policy, and Windows-safe retry.",
+    "A valid receipt prevents duplicate hook execution without weakening gates."
+  ],
+  "deliverables": [
+    "packages/core/src/evidence/validation-receipt.ts",
+    "schemas/evidence/micro-evidence-receipt.schema.json",
+    "tests/cli/validation-receipt-reuse.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/run-validators.ts",
+    "packages/cli/src/commands/evidence/bundle-io.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "packages/core/src/evidence/validation-receipt.ts",
+    "schemas/evidence/micro-evidence-receipt.schema.json",
+    "tests/cli/validation-receipt-reuse.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validation-receipt-reuse.test.ts",
+    "node --strip-types tests/cli/validator-run-resume-and-status.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Symbol-level read-set minimization."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "feature-flag",
+  "rollbackNotes": "Reject cache reuse and rerun through the current wrapper.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.evidence-runtime-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validation-receipt-store",
+        "pattern": "Repository",
+        "source": "scripts/run-validators.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      },
+      {
+        "atom": "atm.evidence-reuse-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/evidence/bundle-io.ts",
+        "disposition": "extract",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0131-validation-receipt-reuse.task.md",
+    "sectionTitle": "ATM-GOV-0131",
+    "headingLine": 50,
+    "hash": "bb49fffe874c3171"
+  },
+  "importedAt": "2026-07-14T11:42:31.162Z",
+  "lastTransitionId": "2026-07-14T11-42-31-175Z-import-1f834cc7d25f",
+  "lastTransitionAt": "2026-07-14T11:42:31.175Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

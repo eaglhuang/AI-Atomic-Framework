@@ -60,6 +60,24 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
   Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
 
+## Memory Write Check (TASK-MEM-0004)
+
+Before finishing a handoff summary, answer this checklist explicitly (write
+"none" when empty):
+
+1. Confirmed pitfall + fix this session? -> write a `gotcha` memory note.
+2. Major closure snapshot (lane cleared, milestone done)? -> write a `status` note.
+3. Human corrected the working method? -> write a `feedback` note with Why /
+   How to apply.
+4. An existing memory note proven wrong? -> update or retire it now.
+
+Write into the current repo's keep-memory directory (resolve via the keep
+registry; in the coordinating workspace this is `docs/keep-memory/` with the
+contract in its README). Do NOT write: anything already recorded in backlog,
+task cards, or consensus shards; details only meaningful to this session.
+Governance defects go to the ATM bug backlog first — memory notes carry only
+the operator intuition the formal record does not keep.
+
 ## Guardrails
 
 - Stay inside ATM CLI routing and evidence contracts.

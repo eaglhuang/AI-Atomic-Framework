@@ -5,24 +5,36 @@
 > resolved through a governed charter waiver proposal (`behavior.evolve` +
 > `charterWaiver` + `HumanReviewDecision`), not by silent override.
 
-**Charter version**: 2.0.0
-**Last amended**: 2026-05-19T00:00:00.000Z
+**Charter version**: 2.1.0
+**Last amended**: 2026-07-14T00:00:00.000Z
 **Machine-readable invariants**: `.atm/charter/charter-invariants.json`
+**Normative design schedule**: `.atm/charter/atm-first-principles.md` (version 1.0.0)
+**Schedule SHA-256**: `sha256:488d193397ed56b89f6f526aa882ebcb4fd8e9f81d2c4a5c8b30e5a3d5487f5c`
 
 ---
 
 ## 1. Authority Hierarchy
 
 ```
-AtomicCharter (this file)           ← highest authority
-    ↑ conflicts require waiver flow
-host project rules / profiles       ← secondary
-    ↑ extends
-single-agent / single-user overlays ← lowest
+AtomicCharter (this file)              <- sole constitutional authority
+    | incorporates and constrains
+ATM First Principles (Schedule A)      <- highest design and acceptance guidance
+    | conflicts require Charter change or waiver
+host project rules / profiles          <- secondary
+    | extends
+single-agent / single-user overlays    <- lowest
 ```
 
-ATM enforces this hierarchy through `atm doctor` (`charter-integrity` check),
-`atm upgrade --propose` (invariant gate), and `atm guard charter --files <...>`.
+The ATM First Principles schedule is normative because this Charter incorporates
+it. The schedule operationalizes governance design, efficiency, evidence, and
+delivery acceptance. It cannot add, remove, waive, or override a Charter
+invariant. If the schedule and this Charter conflict, this Charter prevails and
+the conflict fails closed until resolved through the Charter amendment process.
+
+ATM's required enforcement surfaces are `atm doctor` (`charter-integrity`),
+`atm upgrade --propose` (invariant gate), and
+`atm guard charter --files <...>`. Machine coverage that is not yet connected must
+be reported as an implementation gap and must not be represented as enforced.
 
 ---
 
@@ -60,7 +72,8 @@ the `lock-before-edit` guard and `git-head-evidence` check.
 ## 4. Amending This Charter
 
 Amendments that do not touch an invariant:
-1. Edit this file and `charter-invariants.json` together.
+1. Edit this file and `charter-invariants.json` together. If the amendment changes
+   an incorporated schedule, update that schedule in the same change.
 2. Update `charterVersion` (minor bump) and `lastAmendedAt`.
 3. Commit with ATM evidence (`atm handoff summarize`).
 

@@ -42,6 +42,15 @@ node atm.mjs handoff summarize --task "$ARGUMENTS" --json
 - `INV-ATM-007` — **Public framework docs remain English-only** (enforcement: `doctor`, breaking change: yes)
   Rule: Public contributor-facing documentation in the framework repository must remain English-only and repository-neutral. Non-English planning notes, local experiments, or downstream operating guidance must live in the coordinating host workspace unless they are translated into neutral English framework documentation.
 
+## Memory Read Step (TASK-MEM-0004)
+
+Before acting in an unfamiliar repo, locate its keep entry point and memory
+directory via the keep registry (in the coordinating workspace:
+`docs/keep.registry.md`), then read the keep summary's memory index section
+and pull only the memory notes relevant to the planned work. Cold-starting
+without reading recorded gotchas repeats already-solved failures. Treat aged
+notes as point-in-time observations: verify before asserting.
+
 ## Guardrails
 
 - Stay inside ATM CLI routing and evidence contracts.

@@ -1,0 +1,51 @@
+import assert from 'node:assert/strict';
+import { extractGovernanceTaskIdFromPath, isProtectedStagedGovernanceOwnershipPath, normalizeTaskClaimIntent, pathMatchesTaskScope, uniqueSorted } from '../commit-scope-policy.js';
+import { buildTaskScopedCommitFileSet, isFileAllowedInTaskBundle } from '../commit-bundle-filter.js';
+import { isActionableManualResidue, isDeferrableForeignGovernanceResidue } from '../governance-residue-policy.js';
+function residue(path, ownerTaskId) {
+    return {
+        path,
+        reason: 'test',
+        ownerTaskId,
+        verdict: 'block-and-explain',
+        cleanupAction: null
+    };
+}
+assert.equal(extractGovernanceTaskIdFromPath('.atm/history/tasks/task-rft-0020.json'), 'TASK-RFT-0020');
+assert.equal(extractGovernanceTaskIdFromPath('.atm/history/evidence/TASK-RFT-0020.bundle-manifest.json'), 'TASK-RFT-0020');
+assert.equal(extractGovernanceTaskIdFromPath('.atm/history/task-events/TASK-RFT-0020/close.json'), 'TASK-RFT-0020');
+assert.equal(extractGovernanceTaskIdFromPath('packages/cli/src/commands/git-governance.ts'), null);
+assert.equal(pathMatchesTaskScope('packages/cli/src/commands/git-governance/policy.ts', 'packages/cli/src/commands/git-governance/**'), true);
+assert.equal(pathMatchesTaskScope('packages/cli/src/commands/git-governance.ts', 'packages/cli/src/commands/git-governance.ts'), true);
+assert.equal(pathMatchesTaskScope('packages/cli/src/commands/next.ts', 'packages/cli/src/commands/git-governance/**'), false);
+assert.deepEqual(uniqueSorted(['b', 'a', 'b', '.\\c']), ['a', 'b', 'c']);
+assert.equal(normalizeTaskClaimIntent('no-more-mutation'), 'closeout-only');
+assert.equal(normalizeTaskClaimIntent('write'), 'write');
+assert.equal(isProtectedStagedGovernanceOwnershipPath('.atm/history/tasks/TASK-RFT-0021.json'), true);
+assert.equal(isProtectedStagedGovernanceOwnershipPath('.atm/history/evidence/TASK-RFT-0021.bundle-manifest.json'), false);
+assert.equal(isFileAllowedInTaskBundle({
+    filePath: '.atm/history/tasks/TASK-RFT-0020.json',
+    declaredScope: [],
+    allowedGovernanceArtifact: true
+}), true);
+assert.equal(isFileAllowedInTaskBundle({
+    filePath: 'packages/cli/src/commands/git-governance/commit-scope-policy.ts',
+    declaredScope: ['packages/cli/src/commands/git-governance/**'],
+    allowedGovernanceArtifact: false
+}), true);
+assert.equal(isFileAllowedInTaskBundle({
+    filePath: 'packages/cli/src/commands/next.ts',
+    declaredScope: ['packages/cli/src/commands/git-governance/**'],
+    allowedGovernanceArtifact: false
+}), false);
+assert.deepEqual(buildTaskScopedCommitFileSet({
+    inScopeStagedFiles: ['b.ts'],
+    inScopeStagedDeletions: ['a.ts'],
+    stageCandidates: ['b.ts', 'c.ts'],
+    uniqueSorted
+}), ['a.ts', 'b.ts', 'c.ts']);
+assert.equal(isDeferrableForeignGovernanceResidue('TASK-RFT-0020', residue('.atm/history/evidence/TASK-RFT-0021.closure-packet.json', 'TASK-RFT-0021')), true);
+assert.equal(isDeferrableForeignGovernanceResidue('TASK-RFT-0020', residue('.atm/history/evidence/TASK-RFT-0020.closure-packet.json', 'TASK-RFT-0020')), false);
+assert.equal(isActionableManualResidue('.atm/history/protected-override-audit/event.json'), true);
+assert.equal(isActionableManualResidue('packages/cli/src/commands/git-governance.ts'), false);
+console.log(JSON.stringify({ ok: true, assertions: 23 }, null, 2));

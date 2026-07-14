@@ -83,6 +83,10 @@ export function parseReconcileOptions(argv) {
         taskId: '',
         actorId: null,
         deliveryCommit: '',
+        // TASK-MEM-0007: cross-repo attestation parity with tasks close — a
+        // planning-repo mirror of a card delivered in another repo must be able
+        // to verify that delivery commit against its actual repo root.
+        historicalDeliveryRepo: null,
         waiverOutOfScopeDelivery: false,
         waiverReason: null,
         emergencyApproval: null,
@@ -107,6 +111,11 @@ export function parseReconcileOptions(argv) {
         }
         if (arg === '--delivery-commit' || arg === '--historical-delivery') {
             options.deliveryCommit = requireValue(argv, index, arg);
+            index += 1;
+            continue;
+        }
+        if (arg === '--historical-delivery-repo' || arg === '--delivery-repo' || arg === '--planning-delivery-repo') {
+            options.historicalDeliveryRepo = requireValue(argv, index, arg);
             index += 1;
             continue;
         }
@@ -140,6 +149,7 @@ export function parseReconcileOptions(argv) {
         cwd: path.resolve(options.cwd),
         taskId: options.taskId.trim(),
         deliveryCommit: options.deliveryCommit.trim(),
+        historicalDeliveryRepo: options.historicalDeliveryRepo ? path.resolve(options.historicalDeliveryRepo) : null,
         waiverReason: options.waiverReason?.trim() || null
     };
 }

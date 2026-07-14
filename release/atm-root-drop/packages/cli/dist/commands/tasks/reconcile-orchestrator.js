@@ -60,11 +60,16 @@ export async function runTasksReconcile(argv) {
             command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --allow-stale-runner --json`
         });
     }
-    const commitSha = readGitScalar(options.cwd, ['rev-parse', '--verify', `${options.deliveryCommit}^{commit}`]);
+    // TASK-MEM-0007: cross-repo attestation parity with tasks close — verify
+    // the delivery commit against --historical-delivery-repo when the card was
+    // delivered in another repository (planning-side mirror of a target-repo
+    // close, or vice versa).
+    const deliveryRepoRoot = options.historicalDeliveryRepo ?? options.cwd;
+    const commitSha = readGitScalar(deliveryRepoRoot, ['rev-parse', '--verify', `${options.deliveryCommit}^{commit}`]);
     if (!commitSha) {
         throw new CliError('ATM_COMMIT_NOT_FOUND', `Delivery commit not found in Git: ${options.deliveryCommit}`, {
             exitCode: 1,
-            details: { taskId: options.taskId, requestedRef: options.deliveryCommit }
+            details: { taskId: options.taskId, requestedRef: options.deliveryCommit, deliveryRepoRoot }
         });
     }
     const taskDeclaredFiles = extractTaskCloseDeclaredFiles(taskDocument, options.cwd, options.taskId);
@@ -75,6 +80,7 @@ export async function runTasksReconcile(argv) {
         taskDeclaredFiles,
         claim: null,
         historicalDeliveryRefs: [options.deliveryCommit],
+        historicalDeliveryRepo: options.historicalDeliveryRepo,
         waiverOutOfScopeDelivery: options.waiverOutOfScopeDelivery,
         waiverReason: options.waiverReason
     });
@@ -159,6 +165,7 @@ export async function runTasksReconcile(argv) {
             attestation: {
                 schemaId: 'atm.reconcileAttestation.v1',
                 deliveryCommit: commitSha,
+                ...(options.historicalDeliveryRepo ? { deliveryRepoRoot } : {}),
                 reconciledAt: new Date().toISOString(),
                 reconciledByActor: actorId,
                 reason: reconcileReason

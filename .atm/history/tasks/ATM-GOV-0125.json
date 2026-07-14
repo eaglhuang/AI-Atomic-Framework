@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0125",
+  "title": "Land low-risk Captain guidance and recovery quick wins",
+  "status": "planned",
+  "milestone": "GOVOPT-Foundation",
+  "dependencies": [],
+  "acceptance": [
+    "Batch help exposes `deliver-and-close` and copyable recovery.",
+    "Hook failure output is summary-first.",
+    "Paid provider Team execution runs one minimal provider preflight and classifies auth, model, schema, quota, billing, stale-price, currency, and plan failures before expensive work.",
+    "Preflight binds provider/model/plan, canonical catalog version and a projected spending ceiling; routing prefers the cheapest model that satisfies capability, risk and data-policy requirements.",
+    "Active-work/fresh-reservation tests verify existing behavior and backlog status.",
+    "Operator hints contain no raw destructive Git remediation."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "packages/cli/src/commands/team/provider-preflight.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "tests/cli/team-provider-preflight.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/command-specs/batch.spec.ts",
+    "packages/cli/src/commands/team/provider-preflight.ts",
+    "packages/cli/src/commands/hook/pre-commit.ts",
+    "packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+    "packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+    "tests/cli/team-provider-preflight.test.ts",
+    "tests/cli/integration-raw-git-command-guard.test.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-provider-preflight.test.ts",
+    "node --strip-types packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+    "node --strip-types tests/cli/integration-raw-git-command-guard.test.ts",
+    "git diff --check"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Changing close state, index contents, or evidence truth."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert guidance rendering without changing runtime state.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [],
+    "extractionCandidates": [
+      {
+        "atom": "atm.precommit-failure-summary",
+        "pattern": "Presenter",
+        "source": "packages/cli/src/commands/hook/pre-commit.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": null
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0125-captain-quick-wins.task.md",
+    "sectionTitle": "ATM-GOV-0125",
+    "headingLine": 55,
+    "hash": "e46c7befbb1adfdc"
+  },
+  "importedAt": "2026-07-14T11:42:23.211Z",
+  "lastTransitionId": "2026-07-14T11-42-23-222Z-import-c0bf7416d3f3",
+  "lastTransitionAt": "2026-07-14T11:42:23.222Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

@@ -1,0 +1,23 @@
+{
+  "schemaId": "atm.bulkClosureManifest.v1",
+  "createdAt": "2026-07-11T14:30:00.000Z",
+  "createdBy": "codex-captain",
+  "reason": "Commit 31b85474 (chore(release): sync three-vendor Team runtime mirrors) bundled two planning task-card mirrors whose governed closes already exist individually. This manifest attests the bundle for ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST.",
+  "bundleCommit": "31b854741e82a19b09e9d4934e87515525ae1891",
+  "tasks": [
+    {
+      "taskId": "TASK-AAO-0153",
+      "status": "done",
+      "closurePacket": ".atm/history/evidence/TASK-AAO-0153.closure-packet.json",
+      "bundleManifest": ".atm/history/evidence/TASK-AAO-0153.bundle-manifest.json",
+      "note": "Planning-card mirror only; governed close pre-existed."
+    },
+    {
+      "taskId": "TASK-TEAM-0065",
+      "status": "done",
+      "closurePacket": ".atm/history/evidence/TASK-TEAM-0065.closure-packet.json",
+      "bundleManifest": ".atm/history/evidence/TASK-TEAM-0065.bundle-manifest.json",
+      "note": "Historical closeback card mirror; governed close pre-existed (delivery 072cadf4)."
+    }
+  ]
+}

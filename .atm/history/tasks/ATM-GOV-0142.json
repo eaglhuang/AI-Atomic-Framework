@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0142",
+  "title": "Productize release publication ownership and sealed source receipts",
+  "status": "planned",
+  "milestone": "GOVOPT-Operations",
+  "dependencies": [
+    "ATM-GOV-0127",
+    "ATM-GOV-0129"
+  ],
+  "acceptance": [
+    "Release publication names one steward, sealed source commit, generated artifact digest, and publication receipt.",
+    "Publication validation runs against the sealed source state, not an ambient dirty tree.",
+    "Concurrent runner-sync work is refused unless active captains agree on release artifact ownership first."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/internal-release.ts",
+    "tests/cli/release-publication-steward.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/internal-release.ts",
+    "packages/cli/src/commands/build-release-hygiene.ts",
+    "tests/cli/release-publication-steward.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/release-publication-steward.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Unrelated refactors outside the declared scope."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "feature-flag",
+  "rollbackNotes": "Disable the new lane and keep the previous canonical behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.release-publication-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0142-release-publication-steward.task.md",
+    "sectionTitle": "ATM-GOV-0142",
+    "headingLine": 37,
+    "hash": "2ff8956cc0c95652"
+  },
+  "importedAt": "2026-07-14T11:42:45.984Z",
+  "lastTransitionId": "2026-07-14T11-42-45-995Z-import-d55c640d52cf",
+  "lastTransitionAt": "2026-07-14T11:42:45.995Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

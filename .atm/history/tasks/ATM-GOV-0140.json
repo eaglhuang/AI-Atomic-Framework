@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0140",
+  "title": "Enforce Team monetary-cost, time and quality efficiency controller",
+  "status": "planned",
+  "milestone": "GOVOPT-Operations",
+  "dependencies": [
+    "ATM-GOV-0126",
+    "ATM-GOV-0137"
+  ],
+  "acceptance": [
+    "Production/default promotion requires fully-loaded cost ratio `<= 0.80`, wall-clock ratio `<= 0.75`, quality parity and no increase in repair/residue versus the paired single-Agent baseline.",
+    "Preferred routing requires cost `<= 0.75` and time `<= 0.65`; dual `<= 0.50` is recorded as a breakthrough target rather than the universal minimum.",
+    "Token ratio remains mandatory diagnostic telemetry with reason codes for context inflation, cache misses and retries, but is not a cross-model cash-cost proxy.",
+    "Projected or actual stop-loss failure automatically collapses roles, chooses a cheaper qualified model, shrinks team size or disables Team for the workload class.",
+    "Missing or stale price/usage evidence prevents promotion and allows only a bounded experiment.",
+    "Production/default comparisons group samples by TeamRosterFingerprint; changed model mix, role collapse, ContextManifest, prompt-cache policy, fan-out cap, quota probe or catalog version starts a new comparison cohort.",
+    "Bounded fan-out is enforced at runtime; quota/rate-limit failures, queue wait inflation or spending-ceiling risk trigger scale-down before more workers are launched.",
+    "The controller records bottleneck cause and optimization backlog target, not just the downgrade."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team/efficiency-controller.ts",
+    "tests/cli/team-efficiency-controller.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team/efficiency-controller.ts",
+    "schemas/team-agents/team-efficiency-incident.schema.json",
+    "tests/cli/team-efficiency-controller.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-efficiency-controller.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Unrelated refactors outside the declared scope."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "feature-flag",
+  "rollbackNotes": "Disable the new lane and keep the previous canonical behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-efficiency-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0140-team-efficiency-controller.task.md",
+    "sectionTitle": "ATM-GOV-0140",
+    "headingLine": 37,
+    "hash": "c92dc8d3f60f11f9"
+  },
+  "importedAt": "2026-07-14T11:42:43.127Z",
+  "lastTransitionId": "2026-07-14T11-42-43-141Z-import-87bd2c815940",
+  "lastTransitionAt": "2026-07-14T11:42:43.141Z",
+  "ledgerContractVersion": "task-ledger/v1"
+}

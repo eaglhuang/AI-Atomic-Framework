@@ -14,6 +14,7 @@ export declare function parseReconcileOptions(argv: string[]): {
     cwd: string;
     taskId: string;
     deliveryCommit: string;
+    historicalDeliveryRepo: string | null;
     waiverReason: string | null;
     actorId: string | null;
     waiverOutOfScopeDelivery: boolean;
