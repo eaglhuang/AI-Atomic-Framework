@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T15-26-23-464Z-close-01f949202b24",
+  "taskId": "TASK-RFT-0042",
+  "action": "close",
+  "actorId": "codex-task-rft-0042",
+  "sessionId": "session-20260715151331-codex-task-rft-0042-TASK-RFT-0042-d1f517ce61",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0042.json",
+  "taskSha256": "sha256:09cca81e637ec404675a0549aad3807e96b04188fe582da1525040d9ea57653e",
+  "createdAt": "2026-07-15T15:26:23.464Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0042 --actor codex-task-rft-0042 --status done --historical-delivery a90e1c1a2984d4327b98fe158a73dff9905b6b3d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715151331-codex-task-rft-0042-TASK-RFT-0042-d1f517ce61",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0042.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+      "node --strip-types tests/cli/team-legacy-crew-decision-extraction.test.ts",
+      "node --strip-types tests/cli/team-legacy-patrol-contract-extraction.test.ts",
+      "node --strip-types tests/cli/team-legacy-permission-lease-extraction.test.ts",
+      "node --strip-types tests/cli/team-legacy-provider-execution-extraction.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T15:26:23.457Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0042.*",
+        ".atm/history/task-events/TASK-RFT-0042/**",
+        ".atm/history/tasks/TASK-RFT-0042.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-203.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "packages/cli/src/commands/team/legacy/crew-decision-policy.ts",
+        "packages/cli/src/commands/team/legacy/implementer-selector-policy.ts",
+        "tests/cli/team-*.test.ts",
+        "tests/cli/team-legacy-crew-decision-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "packages/cli/src/commands/team/legacy/crew-decision-policy.ts",
+        "packages/cli/src/commands/team/legacy/implementer-selector-policy.ts",
+        "tests/cli/team-*.test.ts",
+        "tests/cli/team-legacy-crew-decision-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
