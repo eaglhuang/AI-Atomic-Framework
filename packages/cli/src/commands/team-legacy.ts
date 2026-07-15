@@ -22,13 +22,8 @@ import { evaluateBrokerQueueAdmission, restrictTeamWriteScopeForQueueAdmission }
 import { findTaskClaimDependencyBlockers } from './tasks/dependency-gates.ts';
 import { validateStrictPathHeuristic } from './tasks/task-import-validators.ts';
 import { buildTeamKnowledgeSummary, runTeamKnowledge, type TeamKnowledgeSummary } from './team-knowledge.ts';
+import type { TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import { runTeamWave } from './team-wave.ts';
-import {
-  buildTeamBrokerEvidence,
-  brokerLaneToFindings,
-  evaluateTeamBrokerLane,
-  type TeamBrokerLaneEvidence
-} from '../../../core/src/broker/team-lane.ts';
 import {
   resolveNodejsTeamWorkerAdapter,
   type TeamWorkerAdapterContract
@@ -39,9 +34,9 @@ import {
   type BrokerConflictViolationStatus
 } from '../../../core/src/team-runtime/permission-broker.ts';
 import {
-  buildTeamObservabilityContract,
   createBrokerConflictObservabilityEvents,
   createTeamObservabilityEvent,
+  buildTeamObservabilityContract,
   queryTeamObservabilityEvents
 } from '../../../core/src/team-runtime/observability.ts';
 import { createTeamProviderContract } from '../../../core/src/team-runtime/provider-contract.ts';
@@ -52,30 +47,8 @@ import {
 } from '../../../core/src/team-runtime/provider-selection.ts';
 import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/src/broker/proposal.ts';
 import { planSharedSurfaceAcquisition, type SharedSurfaceQueue } from '../../../core/src/broker/shared-surface-queue.ts';
-import { inspectGitIndexOwnership, type GitIndexOwnershipReport } from './git-index-ownership.ts';
+import { inspectGitIndexOwnership } from './git-index-ownership.ts';
 import { loadTeamProviderSelectionConfigFromRepo, resolveTeamRuntimeProviderSelection } from './team/role-provider-resolution.ts';
-import {
-  buildTeamGrowthContract,
-  buildTeamRoleGrowthObservabilityContract,
-  type TeamGrowthContract,
-  type TeamRoleGrowthObservabilityContract
-} from './team/growth-contract.ts';
-import {
-  buildProviderNeutralRoleSkillPackManifest,
-  buildTeamRoleRoutingMatrix,
-  buildTeamRoleSkillPackContract,
-  type TeamRoleRoutingMatrix,
-  type TeamRoleSkillPackContract,
-  type TeamRoleSkillPackManifest
-} from './team/role-skill-packs.ts';
-import {
-  buildAnthropicRuntimeBridgeSummary,
-  buildEditorExecutionRuntimeBridgeSummary,
-  buildMicrosoftFoundryRuntimeBridgeSummary,
-  buildOpenAIFamilyRuntimeBridgeSummary
-} from './team/runtime-bridges.ts';
-import { buildRuntimeTierContract } from './team/runtime-tier-contract.ts';
-import { buildTeamShadowScheduleForPlan } from './team/shadow-plan.ts';
 import { composeTeamContributionManifests } from './team/composer.ts';
 import { resolveTeamStartExecutionLane, runtimeBackendAdmissionForTeam } from './team/team-execution-lane.ts';
 import { resolveTeamActionRoute, resolveTeamFastPath, supportedTeamActionList } from './team/team-route-map.ts';
@@ -105,6 +78,20 @@ import {
   normalizeTaskWriteScope,
   validateTeamPermissionModel
 } from './team/legacy/permission-lease-policy.ts';
+import {
+  buildTeamPlan,
+  buildTeamRuntimePilot,
+  planTeamBrokerLane,
+  readActiveTaskClaimActorId,
+  resolveTeamPlanActorId
+} from './team/legacy/plan-orchestration.ts';
+export {
+  buildTeamPlan,
+  buildTeamRuntimePilot,
+  planTeamBrokerLane,
+  readActiveTaskClaimActorId,
+  resolveTeamPlanActorId
+};
 import {
   buildTeamLeaseConflictDetails,
   buildTeamLeaseNotFoundDetails,
@@ -1761,355 +1748,6 @@ function inferTaskLanguage(task: Record<string, unknown> | null | undefined) {
   return 'typescript';
 }
 
-export function resolveTeamPlanActorId(input: {
-  cwd: string;
-  taskId: string;
-  explicitActorId?: string;
-  fallbackActorId?: string;
-}): string {
-  const explicit = String(input.explicitActorId ?? '').trim();
-  if (explicit) {
-    return explicit;
-  }
-  const claimActor = readActiveTaskClaimActorId(input.cwd, input.taskId);
-  if (claimActor) {
-    return claimActor;
-  }
-  return String(input.fallbackActorId ?? '').trim() || 'team-planner';
-}
-
-export function readActiveTaskClaimActorId(cwd: string, taskId: string): string | null {
-  try {
-    const task = readTask(cwd, taskId);
-    const claim = task.claim && typeof task.claim === 'object' ? task.claim as Record<string, unknown> : null;
-    if (!claim || String(claim.state ?? '').trim() !== 'active') {
-      return null;
-    }
-    const actorId = String(claim.actorId ?? '').trim();
-    if (!actorId) {
-      return null;
-    }
-    const heartbeatAt = String(claim.heartbeatAt ?? claim.claimedAt ?? '').trim();
-    const ttlSeconds = Number(claim.ttlSeconds ?? 0);
-    if (heartbeatAt && Number.isFinite(ttlSeconds) && ttlSeconds > 0) {
-      const heartbeatMs = Date.parse(heartbeatAt);
-      if (Number.isFinite(heartbeatMs) && Date.now() - heartbeatMs > ttlSeconds * 1000) {
-        return null;
-      }
-    }
-    return actorId;
-  } catch {
-    return null;
-  }
-}
-
-export function planTeamBrokerLane(input: {
-  cwd: string;
-  taskId: string;
-  actorId: string;
-  task: Record<string, unknown> | null | undefined;
-  writePaths: string[];
-  readOnly?: boolean;
-}) {
-  const brokerLaneResult = evaluateTeamBrokerLane({
-    cwd: input.cwd,
-    taskId: input.taskId,
-    actorId: input.actorId,
-    task: input.task,
-    writePaths: input.writePaths,
-    readOnly: input.readOnly === true
-  });
-  const findings = brokerLaneToFindings(brokerLaneResult).map((finding) => buildPermissionFinding({
-    level: finding.level,
-    code: finding.code,
-    detail: finding.detail,
-    paths: finding.paths
-  })) satisfies PermissionFinding[];
-  return {
-    result: brokerLaneResult,
-    evidence: buildTeamBrokerEvidence(brokerLaneResult),
-    findings: [
-      ...findings,
-      ...buildProposalFirstParityFindings({
-        taskId: input.taskId,
-        brokerLaneResult,
-        advisoryOnly: input.readOnly === true
-      })
-    ]
-  };
-}
-
-export function buildTeamPlan(input: {
-  cwd?: string;
-  task: Record<string, unknown> | null | undefined;
-  recipe: TeamRecipe;
-  writePaths: string[];
-  validation: { ok: boolean; findings: PermissionFinding[] };
-  brokerLane: TeamBrokerLaneEvidence;
-  gitIndexOwnership?: GitIndexOwnershipReport;
-  allowEmptyWriteScope?: boolean;
-  requestedTeamSize?: string;
-  providerSelectionConfig?: TeamProviderSelectionConfig | null;
-  providerSelectionSource?: { schemaId: 'atm.teamAgentsConfig.v1'; path: string | null; loaded: boolean; cliOverrideCount: number } | null;
-  knowledgeSummary?: TeamKnowledgeSummary;
-}) {
-  const atomizationChecklist = buildAtomizationChecklist(input.task, input.writePaths);
-  const crewBriefingContract = buildMinimalTaskCrewBriefingContract(input.task, input.writePaths, input.validation, input.brokerLane);
-  const implementerSelector = selectTeamImplementer(input.task, input.recipe, input.writePaths);
-  const captainDecision = buildCaptainDecision(input.task, input.writePaths, input.validation, input.brokerLane, crewBriefingContract, atomizationChecklist, implementerSelector, input.requestedTeamSize);
-  const activeTeamLevel = captainDecision.teamLevel ?? mapTeamSizeToLevel(captainDecision.teamSize);
-  const rosterProjection = projectTeamRecipeForLevel(input.recipe, activeTeamLevel);
-  const activeRecipe = rosterProjection.recipe;
-  const roleSkillPacks = buildTeamRoleSkillPackContract(activeRecipe);
-  const roleSkillPackManifest = buildProviderNeutralRoleSkillPackManifest({
-    recipe: activeRecipe,
-    roleSkillPacks,
-    selectionConfig: input.providerSelectionConfig ?? undefined
-  });
-  const routingMatrix = buildTeamRoleRoutingMatrix(roleSkillPacks);
-  const growthContract = buildTeamGrowthContract();
-  const observabilityContract = buildTeamObservabilityContract();
-  const roleGrowthObservabilityContract = buildTeamRoleGrowthObservabilityContract({
-    roleSkillPacks,
-    growthContract
-  });
-  const runtimeTierContract = buildRuntimeTierContract(activeRecipe);
-  const runtimePilot = buildTeamRuntimePilot({
-    roleSkillPacks,
-    routingMatrix,
-    growthContract,
-    validation: input.validation,
-    brokerLane: input.brokerLane
-  });
-  const shadowSchedule = buildTeamShadowScheduleForPlan({
-    cwd: input.cwd ?? process.cwd(),
-    task: input.task,
-    recipe: activeRecipe,
-    writePaths: input.writePaths,
-    captainDecision,
-    validation: input.validation,
-    brokerLane: input.brokerLane
-  });
-  const governanceRuntime = buildTeamGovernanceRuntimeFields({
-    validation: input.validation,
-    brokerLane: input.brokerLane,
-    runtimePilot,
-    captainDecision
-  });
-  return {
-    schemaId: 'atm.teamPlan.v1',
-    recipeId: activeRecipe.recipeId,
-    channelHint: 'normal',
-    teamLevel: activeTeamLevel,
-    rosterProjection: rosterProjection.projection,
-    governanceRuntime,
-    decisionClass: governanceRuntime.decisionClass,
-    decisionReason: governanceRuntime.decisionReason,
-    requiresHumanSignoff: governanceRuntime.requiresHumanSignoff,
-    requiresAdr: governanceRuntime.requiresAdr,
-    violationStatus: governanceRuntime.violationStatus,
-    escalationTarget: governanceRuntime.escalationTarget,
-    providerSelectionSource: input.providerSelectionSource ?? null,
-    brokerLane: input.brokerLane,
-    indexLane: input.gitIndexOwnership?.indexLane ?? {
-      schemaId: 'atm.gitIndexLane.v1',
-      status: 'free',
-      ownerTaskId: null,
-      ownerActorId: null,
-      reason: 'Git index ownership was not inspected for this team plan.'
-    },
-    gitIndexOwnership: input.gitIndexOwnership ?? null,
-    agents: activeRecipe.agents,
-    captainDecision,
-    implementerSelector,
-    roleSkillPacks,
-    roleSkillPackManifest,
-    routingMatrix,
-    growthContract,
-    observabilityContract,
-    roleGrowthObservabilityContract,
-    runtimeTierContract,
-    shadowSchedule,
-    openAIFamilyRuntimeBridges: buildOpenAIFamilyRuntimeBridgeSummary(),
-    editorExecutionRuntimeBridges: buildEditorExecutionRuntimeBridgeSummary(),
-    microsoftFoundryRuntimeBridges: buildMicrosoftFoundryRuntimeBridgeSummary(),
-    anthropicRuntimeBridges: buildAnthropicRuntimeBridgeSummary(),
-    runtimePilot,
-    ...(input.knowledgeSummary ? { knowledgeSummary: input.knowledgeSummary } : {}),
-    requiredRoles: crewBriefingContract.requiredRoles,
-    optionalRoles: crewBriefingContract.optionalRoles,
-    briefingContract: crewBriefingContract,
-    atomizationPlannerRole: {
-      role: 'atomizationPlanner',
-      agentIds: input.recipe.agents.filter((agent) => agent.role === 'atomizationPlanner').map((agent) => agent.agentId),
-      permissions: input.recipe.agents.find((agent) => agent.role === 'atomizationPlanner')?.permissions ?? []
-    },
-    atomizationChecklist,
-    suggestedPermissionLeases: buildSuggestedPermissionLeases(input.recipe, input.writePaths, { allowEmptyWriteScope: input.allowEmptyWriteScope }),
-    nextSteps: [
-      'Review this dry-run plan.',
-      'Run team start when you want a runtime team run record.',
-      'Do not hand-edit .atm/runtime team state.'
-    ],
-    validation: input.validation
-  };
-}
-
-export function buildTeamRuntimePilot(input: {
-  roleSkillPacks: TeamRoleSkillPackContract;
-  routingMatrix: TeamRoleRoutingMatrix;
-  growthContract: TeamGrowthContract;
-  validation: { ok: boolean; findings: PermissionFinding[] };
-  brokerLane: TeamBrokerLaneEvidence;
-}): TeamRuntimePilot {
-  const orderedRoles = ['coordinator', 'implementer', 'validator'];
-  const selectedRoles = orderedRoles.filter((role) => input.roleSkillPacks.roles.some((entry) => entry.role === role));
-  const pilotRoles = selectedRoles.length >= 3 ? selectedRoles.slice(0, 3) : selectedRoles.slice(0, 2);
-  const selectedEntries = input.roleSkillPacks.roles.filter((entry) => pilotRoles.includes(entry.role));
-  const blockedByBroker = input.brokerLane.safeToStart === false;
-  const brokerViolationStatus = blockedByBroker
-    ? input.brokerLane.decision.admission?.state === 'proposal-submitted'
-      ? 'proposal-submitted'
-      : 'broker-conflict-blocked'
-    : 'none';
-  const brokerConflictVocabulary = {
-    decisionClass: blockedByBroker ? 'blocked' : 'auto-execution',
-    decisionReason: input.brokerLane.blockedReasons[0] ?? input.brokerLane.decision.reason ?? 'Team Broker allowed the runtime pilot lane.',
-    violationStatus: blockedByBroker
-      ? brokerViolationStatus === 'proposal-submitted'
-        ? 'proposal-submitted'
-        : 'broker-conflict-blocked'
-      : 'none',
-    blockedCode: blockedByBroker && brokerViolationStatus !== 'proposal-submitted' ? 'broker-conflict-blocked' : null
-  } satisfies TeamRuntimePilot['brokerConflictVocabulary'];
-  const actionableRefinementFindings = [
-    ...input.validation.findings.map((finding) => ({
-      category: classifyTeamPilotFinding(finding.code),
-      summary: finding.summary,
-      detail: finding.detail,
-      correctRoute: 'Keep Coordinator authority primary, resolve lease or scope blockers first, then rerun team validate or team start.',
-      promotionTarget: input.growthContract.promotionPolicy.rawCaseTarget
-    })),
-    ...normalizeTeamBrokerPilotFindings(input.brokerLane, input.growthContract.promotionPolicy.rawCaseTarget)
-  ];
-  return {
-    schemaId: 'atm.teamRuntimePilot.v1',
-    providerNeutral: true,
-    coordinatorOwnsLifecycle: true,
-    pilotMode: pilotRoles.length >= 3 ? 'role-trio' : 'role-pair',
-    selectedRoles: pilotRoles,
-    selectedSkillPackIds: selectedEntries.map((entry) => entry.skillPackId),
-    agentSkillUnits: selectedEntries.map((entry) => ({
-      role: entry.role,
-      agentId: entry.agentId,
-      skillPackId: entry.skillPackId,
-      boundedSkillPackLoaded: true,
-      permissionLease: {
-        allowedPermissions: entry.allowedPermissions,
-        forbiddenPermissions: entry.forbiddenPermissions
-      },
-      playbookSlice: entry.playbookSlice,
-      lifecycleAuthority: entry.role === 'coordinator' ? 'coordinator-owned' : 'worker-forbidden'
-    })),
-    realisticWorkflow: [
-      'Coordinator routes the task and remains the only lifecycle and git.write owner.',
-      'Implementer loads only the scoped delivery pack for the active workstream.',
-      'Validator loads only validator-evidence guidance and returns findings to Coordinator.'
-    ],
-    workflowEvidence: {
-      scenarioId: 'agent-plus-skill-runtime-pilot',
-      roleOrder: input.routingMatrix.routes.find((route) => route.workstream === 'scoped-implementation')?.roleOrder ?? pilotRoles,
-      coordinatorOnlyLifecyclePreserved: true,
-      workerWriteScope: 'bounded-by-task-lease',
-      blockedByBroker,
-      brokerViolationStatus
-    },
-    roleBoundarySignals: [
-      ...selectedEntries.map((entry) => `${entry.role} -> ${entry.playbookSlice}`),
-      ...input.routingMatrix.routes
-        .filter((route) => ['task-entry-routing', 'scoped-implementation', 'validation-and-evidence'].includes(route.workstream))
-        .map((route) => `${route.workstream}: ${route.primaryRole}`)
-    ],
-    lifecycleAuthority: {
-      ownerRole: 'coordinator',
-      forbiddenToWorkers: ['task.lifecycle', 'git.write', 'self-close']
-    },
-    roleConfusionReduction: [
-      'Each pilot role loads only its bounded skill pack instead of a monolithic governance skill.',
-      'Workers return findings or diffs to Coordinator instead of widening into closeout authority.',
-      'Growth lessons land in a shared taxonomy without contaminating unrelated role packs.'
-    ],
-    roleConfusionMetrics: {
-      baselineLoadedSkillPacks: 'monolithic-team-context',
-      pilotLoadedSkillPacks: selectedEntries.map((entry) => entry.skillPackId),
-      preventedPermissionDrift: uniqueStrings(selectedEntries.flatMap((entry) => entry.forbiddenPermissions)),
-      refinementSignalCount: actionableRefinementFindings.length
-    },
-    roleGrowthObservability: {
-      contractSchemaId: 'atm.teamRoleGrowthObservabilityContract.v1',
-      eventType: 'artifact.output',
-      artifactType: 'atm.teamRoleGrowthLearningItem.v1',
-      frictionDimensions: ['shared-atm-routing-friction', 'role-specific-friction'],
-      brokerConflictBlockedMetricId: 'broker-conflict-blocked.hit-rate',
-      roleContractMappings: selectedEntries.map((entry) => ({
-        role: entry.role,
-        skillPackId: entry.skillPackId,
-        playbookSlice: entry.playbookSlice
-      }))
-    },
-    brokerConflictVocabulary,
-    actionableRefinementFindings
-  };
-}
-
-function buildTeamGovernanceRuntimeFields(input: {
-  validation: { ok: boolean; findings: PermissionFinding[] };
-  brokerLane: TeamBrokerLaneEvidence;
-  runtimePilot: TeamRuntimePilot;
-  captainDecision: ReturnType<typeof buildCaptainDecision>;
-}): TeamGovernanceRuntimeFields {
-  const blockingFinding = input.validation.findings.find((finding) => finding.level === 'error') ?? null;
-  const blockedByBroker = input.runtimePilot.brokerConflictVocabulary.violationStatus === 'broker-conflict-blocked'
-    || input.brokerLane.safeToStart === false;
-  const brokerVerdict = String(input.brokerLane.decision.verdict ?? '');
-  const escalationRequired = input.captainDecision.escalationRequired === true
-    || brokerVerdict === 'needs-steward'
-    || brokerVerdict === 'historical-delivery-required';
-  const requiresAdr = brokerVerdict === 'needs-steward'
-    || normalizeStringArray(input.brokerLane.blockedReasons).some((reason) => reason.toLowerCase().includes('adr'));
-  const requiresHumanSignoff = escalationRequired || requiresAdr;
-  const decisionClass = blockedByBroker || blockingFinding
-    ? 'blocked'
-    : requiresAdr
-      ? 'adr-required'
-      : requiresHumanSignoff
-        ? 'human-signoff-required'
-        : 'auto-execution';
-  const decisionReason = blockingFinding?.summary
-    ?? input.runtimePilot.brokerConflictVocabulary.decisionReason
-    ?? input.captainDecision.reason;
-  const violationStatus = blockedByBroker
-    ? 'broker-conflict-blocked'
-    : blockingFinding
-      ? 'blocked'
-      : requiresAdr
-        ? 'adr-required'
-        : requiresHumanSignoff
-          ? 'human-signoff-required'
-          : 'none';
-  return {
-    schemaId: 'atm.teamGovernanceRuntimeFields.v1',
-    decisionClass,
-    decisionReason,
-    requiresHumanSignoff,
-    requiresAdr,
-    violationStatus,
-    escalationTarget: requiresHumanSignoff
-      ? (requiresAdr ? 'ADR + Captain review' : 'Captain / human review')
-      : null
-  };
-}
-
 export function evaluateReviewerIndependence(input: {
   implementer: ReviewerIdentity;
   reviewer: ReviewerIdentity;
@@ -2842,47 +2480,6 @@ function summarizeTask(taskId: string, task: Record<string, unknown> | null | un
     targetRepo: (task as { targetRepo?: unknown })?.targetRepo ?? null,
     sourcePlanPath: (task as { source?: { planPath?: unknown } })?.source?.planPath ?? (task as { sourcePlanPath?: unknown })?.sourcePlanPath ?? null
   };
-}
-
-function classifyTeamPilotFinding(code: string | null | undefined) {
-  const normalized = String(code ?? '').toLowerCase();
-  if (normalized.includes('scope')) return 'boundary-confusion';
-  if (normalized.includes('lease') || normalized.includes('broker')) return 'role-specific-friction';
-  if (normalized.includes('validator')) return 'validator-gap';
-  return 'tooling-mismatch';
-}
-
-function normalizeTeamBrokerPilotFindings(
-  brokerLane: TeamBrokerLaneEvidence,
-  promotionTarget: string
-): Array<{
-  category: string;
-  summary: string;
-  detail: string;
-  correctRoute: string;
-  promotionTarget: string;
-}> {
-  const decision = brokerLane?.decision;
-  if (!decision) {
-    return [];
-  }
-  const conflicts = Array.isArray(decision.conflicts) ? decision.conflicts : [];
-  if (conflicts.length === 0) {
-    return [{
-      category: 'role-specific-friction',
-      summary: decision.reason ?? 'Broker-governed pilot requires refinement.',
-      detail: decision.reason ?? 'No broker detail was provided.',
-      correctRoute: 'Surface the broker verdict as pilot evidence and keep Coordinator from forcing a start.',
-      promotionTarget
-    }];
-  }
-  return conflicts.map((conflict) => ({
-    category: conflict.kind === 'lease' ? 'role-specific-friction' : 'boundary-confusion',
-    summary: decision.reason ?? 'Broker-governed pilot finding',
-    detail: String(conflict.detail ?? '').trim() || 'Broker conflict detail unavailable.',
-    correctRoute: 'Use takeover, repair, or bounded proposal flow before attempting a worker write lease again.',
-    promotionTarget
-  }));
 }
 
 function deriveWritePaths(task: Record<string, unknown> | null | undefined, repoRoot?: string) {
