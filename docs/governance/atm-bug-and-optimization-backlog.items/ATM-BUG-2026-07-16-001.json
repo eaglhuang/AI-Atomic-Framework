@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-001",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in pending taskflow markdown path normalization patch",
+  "area": "Taskflow close / Commit bundle",
+  "finding": "Taskflow close fails at write time when task-card deliverables are Markdown code spans such as `tests/cli/example.test.ts`; close dry-run can still report ready while close --write fails with ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE.",
+  "expectedBehavior": "Taskflow close should normalize path declarations consistently across deliverables, scopePaths, targetAllowedFiles, claim files, and direction locks, while still rejecting narrative non-path text.",
+  "evidenceOrRepro": "TASK-RFT-0044 close --write on 2026-07-16 failed because the imported deliverable value included backticks and therefore did not match the active direction lock path tests/cli/team-legacy-runtime-governance-extraction.test.ts.",
+  "followUp": "Keep the focused regression packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts and split commit-bundle-assembly.ts / commit-bundle-assembly.spec.ts under the 600-line physical-file target in a follow-up atom-map card."
+}
