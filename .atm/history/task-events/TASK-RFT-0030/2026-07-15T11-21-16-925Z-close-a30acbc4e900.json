@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T11-21-16-925Z-close-a30acbc4e900",
+  "taskId": "TASK-RFT-0030",
+  "action": "close",
+  "actorId": "codex-task-rft-0030",
+  "sessionId": "session-20260715111318-codex-task-rft-0030-TASK-RFT-0030-c4f1fc8205",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0030.json",
+  "taskSha256": "sha256:e2378e11aa2941bfe46fcdd46c891b112b1997b0fed20e4055675ca0cbbdba66",
+  "createdAt": "2026-07-15T11:21:16.925Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0030 --actor codex-task-rft-0030 --status done --historical-delivery ced82953f385a16ed2133fb360c8a9374bda25bf",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715111318-codex-task-rft-0030-TASK-RFT-0030-c4f1fc8205",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0030.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+      "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+      "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T11:21:16.917Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0030.*",
+        ".atm/history/task-events/TASK-RFT-0030/**",
+        ".atm/history/tasks/TASK-RFT-0030.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-193.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/**/*.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+        "release/atm-root-drop/release-manifest.json",
+        "tests/cli/team-*.test.ts",
+        "tests/cli/team-legacy-command-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/**/*.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "tests/cli/team-*.test.ts",
+        "tests/cli/team-legacy-command-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
