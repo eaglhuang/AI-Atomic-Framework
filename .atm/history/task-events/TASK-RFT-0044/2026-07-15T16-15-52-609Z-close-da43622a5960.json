@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T16-15-52-609Z-close-da43622a5960",
+  "taskId": "TASK-RFT-0044",
+  "action": "close",
+  "actorId": "codex-task-rft-0044",
+  "sessionId": "session-20260715154338-codex-task-rft-0044-TASK-RFT-0044-9b4667b474",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0044.json",
+  "taskSha256": "sha256:3167e57c87e1b1d6264ea89f99f13c8ac2152565aa571ce2235615e28dcc4419",
+  "createdAt": "2026-07-15T16:15:52.609Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0044 --actor codex-task-rft-0044 --status done --historical-delivery a45cde3a1af80592f39a3e42d10f97e4095e4d23 --historical-delivery c8b9188bf2ed44c04e8a1139eceb5cf2ceb6235f --historical-delivery e28c33c7ccc5cd24de6dfca8b54c1abcf34cbb89",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715154338-codex-task-rft-0044-TASK-RFT-0044-9b4667b474",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0044.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T16:15:52.598Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0044.*",
+        ".atm/history/task-events/TASK-RFT-0044/**",
+        ".atm/history/tasks/TASK-RFT-0044.json",
+        "`atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json`",
+        "`packages/cli/src/commands/team-legacy.ts`",
+        "`packages/cli/src/commands/team/legacy/broker-observability.ts`",
+        "`packages/cli/src/commands/team/legacy/runtime-governance.ts`",
+        "`tests/cli/team-legacy-runtime-governance-extraction.test.ts`",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-001.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/markdown-paths.ts",
+        "packages/cli/src/commands/taskflow/task-scope.ts",
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/broker-observability.ts",
+        "packages/cli/src/commands/team/legacy/runtime-governance.ts",
+        "release/generated",
+        "tests/cli/team-legacy-runtime-governance-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-markdown-paths.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/cli/src/commands/taskflow/markdown-paths.ts",
+        "packages/cli/src/commands/taskflow/task-scope.ts",
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/broker-observability.ts",
+        "packages/cli/src/commands/team/legacy/runtime-governance.ts",
+        "tests/cli/team-legacy-runtime-governance-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
