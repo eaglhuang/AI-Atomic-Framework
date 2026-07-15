@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T15-03-44-290Z-scope-amendment-8240cf9088de",
+  "taskId": "TASK-RFT-0041",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0041",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0041.json",
+  "taskSha256": "sha256:18d3288a4142518aec18927c78c93d24560dba3b105eb1b7f39ca9e5786f1695",
+  "createdAt": "2026-07-15T15:03:44.290Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0041 --actor codex-task-rft-0041 --add packages/cli/src/commands/team/legacy/provider-execution.ts --reason \"TASK-RFT-0041 creates the extracted provider execution module; add explicit scope because direction-lock glob matching did not admit the new file at pre-commit.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0041 creates the extracted provider execution module; add explicit scope because direction-lock glob matching did not admit the new file at pre-commit."
+  }
+}
