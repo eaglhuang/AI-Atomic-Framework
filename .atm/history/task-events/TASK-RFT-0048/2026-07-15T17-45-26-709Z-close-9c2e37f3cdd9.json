@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-45-26-709Z-close-9c2e37f3cdd9",
+  "taskId": "TASK-RFT-0048",
+  "action": "close",
+  "actorId": "codex-task-rft-0048",
+  "sessionId": "session-20260715173725-codex-task-rft-0048-TASK-RFT-0048-28e3a5a4b1",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0048.json",
+  "taskSha256": "sha256:ee897803ba6d11aa6b87c3db681b86c5135da61f2e4fb79ba020e6a19057d4ed",
+  "createdAt": "2026-07-15T17:45:26.709Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0048 --actor codex-task-rft-0048 --status done --historical-delivery 0cc68138dbde3bc2af3adce8c1f6dc8473e1a0ec",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715173725-codex-task-rft-0048-TASK-RFT-0048-28e3a5a4b1",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0048.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+      "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T17:45:26.699Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0048.*",
+        ".atm/history/task-events/TASK-RFT-0048/**",
+        ".atm/history/tasks/TASK-RFT-0048.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/next/playbook-projection.ts",
+        "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+        "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+        "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+        "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+        "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+        "tests/cli/next-playbook-projection-contracts.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/playbook-projection.ts",
+        "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+        "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+        "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+        "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+        "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+        "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+        "tests/cli/next-playbook-projection-contracts.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

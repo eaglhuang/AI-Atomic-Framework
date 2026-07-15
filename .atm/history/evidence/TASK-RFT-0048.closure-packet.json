@@ -1,0 +1,177 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0048",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f7930f93d082c3ced1850d2b9e102bc99116f035",
+  "governedTreeSha": "662f6092d8c7dc578ce0dc3baaf5ce880517d7a8",
+  "targetCommitDelta": {
+    "currentCommitSha": "f7930f93d082c3ced1850d2b9e102bc99116f035",
+    "parentCommitShas": [
+      "f7930f93d082c3ced1850d2b9e102bc99116f035"
+    ],
+    "governedTreeSha": "662f6092d8c7dc578ce0dc3baaf5ce880517d7a8",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0048.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0048.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/playbook-projection.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+      "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.js",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d236f5f48d39d1e3d5f0d97b20140f3a962936e1d18ff77362235b6f1e715970",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fea68219409676b843addb857caf037febc2adff0ffa57ccf3f4af72e8b2c3f3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:1993205f22c892fcd983cfd836348005bb44ef07de06dd88c001be14fa210c5a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+    "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T17:45:26.699Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0048.*",
+      ".atm/history/task-events/TASK-RFT-0048/**",
+      ".atm/history/tasks/TASK-RFT-0048.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/playbook-projection.ts",
+      "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+      "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next/playbook-projection.ts",
+      "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+      "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0048.json",
+  "closedAt": "2026-07-15T17:45:26.700Z",
+  "closedByActor": "codex-task-rft-0048",
+  "sessionId": "session-20260715173725-codex-task-rft-0048-TASK-RFT-0048-28e3a5a4b1",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0cc68138dbde3bc2af3adce8c1f6dc8473e1a0ec",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/playbook-projection.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+      "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0048.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0048/2026-07-15T17-36-52-522Z-import-ad452e57f32a.json",
+      ".atm/history/task-events/TASK-RFT-0048/2026-07-15T17-37-25-248Z-reserve-0027241224e0.json",
+      ".atm/history/task-events/TASK-RFT-0048/2026-07-15T17-37-25-250Z-promote-f3216fcdce85.json",
+      ".atm/history/task-events/TASK-RFT-0048/2026-07-15T17-37-30-637Z-claim-82e75d508c7e.json",
+      ".atm/history/task-events/TASK-RFT-0048/2026-07-15T17-41-25-815Z-scope-amendment-dd62fb133eb9.json",
+      ".atm/history/tasks/TASK-RFT-0048.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
