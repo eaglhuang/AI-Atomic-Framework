@@ -148,6 +148,28 @@
         "node atm.mjs git commit --actor <actor> --message \"<message>\" --broker-conflict-resolution <artifact> --json"
       ],
       "sourceOwner": "packages/cli/src/commands/git-governance.ts"
+    },
+    {
+      "code": "ATM_TEAM_TASK_REQUIRED",
+      "category": "team-agents",
+      "shortDescription": "A Team command that needs a task binding was invoked without --task <id>.",
+      "commonCauses": [
+        "The operator ran team plan, start, validate, patrol, or another task-scoped Team command without --task.",
+        "A copied Team command omitted the task id while retrying from a previous diagnostic."
+      ],
+      "remediation": [
+        "Rerun the command with --task <task-id> and the same actor/recipe options.",
+        "Use node atm.mjs next --prompt \"<current goal>\" --json when unsure which task should own the Team command.",
+        "Do not infer a task from dirty files; bind the Team command to the current ATM task ledger entry."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs team plan --task <task-id> --recipe <recipe-id> --json",
+        "node atm.mjs team start --task <task-id> --actor <actor> --recipe <recipe-id> --json",
+        "node atm.mjs next --prompt \"<current goal>\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/team-legacy.ts"
     }
   ]
 }
