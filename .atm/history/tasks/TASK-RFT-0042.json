@@ -1,0 +1,138 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0042",
+  "title": "Extract team legacy crew decision policy map",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0041"
+  ],
+  "acceptance": [
+    "Extract the Team crew decision policy map from `team-legacy.ts` into focused modules under `packages/cli/src/commands/team/legacy/`.",
+    "Move one large atom map in this card, not just a small helper cluster.",
+    "Keep every new or touched physical support module at or below 600 lines.",
+    "Reduce `team-legacy.ts` below its current 3,628-line baseline.",
+    "Preserve exported helper names currently imported by tests or downstream command surfaces.",
+    "Add a regression that fails if any extracted crew decision module exceeds 600 lines or `team-legacy.ts` does not shrink.",
+    "Register the new extracted module paths in the CLI atom-map shard."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team-legacy.ts",
+    "packages/cli/src/commands/team/legacy/implementer-selector-policy.ts",
+    "packages/cli/src/commands/team/legacy/crew-decision-policy.ts",
+    "tests/cli/team-legacy-crew-decision-extraction.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team-legacy.ts",
+    "packages/cli/src/commands/team/legacy/**/*.ts",
+    "tests/cli/team-*.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-patrol-contract-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-permission-lease-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-provider-execution-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-crew-decision-extraction.test.ts",
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the crew decision policy extraction commit and restore the moved helpers inside team-legacy.ts.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-crew-decision-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/team-legacy.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0042-team-legacy-crew-decision-extraction.task.md",
+    "sectionTitle": "TASK-RFT-0042",
+    "headingLine": 48,
+    "hash": "09490bb6c2ea1b31",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0042-team-legacy-crew-decision-extraction.task.md",
+      "planningCommitSha": "4b03912b08b90b2e5515efad6591d64e827accac",
+      "contentDigest": "sha256:09490bb6c2ea1b3120e16b9f98fa5bf3428663a396a48b34cc75570bcbfadf5f",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T15:13:23.533Z"
+    }
+  },
+  "importedAt": "2026-07-15T15:13:23.533Z",
+  "lastTransitionId": "2026-07-15T15-13-32-174Z-claim-ee0582efd498",
+  "lastTransitionAt": "2026-07-15T15:13:32.174Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0042",
+  "reservedAt": "2026-07-15T15:13:31.034Z",
+  "promotedAt": "2026-07-15T15:13:31.036Z",
+  "claim": {
+    "actorId": "codex-task-rft-0042",
+    "leaseId": "lease-38c490f44818",
+    "claimedAt": "2026-07-15T15:13:31.040Z",
+    "heartbeatAt": "2026-07-15T15:13:31.040Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0042.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/**/*.ts",
+      "tests/cli/team-*.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T15:13:31.040Z",
+  "startedByActor": "codex-task-rft-0042",
+  "startedBySessionId": "session-20260715151331-codex-task-rft-0042-TASK-RFT-0042-d1f517ce61",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0042",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0042.*",
+      ".atm/history/task-events/TASK-RFT-0042/**",
+      ".atm/history/tasks/TASK-RFT-0042.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/**/*.ts",
+      "tests/cli/team-*.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "dee8c42d344986f25d9cd25a69473e06628569b25cc6c0b54e32c6af7d7548d8",
+    "actorId": "codex-task-rft-0042",
+    "createdAt": "2026-07-15T15:13:32.173Z",
+    "status": "active"
+  }
+}
