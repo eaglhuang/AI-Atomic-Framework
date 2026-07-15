@@ -43,11 +43,18 @@ export interface ActiveWorkSummary {
         readonly actorId: string;
         readonly taskIds: readonly string[];
         readonly fileCount: number;
+        readonly sessionIds: readonly string[];
+        readonly sessionCount: number;
+        readonly editors: readonly string[];
     }[];
     readonly activeClaims: readonly {
         readonly taskId: string;
         readonly title: string;
         readonly actorId: string;
+        readonly leaseId: string | null;
+        readonly sessionId: string | null;
+        readonly editor: string | null;
+        readonly gitName: string | null;
         readonly intent: string;
         readonly claimedAt: string | null;
         readonly heartbeatAt: string | null;
@@ -85,6 +92,7 @@ export interface ActiveWorkSummary {
         readonly ownFiles: readonly string[];
         readonly overlappingFiles: readonly string[];
         readonly foreignActors: readonly string[];
+        readonly foreignSessions: readonly string[];
     };
     readonly brokerRecommendation: {
         readonly enabled: boolean;

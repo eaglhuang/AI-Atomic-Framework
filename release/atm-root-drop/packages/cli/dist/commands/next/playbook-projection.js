@@ -17,6 +17,7 @@ import { extractPathLikeStringsFromPrompt, isPathAllowedByScope } from '../work-
 import { makeResult, message, parseJsonText } from '../shared.js';
 import { allowsPlanningMirror, compareGuidedLegacyQueuePriority, compareIsoDesc } from './match-and-sort.js';
 import { finalizeImportedTaskSummary, normalizeOptionalString } from './route-resolution.js';
+import { listActorWorkSessions, resolveActorWorkSession } from '../actor-session.js';
 const NEXT_FRESH_TASK_RESERVATION_TTL_SECONDS = 30 * 60;
 export function enrichWithLegacyPlan(cwd, base, plan, sessionId) {
     const safeSegments = plan.segments.filter((s) => plan.safeFirstAtoms.includes(s.symbolName));
@@ -453,23 +454,29 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
     const activeLocks = readActiveLockRecords(cwd, now);
     const freshReservations = readFreshTaskReservations(cwd, now);
     const stagedFiles = readStagedFiles(cwd);
+    const currentSession = resolveActorWorkSession(cwd, {});
+    const currentSessionId = currentSession?.sessionId ?? null;
     const actorMap = new Map();
     for (const claim of activeClaims) {
-        const bucket = actorMap.get(claim.actorId) ?? { taskIds: new Set(), files: new Set() };
+        const bucket = actorMap.get(claim.actorId) ?? { taskIds: new Set(), files: new Set(), sessionIds: new Set(), editors: new Set() };
         bucket.taskIds.add(claim.taskId);
         for (const file of claim.files)
             bucket.files.add(file);
+        if (claim.sessionId)
+            bucket.sessionIds.add(claim.sessionId);
+        if (claim.editor)
+            bucket.editors.add(claim.editor);
         actorMap.set(claim.actorId, bucket);
     }
     for (const lock of activeLocks) {
-        const bucket = actorMap.get(lock.actorId) ?? { taskIds: new Set(), files: new Set() };
+        const bucket = actorMap.get(lock.actorId) ?? { taskIds: new Set(), files: new Set(), sessionIds: new Set(), editors: new Set() };
         bucket.taskIds.add(lock.workItemId);
         for (const file of lock.files)
             bucket.files.add(file);
         actorMap.set(lock.actorId, bucket);
     }
     for (const reservation of freshReservations) {
-        const bucket = actorMap.get(reservation.actorId) ?? { taskIds: new Set(), files: new Set() };
+        const bucket = actorMap.get(reservation.actorId) ?? { taskIds: new Set(), files: new Set(), sessionIds: new Set(), editors: new Set() };
         bucket.taskIds.add(reservation.taskId);
         for (const file of reservation.files)
             bucket.files.add(file);
@@ -479,21 +486,35 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
         .map(([actorId, value]) => ({
         actorId,
         taskIds: [...value.taskIds].sort((left, right) => left.localeCompare(right)),
-        fileCount: value.files.size
+        fileCount: value.files.size,
+        sessionIds: [...value.sessionIds].sort((left, right) => left.localeCompare(right)),
+        sessionCount: value.sessionIds.size,
+        editors: [...value.editors].sort((left, right) => left.localeCompare(right))
     }))
         .sort((left, right) => left.actorId.localeCompare(right.actorId));
     const foreignActors = activeActors.filter((actor) => !currentActor || actor.actorId !== currentActor);
-    const hasForeignActiveWork = foreignActors.length > 0 || stagedFiles.length > 0;
+    const foreignSessions = activeClaims.filter((claim) => claim.sessionId
+        && currentActor
+        && claim.actorId === currentActor
+        && (!currentSessionId || claim.sessionId !== currentSessionId));
+    const foreignActorIds = uniqueSorted([
+        ...foreignActors.map((actor) => actor.actorId),
+        ...foreignSessions.map((claim) => claim.actorId)
+    ]);
+    const foreignSessionIds = uniqueSorted(foreignSessions.map((claim) => claim.sessionId).filter((entry) => Boolean(entry)));
+    const hasForeignActiveWork = foreignActors.length > 0 || foreignSessionIds.length > 0 || stagedFiles.length > 0;
     const teamLevelRecommendation = buildTeamLevelRecommendation({
         ownFiles: normalizedOwnFiles,
         activeClaims,
         activeLocks,
         freshReservations,
         stagedFiles,
-        foreignActorIds: foreignActors.map((actor) => actor.actorId)
+        foreignActorIds,
+        foreignSessionIds
     });
     const reasonParts = [
         ...(foreignActors.length > 0 ? [`${foreignActors.length} other active actor(s): ${foreignActors.map((entry) => entry.actorId).join(', ')}`] : []),
+        ...(foreignSessionIds.length > 0 ? [`${foreignSessionIds.length} other active session(s) for current actor: ${foreignSessionIds.join(', ')}`] : []),
         ...(freshReservations.length > 0 ? [`${freshReservations.length} fresh task reservation(s) visible`] : []),
         ...(stagedFiles.length > 0 ? [`${stagedFiles.length} staged file(s) present in the shared index`] : [])
     ];
@@ -521,7 +542,7 @@ export function buildActiveWorkSummary(cwd, currentActorId, ownFiles = []) {
 function buildTeamLevelRecommendation(input) {
     const ownSet = new Set(input.ownFiles);
     const foreignFiles = uniqueSorted([
-        ...input.activeClaims.filter((claim) => input.foreignActorIds.includes(claim.actorId)).flatMap((claim) => claim.files),
+        ...input.activeClaims.filter((claim) => input.foreignActorIds.includes(claim.actorId) || (claim.sessionId && input.foreignSessionIds.includes(claim.sessionId))).flatMap((claim) => claim.files),
         ...input.activeLocks.filter((lock) => input.foreignActorIds.includes(lock.actorId)).flatMap((lock) => lock.files),
         ...input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).flatMap((reservation) => reservation.files)
     ]);
@@ -532,17 +553,20 @@ function buildTeamLevelRecommendation(input) {
         ? input.stagedFiles.filter((file) => ownSet.has(file))
         : [];
     const foreignActorCount = new Set(input.foreignActorIds).size;
+    const foreignSessionCount = new Set(input.foreignSessionIds).size;
     const freshForeignReservationCount = input.freshReservations.filter((reservation) => input.foreignActorIds.includes(reservation.actorId)).length;
     const sharedIndexActive = input.stagedFiles.length > 0;
     const overlapCount = uniqueSorted([...overlappingFiles, ...stagedOverlap]).length;
+    const foreignWorkCount = foreignActorCount + foreignSessionCount;
     const frameworkFoundationRisk = input.ownFiles.some(isFrameworkFoundationPath);
-    if (frameworkFoundationRisk && (foreignActorCount > 0 || sharedIndexActive || overlapCount > 0)) {
+    if (frameworkFoundationRisk && (foreignWorkCount > 0 || sharedIndexActive || overlapCount > 0)) {
         return {
             level: 'L5',
             reason: 'Framework foundation files are in scope while other active work or shared-index state exists; use the full Team Agent Broker lane.',
             ownFiles: input.ownFiles,
             overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
     if (frameworkFoundationRisk) {
@@ -551,16 +575,18 @@ function buildTeamLevelRecommendation(input) {
             reason: 'Framework foundation files are in scope; use elevated coordination even without visible overlap.',
             ownFiles: input.ownFiles,
             overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
-    if (foreignActorCount >= 3 || (overlapCount > 0 && sharedIndexActive && foreignActorCount >= 2)) {
+    if (foreignWorkCount >= 3 || (overlapCount > 0 && sharedIndexActive && foreignWorkCount >= 2)) {
         return {
             level: 'L5',
             reason: 'Multiple active actors plus overlapping files or shared staged index require full Broker coordination with review and validation roles.',
             ownFiles: input.ownFiles,
             overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
     if (overlapCount > 1 || (overlapCount > 0 && sharedIndexActive)) {
@@ -569,7 +595,8 @@ function buildTeamLevelRecommendation(input) {
             reason: 'Active foreign work overlaps this scope across multiple files or the shared index, so add a coordinator plus review/validation coverage.',
             ownFiles: input.ownFiles,
             overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
     if (overlapCount === 1 || sharedIndexActive) {
@@ -578,7 +605,8 @@ function buildTeamLevelRecommendation(input) {
             reason: 'A concrete same-file or shared-index risk is present; use Broker arbitration with an implementer and validator lane.',
             ownFiles: input.ownFiles,
             overlappingFiles: uniqueSorted([...overlappingFiles, ...stagedOverlap]),
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
     if (freshForeignReservationCount > 0) {
@@ -587,16 +615,18 @@ function buildTeamLevelRecommendation(input) {
             reason: 'Fresh foreign-created task reservations are visible; use Broker arbitration before claiming another captain\'s newly opened work.',
             ownFiles: input.ownFiles,
             overlappingFiles: [],
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
-    if (foreignActorCount > 0) {
+    if (foreignWorkCount > 0) {
         return {
             level: 'L2',
             reason: 'Other active actors exist but no file overlap is visible for this scope; keep coordination light and monitor Broker status.',
             ownFiles: input.ownFiles,
             overlappingFiles: [],
-            foreignActors: uniqueSorted(input.foreignActorIds)
+            foreignActors: uniqueSorted(input.foreignActorIds),
+            foreignSessions: uniqueSorted(input.foreignSessionIds)
         };
     }
     return {
@@ -604,7 +634,8 @@ function buildTeamLevelRecommendation(input) {
         reason: 'No foreign active work or shared-index risk is visible; a single coordinator/implementer path is enough.',
         ownFiles: input.ownFiles,
         overlappingFiles: [],
-        foreignActors: []
+        foreignActors: [],
+        foreignSessions: []
     };
 }
 function isFrameworkFoundationPath(filePath) {
@@ -730,6 +761,11 @@ function readActiveClaimRecords(cwd, now) {
     const taskStorePath = path.join(cwd, '.atm', 'history', 'tasks');
     if (!existsSync(taskStorePath))
         return [];
+    const sessionsByLeaseId = new Map();
+    for (const session of listActorWorkSessions(cwd)) {
+        if (session.claimLeaseId)
+            sessionsByLeaseId.set(session.claimLeaseId, session);
+    }
     return readdirSync(taskStorePath)
         .filter((entry) => entry.endsWith('.json'))
         .flatMap((entry) => {
@@ -749,10 +785,16 @@ function readActiveClaimRecords(cwd, now) {
                 return [];
             const heartbeatAt = normalizeOptionalString(claimRecord.heartbeatAt);
             const ttlSeconds = normalizeOptionalNumber(claimRecord.ttlSeconds);
+            const leaseId = normalizeOptionalString(claimRecord.leaseId);
+            const session = leaseId ? sessionsByLeaseId.get(leaseId) ?? null : null;
             return [{
                     taskId: workItemId,
                     title: normalizeOptionalString(parsed.title) ?? workItemId,
                     actorId,
+                    leaseId,
+                    sessionId: session?.sessionId ?? normalizeOptionalString(parsed.startedBySessionId) ?? null,
+                    editor: session?.editor ?? null,
+                    gitName: session?.gitName ?? null,
                     intent: normalizeOptionalString(claimRecord.intent) ?? 'write',
                     claimedAt: normalizeOptionalString(claimRecord.claimedAt),
                     heartbeatAt,
