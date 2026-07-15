@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0151",
+  "title": "Move generated projection rebuilds to steward lane",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0134",
+    "ATM-GOV-0148",
+    "ATM-GOV-0149"
+  ],
+  "acceptance": [
+    "Backlog item shard writes can be represented as private append-only work without requiring the Markdown projection key.",
+    "Projection rebuild requests are enqueued under the canonical generated projection key and report owner, queue position, stale-owner release, and suggested retry command.",
+    "A waiting projection rebuild must not block unrelated backlog item shard writes.",
+    "Tests prove the Markdown projection is treated as generated output and cannot be required in a normal backlog item close bundle.",
+    "The steward model records enough source item identity to rebuild deterministically later."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/generated-projection-steward.ts",
+    "packages/core/src/broker/__tests__/generated-projection-steward.test.ts",
+    "packages/cli/src/commands/broker.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/generated-projection-steward.ts",
+    "packages/core/src/broker/__tests__/generated-projection-steward.test.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/broker.ts",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/generated-projection-steward.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-0037.",
+    "Runner-sync steward queue implementation; owned by ATM-GOV-0150.",
+    "Rebuilding or committing docs/governance/atm-bug-and-optimization-backlog.md as this card delivery."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.generated-projection.steward-lane",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.generated-projection.steward-lane",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/generated-projection-steward.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0151-generated-projection-steward.task.md",
+    "sectionTitle": "ATM-GOV-0151",
+    "headingLine": 46,
+    "hash": "6e8e7c491a604edb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0151-generated-projection-steward.task.md",
+      "planningCommitSha": "2430f96df706317bd1bd43c03fc8633cb79b1877",
+      "contentDigest": "sha256:6e8e7c491a604edb0f74735f30b65a741df155575892ce2fd9ccb4d5a3fc4cc2",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T15:31:31.026Z"
+    }
+  },
+  "importedAt": "2026-07-15T15:31:31.026Z",
+  "lastTransitionId": "2026-07-15T15-50-04-786Z-claim-0e8ffa33dc96",
+  "lastTransitionAt": "2026-07-15T15:50:04.786Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T15:49:59.539Z",
+  "promotedAt": "2026-07-15T15:49:59.541Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-d4cec7da4c41",
+    "claimedAt": "2026-07-15T15:49:59.544Z",
+    "heartbeatAt": "2026-07-15T15:49:59.544Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0151.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/generated-projection-steward.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T15:49:59.544Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715154959-codex-gpt-5-5-captain-ATM-GOV-0151-91f3e5a5c0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0151",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0151.*",
+      ".atm/history/task-events/ATM-GOV-0151/**",
+      ".atm/history/tasks/ATM-GOV-0151.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "packages/cli/src/commands/broker.ts",
+      "packages/core/src/broker/__tests__/generated-projection-steward.test.ts",
+      "packages/core/src/broker/generated-projection-steward.ts",
+      "packages/core/src/broker/index.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2df0fc80a08e2f3ac60a02ee0f28527f1304042adb9599eea8780db4f1fb86c5",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T15:50:04.785Z",
+    "status": "active"
+  }
+}
