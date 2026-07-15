@@ -1,6 +1,7 @@
 import { strict as assert } from 'node:assert';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 const repoRoot = process.cwd();
 const routeFacadePath = path.join(repoRoot, 'packages/cli/src/commands/next/route-resolution.ts');
@@ -27,6 +28,7 @@ for (const filePath of routeFiles) {
 }
 
 const facadeText = readFileSync(routeFacadePath, 'utf8');
+const pendingWorktreeText = readFileSync(path.join(routeModuleDir, 'pending-worktree.ts'), 'utf8');
 for (const moduleName of [
   'intent',
   'runtime',
@@ -51,5 +53,27 @@ const strategyMapping = atomMap.mappings?.find((mapping) =>
 );
 assert.equal(strategyMapping?.atom_id, 'atm.next-route-resolution-strategy-map');
 assert.equal(strategyMapping?.source_task, 'TASK-RFT-0047');
+assert.match(
+  pendingWorktreeText,
+  /import \{ extractPathLikeStringsFromText, resolveQuickfixScope \} from '\.\/artifact-scope\.ts';/,
+  'pending-worktree must import artifact-scope text path extraction helpers'
+);
+
+const routeSmoke = spawnSync(process.execPath, [
+  'atm.dev.mjs',
+  'next',
+  '--prompt',
+  'TASK-RFT-0048 route-resolution strategy map smoke',
+  '--json'
+], {
+  cwd: repoRoot,
+  encoding: 'utf8',
+  env: { ...process.env, ATM_SKIP_ACTIVE_WORK_SCAN: '1' }
+});
+assert.equal(
+  routeSmoke.status,
+  0,
+  `route-resolution strategy modules should load through atm.dev.mjs next: ${routeSmoke.stderr || routeSmoke.stdout}`
+);
 
 console.log('next route-resolution strategy map guard passed');

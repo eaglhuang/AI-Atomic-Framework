@@ -196,7 +196,7 @@ function taskCardPathMatchesIntent(taskPath: string, intent: TaskIntent): boolea
   });
 }
 
-function listFilesRecursive(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
+export function listFilesRecursive(directoryPath: string, predicate: (filePath: string) => boolean): readonly string[] {
   if (!existsSync(directoryPath)) return [];
   const stats = safeStat(directoryPath);
   if (!stats) return [];

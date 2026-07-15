@@ -71,7 +71,7 @@ import {
   uniqueSorted
 } from '../view-projections.ts';
 import { shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
-import { resolveQuickfixScope } from './artifact-scope.ts';
+import { extractPathLikeStringsFromText, resolveQuickfixScope } from './artifact-scope.ts';
 
 interface PendingTaskArtifactScopeDiagnostic {
   readonly schemaId: 'atm.taskArtifactScopeDiagnostic.v1';

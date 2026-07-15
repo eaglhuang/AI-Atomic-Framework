@@ -72,6 +72,7 @@ import {
 } from '../view-projections.ts';
 import { shouldReportPlanningRootMissing } from '../../planning-repo-root.ts';
 import { normalizeOptionalString } from './intent.ts';
+import { listFilesRecursive } from './task-card-discovery.ts';
 
 export interface ImportedTaskSummaryWithOutOfScope extends ImportedTaskSummary {
   readonly outOfScope?: readonly string[];
@@ -164,7 +165,7 @@ export function extractTaskArtifactPathsFromMarkdown(cwd: string, text: string) 
   ]);
 }
 
-function extractPathLikeStringsFromText(text: string) {
+export function extractPathLikeStringsFromText(text: string) {
   const candidates = new Set<string>();
   const matches = text.matchAll(/\b(?:\.atm|docs|atomic_workbench|packages|scripts|schemas|specs|templates|integrations|examples|tests|release|\.github|\.claude|\.cursor|\.gemini)(?:\/[A-Za-z0-9._-]+)+\b|\b(?:atm\.mjs|package(?:-lock)?\.json|tsconfig(?:\.[A-Za-z0-9._-]+)?\.json)\b/g);
   for (const match of matches) {
