@@ -17,10 +17,24 @@ const root = process.cwd();
 const policy = resolveAtomizationLinePolicy({ config: readRepoConfig(root) });
 const scanRoots = ['packages/cli/src/commands', 'scripts'] as const;
 const oversized = scanOversizedFiles(root, scanRoots, policy.maxLines);
+const teamValidatorPath = path.join(root, 'scripts', 'validate-team-agents.ts');
+const teamValidatorAtoms = walkTsFiles(path.join(root, 'scripts', 'validators', 'team-agents'));
 
 assert.equal(policy.maxLines, 600, 'framework default atomization maxLines should stay 600 unless explicitly lowered');
 assert.ok(oversized.length > 0, 'rollout inventory should find existing oversized framework modules');
-assert.ok(oversized.some((entry) => entry.file === 'scripts/validate-team-agents.ts'), 'inventory should include known RFT oversized validator surface');
+assert.ok(
+  countLines(teamValidatorPath) <= policy.maxLines,
+  'RFT rollout should keep scripts/validate-team-agents.ts below the atomization line bound after extraction'
+);
+assert.ok(teamValidatorAtoms.length >= 50, 'RFT rollout should preserve extracted Team validator atom files');
+assert.ok(
+  teamValidatorAtoms.every((file) => countLines(file) <= policy.maxLines),
+  'extracted Team validator atoms must stay below the atomization line bound'
+);
+assert.ok(
+  !oversized.some((entry) => entry.file === 'scripts/validate-team-agents.ts'),
+  'RFT rollout inventory should no longer include the extracted Team validator harness as oversized'
+);
 assert.ok(oversized.every((entry) => entry.lines > policy.maxLines), 'inventory must only include files over configured line bound');
 
 const ranked = rankOversizedFiles(oversized);
