@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T14-17-58-710Z-close-45cc528e6cc1",
+  "taskId": "ATM-GOV-0146",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260715141134-codex-gpt-5-5-captain-ATM-GOV-0146-2f1980e8a3",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0146.json",
+  "taskSha256": "sha256:655bcd864b4a916f142f2927c809022ebabde1ec8b02600c9a0b80bc5f175371",
+  "createdAt": "2026-07-15T14:17:58.710Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0146 --actor codex-gpt-5-5-captain --status done --historical-delivery ff23d9086d774bba9b560003302cf58b3d434409",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715141134-codex-gpt-5-5-captain-ATM-GOV-0146-2f1980e8a3",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0146.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T14:17:58.701Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0146.*",
+        ".atm/history/task-events/ATM-GOV-0146/**",
+        ".atm/history/tasks/ATM-GOV-0146.json",
+        "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

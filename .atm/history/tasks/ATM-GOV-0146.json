@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "ATM-GOV-0146",
   "title": "Align close transaction mutex TTL with governed commit window",
-  "status": "running",
+  "status": "done",
   "milestone": "GOVOPT-Foundation-Gate",
   "dependencies": [
     "ATM-GOV-0129",
@@ -81,8 +81,8 @@
     }
   },
   "importedAt": "2026-07-15T14:10:36.416Z",
-  "lastTransitionId": "2026-07-15T14-11-40-442Z-claim-fcc7cb782685",
-  "lastTransitionAt": "2026-07-15T14:11:40.442Z",
+  "lastTransitionId": "2026-07-15T14-17-58-710Z-close-45cc528e6cc1",
+  "lastTransitionAt": "2026-07-15T14:17:58.710Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-gpt-5-5-captain",
   "reservedAt": "2026-07-15T14:11:34.579Z",
@@ -91,7 +91,7 @@
     "actorId": "codex-gpt-5-5-captain",
     "leaseId": "lease-b3e09766b304",
     "claimedAt": "2026-07-15T14:11:34.586Z",
-    "heartbeatAt": "2026-07-15T14:11:34.586Z",
+    "heartbeatAt": "2026-07-15T14:17:58.707Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/ATM-GOV-0146.json",
@@ -99,8 +99,8 @@
       "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
       "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-15T14:11:34.586Z",
   "startedByActor": "codex-gpt-5-5-captain",
@@ -128,5 +128,9 @@
     "actorId": "codex-gpt-5-5-captain",
     "createdAt": "2026-07-15T14:11:40.440Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-15T14:17:58.707Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260715141134-codex-gpt-5-5-captain-ATM-GOV-0146-2f1980e8a3",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0146.closure-packet.json"
 }

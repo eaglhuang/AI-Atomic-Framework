@@ -1,0 +1,341 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0146",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6a8cf4b96833fb4a2855de7ffae039e0ac708fb3",
+  "governedTreeSha": "348be04af125fe7b9a9730cc03d76a758a7d9f10",
+  "targetCommitDelta": {
+    "currentCommitSha": "6a8cf4b96833fb4a2855de7ffae039e0ac708fb3",
+    "parentCommitShas": [
+      "6a8cf4b96833fb4a2855de7ffae039e0ac708fb3"
+    ],
+    "governedTreeSha": "348be04af125fe7b9a9730cc03d76a758a7d9f10",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0146.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0146.json",
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.js",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team-legacy.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/team-legacy-command-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:767956eb36eb81de4654084f96ecf2c84d05c0106084b3c66bdfd695d951b7da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47cd1acfc6ff6c4636fcb9332c7745d057b1a1aa275c6a24f2d77cc66fb44b12",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:3ec79b298d2cdb4ecbb96a9031c5551e44ff8158056b8fdb6d73cde2e2c4a541",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T14:17:58.701Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0146.*",
+      ".atm/history/task-events/ATM-GOV-0146/**",
+      ".atm/history/tasks/ATM-GOV-0146.json",
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0146.json",
+  "closedAt": "2026-07-15T14:17:58.701Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260715141134-codex-gpt-5-5-captain-ATM-GOV-0146-2f1980e8a3",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "ff23d9086d774bba9b560003302cf58b3d434409",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0146.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0146/2026-07-15T14-10-36-705Z-import-c38972357530.json",
+      ".atm/history/task-events/ATM-GOV-0146/2026-07-15T14-11-34-579Z-reserve-9a2171cddaf2.json",
+      ".atm/history/task-events/ATM-GOV-0146/2026-07-15T14-11-34-582Z-promote-dc3691c6ea89.json",
+      ".atm/history/task-events/ATM-GOV-0146/2026-07-15T14-11-40-442Z-claim-fcc7cb782685.json",
+      ".atm/history/tasks/ATM-GOV-0146.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": {
+    "schemaId": "atm.closurePacketTeamSummary.v1",
+    "capturedAt": "2026-07-15T14:17:58.706Z",
+    "source": {
+      "kind": "team-run",
+      "teamRunPath": ".atm/runtime/team-runs/team-1ff95ee54689.json"
+    },
+    "teamRunId": "team-1ff95ee54689",
+    "captainDecision": {
+      "schemaId": "atm.teamCaptainDecision.v1",
+      "captain": {
+        "role": "Task Captain",
+        "agentId": "coordinator"
+      },
+      "taskId": "ATM-GOV-0146",
+      "authorityChain": {
+        "broker": "Broker verdicts override Coordinator decisions inside broker-governed conflict domains.",
+        "coordinator": "Coordinator retains team-local lifecycle authority outside broker-governed conflict domains."
+      },
+      "conflictRules": [
+        "If broker verdict is needs-steward, blocked-cid-conflict, blocked-shared-surface, or historical-delivery-required, Coordinator must stop claim / commit / close progression.",
+        "If broker-prescribed routing exceeds task scope, closure authority, or task-card acceptance, Coordinator must escalate to Captain / human.",
+        "Coordinator must not silently override broker verdicts inside broker-governed conflict domains."
+      ],
+      "teamLevel": "L1",
+      "teamLevelSource": "manual",
+      "teamSize": "small",
+      "requiredRoles": [
+        "Task Captain",
+        "Atomization Planner",
+        "Code Builder",
+        "Check Runner"
+      ],
+      "optionalRoles": [
+        "Reader",
+        "Evidence Collector",
+        "Scope Guardian"
+      ],
+      "reason": "Manual team size override L1 selected by CLI/config.",
+      "confidence": "high",
+      "implementerSelector": {
+        "schemaId": "atm.teamImplementerSelector.v1",
+        "selectedImplementer": {
+          "agentId": "implementer-typescript",
+          "role": "implementer",
+          "profile": "atm.implementer.typescript.v1",
+          "language": "typescript",
+          "recipeId": "atm.default.normal.typescript"
+        },
+        "languageMatch": "typescript",
+        "roleMatch": "typescript-implementer",
+        "fallbackReason": "No fallback needed; TypeScript-heavy paths matched a TypeScript implementer.",
+        "confidence": "high",
+        "deterministicHints": {
+          "scopePaths": [
+            "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+            "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+            "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+          ],
+          "deliverables": [
+            "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+            "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+          ],
+          "fileExtensions": [
+            ".ts"
+          ],
+          "pathHints": [
+            "typescript-file",
+            "typescript-heavy"
+          ],
+          "pythonHeavy": false,
+          "typescriptHeavy": true,
+          "uiPaths": false
+        }
+      },
+      "stopConditions": [
+        "scope must stay within declared allowed files",
+        "required roles must each be uniquely represented",
+        "validators must not report blocking permission conflicts",
+        "a broader or stronger lane must stop the plan"
+      ],
+      "escalationRequired": true,
+      "escalationReason": "Scope spans 3 declared paths, so coordination should be escalated. Scope crosses repo boundaries and should retain a lieutenant coordination boundary. Validator fan-out is 9, which merits lieutenant tracking.",
+      "needLieutenant": true,
+      "nextTeamShape": {
+        "schemaId": "atm.teamLieutenantEscalationShape.v1",
+        "captain": {
+          "role": "Task Captain",
+          "permissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ]
+        },
+        "lieutenant": {
+          "role": "Task Lieutenant",
+          "recommended": true,
+          "permissions": [
+            "file.read",
+            "exec.validator"
+          ],
+          "forbiddenPermissions": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "coordinationFocus": [
+            "phase coordination",
+            "blocker tracking",
+            "handoff summarization"
+          ]
+        },
+        "teamSizeHint": "medium",
+        "coordinationBoundary": "captain+lieutenant",
+        "signals": {
+          "scopeCount": 3,
+          "crossRepoScope": true,
+          "validatorCount": 9,
+          "largeScriptRisk": false,
+          "closureSignals": false,
+          "validationOk": true,
+          "brokerVerdict": "parallel-safe"
+        },
+        "suggestedPermissions": {
+          "captain": [
+            "task.lifecycle",
+            "git.write",
+            "evidence.write"
+          ],
+          "lieutenant": [
+            "file.read",
+            "exec.validator"
+          ]
+        }
+      },
+      "decisionSurface": {
+        "validationOk": true,
+        "brokerVerdict": "parallel-safe",
+        "largeScriptRisk": {
+          "level": "low",
+          "threshold": 3,
+          "reasons": []
+        },
+        "mapUpdateNeed": false,
+        "escalationRequired": true,
+        "needLieutenant": true,
+        "authorityChain": "Broker overrides Coordinator inside broker-governed conflict domains; Coordinator remains local outside them."
+      }
+    },
+    "agentReports": [],
+    "patrolFindings": [],
+    "evidenceCuratorSummary": null,
+    "teamSummary": {
+      "decision": "Manual team size override L1 selected by CLI/config.",
+      "implementationSummary": "broker-only selected; no agents are spawned, language=node, atm.node.broker, selection=cli-global-default role=coordinator; closure remains governed by command-backed evidence.",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+        "npm run typecheck"
+      ],
+      "evidence": [],
+      "brokerGovernance": {
+        "schemaId": "atm.teamBrokerGovernanceSummary.v1",
+        "brokerSubagentEnabled": true,
+        "brokerDecisionSurface": "brokerLane",
+        "brokerStewardId": "neutral-write-steward",
+        "brokerGoverns": [
+          "write-intents",
+          "scope-conflicts",
+          "steward-apply",
+          "commit-lane"
+        ],
+        "brokerEvidenceRequired": [
+          "atm.teamBrokerLaneEvidence.v1",
+          "atm.stewardApplyEvidence.v1",
+          "atm.brokerOperationRunRecordEnvelope.v1"
+        ],
+        "commitLaneSerializedBy": "branch-commit-queue",
+        "commitLaneOwnerRole": "coordinator",
+        "workerGitWrite": false,
+        "workerTaskLifecycle": false,
+        "workerSelfClose": false
+      },
+      "risk": "medium",
+      "closeReady": false
+    }
+  }
+}
