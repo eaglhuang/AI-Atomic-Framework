@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0042",
-  "updatedAt": "2026-07-15T15:18:51.936Z",
+  "updatedAt": "2026-07-15T15:23:25.484Z",
   "updatedBy": "codex-task-rft-0042",
   "freshValidationPasses": [
     "node --strip-types tests/cli/team-agents-dogfood.test.ts",
@@ -10,7 +10,9 @@
     "node --strip-types tests/cli/team-legacy-patrol-contract-extraction.test.ts",
     "node --strip-types tests/cli/team-legacy-permission-lease-extraction.test.ts",
     "node --strip-types tests/cli/team-legacy-provider-execution-extraction.test.ts",
-    "typecheck"
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -103,6 +105,32 @@
       "generatedAt": "2026-07-15T15:18:52.051Z",
       "runnerKind": "dev-source",
       "sourceCommit": "41f908b61b52cfa97b555eb0ddf42d8bd7ce12e6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:e3bfad080f8787f96af28177b8ed55297a5d066536ee62cbcc193793a32b4dca",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-15T15:22:54.786Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "10aba7558106de9ed1d9cd580876a85479c007b5",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-15T15:23:25.607Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "10aba7558106de9ed1d9cd580876a85479c007b5",
       "cached": false
     }
   ],
