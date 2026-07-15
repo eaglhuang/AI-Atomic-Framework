@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-27-47-237Z-close-c341bfdec327",
+  "taskId": "TASK-RFT-0047",
+  "action": "close",
+  "actorId": "codex-task-rft-0047",
+  "sessionId": "session-20260715171250-codex-task-rft-0047-TASK-RFT-0047-d681f7234b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0047.json",
+  "taskSha256": "sha256:2bfe3b35a9c14e9022e13450b24be6e3796035cc8d9020d3441ed41c8a29c1e0",
+  "createdAt": "2026-07-15T17:27:47.237Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0047 --actor codex-task-rft-0047 --status done --historical-delivery 368189cad30ea83bab5a1aa40f5e491dd2d79a89",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715171250-codex-task-rft-0047-TASK-RFT-0047-d681f7234b",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0047.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+      "node --strip-types tests/cli/next-route-resolution-strategy-map.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T17:27:47.223Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0047.*",
+        ".atm/history/task-events/TASK-RFT-0047/**",
+        ".atm/history/tasks/TASK-RFT-0047.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-next.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-005.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/next/route-resolution.ts",
+        "packages/cli/src/commands/next/route-resolution/**/*.ts",
+        "packages/cli/src/commands/next/route-resolution/artifact-scope.ts",
+        "packages/cli/src/commands/next/route-resolution/intent.ts",
+        "packages/cli/src/commands/next/route-resolution/matching.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+        "packages/cli/src/commands/next/route-resolution/runtime.ts",
+        "packages/cli/src/commands/next/route-resolution/task-card-discovery.ts",
+        "tests/cli/next-route-resolution-strategy-map.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/route-resolution.ts",
+        "packages/cli/src/commands/next/route-resolution/**/*.ts",
+        "packages/cli/src/commands/next/route-resolution/artifact-scope.ts",
+        "packages/cli/src/commands/next/route-resolution/intent.ts",
+        "packages/cli/src/commands/next/route-resolution/matching.ts",
+        "packages/cli/src/commands/next/route-resolution/pending-worktree.ts",
+        "packages/cli/src/commands/next/route-resolution/queue-inspection.ts",
+        "packages/cli/src/commands/next/route-resolution/runtime.ts",
+        "packages/cli/src/commands/next/route-resolution/task-card-discovery.ts",
+        "tests/cli/next-route-resolution-strategy-map.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
