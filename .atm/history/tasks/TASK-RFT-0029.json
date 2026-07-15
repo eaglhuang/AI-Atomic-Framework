@@ -1,0 +1,236 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0029",
+  "title": "Atomize team.ts with a Strangler Facade command-handler architecture",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0027"
+  ],
+  "acceptance": [
+    "`packages/cli/src/commands/team.ts` is reduced to 600 lines or fewer.",
+    "Every new or touched `packages/cli/src/commands/team/*.ts` support module is 600 lines or fewer.",
+    "Existing Team commands keep behavior parity for plan/start/status/execute/admission/report paths covered by current tests.",
+    "`team.ts` contains only facade wiring, command registration, and backwards-compatible exports.",
+    "The command registry exposes a deterministic mapping from subcommand name to handler.",
+    "Policy decisions such as admission, runtime tier, roster/skill pack selection, and cost/promotion gating are in separately testable modules.",
+    "The plan/start/status/execute/admission/cost/report bounded contexts each have an explicit atom or atom-map entry in `atomizationImpact.extractionCandidates` and in the target atomization coverage shard.",
+    "The line-budget regression verifies both file size and atom/map coverage, so a plain mechanical split without ATM map registration fails.",
+    "Receipt/report builders are separated from command routing.",
+    "`tests/cli/team-command-facade-atomization.test.ts` fails if `team.ts` or extracted modules exceed the configured atomization line bound.",
+    "No `.atm/history/**` files are edited manually; target ledger updates must come only from ATM import/close flows."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/command-registry.ts",
+    "packages/cli/src/commands/team/plan-command.ts",
+    "packages/cli/src/commands/team/start-command.ts",
+    "packages/cli/src/commands/team/status-command.ts",
+    "packages/cli/src/commands/team/execute-command.ts",
+    "packages/cli/src/commands/team/admission-command.ts",
+    "packages/cli/src/commands/team/cost-command.ts",
+    "packages/cli/src/commands/team/report-command.ts",
+    "tests/cli/team-command-facade-atomization.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/team.ts",
+    "packages/cli/src/commands/team/**/*.ts",
+    "packages/cli/src/commands/team/__tests__/**/*.ts",
+    "tests/cli/team-*.test.ts",
+    "scripts/validate-team-agents.ts",
+    "scripts/validators/team-agents/**/*.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+    "node --strip-types tests/cli/team-plan-contract.test.ts",
+    "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the facade extraction commit and remove the new command modules; no data migration is expected.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-agents-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-command-facade",
+        "pattern": "Strangler Facade",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-command-handler-registry",
+        "pattern": "Command Handler Registry",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-plan-command",
+        "pattern": "Command Handler",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-start-command",
+        "pattern": "Command Handler",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-status-command",
+        "pattern": "Query Handler",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-execute-command",
+        "pattern": "Adapter Orchestrator",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-admission-policy-module",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-cost-governance-module",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.team-report-receipt-module",
+        "pattern": "Receipt Builder",
+        "source": "packages/cli/src/commands/team.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This card does not promote Team Agents to production/default by itself. Team promotion still depends on real paired cost/time/quality evidence and remains promotion-ineligible when measurement is incomplete.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0029-team-command-facade-atomization.task.md",
+    "sectionTitle": "TASK-RFT-0029",
+    "headingLine": 96,
+    "hash": "1983297ae1330f06",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0029-team-command-facade-atomization.task.md",
+      "planningCommitSha": "b880819df28bfb0f76425232fd3a5e34a1b10cf1",
+      "contentDigest": "sha256:1983297ae1330f0693a285757004af67610e80b19e324d7c792a9c108d935eaf",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T10:44:14.819Z"
+    }
+  },
+  "importedAt": "2026-07-15T10:44:14.819Z",
+  "lastTransitionId": "2026-07-15T10-51-21-453Z-scope-amendment-6d39dcb93718",
+  "lastTransitionAt": "2026-07-15T10:51:21.453Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0029",
+  "reservedAt": "2026-07-15T10:44:21.305Z",
+  "promotedAt": "2026-07-15T10:44:21.307Z",
+  "claim": {
+    "actorId": "codex-task-rft-0029",
+    "leaseId": "lease-0db08303c455",
+    "claimedAt": "2026-07-15T10:44:21.311Z",
+    "heartbeatAt": "2026-07-15T10:44:21.311Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0029.*",
+      ".atm/history/task-events/TASK-RFT-0029/**",
+      ".atm/history/tasks/TASK-RFT-0029.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/**/*.ts",
+      "packages/cli/src/commands/team/**/*.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/packages/cli/dist/commands/team.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/rft-atomization-rollout.test.ts",
+      "scripts/validate-team-agents.ts",
+      "scripts/validators/team-agents/**/*.ts",
+      "tests/cli/team-*.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T10:44:21.311Z",
+  "startedByActor": "codex-task-rft-0029",
+  "startedBySessionId": "session-20260715104421-codex-task-rft-0029-TASK-RFT-0029-a11d7609ef",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0029",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0029.*",
+      ".atm/history/task-events/TASK-RFT-0029/**",
+      ".atm/history/tasks/TASK-RFT-0029.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team.ts",
+      "packages/cli/src/commands/team/__tests__/**/*.ts",
+      "packages/cli/src/commands/team/**/*.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/packages/cli/dist/commands/team.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team.js",
+      "release/atm-root-drop/packages/cli/src/commands/team.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/rft-atomization-rollout.test.ts",
+      "scripts/validate-team-agents.ts",
+      "scripts/validators/team-agents/**/*.ts",
+      "tests/cli/team-*.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0029-team-command-facade-atomization.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0029-team-command-facade-atomization.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "64b01a3390db3454a3f576e3a5cfd9e298d04975dcb4873c0b0f530d8ef6b3f5",
+    "actorId": "codex-task-rft-0029",
+    "createdAt": "2026-07-15T10:44:27.617Z",
+    "status": "active"
+  }
+}

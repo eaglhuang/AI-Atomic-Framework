@@ -1,0 +1,110 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0029",
+  "updatedAt": "2026-07-15T10:52:28.287Z",
+  "updatedBy": "codex-task-rft-0029",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+    "node --strip-types tests/cli/team-plan-contract.test.ts",
+    "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa90f7cc0de63fed293b3e17440bb4758b49868fb07bf1bdda78003f455f3fd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-agents-dogfood.test.ts"
+      ],
+      "generatedAt": "2026-07-15T10:48:50.925Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0417f19931ec9e0f813a64b2ac98c779d842771d785562f36833f74a301af69a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-command-facade-atomization.test.ts"
+      ],
+      "generatedAt": "2026-07-15T10:48:51.179Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e9b9837fe4bc2c616b29efe147c0746c3a5fa50c292c6f4a5504cd28c2b39477",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-plan-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-15T10:48:51.446Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-shadow-workspace.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8dd766202b7e5f150c1271e90b12b316138d86abede8d4f6f5b8afd15df07460",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-shadow-workspace.test.ts"
+      ],
+      "generatedAt": "2026-07-15T10:48:51.690Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-15T10:49:03.732Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:701ceabcf34f1b5faa7975db052a4d59c26dd33984d433c367fd2e1528c44c13",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-15T10:51:52.932Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-15T10:52:28.442Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "54846e1f671e7fec804c590fc84f57a0ed22f182",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

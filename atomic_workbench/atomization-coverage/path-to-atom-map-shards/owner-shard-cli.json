@@ -490,6 +490,69 @@
       "atom_id": "atm.task-direction-map",
       "capability": "isPathAllowedByScope is the quickfix/batch scope path matcher; explicitly NOT the SSOT for task direction allowed files (TASK-AAO-0012).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts",
+      "atom_id": "atm.team-command-facade",
+      "capability": "Thin Strangler Facade for Team CLI exports and command registry dispatch.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/command-registry.ts",
+      "atom_id": "atm.team-command-handler-registry",
+      "capability": "Deterministic Team subcommand to handler registry for bounded command extraction.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/plan-command.ts",
+      "atom_id": "atm.team-plan-command",
+      "capability": "Team plan command handler boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/start-command.ts",
+      "atom_id": "atm.team-start-command",
+      "capability": "Team start command handler boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/status-command.ts",
+      "atom_id": "atm.team-status-command",
+      "capability": "Team status query handler boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/execute-command.ts",
+      "atom_id": "atm.team-execute-command",
+      "capability": "Team execute command adapter-orchestrator boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/admission-command.ts",
+      "atom_id": "atm.team-admission-policy-module",
+      "capability": "Team admission and validation policy command boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/cost-command.ts",
+      "atom_id": "atm.team-cost-governance-module",
+      "capability": "Team cost governance command boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/report-command.ts",
+      "atom_id": "atm.team-report-receipt-module",
+      "capability": "Team report and receipt builder command boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
     }
   ]
 }
