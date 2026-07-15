@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0149",
+  "title": "Add true dual-Captain Broker spawn E2E",
+  "status": "running",
+  "milestone": "GOVOPT-Foundation-Gate",
+  "dependencies": [
+    "ATM-GOV-0128",
+    "ATM-GOV-0137",
+    "ATM-GOV-0145",
+    "ATM-GOV-0148"
+  ],
+  "acceptance": [
+    "The test must spawn ATM CLI processes, not call only in-process helpers.",
+    "Actor A must register or hold an RFT-like Team surface through the Broker registry: `packages/cli/src/commands/team-legacy.ts`, `packages/cli/src/commands/team/legacy/**/*.ts`, `tests/cli/team-*.test.ts`, and the atom-map owner shard.",
+    "Actor B must present a non-overlapping backlog item shard intent and receive `parallel-safe` / `allow` without manual index operations.",
+    "Actor B must present a generated backlog Markdown projection rebuild intent and receive a shared-surface block on the canonical generated projection key.",
+    "The fixture must fail if it is reduced to source-text inspection or a pure unit test that bypasses spawned CLI processes.",
+    "`pre-team-foundation-gate` must keep executing this E2E directly."
+  ],
+  "deliverables": [
+    "tests/cli/pre-team-dual-captain-e2e.test.ts"
+  ],
+  "scopePaths": [
+    "tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "tests/cli/pre-team-foundation-gate.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-0037 and all RFT implementation surfaces.",
+    "release/atm-onefile/** and release/atm-root-drop/** artifact sync.",
+    "Runner-sync steward queue implementation.",
+    "Generated projection steward implementation."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the E2E fixture extension if it destabilizes the foundation gate.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.pre-team-foundation-gate-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "tests/cli/pre-team-foundation-gate.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0149-dual-captain-broker-spawn-e2e.task.md",
+    "sectionTitle": "ATM-GOV-0149",
+    "headingLine": 39,
+    "hash": "f51730fafeac2ca3",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0149-dual-captain-broker-spawn-e2e.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:f51730fafeac2ca3fe01d741d3670f21908f048e07a5aaed75bdde907f2eaeee",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T15:14:50.676Z"
+    }
+  },
+  "importedAt": "2026-07-15T15:14:50.676Z",
+  "lastTransitionId": "2026-07-15T15-15-01-368Z-claim-b68e119fb222",
+  "lastTransitionAt": "2026-07-15T15:15:01.368Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T15:14:56.225Z",
+  "promotedAt": "2026-07-15T15:14:56.227Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-b2fb8e3dcf1c",
+    "claimedAt": "2026-07-15T15:14:56.230Z",
+    "heartbeatAt": "2026-07-15T15:14:56.230Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0149.json",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T15:14:56.230Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715151456-codex-gpt-5-5-captain-ATM-GOV-0149-dec38999d5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0149",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0149.*",
+      ".atm/history/task-events/ATM-GOV-0149/**",
+      ".atm/history/tasks/ATM-GOV-0149.json",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "200cbb49c539eba34bd568fdc3898cab65c9140316cce413b0a995b74ae3283c",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T15:15:01.367Z",
+    "status": "active"
+  }
+}
