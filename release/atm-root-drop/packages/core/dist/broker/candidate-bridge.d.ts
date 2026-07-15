@@ -1,4 +1,5 @@
 import type { SharedSurfacesRecord, WriteIntent } from './types.ts';
+import { type GovernanceResourceProjectionOptions } from './global-resource-projection.ts';
 /**
  * Structural mirror of the plugin-sdk `AtomCandidate` schema (TASK-ASP-0001).
  *
@@ -25,6 +26,7 @@ export interface CandidateBridgeContext {
     readonly actorId: string;
     readonly baseCommit: string;
     readonly sharedSurfaces?: Partial<SharedSurfacesRecord>;
+    readonly governanceResources?: GovernanceResourceProjectionOptions;
     readonly requestedLane?: WriteIntent['requestedLane'];
 }
 /**

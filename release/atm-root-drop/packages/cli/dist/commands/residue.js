@@ -49,6 +49,11 @@ function readTaskStatus(cwd, taskId) {
         return null;
     }
 }
+function isActiveTaskStatus(status) {
+    if (!status)
+        return false;
+    return !['abandoned', 'cancelled', 'canceled', 'closed', 'done', 'released'].includes(status);
+}
 function classifyIndexState(gitStatus) {
     if (gitStatus === 'runtime')
         return 'runtime';
@@ -146,8 +151,68 @@ function classifyRecommendation(entry, ownerState, indexState) {
         requiredCommand: null
     };
 }
+function classifyGitIndexOverrideLease(cwd, normalized) {
+    if (!/^\.atm\/runtime\/git-index-leases\/[^/]+\.json$/i.test(normalized))
+        return null;
+    try {
+        const parsed = JSON.parse(readFileSync(path.join(cwd, normalized), 'utf8'));
+        if (parsed.schemaId !== 'atm.gitIndexOverrideLease.v1') {
+            return {
+                path: normalized,
+                verdict: 'manual-review',
+                reason: 'git-index lease file is not an atm.gitIndexOverrideLease.v1 document.',
+                ownerTaskId: null,
+                cleanupAction: null
+            };
+        }
+        const ownerTaskId = typeof parsed.taskId === 'string'
+            ? parsed.taskId.toUpperCase()
+            : typeof parsed.ownerTaskId === 'string'
+                ? parsed.ownerTaskId.toUpperCase()
+                : null;
+        const expiresAt = Date.parse(String(parsed.expiresAt ?? ''));
+        if (!Number.isFinite(expiresAt) || expiresAt > Date.now()) {
+            return {
+                path: normalized,
+                verdict: 'manual-review',
+                reason: 'git-index override lease is still active or has no valid expiry timestamp.',
+                ownerTaskId,
+                cleanupAction: null
+            };
+        }
+        const owner = readLockOwner(cwd, ownerTaskId, normalized);
+        if (owner.state === 'active' || isActiveTaskStatus(readTaskStatus(cwd, ownerTaskId))) {
+            return {
+                path: normalized,
+                verdict: 'manual-review',
+                reason: 'expired git-index override lease still belongs to an active task owner and must be reviewed by that owner.',
+                ownerTaskId,
+                cleanupAction: null
+            };
+        }
+        return {
+            path: normalized,
+            verdict: 'auto-clean-safe',
+            reason: 'expired git-index override lease has no active owner and is disposable runtime residue.',
+            ownerTaskId,
+            cleanupAction: 'remove'
+        };
+    }
+    catch {
+        return {
+            path: normalized,
+            verdict: 'manual-review',
+            reason: 'git-index override lease could not be parsed; fail closed for manual review.',
+            ownerTaskId: null,
+            cleanupAction: null
+        };
+    }
+}
 function normalizeWorkspaceResidueFinding(cwd, filePath, finding) {
     const normalized = normalizeRelativePath(filePath);
+    const gitIndexLease = classifyGitIndexOverrideLease(cwd, normalized);
+    if (gitIndexLease)
+        return gitIndexLease;
     if (/^\.atm\/runtime\/tmp-[^/]+\.(?:json|txt)$/i.test(normalized)) {
         return {
             path: normalized,
@@ -184,6 +249,7 @@ function normalizeWorkspaceResidueFinding(cwd, filePath, finding) {
 function listKnownRuntimeFiles(cwd) {
     const roots = [
         path.join(cwd, '.atm', 'runtime', 'broker-conflict-resolutions'),
+        path.join(cwd, '.atm', 'runtime', 'git-index-leases'),
         path.join(cwd, '.atm', 'runtime', 'git-push-attempts'),
         path.join(cwd, '.atm', 'runtime', 'incidents')
     ];

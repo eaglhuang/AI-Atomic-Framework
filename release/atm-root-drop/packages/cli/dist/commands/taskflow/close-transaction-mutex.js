@@ -1,6 +1,9 @@
 import { closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-export const DEFAULT_CLOSE_TRANSACTION_MUTEX_TTL_MS = 120_000;
+export const GOVERNED_GIT_COMMIT_DEFAULT_TIMEOUT_MS = 420_000;
+export const CLOSE_TRANSACTION_MUTEX_SAFETY_MARGIN_MS = 30_000;
+export const DEFAULT_CLOSE_TRANSACTION_MUTEX_TTL_MS = GOVERNED_GIT_COMMIT_DEFAULT_TIMEOUT_MS + CLOSE_TRANSACTION_MUTEX_SAFETY_MARGIN_MS;
+export const DEFAULT_CLOSE_TRANSACTION_MUTEX_TTL_REASON = 'covers governed git commit timeout plus close transaction safety margin';
 export function closeTransactionMutexPath(repoRoot, taskId) {
     const safeTaskId = taskId.replace(/[^A-Za-z0-9_.-]+/g, '_');
     return path.join(repoRoot, '.atm', 'runtime', 'close-transactions', `${safeTaskId}.lock.json`);
@@ -19,6 +22,8 @@ export function acquireCloseTransactionMutex(options) {
         ownerPid: process.pid,
         acquiredAt: new Date(nowMs).toISOString(),
         expiresAt: new Date(nowMs + ttlMs).toISOString(),
+        ttlMs,
+        ttlReason: DEFAULT_CLOSE_TRANSACTION_MUTEX_TTL_REASON,
         lockPath
     };
     let fd = null;

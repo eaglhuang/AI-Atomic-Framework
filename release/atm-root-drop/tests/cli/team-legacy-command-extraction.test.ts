@@ -7,6 +7,7 @@ const extractedLineLimit = 600;
 const legacyPreviousLineCount = 5405;
 
 const extractedFiles = [
+  'packages/cli/src/commands/team/legacy/runtime-contracts.ts',
   'packages/cli/src/commands/team/legacy/types.ts'
 ];
 

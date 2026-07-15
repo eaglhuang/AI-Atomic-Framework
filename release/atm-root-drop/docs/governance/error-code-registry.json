@@ -3,6 +3,64 @@
   "specVersion": "0.1.0",
   "entries": [
     {
+      "code": "ATM_BROKER_RUNNER_SYNC_RELEASED",
+      "category": "team-broker",
+      "shortDescription": "Runner-sync steward queue head was released after receipt-backed build/publication evidence.",
+      "commonCauses": [
+        "A queue-head runner-sync build completed and produced a receipt reference or digest."
+      ],
+      "remediation": [
+        "No remediation is required; inspect evidence.release.next for the next steward work item, if any."
+      ],
+      "retryable": false,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/broker.ts"
+    },
+    {
+      "code": "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
+      "category": "git-governance",
+      "shortDescription": "Another governed commit is currently finalizing the same branch.",
+      "commonCauses": [
+        "A concurrent captain or worker is inside the serialized branch commit queue.",
+        "A stale branch queue lock exists after an interrupted commit attempt."
+      ],
+      "remediation": [
+        "Run node atm.mjs git commit-status --actor <actor> --json to inspect the branchCommitQueueStatus owner and age.",
+        "If the owner is alive, wait for it to finish and retry the same governed commit command.",
+        "If the owner is stale or dead, inspect the lock path and current HEAD before cleaning it through the governed recovery lane."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs git commit-status --actor <actor> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/git-governance.ts"
+    },
+    {
+      "code": "ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED",
+      "category": "team-broker",
+      "shortDescription": "A Team Broker ownership conflict blocks commit bypass until a recorded conflict-resolution artifact and approval exist.",
+      "commonCauses": [
+        "A commit would bypass an active Team Broker cross-task mutation block.",
+        "A --no-verify or broker override path was attempted without broker-conflict resolution evidence."
+      ],
+      "remediation": [
+        "Resolve the ownership conflict through a paper-style broker conflict-resolution artifact.",
+        "Obtain the required backend.brokerConflictOverride approval only when a human has approved the override.",
+        "Retry the governed commit with --broker-conflict-resolution and the approved lease."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": true,
+      "relatedCommands": [
+        "node atm.mjs emergency approve --permission backend.brokerConflictOverride --actor <actor> --allowed-flag --broker-conflict-override --json",
+        "node atm.mjs git commit --actor <actor> --message \"<message>\" --broker-conflict-resolution <artifact> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/git-governance.ts"
+    },
+    {
       "code": "ATM_GIT_COMMIT_STDIN_PATHSPEC_ADD_ACTIVE",
       "category": "git-governance",
       "shortDescription": "A git add helper using stdin pathspecs is active and can make a governed commit appear hung.",
@@ -47,26 +105,6 @@
       "sourceOwner": "packages/cli/src/commands/git-governance.ts"
     },
     {
-      "code": "ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY",
-      "category": "git-governance",
-      "shortDescription": "Another governed commit is currently finalizing the same branch.",
-      "commonCauses": [
-        "A concurrent captain or worker is inside the serialized branch commit queue.",
-        "A stale branch queue lock exists after an interrupted commit attempt."
-      ],
-      "remediation": [
-        "Run node atm.mjs git commit-status --actor <actor> --json to inspect the branchCommitQueueStatus owner and age.",
-        "If the owner is alive, wait for it to finish and retry the same governed commit command.",
-        "If the owner is stale or dead, inspect the lock path and current HEAD before cleaning it through the governed recovery lane."
-      ],
-      "retryable": true,
-      "requiresHumanApproval": false,
-      "relatedCommands": [
-        "node atm.mjs git commit-status --actor <actor> --json"
-      ],
-      "sourceOwner": "packages/cli/src/commands/git-governance.ts"
-    },
-    {
       "code": "ATM_NEXT_TASK_SCOPE_NOT_FOUND",
       "category": "routing",
       "shortDescription": "ATM could not match the prompt to an imported task card or ledger task.",
@@ -89,24 +127,27 @@
       "sourceOwner": "packages/cli/src/commands/next.ts"
     },
     {
-      "code": "ATM_TASKS_AUDIT_WARNINGS",
-      "category": "task-ledger",
-      "shortDescription": "Task audit passed but found active warnings that should be reviewed before claiming a clean ledger.",
+      "code": "ATM_RUNNER_STALE_WRITE_REFUSED",
+      "category": "runner-mode",
+      "shortDescription": "ATM refused a frozen-runner write because the stable runner is older than source changes.",
       "commonCauses": [
-        "Planning-only done records have not been imported as target-repo closure evidence.",
-        "Static evidence exists without command-backed execution metadata."
+        "Source files changed after release/atm-onefile/atm.mjs was generated.",
+        "A write command such as task import, claim, close, or commit tried to use node atm.mjs while runnerMode.sourceDrift.syncRequired is true.",
+        "Another active captain owns the release/generated or release mirror surface, so rebuilding immediately would risk absorbing foreign work."
       ],
       "remediation": [
-        "Read activeFindings in the tasks audit JSON output.",
-        "Do not treat advisory output as a blocker unless the active task depends on the warned evidence.",
-        "Open a repair or import follow-up when the warning is in the current delivery path."
+        "If no other captain owns release surfaces, run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build and retry the frozen node atm.mjs write command.",
+        "If another captain owns release/generated or release mirrors, enqueue broker runner-sync work for the sealed source SHA and wait for the steward release receipt.",
+        "For read-only source-first validation only, use node atm.dev.mjs; do not use source-first writes to bypass frozen-runner governance."
       ],
       "retryable": true,
       "requiresHumanApproval": false,
       "relatedCommands": [
-        "node atm.mjs tasks audit --json"
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+        "node atm.mjs next --json",
+        "node atm.mjs broker runner-sync enqueue --task <task-id> --actor <actor> --sealed-source-sha <sha> --surface release/atm-onefile/atm.mjs --json"
       ],
-      "sourceOwner": "packages/cli/src/commands/tasks"
+      "sourceOwner": "packages/cli/src/commands/framework-development/closure-packet-schema.ts"
     },
     {
       "code": "ATM_RUNNER_SYNC_REQUIRED",
@@ -129,25 +170,172 @@
       "sourceOwner": "packages/cli/src/commands/runner-mode"
     },
     {
-      "code": "ATM_GIT_COMMIT_BROKER_CONFLICT_OVERRIDE_REQUIRED",
       "category": "team-broker",
-      "shortDescription": "A Team Broker ownership conflict blocks commit bypass until a recorded conflict-resolution artifact and approval exist.",
       "commonCauses": [
-        "A commit would bypass an active Team Broker cross-task mutation block.",
-        "A --no-verify or broker override path was attempted without broker-conflict resolution evidence."
+        "A runner-sync steward release was attempted with an invalid queue state or missing publication receipt.",
+        "A captain tried to release a runner-sync build that is not the current queue head or is not waiting on that steward work id."
       ],
       "remediation": [
-        "Resolve the ownership conflict through a paper-style broker conflict-resolution artifact.",
-        "Obtain the required backend.brokerConflictOverride approval only when a human has approved the override.",
-        "Retry the governed commit with --broker-conflict-resolution and the approved lease."
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json to inspect stewardWorkId, queuePosition, waitingTasks, and suggestedNextAction.",
+        "Only the queue-head steward work may be released after one build has produced a receipt reference or digest.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json, or wait for the current owner to release first."
       ],
       "retryable": true,
-      "requiresHumanApproval": true,
+      "requiresHumanApproval": false,
       "relatedCommands": [
-        "node atm.mjs emergency approve --permission backend.brokerConflictOverride --actor <actor> --allowed-flag --broker-conflict-override --json",
-        "node atm.mjs git commit --actor <actor> --message \"<message>\" --broker-conflict-resolution <artifact> --json"
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
       ],
-      "sourceOwner": "packages/cli/src/commands/git-governance.ts"
+      "sourceOwner": "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_FAILED",
+      "shortDescription": "Runner-sync steward release failed before ATM could classify a more specific release error."
+    },
+    {
+      "category": "team-broker",
+      "commonCauses": [
+        "A runner-sync steward release was attempted with an invalid queue state or missing publication receipt.",
+        "A captain tried to release a runner-sync build that is not the current queue head or is not waiting on that steward work id."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json to inspect stewardWorkId, queuePosition, waitingTasks, and suggestedNextAction.",
+        "Only the queue-head steward work may be released after one build has produced a receipt reference or digest.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json, or wait for the current owner to release first."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
+      ],
+      "sourceOwner": "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_INVALID",
+      "shortDescription": "Runner-sync steward release was invoked without a task id or steward work id."
+    },
+    {
+      "category": "team-broker",
+      "commonCauses": [
+        "A runner-sync steward release was attempted with an invalid queue state or missing publication receipt.",
+        "A captain tried to release a runner-sync build that is not the current queue head or is not waiting on that steward work id."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json to inspect stewardWorkId, queuePosition, waitingTasks, and suggestedNextAction.",
+        "Only the queue-head steward work may be released after one build has produced a receipt reference or digest.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json, or wait for the current owner to release first."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
+      ],
+      "sourceOwner": "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_NOT_FOUND",
+      "shortDescription": "The requested runner-sync steward work id is not present in the steward queue."
+    },
+    {
+      "category": "team-broker",
+      "commonCauses": [
+        "A runner-sync steward release was attempted with an invalid queue state or missing publication receipt.",
+        "A captain tried to release a runner-sync build that is not the current queue head or is not waiting on that steward work id."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json to inspect stewardWorkId, queuePosition, waitingTasks, and suggestedNextAction.",
+        "Only the queue-head steward work may be released after one build has produced a receipt reference or digest.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json, or wait for the current owner to release first."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
+      ],
+      "sourceOwner": "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_NOT_QUEUE_HEAD",
+      "shortDescription": "The requested runner-sync steward work is waiting behind another sealed source and cannot be released yet."
+    },
+    {
+      "category": "team-broker",
+      "commonCauses": [
+        "A runner-sync steward release was attempted with an invalid queue state or missing publication receipt.",
+        "A captain tried to release a runner-sync build that is not the current queue head or is not waiting on that steward work id."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json to inspect stewardWorkId, queuePosition, waitingTasks, and suggestedNextAction.",
+        "Only the queue-head steward work may be released after one build has produced a receipt reference or digest.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json, or wait for the current owner to release first."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
+      ],
+      "sourceOwner": "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_OWNER_MISMATCH",
+      "shortDescription": "The releasing task is not one of the tasks waiting on the requested runner-sync steward work id."
+    },
+    {
+      "category": "team-broker",
+      "commonCauses": [
+        "A runner-sync steward release was attempted with an invalid queue state or missing publication receipt.",
+        "A captain tried to release a runner-sync build that is not the current queue head or is not waiting on that steward work id."
+      ],
+      "remediation": [
+        "Run node atm.mjs broker runner-sync status --task <task-id> --json to inspect stewardWorkId, queuePosition, waitingTasks, and suggestedNextAction.",
+        "Only the queue-head steward work may be released after one build has produced a receipt reference or digest.",
+        "Retry release with node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json, or wait for the current owner to release first."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker runner-sync status --task <task-id> --json",
+        "node atm.mjs broker runner-sync release --task <task-id> --steward-work-id <id> --receipt-ref <path> --json"
+      ],
+      "sourceOwner": "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "code": "ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_REQUIRED",
+      "shortDescription": "Runner-sync steward release requires a build/publication receipt reference or digest before the queue head can be cleared."
+    },
+    {
+      "code": "ATM_TASKS_AUDIT_WARNINGS",
+      "category": "task-ledger",
+      "shortDescription": "Task audit passed but found active warnings that should be reviewed before claiming a clean ledger.",
+      "commonCauses": [
+        "Planning-only done records have not been imported as target-repo closure evidence.",
+        "Static evidence exists without command-backed execution metadata."
+      ],
+      "remediation": [
+        "Read activeFindings in the tasks audit JSON output.",
+        "Do not treat advisory output as a blocker unless the active task depends on the warned evidence.",
+        "Open a repair or import follow-up when the warning is in the current delivery path."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks audit --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks"
+    },
+    {
+      "code": "ATM_TEAM_TASK_REQUIRED",
+      "category": "team-agents",
+      "shortDescription": "A Team command that needs a task binding was invoked without --task <id>.",
+      "commonCauses": [
+        "The operator ran team plan, start, validate, patrol, or another task-scoped Team command without --task.",
+        "A copied Team command omitted the task id while retrying from a previous diagnostic."
+      ],
+      "remediation": [
+        "Rerun the command with --task <task-id> and the same actor/recipe options.",
+        "Use node atm.mjs next --prompt \"<current goal>\" --json when unsure which task should own the Team command.",
+        "Do not infer a task from dirty files; bind the Team command to the current ATM task ledger entry."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs team plan --task <task-id> --recipe <recipe-id> --json",
+        "node atm.mjs team start --task <task-id> --actor <actor> --recipe <recipe-id> --json",
+        "node atm.mjs next --prompt \"<current goal>\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/team-legacy.ts"
     }
   ]
 }

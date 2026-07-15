@@ -15,6 +15,7 @@ import { listTaskOwnedProtectedOverrideAuditFiles, resolveActorGitIdentityForCom
 import { resolvePlanningPathFromStored } from '../planning-repo-root.ts';
 import { CliError, quoteCliValue } from '../shared.ts';
 import { isPathAllowedByScope } from '../work-channels.ts';
+import { normalizeMarkdownPathDeclaration } from './markdown-paths.ts';
 import type { TeamContributionCompositionResult } from '../team/composer.ts';
 import {
   buildGitIndexLeaseParkPlan,
@@ -118,7 +119,7 @@ function uniqueSorted(values: readonly string[]): string[] {
 }
 
 function normalizeTaskflowRelativePath(filePath: string): string {
-  return filePath.trim().replace(/\\/g, '/').replace(/^\.\//, '');
+  return normalizeMarkdownPathDeclaration(filePath).replace(/^\.\//, '');
 }
 
 function normalizeRepoRelativePath(repoRoot: string, filePath: string): string {
@@ -290,12 +291,12 @@ function appendSealTrailers(messageText: string, receipt: TaskflowSealAndCommitR
 function extractTaskStringList(taskDocument: Record<string, unknown>, key: string): string[] {
   const value = taskDocument[key];
   return Array.isArray(value)
-    ? value.map((entry) => typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '').filter(Boolean)
+    ? value.map((entry) => typeof entry === 'string' ? normalizeMarkdownPathDeclaration(entry) : '').filter(Boolean)
     : [];
 }
 
 function isCanonicalTaskflowDeliverableCandidate(value: string): boolean {
-  const normalized = value.trim().replace(/\\/g, '/');
+  const normalized = normalizeMarkdownPathDeclaration(value);
   if (!normalized) return false;
   if (normalized.startsWith('.atm/')) return false;
   if (/[\\/]$/.test(normalized)) return false;

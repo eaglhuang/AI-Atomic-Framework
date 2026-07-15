@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { candidatesToWriteIntent, computeCandidateAtomCid } from '../candidate-bridge.js';
 import { calculateBrokerDecision } from '../decision.js';
+import { GOVERNANCE_BACKLOG_PROJECTION, RELEASE_MIRROR_ARTIFACT, RUNNER_SYNC_STEWARD_GENERATOR } from '../global-resource-projection.js';
 function deepFreeze(value) {
     if (value && typeof value === 'object') {
         for (const child of Object.values(value)) {
@@ -166,6 +167,23 @@ function testInputIsNotMutated() {
     assert.equal(JSON.stringify(candidate), before, 'bridge must treat candidates as read-only');
     console.log('ok: candidate input is not mutated (deep-frozen input accepted)');
 }
+function testGovernanceGlobalResourceProjectionIsMerged() {
+    const intent = candidatesToWriteIntent([
+        makeCandidate({
+            candidateId: 'projection:backlog',
+            filePath: 'docs/governance/atm-bug-and-optimization-backlog.md',
+            suggestedSourcePaths: ['release/atm-onefile/atm.mjs']
+        })
+    ], {
+        ...baseContext,
+        sharedSurfaces: { validators: ['npm:typecheck'] }
+    });
+    assert.deepEqual(intent.sharedSurfaces.generators, [RUNNER_SYNC_STEWARD_GENERATOR]);
+    assert.deepEqual(intent.sharedSurfaces.projections, [GOVERNANCE_BACKLOG_PROJECTION]);
+    assert.deepEqual(intent.sharedSurfaces.validators, ['npm:typecheck']);
+    assert.deepEqual(intent.sharedSurfaces.artifacts, [RELEASE_MIRROR_ARTIFACT]);
+    console.log('ok: candidate bridge merges global governance resource projection');
+}
 function testSdkCandidateAssignability() {
     const sdkCandidate = {
         candidateId: 'py:function:load_rows:12345678',
@@ -191,5 +209,6 @@ testParallelSafeScenario();
 testCidConflictScenario();
 testFileOverlapScenario();
 testInputIsNotMutated();
+testGovernanceGlobalResourceProjectionIsMerged();
 testSdkCandidateAssignability();
 console.log('all broker candidate-bridge tests passed');

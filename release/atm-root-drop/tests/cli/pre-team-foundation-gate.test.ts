@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -10,24 +11,27 @@ function read(relativePath: string): string {
   return readFileSync(absolutePath, 'utf8');
 }
 
-const commitBundleAssembly = read('packages/cli/src/commands/taskflow/commit-bundle-assembly.ts');
-const commitBundleSpec = read('packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts');
-const crashMatrixSpec = read('packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts');
-const runnerSyncSpec = read('tests/cli/runner-sync-foreign-dirty-owner.test.ts');
+function runTest(relativePath: string): void {
+  const absolutePath = path.join(root, relativePath);
+  assert.equal(existsSync(absolutePath), true, `${relativePath} must exist`);
+  const result = spawnSync(process.execPath, ['--strip-types', absolutePath], {
+    cwd: root,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  assert.equal(
+    result.status,
+    0,
+    `${relativePath} must pass directly, not via source-text inspection\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`
+  );
+}
+
 const validatorCatalog = read('scripts/validators.config.json');
 
-assert.match(commitBundleAssembly, /withCloseTransactionMutex/);
-assert.match(commitBundleSpec, /closeTransactionMutexPath/);
-assert.match(commitBundleSpec, /atm\.closeTransactionMutexLease\.v1/);
-
-assert.match(crashMatrixSpec, /makeKillAfterTargetCommitFixture/);
-assert.match(crashMatrixSpec, /terminateProcessTree/);
-assert.match(crashMatrixSpec, /kill-after-target commit should converge dirty planning closeback/);
-assert.match(crashMatrixSpec, /historical-delivery/);
-
-assert.match(runnerSyncSpec, /foreignNonReleaseWip/);
-assert.match(runnerSyncSpec, /ordinaryTaskReleaseAutoStageAllowed/);
-assert.match(runnerSyncSpec, /releaseWip/);
+runTest('tests/cli/pre-team-dual-captain-e2e.test.ts');
+runTest('packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts');
+runTest('packages/cli/src/commands/taskflow/__tests__/taskflow-close-crash-matrix.test.ts');
+runTest('tests/cli/runner-sync-foreign-dirty-owner.test.ts');
 
 const validators = JSON.parse(validatorCatalog) as {
   readonly validators?: ReadonlyArray<{ readonly name?: string; readonly entry?: string; readonly tags?: readonly string[] }>;

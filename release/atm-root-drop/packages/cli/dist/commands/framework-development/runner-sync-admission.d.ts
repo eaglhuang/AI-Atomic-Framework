@@ -3,6 +3,11 @@ export type RunnerSyncAdmissionReport = {
     readonly ok: boolean;
     readonly stewardActorId: string;
     readonly sealedSourceSha: string | null;
+    readonly runnerSyncSteward: {
+        readonly stewardWorkId: string;
+        readonly queuePosition: number;
+        readonly suggestedNextAction: string;
+    } | null;
     readonly foreignNonReleaseWip: readonly string[];
     readonly releaseWip: readonly string[];
     readonly ordinaryTaskReleaseAutoStageAllowed: false;
@@ -12,6 +17,11 @@ export declare function inspectRunnerSyncAdmission(input: {
     readonly cwd: string;
     readonly stewardActorId: string;
     readonly sealedSourceSha?: string | null;
+    readonly runnerSyncSteward?: {
+        readonly stewardWorkId: string;
+        readonly queuePosition: number;
+        readonly suggestedNextAction: string;
+    } | null;
     readonly dirtyFiles?: readonly string[] | null;
 }): RunnerSyncAdmissionReport;
 export declare function assertRunnerSyncAdmission(report: RunnerSyncAdmissionReport): void;

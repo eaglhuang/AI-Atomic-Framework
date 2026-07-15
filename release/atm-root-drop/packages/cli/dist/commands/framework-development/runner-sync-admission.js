@@ -8,6 +8,7 @@ export function inspectRunnerSyncAdmission(input) {
         ok: foreignNonReleaseWip.length === 0,
         stewardActorId: input.stewardActorId,
         sealedSourceSha: input.sealedSourceSha ?? null,
+        runnerSyncSteward: input.runnerSyncSteward ?? null,
         foreignNonReleaseWip,
         releaseWip,
         ordinaryTaskReleaseAutoStageAllowed: false,

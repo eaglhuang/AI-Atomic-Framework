@@ -13,6 +13,8 @@ import { defaultAdapterRegistry, resolveAdapter } from '../../../core/dist/broke
 import { planMutationBatch } from '../../../core/dist/broker/adapters/batch-planner.js';
 import { computeCasResult, hashContent } from '../../../core/dist/broker/adapters/cas.js';
 import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry } from '../../../core/dist/broker/shared-surface-queue.js';
+import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue } from '../../../core/dist/broker/runner-sync-steward-queue.js';
+import { cleanupGeneratedProjectionSteward, emptyGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild } from '../../../core/dist/broker/generated-projection-steward.js';
 import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision } from '../../../core/dist/broker/freeze.js';
 const defaultFallbackBrokerRunEvidenceRelativeDir = path.join('.atm', 'runtime', 'broker-collision-evidence', 'runs');
 export async function runBroker(argv) {
@@ -20,6 +22,198 @@ export async function runBroker(argv) {
     const registryPath = path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json');
     const sharedQueuePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
     const sharedFreezePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-freezes.json');
+    const runnerSyncQueuePath = path.join(options.cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json');
+    const projectionStewardPath = path.join(options.cwd, '.atm', 'runtime', 'generated-projection-steward.json');
+    if (options.action === 'runner-sync') {
+        if (options.runnerSyncAction === 'enqueue') {
+            if (!options.task) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --task <task-id>.', { exitCode: 2 });
+            }
+            if (!options.actorId) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --actor <actor-id>.', { exitCode: 2 });
+            }
+            if (!options.sealedSourceSha) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --sealed-source-sha <sha>.', { exitCode: 2 });
+            }
+            if (options.surfaces.length === 0) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires at least one --surface <path>.', { exitCode: 2 });
+            }
+            const result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+                taskId: options.task,
+                actorId: options.actorId,
+                sealedSourceSha: options.sealedSourceSha,
+                requestedSurfaces: options.surfaces,
+                ttlSeconds: options.ttlSeconds
+            });
+            writeRunnerSyncStewardQueue(runnerSyncQueuePath, result.queue);
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('info', 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
+                        status: result.status,
+                        queuePosition: result.queuePosition,
+                        stewardWorkId: result.stewardWorkId,
+                        waitingTasks: result.waitingTasks,
+                        suggestedNextAction: result.suggestedNextAction
+                    })
+                ],
+                evidence: {
+                    runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+                    runnerSync: result
+                }
+            });
+        }
+        if (options.runnerSyncAction === 'status') {
+            const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
+            const position = options.task ? explainRunnerSyncStewardPosition(queue, options.task) : null;
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('info', 'ATM_BROKER_RUNNER_SYNC_STATUS', `Runner-sync steward queue contains ${queue.groups.length} steward work item(s).`)
+                ],
+                evidence: {
+                    runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+                    queue,
+                    position
+                }
+            });
+        }
+        if (options.runnerSyncAction === 'cleanup') {
+            const cleanup = cleanupRunnerSyncStewardQueue(readRunnerSyncStewardQueue(runnerSyncQueuePath));
+            writeRunnerSyncStewardQueue(runnerSyncQueuePath, cleanup.queue);
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('info', 'ATM_BROKER_RUNNER_SYNC_CLEANUP', `Runner-sync steward cleanup released ${cleanup.staleReleases.length} stale request(s).`, {
+                        staleReleases: cleanup.staleReleases
+                    })
+                ],
+                evidence: {
+                    runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+                    cleanup
+                }
+            });
+        }
+        if (options.runnerSyncAction === 'release') {
+            if (!options.task) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --task <task-id>.', { exitCode: 2 });
+            }
+            if (!options.stewardWorkId) {
+                throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --steward-work-id <id>.', { exitCode: 2 });
+            }
+            try {
+                const release = releaseRunnerSyncStewardQueue(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+                    taskId: options.task,
+                    stewardWorkId: options.stewardWorkId,
+                    receiptRef: options.receiptRef,
+                    receiptDigest: options.receiptDigest
+                });
+                writeRunnerSyncStewardQueue(runnerSyncQueuePath, release.queue);
+                return makeResult({
+                    ok: true,
+                    command: 'broker',
+                    cwd: options.cwd,
+                    messages: [
+                        message('info', 'ATM_BROKER_RUNNER_SYNC_RELEASED', `Runner-sync steward work ${release.released.stewardWorkId} released for ${release.released.waitingTasks.length} waiting task(s).`, {
+                            stewardWorkId: release.released.stewardWorkId,
+                            waitingTasks: release.released.waitingTasks,
+                            nextStewardWorkId: release.next?.stewardWorkId ?? null,
+                            suggestedNextAction: release.suggestedNextAction
+                        })
+                    ],
+                    evidence: {
+                        runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+                        release
+                    }
+                });
+            }
+            catch (error) {
+                throw toRunnerSyncReleaseCliError(error);
+            }
+        }
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup, release', { exitCode: 2 });
+    }
+    if (options.action === 'projection') {
+        if (options.projectionAction === 'enqueue') {
+            if (!options.task) {
+                throw new CliError('ATM_CLI_USAGE', 'broker projection enqueue requires --task <task-id>.', { exitCode: 2 });
+            }
+            if (!options.actorId) {
+                throw new CliError('ATM_CLI_USAGE', 'broker projection enqueue requires --actor <actor-id>.', { exitCode: 2 });
+            }
+            if (!options.projectionKey) {
+                throw new CliError('ATM_CLI_USAGE', 'broker projection enqueue requires --projection-key <key>.', { exitCode: 2 });
+            }
+            if (options.sourceItems.length === 0) {
+                throw new CliError('ATM_CLI_USAGE', 'broker projection enqueue requires at least one --source-item <path>.', { exitCode: 2 });
+            }
+            const result = enqueueGeneratedProjectionRebuild(readGeneratedProjectionSteward(projectionStewardPath), {
+                taskId: options.task,
+                actorId: options.actorId,
+                projectionKey: options.projectionKey,
+                sourceItemPaths: options.sourceItems,
+                ttlSeconds: options.ttlSeconds
+            });
+            writeGeneratedProjectionSteward(projectionStewardPath, result.queue);
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('info', 'ATM_BROKER_PROJECTION_ENQUEUED', `Generated projection rebuild for ${result.projectionKey} is at position ${result.queuePosition}; owner is ${result.ownerTaskId}.`, {
+                        projectionKey: result.projectionKey,
+                        ownerTaskId: result.ownerTaskId,
+                        queuePosition: result.queuePosition,
+                        suggestedNextAction: result.suggestedNextAction
+                    })
+                ],
+                evidence: {
+                    generatedProjectionStewardPath: '.atm/runtime/generated-projection-steward.json',
+                    projection: result
+                }
+            });
+        }
+        if (options.projectionAction === 'status') {
+            const queue = readGeneratedProjectionSteward(projectionStewardPath);
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('info', 'ATM_BROKER_PROJECTION_STATUS', `Generated projection steward contains ${queue.queues.length} projection queue(s).`)
+                ],
+                evidence: {
+                    generatedProjectionStewardPath: '.atm/runtime/generated-projection-steward.json',
+                    queue
+                }
+            });
+        }
+        if (options.projectionAction === 'cleanup') {
+            const cleanup = cleanupGeneratedProjectionSteward(readGeneratedProjectionSteward(projectionStewardPath));
+            writeGeneratedProjectionSteward(projectionStewardPath, cleanup.queue);
+            return makeResult({
+                ok: true,
+                command: 'broker',
+                cwd: options.cwd,
+                messages: [
+                    message('info', 'ATM_BROKER_PROJECTION_CLEANUP', `Generated projection steward cleanup released ${cleanup.staleReleases.length} stale request(s).`, {
+                        staleReleases: cleanup.staleReleases
+                    })
+                ],
+                evidence: {
+                    generatedProjectionStewardPath: '.atm/runtime/generated-projection-steward.json',
+                    cleanup
+                }
+            });
+        }
+        throw new CliError('ATM_CLI_USAGE', 'broker projection supports: enqueue, status, cleanup', { exitCode: 2 });
+    }
     if (options.action === 'register') {
         if (!options.task) {
             throw new CliError('ATM_CLI_USAGE', 'broker register requires --task <task-id>.', { exitCode: 2 });
@@ -798,7 +992,7 @@ export async function runBroker(argv) {
             }
         });
     }
-    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+    throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, projection, plan-batch', { exitCode: 2 });
 }
 function readSharedSurfaceFreezeRecords(filePath) {
     if (!existsSync(filePath))
@@ -829,6 +1023,42 @@ function readSharedSurfaceQueues(filePath) {
 function writeSharedSurfaceQueues(filePath, queues) {
     mkdirSync(path.dirname(filePath), { recursive: true });
     writeFileSync(filePath, `${JSON.stringify({ schemaId: 'atm.brokerSharedSurfaceQueues.v1', queues }, null, 2)}\n`, 'utf8');
+}
+function readRunnerSyncStewardQueue(filePath) {
+    if (!existsSync(filePath))
+        return emptyRunnerSyncStewardQueue();
+    try {
+        return JSON.parse(readFileSync(filePath, 'utf8'));
+    }
+    catch {
+        return emptyRunnerSyncStewardQueue();
+    }
+}
+function writeRunnerSyncStewardQueue(filePath, queue) {
+    mkdirSync(path.dirname(filePath), { recursive: true });
+    writeFileSync(filePath, `${JSON.stringify(queue, null, 2)}\n`, 'utf8');
+}
+function toRunnerSyncReleaseCliError(error) {
+    const messageText = error instanceof Error ? error.message : String(error ?? '');
+    const match = /^(ATM_[A-Z0-9_]+):\s*(.+)$/.exec(messageText);
+    if (match) {
+        return new CliError(match[1], match[2], { exitCode: 1 });
+    }
+    return new CliError('ATM_RUNNER_SYNC_STEWARD_RELEASE_FAILED', messageText || 'Runner-sync steward release failed.', { exitCode: 1 });
+}
+function readGeneratedProjectionSteward(filePath) {
+    if (!existsSync(filePath))
+        return emptyGeneratedProjectionSteward();
+    try {
+        return JSON.parse(readFileSync(filePath, 'utf8'));
+    }
+    catch {
+        return emptyGeneratedProjectionSteward();
+    }
+}
+function writeGeneratedProjectionSteward(filePath, queue) {
+    mkdirSync(path.dirname(filePath), { recursive: true });
+    writeFileSync(filePath, `${JSON.stringify(queue, null, 2)}\n`, 'utf8');
 }
 function updateSharedSurfaceQueues(input) {
     const queues = readSharedSurfaceQueues(input.queuePath);
@@ -1194,11 +1424,20 @@ function parseBrokerArgs(argv) {
         proposalAction: null,
         stewardAction: null,
         runtimeAction: null,
+        runnerSyncAction: null,
+        projectionAction: null,
         task: null,
         actorId: null,
+        sealedSourceSha: null,
+        stewardWorkId: null,
+        receiptRef: null,
+        receiptDigest: null,
+        projectionKey: null,
         intentFile: null,
         freezeId: null,
         ttlSeconds: 1800,
+        surfaces: [],
+        sourceItems: [],
         proposalFiles: [],
         proposalIds: [],
         proposalIdPositional: null,
@@ -1226,6 +1465,41 @@ function parseBrokerArgs(argv) {
         }
         if (arg === '--actor') {
             state.actorId = requireValue(argv, index, '--actor');
+            index += 1;
+            continue;
+        }
+        if (arg === '--sealed-source-sha') {
+            state.sealedSourceSha = requireValue(argv, index, '--sealed-source-sha');
+            index += 1;
+            continue;
+        }
+        if (arg === '--steward-work-id') {
+            state.stewardWorkId = requireValue(argv, index, '--steward-work-id');
+            index += 1;
+            continue;
+        }
+        if (arg === '--receipt-ref' || arg === '--receipt') {
+            state.receiptRef = requireValue(argv, index, arg);
+            index += 1;
+            continue;
+        }
+        if (arg === '--receipt-digest') {
+            state.receiptDigest = requireValue(argv, index, '--receipt-digest');
+            index += 1;
+            continue;
+        }
+        if (arg === '--projection-key') {
+            state.projectionKey = requireValue(argv, index, '--projection-key');
+            index += 1;
+            continue;
+        }
+        if (arg === '--surface') {
+            state.surfaces.push(requireValue(argv, index, '--surface'));
+            index += 1;
+            continue;
+        }
+        if (arg === '--source-item') {
+            state.sourceItems.push(requireValue(argv, index, '--source-item'));
             index += 1;
             continue;
         }
@@ -1318,6 +1592,12 @@ function parseBrokerArgs(argv) {
         else if (state.action === 'runtime' && !state.runtimeAction) {
             state.runtimeAction = arg;
         }
+        else if (state.action === 'runner-sync' && !state.runnerSyncAction) {
+            state.runnerSyncAction = arg;
+        }
+        else if (state.action === 'projection' && !state.projectionAction) {
+            state.projectionAction = arg;
+        }
         else {
             throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
         }
@@ -1333,11 +1613,20 @@ function parseBrokerArgs(argv) {
         proposalAction: state.proposalAction,
         stewardAction: state.stewardAction,
         runtimeAction: state.runtimeAction,
+        runnerSyncAction: state.runnerSyncAction,
+        projectionAction: state.projectionAction,
         task: state.task,
         actorId: state.actorId,
+        sealedSourceSha: state.sealedSourceSha,
+        stewardWorkId: state.stewardWorkId,
+        receiptRef: state.receiptRef,
+        receiptDigest: state.receiptDigest,
+        projectionKey: state.projectionKey,
         intentFile: state.intentFile,
         freezeId: state.freezeId,
         ttlSeconds: state.ttlSeconds,
+        surfaces: state.surfaces,
+        sourceItems: state.sourceItems,
         proposalFiles: state.proposalFiles,
         proposalIds,
         proposalStorePath: state.proposalStorePath,

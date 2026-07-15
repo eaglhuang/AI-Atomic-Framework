@@ -1,11 +1,5 @@
 import { createHash } from 'node:crypto';
-const emptySharedSurfaces = {
-    generators: [],
-    projections: [],
-    registries: [],
-    validators: [],
-    artifacts: []
-};
+import { emptyGovernanceSharedSurfaces, mergeSharedSurfaces, projectGovernanceSharedSurfacesFromPaths } from './global-resource-projection.js';
 /**
  * Convert discovered atom candidates into a well-formed `WriteIntent` for
  * `calculateBrokerDecision()` (TASK-ASP-0004). Pure and deterministic: no
@@ -28,6 +22,7 @@ export function candidatesToWriteIntent(candidates, ctx) {
             candidate.filePath,
             ...(candidate.suggestedSourcePaths ?? [])
         ]).map(normalizePath))].sort();
+    const projectedSharedSurfaces = projectGovernanceSharedSurfacesFromPaths(targetFiles, ctx.governanceResources);
     return {
         schemaId: 'atm.writeIntent.v1',
         specVersion: '0.1.0',
@@ -37,7 +32,7 @@ export function candidatesToWriteIntent(candidates, ctx) {
         baseCommit: ctx.baseCommit,
         targetFiles,
         atomRefs,
-        sharedSurfaces: { ...emptySharedSurfaces, ...ctx.sharedSurfaces },
+        sharedSurfaces: mergeSharedSurfaces(mergeSharedSurfaces(emptyGovernanceSharedSurfaces(), projectedSharedSurfaces), ctx.sharedSurfaces),
         requestedLane: ctx.requestedLane ?? 'auto'
     };
 }

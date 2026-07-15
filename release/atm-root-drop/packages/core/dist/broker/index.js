@@ -15,5 +15,8 @@ export * from './freeze.js';
 export * from './patch-envelope.js';
 export * from './failure-reason.js';
 export * from './conflict-key-overlap.js';
+export * from './global-resource-projection.js';
+export * from './runner-sync-steward-queue.js';
+export * from './generated-projection-steward.js';
 export * from './adapters/index.js';
 export * from './cross-task-mutation-guard.js';

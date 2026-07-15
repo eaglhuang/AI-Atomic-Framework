@@ -3,10 +3,11 @@ import { sanitizeTaskDirectionAllowedFiles, getCanonicalAllowedFilesForTask } fr
 import { resolveStoredPlanningPath } from '../planning-repo-root.js';
 import { relativePathFrom } from '../shared.js';
 import { normalizeRelativePath } from '../tasks/task-file-io-helpers.js';
+import { normalizeMarkdownPathDeclaration } from './markdown-paths.js';
 function extractTaskStringList(taskDocument, key) {
     const value = taskDocument[key];
     return Array.isArray(value)
-        ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
+        ? value.map((entry) => typeof entry === 'string' ? normalizeMarkdownPathDeclaration(entry) : '').filter(Boolean)
         : [];
 }
 function normalizeTaskScopePaths(cwd, values) {

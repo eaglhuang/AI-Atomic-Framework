@@ -1,5 +1,11 @@
 import { createHash } from 'node:crypto';
 import type { SharedSurfacesRecord, WriteIntent, WriteIntentAtomRef } from './types.ts';
+import {
+  emptyGovernanceSharedSurfaces,
+  mergeSharedSurfaces,
+  projectGovernanceSharedSurfacesFromPaths,
+  type GovernanceResourceProjectionOptions
+} from './global-resource-projection.ts';
 
 /**
  * Structural mirror of the plugin-sdk `AtomCandidate` schema (TASK-ASP-0001).
@@ -28,16 +34,9 @@ export interface CandidateBridgeContext {
   readonly actorId: string;
   readonly baseCommit: string;
   readonly sharedSurfaces?: Partial<SharedSurfacesRecord>;
+  readonly governanceResources?: GovernanceResourceProjectionOptions;
   readonly requestedLane?: WriteIntent['requestedLane'];
 }
-
-const emptySharedSurfaces: SharedSurfacesRecord = {
-  generators: [],
-  projections: [],
-  registries: [],
-  validators: [],
-  artifacts: []
-};
 
 /**
  * Convert discovered atom candidates into a well-formed `WriteIntent` for
@@ -68,6 +67,7 @@ export function candidatesToWriteIntent(
       ...(candidate.suggestedSourcePaths ?? [])
     ]).map(normalizePath)
   )].sort();
+  const projectedSharedSurfaces = projectGovernanceSharedSurfacesFromPaths(targetFiles, ctx.governanceResources);
 
   return {
     schemaId: 'atm.writeIntent.v1',
@@ -78,7 +78,10 @@ export function candidatesToWriteIntent(
     baseCommit: ctx.baseCommit,
     targetFiles,
     atomRefs,
-    sharedSurfaces: { ...emptySharedSurfaces, ...ctx.sharedSurfaces },
+    sharedSurfaces: mergeSharedSurfaces(
+      mergeSharedSurfaces(emptyGovernanceSharedSurfaces(), projectedSharedSurfaces),
+      ctx.sharedSurfaces
+    ),
     requestedLane: ctx.requestedLane ?? 'auto'
   };
 }
