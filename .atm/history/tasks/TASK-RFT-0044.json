@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0044",
+  "title": "Extract team legacy runtime governance surfaces",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`team-legacy.ts` is below 2000 physical lines after extraction.",
+    "Every new/extracted physical file in this card is <=600 physical lines.",
+    "Public exports used by existing Team Agents validators remain stable.",
+    "Atom-map shard has explicit coverage for every new extracted file.",
+    "No out-of-scope release/generated or foreign staged work is committed by this card."
+  ],
+  "deliverables": [
+    "`packages/cli/src/commands/team-legacy.ts`",
+    "`packages/cli/src/commands/team/legacy/broker-observability.ts`",
+    "`packages/cli/src/commands/team/legacy/runtime-governance.ts`",
+    "`tests/cli/team-legacy-runtime-governance-extraction.test.ts`",
+    "`atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json`"
+  ],
+  "tags": [],
+  "notes": "- Record line counts for `team-legacy.ts`, `broker-observability.ts`, and `runtime-governance.ts`.\n- If ATM close encounters foreign staged work from another captain/editor, use governed index isolation and do not unstage or revert it manually.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md",
+    "sectionTitle": "Extract team legacy runtime governance surfaces",
+    "headingLine": 14,
+    "hash": "074e7f303df3cec6",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md",
+      "planningCommitSha": "99c5ad7226cc6940e3a4dae39efd077ec6b9debb",
+      "contentDigest": "sha256:033a5b0a77594bb552b8a7aec65cf1acae1b61bda9437a33918267a3be38f151",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T15:43:32.680Z"
+    }
+  },
+  "importedAt": "2026-07-15T15:43:32.680Z",
+  "lastTransitionId": "2026-07-15T15-54-28-170Z-scope-amendment-3172b30ed4bf",
+  "lastTransitionAt": "2026-07-15T15:54:28.170Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0044",
+  "reservedAt": "2026-07-15T15:43:38.886Z",
+  "promotedAt": "2026-07-15T15:43:38.888Z",
+  "claim": {
+    "actorId": "codex-task-rft-0044",
+    "leaseId": "lease-c19831d7ae96",
+    "claimedAt": "2026-07-15T15:43:38.891Z",
+    "heartbeatAt": "2026-07-15T15:43:38.891Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0044.*",
+      ".atm/history/task-events/TASK-RFT-0044/**",
+      ".atm/history/tasks/TASK-RFT-0044.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/broker-observability.ts",
+      "packages/cli/src/commands/team/legacy/runtime-governance.ts",
+      "release/generated",
+      "tests/cli/team-legacy-runtime-governance-extraction.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T15:43:38.891Z",
+  "startedByActor": "codex-task-rft-0044",
+  "startedBySessionId": "session-20260715154338-codex-task-rft-0044-TASK-RFT-0044-9b4667b474",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0044",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0044.*",
+      ".atm/history/task-events/TASK-RFT-0044/**",
+      ".atm/history/tasks/TASK-RFT-0044.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-204.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/broker-observability.ts",
+      "packages/cli/src/commands/team/legacy/runtime-governance.ts",
+      "release/generated",
+      "tests/cli/team-legacy-runtime-governance-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0044-team-legacy-runtime-governance-surfaces.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4cc2735073c44c3296620befc204000de29a6d5beec9d018867b9d49fc6ea626",
+    "actorId": "codex-task-rft-0044",
+    "createdAt": "2026-07-15T15:43:45.069Z",
+    "status": "active"
+  }
+}
