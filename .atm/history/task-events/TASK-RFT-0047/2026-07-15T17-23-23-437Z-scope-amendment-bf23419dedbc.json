@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-23-23-437Z-scope-amendment-bf23419dedbc",
+  "taskId": "TASK-RFT-0047",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0047",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0047.json",
+  "taskSha256": "sha256:30d2f9f0191b6420347d117caeb3d6d3e263cdfd58a02992cf47d25b3143d2b5",
+  "createdAt": "2026-07-15T17:23:23.437Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0047 --actor codex-task-rft-0047 --add docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-005.json --reason \"TASK-RFT-0047 dogfood found that scope glob packages/cli/src/commands/next/route-resolution/**/*.ts was not projected into the taskflow commit bundle for new child modules; record ATM backlog optimization.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0047 dogfood found that scope glob packages/cli/src/commands/next/route-resolution/**/*.ts was not projected into the taskflow commit bundle for new child modules; record ATM backlog optimization."
+  }
+}

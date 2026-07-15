@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-22-41-446Z-scope-amendment-c475e5b8961a",
+  "taskId": "TASK-RFT-0047",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0047",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0047.json",
+  "taskSha256": "sha256:b504946db9137a5a08c71f0eff7b18c0df636a14e4e5e506062012aa151249ae",
+  "createdAt": "2026-07-15T17:22:41.446Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0047 --actor codex-task-rft-0047 --add \"packages/cli/src/commands/next/route-resolution/artifact-scope.ts,packages/cli/src/commands/next/route-resolution/intent.ts,packages/cli/src/commands/next/route-resolution/matching.ts,packages/cli/src/commands/next/route-resolution/pending-worktree.ts,packages/cli/src/commands/next/route-resolution/queue-inspection.ts,packages/cli/src/commands/next/route-resolution/runtime.ts,packages/cli/src/commands/next/route-resolution/task-card-discovery.ts\" --reason \"TASK-RFT-0047 commit bundle requires explicit child module paths because the route-resolution/**/*.ts scope glob was not projected into the governed delivery bundle.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0047 commit bundle requires explicit child module paths because the route-resolution/**/*.ts scope glob was not projected into the governed delivery bundle."
+  }
+}
