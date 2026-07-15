@@ -7,7 +7,8 @@ const extractedLineLimit = 600;
 const legacyPreviousLineCount = 4674;
 
 const extractedFiles = [
-  'packages/cli/src/commands/team/legacy/patrol-contracts.ts'
+  'packages/cli/src/commands/team/legacy/patrol-contracts.ts',
+  'packages/cli/src/commands/team/legacy/team-run-store.ts'
 ];
 
 for (const relativePath of extractedFiles) {
