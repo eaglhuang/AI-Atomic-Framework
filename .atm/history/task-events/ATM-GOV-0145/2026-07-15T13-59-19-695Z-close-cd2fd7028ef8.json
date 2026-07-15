@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T13-59-19-695Z-close-cd2fd7028ef8",
+  "taskId": "ATM-GOV-0145",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0145.json",
+  "taskSha256": "sha256:6b6755829f8ba9821767154bb1c341f3d0b521af712541477d858a291a46e790",
+  "createdAt": "2026-07-15T13:59:19.695Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0145 --actor codex-gpt-5-5-captain --status done --historical-delivery 06c484b6ad4054c57765d7cc0f2b4c26aa26b4ab",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0145.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T13:59:19.686Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0145.*",
+        ".atm/history/task-events/ATM-GOV-0145/**",
+        ".atm/history/tasks/ATM-GOV-0145.json",
+        "scripts/validators.config.json",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "tests/cli/pre-team-foundation-gate.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validators.config.json",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "tests/cli/pre-team-foundation-gate.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

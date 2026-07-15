@@ -1,6 +1,6 @@
 {
   "taskId": "ATM-GOV-0145",
-  "updatedAt": "2026-07-15T13:53:50.031Z",
+  "updatedAt": "2026-07-15T13:58:26.637Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -149,6 +149,108 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:becb73a1451d8e7e037df51e14a4436bf1dabc8eab3035cd71cb96442fd79c2a",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-5-captain",
+      "sessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+      "createdAt": "2026-07-15T13:56:56.471Z",
+      "details": {
+        "actorId": "codex-gpt-5-5-captain",
+        "sessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-team-foundation-gate-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:7d89227f012493acdb95d0903cd585826257e3a384613993e837d6b47eafd27d",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "06c484b6ad4054c57765d7cc0f2b4c26aa26b4ab",
+            "cacheKey": "sha256:6af4093cb1fc94be553e0b0b7e059e125df154c6e0a6a421a8cae5704c56080f",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:56:56.684Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d97cebf51a3311cea4d0dbf6498b178a03981e13f3348f215d256dd7f3e5e2c7",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-gpt-5-5-captain",
+      "sessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+      "createdAt": "2026-07-15T13:58:26.637Z",
+      "details": {
+        "actorId": "codex-gpt-5-5-captain",
+        "sessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-team-foundation-gate-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "7380ba9a2da2e8f4b15a72f9ef5e67f8eda6c1eb",
+            "cacheKey": "sha256:1905c03149e9db6e3bde00672f121886deac378a4fc33d7161138bf374727df1",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:58:26.839Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:767544dfd7dd0577c23160ffff1dcefd4e1e0ba268b1d4ec58d3937feca43451",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null
