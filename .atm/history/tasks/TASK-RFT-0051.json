@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0051",
+  "title": "Finish broker command facade below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-TEAM-0076",
+    "ATM-GOV-0154"
+  ],
+  "acceptance": [
+    "Reduce `packages/cli/src/commands/broker.ts` to at or below 600 physical lines.",
+    "Extract broker command contracts, persistence helpers, status/list/report rendering, cleanup, and mutation-admission command handlers into bounded modules under `packages/cli/src/commands/broker/`.",
+    "Keep every new or touched broker command module at or below 600 physical lines.",
+    "Preserve Broker CLI behavior for `status`, `list`, `admit`, `cleanup`, queue/freeze snapshots, and shared-surface coordination evidence.",
+    "Do not touch `release/**` artifacts or unrelated Team legacy / next command RFT surfaces."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/broker/**/*.ts",
+    "tests/cli/broker-command-facade-final-600.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/broker/**/*.ts",
+    "tests/cli/broker-command-facade-final-600.test.ts",
+    "tests/cli/pre-team-foundation-gate.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/broker-command-facade-final-600.test.ts",
+    "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.broker-command-facade",
+        "pattern": "Facade",
+        "source": "packages/cli/src/commands/broker.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- This is the final remaining >2,000-line source file after TASK-RFT-0048. Completing this card should make the current framework source tree free of TypeScript/JavaScript command files above 2,000 physical lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0051-broker-command-facade-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0051",
+    "headingLine": 42,
+    "hash": "7ac95a659d13932a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0051-broker-command-facade-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:7ac95a659d13932a82f81d8033e763b13234e1fd7f10fa3a4dac8bab4f87ee81",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T17:48:55.200Z"
+    }
+  },
+  "importedAt": "2026-07-15T17:48:55.200Z",
+  "lastTransitionId": "2026-07-15T17-58-13-738Z-scope-amendment-e2f4a7ffcb7f",
+  "lastTransitionAt": "2026-07-15T17:58:13.738Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0051",
+  "reservedAt": "2026-07-15T17:49:13.846Z",
+  "promotedAt": "2026-07-15T17:49:13.848Z",
+  "claim": {
+    "actorId": "codex-task-rft-0051",
+    "leaseId": "lease-6dbfdd5e0c21",
+    "claimedAt": "2026-07-15T17:49:13.851Z",
+    "heartbeatAt": "2026-07-15T17:49:13.851Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0051.*",
+      ".atm/history/task-events/TASK-RFT-0051/**",
+      ".atm/history/tasks/TASK-RFT-0051.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/**/*.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/mutation-helpers.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/plan-batch-action.ts",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/broker/types.ts",
+      "tests/cli/broker-command-facade-final-600.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T17:49:13.851Z",
+  "startedByActor": "codex-task-rft-0051",
+  "startedBySessionId": "session-20260715174913-codex-task-rft-0051-TASK-RFT-0051-7909808ba5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0051",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0051.*",
+      ".atm/history/task-events/TASK-RFT-0051/**",
+      ".atm/history/tasks/TASK-RFT-0051.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/**/*.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/mutation-helpers.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/plan-batch-action.ts",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/broker/types.ts",
+      "tests/cli/broker-command-facade-final-600.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0051-broker-command-facade-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0051-broker-command-facade-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "9a14ed4939d8eb68acc3e42b817a1eda0718a6037a53461cd9a7d9c83a7d019f",
+    "actorId": "codex-task-rft-0051",
+    "createdAt": "2026-07-15T17:49:19.723Z",
+    "status": "active"
+  }
+}
