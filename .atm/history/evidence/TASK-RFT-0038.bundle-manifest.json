@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0038",
+  "updatedAt": "2026-07-15T14:07:06.661Z",
+  "updatedBy": "codex-task-rft-0038",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-runtime-contract-extraction.test.ts",
+    "node --strip-types tests/cli/team-plan-contract.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0cc90aef4c898a9782fe75f10b7310ef91feafac8f57e39251bc11a4e0d78ae5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-legacy-command-extraction.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:06:48.188Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d28e733ed50ea0f03f6f3467e6298b5d85f4f88",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-legacy-runtime-contract-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2763ed7aa331f32d543270be7e5956fd51a5f903312f75b3d75fda36917c41e7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-legacy-runtime-contract-extraction.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:06:50.286Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d28e733ed50ea0f03f6f3467e6298b5d85f4f88",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-plan-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e9b9837fe4bc2c616b29efe147c0746c3a5fa50c292c6f4a5504cd28c2b39477",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-plan-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:06:53.142Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d28e733ed50ea0f03f6f3467e6298b5d85f4f88",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa90f7cc0de63fed293b3e17440bb4758b49868fb07bf1bdda78003f455f3fd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-agents-dogfood.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:06:55.920Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d28e733ed50ea0f03f6f3467e6298b5d85f4f88",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-15T14:07:06.779Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d28e733ed50ea0f03f6f3467e6298b5d85f4f88",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
