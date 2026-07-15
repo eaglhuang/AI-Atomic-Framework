@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-16-11-509Z-scope-amendment-285131b50bd5",
+  "taskId": "ATM-GOV-0154",
+  "action": "scope-amendment",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0154.json",
+  "taskSha256": "sha256:79913f6b04fc6124512a58a8baec4f6f2b04b27370f235fdf893b50936f928c8",
+  "createdAt": "2026-07-15T17:16:11.509Z",
+  "command": "node atm.mjs tasks scope add --task ATM-GOV-0154 --actor codex-gpt-5-5-captain --add \"docs/ERROR_CODES.md,docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-003.json\" --reason \"ATM-GOV-0154 acceptance requires regenerated error-code docs and closes the backlog item that opened this card.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "ATM-GOV-0154 acceptance requires regenerated error-code docs and closes the backlog item that opened this card."
+  }
+}

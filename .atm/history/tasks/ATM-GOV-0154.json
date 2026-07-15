@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0154",
+  "title": "Add runner-sync steward release command",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0150",
+    "ATM-GOV-0152"
+  ],
+  "acceptance": [
+    "Add a governed `broker runner-sync release` or equivalent source/frozen CLI route for a live queue-head steward work item.",
+    "Release must require task id, steward work id, and a receipt reference or receipt digest for the completed runner-sync build.",
+    "Release must clear the queue-head group, advance the next waiting group, and return owner, queue position, suggested next action, and empty-queue state when applicable.",
+    "Stale cleanup must remain separate from live release and must not silently remove a live queue-head owner.",
+    "Register `ATM_RUNNER_STALE_WRITE_REFUSED` in `docs/governance/error-code-registry.json`, regenerate error-code docs, and route its remediation through runner-sync steward guidance when active shared release surfaces exist.",
+    "Add tests for live release, wrong owner/work-id refusal, stale cleanup, and queue advancement.",
+    "Do not touch `TASK-RFT-0037`, `TASK-RFT-0045`, `packages/cli/src/commands/taskflow/__tests__/**`, or unrelated release artifacts as source delivery."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/broker.ts",
+    "docs/governance/error-code-registry.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/command-specs/broker.spec.ts",
+    "docs/governance/error-code-registry.json",
+    "tests/cli/runner-sync-steward-release.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "npm run generate:error-codes",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync.coalescing-steward-queue",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-sync.steward-release",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/command-specs/broker.spec.ts",
+        "docs/governance/error-code-registry.json",
+        "tests/cli/runner-sync-steward-release.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- This card was opened from `ATM-BUG-2026-07-16-003` after TASK-RFT-0046 preflight found that the source steward queue can enqueue/status/cleanup but cannot complete a live queue-head without hand-editing `.atm/runtime`.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0154-runner-sync-steward-release.task.md",
+    "sectionTitle": "ATM-GOV-0154",
+    "headingLine": 45,
+    "hash": "9ae681fc1aa5ac65",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0154-runner-sync-steward-release.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:9ae681fc1aa5ac65a8f04a156f2ac05ff4eb24b7ba66270305d8f501ebf4b6c7",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T17:13:45.171Z"
+    }
+  },
+  "importedAt": "2026-07-15T17:13:45.171Z",
+  "lastTransitionId": "2026-07-15T17-18-23-474Z-claim-de2597a753bb",
+  "lastTransitionAt": "2026-07-15T17:18:23.474Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T17:14:13.325Z",
+  "promotedAt": "2026-07-15T17:14:13.329Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-c0b24b4c9c56",
+    "claimedAt": "2026-07-15T17:18:17.777Z",
+    "heartbeatAt": "2026-07-15T17:18:17.777Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0154.json",
+      ".atm/history/evidence/ATM-GOV-0154.*",
+      ".atm/history/task-events/ATM-GOV-0154/**",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-003.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T17:14:13.333Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715171817-codex-gpt-5-5-captain-ATM-GOV-0154-fd380e3611",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0154",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0154.*",
+      ".atm/history/task-events/ATM-GOV-0154/**",
+      ".atm/history/tasks/ATM-GOV-0154.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-003.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c9f17938e0e5d4060335a05d594b1bb1458e8ab32eee18deec77d630de05fd9d",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T17:18:23.473Z",
+    "status": "active"
+  }
+}

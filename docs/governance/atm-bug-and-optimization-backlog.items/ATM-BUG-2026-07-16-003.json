@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-003",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in ATM-GOV-0154",
+  "area": "Broker runner-sync steward",
+  "finding": "The source runner-sync steward queue supports enqueue, status, and stale cleanup, but has no explicit release or complete subcommand for a live queue-head steward work item after the build is published.",
+  "expectedBehavior": "The Broker runner-sync steward lifecycle should expose a governed release/complete operation that records the steward receipt, clears the queue-head work item, and reports the next waiting tasks or empty queue without hand-editing .atm/runtime.",
+  "evidenceOrRepro": "During TASK-RFT-0046 preparation, frozen tasks import was blocked by ATM_RUNNER_STALE_WRITE_REFUSED. Source-first `node atm.dev.mjs broker runner-sync enqueue --task TASK-RFT-0046 ...` created queue-head `runner-sync-52858269`; `broker runner-sync cleanup` correctly released 0 stale requests, and `rg` confirmed `broker runner-sync supports: enqueue, status, cleanup` only.",
+  "followUp": "ATM-GOV-0154 imported and verified the governed `node atm.mjs broker runner-sync release --task <id> --steward-work-id <id> --receipt-ref <path> --json` route, live release tests, stale cleanup behavior, queue advancement, and ATM_RUNNER_STALE_WRITE_REFUSED registry guidance."
+}
