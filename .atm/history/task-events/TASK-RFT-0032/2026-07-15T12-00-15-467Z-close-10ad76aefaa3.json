@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T12-00-15-467Z-close-10ad76aefaa3",
+  "taskId": "TASK-RFT-0032",
+  "action": "close",
+  "actorId": "codex-task-rft-0032",
+  "sessionId": "session-20260715114505-codex-task-rft-0032-TASK-RFT-0032-0fe32d14ce",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0032.json",
+  "taskSha256": "sha256:3d96f4437cf0635d63a2a4787a0b96c27063747ccd610c72b2a173645e968c30",
+  "createdAt": "2026-07-15T12:00:15.467Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0032 --actor codex-task-rft-0032 --status done --historical-delivery 104b86e1bd5fb5e7ca984f06d04de661af5b2521",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715114505-codex-task-rft-0032-TASK-RFT-0032-0fe32d14ce",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0032.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "framework-development",
+      "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T12:00:15.461Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0032.*",
+        ".atm/history/task-events/TASK-RFT-0032/**",
+        ".atm/history/tasks/TASK-RFT-0032.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-195.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/**/*.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**",
+        "tests/cli/git-*.test.ts",
+        "tests/cli/git-governance-command-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/git-governance/**/*.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "tests/cli/git-*.test.ts",
+        "tests/cli/git-governance-command-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
