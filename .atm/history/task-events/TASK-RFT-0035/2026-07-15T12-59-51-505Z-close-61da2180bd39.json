@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T12-59-51-505Z-close-61da2180bd39",
+  "taskId": "TASK-RFT-0035",
+  "action": "close",
+  "actorId": "codex-task-rft-0035",
+  "sessionId": "session-20260715124530-codex-task-rft-0035-TASK-RFT-0035-c023ee3763",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0035.json",
+  "taskSha256": "sha256:93b6551e6e2c8d9eeeb1f3d6a7d4b59af98fe886ef2e021d7e5891f6e4cd0092",
+  "createdAt": "2026-07-15T12:59:51.505Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0035 --actor codex-task-rft-0035 --status done --historical-delivery e905934fa988c02309a03fb0c2dd457fcf94cab2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715124530-codex-task-rft-0035-TASK-RFT-0035-c023ee3763",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0035.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T12:59:51.498Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0035.*",
+        ".atm/history/task-events/TASK-RFT-0035/**",
+        ".atm/history/tasks/TASK-RFT-0035.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "release/atm-onefile/atm.mjs",
+        "release/atm-onefile/release-manifest.json",
+        "release/atm-root-drop/**",
+        "release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "scripts/validators/task-ledger/**/*.ts",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "tests/cli/task-ledger-*.test.ts",
+        "tests/cli/task-ledger-suite-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validators/task-ledger/**/*.ts",
+        "scripts/validators/task-ledger/suite-impl.ts",
+        "scripts/validators/task-ledger/suite-impl/implementation.ts",
+        "tests/cli/task-ledger-*.test.ts",
+        "tests/cli/task-ledger-suite-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

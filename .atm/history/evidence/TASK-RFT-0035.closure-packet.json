@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0035",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e905934fa988c02309a03fb0c2dd457fcf94cab2",
+  "governedTreeSha": "cbea18d2f89d2d8b5ab0951284fa8a40e5125776",
+  "targetCommitDelta": {
+    "currentCommitSha": "e905934fa988c02309a03fb0c2dd457fcf94cab2",
+    "parentCommitShas": [
+      "e905934fa988c02309a03fb0c2dd457fcf94cab2"
+    ],
+    "governedTreeSha": "cbea18d2f89d2d8b5ab0951284fa8a40e5125776",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0035.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0035.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl.ts",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-suite-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:372ac2fa7d5e30170ceca07ad68c376ee3aae2a433449e831cc3519b43aad51e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:7bc9be3733a7add76cb67afda7e4939ed999c8a51de2b2dad1fc51c7473bd70b",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run build",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:01d4755b9e1874e51e67ada7cab356f93f3a2da54649ba67fac7df7386826880",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T12:59:51.498Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0035.*",
+      ".atm/history/task-events/TASK-RFT-0035/**",
+      ".atm/history/tasks/TASK-RFT-0035.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "scripts/validators/task-ledger/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-*.test.ts",
+      "tests/cli/task-ledger-suite-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validators/task-ledger/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-*.test.ts",
+      "tests/cli/task-ledger-suite-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0035.json",
+  "closedAt": "2026-07-15T12:59:51.499Z",
+  "closedByActor": "codex-task-rft-0035",
+  "sessionId": "session-20260715124530-codex-task-rft-0035-TASK-RFT-0035-c023ee3763",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e905934fa988c02309a03fb0c2dd457fcf94cab2",
+    "taskMatchedFiles": [
+      "scripts/validators/task-ledger/suite-impl/implementation.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
