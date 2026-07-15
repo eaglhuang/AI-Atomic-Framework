@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.pathToAtomMapOwnerShard.v1",
+  "owner": "cli",
+  "shard": "cli-next",
+  "mappings": [
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts",
+      "atom_id": "atm.next-router-map",
+      "capability": "next-action routing, task scope resolution, and public decisionTrail contract",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts",
+      "atom_id": "atom-next-router",
+      "capability": "next selector / claim orchestrator: now treats unrelated untracked files as warning-only (ignoredUntrackedFiles) instead of hard-blocking claim (TASK-AAO-0011).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts",
+      "atom_id": "atm.task-ledger-governance-map",
+      "capability": "next routing applies classifyTaskDelivery; planning_repo authority + foreign target_repo emits ATM_NEXT_TASK_MIRROR_SYNC_REQUIRED instead of normal delivery playbook; next --claim refuses mirror-sync-only tasks with ATM_NEXT_CLAIM_MIRROR_SYNC_REQUIRED (TASK-AAO-0038).",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/intent-normalizers.ts",
+      "atom_id": "atm.cli-next-intent-resolver",
+      "capability": "Pure parsing/normalization helpers for next.ts intent resolution: frontmatter parse, status/intent/scope normalizers, list splitters",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/match-and-sort.ts",
+      "atom_id": "atm.cli-next-match-and-sort",
+      "capability": "Pure comparators, hashers, matchers, weights for next.ts task scoring and queue ordering",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/route-predicates.ts",
+      "atom_id": "atm.cli-next-route-predicates",
+      "capability": "Pure task lifecycle predicates: status routability, dependency satisfaction, claimability, prompt-scope and task mention checks for next.ts routing",
+      "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/route-resolution.ts",
+      "atom_id": "atm.next-route-resolution",
+      "capability": "Prompt/task-card route resolution, imported task queue hydration, task-card discovery, and route-scope matching extracted from next.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/prompt-results.ts",
+      "atom_id": "atm.next-route-resolution",
+      "capability": "Prompt-scoped next result builders for task route ready, import-required, queue, mirror-sync, and no-prompt route projections.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/prompt-result-contracts.ts",
+      "atom_id": "atm.next-prompt-result-contracts",
+      "capability": "Prompt-scoped next result contract helpers for queue, planning-card import, read-only miss, and profiler projections extracted from prompt-results.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0046"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/playbook-projection.ts",
+      "atom_id": "atm.next-playbook-projection",
+      "capability": "Channel playbook, active-work summary, governance readiness, legacy proposal, and next message projection extracted from next.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/view-projections.ts",
+      "atom_id": "atm.cli-next-view-projections",
+      "capability": "Pure view projection, hash, quoting, and dedup helpers for next.ts task candidate rendering",
+      "coverage_status": "active"
+    }
+  ]
+}

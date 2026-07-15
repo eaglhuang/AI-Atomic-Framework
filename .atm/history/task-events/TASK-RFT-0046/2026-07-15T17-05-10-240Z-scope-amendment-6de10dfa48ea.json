@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-05-10-240Z-scope-amendment-6de10dfa48ea",
+  "taskId": "TASK-RFT-0046",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0046",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0046.json",
+  "taskSha256": "sha256:077651d3fc2b1948082f8531241c186e57017aa210455e14695b6b2d5a11c3ad",
+  "createdAt": "2026-07-15T17:05:10.240Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0046 --actor codex-task-rft-0046 --add \"atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json,atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-next.json,atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json\" --reason \"Split CLI atom-map shard so every touched physical file stays below 600 lines\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Split CLI atom-map shard so every touched physical file stays below 600 lines"
+  }
+}

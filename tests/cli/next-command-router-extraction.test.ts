@@ -17,9 +17,15 @@ for (const filePath of extractedFiles) {
   );
 }
 
-const ownerShard = JSON.parse(readFileSync('atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json', 'utf8')) as {
-  mappings: Array<{ path_pattern: string; atom_id: string }>;
+const manifest = JSON.parse(readFileSync('atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json', 'utf8')) as {
+  shardPaths: string[];
 };
+const ownerShardMappings = manifest.shardPaths.flatMap((shardPath) => {
+  const shard = JSON.parse(readFileSync(shardPath, 'utf8')) as {
+    mappings: Array<{ path_pattern: string; atom_id: string }>;
+  };
+  return shard.mappings;
+});
 
 for (const pathPattern of [
   'packages/cli/src/commands/next/route-resolution.ts',
@@ -27,7 +33,7 @@ for (const pathPattern of [
   'packages/cli/src/commands/next/playbook-projection.ts'
 ]) {
   assert(
-    ownerShard.mappings.some((entry) => entry.path_pattern === pathPattern),
+    ownerShardMappings.some((entry) => entry.path_pattern === pathPattern),
     `${pathPattern} must be covered by the CLI atom map`
   );
 }

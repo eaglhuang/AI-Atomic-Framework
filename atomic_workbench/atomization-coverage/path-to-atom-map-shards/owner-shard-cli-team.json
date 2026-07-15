@@ -1,0 +1,196 @@
+{
+  "schemaId": "atm.pathToAtomMapOwnerShard.v1",
+  "owner": "cli",
+  "shard": "cli-team",
+  "mappings": [
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildAtomizationChecklist",
+      "atom_id": "team.plan-atomization-planner",
+      "capability": "Atomization planner advisory checklist for scope shape and split recommendations.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildMinimalTaskCrewBriefingContract",
+      "atom_id": "team.plan-crew-briefing-contract",
+      "capability": "Minimal crew briefing contract with required roles, stop conditions, and parallel advisory.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#buildTeamStatusResult",
+      "atom_id": "team.status-runtime-read",
+      "capability": "Read-only team run status surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#planTeamBrokerLane",
+      "atom_id": "team.plan-broker-lane",
+      "capability": "Broker lane evaluation and steward/composer routing for team plan/start.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#runTeam",
+      "atom_id": "team.cli-entry",
+      "capability": "Team CLI entry router for plan, start, status, and validate actions.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#validateTeamPermissionModel",
+      "atom_id": "team.recipe-permission-model",
+      "capability": "Recipe catalog validation and scoped permission lease planning.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts#writeTeamRun",
+      "atom_id": "team.start-runtime-state",
+      "capability": "Team run runtime record writer under .atm/runtime/team-runs.",
+      "coverage_status": "active",
+      "source_task": "TASK-TEAM-0027"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts",
+      "atom_id": "atm.team-command-facade",
+      "capability": "Thin Strangler Facade for Team CLI exports and command registry dispatch.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/command-registry.ts",
+      "atom_id": "atm.team-command-handler-registry",
+      "capability": "Deterministic Team subcommand to handler registry for bounded command extraction.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/plan-command.ts",
+      "atom_id": "atm.team-plan-command",
+      "capability": "Team plan command handler boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/start-command.ts",
+      "atom_id": "atm.team-start-command",
+      "capability": "Team start command handler boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/status-command.ts",
+      "atom_id": "atm.team-status-command",
+      "capability": "Team status query handler boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/execute-command.ts",
+      "atom_id": "atm.team-execute-command",
+      "capability": "Team execute command adapter-orchestrator boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/admission-command.ts",
+      "atom_id": "atm.team-admission-policy-module",
+      "capability": "Team admission and validation policy command boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/cost-command.ts",
+      "atom_id": "atm.team-cost-governance-module",
+      "capability": "Team cost governance command boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/report-command.ts",
+      "atom_id": "atm.team-report-receipt-module",
+      "capability": "Team report and receipt builder command boundary.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0029"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/types.ts",
+      "atom_id": "atm.team-legacy-types-catalog",
+      "capability": "Team legacy extracted type, recipe, roster, permission, runtime contract, and atom-boundary catalog for the team command strangler migration.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0030"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/runtime-contracts.ts",
+      "atom_id": "atm.team-runtime-contract-builder",
+      "capability": "Team legacy runtime contract, artifact handoff, retry budget, and rework route contract builders extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0038"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/patrol-contracts.ts",
+      "atom_id": "atm.team-patrol-contract-builder",
+      "capability": "Team patrol finding, severity, follow-up command, retry-budget, rework route, broker-governance, and artifact handoff result contract helpers extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0039"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/team-run-store.ts",
+      "atom_id": "atm.team-patrol-contract-builder",
+      "capability": "Team run store, compact status projection, lifecycle lease summaries, and lease conflict detail contracts extracted as the data boundary for Team patrol and lifecycle command surfaces.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0039"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/permission-lease-policy.ts",
+      "atom_id": "atm.team-permission-lease-policy",
+      "capability": "Team permission finding, recipe permission validation, lease validation, write-scope derivation, and suggested permission lease policy extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0040"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/provider-execution.ts",
+      "atom_id": "atm.team-provider-execution-orchestration",
+      "capability": "Team provider execution, direct role handoff context, vendor secret loading, provider observability event construction, and runtime provider routing extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0041"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/implementer-selector-policy.ts",
+      "atom_id": "atm.team-crew-decision-policy",
+      "capability": "Team roster projection and implementer selector policy extracted from the legacy command surface as part of the crew decision atom map.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0042"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/crew-decision-policy.ts",
+      "atom_id": "atm.team-crew-decision-policy",
+      "capability": "Team captain decision, lieutenant escalation, crew briefing, and atomization checklist policy extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0042"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+      "atom_id": "atm.team-plan-orchestration",
+      "capability": "Team plan actor resolution, broker lane planning, team plan assembly, runtime pilot projection, and governance runtime field policy extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0043"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/broker-observability.ts",
+      "atom_id": "atm.team-runtime-governance-surfaces",
+      "capability": "Team broker conflict UX, broker resolution command handling, runtime observability query projection, and runtime backend admission extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0044"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/runtime-governance.ts",
+      "atom_id": "atm.team-runtime-governance-surfaces",
+      "capability": "Team runtime contract selection, closure attestation, editor subagent bridge metadata, runtime normalization, and review signature governance extracted from the legacy command surface.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0044"
+    }
+  ]
+}

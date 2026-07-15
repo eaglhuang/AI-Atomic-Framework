@@ -1,0 +1,163 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0046",
+  "title": "Extract next prompt-result contracts below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0031"
+  ],
+  "acceptance": [
+    "Reduce `packages/cli/src/commands/next/prompt-results.ts` to at or below 600 physical lines.",
+    "Extract prompt-scoped result contract assembly into `packages/cli/src/commands/next/prompt-result-contracts.ts`.",
+    "Keep each new or touched next prompt-result module at or below 600 physical lines.",
+    "Preserve `node atm.mjs next --json` and `node atm.mjs next --prompt ... --json` behavior.",
+    "Add a focused regression that fails if `prompt-results.ts` or `prompt-result-contracts.ts` exceeds 600 lines.",
+    "Do not touch `TASK-RFT-0037`, `TASK-RFT-0045`, `packages/cli/src/commands/taskflow/__tests__/**`, or `release/**` artifacts."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next/prompt-results.ts",
+    "packages/cli/src/commands/next/prompt-result-contracts.ts",
+    "tests/cli/next-prompt-results-contract-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next/prompt-results.ts",
+    "packages/cli/src/commands/next/prompt-result-contracts.ts",
+    "tests/cli/next-prompt-results-contract-extraction.test.ts",
+    "tests/cli/next-command-router-extraction.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/next-prompt-results-contract-extraction.test.ts",
+    "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.next-prompt-result-contracts",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/next/prompt-results.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/next/prompt-results.ts",
+        "packages/cli/src/commands/next/prompt-result-contracts.ts",
+        "tests/cli/next-prompt-results-contract-extraction.test.ts",
+        "tests/cli/next-command-router-extraction.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "- This is a final-600 slice for the `next.ts` transitional extraction gap recorded after TASK-RFT-0031.\n- Follow-up cards remain required for `next.ts`, `route-resolution.ts`, and `playbook-projection.ts`.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0046-next-prompt-results-contract-extraction.task.md",
+    "sectionTitle": "TASK-RFT-0046",
+    "headingLine": 42,
+    "hash": "1c6ddfd8b4dc87ea",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0046-next-prompt-results-contract-extraction.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1c6ddfd8b4dc87ea6584cffdc27820ade262b25c0f2ee332bc616bf2da375180",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T17:00:11.264Z"
+    }
+  },
+  "importedAt": "2026-07-15T17:00:11.264Z",
+  "lastTransitionId": "2026-07-15T17-05-10-240Z-scope-amendment-6de10dfa48ea",
+  "lastTransitionAt": "2026-07-15T17:05:10.240Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0046",
+  "reservedAt": "2026-07-15T17:00:24.751Z",
+  "promotedAt": "2026-07-15T17:00:24.754Z",
+  "claim": {
+    "actorId": "codex-task-rft-0046",
+    "leaseId": "lease-ef676068f2d3",
+    "claimedAt": "2026-07-15T17:00:24.757Z",
+    "heartbeatAt": "2026-07-15T17:00:24.757Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0046.*",
+      ".atm/history/task-events/TASK-RFT-0046/**",
+      ".atm/history/tasks/TASK-RFT-0046.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-next.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/prompt-result-contracts.ts",
+      "packages/cli/src/commands/next/prompt-results.ts",
+      "tests/cli/next-command-router-extraction.test.ts",
+      "tests/cli/next-prompt-results-contract-extraction.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T17:00:24.757Z",
+  "startedByActor": "codex-task-rft-0046",
+  "startedBySessionId": "session-20260715170024-codex-task-rft-0046-TASK-RFT-0046-41d1d36ead",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0046",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0046.*",
+      ".atm/history/task-events/TASK-RFT-0046/**",
+      ".atm/history/tasks/TASK-RFT-0046.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-next.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/prompt-result-contracts.ts",
+      "packages/cli/src/commands/next/prompt-results.ts",
+      "tests/cli/next-command-router-extraction.test.ts",
+      "tests/cli/next-prompt-results-contract-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0046-next-prompt-results-contract-extraction.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0046-next-prompt-results-contract-extraction.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "35614dcfd05227b4edbc2c9753cd55e3e208f0e5df8bf0b607aae73239ff389c",
+    "actorId": "codex-task-rft-0046",
+    "createdAt": "2026-07-15T17:00:30.665Z",
+    "status": "active"
+  }
+}
