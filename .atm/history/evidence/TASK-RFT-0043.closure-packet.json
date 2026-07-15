@@ -1,0 +1,206 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0043",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bfd83deb898114272f7224a355a7b3fddbf98d43",
+  "governedTreeSha": "ae5429722affa0e53bf01cb638e1331dfd1d882c",
+  "targetCommitDelta": {
+    "currentCommitSha": "bfd83deb898114272f7224a355a7b3fddbf98d43",
+    "parentCommitShas": [
+      "bfd83deb898114272f7224a355a7b3fddbf98d43"
+    ],
+    "governedTreeSha": "ae5429722affa0e53bf01cb638e1331dfd1d882c",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0150.bundle-manifest.json",
+      ".atm/history/evidence/ATM-GOV-0150.json",
+      ".atm/history/task-events/ATM-GOV-0150/2026-07-15T15-31-25-134Z-import-d3876f8b4523.json",
+      ".atm/history/task-events/ATM-GOV-0150/2026-07-15T15-32-22-085Z-reserve-fe113a566ebd.json",
+      ".atm/history/task-events/ATM-GOV-0150/2026-07-15T15-32-22-087Z-promote-bdf9a309287c.json",
+      ".atm/history/task-events/ATM-GOV-0150/2026-07-15T15-32-27-294Z-claim-cd0f8bf8b000.json",
+      ".atm/history/tasks/ATM-GOV-0150.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team-legacy.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/candidate-bridge.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/candidate-bridge.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/candidate-bridge.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/team-legacy-command-extraction.test.ts",
+      "tests/cli/team-legacy-plan-orchestration-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0cc90aef4c898a9782fe75f10b7310ef91feafac8f57e39251bc11a4e0d78ae5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-legacy-crew-decision-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8af8894509d5d4c3eb8cf18babddbbb36df31a4154b52c65f44bda301fd62132",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa90f7cc0de63fed293b3e17440bb4758b49868fb07bf1bdda78003f455f3fd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/team-legacy-plan-orchestration-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:783ed9b286578ded76b44a6fa4c734d25e204827bfbc885723bfded823ccb002",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:921d76a7baa055e17f536bcfc1150ed356147b234e1f5469daad876f044fcd1e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-crew-decision-extraction.test.ts",
+    "node --strip-types tests/cli/team-legacy-plan-orchestration-extraction.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T15:41:43.177Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0043.*",
+      ".atm/history/task-events/TASK-RFT-0043/**",
+      ".atm/history/tasks/TASK-RFT-0043.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/**/*.ts",
+      "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+      "tests/cli/team-*.test.ts",
+      "tests/cli/team-legacy-plan-orchestration-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/**/*.ts",
+      "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+      "tests/cli/team-*.test.ts",
+      "tests/cli/team-legacy-plan-orchestration-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0043.json",
+  "closedAt": "2026-07-15T15:41:43.178Z",
+  "closedByActor": "codex-task-rft-0043",
+  "sessionId": "session-20260715153027-codex-task-rft-0043-TASK-RFT-0043-0fd8be06c7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "bfd83deb898114272f7224a355a7b3fddbf98d43",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/team-legacy.ts",
+      "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+      "tests/cli/team-legacy-plan-orchestration-extraction.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0043.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0043/2026-07-15T15-30-21-322Z-import-9fa3103796c1.json",
+      ".atm/history/task-events/TASK-RFT-0043/2026-07-15T15-30-27-424Z-reserve-665f412c42c5.json",
+      ".atm/history/task-events/TASK-RFT-0043/2026-07-15T15-30-27-427Z-promote-3160c583e7ff.json",
+      ".atm/history/task-events/TASK-RFT-0043/2026-07-15T15-30-29-296Z-claim-a60eb2e76786.json",
+      ".atm/history/task-events/TASK-RFT-0043/2026-07-15T15-30-36-291Z-scope-amendment-e6e61469e7b3.json",
+      ".atm/history/tasks/TASK-RFT-0043.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

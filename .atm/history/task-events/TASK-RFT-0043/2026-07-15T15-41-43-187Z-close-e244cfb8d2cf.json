@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T15-41-43-187Z-close-e244cfb8d2cf",
+  "taskId": "TASK-RFT-0043",
+  "action": "close",
+  "actorId": "codex-task-rft-0043",
+  "sessionId": "session-20260715153027-codex-task-rft-0043-TASK-RFT-0043-0fd8be06c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0043.json",
+  "taskSha256": "sha256:3aaa7b0ca4e62d0a0aeaa3da4ee2ccbcb4fa21b043932a43a11b16cc1caa4420",
+  "createdAt": "2026-07-15T15:41:43.187Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0043 --actor codex-task-rft-0043 --status done --historical-delivery bfd83deb898114272f7224a355a7b3fddbf98d43",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715153027-codex-task-rft-0043-TASK-RFT-0043-0fd8be06c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0043.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "node --strip-types tests/cli/team-legacy-command-extraction.test.ts",
+      "node --strip-types tests/cli/team-legacy-crew-decision-extraction.test.ts",
+      "node --strip-types tests/cli/team-legacy-plan-orchestration-extraction.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T15:41:43.177Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0043.*",
+        ".atm/history/task-events/TASK-RFT-0043/**",
+        ".atm/history/tasks/TASK-RFT-0043.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+        "tests/cli/team-*.test.ts",
+        "tests/cli/team-legacy-plan-orchestration-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "packages/cli/src/commands/team/legacy/plan-orchestration.ts",
+        "tests/cli/team-*.test.ts",
+        "tests/cli/team-legacy-plan-orchestration-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
