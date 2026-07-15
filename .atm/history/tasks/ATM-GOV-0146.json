@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0146",
+  "title": "Align close transaction mutex TTL with governed commit window",
+  "status": "running",
+  "milestone": "GOVOPT-Foundation-Gate",
+  "dependencies": [
+    "ATM-GOV-0129",
+    "ATM-GOV-0130",
+    "ATM-GOV-0145"
+  ],
+  "acceptance": [
+    "The default close transaction mutex TTL must be at least as long as the governed git wrapper timeout used by close commits, with a small safety margin.",
+    "The mutex lease must expose enough diagnostics to explain the configured TTL and remaining owner.",
+    "A focused test must prove the default TTL is not shorter than the protected commit window.",
+    "A focused test must prove an expired lease can still be reclaimed and a live lease still blocks a second closer.",
+    "Existing close bundle behavior must continue to release the mutex after a successful close commit.",
+    "No RFT task, RFT source file, or `TASK-RFT-0037` artifact may be modified."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+    "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-* cards and RFT source surfaces.",
+    "Team Agents production promotion or paired-run dogfood measurement.",
+    "Changing git commit timeout semantics outside close transaction mutex protection."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert TTL/heartbeat changes if close transaction admission regresses.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.close-transaction-mutex",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_EXTRACTION_FIRST_CANDIDATE",
+      "severity": "warning",
+      "field": "atomizationImpact",
+      "message": "Scope touches 1 module(s) over 600 lines but the card declares no atomizationImpact.extractionCandidates. Extraction-first is the ATM default: propose an atom/atom-map extraction (see .agents/skills/atm-atom-map-refactor), or record disposition \"inline\" with an inlineReason approved by a human.",
+      "candidates": [
+        "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts (673 lines)"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0146-close-mutex-ttl-heartbeat.task.md",
+    "sectionTitle": "ATM-GOV-0146",
+    "headingLine": 40,
+    "hash": "8a87e9b879aeb26e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0146-close-mutex-ttl-heartbeat.task.md",
+      "planningCommitSha": "6bcaba9bc1e1b9ae0352a981d40d5b597196411e",
+      "contentDigest": "sha256:8a87e9b879aeb26e05f5b22d477246116a9c6d25598f625222a893713f2859fa",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T14:10:36.416Z"
+    }
+  },
+  "importedAt": "2026-07-15T14:10:36.416Z",
+  "lastTransitionId": "2026-07-15T14-11-40-442Z-claim-fcc7cb782685",
+  "lastTransitionAt": "2026-07-15T14:11:40.442Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T14:11:34.579Z",
+  "promotedAt": "2026-07-15T14:11:34.582Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-b3e09766b304",
+    "claimedAt": "2026-07-15T14:11:34.586Z",
+    "heartbeatAt": "2026-07-15T14:11:34.586Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0146.json",
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T14:11:34.586Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715141134-codex-gpt-5-5-captain-ATM-GOV-0146-2f1980e8a3",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0146",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0146.*",
+      ".atm/history/task-events/ATM-GOV-0146/**",
+      ".atm/history/tasks/ATM-GOV-0146.json",
+      "packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3d7b65b017aae99a171e00f4bf7c6970ad31348b8004963f8a912091e8854fa8",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T14:11:40.440Z",
+    "status": "active"
+  }
+}

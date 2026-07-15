@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0146",
+  "updatedAt": "2026-07-15T14:12:04.587Z",
+  "updatedBy": "codex-gpt-5-5-captain",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+    "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:767956eb36eb81de4654084f96ecf2c84d05c0106084b3c66bdfd695d951b7da",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/close-transaction-mutex.spec.ts"
+      ],
+      "generatedAt": "2026-07-15T14:11:53.614Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "cdd8dec962b82251532b7fcbed859ec641b7e7a8",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-15T14:12:02.083Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "cdd8dec962b82251532b7fcbed859ec641b7e7a8",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:47cd1acfc6ff6c4636fcb9332c7745d057b1a1aa275c6a24f2d77cc66fb44b12",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts"
+      ],
+      "generatedAt": "2026-07-15T14:12:04.714Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "cdd8dec962b82251532b7fcbed859ec641b7e7a8",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
