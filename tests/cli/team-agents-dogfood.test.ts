@@ -32,6 +32,28 @@ type PromotionDecision = {
   listPriceCostIncreaseRatio: number;
 };
 
+type RealPairedSampleArtifact = {
+  schemaId: 'atm.teamDogfoodPairedSample.v1';
+  sampleId: string;
+  sampleKind: 'live-paired-run' | 'live-paired-run-blocked';
+  measurementStatus: 'measurement-incomplete' | 'complete';
+  promotionEligible: boolean;
+  providerBillableUsage: boolean;
+  pairedRunId: string | null;
+  pricingEvidenceKind: 'provider-bill' | 'catalog-estimate' | 'missing';
+  pricingCatalogVersion: string | null;
+  modelIdentities: readonly string[];
+  wallClock: {
+    baselineMs: number | null;
+    teamMs: number | null;
+  };
+  qualityOutcome: {
+    baselinePassed: boolean | null;
+    teamPassed: boolean | null;
+  };
+  missingEvidence: readonly string[];
+};
+
 const singleAgentBaseline: DogfoodRun = {
   label: 'single-agent-baseline',
   sampleKind: 'fixture-simulation',
@@ -164,6 +186,30 @@ const simulatedCheapTeam: DogfoodRun = {
 const simulatedCheapDecision = evaluatePromotion(singleAgentBaseline, simulatedCheapTeam);
 assert.equal(simulatedCheapDecision.promote, false, 'simulation-only samples must stay blocked even when cost caps pass');
 assert.ok(simulatedCheapDecision.reasons.includes('measurement-incomplete'));
+
+const realPairedSample = JSON.parse(
+  readFileSync('artifacts/generated/team-dogfood/real-paired-sample.json', 'utf8')
+) as RealPairedSampleArtifact;
+assert.equal(realPairedSample.schemaId, 'atm.teamDogfoodPairedSample.v1');
+assert.equal(realPairedSample.sampleKind, 'live-paired-run-blocked');
+assert.equal(realPairedSample.measurementStatus, 'measurement-incomplete');
+assert.equal(realPairedSample.promotionEligible, false, 'incomplete live dogfood evidence must never promote Team as default');
+assert.equal(realPairedSample.providerBillableUsage, false);
+assert.equal(realPairedSample.pairedRunId, null);
+assert.equal(realPairedSample.pricingEvidenceKind, 'missing');
+assert.equal(realPairedSample.pricingCatalogVersion, null);
+assert.equal(realPairedSample.wallClock.baselineMs, null);
+assert.equal(realPairedSample.wallClock.teamMs, null);
+assert.equal(realPairedSample.qualityOutcome.baselinePassed, null);
+assert.equal(realPairedSample.qualityOutcome.teamPassed, null);
+assert.ok(realPairedSample.missingEvidence.includes('provider-billable-usage'));
+assert.ok(realPairedSample.missingEvidence.includes('paired-wall-clock-sample'));
+assert.ok(realPairedSample.missingEvidence.includes('quality-outcome'));
+
+const liveBlocker = readFileSync('docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-004.json', 'utf8');
+assert.match(liveBlocker, /ATM-GOV-0153/);
+assert.match(liveBlocker, /provider billable usage/);
+assert.match(liveBlocker, /promotionEligible/);
 
 console.log(
   `[team-agents-dogfood] ok (promote=${decision.promote}, wallClockImprovement=${decision.wallClockImprovementRatio.toFixed(2)}, fullyLoadedCostIncrease=${decision.fullyLoadedCostIncreaseRatio.toFixed(2)})`

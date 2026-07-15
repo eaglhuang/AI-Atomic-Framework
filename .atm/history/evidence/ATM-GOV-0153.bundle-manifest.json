@@ -1,0 +1,40 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0153",
+  "updatedAt": "2026-07-15T17:04:20.935Z",
+  "updatedBy": "codex-gpt-5-5-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/governance-cost-bench.test.ts",
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa90f7cc0de63fed293b3e17440bb4758b49868fb07bf1bdda78003f455f3fd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-agents-dogfood.test.ts"
+      ],
+      "generatedAt": "2026-07-15T17:04:20.858Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "cddd779f7c74feaa58acfbf817ff36ec9c6237f9",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/governance-cost-bench.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4dc761bab6c143c738a6b35e5e316e5dad490442832a142bb4ddfdf0214716a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/governance-cost-bench.test.ts"
+      ],
+      "generatedAt": "2026-07-15T17:04:21.034Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "cddd779f7c74feaa58acfbf817ff36ec9c6237f9",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

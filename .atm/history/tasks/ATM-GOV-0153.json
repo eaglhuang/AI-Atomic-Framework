@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0153",
+  "title": "Collect real Team dogfood promotion evidence",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0140",
+    "ATM-GOV-0143",
+    "ATM-GOV-0144",
+    "TASK-RFT-0028"
+  ],
+  "acceptance": [
+    "Produce at least one real paired single-Agent versus Team Agents dogfood sample with provider billable usage, model identities, pricing catalog version, wall-clock time, and quality outcome.",
+    "Keep `measurement-incomplete` and `promotionEligible: false` when any provider usage, billing, pricing, wall-clock, or quality field is missing.",
+    "Team promotion to production/default is allowed only when the real paired sample proves cost and time thresholds from the plan.",
+    "Simulated fixture data may remain diagnostic but must not be counted as promotion evidence.",
+    "If paid/provider execution cannot be run in the current environment, close is forbidden; update backlog with the blocker and leave the task open."
+  ],
+  "deliverables": [
+    "artifacts/generated/team-dogfood/real-paired-sample.json",
+    "tests/cli/team-agents-dogfood.test.ts"
+  ],
+  "scopePaths": [
+    "tests/cli/team-agents-dogfood.test.ts",
+    "tests/cli/governance-cost-bench.test.ts",
+    "artifacts/generated/team-dogfood/**",
+    "docs/governance/atm-bug-and-optimization-backlog.items/**"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/team-agents-dogfood.test.ts",
+    "node --strip-types tests/cli/governance-cost-bench.test.ts"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.team-efficiency-controller",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.team-real-dogfood-promotion-evidence",
+        "pattern": "Result Contract Object",
+        "source": "tests/cli/team-agents-dogfood.test.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- This card closes the residual gap from TASK-RFT-0028, ATM-GOV-0126, and ATM-GOV-0140: fake or fixture cost data must never be treated as production Team promotion evidence.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0153-real-team-dogfood-promotion-evidence.task.md",
+    "sectionTitle": "ATM-GOV-0153",
+    "headingLine": 39,
+    "hash": "bf1d85eb0131f314",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0153-real-team-dogfood-promotion-evidence.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:bf1d85eb0131f314a5683ca95129232b0837f9234d10e069d4a0b618a0824104",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T17:01:38.123Z"
+    }
+  },
+  "importedAt": "2026-07-15T17:01:38.123Z",
+  "lastTransitionId": "2026-07-15T17-01-51-256Z-claim-e3a877c4d006",
+  "lastTransitionAt": "2026-07-15T17:01:51.256Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T17:01:45.580Z",
+  "promotedAt": "2026-07-15T17:01:45.583Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-73d4a2b3f662",
+    "claimedAt": "2026-07-15T17:01:45.589Z",
+    "heartbeatAt": "2026-07-15T17:01:45.589Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0153.json",
+      "artifacts/generated/team-dogfood/**",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "tests/cli/governance-cost-bench.test.ts",
+      "tests/cli/team-agents-dogfood.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T17:01:45.589Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715170145-codex-gpt-5-5-captain-ATM-GOV-0153-6938475a48",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0153",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0153.*",
+      ".atm/history/task-events/ATM-GOV-0153/**",
+      ".atm/history/tasks/ATM-GOV-0153.json",
+      "artifacts/generated/team-dogfood/**",
+      "docs/governance/atm-bug-and-optimization-backlog.items/**",
+      "tests/cli/governance-cost-bench.test.ts",
+      "tests/cli/team-agents-dogfood.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "2df873dccea6ed494603c674077e88568e051f249c6bb08ac8caba7e0411fb48",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T17:01:51.255Z",
+    "status": "active"
+  }
+}

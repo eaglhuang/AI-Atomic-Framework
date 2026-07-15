@@ -1,0 +1,34 @@
+{
+  "schemaId": "atm.teamDogfoodPairedSample.v1",
+  "specVersion": "0.1.0",
+  "sampleId": "ATM-GOV-0153-live-paired-sample-blocked-2026-07-16",
+  "taskId": "ATM-GOV-0153",
+  "generatedAt": "2026-07-16T00:00:00.000+08:00",
+  "sampleKind": "live-paired-run-blocked",
+  "measurementStatus": "measurement-incomplete",
+  "promotionEligible": false,
+  "providerBillableUsage": false,
+  "pairedRunId": null,
+  "pricingEvidenceKind": "missing",
+  "pricingCatalogVersion": null,
+  "modelIdentities": [],
+  "wallClock": {
+    "baselineMs": null,
+    "teamMs": null
+  },
+  "qualityOutcome": {
+    "baselinePassed": null,
+    "teamPassed": null
+  },
+  "missingEvidence": [
+    "provider-billable-usage",
+    "paired-wall-clock-sample",
+    "provider-model-identities",
+    "pricing-catalog-version",
+    "quality-outcome"
+  ],
+  "decision": {
+    "teamPromotionAllowed": false,
+    "reason": "Paid/provider paired execution was not available in the current local environment. ATM-GOV-0153 must remain open until a real paired sample with provider billable usage is collected."
+  }
+}
