@@ -1,0 +1,206 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0051",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "6ec5b4d66ab6f239e8775ee10982f2fa108e1081",
+  "governedTreeSha": "2fbaff7fd4b37224ad0063e3d9a0fe08d50864a2",
+  "targetCommitDelta": {
+    "currentCommitSha": "6ec5b4d66ab6f239e8775ee10982f2fa108e1081",
+    "parentCommitShas": [
+      "6ec5b4d66ab6f239e8775ee10982f2fa108e1081"
+    ],
+    "governedTreeSha": "2fbaff7fd4b37224ad0063e3d9a0fe08d50864a2",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0051.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0051.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/mutation-helpers.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/plan-batch-action.ts",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/broker/types.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/broker-command-facade-final-600.test.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/broker-command-facade-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0d2b7964b21b57fd899bc28d9c6c4275da3d1859fa3b3af3bdb984d0726ac338",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:39459826e550ab51ec93c9998775983ec7769a6a47c48edecfca9528422ceed0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:9520d570abb4568b02a4fe5ca2bcc4268332d9e3b277a15b8cfcf56ee250ae6d",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/broker-command-facade-final-600.test.ts",
+    "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T18:01:57.038Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0051.*",
+      ".atm/history/task-events/TASK-RFT-0051/**",
+      ".atm/history/tasks/TASK-RFT-0051.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/**/*.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/mutation-helpers.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/plan-batch-action.ts",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/broker/types.ts",
+      "tests/cli/broker-command-facade-final-600.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/**/*.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/mutation-helpers.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/plan-batch-action.ts",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/broker/types.ts",
+      "tests/cli/broker-command-facade-final-600.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0051.json",
+  "closedAt": "2026-07-15T18:01:57.038Z",
+  "closedByActor": "codex-task-rft-0051",
+  "sessionId": "session-20260715174913-codex-task-rft-0051-TASK-RFT-0051-7909808ba5",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "6ec5b4d66ab6f239e8775ee10982f2fa108e1081",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/broker/mutation-helpers.ts",
+      "packages/cli/src/commands/broker/parser.ts",
+      "packages/cli/src/commands/broker/persistence.ts",
+      "packages/cli/src/commands/broker/plan-batch-action.ts",
+      "packages/cli/src/commands/broker/proposal-actions.ts",
+      "packages/cli/src/commands/broker/registry-actions.ts",
+      "packages/cli/src/commands/broker/shared-surface.ts",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+      "packages/cli/src/commands/broker/types.ts",
+      "tests/cli/broker-command-facade-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0051.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0051/2026-07-15T17-48-55-406Z-import-ec98e9896783.json",
+      ".atm/history/task-events/TASK-RFT-0051/2026-07-15T17-49-13-846Z-reserve-40051472fadb.json",
+      ".atm/history/task-events/TASK-RFT-0051/2026-07-15T17-49-13-848Z-promote-a3c886772d54.json",
+      ".atm/history/task-events/TASK-RFT-0051/2026-07-15T17-49-19-704Z-claim-411ec69b4aab.json",
+      ".atm/history/task-events/TASK-RFT-0051/2026-07-15T17-58-13-738Z-scope-amendment-e2f4a7ffcb7f.json",
+      ".atm/history/tasks/TASK-RFT-0051.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

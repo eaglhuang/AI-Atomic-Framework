@@ -1,0 +1,85 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T18-01-57-044Z-close-afb8737ab375",
+  "taskId": "TASK-RFT-0051",
+  "action": "close",
+  "actorId": "codex-task-rft-0051",
+  "sessionId": "session-20260715174913-codex-task-rft-0051-TASK-RFT-0051-7909808ba5",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0051.json",
+  "taskSha256": "sha256:10684be4a638d77726a9db8bf56e93ea52fc1dd779eeebce3b405c03a66753aa",
+  "createdAt": "2026-07-15T18:01:57.044Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0051 --actor codex-task-rft-0051 --status done --historical-delivery 6ec5b4d66ab6f239e8775ee10982f2fa108e1081",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715174913-codex-task-rft-0051-TASK-RFT-0051-7909808ba5",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0051.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/broker-command-facade-final-600.test.ts",
+      "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T18:01:57.038Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0051.*",
+        ".atm/history/task-events/TASK-RFT-0051/**",
+        ".atm/history/tasks/TASK-RFT-0051.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/broker/**/*.ts",
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/broker/mutation-helpers.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/broker/persistence.ts",
+        "packages/cli/src/commands/broker/plan-batch-action.ts",
+        "packages/cli/src/commands/broker/proposal-actions.ts",
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/cli/src/commands/broker/shared-surface.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/cli/src/commands/broker/types.ts",
+        "tests/cli/broker-command-facade-final-600.test.ts",
+        "tests/cli/pre-team-foundation-gate.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/broker/**/*.ts",
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/broker/mutation-helpers.ts",
+        "packages/cli/src/commands/broker/parser.ts",
+        "packages/cli/src/commands/broker/persistence.ts",
+        "packages/cli/src/commands/broker/plan-batch-action.ts",
+        "packages/cli/src/commands/broker/proposal-actions.ts",
+        "packages/cli/src/commands/broker/registry-actions.ts",
+        "packages/cli/src/commands/broker/shared-surface.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/broker/steward-runtime-actions.ts",
+        "packages/cli/src/commands/broker/types.ts",
+        "tests/cli/broker-command-facade-final-600.test.ts",
+        "tests/cli/pre-team-foundation-gate.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

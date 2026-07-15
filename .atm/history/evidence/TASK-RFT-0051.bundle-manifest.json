@@ -1,13 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0051",
-  "updatedAt": "2026-07-15T17:57:44.531Z",
+  "updatedAt": "2026-07-15T18:01:17.224Z",
   "updatedBy": "codex-task-rft-0051",
   "freshValidationPasses": [
     "node --strip-types tests/cli/broker-command-facade-final-600.test.ts",
     "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -61,6 +62,19 @@
       "generatedAt": "2026-07-15T17:57:44.651Z",
       "runnerKind": "dev-source",
       "sourceCommit": "86cdfb9b95b1cedccaa677d29a6938afff777bdc",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-15T18:01:17.503Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6ec5b4d66ab6f239e8775ee10982f2fa108e1081",
       "cached": false
     }
   ],
