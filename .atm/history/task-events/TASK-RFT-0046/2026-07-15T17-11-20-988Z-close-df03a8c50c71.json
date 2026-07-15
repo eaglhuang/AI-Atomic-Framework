@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T17-11-20-988Z-close-df03a8c50c71",
+  "taskId": "TASK-RFT-0046",
+  "action": "close",
+  "actorId": "codex-task-rft-0046",
+  "sessionId": "session-20260715170024-codex-task-rft-0046-TASK-RFT-0046-41d1d36ead",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0046.json",
+  "taskSha256": "sha256:7b17542c679bdfbfb5a7e9018e57825e66c6d2b8234f7ee820cb76658e34ac6b",
+  "createdAt": "2026-07-15T17:11:20.988Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0046 --actor codex-task-rft-0046 --status done --historical-delivery 008d4d62f0d792a7b19611ea474dfa6104ec590c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715170024-codex-task-rft-0046-TASK-RFT-0046-41d1d36ead",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0046.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+      "node --strip-types tests/cli/next-prompt-results-contract-extraction.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T17:11:20.980Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0046.*",
+        ".atm/history/task-events/TASK-RFT-0046/**",
+        ".atm/history/tasks/TASK-RFT-0046.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-next.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-team.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/next/prompt-result-contracts.ts",
+        "packages/cli/src/commands/next/prompt-results.ts",
+        "tests/cli/next-command-router-extraction.test.ts",
+        "tests/cli/next-prompt-results-contract-extraction.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/prompt-result-contracts.ts",
+        "packages/cli/src/commands/next/prompt-results.ts",
+        "tests/cli/next-command-router-extraction.test.ts",
+        "tests/cli/next-prompt-results-contract-extraction.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
