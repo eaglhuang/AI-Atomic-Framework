@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0034",
+  "title": "Split closure-packet schema into bounded schema modules",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0033"
+  ],
+  "acceptance": [
+    "Split closure-packet schema constants and validators into bounded schema modules.",
+    "Preserve schema exports and current validation behavior.",
+    "Keep each new or touched module at or below 600 lines."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+    "tests/cli/closure-packet-schema-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+    "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+    "tests/cli/framework-*.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/closure-packet-schema-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.framework-closure-packet-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.closure-packet-schema-core",
+        "pattern": "Schema Module",
+        "source": "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0034-closure-packet-schema-extraction.task.md",
+    "sectionTitle": "TASK-RFT-0034",
+    "headingLine": 41,
+    "hash": "f78111f974a14b02",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0034-closure-packet-schema-extraction.task.md",
+      "planningCommitSha": "68243a66462e4516fa433c604ca1755ba2582c33",
+      "contentDigest": "sha256:f78111f974a14b02330cef4826de7a919b843a9911b8b3a0f3f2341891095cc8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T12:31:26.690Z"
+    }
+  },
+  "importedAt": "2026-07-15T12:31:26.690Z",
+  "lastTransitionId": "2026-07-15T12-38-57-415Z-scope-amendment-48b98ff4f5a8",
+  "lastTransitionAt": "2026-07-15T12:38:57.415Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0034",
+  "reservedAt": "2026-07-15T12:31:33.924Z",
+  "promotedAt": "2026-07-15T12:31:33.926Z",
+  "claim": {
+    "actorId": "codex-task-rft-0034",
+    "leaseId": "lease-ecee1df5841b",
+    "claimedAt": "2026-07-15T12:31:33.929Z",
+    "heartbeatAt": "2026-07-15T12:31:33.929Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0034.*",
+      ".atm/history/task-events/TASK-RFT-0034/**",
+      ".atm/history/tasks/TASK-RFT-0034.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts",
+      "tests/cli/framework-*.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T12:31:33.929Z",
+  "startedByActor": "codex-task-rft-0034",
+  "startedBySessionId": "session-20260715123133-codex-task-rft-0034-TASK-RFT-0034-26ab126329",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0034",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0034.*",
+      ".atm/history/task-events/TASK-RFT-0034/**",
+      ".atm/history/tasks/TASK-RFT-0034.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-197.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/framework-development/closure-packet-schema.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/**/*.ts",
+      "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "tests/cli/closure-packet-schema-extraction.test.ts",
+      "tests/cli/framework-*.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0034-closure-packet-schema-extraction.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0034-closure-packet-schema-extraction.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "dda8dc1f9e2a8f071727da09872adfb983c8b580cec7bda7461564703527f43e",
+    "actorId": "codex-task-rft-0034",
+    "createdAt": "2026-07-15T12:31:38.100Z",
+    "status": "active"
+  }
+}

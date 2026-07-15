@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T12-38-57-415Z-scope-amendment-48b98ff4f5a8",
+  "taskId": "TASK-RFT-0034",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0034",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0034.json",
+  "taskSha256": "sha256:01968a803693d118346703b4797fadaa89105f15491c72e8387088c0b8605f30",
+  "createdAt": "2026-07-15T12:38:57.415Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0034 --actor codex-task-rft-0034 --add \"packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts,release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts,release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js,release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.d.ts\" --reason \"TASK-RFT-0034 implementation module is the explicit moved schema carrier and retained release root-drop contains matching generated source/dist files.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0034 implementation module is the explicit moved schema carrier and retained release root-drop contains matching generated source/dist files."
+  }
+}
