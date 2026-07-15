@@ -1,6 +1,6 @@
 {
   "schemaId": "atm.tasksAuditWarningBaseline.v1",
-  "generatedAt": "2026-07-08T12:10:00.000Z",
+  "generatedAt": "2026-07-15T09:01:00.000Z",
   "rationale": "Acknowledged historical task-audit warnings that are diagnostic but not actionable for ordinary close/commit readiness. New warning paths or task ids remain active.",
   "acknowledgedFindings": [
     {
@@ -126,6 +126,22 @@
       "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
       "path": "atomic_workbench/graduation-gate/final-checklist.json",
       "reason": "Historical static atomization evidence retained as diagnostic material."
+    },
+    {
+      "code": "ATM_TASK_AUDIT_PLANNING_ONLY_DONE",
+      "path": ".atm/history/tasks/TASK-SKL-0001.json",
+      "taskId": "TASK-SKL-0001",
+      "reason": "Historical 3KLife planning-authority done mirror; not target-repo closure evidence for the framework repository."
+    },
+    {
+      "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+      "path": "atomic_workbench/evidence/bulk-closure-manifest-2026-07-11-mirror-sync.json",
+      "reason": "Historical static mirror-sync evidence retained as diagnostic material."
+    },
+    {
+      "code": "ATM_TASK_AUDIT_DRAFT_STATIC_EVIDENCE",
+      "path": "atomic_workbench/atomization-coverage/receipts/TASK-TEAM-0076/2026-07-12T01-58-05-464Z-broker.ts-sharedSurfaceQueue-registration.json",
+      "reason": "Historical static broker registration evidence retained as diagnostic material."
     }
   ]
 }
