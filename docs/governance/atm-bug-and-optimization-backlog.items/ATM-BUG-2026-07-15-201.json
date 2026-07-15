@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-201",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Governance / Multi-captain identity",
+  "finding": "Two Codex captain instances can operate on the same task using the same actor id and claim surface, making active-work warnings look like self-continuation instead of a distinct concurrent session.",
+  "expectedBehavior": "ATM should surface a distinct session or ticket identity for each captain instance and warn when another live session touches the same task, even if actor id and task id match.",
+  "evidenceOrRepro": "During TASK-RFT-0037, ATM surfaced active work and branch queue signals, but the shared codex-task-rft-0037 actor/claim made the other Codex captain indistinguishable from the current continuation until commit-status showed a separate in-flight owner PID and the user flagged the collision.",
+  "followUp": "Open a governance task to add session-key or ticket-level identity to broker status, next active-work summaries, branch commit queue diagnostics, and task claim warnings; include a regression where two sessions share actor/task but must be reported as distinct operators."
+}
