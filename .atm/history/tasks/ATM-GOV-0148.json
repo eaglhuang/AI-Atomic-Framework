@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0148",
+  "title": "Project global governance resources into unified Broker admission",
+  "status": "running",
+  "milestone": "GOVOPT-Foundation-Gate",
+  "dependencies": [
+    "ATM-GOV-0128",
+    "ATM-GOV-0137",
+    "ATM-GOV-0142"
+  ],
+  "acceptance": [
+    "Add a deterministic projection that maps global governance paths into the existing Broker shared-surface keyspace:",
+    "runner-sync/build as a coalescing steward generator.",
+    "release mirrors as release artifacts owned by the steward lane.",
+    "git index and branch commit queue as registries.",
+    "generated Markdown projections as projection surfaces.",
+    "Connect candidate-to-intent conversion to this projection so normal write intents inherit the same resource model.",
+    "The live RFT case is represented by a fixture: an active RFT Team surface and a second backlog item shard write must remain parallel-safe, while a second generated backlog projection rebuild must freeze on the projection key.",
+    "A runner-sync/build request must freeze against another runner-sync/build request and report the steward generator key, proving it is coalesced through one lane instead of split into per-file locks.",
+    "No TASK-RFT-0037 or TASK-RFT-0039 files are modified."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/global-resource-projection.ts",
+    "packages/core/src/broker/candidate-bridge.ts",
+    "packages/core/src/broker/__tests__/global-resource-projection.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/global-resource-projection.ts",
+    "packages/core/src/broker/candidate-bridge.ts",
+    "packages/core/src/broker/types.ts",
+    "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "packages/core/src/broker/__tests__/candidate-bridge.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-0037, TASK-RFT-0039, and any RFT source or test surface.",
+    "release/atm-onefile/** and release/atm-root-drop/** artifact sync.",
+    "Creating new lock semantics outside the Broker admission projection.",
+    "Changing generated projection stewardship implementation beyond projection metadata."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the global-resource projection and tests if admission parity regresses.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-unified-admission-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/global-resource-projection.ts",
+        "packages/core/src/broker/candidate-bridge.ts",
+        "packages/core/src/broker/types.ts",
+        "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+        "packages/core/src/broker/__tests__/candidate-bridge.test.ts"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0148-unified-global-resource-admission.task.md",
+    "sectionTitle": "ATM-GOV-0148",
+    "headingLine": 45,
+    "hash": "856633515b99c18e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0148-unified-global-resource-admission.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:856633515b99c18e52ce718174a5f83e405e468fa343c2300b8e10ea9d347265",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T14:40:02.384Z"
+    }
+  },
+  "importedAt": "2026-07-15T14:40:02.384Z",
+  "lastTransitionId": "2026-07-15T14-40-48-322Z-scope-amendment-3cc84bb3e04c",
+  "lastTransitionAt": "2026-07-15T14:40:48.322Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T14:40:42.709Z",
+  "promotedAt": "2026-07-15T14:40:42.712Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-64ca97385c7d",
+    "claimedAt": "2026-07-15T14:40:42.715Z",
+    "heartbeatAt": "2026-07-15T14:40:42.715Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/ATM-GOV-0148.*",
+      ".atm/history/task-events/ATM-GOV-0148/**",
+      ".atm/history/tasks/ATM-GOV-0148.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-202.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/global-resource-projection.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T14:40:42.715Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715144042-codex-gpt-5-5-captain-ATM-GOV-0148-ef79d0536c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0148",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0148.*",
+      ".atm/history/task-events/ATM-GOV-0148/**",
+      ".atm/history/tasks/ATM-GOV-0148.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-202.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "packages/core/src/broker/candidate-bridge.ts",
+      "packages/core/src/broker/global-resource-projection.ts",
+      "packages/core/src/broker/types.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "621247283bdde8c5c0d7fd52b0813a62f82adc40e73caf99781d2efc03f1e7d1",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T14:40:48.314Z",
+    "status": "active"
+  }
+}

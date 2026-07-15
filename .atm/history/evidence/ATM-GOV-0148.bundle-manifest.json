@@ -1,0 +1,96 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0148",
+  "updatedAt": "2026-07-15T14:48:13.981Z",
+  "updatedBy": "codex-gpt-5-5-captain",
+  "freshValidationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:77a3ac1f76638c227b3d0247b7717b2cdac4dda9cb66bc55ffb278823ceb2dd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:44:00.793Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dcc31d90cca7ec7904f29ca1f0cb0ef6485a6c68",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:24e1aa2db07279fa54dd690e1fabc8cca71fd1d9caa6f64ac81d641408a63bf2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/candidate-bridge.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:44:07.752Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dcc31d90cca7ec7904f29ca1f0cb0ef6485a6c68",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7d26c1e4df541319b710841a59e3492dc962ce106e6655c778472ad5826859a6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/conflict-matrix.test.ts"
+      ],
+      "generatedAt": "2026-07-15T14:46:15.681Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dcc31d90cca7ec7904f29ca1f0cb0ef6485a6c68",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-15T14:46:30.814Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dcc31d90cca7ec7904f29ca1f0cb0ef6485a6c68",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:d3813b110e7979ffde77e440690c2718b43eeca6536d52bd0cb08d3ef04f5205",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-15T14:47:10.829Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dcc31d90cca7ec7904f29ca1f0cb0ef6485a6c68",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-15T14:48:14.165Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "dcc31d90cca7ec7904f29ca1f0cb0ef6485a6c68",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
