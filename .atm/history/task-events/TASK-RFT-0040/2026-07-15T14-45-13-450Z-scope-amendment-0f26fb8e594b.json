@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T14-45-13-450Z-scope-amendment-0f26fb8e594b",
+  "taskId": "TASK-RFT-0040",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0040",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0040.json",
+  "taskSha256": "sha256:8b9144989452e29e913be02cd1d2a3e0a0b348824ae5cb92392de0bdbc99203f",
+  "createdAt": "2026-07-15T14:45:13.450Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0040 --actor codex-task-rft-0040 --add packages/cli/src/commands/team/legacy/permission-lease-policy.ts --reason \"TASK-RFT-0040 creates the extracted permission lease policy module; add explicit scope because close bundle does not expand new files from the legacy glob.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0040 creates the extracted permission lease policy module; add explicit scope because close bundle does not expand new files from the legacy glob."
+  }
+}
