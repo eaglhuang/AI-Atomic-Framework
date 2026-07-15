@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0048",
+  "title": "Extract next playbook projection contracts below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0031",
+    "TASK-RFT-0046"
+  ],
+  "acceptance": [
+    "Reduce `packages/cli/src/commands/next/playbook-projection.ts` to at or below 600 physical lines.",
+    "Extract playbook builders, governance readiness projection, and message assembly contracts into bounded modules under `packages/cli/src/commands/next/playbook-projection/`.",
+    "Keep every new or touched playbook-projection module at or below 600 physical lines.",
+    "Preserve `next` channel playbook JSON shapes.",
+    "Do not touch `TASK-RFT-0037`, `TASK-RFT-0045`, `packages/cli/src/commands/taskflow/__tests__/**`, or `release/**` artifacts."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next/playbook-projection.ts",
+    "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+    "tests/cli/next-playbook-projection-contracts.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next/playbook-projection.ts",
+    "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+    "tests/cli/next-playbook-projection-contracts.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/next-playbook-projection-contracts.test.ts",
+    "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-command-router-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.next-playbook-projection-contracts",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/next/playbook-projection.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- This is a final-600 slice for the `next.ts` transitional extraction gap recorded after TASK-RFT-0031.\n- Follow-up cards remain required for `next.ts` and any shared route contracts left above 600 lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0048-next-playbook-projection-contracts.task.md",
+    "sectionTitle": "TASK-RFT-0048",
+    "headingLine": 41,
+    "hash": "a239111956086c86",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0048-next-playbook-projection-contracts.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:a239111956086c866df037b2a39dfaa9126bc0dc9899ab0ba2edd3ddffd99ac6",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T17:36:52.305Z"
+    }
+  },
+  "importedAt": "2026-07-15T17:36:52.305Z",
+  "lastTransitionId": "2026-07-15T17-41-25-815Z-scope-amendment-dd62fb133eb9",
+  "lastTransitionAt": "2026-07-15T17:41:25.815Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0048",
+  "reservedAt": "2026-07-15T17:37:25.248Z",
+  "promotedAt": "2026-07-15T17:37:25.250Z",
+  "claim": {
+    "actorId": "codex-task-rft-0048",
+    "leaseId": "lease-7633bd888862",
+    "claimedAt": "2026-07-15T17:37:25.254Z",
+    "heartbeatAt": "2026-07-15T17:37:25.254Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0048.*",
+      ".atm/history/task-events/TASK-RFT-0048/**",
+      ".atm/history/tasks/TASK-RFT-0048.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/playbook-projection.ts",
+      "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+      "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T17:37:25.254Z",
+  "startedByActor": "codex-task-rft-0048",
+  "startedBySessionId": "session-20260715173725-codex-task-rft-0048-TASK-RFT-0048-28e3a5a4b1",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0048",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0048.*",
+      ".atm/history/task-events/TASK-RFT-0048/**",
+      ".atm/history/tasks/TASK-RFT-0048.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/next/playbook-projection.ts",
+      "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/channel-playbook.ts",
+      "packages/cli/src/commands/next/playbook-projection/governance-readiness.ts",
+      "packages/cli/src/commands/next/playbook-projection/legacy-guidance.ts",
+      "packages/cli/src/commands/next/playbook-projection/message-assembly.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "tests/cli/next-playbook-projection-contracts.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0048-next-playbook-projection-contracts.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0048-next-playbook-projection-contracts.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "83996d0781fb51dffae6e79d07121365a5f23ee2dc9c8d5132c7f3c1485fc2de",
+    "actorId": "codex-task-rft-0048",
+    "createdAt": "2026-07-15T17:37:30.661Z",
+    "status": "active"
+  }
+}
