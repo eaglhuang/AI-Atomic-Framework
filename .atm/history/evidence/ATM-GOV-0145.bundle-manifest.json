@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "ATM-GOV-0145",
+  "updatedAt": "2026-07-15T13:53:50.031Z",
+  "updatedBy": "codex-gpt-5-5-captain",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d5b32a14cd6af1c9b7939d0b87a950a52f4218df27c1f869e9301dca3f0fb397",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts"
+      ],
+      "generatedAt": "2026-07-15T13:53:12.023Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce9c3186fcd355b28c8af57338f8d1e832e0cb6a",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-15T13:53:30.609Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce9c3186fcd355b28c8af57338f8d1e832e0cb6a",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:39459826e550ab51ec93c9998775983ec7769a6a47c48edecfca9528422ceed0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/pre-team-foundation-gate.test.ts"
+      ],
+      "generatedAt": "2026-07-15T13:53:50.160Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ce9c3186fcd355b28c8af57338f8d1e832e0cb6a",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0145",
+  "title": "Replace Pre-Team Foundation Gate meta-test with real dual-Captain E2E",
+  "status": "running",
+  "milestone": "GOVOPT-Foundation-Gate",
+  "dependencies": [
+    "ATM-GOV-0128",
+    "ATM-GOV-0129",
+    "ATM-GOV-0130"
+  ],
+  "acceptance": [
+    "Add a real fixture-backed dual-Captain E2E test that creates a temporary git repository with two actors' work represented in the same live index/worktree.",
+    "The fixture must include one foreign staged file and one foreign unstaged file before the governed close/commit operation.",
+    "The governed close/commit path must commit only the active task deliverable and must leave the foreign staged blob staged byte-identically.",
+    "The foreign unstaged worktree content must remain byte-identical after the operation.",
+    "The test must fail if the implementation relies only on reading other tests' source text or only checks for string tokens.",
+    "`pre-team-foundation-gate` must execute or import the dual-Captain E2E assertion directly, not merely grep for its source text.",
+    "Validator catalog registration for `pre-team-foundation-gate` must remain intact."
+  ],
+  "deliverables": [
+    "tests/cli/pre-team-foundation-gate.test.ts",
+    "tests/cli/pre-team-dual-captain-e2e.test.ts"
+  ],
+  "scopePaths": [
+    "tests/cli/pre-team-foundation-gate.test.ts",
+    "tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "scripts/validators.config.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "node --strip-types tests/cli/pre-team-foundation-gate.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-* cards, large module atomization, and any RFT source edits.",
+    "Team production/default promotion.",
+    "Provider billing or real dogfood paired-run measurement."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the E2E gate and validator catalog wiring if it blocks unrelated governance flows.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.pre-team-foundation-gate-map",
+    "atomCid": null,
+    "mapUpdates": []
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "tests/cli/pre-team-foundation-gate.test.ts",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "scripts/validators.config.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "This is deliberately non-RFT work. Do not touch `TASK-RFT-0037`, the RFT wave cards, or oversized module extraction surfaces while implementing this card.",
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0145-pre-team-foundation-dual-captain-e2e.task.md",
+    "sectionTitle": "ATM-GOV-0145",
+    "headingLine": 40,
+    "hash": "5a95942c2208b06f",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0145-pre-team-foundation-dual-captain-e2e.task.md",
+      "planningCommitSha": "9a69aff0960513bae9bc245a395a6a058337b800",
+      "contentDigest": "sha256:5a95942c2208b06ff443a0405ab60014c1d0ffe4f4a369ba81c1e16504986a36",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T13:50:04.084Z"
+    }
+  },
+  "importedAt": "2026-07-15T13:50:04.084Z",
+  "lastTransitionId": "2026-07-15T13-50-23-729Z-claim-562d70ebc6de",
+  "lastTransitionAt": "2026-07-15T13:50:23.729Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T13:50:19.952Z",
+  "promotedAt": "2026-07-15T13:50:19.954Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-e4232a4498f4",
+    "claimedAt": "2026-07-15T13:50:19.957Z",
+    "heartbeatAt": "2026-07-15T13:50:19.957Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0145.json",
+      "scripts/validators.config.json",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T13:50:19.957Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715135019-codex-gpt-5-5-captain-ATM-GOV-0145-15d071cf07",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0145",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0145.*",
+      ".atm/history/task-events/ATM-GOV-0145/**",
+      ".atm/history/tasks/ATM-GOV-0145.json",
+      "scripts/validators.config.json",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "tests/cli/pre-team-foundation-gate.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "8441968bcde50fd2a384bd1390eda41bdf6a9255e2d3db701bbd9bd06dfeb3e3",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T13:50:23.728Z",
+    "status": "active"
+  }
+}
