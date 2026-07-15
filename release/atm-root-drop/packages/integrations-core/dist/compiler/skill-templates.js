@@ -62,6 +62,12 @@ export const minimumAtmEntrySkillDefinitions = [
         command: 'node atm.mjs explain --why blocked --json'
     },
     {
+        id: 'atm-error-code-resolver',
+        title: 'ATM Error Code Resolver',
+        summary: 'Resolve ATM_* error codes from CLI JSON, logs, or user reports into canonical meaning, remediation, retryability, and approval guidance.',
+        command: 'node atm.mjs next --prompt "$ARGUMENTS" --json'
+    },
+    {
         id: 'atm-upgrade-scan',
         title: 'ATM Upgrade Scan',
         summary: 'Scan evidence reports and draft governed upgrade proposals.',

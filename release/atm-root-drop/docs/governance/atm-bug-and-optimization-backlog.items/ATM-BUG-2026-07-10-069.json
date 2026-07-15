@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-069",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in validator timeout/status lane",
+  "area": "Evidence validators / closeout baseline",
+  "finding": "`taskflow pre-close` can require heavyweight global validators such as `validate:git-head-evidence` for a narrow atomized task even when focused specs, atomic-map validation, and typecheck have passed in an isolated Team Broker lane. During `TASK-RFT-0018`, the evidence command for `validate:git-head-evidence` exceeded a 184s agent timeout and left a live Node subprocess chain, forcing manual process inspection and cleanup before closeout could continue.",
+  "expectedBehavior": "Closeout should derive the smallest validator set from the task's atom map, scope paths, and Team Broker isolation context, or provide a bounded/resumable validator status path. Heavy global validators should not become mandatory per-card blockers unless the touched paths or protected surface truly require them, and timed-out validator runs must clean up owned child processes.",
+  "evidenceOrRepro": "Fixed by combining scope-derived validator classification with the validator runner's resumable status/timeout lane. `validate:git-head-evidence` is closure-required only for protected surfaces or explicit task declaration, and `scripts/run-validators.ts` tracks spawned children, kills them on timeout/signals, records timeout status, and exposes `--status --run-id` for polling/resume. Verification: `node --strip-types packages/cli/src/commands/evidence/__tests__/validator-classification.spec.ts` and `node --strip-types tests/cli/validator-run-resume-and-status.test.ts` pass.",
+  "followUp": "Keep heavyweight validators available as explicit escalation gates; normal atomized closeout should rely on focused evidence unless protected surfaces are touched."
+}

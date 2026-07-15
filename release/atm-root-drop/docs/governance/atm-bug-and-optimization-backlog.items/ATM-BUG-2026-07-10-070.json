@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-070",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in broker conflict override lane",
+  "area": "Team Broker / emergency governance",
+  "finding": "A generic `backend.gitHookBypass` emergency lease could be used with `git commit --no-verify` during an active Team Broker file-ownership conflict, which weakens the cross-task mutation guard by treating a collaboration conflict as if it were only a broken local hook.",
+  "expectedBehavior": "Hook bypass recovery must not bypass Team Broker cross-task mutation blocks. Active file-ownership conflicts should be forced through the paper-style parallel conflict-resolution lane first: record the competing task ids, shared paths, atom/CID overlap, owner acknowledgement or timeout, chosen serialization/merge order, and validator plan before either lane can commit.",
+  "evidenceOrRepro": "Dogfood review on 2026-07-10 after `TASK-RFT-0019`: `TASK-AAO-0155` had an active claim including `packages/cli/src/commands/tasks.ts`; a `backend.gitHookBypass` lease plus direct `git commit --no-verify` landed `TASK-RFT-0019` without a broker-specific resolution artifact. Later audit found no physical overwrite, but the procedure made Broker authority ambiguous and contradicted the expected early-parallel conflict-resolution model. The repair adds `backend.brokerConflictOverride`, `--broker-conflict-override`, and `--broker-conflict-resolution`, with regression coverage proving ordinary hook bypass is rejected while high-authority override requires a valid `atm.brokerConflictResolution.v1` artifact.",
+  "followUp": "Keep ordinary emergency hook bypass lower authority than Team Broker conflict ownership. Future hardening can add a first-class `tasks parallel resolve` command to generate the resolution artifact instead of requiring operators to author the JSON manually."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-152",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-FABLE-001",
+  "area": "`validate:git-hooks-enforcement` runtime budget",
+  "finding": "The timeout/progress guard now prevents opaque child hangs, but the full `npm run validate:git-hooks-enforcement` suite still took about 202 seconds in the prior closeout, exceeding common interactive command windows and making a completed run look like a timeout risk.",
+  "expectedBehavior": "Split the full hook-enforcement suite into bounded focused lanes with resumable status and retain an explicit full-suite command; report expected duration before execution so agents can choose the correct lane.",
+  "evidenceOrRepro": "TASK-AAO-0164 recorded a successful 202-second run with 168 steps. The current backlog cleanup keeps this as a follow-up rather than treating the slow successful run as fixed timeout behavior.",
+  "followUp": "Add a performance budget/regression for focused hook lanes and a preflight estimate for the full suite; preserve child timeout cleanup from TASK-AAO-0164."
+}

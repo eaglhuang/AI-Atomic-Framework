@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-189",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Pre-commit / baseline validator isolation",
+  "finding": "During ATM-GOV-0134 close commit, pre-commit reran validate:cli and failed on existing atm-memory-consolidate skill template prose containing downstream-only tools_node/, even though the active task did not edit that memory-consolidation surface and the handoff explicitly marked it as external residue.",
+  "expectedBehavior": "Pre-commit framework validation should distinguish current-task failures from unrelated baseline/template residue, or provide a governed baseline waiver/repair lane that does not force the active task to commit unrelated memory-consolidation files.",
+  "evidenceOrRepro": "node atm.mjs git commit --actor codex-gpt-5-5-captain --task ATM-GOV-0134 --message \"feat(governance): complete ATM-GOV-0134\" --json failed with ATM_FRAMEWORK_VALIDATOR_FAILED; nested validator-run-resume-and-status reported validate-product-charter failure: templates/skills/atm-memory-consolidate.skill.md contains downstream-only term: tools_node/.",
+  "followUp": "Create a follow-up task for pre-commit baseline/current-task classification around validator-run-resume-and-status and product-charter checks; do not mix the memory-consolidation template repair into ATM-GOV-0134."
+}

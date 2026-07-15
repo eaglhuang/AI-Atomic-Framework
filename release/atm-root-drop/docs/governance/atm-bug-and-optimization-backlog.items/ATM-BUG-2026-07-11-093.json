@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-093",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in Team overlap diagnostics lane",
+  "area": "Frozen release dependency sync",
+  "finding": "A scope-aware Team git-owner gate correctly blocks commits that overlap an active run's `file.write` lease, but its aggregated failure previously omitted the overlapping staged files. That made a valid Coordinator requirement look like unrelated stale-run residue.",
+  "expectedBehavior": "When Team ownership blocks a commit, ATM should show the exact staged files that overlap active `file.write` leases so the operator can distinguish a real scoped handoff from unrelated run residue.",
+  "evidenceOrRepro": "Reproduced on 2026-07-11 while committing the 091/092 repair: `packages/cli/src/commands/next.ts` and `scripts/validate-prompt-scoped-next.ts` overlap the active `TASK-AAO-0043` lease. Fixed by returning `relevantFiles` and adding them to `ATM_TEAM_GIT_OWNER_REQUIRED` details. `node --strip-types scripts/validate-team-agents.ts --case hook-team-gate` asserts the exact overlap.",
+  "followUp": "Keep the overlap list in the pre-commit envelope and preserve both related-scope block and unrelated-scope allow regressions."
+}

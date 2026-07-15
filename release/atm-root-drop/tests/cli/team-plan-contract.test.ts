@@ -1,12 +1,17 @@
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   buildTeamLeaseConflictDetails,
   buildTeamLeaseNotFoundDetails,
   buildTeamGrowthContract,
   buildTeamPlan,
+  buildTeamRuntimeContract,
   buildTeamRuntimePilot,
   buildTeamRoleRoutingMatrix,
-  buildTeamRoleSkillPackContract
+  buildTeamRoleSkillPackContract,
+  writeTeamRun
 } from '../../packages/cli/src/commands/team.ts';
 
 const recipe = {
@@ -155,6 +160,47 @@ const teamPlanWithIndexLane = buildTeamPlan({
 });
 assert.equal(teamPlanWithIndexLane.indexLane.status, 'free');
 assert.equal(teamPlanWithIndexLane.gitIndexOwnership?.schemaId, 'atm.gitIndexOwnership.v1');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.schemaId, 'atm.teamShadowSchedule.v1');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.shadowOnly, true);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.taskId, 'TASK-GIT-0015');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.fanOutCap >= 1, true);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.rosterFingerprint.schemaId, 'atm.teamRosterFingerprint.v1');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.reviewerLane?.cleanContext, true);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.reviewerLane?.barrierRequired, true);
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.schemaId, 'atm.teamShadowWorkspaceProvider.v1');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.mode, 'ephemeral-detached-worktree');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.isolatedIndexEnv, 'GIT_INDEX_FILE');
+assert.equal(teamPlanWithIndexLane.shadowSchedule.workspaceProvider?.writebackToPrimaryWorktree, false);
+const teamRunTemp = mkdtempSync(path.join(os.tmpdir(), 'atm-team-plan-contract-'));
+try {
+  const teamRun = writeTeamRun({
+    cwd: teamRunTemp,
+    actorId: 'contract-captain',
+    taskId: 'TASK-GIT-0015',
+    task: {
+      workItemId: 'TASK-GIT-0015',
+      targetAllowedFiles: ['packages/cli/src/commands/git-governance.ts']
+    },
+    recipe: recipe as any,
+    teamPlan: teamPlanWithIndexLane,
+    validation: { ok: true, findings: [] },
+    runtimeContract: buildTeamRuntimeContract({
+      runtimeMode: 'broker-only',
+      runtimeLanguage: 'node',
+      roleName: 'coordinator',
+      recipe: recipe as any,
+      allowedFiles: ['packages/cli/src/commands/git-governance.ts'],
+      permissionLeases: teamPlanWithIndexLane.suggestedPermissionLeases,
+      evidenceRequired: 'command-backed'
+    })
+  });
+  assert.equal(teamRun.shadowSchedule.schemaId, 'atm.teamShadowSchedule.v1');
+  assert.equal(teamRun.contributionComposition.schemaId, 'atm.teamContributionComposition.v1');
+  assert.equal(teamRun.contributionComposition.failClosed, false);
+  assert.equal(teamRun.contributionComposition.finalTree.files.length, 0);
+} finally {
+  rmSync(teamRunTemp, { recursive: true, force: true });
+}
 
 const activeLeases = [
   { permission: 'file.write', agentId: 'implementer-typescript', paths: ['packages/cli/src/commands/team.ts'] },

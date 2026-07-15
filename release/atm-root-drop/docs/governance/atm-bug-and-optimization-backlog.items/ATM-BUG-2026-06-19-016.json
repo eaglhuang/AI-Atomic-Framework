@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-19-016",
+  "date": "2026-06-19",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 residue-classifier hardening",
+  "area": "Git governance / residue hygiene",
+  "finding": "ATM hook and governed commit flows can generate transient residue such as `git-head` evidence files or close-window snapshots, then leave them unstaged or out-of-scope after a failed or completed commit attempt. Agents rarely clean these files proactively, so the repo accumulates garbage and later governance checks become noisy.",
+  "expectedBehavior": "ATM should classify auto-generated residue explicitly and either auto-clean safe byproducts or hard-block the commit with a precise diagnostic. User-authored dirt must never be silently deleted, but deterministic unreferenced byproducts should not be left behind for humans to clean manually.",
+  "evidenceOrRepro": "On 2026-06-19, a focused governed commit added `packages/cli/src/commands/taskflow/__tests__/close-gates-focused.spec.ts`, then hook-generated `.atm/history/evidence/git-head.jsonl` remained as dirty residue after the final commit race. The same repo also shows recurring snapshot-style runtime residue under `.atm/runtime/snapshots/` from abandoned close/commit attempts. Reconfirmed on 2026-06-24 while dogfooding `TASK-CID-0120`: failed same-repo `taskflow close --write` attempts left stale close transition artifacts such as `.atm/history/task-events/TASK-CID-0120/2026-06-24T06-41-36-463Z-close-98d343f463cb.json`, which then became fresh blockers for later retries. Resolved on 2026-06-28 by hardening the shared residue classifier so `hook pre-commit` and the governed git wrapper now distinguish current-task governance artifacts from foreign closeback residue, auto-clean safe ATM byproducts such as transient task-import / protected-override reports, and fail closed on foreign closure packets or close/reconcile task-events with focused regression coverage.",
+  "followUp": "Keep monitoring for any newly introduced ATM-generated artifact families and add them to the shared classifier only when ownership or reproducibility can be proven."
+}

@@ -27,6 +27,10 @@ export interface ClosurePacketRequiredGatesSnapshot {
 export interface ClosurePacketReconcileAttestation {
     readonly schemaId: 'atm.reconcileAttestation.v1';
     readonly deliveryCommit: string;
+    /** TASK-MEM-0007: repo root the delivery commit was verified against when it lives in another repository. */
+    readonly deliveryRepoRoot?: string;
+    /** TASK-MEM-0008: clean-mirror-attestation (non-emergency) vs local-closure-rewrite (emergency-gated). */
+    readonly reconcileClassification?: 'clean-mirror-attestation' | 'local-closure-rewrite';
     readonly reconciledAt: string;
     readonly reconciledByActor: string;
     readonly reason: string;

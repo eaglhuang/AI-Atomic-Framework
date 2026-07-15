@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-190",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Batch checkpoint / Team Agents dogfood",
+  "finding": "TASK-RFT-0026 dogfood showed that batch checkpoint can advance and claim the next queue head before the previous task's post-checkpoint commit lands, causing the active direction lock for TASK-RFT-0027 to block the already-validated TASK-RFT-0026 commit. The same RFT closeout also showed that shared governance files plus another active captain make multi-agent write fan-out more expensive and riskier than a single coordinator for this task family.",
+  "expectedBehavior": "Batch checkpoint should preserve a commit window for the validated queue-head bundle or defer next-task claim until the previous task is committed. Team Agents should remain shadow/controlled dogfood until production cost, wall-clock, quality, roster, and pricing evidence prove a net win.",
+  "evidenceOrRepro": "TASK-RFT-0026 required emergency lease EMG-TASK-RFT-0026-a24301fd74 after checkpoint advanced to TASK-RFT-0027; TASK-RFT-0028 controlled dogfood compares incremental, fully-loaded, and list-price-equivalent Team cost against paired single-Agent baseline and keeps token counts diagnostic-only.",
+  "followUp": "Next experiment: add a close-commit-window-aware batch checkpoint or pendingCommitTaskId hook lane, then rerun Team Agents dogfood with canonical provider usage, pricing evidence, cheap worker models, role collapse, prompt caching, mixed-model routing, and stop-loss enabled before promoting Team as default."
+}

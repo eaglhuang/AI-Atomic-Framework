@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-042",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in prompt-scoped next validator lane",
+  "area": "Validator UX / noisy success logs",
+  "finding": "`npm run validate:prompt-scoped-next` prints a full `teamPlanResult` JSON on success, producing multi-thousand-line logs and making CI or agent transcripts harder to scan even when the validator passes.",
+  "expectedBehavior": "Validators should default to quiet success output and emit large diagnostic payloads only on failure or behind a debug flag.",
+  "evidenceOrRepro": "Fixed in `scripts/validate-prompt-scoped-next.ts`: `teamPlanResult is: ...` is now printed only inside the assertion failure path, and `runTeam failed with error` is printed only when the team command itself throws. Validation: `npm run validate:prompt-scoped-next` completed with quiet success output and no large `teamPlanResult` payload.",
+  "followUp": "Keep the failure-only dump pattern in focused validators; future validator additions should avoid success-path JSON dumps unless explicitly gated by a debug flag."
+}

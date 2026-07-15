@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-001",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0029 / 48d5b55a",
+  "area": "Team Agents",
+  "finding": "`team start` could create a team runtime run even when normal task claim dependency gates would reject the task.",
+  "expectedBehavior": "Team Agents start should share claim-admission parity with normal task lifecycle and fail closed before writing runtime state.",
+  "evidenceOrRepro": "Dogfood on `TASK-APO-0029`: `next --claim` was blocked by missing dependency `TASK-APO-0028`, while `team start` still wrote `team-4d7bc0109ef7`.",
+  "followUp": "Keep regression coverage in `scripts/validate-team-agents.ts --case claim-gate-parity`."
+}

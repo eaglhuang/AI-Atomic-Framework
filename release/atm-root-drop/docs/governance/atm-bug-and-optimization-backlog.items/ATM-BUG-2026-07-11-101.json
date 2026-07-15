@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-101",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Team Agents / direct provider artifact handoff",
+  "finding": "Direct-provider roles currently receive independent generic role prompts. The persisted artifact handoff contract says Review Agent consumes implementation artifacts, but concrete vendor orchestration does not yet pass the Anthropic Implementer output into the OpenAI Review Agent request.",
+  "expectedBehavior": "Real-provider orchestration should carry bounded, redacted prior-role artifacts through declared `consumesFrom`/`producesTo` edges and prove that reviewer input references the implementer artifact.",
+  "evidenceOrRepro": "Paid L5 runs invoked the intended providers and roles, but observability proves per-role execution only; it does not prove cross-vendor content handoff.",
+  "followUp": "Author a separate implementation task with deterministic chaining coverage and a paid retry once OpenAI quota is available."
+}

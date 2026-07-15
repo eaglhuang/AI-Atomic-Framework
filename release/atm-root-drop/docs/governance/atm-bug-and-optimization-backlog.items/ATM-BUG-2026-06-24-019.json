@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-24-019",
+  "date": "2026-06-24",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 hook-scope filtering lane",
+  "area": "Taskflow close / pre-commit scope filtering",
+  "finding": "Same-repo `taskflow close` could be blocked by unrelated active planning-mirror / direction-lock findings because the pre-commit protected-state checks evaluated all active direction locks instead of only the locks relevant to the staged governed bundle.",
+  "expectedBehavior": "Pre-commit scope checks for taskflow close should filter active direction locks down to the staged bundle so foreign planning mirrors do not raise false `ATM_PLANNING_MIRROR_DRIFT` or `ATM_TASK_DIRECTION_SCOPE_DRIFT` failures.",
+  "evidenceOrRepro": "Verified on 2026-06-28 that the source fix is present in `packages/cli/src/commands/hook.ts` via `selectRelevantDirectionLocksForCommit(...)`, and the focused same-repo close regression passes in `packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts`. This repair lane promoted that regression into a first-class validator surface through `scripts/validate-framework-hook-scope-filtering.ts`, `package.json`, and `scripts/validators.config.json`, so standard ATM validation now guards the foreign-planning-lock case instead of leaving it as an ad hoc test file. Validation used `node --strip-types packages/cli/src/commands/__tests__/framework-mode-staged-residue.spec.ts`, `npm run validate:framework-hook-scope-filtering`, and post-build frozen release verification.",
+  "followUp": "Keep `selectRelevantDirectionLocksForCommit(...)` as the common staged-bundle filter for direction-lock scope checks, and preserve the new validator in standard profiles so same-repo close bundles cannot regress back to foreign planning-lock false positives."
+}

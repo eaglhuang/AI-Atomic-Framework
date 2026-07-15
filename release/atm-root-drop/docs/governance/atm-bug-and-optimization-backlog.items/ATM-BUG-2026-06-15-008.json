@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-008",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in this cleanup commit",
+  "area": "Team Agents",
+  "finding": "`team plan` / `team validate` reject imported cross-repo planning tasks whose `scopePaths` are absolute 3KLife paths, so Phase 0 planning tasks cannot start through Team Agents even after broker cleanup.",
+  "expectedBehavior": "Team Agents should normalize or classify cross-repo planning paths before building `file.write` leases, or choose a read-only/planning recipe that does not request unsafe writes.",
+  "evidenceOrRepro": "Fixed by deriving Team Agents write scope from target repo paths only: `targetAllowedFiles` is authoritative when present, target-root absolute paths normalize to repo-relative write leases, and planning-repo absolute paths become read-only planning context instead of `file.write` lease paths. `node --strip-types scripts/validate-team-agents.ts --case permission-lease` now creates a temp target/planning repo fixture and proves planning absolute paths do not raise `ATM_TEAM_WRITE_SCOPE_TRAVERSAL` or emit an empty `file.write` lease.",
+  "followUp": "Keep the cross-repo planning fixture in `scripts/validate-team-agents.ts`; future Team Agents scope changes must preserve target-write fail-closed behavior while allowing planning-only absolute context."
+}

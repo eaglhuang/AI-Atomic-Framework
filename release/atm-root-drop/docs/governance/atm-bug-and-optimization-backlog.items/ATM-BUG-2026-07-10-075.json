@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-075",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in encoding touched multi-file parser lane",
+  "area": "Encoding guard / touched-file reporting",
+  "finding": "`npm run check:encoding:touched -- --files <many files>` can pass while reporting only the first file in `evidence.files`, which makes the guard hard to trust for multi-file edits.",
+  "expectedBehavior": "The guard should either verify and report every explicit `--files` entry, or clearly distinguish \"checked files\" from \"display sample\" so agents know the full touched set was covered.",
+  "evidenceOrRepro": "Fixed by teaching `scripts/check-encoding-touched.ts` to consume every non-option token after `--files`, while preserving CSV and `--files=<csv>` input. Verification: `npm run check:encoding:touched -- --files scripts/check-encoding-touched.ts scripts/validate-script-parity.ts` now reports both files in `evidence.files`; `node --strip-types scripts/validate-script-parity.ts --mode validate` includes a multi-file probe.",
+  "followUp": "Keep the multi-token `--files` regression in script parity so encoding guard evidence cannot silently shrink back to a one-file sample."
+}

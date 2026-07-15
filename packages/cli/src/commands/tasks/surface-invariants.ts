@@ -85,6 +85,9 @@ export function resolveTaskflowCloseMode(input: {
   if (input.bucket === 'complete-but-unfinalized' || input.bucket === 'source-done-governance-incomplete') {
     return 'historical-delivery-close';
   }
+  if (liveStatus === 'done' && planningStatus === 'done' && input.historicalDeliveryRefs.length > 0) {
+    return 'historical-delivery-close';
+  }
   if (liveStatus === 'done') {
     return 'ambiguous-manual-review';
   }

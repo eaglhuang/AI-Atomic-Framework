@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-104",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "In progress",
+  "area": "Team Agents / historical completion evidence",
+  "finding": "The TASK-TEAM-0053 handoff and closed-task evidence described a Gemini Direct bridge as implemented, but `packages/core/src/team-runtime/providers/gemini-direct.ts` was absent from the current branch and every Git ref inspected. The closure claim therefore exceeded source reality.",
+  "expectedBehavior": "Required deliverables named by a task card should be checked for tracked-file existence and reachable commit evidence before close; manual live requirements must remain explicitly unproven until run artifacts exist.",
+  "evidenceOrRepro": "`git log --all -- packages/core/src/team-runtime/providers/gemini-direct.ts` returned no commits, while the handoff named the file as the preferred and required direct bridge.",
+  "followUp": "TASK-TEAM-0071 restores the missing implementation and adds behavior-level three-vendor coverage; closeout must include source, validator, and live evidence."
+}

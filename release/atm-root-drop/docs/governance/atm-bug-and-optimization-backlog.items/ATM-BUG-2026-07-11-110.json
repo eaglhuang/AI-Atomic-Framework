@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-110",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed",
+  "area": "Validator discoverability / local tooling",
+  "finding": "The documented `tools_node/compute-gate.js` path is absent in this repository, and the test validator does not accept the common `npm test -- --grep ...` filter, causing avoidable preflight friction.",
+  "expectedBehavior": "Documentation and validator entrypoints should expose the actual supported compute-gate command and a supported focused-test selector, or fail with a copyable remediation command.",
+  "evidenceOrRepro": "Fixed by adding a repo-local `tools_node/compute-gate.js` facade that maps common gates such as `ts-syntax` to supported npm scripts, plus a targeted `--grep` migration hint that points operators to `--filter` and `--focus-path`. Validator: `node --strip-types tests/cli/validator-discoverability.test.ts`.",
+  "followUp": "Delivered in current fix commit."
+}

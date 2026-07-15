@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-185",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0202",
+  "area": "Task ledger / claim release transition evidence",
+  "finding": "Batch checkpoint and governed closeout can leave a post-delivery task ledger mutation that changes `claim.status` from `active` to `released` and adds release metadata after the task delivery commit, but no matching task-event file is generated. The protected-state pre-commit guard then rejects staging that ledger file alone with `ATM_PROTECTED_STATE_TASK_FILE_MISSING_TRANSITION`, leaving durable manual-review residue.",
+  "expectedBehavior": "Claim release metadata should be written before the delivery commit, written with a matching transition/audit event, or classified by residue reconcile as a safe post-close claim-release state mutation with an accepted governed cleanup lane.",
+  "evidenceOrRepro": "Reproduced after TASK-RFT-0024 close commit `ee65c657`: `.atm/history/tasks/TASK-RFT-0024.json` changed only claim release fields; `node atm.mjs residue status --json` classified it as manual-review; `node atm.mjs git commit --task TASK-RFT-0024 --actor \"Codex-GPT 5.5\" --message \"chore(tasks): record TASK-RFT-0024 claim release\" --json` failed with `ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED` / `ATM_PROTECTED_STATE_TASK_FILE_MISSING_TRANSITION` because no matching transition event exists under `.atm/history/task-events/TASK-RFT-0024/`.",
+  "followUp": "Fixed in `packages/cli/src/commands/tasks/legacy-impl.ts`: `tasks lock cleanup` now writes governed `lock-cleanup` task transitions whenever it releases a terminal active claim or canonical direction lock, instead of mutating `.atm/history/tasks/*.json` directly. Validation: `node --strip-types packages/cli/src/commands/tasks/__tests__/claim-release-transition.spec.ts`; `node --strip-types packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts`."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-143",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0074",
+  "area": "Broker proposal hash normalization",
+  "finding": "Proposal validation emitted the same SHA-256 digest with and without the `sha256:` prefix, then treated the formatting difference as a stale-file mismatch and blocked a legitimate fail-closed Team start.",
+  "expectedBehavior": "Compare normalized SHA-256 digest values while retaining every other proposal validation issue as blocking.",
+  "evidenceOrRepro": "Reproduced by the first formal TASK-TEAM-0074 L5 start: `195ea...8372` matched semantically but gate rejected it because `currentFileHash` included the prefix.",
+  "followUp": "Keep a regression for prefixed/unprefixed equal hashes and a separate mismatch rejection."
+}

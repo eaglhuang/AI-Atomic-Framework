@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-031",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Fixed in 2026-06-28 repair lane",
+  "area": "Git governance / pathscoped commit semantics",
+  "finding": "A path-scoped `git commit -- <paths>` still runs ATM pre-commit against the entire staged index, so an operator cannot safely rescue or land a narrow fix when unrelated staged files already exist in the same worktree. This makes scoped recovery commits behave as though they were full-index commits and can block urgent evidence or hotfix backfills without touching other people's staged work.",
+  "expectedBehavior": "ATM hook and governed git lanes should understand the effective commit surface for path-scoped commits. At minimum, the hook should distinguish the requested pathspec surface from unrelated staged entries and validate only the commit-bound file set, or provide a first-class isolated commit lane that preserves other staged state without requiring users to unstage foreign work.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by keeping `GIT_INDEX_FILE` intact when ATM sanitizes git hook environments, so native path-scoped `git commit -- <paths>` continues to validate only the temporary pathspec index instead of collapsing back to the caller's full staged surface. Focused regression coverage in `scripts/validate-git-hooks-enforcement.ts` now proves the commit lands only the requested pathspec while unrelated staged files remain staged and untouched in the real index.",
+  "followUp": "Keep the pathspec regression in `scripts/validate-git-hooks-enforcement.ts`, and treat any future hook env sanitation touching git index variables as release-critical because it can silently widen commit scope again."
+}

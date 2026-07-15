@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-114",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0164",
+  "area": "Pre-commit guidance / requiredCommand accuracy",
+  "finding": "When a protected evidence file is staged without task context, pre-commit suggested `node atm.mjs git commit --task <basename-of-staged-file>`, deriving a task id from the filename; running the suggested command failed with `ATM_TASK_NOT_FOUND` because no such task existed.",
+  "expectedBehavior": "requiredCommand now only references task ids that exist in the ledger or are staged as task ledger files; otherwise it falls back to the generic governed commit wrapper without a fabricated task id.",
+  "evidenceOrRepro": "2026-07-11: staging `.atm/history/evidence/bulk-closure-manifest-2026-07-11-mirror-sync.json` produced the suggestion `--task bulk-closure-manifest-2026-07-11-mirror-sync`, which then failed `ATM_TASK_NOT_FOUND`. TASK-AAO-0164 adds a regression for a bogus `bulk-closure-manifest-2099-01-01-mirror-sync.json` evidence basename and proves no basename-derived `--task` is emitted.",
+  "followUp": "Keep the hook regression in `scripts/validate-governance-commands.ts`; future pre-commit remediation must validate suggested task ids against the ledger before emitting task-scoped requiredCommand text."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-044",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in prompt-scoped next lane",
+  "area": "Scope amendment / re-claim lifecycle",
+  "finding": "Re-claiming an already amended task with `next --claim --claim-intent write` can rebuild the direction lock from original task scope and drop previously added scope-amendment paths, forcing the operator to re-run `tasks scope add`.",
+  "expectedBehavior": "Re-claim should preserve active task scope amendments or clearly state that it is replacing the lock and list amendments that must be re-applied.",
+  "evidenceOrRepro": "Fixed in `packages/cli/src/commands/next.ts`: when re-claiming a task that already has an active claim, existing claim files are merged into the next allowed-files set so scope-amended paths survive intent escalation. Regression coverage in `scripts/validate-prompt-scoped-next.ts` creates `TASK-SCOPEAMEND-0001`, reclaims it from `closeout-only` to `write`, and asserts `src/scope-amend-linked.ts` remains in `claim.files`. Validation: `npm run validate:prompt-scoped-next` and `node --strip-types tests/cli/task-scope-amendment.test.ts`.",
+  "followUp": "Keep the prompt-scoped next regression for `TASK-SCOPEAMEND-0001`; future claim-direction changes must preserve scope-amended paths across same-actor re-claim and intent upgrade."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-177",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0191",
+  "area": "Governed commit / defer-foreign-staged absorbs ordinary-unowned staged residue",
+  "finding": "`node atm.dev.mjs git commit --auto-stage --defer-foreign-staged` for a framework temp claim scoped only to backlog + task-plan still included a long-lived staged foreign file (`packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts`, ownership `ordinary-unowned`) in the resulting commit `a6aa957a3`. Pre-push then treated that path as a critical changed file even though it was not part of the claim scope.",
+  "expectedBehavior": "Task/temp-claim scoped commits must never stage or commit ordinary-unowned / foreign staged files when `--defer-foreign-staged` is set; deferral must cover unattributable staged source, not only governance artifacts with task ids.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0191: framework-claim commits now fail closed on out-of-claim staged files unless `--defer-foreign-staged` is set, and always commit through an isolated claim-allowed index so ordinary-unowned staged residue stays out of the commit while remaining staged for the original owner. Regression covers both fail-closed and defer paths in `tests/cli/git-commit-task-scoped-staging.test.ts`.",
+  "followUp": "Keep framework-claim commits on the isolated-index path; do not fall back to the live index when a temp framework claim is active."
+}

@@ -43,6 +43,7 @@ import {
   selectPostClaimChannel,
   selectQuickfixChannel
 } from './next/channel-strategy.ts';
+import { buildGovernanceReadinessHintContract, type GovernanceChannel } from './next/governance-readiness.ts';
 import { buildTaskScopedClaimCommand } from './next/task-scoped-claim-command.ts';
 import { withRunnerMode } from './next/runner-mode.ts';
 import {
@@ -4552,7 +4553,6 @@ function buildMirrorSyncNextAction(input: {
   };
 }
 
-type GovernanceChannel = 'fast' | 'normal' | 'batch';
 type BatchPlaybookState = 'queue-preview' | 'queue-head-active' | 'repair-required';
 
 interface ActiveTaskDivergence {
@@ -5602,50 +5602,16 @@ function buildGovernanceReadinessHint(cwd: string, input: {
   readonly ownFiles?: readonly string[];
   readonly frameworkClaimRequired?: boolean;
 }) {
-  const gitReadiness = readFastGitReadiness(cwd);
-  const currentBranch = gitReadiness.currentBranch;
-  const upstreamRef = gitReadiness.upstreamRef;
-  const aheadCount = gitReadiness.aheadCount;
-  const protectedBranchTarget = Boolean(currentBranch && isProtectedFrameworkBranchTarget(currentBranch));
-  const needsFrameworkStatus = Boolean(input.frameworkClaimRequired) || isFrameworkMaintenancePrompt(input.prompt);
-  const frameworkStatus = needsFrameworkStatus ? createFrameworkModeStatus({ cwd }) : null;
-  const ownFiles = uniqueSorted([
-    ...(input.ownFiles ?? []),
-    ...(input.taskId ? readTaskWorkFiles(cwd, input.taskId) : [])
-  ]);
-  const activeWorkSummary = buildActiveWorkSummary(cwd, input.actorId, ownFiles);
-  const earlyPreparation = [
-    'Read evidence.nextAction.playbook before editing, closing, or committing.',
-    'Resolve explicit actor identity before claim, commit, or report.',
-    ...(input.frameworkClaimRequired || (frameworkStatus?.repoIdentity.isFrameworkRepo && isFrameworkMaintenancePrompt(input.prompt))
-      ? ['Acquire framework-mode claim before editing framework-critical files.']
-      : []),
-    ...(input.channel === 'batch'
-      ? ['Stay on the queue head and expect batch checkpoint before commit.']
-      : []),
-    ...(protectedBranchTarget
-      ? ['Do not wait until push to discover branch-queue or closeout-boundary blockers; rerun doctor and hook pre-push proactively.']
-      : [])
-  ];
-  return {
-    schemaId: 'atm.nextGovernanceReadinessHint.v1' as const,
-    channel: input.channel,
-    currentBranch,
-    upstreamRef,
-    protectedBranchTarget,
-    aheadCount,
-    frameworkClaimRequired: Boolean(input.frameworkClaimRequired),
-    activeWorkSummary,
-    earlyPreparation,
-    queueRetryCodes: ['ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY', 'ATM_GIT_COMMIT_BRANCH_QUEUE_RACE'] as const,
-    perCriticalCommitGitHeadEvidence: {
-      enforcement: 'disabled',
-      retainedStrictBoundaries: ['same-commit governed provenance', 'closure packet', 'evidence-only repair', 'task closeout']
-    },
-    protectedPushHint: protectedBranchTarget
-      ? 'Protected framework branches no longer require per-critical-commit git-head evidence; same-commit governed provenance and high-risk closeout evidence remain strict.'
-      : null
-  };
+  return buildGovernanceReadinessHintContract({
+    cwd,
+    ...input,
+    uniqueSorted,
+    readTaskWorkFiles,
+    buildActiveWorkSummary,
+    createFrameworkModeStatus,
+    isFrameworkMaintenancePrompt,
+    isProtectedFrameworkBranchTarget
+  });
 }
 
 function readTaskWorkFiles(cwd: string, taskId: string): string[] {
@@ -5672,92 +5638,6 @@ function readTaskWorkFiles(cwd: string, taskId: string): string[] {
   }
 }
 
-function readFastGitReadiness(cwd: string) {
-  const gitDirectory = resolveGitDirectory(cwd);
-  const currentBranch = gitDirectory ? readCurrentBranchFromGitDir(gitDirectory) : runGitScalar(cwd, ['branch', '--show-current']);
-  const upstreamRef = currentBranch && gitDirectory
-    ? readUpstreamFromGitConfig(gitDirectory, currentBranch) ?? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`])
-    : (currentBranch ? runGitScalar(cwd, ['rev-parse', '--abbrev-ref', `${currentBranch}@{upstream}`]) : null);
-  const aheadCount = currentBranch && upstreamRef && gitDirectory
-    ? (readAheadCountFast(gitDirectory, currentBranch, upstreamRef) ?? Number.parseInt(runGitScalar(cwd, ['rev-list', '--count', `${upstreamRef}..HEAD`]) ?? '0', 10)) || 0
-    : 0;
-  return { currentBranch, upstreamRef, aheadCount };
-}
-
-function resolveGitDirectory(cwd: string) {
-  const dotGit = path.join(cwd, '.git');
-  if (!existsSync(dotGit)) return null;
-  try {
-    const stat = statSync(dotGit);
-    if (stat.isDirectory()) return dotGit;
-    if (stat.isFile()) {
-      const text = readFileSync(dotGit, 'utf8').trim();
-      const match = /^gitdir:\s*(.+)$/i.exec(text);
-      if (match?.[1]) {
-        const gitdir = match[1].trim();
-        return path.isAbsolute(gitdir) ? gitdir : path.resolve(cwd, gitdir);
-      }
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
-function readCurrentBranchFromGitDir(gitDirectory: string) {
-  try {
-    const head = readFileSync(path.join(gitDirectory, 'HEAD'), 'utf8').trim();
-    const prefix = 'ref: refs/heads/';
-    return head.startsWith(prefix) ? head.slice(prefix.length).trim() || null : null;
-  } catch {
-    return null;
-  }
-}
-
-function readUpstreamFromGitConfig(gitDirectory: string, branch: string) {
-  try {
-    const config = readFileSync(path.join(gitDirectory, 'config'), 'utf8');
-    const escaped = branch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const section = new RegExp(`\\[branch "${escaped}"\\]([\\s\\S]*?)(?=\\n\\[|$)`).exec(config)?.[1];
-    if (!section) return null;
-    const remote = /^\s*remote\s*=\s*(.+)\s*$/m.exec(section)?.[1]?.trim();
-    const merge = /^\s*merge\s*=\s*refs\/heads\/(.+)\s*$/m.exec(section)?.[1]?.trim();
-    return remote && merge ? `${remote}/${merge}` : null;
-  } catch {
-    return null;
-  }
-}
-
-function readAheadCountFast(gitDirectory: string, branch: string, upstreamRef: string) {
-  const localSha = readRefSha(gitDirectory, `refs/heads/${branch}`);
-  const upstreamSha = readRefSha(gitDirectory, `refs/remotes/${upstreamRef}`);
-  if (!localSha || !upstreamSha) return null;
-  return localSha === upstreamSha ? 0 : null;
-}
-
-function readRefSha(gitDirectory: string, refPath: string) {
-  try {
-    const value = readFileSync(path.join(gitDirectory, ...refPath.split('/')), 'utf8').trim();
-    return /^[0-9a-f]{40}$/i.test(value) ? value : null;
-  } catch {
-    return readPackedRefSha(gitDirectory, refPath);
-  }
-}
-
-function readPackedRefSha(gitDirectory: string, refPath: string) {
-  try {
-    const packedRefs = readFileSync(path.join(gitDirectory, 'packed-refs'), 'utf8');
-    for (const line of packedRefs.split(/\r?\n/)) {
-      if (line.startsWith('#') || line.startsWith('^')) continue;
-      const [sha, ref] = line.trim().split(/\s+/, 2);
-      if (ref === refPath && /^[0-9a-f]{40}$/i.test(sha)) return sha;
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
 function shouldInspectCrossRepoFrameworkStatus(cwd: string, targetRepo: string | null) {
   if (!targetRepo) return false;
   const normalizedTarget = targetRepo.replace(/\\/g, '/').trim();
@@ -5767,13 +5647,6 @@ function shouldInspectCrossRepoFrameworkStatus(cwd: string, targetRepo: string |
   if (normalizedTarget.toLowerCase() === currentName) return false;
   if (path.isAbsolute(normalizedTarget) && path.resolve(normalizedTarget) === currentRoot) return false;
   return true;
-}
-
-function runGitScalar(cwd: string, args: readonly string[]) {
-  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
-  if (result.status !== 0) return null;
-  const value = String(result.stdout ?? '').trim();
-  return value.length > 0 ? value : null;
 }
 
 function isProtectedFrameworkBranchTarget(branch: string) {

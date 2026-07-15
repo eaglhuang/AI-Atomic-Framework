@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-184",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug / Process",
+  "severity": "High",
+  "status": "Open",
+  "area": "Parallel captain runner sync wipes foreign uncommitted source",
+  "finding": "Another captain's `build(release): sync ... runner artifacts` (`3cd236598`) coincided with disappearance of uncommitted bug-fix WIP (team plan read-only, provider metadata, import/lock/incident edits).",
+  "expectedBehavior": "Runner sync must refuse or snapshot-protect foreign dirty non-release paths before mutating the tree.",
+  "evidenceOrRepro": "2026-07-14 cursor-grok-4.5 lost 0195/099/159/097/102 WIP and had to re-implement after RFT-0020 sync.",
+  "followUp": "Pre-build dirty-owner scan + handoff packet."
+}

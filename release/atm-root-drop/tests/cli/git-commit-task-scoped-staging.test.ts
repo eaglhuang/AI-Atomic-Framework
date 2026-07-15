@@ -226,6 +226,13 @@ try {
   ]);
   assert.equal(dryRun.ok, true);
   assert.equal((dryRun.evidence as any).commitBundle.schemaId, 'atm.taskScopedCommitBundle.v1');
+  assert.equal((dryRun.evidence as any).commitBundle.stagingStrategy, 'explicit-pathspec-git-add');
+  assert.deepEqual((dryRun.evidence as any).commitBundle.stagingCommand, ['git', 'add', '-A', '-f', '--', scopedFile]);
+  assert.equal(
+    ((dryRun.evidence as any).commitBundle.stagingCommand as string[]).includes('--pathspec-from-file=-'),
+    false,
+    'ATM auto-stage must not use stdin pathspec staging'
+  );
   assert.deepEqual((dryRun.evidence as any).commitBundle.stageFiles, [scopedFile]);
   assert.deepEqual((dryRun.evidence as any).commitBundle.commitFiles, [scopedFile]);
   assert.deepEqual((dryRun.evidence as any).commitBundle.skippedExternalDirtyFiles, [outsideFile]);

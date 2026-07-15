@@ -313,6 +313,112 @@ function runGitCommandWithEnv(
   });
 }
 
+interface StdinPathspecGitAddProcess {
+  readonly pid: number | null;
+  readonly commandLine: string;
+}
+
+function inspectStdinPathspecGitAddProcesses(): readonly StdinPathspecGitAddProcess[] {
+  if (process.env.ATM_GIT_STDIN_PATHSPEC_PREFLIGHT === '0') {
+    return [];
+  }
+  const fixture = process.env.ATM_GIT_STDIN_PATHSPEC_PROCESS_FIXTURE;
+  if (fixture) {
+    try {
+      const parsed = JSON.parse(fixture) as unknown;
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .map((entry) => {
+          if (!entry || typeof entry !== 'object') return null;
+          const record = entry as Record<string, unknown>;
+          const commandLine = typeof record.commandLine === 'string' ? record.commandLine : '';
+          return {
+            pid: typeof record.pid === 'number' ? record.pid : null,
+            commandLine
+          };
+        })
+        .filter((entry): entry is StdinPathspecGitAddProcess => Boolean(entry?.commandLine))
+        .filter(isStdinPathspecGitAddProcess);
+    } catch {
+      return [];
+    }
+  }
+  try {
+    if (process.platform === 'win32') {
+      const raw = execFileSync('powershell.exe', [
+        '-NoProfile',
+        '-Command',
+        "Get-CimInstance Win32_Process -Filter \"Name = 'git.exe'\" | Select-Object ProcessId,CommandLine | ConvertTo-Json -Compress"
+      ], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore']
+      }).trim();
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as unknown;
+      const rows = Array.isArray(parsed) ? parsed : [parsed];
+      return rows
+        .map((entry) => {
+          if (!entry || typeof entry !== 'object') return null;
+          const record = entry as Record<string, unknown>;
+          return {
+            pid: typeof record.ProcessId === 'number' ? record.ProcessId : null,
+            commandLine: typeof record.CommandLine === 'string' ? record.CommandLine : ''
+          };
+        })
+        .filter((entry): entry is StdinPathspecGitAddProcess => Boolean(entry?.commandLine))
+        .filter(isStdinPathspecGitAddProcess);
+    }
+    const raw = execFileSync('ps', ['-eo', 'pid=,args='], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+    return raw
+      .split(/\r?\n/)
+      .map((line): StdinPathspecGitAddProcess | null => {
+        const match = line.trim().match(/^(\d+)\s+(.+)$/);
+        if (!match) return null;
+        return {
+          pid: Number(match[1]),
+          commandLine: match[2] ?? ''
+        };
+      })
+      .filter((entry): entry is StdinPathspecGitAddProcess => Boolean(entry?.commandLine))
+      .filter(isStdinPathspecGitAddProcess);
+  } catch {
+    return [];
+  }
+}
+
+function isStdinPathspecGitAddProcess(processInfo: StdinPathspecGitAddProcess): boolean {
+  const commandLine = processInfo.commandLine.toLowerCase();
+  return /\bgit(?:\.exe)?["']?\s/.test(commandLine)
+    && commandLine.includes(' add ')
+    && commandLine.includes('--pathspec-from-file=-')
+    && commandLine.includes('--pathspec-file-nul');
+}
+
+function assertNoStdinPathspecGitAddPreflight(cwd: string) {
+  const processes = inspectStdinPathspecGitAddProcesses();
+  if (processes.length === 0) return;
+  throw new CliError(
+    'ATM_GIT_COMMIT_STDIN_PATHSPEC_ADD_ACTIVE',
+    'ATM detected an active git add --pathspec-from-file=- process before commit. This usually means an editor staging helper is waiting on stdin and can make the commit appear hung.',
+    {
+      exitCode: 1,
+      details: {
+        cwd,
+        processes,
+        recovery: [
+          'Wait briefly for the staging helper to finish, then rerun git commit-status.',
+          'If it remains active, terminate only the listed git add process after confirming it is the stuck stdin pathspec helper.',
+          'Stage files explicitly with git add -- <paths> before retrying node atm.mjs git commit.'
+        ],
+        disablePreflightEnv: 'ATM_GIT_STDIN_PATHSPEC_PREFLIGHT=0'
+      }
+    }
+  );
+}
+
 function stageTrackedActorRegistryIfNeeded(cwd: string): string | null {
   const actorRegistryState = inspectTrackedActorRegistryState(cwd);
   if (!actorRegistryState.tracked || !actorRegistryState.unstaged) {
@@ -638,6 +744,8 @@ export interface TaskScopedCommitBundleReport {
   readonly taskId: string;
   readonly ok: boolean;
   readonly apply: boolean;
+  readonly stagingStrategy: 'manual-staged-index' | 'explicit-pathspec-git-add';
+  readonly stagingCommand: readonly string[] | null;
   readonly stageFiles: readonly string[];
   readonly commitFiles: readonly string[];
   readonly skippedExternalDirtyFiles: readonly string[];
@@ -1596,6 +1704,7 @@ function runGitCommitStatus(options: ParsedGitOptions) {
   const actorId = resolvedActor.actorId;
   const status = readGitCommitAttemptStatus(options.cwd, actorId, options.taskId);
   const branchQueueStatus = inspectCurrentBranchCommitQueueStatus(options.cwd);
+  const stdinPathspecGitAddProcesses = inspectStdinPathspecGitAddProcesses();
   const label = `${actorId}${options.taskId ? ` / ${options.taskId}` : ''}`;
   return makeResult({
     ok: true,
@@ -1612,14 +1721,21 @@ function runGitCommitStatus(options: ParsedGitOptions) {
           branchQueueStatus.status === 'busy' ? 'ATM_GIT_COMMIT_BRANCH_QUEUE_ACTIVE' : 'ATM_GIT_COMMIT_BRANCH_QUEUE_STALE_OR_DEAD',
           branchQueueStatus.recommendedAction,
           { branchQueueStatus }
-        )
+        ),
+      stdinPathspecGitAddProcesses.length === 0
+        ? message('info', 'ATM_GIT_COMMIT_STDIN_PATHSPEC_ADD_CLEAR', 'No active git add stdin pathspec helper was detected.', {})
+        : message('warning', 'ATM_GIT_COMMIT_STDIN_PATHSPEC_ADD_ACTIVE', 'An active git add --pathspec-from-file=- helper was detected; this can make a commit appear stuck while the helper waits for stdin.', {
+          processes: stdinPathspecGitAddProcesses,
+          recovery: 'Terminate only the listed stuck helper after confirming it is not an intentional staging operation, then stage files explicitly with git add -- <paths>.'
+        })
     ],
     evidence: {
       action: 'commit-status',
       actorId,
       taskId: options.taskId,
       commitAttemptStatus: status,
-      branchCommitQueueStatus: branchQueueStatus
+      branchCommitQueueStatus: branchQueueStatus,
+      stdinPathspecGitAddProcesses
     }
   });
 }
@@ -1801,6 +1917,7 @@ function runGitCommit(options: ParsedGitOptions) {
     throw new CliError('ATM_CLI_USAGE', 'git commit requires --message <summary>.', { exitCode: 2 });
   }
   const actorId = resolvedActor.actorId;
+  assertNoStdinPathspecGitAddPreflight(options.cwd);
   const commitCommand = `node atm.mjs git commit --actor ${actorId}${options.taskId ? ` --task ${options.taskId}` : ''} --message ${quoteCliValue(options.message)}${options.noVerify ? ' --no-verify' : ''} --json`;
   let protectedOverrideAudit: ReturnType<typeof assertEmergencyApproval> | null = null;
   if (options.noVerify) {
@@ -3315,6 +3432,9 @@ function stageTaskScopedBundleFiles(cwd: string, files: readonly string[], env?:
   if (normalizedFiles.length === 0) {
     return;
   }
+  // Keep auto-stage finite and visible: never use stdin pathspecs here. A UI
+  // helper that runs `git add --pathspec-from-file=-` is diagnosed separately
+  // by commit-status and the commit preflight.
   runGitCommandWithEnv(cwd, ['add', '-A', '-f', '--', ...normalizedFiles], env ?? process.env, ['ignore', 'pipe', 'pipe']);
 }
 
@@ -3493,6 +3613,10 @@ export function resolveTaskScopedCommitBundle(input: {
     taskId: input.taskId,
     ok: blockedCode === null,
     apply: input.apply,
+    stagingStrategy: input.autoStage ? 'explicit-pathspec-git-add' : 'manual-staged-index',
+    stagingCommand: input.autoStage && stageCandidates.length > 0
+      ? ['git', 'add', '-A', '-f', '--', ...stageCandidates]
+      : null,
     stageFiles: input.apply && input.autoStage ? stageCandidates : inScopeUnstagedDirty,
     commitFiles: commitFilesWithGovernanceEvidence,
     skippedExternalDirtyFiles: uniqueSorted(skippedExternalDirtyFiles),

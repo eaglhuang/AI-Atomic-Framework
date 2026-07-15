@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-127",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Active in TASK-TEAM-0079",
+  "area": "Next claim / Broker lease lifecycle",
+  "finding": "`next --claim` can create a second overlapping active write intent for the same actor without first advancing, coalescing, or preserving the earlier lease epoch. Broker then treats the earlier valid task as stale and blocks re-arbitration before queue admission.",
+  "expectedBehavior": "Claim admission and Broker registration must be one atomic lifecycle: same-actor overlapping tasks either enter explicit per-surface queue order with both valid epochs, or the second claim fails before writing a conflicting intent.",
+  "evidenceOrRepro": "After claiming TASK-TEAM-0079 while TASK-TEAM-0075 remained active, `broker status` reported active intents for both, then `effectiveDecision` for 0079 became `blocked-active-lease` because 0075 epoch `1783822301570` was behind current epoch `1783823610473`.",
+  "followUp": "TASK-TEAM-0079 must add same-actor lease/queue regression and prevent stale-epoch self-conflict before AAO-0158 dogfood."
+}

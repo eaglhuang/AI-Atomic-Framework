@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {
@@ -10,6 +10,7 @@ import {
   isDeferrableGovernanceDirtyFile,
   restoreDeferredGovernanceDirtyFiles
 } from '../commit-bundle-assembly.ts';
+import { closeTransactionMutexPath } from '../close-transaction-mutex.ts';
 
 function writeJson(filePath: string, value: unknown) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -197,6 +198,91 @@ assert.ok(!autoTargetStaged.includes(autoBundleManifestPath), 'refreshed same-ta
 assert.equal(
   execFileSync('git', ['log', '-1', '--pretty=%s'], { cwd: autoTargetRepo, encoding: 'utf8' }).trim(),
   `chore(taskflow): close ${autoCommitTaskId} target governance bundle`
+);
+assert.equal(
+  existsSync(closeTransactionMutexPath(autoTargetRepo, autoCommitTaskId)),
+  false,
+  'auto-commit close transaction mutex must release after commit'
+);
+
+const blockedMutexTaskId = 'TASK-BUNDLE-MUTEX';
+const blockedMutexTargetRepo = path.join(tempRoot, 'target-mutex-blocked');
+const blockedMutexPlanningRepo = path.join(tempRoot, 'planning-mutex-blocked');
+initGitRepo(blockedMutexTargetRepo);
+initGitRepo(blockedMutexPlanningRepo);
+const blockedMutexPlanPath = path.join(blockedMutexPlanningRepo, 'docs/tasks/TASK-BUNDLE-MUTEX.task.md');
+writeText(blockedMutexPlanPath, `---\ntask_id: ${blockedMutexTaskId}\nstatus: running\n---\n# ${blockedMutexTaskId}\n`);
+writeJson(path.join(blockedMutexTargetRepo, '.atm/history/tasks/TASK-BUNDLE-MUTEX.json'), {
+  workItemId: blockedMutexTaskId,
+  title: `${blockedMutexTaskId} fixture`,
+  status: 'running',
+  claim: {
+    actorId: 'validator',
+    leaseId: 'lease-bundle-mutex',
+    state: 'active'
+  },
+  deliverables: ['src/app.ts'],
+  scopePaths: ['src/app.ts'],
+  source: { planPath: blockedMutexPlanPath }
+});
+writeJson(path.join(blockedMutexTargetRepo, '.atm/history/evidence/TASK-BUNDLE-MUTEX.json'), {
+  taskId: blockedMutexTaskId,
+  schemaId: 'atm.taskEvidence.v1'
+});
+writeJson(path.join(blockedMutexTargetRepo, '.atm/history/evidence/TASK-BUNDLE-MUTEX.closure-packet.json'), {
+  taskId: blockedMutexTaskId,
+  schemaId: 'atm.closurePacket.v1'
+});
+writeText(path.join(blockedMutexTargetRepo, 'src/app.ts'), 'export const value = "mutex";\n');
+const blockedMutexPath = closeTransactionMutexPath(blockedMutexTargetRepo, blockedMutexTaskId);
+writeJson(blockedMutexPath, {
+  schemaId: 'atm.closeTransactionMutexLease.v1',
+  taskId: blockedMutexTaskId,
+  actorId: 'other-captain',
+  leaseId: 'held-by-other',
+  acquiredAt: '2026-07-15T00:00:00.000Z',
+  expiresAt: '2999-01-01T00:00:00.000Z',
+  lockPath: blockedMutexPath
+});
+const blockedMutexBundle = buildTaskflowCommitBundle({
+  cwd: blockedMutexTargetRepo,
+  taskId: blockedMutexTaskId,
+  actorId: 'validator',
+  commitMode: 'auto-commit',
+  planningMirrorPath: blockedMutexPlanPath,
+  rosterIndexPath: null,
+  planningAuthorityDeliveryOk: false
+});
+await assert.rejects(
+  () => finalizeTaskflowCommitBundle({
+    bundle: blockedMutexBundle,
+    actorId: 'validator',
+    taskId: blockedMutexTaskId
+  }),
+  /close transaction mutex is already held/,
+  'only one closer may own the auto-commit close transaction window'
+);
+rmSync(blockedMutexPath, { force: true });
+writeJson(blockedMutexPath, {
+  schemaId: 'atm.closeTransactionMutexLease.v1',
+  taskId: blockedMutexTaskId,
+  actorId: 'crashed-captain',
+  leaseId: 'close-TASK-BUNDLE-MUTEX-1784080000000-99999999',
+  ownerPid: 99999999,
+  acquiredAt: '2026-07-15T00:00:00.000Z',
+  expiresAt: '2999-01-01T00:00:00.000Z',
+  lockPath: blockedMutexPath
+});
+const recoveredMutexFinal = await finalizeTaskflowCommitBundle({
+  bundle: blockedMutexBundle,
+  actorId: 'validator',
+  taskId: blockedMutexTaskId
+});
+assert.equal(recoveredMutexFinal.targetRepo.status, 'committed');
+assert.equal(
+  existsSync(blockedMutexPath),
+  false,
+  'dead-owner close transaction mutex must be cleaned and released after the recovered commit'
 );
 
 const sameRepoTaskId = 'TASK-BUNDLE-0003';

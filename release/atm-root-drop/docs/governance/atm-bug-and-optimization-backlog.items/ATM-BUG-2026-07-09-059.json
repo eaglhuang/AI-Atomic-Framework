@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-059",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Fixed in prompt-scoped next audit advisory lane",
+  "area": "Prompt routing / retrospective audit scope",
+  "finding": "`next --prompt` can hard-block retrospective cleanup/audit prompts as `ATM_NEXT_TASK_SCOPE_NOT_FOUND` when the prompt mentions a non-ledger OPT shorthand, even if the requested action is to inspect whether prior cleanup was completed rather than to claim that task.",
+  "expectedBehavior": "Audit/review prompts that mention non-ledger historical labels should either route to a read-only audit/orient lane or report the missing task as advisory while preserving safe read-only evidence commands. They should not force the agent into a retry loop when no exact task card exists.",
+  "evidenceOrRepro": "Fixed in `packages/cli/src/commands/next.ts`: read-only audit/analyze prompts with task-like scope misses return `status: task-scope-audit-advisory`, emit `ATM_NEXT_TASK_SCOPE_AUDIT_ADVISORY`, and keep safe read-only guidance instead of hard-blocking. Validation: `node atm.mjs next --prompt \"請檢查 OPT-12 後續盤點清單是否已補齊，這不是要 claim OPT-12，只是做 retrospective audit review\" --json` with `ATM_PLANNING_REPO_ROOT=C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework` returned ok with `ATM_NEXT_TASK_SCOPE_AUDIT_ADVISORY`; `npm run validate:prompt-scoped-next` covers the same retrospective OPT-12 lane.",
+  "followUp": "Keep the retrospective audit regression in `scripts/validate-prompt-scoped-next.ts`; mutation-oriented missing task scopes must still fail closed with `ATM_NEXT_TASK_SCOPE_NOT_FOUND`."
+}

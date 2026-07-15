@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-116",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "P0",
+  "status": "Fixed in TASK-TEAM-0078",
+  "area": "Team Broker / admission ordering",
+  "finding": "`TASK-TEAM-0076` added a seven-layer CID trace and per-surface queue projection in Broker/Team planning, but `next --claim` does not consume queue state. A waiting task is still rejected by broad shared backlog/map and CID overlap instead of receiving a per-file queued admission.",
+  "expectedBehavior": "Every task claim must run the same seven-layer CID decision, use queue state for confirmed shared file/surface conflicts, and return a bounded wait/next-file admission rather than a global overlap deadlock.",
+  "evidenceOrRepro": "Post-0076 dogfood: `TASK-AAO-0158` remains blocked by `next --claim` on shared backlog/map and CID overlap although 0076 is closed and the queue should permit file-ordered progress.",
+  "followUp": "Create follow-up for `next.ts` admission integration, queue-aware claim responses, stale-owner release, and a two-task dogfood regression. Keep 0076's trace/queue modules as the shared source of truth."
+}

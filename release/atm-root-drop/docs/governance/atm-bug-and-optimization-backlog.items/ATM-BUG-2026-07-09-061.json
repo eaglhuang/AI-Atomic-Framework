@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-061",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Fixed in this cleanup commit",
+  "area": "Skill preflight / encoding guard",
+  "finding": "The `encoding-touched-guard` skill tells agents to run `npm run check:encoding:touched`, but this framework repo does not define that npm script, so the recommended preflight fails before checking any touched files.",
+  "expectedBehavior": "Repo-local encoding guidance should point to an existing validator or the package should add the documented script; agents should not need to invent a fallback for BOM/U+FFFD checks.",
+  "evidenceOrRepro": "Fixed by adding `scripts/check-encoding-touched.ts`, `check:encoding:touched`, and `check:encoding:staged`. The wrapper delegates the actual scan to `node atm.mjs guard encoding --files ... --json`, supports explicit `--files`, includes untracked text files in touched mode, and keeps staged mode index-only. Validation: `npm run check:encoding:touched -- --files package.json`, `npm run check:encoding:touched`, `npm run check:encoding:staged`, and `npm run validate:script-parity`.",
+  "followUp": "Keep the script-parity assertion that both npm scripts remain wired to the wrapper; future encoding skill changes should prefer this canonical package script instead of ad hoc PowerShell fallbacks."
+}

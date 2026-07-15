@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-128",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0079",
+  "area": "Broker shared-surface queue trigger",
+  "finding": "`shouldQueueSharedSurface` required a `conflictMatrix.gateResults` block in addition to `needs-physical-split`. Physical file overlaps intentionally route to composer with matrix `allow`, so Broker reported a valid per-file conflict yet created no queue or holder notification.",
+  "expectedBehavior": "Any `needs-physical-split` decision with concrete overlapping files must create per-file queue entries and an existing-protocol `FreezeSignal` sidecar; matrix `allow` for the composer route must not suppress queueing.",
+  "evidenceOrRepro": "Live 0075 owner + AAO-0158 waiter transactions both returned `needs-physical-split`, while `broker status` still showed `sharedSurfaceQueues: []`.",
+  "followUp": "Fix trigger condition and retain two-task dogfood with queue entries, freeze/ack evidence, and a governed release that advances the waiter."
+}

@@ -1,0 +1,114 @@
+{
+  "schemaId": "atm.modelPriceCatalog.v1",
+  "specVersion": "0.1.0",
+  "migration": {
+    "strategy": "none",
+    "fromVersion": null,
+    "notes": "Initial standard list-price catalog for governed Team cost accounting."
+  },
+  "catalogVersion": "2026-07-15.standard",
+  "currency": "USD",
+  "immutable": true,
+  "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+  "prices": [
+    {
+      "provider": "openai",
+      "model": "gpt-5.4-mini",
+      "billingProduct": "responses-api",
+      "plan": "standard",
+      "region": "global",
+      "serviceTier": "standard",
+      "currency": "USD",
+      "priceUnit": "per-1m-tokens",
+      "effectiveAt": "2026-07-14T00:00:00.000Z",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "officialSourceUrl": "https://developers.openai.com/api/docs/pricing",
+      "sourceHash": "sha256:0d50e0debba36db67f44e69369f98ac6d12397b752c8f7cc64bce4dc1204232b",
+      "rates": {
+        "input": 0.75,
+        "cacheRead": 0.075,
+        "output": 4.5
+      },
+      "notes": "OpenAI API standard short-context row; cache write is not listed for this model row."
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.6-terra",
+      "billingProduct": "responses-api",
+      "plan": "standard",
+      "region": "global",
+      "serviceTier": "standard",
+      "currency": "USD",
+      "priceUnit": "per-1m-tokens",
+      "effectiveAt": "2026-07-14T00:00:00.000Z",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "officialSourceUrl": "https://developers.openai.com/api/docs/pricing",
+      "sourceHash": "sha256:6d84bfcfd88d771b0fcd64bd9317a965317089949f1a9da3aede1a886bc84c36",
+      "rates": {
+        "input": 2.5,
+        "cacheRead": 0.25,
+        "cacheWrite": 3.125,
+        "output": 15
+      }
+    },
+    {
+      "provider": "anthropic",
+      "model": "claude-fable-5",
+      "billingProduct": "messages-api",
+      "plan": "standard",
+      "region": "global",
+      "serviceTier": "standard",
+      "currency": "USD",
+      "priceUnit": "per-1m-tokens",
+      "effectiveAt": "2026-07-14T00:00:00.000Z",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "officialSourceUrl": "https://docs.anthropic.com/en/docs/about-claude/pricing",
+      "sourceHash": "sha256:964e2a5fd6bd84a4b3f9d51b806c3bd03189938b4ee74fc1834357b24de85745",
+      "rates": {
+        "input": 10,
+        "cacheRead": 1,
+        "cacheWrite": 12.5,
+        "output": 50
+      },
+      "notes": "Cache read uses 10% input; 5-minute cache write uses 1.25x input."
+    },
+    {
+      "provider": "gemini-direct",
+      "model": "gemini-3.1-flash-lite",
+      "billingProduct": "gemini-api",
+      "plan": "paid",
+      "region": "global",
+      "serviceTier": "standard",
+      "currency": "USD",
+      "priceUnit": "per-1m-tokens",
+      "effectiveAt": "2026-07-09T00:00:00.000Z",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "officialSourceUrl": "https://ai.google.dev/gemini-api/docs/pricing",
+      "sourceHash": "sha256:97470f8c536d648ac2c9c9a2c44ee2b0c30e27f134a5c0a065857a551e658cd1",
+      "rates": {
+        "input": 0.25,
+        "cacheRead": 0.025,
+        "output": 1.5
+      }
+    },
+    {
+      "provider": "claude-code",
+      "model": "copilot-pro",
+      "billingProduct": "agent-subscription",
+      "plan": "pro",
+      "region": "global",
+      "serviceTier": "standard",
+      "currency": "USD",
+      "priceUnit": "per-seat-month",
+      "effectiveAt": "2026-07-14T00:00:00.000Z",
+      "retrievedAt": "2026-07-15T00:00:00.000+08:00",
+      "officialSourceUrl": "https://github.com/features/copilot/plans",
+      "sourceHash": "sha256:62ff13be4b72c43170b507f563eeb107d29ff2ea6b6db0bc9a8681c22467e506",
+      "rates": {
+        "seatMonth": 10,
+        "creditOverage": 0.04
+      },
+      "notes": "Subscription rows require a seat allocation policy before fully loaded cost is considered complete."
+    }
+  ]
+}

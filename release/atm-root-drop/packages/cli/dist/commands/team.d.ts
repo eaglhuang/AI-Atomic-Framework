@@ -2,16 +2,15 @@ import { type TeamClosureAttestationEvidence, type TeamClosureReviewerIndependen
 import { type TeamKnowledgeSummary } from './team-knowledge.ts';
 import { evaluateTeamBrokerLane, type TeamBrokerLaneEvidence } from '../../../core/src/broker/team-lane.ts';
 import { type TeamWorkerAdapterContract } from '../../../core/src/team-runtime/nodejs-worker-adapter.ts';
-import { buildAnthropicTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/anthropic.ts';
-import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
-import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/claude-code.ts';
-import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
-import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
-import { buildOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/openai.ts';
 import { type TeamProviderHttpExecutor } from '../../../core/src/team-runtime/provider-contract.ts';
 import { type TeamProviderSelectionConfig } from '../../../core/src/team-runtime/provider-selection.ts';
 import { runProviderOrchestration } from '../../../core/src/team-runtime/execution-orchestrator.ts';
 import { type GitIndexOwnershipReport } from './git-index-ownership.ts';
+import { type TeamGrowthContract, type TeamRoleGrowthObservabilityContract } from './team/growth-contract.ts';
+import { type TeamRoleRoutingMatrix, type TeamRoleSkillPackContract, type TeamRoleSkillPackManifest } from './team/role-skill-packs.ts';
+export { buildTeamGrowthContract, buildTeamRoleGrowthObservabilityContract, type TeamGrowthContract, type TeamRoleGrowthObservabilityContract } from './team/growth-contract.ts';
+export { buildProviderNeutralRoleSkillPackManifest, buildTeamRoleRoutingMatrix, buildTeamRoleSkillPackContract, type TeamRoleRoutingMatrix, type TeamRoleSkillPackContract, type TeamRoleSkillPackManifest } from './team/role-skill-packs.ts';
+export { buildAnthropicRuntimeBridgeSummary, buildEditorExecutionRuntimeBridgeSummary, buildGeminiDirectRuntimeBridgeSummary, buildMicrosoftFoundryRuntimeBridgeSummary, buildOpenAIFamilyRuntimeBridgeSummary } from './team/runtime-bridges.ts';
 type TeamVendorLocalSecretsSummary = {
     schemaId: 'atm.teamVendorLocalSecretsSummary.v1';
     path: string;
@@ -85,185 +84,6 @@ type TeamCrewRole = {
     required: boolean;
     permissions: string[];
     description: string;
-};
-type TeamRoleSkillPackContract = {
-    schemaId: 'atm.teamRoleSkillPackContract.v1';
-    providerNeutral: true;
-    coordinatorOwnsLifecycle: true;
-    roles: Array<{
-        role: string;
-        agentId: string;
-        skillPackId: string;
-        specialistSkills: string[];
-        allowedPermissions: string[];
-        forbiddenPermissions: string[];
-        playbookSlice: string;
-        growthContractAttachment: string;
-    }>;
-};
-type TeamRoleSkillPackManifest = {
-    schemaId: 'atm.teamRoleSkillPackManifest.v1';
-    providerNeutral: true;
-    coordinatorOwnsLifecycle: true;
-    discoveryMode: 'capability-driven';
-    roleFirstProviderSecond: true;
-    sharedVocabulary: {
-        brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-    };
-    roles: Array<{
-        role: string;
-        skillPackId: string;
-        playbookSlice: string;
-        capabilityTags: string[];
-        permissionLease: {
-            alignment: 'role-first';
-            allowedPermissions: string[];
-            forbiddenPermissions: string[];
-        };
-        selectedProvider: {
-            providerId: string;
-            sdkId: string;
-            modelId: string;
-            runtimeMode: TeamRuntimeMode;
-            source: 'repo-default' | 'cli-global-default' | 'role-override' | 'cli-role-override';
-        };
-        providerCapabilities: Array<{
-            providerId: string;
-            runtimeModes: TeamRuntimeMode[];
-            artifacts: string[];
-            satisfiesRolePack: true;
-            reason: string;
-        }>;
-        growthContractAttachment: string;
-    }>;
-};
-type TeamRoleRoutingMatrix = {
-    schemaId: 'atm.teamRoleRoutingMatrix.v1';
-    providerNeutral: true;
-    coordinatorOwnsLifecycle: true;
-    routes: Array<{
-        workstream: string;
-        primaryRole: string;
-        supportingRoles: string[];
-        advisoryRoles: string[];
-        roleOrder: string[];
-        parallelSafeRoles: string[];
-        advisoryOnlyRoles: string[];
-        playbookSlice: string;
-        lifecycleOwner: 'coordinator';
-        stopConditions: string[];
-    }>;
-};
-type TeamGrowthContract = {
-    schemaId: 'atm.teamGrowthContract.v1';
-    sharedAcrossRolePacks: true;
-    taxonomy: string[];
-    captureTemplate: string[];
-    promotionPolicy: {
-        stableRuleTarget: string;
-        rawCaseTarget: string;
-    };
-};
-type TeamRoleGrowthObservabilityContract = {
-    schemaId: 'atm.teamRoleGrowthObservabilityContract.v1';
-    sharedAcrossRolePacks: true;
-    referenceFirst: true;
-    sourceGrowthContract: 'atm.teamGrowthContract.v1';
-    sourceObservabilityContract: 'atm.teamAgentObservabilityContract.v1';
-    learningEventProjection: {
-        eventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-        eventType: 'artifact.output';
-        artifactType: 'atm.teamRoleGrowthLearningItem.v1';
-        queryKeys: string[];
-        artifactFields: string[];
-    };
-    frictionClassification: {
-        sharedAtmRoutingFriction: string[];
-        roleSpecificFriction: string[];
-    };
-    roleMappings: Array<{
-        role: string;
-        agentId: string;
-        skillPackId: string;
-        playbookSlice: string;
-        growthAttachmentPoint: string;
-        learningReference: string;
-        taxonomy: string[];
-        observableEventSelector: {
-            role: string;
-            eventType: 'artifact.output';
-            artifactType: 'atm.teamRoleGrowthLearningItem.v1';
-        };
-    }>;
-    metrics: Array<{
-        metricId: string;
-        description: string;
-        numerator: Record<string, string>;
-        denominator: Record<string, string>;
-        groupedBy: string[];
-    }>;
-    brokerConflictVocabulary: {
-        decisionClass: string;
-        decisionReason: string;
-        violationStatus: string;
-        blockedCode: 'broker-conflict-blocked';
-    };
-};
-type TeamOpenAIFamilyRuntimeBridgeSummary = {
-    schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1';
-    milestone: 'M9I';
-    providerIds: readonly ['openai', 'azure-openai'];
-    sharedProviderInterface: 'atm.teamProviderContract.v1';
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-    coordinatorOwnedAuthority: true;
-    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-    bridges: readonly [
-        ReturnType<typeof buildOpenAITeamProviderBridgeDescriptor>,
-        ReturnType<typeof buildAzureOpenAITeamProviderBridgeDescriptor>
-    ];
-};
-type TeamEditorExecutionRuntimeBridgeSummary = {
-    schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1';
-    milestone: 'M9I';
-    providerIds: readonly ['claude-code', 'gemini'];
-    sharedProviderInterface: 'atm.teamProviderContract.v1';
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-    roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1';
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-    coordinatorOwnedAuthority: true;
-    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-    bridges: readonly [
-        ReturnType<typeof buildClaudeCodeTeamProviderBridgeDescriptor>,
-        ReturnType<typeof buildGeminiTeamProviderBridgeDescriptor>
-    ];
-};
-type TeamMicrosoftFoundryRuntimeBridgeSummary = {
-    schemaId: 'atm.microsoftFoundryRuntimeBridgeSummary.v1';
-    milestone: 'M9I';
-    providerIds: readonly ['microsoft-foundry'];
-    sharedProviderInterface: 'atm.teamProviderContract.v1';
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-    supportedSurfaces: readonly ['project-chat-inference', 'agent-service'];
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-    coordinatorOwnedAuthority: true;
-    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-    bridges: readonly [
-        ReturnType<typeof buildMicrosoftFoundryTeamProviderBridgeDescriptor>
-    ];
-};
-type TeamAnthropicRuntimeBridgeSummary = {
-    schemaId: 'atm.anthropicRuntimeBridgeSummary.v1';
-    milestone: 'M10X';
-    providerIds: readonly ['anthropic'];
-    sharedProviderInterface: 'atm.teamProviderContract.v1';
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-    coordinatorOwnedAuthority: true;
-    brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-    bridges: readonly [
-        ReturnType<typeof buildAnthropicTeamProviderBridgeDescriptor>
-    ];
 };
 type TeamRuntimePilot = {
     schemaId: 'atm.teamRuntimePilot.v1';
@@ -357,7 +177,6 @@ type TeamImplementerSelector = {
 type TeamPatrolMode = 'claim-preflight' | 'close-preflight' | 'big-script' | 'daily-noon';
 type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
 type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
-type TeamRuntimeTier = 'raw-api' | 'agent-sdk' | 'editor';
 type TeamReworkRouteStatus = 'work-in-progress' | 'needs-rework' | 'revalidate-pending' | 'ready-for-close' | 'blocked' | 'escalated';
 type TeamReworkFinding = {
     source: 'reviewer' | 'validator';
@@ -787,6 +606,7 @@ export declare function buildProposalFirstParityFindings(input: {
     advisoryOnly?: boolean;
 }): PermissionFinding[];
 export declare function buildTeamPlan(input: {
+    cwd?: string;
     task: Record<string, unknown> | null | undefined;
     recipe: TeamRecipe;
     writePaths: string[];
@@ -1016,57 +836,59 @@ export declare function buildTeamPlan(input: {
         roleTiers: {
             role: string;
             agentId: string;
-            runtimeTier: TeamRuntimeTier;
+            runtimeTier: "editor" | "raw-api" | "agent-sdk";
             rationale: string;
         }[];
     };
-    openAIFamilyRuntimeBridges: TeamOpenAIFamilyRuntimeBridgeSummary;
-    editorExecutionRuntimeBridges: TeamEditorExecutionRuntimeBridgeSummary;
-    microsoftFoundryRuntimeBridges: TeamMicrosoftFoundryRuntimeBridgeSummary;
-    anthropicRuntimeBridges: TeamAnthropicRuntimeBridgeSummary;
+    shadowSchedule: import("./team/scheduler.ts").TeamShadowSchedule;
+    openAIFamilyRuntimeBridges: {
+        schemaId: "atm.openAIFamilyRuntimeBridgeSummary.v1";
+        milestone: "M9I";
+        providerIds: readonly ["openai", "azure-openai"];
+        sharedProviderInterface: "atm.teamProviderContract.v1";
+        sharedArtifactType: "atm.teamProviderRunArtifact.v1";
+        observabilityEventSchemaId: "atm.teamAgentObservabilityEvent.v1";
+        coordinatorOwnedAuthority: true;
+        brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
+        bridges: readonly [ReturnType<typeof import("../../../core/src/team-runtime/providers/openai.ts").buildOpenAITeamProviderBridgeDescriptor>, ReturnType<typeof import("packages/core/src/team-runtime/providers/azure-openai.ts").buildAzureOpenAITeamProviderBridgeDescriptor>];
+    };
+    editorExecutionRuntimeBridges: {
+        schemaId: "atm.editorExecutionRuntimeBridgeSummary.v1";
+        milestone: "M9I";
+        providerIds: readonly ["claude-code", "gemini"];
+        sharedProviderInterface: "atm.teamProviderContract.v1";
+        sharedArtifactType: "atm.teamProviderRunArtifact.v1";
+        roleEnvelopeSchemaId: "atm.teamEditorSubagentRoleEnvelope.v1";
+        observabilityEventSchemaId: "atm.teamAgentObservabilityEvent.v1";
+        coordinatorOwnedAuthority: true;
+        brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
+        bridges: readonly [ReturnType<typeof import("packages/core/src/team-runtime/providers/claude-code.ts").buildClaudeCodeTeamProviderBridgeDescriptor>, ReturnType<typeof import("packages/core/src/team-runtime/providers/gemini.ts").buildGeminiTeamProviderBridgeDescriptor>];
+    };
+    microsoftFoundryRuntimeBridges: {
+        schemaId: "atm.microsoftFoundryRuntimeBridgeSummary.v1";
+        milestone: "M9I";
+        providerIds: readonly ["microsoft-foundry"];
+        sharedProviderInterface: "atm.teamProviderContract.v1";
+        sharedArtifactType: "atm.teamProviderRunArtifact.v1";
+        supportedSurfaces: readonly ["project-chat-inference", "agent-service"];
+        observabilityEventSchemaId: "atm.teamAgentObservabilityEvent.v1";
+        coordinatorOwnedAuthority: true;
+        brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
+        bridges: readonly [ReturnType<typeof import("packages/core/src/team-runtime/providers/microsoft-foundry.ts").buildMicrosoftFoundryTeamProviderBridgeDescriptor>];
+    };
+    anthropicRuntimeBridges: {
+        schemaId: "atm.anthropicRuntimeBridgeSummary.v1";
+        milestone: "M10X";
+        providerIds: readonly ["anthropic"];
+        sharedProviderInterface: "atm.teamProviderContract.v1";
+        sharedArtifactType: "atm.teamProviderRunArtifact.v1";
+        observabilityEventSchemaId: "atm.teamAgentObservabilityEvent.v1";
+        coordinatorOwnedAuthority: true;
+        brokerConflictVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
+        bridges: readonly [ReturnType<typeof import("../../../core/src/team-runtime/providers/anthropic.ts").buildAnthropicTeamProviderBridgeDescriptor>];
+    };
     runtimePilot: TeamRuntimePilot;
 };
-export declare function buildOpenAIFamilyRuntimeBridgeSummary(): TeamOpenAIFamilyRuntimeBridgeSummary;
-export declare function buildEditorExecutionRuntimeBridgeSummary(): TeamEditorExecutionRuntimeBridgeSummary;
-export declare function buildGeminiDirectRuntimeBridgeSummary(): {
-    schemaId: string;
-    providerIds: readonly ["gemini-direct"];
-    sharedProviderInterface: string;
-    sharedArtifactType: string;
-    coordinatorOwnedAuthority: boolean;
-    bridge: {
-        schemaId: string;
-        providerId: string;
-        bridgeSchemaId: string;
-        configSchemaId: string;
-        supportedRuntimeModes: readonly ["real-agent", "broker-only"];
-        requiredConfigRefs: readonly ["modelId", "apiKeyEnvVar"];
-        optionalConfigRefs: readonly ["baseUrlEnvVar"];
-        authModes: readonly ["api-key-env"];
-        executionReadiness: "vendor-execution-ready";
-        executionSurface: "gemini-generate-content-http";
-        brokerCheckedPermissions: readonly ["exec.validator"];
-        artifactType: string;
-        observabilityEventTypes: readonly ["session.start", "artifact.output", "session.complete"];
-        sharedBrokerVocabulary: readonly ["decisionClass", "decisionReason", "violationStatus", "broker-conflict-blocked"];
-        rawSecretsLogged: false;
-    };
-};
-export declare function buildMicrosoftFoundryRuntimeBridgeSummary(): TeamMicrosoftFoundryRuntimeBridgeSummary;
-export declare function buildAnthropicRuntimeBridgeSummary(): TeamAnthropicRuntimeBridgeSummary;
-export declare function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract;
-export declare function buildProviderNeutralRoleSkillPackManifest(input: {
-    recipe: TeamRecipe;
-    roleSkillPacks?: TeamRoleSkillPackContract;
-    selectionConfig?: TeamProviderSelectionConfig;
-    providerIds?: readonly string[];
-}): TeamRoleSkillPackManifest;
-export declare function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix;
-export declare function buildTeamGrowthContract(): TeamGrowthContract;
-export declare function buildTeamRoleGrowthObservabilityContract(input: {
-    roleSkillPacks: TeamRoleSkillPackContract;
-    growthContract?: TeamGrowthContract;
-}): TeamRoleGrowthObservabilityContract;
 export declare function buildTeamRuntimePilot(input: {
     roleSkillPacks: TeamRoleSkillPackContract;
     routingMatrix: TeamRoleRoutingMatrix;
@@ -1377,6 +1199,8 @@ export declare function writeTeamRun(input: {
             authorityChain: string;
         };
     };
+    shadowSchedule: import("./team/scheduler.ts").TeamShadowSchedule;
+    contributionComposition: import("./team/composer.ts").TeamContributionCompositionResult;
     runtimeTierContract: {
         schemaId: string;
         tiers: readonly ["raw-api", "agent-sdk", "editor"];
@@ -1384,7 +1208,7 @@ export declare function writeTeamRun(input: {
         roleTiers: {
             role: string;
             agentId: string;
-            runtimeTier: TeamRuntimeTier;
+            runtimeTier: "editor" | "raw-api" | "agent-sdk";
             rationale: string;
         }[];
     };
@@ -1661,4 +1485,3 @@ export declare function buildTeamLeaseNotFoundDetails(input: {
     holderCount: number;
     requiredCommand: string;
 };
-export {};

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-115",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Hook failure output UX",
+  "finding": "Pre-push and pre-commit hook failures surface as one large raw JSON blob (>100 KB observed) on host git stderr; the blocking finding and `requiredCommand` are buried, so both human and AI operators must grep persisted output to find the actual remediation.",
+  "expectedBehavior": "Hook failures should print a compact human summary first (top blocking finding + exact requiredCommand), then write the full JSON to a report file path referenced in the summary.",
+  "evidenceOrRepro": "2026-07-11 `git push origin main` block for `ATM_TASK_AUDIT_BULK_CLOSE_WITHOUT_MANIFEST` produced ~118 KB of JSON through stderr across two attempts before the finding was located.",
+  "followUp": "Add a summary-first formatter to hook stderr with `--json-report <path>` style overflow."
+}

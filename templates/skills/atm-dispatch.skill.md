@@ -57,8 +57,16 @@ After every `next --prompt` or `next --claim` response, read
 `evidence.nextAction.playbook` before drafting dispatch instructions, editing,
 closing, or committing. The playbook is the short channel-specific work order.
 
+If a route, validator, hook, or worker report includes an `ATM_*` error code,
+route interpretation through `atm-error-code-resolver` and its shared registry
+instead of keeping private recovery prose in the dispatch brief.
+
 ## Dispatch Rules
 
+- Before drafting a plan or task cards, state `Planning authority`, `Target
+  authority`, and `Closure authority`. If planning and target repositories
+  differ, keep the full plan and source cards in the planning repository and
+  let the target receive only CLI-imported ATM ledger records.
 - Do not create a parallel task model; route task-card work through ATM.
 - Do not delegate write authority unless the user explicitly granted it.
 - Prefer internal sidecars for review, grep, preflight, checklist, and
@@ -120,6 +128,14 @@ governance defects go to the bug backlog first.
 {{CHARTER_INVARIANTS}}
 
 ## Captain Dogfood Lessons (2026-07-14)
+
+Planning authority:
+
+- Do not let the current working directory decide where a plan lives. Resolve
+  planning, target, and closure authority before writing any plan or card.
+- Memory and handoff summaries are not a gate. Persist cross-repository planning
+  rules in `atm-task-card-authoring` and verify the card source path before
+  import.
 
 Token / speed:
 

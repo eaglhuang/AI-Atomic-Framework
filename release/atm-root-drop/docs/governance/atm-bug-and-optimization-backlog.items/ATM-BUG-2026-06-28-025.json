@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-025",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`, push verified by `f57dbfe0b`)",
+  "area": "Git governance / pre-push evidence visibility",
+  "finding": "`hook pre-push` commit-range inspection only scanned git-head evidence from committed refs, so a valid worktree-local `git-head` backfill for the current `HEAD` was invisible to the guard and protected-branch pushes were still blocked as missing evidence.",
+  "expectedBehavior": "Pre-push commit-range inspection should also read worktree-local `git-head` evidence, so a freshly backfilled current `HEAD` can satisfy the push guard without requiring an extra evidence-only commit.",
+  "evidenceOrRepro": "Reproduced on 2026-06-28 after emergency framework delivery: `main` commit `191fd310166054d3fa526b6961351716bb2d489e` could be backfilled locally, but pre-push still reported `ATM_COMMIT_RANGE_GIT_HEAD_EVIDENCE_MISSING` because the guard only read `git show <ref>:.atm/history/evidence/git-head.jsonl`. Landed in `c589f125049ad81adc146f1b78e6a5ee36b8f607`; final verification used `node atm.mjs evidence git-head-backfill ...`, an evidence-only follow-up commit `f57dbfe0bdfdf9f939e35400ec346501f4ccb2f3`, and a successful `git push origin main` with `ATM_HOOK_PRE_PUSH_OK`.",
+  "followUp": "Keep regression coverage in `scripts/validate-git-hooks-enforcement.ts` by backfilling `HEAD` and verifying `hook pre-push` accepts the worktree evidence."
+}

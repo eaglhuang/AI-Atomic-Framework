@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-109",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in current working tree",
+  "area": "Team Agents / permission hard gate",
+  "finding": "`team validate/start` checked the permission catalog, but direct `team lease/release` mutation accepted an unknown permission or a missing required scope after bypassing recipe validation.",
+  "expectedBehavior": "Every permission lease mutation must pass one fail-closed hard gate that verifies catalog membership and required scope before writing runtime state.",
+  "evidenceOrRepro": "Reproduced by tracing `runTeamLifecycleAction` in `packages/cli/src/commands/team.ts`; the direct lease path only required a non-empty permission string. Added `ATM_TEAM_PERMISSION_HARD_GATE` and direct lease/release checks; broker tests pass.",
+  "followUp": "Keep direct lifecycle mutation and provider permission brokerage covered by one catalog-backed hard-gate regression."
+}

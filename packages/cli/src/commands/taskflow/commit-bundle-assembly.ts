@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import os from 'node:os';
 import path from 'node:path';
 import { buildTaskflowCommitMessage } from './commit-messages.ts';
+import { withCloseTransactionMutex } from './close-transaction-mutex.ts';
 import { expandDirectoryDeliverableDeclarations } from '../tasks/historical-delivery.ts';
 import { loadTaskDocumentOrThrow } from '../tasks/public-surface.ts';
 import { assertCloseWindowStagingAllowed } from '../tasks/close-window-lock.ts';
@@ -1133,8 +1134,41 @@ export async function finalizeTaskflowCommitBundle(input: {
   const sealedInputBundle = input.bundle.commitMode === 'dry-run'
     ? input.bundle
     : refreshSealAndCommitReceipt(input.bundle);
+  const mutexRepoRoot = sealedInputBundle.targetRepo.repoRoot ?? sealedInputBundle.planningRepo.repoRoot;
   const strictIsolation = sealedInputBundle.commitMode === 'stage-only';
   const sharedRepoMode = isSameRepoBundle(sealedInputBundle);
+  if (sealedInputBundle.commitMode === 'auto-commit' && mutexRepoRoot) {
+    return withCloseTransactionMutex({
+      repoRoot: mutexRepoRoot,
+      taskId: input.taskId,
+      actorId: input.actorId
+    }, () => finalizeTaskflowCommitBundleWithSeal({
+      bundle: sealedInputBundle,
+      actorId: input.actorId,
+      taskId: input.taskId,
+      strictIsolation,
+      sharedRepoMode
+    }));
+  }
+  return finalizeTaskflowCommitBundleWithSeal({
+    bundle: sealedInputBundle,
+    actorId: input.actorId,
+    taskId: input.taskId,
+    strictIsolation,
+    sharedRepoMode
+  });
+}
+
+async function finalizeTaskflowCommitBundleWithSeal(input: {
+  bundle: TaskflowGovernedCommitBundle;
+  actorId: string;
+  taskId: string;
+  strictIsolation: boolean;
+  sharedRepoMode: boolean;
+}): Promise<TaskflowGovernedCommitBundle> {
+  const sealedInputBundle = input.bundle;
+  const strictIsolation = input.strictIsolation;
+  const sharedRepoMode = input.sharedRepoMode;
   if (sharedRepoMode) {
     const repoRoot = sealedInputBundle.targetRepo.repoRoot!;
     const sharedRepo = buildSharedRepoBundle(repoRoot, [

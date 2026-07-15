@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-029",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`)",
+  "area": "Actor identity / cross-editor handoff",
+  "finding": "Repo default identity could be silently reused across editors or agents, and commit attribution did not read per-actor runtime identity consistently, so a new agent could accidentally commit or pass governance checks with a prior agent's stale identity.",
+  "expectedBehavior": "Governed git boundaries should require an explicit actor, per-actor runtime identity should be resolved before default identity, editor/provider provenance mismatches should block commit attribution, stale repo default identity should be clearable before handoff, and ATM entry skills should teach the identity handoff gate before the agent reaches CLI/hook failure.",
+  "evidenceOrRepro": "User concern on 2026-06-28: agents from different editors can overwrite or inherit each other's identity, causing commits or permissions to use old records. During fixture dry run, `restore-operator` had a valid `.atm/runtime/identity/actors/restore-operator.json` but hook attribution still reported `ATM_COMMIT_IDENTITY_PROFILE_MISSING`, proving the resolver ignored per-actor runtime identity. A follow-up dogfood pass found that only repairing CLI/hook was insufficient: `atm-next`, `atm-governance-router`, dispatch, handoff, and worker entry skills also need the same semantic warning so agents clear stale default identity and set explicit actor identity before claim/commit/report. Landed in `c589f125049ad81adc146f1b78e6a5ee36b8f607`, including `identity clear`, explicit governed git actor enforcement, per-actor identity resolution, editor/provider mismatch checks, and canonical skill-template handoff guidance propagated through integration installers.",
+  "followUp": "Keep `identity clear`, explicit git actor enforcement, per-actor identity resolver, editor/provider mismatch checks, and skill-compiler actor handoff gate covered by hook/git governance and integration-adapter regression. Future handoff docs should say: clear stale default, then set/use explicit actor plus task before claiming authority."
+}

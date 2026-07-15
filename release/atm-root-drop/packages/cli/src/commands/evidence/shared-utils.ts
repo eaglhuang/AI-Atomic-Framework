@@ -5,6 +5,7 @@ export function isRecord(value: unknown): value is Record<string, unknown> {
 export function isCommandRunProof(value: unknown): boolean {
   if (!isRecord(value)) return false;
   return typeof value.exitCode === 'number'
+    && value.exitCode === 0
     && typeof value.stdoutSha256 === 'string'
     && value.stdoutSha256.length > 0
     && typeof value.stderrSha256 === 'string'

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-16-013",
+  "date": "2026-06-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in `5f1a4548`",
+  "area": "Historical batch evidence / commit bundle",
+  "finding": "`taskflow close --historical-batch` writes per-task closure bundles but does not stage the referenced historical batch envelope, leaving `.atm/history/evidence/historical-batches/<batch>.json` untracked while closure packets reference it.",
+  "expectedBehavior": "The close commit bundle should include the referenced historical batch envelope, or create a governed batch-envelope commit before task-level closure packets can reference it.",
+  "evidenceOrRepro": "After closing `TASK-CID-0103`, `git status --short` still showed `?? .atm/history/evidence/historical-batches/hist-batch-2026-06-16T01-40-43-634Z.json`; closure output referenced that same batch path as the source of the slice. Fast repair `5f1a4548` added envelope staging and dogfood dry-runs for `TASK-CID-0105` / `TASK-CID-0107` showed the batch envelope in `governedCommitBundle.targetRepo.stageFiles`.",
+  "followUp": "Keep regression coverage in `packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts`."
+}

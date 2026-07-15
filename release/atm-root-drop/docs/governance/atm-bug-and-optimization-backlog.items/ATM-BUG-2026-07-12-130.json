@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-130",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0078",
+  "area": "Team L5 Broker admission",
+  "finding": "`team plan` calls Broker decision directly and treats any shared-file conflict as a global `broker-conflict-blocked`, without consuming the canonical per-file queue or retaining the task's disjoint private paths.",
+  "expectedBehavior": "Team plan/start must use the same queue-aware admission projection as `next --claim`: queued shared paths stay blocked, while the role runtime receives only its private allowed files; a team with no private paths remains blocked.",
+  "evidenceOrRepro": "Live `team plan --task TASK-TEAM-0079 --team-size L5` correctly found shared backlog/map files with active 0075, but then denied the whole L5 plan although 0079 has disjoint broker/runtime files.",
+  "followUp": "Add a Team admission regression for queue head, queued-private, and shared-only blocked; dogfood a real L5 run after queue state is consumed."
+}

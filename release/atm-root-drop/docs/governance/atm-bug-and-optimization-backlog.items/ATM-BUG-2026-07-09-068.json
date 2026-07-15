@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-068",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in validator cache/status lane",
+  "area": "Governed git / commit latency",
+  "finding": "`node atm.mjs git commit --auto-stage --defer-foreign-staged` can spend several minutes inside pre-commit validation even after the task has already recorded fresh focused evidence. This is distinct from `ATM-BUG-2026-07-09-064` observability and `ATM-BUG-2026-07-09-065` task-card validator selection: the wrapper itself still lacks a fast path, validator-result reuse, or phase-level cache for the commit hook.",
+  "expectedBehavior": "Governed commit should reuse fresh task evidence or a trusted validator cache when the commit bundle matches the already-validated scope, and it should expose phase timing so operators can see which hook step is consuming time. A normal atomic task commit should not spend four minutes rerunning heavyweight checks unless the touched paths or policy truly require it.",
+  "evidenceOrRepro": "Fixed by the validator runner's manifest/receipt cache and status surface plus commit attempt status. Validator runs now record receipts, support resume/status polling, bound individual validator attempts with `--validator-timeout-ms`, and preserve a durable commit-attempt status packet so repeated heavyweight validation no longer appears as an opaque hung commit. Verification: `node --strip-types tests/cli/validator-run-resume-and-status.test.ts` and `node --strip-types tests/cli/git-commit-timeout-and-status.test.ts` pass.",
+  "followUp": "Hook-level evidence reuse remains conservative for protected git-head provenance; broader skip policies should continue to be explicit and cache-keyed."
+}

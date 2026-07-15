@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-16-014",
+  "date": "2026-06-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "Medium",
+  "status": "Fixed in historical-batch diagnostic disposition lane",
+  "area": "Historical batch evidence / partial slices",
+  "finding": "Historical batch import can leave unclosed partial or diagnostic-only task slices as untracked `.atm/history/tasks`, evidence, and task-events, while completed slices close cleanly. The operator previously had no clear governed command to archive, abandon, or commit diagnostic-only slices without pretending they are done.",
+  "expectedBehavior": "Batch evidence should provide an explicit partial-slice disposition: keep diagnostic evidence, abandon with reason, or remove generated diagnostic evidence through a governed cleanup path. Close-ready slices must remain fail-closed to taskflow close.",
+  "evidenceOrRepro": "Fixed by `node atm.mjs evidence historical-batch-finalize`: it reads the batch envelope, refuses `okToCloseTask: true` slices, records `atm.historicalBatchTaskSliceDisposition.v1` in the envelope, appends audit evidence for `keep-diagnostic`/`abandon`, and supports `remove-evidence` that removes only task evidence records referencing that batch.",
+  "followUp": "Keep `packages/cli/src/commands/tasks/__tests__/historical-delivery.test.ts` coverage for approved diagnostic batch finalization, `remove-evidence` cleanup, and close-ready finalize refusal."
+}

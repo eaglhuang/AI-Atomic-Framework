@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-168",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-GIT-0015",
+  "area": "Taskflow pre-close / destructive Git remediation",
+  "finding": "`taskflow pre-close` still emitted raw `git restore -- <files>` as the accidental-drift recovery path for dirty in-scope delivery files even after staging-index remediation had moved to ATM leases.",
+  "expectedBehavior": "No taskflow/operator remediation should recommend raw `git restore`, `git reset`, `git checkout`, or `git clean`; destructive worktree or index mutation must route through a governed ATM lease/audit path.",
+  "evidenceOrRepro": "Reproduced during TASK-GIT-0015 pre-close: `ATM_TASKFLOW_PRECLOSE_SCOPE_TRACKED_DIRTY` suggested `git restore -- \"packages/cli/src/commands/git-governance.ts\" ...`. TASK-GIT-0015 replaced that hint with `node atm.mjs git lease destructive-override ...` and removed a raw `git restore` rollback hint from git-admission proposal generation plus release hygiene guidance.",
+  "followUp": "Keep a regression scanning taskflow/git-governance operator hints for raw destructive Git remediation commands; allow only negative examples such as \"do not use\"."
+}

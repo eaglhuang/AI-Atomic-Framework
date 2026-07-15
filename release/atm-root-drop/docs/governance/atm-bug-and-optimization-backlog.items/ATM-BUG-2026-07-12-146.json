@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-146",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0164",
+  "area": "Validator execution / timeout observability",
+  "finding": "`npm run validate:git-hooks-enforcement` could exceed agent command windows without a resumable status packet or progress checkpoint, and a mixed historical-restore fixture could recurse through the expensive framework-validator lane.",
+  "expectedBehavior": "Long-running validators should emit bounded progress, enforce child-process timeouts, and provide actionable evidence when a child hangs; governance blockers should fail before recursively invoking expensive validators.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0164: `scripts/validate-git-hooks-enforcement.ts` now emits per-step progress/duration, applies `ATM_VALIDATOR_CHILD_TIMEOUT_MS` (default 30s), and reports the timed-out command; `packages/cli/src/commands/hook/pre-commit.ts` skips expensive framework validators after decisive attribution/protected-state blockers. `npm run validate:git-hooks-enforcement` passed in 202s with 168 steps, and `node atm.mjs evidence run --task TASK-AAO-0164 ... --command \\\"npm run validate:git-hooks-enforcement\\\" ...` recorded fresh command-backed evidence.",
+  "followUp": "Keep the progress/timeout contract covered; consider a future performance split for the 202s full suite, but do not treat a slow completed run as a hang."
+}

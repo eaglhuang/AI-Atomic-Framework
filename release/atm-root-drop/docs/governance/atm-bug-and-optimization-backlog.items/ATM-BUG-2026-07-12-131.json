@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-131",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Critical",
+  "status": "Fixed in TASK-TEAM-0079",
+  "area": "Broker CID-to-queue routing",
+  "finding": "A same-CID write on a known common target file is returned as `blocked-cid-conflict` before the physical file queue is considered. The Broker therefore creates neither a per-file queue nor a freeze/ack sidecar, even though it has enough evidence to serialize the shared paths while admitting private paths.",
+  "expectedBehavior": "Retain CID as a hard conflict signal, but route a conflict with concrete common writable paths into the canonical per-file queue/freeze lane. Reserve global `blocked-cid-conflict` for semantic identity conflicts without a bounded queueable surface.",
+  "evidenceOrRepro": "`broker register TASK-TEAM-0079` against active 0075 reported both shared backlog/map paths and same `atm.team-agents-runtime` identity, then returned `blocked-cid-conflict` with `sharedSurfaceQueues: []` and `sharedSurfaceFreezes: []`.",
+  "followUp": "Add a regression proving same CID + bounded shared files yields queued-private admission, while same CID with no bounded surface remains fail-closed/manual escalation."
+}

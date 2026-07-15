@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-144",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0175",
+  "area": "`next` prompt scope resolution / handoff resume",
+  "finding": "A prompt that explicitly asks to read `WORKSPACE-UNFINISHED-WORK.md` was classified as task-scoped, but `next --prompt` could not resolve the active task from the handoff filename and failed with `ATM_NEXT_TASK_SCOPE_NOT_FOUND` instead of offering the uniquely active governed task.",
+  "expectedBehavior": "Handoff/task-root hints should resolve to the active task when the live ledger has exactly one matching running claim, or emit the exact task id and a bounded resume command without falling back to unrelated tasks.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0175: handoff prompts now read referenced task ids, route to the unique active claim, and return selection-required for multiple active claims; stale completed references do not fall back. `node --strip-types tests/cli/handoff-resume-route.test.ts`, `npm run typecheck`, and `npm run validate:cli` passed.",
+  "followUp": "Keep the handoff filename, stale-reference, unique-active, and multi-claim regressions; row 154 separately tracks stale frozen-runner write preflight."
+}

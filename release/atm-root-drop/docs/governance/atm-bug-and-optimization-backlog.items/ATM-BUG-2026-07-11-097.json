@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-097",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in working tree (cursor-grok-4.5)",
+  "area": "Task lock cleanup / canonical direction lock",
+  "finding": "`tasks lock cleanup --all-stale` reported 151 stale locks cleaned and released the runtime lock's embedded direction lock, but left the terminal task ledger's canonical `taskDirectionLock.status` active. `tasks repair-claim` simultaneously reported no repairable drift, so `taskflow close` remained blocked with `ATM_TASKFLOW_CLOSE_BROKER_TAKEOVER_REQUIRED`.",
+  "expectedBehavior": "Cleanup must synchronize terminal stale-lock release across the runtime lock, task ledger direction lock, and sidecar, and report each mutation accurately.",
+  "evidenceOrRepro": "Fixed 2026-07-14: `releaseLock()` now syncs embedded + canonical direction locks and sidecar. Regression: `packages/cli/src/commands/tasks/__tests__/lock-cleanup.spec.ts`.",
+  "followUp": "Governed commit/close still pending after foreign runner-sync wipe recovery."
+}

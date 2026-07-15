@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-167",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Low",
+  "status": "Fixed",
+  "area": "Task scope amendment UX",
+  "finding": "`tasks scope add` uses `--add`, but `--paths` is a natural guess and fails with generic `ATM_CLI_USAGE`.",
+  "expectedBehavior": "When an operator uses `--paths` with `tasks scope add`, ATM should either alias it to `--add` or print the exact corrected command.",
+  "evidenceOrRepro": "Fixed on 2026-07-13: `tasks scope add --paths <paths>` now aliases to `--add <paths>` through the same CSV/quote normalization, and the missing-add usage text names the alias.",
+  "followUp": "Covered by `tests/cli/task-scope-amendment.test.ts` alias regression."
+}

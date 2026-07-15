@@ -8,7 +8,7 @@ import {
 
 export default defineCommandSpec({
   name: 'git',
-  summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue owner diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
+  summary: 'Prepare actor git identity, evaluate pre-push git admission, recover from rejected push attempts with a fresh admission rerun, create governed commits with actor-scoped author env vars, create narrow record-only commits for low-risk .atm/history maintenance, verify ATM git-governance trailers, resolve task-scoped commit bundles, query the status of the last governed commit attempt plus live branch queue and stuck stdin pathspec staging diagnostics, and return copyable fallback plus host-git compatibility guidance when the wrapper cannot complete.',
   positional: [
     { name: 'action', summary: 'prepare | admit | push | recover-push-fail | check | commit | record-commit | commit-status', required: true }
   ],
@@ -29,7 +29,7 @@ export default defineCommandSpec({
     { flag: '--session', value: 'session-id', summary: 'Optional ATM work session id for check/commit alignment.' },
     { flag: '--message', value: 'text', summary: 'Commit summary for git commit; ATM appends governed trailers automatically.' },
     { flag: '--trailer', value: 'text', summary: 'Repeatable extra trailer line for git commit (e.g. an editor-injected Co-authored-by line); folded into the governed trailer set instead of failing the commit.' },
-    { flag: '--auto-stage', summary: 'Stage only the current task allowed delivery bundle before commit; report skipped external dirty files without using git add .' },
+    { flag: '--auto-stage', summary: 'Stage only the current task allowed delivery bundle with explicit git add -- <paths>; never use stdin pathspec staging, and report skipped external dirty files without using git add .' },
     { flag: '--defer-foreign-staged', summary: 'Snapshot and unstage foreign task governance files already in the index before resolving the bundle; never silent.' },
     { flag: '--dry-run', summary: 'Resolve the task-scoped commit bundle without staging or committing; for record-commit, validate the staged record-only scope without mutating HEAD.' },
     { flag: '--no-verify', summary: 'Emergency-only pass-through to git commit; requires --emergency-approval with backend.gitHookBypass permission and cannot override Team Broker conflicts by itself.' },
@@ -38,7 +38,7 @@ export default defineCommandSpec({
     { flag: '--broker-conflict-resolution', value: 'path', summary: 'Paper-style Team Broker conflict-resolution artifact proving conflict task id, shared paths, resolution order, and validator plan.' },
     { flag: '--reason', value: 'text', summary: 'Human-readable reason for the governed hook bypass when using --no-verify.' },
     { flag: '--no-trailers', summary: 'Skip trailer checks in git check (identity/owner checks still run).' },
-    { flag: '--timeout-ms', value: 'ms', summary: 'For git commit: override the default 420000ms timeout for the underlying git commit spawn (also settable via ATM_GIT_COMMIT_TIMEOUT_MS); a hung pre-commit hook fails as a retryable timeout instead of hanging forever.' },
+    { flag: '--timeout-ms', value: 'ms', summary: 'For git commit: override the default 420000ms timeout for the underlying git commit spawn (also settable via ATM_GIT_COMMIT_TIMEOUT_MS); a hung pre-commit hook fails as a retryable timeout instead of hanging forever. Commit also fails fast when a git add --pathspec-from-file=- helper is already waiting on stdin.' },
     commonJsonOption,
     commonPrettyOption,
     commonHelpOption

@@ -60,6 +60,11 @@ export declare const minimumAtmEntrySkillDefinitions: readonly [{
     readonly summary: "Explain missing evidence or blocked guidance before proceeding.";
     readonly command: "node atm.mjs explain --why blocked --json";
 }, {
+    readonly id: "atm-error-code-resolver";
+    readonly title: "ATM Error Code Resolver";
+    readonly summary: "Resolve ATM_* error codes from CLI JSON, logs, or user reports into canonical meaning, remediation, retryability, and approval guidance.";
+    readonly command: "node atm.mjs next --prompt \"$ARGUMENTS\" --json";
+}, {
     readonly id: "atm-upgrade-scan";
     readonly title: "ATM Upgrade Scan";
     readonly summary: "Scan evidence reports and draft governed upgrade proposals.";

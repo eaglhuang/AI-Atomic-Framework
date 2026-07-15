@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-192",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "P0",
+  "status": "Needs task card",
+  "area": "CLI error-code knowledge base",
+  "finding": "ATM has docs/ERROR_CODES.md generated from source occurrences and docs/cli-error-policy.md for envelope policy, but the global error-code surface is not yet a curated knowledge base with canonical category, human description, remediation, retryability, approval requirements, and related recovery commands for every user-visible ATM_* code.",
+  "expectedBehavior": "Every user-visible ATM error code should resolve to one canonical registry entry that includes stable meaning, severity/category, short operator-facing explanation, required command or recovery action, retryability, and links to the owning validator or runbook. Skills and CLI help should reference the same registry instead of duplicating partial prose.",
+  "evidenceOrRepro": "docs/ERROR_CODES.md currently lists code, source location, and raw context only; Team Agents has a separate local canonical-code table in docs/governance/team-agents/team-plan-vocabulary-and-roster-drift.md, showing the registry is fragmented by surface.",
+  "followUp": "Open a dedicated task to replace or augment generate-error-code-index with a structured error-code registry/projection and update ATM skills so agents can look up a code and provide the same concise description plus fix path."
+}

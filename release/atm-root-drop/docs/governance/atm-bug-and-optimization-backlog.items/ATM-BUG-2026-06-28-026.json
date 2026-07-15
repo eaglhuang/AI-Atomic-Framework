@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-026",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`)",
+  "area": "Validator fixtures / task audit baseline",
+  "finding": "Temp validator fixtures copied historical `docs/tasks/*.task.md` cards from the framework repo into fresh bootstrap repos without also copying the matching `.atm/history/task-events` ledger, so task audit raised false `ATM_TASK_AUDIT_TRANSITION_EVENT_MISSING` findings unrelated to the hook regression being tested.",
+  "expectedBehavior": "Source-first validator fixtures that bootstrap a fresh `.atm` runtime should either copy a consistent historical task/evidence/event set or explicitly drop inherited historical task cards before running task audit sensitive commands.",
+  "evidenceOrRepro": "Reproduced on 2026-06-28 while debugging `scripts/validate-framework-governance-repairs.ts`: after worktree-local `git-head` backfill, `hook pre-push` no longer reported `ATM_COMMIT_RANGE_GIT_HEAD_EVIDENCE_MISSING`, but still failed on orphaned `TASK-AAO-0146` transition history because the temp repo included `docs/tasks/TASK-AAO-0146-*.task.md` without the corresponding `.atm/history/task-events/...` files. The shared fixture layer landed in `c589f125049ad81adc146f1b78e6a5ee36b8f607` via `schemas/validators/validator-fixture.schema.json`, `scripts/lib/validator-fixture.ts`, and fixture-backed validator rewrites.",
+  "followUp": "Keep fixture hygiene in the shared validator fixture schema/helper, preserve the focused regression for worktree-local backfill, and treat future task-audit failures in temp repos as fixture-consistency issues first."
+}

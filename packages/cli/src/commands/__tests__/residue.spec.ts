@@ -32,6 +32,7 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
     const activeEvidencePath = path.join(repo, '.atm/history/evidence/TASK-ACTIVE-0001.json');
     const activeLockPath = path.join(repo, '.atm/runtime/locks/TASK-ACTIVE-0001.lock.json');
     const pushAttemptPath = path.join(repo, '.atm/runtime/git-push-attempts/tester__origin__main.json');
+    const archivedIncidentPath = path.join(repo, '.atm/runtime/incidents/archive/123-TASK-OLD-0001-incident.json');
     const releasedBrokerIntentPath = path.join(repo, '.atm/runtime/broker-intents/TASK-OLD-0001.json');
     const activeBrokerIntentPath = path.join(repo, '.atm/runtime/broker-intents/TASK-ACTIVE-0001.json');
 
@@ -46,6 +47,7 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
       actorId: 'other-agent'
     });
     writeJson(pushAttemptPath, { actorId: 'tester', remote: 'origin', branch: 'main' });
+    writeJson(archivedIncidentPath, { schemaId: 'atm.incidentReport.v1', taskId: 'TASK-OLD-0001' });
     writeJson(releasedBrokerIntentPath, { taskId: 'TASK-OLD-0001', actorId: 'tester' });
     writeJson(activeBrokerIntentPath, { taskId: 'TASK-ACTIVE-0001', actorId: 'other-agent' });
 
@@ -61,6 +63,10 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
     assert.ok(
       dryRun.evidence.report.actions.some((action: any) => action.path === '.atm/runtime/git-push-attempts/tester__origin__main.json'),
       'runtime push attempt should be planned for cleanup'
+    );
+    assert.ok(
+      dryRun.evidence.report.actions.some((action: any) => action.path === '.atm/runtime/incidents/archive/123-TASK-OLD-0001-incident.json'),
+      'archived runtime incident should be planned for cleanup'
     );
     assert.ok(
       dryRun.evidence.report.actions.some((action: any) => action.path === '.atm/runtime/broker-intents/TASK-OLD-0001.json'),
@@ -83,6 +89,7 @@ async function testResidueReconcileAppliesOnlySafeOwnerAwareResidue(): Promise<v
     assert.equal(existsSync(abandonedEvidencePath), false, 'abandoned evidence residue should be removed');
     assert.equal(existsSync(abandonedEventPath), false, 'abandoned task-event residue should be removed');
     assert.equal(existsSync(pushAttemptPath), false, 'runtime push-attempt residue should be removed');
+    assert.equal(existsSync(archivedIncidentPath), false, 'archived runtime incident residue should be removed');
     assert.equal(existsSync(releasedBrokerIntentPath), false, 'released broker-intent residue should be removed');
     assert.equal(existsSync(activeEvidencePath), true, 'active owner evidence must be preserved');
     assert.equal(existsSync(activeBrokerIntentPath), true, 'active owner broker intent must be preserved');

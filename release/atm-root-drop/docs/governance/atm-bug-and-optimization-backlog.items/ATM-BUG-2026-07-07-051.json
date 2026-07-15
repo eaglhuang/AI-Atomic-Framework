@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-051",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in emergency gate lane",
+  "area": "Emergency lane UX / flag approvals",
+  "finding": "`ATM_EMERGENCY_LANE_APPROVAL_REQUIRED` reports an emergency approve command, but omits `--allowed-flag` guidance for required backend flags such as `--historical-delivery`, causing the first lease to fail with `ATM_EMERGENCY_FLAG_NOT_APPROVED`.",
+  "expectedBehavior": "When a protected backend command requires an emergency lease and non-default flags, the required command should include the needed `--allowed-flag` entries or explain that flags must be approved explicitly before use.",
+  "evidenceOrRepro": "Fixed in `packages/cli/src/commands/emergency/gate.ts`: the approval-required error dedupes protected flags into `requiredAllowedFlags`, appends matching `--allowed-flag` arguments to `details.requiredCommand`, and warns that missing flag approval will fail with `ATM_EMERGENCY_FLAG_NOT_APPROVED`. Validation: `node --strip-types packages/cli/src/commands/emergency/__tests__/gate.test.ts` and `npm run validate:cli -- --mode validate`.",
+  "followUp": "Keep `packages/cli/src/commands/emergency/__tests__/gate.test.ts`; it proves `--historical-delivery` is pre-approved in the first generated emergency approve command while flag-free commands stay backward compatible."
+}

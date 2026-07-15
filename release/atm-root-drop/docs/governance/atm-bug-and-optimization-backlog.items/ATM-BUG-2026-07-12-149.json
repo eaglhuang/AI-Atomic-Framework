@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-149",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0199",
+  "area": "Task-ledger governance validator fixtures / Broker base state",
+  "finding": "`validate:task-ledger-governance` fixtures assumed an unborn Git branch or reused one fixed framework fixture directory; after Broker claim admission began requiring a resolvable HEAD, duplicate seed commits and shared queue state caused `ATM_BROKER_TRANSACTION_BASE_MISSING`, `ATM_BROKER_SHARED_QUEUE_BLOCKED`, and empty-commit failures before the intended assertions ran.",
+  "expectedBehavior": "Every governance fixture should create an isolated repository with one deterministic seed commit and no inherited Broker queue/claim state; fixture setup must be idempotent and fail only on the behavior under test.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0199: isolated fixture helpers clear Broker state and seed one HEAD; regression `tests/cli/task-ledger-fixture-isolation.test.ts`.",
+  "followUp": "Keep fixture isolation independent of the long integration suite."
+}

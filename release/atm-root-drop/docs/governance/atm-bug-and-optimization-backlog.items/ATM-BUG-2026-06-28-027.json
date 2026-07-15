@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-027",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 repair lane (`c589f1250`)",
+  "area": "Validator runner / performance budget",
+  "finding": "The unified validator runner already measured per-validator `durationMs`, but the summary did not flag direct duration budget overruns or compare timings against a baseline, so `validate:*` growth could accumulate until humans noticed that the suite felt slow.",
+  "expectedBehavior": "Validator summaries should include a structured performance report, slowest-validator list, direct per-validator budget warnings, optional baseline regression warnings, and profile budget warnings so overweight validators are visible before they become normal.",
+  "evidenceOrRepro": "User concern on 2026-06-28: `validate` is getting larger and slower, and future runs should keep timing data, warn when runs get too long, and point maintainers toward overly broad or complex validator content. Landed in `c589f125049ad81adc146f1b78e6a5ee36b8f607` through `scripts/run-validators.ts`, `scripts/validators.config.json`, and `scripts/validate-test-facade.ts`, including explicit `ATM_VALIDATOR_DURATION_BUDGET_EXCEEDED` reporting and optional `--performance-baseline` comparison.",
+  "followUp": "Keep direct `ATM_VALIDATOR_DURATION_BUDGET_EXCEEDED` warnings plus optional `scripts/run-validators.ts --performance-baseline <summary.json>` comparison covered by `scripts/validate-test-facade.ts`; use `overBudgetMs` and the slowest-validator list before adding new broad validators."
+}

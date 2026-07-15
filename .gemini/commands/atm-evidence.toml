@@ -34,6 +34,10 @@ Use this ATM command only after the first command confirms it is the current gov
 node atm.mjs explain --why blocked --json
 ```
 
+If blocked guidance includes an `ATM_*` code, use `atm-error-code-resolver`
+for the meaning, retryability, approval requirement, and next safe action. Do
+not turn source-index context into a private remediation table here.
+
 ## Team Agents Evidence Surface
 
 When evidence or blocked guidance involves Team Agents, recognize these as

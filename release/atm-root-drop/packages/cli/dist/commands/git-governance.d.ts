@@ -20,6 +20,8 @@ export interface TaskScopedCommitBundleReport {
     readonly taskId: string;
     readonly ok: boolean;
     readonly apply: boolean;
+    readonly stagingStrategy: 'manual-staged-index' | 'explicit-pathspec-git-add';
+    readonly stagingCommand: readonly string[] | null;
     readonly stageFiles: readonly string[];
     readonly commitFiles: readonly string[];
     readonly skippedExternalDirtyFiles: readonly string[];

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-14-186",
+  "date": "2026-07-14",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0201",
+  "area": "Multi-task shared delivery close UX",
+  "finding": "Closing sibling tasks against one intentional shared delivery commit (`--historical-delivery`) fails without `--waiver-out-of-scope-delivery`, and dry-run/write messaging mixes `MIXED_DELIVERY_COMMIT`, `OUT_OF_SCOPE_WAIVER_REQUIRED`, and `DELIVERABLE_DIFF_REQUIRED` until the waiver is present.",
+  "expectedBehavior": "When the operator already passes `--historical-delivery` for co-delivered siblings owned by the same actor batch, ATM should offer a first-class multi-task delivery acknowledgment (or auto-suggest the exact waiver command with the sibling task list) instead of looking like a failed delivery.",
+  "evidenceOrRepro": "Dogfood 2026-07-14: TASK-AAO-0197..0200 against delivery `c7e3e81a` after TASK-AAO-0196 scope-amended shared commit; close succeeded only after `--waiver-out-of-scope-delivery --reason`.",
+  "followUp": "Fixed in `packages/cli/src/commands/taskflow/write-readiness.ts` and `historical-close-preflight.ts`: shared `--historical-delivery` close now promotes the exact waiver command as the primary blocker, demotes missing-delivery codes, and surfaces a `multiTaskCloseRecipe` sibling hint. Validation: `node --strip-types packages/cli/src/commands/taskflow/__tests__/mixed-delivery-close-ux.spec.ts`."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-098",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Needs triage",
+  "area": "Taskflow close / broker and commit-bundle recovery",
+  "finding": "A terminal task's stale broker intent required a separate `broker release` after lock cleanup, and `taskflow close` dry-run reported ready while `--write` first revealed a missing closure-packet validator and then twice rolled back after `ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED`, including with `--defer-foreign-state`. Reconfirmed on 2026-07-12 during `TASK-AAO-0163`: `pre-close` reported ready and dry-run treated `validate:cli` / `validate:git-head-evidence` as advisory skipped, but `close --write` failed with `ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID` until both validators were added.",
+  "expectedBehavior": "Close preflight should expose every closure-packet requirement; terminal lock cleanup or close should release stale broker intents; and taskflow's own governed bundle must not deadlock with its deferred-governance hook.",
+  "evidenceOrRepro": "TASK-TEAM-0068 close required `broker release TASK-TEAM-0067`, then `validate:git-head-evidence`, then protected backend close after two taskflow write rollbacks. TASK-AAO-0163 close additionally proved pre-close readiness and closure-packet validation can disagree on required validators.",
+  "followUp": "Add focused coverage for ready-to-write parity, terminal broker-intent cleanup, close-window deferred-governance self-ownership, and pre-close versus closure-packet validator parity."
+}

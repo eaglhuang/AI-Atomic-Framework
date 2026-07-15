@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-006",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "High",
+  "status": "Fixed by `.agents/skills/atm-bug-backlog`",
+  "area": "Agent onboarding",
+  "finding": "The assistant could not find `ATM Bug and Optimization Backlog` when asked to update the bug record, because the backlog was not exposed through a dedicated skill or canonical repo path.",
+  "expectedBehavior": "AI routing should trigger a skill that points directly to the correct backlog.",
+  "evidenceOrRepro": "Initial searches found `docs/INCIDENT_RESPONSE.md` and `docs/governance/redteam-drift-defects.md`, but not this backlog.",
+  "followUp": "Keep `.agents/skills/atm-bug-backlog/SKILL.md` as the canonical trigger surface for bug/optimization recording."
+}

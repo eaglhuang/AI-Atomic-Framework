@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-050",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in taskflow close atomicity lane",
+  "area": "Taskflow close / write readiness",
+  "finding": "`taskflow close` dry-run can report `writeReadinessHint.status: ready`, but the identical `--write` command then fails with `ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING` for a stale `source.planPath`, even when the task is `closureAuthority: target_repo` and has no `planningMirrorPaths`.",
+  "expectedBehavior": "Dry-run readiness must include every blocker that `--write` will enforce, or target-repo-only tasks with no planning mirror should not fail write because a non-authoritative historical planning path is missing.",
+  "evidenceOrRepro": "During `TASK-AAO-0147`, `node atm.mjs taskflow close --task TASK-AAO-0147 --actor codex-captain --historical-delivery cda5705 --json` returned ready, but the `--write` form failed because `atm-agent-first-operability/tasks/TASK-AAO-0147-main-push-audit-baseline-repair.task.md` was missing. The source fix in `packages/cli/src/commands/taskflow/write-readiness.ts` treats stale/unresolvable source plan paths as advisory for target-repo-authority tasks without planning mirrors, so dry-run and write share the same closeback-path policy.",
+  "followUp": "Keep `packages/cli/src/commands/taskflow/__tests__/write-readiness.spec.ts` and `validate-taskflow-close-atomicity` coverage proving dry-run/write closeback-path parity."
+}

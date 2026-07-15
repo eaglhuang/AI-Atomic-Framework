@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-27-023",
+  "date": "2026-06-27",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 backlog follow-up lane",
+  "area": "Git governance / hook timing",
+  "finding": "The Git hook subprocess can rerun `validate:git-head-evidence` against stale or pre-refresh state after the parent governance flow has already generated fresh git-head evidence, causing a legitimate framework commit to fail on a false old-state verdict.",
+  "expectedBehavior": "Hook and ATM git wrapper lanes should pass the same fresh git-head evidence context into the subprocess, or deterministically regenerate it inside the child before validation, so a successful parent preflight cannot be invalidated by stale child timing.",
+  "evidenceOrRepro": "Reproduced on 2026-06-27 while backfilling meaningful fixes onto `origin/main`: `node atm.mjs hook pre-commit --json` passed after fresh evidence generation, but the later Git hook subprocess and governed commit lane fell back to old `validate:git-head-evidence` behavior and forced `git commit --no-verify` despite no real content failure. Related symptoms overlap the frozen-hook timing family tracked in `ATM-BUG-2026-06-23-018`, but this case is specifically about git-head evidence freshness crossing the hook subprocess boundary. Closed on 2026-06-28 after adding a dedicated regression in `scripts/validate-git-hooks-enforcement.ts` that uses the governed reconcile close-window lane to run an explicit parent `hook pre-commit`, verify the staged close packet plus `.atm/history/evidence/git-head.jsonl`, then complete a real child `git commit` through the installed hook path without reintroducing a stale evidence verdict. Validation: `node --strip-types scripts/validate-git-hooks-enforcement.ts --mode validate`.",
+  "followUp": "Keep the parent/child freshness regression in `scripts/validate-git-hooks-enforcement.ts`; if this regresses again, treat it as a release-critical git-head evidence handoff failure rather than a docs-only backlog discrepancy."
+}

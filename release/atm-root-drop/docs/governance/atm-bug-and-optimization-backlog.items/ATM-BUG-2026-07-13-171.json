@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-171",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in current working tree",
+  "area": "Release build hygiene / root-drop mirror residue",
+  "finding": "`ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build` and closeout validation can leave a large `release/atm-root-drop/**` tracked mirror diff in the framework worktree, while `scripts/build-release-hygiene.ts --mode cleanup` only restores `release/atm-onefile/atm.mjs`, `release/atm-onefile/release-manifest.json`, and `release/atm-root-drop/release-manifest.json`. Operators then inherit dozens of generated mirror modifications that are not owned by the current task and are unsafe to silently include or raw-restore.",
+  "expectedBehavior": "ATM governance actions must be self-cleaning by default: build/runner-sync/validation flows should leave the working tree as clean as they found it unless the workflow is intentionally publishing release artifacts or is forced to pause for human/foreign-owner intervention. When residue is unavoidable, ATM must write an explicit owner/status/next-action packet and provide a governed cleanup/apply command. Cleanup should cover the entire generated root-drop mirror when it was produced only as validation/sync residue.",
+  "evidenceOrRepro": "Reproduced after closing TASK-GIT-0015 on 2026-07-13: source, task ledger, backlog, and remote push were complete, but `git status --short` still showed about 70 modified `release/atm-root-drop/**` files. Running `node --strip-types scripts/build-release-hygiene.ts --mode cleanup` restored only three tracked release files and left the root-drop mirror dirty. Fix evidence: `collectTrackedReleaseArtifactPaths` now includes every tracked path under `release/atm-onefile` and `release/atm-root-drop`; regression `tests/cli/build-release-hygiene.test.ts` covers tracked root-drop files missing from the manifest; `npm run build` without retain restored the generated tracked release tree back to HEAD.",
+  "followUp": "Keep release publication explicit through `ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build`; validation-only builds should self-clean tracked release mirror changes by default."
+}

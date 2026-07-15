@@ -158,6 +158,7 @@ function normalizeWorkspaceResidueFinding(cwd, filePath, finding) {
         };
     }
     if (/^\.atm\/runtime\/(?:git-push-attempts|broker-conflict-resolutions|broker-intents)\//i.test(normalized)
+        || /^\.atm\/runtime\/incidents\/archive\/[^/]+\.json$/i.test(normalized)
         || /^\.atm\/runtime\/(?:broker-shared-surface-freezes\.json|framework-lock-auto-reconcile\.jsonl)$/i.test(normalized)) {
         return {
             path: normalized,

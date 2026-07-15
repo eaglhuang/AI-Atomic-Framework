@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-052",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in protected override audit staging lane",
+  "area": "Protected override audit / evidence persistence",
+  "finding": "A successful emergency backend close can report protected override audit event paths in command output, but the corresponding events are not visible to `node atm.mjs emergency audit --task <id> --json` afterward.",
+  "expectedBehavior": "Protected override audit events reported by a backend command should be durable, committed or otherwise discoverable by `emergency audit`, and the audit query should find events for the task immediately after close.",
+  "evidenceOrRepro": "During `TASK-AAO-0147`, backend close output reported `.atm/history/protected-override-audit/2026-07-07T15-25-47-193Z-POA-03e4b36a9140.json` and `...719Z-POA-57c53bb7da90.json`, but `node atm.mjs emergency audit --task TASK-AAO-0147 --json` returned 0 events and the close commit stat did not include those audit files. The source fix keeps this-task audit events out of auto-clean residue and stages them into the task commit bundle while leaving foreign-task audit events untouched.",
+  "followUp": "Keep `tests/cli/protected-override-audit-staging.test.ts` in `validate:cli`; it proves owned audit events land in the commit and foreign events survive without being swept into unrelated commits."
+}

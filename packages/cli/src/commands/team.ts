@@ -44,19 +44,14 @@ import {
   createTeamObservabilityEvent,
   queryTeamObservabilityEvents
 } from '../../../core/src/team-runtime/observability.ts';
-import { buildAnthropicTeamProviderBridgeDescriptor, createAnthropicTeamProviderBridge, launchAnthropicTeamProviderRun } from '../../../core/src/team-runtime/providers/anthropic.ts';
-import { buildAzureOpenAITeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/azure-openai.ts';
-import { buildClaudeCodeTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/claude-code.ts';
-import { buildGeminiTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/gemini.ts';
-import { buildGeminiDirectTeamProviderBridgeDescriptor, createGeminiDirectTeamProviderBridge, launchGeminiDirectTeamProviderRun } from '../../../core/src/team-runtime/providers/gemini-direct.ts';
-import { buildMicrosoftFoundryTeamProviderBridgeDescriptor } from '../../../core/src/team-runtime/providers/microsoft-foundry.ts';
-import { buildOpenAITeamProviderBridgeDescriptor, createOpenAITeamProviderBridge, launchOpenAITeamProviderRun } from '../../../core/src/team-runtime/providers/openai.ts';
+import { createAnthropicTeamProviderBridge, launchAnthropicTeamProviderRun } from '../../../core/src/team-runtime/providers/anthropic.ts';
+import { createGeminiDirectTeamProviderBridge, launchGeminiDirectTeamProviderRun } from '../../../core/src/team-runtime/providers/gemini-direct.ts';
+import { createOpenAITeamProviderBridge, launchOpenAITeamProviderRun } from '../../../core/src/team-runtime/providers/openai.ts';
 import { TEAM_PROVIDER_IDS } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createTeamProviderContract, type TeamProviderHttpExecutor, type TeamProviderId } from '../../../core/src/team-runtime/provider-contract.ts';
 import { createDefaultTeamPermissionPolicy } from '../../../core/src/team-runtime/permission-broker.ts';
 import { materializeTeamRoleHandoff, readTeamHandoffArtifacts, renderTeamHandoffIndex, teamHandoffHistoryDirectory, teamHandoffRuntimeDirectory, verifyTeamHandoffHistory, verifyTeamHandoffLedger } from '../../../core/src/team-runtime/handoff-ledger.ts';
 import {
-  resolveTeamProviderSelection,
   type TeamProviderSelectionConfig,
   type TeamRoleProviderOverride
 } from '../../../core/src/team-runtime/provider-selection.ts';
@@ -65,8 +60,52 @@ import { readBrokerProposalFile, validateBrokerProposal } from '../../../core/sr
 import { planSharedSurfaceAcquisition, type SharedSurfaceQueue } from '../../../core/src/broker/shared-surface-queue.ts';
 import { inspectGitIndexOwnership, type GitIndexOwnershipReport } from './git-index-ownership.ts';
 import { loadTeamProviderSelectionConfigFromRepo, resolveTeamRuntimeProviderSelection } from './team/role-provider-resolution.ts';
+import {
+  buildTeamGrowthContract,
+  buildTeamRoleGrowthObservabilityContract,
+  type TeamGrowthContract,
+  type TeamRoleGrowthObservabilityContract
+} from './team/growth-contract.ts';
+import {
+  buildProviderNeutralRoleSkillPackManifest,
+  buildTeamRoleRoutingMatrix,
+  buildTeamRoleSkillPackContract,
+  type TeamRoleRoutingMatrix,
+  type TeamRoleSkillPackContract,
+  type TeamRoleSkillPackManifest
+} from './team/role-skill-packs.ts';
+import {
+  buildAnthropicRuntimeBridgeSummary,
+  buildEditorExecutionRuntimeBridgeSummary,
+  buildMicrosoftFoundryRuntimeBridgeSummary,
+  buildOpenAIFamilyRuntimeBridgeSummary
+} from './team/runtime-bridges.ts';
+import { buildRuntimeTierContract } from './team/runtime-tier-contract.ts';
+import { buildTeamShadowScheduleForPlan } from './team/shadow-plan.ts';
+import { composeTeamContributionManifests } from './team/composer.ts';
 import { resolveTeamStartExecutionLane, runtimeBackendAdmissionForTeam } from './team/team-execution-lane.ts';
 import { resolveTeamActionRoute, resolveTeamFastPath, supportedTeamActionList } from './team/team-route-map.ts';
+export {
+  buildTeamGrowthContract,
+  buildTeamRoleGrowthObservabilityContract,
+  type TeamGrowthContract,
+  type TeamRoleGrowthObservabilityContract
+} from './team/growth-contract.ts';
+export {
+  buildProviderNeutralRoleSkillPackManifest,
+  buildTeamRoleRoutingMatrix,
+  buildTeamRoleSkillPackContract,
+  type TeamRoleRoutingMatrix,
+  type TeamRoleSkillPackContract,
+  type TeamRoleSkillPackManifest
+} from './team/role-skill-packs.ts';
+export {
+  buildAnthropicRuntimeBridgeSummary,
+  buildEditorExecutionRuntimeBridgeSummary,
+  buildGeminiDirectRuntimeBridgeSummary,
+  buildMicrosoftFoundryRuntimeBridgeSummary,
+  buildOpenAIFamilyRuntimeBridgeSummary
+} from './team/runtime-bridges.ts';
 
 type TeamPermissionMode = 'exclusive' | 'shareable';
 
@@ -170,194 +209,6 @@ type TeamCrewRole = {
   description: string;
 };
 
-type TeamRoleSkillPackContract = {
-  schemaId: 'atm.teamRoleSkillPackContract.v1';
-  providerNeutral: true;
-  coordinatorOwnsLifecycle: true;
-  roles: Array<{
-    role: string;
-    agentId: string;
-    skillPackId: string;
-    specialistSkills: string[];
-    allowedPermissions: string[];
-    forbiddenPermissions: string[];
-    playbookSlice: string;
-    growthContractAttachment: string;
-  }>;
-};
-
-type TeamRoleSkillPackManifest = {
-  schemaId: 'atm.teamRoleSkillPackManifest.v1';
-  providerNeutral: true;
-  coordinatorOwnsLifecycle: true;
-  discoveryMode: 'capability-driven';
-  roleFirstProviderSecond: true;
-  sharedVocabulary: {
-    brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-  };
-  roles: Array<{
-    role: string;
-    skillPackId: string;
-    playbookSlice: string;
-    capabilityTags: string[];
-    permissionLease: {
-      alignment: 'role-first';
-      allowedPermissions: string[];
-      forbiddenPermissions: string[];
-    };
-    selectedProvider: {
-      providerId: string;
-      sdkId: string;
-      modelId: string;
-      runtimeMode: TeamRuntimeMode;
-      source: 'repo-default' | 'cli-global-default' | 'role-override' | 'cli-role-override';
-    };
-    providerCapabilities: Array<{
-      providerId: string;
-      runtimeModes: TeamRuntimeMode[];
-      artifacts: string[];
-      satisfiesRolePack: true;
-      reason: string;
-    }>;
-    growthContractAttachment: string;
-  }>;
-};
-
-type TeamRoleRoutingMatrix = {
-  schemaId: 'atm.teamRoleRoutingMatrix.v1';
-  providerNeutral: true;
-  coordinatorOwnsLifecycle: true;
-  routes: Array<{
-    workstream: string;
-    primaryRole: string;
-    supportingRoles: string[];
-    advisoryRoles: string[];
-    roleOrder: string[];
-    parallelSafeRoles: string[];
-    advisoryOnlyRoles: string[];
-    playbookSlice: string;
-    lifecycleOwner: 'coordinator';
-    stopConditions: string[];
-  }>;
-};
-
-type TeamGrowthContract = {
-  schemaId: 'atm.teamGrowthContract.v1';
-  sharedAcrossRolePacks: true;
-  taxonomy: string[];
-  captureTemplate: string[];
-  promotionPolicy: {
-    stableRuleTarget: string;
-    rawCaseTarget: string;
-  };
-};
-
-type TeamRoleGrowthObservabilityContract = {
-  schemaId: 'atm.teamRoleGrowthObservabilityContract.v1';
-  sharedAcrossRolePacks: true;
-  referenceFirst: true;
-  sourceGrowthContract: 'atm.teamGrowthContract.v1';
-  sourceObservabilityContract: 'atm.teamAgentObservabilityContract.v1';
-  learningEventProjection: {
-    eventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-    eventType: 'artifact.output';
-    artifactType: 'atm.teamRoleGrowthLearningItem.v1';
-    queryKeys: string[];
-    artifactFields: string[];
-  };
-  frictionClassification: {
-    sharedAtmRoutingFriction: string[];
-    roleSpecificFriction: string[];
-  };
-  roleMappings: Array<{
-    role: string;
-    agentId: string;
-    skillPackId: string;
-    playbookSlice: string;
-    growthAttachmentPoint: string;
-    learningReference: string;
-    taxonomy: string[];
-    observableEventSelector: {
-      role: string;
-      eventType: 'artifact.output';
-      artifactType: 'atm.teamRoleGrowthLearningItem.v1';
-    };
-  }>;
-  metrics: Array<{
-    metricId: string;
-    description: string;
-    numerator: Record<string, string>;
-    denominator: Record<string, string>;
-    groupedBy: string[];
-  }>;
-  brokerConflictVocabulary: {
-    decisionClass: string;
-    decisionReason: string;
-    violationStatus: string;
-    blockedCode: 'broker-conflict-blocked';
-  };
-};
-
-type TeamOpenAIFamilyRuntimeBridgeSummary = {
-  schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1';
-  milestone: 'M9I';
-  providerIds: readonly ['openai', 'azure-openai'];
-  sharedProviderInterface: 'atm.teamProviderContract.v1';
-  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-  coordinatorOwnedAuthority: true;
-  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-  bridges: readonly [
-    ReturnType<typeof buildOpenAITeamProviderBridgeDescriptor>,
-    ReturnType<typeof buildAzureOpenAITeamProviderBridgeDescriptor>
-  ];
-};
-
-type TeamEditorExecutionRuntimeBridgeSummary = {
-  schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1';
-  milestone: 'M9I';
-  providerIds: readonly ['claude-code', 'gemini'];
-  sharedProviderInterface: 'atm.teamProviderContract.v1';
-  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-  roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1';
-  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-  coordinatorOwnedAuthority: true;
-  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-  bridges: readonly [
-    ReturnType<typeof buildClaudeCodeTeamProviderBridgeDescriptor>,
-    ReturnType<typeof buildGeminiTeamProviderBridgeDescriptor>
-  ];
-};
-
-type TeamMicrosoftFoundryRuntimeBridgeSummary = {
-  schemaId: 'atm.microsoftFoundryRuntimeBridgeSummary.v1';
-  milestone: 'M9I';
-  providerIds: readonly ['microsoft-foundry'];
-  sharedProviderInterface: 'atm.teamProviderContract.v1';
-  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-  supportedSurfaces: readonly ['project-chat-inference', 'agent-service'];
-  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-  coordinatorOwnedAuthority: true;
-  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-  bridges: readonly [
-    ReturnType<typeof buildMicrosoftFoundryTeamProviderBridgeDescriptor>
-  ];
-};
-
-type TeamAnthropicRuntimeBridgeSummary = {
-  schemaId: 'atm.anthropicRuntimeBridgeSummary.v1';
-  milestone: 'M10X';
-  providerIds: readonly ['anthropic'];
-  sharedProviderInterface: 'atm.teamProviderContract.v1';
-  sharedArtifactType: 'atm.teamProviderRunArtifact.v1';
-  observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1';
-  coordinatorOwnedAuthority: true;
-  brokerConflictVocabulary: readonly ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'];
-  bridges: readonly [
-    ReturnType<typeof buildAnthropicTeamProviderBridgeDescriptor>
-  ];
-};
-
 type TeamRuntimePilot = {
   schemaId: 'atm.teamRuntimePilot.v1';
   providerNeutral: true;
@@ -454,8 +305,6 @@ type TeamPatrolMode = 'claim-preflight' | 'close-preflight' | 'big-script' | 'da
 type TeamPatrolFindingLevel = 'info' | 'warning' | 'blocker';
 
 type TeamRuntimeMode = 'real-agent' | 'editor-subagent' | 'broker-only';
-type TeamRuntimeTier = 'raw-api' | 'agent-sdk' | 'editor';
-
 type TeamReworkRouteStatus =
   | 'work-in-progress'
   | 'needs-rework'
@@ -2467,6 +2316,7 @@ async function buildTeamPlanningContext(input: {
   );
 
   const finalTeamPlan = buildTeamPlan({
+    cwd: input.cwd,
     task,
     recipe: activeRecipe,
     writePaths,
@@ -3136,6 +2986,7 @@ function buildSuggestedPermissionLeases(recipe: TeamRecipe, writePaths: string[]
 }
 
 export function buildTeamPlan(input: {
+  cwd?: string;
   task: Record<string, unknown> | null | undefined;
   recipe: TeamRecipe;
   writePaths: string[];
@@ -3173,6 +3024,15 @@ export function buildTeamPlan(input: {
     roleSkillPacks,
     routingMatrix,
     growthContract,
+    validation: input.validation,
+    brokerLane: input.brokerLane
+  });
+  const shadowSchedule = buildTeamShadowScheduleForPlan({
+    cwd: input.cwd ?? process.cwd(),
+    task: input.task,
+    recipe: activeRecipe,
+    writePaths: input.writePaths,
+    captainDecision,
     validation: input.validation,
     brokerLane: input.brokerLane
   });
@@ -3215,6 +3075,7 @@ export function buildTeamPlan(input: {
     observabilityContract,
     roleGrowthObservabilityContract,
     runtimeTierContract,
+    shadowSchedule,
     openAIFamilyRuntimeBridges: buildOpenAIFamilyRuntimeBridgeSummary(),
     editorExecutionRuntimeBridges: buildEditorExecutionRuntimeBridgeSummary(),
     microsoftFoundryRuntimeBridges: buildMicrosoftFoundryRuntimeBridgeSummary(),
@@ -3238,488 +3099,6 @@ export function buildTeamPlan(input: {
     ],
     validation: input.validation
   };
-}
-
-export function buildOpenAIFamilyRuntimeBridgeSummary(): TeamOpenAIFamilyRuntimeBridgeSummary {
-  return {
-    schemaId: 'atm.openAIFamilyRuntimeBridgeSummary.v1',
-    milestone: 'M9I',
-    providerIds: ['openai', 'azure-openai'],
-    sharedProviderInterface: 'atm.teamProviderContract.v1',
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
-    coordinatorOwnedAuthority: true,
-    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
-    bridges: [
-      buildOpenAITeamProviderBridgeDescriptor(),
-      buildAzureOpenAITeamProviderBridgeDescriptor()
-    ]
-  };
-}
-
-export function buildEditorExecutionRuntimeBridgeSummary(): TeamEditorExecutionRuntimeBridgeSummary {
-  return {
-    schemaId: 'atm.editorExecutionRuntimeBridgeSummary.v1',
-    milestone: 'M9I',
-    providerIds: ['claude-code', 'gemini'],
-    sharedProviderInterface: 'atm.teamProviderContract.v1',
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
-    roleEnvelopeSchemaId: 'atm.teamEditorSubagentRoleEnvelope.v1',
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
-    coordinatorOwnedAuthority: true,
-    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
-    bridges: [
-      buildClaudeCodeTeamProviderBridgeDescriptor(),
-      buildGeminiTeamProviderBridgeDescriptor()
-    ]
-  };
-}
-
-export function buildGeminiDirectRuntimeBridgeSummary() {
-  return {
-    schemaId: 'atm.geminiDirectRuntimeBridgeSummary.v1',
-    providerIds: ['gemini-direct'] as const,
-    sharedProviderInterface: 'atm.teamProviderContract.v1',
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
-    coordinatorOwnedAuthority: true,
-    bridge: buildGeminiDirectTeamProviderBridgeDescriptor()
-  };
-}
-
-export function buildMicrosoftFoundryRuntimeBridgeSummary(): TeamMicrosoftFoundryRuntimeBridgeSummary {
-  return {
-    schemaId: 'atm.microsoftFoundryRuntimeBridgeSummary.v1',
-    milestone: 'M9I',
-    providerIds: ['microsoft-foundry'],
-    sharedProviderInterface: 'atm.teamProviderContract.v1',
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
-    supportedSurfaces: ['project-chat-inference', 'agent-service'],
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
-    coordinatorOwnedAuthority: true,
-    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
-    bridges: [
-      buildMicrosoftFoundryTeamProviderBridgeDescriptor()
-    ]
-  };
-}
-
-export function buildAnthropicRuntimeBridgeSummary(): TeamAnthropicRuntimeBridgeSummary {
-  return {
-    schemaId: 'atm.anthropicRuntimeBridgeSummary.v1',
-    milestone: 'M10X',
-    providerIds: ['anthropic'],
-    sharedProviderInterface: 'atm.teamProviderContract.v1',
-    sharedArtifactType: 'atm.teamProviderRunArtifact.v1',
-    observabilityEventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
-    coordinatorOwnedAuthority: true,
-    brokerConflictVocabulary: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked'],
-    bridges: [
-      buildAnthropicTeamProviderBridgeDescriptor()
-    ]
-  };
-}
-
-export function buildTeamRoleSkillPackContract(recipe: TeamRecipe): TeamRoleSkillPackContract {
-  const rolePackDefaults: Record<string, { skillPackId: string; specialistSkills: string[]; playbookSlice: string }> = {
-    coordinator: {
-      skillPackId: 'atm.role-pack.coordinator',
-      specialistSkills: ['atm-governance-router', 'atm-next', 'atm-handoff'],
-      playbookSlice: 'route-claim-close-commit'
-    },
-    reader: {
-      skillPackId: 'atm.role-pack.reader',
-      specialistSkills: ['atm-orient'],
-      playbookSlice: 'source-read-discovery'
-    },
-    scopeGuardian: {
-      skillPackId: 'atm.role-pack.scope-guardian',
-      specialistSkills: ['atm-lock'],
-      playbookSlice: 'scope-preflight-boundary-watch'
-    },
-    implementer: {
-      skillPackId: 'atm.role-pack.implementer',
-      specialistSkills: ['atm-task-intent-resolver'],
-      playbookSlice: 'scoped-delivery'
-    },
-    validator: {
-      skillPackId: 'atm.role-pack.validator',
-      specialistSkills: ['atm-evidence'],
-      playbookSlice: 'validator-evidence-pass'
-    },
-    evidenceCollector: {
-      skillPackId: 'atm.role-pack.evidence-collector',
-      specialistSkills: ['atm-evidence', 'atm-handoff'],
-      playbookSlice: 'evidence-summary-handoff'
-    },
-    atomizationPlanner: {
-      skillPackId: 'atm.role-pack.atomization-planner',
-      specialistSkills: ['atm-atom-map-refactor', 'atm-task-card-authoring'],
-      playbookSlice: 'atomization-scope-shaping'
-    },
-    lieutenant: {
-      skillPackId: 'atm.role-pack.lieutenant',
-      specialistSkills: ['atm-dispatch', 'atm-lock'],
-      playbookSlice: 'coordination-boundary-watch'
-    },
-    reviewAgent: {
-      skillPackId: 'atm.role-pack.review-agent',
-      specialistSkills: ['atm-evidence'],
-      playbookSlice: 'review-signature-advisory'
-    },
-    knowledgeScout: {
-      skillPackId: 'atm.role-pack.knowledge-scout',
-      specialistSkills: ['atm-orient'],
-      playbookSlice: 'knowledge-query-advisory'
-    }
-  };
-  const coordinatorExclusive = ['task.lifecycle', 'git.write', 'evidence.write'];
-  return {
-    schemaId: 'atm.teamRoleSkillPackContract.v1',
-    providerNeutral: true,
-    coordinatorOwnsLifecycle: true,
-    roles: recipe.agents.map((agent) => {
-      const defaults = rolePackDefaults[agent.role] ?? {
-        skillPackId: `atm.role-pack.${agent.role}`,
-        specialistSkills: [],
-        playbookSlice: 'specialist-advisory'
-      };
-      return {
-        role: agent.role,
-        agentId: agent.agentId,
-        skillPackId: defaults.skillPackId,
-        specialistSkills: defaults.specialistSkills,
-        allowedPermissions: [...agent.permissions],
-        forbiddenPermissions: agent.role === 'coordinator' ? [] : coordinatorExclusive,
-        playbookSlice: defaults.playbookSlice,
-        growthContractAttachment: 'shared-team-growth-contract'
-      };
-    })
-  };
-}
-
-export function buildProviderNeutralRoleSkillPackManifest(input: {
-  recipe: TeamRecipe;
-  roleSkillPacks?: TeamRoleSkillPackContract;
-  selectionConfig?: TeamProviderSelectionConfig;
-  providerIds?: readonly string[];
-}): TeamRoleSkillPackManifest {
-  const roleSkillPacks = input.roleSkillPacks ?? buildTeamRoleSkillPackContract(input.recipe);
-  const selectionConfig = input.selectionConfig ?? {
-    repoDefault: {
-      providerId: 'openai',
-      sdkId: 'responses',
-      modelId: 'gpt-5-mini',
-      runtimeMode: 'broker-only'
-    },
-    roleOverrides: {}
-  };
-  const providerIds = uniqueStrings([...(input.providerIds ?? TEAM_PROVIDER_IDS)]);
-
-  return {
-    schemaId: 'atm.teamRoleSkillPackManifest.v1',
-    providerNeutral: true,
-    coordinatorOwnsLifecycle: true,
-    discoveryMode: 'capability-driven',
-    roleFirstProviderSecond: true,
-    sharedVocabulary: {
-      brokerConflict: ['decisionClass', 'decisionReason', 'violationStatus', 'broker-conflict-blocked']
-    },
-    roles: roleSkillPacks.roles.map((entry) => {
-      const selection = resolveTeamProviderSelection(entry.role, selectionConfig);
-      return {
-        role: entry.role,
-        skillPackId: entry.skillPackId,
-        playbookSlice: entry.playbookSlice,
-        capabilityTags: capabilityTagsForRole(entry.role),
-        permissionLease: {
-          alignment: 'role-first',
-          allowedPermissions: entry.allowedPermissions,
-          forbiddenPermissions: entry.forbiddenPermissions
-        },
-        selectedProvider: {
-          providerId: selection.providerId,
-          sdkId: selection.sdkId,
-          modelId: selection.modelId,
-          runtimeMode: selection.runtimeMode,
-          source: selection.source
-        },
-        providerCapabilities: providerIds.map((providerId) => ({
-          providerId,
-          runtimeModes: ['real-agent', 'editor-subagent', 'broker-only'],
-          artifacts: artifactsForRole(entry.role),
-          satisfiesRolePack: true as const,
-          reason: `${providerId} can satisfy ${entry.skillPackId} through role-first permission leases and ${entry.playbookSlice}.`
-        })),
-        growthContractAttachment: entry.growthContractAttachment
-      };
-    })
-  };
-}
-
-export function buildTeamRoleRoutingMatrix(roleSkillPacks: TeamRoleSkillPackContract): TeamRoleRoutingMatrix {
-  const hasRole = (role: string) => roleSkillPacks.roles.some((entry) => entry.role === role);
-  const maybe = (role: string) => hasRole(role) ? [role] : [];
-  const route = (input: {
-    workstream: string;
-    primaryRole: string;
-    supportingRoles?: string[];
-    advisoryRoles?: string[];
-    roleOrder: string[];
-    parallelSafeRoles?: string[];
-    advisoryOnlyRoles?: string[];
-    playbookSlice: string;
-    stopConditions?: string[];
-  }) => ({
-    workstream: input.workstream,
-    primaryRole: input.primaryRole,
-    supportingRoles: input.supportingRoles ?? [],
-    advisoryRoles: input.advisoryRoles ?? [],
-    roleOrder: input.roleOrder,
-    parallelSafeRoles: input.parallelSafeRoles ?? [],
-    advisoryOnlyRoles: input.advisoryOnlyRoles ?? input.advisoryRoles ?? [],
-    playbookSlice: input.playbookSlice,
-    lifecycleOwner: 'coordinator' as const,
-    stopConditions: input.stopConditions ?? [
-      'broker-conflict-blocked',
-      'blocked-active-lease',
-      'proposal-submitted'
-    ]
-  });
-  return {
-    schemaId: 'atm.teamRoleRoutingMatrix.v1',
-    providerNeutral: true,
-    coordinatorOwnsLifecycle: true,
-    routes: [
-      route({
-        workstream: 'task-entry-routing',
-        primaryRole: 'coordinator',
-        supportingRoles: [...maybe('reader'), ...maybe('scopeGuardian')],
-        advisoryRoles: [...maybe('evidenceCollector')],
-        roleOrder: ['coordinator', ...maybe('scopeGuardian'), ...maybe('reader'), ...maybe('evidenceCollector')],
-        parallelSafeRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
-        playbookSlice: 'route-claim-close-commit'
-      }),
-      route({
-        workstream: 'scoped-implementation',
-        primaryRole: hasRole('implementer') ? 'implementer' : 'coordinator',
-        supportingRoles: [...maybe('scopeGuardian')],
-        advisoryRoles: [...maybe('reader')],
-        roleOrder: ['coordinator', ...maybe('scopeGuardian'), hasRole('implementer') ? 'implementer' : 'coordinator', ...maybe('reader')],
-        parallelSafeRoles: [...maybe('scopeGuardian'), ...maybe('reader')],
-        playbookSlice: 'scoped-delivery'
-      }),
-      route({
-        workstream: 'validation-and-evidence',
-        primaryRole: hasRole('validator') ? 'validator' : 'coordinator',
-        supportingRoles: [...maybe('evidenceCollector')],
-        advisoryRoles: [...maybe('reader')],
-        roleOrder: ['coordinator', hasRole('validator') ? 'validator' : 'coordinator', ...maybe('evidenceCollector'), ...maybe('reader')],
-        parallelSafeRoles: [...maybe('evidenceCollector'), ...maybe('reader')],
-        playbookSlice: 'validator-evidence-pass'
-      }),
-      route({
-        workstream: 'broker-conflict-resolution',
-        primaryRole: 'coordinator',
-        supportingRoles: [...maybe('scopeGuardian')],
-        advisoryRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
-        roleOrder: ['coordinator', ...maybe('scopeGuardian'), ...maybe('reader'), ...maybe('evidenceCollector')],
-        parallelSafeRoles: [...maybe('reader'), ...maybe('evidenceCollector')],
-        playbookSlice: 'broker-conflict-resolution',
-        stopConditions: [
-          'broker-conflict-blocked',
-          'missing-atm.brokerConflictResolution.v1',
-          'manual-runtime-edit-requested'
-        ]
-      })
-    ]
-  };
-}
-
-function capabilityTagsForRole(role: string): string[] {
-  const normalized = role.toLowerCase();
-  if (normalized === 'coordinator') return ['task-routing', 'lifecycle-authority', 'closeout-sequencing'];
-  if (normalized.includes('scope')) return ['scope-boundary', 'broker-preflight', 'lease-watch'];
-  if (normalized.includes('implementer')) return ['scoped-delivery', 'bounded-file-write'];
-  if (normalized.includes('validator')) return ['validator-run', 'failure-interpretation'];
-  if (normalized.includes('evidence')) return ['evidence-packaging', 'closure-readiness'];
-  if (normalized.includes('knowledge')) return ['knowledge-query', 'shared-growth-context'];
-  if (normalized.includes('steward')) return ['broker-authorized-apply', 'bounded-merge-plan'];
-  return ['specialist-advisory'];
-}
-
-function artifactsForRole(role: string): string[] {
-  const normalized = role.toLowerCase();
-  if (normalized === 'coordinator') return ['captain-decision', 'team-brief', 'handoff'];
-  if (normalized.includes('validator')) return ['validator-report'];
-  if (normalized.includes('evidence')) return ['evidence-summary'];
-  if (normalized.includes('implementer')) return ['agent-report', 'patch-summary'];
-  if (normalized.includes('scope')) return ['scope-report'];
-  if (normalized.includes('knowledge')) return ['knowledge-summary'];
-  if (normalized.includes('steward')) return ['broker-apply-report'];
-  return ['agent-report'];
-}
-
-export function buildTeamGrowthContract(): TeamGrowthContract {
-  return {
-    schemaId: 'atm.teamGrowthContract.v1',
-    sharedAcrossRolePacks: true,
-    taxonomy: [
-      'entry-friction',
-      'route-confusion',
-      'boundary-confusion',
-      'fallback-misuse',
-      'validator-gap',
-      'tooling-mismatch',
-      'overloaded-context',
-      'shared-atm-routing-friction',
-      'role-specific-friction'
-    ],
-    captureTemplate: [
-      'Trigger',
-      'Symptom',
-      'Correct route',
-      'Durable rule',
-      'Promotion target',
-      'Reuse scope'
-    ],
-    promotionPolicy: {
-      stableRuleTarget: 'SKILL.md',
-      rawCaseTarget: 'docs/governance/team-agents/role-pack-learning-loop.md'
-    }
-  };
-}
-
-export function buildTeamRoleGrowthObservabilityContract(input: {
-  roleSkillPacks: TeamRoleSkillPackContract;
-  growthContract?: TeamGrowthContract;
-}): TeamRoleGrowthObservabilityContract {
-  const growthContract = input.growthContract ?? buildTeamGrowthContract();
-  const learningReference = growthContract.promotionPolicy.rawCaseTarget;
-  return {
-    schemaId: 'atm.teamRoleGrowthObservabilityContract.v1',
-    sharedAcrossRolePacks: true,
-    referenceFirst: true,
-    sourceGrowthContract: 'atm.teamGrowthContract.v1',
-    sourceObservabilityContract: 'atm.teamAgentObservabilityContract.v1',
-    learningEventProjection: {
-      eventSchemaId: 'atm.teamAgentObservabilityEvent.v1',
-      eventType: 'artifact.output',
-      artifactType: 'atm.teamRoleGrowthLearningItem.v1',
-      queryKeys: ['taskId', 'teamRunId', 'providerId', 'role', 'artifactType', 'eventType'],
-      artifactFields: [
-        'Category',
-        'Trigger',
-        'Symptom',
-        'Correct route',
-        'Durable rule',
-        'Promotion target',
-        'Confidence',
-        'Reuse scope'
-      ]
-    },
-    frictionClassification: {
-      sharedAtmRoutingFriction: [
-        'entry-friction',
-        'route-confusion',
-        'fallback-misuse',
-        'tooling-mismatch',
-        'shared-atm-routing-friction'
-      ],
-      roleSpecificFriction: [
-        'boundary-confusion',
-        'validator-gap',
-        'overloaded-context',
-        'role-specific-friction'
-      ]
-    },
-    roleMappings: input.roleSkillPacks.roles.map((entry) => ({
-      role: entry.role,
-      agentId: entry.agentId,
-      skillPackId: entry.skillPackId,
-      playbookSlice: entry.playbookSlice,
-      growthAttachmentPoint: entry.growthContractAttachment,
-      learningReference,
-      taxonomy: growthContract.taxonomy,
-      observableEventSelector: {
-        role: entry.role,
-        eventType: 'artifact.output',
-        artifactType: 'atm.teamRoleGrowthLearningItem.v1'
-      }
-    })),
-    metrics: [
-      {
-        metricId: 'role-growth.learning-events.by-role',
-        description: 'Counts reference-first role learning artifacts by role and skill pack.',
-        numerator: {
-          eventType: 'artifact.output',
-          artifactType: 'atm.teamRoleGrowthLearningItem.v1'
-        },
-        denominator: {
-          eventType: 'artifact.output',
-          artifactType: 'atm.teamRoleGrowthLearningItem.v1'
-        },
-        groupedBy: ['role', 'skillPackId', 'playbookSlice']
-      },
-      {
-        metricId: 'role-growth.role-specific-friction.rate',
-        description: 'Separates role-boundary friction from shared ATM routing friction.',
-        numerator: {
-          category: 'role-specific-friction'
-        },
-        denominator: {
-          artifactType: 'atm.teamRoleGrowthLearningItem.v1'
-        },
-        groupedBy: ['role', 'skillPackId']
-      },
-      {
-        metricId: 'broker-conflict-blocked.hit-rate',
-        description: 'Tracks how often Team role growth observes the M8E broker-conflict-blocked state.',
-        numerator: {
-          violationStatus: 'broker-conflict-blocked'
-        },
-        denominator: {
-          eventType: 'broker.conflict.blocked'
-        },
-        groupedBy: ['role', 'taskId', 'decisionClass']
-      }
-    ],
-    brokerConflictVocabulary: {
-      decisionClass: 'decisionClass',
-      decisionReason: 'decisionReason',
-      violationStatus: 'violationStatus',
-      blockedCode: 'broker-conflict-blocked'
-    }
-  };
-}
-
-function buildRuntimeTierContract(recipe: TeamRecipe) {
-  return {
-    schemaId: 'atm.teamRuntimeTierContract.v1',
-    tiers: ['raw-api', 'agent-sdk', 'editor'] as const,
-    providerContractCompatibility: ['RawChatAdapter', 'AgentLoopAdapter', 'EditorAgentAdapter'] as const,
-    roleTiers: recipe.agents.map((agent) => {
-      const tier = recommendRuntimeTier(agent.role);
-      return {
-        role: agent.role,
-        agentId: agent.agentId,
-        runtimeTier: tier,
-        rationale: runtimeTierRationale(agent.role, tier)
-      };
-    })
-  };
-}
-
-function recommendRuntimeTier(role: string): TeamRuntimeTier {
-  if (['reader', 'validator', 'knowledgeScout', 'reviewAgent', 'evidenceCollector'].includes(role)) return 'raw-api';
-  if (['implementer', 'coordinator'].includes(role)) return 'agent-sdk';
-  if (role === 'lieutenant' || role === 'scopeGuardian' || role === 'atomizationPlanner') return 'editor';
-  return 'raw-api';
-}
-
-function runtimeTierRationale(role: string, tier: TeamRuntimeTier) {
-  if (tier === 'raw-api') return `${role} is advisory/read-heavy and should prefer direct low-state API calls.`;
-  if (tier === 'agent-sdk') return `${role} may need tool-loop orchestration while preserving Coordinator-owned lifecycle.`;
-  return `${role} benefits from editor context but remains bounded by Team permission leases.`;
 }
 
 export function buildTeamRuntimePilot(input: {
@@ -4664,6 +4043,12 @@ export function writeTeamRun(input: {
 }) {
   const now = new Date().toISOString();
   const teamRunId = createTeamRunId(input.taskId, input.actorId, now);
+  const contributionComposition = composeTeamContributionManifests({
+    taskId: input.taskId,
+    baseCommit: input.teamPlan.shadowSchedule.baseCommit,
+    contributions: [],
+    declaredScope: deriveWritePaths(input.task, input.cwd)
+  });
   const teamRun = {
     schemaId: 'atm.teamRun.v1',
     teamRunId,
@@ -4708,6 +4093,8 @@ export function writeTeamRun(input: {
     escalationTarget: input.teamPlan.escalationTarget,
     brokerLane: input.teamPlan.brokerLane,
     captainDecision: input.teamPlan.captainDecision,
+    shadowSchedule: input.teamPlan.shadowSchedule,
+    contributionComposition,
     runtimeTierContract: input.teamPlan.runtimeTierContract,
     runtimePilot: input.teamPlan.runtimePilot,
     reworkRoute: buildTeamReworkRouteStateMachine({

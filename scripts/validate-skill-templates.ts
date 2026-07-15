@@ -19,11 +19,13 @@ const requiredTemplateIds = [
   'atm-create',
   'atm-lock',
   'atm-evidence',
+  'atm-error-code-resolver',
   'atm-upgrade-scan',
   'atm-handoff',
   'mailbox-worker-execution',
   'atm-internal-build-sync',
-  'atm-atom-map-refactor'
+  'atm-atom-map-refactor',
+  'atm-memory-consolidate'
 ];
 
 const requiredTeamAgentsTermsByTemplate: Record<string, readonly string[]> = {
@@ -228,6 +230,12 @@ for (const entryDefinition of packageModule.minimumAtmEntrySkillDefinitions) {
     assert(template.body.includes('Semantic Extraction First'), 'atm-task-intent-resolver must require semantic extraction before CLI routing');
     assert(template.body.includes('"source": "atm-skill"'), 'atm-task-intent-resolver must produce atm-skill intent');
     assert(template.body.includes('primary route when this skill is available'), 'atm-task-intent-resolver must downgrade next --prompt to fallback');
+  }
+  if (entryDefinition.id === 'atm-error-code-resolver') {
+    assert(template.body.includes('docs/governance/error-code-registry.json'), 'atm-error-code-resolver must read the structured registry first');
+    assert(template.body.includes('docs/ERROR_CODES.md'), 'atm-error-code-resolver must fall back to the generated source index');
+    assert(template.body.includes('registry-missing'), 'atm-error-code-resolver must expose missing registry entries explicitly');
+    assert(template.body.includes('human approval'), 'atm-error-code-resolver must preserve approval guidance');
   }
   for (const requiredTerm of requiredTeamAgentsTermsByTemplate[entryDefinition.id] || []) {
     assert(template.body.includes(requiredTerm), `${entryDefinition.id} missing Team Agents skill surface term: ${requiredTerm}`);

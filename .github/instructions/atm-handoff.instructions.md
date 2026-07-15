@@ -26,6 +26,10 @@ First command:
 node atm.mjs next --prompt "$ARGUMENTS" --json
 ```
 
+When a handoff mentions unresolved `ATM_*` codes, point the next agent to
+`atm-error-code-resolver` instead of copying ad hoc recovery prose. Include the
+code, command that produced it, and whether the registry entry was found.
+
 ## Route Command
 
 Use this ATM command only after the first command confirms it is the current governed route:

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-033",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "P0",
+  "status": "Fixed in 2026-06-28 governance-entry-readiness lane",
+  "area": "Governance entry / evidence timing",
+  "finding": "Git-head evidence, protected-push readiness, and framework-claim prerequisites were still easy to discover too late because the main operator route only became painful at hook or push time. Skills told agents to run `next`, but did not also tell them how to prepare for the likely protected-branch blockers returned by that route.",
+  "expectedBehavior": "`doctor` and prompt-scoped `next` should surface governance readiness as an explicit early contract, and canonical skill surfaces should teach agents to consume those hints before commit/push.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by adding `governance-entry-readiness` to `doctor`, by attaching `evidence.nextAction.governanceReadiness` plus `ATM_NEXT_GOVERNANCE_READINESS_HINT` to prompt-scoped `next` routes, and by updating canonical `atm-next` / `atm-governance-router` entry surfaces plus installed editor adapters to teach agents that framework claim, protected-push evidence, `doctor`, and branch queue retry codes must be prepared early rather than discovered at hook/push time. Regression coverage now lives in `scripts/validate-prompt-scoped-next.ts`, `scripts/validate-git-hooks-enforcement.ts`, and `scripts/validate-guide.ts`.",
+  "followUp": "Keep governance-entry-readiness in both CLI and skill entry surfaces; future router or adapter changes must preserve the early warning contract instead of pushing diagnosis back down to hooks only."
+}

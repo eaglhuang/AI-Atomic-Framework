@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-08-056",
+  "date": "2026-07-08",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in framework lock audit lane",
+  "area": "Framework-mode lock audit / protected evidence",
+  "finding": "`framework-mode claim` can auto-release a same-actor stale-completed temp lock and write `.atm/history/evidence/framework-lock-auto-reconcile.jsonl`, but `node atm.mjs git commit --auto-stage` then stages that audit file and pre-commit blocks it as `ATM_PROTECTED_STATE_EVIDENCE_FILE_MISSING_TASK_CONTEXT` with no recovery command.",
+  "expectedBehavior": "Auto-reconcile audit evidence should either be written to a committable governed audit surface with matching context, be treated as runtime-only and never auto-staged, or emit an exact cleanup/retry command that preserves the audit intent without blocking unrelated source/release commits.",
+  "evidenceOrRepro": "During the 2026-07-08 `atm do` removal / release-sync lane, repeated same-actor framework claims correctly auto-released stale locks and appended `framework-lock-auto-reconcile.jsonl`; the governed commit then failed after 196 seconds because the audit singleton was staged without a task ledger or transition event. The source fix writes auto-reconcile audit to `.atm/runtime/framework-lock-auto-reconcile.jsonl` and prevents active unlabeled temp locks from inheriting stale linked-task context from older actor sessions.",
+  "followUp": "Keep `scripts/validate-framework-development-governance.ts` and `scripts/validate-task-ledger-governance.ts` assertions that auto-reconcile evidence reports the runtime audit path and never creates `.atm/history/evidence/framework-lock-auto-reconcile.jsonl`."
+}

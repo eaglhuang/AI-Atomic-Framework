@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-08-058",
+  "date": "2026-07-08",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in TASK-AAO-0153",
+  "area": "Task ledger / record-only commits",
+  "finding": "Pure task-ledger or `.atm/history` record updates still often require borrowing a task-bound claim/release/commit dance even when the operator is only syncing import metadata, transition records, or benign governance history.",
+  "expectedBehavior": "ATM should provide an official record-commit lane for `tasks import --write` and pure `.atm/history` maintenance that preserves evidence, actor identity, and protected-state checks without requiring a fake delivery session.",
+  "evidenceOrRepro": "`TASK-AAO-0153` adds `node atm.mjs git record-commit`: it requires explicit actor/message, rejects `--task`, `--auto-stage`, `--defer-foreign-staged`, and `--no-verify`, accepts only low-risk `.atm/history` record files, appends `ATM-Record-Commit: true`, and still stages same-commit git-head provenance through the governed commit wrapper.",
+  "followUp": "Keep `tests/cli/git-record-commit.test.ts` wired into `validate:cli`; it proves task ledger records can commit without a task session while source files and closure packets fail closed."
+}

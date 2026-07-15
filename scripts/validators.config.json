@@ -180,6 +180,7 @@
         "validate-package-skeleton",
         "validate-terminology",
         "validate-captain-dispatch-protocol",
+        "pre-team-foundation-gate",
         "validate-behavior-pack",
         "audit-hash-placeholders"
       ]
@@ -224,6 +225,7 @@
         "validate-framework-hook-scope-filtering",
         "validate-branch-commit-queue",
         "validate-taskflow-close-atomicity",
+        "pre-team-foundation-gate",
         "validate-broker-lifecycle",
         "validate-internal-release-sync",
         "validate-local-git-adapter",
@@ -342,6 +344,7 @@
     { "name": "validate-framework-hook-scope-filtering", "entry": "scripts/validate-framework-hook-scope-filtering.ts", "tags": ["framework", "hook", "scope", "taskflow"], "slow": false },
     { "name": "validate-branch-commit-queue", "entry": "scripts/validate-branch-commit-queue.ts", "tags": ["git", "queue", "branch", "governance"], "slow": false },
     { "name": "validate-taskflow-close-atomicity", "entry": "scripts/validate-taskflow-close-atomicity.ts", "tags": ["taskflow", "close", "atomicity", "planning-mirror"], "slow": false },
+    { "name": "pre-team-foundation-gate", "entry": "tests/cli/pre-team-foundation-gate.test.ts", "tags": ["foundation-gate", "team", "taskflow", "runner-sync"], "slow": false },
     { "name": "validate-broker-lifecycle", "entry": "scripts/validate-broker-lifecycle.ts", "tags": ["broker", "lifecycle", "logic"], "slow": false },
     { "name": "validate-internal-release-sync", "entry": "scripts/validate-internal-release-sync.ts", "tags": ["cli", "release", "internal-sync"], "slow": false },
     { "name": "validate-local-git-adapter", "entry": "scripts/validate-local-git-adapter.ts", "tags": ["adapter", "git"], "slow": false },

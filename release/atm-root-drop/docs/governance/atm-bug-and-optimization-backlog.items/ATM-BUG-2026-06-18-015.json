@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-18-015",
+  "date": "2026-06-18",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 branch queue validation lane",
+  "area": "Git governance / multi-agent commit lane",
+  "finding": "Two Codex agents can both pass local governance checks, then collide at final `git commit` with `fatal: cannot lock ref 'HEAD'` because another agent moved `HEAD` between wrapper preflight and commit execution. The wrapper surfaces the raw failure, but ATM does not yet serialize the final branch-tip mutation through a steward lane or retry on safe fast-forward drift.",
+  "expectedBehavior": "When governed commits target the same branch concurrently, ATM should funnel the final branch-tip mutation through a serialized steward lane or equivalent commit queue. At minimum, the wrapper should detect `HEAD` drift, re-evaluate branch state, and emit a first-class queue/retry path instead of a raw Git race.",
+  "evidenceOrRepro": "The current source now satisfies that contract: `packages/cli/src/commands/git-governance.ts` serializes final commit mutation through `withBranchCommitQueueLock(...)`, emits `ATM_GIT_COMMIT_BRANCH_QUEUE_BUSY` / `ATM_GIT_COMMIT_BRANCH_QUEUE_RACE`, records `atm.branchCommitQueueEvidence.v1`, and explicitly detects raw `cannot lock ref 'HEAD'` races. Taskflow write-readiness already exposes the same guard via `branchCommitQueueGate`, and on 2026-06-28 this lane promoted the queue regression into a first-class validator surface with `scripts/validate-branch-commit-queue.ts`, `package.json`, and `scripts/validators.config.json`, so standard validation now proves both the taskflow busy gate and the governed commit retry contract remain wired in.",
+  "followUp": "Keep the new branch queue validator in standard profiles; future git-governance refactors must preserve queue serialization, busy/race retry codes, and taskflow close write-readiness integration instead of falling back to raw Git `HEAD` race failures."
+}

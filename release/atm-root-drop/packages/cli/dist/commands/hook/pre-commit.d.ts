@@ -127,4 +127,13 @@ export declare function inspectProtectedAtmStateChanges(cwd: string, stagedFiles
     files: readonly string[];
     findings: ProtectedStateFinding[];
 };
+/**
+ * TASK-MEM-0009 (BUG-ATM-0074) — a close-window governance-dirty snapshot
+ * whose recorded `restoredAt` is still null is an UNCONSUMED deferral: it is
+ * the only surviving copy of another close window's deferred evidence file.
+ * Auto-cleaning it destroys that evidence permanently (the owning close then
+ * reports snapshot-missing on restore). Consumed snapshots (restoredAt set)
+ * remain auto-cleanable.
+ */
+export declare function isUnconsumedCloseWindowDeferralSnapshot(cwd: string, relativePath: string): boolean;
 export {};

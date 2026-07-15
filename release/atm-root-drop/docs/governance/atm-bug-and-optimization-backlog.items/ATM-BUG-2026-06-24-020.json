@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-24-020",
+  "date": "2026-06-24",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 taskflow close atomicity lane",
+  "area": "Taskflow close / planning mirror closeback",
+  "finding": "Same-repo `taskflow close` can mutate the planning card to `done` without a fully governed closeback packet for the planning mirror, causing task audit / protected-state failures such as manual-done metadata gaps, missing planning transition events, or stale planning close events that poison later retries.",
+  "expectedBehavior": "Planning-mirror closeback should write a complete governed close transition for the mirror task, stage that transition event with the same close bundle, and roll it back cleanly if the governed commit fails.",
+  "evidenceOrRepro": "Reproduced repeatedly on `TASK-CID-0120` with failures including `ATM_TASK_AUDIT_TRANSITION_EVIDENCE_MISSING`, `ATM_TASK_AUDIT_MANUAL_DONE`, and later `ATM_TASK_AUDIT_TRANSITION_EVENT_MISSING` / `ATM_PROTECTED_STATE_TASK_TRANSITION_COMMAND_INVALID`. Verified on 2026-06-28 that the governing source path now covers the whole close transaction: `applyPlanningCardCloseback(...)` writes frontmatter plus planning transition evidence, `buildTaskflowCommitBundle(...)` exact-stages that planning transition inside the same governed bundle, and `rollbackCloseWriteTransaction(...)` deletes the newly created planning transition artifact and restores the prior planning card snapshot if the governed commit fails. This lane elevated the end-to-end regression in `packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts` into the standard validator surface via `scripts/validate-taskflow-close-atomicity.ts`, `package.json`, and `scripts/validators.config.json`, so release validation now guards both the success path and the rollback path instead of leaving them as an ad hoc test file. Validation: `node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-close-atomicity.test.ts`, `npm run validate:taskflow-close-atomicity`, plus post-build frozen release verification.",
+  "followUp": "Keep the planning closeback atomicity validator in standard profiles; any future same-repo closeback refactor must preserve staged planning transition evidence and rollback cleanup as one governed transaction."
+}

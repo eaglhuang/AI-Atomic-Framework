@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -766,7 +766,7 @@ function buildSelectionFingerprint({ profile, mode, filters, focusPaths, validat
 
 function buildValidatorRunFingerprint({ validator, mode, command, validatorPath, profile, selectionFingerprint, headCommit }: any): string {
   const fingerprint = {
-    schemaId: 'atm.validatorRunFingerprint.v1',
+    schemaId: 'atm.validatorRunFingerprint.v2',
     validator: validator.name,
     entry: validator.entry,
     mode,
@@ -774,7 +774,7 @@ function buildValidatorRunFingerprint({ validator, mode, command, validatorPath,
     command,
     selectionFingerprint,
     headCommit,
-    sourceMtimeMs: safeMtimeMs(validatorPath)
+    sourceDigest: safeFileSha256(validatorPath)
   };
   return sha256Json(fingerprint);
 }
@@ -1274,12 +1274,12 @@ function formatSpawnError(error: unknown): string {
 
 function buildValidatorCacheKey(validator: any, mode: string, command: string, validatorPath: string): string {
   const fingerprint = {
-    schemaId: 'atm.validatorCacheKey.v1',
+    schemaId: 'atm.validatorCacheKey.v2',
     validator: validator.name,
     entry: validator.entry,
     mode,
     command,
-    sourceMtimeMs: safeMtimeMs(validatorPath)
+    sourceDigest: safeFileSha256(validatorPath)
   };
   return crypto.createHash('sha256').update(JSON.stringify(fingerprint)).digest('hex');
 }
@@ -1741,9 +1741,9 @@ function buildFocusedValidatorCommand(results: readonly any[]): string | null {
   return null;
 }
 
-function safeMtimeMs(filePath: string): number | null {
+function safeFileSha256(filePath: string): string | null {
   try {
-    return statSync(filePath).mtimeMs;
+    return `sha256:${crypto.createHash('sha256').update(readFileSync(filePath)).digest('hex')}`;
   } catch {
     return null;
   }

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-11-086",
+  "date": "2026-07-11",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in Team Agents closeback ledger lane",
+  "area": "Team Agents / task ledger closeback",
+  "finding": "The Team Agents completion slice for `TASK-TEAM-0053` through `TASK-TEAM-0065` existed in source history, but those task ids were not present in `.atm/history/tasks/**` or the 3KLife planning-card directory, so operators could not prove the 13-card plan was imported and closed through normal task ledger governance.",
+  "expectedBehavior": "A bulk Team completion delivery should have planning cards or an equivalent governed historical closeback path before it is treated as ledger-complete. Source commits can be used as historical delivery evidence, but `.atm/history/tasks/**` must be created by official import/close commands, not hand-authored.",
+  "evidenceOrRepro": "Fixed on 2026-07-11 by importing and closing the missing closeback chain through governed taskflow: `TASK-TEAM-0050` target commit `80f31df2` / planning commit `ffc7b2be`; `TASK-TEAM-0051` target `364ebafe` / planning `27774733`; `TASK-TEAM-0052` target `9f50ccd2` / planning `ff6b385f`; `TASK-TEAM-0053` target `b5f9ff8c` / planning `ce60e2c8`; aggregate `TASK-TEAM-0065` closeback commit `c95490f6`. `tasks status` reports live ledger and planning frontmatter done for 0050/0051/0052/0053/0065.",
+  "followUp": "Keep future Team completion slices from landing as source-only history: import or generate task ledgers before dependency-ordered taskflow close, and use aggregate closeback only when explicit individual cards are unavailable."
+}

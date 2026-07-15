@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-060",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in this cleanup commit",
+  "area": "Git governance / wrapper timeout budget",
+  "finding": "Governed `node atm.mjs git commit` defaulted the underlying host `git commit` spawn to 120s, but a normal framework pre-commit path can legitimately take around 277s when task audit and git-head evidence validators run. This makes a green hook look like a wrapper timeout and forces the operator into manual retry/status work.",
+  "expectedBehavior": "The wrapper should remain bounded against truly hung hooks while giving the observed green framework pre-commit path enough budget by default; shorter budgets should be an explicit `--timeout-ms` override for tests or emergency operators.",
+  "evidenceOrRepro": "On 2026-07-09, committing `6c9272ee` first failed with `ATM_GIT_COMMIT_TIMEOUT`; `git commit-status` proved `HEAD` did not advance and rollback removed `.atm/history/evidence/git-head.jsonl`. A direct `hook pre-commit --json` then passed after about 277s, and retrying the same wrapper command with `--timeout-ms 420000` succeeded.",
+  "followUp": "Keep `tests/cli/git-commit-timeout-and-status.test.ts` asserting the default recorded timeout is 420000ms while explicit `--timeout-ms 1500` still bounds a deliberately hung hook."
+}

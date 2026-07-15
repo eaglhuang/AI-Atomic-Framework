@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-atomic-framework.local/schemas/team-agents/team-cost-receipt.schema.json",
+  "title": "ATM Team Cost Receipt",
+  "type": "object",
+  "required": [
+    "schemaId",
+    "specVersion",
+    "migration",
+    "catalogVersion",
+    "measurementStatus",
+    "promotionEligible",
+    "provider",
+    "model",
+    "currency",
+    "originalCurrency",
+    "incrementalCashCost",
+    "fullyLoadedCashCost",
+    "listPriceEquivalentCost",
+    "lineItems",
+    "incompleteReasons"
+  ],
+  "properties": {
+    "schemaId": { "const": "atm.teamCostReceipt.v1" },
+    "specVersion": { "type": "string" },
+    "migration": { "type": "object" },
+    "catalogVersion": { "type": "string" },
+    "measurementStatus": { "enum": ["complete", "cost-measurement-incomplete"] },
+    "promotionEligible": { "type": "boolean" },
+    "provider": { "type": "string" },
+    "model": { "type": "string" },
+    "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "originalCurrency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "incrementalCashCost": { "type": "number", "minimum": 0 },
+    "fullyLoadedCashCost": { "type": "number", "minimum": 0 },
+    "listPriceEquivalentCost": { "type": "number", "minimum": 0 },
+    "lineItems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["dimension", "quantity", "rate", "cost", "currency"],
+        "properties": {
+          "dimension": { "type": "string" },
+          "quantity": { "type": "number", "minimum": 0 },
+          "rate": { "type": "number", "minimum": 0 },
+          "cost": { "type": "number", "minimum": 0 },
+          "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "incompleteReasons": { "type": "array", "items": { "type": "string" } },
+    "fxSnapshotVersion": { "type": ["string", "null"] },
+    "seatAllocationPolicyVersion": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false
+}

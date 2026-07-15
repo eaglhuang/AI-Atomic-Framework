@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-134",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Critical",
+  "status": "Follow-up in TASK-TEAM-0084",
+  "area": "Protected staged bundle / Broker release-order deadlock",
+  "finding": "A Broker resolution can correctly grant task A the current shared-surface release order, but A's governed commit cannot use `--defer-foreign-staged` when task B's protected `.atm/history` bundle is staged. B cannot commit first because the same resolution blocks B.",
+  "expectedBehavior": "A resolution-authorized current task must be able to snapshot and temporarily unstage a complete protected foreign task bundle, commit only its own scope, then return a deterministic restage command; incomplete or non-resolution foreign bundles remain protected.",
+  "evidenceOrRepro": "Closeout audit after TASK-TEAM-0079 and TASK-TEAM-0080 found the stale `Active in TASK-TEAM-0079` status was incorrect: 0079 closed queue/composer projection issues, and 0080 propagated `--defer-foreign-staged` through taskflow plus scope tools, but `git-governance.ts` still blocks protected foreign staged ownership with `ATM_GIT_COMMIT_PROTECTED_FOREIGN_STAGED_OWNERSHIP`.",
+  "followUp": "TASK-TEAM-0084 records the remaining boundary as follow-up: implement or reject a narrow resolution-authorized protected defer lane with regression proving no silent unstage, complete-bundle validation, snapshot/recovery, and denial without currentAllowedTaskId."
+}

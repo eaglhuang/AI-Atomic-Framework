@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-139",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0177",
+  "area": "Team Agents / role-provider parser",
+  "finding": "`--role-provider role=provider:model::real-agent` contains an empty SDK segment, but parser behavior can shift the fields so `real-agent` is consumed as the SDK/mode boundary incorrectly, causing roles to silently downgrade or skip execution.",
+  "expectedBehavior": "Role-provider parsing should reject empty required segments with a clear error, or normalize four-segment input without field drift; `team start --execute` should fail before writing a run if requested real-agent roles select no provider execution.",
+  "evidenceOrRepro": "Fixed in TASK-AAO-0177: delivery commit `681c3467a49723c1a46e19accb6966cbb08c56a3` preserves empty SDK segment positions in `provider-selection.ts`; close commit `fdd2f0bd0452963de38c8b621458d46430166d1b` recorded done/released/no-residue. Evidence passed `node --strip-types tests/cli/team-role-provider-parser.test.ts`, `npm run typecheck`, `npm run validate:git-head-evidence`, and `npm run validate:cli`.",
+  "followUp": "Keep parser regressions for two-, three-, four-segment, empty-SDK, malformed, and runtime-mode cases; separately track zero-provider execution semantics under execute-result backlog rows."
+}

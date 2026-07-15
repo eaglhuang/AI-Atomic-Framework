@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-054",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in validator resume/status lane",
+  "area": "Validator evidence / resumable standard profile",
+  "finding": "Long profile validation through `node atm.mjs evidence run --command \"npm run validate:standard\"` has no resumable batch/checkpoint model. If the caller times out after many validators have already run, ATM does not expose a batch id, completed-step cache, expected-duration hint, or continuation command, so the operator must either rerun the whole profile or manually decide which evidence is trustworthy.",
+  "expectedBehavior": "Standard/full validator profiles should be resumable and time-budget aware: assign a single batch id, persist per-validator command/result/log metadata as each step finishes, surface estimated/observed profile duration before starting, and let a later run continue only unfinished or invalidated steps while preserving one coherent evidence summary.",
+  "evidenceOrRepro": "During `TASK-MAO-0021`, the focused evidence gates passed, but `evidence run` for `npm run validate:standard` hit a 10-minute caller timeout (`exit code 124`). A second run with a 20-minute caller timeout also timed out; process inspection then showed both timed-out evidence runs had left descendant `npm run validate:standard` / `scripts/run-validators.ts standard` processes alive, so retrying created duplicate concurrent standard profiles instead of a clean continuation. The source fix adds validator run status/resume behavior, per-step checkpointing, and timeout-bounded validator execution coverage.",
+  "followUp": "Keep `tests/cli/validator-run-resume-and-status.test.ts` in `validate:cli`; it asserts read-only `--status`, `--validator-timeout-ms`, and resume behavior that skips completed validators and reruns only outstanding work."
+}

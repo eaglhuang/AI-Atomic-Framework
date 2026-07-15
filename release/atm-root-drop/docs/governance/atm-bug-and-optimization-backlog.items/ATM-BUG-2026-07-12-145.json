@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-145",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Cross-repo planning-root configuration",
+  "finding": "`.atm/config.json` enables external task-ledger mirroring and contains a broker evidence path under `../3KLife`, but `next --prompt` still fails with `ATM_PLANNING_ROOT_MISSING` unless the operator separately knows to set `ATM_PLANNING_REPO_ROOT`; the required configuration key and expected root are not surfaced by preflight.",
+  "expectedBehavior": "Bootstrap/doctor/next should discover or validate the configured planning repository, or provide a repo-local exact configuration command and explain why planning-root resolution is required before task routing.",
+  "evidenceOrRepro": "2026-07-12: initial `next --prompt` failed; the actual root `C:\\Users\\User\\3KLife\\docs\\ai_atomic_framework` existed, but `.atm/config.json` had no `taskLedger.planningRoots` and the environment variable was unset. A process-local env override removed this error.",
+  "followUp": "Add planning-root discovery/configuration guidance and a preflight regression for broker-only external paths versus task-ledger planning roots."
+}

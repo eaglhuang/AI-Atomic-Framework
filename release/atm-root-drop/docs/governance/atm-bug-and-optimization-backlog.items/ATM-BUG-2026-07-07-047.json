@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-047",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in prompt-scoped next batch lane",
+  "area": "Prompt routing / batch queue",
+  "finding": "A broad request to complete all open ATM task cards can expose the open task queue in `importedTaskQueue` but still return `ATM_NEXT_TASK_SCOPE_NOT_FOUND` instead of a batch route, forcing the operator to manually choose the next task and risking a parallel task model.",
+  "expectedBehavior": "If the prompt asks for all / remaining / open task cards and open imported tasks exist, `next` should return `recommendedChannel=batch` with a queue head and checkpoint playbook, or explain the exact missing scope without discarding the discovered queue.",
+  "evidenceOrRepro": "During `TASK-AAO-0150` continuation, `node atm.mjs next --prompt \"完成所有 open ATM task cards 並提交 push\" --json` reported `openTaskCount: 6` and listed the tasks, but hard-blocked with `ATM_NEXT_TASK_SCOPE_NOT_FOUND`. The source fix in `packages/cli/src/commands/next.ts` handles blanket \"all/open/remaining task cards\" prompts as batch intent, and `scripts/validate-prompt-scoped-next.ts` asserts the route no longer emits `ATM_NEXT_TASK_SCOPE_NOT_FOUND` and recommends `recommendedChannel=batch`.",
+  "followUp": "Keep `npm run validate:prompt-scoped-next` coverage for blanket all/open/remaining task-card prompts."
+}

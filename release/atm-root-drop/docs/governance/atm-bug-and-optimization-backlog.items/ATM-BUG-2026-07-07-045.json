@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-045",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in this cleanup commit",
+  "area": "Git governance / commit wrapper observability",
+  "finding": "`node atm.mjs git commit --auto-stage --json` can exceed the caller timeout after the underlying git commit already succeeds, leaving the operator with a timeout error, a moved `HEAD`, and staged/unstaged residue to reconcile manually.",
+  "expectedBehavior": "The wrapper should emit phase progress, bound long hook/validator phases, and make successful commit completion observable before any post-commit work can overrun the caller timeout. A retry/status command should identify whether the commit already landed.",
+  "evidenceOrRepro": "During `TASK-AAO-0151`, the governed commit command timed out after 184 seconds, but `git log -1` showed commit `7eb64669 fix(next): admit unconfirmed broker overlaps` had landed. Residual working-tree changes then had to be inspected and reconciled by diffing staged vs unstaged state. Reconfirmed on 2026-07-09 when wrapper failures returned empty stdout/stderr and required a manual hook pass plus native copyable commit to prove the repo state.",
+  "followUp": "Keep `tests/cli/git-commit-timeout-and-status.test.ts` coverage that timed-out attempts record HEAD before/after, status/retry commands, and copyable host-git diagnostics; keep using `git commit-status` before any retry after timeout."
+}

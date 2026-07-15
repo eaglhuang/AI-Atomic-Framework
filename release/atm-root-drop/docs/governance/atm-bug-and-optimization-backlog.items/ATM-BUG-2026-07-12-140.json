@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-140",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Next claim / auto-intent UX",
+  "finding": "`next --claim --auto-intent` can still classify a backlog/doc delivery as `closeout-only`, and the operator only discovers the mismatch when `git commit --auto-stage` rejects source mutations with `ATM_GIT_COMMIT_CLOSEOUT_ONLY_MUTATION`.",
+  "expectedBehavior": "Auto-intent should infer `write` for open tasks with declared non-.atm deliverables or prompts that ask to update backlog/source, or `next --claim` should print a stronger warning and copyable `--claim-intent write` recovery before work begins.",
+  "evidenceOrRepro": "During TASK-TEAM-0084, auto-intent claimed `closeout-only`; the commit wrapper correctly failed early and required `node atm.mjs next --claim --actor \"Codex-GPT5.6 Terra\" --task \"TASK-TEAM-0084\" --claim-intent write --json`. Earlier preflight guard row `ATM-BUG-2026-07-07-043` remains fixed; this row tracks the remaining UX friction.",
+  "followUp": "Add an auto-intent regression for backlog/document delivery prompts and surface a pre-edit warning or default write intent."
+}

@@ -58,6 +58,10 @@ before you reach commit or push. Treat framework claim, protected push
 evidence, `doctor`, and branch queue retry codes as early blockers, not as
 something to discover only after a hook or push failure.
 
+If `next`, a validator, hook, or task command returns an `ATM_*` code that
+needs explanation, route interpretation through `atm-error-code-resolver` and
+its shared registry. Do not keep a private error-code table in this skill.
+
 Translate `evidence.nextAction.governanceReadiness` into an immediate
 preparation checklist before implementation:
 

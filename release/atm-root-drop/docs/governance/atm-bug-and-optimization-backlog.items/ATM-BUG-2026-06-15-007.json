@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-007",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Documentation / AI routing",
+  "severity": "High",
+  "status": "Fixed by `.agents/skills/atm-bug-backlog` update",
+  "area": "Backlog ownership",
+  "finding": "The first backlog skill treated all bug/optimization records as ATM backlog entries and did not distinguish ATM framework bugs from adopter/project bugs.",
+  "expectedBehavior": "The skill should route ATM product bugs to the ATM backlog and non-ATM project bugs to a repo-local project backlog.",
+  "evidenceOrRepro": "User correction: \"這個 skill 應該是要區別紀錄的是 ATM 的 bug 還是 其他專案的 bug\".",
+  "followUp": "Preserve the owner classification table in the skill and use `docs/governance/project-bug-and-optimization-backlog.md` for non-ATM repos."
+}

@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-114",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Mitigated in TASK-TEAM-0074; follow-up open",
+  "area": "Broker proposal-first / Team execution",
+  "finding": "`broker runtime activate --proposal-file` validates and opens a safe hot-file admission, but the subsequent `team start --execute` historically rebuilt a fresh provisional admission instead of consuming that approval.",
+  "expectedBehavior": "`team start --broker-proposal-file` now validates and consumes a matching proposal in-memory before Team broker planning. A durable activation-to-start binding and automatic terminal intent cleanup remain required.",
+  "evidenceOrRepro": "Reproduced during TASK-TEAM-0074 paid L5 dogfood after a successful broker activation for `packages/cli/src/commands/team.ts`; the Team start route returned to proposal-first rather than launching.",
+  "followUp": "Add a focused regression for activate -> start consumption, stale/mismatched proposal rejection, and automatic terminal intent cleanup."
+}

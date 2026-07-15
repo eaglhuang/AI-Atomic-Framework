@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-071",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in historical scratch-residue lane",
+  "area": "Taskflow close / commit bundle scope classification",
+  "finding": "`taskflow close --historical-delivery` can include unrelated untracked backup files from broad task scope in `targetDeliveryFiles`, even after the real delivery has already landed in a valid historical delivery commit. This can pressure operators to stage or commit another agent's scratch/WIP files just to finish closeout.",
+  "expectedBehavior": "Historical-delivery close should restrict delivery-file requirements to files proven to belong to the historical delivery, or classify unrelated untracked backup/scratch files as advisory residue with an exact remediation. Broad scopes such as `packages/**` should not turn arbitrary `.bak` files into required close-bundle delivery.",
+  "evidenceOrRepro": "Fixed by classifying scratch/backup files such as `.bak`, `.backup`, `.orig`, and `.tmp` as advisory residue during historical closeback unless they are explicitly declared as exact deliverables. Verification: `node --strip-types packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts` covers a broad `packages/**` historical delivery with an unrelated untracked `.bak` and proves it is excluded from `targetDeliveryFiles` and staging.",
+  "followUp": "Keep explicit file deliverables authoritative; only broad-scope historical closeback scratch files are excluded."
+}

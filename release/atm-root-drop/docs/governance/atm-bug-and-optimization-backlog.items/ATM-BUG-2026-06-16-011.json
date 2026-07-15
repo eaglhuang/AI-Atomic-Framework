@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-16-011",
+  "date": "2026-06-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Product gap",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 deferred-governance diagnosis lane",
+  "area": "Pre-commit governance / framework-mode",
+  "finding": "Pre-commit governance blocks can fail a legitimate framework-repo commit because `framework claim` / direction-lock state is missing, even when the diff content, validators, and historical governance intent are otherwise correct. The hook currently treats governance timing gaps as a hard commit failure instead of distinguishing them from content-integrity failures.",
+  "expectedBehavior": "Framework-repo pre-commit should surface a precise deferred-governance diagnosis, and historical-batch or closeback flows should have an explicit, governed path to satisfy or defer framework claim / direction-lock requirements without forcing blanket `--no-verify`.",
+  "evidenceOrRepro": "Closed on 2026-06-28 by teaching `packages/cli/src/commands/hook.ts` to classify pre-commit failures into governance-state versus content-validation lanes instead of flattening everything into one generic block. `failureEnvelope` now exposes `governanceStateFailures`, `contentValidationFailures`, and `deferredGovernanceCandidate`, while governance-only failures surface the dedicated hook code `ATM_HOOK_PRE_COMMIT_DEFERRED_GOVERNANCE_REQUIRED` so operators can tell that the staged content is not failing validation and the remaining blocker is claim/governance timing. Regression coverage was added to `scripts/validate-git-hooks-enforcement.ts`, which now stages a framework-critical file in a fixture repo, forces validator success, and proves the hook reports the deferred-governance marker instead of a generic content-failure-only diagnosis.",
+  "followUp": "Keep the deferred-governance split in `packages/cli/src/commands/hook.ts` and the fixture-backed regression in `scripts/validate-git-hooks-enforcement.ts`; future hook refactors must preserve a first-class governance-state diagnosis whenever the staged content is otherwise validator-clean."
+}

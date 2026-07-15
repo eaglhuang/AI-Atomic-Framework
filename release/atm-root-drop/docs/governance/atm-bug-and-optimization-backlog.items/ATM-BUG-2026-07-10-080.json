@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-080",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Low",
+  "status": "Fixed in planning-index advisory lane",
+  "area": "Cross-repo planning docs / closeout sync",
+  "finding": "After `taskflow close --write` lands planning commits in `3KLife`, the planning task index (`docs/ai_atomic_framework/rft-hardening/tasks/README.md`) and plan snapshot can still list completed RFT cards as `planned` or in the open-priority queue until an operator manually edits and commits planning docs.",
+  "expectedBehavior": "Planning close bundles should either update the index/README as part of governed closeout, or emit an explicit post-close advisory with the exact docs paths and frontmatter fields that still lag ledger reality.",
+  "evidenceOrRepro": "Fixed by adding `atm.taskflowPlanningIndexAdvisory.v1` to successful `taskflow close --write` results whenever a planning roster/index path or roster follow-up command is present. The advisory reports the planning repo root, README/index path, planning card path, closeback frontmatter fields, status (`updated`, `already-current`, or `follow-up-required`), row diff, and exact `tasks roster update` command. Verification: `node --strip-types packages/cli/src/commands/taskflow/__tests__/close-residue-advisory.spec.ts` and `npm run typecheck` pass.",
+  "followUp": "Keep inline roster sync in the close bundle; the advisory is the operator-facing audit trail and fallback when a profile uses follow-up roster sync."
+}

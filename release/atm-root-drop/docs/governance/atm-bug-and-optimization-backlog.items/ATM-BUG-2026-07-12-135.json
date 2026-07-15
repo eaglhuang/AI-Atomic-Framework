@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-135",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Critical",
+  "status": "Fixed in TASK-TEAM-0079",
+  "area": "Governed commit / composer projection",
+  "finding": "`withTaskScopedCommitIndex` built the temporary index from HEAD and re-added bundle files from the working tree, overwriting a composer partial-staged projection with foreign worktree content before pre-commit ran.",
+  "expectedBehavior": "The temporary index must plant the exact approved live-index blobs for selected paths instead of re-reading the working tree, preserving partial staging and excluding other tasks' index content.",
+  "evidenceOrRepro": "TASK-TEAM-0079 queue-only projection was repeatedly replaced by 0075 worktree edits inside the wrapper's temporary index, so pre-commit saw handoff imports the composer never staged.",
+  "followUp": "Keep a regression proving a partial-staged blob survives the task-scoped commit wrapper byte-for-byte while unrelated worktree edits stay out."
+}

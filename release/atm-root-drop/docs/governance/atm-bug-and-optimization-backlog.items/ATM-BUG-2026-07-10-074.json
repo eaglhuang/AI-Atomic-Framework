@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-10-074",
+  "date": "2026-07-10",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Fixed in planning-root status triangulation lane",
+  "area": "Task status triangulation / planning mirror closeback",
+  "finding": "After a successful adopter-aware planning closeback commit, `tasks status` can still report `planningFrontmatter.status: null` and classify the task as `stale-import` or `ledger-ahead-of-planning-mirror`, even though live ledger is `done` and the planning repo close commit exists. Target ledger `source.planPath` values imported from `3KLife` are often relative planning-tree paths that do not resolve from the target repo working tree.",
+  "expectedBehavior": "Status triangulation should resolve the task's `source.planPath` back to the planning repo via `ATM_PLANNING_REPO_ROOT` (or an absolute stored path) after taskflow closeback and report the actual planning frontmatter status, or explain precisely why the mirror cannot be read. A successful closeback should not immediately look stale.",
+  "evidenceOrRepro": "Fixed by routing `resolvePlanningCardPath()` through `resolvePlanAbsoluteFromStored()`, so planning-root-relative ledger paths resolve against configured planning roots instead of the target repo root. Regression coverage: `node --strip-types packages/cli/src/commands/tasks/__tests__/status-triangulation.spec.ts` creates a temporary `ATM_PLANNING_REPO_ROOT` and proves `source.planPath: rft-hardening/tasks/TASK-RFT-0004.task.md` resolves to the external planning card.",
+  "followUp": "Keep the planning-root-relative resolver regression alongside parity override tests; broader close exit behavior remains tracked by `ATM-BUG-2026-07-10-078`."
+}

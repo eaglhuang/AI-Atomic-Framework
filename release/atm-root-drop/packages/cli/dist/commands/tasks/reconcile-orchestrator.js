@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { assertRunnerFreshForWriteAction, createClosurePacket, createFrameworkModeStatus, executeTaskCloseTransaction, normalizeSha256FieldsDeep, registerCloseCommitWindow, validateClosurePacket, writeClosurePacket } from '../framework-development.js';
@@ -16,6 +16,45 @@ import { buildHistoricalDeliveryProvenance } from './historical-delivery.js';
 import { createClosureTransitionMetadata } from './task-transition-helpers.js';
 import { extractTaskCloseDeclaredFiles, evaluateTaskDeliverableGate, stageTaskCloseArtifacts } from './close-helpers/close-artifact-staging.js';
 import { writeTaskDocumentWithTransition } from './close-helpers/task-transition-writer.js';
+/**
+ * TASK-MEM-0008 (BUG-ATM-0072) — Policy Object: decide whether this reconcile
+ * merely CREATES closure provenance for a clean imported-as-done mirror
+ * (non-emergency) or would REWRITE existing local closure state (emergency).
+ * Fail closed: any local closure artifact or live claim keeps the emergency
+ * gate.
+ */
+export function classifyReconcileEmergency(input) {
+    const reasons = [];
+    const doc = input.taskDocument;
+    const claim = doc.claim;
+    const claimState = claim ? String(claim.state ?? '') : '';
+    if (claimState === 'active' || claimState === 'handoff') {
+        reasons.push(`live claim state '${claimState}' would be overwritten`);
+    }
+    const localClosurePacket = path.join(input.cwd, '.atm', 'history', 'evidence', `${input.taskId}.closure-packet.json`);
+    if (existsSync(localClosurePacket)) {
+        reasons.push('local closure packet already exists');
+    }
+    const declaredPacket = typeof doc.closurePacket === 'string' && doc.closurePacket.trim().length > 0;
+    if (declaredPacket) {
+        reasons.push('task document already declares a closure packet');
+    }
+    const eventsDir = path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId);
+    if (existsSync(eventsDir)) {
+        const closeEvents = readdirSync(eventsDir).filter((entry) => /close|reconcile|repair-closure/i.test(entry));
+        if (closeEvents.length > 0) {
+            reasons.push(`local close-family transition event(s) already recorded (${closeEvents.length})`);
+        }
+    }
+    if (String(doc.status ?? '') !== 'done') {
+        reasons.push(`task status '${String(doc.status ?? '')}' is not an imported-done mirror`);
+    }
+    return {
+        schemaId: 'atm.reconcileEmergencyClassification.v1',
+        classification: reasons.length === 0 ? 'clean-mirror-attestation' : 'local-closure-rewrite',
+        reasons
+    };
+}
 export async function runTasksReconcile(argv) {
     const options = parseReconcileOptions(argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -23,20 +62,6 @@ export async function runTasksReconcile(argv) {
         throw new CliError('ATM_ACTOR_ID_MISSING', 'tasks reconcile requires --actor or ATM_ACTOR_ID (legacy alias: AGENT_IDENTITY).', { exitCode: 2 });
     }
     const actorId = resolvedActor.actorId;
-    const emergencyUse = assertEmergencyApproval({
-        cwd: options.cwd,
-        surface: 'tasks reconcile',
-        permission: 'backend.tasks.reconcile',
-        taskId: options.taskId,
-        actorId,
-        emergencyApproval: options.emergencyApproval,
-        flags: [
-            ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
-            ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
-        ],
-        reason: options.waiverReason ?? 'Direct reconcile backend closeback.',
-        command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`
-    });
     const taskPath = taskPathFor(options.cwd, options.taskId);
     if (!existsSync(taskPath)) {
         throw new CliError('ATM_TASK_NOT_FOUND', `Task file not found for ${options.taskId}.`, {
@@ -45,6 +70,31 @@ export async function runTasksReconcile(argv) {
         });
     }
     const taskDocument = JSON.parse(readFileSync(taskPath, 'utf8'));
+    // TASK-MEM-0008 (BUG-ATM-0072) — reset-open precedent (TASK-RFT-0011):
+    // classify before demanding an emergency lease. Creating closure provenance
+    // for a clean mirror is routine cross-repo closeback; rewriting existing
+    // local closure state stays an emergency surface.
+    const reconcileClassification = classifyReconcileEmergency({
+        cwd: options.cwd,
+        taskId: options.taskId,
+        taskDocument
+    });
+    const emergencyUse = reconcileClassification.classification === 'clean-mirror-attestation'
+        ? null
+        : assertEmergencyApproval({
+            cwd: options.cwd,
+            surface: 'tasks reconcile',
+            permission: 'backend.tasks.reconcile',
+            taskId: options.taskId,
+            actorId,
+            emergencyApproval: options.emergencyApproval,
+            flags: [
+                ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
+                ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
+            ],
+            reason: options.waiverReason ?? 'Direct reconcile backend closeback.',
+            command: `node atm.mjs tasks reconcile --task ${options.taskId} --actor ${actorId} --delivery-commit ${options.deliveryCommit} --json`
+        });
     const previousTaskContent = readFileSync(taskPath, 'utf8');
     const staleGate = assertRunnerFreshForWriteAction({
         cwd: options.cwd,
@@ -168,6 +218,7 @@ export async function runTasksReconcile(argv) {
                 ...(options.historicalDeliveryRepo ? { deliveryRepoRoot } : {}),
                 reconciledAt: new Date().toISOString(),
                 reconciledByActor: actorId,
+                reconcileClassification: reconcileClassification.classification,
                 reason: reconcileReason
             },
             historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate.historicalDeliveries[0] ?? null, options.waiverReason)

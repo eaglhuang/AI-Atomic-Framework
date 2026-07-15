@@ -941,7 +941,32 @@ async function runTaskflowClose(parsed: ReturnType<typeof parseArgsForCommand>, 
       planningMirrorPath: closebackPlan.writerBoundary.planningMirrorPath,
       forceImport: diagnosis.bucket === 'stale-import'
     });
-    const backendResult = await withTaskflowOperatorLane(() => runTasks(backendArgv));
+    const ledgerAlreadyClosedHistoricalCloseback =
+      closebackPlan.backendSurface === 'tasks-close'
+      && closebackPlan.closeMode === 'historical-delivery-close'
+      && enrichedDiagnosis.triangulation.liveLedger.status === 'done'
+      && effectiveHistoricalDeliveryRefs.length > 0;
+    const backendResult = ledgerAlreadyClosedHistoricalCloseback
+      ? makeResult({
+        ok: true,
+        command: 'tasks close',
+        cwd,
+        mode: 'taskflow-closeback-reconcile',
+        messages: [
+          message('info', 'ATM_TASKFLOW_CLOSE_LEDGER_ALREADY_DONE', 'Live task ledger is already done; taskflow is reconciling planning closeback only.', {
+            taskId,
+            historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
+          })
+        ],
+        evidence: {
+          action: 'closeback-reconcile',
+          taskId,
+          actorId,
+          ledgerAlreadyDone: true,
+          historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
+        }
+      })
+      : await withTaskflowOperatorLane(() => runTasks(backendArgv));
     const rollbackSnapshot = buildCloseWriteRollbackSnapshot({
       cwd,
       taskId,

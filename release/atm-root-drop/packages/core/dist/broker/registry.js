@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { classifyLeasePhase } from './orphan-cleanup.js';
 export const DEFAULT_BROKER_CLEANUP_COMMAND = 'node atm.mjs broker cleanup --json';
@@ -40,7 +40,49 @@ export function saveRegistry(filePath, doc) {
     if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true });
     }
-    writeFileSync(filePath, JSON.stringify(doc, null, 2), 'utf8');
+    writeAtomicUtf8(filePath, `${JSON.stringify(doc, null, 2)}\n`);
+}
+function writeAtomicUtf8(filePath, content) {
+    const dir = dirname(filePath);
+    const tempPath = `${filePath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    let fd = null;
+    try {
+        fd = openSync(tempPath, 'wx');
+        writeFileSync(fd, content, 'utf8');
+        fsyncSync(fd);
+        closeSync(fd);
+        fd = null;
+        renameSync(tempPath, filePath);
+        fsyncDirectory(dir);
+    }
+    catch (error) {
+        if (fd !== null) {
+            try {
+                closeSync(fd);
+            }
+            catch {
+                // Best effort cleanup after a failed atomic registry write.
+            }
+        }
+        rmSync(tempPath, { force: true });
+        throw error;
+    }
+}
+function fsyncDirectory(dir) {
+    let fd = null;
+    try {
+        fd = openSync(dir, 'r');
+        fsyncSync(fd);
+    }
+    catch {
+        // Some platforms do not allow fsync on directories; the file-level fsync
+        // plus atomic rename remains the portable minimum.
+    }
+    finally {
+        if (fd !== null) {
+            closeSync(fd);
+        }
+    }
 }
 export function registerIntent(doc, intent, lane, ttlSeconds = 1800, admissionOverride) {
     const leaseSeconds = resolveLeaseSeconds(intent, ttlSeconds);

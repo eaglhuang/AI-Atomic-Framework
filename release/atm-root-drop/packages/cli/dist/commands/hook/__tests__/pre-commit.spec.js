@@ -197,4 +197,24 @@ try {
 finally {
     rmSync(repairRoot, { recursive: true, force: true });
 }
+// TASK-MEM-0009 (BUG-ATM-0074) — unconsumed close-window deferral snapshots must survive auto-clean.
+{
+    const { isUnconsumedCloseWindowDeferralSnapshot } = await import('../pre-commit.js');
+    const snapRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-snap-guard-'));
+    try {
+        const rel = '.atm/runtime/snapshots/close-window-governance-dirty-x-.atm__history__evidence__TASK-X.json.json';
+        const abs = path.join(snapRoot, rel);
+        mkdirSync(path.dirname(abs), { recursive: true });
+        writeFileSync(abs, JSON.stringify({ schemaId: 'atm.closeWindowGovernanceDirtySnapshot.v1', file: 'x', restoredAt: null }), 'utf8');
+        assert.equal(isUnconsumedCloseWindowDeferralSnapshot(snapRoot, rel), true, 'unconsumed snapshot must be protected');
+        writeFileSync(abs, JSON.stringify({ schemaId: 'atm.closeWindowGovernanceDirtySnapshot.v1', file: 'x', restoredAt: '2026-07-15T00:00:00.000Z' }), 'utf8');
+        assert.equal(isUnconsumedCloseWindowDeferralSnapshot(snapRoot, rel), false, 'consumed snapshot stays auto-cleanable');
+        writeFileSync(abs, 'not-json', 'utf8');
+        assert.equal(isUnconsumedCloseWindowDeferralSnapshot(snapRoot, rel), true, 'unreadable snapshot must fail safe (kept)');
+        assert.equal(isUnconsumedCloseWindowDeferralSnapshot(snapRoot, '.atm/runtime/snapshots/foreign-staged-task-1.json'), false, 'non-close-window snapshots are unaffected');
+    }
+    finally {
+        rmSync(snapRoot, { recursive: true, force: true });
+    }
+}
 console.log('[pre-commit.spec] ok');

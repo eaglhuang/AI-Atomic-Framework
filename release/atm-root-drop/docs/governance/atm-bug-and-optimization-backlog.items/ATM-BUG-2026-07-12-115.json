@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-115",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Identity provenance",
+  "finding": "The active governed claim correctly records `Codex-GPT5.6 Terra`, while generic environment detection still reports legacy `codex-gpt-5.4-mini`; an operator cannot distinguish verified runtime model provenance from a user-authorized actor label. A second dogfood case showed the same defect for the active Codex editor surface: the actor identity should be `Codex-GPT 5.5` from the Codex editor plus the current model code, but `next` integration metadata still exposed stale `AGENT_IDENTITY=codex-gpt-5.4-mini`. This does not mean every agent should be called Codex, and it does not mean every suffix is an editor: for example `Fable 5` is a model code, not an editor surface.",
+  "expectedBehavior": "Surface actor label, provider/model provenance, editor/surface id, and confidence/source separately. Never infer a model identity from a legacy editor environment variable. Actor identity should be assembled from the current editor/surface plus current model code when available: current supported editor surfaces are Codex, Claude, Antigravity, Cursor, and Copilot. Codex editor plus GPT 5.5 can produce `Codex-GPT 5.5`, while a Claude surface using Fable 5 should preserve Claude as the surface and Fable 5 as the model code. Stale environment aliases should be reported only as low-confidence legacy hints.",
+  "evidenceOrRepro": "Confirmed while finishing TASK-TEAM-0074; the task ledger claim was Terra and `next` integration metadata exposed the stale environment value. Reconfirmed on 2026-07-14 while operating from the Codex editor as `Codex-GPT 5.5`: `node atm.mjs next --prompt ... --json` failed route selection but still reported `integrationBootstrap.currentEditorDetectedFrom: AGENT_IDENTITY` and `currentEditorRawValue: codex-gpt-5.4-mini`, prompting corrections that Codex is the editor surface for this session, the current editor set is Codex/Claude/Antigravity/Cursor/Copilot, and Fable 5 is a model code, not an editor.",
+  "followUp": "Resolve together with 112 using a precedence regression and an explicit provenance schema; add Codex/Claude/Antigravity/Cursor/Copilot surface regressions proving stale `AGENT_IDENTITY` cannot override the current surface+model actor label, plus a cross-surface test that model codes such as Fable 5 are not misclassified as editor/surface ids."
+}

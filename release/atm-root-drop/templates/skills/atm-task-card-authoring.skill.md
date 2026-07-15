@@ -24,6 +24,32 @@ First command:
 If the task card does not exist yet and `next` returns scope-not-found, continue
 only as an authoring action. Do not claim unrelated open tasks.
 
+When a task card is opened because an `ATM_*` code is confusing, missing
+remediation, or repeatedly mishandled, route the code explanation through
+`atm-error-code-resolver`. The card should update the shared registry instead
+of adding private error-code prose to one skill.
+
+## Planning Authority Gate
+
+Before creating a plan, task-card directory, or task card, resolve and state
+these three authorities:
+
+- `planning authority`: repository that owns the human-readable plan and source
+  task cards;
+- `target authority`: repository where implementation files may change;
+- `closure authority`: repository whose ATM ledger, evidence, close, and commit
+  establish completion.
+
+When planning and target authorities differ, keep the complete plan and source
+cards only in the planning repository. The target repository may receive only
+CLI-imported `.atm/history/**` ledger records and neutral product documentation
+that is itself an explicit deliverable. Do not create a framework-local plan or
+temporary card directory merely because implementation will happen there.
+
+Treat an existing `planning_repo`, `related_plan`, AGENTS instruction, or human
+decision as binding. If the authority is still unknown, stop authoring until it
+is resolved. Memory and handoff notes are supporting context, not enforcement.
+
 ## Required Card Contract
 
 Every task card must include frontmatter or an equivalent machine-readable block:
@@ -166,6 +192,10 @@ node atm.mjs tasks import --from "$ARGUMENTS" --dry-run --json
 
 The dry-run must discover the intended task ids and must not fall back to
 unrelated open tasks.
+
+Before import, verify that `--from` points into the declared planning authority
+and that import writes only the target repository's ATM-managed ledger. A local
+copy of an external source card is not a valid substitute.
 
 ## Charter Invariants
 

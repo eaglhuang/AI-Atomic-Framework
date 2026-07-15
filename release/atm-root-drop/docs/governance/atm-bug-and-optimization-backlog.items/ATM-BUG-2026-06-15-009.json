@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-15-009",
+  "date": "2026-06-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 claim-readiness / latency lane",
+  "area": "Claim / lifecycle routing",
+  "finding": "`tasks claim` and `taskflow close` for CID tasks took many rounds of reserve/promote/status probes and even a 300s `next --claim` timeout before surfacing the real blocker, so the operator path felt slow even though `path-to-atom-map.json` is only ~56 KB.",
+  "expectedBehavior": "Claim should fail fast or converge quickly with one blocker summary when lifecycle state is already inconsistent; sharding should reduce shared-file contention, but it should not be needed to explain long claim latency.",
+  "evidenceOrRepro": "Closed on 2026-06-28 by teaching `packages/cli/src/commands/next.ts` to emit a structured `claimReadiness` triage whenever `next --claim` cannot select a claimable task, including first blocker summaries for import-required, review closeout-only, dependency-closeout, and unscoped-prompt cases instead of a generic no-task answer. The same lane now emits `atm.claimLatencyTelemetry.v1` from both `next --claim` and `tasks claim`, so operators can see whether time was spent in parallel preflight, reserve/promote preparation, claim acquisition, or direction-lock writes. Focused regression coverage landed in `packages/cli/src/commands/next/__tests__/claim-readiness.test.ts`, while existing `packages/cli/src/commands/tasks/__tests__/dependency-gate.test.ts`, `packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts`, `scripts/validate-prompt-scoped-next.ts`, and `scripts/validate-cli.ts --mode validate` continue to guard the broader claim route.",
+  "followUp": "Keep the structured `claimReadiness` envelope and `atm.claimLatencyTelemetry.v1` attached to claim entrypoints; future claim / close routing changes must preserve first-blocker surfacing before operators fall back to manual reserve/promote/status probe loops."
+}

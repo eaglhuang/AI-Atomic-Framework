@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-159",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in working tree (cursor-grok-4.5)",
+  "area": "Task import lifecycle / low-level create drift",
+  "finding": "Creating a placeholder task with `tasks create` before authoring the real markdown plan leaves a ledger entry with a different source hash; `tasks import --write` then refuses with `ATM_TASKS_IMPORT_DRIFT`, while `--force` is protected by `ATM_EMERGENCY_LANE_APPROVAL_REQUIRED`. This traps a normal operator between an unclaimable planned task and an emergency-only overwrite.",
+  "expectedBehavior": "A low-level placeholder task should be upgradable through a normal governed import/open lane when no active claim exists, or the create path should emit the exact next command and warn that later markdown import will require emergency overwrite.",
+  "evidenceOrRepro": "Fixed 2026-07-14: `isCreatePlaceholderLedger()` allows normal import overwrite when no active claim. Regression in `import-orchestrator.spec.ts`.",
+  "followUp": "Keep emergency `--force` for active-claim overwrites only."
+}

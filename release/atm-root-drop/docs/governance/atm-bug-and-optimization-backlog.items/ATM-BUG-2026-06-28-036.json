@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-036",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 governance-entry-readiness lane",
+  "area": "Multi-agent governance / observability",
+  "finding": "ATM already had branch queue retry codes and protected-push diagnostics, but those signals were spread across hook, taskflow, and git-governance lanes instead of showing up as one early operator summary. That made captain-style巡檢 slow because the agent had to hit several subsystems before it could explain the likely race / retry path.",
+  "expectedBehavior": "Governance entry points should surface one compact observability summary for protected branches and multi-agent commit lanes, including ahead-of-upstream context and the branch queue retry codes.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by teaching `doctor` and prompt-scoped `next` to surface branch queue retry codes, protected-branch context, and ahead-of-upstream readiness as one early governance summary instead of leaving them buried in later hook/git subcommands. `doctor` now exposes the summary through `governance-entry-readiness`, while `next` projects the same preparation model through `evidence.nextAction.governanceReadiness`.",
+  "followUp": "Preserve one compact governance observability summary at the top-level entry points; later hook/taskflow diagnostics can stay richer, but they should no longer be the first time an agent learns the retry model."
+}

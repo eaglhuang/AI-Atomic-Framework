@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-164",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed",
+  "area": "Task scope amendment UX",
+  "finding": "`tasks scope add` can require a claim, while `next --claim` can require scope expansion; the successful escape hatch is `--claim-first`, but the error path and help text do not lead there clearly enough.",
+  "expectedBehavior": "When claim is blocked by scope expansion, ATM should suggest the exact `tasks scope add --claim-first ...` command. Help text should distinguish task-card scope/deliverables from runtime lock repair.",
+  "evidenceOrRepro": "Fixed by making no-lock/released-lock scope amendment failures expose `tasks scope add --claim-first --add <paths>` as the primary `requiredCommand`, while retaining `next --claim` as `claimCommand`; regression asserts both human text and structured data expose the claim-first escape hatch. Validator: `node --strip-types tests/cli/tasks-scope-add-error-clarity.test.ts`.",
+  "followUp": "Delivered in current fix commit."
+}

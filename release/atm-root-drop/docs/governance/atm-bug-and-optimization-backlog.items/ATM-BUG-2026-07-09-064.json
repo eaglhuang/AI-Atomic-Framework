@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-09-064",
+  "date": "2026-07-09",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Fixed in this cleanup commit",
+  "area": "Governed git / pre-commit observability",
+  "finding": "`node atm.mjs git commit` can time out at the agent/tool layer while its spawned pre-commit hook continues running heavyweight validators, so the operator sees a timeout even though the commit later succeeds.",
+  "expectedBehavior": "Governed commit should expose a durable transaction id, phase log, resumable status command, or timeout-aware progress output so agents can distinguish \"still validating\" from \"safe to retry/repair\".",
+  "evidenceOrRepro": "Fixed by extending `git commit-status` with `evidence.branchCommitQueueStatus`: current branch queue lock path, lock record, owner PID liveness, age, current HEAD, head-moved signal, and wait-vs-inspect guidance. Regression coverage in `tests/cli/git-commit-timeout-and-status.test.ts` now simulates a live queue owner and requires `status: busy`, `ownerAlive: true`, and wait guidance.",
+  "followUp": "Keep the live branch queue diagnostic in `git commit-status`; future commit transaction work can add richer phase logs, but operators must never have to guess whether a timed-out wrapper is still committing."
+}

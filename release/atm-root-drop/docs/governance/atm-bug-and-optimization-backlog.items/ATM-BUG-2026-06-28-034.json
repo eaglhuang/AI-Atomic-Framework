@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-034",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 governance-entry-readiness lane",
+  "area": "Validator architecture / contract boundary",
+  "finding": "Focused validators can drift into ad hoc string-anchor checks that mix source-contract verification with behavior-regression expectations, which makes it too easy to \"bind the whole spec\" when a smaller governance contract would be more stable and faster.",
+  "expectedBehavior": "Contract validators should share a small source-anchor helper so they can verify the minimum public governance contract explicitly, while behavior/regression tests stay in their own focused spec lanes.",
+  "evidenceOrRepro": "Repaired on 2026-06-28 by extracting shared source-contract anchor collection into `scripts/lib/validator-envelope.ts` and migrating `scripts/validate-branch-commit-queue.ts` to use that helper for contract anchors instead of open-coded one-off `includes(...)` chains. This keeps the branch queue validator focused on the public governance contract while leaving behavioral regression coverage in the taskflow and git-governance tests.",
+  "followUp": "Reuse the shared source-contract helper for future contract validators instead of binding them to large focused specs or duplicating inline anchor scans."
+}

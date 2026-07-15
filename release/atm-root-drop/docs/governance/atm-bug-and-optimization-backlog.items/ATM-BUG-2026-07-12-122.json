@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-122",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in TASK-AAO-0158",
+  "area": "Governance validator performance / cancellation",
+  "finding": "The focused `node --strip-types scripts/validate-governance-commands.ts` lane exceeded a 124-second interactive command timeout without progress output while validating TASK-AAO-0157.",
+  "expectedBehavior": "Focused governance validation should expose phase progress, support safe resume or focused case selection, and complete within an interactive budget where feasible.",
+  "evidenceOrRepro": "TASK-AAO-0158 switched the validator's ATM command calls to in-process `runCli`, added stable phase progress and SIGINT cancellation diagnostics, and measured `node --strip-types scripts/validate-governance-commands.ts --mode validate` at 26.9s on the Windows development host.",
+  "followUp": "Keep `validate:governance-commands` as the default under-30s lane and `validate:governance-commands:full` as the named full integration lane while future fixture splits can add true parallel groups."
+}

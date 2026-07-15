@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-138",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in TASK-TEAM-0082",
+  "area": "Task card deliverables path validation",
+  "finding": "Prose (non-path) deliverables pass `tasks import` with only a mechanical-split warning, then make `taskflow close` fail with `ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_INCOMPLETE` because the bundle cannot map the deliverable to the direction lock; the only repair lane is an emergency-lease `tasks import --write --force`.",
+  "expectedBehavior": "Import should fail closed (or normalize with an explicit diagnostic) when a deliverable is not a repo path, and a governed non-emergency metadata-repair lane should exist for claimed tasks whose card text needs correction.",
+  "evidenceOrRepro": "TASK-TEAM-0082 adds path-shaped deliverable validation, explicit normalization diagnostics when scope paths can repair prose deliverables, strict-mode fail-closed behavior, and regression coverage for CJK prose versus valid CJK paths.",
+  "followUp": "Closed by TASK-TEAM-0082."
+}

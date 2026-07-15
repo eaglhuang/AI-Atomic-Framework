@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-07-046",
+  "date": "2026-07-07",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Fixed in taskflow close atomicity lane",
+  "area": "Taskflow close / commit attribution",
+  "finding": "`taskflow close --write` auto-commit can call native `git commit` without propagating the task actor identity, so pre-commit blocks the close bundle with `ATM_COMMIT_AUTHOR_NAME_MISMATCH` / `ATM_COMMIT_AUTHOR_EMAIL_MISMATCH` when repo-local Git config belongs to a previous actor.",
+  "expectedBehavior": "Taskflow close auto-commit should either use the same governed git wrapper/env as `node atm.mjs git commit`, or preflight the repo-local Git identity and emit a required identity command before backend close mutates ledger state.",
+  "evidenceOrRepro": "During `TASK-AAO-0151`, close write rolled back after backend close because the commit bundle attempted author `codex-gpt-5.4-mini <codex-gpt-5.4-mini@atm.local>` while the task actor was `codex-captain`; rollback restored ledger state but required manual diagnosis and local git config correction. The source fix in `packages/cli/src/commands/taskflow/commit-bundle-assembly.ts` resolves actor-scoped author/committer env for the raw-git close commit lane, and `packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts` asserts the close commit uses the actor identity instead of drifted host git config.",
+  "followUp": "Keep `node --strip-types scripts/validate-taskflow-close-atomicity.ts --mode validate` in the close/commit gate; it runs the commit-bundle identity regression alongside atomicity coverage."
+}

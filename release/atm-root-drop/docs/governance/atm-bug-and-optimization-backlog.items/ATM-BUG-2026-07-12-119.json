@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-119",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "High",
+  "status": "Needs task card",
+  "area": "Cross-repo planning-source governance",
+  "finding": "An active target task can continue while its 3KLife planning source card is changed because the imported task/direction lock does not durably enforce source-card identity and hash across repositories.",
+  "expectedBehavior": "Import and claim must retain planning source identity/hash; target write/close must detect planning-source drift and fail closed unless a governed amendment or mirror authority exists.",
+  "evidenceOrRepro": "TASK-AAO-0157 planning card was mutable after target claim; the target direction lock had empty persisted planningReadOnlyPaths even though prompt routing could derive the source path.",
+  "followUp": "Add cross-repo source hash/lock persistence, planning-repo enforcement, and drift regressions."
+}

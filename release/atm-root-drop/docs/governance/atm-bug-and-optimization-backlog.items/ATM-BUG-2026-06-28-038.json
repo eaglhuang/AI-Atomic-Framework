@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-06-28-038",
+  "date": "2026-06-28",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "High",
+  "status": "Fixed in 2026-06-28 governance-skill-checklist lane",
+  "area": "Governance entry / skill preflight clarity",
+  "finding": "`doctor` and prompt-scoped `next` already emitted governance-readiness data, but the top-level `atm-next` and `atm-governance-router` skill surfaces still left too much preparation implicit. Agents could see `governanceReadiness`, yet still miss that they should immediately translate it into actor, claim, `doctor`, and `hook pre-push` preflight steps before editing or pushing.",
+  "expectedBehavior": "Canonical skill entrypoints should turn `governanceReadiness` into an explicit preflight checklist, including actor resolution, framework claim, proactive `doctor`, proactive `hook pre-push`, and branch-queue retry interpretation.",
+  "evidenceOrRepro": "User feedback on 2026-06-28: \"先收斂到 doctor / next 這個上層治理入口 ==> 如果可以在這些的 skill 裡面預先說明, AI 不就可以更早知道要準備嗎?\" Repaired by updating `templates/skills/atm-next.skill.md`, `templates/skills/atm-governance-router.skill.md`, and the installed Codex / `.agents` skill surfaces so they now spell out the immediate preparation checklist instead of only mentioning `governanceReadiness` abstractly. `scripts/validate-guide.ts` now also asserts the skill text keeps `doctor --json`, `hook pre-push`, `queueRetryCodes`, and `upstreamRef` visible.",
+  "followUp": "Keep the checklist language in the source templates and installed skill surfaces together; future guidance simplifications must not regress from an explicit preflight checklist back to vague prose that leaves protected-branch preparation to trial and error."
+}

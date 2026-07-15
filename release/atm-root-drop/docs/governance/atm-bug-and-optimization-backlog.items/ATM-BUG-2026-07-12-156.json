@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-12-156",
+  "date": "2026-07-12",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Low",
+  "status": "Fixed in TASK-AAO-0183",
+  "area": "Tasks import CLI / operator guidance",
+  "finding": "Invoking `node atm.mjs tasks import --from plan --write --json` without a path produced `ATM_TASKS_PLAN_NOT_FOUND` for a literal file named `plan`, rather than explaining that `--from` requires a markdown path and showing the copyable command.",
+  "expectedBehavior": "Missing or malformed task import paths should produce targeted usage guidance with the expected `--from <path>` form and a valid example; avoid interpreting the subcommand token as a filesystem path when parsing fails.",
+  "evidenceOrRepro": "Fixed by delivery commit `dba70e92a882e33c0a0e7a3b9e706cc9ebbc0288` and close commit `def6460850214e094ed00aabec550bfe64ea62eb`. Evidence: `node --strip-types packages/cli/src/commands/tasks/__tests__/import-orchestrator.spec.ts`, `npm run typecheck`, `npm run validate:cli`, and `npm run validate:git-head-evidence` passed.",
+  "followUp": "Regression now covers missing `--from`, literal `plan`, nonexistent markdown path, and valid reconcile import."
+}

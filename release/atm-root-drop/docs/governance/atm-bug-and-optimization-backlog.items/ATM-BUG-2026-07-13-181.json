@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-13-181",
+  "date": "2026-07-13",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug / AI routing",
+  "severity": "High",
+  "status": "Fixed in `cf883b8f3`",
+  "area": "Next claim / fresh foreign-created task reservation",
+  "finding": "`next --prompt` can select and `next --claim` can claim a task that was just imported or opened by another captain but not yet actively claimed, because active-work radar only sees live claims/locks and does not treat fresh task creation provenance as a soft reservation. A second captain can therefore steal a newly created task card before the creator starts work.",
+  "expectedBehavior": "Fresh task imports/opens should carry creator actor, created/imported timestamp, source planning owner, and a short reservation/grace policy. `next --prompt` and `next --claim` should avoid auto-claiming another actor's fresh unclaimed task unless the creator explicitly handed it off, the reservation TTL expired, or a human/Team Broker override authorizes takeover. The one-glance active-work summary should include these fresh reserved tasks and recommend Team Broker level based on creator/claim/scope overlap; for framework/source compiler work, default at least L3 and escalate if shared foundation files overlap.",
+  "evidenceOrRepro": "Live dogfood on 2026-07-13: `TASK-AAO-FABLE-010` had just been created by captain `claude-fable-5` for skill-template installed-copy drift detection. Codex asked ATM to continue backlog work while avoiding other active actors; activeWorkSummary reported no foreign active work and Team L1, then `next --claim --actor codex-gpt-5.4-mini` claimed `TASK-AAO-FABLE-010`. The user corrected that this was Fable5's freshly opened task; Codex released the claim with `node atm.mjs tasks release --task TASK-AAO-FABLE-010 --actor codex-gpt-5.4-mini --json` and made no deliverable edits. Fix evidence: `node --strip-types packages/cli/src/commands/next/__tests__/active-work-summary.spec.ts`, `node --strip-types packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts`, `npm run typecheck`, pushed commit `cf883b8f3`.",
+  "followUp": "Implemented fresh reservation visibility in active-work summary and a claim-admission guard that blocks different actors from auto-claiming a fresh unclaimed foreign-created task unless `--force` is used after the warning/Team Broker context is shown."
+}
