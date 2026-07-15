@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0033",
-  "updatedAt": "2026-07-15T12:09:18.765Z",
+  "updatedAt": "2026-07-15T12:13:07.713Z",
   "updatedBy": "codex-task-rft-0033",
   "freshValidationPasses": [
     "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
@@ -86,6 +86,45 @@
       "generatedAt": "2026-07-15T12:09:18.873Z",
       "runnerKind": "dev-source",
       "sourceCommit": "753f6b5f2659d05560543a61734a531309ccef82",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/tasks-legacy-impl-extraction.test.ts"
+      ],
+      "generatedAt": "2026-07-15T12:12:21.365Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-15T12:12:29.214Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-15T12:13:07.820Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0fb6c49b84b36a54b61d0227d6e9bb45775f162a",
       "cached": false
     }
   ],
