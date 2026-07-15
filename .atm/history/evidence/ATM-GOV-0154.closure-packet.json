@@ -1,0 +1,208 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0154",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "24058f050ea85c309ed92cd726ae9c8d0dc83fdd",
+  "governedTreeSha": "4123f5400d2b8771ef3944a9fc814012a13ac169",
+  "targetCommitDelta": {
+    "currentCommitSha": "24058f050ea85c309ed92cd726ae9c8d0dc83fdd",
+    "parentCommitShas": [
+      "24058f050ea85c309ed92cd726ae9c8d0dc83fdd"
+    ],
+    "governedTreeSha": "4123f5400d2b8771ef3944a9fc814012a13ac169",
+    "changedFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-003.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/ERROR_CODES.md",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/docs/governance/error-code-registry.json",
+      "release/atm-root-drop/packages/cli/dist/commands/__tests__/residue.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/command-specs/broker.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/prompt-results.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-resolution.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-resolution.js",
+      "release/atm-root-drop/packages/cli/dist/commands/residue.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/taskflow-dryrun.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/task-scope.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.js",
+      "release/atm-root-drop/packages/cli/src/commands/__tests__/residue.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/command-specs/broker.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/prompt-results.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-resolution.ts",
+      "release/atm-root-drop/packages/cli/src/commands/residue.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/task-scope.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team-legacy.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/candidate-bridge.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/candidate-bridge.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/candidate-bridge.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli-fixtures/help-snapshots/broker.json",
+      "release/atm-root-drop/tests/cli/next-command-router-extraction.test.ts",
+      "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/team-agents-dogfood.test.ts",
+      "release/atm-root-drop/tests/cli/team-legacy-command-extraction.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e5bc9553c42a98d301f042b96fbdbfd31ef4d44ed415c944d21c595a528ef8f8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1d1d7a9fbb09bd6aca59834ca58e712d21b4e96f3ea9bd73a804fd708e6d1b19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run generate:error-codes",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:cf345f4f8675316f866b5904f3b41421af012c985aee5079653de6f98e602e6d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:a4c2724e5e403f009a7ecce11097e7f5c8d523b851da2545d600b4a1a380d185",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "generate:error-codes",
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T17:28:12.739Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0154.*",
+      ".atm/history/task-events/ATM-GOV-0154/**",
+      ".atm/history/tasks/ATM-GOV-0154.json",
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-003.json",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/command-specs/broker.spec.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0154.json",
+  "closedAt": "2026-07-15T17:28:12.740Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260715171817-codex-gpt-5-5-captain-ATM-GOV-0154-fd380e3611",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "0b3f6df20e3b48bc88eaa48a1160321a69818aa3",
+    "taskMatchedFiles": [
+      "docs/ERROR_CODES.md",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-003.json"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/ATM-GOV-0154.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/ATM-GOV-0154/2026-07-15T17-13-45-524Z-import-c15ffedcb316.json",
+      ".atm/history/task-events/ATM-GOV-0154/2026-07-15T17-14-13-325Z-reserve-cddde1f95553.json",
+      ".atm/history/task-events/ATM-GOV-0154/2026-07-15T17-14-13-329Z-promote-ed204af35e99.json",
+      ".atm/history/task-events/ATM-GOV-0154/2026-07-15T17-14-19-150Z-claim-a8f031cabc15.json",
+      ".atm/history/task-events/ATM-GOV-0154/2026-07-15T17-16-11-509Z-scope-amendment-285131b50bd5.json",
+      ".atm/history/task-events/ATM-GOV-0154/2026-07-15T17-18-23-474Z-claim-de2597a753bb.json",
+      ".atm/history/tasks/ATM-GOV-0154.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
