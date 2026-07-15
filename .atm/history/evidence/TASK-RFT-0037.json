@@ -1,0 +1,621 @@
+{
+  "taskId": "TASK-RFT-0037",
+  "updatedAt": "2026-07-15T13:41:45.533Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:16:51.098Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:5c9e4c1f54503f2bd1a54062088cd99ce37b216cb8c1715c22fdcf64961933ec",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:16:51.267Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:550d68e9ece4c90c54d082f3597f44cd408be98e925b5c7641b5d3e180813107",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:17:05.744Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:7fea5d62e8b691c6ffc4e0a400c9d22a13905a4bf3ee9f5ffd85af535cc0d5c5",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:17:05.878Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6f5b4352a82bed70e6a5029da85baa7f71326f5e6ae8b3f7ed0be974aeaafdf9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:17:28.587Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:811284e323b071ab04bfc20304e28063a149b49de9a0e1403d440f7867218f2e",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:1205bd9e53d5211a514fcb59bd102d660b45543a075362c208e17af98fb380eb",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:17:28.731Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0ca9d7a4eefdd387c10b6ef4cb8b3ebbbc31804f5962b62914855decf7821be0",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-governance-projections.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:17:37.482Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:governance-projections"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-governance-projections.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:40a2334f1cfe5a68da8c0e6ae0f2c0b477a487c3247d56d6ee836d871f419b58",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:governance-projections"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:1016c015d0b54b31a37e752c5fc4578ba4ee2144eb8711082d361d96ca0b8b65",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:17:37.627Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7b87665264e9cc5e8b2fbcb5c0bd55a552ad7d82d26e47a17e079df08d8c58cc",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run build",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:18:22.403Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run build",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:71d859ca6b3aee2ae6cc1c7ec5f1be28d86e5f01190c245afa4bc57ee1ab404e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:7bb474c389f12afd6a474e8cb4b202e9159e96aea76e43a1de7d3b1c95995f07",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:18:22.628Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:be93205731cfe2e61f16c51b6173d7ecfab6256098461d0b158c41651581959d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:36:28.958Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types tests/cli/pre-commit-hook-extraction.test.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:5c9e4c1f54503f2bd1a54062088cd99ce37b216cb8c1715c22fdcf64961933ec",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:36:29.190Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:550d68e9ece4c90c54d082f3597f44cd408be98e925b5c7641b5d3e180813107",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:36:38.621Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:7fea5d62e8b691c6ffc4e0a400c9d22a13905a4bf3ee9f5ffd85af535cc0d5c5",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:36:38.775Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:6f5b4352a82bed70e6a5029da85baa7f71326f5e6ae8b3f7ed0be974aeaafdf9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-governance-projections.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:39:07.662Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:governance-projections"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-governance-projections.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:40a2334f1cfe5a68da8c0e6ae0f2c0b477a487c3247d56d6ee836d871f419b58",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:governance-projections"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:1016c015d0b54b31a37e752c5fc4578ba4ee2144eb8711082d361d96ca0b8b65",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:39:08.094Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:7b87665264e9cc5e8b2fbcb5c0bd55a552ad7d82d26e47a17e079df08d8c58cc",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:39:34.000Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+            "stderrSha256": "sha256:7c352ca7a70bbcced4ebd228823874a2730568bbd32a11df05f8d74bc11f40a7",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:3105ac10bf83d7c27ef196cec41153ac54544d46fbb2cd4551caf420eed3ba67",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:39:34.216Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:d5345eb891c57e7295489d7504701b462e0a47467615fe162f82af7a3a618eae",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run build",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:39:44.887Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run build",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:432083e45e51db2694f16f919e2c51ed0478b59f7b0a31f8067ce1e3fbcae45a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:2bbe3a9609956cf9a61c82c6dfd5806a6012ef6c50253a8d4e93635a9389fc00",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:39:45.224Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:888c3880ce6ac1bebc6277a87503321562f4b99c835b4717f28cc0ef49734f41",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0037",
+      "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+      "createdAt": "2026-07-15T13:41:45.533Z",
+      "details": {
+        "actorId": "codex-task-rft-0037",
+        "sessionId": "session-20260715131309-codex-task-rft-0037-TASK-RFT-0037-c8fcb515a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.pre-commit-hook-guard-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "ba5f70c274cdb70dfa37cba05c426c3c2f2b006a",
+            "cacheKey": "sha256:cee9f43e3fa5142af3f5572e1a9fcf9e22f6f6388bab3c50d984c9b708037cd1",
+            "cached": false,
+            "generatedAt": "2026-07-15T13:41:45.722Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:e8ca0cd5260cc319a6fcaf2a64772b27434be9f3554c5acc83d8be788041bbf5",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T13-33-41-208Z-scope-amendment-2f14388f5ac6",
+  "taskId": "TASK-RFT-0037",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0037",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0037.json",
+  "taskSha256": "sha256:19edcdd2d16afed3486e114d95265bfa996f690ad430fe45585d9cfb7007088f",
+  "createdAt": "2026-07-15T13:33:41.208Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0037 --actor codex-task-rft-0037 --add tests/cli/pre-commit-hook-extraction.test.ts --class linked-surface --phase during-implementation --reason \"TASK-RFT-0037 extraction regression test is declared in deliverables but was omitted from imported allowedFiles.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0037 extraction regression test is declared in deliverables but was omitted from imported allowedFiles."
+  }
+}

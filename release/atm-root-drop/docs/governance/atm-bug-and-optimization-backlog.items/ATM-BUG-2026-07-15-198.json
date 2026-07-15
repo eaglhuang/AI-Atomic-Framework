@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-198",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Scripts / Task ledger validators",
+  "finding": "TASK-RFT-0035 can make scripts/validators/task-ledger/suite-impl.ts bounded with a facade and compact implementation carrier, but the validator concerns should still be expanded into explicit harness, fixture, closeout, residue, import, and emergency-use modules for maintainability.",
+  "expectedBehavior": "Task-ledger validator fixtures and assertions should live in semantic bounded modules that each stay below the line budget without compact carrier compression.",
+  "evidenceOrRepro": "scripts/validators/task-ledger/suite-impl/implementation.ts was introduced during TASK-RFT-0035 to preserve behavior while satisfying the immediate facade split and line-count gate.",
+  "followUp": "Open a follow-up RFT card after the current giant-file wave to replace the compact carrier with semantic modules while keeping the public suite exports stable."
+}

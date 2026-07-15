@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-196",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "CLI / Tasks command",
+  "finding": "TASK-RFT-0033 made tasks/legacy-impl.ts a thin facade, but the moved implementation remains a transitional compact carrier instead of readable semantic command modules.",
+  "expectedBehavior": "Tasks import, status, close, audit, scope, queue, roster, and parser compatibility logic should live in typed bounded modules that each stay below the line budget without compact carrier compression.",
+  "evidenceOrRepro": "packages/cli/src/commands/tasks/legacy/implementation.ts was created during TASK-RFT-0033 to preserve behavior while satisfying the immediate facade split and line-count gate.",
+  "followUp": "Open follow-up refactor cards to expand tasks/legacy/implementation.ts into typed command modules, keep facade exports stable, and keep tests/cli/tasks-legacy-impl-extraction.test.ts green."
+}
