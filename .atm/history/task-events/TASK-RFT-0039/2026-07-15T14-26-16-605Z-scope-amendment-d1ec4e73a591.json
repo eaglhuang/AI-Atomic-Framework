@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T14-26-16-605Z-scope-amendment-d1ec4e73a591",
+  "taskId": "TASK-RFT-0039",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0039",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0039.json",
+  "taskSha256": "sha256:18f340b709f160efbb9faa2291e88140be8ec012bc2380d04692b6cdd6b42677",
+  "createdAt": "2026-07-15T14:26:16.605Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0039 --actor codex-task-rft-0039 --add packages/cli/src/commands/team/legacy/patrol-contracts.ts --reason \"TASK-RFT-0039 creates the extracted patrol contract helper module; add explicit scope because close bundle does not expand new files from the legacy glob.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0039 creates the extracted patrol contract helper module; add explicit scope because close bundle does not expand new files from the legacy glob."
+  }
+}
