@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0032",
+  "title": "Extract git-governance commit and push guards into bounded modules",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0031"
+  ],
+  "acceptance": [
+    "Split commit, pre-push, and evidence-boundary logic into bounded modules.",
+    "Preserve protected branch guard behavior.",
+    "Keep each new or touched module at or below 600 lines."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/**/*.ts",
+    "tests/cli/git-governance-command-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/git-governance/**/*.ts",
+    "tests/cli/git-*.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/git-governance-command-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-commit-governance",
+        "pattern": "Command Handler",
+        "source": "packages/cli/src/commands/git-governance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.git-push-governance",
+        "pattern": "Guard Orchestrator",
+        "source": "packages/cli/src/commands/git-governance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0032-git-governance-command-extraction.task.md",
+    "sectionTitle": "TASK-RFT-0032",
+    "headingLine": 46,
+    "hash": "51ab9e943e61915e",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0032-git-governance-command-extraction.task.md",
+      "planningCommitSha": "68243a66462e4516fa433c604ca1755ba2582c33",
+      "contentDigest": "sha256:51ab9e943e61915ed4e08f97c30b3413c483033dea9d65afc53e1afa641072e8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T11:44:53.783Z"
+    }
+  },
+  "importedAt": "2026-07-15T11:44:53.783Z",
+  "lastTransitionId": "2026-07-15T11-56-30-870Z-scope-amendment-9c604de141de",
+  "lastTransitionAt": "2026-07-15T11:56:30.870Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0032",
+  "reservedAt": "2026-07-15T11:45:05.369Z",
+  "promotedAt": "2026-07-15T11:45:05.372Z",
+  "claim": {
+    "actorId": "codex-task-rft-0032",
+    "leaseId": "lease-bc56eb529c44",
+    "claimedAt": "2026-07-15T11:45:05.374Z",
+    "heartbeatAt": "2026-07-15T11:45:05.374Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0032.*",
+      ".atm/history/task-events/TASK-RFT-0032/**",
+      ".atm/history/tasks/TASK-RFT-0032.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-195.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/**/*.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "tests/cli/git-*.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T11:45:05.374Z",
+  "startedByActor": "codex-task-rft-0032",
+  "startedBySessionId": "session-20260715114505-codex-task-rft-0032-TASK-RFT-0032-0fe32d14ce",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0032",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0032.*",
+      ".atm/history/task-events/TASK-RFT-0032/**",
+      ".atm/history/tasks/TASK-RFT-0032.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-195.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/git-governance/**/*.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "tests/cli/git-*.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0032-git-governance-command-extraction.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0032-git-governance-command-extraction.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "2dc3ed6ca4388550f4cae191cde516e8970321b3589b73799bf6d9e0f0cac5e6",
+    "actorId": "codex-task-rft-0032",
+    "createdAt": "2026-07-15T11:45:09.167Z",
+    "status": "active"
+  }
+}

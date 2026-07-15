@@ -187,6 +187,13 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/cli/src/commands/git-governance/implementation.ts",
+      "atom_id": "atm.git-governance-map",
+      "capability": "bounded extracted implementation surface for governed git command commit, push, status, and evidence-boundary behavior",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0032"
+    },
+    {
       "path_pattern": "packages/cli/src/commands/guard.ts",
       "atom_id": "atm.framework-mode-governance-map",
       "capability": "guard command routing for framework-development and governance checks",
@@ -245,6 +252,27 @@
       "atom_id": "atm.cli-next-route-predicates",
       "capability": "Pure task lifecycle predicates: status routability, dependency satisfaction, claimability, prompt-scope and task mention checks for next.ts routing",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/route-resolution.ts",
+      "atom_id": "atm.next-route-resolution",
+      "capability": "Prompt/task-card route resolution, imported task queue hydration, task-card discovery, and route-scope matching extracted from next.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/prompt-results.ts",
+      "atom_id": "atm.next-route-resolution",
+      "capability": "Prompt-scoped next result builders for task route ready, import-required, queue, mirror-sync, and no-prompt route projections.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/playbook-projection.ts",
+      "atom_id": "atm.next-playbook-projection",
+      "capability": "Channel playbook, active-work summary, governance readiness, legacy proposal, and next message projection extracted from next.ts.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0031"
     },
     {
       "path_pattern": "packages/cli/src/commands/next/view-projections.ts",
