@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T12-47-31-972Z-scope-amendment-a6e369783fee",
+  "taskId": "TASK-RFT-0035",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0035",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0035.json",
+  "taskSha256": "sha256:09007f412b550cf446717bc3ebabf9797befc6506d5714841b1d11f9937a0fd2",
+  "createdAt": "2026-07-15T12:47:31.972Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0035 --actor codex-task-rft-0035 --add \"tests/cli/task-ledger-suite-extraction.test.ts,docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json,docs/governance/atm-bug-and-optimization-backlog.md,release/atm-onefile/atm.mjs,release/atm-onefile/release-manifest.json,release/atm-root-drop/**\" --reason \"TASK-RFT-0035 linked extraction regression, backlog follow-up, and retained release build artifacts after validator/build evidence.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0035 linked extraction regression, backlog follow-up, and retained release build artifacts after validator/build evidence."
+  }
+}

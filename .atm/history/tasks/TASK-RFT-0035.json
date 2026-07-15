@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0035",
+  "title": "Split task-ledger validator suite implementation",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0034"
+  ],
+  "acceptance": [
+    "Split task-ledger suite implementation by validator concern.",
+    "Preserve current validation results.",
+    "Keep each new or touched module at or below 600 lines."
+  ],
+  "deliverables": [
+    "scripts/validators/task-ledger/suite-impl.ts",
+    "scripts/validators/task-ledger/**/*.ts",
+    "tests/cli/task-ledger-suite-extraction.test.ts"
+  ],
+  "scopePaths": [
+    "scripts/validators/task-ledger/suite-impl.ts",
+    "scripts/validators/task-ledger/**/*.ts",
+    "tests/cli/task-ledger-*.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/task-ledger-suite-extraction.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-ledger-validator-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-ledger-suite-runner",
+        "pattern": "Validator Suite",
+        "source": "scripts/validators/task-ledger/suite-impl.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0035-task-ledger-suite-extraction.task.md",
+    "sectionTitle": "TASK-RFT-0035",
+    "headingLine": 41,
+    "hash": "9f10f0e76329b32c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0035-task-ledger-suite-extraction.task.md",
+      "planningCommitSha": "68243a66462e4516fa433c604ca1755ba2582c33",
+      "contentDigest": "sha256:9f10f0e76329b32cc3a76cd1ffd19708127573a484325b5ec544f2b03d6ed1cd",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T12:45:24.000Z"
+    }
+  },
+  "importedAt": "2026-07-15T12:45:24.000Z",
+  "lastTransitionId": "2026-07-15T12-51-36-600Z-scope-amendment-d3250b1f668f",
+  "lastTransitionAt": "2026-07-15T12:51:36.600Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0035",
+  "reservedAt": "2026-07-15T12:45:30.488Z",
+  "promotedAt": "2026-07-15T12:45:30.491Z",
+  "claim": {
+    "actorId": "codex-task-rft-0035",
+    "leaseId": "lease-b90399918183",
+    "claimedAt": "2026-07-15T12:45:30.497Z",
+    "heartbeatAt": "2026-07-15T12:45:30.497Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0035.*",
+      ".atm/history/task-events/TASK-RFT-0035/**",
+      ".atm/history/tasks/TASK-RFT-0035.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "scripts/validators/task-ledger/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-*.test.ts",
+      "tests/cli/task-ledger-suite-extraction.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T12:45:30.497Z",
+  "startedByActor": "codex-task-rft-0035",
+  "startedBySessionId": "session-20260715124530-codex-task-rft-0035-TASK-RFT-0035-c023ee3763",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0035",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0035.*",
+      ".atm/history/task-events/TASK-RFT-0035/**",
+      ".atm/history/tasks/TASK-RFT-0035.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-198.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/**",
+      "release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "scripts/validators/task-ledger/**/*.ts",
+      "scripts/validators/task-ledger/suite-impl.ts",
+      "scripts/validators/task-ledger/suite-impl/implementation.ts",
+      "tests/cli/task-ledger-*.test.ts",
+      "tests/cli/task-ledger-suite-extraction.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0035-task-ledger-suite-extraction.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0035-task-ledger-suite-extraction.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4670c24efd313a35b29cdcea0bfcdcb3a8bc7d9f5adc90f4682c07ec005e8723",
+    "actorId": "codex-task-rft-0035",
+    "createdAt": "2026-07-15T12:45:36.254Z",
+    "status": "active"
+  }
+}

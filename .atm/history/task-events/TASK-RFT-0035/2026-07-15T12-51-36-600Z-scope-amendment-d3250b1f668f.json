@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T12-51-36-600Z-scope-amendment-d3250b1f668f",
+  "taskId": "TASK-RFT-0035",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0035",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0035.json",
+  "taskSha256": "sha256:e8b4711f5dc9f53134012c530f6866cd0d20f52f0ec5ea2eed94bbbdbc9ecdad",
+  "createdAt": "2026-07-15T12:51:36.600Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0035 --actor codex-task-rft-0035 --add \"scripts/validators/task-ledger/suite-impl/implementation.ts,release/atm-root-drop/scripts/validators/task-ledger/suite-impl/implementation.ts\" --reason \"TASK-RFT-0035 implementation carrier is the explicit moved validator suite module and retained release root-drop contains the matching generated source file.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "TASK-RFT-0035 implementation carrier is the explicit moved validator suite module and retained release root-drop contains the matching generated source file."
+  }
+}
