@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0029",
   "title": "Atomize team.ts with a Strangler Facade command-handler architecture",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-RFT-0027"
@@ -150,8 +150,8 @@
     }
   },
   "importedAt": "2026-07-15T10:44:14.819Z",
-  "lastTransitionId": "2026-07-15T10-51-21-453Z-scope-amendment-6d39dcb93718",
-  "lastTransitionAt": "2026-07-15T10:51:21.453Z",
+  "lastTransitionId": "2026-07-15T10-56-05-890Z-close-c3f8056f31f6",
+  "lastTransitionAt": "2026-07-15T10:56:05.890Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-task-rft-0029",
   "reservedAt": "2026-07-15T10:44:21.305Z",
@@ -160,7 +160,7 @@
     "actorId": "codex-task-rft-0029",
     "leaseId": "lease-0db08303c455",
     "claimedAt": "2026-07-15T10:44:21.311Z",
-    "heartbeatAt": "2026-07-15T10:44:21.311Z",
+    "heartbeatAt": "2026-07-15T10:56:05.887Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-RFT-0029.*",
@@ -171,6 +171,14 @@
       "packages/cli/src/commands/team.ts",
       "packages/cli/src/commands/team/__tests__/**/*.ts",
       "packages/cli/src/commands/team/**/*.ts",
+      "packages/cli/src/commands/team/admission-command.ts",
+      "packages/cli/src/commands/team/command-registry.ts",
+      "packages/cli/src/commands/team/cost-command.ts",
+      "packages/cli/src/commands/team/execute-command.ts",
+      "packages/cli/src/commands/team/plan-command.ts",
+      "packages/cli/src/commands/team/report-command.ts",
+      "packages/cli/src/commands/team/start-command.ts",
+      "packages/cli/src/commands/team/status-command.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
@@ -183,8 +191,8 @@
       "scripts/validators/team-agents/**/*.ts",
       "tests/cli/team-*.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-15T10:44:21.311Z",
   "startedByActor": "codex-task-rft-0029",
@@ -206,6 +214,14 @@
       "packages/cli/src/commands/team.ts",
       "packages/cli/src/commands/team/__tests__/**/*.ts",
       "packages/cli/src/commands/team/**/*.ts",
+      "packages/cli/src/commands/team/admission-command.ts",
+      "packages/cli/src/commands/team/command-registry.ts",
+      "packages/cli/src/commands/team/cost-command.ts",
+      "packages/cli/src/commands/team/execute-command.ts",
+      "packages/cli/src/commands/team/plan-command.ts",
+      "packages/cli/src/commands/team/report-command.ts",
+      "packages/cli/src/commands/team/start-command.ts",
+      "packages/cli/src/commands/team/status-command.ts",
       "release/atm-onefile/atm.mjs",
       "release/atm-onefile/release-manifest.json",
       "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
@@ -232,5 +248,9 @@
     "actorId": "codex-task-rft-0029",
     "createdAt": "2026-07-15T10:44:27.617Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-15T10:56:05.887Z",
+  "closedByActor": "codex-task-rft-0029",
+  "closedBySessionId": "session-20260715104421-codex-task-rft-0029-TASK-RFT-0029-a11d7609ef",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0029.closure-packet.json"
 }
