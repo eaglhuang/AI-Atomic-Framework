@@ -1,0 +1,84 @@
+{
+  "taskId": "TASK-RFT-0045",
+  "updatedAt": "2026-07-15T16:45:21.142Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0045",
+      "sessionId": "session-20260715162204-codex-task-rft-0045-TASK-RFT-0045-be381047ea",
+      "createdAt": "2026-07-15T16:42:41.955Z",
+      "details": {
+        "actorId": "codex-task-rft-0045",
+        "sessionId": "session-20260715162204-codex-task-rft-0045-TASK-RFT-0045-be381047ea",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:7d78a8b84499b5012351bb7d2cc4e1b5c41a52cdbba1d6d5e753824da4d47710",
+            "cached": false,
+            "generatedAt": "2026-07-15T16:42:42.090Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:f0f80a2d5e4069d9c56136e31ee8f3cc3f0d0e70038bccb21cd9b25d9804770c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0045",
+      "sessionId": "session-20260715162204-codex-task-rft-0045-TASK-RFT-0045-be381047ea",
+      "createdAt": "2026-07-15T16:45:21.142Z",
+      "details": {
+        "actorId": "codex-task-rft-0045",
+        "sessionId": "session-20260715162204-codex-task-rft-0045-TASK-RFT-0045-be381047ea",
+        "kind": "test",
+        "freshness": "fresh",
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/taskflow/__tests__/taskflow-dryrun.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c0bcdc9e3857b325e32bb3342b7db1035ebcb252fe9632a6d071af50588714a9",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:204dee661b4d1f55d8396c10b94238191f48381945393a1776293a459fbd8947",
+            "cached": false,
+            "generatedAt": "2026-07-15T16:45:21.268Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:ce6405f81463937b616a0c6a45d8be56aa99e0f497e6d7b73238683ba8ab77d2",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}
