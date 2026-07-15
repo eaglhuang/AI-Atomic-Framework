@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-15-193",
+  "date": "2026-07-15",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Task Authoring",
+  "finding": "The giant-module split wave can author task cards whose acceptance criteria imply one card should reduce a 5,000+ line legacy module all the way to the final 600-line target. That makes safe first-slice extraction look incomplete even when it creates a valid strangler boundary and command-backed evidence.",
+  "expectedBehavior": "ATM task-card authoring for oversized modules should generate phased acceptance: first establish or extend an extraction seam, then reduce the source below 2,000 lines, then below 600 lines, with each card carrying a realistic line-budget delta and atom-map coverage requirement.",
+  "evidenceOrRepro": "TASK-RFT-0030 was authored for packages/cli/src/commands/team-legacy.ts after TASK-RFT-0029. The first safe extraction moved 573 lines of Team legacy type/catalog code into packages/cli/src/commands/team/legacy/types.ts, but the source remains above the final 600-line goal.",
+  "followUp": "Add a card-authoring helper or validator hint for giant-module split cards: when source lines exceed 2,000, require phased line-budget acceptance and a follow-up queue instead of a single final 600-line gate."
+}
