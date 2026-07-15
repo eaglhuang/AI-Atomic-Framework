@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-15T16-06-37-289Z-close-2188d44a634c",
+  "taskId": "ATM-GOV-0152",
+  "action": "close",
+  "actorId": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260715160327-codex-gpt-5-5-captain-ATM-GOV-0152-fd706cfb5e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/ATM-GOV-0152.json",
+  "taskSha256": "sha256:26a4b80ed344295987190e9baf6e0a457452225686467e336adaa81f1085afd1",
+  "createdAt": "2026-07-15T16:06:37.289Z",
+  "command": "node atm.mjs tasks close --task ATM-GOV-0152 --actor codex-gpt-5-5-captain --status done --historical-delivery f018095c6362e673b287bb31761376052d368274",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260715160327-codex-gpt-5-5-captain-ATM-GOV-0152-fd706cfb5e",
+    "closurePacketPath": ".atm/history/evidence/ATM-GOV-0152.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-15T16:06:37.282Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/ATM-GOV-0152.*",
+        ".atm/history/task-events/ATM-GOV-0152/**",
+        ".atm/history/tasks/ATM-GOV-0152.json",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+        "packages/core/src/broker/global-resource-projection.ts",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+        "packages/core/src/broker/global-resource-projection.ts",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

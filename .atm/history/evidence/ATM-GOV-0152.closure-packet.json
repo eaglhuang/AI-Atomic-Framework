@@ -1,0 +1,170 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "ATM-GOV-0152",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d09152009db74cbe3b524b3793a8058db6cf1ef2",
+  "governedTreeSha": "26abf445336a10224bef07b77aedb352b485d2c2",
+  "targetCommitDelta": {
+    "currentCommitSha": "d09152009db74cbe3b524b3793a8058db6cf1ef2",
+    "parentCommitShas": [
+      "d09152009db74cbe3b524b3793a8058db6cf1ef2"
+    ],
+    "governedTreeSha": "26abf445336a10224bef07b77aedb352b485d2c2",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0152.json",
+      ".atm/history/task-events/ATM-GOV-0152/2026-07-15T15-31-37-524Z-import-4a673098114d.json",
+      ".atm/history/task-events/ATM-GOV-0152/2026-07-15T16-03-27-377Z-reserve-f491f0309c76.json",
+      ".atm/history/task-events/ATM-GOV-0152/2026-07-15T16-03-27-380Z-promote-3a03e4dcfb18.json",
+      ".atm/history/task-events/ATM-GOV-0152/2026-07-15T16-03-29-888Z-claim-9b5a78d75198.json",
+      ".atm/history/tasks/ATM-GOV-0152.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-transaction-mutex.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team-legacy.ts",
+      "release/atm-root-drop/packages/core/dist/broker/__tests__/candidate-bridge.test.js",
+      "release/atm-root-drop/packages/core/dist/broker/candidate-bridge.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/candidate-bridge.js",
+      "release/atm-root-drop/packages/core/dist/broker/index.d.ts",
+      "release/atm-root-drop/packages/core/dist/broker/index.js",
+      "release/atm-root-drop/packages/core/src/broker/__tests__/candidate-bridge.test.ts",
+      "release/atm-root-drop/packages/core/src/broker/candidate-bridge.ts",
+      "release/atm-root-drop/packages/core/src/broker/index.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/tests/cli/pre-team-foundation-gate.test.ts",
+      "release/atm-root-drop/tests/cli/team-legacy-command-extraction.test.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:77a3ac1f76638c227b3d0247b7717b2cdac4dda9cb66bc55ffb278823ceb2dd7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d5b32a14cd6af1c9b7939d0b87a950a52f4218df27c1f869e9301dca3f0fb397",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:81d9ba76313153ee99ae8bbeeef415ab41fbbb0fef47b74e8402eb0256f3be40",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-15T16:06:37.282Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/ATM-GOV-0152.*",
+      ".atm/history/task-events/ATM-GOV-0152/**",
+      ".atm/history/tasks/ATM-GOV-0152.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "packages/core/src/broker/global-resource-projection.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "packages/core/src/broker/global-resource-projection.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/ATM-GOV-0152.json",
+  "closedAt": "2026-07-15T16:06:37.283Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "sessionId": "session-20260715160327-codex-gpt-5-5-captain-ATM-GOV-0152-fd706cfb5e",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f018095c6362e673b287bb31761376052d368274",
+    "taskMatchedFiles": [
+      "tests/cli/pre-team-dual-captain-e2e.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0152",
+  "title": "Alias legacy global locks into unified Broker admission",
+  "status": "done",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0128",
+    "ATM-GOV-0129",
+    "ATM-GOV-0137",
+    "ATM-GOV-0148",
+    "ATM-GOV-0150",
+    "ATM-GOV-0151"
+  ],
+  "acceptance": [
+    "The global projection maps existing git-index lease files, branch commit queue locks, close transaction mutex windows, release mirror outputs, and generated projections to canonical Broker keys.",
+    "Tests prove no duplicate arbiter exists for git-index and branch commit queue surfaces: the same runtime path resolves to exactly one canonical key.",
+    "Dual Captain E2E continues to pass and reports queue owner/position/suggested action when blocked.",
+    "The implementation does not create a new lock directory, new registry document, or second queue semantics."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/global-resource-projection.ts",
+    "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "tests/cli/pre-team-dual-captain-e2e.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/global-resource-projection.ts",
+    "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "packages/cli/src/commands/git-governance.ts",
+    "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+    "tests/cli/pre-team-dual-captain-e2e.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "node --strip-types tests/cli/pre-team-dual-captain-e2e.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-0037.",
+    "New independent lock semantics outside the Broker keyspace.",
+    "Release mirror artifact sync."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.unified-admission.global-runtime-aliases",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.unified-admission.global-runtime-aliases",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/global-resource-projection.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/global-resource-projection.ts",
+        "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+        "packages/cli/src/commands/git-governance.ts",
+        "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "tests/cli/pre-team-dual-captain-e2e.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0152-unified-admission-runtime-aliases.task.md",
+    "sectionTitle": "ATM-GOV-0152",
+    "headingLine": 47,
+    "hash": "eefd6c5c5caea9ed",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0152-unified-admission-runtime-aliases.task.md",
+      "planningCommitSha": "2430f96df706317bd1bd43c03fc8633cb79b1877",
+      "contentDigest": "sha256:eefd6c5c5caea9edfb0de16020c5abb03176ee217bffd4f8bf773c9728256e78",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T15:31:37.416Z"
+    }
+  },
+  "importedAt": "2026-07-15T15:31:37.416Z",
+  "lastTransitionId": "2026-07-15T16-06-37-289Z-close-2188d44a634c",
+  "lastTransitionAt": "2026-07-15T16:06:37.289Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T16:03:27.377Z",
+  "promotedAt": "2026-07-15T16:03:27.380Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-6629576d10dc",
+    "claimedAt": "2026-07-15T16:03:27.383Z",
+    "heartbeatAt": "2026-07-15T16:06:37.287Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0152.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "packages/core/src/broker/global-resource-projection.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts"
+    ],
+    "state": "released",
+    "reason": "closed"
+  },
+  "startedAt": "2026-07-15T16:03:27.383Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715160327-codex-gpt-5-5-captain-ATM-GOV-0152-fd706cfb5e",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0152",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0152.*",
+      ".atm/history/task-events/ATM-GOV-0152/**",
+      ".atm/history/tasks/ATM-GOV-0152.json",
+      "packages/cli/src/commands/git-governance.ts",
+      "packages/cli/src/commands/taskflow/close-transaction-mutex.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+      "packages/core/src/broker/global-resource-projection.ts",
+      "tests/cli/pre-team-dual-captain-e2e.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "f63d488ab0db5b8ffc70293a95ecb5b98e669cb64c8e9e8770fdc161726b10ef",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T16:03:29.887Z",
+    "status": "active"
+  },
+  "closedAt": "2026-07-15T16:06:37.287Z",
+  "closedByActor": "codex-gpt-5-5-captain",
+  "closedBySessionId": "session-20260715160327-codex-gpt-5-5-captain-ATM-GOV-0152-fd706cfb5e",
+  "closurePacket": ".atm/history/evidence/ATM-GOV-0152.closure-packet.json"
+}
