@@ -43,6 +43,7 @@ import {
   emptyRunnerSyncStewardQueue,
   enqueueRunnerSyncStewardRequest,
   explainRunnerSyncStewardPosition,
+  releaseRunnerSyncStewardQueue,
   type RunnerSyncStewardQueueDocument
 } from '../../../core/src/broker/runner-sync-steward-queue.ts';
 import {
@@ -167,7 +168,44 @@ export async function runBroker(argv: string[]) {
       });
     }
 
-    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup', { exitCode: 2 });
+    if (options.runnerSyncAction === 'release') {
+      if (!options.task) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --task <task-id>.', { exitCode: 2 });
+      }
+      if (!options.stewardWorkId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync release requires --steward-work-id <id>.', { exitCode: 2 });
+      }
+      try {
+        const release = releaseRunnerSyncStewardQueue(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+          taskId: options.task,
+          stewardWorkId: options.stewardWorkId,
+          receiptRef: options.receiptRef,
+          receiptDigest: options.receiptDigest
+        });
+        writeRunnerSyncStewardQueue(runnerSyncQueuePath, release.queue);
+        return makeResult({
+          ok: true,
+          command: 'broker',
+          cwd: options.cwd,
+          messages: [
+            message('info', 'ATM_BROKER_RUNNER_SYNC_RELEASED', `Runner-sync steward work ${release.released.stewardWorkId} released for ${release.released.waitingTasks.length} waiting task(s).`, {
+              stewardWorkId: release.released.stewardWorkId,
+              waitingTasks: release.released.waitingTasks,
+              nextStewardWorkId: release.next?.stewardWorkId ?? null,
+              suggestedNextAction: release.suggestedNextAction
+            })
+          ],
+          evidence: {
+            runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+            release
+          }
+        });
+      } catch (error) {
+        throw toRunnerSyncReleaseCliError(error);
+      }
+    }
+
+    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup, release', { exitCode: 2 });
   }
 
   if (options.action === 'projection') {
@@ -1186,6 +1224,15 @@ function writeRunnerSyncStewardQueue(filePath: string, queue: RunnerSyncStewardQ
   writeFileSync(filePath, `${JSON.stringify(queue, null, 2)}\n`, 'utf8');
 }
 
+function toRunnerSyncReleaseCliError(error: unknown): CliError {
+  const messageText = error instanceof Error ? error.message : String(error ?? '');
+  const match = /^(ATM_[A-Z0-9_]+):\s*(.+)$/.exec(messageText);
+  if (match) {
+    return new CliError(match[1], match[2], { exitCode: 1 });
+  }
+  return new CliError('ATM_RUNNER_SYNC_STEWARD_RELEASE_FAILED', messageText || 'Runner-sync steward release failed.', { exitCode: 1 });
+}
+
 function readGeneratedProjectionSteward(filePath: string): GeneratedProjectionStewardDocument {
   if (!existsSync(filePath)) return emptyGeneratedProjectionSteward();
   try {
@@ -1622,11 +1669,14 @@ interface ParsedBrokerOptions {
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
-  readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | null;
+  readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | 'release' | null;
   readonly projectionAction: 'enqueue' | 'status' | 'cleanup' | null;
   readonly task: string | null;
   readonly actorId: string | null;
   readonly sealedSourceSha: string | null;
+  readonly stewardWorkId: string | null;
+  readonly receiptRef: string | null;
+  readonly receiptDigest: string | null;
   readonly projectionKey: string | null;
   readonly intentFile: string | null;
   readonly freezeId: string | null;
@@ -1658,6 +1708,9 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     task: null as string | null,
     actorId: null as string | null,
     sealedSourceSha: null as string | null,
+    stewardWorkId: null as string | null,
+    receiptRef: null as string | null,
+    receiptDigest: null as string | null,
     projectionKey: null as string | null,
     intentFile: null as string | null,
     freezeId: null as string | null,
@@ -1697,6 +1750,21 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--sealed-source-sha') {
       state.sealedSourceSha = requireValue(argv, index, '--sealed-source-sha');
+      index += 1;
+      continue;
+    }
+    if (arg === '--steward-work-id') {
+      state.stewardWorkId = requireValue(argv, index, '--steward-work-id');
+      index += 1;
+      continue;
+    }
+    if (arg === '--receipt-ref' || arg === '--receipt') {
+      state.receiptRef = requireValue(argv, index, arg);
+      index += 1;
+      continue;
+    }
+    if (arg === '--receipt-digest') {
+      state.receiptDigest = requireValue(argv, index, '--receipt-digest');
       index += 1;
       continue;
     }
@@ -1825,6 +1893,9 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     task: state.task,
     actorId: state.actorId,
     sealedSourceSha: state.sealedSourceSha,
+    stewardWorkId: state.stewardWorkId,
+    receiptRef: state.receiptRef,
+    receiptDigest: state.receiptDigest,
     projectionKey: state.projectionKey,
     intentFile: state.intentFile,
     freezeId: state.freezeId,

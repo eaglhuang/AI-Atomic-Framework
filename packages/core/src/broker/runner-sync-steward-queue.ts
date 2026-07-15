@@ -76,6 +76,37 @@ export type RunnerSyncStewardCleanupResult = {
   readonly queue: RunnerSyncStewardQueueDocument;
 };
 
+export type RunnerSyncStewardReleaseInput = {
+  readonly taskId: string;
+  readonly stewardWorkId: string;
+  readonly receiptRef?: string | null;
+  readonly receiptDigest?: string | null;
+  readonly releasedAt?: string;
+};
+
+export type RunnerSyncStewardReleaseRecord = {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly sealedSourceSha: string;
+  readonly stewardWorkId: string;
+  readonly queuePosition: number;
+  readonly waitingTasks: readonly string[];
+  readonly requestedSurfaces: readonly string[];
+  readonly receiptRef: string | null;
+  readonly receiptDigest: string | null;
+  readonly releasedAt: string;
+};
+
+export type RunnerSyncStewardReleaseResult = {
+  readonly schemaId: 'atm.runnerSyncStewardReleaseResult.v1';
+  readonly ok: boolean;
+  readonly stewardKey: typeof RUNNER_SYNC_STEWARD_GENERATOR;
+  readonly released: RunnerSyncStewardReleaseRecord;
+  readonly queue: RunnerSyncStewardQueueDocument;
+  readonly next: RunnerSyncStewardQueueResult | null;
+  readonly suggestedNextAction: string;
+};
+
 const defaultTtlSeconds = 420;
 
 export function emptyRunnerSyncStewardQueue(now = new Date().toISOString()): RunnerSyncStewardQueueDocument {
@@ -161,6 +192,65 @@ export function cleanupRunnerSyncStewardQueue(
   };
 }
 
+export function releaseRunnerSyncStewardQueue(
+  queue: RunnerSyncStewardQueueDocument | null | undefined,
+  input: RunnerSyncStewardReleaseInput
+): RunnerSyncStewardReleaseResult {
+  const releasedAt = validIso(input.releasedAt) ? input.releasedAt : new Date().toISOString();
+  const taskId = String(input.taskId ?? '').trim();
+  const stewardWorkId = String(input.stewardWorkId ?? '').trim();
+  const receiptRef = normalizeOptional(input.receiptRef);
+  const receiptDigest = normalizeOptional(input.receiptDigest);
+  if (!taskId || !stewardWorkId) {
+    throw new Error('ATM_RUNNER_SYNC_STEWARD_RELEASE_INVALID: task and steward work id are required.');
+  }
+  if (!receiptRef && !receiptDigest) {
+    throw new Error('ATM_RUNNER_SYNC_STEWARD_RELEASE_RECEIPT_REQUIRED: release requires --receipt-ref or --receipt-digest.');
+  }
+
+  const base = materializeQueue(normalizeQueue(queue, releasedAt));
+  const groupIndex = base.groups.findIndex((group) => group.stewardWorkId === stewardWorkId);
+  if (groupIndex < 0) {
+    throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_NOT_FOUND: steward work ${stewardWorkId} is not queued.`);
+  }
+  const group = base.groups[groupIndex];
+  if (group.queuePosition !== 1) {
+    throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_NOT_QUEUE_HEAD: steward work ${stewardWorkId} is at queue position ${group.queuePosition}.`);
+  }
+  const ownerRequest = group.requests.find((request) => request.taskId === taskId);
+  if (!ownerRequest) {
+    throw new Error(`ATM_RUNNER_SYNC_STEWARD_RELEASE_OWNER_MISMATCH: task ${taskId} is not waiting on ${stewardWorkId}.`);
+  }
+
+  const remainingGroups = base.groups.filter((candidate) => candidate.stewardWorkId !== stewardWorkId);
+  const nextQueue = materializeQueue({ ...base, updatedAt: releasedAt, groups: remainingGroups });
+  const nextGroup = nextQueue.groups[0] ?? null;
+  const next = nextGroup ? groupToResult(nextQueue, nextGroup) : null;
+  const released: RunnerSyncStewardReleaseRecord = {
+    taskId,
+    actorId: ownerRequest.actorId,
+    sealedSourceSha: group.sealedSourceSha,
+    stewardWorkId: group.stewardWorkId,
+    queuePosition: group.queuePosition,
+    waitingTasks: group.waitingTasks,
+    requestedSurfaces: group.requestedSurfaces,
+    receiptRef,
+    receiptDigest,
+    releasedAt
+  };
+  return {
+    schemaId: 'atm.runnerSyncStewardReleaseResult.v1',
+    ok: true,
+    stewardKey: RUNNER_SYNC_STEWARD_GENERATOR,
+    released,
+    queue: nextQueue,
+    next,
+    suggestedNextAction: next
+      ? `Runner-sync steward advanced to ${next.stewardWorkId} at queue position ${next.queuePosition}. ${next.suggestedNextAction}`
+      : `Runner-sync steward queue is empty after releasing ${stewardWorkId}.`
+  };
+}
+
 export function explainRunnerSyncStewardPosition(
   queue: RunnerSyncStewardQueueDocument | null | undefined,
   taskId: string,
@@ -169,6 +259,10 @@ export function explainRunnerSyncStewardPosition(
   const base = materializeQueue(normalizeQueue(queue, now));
   const group = base.groups.find((candidate) => candidate.requests.some((request) => request.taskId === taskId));
   if (!group) return null;
+  return groupToResult(base, group);
+}
+
+function groupToResult(queue: RunnerSyncStewardQueueDocument, group: RunnerSyncStewardGroup): RunnerSyncStewardQueueResult {
   const status = group.queuePosition === 1 ? 'queue-head' : 'coalesced-waiter';
   return {
     schemaId: 'atm.runnerSyncStewardQueueResult.v1',
@@ -181,7 +275,7 @@ export function explainRunnerSyncStewardPosition(
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
-    queue: base
+    queue
   };
 }
 
@@ -317,6 +411,11 @@ function sortedUnique(values: readonly string[]): readonly string[] {
 
 function normalizePath(value: string): string {
   return String(value ?? '').trim().replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function normalizeOptional(value: string | null | undefined): string | null {
+  const normalized = String(value ?? '').trim();
+  return normalized.length > 0 ? normalized : null;
 }
 
 function validIso(value: string | undefined): value is string {
