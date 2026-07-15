@@ -5,6 +5,11 @@ export type RunnerSyncAdmissionReport = {
   readonly ok: boolean;
   readonly stewardActorId: string;
   readonly sealedSourceSha: string | null;
+  readonly runnerSyncSteward: {
+    readonly stewardWorkId: string;
+    readonly queuePosition: number;
+    readonly suggestedNextAction: string;
+  } | null;
   readonly foreignNonReleaseWip: readonly string[];
   readonly releaseWip: readonly string[];
   readonly ordinaryTaskReleaseAutoStageAllowed: false;
@@ -15,6 +20,11 @@ export function inspectRunnerSyncAdmission(input: {
   readonly cwd: string;
   readonly stewardActorId: string;
   readonly sealedSourceSha?: string | null;
+  readonly runnerSyncSteward?: {
+    readonly stewardWorkId: string;
+    readonly queuePosition: number;
+    readonly suggestedNextAction: string;
+  } | null;
   readonly dirtyFiles?: readonly string[] | null;
 }): RunnerSyncAdmissionReport {
   const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
@@ -25,6 +35,7 @@ export function inspectRunnerSyncAdmission(input: {
     ok: foreignNonReleaseWip.length === 0,
     stewardActorId: input.stewardActorId,
     sealedSourceSha: input.sealedSourceSha ?? null,
+    runnerSyncSteward: input.runnerSyncSteward ?? null,
     foreignNonReleaseWip,
     releaseWip,
     ordinaryTaskReleaseAutoStageAllowed: false,

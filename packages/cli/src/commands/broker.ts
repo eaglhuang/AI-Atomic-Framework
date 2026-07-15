@@ -39,6 +39,13 @@ import { planMutationBatch } from '../../../core/src/broker/adapters/batch-plann
 import { computeCasResult, hashContent } from '../../../core/src/broker/adapters/cas.ts';
 import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry, type SharedSurfaceQueue } from '../../../core/src/broker/shared-surface-queue.ts';
 import {
+  cleanupRunnerSyncStewardQueue,
+  emptyRunnerSyncStewardQueue,
+  enqueueRunnerSyncStewardRequest,
+  explainRunnerSyncStewardPosition,
+  type RunnerSyncStewardQueueDocument
+} from '../../../core/src/broker/runner-sync-steward-queue.ts';
+import {
   acknowledgeFreeze,
   createFreezeSignal,
   resolveFreezeDecision,
@@ -72,6 +79,89 @@ export async function runBroker(argv: string[]) {
   const registryPath = path.join(options.cwd, '.atm', 'runtime', 'write-broker.registry.json');
   const sharedQueuePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-queues.json');
   const sharedFreezePath = path.join(options.cwd, '.atm', 'runtime', 'broker-shared-surface-freezes.json');
+  const runnerSyncQueuePath = path.join(options.cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json');
+
+  if (options.action === 'runner-sync') {
+    if (options.runnerSyncAction === 'enqueue') {
+      if (!options.task) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --task <task-id>.', { exitCode: 2 });
+      }
+      if (!options.actorId) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --actor <actor-id>.', { exitCode: 2 });
+      }
+      if (!options.sealedSourceSha) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires --sealed-source-sha <sha>.', { exitCode: 2 });
+      }
+      if (options.surfaces.length === 0) {
+        throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires at least one --surface <path>.', { exitCode: 2 });
+      }
+      const result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+        taskId: options.task,
+        actorId: options.actorId,
+        sealedSourceSha: options.sealedSourceSha,
+        requestedSurfaces: options.surfaces,
+        ttlSeconds: options.ttlSeconds
+      });
+      writeRunnerSyncStewardQueue(runnerSyncQueuePath, result.queue);
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message('info', 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
+            status: result.status,
+            queuePosition: result.queuePosition,
+            stewardWorkId: result.stewardWorkId,
+            waitingTasks: result.waitingTasks,
+            suggestedNextAction: result.suggestedNextAction
+          })
+        ],
+        evidence: {
+          runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+          runnerSync: result
+        }
+      });
+    }
+
+    if (options.runnerSyncAction === 'status') {
+      const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
+      const position = options.task ? explainRunnerSyncStewardPosition(queue, options.task) : null;
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message('info', 'ATM_BROKER_RUNNER_SYNC_STATUS', `Runner-sync steward queue contains ${queue.groups.length} steward work item(s).`)
+        ],
+        evidence: {
+          runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+          queue,
+          position
+        }
+      });
+    }
+
+    if (options.runnerSyncAction === 'cleanup') {
+      const cleanup = cleanupRunnerSyncStewardQueue(readRunnerSyncStewardQueue(runnerSyncQueuePath));
+      writeRunnerSyncStewardQueue(runnerSyncQueuePath, cleanup.queue);
+      return makeResult({
+        ok: true,
+        command: 'broker',
+        cwd: options.cwd,
+        messages: [
+          message('info', 'ATM_BROKER_RUNNER_SYNC_CLEANUP', `Runner-sync steward cleanup released ${cleanup.staleReleases.length} stale request(s).`, {
+            staleReleases: cleanup.staleReleases
+          })
+        ],
+        evidence: {
+          runnerSyncStewardQueuePath: '.atm/runtime/runner-sync-steward-queue.json',
+          cleanup
+        }
+      });
+    }
+
+    throw new CliError('ATM_CLI_USAGE', 'broker runner-sync supports: enqueue, status, cleanup', { exitCode: 2 });
+  }
 
   if (options.action === 'register') {
     if (!options.task) {
@@ -949,7 +1039,7 @@ export async function runBroker(argv: string[]) {
     });
   }
 
-  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, plan-batch', { exitCode: 2 });
+  throw new CliError('ATM_CLI_USAGE', 'broker supports: register, decision, status, release, acknowledge, cleanup, proposal, compose, steward, runtime, runner-sync, plan-batch', { exitCode: 2 });
 }
 
 type SharedSurfaceFreezeRecord = {
@@ -994,6 +1084,20 @@ function readSharedSurfaceQueues(filePath: string): SharedSurfaceQueue[] {
 function writeSharedSurfaceQueues(filePath: string, queues: readonly SharedSurfaceQueue[]) {
   mkdirSync(path.dirname(filePath), { recursive: true });
   writeFileSync(filePath, `${JSON.stringify({ schemaId: 'atm.brokerSharedSurfaceQueues.v1', queues }, null, 2)}\n`, 'utf8');
+}
+
+function readRunnerSyncStewardQueue(filePath: string): RunnerSyncStewardQueueDocument {
+  if (!existsSync(filePath)) return emptyRunnerSyncStewardQueue();
+  try {
+    return JSON.parse(readFileSync(filePath, 'utf8')) as RunnerSyncStewardQueueDocument;
+  } catch {
+    return emptyRunnerSyncStewardQueue();
+  }
+}
+
+function writeRunnerSyncStewardQueue(filePath: string, queue: RunnerSyncStewardQueueDocument) {
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  writeFileSync(filePath, `${JSON.stringify(queue, null, 2)}\n`, 'utf8');
 }
 
 function updateSharedSurfaceQueues(input: {
@@ -1414,15 +1518,18 @@ function extractMutationRequestTransactionIds(request: MutationRequest): readonl
 
 interface ParsedBrokerOptions {
   readonly cwd: string;
-  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'plan-batch' | null;
+  readonly action: 'register' | 'heartbeat' | 'decision' | 'status' | 'release' | 'acknowledge' | 'cleanup' | 'proposal' | 'compose' | 'steward' | 'runtime' | 'runner-sync' | 'plan-batch' | null;
   readonly proposalAction: 'create' | 'list' | 'show' | 'validate' | null;
   readonly stewardAction: 'plan' | 'apply' | null;
   readonly runtimeAction: 'activate' | null;
+  readonly runnerSyncAction: 'enqueue' | 'status' | 'cleanup' | null;
   readonly task: string | null;
   readonly actorId: string | null;
+  readonly sealedSourceSha: string | null;
   readonly intentFile: string | null;
   readonly freezeId: string | null;
   readonly ttlSeconds: number;
+  readonly surfaces: readonly string[];
   readonly proposalFiles: readonly string[];
   readonly proposalIds: readonly string[];
   readonly proposalStorePath: string | null;
@@ -1443,11 +1550,14 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     proposalAction: null as ParsedBrokerOptions['proposalAction'],
     stewardAction: null as ParsedBrokerOptions['stewardAction'],
     runtimeAction: null as ParsedBrokerOptions['runtimeAction'],
+    runnerSyncAction: null as ParsedBrokerOptions['runnerSyncAction'],
     task: null as string | null,
     actorId: null as string | null,
+    sealedSourceSha: null as string | null,
     intentFile: null as string | null,
     freezeId: null as string | null,
     ttlSeconds: 1800,
+    surfaces: [] as string[],
     proposalFiles: [] as string[],
     proposalIds: [] as string[],
     proposalIdPositional: null as string | null,
@@ -1476,6 +1586,16 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     }
     if (arg === '--actor') {
       state.actorId = requireValue(argv, index, '--actor');
+      index += 1;
+      continue;
+    }
+    if (arg === '--sealed-source-sha') {
+      state.sealedSourceSha = requireValue(argv, index, '--sealed-source-sha');
+      index += 1;
+      continue;
+    }
+    if (arg === '--surface') {
+      state.surfaces.push(requireValue(argv, index, '--surface'));
       index += 1;
       continue;
     }
@@ -1563,6 +1683,8 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
       state.stewardAction = arg as ParsedBrokerOptions['stewardAction'];
     } else if (state.action === 'runtime' && !state.runtimeAction) {
       state.runtimeAction = arg as ParsedBrokerOptions['runtimeAction'];
+    } else if (state.action === 'runner-sync' && !state.runnerSyncAction) {
+      state.runnerSyncAction = arg as ParsedBrokerOptions['runnerSyncAction'];
     } else {
       throw new CliError('ATM_CLI_USAGE', 'broker accepts only one action (and optional proposal subaction).', { exitCode: 2 });
     }
@@ -1580,11 +1702,14 @@ function parseBrokerArgs(argv: string[]): ParsedBrokerOptions {
     proposalAction: state.proposalAction,
     stewardAction: state.stewardAction,
     runtimeAction: state.runtimeAction,
+    runnerSyncAction: state.runnerSyncAction,
     task: state.task,
     actorId: state.actorId,
+    sealedSourceSha: state.sealedSourceSha,
     intentFile: state.intentFile,
     freezeId: state.freezeId,
     ttlSeconds: state.ttlSeconds,
+    surfaces: state.surfaces,
     proposalFiles: state.proposalFiles,
     proposalIds,
     proposalStorePath: state.proposalStorePath,

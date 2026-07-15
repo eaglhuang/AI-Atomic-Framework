@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "ATM-GOV-0150",
+  "title": "Implement runner-sync coalescing steward queue",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "ATM-GOV-0127",
+    "ATM-GOV-0142",
+    "ATM-GOV-0148",
+    "ATM-GOV-0149"
+  ],
+  "acceptance": [
+    "A runner-sync request records requester task, actor, sealed source SHA, requested surfaces, createdAt, heartbeatAt, expiresAt, queue position, and suggested next action.",
+    "Requests with the same sealed source SHA coalesce under one steward work item and expose all waiting tasks instead of creating duplicate build lanes.",
+    "Requests for different sealed source SHAs remain ordered and report queue-head versus waiting position.",
+    "Expired owners are released or marked stale by deterministic cleanup; stale-owner diagnostics include owner, position, and the safe retry command.",
+    "The CLI exposes a read/write path through `broker runner-sync ...` or an equivalent broker subcommand; tests must exercise this through source helpers and at least one CLI-facing JSON shape.",
+    "No release mirror artifact is committed as the deliverable for this card."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/core/src/broker/index.ts",
+    "packages/cli/src/commands/broker.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types packages/core/src/broker/__tests__/global-resource-projection.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "TASK-RFT-0037 and all pre-commit hook extraction surfaces.",
+    "Generated projection steward implementation; owned by ATM-GOV-0151.",
+    "Changing release/atm-onefile/** or release/atm-root-drop/** artifacts as the delivery."
+  ],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync.coalescing-steward-queue",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.runner-sync.coalescing-steward-queue",
+        "pattern": "Policy Object",
+        "source": "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/index.ts",
+        "packages/cli/src/commands/broker.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/ATM-GOV-0150-runner-sync-coalescing-steward-queue.task.md",
+    "sectionTitle": "ATM-GOV-0150",
+    "headingLine": 47,
+    "hash": "cab9046c08e3241a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/ATM-GOV-0150-runner-sync-coalescing-steward-queue.task.md",
+      "planningCommitSha": "2430f96df706317bd1bd43c03fc8633cb79b1877",
+      "contentDigest": "sha256:cab9046c08e3241a220d7aaf22890f62df134885f2660d62979ae7f84bd9e202",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-15T15:31:25.032Z"
+    }
+  },
+  "importedAt": "2026-07-15T15:31:25.032Z",
+  "lastTransitionId": "2026-07-15T15-32-27-294Z-claim-cd0f8bf8b000",
+  "lastTransitionAt": "2026-07-15T15:32:27.294Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-gpt-5-5-captain",
+  "reservedAt": "2026-07-15T15:32:22.084Z",
+  "promotedAt": "2026-07-15T15:32:22.087Z",
+  "claim": {
+    "actorId": "codex-gpt-5-5-captain",
+    "leaseId": "lease-38d5db943635",
+    "claimedAt": "2026-07-15T15:32:22.090Z",
+    "heartbeatAt": "2026-07-15T15:32:22.090Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/ATM-GOV-0150.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-15T15:32:22.090Z",
+  "startedByActor": "codex-gpt-5-5-captain",
+  "startedBySessionId": "session-20260715153222-codex-gpt-5-5-captain-ATM-GOV-0150-a8ddb0abed",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "ATM-GOV-0150",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/ATM-GOV-0150.*",
+      ".atm/history/task-events/ATM-GOV-0150/**",
+      ".atm/history/tasks/ATM-GOV-0150.json",
+      "packages/cli/src/commands/broker.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/index.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "25e1391c4837f1adeacbe3b7ab756cea5d143eeafaa7a25a3770cb00cb2e841d",
+    "actorId": "codex-gpt-5-5-captain",
+    "createdAt": "2026-07-15T15:32:27.293Z",
+    "status": "active"
+  }
+}
