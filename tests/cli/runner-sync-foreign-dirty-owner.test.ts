@@ -43,6 +43,39 @@ assert.equal(releaseOnly.ok, true);
 assert.equal(releaseOnly.queueHeadOwnership.ok, true);
 assert.equal(ordinaryTaskCanAutoStageRelease({ taskId: 'ATM-GOV-0127', files: ['release/atm-onefile/atm.mjs'] }), false);
 
+const queueHeadWithOwnQueueFile = inspectRunnerSyncAdmission({
+  cwd: process.cwd(),
+  stewardActorId: 'release-steward',
+  sealedSourceSha: 'queue-file-owned',
+  runnerSyncSteward: {
+    stewardWorkId: 'runner-sync-owned-queue-file',
+    queuePosition: 1,
+    suggestedNextAction: 'run runner sync',
+    requests: [{ actorId: 'release-steward' }]
+  } as any,
+  dirtyFiles: [
+    '.atm/runtime/runner-sync-steward-queue.json',
+    'release/atm-onefile/atm.mjs'
+  ]
+});
+assert.equal(queueHeadWithOwnQueueFile.ok, true);
+assert.deepEqual(queueHeadWithOwnQueueFile.foreignNonReleaseWip, []);
+assert.deepEqual(queueHeadWithOwnQueueFile.releaseWip, ['release/atm-onefile/atm.mjs']);
+
+const queueFileWithoutHead = inspectRunnerSyncAdmission({
+  cwd: process.cwd(),
+  stewardActorId: 'release-steward',
+  sealedSourceSha: 'queue-file-no-head',
+  runnerSyncSteward: {
+    stewardWorkId: 'runner-sync-not-head',
+    queuePosition: 2,
+    suggestedNextAction: 'wait'
+  },
+  dirtyFiles: ['.atm/runtime/runner-sync-steward-queue.json']
+});
+assert.equal(queueFileWithoutHead.ok, false);
+assert.deepEqual(queueFileWithoutHead.foreignNonReleaseWip, ['.atm/runtime/runner-sync-steward-queue.json']);
+
 const missingReservation = inspectRunnerSyncAdmission({
   cwd: process.cwd(),
   stewardActorId: 'release-steward',

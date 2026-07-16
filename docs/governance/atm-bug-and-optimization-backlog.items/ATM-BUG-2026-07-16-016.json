@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-016",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Git governance / Scoped index",
+  "finding": "A native git commit under ATM pre-commit scoped-index governance can report ATM_HOOK_PRE_COMMIT_OK with stagedFileCount > 0, yet produce an empty commit while the intended files remain dirty in the live worktree.",
+  "expectedBehavior": "When ATM uses a scoped index or temp-index path, pre-commit should fail closed if the host git commit will not include the reported staged files, or should surface an explicit recovery command before allowing an empty commit.",
+  "evidenceOrRepro": "During the ATM-BUG-2026-07-16-015 fix, native `git commit -m \"fix(runner-sync): admit owned steward queue file\"` reported ATM_HOOK_PRE_COMMIT_OK with four staged files, but `git show --name-status HEAD` showed no changed files and `git diff HEAD --name-only` still listed the four intended files. A follow-up `git commit --amend --no-edit` with ATM_COMMIT_ACTOR_ID set included the files.",
+  "followUp": "Add a regression for native git commit plus ATM scoped-index pre-commit behavior, then ensure empty commits are rejected when staged deliverables were reported or make the hook emit a precise amend/retry command."
+}

@@ -39,8 +39,11 @@ export function inspectRunnerSyncAdmission(input: {
 }): RunnerSyncAdmissionReport {
   const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
   const releaseWip = dirtyFiles.filter(isReleasePath);
-  const foreignNonReleaseWip = dirtyFiles.filter((file) => !isReleasePath(file));
   const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
+  const foreignNonReleaseWip = dirtyFiles.filter((file) => {
+    if (isReleasePath(file)) return false;
+    return !isRunnerSyncQueueFileOwnedByHead(file, queueHeadOwnership);
+  });
   return {
     schemaId: 'atm.runnerSyncAdmission.v1',
     ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
@@ -103,6 +106,17 @@ function normalizePaths(paths: readonly string[]): readonly string[] {
 
 function isReleasePath(file: string): boolean {
   return file === 'release' || file.startsWith('release/');
+}
+
+function isRunnerSyncQueueFileOwnedByHead(
+  file: string,
+  queueHeadOwnership: RunnerSyncAdmissionReport['queueHeadOwnership']
+): boolean {
+  return file === '.atm/runtime/runner-sync-steward-queue.json'
+    && queueHeadOwnership.ok
+    && queueHeadOwnership.queuePosition === 1
+    && typeof queueHeadOwnership.stewardWorkId === 'string'
+    && queueHeadOwnership.stewardWorkId.length > 0;
 }
 
 function inspectRunnerSyncQueueHeadOwnership(input: {
