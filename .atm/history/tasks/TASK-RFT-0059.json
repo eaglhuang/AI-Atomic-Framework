@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0059",
+  "title": "Split plugin bootstrap facade below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0058"
+  ],
+  "acceptance": [
+    "Reduce `packages/plugin-governance-local/src/bootstrap/bootstrap.ts` to at or below 600 physical lines.",
+    "Move bootstrap/adopter implementation support into bounded modules under `packages/plugin-governance-local/src/bootstrap/bootstrap/**`.",
+    "Keep every new or touched bootstrap support module at or below 600 physical lines.",
+    "Preserve the existing public exports used by plugin callers, package exports, scripts, and tests.",
+    "Add a final-600 validator for the facade and `packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts`.",
+    "Update plugin owner shard coverage for the extracted bootstrap implementation modules."
+  ],
+  "deliverables": [
+    "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+    "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+    "tests/plugin-governance-local/bootstrap-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins*.json"
+  ],
+  "scopePaths": [
+    "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+    "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+    "tests/plugin-governance-local/bootstrap-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins*.json"
+  ],
+  "validators": [
+    "node --strip-types tests/plugin-governance-local/bootstrap-final-600.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plugin-governance-bootstrap-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.plugin-governance-bootstrap-facade",
+        "pattern": "Facade",
+        "source": "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.plugin-governance-bootstrap-adapter-map",
+        "pattern": "Adapter/Port",
+        "source": "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Current audit found `packages/plugin-governance-local/src/bootstrap/bootstrap.ts` at 1091 physical lines after TASK-RFT-0058.\n- This card continues the RFT large-file atom-map/facade split series toward the physical-file limit of 600 lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0059-plugin-bootstrap-facade-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0059",
+    "headingLine": 47,
+    "hash": "88439845ff3f073d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0059-plugin-bootstrap-facade-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:88439845ff3f073d0ef6274e7b0430f30c0ede096f41a46d0371d39b513aaeb5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T03:34:57.438Z"
+    }
+  },
+  "importedAt": "2026-07-16T03:34:57.438Z",
+  "lastTransitionId": "2026-07-16T03-41-11-126Z-scope-amendment-d57956adf7d3",
+  "lastTransitionAt": "2026-07-16T03:41:11.126Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0059",
+  "reservedAt": "2026-07-16T03:34:59.145Z",
+  "promotedAt": "2026-07-16T03:34:59.147Z",
+  "claim": {
+    "actorId": "codex-task-rft-0059",
+    "leaseId": "lease-3cf86a55365d",
+    "claimedAt": "2026-07-16T03:34:59.151Z",
+    "heartbeatAt": "2026-07-16T03:34:59.151Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0059.*",
+      ".atm/history/task-events/TASK-RFT-0059/**",
+      ".atm/history/tasks/TASK-RFT-0059.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins*.json",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+      "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T03:34:59.151Z",
+  "startedByActor": "codex-task-rft-0059",
+  "startedBySessionId": "session-20260716033459-codex-task-rft-0059-TASK-RFT-0059-59b5c4108f",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0059",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0059.*",
+      ".atm/history/task-events/TASK-RFT-0059/**",
+      ".atm/history/tasks/TASK-RFT-0059.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins*.json",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+      "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0059-plugin-bootstrap-facade-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0059-plugin-bootstrap-facade-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "0016b481997a1d83185f69243f949e20a3a0acc3d189a7b83f0b5700432b382d",
+    "actorId": "codex-task-rft-0059",
+    "createdAt": "2026-07-16T03:35:02.200Z",
+    "status": "active"
+  }
+}

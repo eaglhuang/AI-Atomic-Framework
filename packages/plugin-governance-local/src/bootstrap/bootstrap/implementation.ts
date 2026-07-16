@@ -1,0 +1,582 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type {
+  ArtifactRecord,
+  EvidenceRecord,
+  RegistryDocument,
+  RegistryEntryRecord,
+  WorkItemRef
+} from '@ai-atomic-framework/core';
+import type { CapabilityResult } from '@ai-atomic-framework/plugin-sdk';
+import { createDefaultGuards } from '../../default-guards.ts';
+import { createLocalGovernanceStores } from '../../stores.ts';
+import {
+  createContextBudgetSummary,
+  createDefaultContextBudgetPolicy,
+  evaluateContextBudget,
+  estimateContextBudgetTokens,
+  sanitizeBudgetFileId
+} from '../budget.ts';
+import {
+  createContinuationRunReport,
+  createContinuationSummaryRecord,
+  renderContextSummaryMarkdown
+} from '../prompt.ts';
+import type {
+  ContinuationContractInput,
+  LocalGovernanceBootstrapOptions,
+  LocalGovernanceBootstrapResult,
+  LocalGovernanceScriptInstallResult
+} from '../types.ts';
+import {
+  appendManifestRecord,
+  capabilityResult,
+  createEmptyRegistry,
+  ensureDirectory,
+  installPinnedRunner,
+  listFilesRecursive,
+  normalizeRelativePath,
+  normalizeWorkItem,
+  patchReadmeEntry,
+  probeRepository,
+  readDocumentIndex,
+  readEvidenceRecords,
+  readProjectName,
+  readUnknownFile,
+  relativePathFrom,
+  renderTemplate,
+  resolveRepoPath,
+  sha256Bytes,
+  withJsonExtension,
+  writeAgentInstructionsTemplate,
+  writeContentFile,
+  writeJson,
+  writeRootDropScripts,
+  writeTemplate,
+  writeText,
+  writeUnknownFile
+} from './bootstrap-support.ts';
+
+const defaultBootstrapTaskId = 'BOOTSTRAP-0001';
+const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
+const currentLayoutVersion = 2;
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
+const templateRoot = path.join(repoRoot, 'templates', 'root-drop');
+const templateFiles = [
+  {
+    source: 'AGENTS.md',
+    target: 'AGENTS.md'
+  },
+  {
+    source: path.join('.atm', 'profile', 'default.md'),
+    target: path.join('.atm', 'runtime', 'profile', 'default.md')
+  },
+  {
+    source: path.join('.atm', 'context', 'INITIAL_SUMMARY.md'),
+    target: path.join('.atm', 'history', 'handoff', 'INITIAL_SUMMARY.md')
+  }
+] as const;
+
+const charterTemplateFiles = [
+  {
+    source: path.join('.atm', 'charter', 'atomic-charter.template.md'),
+    target: path.join('.atm', 'charter', 'atomic-charter.md')
+  },
+  {
+    source: path.join('.atm', 'charter', 'atm-first-principles.template.md'),
+    target: path.join('.atm', 'charter', 'atm-first-principles.md')
+  },
+  {
+    source: path.join('.atm', 'charter', 'charter-invariants.template.json'),
+    target: path.join('.atm', 'charter', 'charter-invariants.json')
+  }
+] as const;
+
+const rootDropScriptNames = [
+  'atm-next',
+  'atm-orient',
+  'atm-create',
+  'atm-lock',
+  'atm-evidence',
+  'atm-upgrade-scan',
+  'atm-handoff'
+] as const;
+
+const rootDropScriptTemplateFiles = rootDropScriptNames.flatMap((scriptName) => [
+  {
+    source: path.join('.atm', 'scripts', 'sh', `${scriptName}.sh`),
+    target: path.join('.atm', 'scripts', 'sh', `${scriptName}.sh`)
+  },
+  {
+    source: path.join('.atm', 'scripts', 'ps', `${scriptName}.ps1`),
+    target: path.join('.atm', 'scripts', 'ps', `${scriptName}.ps1`)
+  }
+]);
+
+const rootAgentsEntryStart = '<!-- ATM ROOT ENTRY:START -->';
+const rootAgentsEntryEnd = '<!-- ATM ROOT ENTRY:END -->';
+const rootReadmeEntryStart = '<!-- ATM README ENTRY:START -->';
+const rootReadmeEntryEnd = '<!-- ATM README ENTRY:END -->';
+
+export function installRootDropScripts(cwd: string, options: { readonly force?: boolean } = {}): LocalGovernanceScriptInstallResult {
+  const created: string[] = [];
+  const unchanged: string[] = [];
+  writeRootDropScripts(cwd, options.force === true, created, unchanged);
+  return {
+    created,
+    unchanged,
+    scriptPaths: rootDropScriptTemplateFiles.map((templateFile) => normalizeRelativePath(templateFile.target)),
+    platformHintPath: process.platform === 'win32'
+      ? '.atm/scripts/ps'
+      : '.atm/scripts/sh'
+  };
+}
+
+export function adoptLocalGovernanceBundle(cwd: string, options: LocalGovernanceBootstrapOptions = {}): LocalGovernanceBootstrapResult {
+  const force = options.force === true;
+  const taskId = typeof options.taskId === 'string' && options.taskId.trim().length > 0
+    ? options.taskId.trim()
+    : defaultBootstrapTaskId;
+  const taskTitle = typeof options.taskTitle === 'string' && options.taskTitle.trim().length > 0
+    ? options.taskTitle.trim()
+    : defaultBootstrapTaskTitle;
+  const created: string[] = [];
+  const unchanged: string[] = [];
+  const paths = createBootstrapPaths(cwd, taskId);
+  const migration = migrateLegacyBootstrapLayout(cwd, taskId, paths, force, created, unchanged);
+  const stores = createLocalGovernanceStores({ repositoryRoot: cwd });
+
+  for (const directoryPath of Object.values(paths.directories)) {
+    ensureDirectory(directoryPath, cwd, created, unchanged);
+  }
+  const pinnedRunner = installPinnedRunner(cwd, force, created, unchanged);
+
+  stores.documentIndex.initialize?.();
+  stores.shardStore.initialize?.();
+  stores.artifactStore.initialize?.();
+  stores.logStore.initialize?.();
+  stores.runReportStore?.initialize?.();
+  stores.ruleGuard.initialize?.();
+  stores.evidenceStore.initialize?.();
+  stores.contextBudgetGuard?.initialize?.();
+  stores.contextSummaryStore?.initialize?.();
+
+  const recommendedPrompt = createRecommendedPrompt(taskId);
+  const projectProbe = probeRepository(cwd, recommendedPrompt);
+  const defaultGuards = createDefaultGuards(projectProbe);
+  const defaultContextBudgetPolicy = createDefaultContextBudgetPolicy(projectProbe.generatedAt ?? new Date().toISOString());
+  const bootstrapBudgetId = `bootstrap/${taskId}`;
+  const contextBudgetReportPath = path.join('.atm', 'history', 'reports', 'context-budget', `bootstrap-${sanitizeBudgetFileId(bootstrapBudgetId)}.json`);
+  const contextBudgetSummaryPath = relativePathFrom(cwd, paths.contextBudgetSummaryPath);
+  const continuationReportPath = path.join('.atm', 'history', 'reports', 'continuation', `${taskId}.json`);
+  const contextSummaryPath = relativePathFrom(cwd, paths.contextSummaryPath);
+  const contextSummaryMarkdownPath = relativePathFrom(cwd, paths.contextSummaryMarkdownPath);
+  const bootstrapBudgetInput = {
+    budgetId: bootstrapBudgetId,
+    workItemId: taskId,
+    estimatedTokens: estimateContextBudgetTokens(projectProbe, defaultGuards, recommendedPrompt, templateFiles.map((entry) => entry.target)),
+    inlineArtifacts: 0,
+    requestedSummary: 'Continue from the stored bootstrap summary and evidence paths instead of replaying the full bootstrap probe inline.'
+  };
+  const bootstrapBudgetEvaluation = evaluateContextBudget(defaultContextBudgetPolicy, bootstrapBudgetInput, projectProbe.generatedAt ?? new Date().toISOString());
+  const continuationInput: ContinuationContractInput = {
+    workItemId: taskId,
+    generatedAt: projectProbe.generatedAt ?? new Date().toISOString(),
+    summaryId: `summary.${sanitizeBudgetFileId(taskId).toLowerCase()}`,
+    summary: 'Default ATM bootstrap pack created and linked to evidence, context budget, and the next continuation prompt.',
+    nextActions: [
+      `Read .atm/history/tasks/${taskId}.json and .atm/runtime/profile/default.md.`,
+      'Run node atm.mjs next --prompt "<current user prompt>" --json, show ATM_USER_NOTICE or evidence.userNotice if present, then execute the returned next action.',
+      'Record the first smoke artifact, log, evidence, and handoff before closing the work item.'
+    ],
+    artifactPaths: ['.atm/history/artifacts', '.atm/history/logs', '.atm/history/reports'],
+    evidencePaths: [relativePathFrom(cwd, paths.evidencePath)],
+    reportPaths: [normalizeRelativePath(contextBudgetReportPath), normalizeRelativePath(continuationReportPath)],
+    authoredBy: '@ai-atomic-framework/plugin-governance-local',
+    handoffKind: 'bootstrap',
+    continuationGoal: 'Resume bootstrap from the generated task, profile, evidence, and budget surfaces.',
+    resumePrompt: recommendedPrompt,
+    resumeCommand: ['node', 'atm.mjs', 'next', '--prompt', '<current user prompt>', '--json'],
+    budgetDecision: bootstrapBudgetEvaluation.decision,
+    hardStop: bootstrapBudgetEvaluation.decision === 'hard-stop'
+  };
+  const continuationSummary = {
+    ...createContinuationSummaryRecord(continuationInput),
+    summaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath)
+  };
+  const bootstrapEvidence = {
+    ...createBootstrapEvidence(taskId, projectProbe, defaultGuards, paths),
+    pinnedRunner,
+    contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
+    contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? null : normalizeRelativePath(contextBudgetSummaryPath),
+    contextSummaryPath: normalizeRelativePath(contextSummaryPath),
+    contextSummaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath),
+    continuationReportPath: normalizeRelativePath(continuationReportPath),
+    budgetDecision: bootstrapBudgetEvaluation.decision,
+    continuationGoal: continuationInput.continuationGoal
+  };
+
+  writeJson(paths.configPath, createBootstrapConfig(taskId), cwd, force, created, unchanged);
+  writeJson(paths.currentTaskPath, createCurrentTaskState(taskId, taskTitle, paths), cwd, force, created, unchanged);
+  writeJson(paths.projectProbePath, projectProbe, cwd, force, created, unchanged);
+  writeJson(paths.defaultGuardsPath, defaultGuards, cwd, force, created, unchanged);
+  writeJson(paths.contextBudgetPolicyPath, defaultContextBudgetPolicy, cwd, force, created, unchanged);
+  writeJson(paths.taskPath, createBootstrapTask(taskId, taskTitle, projectProbe, paths), cwd, force, created, unchanged);
+  writeJson(paths.lockPath, createBootstrapLock(taskId, paths), cwd, force, created, unchanged);
+  writeJson(paths.evidencePath, bootstrapEvidence, cwd, force, created, unchanged);
+  writeJson(resolveRepoPath(cwd, contextBudgetReportPath), {
+    budgetId: bootstrapBudgetId,
+    workItemId: taskId,
+    policyId: defaultContextBudgetPolicy.policyId,
+    decision: bootstrapBudgetEvaluation.decision,
+    estimatedTokens: bootstrapBudgetEvaluation.estimatedTokens,
+    inlineArtifacts: bootstrapBudgetEvaluation.inlineArtifacts,
+    generatedAt: bootstrapBudgetEvaluation.generatedAt,
+    reason: bootstrapBudgetEvaluation.reason
+  }, cwd, force, created, unchanged);
+  if (bootstrapBudgetEvaluation.decision !== 'pass') {
+    writeText(resolveRepoPath(cwd, contextBudgetSummaryPath), createContextBudgetSummary(defaultContextBudgetPolicy, bootstrapBudgetInput, bootstrapBudgetEvaluation), cwd, force, created, unchanged);
+  }
+  writeJson(resolveRepoPath(cwd, continuationReportPath), createContinuationRunReport(`continuation/${taskId}`, continuationInput), cwd, force, created, unchanged);
+  writeJson(resolveRepoPath(cwd, contextSummaryPath), continuationSummary, cwd, force, created, unchanged);
+  writeText(resolveRepoPath(cwd, contextSummaryMarkdownPath), renderContextSummaryMarkdown(continuationSummary), cwd, force, created, unchanged);
+  if (migration !== null) {
+    writeJson(migration.path, migration.report, cwd, force, created, unchanged);
+  }
+
+  const templateTokens = {
+    RECOMMENDED_PROMPT: recommendedPrompt,
+    BOOTSTRAP_TASK_PATH: relativePathFrom(cwd, paths.taskPath),
+    BOOTSTRAP_LOCK_PATH: relativePathFrom(cwd, paths.lockPath),
+    BOOTSTRAP_PROFILE_PATH: relativePathFrom(cwd, paths.profilePath),
+    PROJECT_PROBE_PATH: relativePathFrom(cwd, paths.projectProbePath),
+    DEFAULT_GUARDS_PATH: relativePathFrom(cwd, paths.defaultGuardsPath),
+    BOOTSTRAP_EVIDENCE_PATH: relativePathFrom(cwd, paths.evidencePath),
+    REPOSITORY_KIND: String(projectProbe.repositoryKind ?? 'generic-repository'),
+    HOST_WORKFLOW: String(projectProbe.hostWorkflow ?? 'manual'),
+    PACKAGE_MANAGER: String(projectProbe.packageManager ?? 'none')
+  };
+
+  for (const templateFile of templateFiles) {
+    if (templateFile.target === 'AGENTS.md') {
+      writeAgentInstructionsTemplate(
+        path.join(templateRoot, templateFile.source),
+        path.join(cwd, templateFile.target),
+        templateTokens,
+        cwd,
+        force,
+        created,
+        unchanged
+      );
+      continue;
+    }
+    writeTemplate(
+      path.join(templateRoot, templateFile.source),
+      path.join(cwd, templateFile.target),
+      templateTokens,
+      cwd,
+      force,
+      created,
+      unchanged
+    );
+  }
+  patchReadmeEntry(path.join(cwd, 'README.md'), cwd, force, created, unchanged);
+
+  const now = projectProbe.generatedAt ? new Date(String(projectProbe.generatedAt)) : new Date();
+  const lastAmendedDate = now.toISOString().slice(0, 10);
+  const projectName = (typeof projectProbe.repositoryKind === 'string'
+    ? (readProjectName(cwd) ?? projectProbe.repositoryKind)
+    : (readProjectName(cwd) ?? path.basename(cwd))) || 'unknown-project';
+  const charterTokens = {
+    PROJECT_NAME: projectName,
+    CHARTER_VERSION: '1.0.0',
+    LAST_AMENDED_DATE: `${lastAmendedDate}T00:00:00.000Z`
+  };
+
+  const atomicCharterPath = path.join(cwd, '.atm', 'charter', 'atomic-charter.md');
+  const firstPrinciplesPath = path.join(cwd, '.atm', 'charter', 'atm-first-principles.md');
+  const invariantsPath = path.join(cwd, '.atm', 'charter', 'charter-invariants.json');
+  const renderedAtomicCharter = renderTemplate(readFileSync(path.join(templateRoot, '.atm', 'charter', 'atomic-charter.template.md'), 'utf8'), charterTokens);
+  const renderedFirstPrinciples = renderTemplate(readFileSync(path.join(templateRoot, '.atm', 'charter', 'atm-first-principles.template.md'), 'utf8'), charterTokens);
+  writeText(atomicCharterPath, renderedAtomicCharter, cwd, force, created, unchanged);
+  writeText(firstPrinciplesPath, renderedFirstPrinciples, cwd, force, created, unchanged);
+  writeTemplate(
+    path.join(templateRoot, '.atm', 'charter', 'charter-invariants.template.json'),
+    invariantsPath,
+    {
+      ...charterTokens,
+      ATOMIC_CHARTER_SHA256: `sha256:${sha256Bytes(Buffer.from(renderedAtomicCharter, 'utf8'))}`,
+      ATM_FIRST_PRINCIPLES_SHA256: `sha256:${sha256Bytes(Buffer.from(renderedFirstPrinciples, 'utf8'))}`
+    },
+    cwd,
+    force,
+    created,
+    unchanged
+  );
+
+  writeRootDropScripts(cwd, force, created, unchanged);
+
+  return {
+    created,
+    unchanged,
+    pinnedRunner,
+    adoptedProfile: 'default',
+    bootstrapTaskPath: relativePathFrom(cwd, paths.taskPath),
+    bootstrapLockPath: relativePathFrom(cwd, paths.lockPath),
+    agentInstructionsPath: relativePathFrom(cwd, paths.agentInstructionsPath),
+    profilePath: relativePathFrom(cwd, paths.profilePath),
+    projectProbePath: relativePathFrom(cwd, paths.projectProbePath),
+    defaultGuardsPath: relativePathFrom(cwd, paths.defaultGuardsPath),
+    evidencePath: relativePathFrom(cwd, paths.evidencePath),
+    contextBudgetPolicyPath: relativePathFrom(cwd, paths.contextBudgetPolicyPath),
+    contextBudgetReportPath: normalizeRelativePath(contextBudgetReportPath),
+    contextBudgetSummaryPath: bootstrapBudgetEvaluation.decision === 'pass' ? undefined : normalizeRelativePath(contextBudgetSummaryPath),
+    contextSummaryPath: normalizeRelativePath(contextSummaryPath),
+    contextSummaryMarkdownPath: normalizeRelativePath(contextSummaryMarkdownPath),
+    continuationReportPath: normalizeRelativePath(continuationReportPath),
+    projectProbe,
+    recommendedPrompt,
+    charterPath: relativePathFrom(cwd, paths.charterPath),
+    charterInvariantsPath: relativePathFrom(cwd, paths.charterInvariantsPath),
+    scriptPaths: rootDropScriptTemplateFiles.map((templateFile) => normalizeRelativePath(templateFile.target))
+  };
+}
+
+export function createOfficialBootstrapCommand(commandCwd = '.'): string {
+  return `node atm.mjs bootstrap --cwd ${commandCwd} --task "${defaultBootstrapTaskTitle}"`;
+}
+
+export function createRecommendedPrompt(taskId = defaultBootstrapTaskId): string {
+  return `Read README.md if present, then run \`node atm.mjs next --prompt "<current user prompt>" --json\` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, \`node atm.mjs next --json\` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action. Use .atm/history/tasks/${taskId}.json, .atm/runtime/profile/default.md, and .atm/history/evidence/${taskId}.json only as supporting runtime state.`;
+}
+
+export function createSelfHostingAlphaPrompt(): string {
+  return 'Read README.md if present, then run `node atm.mjs next --prompt "<current user prompt>" --json` from the repository root before task work. If there is no current user prompt and you are only checking repository orientation, `node atm.mjs next --json` is read-only status. If the result includes ATM_USER_NOTICE or evidence.userNotice, show it to the user before executing the returned next action.';
+}
+
+function createBootstrapConfig(taskId: string) {
+  return {
+    schemaVersion: 'atm.config.v0.1',
+    layoutVersion: currentLayoutVersion,
+    createdBy: '@ai-atomic-framework/plugin-governance-local',
+    adapter: {
+      mode: 'standalone',
+      implemented: false
+    },
+    paths: {
+      runtime: '.atm/runtime',
+      history: '.atm/history',
+      catalog: '.atm/catalog',
+      profile: '.atm/runtime/profile',
+      currentTask: '.atm/runtime/current-task.json',
+      projectProbe: '.atm/runtime/project-probe.json',
+      defaultGuards: '.atm/runtime/default-guards.json',
+      contextBudget: '.atm/runtime/budget',
+      tasks: '.atm/history/tasks',
+      taskEvents: '.atm/history/task-events',
+      locks: '.atm/runtime/locks',
+      evidence: '.atm/history/evidence',
+      handoff: '.atm/history/handoff',
+      artifacts: '.atm/history/artifacts',
+      logs: '.atm/history/logs',
+      reports: '.atm/history/reports',
+      registry: '.atm/catalog/registry',
+      index: '.atm/catalog/index',
+      shards: '.atm/catalog/shards'
+    },
+    taskLedger: {
+      enabled: true,
+      mode: 'auto',
+      mirrorExternalTasks: true,
+      requireCliTransitions: true,
+      provider: 'atm-local'
+    },
+    adoption: {
+      profile: 'default',
+      taskPath: `.atm/history/tasks/${taskId}.json`,
+      lockPath: `.atm/runtime/locks/${taskId}.lock.json`,
+      projectProbePath: '.atm/runtime/project-probe.json',
+      defaultGuardsPath: '.atm/runtime/default-guards.json',
+      evidencePath: `.atm/history/evidence/${taskId}.json`,
+      currentTaskPath: '.atm/runtime/current-task.json'
+    }
+  };
+}
+
+function createCurrentTaskState(taskId: string, taskTitle: string, paths: ReturnType<typeof createBootstrapPaths>) {
+  return {
+    workItemId: taskId,
+    title: taskTitle,
+    status: 'open',
+    updatedAt: new Date().toISOString(),
+    lockPath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.lockPath),
+    evidencePath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath),
+    summaryPath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.contextSummaryPath)
+  };
+}
+
+function migrateLegacyBootstrapLayout(
+  cwd: string,
+  taskId: string,
+  paths: ReturnType<typeof createBootstrapPaths>,
+  force: boolean,
+  created: string[],
+  unchanged: string[]
+) {
+  const legacyPairs = [
+    [path.join(cwd, '.atm', 'profile', 'default.md'), paths.profilePath],
+    [path.join(cwd, '.atm', 'state', 'project-probe.json'), paths.projectProbePath],
+    [path.join(cwd, '.atm', 'state', 'default-guards.json'), paths.defaultGuardsPath],
+    [path.join(cwd, '.atm', 'state', 'context-budget', 'default-policy.json'), paths.contextBudgetPolicyPath],
+    [path.join(cwd, '.atm', 'tasks', `${taskId}.json`), paths.taskPath],
+    [path.join(cwd, '.atm', 'locks', `${taskId}.lock.json`), paths.lockPath],
+    [path.join(cwd, '.atm', 'evidence', `${taskId}.json`), paths.evidencePath],
+    [path.join(cwd, '.atm', 'state', 'context-summary', `${taskId}.json`), paths.contextSummaryPath],
+    [path.join(cwd, '.atm', 'state', 'context-summary', `${taskId}.md`), paths.contextSummaryMarkdownPath]
+  ] as const;
+  const moved: string[] = [];
+
+  for (const [legacyPath, nextPath] of legacyPairs) {
+    if (!existsSync(legacyPath)) {
+      continue;
+    }
+    if (existsSync(nextPath) && !force) {
+      unchanged.push(relativePathFrom(cwd, nextPath));
+      continue;
+    }
+    mkdirSync(path.dirname(nextPath), { recursive: true });
+    writeFileSync(nextPath, readFileSync(legacyPath));
+    created.push(relativePathFrom(cwd, nextPath));
+    moved.push(relativePathFrom(cwd, legacyPath));
+  }
+
+  if (moved.length === 0) {
+    return null;
+  }
+
+  return {
+    path: path.join(cwd, '.atm', 'history', 'reports', 'migrations', `layout-v1-to-v${currentLayoutVersion}.json`),
+    report: {
+      schemaVersion: 'atm.layoutMigration.v0.1',
+      migrationId: `layout-v1-to-v${currentLayoutVersion}`,
+      migratedAt: new Date().toISOString(),
+      taskId,
+      fromLayoutVersion: 1,
+      toLayoutVersion: currentLayoutVersion,
+      copiedFrom: moved,
+      notes: 'Legacy ATM layout paths were copied forward into the v2 runtime/history/catalog layout.'
+    }
+  };
+}
+
+function createBootstrapPaths(cwd: string, taskId: string) {
+  const atmRoot = path.join(cwd, '.atm');
+  return {
+    configPath: path.join(atmRoot, 'config.json'),
+    agentInstructionsPath: path.join(cwd, 'AGENTS.md'),
+    profilePath: path.join(atmRoot, 'runtime', 'profile', 'default.md'),
+    currentTaskPath: path.join(atmRoot, 'runtime', 'current-task.json'),
+    projectProbePath: path.join(atmRoot, 'runtime', 'project-probe.json'),
+    defaultGuardsPath: path.join(atmRoot, 'runtime', 'default-guards.json'),
+    contextBudgetPolicyPath: path.join(atmRoot, 'runtime', 'budget', 'default-policy.json'),
+    contextBudgetSummaryPath: path.join(atmRoot, 'runtime', 'budget', `bootstrap-${sanitizeBudgetFileId(`bootstrap/${taskId}`)}.md`),
+    taskPath: path.join(atmRoot, 'history', 'tasks', `${taskId}.json`),
+    lockPath: path.join(atmRoot, 'runtime', 'locks', `${taskId}.lock.json`),
+    evidencePath: path.join(atmRoot, 'history', 'evidence', `${taskId}.json`),
+    contextSummaryPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.json`),
+    contextSummaryMarkdownPath: path.join(atmRoot, 'history', 'handoff', `${taskId}.md`),
+    contextPath: path.join(atmRoot, 'history', 'handoff', 'INITIAL_SUMMARY.md'),
+    directories: {
+      runtime: path.join(atmRoot, 'runtime'),
+      profile: path.join(atmRoot, 'runtime', 'profile'),
+      state: path.join(atmRoot, 'runtime', 'state'),
+      locks: path.join(atmRoot, 'runtime', 'locks'),
+      rules: path.join(atmRoot, 'runtime', 'rules'),
+      contextBudget: path.join(atmRoot, 'runtime', 'budget'),
+      history: path.join(atmRoot, 'history'),
+      tasks: path.join(atmRoot, 'history', 'tasks'),
+      evidence: path.join(atmRoot, 'history', 'evidence'),
+      artifacts: path.join(atmRoot, 'history', 'artifacts'),
+      logs: path.join(atmRoot, 'history', 'logs'),
+      reports: path.join(atmRoot, 'history', 'reports'),
+      reportContextBudget: path.join(atmRoot, 'history', 'reports', 'context-budget'),
+      reportContinuation: path.join(atmRoot, 'history', 'reports', 'continuation'),
+      reportSelfHost: path.join(atmRoot, 'history', 'reports', 'self-host-alpha'),
+      reportMigrations: path.join(atmRoot, 'history', 'reports', 'migrations'),
+      context: path.join(atmRoot, 'history', 'handoff'),
+      catalog: path.join(atmRoot, 'catalog'),
+      index: path.join(atmRoot, 'catalog', 'index'),
+      shards: path.join(atmRoot, 'catalog', 'shards'),
+      registry: path.join(atmRoot, 'catalog', 'registry'),
+      charter: path.join(atmRoot, 'charter')
+    },
+    charterPath: path.join(atmRoot, 'charter', 'atomic-charter.md'),
+    charterInvariantsPath: path.join(atmRoot, 'charter', 'charter-invariants.json')
+  };
+}
+
+function createBootstrapTask(taskId: string, taskTitle: string, projectProbe: Readonly<Record<string, unknown>>, paths: ReturnType<typeof createBootstrapPaths>) {
+  return {
+    schemaVersion: 'atm.workItem.v0.1',
+    id: taskId,
+    title: taskTitle,
+    status: 'open',
+    taskKind: 'bootstrap',
+    repositoryKind: projectProbe.repositoryKind,
+    summary: 'Establish the default ATM bootstrap pack, verify the host workflow, and leave initial evidence for the next agent run.',
+    scope: [
+      'atm.mjs',
+      'README.md',
+      'AGENTS.md',
+      '.atm/runtime/pinned-runner.json',
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.taskPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.lockPath)
+    ],
+    guardPaths: [
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.defaultGuardsPath)
+    ],
+    evidencePath: relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath),
+    nextPrompt: createRecommendedPrompt(taskId)
+  };
+}
+
+function createBootstrapLock(taskId: string, paths: ReturnType<typeof createBootstrapPaths>) {
+  return {
+    schemaVersion: 'atm.scopeLock.v0.1',
+    taskId,
+    status: 'open',
+    files: [
+      'atm.mjs',
+      'README.md',
+      'AGENTS.md',
+      '.atm/runtime/pinned-runner.json',
+      '.atm/config.json',
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.profilePath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.currentTaskPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.projectProbePath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.defaultGuardsPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.taskPath),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.evidencePath)
+    ]
+  };
+}
+
+function createBootstrapEvidence(taskId: string, projectProbe: Readonly<Record<string, unknown>>, defaultGuards: { guards: readonly { id: string }[] }, paths: ReturnType<typeof createBootstrapPaths>) {
+  return {
+    schemaVersion: 'atm.evidence.v0.1',
+    taskId,
+    status: 'seeded',
+    summary: 'Default ATM bootstrap pack created.',
+    repositoryKind: projectProbe.repositoryKind,
+    packageManager: projectProbe.packageManager,
+    recommendedPrompt: createRecommendedPrompt(),
+    guardIds: defaultGuards.guards.map((guard) => guard.id),
+    artifactDirectories: [
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.artifacts),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.logs),
+      relativePathFrom(path.dirname(paths.agentInstructionsPath), paths.directories.reports)
+    ],
+    evidence: []
+  };
+}
