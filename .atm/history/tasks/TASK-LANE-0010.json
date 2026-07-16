@@ -1,0 +1,142 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0010",
+  "title": "Lane session store and event stream",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`atm.laneSession.v1` documents live under `.atm/runtime/lane-sessions/`.",
+    "Lane session documents include lane id, actor id metadata, identity snapshot, status, timestamps, TTL, adoption source, handoff token hash, and last command.",
+    "Atomic writes use temp-file plus rename behavior consistent with existing ATM runtime stores.",
+    "Lane event files live under `.atm/history/session-events/<laneId>/`.",
+    "Lane event ids follow the task-transition id pattern.",
+    "Tests cover mint/read round-trip, TTL phase classification, append-only event order, and no temp-file residue after writes."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "CLI lane command dispatch",
+    "claim, task direction, or broker ownership policy",
+    "commit attribution"
+  ],
+  "nonGoals": [
+    "Do not modify actor work session schema for this foundation card"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove lane-session store/events files and their tests.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/lane-session/store.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "Actor id in this store is metadata. No ownership policy changes should land in\nthis card.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0010-lane-session-store-events.task.md",
+    "sectionTitle": "TASK-LANE-0010",
+    "headingLine": 44,
+    "hash": "b3eb7a79ec994e64",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0010-lane-session-store-events.task.md",
+      "planningCommitSha": "18abf5497cda9c54d73a4a8c5e1b1d50e7cb7aa6",
+      "contentDigest": "sha256:b3eb7a79ec994e64535a9065106e047fb71bb8e984f840882709c509383f358e",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T15:04:53.109Z"
+    }
+  },
+  "importedAt": "2026-07-16T15:04:53.109Z",
+  "lastTransitionId": "2026-07-16T15-32-15-037Z-claim-3552a3de932e",
+  "lastTransitionAt": "2026-07-16T15:32:15.037Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0010",
+  "reservedAt": "2026-07-16T15:32:10.801Z",
+  "promotedAt": "2026-07-16T15:32:10.805Z",
+  "claim": {
+    "actorId": "codex-lane-0010",
+    "leaseId": "lease-3f1f9c888c82",
+    "claimedAt": "2026-07-16T15:32:10.808Z",
+    "heartbeatAt": "2026-07-16T15:32:10.808Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-LANE-0010.json",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T15:32:10.808Z",
+  "startedByActor": "codex-lane-0010",
+  "startedBySessionId": "session-20260716153210-codex-lane-0010-TASK-LANE-0010-1b6c343837",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0010",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0010.*",
+      ".atm/history/task-events/TASK-LANE-0010/**",
+      ".atm/history/tasks/TASK-LANE-0010.json",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "227b1bdd2d02bb318364dd0ff6672b00333cd7e61427b5bdfbf95cad406b1cbb",
+    "actorId": "codex-lane-0010",
+    "sessionId": "session-20260716153210-codex-lane-0010-TASK-LANE-0010-1b6c343837",
+    "createdAt": "2026-07-16T15:32:15.035Z",
+    "status": "active"
+  }
+}
