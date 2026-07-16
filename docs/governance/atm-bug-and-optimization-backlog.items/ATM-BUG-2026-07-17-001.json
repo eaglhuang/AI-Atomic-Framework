@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-17-001",
+  "date": "2026-07-17",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Guidance / Upgrade Proposal",
+  "finding": "Guidance session start can emit `node atm.mjs upgrade --propose --behavior behavior.split --dry-run --json` as the next command even though the upgrade command requires `--atom`, producing an immediate ATM_CLI_USAGE failure.",
+  "expectedBehavior": "When routing a free-text split/refactor goal, ATM should either include the required atom target in the proposed upgrade command or route to candidate discovery/task-card authoring until a concrete atom target is selected.",
+  "evidenceOrRepro": "During the 2026-07-17 RFT completion audit, `node atm.mjs start --cwd . --goal \"Continue governed RFT atom-map refactor cards...\" --json` returned the split dry-run upgrade command without --atom. Running that command failed with `ATM_CLI_USAGE: upgrade requires --atom`.",
+  "followUp": "Add a guidance regression for split goals without explicit atom ids and make the nextCommand target-selection aware before suggesting upgrade --propose."
+}
