@@ -1,0 +1,126 @@
+{
+  "taskId": "TASK-RFT-0089",
+  "updatedAt": "2026-07-16T12:31:35.048Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0089",
+      "sessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+      "createdAt": "2026-07-16T12:31:32.799Z",
+      "details": {
+        "actorId": "codex-task-rft-0089",
+        "sessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "a69ecab823c2511fe3da1ed51c242134d8260291",
+            "cacheKey": "sha256:bb92c2d3e6d10dab253b00ba71848a0db5e92951eddcb53c881059c0acb3cf29",
+            "cached": false,
+            "generatedAt": "2026-07-16T12:31:32.865Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:50e2b65670cb0ecd6defa9b574fc8169241b090d3edbc671100de02a8e0aa659",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0089",
+      "sessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+      "createdAt": "2026-07-16T12:31:35.048Z",
+      "details": {
+        "actorId": "codex-task-rft-0089",
+        "sessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.git-governance-map",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:9e1534d8f4c45d419a21c57ba383cb77e991ec269cad21385396fdb1c4f91fb2",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "a69ecab823c2511fe3da1ed51c242134d8260291",
+            "cacheKey": "sha256:9444b7ba10a3045057bbdacbe3fffeb196bc635a65f3c344472f8967a3206c16",
+            "cached": false,
+            "generatedAt": "2026-07-16T12:31:35.106Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c0b5850ad4b90704b3faa0898991f119ee725b209e52bdf1343f8bfaa0b249ef",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

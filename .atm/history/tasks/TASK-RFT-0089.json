@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0089",
+  "title": "Split git commit task-scoped staging test below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`tests/cli/git-commit-task-scoped-staging.test.ts` is below 600 lines.",
+    "Every new or touched physical TypeScript file is below 600 lines.",
+    "The test remains executable through the existing validation suite without changing its semantic coverage.",
+    "Atomization coverage maps the facade and support directory to the git governance atom owner.",
+    "Validators pass and are recorded as command-backed ATM evidence:",
+    "`npm run typecheck`",
+    "`npm run validate:cli`",
+    "`node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate`",
+    "`node atm.mjs doctor --json`"
+  ],
+  "deliverables": [
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-commit-task-scoped-staging/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "scopePaths": [
+    "tests/cli/git-commit-task-scoped-staging.test.ts",
+    "tests/cli/git-commit-task-scoped-staging/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": null,
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.git-governance-map",
+        "pattern": "Test Facade",
+        "source": "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.git-governance-test-support",
+        "pattern": "Test Support Modules",
+        "source": "tests/cli/git-commit-task-scoped-staging/**",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_SCOPE_DELIVERABLES_INFERRED",
+      "severity": "warning",
+      "message": "No explicit deliverables were declared; ATM inferred deliverables from legacy scopePaths/allowed_files because every entry was file-shaped.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "- This is a continuation of the TASK-RFT large-file atomization series.\n- Do not include unrelated captain parallel ledger WIP, ATMChart drift, or report residues in this card.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0089-git-commit-task-scoped-staging-test-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0089",
+    "headingLine": 38,
+    "hash": "ac91ce3fa685a92d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0089-git-commit-task-scoped-staging-test-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:ac91ce3fa685a92da34b251cd7f50ba4adaeb818c85c55c03cfaaf33b236f810",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T12:26:03.156Z"
+    }
+  },
+  "importedAt": "2026-07-16T12:26:03.156Z",
+  "lastTransitionId": "2026-07-16T12-26-15-946Z-claim-7034f4a36702",
+  "lastTransitionAt": "2026-07-16T12:26:15.946Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0089",
+  "reservedAt": "2026-07-16T12:26:12.375Z",
+  "promotedAt": "2026-07-16T12:26:12.378Z",
+  "claim": {
+    "actorId": "codex-task-rft-0089",
+    "leaseId": "lease-693dd88451be",
+    "claimedAt": "2026-07-16T12:26:12.381Z",
+    "heartbeatAt": "2026-07-16T12:26:12.381Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0089.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T12:26:12.381Z",
+  "startedByActor": "codex-task-rft-0089",
+  "startedBySessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0089",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0089.*",
+      ".atm/history/task-events/TASK-RFT-0089/**",
+      ".atm/history/tasks/TASK-RFT-0089.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/cli/git-commit-task-scoped-staging.test.ts",
+      "tests/cli/git-commit-task-scoped-staging/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "7a35ba5dccc2d338ca9058e68c868523d84456aac446492598697fcc78aa221a",
+    "actorId": "codex-task-rft-0089",
+    "createdAt": "2026-07-16T12:26:15.945Z",
+    "status": "active"
+  }
+}

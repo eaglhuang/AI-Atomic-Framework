@@ -1,0 +1,37 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0089",
+  "updatedAt": "2026-07-16T12:31:35.048Z",
+  "updatedBy": "codex-task-rft-0089",
+  "freshValidationPasses": [
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/git-commit-task-scoped-staging.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:caf5f01f03e8067a2abd5d397378fcfcdda00aa49f43e4ec065f0fa6c04c38d6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-16T12:31:32.865Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a69ecab823c2511fe3da1ed51c242134d8260291",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9e1534d8f4c45d419a21c57ba383cb77e991ec269cad21385396fdb1c4f91fb2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T12:31:35.106Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a69ecab823c2511fe3da1ed51c242134d8260291",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
