@@ -16,9 +16,11 @@ export type RunnerSyncAdmissionReport = {
     readonly ok: boolean;
     readonly stewardWorkId: string | null;
     readonly queuePosition: number | null;
+    readonly queueHeadHealth: 'task-active' | 'task-missing' | 'task-terminal';
     readonly waitingTasks: readonly string[];
     readonly ownerActorIds: readonly string[];
     readonly reason: string | null;
+    readonly cleanupCommand: string | null;
   };
   readonly foreignNonReleaseWip: readonly string[];
   readonly releaseWip: readonly string[];
@@ -68,6 +70,8 @@ export function assertRunnerSyncAdmission(report: RunnerSyncAdmissionReport): vo
     Object.assign(error, {
       code: report.foreignNonReleaseWip.length > 0
         ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
+        : report.queueHeadOwnership.queueHeadHealth !== 'task-active'
+          ? 'ATM_RUNNER_SYNC_QUEUE_HEAD_ORPHANED'
         : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
       details: report
     });
@@ -121,25 +125,35 @@ function inspectRunnerSyncQueueHeadOwnership(input: {
       ok: false,
       stewardWorkId: null,
       queuePosition: null,
+      queueHeadHealth: 'task-active',
       waitingTasks: [],
       ownerActorIds: [],
-      reason: 'runner sync requires a broker runner-sync queue-head reservation before build or internal-release sync'
+      reason: 'runner sync requires a broker runner-sync queue-head reservation before build or internal-release sync',
+      cleanupCommand: null
     };
   }
   const ownerActorIds = normalizeOwnerActorIds((steward as { requests?: unknown }).requests);
   const actorOwnsHead = ownerActorIds.length === 0 || ownerActorIds.includes(input.stewardActorId);
-  const ok = steward.queuePosition === 1 && actorOwnsHead;
+  const queueHeadHealth = resolveQueueHeadHealth(input.cwd, (steward as { requests?: unknown }).requests);
+  const cleanupCommand = queueHeadHealth === 'task-active'
+    ? null
+    : 'node atm.mjs broker runner-sync cleanup --json';
+  const ok = steward.queuePosition === 1 && actorOwnsHead && queueHeadHealth === 'task-active';
   return {
     ok,
     stewardWorkId: steward.stewardWorkId,
     queuePosition: steward.queuePosition,
+    queueHeadHealth,
     waitingTasks: normalizeStringArray((steward as { waitingTasks?: unknown }).waitingTasks),
     ownerActorIds,
     reason: ok
       ? null
+      : queueHeadHealth !== 'task-active'
+        ? `runner sync steward ${steward.stewardWorkId} queue head is orphaned (${queueHeadHealth}); run ${cleanupCommand} before build or sync`
       : steward.queuePosition !== 1
         ? `runner sync steward ${steward.stewardWorkId} is queued at position ${steward.queuePosition}; wait for queue head before build or sync`
-        : `runner sync steward ${steward.stewardWorkId} is owned by ${ownerActorIds.join(', ') || 'unknown actor'}, not ${input.stewardActorId}`
+        : `runner sync steward ${steward.stewardWorkId} is owned by ${ownerActorIds.join(', ') || 'unknown actor'}, not ${input.stewardActorId}`,
+    cleanupCommand
   };
 }
 
@@ -195,4 +209,24 @@ function normalizeStringArray(value: unknown): readonly string[] {
   if (!Array.isArray(value)) return [];
   return [...new Set(value.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right));
+}
+
+function resolveQueueHeadHealth(
+  cwd: string,
+  requests: unknown
+): 'task-active' | 'task-missing' | 'task-terminal' {
+  if (!Array.isArray(requests) || requests.length === 0) return 'task-active';
+  const taskId = String((requests[0] as { taskId?: unknown })?.taskId ?? '').trim();
+  if (!taskId) return 'task-active';
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
+  if (!existsSync(taskPath)) return 'task-missing';
+  try {
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
+    return status === 'done' || status === 'verified' || status === 'abandoned'
+      ? 'task-terminal'
+      : 'task-active';
+  } catch {
+    return 'task-active';
+  }
 }

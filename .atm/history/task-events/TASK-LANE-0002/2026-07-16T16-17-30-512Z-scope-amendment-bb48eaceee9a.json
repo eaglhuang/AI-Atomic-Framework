@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T16-17-30-512Z-scope-amendment-bb48eaceee9a",
+  "taskId": "TASK-LANE-0002",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-0002",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0002.json",
+  "taskSha256": "sha256:0276e07e740d6169d0ccf14ba990574a0927e06ae5b161d6cfd0d5c160841cdd",
+  "createdAt": "2026-07-16T16:17:30.512Z",
+  "command": "node atm.mjs tasks scope add --task TASK-LANE-0002 --actor codex-lane-0002 --add tests/cli/runner-sync-steward-release.test.ts --reason \"Update required validator fixture for runner-sync enqueue task-health admission contract.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Update required validator fixture for runner-sync enqueue task-health admission contract."
+  }
+}

@@ -23,7 +23,20 @@ function runAtm(args: readonly string[], expectStatus = 0): Record<string, any> 
   return JSON.parse(payload) as Record<string, any>;
 }
 
+function writeTask(taskId: string, status = 'planned'): void {
+  const taskDir = path.join(repo, '.atm/history/tasks');
+  mkdirSync(taskDir, { recursive: true });
+  writeFileSync(path.join(taskDir, `${taskId}.json`), `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: taskId,
+    status
+  }, null, 2)}\n`, 'utf8');
+}
+
 try {
+  writeTask('TASK-A');
+  writeTask('TASK-B');
+  writeTask('TASK-C');
   const first = runAtm([
     'broker',
     'runner-sync',
@@ -112,6 +125,7 @@ try {
   const cleanedQueue = JSON.parse(readFileSync(queuePath, 'utf8'));
   assert.equal(cleanedQueue.groups.length, 0, 'stale runner-sync steward owner must be removed by CLI cleanup');
 
+  writeTask('TASK-MISSING');
   runAtm([
     'broker',
     'runner-sync',
@@ -121,6 +135,7 @@ try {
     '--sealed-source-sha', 'sha256:missing',
     '--surface', 'release/atm-onefile/atm.mjs'
   ]);
+  rmSync(path.join(repo, '.atm/history/tasks/TASK-MISSING.json'));
   const missingCleanup = runAtm([
     'broker',
     'runner-sync',
@@ -130,13 +145,7 @@ try {
   assert.equal(missingCleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-MISSING');
   assert.equal(missingCleanup.evidence.cleanup.staleReleases[0].reason, 'orphan-task-missing');
 
-  const taskDir = path.join(repo, '.atm/history/tasks');
-  mkdirSync(taskDir, { recursive: true });
-  writeFileSync(path.join(taskDir, 'TASK-DONE.json'), `${JSON.stringify({
-    schemaVersion: 'atm.workItem.v0.2',
-    workItemId: 'TASK-DONE',
-    status: 'done'
-  }, null, 2)}\n`, 'utf8');
+  writeTask('TASK-DONE');
   runAtm([
     'broker',
     'runner-sync',
@@ -146,6 +155,7 @@ try {
     '--sealed-source-sha', 'sha256:done',
     '--surface', 'release/atm-onefile/atm.mjs'
   ]);
+  writeTask('TASK-DONE', 'done');
   const terminalCleanup = runAtm([
     'broker',
     'runner-sync',

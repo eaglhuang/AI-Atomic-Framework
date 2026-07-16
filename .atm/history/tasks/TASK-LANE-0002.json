@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0002",
+  "title": "Runner-sync queue health admission",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0001"
+  ],
+  "acceptance": [
+    "Enqueue rejects missing or terminal task ids with `ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID`.",
+    "Queue position/status evidence includes `queueHeadHealth`.",
+    "Runner-sync admission reports `ATM_RUNNER_SYNC_QUEUE_HEAD_ORPHANED` when a non-head request is blocked by an unhealthy head.",
+    "The orphaned-head response includes a copyable cleanup command.",
+    "Focused CLI regression proves: orphan enqueue is rejected, orphan head blocks with cleanup guidance, cleanup promotes a healthy waiter."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "tests/cli/runner-sync-orphan-head.test.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+    "tests/cli/runner-sync-orphan-head.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/runner-sync-orphan-head.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "taskflow close chain output",
+    "lane session schema or command work",
+    "broad broker registry refactors"
+  ],
+  "nonGoals": [
+    "Do not replace the steward queue model"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert queue-health admission changes and the orphan-head regression.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.runner-sync-admission",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "tests/cli/runner-sync-orphan-head.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "This card builds directly on `TASK-LANE-0001` and must not reimplement a second\ntask health resolver.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0002-runner-sync-health-admission.task.md",
+    "sectionTitle": "TASK-LANE-0002",
+    "headingLine": 45,
+    "hash": "ce9433c03dc74c81",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0002-runner-sync-health-admission.task.md",
+      "planningCommitSha": "18abf5497cda9c54d73a4a8c5e1b1d50e7cb7aa6",
+      "contentDigest": "sha256:ce9433c03dc74c8160eb1334c27acbad0090f1e9c8546ba8927a2e8c5e9e52bf",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T15:04:40.717Z"
+    }
+  },
+  "importedAt": "2026-07-16T15:04:40.717Z",
+  "lastTransitionId": "2026-07-16T16-17-30-512Z-scope-amendment-bb48eaceee9a",
+  "lastTransitionAt": "2026-07-16T16:17:30.512Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0002",
+  "reservedAt": "2026-07-16T16:11:27.210Z",
+  "promotedAt": "2026-07-16T16:11:27.213Z",
+  "claim": {
+    "actorId": "codex-lane-0002",
+    "leaseId": "lease-cc5c2947df54",
+    "claimedAt": "2026-07-16T16:11:27.218Z",
+    "heartbeatAt": "2026-07-16T16:11:27.218Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-LANE-0002.*",
+      ".atm/history/task-events/TASK-LANE-0002/**",
+      ".atm/history/tasks/TASK-LANE-0002.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-orphan-head.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T16:11:27.218Z",
+  "startedByActor": "codex-lane-0002",
+  "startedBySessionId": "session-20260716161127-codex-lane-0002-TASK-LANE-0002-6140ee722d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0002",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0002.*",
+      ".atm/history/task-events/TASK-LANE-0002/**",
+      ".atm/history/tasks/TASK-LANE-0002.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-orphan-head.test.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0002-runner-sync-health-admission.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0002-runner-sync-health-admission.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "a30c7ed80f6803c91ffb6ca996e5e6a1fd76a64151fabb06be96f7074a2cfd02",
+    "actorId": "codex-lane-0002",
+    "sessionId": null,
+    "createdAt": "2026-07-16T16:11:31.082Z",
+    "status": "active"
+  }
+}

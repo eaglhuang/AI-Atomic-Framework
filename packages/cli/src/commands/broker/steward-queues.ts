@@ -50,13 +50,20 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
       if (options.surfaces.length === 0) {
         throw new CliError('ATM_CLI_USAGE', 'broker runner-sync enqueue requires at least one --surface <path>.', { exitCode: 2 });
       }
-      const result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
-        taskId: options.task,
-        actorId: options.actorId,
-        sealedSourceSha: options.sealedSourceSha,
-        requestedSurfaces: options.surfaces,
-        ttlSeconds: options.ttlSeconds
-      });
+      let result;
+      try {
+        result = enqueueRunnerSyncStewardRequest(readRunnerSyncStewardQueue(runnerSyncQueuePath), {
+          taskId: options.task,
+          actorId: options.actorId,
+          sealedSourceSha: options.sealedSourceSha,
+          requestedSurfaces: options.surfaces,
+          ttlSeconds: options.ttlSeconds
+        }, {
+          taskHealthResolver: (taskId) => resolveRunnerSyncTaskIdHealth(options.cwd, taskId)
+        });
+      } catch (error) {
+        throw toRunnerSyncQueueCliError(error);
+      }
       writeRunnerSyncStewardQueue(runnerSyncQueuePath, result.queue);
       return makeResult({
         ok: true,
@@ -66,6 +73,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
           message('info', 'ATM_BROKER_RUNNER_SYNC_ENQUEUED', `Runner-sync request is ${result.status} at position ${result.queuePosition} for steward work ${result.stewardWorkId}.`, {
             status: result.status,
             queuePosition: result.queuePosition,
+            queueHeadHealth: result.queueHeadHealth,
             stewardWorkId: result.stewardWorkId,
             waitingTasks: result.waitingTasks,
             suggestedNextAction: result.suggestedNextAction
@@ -80,7 +88,11 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
 
     if (options.runnerSyncAction === 'status') {
       const queue = readRunnerSyncStewardQueue(runnerSyncQueuePath);
-      const position = options.task ? explainRunnerSyncStewardPosition(queue, options.task) : null;
+      const position = options.task
+        ? explainRunnerSyncStewardPosition(queue, options.task, new Date().toISOString(), {
+          taskHealthResolver: (request) => resolveRunnerSyncTaskHealth(options.cwd, request)
+        })
+        : null;
       return makeResult({
         ok: true,
         command: 'broker',
@@ -244,7 +256,11 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
 }
 
 function resolveRunnerSyncTaskHealth(cwd: string, request: RunnerSyncStewardRequest): RunnerSyncTaskHealth {
-  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${request.taskId}.json`);
+  return resolveRunnerSyncTaskIdHealth(cwd, request.taskId);
+}
+
+function resolveRunnerSyncTaskIdHealth(cwd: string, taskId: string): RunnerSyncTaskHealth {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${taskId}.json`);
   if (!existsSync(taskPath)) {
     return 'task-missing';
   }
@@ -257,4 +273,13 @@ function resolveRunnerSyncTaskHealth(cwd: string, request: RunnerSyncStewardRequ
   } catch {
     return 'task-active';
   }
+}
+
+function toRunnerSyncQueueCliError(error: unknown): CliError {
+  const messageText = error instanceof Error ? error.message : String(error ?? '');
+  const match = /^(ATM_[A-Z0-9_]+):\s*(.+)$/.exec(messageText);
+  if (match) {
+    return new CliError(match[1], match[2], { exitCode: 1 });
+  }
+  return new CliError('ATM_RUNNER_SYNC_QUEUE_FAILED', messageText || 'Runner-sync steward queue operation failed.', { exitCode: 1 });
 }

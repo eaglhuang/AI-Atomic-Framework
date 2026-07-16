@@ -28,6 +28,7 @@ export type RunnerSyncStewardGroup = {
   readonly sealedSourceSha: string;
   readonly queuePosition: number;
   readonly status: 'queue-head' | 'waiting';
+  readonly queueHeadHealth?: RunnerSyncTaskHealth;
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly requestedSurfaces: readonly string[];
@@ -52,6 +53,7 @@ export type RunnerSyncStewardQueueResult = {
   readonly stewardWorkId: string;
   readonly sealedSourceSha: string;
   readonly queuePosition: number;
+  readonly queueHeadHealth: RunnerSyncTaskHealth;
   readonly waitingTasks: readonly string[];
   readonly requestedSurfaces: readonly string[];
   readonly suggestedNextAction: string;
@@ -94,6 +96,14 @@ export type RunnerSyncStewardCleanupOptions = {
   readonly shouldReleaseRequest?: (request: RunnerSyncStewardRequest) => boolean;
 };
 
+export type RunnerSyncStewardEnqueueOptions = {
+  readonly taskHealthResolver?: (taskId: string) => RunnerSyncTaskHealth;
+};
+
+export type RunnerSyncStewardExplainOptions = {
+  readonly taskHealthResolver?: TaskHealthResolver;
+};
+
 export type RunnerSyncStewardReleaseRecord = {
   readonly taskId: string;
   readonly actorId: string;
@@ -131,9 +141,14 @@ export function emptyRunnerSyncStewardQueue(now = new Date().toISOString()): Run
 
 export function enqueueRunnerSyncStewardRequest(
   queue: RunnerSyncStewardQueueDocument | null | undefined,
-  request: RunnerSyncStewardRequestInput
+  request: RunnerSyncStewardRequestInput,
+  options: RunnerSyncStewardEnqueueOptions = {}
 ): RunnerSyncStewardQueueResult {
   const normalized = normalizeRequestInput(request);
+  const taskHealth = options.taskHealthResolver?.(normalized.taskId) ?? 'task-active';
+  if (taskHealth !== 'task-active') {
+    throw new Error(`ATM_RUNNER_SYNC_ENQUEUE_TASK_INVALID: task ${normalized.taskId} is ${taskHealth}; runner-sync steward enqueue requires an active task.`);
+  }
   const base = normalizeQueue(queue, normalized.createdAt);
   const existingIndex = base.groups.findIndex((group) => group.sealedSourceSha === normalized.sealedSourceSha);
   const groups = existingIndex >= 0 ? [...base.groups] : [...base.groups, emptyGroup(normalized)];
@@ -146,8 +161,8 @@ export function enqueueRunnerSyncStewardRequest(
     ...target,
     updatedAt: normalized.heartbeatAt,
     requests: nextRequests
-  }, targetIndex);
-  const materialized = materializeQueue({ ...base, updatedAt: normalized.heartbeatAt, groups });
+  }, targetIndex, taskHealthForRequest(options));
+  const materialized = materializeQueue({ ...base, updatedAt: normalized.heartbeatAt, groups }, taskHealthForRequest(options));
   const group = materialized.groups[targetIndex];
   const status = group.queuePosition === 1
     ? 'queue-head'
@@ -162,6 +177,7 @@ export function enqueueRunnerSyncStewardRequest(
     stewardWorkId: group.stewardWorkId,
     sealedSourceSha: group.sealedSourceSha,
     queuePosition: group.queuePosition,
+    queueHeadHealth: group.queueHeadHealth ?? 'task-active',
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
@@ -202,7 +218,7 @@ export function cleanupRunnerSyncStewardQueue(
     ok: true,
     stewardKey: RUNNER_SYNC_STEWARD_GENERATOR,
     staleReleases,
-    queue: materializeQueue({ ...base, updatedAt: now, groups })
+    queue: materializeQueue({ ...base, updatedAt: now, groups }, options.taskHealthResolver)
   };
 }
 
@@ -268,9 +284,10 @@ export function releaseRunnerSyncStewardQueue(
 export function explainRunnerSyncStewardPosition(
   queue: RunnerSyncStewardQueueDocument | null | undefined,
   taskId: string,
-  now = new Date().toISOString()
+  now = new Date().toISOString(),
+  options: RunnerSyncStewardExplainOptions = {}
 ): RunnerSyncStewardQueueResult | null {
-  const base = materializeQueue(normalizeQueue(queue, now));
+  const base = materializeQueue(normalizeQueue(queue, now), options.taskHealthResolver);
   const group = base.groups.find((candidate) => candidate.requests.some((request) => request.taskId === taskId));
   if (!group) return null;
   return groupToResult(base, group);
@@ -286,6 +303,7 @@ function groupToResult(queue: RunnerSyncStewardQueueDocument, group: RunnerSyncS
     stewardWorkId: group.stewardWorkId,
     sealedSourceSha: group.sealedSourceSha,
     queuePosition: group.queuePosition,
+    queueHeadHealth: group.queueHeadHealth ?? 'task-active',
     waitingTasks: group.waitingTasks,
     requestedSurfaces: group.requestedSurfaces,
     suggestedNextAction: group.suggestedNextAction,
@@ -309,11 +327,14 @@ function normalizeQueue(
   });
 }
 
-function materializeQueue(queue: RunnerSyncStewardQueueDocument): RunnerSyncStewardQueueDocument {
+function materializeQueue(
+  queue: RunnerSyncStewardQueueDocument,
+  taskHealthResolver?: TaskHealthResolver
+): RunnerSyncStewardQueueDocument {
   const groups = [...queue.groups]
     .filter((group) => group.requests.length > 0)
     .sort(compareGroups)
-    .map((group, index) => materializeGroup(group, index));
+    .map((group, index) => materializeGroup(group, index, taskHealthResolver));
   return {
     ...queue,
     stewardKey: RUNNER_SYNC_STEWARD_GENERATOR,
@@ -327,6 +348,7 @@ function emptyGroup(request: NormalizedRequestInput): RunnerSyncStewardGroup {
     sealedSourceSha: request.sealedSourceSha,
     queuePosition: 1,
     status: 'queue-head',
+    queueHeadHealth: 'task-active',
     createdAt: request.createdAt,
     updatedAt: request.heartbeatAt,
     requestedSurfaces: request.requestedSurfaces,
@@ -336,7 +358,11 @@ function emptyGroup(request: NormalizedRequestInput): RunnerSyncStewardGroup {
   };
 }
 
-function materializeGroup(group: RunnerSyncStewardGroup, groupIndex: number): RunnerSyncStewardGroup {
+function materializeGroup(
+  group: RunnerSyncStewardGroup,
+  groupIndex: number,
+  taskHealthResolver?: TaskHealthResolver
+): RunnerSyncStewardGroup {
   const queuePosition = groupIndex + 1;
   const requestedSurfaces = sortedUnique(group.requests.flatMap((request) => request.requestedSurfaces));
   const waitingTasks = sortedUnique(group.requests.map((request) => request.taskId));
@@ -348,6 +374,7 @@ function materializeGroup(group: RunnerSyncStewardGroup, groupIndex: number): Ru
     ...group,
     queuePosition,
     status,
+    queueHeadHealth: resolveQueueHeadHealth(group.requests, taskHealthResolver),
     requestedSurfaces,
     waitingTasks,
     suggestedNextAction,
@@ -357,6 +384,20 @@ function materializeGroup(group: RunnerSyncStewardGroup, groupIndex: number): Ru
       suggestedNextAction
     })).sort(compareRequests)
   };
+}
+
+function taskHealthForRequest(options: RunnerSyncStewardEnqueueOptions): TaskHealthResolver | undefined {
+  return options.taskHealthResolver
+    ? (request) => options.taskHealthResolver?.(request.taskId) ?? 'task-active'
+    : undefined;
+}
+
+function resolveQueueHeadHealth(
+  requests: readonly RunnerSyncStewardRequest[],
+  taskHealthResolver?: TaskHealthResolver
+): RunnerSyncTaskHealth {
+  const owner = requests[0] ?? null;
+  return owner ? resolveTaskHealth(owner, { taskHealthResolver }) : 'task-active';
 }
 
 type NormalizedRequestInput = Required<RunnerSyncStewardRequestInput>;
