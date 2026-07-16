@@ -624,6 +624,20 @@
       "atom_id": "atm.task-direction-map",
       "capability": "isPathAllowedByScope is the quickfix/batch scope path matcher; explicitly NOT the SSOT for task direction allowed files (TASK-AAO-0012).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/integration-hooks.ts",
+      "atom_id": "atm.cli-integration-hooks-command-map",
+      "capability": "TASK-RFT-0056 bounded integration-hooks command facade over extracted hook invocation, install, verify, and readiness implementation modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0056"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/integration-hooks/**/*.ts",
+      "atom_id": "atm.cli-integration-hooks-command-map",
+      "capability": "TASK-RFT-0056 integration-hooks extracted command implementation carrier modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0056"
     }
   ]
 }
