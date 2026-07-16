@@ -1,0 +1,197 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0049",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "fe4e05517347402309e8bd470c08cc660fc73c23",
+  "governedTreeSha": "ef9692f9349c9db61372bcd768019bfd2582dc7b",
+  "targetCommitDelta": {
+    "currentCommitSha": "fe4e05517347402309e8bd470c08cc660fc73c23",
+    "parentCommitShas": [
+      "fe4e05517347402309e8bd470c08cc660fc73c23"
+    ],
+    "governedTreeSha": "ef9692f9349c9db61372bcd768019bfd2582dc7b",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-007.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/claim-cleanup.ts",
+      "packages/cli/src/commands/next/claim-early-results.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/next/cross-repo-framework-result.ts",
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts",
+      "packages/cli/src/commands/next/profiler.ts",
+      "packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "packages/cli/src/commands/next/result-compaction.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/cli/next-command-facade-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/next-command-facade-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:39b2f070a3352e96664f193c7abdc8b8c3a5dc9ee9e211e20b32868f0155c287",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fea68219409676b843addb857caf037febc2adff0ffa57ccf3f4af72e8b2c3f3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6e8119f26c69dd4259760d0cef074f798c9b6e3fa49aed785001447b5c4ec2a",
+      "stderrSha256": "sha256:c3a4a55226eccf59af107b091be489b7761a1e699988b38d92fc35d13719bc7a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-governance-projections.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5b994018f0421a6d24707361603dfd1ee3fd049cee775a71a8ef433f87567d62",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/next-command-facade-final-600.test.ts",
+    "node --strip-types tests/cli/next-command-router-extraction.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T01:45:25.691Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0049.*",
+      ".atm/history/task-events/TASK-RFT-0049/**",
+      ".atm/history/tasks/TASK-RFT-0049.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-007.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/**/*.ts",
+      "packages/cli/src/commands/next/claim-cleanup.ts",
+      "packages/cli/src/commands/next/claim-early-results.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/next/cross-repo-framework-result.ts",
+      "packages/cli/src/commands/next/profiler.ts",
+      "packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "packages/cli/src/commands/next/result-compaction.ts",
+      "tests/cli/next-command-facade-final-600.test.ts",
+      "tests/cli/next-command-router-extraction.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/next.ts",
+      "packages/cli/src/commands/next/**/*.ts",
+      "packages/cli/src/commands/next/claim-cleanup.ts",
+      "packages/cli/src/commands/next/claim-early-results.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/next/claim-readiness.ts",
+      "packages/cli/src/commands/next/cross-repo-framework-result.ts",
+      "packages/cli/src/commands/next/profiler.ts",
+      "packages/cli/src/commands/next/prompt-guidance-result.ts",
+      "packages/cli/src/commands/next/result-compaction.ts",
+      "tests/cli/next-command-facade-final-600.test.ts",
+      "tests/cli/next-command-router-extraction.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0049.json",
+  "closedAt": "2026-07-16T01:45:25.691Z",
+  "closedByActor": "codex-task-rft-0049",
+  "sessionId": "session-20260716013051-codex-task-rft-0049-TASK-RFT-0049-88b18d5095",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "fe4e05517347402309e8bd470c08cc660fc73c23",
+    "taskMatchedFiles": [
+      "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts",
+      "packages/cli/src/commands/next/playbook-projection/task-routing.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
