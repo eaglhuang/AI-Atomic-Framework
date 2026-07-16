@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0013",
+  "title": "Lane commit attribution",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0012"
+  ],
+  "acceptance": [
+    "Governed `git commit` receives `ATM_COMMIT_LANE_SESSION_ID` when a lane is available.",
+    "Taskflow target and planning close commits include lane attribution in their sanitized env when available.",
+    "Commit trailers or evidence expose lane identity without changing existing `ATM-Actor`, `ATM-Task`, or `ATM-Session` semantics.",
+    "Actor-only commits still pass existing governance checks."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/git-governance/implementation.ts",
+    "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+    "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Reusing ATM_COMMIT_SESSION_ID for lane identity",
+    "Changing git author name or email semantics"
+  ],
+  "nonGoals": [
+    "Do not require lane attribution for legacy commits."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert ATM_COMMIT_LANE_SESSION_ID propagation and commit trailer/env additions.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-commit",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.commit-lane-attribution",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/git-governance/implementation.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "This task is attribution only. Conflict arbitration still lands in\n`TASK-LANE-0017`.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0013-commit-lane-attribution.task.md",
+    "sectionTitle": "TASK-LANE-0013",
+    "headingLine": 46,
+    "hash": "76fc30599257fc7a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0013-commit-lane-attribution.task.md",
+      "planningCommitSha": "c0ef3957558cf3255920da203f2e8884d57d3f8c",
+      "contentDigest": "sha256:76fc30599257fc7aefb4cd0635dbc1cb488d5fdb3f9dcd57c9cb8c9762733545",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T17:35:48.034Z"
+    }
+  },
+  "importedAt": "2026-07-16T17:35:48.034Z",
+  "lastTransitionId": "2026-07-16T17-39-14-764Z-claim-a36c05572033",
+  "lastTransitionAt": "2026-07-16T17:39:14.764Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0013",
+  "reservedAt": "2026-07-16T17:39:10.705Z",
+  "promotedAt": "2026-07-16T17:39:10.708Z",
+  "claim": {
+    "actorId": "codex-lane-0013",
+    "leaseId": "lease-88ff16cbfe07",
+    "claimedAt": "2026-07-16T17:39:10.712Z",
+    "heartbeatAt": "2026-07-16T17:39:10.712Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-LANE-0013.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+    ],
+    "state": "active",
+    "intent": "write",
+    "laneSession": {
+      "laneSessionId": "lane-20260716173914-codex-lane-0013-fe73246462",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260716173914-codex-lane-0013-fe73246462\""
+    }
+  },
+  "startedAt": "2026-07-16T17:39:10.712Z",
+  "startedByActor": "codex-lane-0013",
+  "startedBySessionId": "session-20260716173910-codex-lane-0013-TASK-LANE-0013-268e6e5584",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0013",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0013.*",
+      ".atm/history/task-events/TASK-LANE-0013/**",
+      ".atm/history/tasks/TASK-LANE-0013.json",
+      "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "packages/cli/src/commands/git-governance/implementation.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "bc43aa094cdd770f607170964e69925be7adb34b21e16403e0d8a7e0a7ccbadb",
+    "actorId": "codex-lane-0013",
+    "sessionId": "session-20260716173910-codex-lane-0013-TASK-LANE-0013-268e6e5584",
+    "laneSession": {
+      "laneSessionId": "lane-20260716173914-codex-lane-0013-fe73246462",
+      "status": "active",
+      "source": "minted",
+      "exportHint": "export ATM_LANE_SESSION_ID=\"lane-20260716173914-codex-lane-0013-fe73246462\""
+    },
+    "createdAt": "2026-07-16T17:39:14.762Z",
+    "status": "active"
+  }
+}

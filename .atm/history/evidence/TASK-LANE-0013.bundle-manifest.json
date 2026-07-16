@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-LANE-0013",
+  "updatedAt": "2026-07-16T17:46:18.163Z",
+  "updatedBy": "codex-lane-0013",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0a650a5c0d402a5ac0acd3cb24f719b6d90719d4ee98b6fb155e07a733586cf7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts"
+      ],
+      "generatedAt": "2026-07-16T17:45:36.036Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6d849f0c25c6e805caee49b682a61a350cc44ec2",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T17:45:53.868Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6d849f0c25c6e805caee49b682a61a350cc44ec2",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f320d2d889fd75b1d015db4be8cf4fe67a94047bc51204d17df677b691dad22c",
+      "stderrSha256": "sha256:df15d9150e61fcd81573d7953543ce3b40126f29517b4c956a644d2d0ca4b2c7",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T17:46:18.252Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6d849f0c25c6e805caee49b682a61a350cc44ec2",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
