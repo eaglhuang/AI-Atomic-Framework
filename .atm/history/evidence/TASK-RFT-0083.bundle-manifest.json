@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0083",
+  "updatedAt": "2026-07-16T10:50:21.961Z",
+  "updatedBy": "codex-task-rft-0083",
+  "freshValidationPasses": [
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:mao-parallel-routing"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9210bbce8491b329c46a12bfb96233ebf1e9eba3970245ef35374c6baf2b584d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T10:50:13.325Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "1afeccfa655573ac7344bbb7a36fcb7271ccdf9c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-mao-parallel-routing.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:917f2dcf7c7d31a4fae4177dbb43b49e13ea7745f6060e5433bb648c66a1a20d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:mao-parallel-routing"
+      ],
+      "generatedAt": "2026-07-16T10:50:15.549Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "1afeccfa655573ac7344bbb7a36fcb7271ccdf9c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T10:50:22.045Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "1afeccfa655573ac7344bbb7a36fcb7271ccdf9c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
