@@ -1,0 +1,173 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0061",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d04a74c330a60fd9e4189570c3a6abd1157e89b3",
+  "governedTreeSha": "fbfd250ae0825bd4b4089c6f0b203ec7ff898016",
+  "targetCommitDelta": {
+    "currentCommitSha": "d04a74c330a60fd9e4189570c3a6abd1157e89b3",
+    "parentCommitShas": [
+      "d04a74c330a60fd9e4189570c3a6abd1157e89b3"
+    ],
+    "governedTreeSha": "fbfd250ae0825bd4b4089c6f0b203ec7ff898016",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0061.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0061.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/create-close-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/helpers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/status-options.ts",
+      "tests/unit/task-option-parsers-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/unit/task-option-parsers-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1f878d1ff81434780ca7d402e864fc1b85e8702cc5103084fc8a9ac3e2a89fd1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/unit/task-option-parsers.unit.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d7fe20e8d3235e0e93d10bd62f7a25881ca91f65b960b2774b9be757cdd1128b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:233459bda837289dcb4476ff3075eda535c75f00697be911aa06f84f3b5c9055",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/unit/task-option-parsers-final-600.test.ts",
+    "node --strip-types tests/unit/task-option-parsers.unit.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T04:27:45.746Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0061.*",
+      ".atm/history/task-events/TASK-RFT-0061/**",
+      ".atm/history/tasks/TASK-RFT-0061.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/**/*.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/create-close-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/helpers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/status-options.ts",
+      "tests/unit/task-option-parsers-final-600.test.ts",
+      "tests/unit/task-option-parsers.unit.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/**/*.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/create-close-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/helpers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/status-options.ts",
+      "tests/unit/task-option-parsers-final-600.test.ts",
+      "tests/unit/task-option-parsers.unit.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0061.json",
+  "closedAt": "2026-07-16T04:27:45.747Z",
+  "closedByActor": "codex-task-rft-0061",
+  "sessionId": "session-20260716041912-codex-task-rft-0061-TASK-RFT-0061-98a04dfe5f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "60ab404c2e3d136306353887a6c950b81782143d",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/tasks/task-option-parsers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/create-close-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/helpers.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+      "packages/cli/src/commands/tasks/task-option-parsers/status-options.ts",
+      "tests/unit/task-option-parsers-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0061.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0061/2026-07-16T04-19-07-291Z-import-e01622bbb9b3.json",
+      ".atm/history/task-events/TASK-RFT-0061/2026-07-16T04-19-12-971Z-reserve-ad49f5fb2a2d.json",
+      ".atm/history/task-events/TASK-RFT-0061/2026-07-16T04-19-12-973Z-promote-17e83f718c6f.json",
+      ".atm/history/task-events/TASK-RFT-0061/2026-07-16T04-19-16-211Z-claim-a1ac350be8f6.json",
+      ".atm/history/task-events/TASK-RFT-0061/2026-07-16T04-24-04-204Z-scope-amendment-b6f9dadfbc3d.json",
+      ".atm/history/tasks/TASK-RFT-0061.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

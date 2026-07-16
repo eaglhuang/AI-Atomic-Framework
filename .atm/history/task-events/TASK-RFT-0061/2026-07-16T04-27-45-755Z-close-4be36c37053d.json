@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T04-27-45-755Z-close-4be36c37053d",
+  "taskId": "TASK-RFT-0061",
+  "action": "close",
+  "actorId": "codex-task-rft-0061",
+  "sessionId": "session-20260716041912-codex-task-rft-0061-TASK-RFT-0061-98a04dfe5f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0061.json",
+  "taskSha256": "sha256:ef6a942979bfaa14e0f7059fae603209a68fecb817e2be1d3ef583b8cfbd480d",
+  "createdAt": "2026-07-16T04:27:45.755Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0061 --actor codex-task-rft-0061 --status done --historical-delivery 60ab404c2e3d136306353887a6c950b81782143d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716041912-codex-task-rft-0061-TASK-RFT-0061-98a04dfe5f",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0061.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/unit/task-option-parsers-final-600.test.ts",
+      "node --strip-types tests/unit/task-option-parsers.unit.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T04:27:45.746Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0061.*",
+        ".atm/history/task-events/TASK-RFT-0061/**",
+        ".atm/history/tasks/TASK-RFT-0061.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/**/*.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/create-close-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/helpers.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/status-options.ts",
+        "tests/unit/task-option-parsers-final-600.test.ts",
+        "tests/unit/task-option-parsers.unit.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/task-option-parsers.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/**/*.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/close-delivery-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/create-close-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/helpers.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/misc-claim-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/scope-options.ts",
+        "packages/cli/src/commands/tasks/task-option-parsers/status-options.ts",
+        "tests/unit/task-option-parsers-final-600.test.ts",
+        "tests/unit/task-option-parsers.unit.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
