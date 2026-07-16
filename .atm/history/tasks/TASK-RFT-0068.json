@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0068",
+  "title": "Split CLI route command below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0067"
+  ],
+  "acceptance": [
+    "`packages/cli/src/commands/route.ts` remains the stable command entrypoint.",
+    "Every physical TypeScript file in this task scope is below 600 lines.",
+    "Existing CLI route behavior is preserved.",
+    "A focused final-600 guard verifies the facade and extracted module line counts.",
+    "The CLI owner shard records both the facade and extracted module glob."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/route.ts",
+    "packages/cli/src/commands/route/**/*.ts",
+    "tests/cli/route-command-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/route.ts",
+    "packages/cli/src/commands/route/**/*.ts",
+    "tests/cli/route-command-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/route-command-final-600.test.ts",
+    "npm run validate:cli",
+    "npm run typecheck",
+    "npm run validate:governance-projections"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.cli-route-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.cli-route-command-map",
+        "pattern": "Facade",
+        "source": "packages/cli/src/commands/route.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0068-cli-route-command-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0068",
+    "headingLine": 44,
+    "hash": "57753102ded913cf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0068-cli-route-command-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:57753102ded913cfa942d9dc45b777bba9babda628ec1c8bd6784be7f4af63a9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T06:04:50.365Z"
+    }
+  },
+  "importedAt": "2026-07-16T06:04:50.365Z",
+  "lastTransitionId": "2026-07-16T06-11-47-236Z-scope-amendment-7057b4d1dbbf",
+  "lastTransitionAt": "2026-07-16T06:11:47.236Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0068",
+  "reservedAt": "2026-07-16T06:05:07.012Z",
+  "promotedAt": "2026-07-16T06:05:07.014Z",
+  "claim": {
+    "actorId": "codex-task-rft-0068",
+    "leaseId": "lease-1792965abc3e",
+    "claimedAt": "2026-07-16T06:05:07.016Z",
+    "heartbeatAt": "2026-07-16T06:05:07.016Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0068.*",
+      ".atm/history/task-events/TASK-RFT-0068/**",
+      ".atm/history/tasks/TASK-RFT-0068.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/cli/src/commands/route/**/*.ts",
+      "packages/cli/src/commands/route/files.ts",
+      "packages/cli/src/commands/route/freeze-patch.ts",
+      "packages/cli/src/commands/route/lifecycle.ts",
+      "packages/cli/src/commands/route/main.ts",
+      "packages/cli/src/commands/route/parser.ts",
+      "packages/cli/src/commands/route/takeover.ts",
+      "packages/cli/src/commands/route/types.ts",
+      "packages/cli/src/commands/route/validation.ts",
+      "tests/cli/route-command-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T06:05:07.016Z",
+  "startedByActor": "codex-task-rft-0068",
+  "startedBySessionId": "session-20260716060507-codex-task-rft-0068-TASK-RFT-0068-9a92cfdf50",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0068",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0068.*",
+      ".atm/history/task-events/TASK-RFT-0068/**",
+      ".atm/history/tasks/TASK-RFT-0068.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/cli/src/commands/route/**/*.ts",
+      "packages/cli/src/commands/route/files.ts",
+      "packages/cli/src/commands/route/freeze-patch.ts",
+      "packages/cli/src/commands/route/lifecycle.ts",
+      "packages/cli/src/commands/route/main.ts",
+      "packages/cli/src/commands/route/parser.ts",
+      "packages/cli/src/commands/route/takeover.ts",
+      "packages/cli/src/commands/route/types.ts",
+      "packages/cli/src/commands/route/validation.ts",
+      "tests/cli/route-command-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0068-cli-route-command-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0068-cli-route-command-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "d831be915f00f940122d61509c31daab0f4ae1ae4346c1902292ea52b354b6fd",
+    "actorId": "codex-task-rft-0068",
+    "createdAt": "2026-07-16T06:05:10.149Z",
+    "status": "active"
+  }
+}
