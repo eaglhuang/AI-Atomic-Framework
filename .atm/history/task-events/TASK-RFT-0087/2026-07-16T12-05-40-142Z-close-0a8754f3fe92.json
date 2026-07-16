@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T12-05-40-142Z-close-0a8754f3fe92",
+  "taskId": "TASK-RFT-0087",
+  "action": "close",
+  "actorId": "codex-task-rft-0087",
+  "sessionId": "session-20260716115513-codex-task-rft-0087-TASK-RFT-0087-95d368576e",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0087.json",
+  "taskSha256": "sha256:a832e78f2c2a81a4fb0783eacbcf3419dfd25170230b2cb6ac5adea9c1f234fe",
+  "createdAt": "2026-07-16T12:05:40.142Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0087 --actor codex-task-rft-0087 --status done --historical-delivery 2ab9556c55c3307b0d4417d4e67e135e66f971b7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716115513-codex-task-rft-0087-TASK-RFT-0087-95d368576e",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0087.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T12:05:40.131Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0087.*",
+        ".atm/history/task-events/TASK-RFT-0087/**",
+        ".atm/history/tasks/TASK-RFT-0087.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/manager/test-runner.ts",
+        "packages/core/src/manager/test-runner/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/manager/test-runner.ts",
+        "packages/core/src/manager/test-runner/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
