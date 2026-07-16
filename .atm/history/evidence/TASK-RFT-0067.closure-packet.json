@@ -1,0 +1,177 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0067",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "d55c45f314fb7b55fca2398c8c94d1ff550642a9",
+  "governedTreeSha": "f4ed5c0f1151b0c964cc70e6f65032b2fa17a791",
+  "targetCommitDelta": {
+    "currentCommitSha": "d55c45f314fb7b55fca2398c8c94d1ff550642a9",
+    "parentCommitShas": [
+      "d55c45f314fb7b55fca2398c8c94d1ff550642a9"
+    ],
+    "governedTreeSha": "f4ed5c0f1151b0c964cc70e6f65032b2fa17a791",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/context.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/main.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-git-hooks-enforcement/root-emergency-audit.ts",
+      "tests/scripts/validate-git-hooks-enforcement-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/scripts/validate-git-hooks-enforcement-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7c8e4664613570aa18650d17099afa89e244ddf64886b5a407b827821e19946b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-hooks-enforcement -- --lane install",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:762acb3eea357b7a50835520388c41136b1b826dc03bf11a194b6f704df6c25c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-projections",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de9bb6c888364b2b42faebdb2dfa3acb7e39c43cca3e6da788698d6327ae67dd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a33945ff35fbd5d9c516c38ad8973316251efec8ac8ff2c756d4d9ee7d69424c",
+      "stderrSha256": "sha256:6c0243cee9ad88f86aa691e9de04b963df35ad040941bc780cedc3531e0566f5",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/scripts/validate-git-hooks-enforcement-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:git-hooks-enforcement -- --lane install",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T06:01:18.937Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0067.*",
+      ".atm/history/task-events/TASK-RFT-0067/**",
+      ".atm/history/tasks/TASK-RFT-0067.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/**/*.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/context.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/main.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-git-hooks-enforcement/root-emergency-audit.ts",
+      "tests/scripts/validate-git-hooks-enforcement-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/**/*.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/context.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/main.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-git-hooks-enforcement/root-emergency-audit.ts",
+      "tests/scripts/validate-git-hooks-enforcement-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0067.json",
+  "closedAt": "2026-07-16T06:01:18.937Z",
+  "closedByActor": "codex-task-rft-0067",
+  "sessionId": "session-20260716055239-codex-task-rft-0067-TASK-RFT-0067-5dccb5fdd9",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "d55c45f314fb7b55fca2398c8c94d1ff550642a9",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-git-hooks-enforcement.ts",
+      "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+      "scripts/validate-git-hooks-enforcement/context.ts",
+      "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+      "scripts/validate-git-hooks-enforcement/main.ts",
+      "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+      "scripts/validate-git-hooks-enforcement/root-emergency-audit.ts",
+      "tests/scripts/validate-git-hooks-enforcement-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0067.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0067/2026-07-16T05-52-28-399Z-import-a5fe8d423947.json",
+      ".atm/history/task-events/TASK-RFT-0067/2026-07-16T05-52-39-658Z-reserve-71e0f24bee57.json",
+      ".atm/history/task-events/TASK-RFT-0067/2026-07-16T05-52-39-660Z-promote-5f89a1c0550d.json",
+      ".atm/history/task-events/TASK-RFT-0067/2026-07-16T05-52-42-782Z-claim-f64b97453ba5.json",
+      ".atm/history/task-events/TASK-RFT-0067/2026-07-16T05-58-57-613Z-scope-amendment-b5d5c934e8b0.json",
+      ".atm/history/tasks/TASK-RFT-0067.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

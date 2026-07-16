@@ -1,0 +1,74 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T06-01-18-943Z-close-ec256c491d33",
+  "taskId": "TASK-RFT-0067",
+  "action": "close",
+  "actorId": "codex-task-rft-0067",
+  "sessionId": "session-20260716055239-codex-task-rft-0067-TASK-RFT-0067-5dccb5fdd9",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0067.json",
+  "taskSha256": "sha256:b7c7aa6038eba430a6843ea09479e6f1fa001b49cfe2d6f758d5523b60a6243e",
+  "createdAt": "2026-07-16T06:01:18.943Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0067 --actor codex-task-rft-0067 --status done --historical-delivery d55c45f314fb7b55fca2398c8c94d1ff550642a9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716055239-codex-task-rft-0067-TASK-RFT-0067-5dccb5fdd9",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0067.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-git-hooks-enforcement-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:git-hooks-enforcement -- --lane install",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T06:01:18.937Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0067.*",
+        ".atm/history/task-events/TASK-RFT-0067/**",
+        ".atm/history/tasks/TASK-RFT-0067.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-git-hooks-enforcement/**/*.ts",
+        "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+        "scripts/validate-git-hooks-enforcement/context.ts",
+        "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+        "scripts/validate-git-hooks-enforcement/main.ts",
+        "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+        "scripts/validate-git-hooks-enforcement/root-emergency-audit.ts",
+        "tests/scripts/validate-git-hooks-enforcement-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-git-hooks-enforcement.ts",
+        "scripts/validate-git-hooks-enforcement/**/*.ts",
+        "scripts/validate-git-hooks-enforcement/closure-cross-checks.ts",
+        "scripts/validate-git-hooks-enforcement/context.ts",
+        "scripts/validate-git-hooks-enforcement/initial-lanes.ts",
+        "scripts/validate-git-hooks-enforcement/main.ts",
+        "scripts/validate-git-hooks-enforcement/pre-push-regressions.ts",
+        "scripts/validate-git-hooks-enforcement/root-emergency-audit.ts",
+        "tests/scripts/validate-git-hooks-enforcement-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
