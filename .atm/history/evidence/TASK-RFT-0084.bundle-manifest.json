@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0084",
-  "updatedAt": "2026-07-16T11:09:39.886Z",
+  "updatedAt": "2026-07-16T11:13:18.427Z",
   "updatedBy": "codex-task-rft-0084",
   "freshValidationPasses": [
+    "doctor",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:guidance"
   ],
   "staleValidationPasses": [],
@@ -47,6 +50,45 @@
       "generatedAt": "2026-07-16T11:09:39.950Z",
       "runnerKind": "dev-source",
       "sourceCommit": "5b78222db11839e9f1a8518e06dd8e06836d7b9a",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10b9e1131e1d6d913c30a78e9135c0677eb0790950179ef7fc01f1bd9e85fb17",
+      "stderrSha256": "sha256:791ea7f7aa3502fda0f34999f97784b33de2a33760bf84473d8c5bddf38fa963",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T11:11:23.445Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "bf3cf5dd791933a1e296bd9e8f1481814be3a6d1",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T11:11:50.566Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "bf3cf5dd791933a1e296bd9e8f1481814be3a6d1",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8373a6c561f4d88549bc99ef3c0a3d9f9105d9d541abd880d316988e2b70e985",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T11:13:18.513Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
