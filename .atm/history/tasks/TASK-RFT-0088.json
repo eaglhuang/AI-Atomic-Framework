@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0088",
+  "title": "Split map generator support below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`packages/core/src/manager/map-generator.ts` is below 600 lines.",
+    "Every new or touched physical TypeScript file is below 600 lines.",
+    "Existing imports of `generateAtomicMap` and `createMinimalAtomicMapSpec` remain compatible.",
+    "Atomization coverage maps the facade and support directory to the map generator atom owner.",
+    "Validators pass and are recorded as command-backed ATM evidence:",
+    "`npm run typecheck`",
+    "`npm run validate:cli`",
+    "`node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate`",
+    "`node atm.mjs doctor --json`"
+  ],
+  "deliverables": [
+    "packages/core/src/manager/map-generator.ts",
+    "packages/core/src/manager/map-generator/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "scopePaths": [
+    "packages/core/src/manager/map-generator.ts",
+    "packages/core/src/manager/map-generator/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": null,
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": null,
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": null,
+  "rollbackStrategy": null,
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-map-generator",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atom-core-map-generator",
+        "pattern": "Facade",
+        "source": "packages/core/src/manager/map-generator.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-core-map-generator-support",
+        "pattern": "Support Modules",
+        "source": "packages/core/src/manager/map-generator/**",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_LEGACY_SCOPE_DELIVERABLES_INFERRED",
+      "severity": "warning",
+      "message": "No explicit deliverables were declared; ATM inferred deliverables from legacy scopePaths/allowed_files because every entry was file-shaped.",
+      "field": "deliverables"
+    }
+  ],
+  "tags": [],
+  "notes": "- This is a continuation of the TASK-RFT large-file atomization series.\n- Do not include unrelated captain parallel ledger WIP, ATMChart drift, or report residues in this card.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0088-map-generator-support-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0088",
+    "headingLine": 38,
+    "hash": "0c4b452b3e52d0b4",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0088-map-generator-support-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:0c4b452b3e52d0b4efc4184a0ef6e5cb2c0f0c9acf2f2bc1d60d922bba8d06e5",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T12:09:14.185Z"
+    }
+  },
+  "importedAt": "2026-07-16T12:09:14.185Z",
+  "lastTransitionId": "2026-07-16T12-09-31-668Z-claim-d4b2bcc050ca",
+  "lastTransitionAt": "2026-07-16T12:09:31.668Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0088",
+  "reservedAt": "2026-07-16T12:09:28.190Z",
+  "promotedAt": "2026-07-16T12:09:28.193Z",
+  "claim": {
+    "actorId": "codex-task-rft-0088",
+    "leaseId": "lease-b58263d7dcad",
+    "claimedAt": "2026-07-16T12:09:28.196Z",
+    "heartbeatAt": "2026-07-16T12:09:28.196Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0088.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/manager/map-generator.ts",
+      "packages/core/src/manager/map-generator/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T12:09:28.196Z",
+  "startedByActor": "codex-task-rft-0088",
+  "startedBySessionId": "session-20260716120928-codex-task-rft-0088-TASK-RFT-0088-a4b4bdaf17",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0088",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0088.*",
+      ".atm/history/task-events/TASK-RFT-0088/**",
+      ".atm/history/tasks/TASK-RFT-0088.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/manager/map-generator.ts",
+      "packages/core/src/manager/map-generator/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "5ec670c124350465cef1be91236e71a8dfc845a433f872617e4f9b5a1e68545e",
+    "actorId": "codex-task-rft-0088",
+    "createdAt": "2026-07-16T12:09:31.666Z",
+    "status": "active"
+  }
+}
