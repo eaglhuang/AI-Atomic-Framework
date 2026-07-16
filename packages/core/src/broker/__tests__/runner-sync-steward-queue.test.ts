@@ -97,6 +97,7 @@ function testStaleOwnerCleanupReleasesExpiredRequests() {
   const cleanup = cleanupRunnerSyncStewardQueue(queue, '2026-07-15T00:00:03.000Z');
   assert.equal(cleanup.staleReleases.length, 1);
   assert.equal(cleanup.staleReleases[0].taskId, 'TASK-STALE');
+  assert.equal(cleanup.staleReleases[0].reason, 'ttl-expired');
   assert.equal(cleanup.staleReleases[0].queuePosition, 1);
   assert.ok(cleanup.staleReleases[0].safeRetryCommand.includes('broker runner-sync enqueue'));
   assert.equal(cleanup.queue.groups.length, 1);
@@ -127,16 +128,50 @@ function testOrphanTaskCleanupReleasesHeadAndAdvancesWaitingGroup() {
   }).queue;
 
   const cleanup = cleanupRunnerSyncStewardQueue(queue, '2026-07-15T00:00:03.000Z', {
-    shouldReleaseRequest: (request) => request.taskId === 'TASK-MISSING'
+    taskHealthResolver: (request) => request.taskId === 'TASK-MISSING' ? 'task-missing' : 'task-active'
   });
 
   assert.equal(cleanup.staleReleases.length, 1);
   assert.equal(cleanup.staleReleases[0].taskId, 'TASK-MISSING');
-  assert.equal(cleanup.staleReleases[0].reason, 'orphaned-task');
+  assert.equal(cleanup.staleReleases[0].reason, 'orphan-task-missing');
   assert.equal(cleanup.queue.groups.length, 1);
   assert.equal(cleanup.queue.groups[0].queuePosition, 1);
   assert.equal(cleanup.queue.groups[0].waitingTasks[0], 'TASK-WAITING');
   console.log('ok: orphaned runner-sync task requests are released and waiting work advances');
+}
+
+function testTerminalTaskCleanupReleasesHeadAndAdvancesWaitingGroup() {
+  let queue = emptyRunnerSyncStewardQueue(t0);
+  queue = enqueueRunnerSyncStewardRequest(queue, {
+    taskId: 'TASK-DONE',
+    actorId: 'done-captain',
+    sealedSourceSha: 'sha256:done',
+    requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+    createdAt: t0,
+    heartbeatAt: t0,
+    ttlSeconds: 420
+  }).queue;
+  queue = enqueueRunnerSyncStewardRequest(queue, {
+    taskId: 'TASK-WAITING',
+    actorId: 'waiting-captain',
+    sealedSourceSha: 'sha256:waiting',
+    requestedSurfaces: ['release/atm-root-drop/atm.mjs'],
+    createdAt: '2026-07-15T00:00:02.000Z',
+    heartbeatAt: '2026-07-15T00:00:02.000Z',
+    ttlSeconds: 420
+  }).queue;
+
+  const cleanup = cleanupRunnerSyncStewardQueue(queue, '2026-07-15T00:00:03.000Z', {
+    taskHealthResolver: (request) => request.taskId === 'TASK-DONE' ? 'task-terminal' : 'task-active'
+  });
+
+  assert.equal(cleanup.staleReleases.length, 1);
+  assert.equal(cleanup.staleReleases[0].taskId, 'TASK-DONE');
+  assert.equal(cleanup.staleReleases[0].reason, 'orphan-task-terminal');
+  assert.equal(cleanup.queue.groups.length, 1);
+  assert.equal(cleanup.queue.groups[0].queuePosition, 1);
+  assert.deepEqual(cleanup.queue.groups[0].waitingTasks, ['TASK-WAITING']);
+  console.log('ok: terminal runner-sync task requests are released and waiting work advances');
 }
 
 function testCliFacingJsonShape() {
@@ -253,6 +288,7 @@ testSameSealedSourceCoalesces();
 testDifferentSealedSourcesStayOrdered();
 testStaleOwnerCleanupReleasesExpiredRequests();
 testOrphanTaskCleanupReleasesHeadAndAdvancesWaitingGroup();
+testTerminalTaskCleanupReleasesHeadAndAdvancesWaitingGroup();
 testCliFacingJsonShape();
 testLiveReleaseClearsQueueHeadAndAdvancesNextGroup();
 testReleaseRequiresReceiptQueueHeadAndWaitingTask();

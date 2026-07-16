@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-LANE-0001",
+  "updatedAt": "2026-07-16T15:55:53.301Z",
+  "updatedBy": "codex-lane-0001",
+  "freshValidationPasses": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:45abd4c29986fbc6aeb32b3ce8be7e2c6ad44ed8bab215f312db16a4b7cbb09a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts"
+      ],
+      "generatedAt": "2026-07-16T15:53:15.740Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ac245bd9041408257a9bf7a2454f51e08bbfa2cd",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1d1d7a9fbb09bd6aca59834ca58e712d21b4e96f3ea9bd73a804fd708e6d1b19",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "generatedAt": "2026-07-16T15:53:40.915Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ac245bd9041408257a9bf7a2454f51e08bbfa2cd",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T15:53:58.294Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ac245bd9041408257a9bf7a2454f51e08bbfa2cd",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T15:55:26.699Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ac245bd9041408257a9bf7a2454f51e08bbfa2cd",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da1f87a2321706989652c0f294c29b7a6c134c183c63abfdee52486ebc9e8375",
+      "stderrSha256": "sha256:11c15810c8be6e3287f343e8ec0ef5cc63251aab5a4c1104a122e2d3df60e8a1",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T15:55:53.382Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "ac245bd9041408257a9bf7a2454f51e08bbfa2cd",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

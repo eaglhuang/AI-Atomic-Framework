@@ -21,7 +21,7 @@ import { defaultAdapterRegistry, resolveAdapter } from '../../../../core/src/bro
 import { planMutationBatch } from '../../../../core/src/broker/adapters/batch-planner.ts';
 import { computeCasResult, hashContent } from '../../../../core/src/broker/adapters/cas.ts';
 import { enqueueSharedSurface, planSharedSurfaceAcquisition, removeSharedSurfaceEntry, type SharedSurfaceQueue } from '../../../../core/src/broker/shared-surface-queue.ts';
-import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue, type RunnerSyncStewardQueueDocument } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
+import { cleanupRunnerSyncStewardQueue, emptyRunnerSyncStewardQueue, enqueueRunnerSyncStewardRequest, explainRunnerSyncStewardPosition, releaseRunnerSyncStewardQueue, type RunnerSyncStewardQueueDocument, type RunnerSyncTaskHealth, type RunnerSyncStewardRequest } from '../../../../core/src/broker/runner-sync-steward-queue.ts';
 import { cleanupGeneratedProjectionSteward, emptyGeneratedProjectionSteward, enqueueGeneratedProjectionRebuild, type GeneratedProjectionStewardDocument } from '../../../../core/src/broker/generated-projection-steward.ts';
 import { acknowledgeFreeze, createFreezeSignal, resolveFreezeDecision, type FreezeAck, type FreezeResolution, type FreezeSignal } from '../../../../core/src/broker/freeze.ts';
 import type { ActiveWriteIntent, WriteBrokerRegistryDocument, BrokerMutationEvidenceEntry, MergePlan, MutationRequest, PatchProposal, WriteIntent, ConflictKey, BrokerOperationRunRecord, ExplicitMutationIntentInputSummary, ExplicitMutationIntentKind, MutationIntentMissingInput } from '../../../../core/src/broker/types.ts';
@@ -101,7 +101,7 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
         readRunnerSyncStewardQueue(runnerSyncQueuePath),
         new Date().toISOString(),
         {
-          shouldReleaseRequest: (request) => !existsSync(path.join(options.cwd, '.atm', 'history', 'tasks', `${request.taskId}.json`))
+          taskHealthResolver: (request) => resolveRunnerSyncTaskHealth(options.cwd, request)
         }
       );
       writeRunnerSyncStewardQueue(runnerSyncQueuePath, cleanup.queue);
@@ -241,4 +241,20 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
   }
 
   return null;
+}
+
+function resolveRunnerSyncTaskHealth(cwd: string, request: RunnerSyncStewardRequest): RunnerSyncTaskHealth {
+  const taskPath = path.join(cwd, '.atm', 'history', 'tasks', `${request.taskId}.json`);
+  if (!existsSync(taskPath)) {
+    return 'task-missing';
+  }
+  try {
+    const task = JSON.parse(readFileSync(taskPath, 'utf8')) as Record<string, unknown>;
+    const status = typeof task.status === 'string' ? task.status.trim().toLowerCase() : '';
+    return status === 'done' || status === 'verified' || status === 'abandoned'
+      ? 'task-terminal'
+      : 'task-active';
+  } catch {
+    return 'task-active';
+  }
 }

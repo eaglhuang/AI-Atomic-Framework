@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -108,8 +108,52 @@ try {
   assert.equal(cleanup.messages[0].code, 'ATM_BROKER_RUNNER_SYNC_CLEANUP');
   assert.equal(cleanup.evidence.cleanup.staleReleases.length, 1);
   assert.equal(cleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-STALE');
+  assert.equal(cleanup.evidence.cleanup.staleReleases[0].reason, 'ttl-expired');
   const cleanedQueue = JSON.parse(readFileSync(queuePath, 'utf8'));
   assert.equal(cleanedQueue.groups.length, 0, 'stale runner-sync steward owner must be removed by CLI cleanup');
+
+  runAtm([
+    'broker',
+    'runner-sync',
+    'enqueue',
+    '--task', 'TASK-MISSING',
+    '--actor', 'missing-captain',
+    '--sealed-source-sha', 'sha256:missing',
+    '--surface', 'release/atm-onefile/atm.mjs'
+  ]);
+  const missingCleanup = runAtm([
+    'broker',
+    'runner-sync',
+    'cleanup'
+  ]);
+  assert.equal(missingCleanup.evidence.cleanup.staleReleases.length, 1);
+  assert.equal(missingCleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-MISSING');
+  assert.equal(missingCleanup.evidence.cleanup.staleReleases[0].reason, 'orphan-task-missing');
+
+  const taskDir = path.join(repo, '.atm/history/tasks');
+  mkdirSync(taskDir, { recursive: true });
+  writeFileSync(path.join(taskDir, 'TASK-DONE.json'), `${JSON.stringify({
+    schemaVersion: 'atm.workItem.v0.2',
+    workItemId: 'TASK-DONE',
+    status: 'done'
+  }, null, 2)}\n`, 'utf8');
+  runAtm([
+    'broker',
+    'runner-sync',
+    'enqueue',
+    '--task', 'TASK-DONE',
+    '--actor', 'done-captain',
+    '--sealed-source-sha', 'sha256:done',
+    '--surface', 'release/atm-onefile/atm.mjs'
+  ]);
+  const terminalCleanup = runAtm([
+    'broker',
+    'runner-sync',
+    'cleanup'
+  ]);
+  assert.equal(terminalCleanup.evidence.cleanup.staleReleases.length, 1);
+  assert.equal(terminalCleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-DONE');
+  assert.equal(terminalCleanup.evidence.cleanup.staleReleases[0].reason, 'orphan-task-terminal');
 
   console.log('[runner-sync-steward-release.test] ok');
 } finally {

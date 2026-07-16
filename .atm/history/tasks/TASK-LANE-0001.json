@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0001",
+  "title": "Runner-sync orphan queue-head cleanup",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`RunnerSyncTaskHealth` and `TaskHealthResolver` are defined in the core queue module.",
+    "`cleanupRunnerSyncStewardQueue` releases stale entries when TTL expires or the resolver reports `task-missing` or `task-terminal`.",
+    "Stale release records include a reason: `ttl-expired`, `orphan-task-missing`, or `orphan-task-terminal`.",
+    "CLI cleanup injects a resolver that checks the task ledger without importing CLI code into core.",
+    "Cleanup output lists released entries with reason and safe retry guidance.",
+    "Existing TTL-only behavior remains unchanged when no resolver is supplied."
+  ],
+  "deliverables": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts"
+  ],
+  "scopePaths": [
+    "packages/core/src/broker/runner-sync-steward-queue.ts",
+    "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "packages/cli/src/commands/broker/steward-queues.ts",
+    "tests/cli/runner-sync-steward-release.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+    "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "taskflow close stale-runner lane changes",
+    "lane session schema or command work",
+    "manual edits to .atm/runtime or .atm/history"
+  ],
+  "nonGoals": [
+    "Do not make packages/core import task-ledger readers from packages/cli"
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert runner-sync cleanup resolver changes and focused tests.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.broker-runner-sync-steward-queue",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "tests/cli/runner-sync-steward-release.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "This card is opened from the 3KLife planning repository and targets\nAI-Atomic-Framework. It precedes lane-session work because a dead runner-sync\nqueue head can block close/build governance for unrelated implementation cards.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0001-runner-sync-orphan-cleanup.task.md",
+    "sectionTitle": "TASK-LANE-0001",
+    "headingLine": 43,
+    "hash": "321b609b885dd81c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0001-runner-sync-orphan-cleanup.task.md",
+      "planningCommitSha": "18abf5497cda9c54d73a4a8c5e1b1d50e7cb7aa6",
+      "contentDigest": "sha256:321b609b885dd81c4c166feb17116305e7983814e9c2f6fd1aade43b1f21704b",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T15:04:32.929Z"
+    }
+  },
+  "importedAt": "2026-07-16T15:04:32.929Z",
+  "lastTransitionId": "2026-07-16T15-56-44-042Z-claim-4e688e6454fc",
+  "lastTransitionAt": "2026-07-16T15:56:44.042Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0001",
+  "reservedAt": "2026-07-16T15:50:02.705Z",
+  "promotedAt": "2026-07-16T15:50:02.709Z",
+  "claim": {
+    "actorId": "codex-lane-0001",
+    "leaseId": "lease-f9edbeda7acb",
+    "claimedAt": "2026-07-16T15:56:42.351Z",
+    "heartbeatAt": "2026-07-16T15:56:42.351Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-LANE-0001.json",
+      ".atm/history/evidence/TASK-LANE-0001.*",
+      ".atm/history/task-events/TASK-LANE-0001/**",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T15:50:02.713Z",
+  "startedByActor": "codex-lane-0001",
+  "startedBySessionId": "session-20260716155642-codex-lane-0001-TASK-LANE-0001-21adb16727",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0001",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0001.*",
+      ".atm/history/task-events/TASK-LANE-0001/**",
+      ".atm/history/tasks/TASK-LANE-0001.json",
+      "packages/cli/src/commands/broker/steward-queues.ts",
+      "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "packages/core/src/broker/runner-sync-steward-queue.ts",
+      "tests/cli/runner-sync-steward-release.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "e2c7a5421c849942c57e5327bffae61b7b88af579cb1bedf3b40e020708482c4",
+    "actorId": "codex-lane-0001",
+    "sessionId": "session-20260716155642-codex-lane-0001-TASK-LANE-0001-21adb16727",
+    "createdAt": "2026-07-16T15:56:44.040Z",
+    "status": "active"
+  }
+}

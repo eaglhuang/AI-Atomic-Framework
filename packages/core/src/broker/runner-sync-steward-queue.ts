@@ -65,7 +65,7 @@ export type RunnerSyncStewardStaleRelease = {
   readonly stewardWorkId: string;
   readonly queuePosition: number;
   readonly expiredAt: string;
-  readonly reason: 'expired' | 'orphaned-task';
+  readonly reason: 'ttl-expired' | 'orphan-task-missing' | 'orphan-task-terminal';
   readonly safeRetryCommand: string;
 };
 
@@ -85,7 +85,12 @@ export type RunnerSyncStewardReleaseInput = {
   readonly releasedAt?: string;
 };
 
+export type RunnerSyncTaskHealth = 'task-active' | 'task-missing' | 'task-terminal';
+
+export type TaskHealthResolver = (request: RunnerSyncStewardRequest) => RunnerSyncTaskHealth;
+
 export type RunnerSyncStewardCleanupOptions = {
+  readonly taskHealthResolver?: TaskHealthResolver;
   readonly shouldReleaseRequest?: (request: RunnerSyncStewardRequest) => boolean;
 };
 
@@ -174,8 +179,9 @@ export function cleanupRunnerSyncStewardQueue(
   const groups = base.groups.flatMap((group, groupIndex) => {
     const live = group.requests.filter((request) => {
       const expired = isExpired(request, now);
-      const orphanedTask = !expired && options.shouldReleaseRequest?.(request) === true;
-      if (expired || orphanedTask) {
+      const health = expired ? 'task-active' : resolveTaskHealth(request, options);
+      const releaseReason = expired ? 'ttl-expired' : staleReleaseReasonFromHealth(health);
+      if (releaseReason) {
         staleReleases.push({
           taskId: request.taskId,
           actorId: request.actorId,
@@ -183,11 +189,11 @@ export function cleanupRunnerSyncStewardQueue(
           stewardWorkId: group.stewardWorkId,
           queuePosition: groupIndex + 1,
           expiredAt: request.expiresAt,
-          reason: expired ? 'expired' : 'orphaned-task',
+          reason: releaseReason,
           safeRetryCommand: buildRetryCommand(request)
         });
       }
-      return !expired && !orphanedTask;
+      return !releaseReason;
     });
     return live.length === 0 ? [] : [{ ...group, requests: live, updatedAt: now }];
   });
@@ -390,6 +396,24 @@ function isExpired(request: RunnerSyncStewardRequest, now: string): boolean {
   const expiresAt = Date.parse(request.expiresAt);
   const nowMs = Date.parse(now);
   return Number.isFinite(expiresAt) && Number.isFinite(nowMs) && expiresAt <= nowMs;
+}
+
+function resolveTaskHealth(
+  request: RunnerSyncStewardRequest,
+  options: RunnerSyncStewardCleanupOptions
+): RunnerSyncTaskHealth {
+  if (options.taskHealthResolver) {
+    return options.taskHealthResolver(request);
+  }
+  return options.shouldReleaseRequest?.(request) === true ? 'task-missing' : 'task-active';
+}
+
+function staleReleaseReasonFromHealth(
+  health: RunnerSyncTaskHealth
+): RunnerSyncStewardStaleRelease['reason'] | null {
+  if (health === 'task-missing') return 'orphan-task-missing';
+  if (health === 'task-terminal') return 'orphan-task-terminal';
+  return null;
 }
 
 function buildRetryCommand(request: RunnerSyncStewardRequest): string {
