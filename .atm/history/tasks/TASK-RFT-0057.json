@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0057",
+  "title": "Split batch command facade below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0056"
+  ],
+  "acceptance": [
+    "Reduce `packages/cli/src/commands/batch.ts` to at or below 600 physical lines.",
+    "Move batch command implementation glue into bounded modules under `packages/cli/src/commands/batch/**`.",
+    "Keep every new or touched batch support module at or below 600 physical lines.",
+    "Preserve the existing public exports used by command registry, hooks, scripts, and tests.",
+    "Add a final-600 validator for the facade and `packages/cli/src/commands/batch/**/*.ts`.",
+    "Update CLI owner shard coverage for the extracted batch implementation module."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/batch/**/*.ts",
+    "tests/cli/batch-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/batch.ts",
+    "packages/cli/src/commands/batch/**/*.ts",
+    "tests/cli/batch-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/batch-final-600.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.batch-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.batch-command-facade",
+        "pattern": "Facade",
+        "source": "packages/cli/src/commands/batch.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.batch-implementation-carrier",
+        "pattern": "Strategy Map",
+        "source": "packages/cli/src/commands/batch.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Current audit found `packages/cli/src/commands/batch.ts` at 1496 physical lines after TASK-RFT-0056.\n- This card continues the RFT large-file atom-map/facade split series toward the physical-file limit of 600 lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0057-batch-command-facade-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0057",
+    "headingLine": 47,
+    "hash": "0afeaff24d8af30c",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0057-batch-command-facade-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:0afeaff24d8af30c4e2ec8d13df36a27862572b67893936d68760826a3624617",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T03:14:39.495Z"
+    }
+  },
+  "importedAt": "2026-07-16T03:14:39.495Z",
+  "lastTransitionId": "2026-07-16T03-17-43-252Z-scope-amendment-a8efec640c86",
+  "lastTransitionAt": "2026-07-16T03:17:43.252Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0057",
+  "reservedAt": "2026-07-16T03:14:41.160Z",
+  "promotedAt": "2026-07-16T03:14:41.163Z",
+  "claim": {
+    "actorId": "codex-task-rft-0057",
+    "leaseId": "lease-957f6d55af9b",
+    "claimedAt": "2026-07-16T03:14:41.165Z",
+    "heartbeatAt": "2026-07-16T03:14:41.165Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0057.*",
+      ".atm/history/task-events/TASK-RFT-0057/**",
+      ".atm/history/tasks/TASK-RFT-0057.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/batch/**/*.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "tests/cli/batch-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T03:14:41.165Z",
+  "startedByActor": "codex-task-rft-0057",
+  "startedBySessionId": "session-20260716031441-codex-task-rft-0057-TASK-RFT-0057-cdbd23be87",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0057",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0057.*",
+      ".atm/history/task-events/TASK-RFT-0057/**",
+      ".atm/history/tasks/TASK-RFT-0057.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+      "packages/cli/src/commands/batch.ts",
+      "packages/cli/src/commands/batch/**/*.ts",
+      "packages/cli/src/commands/batch/implementation.ts",
+      "tests/cli/batch-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0057-batch-command-facade-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0057-batch-command-facade-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "e2dc3fcaaceaa0075f4e8dc352d66df6479c1e0069ef8d29292230ea328717a3",
+    "actorId": "codex-task-rft-0057",
+    "createdAt": "2026-07-16T03:14:44.045Z",
+    "status": "active"
+  }
+}
