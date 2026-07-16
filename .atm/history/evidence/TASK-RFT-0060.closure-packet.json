@@ -1,0 +1,173 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0060",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "afaa53f9c1f4819f7d3842d140e164ffddaa8b25",
+  "governedTreeSha": "81cc9abab5c63f9836c8aa0f52652ecb794f376e",
+  "targetCommitDelta": {
+    "currentCommitSha": "afaa53f9c1f4819f7d3842d140e164ffddaa8b25",
+    "parentCommitShas": [
+      "afaa53f9c1f4819f7d3842d140e164ffddaa8b25"
+    ],
+    "governedTreeSha": "81cc9abab5c63f9836c8aa0f52652ecb794f376e",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0060.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/capture-broker-evidence.ts",
+      "scripts/capture-broker-evidence/args.ts",
+      "scripts/capture-broker-evidence/commands.ts",
+      "scripts/capture-broker-evidence/selection-and-report.ts",
+      "scripts/capture-broker-evidence/summaries.ts",
+      "scripts/capture-broker-evidence/summary-utils.ts",
+      "scripts/capture-broker-evidence/types.ts",
+      "tests/scripts/capture-broker-evidence-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/scripts/capture-broker-evidence-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:37580eba0c898001c9b884c2c8870414da3fe30c007728e2e6c8579bc2dd0dd6",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:team-agents -- --case capture-broker-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fa99ba2f7f102d928297157edc9b9c6e749df9e6073eb83f29d0542a0488b98f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:89cc3c82c7a1702f049e2334ee0ac361a9bb4d19adc7b46442d4dbd29870d983",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/scripts/capture-broker-evidence-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-agents -- --case capture-broker-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T04:16:31.776Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0060.*",
+      ".atm/history/task-events/TASK-RFT-0060/**",
+      ".atm/history/tasks/TASK-RFT-0060.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/capture-broker-evidence.ts",
+      "scripts/capture-broker-evidence/**/*.ts",
+      "scripts/capture-broker-evidence/args.ts",
+      "scripts/capture-broker-evidence/commands.ts",
+      "scripts/capture-broker-evidence/selection-and-report.ts",
+      "scripts/capture-broker-evidence/summaries.ts",
+      "scripts/capture-broker-evidence/summary-utils.ts",
+      "scripts/capture-broker-evidence/types.ts",
+      "scripts/validators/team-agents/capture-broker-evidence.ts",
+      "tests/scripts/capture-broker-evidence-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/capture-broker-evidence.ts",
+      "scripts/capture-broker-evidence/**/*.ts",
+      "scripts/capture-broker-evidence/args.ts",
+      "scripts/capture-broker-evidence/commands.ts",
+      "scripts/capture-broker-evidence/selection-and-report.ts",
+      "scripts/capture-broker-evidence/summaries.ts",
+      "scripts/capture-broker-evidence/summary-utils.ts",
+      "scripts/capture-broker-evidence/types.ts",
+      "scripts/validators/team-agents/capture-broker-evidence.ts",
+      "tests/scripts/capture-broker-evidence-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0060.json",
+  "closedAt": "2026-07-16T04:16:31.776Z",
+  "closedByActor": "codex-task-rft-0060",
+  "sessionId": "session-20260716040937-codex-task-rft-0060-TASK-RFT-0060-affe8b097b",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "afaa53f9c1f4819f7d3842d140e164ffddaa8b25",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/capture-broker-evidence.ts",
+      "scripts/capture-broker-evidence/args.ts",
+      "scripts/capture-broker-evidence/commands.ts",
+      "scripts/capture-broker-evidence/selection-and-report.ts",
+      "scripts/capture-broker-evidence/summaries.ts",
+      "scripts/capture-broker-evidence/summary-utils.ts",
+      "scripts/capture-broker-evidence/types.ts",
+      "tests/scripts/capture-broker-evidence-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0060.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0060/2026-07-16T04-09-35-631Z-import-85db330a46fd.json",
+      ".atm/history/task-events/TASK-RFT-0060/2026-07-16T04-09-37-313Z-reserve-baf01c49c840.json",
+      ".atm/history/task-events/TASK-RFT-0060/2026-07-16T04-09-37-315Z-promote-97f5f81877c4.json",
+      ".atm/history/task-events/TASK-RFT-0060/2026-07-16T04-09-40-514Z-claim-647b33cbce76.json",
+      ".atm/history/task-events/TASK-RFT-0060/2026-07-16T04-12-16-747Z-scope-amendment-7164f72aed89.json",
+      ".atm/history/tasks/TASK-RFT-0060.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
