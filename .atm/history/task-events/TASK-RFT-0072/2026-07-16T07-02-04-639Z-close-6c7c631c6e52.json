@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T07-02-04-639Z-close-6c7c631c6e52",
+  "taskId": "TASK-RFT-0072",
+  "action": "close",
+  "actorId": "codex-task-rft-0072",
+  "sessionId": "session-20260716065618-codex-task-rft-0072-TASK-RFT-0072-f4b65eeac6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0072.json",
+  "taskSha256": "sha256:2d6de0e5f5a59612a275d218e3514a29e4add63af561a386dbf1306e9b5267dd",
+  "createdAt": "2026-07-16T07:02:04.639Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0072 --actor codex-task-rft-0072 --status done --historical-delivery 7b799833168a6709dbfcd7f88f5d2acada3e3d2a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716065618-codex-task-rft-0072-TASK-RFT-0072-f4b65eeac6",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0072.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/core/broker-decision-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T07:02:04.632Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0072.*",
+        ".atm/history/task-events/TASK-RFT-0072/**",
+        ".atm/history/tasks/TASK-RFT-0072.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/decision/**/*.ts",
+        "packages/core/src/broker/decision/admission.ts",
+        "packages/core/src/broker/decision/decomposition.ts",
+        "packages/core/src/broker/decision/failure.ts",
+        "packages/core/src/broker/decision/physical-overlap.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "packages/core/src/broker/decision/surfaces.ts",
+        "tests/core/broker-decision-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/broker/decision.ts",
+        "packages/core/src/broker/decision/**/*.ts",
+        "packages/core/src/broker/decision/admission.ts",
+        "packages/core/src/broker/decision/decomposition.ts",
+        "packages/core/src/broker/decision/failure.ts",
+        "packages/core/src/broker/decision/physical-overlap.ts",
+        "packages/core/src/broker/decision/proposal-overlap.ts",
+        "packages/core/src/broker/decision/surfaces.ts",
+        "tests/core/broker-decision-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
