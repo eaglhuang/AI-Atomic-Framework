@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-RFT-0096",
-  "updatedAt": "2026-07-16T15:59:17.400Z",
+  "updatedAt": "2026-07-16T16:05:09.524Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -317,6 +317,390 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:c4f95278f1f1defbefdc8bcc8dc70cd5acda85d02f534b622d94beace2a3f055",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0096",
+      "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+      "createdAt": "2026-07-16T16:01:33.901Z",
+      "details": {
+        "actorId": "codex-task-rft-0096",
+        "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "and prompt issue translation behavior.\" --json",
+          "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+          "normalized model output",
+          "schema validation"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-spec-parser",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:407c6a43731bce0d1aa6dfe984e824e69b6bfa36146662fbc5f4bc6dc8de585f",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+              "schema validation",
+              "normalized model output",
+              "and prompt issue translation behavior.\" --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:1935166510d57faf87f627088ef40d201dbf3bb6da3ac17264274ec5038ae7d5",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:01:33.999Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:5c9dd92ae3f67088bc490ab829a4656c7c40ca3202a2326539161c345a9b04ea",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0096",
+      "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+      "createdAt": "2026-07-16T16:02:25.852Z",
+      "details": {
+        "actorId": "codex-task-rft-0096",
+        "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-spec-parser",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:6ceadb2012b4063ae23750d3c556a5924639554959809c578ba2b31cb5991575",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:02:25.966Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:76086cd6696b7e432e2941396a6beaf5070597a466d42a069df95b07c3b9d8b9",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \" Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0096",
+      "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+      "createdAt": "2026-07-16T16:03:50.788Z",
+      "details": {
+        "actorId": "codex-task-rft-0096",
+        "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-spec-parser",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \" Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules",
+            "exitCode": 1,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:b2e8ffa0db7a8c94976a2166074f4f123348c671280d2a8023b307c01306333e",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:03:50.849Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:1a609bd698419323421f172f68260ed11b33a2c79239e8b2c0c16fecaa7b3e9d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0096",
+      "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+      "createdAt": "2026-07-16T16:04:20.034Z",
+      "details": {
+        "actorId": "codex-task-rft-0096",
+        "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-spec-parser",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:c5b4586bf7460034820e30e62c227fa78bdb18ef2a2bc737e297bc48f876d7f0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:2f1c19dc92c8087bc8e3eca808f027ddd4640f63d8f7a181e486f1a68bb3e3df",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:04:20.119Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:cc1fd91762371cc1b51e71e80d64e30c8f0d1c39b3bc642423ae843ea1d10607",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0096",
+      "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+      "createdAt": "2026-07-16T16:04:48.825Z",
+      "details": {
+        "actorId": "codex-task-rft-0096",
+        "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "and prompt issue translation behavior.\" --json",
+          "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+          "normalized model output",
+          "schema validation"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-spec-parser",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:9a6ec9c83a710099221538812cce480a885c805ffd07b238a36a69c8c010cf33",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+              "schema validation",
+              "normalized model output",
+              "and prompt issue translation behavior.\" --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:5d47bf550a591d188dd65dba61052c9db58256b7ae9ed512df3495ff550aed8a",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:04:48.944Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:03f8d6c7a54e07ea28889b88eede6938c1d857baa709376c45b183473a9ca440",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0096",
+      "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+      "createdAt": "2026-07-16T16:05:09.524Z",
+      "details": {
+        "actorId": "codex-task-rft-0096",
+        "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "and prompt issue translation behavior.\" --json",
+          "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+          "normalized model output",
+          "schema validation"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-core-spec-parser",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:662ace88266c98557b210e64da3867c0ba2aa2de1c6f46fbafb6de026299c7bd",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+              "schema validation",
+              "normalized model output",
+              "and prompt issue translation behavior.\" --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:aa78c219e42b7a7186758fdc7d93768d62078fb7b0a6fc85689160599f1ff863",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:05:09.622Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c3caa65e8e78c4062c0a823a9f883a94b949d48a139b471875a48ec9c30767c2",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

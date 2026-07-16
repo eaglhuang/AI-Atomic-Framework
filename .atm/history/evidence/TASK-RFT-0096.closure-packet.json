@@ -1,0 +1,238 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0096",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "bb40c439e1555d342713c775db2183730c6bea81",
+  "governedTreeSha": "9dbb60e2f7540a7ba9c75f05fecb1aaf9309fd9c",
+  "targetCommitDelta": {
+    "currentCommitSha": "bb40c439e1555d342713c775db2183730c6bea81",
+    "parentCommitShas": [
+      "bb40c439e1555d342713c775db2183730c6bea81"
+    ],
+    "governedTreeSha": "9dbb60e2f7540a7ba9c75f05fecb1aaf9309fd9c",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-CODEX-0204.bundle-manifest.json",
+      ".atm/history/evidence/TASK-CODEX-0204.json",
+      ".atm/history/evidence/TASK-RFT-0096.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0096.json",
+      ".atm/history/evidence/TASK-SKL-0013.bundle-manifest.json",
+      ".atm/history/evidence/TASK-SKL-0013.json",
+      ".atm/memory/atm-chart.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "packages/core/src/spec/parse-spec.ts",
+      "packages/core/src/spec/parse-spec/types.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-14-183.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-190.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/commit-range-guard.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/commit-range-guard.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
+      "release/atm-root-drop/packages/cli/dist/commands/internal-release.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/internal-release.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/active-work-summary.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/active-work-summary.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/commit-range-guard.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
+      "release/atm-root-drop/packages/cli/src/commands/internal-release.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/active-work-summary.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-hook-atomic-map.ts",
+      "release/atm-root-drop/scripts/validate-hook-batch-pending-window.ts",
+      "release/atm-root-drop/scripts/validate-internal-release-sync.ts",
+      "release/atm-root-drop/tests/cli/team-admission-projection.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1f2e73fee34e1c6425d753b3b0a11f67f3aaba3edf952b7546290d4509d08027",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-core-spec-parser.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7b7e213380dd20f4ef18f712c7b9b3029bea7c65802826a0b3cb62c5bf9303a2",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:be30b90d94df29f1eb2057689e02749c99136da8822f607d90ff6a5f8f77e66a",
+      "stderrSha256": "sha256:d4349f6fe750185bc471ee7ffd1bbc92f725d87e454afdf194c5d8bf4077f52c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3de94d23249b63333983e2c9a13d60466400e8fd47f8272955fac1f93ca6eb4b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:407c6a43731bce0d1aa6dfe984e824e69b6bfa36146662fbc5f4bc6dc8de585f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \" Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c5b4586bf7460034820e30e62c227fa78bdb18ef2a2bc737e297bc48f876d7f0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a6ec9c83a710099221538812cce480a885c805ffd07b238a36a69c8c010cf33",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:662ace88266c98557b210e64da3867c0ba2aa2de1c6f46fbafb6de026299c7bd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "and prompt issue translation behavior.\" --json",
+    "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+    "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "normalized model output",
+    "schema validation",
+    "typecheck",
+    "validate:cli",
+    "validate:core-spec-parser",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T16:05:15.723Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0096.*",
+      ".atm/history/task-events/TASK-RFT-0096/**",
+      ".atm/history/tasks/TASK-RFT-0096.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/spec/parse-spec.ts",
+      "packages/core/src/spec/parse-spec/**"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/spec/parse-spec.ts",
+      "packages/core/src/spec/parse-spec/**"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0096.json",
+  "closedAt": "2026-07-16T16:05:15.723Z",
+  "closedByActor": "codex-task-rft-0096",
+  "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "bb40c439e1555d342713c775db2183730c6bea81",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/spec/parse-spec.ts",
+      "packages/core/src/spec/parse-spec/types.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0096.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0096/2026-07-16T15-53-07-960Z-import-311f2ca4883e.json",
+      ".atm/history/task-events/TASK-RFT-0096/2026-07-16T15-53-17-319Z-reserve-af4019e5a4b4.json",
+      ".atm/history/task-events/TASK-RFT-0096/2026-07-16T15-53-17-321Z-promote-c4b36732d911.json",
+      ".atm/history/task-events/TASK-RFT-0096/2026-07-16T15-53-21-214Z-claim-d7060a442b3c.json",
+      ".atm/history/tasks/TASK-RFT-0096.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

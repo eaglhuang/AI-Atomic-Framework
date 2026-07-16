@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T16-05-15-735Z-close-3ebbc1f40b1f",
+  "taskId": "TASK-RFT-0096",
+  "action": "close",
+  "actorId": "codex-task-rft-0096",
+  "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0096.json",
+  "taskSha256": "sha256:1d661c96b837c3d6d7bdf6267eeead576123eb22f3177d2423084bb97affe069",
+  "createdAt": "2026-07-16T16:05:15.735Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0096 --actor codex-task-rft-0096 --status done --historical-delivery bb40c439e1555d342713c775db2183730c6bea81",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716155317-codex-task-rft-0096-TASK-RFT-0096-bee7d44ce7",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0096.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "and prompt issue translation behavior.\" --json",
+      "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+      "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "normalized model output",
+      "schema validation",
+      "typecheck",
+      "validate:cli",
+      "validate:core-spec-parser",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T16:05:15.723Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0096.*",
+        ".atm/history/task-events/TASK-RFT-0096/**",
+        ".atm/history/tasks/TASK-RFT-0096.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/spec/parse-spec.ts",
+        "packages/core/src/spec/parse-spec/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/spec/parse-spec.ts",
+        "packages/core/src/spec/parse-spec/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

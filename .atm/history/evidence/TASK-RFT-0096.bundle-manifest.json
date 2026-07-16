@@ -1,17 +1,19 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0096",
-  "updatedAt": "2026-07-16T15:59:17.400Z",
+  "updatedAt": "2026-07-16T16:05:09.524Z",
   "updatedBy": "codex-task-rft-0096",
   "freshValidationPasses": [
     "and prompt issue translation behavior.\" --json",
     "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+    "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "normalized model output",
     "schema validation",
     "typecheck",
     "validate:cli",
-    "validate:core-spec-parser"
+    "validate:core-spec-parser",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -81,6 +83,80 @@
       "generatedAt": "2026-07-16T15:59:17.511Z",
       "runnerKind": "dev-source",
       "sourceCommit": "9c3d80cecba949c7369d2717028c139643fb08eb",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:407c6a43731bce0d1aa6dfe984e824e69b6bfa36146662fbc5f4bc6dc8de585f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+        "schema validation",
+        "normalized model output",
+        "and prompt issue translation behavior.\" --json"
+      ],
+      "generatedAt": "2026-07-16T16:01:33.999Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T16:02:25.966Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c5b4586bf7460034820e30e62c227fa78bdb18ef2a2bc737e297bc48f876d7f0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal Split"
+      ],
+      "generatedAt": "2026-07-16T16:04:20.119Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9a6ec9c83a710099221538812cce480a885c805ffd07b238a36a69c8c010cf33",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+        "schema validation",
+        "normalized model output",
+        "and prompt issue translation behavior.\" --json"
+      ],
+      "generatedAt": "2026-07-16T16:04:48.944Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing, schema validation, normalized model output, and prompt issue translation behavior.\" --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:662ace88266c98557b210e64da3867c0ba2aa2de1c6f46fbafb6de026299c7bd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include packages/core/src/spec/parse-spec.ts --goal \"Split packages/core/src/spec/parse-spec.ts into a stable facade plus bounded support modules; every physical TypeScript source file must stay below 600 lines; preserve atomic spec parsing",
+        "schema validation",
+        "normalized model output",
+        "and prompt issue translation behavior.\" --json"
+      ],
+      "generatedAt": "2026-07-16T16:05:09.622Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
