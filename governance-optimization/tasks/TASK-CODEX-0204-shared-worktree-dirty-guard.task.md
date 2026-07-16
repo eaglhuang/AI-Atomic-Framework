@@ -4,6 +4,7 @@ title: Repair shared worktree active-task dirty guard
 status: planned
 owner: codex-bug-0204
 priority: High
+amendment_epoch: 1
 depends_on: []
 related_plan: docs/governance/atm-bug-and-optimization-backlog.md
 planning_repo: AI-Atomic-Framework
@@ -50,3 +51,7 @@ Fix ATM-BUG-2026-07-15-204 by making active-work recommendations account for dir
 - Do not implement destructive cleanup, stash, or restore behavior.
 - Do not change runner-sync admission or release publication policy.
 - Do not refactor the whole next/playbook projection surface.
+
+## Governance Amendments
+
+- 2026-07-16: Bump amendment epoch after the previously untracked planning source entered HEAD in commit `c30730934753b1b2ab291295dfb156842511d6b5`; content scope remains unchanged and this amendment records the governed planning-source seal transition.
