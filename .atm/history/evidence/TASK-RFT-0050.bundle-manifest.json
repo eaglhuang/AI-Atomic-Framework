@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0050",
+  "updatedAt": "2026-07-16T01:58:27.044Z",
+  "updatedBy": "codex-task-rft-0050",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+    "node --strip-types tests/cli/team-legacy-final-600.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-legacy-final-600.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:af766247b73e9ce0de7c8da30f836e40cfc56af94719dd26983d74a793815f16",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-legacy-final-600.test.ts"
+      ],
+      "generatedAt": "2026-07-16T01:58:15.842Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f106e7bbc36c7225a523bb8bbeec0de629af366",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0417f19931ec9e0f813a64b2ac98c779d842771d785562f36833f74a301af69a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-command-facade-atomization.test.ts"
+      ],
+      "generatedAt": "2026-07-16T01:58:18.461Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f106e7bbc36c7225a523bb8bbeec0de629af366",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T01:58:27.146Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7f106e7bbc36c7225a523bb8bbeec0de629af366",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
