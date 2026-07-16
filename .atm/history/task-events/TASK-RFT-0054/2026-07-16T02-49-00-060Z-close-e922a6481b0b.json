@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T02-49-00-060Z-close-e922a6481b0b",
+  "taskId": "TASK-RFT-0054",
+  "action": "close",
+  "actorId": "codex-task-rft-0054",
+  "sessionId": "session-20260716023625-codex-task-rft-0054-TASK-RFT-0054-5688b3e20c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0054.json",
+  "taskSha256": "sha256:760bcb7451c87258009a12333848a0e9954af890e1665ff088c1fe676df194e2",
+  "createdAt": "2026-07-16T02:49:00.060Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0054 --actor codex-task-rft-0054 --status done --historical-delivery dab343cc2765dd3872a1026f64315f22fe0a67ad",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716023625-codex-task-rft-0054-TASK-RFT-0054-5688b3e20c",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0054.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/taskflow-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T02:49:00.048Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0054.*",
+        ".atm/history/task-events/TASK-RFT-0054/**",
+        ".atm/history/tasks/TASK-RFT-0054.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/**/*.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/taskflow.ts",
+        "packages/cli/src/commands/taskflow/**/*.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

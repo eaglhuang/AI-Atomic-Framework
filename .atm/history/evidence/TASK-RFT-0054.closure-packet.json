@@ -1,0 +1,176 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0054",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "dab343cc2765dd3872a1026f64315f22fe0a67ad",
+  "governedTreeSha": "aa1904c877daab4c6951c32776c72a6b2cf5f162",
+  "targetCommitDelta": {
+    "currentCommitSha": "dab343cc2765dd3872a1026f64315f22fe0a67ad",
+    "parentCommitShas": [
+      "dab343cc2765dd3872a1026f64315f22fe0a67ad"
+    ],
+    "governedTreeSha": "aa1904c877daab4c6951c32776c72a6b2cf5f162",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/broker.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/playbook-projection.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/__tests__/commit-bundle-assembly.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-orchestration.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/close-orchestration.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/commit-bundle-assembly.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team-legacy.js",
+      "release/atm-root-drop/packages/cli/src/commands/broker.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/playbook-projection.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/commit-bundle-assembly.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team-legacy.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/run-validators.ts",
+      "release/atm-root-drop/scripts/validate-cli.ts",
+      "tests/cli/taskflow-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/taskflow-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4477666ecf49439be0024f7eb14e1ff59a7b2ad8410723be6482c1fb9bd8cbe9",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e91c5b37e72fbde176e887ca2eaa56a872681e26cd0c8d2490d0e5b8d9237f20",
+      "stderrSha256": "sha256:d544c8a8d65037c379d10d51f8e32067dd336c5f2ff3aa19cb698f6a964e55b7",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/taskflow-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T02:49:00.048Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0054.*",
+      ".atm/history/task-events/TASK-RFT-0054/**",
+      ".atm/history/tasks/TASK-RFT-0054.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/**/*.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "tests/cli/taskflow-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/**/*.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "tests/cli/taskflow-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0054.json",
+  "closedAt": "2026-07-16T02:49:00.048Z",
+  "closedByActor": "codex-task-rft-0054",
+  "sessionId": "session-20260716023625-codex-task-rft-0054-TASK-RFT-0054-5688b3e20c",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "dab343cc2765dd3872a1026f64315f22fe0a67ad",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/taskflow.ts",
+      "packages/cli/src/commands/taskflow/__tests__/commit-bundle-assembly.spec.ts",
+      "packages/cli/src/commands/taskflow/implementation.ts",
+      "tests/cli/taskflow-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0054.json",
+      ".atm/history/task-events/TASK-RFT-0054/2026-07-16T02-36-18-657Z-import-05f29fce81ab.json",
+      ".atm/history/task-events/TASK-RFT-0054/2026-07-16T02-36-25-743Z-reserve-3d25b395f1b8.json",
+      ".atm/history/task-events/TASK-RFT-0054/2026-07-16T02-36-25-745Z-promote-b0d912848954.json",
+      ".atm/history/task-events/TASK-RFT-0054/2026-07-16T02-36-28-195Z-claim-0c72b7b5f21a.json",
+      ".atm/history/task-events/TASK-RFT-0054/2026-07-16T02-47-05-502Z-scope-amendment-e898791d5547.json",
+      ".atm/history/tasks/TASK-RFT-0054.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "packages/cli/src/commands/taskflow/close-orchestration.ts",
+      "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+    ],
+    "waiverReason": "TASK-RFT-0054 scope covers packages/cli/src/commands/taskflow/**/*.ts; close-orchestration.ts and commit-bundle-assembly.ts were intentionally line-packed as part of the taskflow final-600 atomic map and validated by taskflow-final-600, typecheck, validate:cli, and validate:git-head-evidence. ATM historical-delivery classified the broad-glob sibling files as out-of-scope, so this waiver documents the governed map split rather than unrelated work."
+  },
+  "teamSummary": null
+}
