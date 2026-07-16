@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T15-59-22-785Z-close-14fc1eb04886",
+  "taskId": "TASK-LANE-0001",
+  "action": "close",
+  "actorId": "codex-lane-0001",
+  "sessionId": "session-20260716155642-codex-lane-0001-TASK-LANE-0001-21adb16727",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0001.json",
+  "taskSha256": "sha256:b367008797bda73e31116672cde7eec44092d47dc91775d1835800d4714dcaaf",
+  "createdAt": "2026-07-16T15:59:22.785Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0001 --actor codex-lane-0001 --status done --historical-delivery 9c3d80cecba949c7369d2717028c139643fb08eb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716155642-codex-lane-0001-TASK-LANE-0001-21adb16727",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0001.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+      "node --strip-types tests/cli/runner-sync-steward-release.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T15:59:22.770Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0001.*",
+        ".atm/history/task-events/TASK-LANE-0001/**",
+        ".atm/history/tasks/TASK-LANE-0001.json",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/core/src/broker/__tests__/runner-sync-steward-queue.test.ts",
+        "packages/core/src/broker/runner-sync-steward-queue.ts",
+        "tests/cli/runner-sync-steward-release.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
