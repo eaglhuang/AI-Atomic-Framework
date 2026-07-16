@@ -1,0 +1,110 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0081",
+  "updatedAt": "2026-07-16T10:19:45.916Z",
+  "updatedBy": "codex-task-rft-0081",
+  "freshValidationPasses": [
+    "doctor",
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-brokered-write"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:73b7f13ae9c3e8184bd93030cb2680bb5d7239b56a3abd32750d7e2cf27603b7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T10:18:16.592Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/atomic-map-physical-cap.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6a5394961ecbeb0dd15beb80213bf56fd974337c827996e91b8c0422bcb4843",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/atomic-map-physical-cap.test.ts"
+      ],
+      "generatedAt": "2026-07-16T10:18:16.646Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-brokered-write.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c4330ce1ca454fff39dbc221d5150e739ab2aa7ee70363b9ed2477facb39d4a4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-brokered-write"
+      ],
+      "generatedAt": "2026-07-16T10:18:19.633Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4c29e9d24a623c3706818a0e820cdf02a05a625e59f809968512b7fd31580f90",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T10:18:33.488Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T10:18:38.856Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10b9e1131e1d6d913c30a78e9135c0677eb0790950179ef7fc01f1bd9e85fb17",
+      "stderrSha256": "sha256:7eb1f71a135a5adbebce522a3eae475959675991673c1ef64e381dacdff634e3",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T10:19:18.843Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T10:19:45.968Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d9c1cfab783fa04a52454e85f9ec792dbf94db24",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
