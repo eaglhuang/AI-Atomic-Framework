@@ -1,13 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-LANE-0014",
-  "updatedAt": "2026-07-16T18:08:24.774Z",
+  "updatedAt": "2026-07-16T18:15:20.316Z",
   "updatedBy": "codex-lane-0014",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
     "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "node atm.mjs lane status --json",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -61,6 +63,32 @@
       "generatedAt": "2026-07-16T18:08:24.865Z",
       "runnerKind": "dev-source",
       "sourceCommit": "ca29ecb4f47360fd3674b973c2b1470b0e577a6e",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs lane status --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e2e2e1743c56e9dce24e1f92a32cb0deac0e175a247045d9795b3c26e79ca879",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs lane status --json"
+      ],
+      "generatedAt": "2026-07-16T18:14:36.648Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T18:15:20.396Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

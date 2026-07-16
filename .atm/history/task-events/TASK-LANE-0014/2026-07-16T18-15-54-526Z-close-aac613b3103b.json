@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T18-15-54-526Z-close-aac613b3103b",
+  "taskId": "TASK-LANE-0014",
+  "action": "close",
+  "actorId": "codex-lane-0014",
+  "sessionId": "session-20260716180344-codex-lane-0014-TASK-LANE-0014-d2c2b11ba2",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0014.json",
+  "taskSha256": "sha256:ec78df16fa68376eb64d8efc5d6a8d299acb764865dc9d64b41c555b24b72a6d",
+  "createdAt": "2026-07-16T18:15:54.526Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0014 --actor codex-lane-0014 --status done --historical-delivery eef10bf7178a8bdd26a688843027de65701b01b9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716180344-codex-lane-0014-TASK-LANE-0014-d2c2b11ba2",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0014.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "node atm.mjs lane status --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T18:15:54.519Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0014.*",
+        ".atm/history/task-events/TASK-LANE-0014/**",
+        ".atm/history/tasks/TASK-LANE-0014.json",
+        "packages/cli/src/commands/command-specs/lane.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/store.ts",
+        "packages/cli/src/commands/lane.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/command-specs/lane.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/store.ts",
+        "packages/cli/src/commands/lane.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
