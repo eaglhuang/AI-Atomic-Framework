@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0055",
+  "title": "Split validate-governance-commands facade below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0054"
+  ],
+  "acceptance": [
+    "Reduce `scripts/validate-governance-commands.ts` to at or below 600 physical lines.",
+    "Move validator implementation glue into bounded modules under `scripts/validate-governance-commands/**`.",
+    "Keep every new or touched validate-governance-commands support module at or below 600 physical lines.",
+    "Preserve the existing `node --strip-types scripts/validate-governance-commands.ts --mode validate` behavior.",
+    "Add a final-600 validator for the facade and `scripts/validate-governance-commands/**/*.ts`.",
+    "Update scripts owner shard coverage for the extracted validate-governance-commands implementation module."
+  ],
+  "deliverables": [
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-governance-commands/**/*.ts",
+    "tests/cli/validate-governance-commands-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-governance-commands.ts",
+    "scripts/validate-governance-commands/**/*.ts",
+    "tests/cli/validate-governance-commands-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/validate-governance-commands-final-600.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.git-governance-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validate-governance-commands-facade",
+        "pattern": "Facade",
+        "source": "scripts/validate-governance-commands.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.validate-governance-commands-implementation-carrier",
+        "pattern": "Strategy Map",
+        "source": "scripts/validate-governance-commands.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Current audit found `scripts/validate-governance-commands.ts` at 1489 physical lines after TASK-RFT-0054.\n- This card continues the RFT large-file atom-map/facade split series toward the physical-file limit of 600 lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0055-validate-governance-commands-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0055",
+    "headingLine": 47,
+    "hash": "3a63b46be961fadb",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0055-validate-governance-commands-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:3a63b46be961fadb14912ae316a52630717a5d4a9f7716f72decf9e8f7770fdd",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T02:51:50.475Z"
+    }
+  },
+  "importedAt": "2026-07-16T02:51:50.475Z",
+  "lastTransitionId": "2026-07-16T02-57-13-763Z-scope-amendment-ef85a57f4efb",
+  "lastTransitionAt": "2026-07-16T02:57:13.763Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0055",
+  "reservedAt": "2026-07-16T02:51:52.368Z",
+  "promotedAt": "2026-07-16T02:51:52.371Z",
+  "claim": {
+    "actorId": "codex-task-rft-0055",
+    "leaseId": "lease-e0fbe0df72c1",
+    "claimedAt": "2026-07-16T02:51:52.375Z",
+    "heartbeatAt": "2026-07-16T02:51:52.375Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0055.*",
+      ".atm/history/task-events/TASK-RFT-0055/**",
+      ".atm/history/tasks/TASK-RFT-0055.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/**/*.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "tests/cli/validate-governance-commands-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T02:51:52.375Z",
+  "startedByActor": "codex-task-rft-0055",
+  "startedBySessionId": "session-20260716025152-codex-task-rft-0055-TASK-RFT-0055-df31868b16",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0055",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0055.*",
+      ".atm/history/task-events/TASK-RFT-0055/**",
+      ".atm/history/tasks/TASK-RFT-0055.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/**/*.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "tests/cli/validate-governance-commands-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0055-validate-governance-commands-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0055-validate-governance-commands-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "8e6e4b3a2ce85a2868d810bf272a326d73d21b8e92e31ab1666b840910554093",
+    "actorId": "codex-task-rft-0055",
+    "createdAt": "2026-07-16T02:51:55.495Z",
+    "status": "active"
+  }
+}
