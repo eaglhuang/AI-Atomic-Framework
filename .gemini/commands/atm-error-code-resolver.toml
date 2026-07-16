@@ -33,9 +33,12 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 
 1. Extract exact `ATM_*` codes from the user text or CLI JSON.
 2. Read `docs/governance/error-code-registry.json` first.
-3. If a code is registered, answer from that registry entry.
-4. If a code is missing from the registry, read `docs/ERROR_CODES.md` to find
-   source location/context, then say the code is `registry-missing`.
+3. If a code has an exact registry entry, answer from that entry.
+4. If no exact entry exists, look for the longest matching `prefixRules[]`
+   entry in the same registry and report the code as `prefix-documented`.
+5. If neither an exact entry nor a prefix rule covers the code, read
+   `docs/ERROR_CODES.md` to find source location/context, then say the code is
+   `registry-missing`.
 5. Do not invent recovery authority. If the registry says human approval is
    required, state that before any retry command.
 
@@ -44,11 +47,13 @@ node atm.mjs next --prompt "$ARGUMENTS" --json
 For each code, report:
 
 - `meaning`: one short operator-facing sentence.
-- `category`: registry category, or `unknown` when registry-missing.
+- `category`: exact or prefix registry category, or `unknown` when
+  registry-missing.
 - `retryable`: `yes`, `no`, or `unknown`.
 - `human approval`: `yes`, `no`, or `unknown`.
 - `next safe action`: the smallest command or inspection step.
-- `source`: registry sourceOwner or source-index location.
+- `source`: exact registry sourceOwner, prefix rule sourceOwner, or source-index
+  location.
 
 If the code is `registry-missing`, add this remediation:
 
