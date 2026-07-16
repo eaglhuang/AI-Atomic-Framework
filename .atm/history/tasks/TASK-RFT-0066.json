@@ -1,0 +1,161 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0066",
+  "title": "Split task direction governance validator below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0065"
+  ],
+  "acceptance": [
+    "`node --strip-types tests/scripts/validate-task-direction-governance-final-600.test.ts` passes.",
+    "`npm run validate:task-direction-governance` passes.",
+    "`npm run validate:governance-projections` passes.",
+    "`npm run typecheck` passes.",
+    "Existing package.json validator wiring does not need command changes."
+  ],
+  "deliverables": [
+    "scripts/validate-task-direction-governance.ts",
+    "scripts/validate-task-direction-governance/**/*.ts",
+    "tests/scripts/validate-task-direction-governance-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-011.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "scopePaths": [
+    "scripts/validate-task-direction-governance.ts",
+    "scripts/validate-task-direction-governance/**/*.ts",
+    "tests/scripts/validate-task-direction-governance-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+    "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-011.json",
+    "docs/governance/atm-bug-and-optimization-backlog.md"
+  ],
+  "validators": [
+    "node --strip-types tests/scripts/validate-task-direction-governance-final-600.test.ts",
+    "npm run validate:task-direction-governance",
+    "npm run validate:governance-projections",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-direction-governance-validator-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.task-direction-governance-validator-facade",
+        "pattern": "Facade",
+        "source": "scripts/validate-task-direction-governance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0066-task-direction-governance-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0066",
+    "headingLine": 48,
+    "hash": "b669ba10b33b0b8d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0066-task-direction-governance-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:b669ba10b33b0b8d355bd7ac567e410dc8256bcbf52fc2eba50543064611b491",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T05:30:20.248Z"
+    }
+  },
+  "importedAt": "2026-07-16T05:30:20.248Z",
+  "lastTransitionId": "2026-07-16T05-45-48-502Z-scope-amendment-a4532a66a6b3",
+  "lastTransitionAt": "2026-07-16T05:45:48.502Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0066",
+  "reservedAt": "2026-07-16T05:30:26.415Z",
+  "promotedAt": "2026-07-16T05:30:26.417Z",
+  "claim": {
+    "actorId": "codex-task-rft-0066",
+    "leaseId": "lease-57e5cb625be0",
+    "claimedAt": "2026-07-16T05:30:26.420Z",
+    "heartbeatAt": "2026-07-16T05:30:26.420Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0066.*",
+      ".atm/history/task-events/TASK-RFT-0066/**",
+      ".atm/history/tasks/TASK-RFT-0066.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-011.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "scripts/validate-task-direction-governance.ts",
+      "scripts/validate-task-direction-governance/**/*.ts",
+      "scripts/validate-task-direction-governance/adopter-core.ts",
+      "scripts/validate-task-direction-governance/context.ts",
+      "scripts/validate-task-direction-governance/framework-development.ts",
+      "scripts/validate-task-direction-governance/main.ts",
+      "scripts/validate-task-direction-governance/prompt-scope.ts",
+      "scripts/validate-task-direction-governance/same-file-ownership.ts",
+      "tests/scripts/validate-task-direction-governance-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T05:30:26.420Z",
+  "startedByActor": "codex-task-rft-0066",
+  "startedBySessionId": "session-20260716053026-codex-task-rft-0066-TASK-RFT-0066-6f2a719305",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0066",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0066.*",
+      ".atm/history/task-events/TASK-RFT-0066/**",
+      ".atm/history/tasks/TASK-RFT-0066.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-011.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "scripts/validate-task-direction-governance.ts",
+      "scripts/validate-task-direction-governance/**/*.ts",
+      "scripts/validate-task-direction-governance/adopter-core.ts",
+      "scripts/validate-task-direction-governance/context.ts",
+      "scripts/validate-task-direction-governance/framework-development.ts",
+      "scripts/validate-task-direction-governance/main.ts",
+      "scripts/validate-task-direction-governance/prompt-scope.ts",
+      "scripts/validate-task-direction-governance/same-file-ownership.ts",
+      "tests/scripts/validate-task-direction-governance-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0066-task-direction-governance-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0066-task-direction-governance-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "63f7816bfb42e42cd7e59194b51e7f3c51b7ce0b00516c222ecc84a65d4a4b3a",
+    "actorId": "codex-task-rft-0066",
+    "createdAt": "2026-07-16T05:30:29.541Z",
+    "status": "active"
+  }
+}
