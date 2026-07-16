@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0065",
+  "updatedAt": "2026-07-16T05:23:54.077Z",
+  "updatedBy": "codex-task-rft-0065",
+  "freshValidationPasses": [
+    "node --strip-types tests/scripts/validate-team-brokered-write-final-600.test.ts",
+    "typecheck",
+    "validate:team-brokered-write"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/scripts/validate-team-brokered-write-final-600.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9b1f4a9bb6a90f66786b34d236d13520d3843396503cacad7db72951dcd7ac62",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/scripts/validate-team-brokered-write-final-600.test.ts"
+      ],
+      "generatedAt": "2026-07-16T05:23:31.983Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "589a0c0cb4bb5ed53aeb22f57eb65721c3b3ea23",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:team-brokered-write",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:615d8003cd80d2b7380f261574f49d073a54f7e5a68a48e4e2caf33f1758d819",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:team-brokered-write"
+      ],
+      "generatedAt": "2026-07-16T05:23:41.161Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "589a0c0cb4bb5ed53aeb22f57eb65721c3b3ea23",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T05:23:54.129Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "589a0c0cb4bb5ed53aeb22f57eb65721c3b3ea23",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
