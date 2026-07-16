@@ -1,8 +1,8 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-LANE-0010",
-  "updatedAt": "2026-07-16T15:39:18.120Z",
-  "updatedBy": "codex-lane-0010",
+  "updatedAt": "2026-07-16T16:50:14.657Z",
+  "updatedBy": "codex-lane-0010-takeover",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
     "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
@@ -75,6 +75,45 @@
       "generatedAt": "2026-07-16T15:39:18.345Z",
       "runnerKind": "dev-source",
       "sourceCommit": "da400e119fab195ce7420c3f039e238dd4cc2186",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7f22b704843788cda702b122d3d5aa826c6038f15043b38fbcebff2bc274953a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts"
+      ],
+      "generatedAt": "2026-07-16T16:49:50.190Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a25b6e8862fb814b66ec2bb4be352cafe312ca2",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9ecccd68e916e1526b7c4004d2fb1f0b596a3994219b80f78418a4826253576c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+      ],
+      "generatedAt": "2026-07-16T16:49:58.630Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a25b6e8862fb814b66ec2bb4be352cafe312ca2",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T16:50:14.740Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "4a25b6e8862fb814b66ec2bb4be352cafe312ca2",
       "cached": false
     }
   ],

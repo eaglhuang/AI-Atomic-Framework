@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-LANE-0010",
   "title": "Lane session store and event stream",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [],
   "acceptance": [
@@ -88,17 +88,16 @@
     }
   },
   "importedAt": "2026-07-16T15:04:53.109Z",
-  "lastTransitionId": "2026-07-16T15-32-15-037Z-claim-3552a3de932e",
-  "lastTransitionAt": "2026-07-16T15:32:15.037Z",
+  "lastTransitionId": "2026-07-16T16-50-52-715Z-close-376c28abe57c",
+  "lastTransitionAt": "2026-07-16T16:50:52.715Z",
   "ledgerContractVersion": "task-ledger/v1",
-  "owner": "codex-lane-0010",
   "reservedAt": "2026-07-16T15:32:10.801Z",
   "promotedAt": "2026-07-16T15:32:10.805Z",
   "claim": {
-    "actorId": "codex-lane-0010",
-    "leaseId": "lease-3f1f9c888c82",
-    "claimedAt": "2026-07-16T15:32:10.808Z",
-    "heartbeatAt": "2026-07-16T15:32:10.808Z",
+    "actorId": "codex-lane-0010-takeover",
+    "leaseId": "lease-6a166ded2c35",
+    "claimedAt": "2026-07-16T16:49:06.708Z",
+    "heartbeatAt": "2026-07-16T16:50:52.711Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-LANE-0010.json",
@@ -107,12 +106,13 @@
       "packages/cli/src/commands/lane-session/events.ts",
       "packages/cli/src/commands/lane-session/store.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-16T15:32:10.808Z",
   "startedByActor": "codex-lane-0010",
-  "startedBySessionId": "session-20260716153210-codex-lane-0010-TASK-LANE-0010-1b6c343837",
+  "startedBySessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+  "owner": "codex-lane-0010-takeover",
   "taskDirectionLock": {
     "schemaId": "atm.taskDirectionLock.v1",
     "specVersion": "0.1.0",
@@ -134,9 +134,13 @@
     "planningMirrorPaths": [],
     "allowPlanningMirror": false,
     "promptHash": "227b1bdd2d02bb318364dd0ff6672b00333cd7e61427b5bdfbf95cad406b1cbb",
-    "actorId": "codex-lane-0010",
-    "sessionId": "session-20260716153210-codex-lane-0010-TASK-LANE-0010-1b6c343837",
-    "createdAt": "2026-07-16T15:32:15.035Z",
+    "actorId": "codex-lane-0010-takeover",
+    "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+    "createdAt": "2026-07-16T16:49:07.445Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-16T16:50:52.711Z",
+  "closedByActor": "codex-lane-0010-takeover",
+  "closedBySessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+  "closurePacket": ".atm/history/evidence/TASK-LANE-0010.closure-packet.json"
 }

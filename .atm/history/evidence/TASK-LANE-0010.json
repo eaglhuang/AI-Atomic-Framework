@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-LANE-0010",
-  "updatedAt": "2026-07-16T15:39:18.120Z",
+  "updatedAt": "2026-07-16T16:50:14.657Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -281,6 +281,177 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:8cc8546dd59b59eee3a453b6517ef22de35a7ca85f5064485d0d12d72a4ea834",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-lane-0010-takeover",
+      "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+      "createdAt": "2026-07-16T16:49:50.126Z",
+      "details": {
+        "actorId": "codex-lane-0010-takeover",
+        "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.lane-session-runtime",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:7f22b704843788cda702b122d3d5aa826c6038f15043b38fbcebff2bc274953a",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4a25b6e8862fb814b66ec2bb4be352cafe312ca2",
+            "cacheKey": "sha256:270cbd6d91ac33dab9352cc436e2ddf57b8545371912408595f536726e9371bd",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:49:50.190Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:fb16973969cb51444fe494041fc220d64043afcf4406b651b79247952a831f38",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-lane-0010-takeover",
+      "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+      "createdAt": "2026-07-16T16:49:58.573Z",
+      "details": {
+        "actorId": "codex-lane-0010-takeover",
+        "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.lane-session-runtime",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:9ecccd68e916e1526b7c4004d2fb1f0b596a3994219b80f78418a4826253576c",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4a25b6e8862fb814b66ec2bb4be352cafe312ca2",
+            "cacheKey": "sha256:2d524404913c5908fb7c2f7f6e0f885dd09c8528d9c0f18c22ab3049414d47d0",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:49:58.630Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a166c15c4fbcda26cd48344495486041354254a48906b36a4863f82cabe9c0a1",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-lane-0010-takeover",
+      "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+      "createdAt": "2026-07-16T16:50:14.657Z",
+      "details": {
+        "actorId": "codex-lane-0010-takeover",
+        "sessionId": "session-20260716164906-codex-lane-0010-takeover-TASK-LANE-0010-456d3805a2",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atm.lane-session-runtime",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "4a25b6e8862fb814b66ec2bb4be352cafe312ca2",
+            "cacheKey": "sha256:be68699fa3082bc8a060bd68f6573d0b057b5daae947608250e8e05ca5601f04",
+            "cached": false,
+            "generatedAt": "2026-07-16T16:50:14.740Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:799660155ee7bf3a9a6e31b0256b44e22404230a2ade96d81cfc8b404e2a3225",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

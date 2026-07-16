@@ -1,0 +1,15 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T16-48-59-883Z-repair-claim-fa53ab7dd459",
+  "taskId": "TASK-LANE-0010",
+  "action": "repair-claim",
+  "actorId": "codex-lane-0010-takeover",
+  "sessionId": "session-20260716153210-codex-lane-0010-TASK-LANE-0010-1b6c343837",
+  "fromStatus": "running",
+  "toStatus": "ready",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0010.json",
+  "taskSha256": "sha256:a88b0eade10df9efc1088a82a5e1f58371911e2b3f7820673317858936376a1d",
+  "createdAt": "2026-07-16T16:48:59.883Z",
+  "command": "node atm.mjs tasks repair-claim --task TASK-LANE-0010 --actor codex-lane-0010-takeover --write --reason \"expired prior lane-session claim; resume closeout under current captain without editing source planning cards\" --json"
+}
