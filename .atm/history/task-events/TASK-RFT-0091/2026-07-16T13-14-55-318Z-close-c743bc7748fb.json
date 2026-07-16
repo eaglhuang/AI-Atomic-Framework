@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T13-14-55-318Z-close-c743bc7748fb",
+  "taskId": "TASK-RFT-0091",
+  "action": "close",
+  "actorId": "codex-task-rft-0091",
+  "sessionId": "session-20260716130223-codex-task-rft-0091-TASK-RFT-0091-188b56ac3d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0091.json",
+  "taskSha256": "sha256:d75804d5ae0749e0a37cd4e013919dfa65e795a70ce051c4e1bb50dcbb5a1735",
+  "createdAt": "2026-07-16T13:14:55.318Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0091 --actor codex-task-rft-0091 --status done --historical-delivery 3caa47f04678e0d17d831211631339f528c1f953",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716130223-codex-task-rft-0091-TASK-RFT-0091-188b56ac3d",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0091.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --test packages/language-python/test/atomization-planning.test.ts",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:python-adapter"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T13:14:55.310Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0091.*",
+        ".atm/history/task-events/TASK-RFT-0091/**",
+        ".atm/history/tasks/TASK-RFT-0091.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/language-python/src/index.ts",
+        "packages/language-python/src/language-python-adapter.ts",
+        "packages/language-python/src/language-python-adapter/**",
+        "packages/language-python/test/atomization-planning.test.ts",
+        "scripts/validate-python-adapter.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/language-python/src/index.ts",
+        "packages/language-python/src/language-python-adapter.ts",
+        "packages/language-python/src/language-python-adapter/**",
+        "packages/language-python/test/atomization-planning.test.ts",
+        "scripts/validate-python-adapter.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

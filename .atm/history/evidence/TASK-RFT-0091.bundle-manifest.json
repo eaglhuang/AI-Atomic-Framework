@@ -1,13 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0091",
-  "updatedAt": "2026-07-16T13:07:12.432Z",
+  "updatedAt": "2026-07-16T13:09:31.112Z",
   "updatedBy": "codex-task-rft-0091",
   "freshValidationPasses": [
     "node --test packages/language-python/test/atomization-planning.test.ts",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:python-adapter"
   ],
   "staleValidationPasses": [],
@@ -114,6 +115,19 @@
       "generatedAt": "2026-07-16T13:07:12.486Z",
       "runnerKind": "dev-source",
       "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T13:09:31.182Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
