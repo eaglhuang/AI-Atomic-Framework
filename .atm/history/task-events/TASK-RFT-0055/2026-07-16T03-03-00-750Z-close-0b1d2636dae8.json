@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T03-03-00-750Z-close-0b1d2636dae8",
+  "taskId": "TASK-RFT-0055",
+  "action": "close",
+  "actorId": "codex-task-rft-0055",
+  "sessionId": "session-20260716025152-codex-task-rft-0055-TASK-RFT-0055-df31868b16",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0055.json",
+  "taskSha256": "sha256:5df9dc6da8a832da9ab93bbcb9f1359bd1c7aca1989d558b6a06741bbd8c017d",
+  "createdAt": "2026-07-16T03:03:00.750Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0055 --actor codex-task-rft-0055 --status done --historical-delivery c1f7f1ae0bdcf5e5f95555d82f40f2bf24e9d21e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716025152-codex-task-rft-0055-TASK-RFT-0055-df31868b16",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0055.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/validate-governance-commands-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T03:03:00.736Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0055.*",
+        ".atm/history/task-events/TASK-RFT-0055/**",
+        ".atm/history/tasks/TASK-RFT-0055.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-governance-commands/**/*.ts",
+        "scripts/validate-governance-commands/implementation.ts",
+        "tests/cli/validate-governance-commands-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-governance-commands.ts",
+        "scripts/validate-governance-commands/**/*.ts",
+        "scripts/validate-governance-commands/implementation.ts",
+        "tests/cli/validate-governance-commands-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0055",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "c1f7f1ae0bdcf5e5f95555d82f40f2bf24e9d21e",
+  "governedTreeSha": "047f08485c2e2236152208efc6915aba3e809216",
+  "targetCommitDelta": {
+    "currentCommitSha": "c1f7f1ae0bdcf5e5f95555d82f40f2bf24e9d21e",
+    "parentCommitShas": [
+      "c1f7f1ae0bdcf5e5f95555d82f40f2bf24e9d21e"
+    ],
+    "governedTreeSha": "047f08485c2e2236152208efc6915aba3e809216",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "tests/cli/validate-governance-commands-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/validate-governance-commands-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ce64743a2cbdf41f200429e2b9a8441f0132658794f30fb12af042603d131138",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a33945ff35fbd5d9c516c38ad8973316251efec8ac8ff2c756d4d9ee7d69424c",
+      "stderrSha256": "sha256:b386e552c074f8a03717b24b9667f6befca708546f4061c11d5a90ce188984fc",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/validate-governance-commands-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T03:03:00.736Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0055.*",
+      ".atm/history/task-events/TASK-RFT-0055/**",
+      ".atm/history/tasks/TASK-RFT-0055.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/**/*.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "tests/cli/validate-governance-commands-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/**/*.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "tests/cli/validate-governance-commands-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0055.json",
+  "closedAt": "2026-07-16T03:03:00.736Z",
+  "closedByActor": "codex-task-rft-0055",
+  "sessionId": "session-20260716025152-codex-task-rft-0055-TASK-RFT-0055-df31868b16",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "c1f7f1ae0bdcf5e5f95555d82f40f2bf24e9d21e",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-governance-commands.ts",
+      "scripts/validate-governance-commands/implementation.ts",
+      "tests/cli/validate-governance-commands-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0055.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0055/2026-07-16T02-51-50-645Z-import-f58925fb6963.json",
+      ".atm/history/task-events/TASK-RFT-0055/2026-07-16T02-51-52-368Z-reserve-8e1b90e34c03.json",
+      ".atm/history/task-events/TASK-RFT-0055/2026-07-16T02-51-52-371Z-promote-5a64aa867f51.json",
+      ".atm/history/task-events/TASK-RFT-0055/2026-07-16T02-51-55-475Z-claim-2ca68c909677.json",
+      ".atm/history/task-events/TASK-RFT-0055/2026-07-16T02-57-13-763Z-scope-amendment-ef85a57f4efb.json",
+      ".atm/history/tasks/TASK-RFT-0055.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
