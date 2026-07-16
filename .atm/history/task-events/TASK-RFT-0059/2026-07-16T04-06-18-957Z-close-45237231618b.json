@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T04-06-18-957Z-close-45237231618b",
+  "taskId": "TASK-RFT-0059",
+  "action": "close",
+  "actorId": "codex-task-rft-0059",
+  "sessionId": "session-20260716033459-codex-task-rft-0059-TASK-RFT-0059-59b5c4108f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0059.json",
+  "taskSha256": "sha256:c694e4279f07620f5bb778fc32bda0428c84a82e7d797f9aca06cabdfab5d850",
+  "createdAt": "2026-07-16T04:06:18.957Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0059 --actor codex-task-rft-0059 --status done --historical-delivery f450aaa77ea60a5478acdda1eeb66c828f80797f",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716033459-codex-task-rft-0059-TASK-RFT-0059-59b5c4108f",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0059.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/plugin-governance-local/bootstrap-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T04:06:18.947Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0059.*",
+        ".atm/history/task-events/TASK-RFT-0059/**",
+        ".atm/history/tasks/TASK-RFT-0059.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins*.json",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+        "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+        "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+        "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

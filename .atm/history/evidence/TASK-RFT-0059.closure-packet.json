@@ -1,0 +1,153 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0059",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "f450aaa77ea60a5478acdda1eeb66c828f80797f",
+  "governedTreeSha": "52e8c99963cbd2a6a909f4ae2b6b0df7ebd6855c",
+  "targetCommitDelta": {
+    "currentCommitSha": "f450aaa77ea60a5478acdda1eeb66c828f80797f",
+    "parentCommitShas": [
+      "f450aaa77ea60a5478acdda1eeb66c828f80797f"
+    ],
+    "governedTreeSha": "52e8c99963cbd2a6a909f4ae2b6b0df7ebd6855c",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0059.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0059.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/bootstrap.d.ts",
+      "release/atm-root-drop/packages/plugin-governance-local/dist/bootstrap/bootstrap.js",
+      "release/atm-root-drop/packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/plugin-governance-local/bootstrap-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:61ad8d4895624ea909295d56145b72152ffceedcba80454adbae6fb1514f06a4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b10721c6ecbad01b8d6d75a0edec2c801d76c22a52618273852d7bf7fb4d2a1d",
+      "stderrSha256": "sha256:7c81f8b43d5678ed8bf9743889785f55340b724278e97495a28a46a5ba25031c",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b10721c6ecbad01b8d6d75a0edec2c801d76c22a52618273852d7bf7fb4d2a1d",
+      "stderrSha256": "sha256:6d578cf84f31672606bf9a40b1aa41190b28aac7114724f2c1c5aeca928b8cc3",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/plugin-governance-local/bootstrap-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T04:06:18.947Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0059.*",
+      ".atm/history/task-events/TASK-RFT-0059/**",
+      ".atm/history/tasks/TASK-RFT-0059.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins*.json",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+      "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/plugin-governance-local/src/bootstrap/bootstrap.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/**/*.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/root-entry-patching.ts",
+      "tests/plugin-governance-local/bootstrap-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0059.json",
+  "closedAt": "2026-07-16T04:06:18.947Z",
+  "closedByActor": "codex-task-rft-0059",
+  "sessionId": "session-20260716033459-codex-task-rft-0059-TASK-RFT-0059-59b5c4108f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "f450aaa77ea60a5478acdda1eeb66c828f80797f",
+    "taskMatchedFiles": [
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/bootstrap-support.ts",
+      "packages/plugin-governance-local/src/bootstrap/bootstrap/implementation.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/git-head.jsonl"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
