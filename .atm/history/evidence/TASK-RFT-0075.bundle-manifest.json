@@ -1,12 +1,13 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0075",
-  "updatedAt": "2026-07-16T07:32:24.938Z",
+  "updatedAt": "2026-07-16T07:34:55.888Z",
   "updatedBy": "codex-task-rft-0075",
   "freshValidationPasses": [
     "node --strip-types tests/scripts/validate-schemas-final-600.test.ts",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:governance-projections",
     "validate:schemas"
   ],
@@ -75,6 +76,19 @@
       "generatedAt": "2026-07-16T07:32:24.992Z",
       "runnerKind": "dev-source",
       "sourceCommit": "242f594b6bde55e8a1bcd97eeb832518c22b833b",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T07:34:55.953Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "7063798600bff1a169e737126a3e6dc19094c5f0",
       "cached": false
     }
   ],

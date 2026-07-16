@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T07-37-01-186Z-close-7ebfa5ecfdee",
+  "taskId": "TASK-RFT-0075",
+  "action": "close",
+  "actorId": "codex-task-rft-0075",
+  "sessionId": "session-20260716072847-codex-task-rft-0075-TASK-RFT-0075-806ea03d97",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0075.json",
+  "taskSha256": "sha256:d2b6683d7197286e3e2fed7a717e39940513e3a7037114ff451911f142084754",
+  "createdAt": "2026-07-16T07:37:01.186Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0075 --actor codex-task-rft-0075 --status done --historical-delivery 7063798600bff1a169e737126a3e6dc19094c5f0",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716072847-codex-task-rft-0075-TASK-RFT-0075-806ea03d97",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0075.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-schemas-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:schemas"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T07:37:01.180Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0075.*",
+        ".atm/history/task-events/TASK-RFT-0075/**",
+        ".atm/history/tasks/TASK-RFT-0075.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/validate-schemas.ts",
+        "scripts/validate-schemas/**/*.ts",
+        "scripts/validate-schemas/broker-team-contracts.ts",
+        "scripts/validate-schemas/context.ts",
+        "scripts/validate-schemas/core-contracts.ts",
+        "scripts/validate-schemas/fixtures-and-protection.ts",
+        "tests/scripts/validate-schemas-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-schemas.ts",
+        "scripts/validate-schemas/**/*.ts",
+        "scripts/validate-schemas/broker-team-contracts.ts",
+        "scripts/validate-schemas/context.ts",
+        "scripts/validate-schemas/core-contracts.ts",
+        "scripts/validate-schemas/fixtures-and-protection.ts",
+        "tests/scripts/validate-schemas-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
