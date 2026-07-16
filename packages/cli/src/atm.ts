@@ -24,6 +24,7 @@ import { runHandoff } from './commands/handoff.ts';
 import { runInit } from './commands/init.ts';
 import { runInternalRelease } from './commands/internal-release.ts';
 import { runIntegration } from './commands/integration.ts';
+import { runLane } from './commands/lane.ts';
 import { runLock } from './commands/lock.ts';
 import { runNext } from './commands/next.ts';
 import { runOrient } from './commands/orient.ts';
@@ -95,6 +96,7 @@ export const cliCommandRunners: Record<string, (argv: string[]) => Promise<Comma
   'internal-release': runInternalRelease,
   'git-hooks': runGitHooks,
   integration: runIntegration,
+  lane: runLane,
   lock: runLock,
   next: runNext,
   orient: runOrient,

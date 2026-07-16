@@ -125,6 +125,7 @@ export interface ToolBridgeProjection {
   allowedCommands?: readonly string[];
   blockedCommands?: readonly string[];
   skillGrowth?: Record<string, unknown> | null;
+  laneSession?: Record<string, unknown> | null;
 }
 
 
@@ -228,6 +229,11 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
     : nextAction && isRecord(nextAction.skillGrowth)
       ? nextAction.skillGrowth
       : null;
+  const laneSession = isRecord(evidence.laneSession)
+    ? evidence.laneSession
+    : nextAction && isRecord(nextAction.laneSession)
+      ? nextAction.laneSession
+      : null;
   const allowedCommands = readStringList(evidence.allowedCommands)
     ?? (nextAction ? readStringList(nextAction.allowedCommands) : undefined);
   const blockedCommands = readStringList(evidence.blockedCommands)
@@ -245,7 +251,8 @@ export function projectToolBridgeFields(evidence: Record<string, unknown>): Tool
     commitBundle,
     allowedCommands,
     blockedCommands,
-    skillGrowth
+    skillGrowth,
+    laneSession
   };
 }
 

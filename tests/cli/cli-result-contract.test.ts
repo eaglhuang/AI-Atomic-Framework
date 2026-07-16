@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -136,6 +137,22 @@ assert.equal(evidenceProjection.evidenceSummary?.taskId, 'TASK-SKL-0004');
 assert.deepEqual(evidenceProjection.evidenceSummary?.freshValidationPasses, ['git diff --check']);
 assert.deepEqual(evidenceProjection.evidenceSummary?.artifactPaths, ['artifacts/report.json']);
 
+const laneSessionProjection = enrichCommandResult(makeResult({
+  ok: true,
+  command: 'lane',
+  cwd: process.cwd(),
+  messages: [message('info', 'ATM_LANE_SESSION_STATUS', 'status', {})],
+  evidence: {
+    laneSession: {
+      laneSessionId: 'lane-fixture',
+      status: 'active',
+      source: 'minted',
+      exportHint: 'export ATM_LANE_SESSION_ID="lane-fixture"'
+    }
+  }
+}));
+assert.equal(laneSessionProjection.laneSession?.laneSessionId, 'lane-fixture');
+
 const guardProjection = enrichCommandResult(makeResult({
   ok: false,
   command: 'guard',
@@ -241,5 +258,37 @@ assert.equal(unknown.payload.exitCode, 2);
 assert.equal(unknown.payload.blocking, true);
 assert.ok(unknown.payload.diagnostics.errorCodes.includes('ATM_CLI_UNKNOWN_COMMAND'));
 assert.equal(validateCliResult(unknown.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+
+const laneRepo = mkdtempSync(path.join(os.tmpdir(), 'atm-lane-contract-'));
+const previousLaneEnv = process.env.ATM_LANE_SESSION_ID;
+try {
+  delete process.env.ATM_LANE_SESSION_ID;
+  const mintedLane = await captureCli(['lane', 'status', '--cwd', laneRepo, '--actor', 'agent-a', '--json']);
+  assert.equal(mintedLane.exitCode, 0);
+  assert.equal(mintedLane.payload.laneSession?.source, 'minted');
+  assert.match(mintedLane.payload.laneSession?.laneSessionId, /^lane-/);
+  assert.ok(mintedLane.payload.diagnostics.infoCodes.includes('ATM_LANE_SESSION_MINTED'));
+  assert.equal(validateCliResult(mintedLane.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+
+  const secondLane = await captureCli(['lane', 'status', '--cwd', laneRepo, '--actor', 'agent-a', '--json']);
+  assert.equal(secondLane.exitCode, 0);
+  assert.equal(secondLane.payload.laneSession?.source, 'minted');
+  assert.ok(secondLane.payload.diagnostics.warningCodes.includes('ATM_LANE_SESSION_ADOPTABLE'));
+  assert.equal(validateCliResult(secondLane.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+
+  process.env.ATM_LANE_SESSION_ID = 'missing-lane';
+  const staleEnvLane = await captureCli(['lane', 'status', '--cwd', laneRepo, '--actor', 'agent-a', '--json']);
+  assert.equal(staleEnvLane.exitCode, 0);
+  assert.equal(staleEnvLane.payload.laneSession?.source, 'minted');
+  assert.ok(staleEnvLane.payload.diagnostics.warningCodes.includes('ATM_LANE_SESSION_STALE_ENV'));
+  assert.equal(validateCliResult(staleEnvLane.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+} finally {
+  if (previousLaneEnv === undefined) {
+    delete process.env.ATM_LANE_SESSION_ID;
+  } else {
+    process.env.ATM_LANE_SESSION_ID = previousLaneEnv;
+  }
+  rmSync(laneRepo, { recursive: true, force: true });
+}
 
 console.log('[cli-result-contract:test] ok');
