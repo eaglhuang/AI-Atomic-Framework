@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T06-58-35-133Z-scope-amendment-2cb24e2ad6b9",
+  "taskId": "TASK-RFT-0072",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0072",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0072.json",
+  "taskSha256": "sha256:92cfbfb890d03fbfe354ab823cfe571dde2f5ff5f2964c327aa396b15814ed92",
+  "createdAt": "2026-07-16T06:58:35.133Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0072 --actor codex-task-rft-0072 --add \"packages/core/src/broker/decision/admission.ts,packages/core/src/broker/decision/decomposition.ts,packages/core/src/broker/decision/failure.ts,packages/core/src/broker/decision/physical-overlap.ts,packages/core/src/broker/decision/proposal-overlap.ts,packages/core/src/broker/decision/surfaces.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}
