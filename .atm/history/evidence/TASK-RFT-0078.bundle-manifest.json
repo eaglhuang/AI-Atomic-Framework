@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0078",
+  "updatedAt": "2026-07-16T09:36:39.188Z",
+  "updatedBy": "codex-task-rft-0078",
+  "freshValidationPasses": [
+    "doctor",
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "validate:atomization-coverage"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-atomization-coverage.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:82f6f0cc41c642ca139d07f4a4ecf64b959b63e8e74d3a7c0dec0141e0cc29ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:atomization-coverage"
+      ],
+      "generatedAt": "2026-07-16T09:36:34.657Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "089d63ab6e1917e4cee222253bbd109bd139b4e8",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:04ca4d921a653228428ec90be89773edf73d78fb1befb0c6b9d0bfa98473bde8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T09:36:34.658Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "089d63ab6e1917e4cee222253bbd109bd139b4e8",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/atomic-map-physical-cap.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6a5394961ecbeb0dd15beb80213bf56fd974337c827996e91b8c0422bcb4843",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/atomic-map-physical-cap.test.ts"
+      ],
+      "generatedAt": "2026-07-16T09:36:34.732Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "089d63ab6e1917e4cee222253bbd109bd139b4e8",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a58e3489bbb9929ce3f3f21b65203a082cd03b5c11e24ee1ca6d2782b40464bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T09:36:39.238Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "089d63ab6e1917e4cee222253bbd109bd139b4e8",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

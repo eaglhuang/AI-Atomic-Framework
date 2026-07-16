@@ -71,7 +71,7 @@ export function mergeOwnerShards(repoRoot, manifest = loadManifest(repoRoot)) {
   }
 
   const shardPaths = [...manifest.shardPaths].sort((left, right) => left.localeCompare(right));
-  const shardOwnershipByPattern = new Map();
+  const shardOwnershipByPatternAndAtom = new Map();
   const mergedMappings = [];
 
   for (const shardRelativePath of shardPaths) {
@@ -84,17 +84,19 @@ export function mergeOwnerShards(repoRoot, manifest = loadManifest(repoRoot)) {
         throw new Error(`Owner shard ${shardRelativePath} contains mapping without path_pattern`);
       }
 
-      const existing = shardOwnershipByPattern.get(pathPattern);
-      if (existing && existing.shardRelativePath !== shardRelativePath) {
+      const ownershipKey = `${pathPattern}\0${String(mapping.atom_id ?? '')}`;
+      const existing = shardOwnershipByPatternAndAtom.get(ownershipKey);
+      if (existing && existing.ownerId !== ownerId) {
         throw new Error(
-          `Duplicate path_pattern ownership for "${pathPattern}" between shards `
+          `Duplicate path_pattern + atom_id ownership for "${pathPattern}" `
+          + `(atom_id=${String(mapping.atom_id ?? '')}) between shards `
           + `"${existing.shardRelativePath}" (owner=${existing.ownerId}) and `
           + `"${shardRelativePath}" (owner=${ownerId})`
         );
       }
 
       if (!existing) {
-        shardOwnershipByPattern.set(pathPattern, { shardRelativePath, ownerId });
+        shardOwnershipByPatternAndAtom.set(ownershipKey, { shardRelativePath, ownerId });
       }
       mergedMappings.push({ ...mapping });
     }
@@ -188,7 +190,7 @@ export function writeProjectionFromShards(repoRoot, manifest = loadManifest(repo
   }
   const merged = mergeOwnerShards(repoRoot, manifest);
   const projectionPath = resolveRepoPath(repoRoot, manifest.projectionPath ?? PROJECTION_REL);
-  writeFileSync(projectionPath, `${JSON.stringify(merged, null, 2)}\n`, 'utf8');
+  writeFileSync(projectionPath, `${JSON.stringify(merged)}\n`, 'utf8');
   return { projectionPath, mappingCount: merged.mappings.length };
 }
 

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0078",
+  "title": "Cap atomization coverage map physical files below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0077"
+  ],
+  "acceptance": [
+    "`atomic_workbench/atomization-coverage/path-to-atom-map.json` is below 600 physical lines.",
+    "`atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json` is below 600 physical lines.",
+    "The shard merge validator proves the projection still semantically matches owner shards.",
+    "Existing direct JSON readers of `owner-shard-cli.json` continue to pass without caller rewrites.",
+    "A focused guard fails if the projection or CLI owner shard regresses above 600 lines."
+  ],
+  "deliverables": [
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "tests/atomic-map-physical-cap.test.ts"
+  ],
+  "scopePaths": [
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-*.json",
+    "tests/atomic-map-physical-cap.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "node --strip-types scripts/validate-atomization-coverage.ts",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the TASK-RFT-0078 delivery commit and close bundle; if projection formatting changes are reverted, rebuild projection through the shard merge tool before retrying.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.atomization-coverage-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.atomization-coverage-map-physical-cap",
+        "pattern": "Result Contract Object",
+        "source": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0078-atomization-map-physical-cap.task.md",
+    "sectionTitle": "TASK-RFT-0078",
+    "headingLine": 50,
+    "hash": "3b65c9f50f0c69e8",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0078-atomization-map-physical-cap.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:3b65c9f50f0c69e80d0495ea9efa7b53e32fc9acc76c8d07a035b4cc82ed5130",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T09:32:19.020Z"
+    }
+  },
+  "importedAt": "2026-07-16T09:32:19.020Z",
+  "lastTransitionId": "2026-07-16T09-32-24-283Z-claim-ce7245f6f807",
+  "lastTransitionAt": "2026-07-16T09:32:24.283Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0078",
+  "reservedAt": "2026-07-16T09:32:20.754Z",
+  "promotedAt": "2026-07-16T09:32:20.756Z",
+  "claim": {
+    "actorId": "codex-task-rft-0078",
+    "leaseId": "lease-1b1783a08628",
+    "claimedAt": "2026-07-16T09:32:20.759Z",
+    "heartbeatAt": "2026-07-16T09:32:20.759Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0078.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-*.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T09:32:20.759Z",
+  "startedByActor": "codex-task-rft-0078",
+  "startedBySessionId": "session-20260716093220-codex-task-rft-0078-TASK-RFT-0078-da82ee218a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0078",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0078.*",
+      ".atm/history/task-events/TASK-RFT-0078/**",
+      ".atm/history/tasks/TASK-RFT-0078.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-*.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "74e29539c8222db36a2c7543646773f2cf7ea33a2478834f23ca68602cc434c4",
+    "actorId": "codex-task-rft-0078",
+    "createdAt": "2026-07-16T09:32:24.282Z",
+    "status": "active"
+  }
+}
