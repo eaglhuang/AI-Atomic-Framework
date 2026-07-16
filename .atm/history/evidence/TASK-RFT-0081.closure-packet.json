@@ -1,0 +1,169 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0081",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1968e0cfdc8626dffba3f3fde8889af8b21f7611",
+  "governedTreeSha": "cc54f02f0c25c8df3282f7a47a93fb2f48d67488",
+  "targetCommitDelta": {
+    "currentCommitSha": "1968e0cfdc8626dffba3f3fde8889af8b21f7611",
+    "parentCommitShas": [
+      "1968e0cfdc8626dffba3f3fde8889af8b21f7611"
+    ],
+    "governedTreeSha": "cc54f02f0c25c8df3282f7a47a93fb2f48d67488",
+    "changedFiles": [
+      ".atm/memory/atm-chart.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/team-lane/support.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:73b7f13ae9c3e8184bd93030cb2680bb5d7239b56a3abd32750d7e2cf27603b7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/atomic-map-physical-cap.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6a5394961ecbeb0dd15beb80213bf56fd974337c827996e91b8c0422bcb4843",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-team-brokered-write.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c4330ce1ca454fff39dbc221d5150e739ab2aa7ee70363b9ed2477facb39d4a4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4c29e9d24a623c3706818a0e820cdf02a05a625e59f809968512b7fd31580f90",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10b9e1131e1d6d913c30a78e9135c0677eb0790950179ef7fc01f1bd9e85fb17",
+      "stderrSha256": "sha256:7eb1f71a135a5adbebce522a3eae475959675991673c1ef64e381dacdff634e3",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-brokered-write"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T10:23:49.580Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0081.*",
+      ".atm/history/task-events/TASK-RFT-0081/**",
+      ".atm/history/tasks/TASK-RFT-0081.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/team-lane/**",
+      "scripts/validate-team-brokered-write.ts",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/team-lane/**",
+      "scripts/validate-team-brokered-write.ts",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0081.json",
+  "closedAt": "2026-07-16T10:23:49.581Z",
+  "closedByActor": "codex-task-rft-0081",
+  "sessionId": "session-20260716101429-codex-task-rft-0081-TASK-RFT-0081-da045a27f6",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "1968e0cfdc8626dffba3f3fde8889af8b21f7611",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/broker/team-lane.ts",
+      "packages/core/src/broker/team-lane/support.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0081.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0081/2026-07-16T10-14-25-070Z-import-6544d402feee.json",
+      ".atm/history/task-events/TASK-RFT-0081/2026-07-16T10-14-29-232Z-reserve-f25e1d8d724b.json",
+      ".atm/history/task-events/TASK-RFT-0081/2026-07-16T10-14-29-234Z-promote-ae030c40345a.json",
+      ".atm/history/task-events/TASK-RFT-0081/2026-07-16T10-14-32-422Z-claim-9196909a9186.json",
+      ".atm/history/task-events/TASK-RFT-0081/2026-07-16T10-16-18-415Z-renew-f65ddb9bdc42.json",
+      ".atm/history/tasks/TASK-RFT-0081.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
