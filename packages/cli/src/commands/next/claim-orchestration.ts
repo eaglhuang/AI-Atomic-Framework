@@ -174,7 +174,8 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       claimableTask = activeBatchClaimDecision.task;
     }
   }
-  const freshForeignReservation = inspectFreshTaskReservationForTask(input.cwd, claimableTask, resolvedActor.actorId, Date.now());
+  const currentLaneSessionId = resolveCurrentLaneSessionIdForFreshReservation(input.cwd, resolvedActor.actorId);
+  const freshForeignReservation = inspectFreshTaskReservationForTask(input.cwd, claimableTask, resolvedActor.actorId, Date.now(), currentLaneSessionId);
   if (freshForeignReservation && !input.forceClaim) {
     const activeWorkSummary = buildActiveWorkSummary(input.cwd, resolvedActor.actorId, buildAllowedFilesForTask(claimableTask));
     const overrideCommand = `node atm.mjs next --claim --actor ${resolvedActor.actorId} --task ${claimableTask.workItemId} --auto-intent --force --json`;
@@ -183,6 +184,9 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       details: {
         taskId: claimableTask.workItemId,
         reservedByActorId: freshForeignReservation.actorId,
+        reservedByLaneSessionId: freshForeignReservation.laneSessionId,
+        currentActorId: resolvedActor.actorId,
+        currentLaneSessionId,
         createdAt: freshForeignReservation.createdAt,
         importedAt: freshForeignReservation.importedAt,
         ageSeconds: freshForeignReservation.ageSeconds,
@@ -607,6 +611,15 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       }
     }
   });
+}
+
+function resolveCurrentLaneSessionIdForFreshReservation(cwd: string, actorId: string): string | null {
+  return normalizeOptionalLaneSessionId(process.env.ATM_LANE_SESSION_ID)
+    ?? normalizeOptionalLaneSessionId(resolveActorWorkSession(cwd, { actorId })?.guidanceSessionId);
+}
+
+function normalizeOptionalLaneSessionId(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 }
 
 function normalizeClaimLaneSessionEnvelope(value: Record<string, unknown> | null): {

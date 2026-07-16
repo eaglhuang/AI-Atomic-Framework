@@ -52,6 +52,7 @@ export interface ActiveWorkSummary {
     readonly taskId: string;
     readonly title: string;
     readonly actorId: string;
+    readonly laneSessionId: string | null;
     readonly createdAt: string | null;
     readonly importedAt: string | null;
     readonly ageSeconds: number;
@@ -352,14 +353,18 @@ export function inspectFreshTaskReservationForTask(
   cwd: string,
   task: ImportedTaskSummary,
   currentActorId: string | null | undefined,
-  now: number
+  now: number,
+  currentLaneSessionId: string | null | undefined = null
 ): ActiveWorkSummary['freshReservations'][number] | null {
   const reservations = readFreshTaskReservations(cwd, now);
   const currentActor = currentActorId?.trim() || null;
-  return reservations.find((reservation) =>
-    reservation.taskId === task.workItemId
-    && (!currentActor || reservation.actorId !== currentActor)
-  ) ?? null;
+  const currentLane = normalizeOptionalString(currentLaneSessionId);
+  return reservations.find((reservation) => {
+    if (reservation.taskId !== task.workItemId) return false;
+    if (!currentActor || reservation.actorId !== currentActor) return true;
+    if (!currentLane || !reservation.laneSessionId) return false;
+    return reservation.laneSessionId !== currentLane;
+  }) ?? null;
 }
 
 function readFreshTaskReservations(cwd: string, now: number): ActiveWorkSummary['freshReservations'] {
@@ -386,6 +391,7 @@ function readFreshTaskReservations(cwd: string, now: number): ActiveWorkSummary[
         const actorId = sourceOwner
           ?? normalizeOptionalString(parsed.owner ?? parsed.ownerActorId ?? parsed.createdByActor ?? parsed.createdBy ?? parsed.importedByActor ?? parsed.importedBy ?? source.owner ?? source.actorId);
         if (!actorId) return [];
+        const laneSessionId = readLaneSessionIdFromTaskDocument(parsed);
         const createdAt = normalizeOptionalString(parsed.createdAt ?? parsed.created_at ?? source.createdAt ?? source.created_at);
         const importedAt = normalizeOptionalString(parsed.importedAt ?? parsed.imported_at ?? source.importedAt ?? source.imported_at);
         const referenceAt = parseIsoMillis(importedAt) ?? parseIsoMillis(createdAt) ?? parseIsoMillis(normalizeOptionalString(parsed.lastTransitionAt ?? parsed.last_transition_at));
@@ -407,6 +413,7 @@ function readFreshTaskReservations(cwd: string, now: number): ActiveWorkSummary[
           taskId: workItemId,
           title: normalizeOptionalString(parsed.title) ?? workItemId,
           actorId,
+          laneSessionId,
           createdAt,
           importedAt,
           ageSeconds,
@@ -418,6 +425,29 @@ function readFreshTaskReservations(cwd: string, now: number): ActiveWorkSummary[
         return [];
       }
     });
+}
+
+function readLaneSessionIdFromTaskDocument(parsed: Record<string, unknown>): string | null {
+  const source = parsed.source && typeof parsed.source === 'object' && !Array.isArray(parsed.source)
+    ? parsed.source as Record<string, unknown>
+    : {};
+  const claimRecord = parsed.claim && typeof parsed.claim === 'object' && !Array.isArray(parsed.claim)
+    ? parsed.claim as Record<string, unknown>
+    : {};
+  const directionLock = parsed.taskDirectionLock && typeof parsed.taskDirectionLock === 'object' && !Array.isArray(parsed.taskDirectionLock)
+    ? parsed.taskDirectionLock as Record<string, unknown>
+    : {};
+  return normalizeOptionalString(parsed.laneSessionId ?? parsed.laneId ?? source.laneSessionId ?? source.laneId)
+    ?? readLaneSessionIdFromEnvelope(parsed.laneSession)
+    ?? readLaneSessionIdFromEnvelope(source.laneSession)
+    ?? readLaneSessionIdFromEnvelope(claimRecord.laneSession)
+    ?? readLaneSessionIdFromEnvelope(directionLock.laneSession)
+    ?? normalizeOptionalString(directionLock.laneSessionId ?? directionLock.guidanceSessionId);
+}
+
+function readLaneSessionIdFromEnvelope(value: unknown): string | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  return normalizeOptionalString((value as Record<string, unknown>).laneSessionId);
 }
 
 function isTaskFreshReservationCandidate(parsed: Record<string, unknown>): boolean {
