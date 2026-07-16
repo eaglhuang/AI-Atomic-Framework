@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0076",
+  "title": "Split doctor command below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0075"
+  ],
+  "acceptance": [
+    "`packages/cli/src/commands/doctor.ts` remains the public command facade and continues to export `runDoctor`.",
+    "Helper modules live under `packages/cli/src/commands/doctor/`.",
+    "Every touched physical TypeScript file is below 600 lines.",
+    "`owner-shard-cli.json` explicitly maps the facade and helper directory to the doctor command atom/map.",
+    "Focused final-600 guard proves line budgets, facade delegation, and owner-shard coverage.",
+    "Existing doctor, typecheck, governance projection validation, and CLI validation pass."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/commands/doctor/**/*.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "tests/cli/doctor-final-600.test.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/doctor.ts",
+    "packages/cli/src/commands/doctor/**/*.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "tests/cli/doctor-final-600.test.ts"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/doctor-final-600.test.ts",
+    "node atm.mjs doctor --json",
+    "npm run typecheck",
+    "npm run validate:governance-projections",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.doctor-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.doctor-command-map",
+        "pattern": "Facade",
+        "source": "packages/cli/src/commands/doctor.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0076-doctor-command-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0076",
+    "headingLine": 45,
+    "hash": "453d814e19f69c2a",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0076-doctor-command-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:453d814e19f69c2a0537608c38d0ceb04996c78bdee98bc218656362c5a2bff0",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T07:40:17.942Z"
+    }
+  },
+  "importedAt": "2026-07-16T07:40:17.942Z",
+  "lastTransitionId": "2026-07-16T08-49-04-092Z-scope-amendment-4fdf6c138912",
+  "lastTransitionAt": "2026-07-16T08:49:04.092Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0076",
+  "reservedAt": "2026-07-16T07:40:27.237Z",
+  "promotedAt": "2026-07-16T07:40:27.239Z",
+  "claim": {
+    "actorId": "codex-task-rft-0076",
+    "leaseId": "lease-a514984d5018",
+    "claimedAt": "2026-07-16T07:40:27.242Z",
+    "heartbeatAt": "2026-07-16T08:47:40.445Z",
+    "ttlSeconds": 3600,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0076.*",
+      ".atm/history/task-events/TASK-RFT-0076/**",
+      ".atm/history/tasks/TASK-RFT-0076.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/doctor/**/*.ts",
+      "packages/cli/src/commands/doctor/constants.ts",
+      "packages/cli/src/commands/doctor/lifecycle.ts",
+      "packages/cli/src/commands/doctor/policy.ts",
+      "packages/cli/src/commands/doctor/readiness.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/doctor/types.ts",
+      "packages/cli/src/commands/doctor/utilities.ts",
+      "tests/cli/doctor-final-600.test.ts"
+    ],
+    "state": "active"
+  },
+  "startedAt": "2026-07-16T07:40:27.242Z",
+  "startedByActor": "codex-task-rft-0076",
+  "startedBySessionId": "session-20260716074027-codex-task-rft-0076-TASK-RFT-0076-025803fdc0",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0076",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0076.*",
+      ".atm/history/task-events/TASK-RFT-0076/**",
+      ".atm/history/tasks/TASK-RFT-0076.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-014.json",
+      "docs/governance/atm-bug-and-optimization-backlog.md",
+      "packages/cli/src/commands/doctor.ts",
+      "packages/cli/src/commands/doctor/**/*.ts",
+      "packages/cli/src/commands/doctor/constants.ts",
+      "packages/cli/src/commands/doctor/lifecycle.ts",
+      "packages/cli/src/commands/doctor/policy.ts",
+      "packages/cli/src/commands/doctor/readiness.ts",
+      "packages/cli/src/commands/doctor/run-doctor.ts",
+      "packages/cli/src/commands/doctor/types.ts",
+      "packages/cli/src/commands/doctor/utilities.ts",
+      "tests/cli/doctor-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0076-doctor-command-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0076-doctor-command-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4e17ecd677036bbd758ff49449be269c95a7643d7e8c8fda19fbad6ba7013f52",
+    "actorId": "codex-task-rft-0076",
+    "createdAt": "2026-07-16T07:40:30.754Z",
+    "status": "active"
+  }
+}

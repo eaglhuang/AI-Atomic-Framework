@@ -1,0 +1,20 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T08-49-04-092Z-scope-amendment-4fdf6c138912",
+  "taskId": "TASK-RFT-0076",
+  "action": "scope-amendment",
+  "actorId": "codex-task-rft-0076",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0076.json",
+  "taskSha256": "sha256:29815d96b4905647a98b9958f408eebffc4d1ad76e04217b4b4de9ad04837ceb",
+  "createdAt": "2026-07-16T08:49:04.092Z",
+  "command": "node atm.mjs tasks scope add --task TASK-RFT-0076 --actor codex-task-rft-0076 --add \"packages/cli/src/commands/doctor/constants.ts,packages/cli/src/commands/doctor/lifecycle.ts,packages/cli/src/commands/doctor/policy.ts,packages/cli/src/commands/doctor/readiness.ts,packages/cli/src/commands/doctor/run-doctor.ts,packages/cli/src/commands/doctor/types.ts,packages/cli/src/commands/doctor/utilities.ts\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal"
+  }
+}

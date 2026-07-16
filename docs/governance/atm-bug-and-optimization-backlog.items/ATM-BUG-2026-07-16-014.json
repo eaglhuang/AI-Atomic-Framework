@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-014",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "TypeScript governance",
+  "finding": "Doctor now distinguishes known transitional @ts-nocheck baseline files from newly introduced escape hatches, but the baseline still contains 31 source files.",
+  "expectedBehavior": "ATM should retire the transitional @ts-nocheck baseline through focused owner-map cleanup cards until doctor can enforce zero source escape hatches without exceptions.",
+  "evidenceOrRepro": "TASK-RFT-0076 dogfood: node atm.mjs doctor --json reports typescript-escape-hatches ok with baselineCount 31 and unexpectedFiles [].",
+  "followUp": "Open follow-up RFT/cleanup cards by owner map for broker, next, hook pre-commit, and git-governance modules; remove baseline entries as each group becomes type-clean."
+}
