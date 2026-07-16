@@ -1,9 +1,10 @@
 ---
 task_id: TASK-CODEX-011190
 title: Repair batch checkpoint pending commit window
-status: planned
+status: done
 owner: codex-bug-011-190
 priority: High
+amendment_epoch: 1
 depends_on: []
 related_plan: docs/governance/atm-bug-and-optimization-backlog.md
 planning_repo: AI-Atomic-Framework
@@ -44,6 +45,15 @@ atomizationImpact:
       source: packages/cli/src/commands/batch/implementation.ts
       disposition: follow-up-card
       inlineReason: null
+completed_at: "2026-07-16T14:10:37.354Z"
+completed_by_agent: "codex-bug-011-190"
+closedAt: "2026-07-16T14:10:37.354Z"
+closedByActor: "codex-bug-011-190"
+closedByCommand: atm tasks close
+lastTransitionId: "2026-07-16T14-10-37-354Z-close-594acea47134"
+lastTransitionAt: "2026-07-16T14:10:37.354Z"
+ledgerContractVersion: task-ledger/v1
+delivery_commit: "41d335528"
 ---
 
 # TASK-CODEX-011190 Repair Batch Checkpoint Pending Commit Window
@@ -58,3 +68,7 @@ Fix ATM-BUG-2026-07-16-011 and ATM-BUG-2026-07-15-190 by making batch checkpoint
 - Pre-commit accepts the staged just-checkpointed task bundle during the pending commit window.
 - `batch checkpoint` without `--hold` preserves a pending commit window even after the next queue head is active.
 - Backlog items 011 and 190 are updated together with the generated backlog projection.
+
+## Amendment History
+
+- 2026-07-16: Promote the planning source into the committed main history so closeback can reference a durable task-card source instead of an untracked local file.

@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T14-10-37-243Z-close-bd950acadaa7",
+  "taskId": "TASK-CODEX-011190",
+  "action": "close",
+  "actorId": "codex-bug-011-190",
+  "sessionId": "session-20260716134255-codex-bug-011-190-TASK-CODEX-011190-e6cbb7acfd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-CODEX-011190.json",
+  "taskSha256": "sha256:1192e4db33fe172198810d6e313ca3b098f7cec6d795947f32bf029c24f6bb28",
+  "createdAt": "2026-07-16T14:10:37.243Z",
+  "command": "node atm.mjs tasks close --task TASK-CODEX-011190 --actor codex-bug-011-190 --status done --historical-delivery 41d335528",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716134255-codex-bug-011-190-TASK-CODEX-011190-e6cbb7acfd",
+    "closurePacketPath": ".atm/history/evidence/TASK-CODEX-011190.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:hook-batch-evidence-context",
+      "validate:hook-batch-pending-window",
+      "validate:task-direction-governance"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T14:10:37.234Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-CODEX-011190.*",
+        ".atm/history/task-events/TASK-CODEX-011190/**",
+        ".atm/history/tasks/TASK-CODEX-011190.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-190.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-011.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "scripts/validate-hook-batch-evidence-context.ts",
+        "scripts/validate-hook-batch-pending-window.ts",
+        "scripts/validate-task-direction-governance/adopter-core.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch/implementation.ts",
+        "packages/cli/src/commands/hook/pre-commit/support.ts",
+        "scripts/validate-hook-batch-evidence-context.ts",
+        "scripts/validate-hook-batch-pending-window.ts",
+        "scripts/validate-task-direction-governance/adopter-core.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
