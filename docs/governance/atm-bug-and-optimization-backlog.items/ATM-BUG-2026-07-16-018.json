@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-018",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Bug",
+  "severity": "P0",
+  "status": "Fixed in fix(taskflow): surface pending close-owned dirty files",
+  "area": "Taskflow closeback / pre-close readiness",
+  "finding": "taskflow pre-close could report no preflight blockers while close --write was blocked by another readiness issue, leaving close-owned advisory dirty files in the shared worktree. Those files then appeared as foreign dirty work and blocked another lane's next --claim with ATM_TASK_SCOPE_EXPANSION_REQUIRED.",
+  "expectedBehavior": "When taskflow close owns pending dirty files and close --write is not ready, pre-close should fail closed with an explicit writeReadinessHint blocker, list the pending files, and warn the agent before it leaves or claims another lane.",
+  "evidenceOrRepro": "On 2026-07-16, TASK-CODEX-0204 left governance-optimization/tasks/TASK-CODEX-0204-shared-worktree-dirty-guard.task.md dirty after closeback was blocked by runner stale / runner-sync readiness. TASK-RFT-0094 next --claim then blocked on that foreign planning amendment with ATM_TASK_SCOPE_EXPANSION_REQUIRED. The file was later committed in 0d85609ec to unblock RFT.",
+  "followUp": "Add a taskflow pre-close blocker for close-owned dirty files whenever write readiness is already blocked, and make the pre-close envelope return not-ok so agents cannot miss the handoff/commit obligation."
+}
