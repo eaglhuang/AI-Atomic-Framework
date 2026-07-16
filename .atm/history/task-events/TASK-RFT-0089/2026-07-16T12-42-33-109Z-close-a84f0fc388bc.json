@@ -1,0 +1,63 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T12-42-33-109Z-close-a84f0fc388bc",
+  "taskId": "TASK-RFT-0089",
+  "action": "close",
+  "actorId": "codex-task-rft-0089",
+  "sessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0089.json",
+  "taskSha256": "sha256:af565ee465710eb9f4ea8fb593f4973fb9705305801907325bf73e0685ea583a",
+  "createdAt": "2026-07-16T12:42:33.109Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0089 --actor codex-task-rft-0089 --status done --historical-delivery abdc7f91feb36986684c2bada98b664587be0fd1 --historical-delivery c32ada7bfa2864f9006cf2c23deecf3f3c6f1fb2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716122612-codex-task-rft-0089-TASK-RFT-0089-302d05573c",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0089.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T12:42:33.101Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0089.*",
+        ".atm/history/task-events/TASK-RFT-0089/**",
+        ".atm/history/tasks/TASK-RFT-0089.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/doctor/constants.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/doctor/constants.ts",
+        "tests/cli/git-commit-task-scoped-staging.test.ts",
+        "tests/cli/git-commit-task-scoped-staging/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

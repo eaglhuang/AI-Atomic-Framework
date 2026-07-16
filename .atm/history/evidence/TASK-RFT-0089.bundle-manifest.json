@@ -1,9 +1,10 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0089",
-  "updatedAt": "2026-07-16T12:37:18.997Z",
+  "updatedAt": "2026-07-16T12:39:21.276Z",
   "updatedBy": "codex-task-rft-0089",
   "freshValidationPasses": [
+    "doctor",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
     "validate:cli",
@@ -83,6 +84,19 @@
         "typecheck"
       ],
       "generatedAt": "2026-07-16T12:37:19.049Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c97c52f38113b7621a7542feb344c3ea4e67bc83187789b5992c81220b1fb3ea",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T12:39:21.362Z",
       "runnerKind": "unknown",
       "sourceCommit": null,
       "cached": false
