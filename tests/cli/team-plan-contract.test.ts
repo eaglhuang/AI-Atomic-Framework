@@ -154,6 +154,7 @@ const teamPlanWithIndexLane = buildTeamPlan({
       status: 'free',
       ownerTaskId: null,
       ownerActorId: null,
+      ownerSessionId: null,
       reason: 'fixture free index'
     }
   }

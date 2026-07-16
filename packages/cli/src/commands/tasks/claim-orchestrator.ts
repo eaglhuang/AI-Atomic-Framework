@@ -181,7 +181,8 @@ export async function runTasksClaimLifecycle(action: 'claim' | 'renew' | 'releas
       planningReadOnlyPaths: Array.isArray(taskDocument.planningReadOnlyPaths) ? taskDocument.planningReadOnlyPaths as string[] : [],
       planningMirrorPaths: Array.isArray(taskDocument.planningMirrorPaths) ? taskDocument.planningMirrorPaths as string[] : [],
       allowPlanningMirror: taskDocument.allowPlanningMirror === true,
-      prompt: options.taskId
+      prompt: options.taskId,
+      sessionId: sessionRecord.session.sessionId
     });
     claimLifecyclePhases.push({ phase: 'direction-lock-write', durationMs: Date.now() - directionLockStartedAt });
     taskDocument.taskDirectionLock = directionLock;

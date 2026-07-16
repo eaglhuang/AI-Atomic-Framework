@@ -77,6 +77,7 @@ try {
     specVersion: '0.1.0',
     actorId: 'opt08-actor',
     taskId: null,
+    sessionId: 'session-opt08-busy',
     branchRef,
     branchName: branchRef.replace(/^refs\/heads\//, ''),
     headShaAtAcquire: readHeadSha(repo),
@@ -87,6 +88,7 @@ try {
   const busyQueueEvidence = (busyQueueStatus as { evidence?: Record<string, unknown> }).evidence;
   const busyQueueRecord = busyQueueEvidence?.branchCommitQueueStatus as Record<string, unknown>;
   assert.equal(busyQueueRecord.status, 'busy', 'commit-status must report a live branch commit queue owner as busy');
+  assert.equal((busyQueueRecord.lockRecord as Record<string, unknown>).sessionId, 'session-opt08-busy', 'busy queue diagnostics must preserve the owner session id');
   assert.equal(busyQueueRecord.ownerAlive, true, 'commit-status must prove the queue owner process is alive when possible');
   assert.match(String(busyQueueRecord.recommendedAction), /wait/i, 'busy queue guidance must tell the operator to wait instead of blindly retrying');
   rmSync(queueLockPath, { recursive: true, force: true });

@@ -89,6 +89,7 @@ export interface TaskDirectionLock {
   readonly allowPlanningMirror: boolean;
   readonly promptHash: string | null;
   readonly actorId: string;
+  readonly sessionId: string | null;
   readonly createdAt: string;
   readonly status: 'active';
 }
@@ -285,6 +286,7 @@ export function writeTaskDirectionLock(input: {
   readonly planningMirrorPaths?: readonly string[];
   readonly allowPlanningMirror?: boolean;
   readonly prompt?: string | null;
+  readonly sessionId?: string | null;
 }) {
   const queueIndex = input.queue ? input.queue.taskIds.indexOf(input.taskId) : -1;
   // TASK-AAO-0058：claim 時自動將任務自身治理路徑隱式 self-allow，
@@ -307,6 +309,7 @@ export function writeTaskDirectionLock(input: {
     allowPlanningMirror: input.allowPlanningMirror === true,
     promptHash: input.prompt?.trim() ? sha256(input.prompt.trim()) : input.queue?.sourcePromptHash ?? null,
     actorId: input.actorId,
+    sessionId: input.sessionId?.trim() || null,
     createdAt: new Date().toISOString(),
     status: 'active'
   };

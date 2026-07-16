@@ -93,6 +93,7 @@ try {
   assert.equal(typeof autoStageCommit.evidence?.commitSha, 'string');
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.serializedBy, 'branch-commit-queue');
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.taskId, taskId);
+  assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.sessionId, sessionId);
   assert.equal((autoStageCommit.evidence as any).branchCommitQueue?.headShaAtCommitStart, (autoStageCommit.evidence as any).branchCommitQueue?.headShaAtAcquire);
   assertBranchCommitQueueSchema((autoStageCommit.evidence as any).branchCommitQueue, 'auto-stage commit branch queue evidence');
   assert.ok(String((autoStageCommit.evidence as any).copyableCommitCommand).includes('ATM-Task'));
@@ -501,15 +502,37 @@ try {
       allowPlanningMirror: false,
       promptHash: null,
       actorId: 'other-agent',
+      sessionId: 'session-foreign-active',
       createdAt: '2026-06-18T00:00:00.000Z',
       status: 'active'
     }
+  });
+  writeJson(path.join(tempDir, '.atm/runtime/sessions/session-foreign-active.json'), {
+    schemaId: 'atm.actorWorkSession.v1',
+    specVersion: '0.1.0',
+    sessionId: 'session-foreign-active',
+    actorId: 'other-agent',
+    taskId: foreignActiveTaskId,
+    claimLeaseId: 'lease-foreign-active',
+    status: 'active',
+    createdAt: '2026-06-18T00:00:00.000Z',
+    updatedAt: '2026-06-18T00:00:00.000Z',
+    heartbeatAt: '2026-06-18T00:00:00.000Z',
+    taskPath: `.atm/history/tasks/${foreignActiveTaskId}.json`,
+    sourcePrompt: null,
+    batchId: null,
+    guidanceSessionId: null,
+    editor: 'codex',
+    gitName: 'Other Agent',
+    gitEmail: 'other-agent@example.invalid'
   });
   runGit(tempDir, ['add', foreignActiveFile]);
   const ownership = inspectGitIndexOwnership({ cwd: tempDir, taskId, stagedFiles: [foreignActiveFile] });
   assert.equal(ownership.indexLane.status, 'blocked-foreign-active-staged');
   assert.equal(ownership.foreignActiveStaged[0]?.ownerTaskId, foreignActiveTaskId);
   assert.equal(ownership.foreignActiveStaged[0]?.ownerActorId, 'other-agent');
+  assert.equal(ownership.foreignActiveStaged[0]?.ownerSessionId, 'session-foreign-active');
+  assert.equal(ownership.indexLane.ownerSessionId, 'session-foreign-active');
   const foreignActiveBundle = resolveTaskScopedCommitBundle({
     cwd: tempDir,
     taskId,
@@ -524,6 +547,7 @@ try {
   assert.equal(foreignActiveBundle.ok, false);
   assert.equal(foreignActiveBundle.blockedCode, 'ATM_INDEX_FOREIGN_ACTIVE_STAGED');
   assert.equal(foreignActiveBundle.gitIndexOwnership.indexLane.status, 'blocked-foreign-active-staged');
+  assert.equal(foreignActiveBundle.gitIndexOwnership.indexLane.ownerSessionId, 'session-foreign-active');
   const stageOverrideLease = await runAtmGit([
     'lease',
     'stage-override',
