@@ -2,10 +2,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { runInternalRelease, runInternalReleaseSync } from '../packages/cli/src/commands/internal-release.ts';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv.includes('--mode')
   ? process.argv[process.argv.indexOf('--mode') + 1]
   : 'validate';
@@ -29,8 +28,22 @@ function sha256File(filePath: string) {
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
 }
 
+function runGit(cwd: string, args: readonly string[]) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  assert(result.status === 0 && !result.error, `git ${args.join(' ')} must succeed in fixture repo`);
+}
+
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'atm-internal-release-'));
 try {
+  const fixtureFrameworkRoot = path.join(tempRoot, 'framework-root');
+  mkdirSync(fixtureFrameworkRoot, { recursive: true });
+  writeJson(path.join(fixtureFrameworkRoot, 'package.json'), { version: '0.1.0' });
+  runGit(fixtureFrameworkRoot, ['init']);
+  runGit(fixtureFrameworkRoot, ['config', 'user.email', 'atm-validator@example.invalid']);
+  runGit(fixtureFrameworkRoot, ['config', 'user.name', 'ATM Validator']);
+  runGit(fixtureFrameworkRoot, ['add', 'package.json']);
+  runGit(fixtureFrameworkRoot, ['commit', '-m', 'fixture framework root']);
+
   const sourceRunner = path.join(tempRoot, 'source-atm.mjs');
   writeFileSync(sourceRunner, '#!/usr/bin/env node\nconsole.log("atm internal release fixture");\n', 'utf8');
   const sourceHash = sha256File(sourceRunner);
@@ -50,7 +63,7 @@ try {
   const previousHash = sha256File(path.join(targetA, 'atm.mjs'));
 
   const report = runInternalReleaseSync({
-    cwd: root,
+    cwd: fixtureFrameworkRoot,
     repos: [targetA, targetB],
     skips: ['host-b'],
     build: false,
@@ -80,7 +93,7 @@ try {
   assert(!existsSync(path.join(targetB, 'atm.mjs')), 'skipped host-b must not be mutated');
 
   const dryRun = runInternalReleaseSync({
-    cwd: root,
+    cwd: fixtureFrameworkRoot,
     repos: [targetC],
     skips: [],
     build: false,
@@ -94,7 +107,7 @@ try {
   assert(dryRun.targets[0]?.newSha256 === sourceHash, 'dry-run target must show planned source hash');
   assert(!existsSync(path.join(targetC, 'atm.mjs')), 'dry-run must not write target atm.mjs');
 
-  const cliResult = runInternalRelease(['sync', '--cwd', root, '--repo', targetC, '--source', sourceRunner, '--no-build', '--dry-run', '--no-verify']);
+  const cliResult = runInternalRelease(['sync', '--cwd', fixtureFrameworkRoot, '--repo', targetC, '--source', sourceRunner, '--no-build', '--dry-run', '--no-verify']);
   assert(cliResult.ok === true, 'internal-release sync CLI runner must support dry-run no-build no-verify');
 
   if (!process.exitCode) {

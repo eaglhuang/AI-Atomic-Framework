@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0093",
+  "updatedAt": "2026-07-16T14:02:20.115Z",
+  "updatedBy": "codex-task-rft-0093",
+  "freshValidationPasses": [
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:internal-release-sync"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-internal-release-sync.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bcf1ea3fffea6a2aef77cca59cca96aebfcdf144441a6bd1ef2157c9de8c4a43",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:internal-release-sync"
+      ],
+      "generatedAt": "2026-07-16T14:01:03.648Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "41d335528a0058052c9121898f9bbdc1fbdad4f6",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2d9a4a1974504ce686212c1e64bb2deaa7a808833d6974b894a3ad206af3619f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T14:01:22.378Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "41d335528a0058052c9121898f9bbdc1fbdad4f6",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T14:01:40.458Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "41d335528a0058052c9121898f9bbdc1fbdad4f6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6c00275d39ff8b5b6bfcdfdf71ccdb0965737968cf791f326356b0623be204fa",
+      "stderrSha256": "sha256:c664877a2b725949420290c659e625119c58ad88d671baeab0a84ffac2eeab4b",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T14:01:46.418Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "41d335528a0058052c9121898f9bbdc1fbdad4f6",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c662182b69f0a847ea7831f6a9b1e8858627e7284bda6a55f59589a769804adf",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-16T14:02:20.236Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "41d335528a0058052c9121898f9bbdc1fbdad4f6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

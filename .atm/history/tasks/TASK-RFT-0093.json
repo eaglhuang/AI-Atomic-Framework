@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0093",
+  "title": "Split internal release command under 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0092"
+  ],
+  "acceptance": [
+    "`packages/cli/src/commands/internal-release.ts` is below 600 physical lines.",
+    "Every newly created physical TypeScript file is below 600 physical lines.",
+    "`runInternalRelease`, `runInternalReleaseSync`, `inspectReleasePublicationReadiness`, and `createReleasePublicationReceipt` remain import-compatible for CLI callers and tests.",
+    "Internal release sync behavior remains deterministic, including runner publication readiness, target backup, metadata writes, verification runs, and scratch cleanup.",
+    "The path-to-atom owner shard maps both the facade and extracted support modules to `atom-cli-internal-release`.",
+    "Validation evidence is command-backed, including the guided `behavior.split` dry-run proposal."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/internal-release.ts",
+    "packages/cli/src/commands/internal-release/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/internal-release.ts",
+    "packages/cli/src/commands/internal-release/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "node atm.mjs candidates rank --include \"pipelines/**/*.py\" --goal \"Split packages/cli/src/commands/internal-release.ts into a facade plus internal-release/* support modules; every physical TypeScript file must stay under 600 lines; preserve behavior and ATM governance evidence.\" --json",
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-internal-release --to 0.1.1 --legacy-target \"packages/cli/src/commands/internal-release.ts#runInternalReleaseSync\" --guidance-session guidance-20260716134604-b8aceaf31b --dry-run --json",
+    "node --strip-types scripts/validate-internal-release-sync.ts --mode validate",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-cli-internal-release",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atom-cli-internal-release-command",
+        "pattern": "Command Facade",
+        "source": "packages/cli/src/commands/internal-release.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-cli-internal-release-publication",
+        "pattern": "Publication Readiness Module",
+        "source": "packages/cli/src/commands/internal-release.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-cli-internal-release-target-sync",
+        "pattern": "Target Sync Module",
+        "source": "packages/cli/src/commands/internal-release.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-cli-internal-release-options",
+        "pattern": "Options Parser Module",
+        "source": "packages/cli/src/commands/internal-release.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Do not redesign runner-sync admission or release publication ownership semantics in this card.\n- Avoid the active TASK-CODEX-011190 batch/hook scope and stale next/playbook-projection lock scope.\n- If a high-value governance defect appears during closeout, amend scope before fixing it.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0093-internal-release-map.task.md",
+    "sectionTitle": "TASK-RFT-0093",
+    "headingLine": 62,
+    "hash": "d666fe981522f86b",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0093-internal-release-map.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:d666fe981522f86b227c25f472361d90c78888503d15e48caef9dab016b95487",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T13:53:05.332Z"
+    }
+  },
+  "importedAt": "2026-07-16T13:53:05.332Z",
+  "lastTransitionId": "2026-07-16T13-59-07-283Z-scope-amendment-6e79d28dcfa4",
+  "lastTransitionAt": "2026-07-16T13:59:07.283Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0093",
+  "reservedAt": "2026-07-16T13:54:11.475Z",
+  "promotedAt": "2026-07-16T13:54:11.477Z",
+  "claim": {
+    "actorId": "codex-task-rft-0093",
+    "leaseId": "lease-651dc8664fe4",
+    "claimedAt": "2026-07-16T13:55:11.643Z",
+    "heartbeatAt": "2026-07-16T13:55:11.643Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0093.*",
+      ".atm/history/task-events/TASK-RFT-0093/**",
+      ".atm/history/tasks/TASK-RFT-0093.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/internal-release.ts",
+      "packages/cli/src/commands/internal-release/**",
+      "scripts/validate-internal-release-sync.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T13:55:11.643Z",
+  "startedByActor": "codex-task-rft-0093",
+  "startedBySessionId": "session-20260716135511-codex-task-rft-0093-TASK-RFT-0093-c7b34b0420",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0093",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0093.*",
+      ".atm/history/task-events/TASK-RFT-0093/**",
+      ".atm/history/tasks/TASK-RFT-0093.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/internal-release.ts",
+      "packages/cli/src/commands/internal-release/**",
+      "scripts/validate-internal-release-sync.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0093-internal-release-map.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0093-internal-release-map.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "df21996fe133dbae540a44b498f4143dad56be6ae30647fcd1e570059647d0bd",
+    "actorId": "codex-task-rft-0093",
+    "sessionId": null,
+    "createdAt": "2026-07-16T13:55:16.036Z",
+    "status": "active"
+  }
+}
