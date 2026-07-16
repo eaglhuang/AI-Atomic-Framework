@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0082",
+  "updatedAt": "2026-07-16T10:29:17.258Z",
+  "updatedBy": "codex-task-rft-0082",
+  "freshValidationPasses": [
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:task-direction-governance"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a3b45b9f5ca9896fa9358614f9c8544a714bcefb077a6023a8e058e25f9f5c10",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T10:28:57.408Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e9ef2c4470dbd97dc4ab109e510c68e9a7f32e0c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/atomic-map-physical-cap.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6a5394961ecbeb0dd15beb80213bf56fd974337c827996e91b8c0422bcb4843",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/atomic-map-physical-cap.test.ts"
+      ],
+      "generatedAt": "2026-07-16T10:28:57.496Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e9ef2c4470dbd97dc4ab109e510c68e9a7f32e0c",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T10:29:07.795Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e9ef2c4470dbd97dc4ab109e510c68e9a7f32e0c",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-task-direction-governance.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:8a2f3ae24bb974cb60d40ad8d5eb2ab4c42967264010dae1c2328362d4c0bd5f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:task-direction-governance"
+      ],
+      "generatedAt": "2026-07-16T10:29:17.313Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "e9ef2c4470dbd97dc4ab109e510c68e9a7f32e0c",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
