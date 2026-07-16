@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Needs task card",
+  "status": "Fixed in TASK-CODEX-0204",
   "area": "Team Agents / Multi-captain coordination",
   "finding": "A concurrently active captain landed ATM-GOV-0150/0151 changes while TASK-RFT-0044 had uncommitted extracted source files, causing the RFT worktree changes to disappear and later blocking TASK-RFT-0044 close because the claimed ATM-GOV-0151 lane introduced repository-wide typecheck failures.",
   "expectedBehavior": "ATM should warn or fail closed when another active captain is about to commit/close while the shared worktree contains uncommitted changes owned by a different active task, and it should surface claimed-task validator failures as explicit cross-task blockers with owner/session identity.",
   "evidenceOrRepro": "During TASK-RFT-0044 on 2026-07-15, HEAD advanced to 08ecde66d (ATM-GOV-0150 close) while uncommitted broker-observability/runtime-governance extraction files were present; afterwards `npm run typecheck` failed in packages/core/src/broker/generated-projection-steward.ts, but ATM-GOV-0151 was already claimed by codex-gpt-5-5-captain.",
-  "followUp": "Add a shared-worktree active-task dirty guard and cross-task validator-blocker report that includes owner actor/session/key, plus guidance for safe handoff or takeover before another captain commits or closes."
+  "followUp": "TASK-CODEX-0204 adds foreign dirty WIP projection to active-work summaries and team-level recommendation logic so shared-worktree uncommitted files owned by another active lock/claim escalate before commit or close. Cross-task validator blocker reporting remains a follow-up for claimed-task validator execution surfaces."
 }

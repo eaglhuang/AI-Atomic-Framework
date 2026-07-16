@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-CODEX-0204",
+  "updatedAt": "2026-07-16T14:16:02.629Z",
+  "updatedBy": "codex-bug-0204",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/team-admission-projection.test.ts",
+    "typecheck",
+    "validate:governance-projections"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/team-admission-projection.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6d8dd776c15a0a2e69cc98b1f3247bf9560b2dcabe3fa57cd82d02c31f82e668",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/team-admission-projection.test.ts"
+      ],
+      "generatedAt": "2026-07-16T14:15:48.275Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "410802d21de011211d643e1c4f6b905e75f24587",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T14:15:59.512Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "410802d21de011211d643e1c4f6b905e75f24587",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:governance-projections",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7327be311a8e3269a2eac54a9ce5dcb43e1308aa6ddc2a62dad64df44433b5a3",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:governance-projections"
+      ],
+      "generatedAt": "2026-07-16T14:16:02.687Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "410802d21de011211d643e1c4f6b905e75f24587",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

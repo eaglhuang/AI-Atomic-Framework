@@ -78,4 +78,24 @@ const level = projectTeamLevelRecommendation({
 assert.equal(level.level, 'L5');
 assert.deepEqual(level.overlappingFiles, ['packages/cli/src/commands/next/active-work-summary.ts']);
 
+const dirtyWipLevel = projectTeamLevelRecommendation({
+  ownFiles: ['docs/readme.md'],
+  foreignFiles: [],
+  foreignDirtyFiles: ['packages/cli/src/commands/broker/dirty-wip.ts'],
+  stagedFiles: [],
+  foreignActorIds: ['other-captain']
+});
+assert.equal(dirtyWipLevel.level, 'L3');
+assert.match(dirtyWipLevel.reason, /dirty WIP/);
+
+const dirtyWipOverlap = projectTeamLevelRecommendation({
+  ownFiles: ['packages/cli/src/commands/broker/dirty-wip.ts'],
+  foreignFiles: [],
+  foreignDirtyFiles: ['packages/cli/src/commands/broker/dirty-wip.ts'],
+  stagedFiles: [],
+  foreignActorIds: ['other-captain']
+});
+assert.equal(dirtyWipOverlap.level, 'L3');
+assert.deepEqual(dirtyWipOverlap.overlappingFiles, ['packages/cli/src/commands/broker/dirty-wip.ts']);
+
 console.log('[team-admission-projection] ok');
