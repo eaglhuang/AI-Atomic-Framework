@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0086",
+  "title": "Split registry lineage normalization below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`packages/cli/src/commands/registry.ts` is below 600 physical lines.",
+    "Every new file under `packages/cli/src/commands/registry/**` is below 600 physical lines.",
+    "`npm run typecheck` continues to pass.",
+    "`npm run validate:cli` continues to pass.",
+    "Atomization coverage maps the registry facade and support directory to `atm.registry-lineage-command-map`."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/registry.ts",
+    "packages/cli/src/commands/registry/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/registry.ts",
+    "packages/cli/src/commands/registry/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "validators": [
+    "npm run typecheck",
+    "npm run validate:cli",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.registry-lineage-command-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.registry-lineage-command-map",
+        "pattern": "Facade",
+        "source": "packages/cli/src/commands/registry.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.registry-lineage-normalization-map",
+        "pattern": "Result Contract Object",
+        "source": "packages/cli/src/commands/registry/**",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0086-registry-lineage-normalization-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0086",
+    "headingLine": 50,
+    "hash": "4fc257f4073f7d28",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0086-registry-lineage-normalization-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:4fc257f4073f7d28f15524ea11abf084bc56e143b98b1ddee8d15cae90467d47",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T11:33:48.464Z"
+    }
+  },
+  "importedAt": "2026-07-16T11:33:48.464Z",
+  "lastTransitionId": "2026-07-16T11-35-28-408Z-claim-bfc2c771a5be",
+  "lastTransitionAt": "2026-07-16T11:35:28.408Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0086",
+  "reservedAt": "2026-07-16T11:35:25.197Z",
+  "promotedAt": "2026-07-16T11:35:25.199Z",
+  "claim": {
+    "actorId": "codex-task-rft-0086",
+    "leaseId": "lease-1844534969f0",
+    "claimedAt": "2026-07-16T11:35:25.202Z",
+    "heartbeatAt": "2026-07-16T11:35:25.202Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0086.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/registry.ts",
+      "packages/cli/src/commands/registry/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T11:35:25.202Z",
+  "startedByActor": "codex-task-rft-0086",
+  "startedBySessionId": "session-20260716113525-codex-task-rft-0086-TASK-RFT-0086-33a699ab53",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0086",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0086.*",
+      ".atm/history/task-events/TASK-RFT-0086/**",
+      ".atm/history/tasks/TASK-RFT-0086.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/registry.ts",
+      "packages/cli/src/commands/registry/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "3dd388f86c4fd7e235cd7322e72f39b1bc9682f67f3c4f11936ba155f5bea138",
+    "actorId": "codex-task-rft-0086",
+    "createdAt": "2026-07-16T11:35:28.407Z",
+    "status": "active"
+  }
+}

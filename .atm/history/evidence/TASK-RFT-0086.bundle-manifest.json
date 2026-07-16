@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0086",
+  "updatedAt": "2026-07-16T11:45:42.716Z",
+  "updatedBy": "codex-task-rft-0086",
+  "freshValidationPasses": [
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b6f40dbae4ead2a69c6310c6716e226a025b5e387c17bdbca22dcfed3e2ab2fc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T11:45:27.574Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3d9c07a2236f0c15af82395a3acd484b3de61441",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T11:45:39.004Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3d9c07a2236f0c15af82395a3acd484b3de61441",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10b9e1131e1d6d913c30a78e9135c0677eb0790950179ef7fc01f1bd9e85fb17",
+      "stderrSha256": "sha256:174db317c0e783f19d5dc28b1d17b82c18204245953a9d6019303bacbd782c59",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T11:45:42.793Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "3d9c07a2236f0c15af82395a3acd484b3de61441",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
