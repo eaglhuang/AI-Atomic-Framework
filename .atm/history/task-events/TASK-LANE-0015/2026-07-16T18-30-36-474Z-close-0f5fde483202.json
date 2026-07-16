@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T18-30-36-474Z-close-0f5fde483202",
+  "taskId": "TASK-LANE-0015",
+  "action": "close",
+  "actorId": "codex-lane-0015",
+  "sessionId": "session-20260716181918-codex-lane-0015-TASK-LANE-0015-feb5e6b2d8",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0015.json",
+  "taskSha256": "sha256:784e6ea6b23c6b4f25bbf0b7f830dbb15ea0ae7bc80cda110d29518d432dcc51",
+  "createdAt": "2026-07-16T18:30:36.474Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0015 --actor codex-lane-0015 --status done --historical-delivery 57a976e35611e414f63fcf3d4e0bdba1aecd16b2",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716181918-codex-lane-0015-TASK-LANE-0015-feb5e6b2d8",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0015.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T18:30:36.466Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0015.*",
+        ".atm/history/task-events/TASK-LANE-0015/**",
+        ".atm/history/tasks/TASK-LANE-0015.json",
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/framework-development/temp-claim.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/framework-development/__tests__/temp-claim.spec.ts",
+        "packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+        "packages/cli/src/commands/framework-development/temp-claim.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
