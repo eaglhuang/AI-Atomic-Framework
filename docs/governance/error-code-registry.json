@@ -337,5 +337,194 @@
       ],
       "sourceOwner": "packages/cli/src/commands/team-legacy.ts"
     }
+  ],
+  "prefixRules": [
+    {
+      "prefix": "ATM_GIT_",
+      "category": "git-governance",
+      "shortDescription": "Git governance, staging, commit, branch queue, or push admission reported a guarded condition.",
+      "remediation": [
+        "Run node atm.mjs git commit-status --actor <actor> --json when the condition happened during commit or staging.",
+        "Run node atm.mjs git admit --actor <actor> --branch <branch> --remote origin --json before protected push retries.",
+        "Do not bypass hooks or broker conflicts unless an explicit emergency approval names the required backend permission."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs git commit-status --actor <actor> --json",
+        "node atm.mjs git admit --actor <actor> --branch <branch> --remote origin --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/git-governance.ts"
+    },
+    {
+      "prefix": "ATM_TASKFLOW_",
+      "category": "taskflow",
+      "shortDescription": "Taskflow refused or diagnosed a task open, pre-close, close, delivery, or evidence transition.",
+      "remediation": [
+        "Run node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json for close-readiness details.",
+        "Inspect excludedDirtyFiles, missing validators, and commit-bundle diagnostics before retrying close.",
+        "Use taskflow close only after real deliverables and validator evidence exist."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs taskflow pre-close --task <task-id> --actor <actor> --json",
+        "node atm.mjs taskflow close --task <task-id> --actor <actor> --dry-run --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/taskflow.ts"
+    },
+    {
+      "prefix": "ATM_TASK_",
+      "category": "task-ledger",
+      "shortDescription": "Task ledger, task scope, claim, audit, or lifecycle governance reported a guarded condition.",
+      "remediation": [
+        "Run node atm.mjs tasks status --task <task-id> --json for the current ledger and claim state.",
+        "Use node atm.mjs next --prompt \"<current goal>\" --json when the correct task route is unclear.",
+        "Do not hand-edit .atm/history task records; use the ATM task lifecycle command named by the diagnostic."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs tasks status --task <task-id> --json",
+        "node atm.mjs next --prompt \"<current goal>\" --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/tasks"
+    },
+    {
+      "prefix": "ATM_TEAM_",
+      "category": "team-agents",
+      "shortDescription": "Team Agents planning, start, validation, runtime, knowledge, or roster governance reported a guarded condition.",
+      "remediation": [
+        "Run node atm.mjs team status --compact --json to inspect active Team runs.",
+        "Rerun the relevant team plan or validate command with the same --task and --recipe values.",
+        "Coordinator remains the task lifecycle and git.write owner unless Team start --execute explicitly granted a governed execution lane."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs team status --compact --json",
+        "node atm.mjs team validate --task <task-id> --recipe <recipe-id> --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/team-legacy.ts"
+    },
+    {
+      "prefix": "ATM_RUNNER_",
+      "category": "runner-mode",
+      "shortDescription": "Frozen-runner freshness, runner-sync, or release publication governance reported a guarded condition.",
+      "remediation": [
+        "Read runnerMode.sourceDrift in the command output before retrying writes.",
+        "If syncRequired is true and you own release surfaces, run ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build.",
+        "If another actor owns release surfaces, use broker runner-sync enqueue/status and wait for the steward receipt."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "ATM_RETAIN_RELEASE_ARTIFACTS=1 npm run build",
+        "node atm.mjs broker runner-sync status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/runner-mode"
+    },
+    {
+      "prefix": "ATM_BROKER_",
+      "category": "team-broker",
+      "shortDescription": "Team Broker, shared surface, steward, or conflict admission reported a guarded condition.",
+      "remediation": [
+        "Run node atm.mjs broker status --json to inspect current shared-surface ownership.",
+        "Do not bypass broker-conflict-blocked results; obtain a conflict-resolution artifact and required approval when the diagnostic asks for one.",
+        "Prefer waiting, steward release, or documented takeover over ad hoc staging or direct runtime edits."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs broker status --json",
+        "node atm.mjs team status --compact --json"
+      ],
+      "sourceOwner": "packages/core/src/broker"
+    },
+    {
+      "prefix": "ATM_NEXT_",
+      "category": "routing",
+      "shortDescription": "Prompt-scoped routing, claim admission, or next-action guidance reported a guarded condition.",
+      "remediation": [
+        "Rerun node atm.mjs next --prompt \"<current goal>\" --json and read evidence.nextAction before editing.",
+        "If the prompt refers to a planning card, import or identify the target-repo task before claim.",
+        "If active work exists, inspect broker and task status before widening scope."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs next --prompt \"<current goal>\" --json",
+        "node atm.mjs tasks status --json"
+      ],
+      "sourceOwner": "packages/cli/src/commands/next.ts"
+    },
+    {
+      "prefix": "ATM_GUARD_",
+      "category": "guard",
+      "shortDescription": "A local ATM guard found a policy, encoding, framework-development, or protected-state condition.",
+      "remediation": [
+        "Read the guard report findings and repair only the listed files or state.",
+        "Run the same guard command again after the focused repair.",
+        "Do not bypass guard findings unless a documented emergency approval explicitly allows that protected action."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs doctor --json",
+        "npm run check:encoding:touched"
+      ],
+      "sourceOwner": "packages/cli/src/commands/guard.ts"
+    },
+    {
+      "prefix": "ATM_VALIDATE_",
+      "category": "validation",
+      "shortDescription": "An ATM validation command found a failing invariant, stale projection, missing evidence, or governance mismatch.",
+      "remediation": [
+        "Read the validator output and rerun the same command after the focused repair.",
+        "If the validator names a generated projection, run the paired --write or generator command first.",
+        "Do not treat validation output as task evidence until the command exits successfully."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "npm run validate:quick",
+        "node atm.mjs doctor --json"
+      ],
+      "sourceOwner": "scripts/validate-*"
+    },
+    {
+      "prefix": "ATM_CLI_",
+      "category": "cli-usage",
+      "shortDescription": "The ATM CLI parser or command dispatcher rejected the command shape.",
+      "remediation": [
+        "Run node atm.mjs <command> --help for the supported options and examples.",
+        "Retry with explicit --json, --actor, --task, or required positional arguments named by the diagnostic.",
+        "Do not infer missing task or actor identity from dirty files."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "node atm.mjs --help",
+        "node atm.mjs <command> --help"
+      ],
+      "sourceOwner": "packages/cli/src/atm.ts"
+    },
+    {
+      "prefix": "ATM_",
+      "category": "general",
+      "shortDescription": "ATM reported a guarded condition that does not yet have a narrower exact entry or prefix rule.",
+      "remediation": [
+        "Read the command's JSON details and messages before retrying.",
+        "Run npm run generate:error-codes to refresh the source index and locate the owning source context.",
+        "Add an exact registry entry when the code is user-visible or appears in recurring operator reports."
+      ],
+      "retryable": true,
+      "requiresHumanApproval": false,
+      "relatedCommands": [
+        "npm run generate:error-codes",
+        "node atm.mjs doctor --json"
+      ],
+      "sourceOwner": "docs/governance/error-code-registry.json"
+    }
   ]
 }
