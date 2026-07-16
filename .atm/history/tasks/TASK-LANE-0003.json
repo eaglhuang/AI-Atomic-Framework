@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-LANE-0003",
   "title": "Taskflow runner-sync closeback lane",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-LANE-0002"
@@ -97,8 +97,8 @@
     }
   },
   "importedAt": "2026-07-16T15:04:47.034Z",
-  "lastTransitionId": "2026-07-16T16-27-39-124Z-claim-920bd303b031",
-  "lastTransitionAt": "2026-07-16T16:27:39.124Z",
+  "lastTransitionId": "2026-07-16T16-44-09-658Z-close-67678cc284ea",
+  "lastTransitionAt": "2026-07-16T16:44:09.658Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-lane-0003",
   "reservedAt": "2026-07-16T16:27:35.237Z",
@@ -107,7 +107,7 @@
     "actorId": "codex-lane-0003",
     "leaseId": "lease-1e69fc04ed6d",
     "claimedAt": "2026-07-16T16:27:35.246Z",
-    "heartbeatAt": "2026-07-16T16:27:35.246Z",
+    "heartbeatAt": "2026-07-16T16:44:09.654Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-LANE-0003.json",
@@ -116,8 +116,8 @@
       "packages/cli/src/commands/taskflow/implementation.ts",
       "tests/cli/taskflow-stale-runner-lane.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-16T16:27:35.246Z",
   "startedByActor": "codex-lane-0003",
@@ -147,5 +147,9 @@
     "sessionId": "session-20260716162735-codex-lane-0003-TASK-LANE-0003-b66503ff1d",
     "createdAt": "2026-07-16T16:27:39.122Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-16T16:44:09.654Z",
+  "closedByActor": "codex-lane-0003",
+  "closedBySessionId": "session-20260716162735-codex-lane-0003-TASK-LANE-0003-b66503ff1d",
+  "closurePacket": ".atm/history/evidence/TASK-LANE-0003.closure-packet.json"
 }

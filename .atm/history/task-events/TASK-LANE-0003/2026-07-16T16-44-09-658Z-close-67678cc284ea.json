@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T16-44-09-658Z-close-67678cc284ea",
+  "taskId": "TASK-LANE-0003",
+  "action": "close",
+  "actorId": "codex-lane-0003",
+  "sessionId": "session-20260716162735-codex-lane-0003-TASK-LANE-0003-b66503ff1d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0003.json",
+  "taskSha256": "sha256:2e79212649bae2623014f8772551213b109ad3512e9ba15071417df7faefb34b",
+  "createdAt": "2026-07-16T16:44:09.658Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0003 --actor codex-lane-0003 --status done --historical-delivery f5c1865761557a6f977125ee46a822de89379f66",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716162735-codex-lane-0003-TASK-LANE-0003-b66503ff1d",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0003.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/taskflow-stale-runner-lane.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T16:44:09.645Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0003.*",
+        ".atm/history/task-events/TASK-LANE-0003/**",
+        ".atm/history/tasks/TASK-LANE-0003.json",
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-stale-runner-lane.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/steward-queues.ts",
+        "packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+        "packages/cli/src/commands/taskflow/implementation.ts",
+        "tests/cli/taskflow-stale-runner-lane.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
