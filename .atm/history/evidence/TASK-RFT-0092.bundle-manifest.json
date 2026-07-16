@@ -1,13 +1,16 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0092",
-  "updatedAt": "2026-07-16T13:28:42.292Z",
+  "updatedAt": "2026-07-16T13:36:35.529Z",
   "updatedBy": "codex-task-rft-0092",
   "freshValidationPasses": [
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-core-registry --to 0.1.1 --legacy-target packages/core/src/registry/replacement-lane.ts#transitionReplacementMode --guidance-session guidance-20260716131837-247dc3c7eb --dry-run --json",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
     "validate:cli",
-    "validate:registry-core"
+    "validate:git-head-evidence",
+    "validate:registry-core",
+    "validate:validator-classification"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -61,6 +64,58 @@
       "generatedAt": "2026-07-16T13:28:42.361Z",
       "runnerKind": "dev-source",
       "sourceCommit": "b384eb1698f5cb2ba89988ba9791295a6136c6b1",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T13:31:31.103Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d235d416714724dbd4a54342e762fe4d600640e6",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-core-registry --to 0.1.1 --legacy-target packages/core/src/registry/replacement-lane.ts#transitionReplacementMode --guidance-session guidance-20260716131837-247dc3c7eb --dry-run --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:2cd132d2098f601e5e194059ae50f7de0c18797247cf9506da35d9e4e859ffa5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-core-registry --to 0.1.1 --legacy-target packages/core/src/registry/replacement-lane.ts#transitionReplacementMode --guidance-session guidance-20260716131837-247dc3c7eb --dry-run --json"
+      ],
+      "generatedAt": "2026-07-16T13:34:02.713Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/evidence/__tests__/validator-classification.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:c003484a61fd558ff705a7fae04f29e2ed66bc300e088446550ed4825a194e8f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:validator-classification"
+      ],
+      "generatedAt": "2026-07-16T13:36:27.400Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "b07bdd060f7a18f4321f3bb2b15cb125b246fd9f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T13:36:35.588Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "b07bdd060f7a18f4321f3bb2b15cb125b246fd9f",
       "cached": false
     }
   ],
