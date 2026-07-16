@@ -1,12 +1,15 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0082",
-  "updatedAt": "2026-07-16T10:29:17.258Z",
+  "updatedAt": "2026-07-16T10:36:19.793Z",
   "updatedBy": "codex-task-rft-0082",
   "freshValidationPasses": [
+    "doctor",
     "node --strip-types tests/atomic-map-physical-cap.test.ts",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:task-direction-governance"
   ],
   "staleValidationPasses": [],
@@ -61,6 +64,45 @@
       "generatedAt": "2026-07-16T10:29:17.313Z",
       "runnerKind": "dev-source",
       "sourceCommit": "e9ef2c4470dbd97dc4ab109e510c68e9a7f32e0c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e91c5b37e72fbde176e887ca2eaa56a872681e26cd0c8d2490d0e5b8d9237f20",
+      "stderrSha256": "sha256:7b53c91e3505d08ba7247f85303e6601759be8ffff9e6b623ec82c28e5c9f704",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T10:32:57.455Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f451ace65bbf9a1f967f418bbb7bb9c78f0ae177",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T10:33:22.879Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f451ace65bbf9a1f967f418bbb7bb9c78f0ae177",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:452ccaed11ee5f68240a0b085eb60d8f690f233e4f407deb98f3d29036416805",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T10:36:19.861Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],
