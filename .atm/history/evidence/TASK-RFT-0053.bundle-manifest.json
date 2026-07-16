@@ -1,12 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0053",
-  "updatedAt": "2026-07-16T02:29:49.563Z",
+  "updatedAt": "2026-07-16T02:33:22.110Z",
   "updatedBy": "codex-task-rft-0053",
   "freshValidationPasses": [
     "node --strip-types scripts/run-validators.ts --profile quick --json",
     "node --strip-types tests/cli/run-validators-final-600.test.ts",
-    "typecheck"
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -71,6 +73,32 @@
       "generatedAt": "2026-07-16T02:29:49.670Z",
       "runnerKind": "dev-source",
       "sourceCommit": "f7afc96390d01b9ea9f81a69fe058eeaf823f478",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:04322848b934ed8f0c98f60a92123dce593781017da9e21748e700a0594c8786",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T02:32:57.464Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T02:33:22.222Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

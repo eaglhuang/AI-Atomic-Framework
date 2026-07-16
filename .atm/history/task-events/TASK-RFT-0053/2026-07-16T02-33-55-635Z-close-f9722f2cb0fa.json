@@ -1,0 +1,61 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T02-33-55-635Z-close-f9722f2cb0fa",
+  "taskId": "TASK-RFT-0053",
+  "action": "close",
+  "actorId": "codex-task-rft-0053",
+  "sessionId": "session-20260716022556-codex-task-rft-0053-TASK-RFT-0053-8fad319c81",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0053.json",
+  "taskSha256": "sha256:462427fabd8e2aa0f6ab30053b961da872e9e2745c34f217b0aafd9ef2e09a89",
+  "createdAt": "2026-07-16T02:33:55.635Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0053 --actor codex-task-rft-0053 --status done --historical-delivery b19d101d7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716022556-codex-task-rft-0053-TASK-RFT-0053-8fad319c81",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0053.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/run-validators.ts --profile quick --json",
+      "node --strip-types tests/cli/run-validators-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T02:33:55.624Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0053.*",
+        ".atm/history/task-events/TASK-RFT-0053/**",
+        ".atm/history/tasks/TASK-RFT-0053.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/run-validators.ts",
+        "scripts/run-validators/**/*.ts",
+        "tests/cli/run-validators-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/run-validators.ts",
+        "scripts/run-validators/**/*.ts",
+        "tests/cli/run-validators-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

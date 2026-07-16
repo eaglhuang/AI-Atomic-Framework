@@ -1,0 +1,157 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0053",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "b19d101d7094f0024735f7566444e6119b4e398e",
+  "governedTreeSha": "052f2e623b0e443afb4c4dfde5d55bbcdffd9786",
+  "targetCommitDelta": {
+    "currentCommitSha": "b19d101d7094f0024735f7566444e6119b4e398e",
+    "parentCommitShas": [
+      "b19d101d7094f0024735f7566444e6119b4e398e"
+    ],
+    "governedTreeSha": "052f2e623b0e443afb4c4dfde5d55bbcdffd9786",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0053.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-validators.ts",
+      "tests/cli/run-validators-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/run-validators-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:496b49ca10ac54f6f4dbbbe347194460f39db76bbc36def7a6bcdeb45e78a916",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts quick --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4081f7cefbfd504082307e31b01aeed7a4c52478b09f89d3c5e66fb4388f1939",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts --profile quick --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bef7b20c172eb9936859bea1cc6c239fc5cdffe7cbcb77907edb0a37512d632b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:04322848b934ed8f0c98f60a92123dce593781017da9e21748e700a0594c8786",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types scripts/run-validators.ts --profile quick --json",
+    "node --strip-types tests/cli/run-validators-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T02:33:55.624Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0053.*",
+      ".atm/history/task-events/TASK-RFT-0053/**",
+      ".atm/history/tasks/TASK-RFT-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/**/*.ts",
+      "tests/cli/run-validators-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/run-validators.ts",
+      "scripts/run-validators/**/*.ts",
+      "tests/cli/run-validators-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0053.json",
+  "closedAt": "2026-07-16T02:33:55.625Z",
+  "closedByActor": "codex-task-rft-0053",
+  "sessionId": "session-20260716022556-codex-task-rft-0053-TASK-RFT-0053-8fad319c81",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "b19d101d7094f0024735f7566444e6119b4e398e",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-validators.ts",
+      "tests/cli/run-validators-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0053.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0053/2026-07-16T02-25-50-099Z-import-d1a395b7ed8a.json",
+      ".atm/history/task-events/TASK-RFT-0053/2026-07-16T02-25-55-996Z-reserve-265f2ea29379.json",
+      ".atm/history/task-events/TASK-RFT-0053/2026-07-16T02-25-55-998Z-promote-ed4f736dfa06.json",
+      ".atm/history/task-events/TASK-RFT-0053/2026-07-16T02-25-59-075Z-claim-ba52c7fbe7bd.json",
+      ".atm/history/tasks/TASK-RFT-0053.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [
+      "scripts/run-validators/implementation.ts"
+    ],
+    "waivedOutOfScopeFiles": [
+      "scripts/run-validators/implementation.ts"
+    ],
+    "waiverReason": "ATM scope glob classifier misclassified scripts/run-validators/implementation.ts even though TASK-RFT-0053 scope includes scripts/run-validators/**/*.ts; delivery is required by the facade import and covered by owner shard/final-600 validation."
+  },
+  "teamSummary": null
+}

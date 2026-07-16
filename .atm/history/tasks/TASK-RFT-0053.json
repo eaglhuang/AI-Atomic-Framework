@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0053",
   "title": "Split run-validators orchestrator below 600 lines",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-RFT-0052"
@@ -94,8 +94,8 @@
     }
   },
   "importedAt": "2026-07-16T02:25:49.928Z",
-  "lastTransitionId": "2026-07-16T02-25-59-075Z-claim-ba52c7fbe7bd",
-  "lastTransitionAt": "2026-07-16T02:25:59.075Z",
+  "lastTransitionId": "2026-07-16T02-33-55-635Z-close-f9722f2cb0fa",
+  "lastTransitionAt": "2026-07-16T02:33:55.635Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-task-rft-0053",
   "reservedAt": "2026-07-16T02:25:55.996Z",
@@ -104,7 +104,7 @@
     "actorId": "codex-task-rft-0053",
     "leaseId": "lease-35bdd7a020d6",
     "claimedAt": "2026-07-16T02:25:56.001Z",
-    "heartbeatAt": "2026-07-16T02:25:56.001Z",
+    "heartbeatAt": "2026-07-16T02:33:55.633Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/tasks/TASK-RFT-0053.json",
@@ -113,8 +113,8 @@
       "scripts/run-validators/**/*.ts",
       "tests/cli/run-validators-final-600.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "ATM scope glob classifier misclassified scripts/run-validators/implementation.ts even though TASK-RFT-0053 scope includes scripts/run-validators/**/*.ts; delivery is required by the facade import and covered by owner shard/final-600 validation."
   },
   "startedAt": "2026-07-16T02:25:56.001Z",
   "startedByActor": "codex-task-rft-0053",
@@ -143,5 +143,10 @@
     "actorId": "codex-task-rft-0053",
     "createdAt": "2026-07-16T02:25:59.074Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-16T02:33:55.633Z",
+  "closedByActor": "codex-task-rft-0053",
+  "closedBySessionId": "session-20260716022556-codex-task-rft-0053-TASK-RFT-0053-8fad319c81",
+  "closeReason": "ATM scope glob classifier misclassified scripts/run-validators/implementation.ts even though TASK-RFT-0053 scope includes scripts/run-validators/**/*.ts; delivery is required by the facade import and covered by owner shard/final-600 validation.",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0053.closure-packet.json"
 }
