@@ -1,0 +1,79 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T09-58-08-393Z-close-7debc5bcfa68",
+  "taskId": "TASK-RFT-0079",
+  "action": "close",
+  "actorId": "codex-task-rft-0079",
+  "sessionId": "session-20260716094300-codex-task-rft-0079-TASK-RFT-0079-aec6bca9db",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0079.json",
+  "taskSha256": "sha256:a54ffe7c44acbdf1a8bddd8968cebdd9663a7f383da1aa867ab4b064a7cc69ba",
+  "createdAt": "2026-07-16T09:58:08.393Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0079 --actor codex-task-rft-0079 --status done --historical-delivery 5bbd1371262cb35c31e954d0f4b9af636bbeece4",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716094300-codex-task-rft-0079-TASK-RFT-0079-aec6bca9db",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0079.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types tests/atomic-map-physical-cap.test.ts",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:atom-callsite-readability",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T09:58:08.386Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0079.*",
+        ".atm/history/task-events/TASK-RFT-0079/**",
+        ".atm/history/tasks/TASK-RFT-0079.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/core/src/index.ts",
+        "packages/core/src/registry/atom-ref-readability.ts",
+        "packages/core/src/registry/atom-ref-readability/**",
+        "packages/core/src/registry/atom-ref-readability/callsites.ts",
+        "packages/core/src/registry/atom-ref-readability/catalog.ts",
+        "packages/core/src/registry/atom-ref-readability/render.ts",
+        "packages/core/src/registry/atom-ref-readability/reports.ts",
+        "packages/core/src/registry/atom-ref-readability/types.ts",
+        "scripts/validate-atom-callsite-readability.ts",
+        "tests/atomic-map-physical-cap.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/index.ts",
+        "packages/core/src/registry/atom-ref-readability.ts",
+        "packages/core/src/registry/atom-ref-readability/**",
+        "packages/core/src/registry/atom-ref-readability/callsites.ts",
+        "packages/core/src/registry/atom-ref-readability/catalog.ts",
+        "packages/core/src/registry/atom-ref-readability/render.ts",
+        "packages/core/src/registry/atom-ref-readability/reports.ts",
+        "packages/core/src/registry/atom-ref-readability/types.ts",
+        "scripts/validate-atom-callsite-readability.ts",
+        "tests/atomic-map-physical-cap.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
