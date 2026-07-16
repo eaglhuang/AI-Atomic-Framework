@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0053",
+  "title": "Split run-validators orchestrator below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0052"
+  ],
+  "acceptance": [
+    "Reduce `scripts/run-validators.ts` to at or below 600 physical lines.",
+    "Extract CLI parsing, selection/profile resolution, validator execution, receipt persistence, summary/performance reporting, and git/cache helpers into bounded modules under `scripts/run-validators/**`.",
+    "Keep every new or touched run-validators support module at or below 600 physical lines.",
+    "Preserve quick profile validator behavior, JSON output behavior, status/resume behavior, cache behavior, and receipt reuse semantics.",
+    "Add a final-600 validator that checks `scripts/run-validators.ts` and `scripts/run-validators/**/*.ts`.",
+    "Update the scripts owner shard so both the facade and extracted modules remain covered by `atm.validator-envelope-map`.",
+    "Do not touch `release/**` artifacts or unrelated runner-sync work."
+  ],
+  "deliverables": [
+    "scripts/run-validators.ts",
+    "scripts/run-validators/**/*.ts",
+    "tests/cli/run-validators-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+  ],
+  "scopePaths": [
+    "scripts/run-validators.ts",
+    "scripts/run-validators/**/*.ts",
+    "tests/cli/run-validators-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+  ],
+  "validators": [
+    "node --strip-types tests/cli/run-validators-final-600.test.ts",
+    "node --strip-types scripts/run-validators.ts --profile quick --json",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.validator-envelope-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.validator-runner-facade",
+        "pattern": "Facade",
+        "source": "scripts/run-validators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.validator-runner-cli-and-selection-map",
+        "pattern": "Strategy Map",
+        "source": "scripts/run-validators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.validator-runner-receipt-and-summary-map",
+        "pattern": "Result Contract Object",
+        "source": "scripts/run-validators.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Current audit found `scripts/run-validators.ts` at 1699 physical lines after TASK-RFT-0052 was done.\n- This card continues the RFT large-file atom-map/facade split series after the >2000 source-file threshold was cleared, moving the same governance line toward the physical-file limit of 600 lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0053-run-validators-orchestrator-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0053",
+    "headingLine": 52,
+    "hash": "1bc68490c4546aea",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0053-run-validators-orchestrator-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1bc68490c4546aea2736f5f44fcd41123f33daad9443380754a9906268e53cb3",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T02:25:49.928Z"
+    }
+  },
+  "importedAt": "2026-07-16T02:25:49.928Z",
+  "lastTransitionId": "2026-07-16T02-25-59-075Z-claim-ba52c7fbe7bd",
+  "lastTransitionAt": "2026-07-16T02:25:59.075Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0053",
+  "reservedAt": "2026-07-16T02:25:55.996Z",
+  "promotedAt": "2026-07-16T02:25:55.998Z",
+  "claim": {
+    "actorId": "codex-task-rft-0053",
+    "leaseId": "lease-35bdd7a020d6",
+    "claimedAt": "2026-07-16T02:25:56.001Z",
+    "heartbeatAt": "2026-07-16T02:25:56.001Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/**/*.ts",
+      "tests/cli/run-validators-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T02:25:56.001Z",
+  "startedByActor": "codex-task-rft-0053",
+  "startedBySessionId": "session-20260716022556-codex-task-rft-0053-TASK-RFT-0053-8fad319c81",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0053",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0053.*",
+      ".atm/history/task-events/TASK-RFT-0053/**",
+      ".atm/history/tasks/TASK-RFT-0053.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/run-validators.ts",
+      "scripts/run-validators/**/*.ts",
+      "tests/cli/run-validators-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "41903bfbdc8447a6afbe96d900d8f276491093b2b7e45f2c003344e5fbb2ecd2",
+    "actorId": "codex-task-rft-0053",
+    "createdAt": "2026-07-16T02:25:59.074Z",
+    "status": "active"
+  }
+}

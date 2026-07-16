@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0053",
+  "updatedAt": "2026-07-16T02:29:49.563Z",
+  "updatedBy": "codex-task-rft-0053",
+  "freshValidationPasses": [
+    "node --strip-types scripts/run-validators.ts --profile quick --json",
+    "node --strip-types tests/cli/run-validators-final-600.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/run-validators-final-600.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:496b49ca10ac54f6f4dbbbe347194460f39db76bbc36def7a6bcdeb45e78a916",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/run-validators-final-600.test.ts"
+      ],
+      "generatedAt": "2026-07-16T02:28:33.414Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f7afc96390d01b9ea9f81a69fe058eeaf823f478",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts quick --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4081f7cefbfd504082307e31b01aeed7a4c52478b09f89d3c5e66fb4388f1939",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [],
+      "generatedAt": "2026-07-16T02:28:42.634Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f7afc96390d01b9ea9f81a69fe058eeaf823f478",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T02:28:50.088Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f7afc96390d01b9ea9f81a69fe058eeaf823f478",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/run-validators.ts --profile quick --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:bef7b20c172eb9936859bea1cc6c239fc5cdffe7cbcb77907edb0a37512d632b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types scripts/run-validators.ts --profile quick --json"
+      ],
+      "generatedAt": "2026-07-16T02:29:42.008Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f7afc96390d01b9ea9f81a69fe058eeaf823f478",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T02:29:49.670Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f7afc96390d01b9ea9f81a69fe058eeaf823f478",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
