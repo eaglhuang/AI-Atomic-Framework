@@ -77,9 +77,17 @@
     },
     {
       "path_pattern": "scripts/validate-cli.ts",
-      "atom_id": "atom-cli-command-specs",
-      "capability": "CLI command surface validation and runner/spec/help drift guards",
-      "coverage_status": "partial"
+      "atom_id": "atm.validate-cli-script-map",
+      "capability": "CLI validation facade for command surface, focused regression, and full fixture suites",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0052"
+    },
+    {
+      "path_pattern": "scripts/validate-cli/**/*.ts",
+      "atom_id": "atm.validate-cli-script-map",
+      "capability": "validate-cli harness, suite orchestration, focused regression runner, and full fixture shards",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0052"
     },
     {
       "path_pattern": "scripts/validate-governance-commands.ts",
