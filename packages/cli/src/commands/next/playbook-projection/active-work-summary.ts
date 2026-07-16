@@ -493,7 +493,7 @@ function readStagedFiles(cwd: string): string[] {
     .filter(Boolean));
 }
 
-function mentionsNotCurrentTask(prompt: string) {
+export function mentionsNotCurrentTask(prompt: string) {
   const normalized = normalizeSearchText(prompt);
   return /\bnot\s+(?:the\s+)?current\s+task\b|\bnot\s+(?:this\s+)?active\s+task\b/.test(normalized)
     || /不是(?:目前|當前|現在)?(?:這張|此)?(?:任務|active task|current task)/.test(prompt)

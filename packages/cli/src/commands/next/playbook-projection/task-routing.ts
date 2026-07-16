@@ -13,6 +13,7 @@ import { allowsPlanningMirror } from '../match-and-sort.ts';
 import { finalizeImportedTaskSummary, normalizeOptionalString } from '../route-resolution.ts';
 import { buildNextMessages } from './message-assembly.ts';
 import { buildTaskDeliveryPrinciple } from './channel-playbook.ts';
+import { mentionsNotCurrentTask } from './active-work-summary.ts';
 
 function mapStatusToSlashCommandId(status: string): string {
   if (status === 'needs-bootstrap' || status === 'needs-onboarding-refresh') {
