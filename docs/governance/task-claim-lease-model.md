@@ -25,6 +25,8 @@ Claim data is persisted under each task JSON as `claim`:
 
 - `actorId`
 - `leaseId`
+- `startedBySessionId` on the task document links the active claim to
+  `.atm/runtime/sessions/<session-id>.json`
 - `claimedAt`
 - `heartbeatAt`
 - `ttlSeconds`
@@ -32,6 +34,21 @@ Claim data is persisted under each task JSON as `claim`:
 - `state`: `active` | `released` | `handoff` | `taken_over`
 - `handoffTo` (optional)
 - `reason` (optional)
+
+Runtime session records carry the operator instance identity:
+
+- `sessionId`
+- `actorId`
+- `taskId`
+- `claimLeaseId`
+- `editor`
+- `gitName`
+- `gitEmail`
+
+Direction locks, Git index ownership diagnostics, and branch commit queue
+records should preserve this session id when available. This lets ATM warn
+about a distinct live operator even when two editor windows reuse the same
+actor id and task id.
 
 ## Lock Conflict Behavior
 
