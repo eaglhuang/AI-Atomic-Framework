@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T18-00-27-163Z-close-29fed921fd29",
+  "taskId": "TASK-LANE-0013",
+  "action": "close",
+  "actorId": "codex-lane-0013",
+  "sessionId": "session-20260716173910-codex-lane-0013-TASK-LANE-0013-268e6e5584",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0013.json",
+  "taskSha256": "sha256:1f67f6ab86d6e3e98d343e7a061f4bdc8915b25d4673fb22877ce6b1e18b2677",
+  "createdAt": "2026-07-16T18:00:27.163Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0013 --actor codex-lane-0013 --status done --historical-delivery 3cd6ccaf7f6058ddd00aa7340366eee2046dce50",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716173910-codex-lane-0013-TASK-LANE-0013-268e6e5584",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0013.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T18:00:27.154Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0013.*",
+        ".atm/history/task-events/TASK-LANE-0013/**",
+        ".atm/history/tasks/TASK-LANE-0013.json",
+        "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/git-governance/__tests__/commit-scope-policy.spec.ts",
+        "packages/cli/src/commands/git-governance/implementation.ts",
+        "packages/cli/src/commands/taskflow/commit-bundle-assembly.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
