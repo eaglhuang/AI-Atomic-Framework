@@ -61,7 +61,7 @@ import {
 const defaultBootstrapTaskId = 'BOOTSTRAP-0001';
 const defaultBootstrapTaskTitle = 'Bootstrap ATM in this repository';
 const currentLayoutVersion = 2;
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
+const repoRoot = resolveBundledRepoRoot(path.dirname(fileURLToPath(import.meta.url)), '../../../../');
 const templateRoot = path.join(repoRoot, 'templates', 'root-drop');
 const templateFiles = [
   {
@@ -118,6 +118,20 @@ const rootAgentsEntryStart = '<!-- ATM ROOT ENTRY:START -->';
 const rootAgentsEntryEnd = '<!-- ATM ROOT ENTRY:END -->';
 const rootReadmeEntryStart = '<!-- ATM README ENTRY:START -->';
 const rootReadmeEntryEnd = '<!-- ATM README ENTRY:END -->';
+
+function resolveBundledRepoRoot(start: string, fallback: string): string {
+  let current = path.resolve(start);
+  while (true) {
+    if (existsSync(path.join(current, 'templates', 'root-drop'))) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return path.resolve(start, fallback);
+    }
+    current = parent;
+  }
+}
 
 export function installRootDropScripts(cwd: string, options: { readonly force?: boolean } = {}): LocalGovernanceScriptInstallResult {
   const created: string[] = [];

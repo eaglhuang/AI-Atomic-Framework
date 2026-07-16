@@ -7,7 +7,7 @@ import type { CapabilityResult } from '@ai-atomic-framework/plugin-sdk';
 import type { LocalGovernancePinnedRunnerResult } from '../types.ts';
 import { createAgentsRootEntryBlock, createReadmeRootEntryBlock, patchManagedRootEntry } from './root-entry-patching.ts';
 
-const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
+const repoRoot = resolveBundledRepoRoot(path.dirname(fileURLToPath(import.meta.url)), '../../../../../');
 const templateRoot = path.join(repoRoot, 'templates', 'root-drop');
 const rootDropScriptNames = [
   'atm-next',
@@ -26,6 +26,20 @@ const rootAgentsEntryStart = '<!-- ATM ROOT ENTRY:START -->';
 const rootAgentsEntryEnd = '<!-- ATM ROOT ENTRY:END -->';
 const rootReadmeEntryStart = '<!-- ATM README ENTRY:START -->';
 const rootReadmeEntryEnd = '<!-- ATM README ENTRY:END -->';
+
+function resolveBundledRepoRoot(start: string, fallback: string): string {
+  let current = path.resolve(start);
+  while (true) {
+    if (existsSync(path.join(current, 'templates', 'root-drop'))) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return path.resolve(start, fallback);
+    }
+    current = parent;
+  }
+}
 
 export function readProjectName(cwd: string): string | null {
   const packageJsonPath = path.join(cwd, 'package.json');
