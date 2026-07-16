@@ -1,0 +1,80 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T04-44-22-956Z-close-4ecb65ef4ab6",
+  "taskId": "TASK-RFT-0062",
+  "action": "close",
+  "actorId": "codex-task-rft-0062",
+  "sessionId": "session-20260716043027-codex-task-rft-0062-TASK-RFT-0062-0fa2eddd0b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0062.json",
+  "taskSha256": "sha256:42d2f68546c100c407ed0e06ddd96b3c3a54255854b676295f313499e08701c6",
+  "createdAt": "2026-07-16T04:44:22.956Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0062 --actor codex-task-rft-0062 --status done --historical-delivery 9ddaa1600e99e1fc21efddc4f91780510cf0fd7d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716043027-codex-task-rft-0062-TASK-RFT-0062-0fa2eddd0b",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0062.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-prompt-scoped-next-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:prompt-scoped-next"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T04:44:22.943Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0062.*",
+        ".atm/history/task-events/TASK-RFT-0062/**",
+        ".atm/history/tasks/TASK-RFT-0062.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-prompt-scoped-next/**/*.ts",
+        "scripts/validate-prompt-scoped-next/assertions.ts",
+        "scripts/validate-prompt-scoped-next/batch-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/claim-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/fixture.ts",
+        "scripts/validate-prompt-scoped-next/import-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/main.ts",
+        "scripts/validate-prompt-scoped-next/route-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/worktree-team-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/writers.ts",
+        "tests/scripts/validate-prompt-scoped-next-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-prompt-scoped-next.ts",
+        "scripts/validate-prompt-scoped-next/**/*.ts",
+        "scripts/validate-prompt-scoped-next/assertions.ts",
+        "scripts/validate-prompt-scoped-next/batch-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/claim-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/fixture.ts",
+        "scripts/validate-prompt-scoped-next/import-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/main.ts",
+        "scripts/validate-prompt-scoped-next/route-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/worktree-team-scenarios.ts",
+        "scripts/validate-prompt-scoped-next/writers.ts",
+        "tests/scripts/validate-prompt-scoped-next-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
