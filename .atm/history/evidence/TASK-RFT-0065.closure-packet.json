@@ -1,0 +1,165 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0065",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "24d4872f31259693eba262d3e7f67066b703d8b9",
+  "governedTreeSha": "6e86d66face435949afa00b541297fbb77fef153",
+  "targetCommitDelta": {
+    "currentCommitSha": "24d4872f31259693eba262d3e7f67066b703d8b9",
+    "parentCommitShas": [
+      "24d4872f31259693eba262d3e7f67066b703d8b9"
+    ],
+    "governedTreeSha": "6e86d66face435949afa00b541297fbb77fef153",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0065.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0065.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validate-team-brokered-write/context.ts",
+      "scripts/validate-team-brokered-write/linkage.ts",
+      "scripts/validate-team-brokered-write/main.ts",
+      "scripts/validate-team-brokered-write/proposal-flow.ts",
+      "tests/scripts/validate-team-brokered-write-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/scripts/validate-team-brokered-write-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9b1f4a9bb6a90f66786b34d236d13520d3843396503cacad7db72951dcd7ac62",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:team-brokered-write",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:615d8003cd80d2b7380f261574f49d073a54f7e5a68a48e4e2caf33f1758d819",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a33945ff35fbd5d9c516c38ad8973316251efec8ac8ff2c756d4d9ee7d69424c",
+      "stderrSha256": "sha256:590f71f15a7ac2f5cc86b9acac130c1675c9c6d930a174eda73b784590740128",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/scripts/validate-team-brokered-write-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:team-brokered-write"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T05:26:49.366Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0065.*",
+      ".atm/history/task-events/TASK-RFT-0065/**",
+      ".atm/history/tasks/TASK-RFT-0065.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validate-team-brokered-write/**/*.ts",
+      "scripts/validate-team-brokered-write/context.ts",
+      "scripts/validate-team-brokered-write/linkage.ts",
+      "scripts/validate-team-brokered-write/main.ts",
+      "scripts/validate-team-brokered-write/proposal-flow.ts",
+      "tests/scripts/validate-team-brokered-write-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validate-team-brokered-write/**/*.ts",
+      "scripts/validate-team-brokered-write/context.ts",
+      "scripts/validate-team-brokered-write/linkage.ts",
+      "scripts/validate-team-brokered-write/main.ts",
+      "scripts/validate-team-brokered-write/proposal-flow.ts",
+      "tests/scripts/validate-team-brokered-write-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0065.json",
+  "closedAt": "2026-07-16T05:26:49.366Z",
+  "closedByActor": "codex-task-rft-0065",
+  "sessionId": "session-20260716052007-codex-task-rft-0065-TASK-RFT-0065-fefc13c04f",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "24d4872f31259693eba262d3e7f67066b703d8b9",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "scripts/validate-team-brokered-write.ts",
+      "scripts/validate-team-brokered-write/context.ts",
+      "scripts/validate-team-brokered-write/linkage.ts",
+      "scripts/validate-team-brokered-write/main.ts",
+      "scripts/validate-team-brokered-write/proposal-flow.ts",
+      "tests/scripts/validate-team-brokered-write-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0065.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-20-01-618Z-import-99af2c2fca6c.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-20-07-331Z-reserve-04afb1d76413.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-20-07-333Z-promote-98a9bceefa6e.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-20-10-342Z-claim-b52a5fb21b2a.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-23-20-399Z-scope-amendment-818e61f39e13.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-23-21-425Z-scope-amendment-bb09962bd2fa.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-23-22-572Z-scope-amendment-1d60b2b1ace4.json",
+      ".atm/history/task-events/TASK-RFT-0065/2026-07-16T05-23-23-761Z-scope-amendment-59e97cc30417.json",
+      ".atm/history/tasks/TASK-RFT-0065.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T05-26-49-371Z-close-3c632d0dd12c",
+  "taskId": "TASK-RFT-0065",
+  "action": "close",
+  "actorId": "codex-task-rft-0065",
+  "sessionId": "session-20260716052007-codex-task-rft-0065-TASK-RFT-0065-fefc13c04f",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0065.json",
+  "taskSha256": "sha256:e677f56ec1618332b929bba0cdebf1b537029e8f41969cf2780ca22cc6acab69",
+  "createdAt": "2026-07-16T05:26:49.371Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0065 --actor codex-task-rft-0065 --status done --historical-delivery 24d4872f31259693eba262d3e7f67066b703d8b9",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716052007-codex-task-rft-0065-TASK-RFT-0065-fefc13c04f",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0065.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-team-brokered-write-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:team-brokered-write"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T05:26:49.366Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0065.*",
+        ".atm/history/task-events/TASK-RFT-0065/**",
+        ".atm/history/tasks/TASK-RFT-0065.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/validate-team-brokered-write.ts",
+        "scripts/validate-team-brokered-write/**/*.ts",
+        "scripts/validate-team-brokered-write/context.ts",
+        "scripts/validate-team-brokered-write/linkage.ts",
+        "scripts/validate-team-brokered-write/main.ts",
+        "scripts/validate-team-brokered-write/proposal-flow.ts",
+        "tests/scripts/validate-team-brokered-write-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-team-brokered-write.ts",
+        "scripts/validate-team-brokered-write/**/*.ts",
+        "scripts/validate-team-brokered-write/context.ts",
+        "scripts/validate-team-brokered-write/linkage.ts",
+        "scripts/validate-team-brokered-write/main.ts",
+        "scripts/validate-team-brokered-write/proposal-flow.ts",
+        "tests/scripts/validate-team-brokered-write-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
