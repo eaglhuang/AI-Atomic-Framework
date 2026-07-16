@@ -1,0 +1,67 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T15-17-35-560Z-close-8c141a2f9da7",
+  "taskId": "TASK-RFT-0094",
+  "action": "close",
+  "actorId": "codex-task-rft-0094",
+  "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0094.json",
+  "taskSha256": "sha256:09419f769149e3f8f5794746fbfbede7073ae079f589bd82a3866559562b5fa7",
+  "createdAt": "2026-07-16T15:17:35.560Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0094 --actor codex-task-rft-0094 --status done --historical-delivery 1deaf304f76dd56db1572b4bc8f8fd7d5bc7adf7",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0094.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+      "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+      "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:hook-atomic-map"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T15:17:35.539Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0094.*",
+        ".atm/history/task-events/TASK-RFT-0094/**",
+        ".atm/history/tasks/TASK-RFT-0094.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/hook/commit-range-guard.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/**",
+        "packages/cli/src/commands/hook/pre-commit/**",
+        "scripts/validate-hook-atomic-map.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/hook/commit-range-guard.ts",
+        "packages/cli/src/commands/hook/commit-range-guard/**",
+        "packages/cli/src/commands/hook/pre-commit/**",
+        "scripts/validate-hook-atomic-map.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

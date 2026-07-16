@@ -1,0 +1,231 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0094",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "1deaf304f76dd56db1572b4bc8f8fd7d5bc7adf7",
+  "governedTreeSha": "631392c49f7ae01367e958be136de88ef318747c",
+  "targetCommitDelta": {
+    "currentCommitSha": "1deaf304f76dd56db1572b4bc8f8fd7d5bc7adf7",
+    "parentCommitShas": [
+      "1deaf304f76dd56db1572b4bc8f8fd7d5bc7adf7"
+    ],
+    "governedTreeSha": "631392c49f7ae01367e958be136de88ef318747c",
+    "changedFiles": [
+      ".agents/skills/atm-dispatch/SKILL.md",
+      ".atm/history/evidence/TASK-CODEX-0204.bundle-manifest.json",
+      ".atm/history/evidence/TASK-CODEX-0204.json",
+      ".atm/memory/atm-chart.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "integrations/codex-skills/atm-dispatch/SKILL.md",
+      "packages/cli/src/commands/hook/commit-range-guard.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/args.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/baseline.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/support.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-14-183.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-15-190.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/closure-packet-schema/implementation.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/commit-range-guard.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/commit-range-guard.js",
+      "release/atm-root-drop/packages/cli/dist/commands/hook/pre-commit/support.js",
+      "release/atm-root-drop/packages/cli/dist/commands/internal-release.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/internal-release.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/active-work-summary.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/active-work-summary.js",
+      "release/atm-root-drop/packages/cli/dist/commands/taskflow/write-readiness.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/import-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/legacy/implementation.js",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/closure-packet-schema/implementation.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/commit-range-guard.ts",
+      "release/atm-root-drop/packages/cli/src/commands/hook/pre-commit/support.ts",
+      "release/atm-root-drop/packages/cli/src/commands/internal-release.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/active-work-summary.ts",
+      "release/atm-root-drop/packages/cli/src/commands/taskflow/write-readiness.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/import-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/legacy/implementation.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-hook-atomic-map.ts",
+      "release/atm-root-drop/scripts/validate-hook-batch-pending-window.ts",
+      "release/atm-root-drop/scripts/validate-internal-release-sync.ts",
+      "release/atm-root-drop/tests/cli/team-admission-projection.test.ts",
+      "scripts/validate-hook-atomic-map.ts",
+      "templates/skills/atm-dispatch.skill.md"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-hook-atomic-map.ts --mode validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b33c4e1e82ec6d01f43a3a90f5f547a26e06ebeb59e6420f982a93ddb56e5338",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3d53239be5a095503bf408eff51ff31a6e2b86fc945b999da75cffb3875067e0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:262e0fccd5656c611a26f93317cec04da1a20e28c0bc2d8fdd3cb123de0b1a45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:82e024706ad164b04dbe2c4649c0c5df17ff42f311fe0fc05fcecd5d95a1f784",
+      "stderrSha256": "sha256:6b7d39f08df47e65b4f91660e1b983e686980b62f3b3fe931f899659697b9e5e",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal \" Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules",
+      "cwd": ".",
+      "exitCode": 1,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e0fa25a6cbb7ba002687d30d6f11687407db3c9a2a2e0cf5c264d0dd758280ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d9fd3a807b7f35745f6a476dd843a9546e03106881621ca2dfbe34ad6953422e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+    "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:hook-atomic-map"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T15:17:35.539Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0094.*",
+      ".atm/history/task-events/TASK-RFT-0094/**",
+      ".atm/history/tasks/TASK-RFT-0094.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook/commit-range-guard.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/**",
+      "packages/cli/src/commands/hook/pre-commit/**",
+      "scripts/validate-hook-atomic-map.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/hook/commit-range-guard.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/**",
+      "packages/cli/src/commands/hook/pre-commit/**",
+      "scripts/validate-hook-atomic-map.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0094.json",
+  "closedAt": "2026-07-16T15:17:35.540Z",
+  "closedByActor": "codex-task-rft-0094",
+  "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "1deaf304f76dd56db1572b4bc8f8fd7d5bc7adf7",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/cli/src/commands/hook/commit-range-guard.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/args.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/baseline.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/implementation.ts",
+      "packages/cli/src/commands/hook/commit-range-guard/support.ts",
+      "scripts/validate-hook-atomic-map.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0094.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0094/2026-07-16T14-55-15-345Z-import-2c4335652084.json",
+      ".atm/history/task-events/TASK-RFT-0094/2026-07-16T15-05-40-652Z-reserve-fa0cd331ff96.json",
+      ".atm/history/task-events/TASK-RFT-0094/2026-07-16T15-05-40-654Z-promote-524b3fc3f3c2.json",
+      ".atm/history/task-events/TASK-RFT-0094/2026-07-16T15-05-44-993Z-claim-d226f81e3dba.json",
+      ".atm/history/tasks/TASK-RFT-0094.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
