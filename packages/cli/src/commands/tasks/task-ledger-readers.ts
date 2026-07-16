@@ -3,11 +3,22 @@ import { existsSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import type { TaskClaimRecord } from '@ai-atomic-framework/core';
 
+export interface ClaimLaneSessionMetadata {
+  readonly laneSessionId: string;
+  readonly status: string;
+  readonly source: string;
+  readonly exportHint: string;
+}
+
+export type TaskClaimRecordWithLane = TaskClaimRecord & {
+  readonly laneSession?: ClaimLaneSessionMetadata;
+};
+
 function normalizeRelativePath(value: string): string {
   return value.replace(/\\/g, '/').replace(/^\.\//, '').trim();
 }
 
-export function parseClaimRecord(value: unknown): TaskClaimRecord | null {
+export function parseClaimRecord(value: unknown): TaskClaimRecordWithLane | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return null;
   }
@@ -27,6 +38,7 @@ export function parseClaimRecord(value: unknown): TaskClaimRecord | null {
   }
   const handoffTo = typeof candidate.handoffTo === 'string' && candidate.handoffTo.trim().length > 0 ? candidate.handoffTo.trim() : undefined;
   const reason = typeof candidate.reason === 'string' && candidate.reason.trim().length > 0 ? candidate.reason.trim() : undefined;
+  const laneSession = parseClaimLaneSession(candidate.laneSession);
   return {
     actorId,
     leaseId,
@@ -36,7 +48,8 @@ export function parseClaimRecord(value: unknown): TaskClaimRecord | null {
     files,
     state,
     ...(handoffTo ? { handoffTo } : {}),
-    ...(reason ? { reason } : {})
+    ...(reason ? { reason } : {}),
+    ...(laneSession ? { laneSession } : {})
   };
 }
 
@@ -57,6 +70,17 @@ export function createClaimRecord(input: {
     files: Array.from(new Set(input.files.map((entry) => normalizeRelativePath(entry)).filter(Boolean))),
     state: 'active'
   };
+}
+
+function parseClaimLaneSession(value: unknown): ClaimLaneSessionMetadata | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  const laneSessionId = typeof record.laneSessionId === 'string' ? record.laneSessionId.trim() : '';
+  const status = typeof record.status === 'string' ? record.status.trim() : '';
+  const source = typeof record.source === 'string' ? record.source.trim() : '';
+  const exportHint = typeof record.exportHint === 'string' ? record.exportHint.trim() : '';
+  if (!laneSessionId || !status || !source || !exportHint) return null;
+  return { laneSessionId, status, source, exportHint };
 }
 
 export function isClaimExpired(claim: TaskClaimRecord, nowIso: string): boolean {

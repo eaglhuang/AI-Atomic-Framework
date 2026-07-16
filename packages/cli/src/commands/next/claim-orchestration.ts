@@ -414,6 +414,21 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       queue: queueForDirection
     });
   }
+  const claimEvidence = claimResult && typeof claimResult === 'object' && 'evidence' in claimResult && claimResult.evidence && typeof claimResult.evidence === 'object'
+    ? claimResult.evidence as Record<string, unknown>
+    : null;
+  const resolvedClaimIntent = typeof claimEvidence?.claimIntent === 'string'
+    ? claimEvidence.claimIntent
+    : claimIntent;
+  const claimRecord = claimEvidence && typeof claimEvidence.claim === 'object' && claimEvidence.claim
+    ? claimEvidence.claim as Record<string, unknown>
+    : null;
+  const rawLaneSession = claimEvidence && typeof claimEvidence.laneSession === 'object' && claimEvidence.laneSession
+    ? claimEvidence.laneSession as Record<string, unknown>
+    : claimRecord && typeof claimRecord.laneSession === 'object' && claimRecord.laneSession
+      ? claimRecord.laneSession as Record<string, unknown>
+      : null;
+  const laneSession = normalizeClaimLaneSessionEnvelope(rawLaneSession);
   const directionLockStartedAt = Date.now();
   const directionLock = writeTaskDirectionLock({
     cwd: input.cwd,
@@ -426,18 +441,10 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     planningReadOnlyPaths: claimableTask.planningReadOnlyPaths,
     planningMirrorPaths: claimableTask.planningMirrorPaths,
     allowPlanningMirror: claimableTask.allowPlanningMirror,
-    prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId
+    prompt: input.taskIntent?.userPrompt ?? claimableTask.workItemId,
+    laneSession
   });
   claimLatencyPhases.push({ phase: 'direction-lock-write', durationMs: Date.now() - directionLockStartedAt });
-  const claimEvidence = claimResult && typeof claimResult === 'object' && 'evidence' in claimResult && claimResult.evidence && typeof claimResult.evidence === 'object'
-    ? claimResult.evidence as Record<string, unknown>
-    : null;
-  const resolvedClaimIntent = typeof claimEvidence?.claimIntent === 'string'
-    ? claimEvidence.claimIntent
-    : claimIntent;
-  const claimRecord = claimEvidence && typeof claimEvidence.claim === 'object' && claimEvidence.claim
-    ? claimEvidence.claim as Record<string, unknown>
-    : null;
   const claimedSessionId = typeof claimEvidence?.sessionId === 'string' ? claimEvidence.sessionId : null;
   const actorSession = upsertActorWorkSession({
     cwd: input.cwd,
@@ -455,8 +462,11 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     taskPath: claimableTask.taskPath,
     sourcePrompt: batchRun?.sourcePrompt ?? input.taskIntent?.userPrompt ?? claimableTask.workItemId,
     batchId: batchRun?.batchId ?? null,
-    guidanceSessionId: null
+    guidanceSessionId: laneSession?.laneSessionId ?? null
   }).session;
+  const laneSessionMessages = Array.isArray(claimResult.messages)
+    ? claimResult.messages.filter((entry) => typeof entry?.code === 'string' && entry.code.startsWith('ATM_LANE_SESSION_'))
+    : [];
   const recommendedChannel = selectPostClaimChannel(batchRun?.status === 'active').recommendedChannel;
   if (shouldReuseActiveClaim) {
     recordBrokerClaimIntent({
@@ -514,6 +524,7 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       sourcePlanPath: claimableTask.sourcePlanPath
     },
     taskDirectionLock: directionLock,
+    ...(laneSession ? { laneSession } : {}),
     ...(brokerQueueAdmission ? { brokerQueueAdmission } : {}),
     taskQueue: activeQueue,
     batchRun,
@@ -543,32 +554,36 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
     ok: true,
     command: 'next',
     cwd: input.cwd,
-    messages: buildNextMessages(
-      nextAction,
-      userNotice,
-      input.integrationBootstrap,
-      input.runtimeAdapterReadiness,
-      message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
-        taskId: claimableTask.workItemId,
-        actorId: resolvedActor.actorId,
-        actorSource: resolvedActor.source,
-        actorResolution,
-        recommendedChannel: nextAction.recommendedChannel,
-        claimIntent: resolvedClaimIntent,
-        batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
-          ? 'node atm.mjs batch checkpoint --actor <id> --json'
-          : null,
-        blockedPattern: nextAction.recommendedChannel === 'batch'
-          ? 'manual tasks claim/close loop'
-          : null,
-        ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
-        ignoredUntrackedNote: scopeDiagnostic.ignoredUntrackedFiles.length > 0
-          ? 'These files are NOT blocking the claim. If any of them is actually a deliverable for this task, run `node atm.mjs tasks scope --add <paths>` to widen the scope and then `git add` them.'
-          : null
-      })
-    ),
+    messages: [
+      ...buildNextMessages(
+        nextAction,
+        userNotice,
+        input.integrationBootstrap,
+        input.runtimeAdapterReadiness,
+        message('info', 'ATM_NEXT_CLAIMED', 'Claimed the next imported work item.', {
+          taskId: claimableTask.workItemId,
+          actorId: resolvedActor.actorId,
+          actorSource: resolvedActor.source,
+          actorResolution,
+          recommendedChannel: nextAction.recommendedChannel,
+          claimIntent: resolvedClaimIntent,
+          batchCheckpointCommand: nextAction.recommendedChannel === 'batch'
+            ? 'node atm.mjs batch checkpoint --actor <id> --json'
+            : null,
+          blockedPattern: nextAction.recommendedChannel === 'batch'
+            ? 'manual tasks claim/close loop'
+            : null,
+          ignoredUntrackedFiles: scopeDiagnostic.ignoredUntrackedFiles,
+          ignoredUntrackedNote: scopeDiagnostic.ignoredUntrackedFiles.length > 0
+            ? 'These files are NOT blocking the claim. If any of them is actually a deliverable for this task, run `node atm.mjs tasks scope --add <paths>` to widen the scope and then `git add` them.'
+            : null
+        })
+      ),
+      ...laneSessionMessages
+    ],
     evidence: {
       nextAction,
+      ...(laneSession ? { laneSession } : {}),
       actorResolution,
       claimIntent: resolvedClaimIntent,
       claimPreparation,
@@ -592,4 +607,19 @@ export async function claimNextImportedTask(input: { readonly cwd: string; reado
       }
     }
   });
+}
+
+function normalizeClaimLaneSessionEnvelope(value: Record<string, unknown> | null): {
+  readonly laneSessionId: string;
+  readonly status: string;
+  readonly source: string;
+  readonly exportHint: string;
+} | null {
+  if (!value) return null;
+  const laneSessionId = typeof value.laneSessionId === 'string' ? value.laneSessionId.trim() : '';
+  const status = typeof value.status === 'string' ? value.status.trim() : '';
+  const source = typeof value.source === 'string' ? value.source.trim() : '';
+  const exportHint = typeof value.exportHint === 'string' ? value.exportHint.trim() : '';
+  if (!laneSessionId || !status || !source || !exportHint) return null;
+  return { laneSessionId, status, source, exportHint };
 }

@@ -20,6 +20,7 @@ export interface ResolveLaneSessionInput {
   readonly cwd: string;
   readonly laneSessionId?: string | null;
   readonly actorId?: string | null;
+  readonly taskId?: string | null;
   readonly command?: string | null;
   readonly now?: string;
   readonly ttlMs?: number;
@@ -54,6 +55,7 @@ export function resolveLaneSession(input: ResolveLaneSessionInput): LaneSessionR
   const minted = mintLaneSession({
     cwd: input.cwd,
     actorId,
+    taskId: input.taskId,
     ttlMs: input.ttlMs ?? defaultLaneSessionTtlMs,
     timestamp: input.now,
     lastCommand: input.command

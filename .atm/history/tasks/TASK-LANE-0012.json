@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0012",
+  "title": "Lane claim stamping and direction metadata",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0011"
+  ],
+  "acceptance": [
+    "A claim made with `ATM_LANE_SESSION_ID` records `laneSessionId` on the active claim and task direction lock.",
+    "A claim made without `ATM_LANE_SESSION_ID` lazily resolves or mints a lane through the same resolution helper used by `atm lane status`.",
+    "Existing actor-only tasks remain readable and closeable through legacy fallback.",
+    "Work-session records expose the lane id without changing the meaning of `guidanceSessionId`.",
+    "JSON output for claim-related routes may include the optional top-level `laneSession` envelope when a lane is resolved.",
+    "Focused tests cover lane-stamped claim metadata and actor-only legacy fallback."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/task-transition-helpers.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane-session/resolve.ts",
+    "packages/cli/src/commands/next/claim-orchestration.ts",
+    "packages/cli/src/commands/next/claim-helpers.ts",
+    "packages/cli/src/commands/task-direction.ts",
+    "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+    "packages/cli/src/commands/tasks/claim-preparation.ts",
+    "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+    "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+    "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+    "node --strip-types tests/cli/cli-result-contract.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "commit attribution",
+    "lane adoption command semantics",
+    "framework temp lock ownership changes",
+    "broker conflict policy changes"
+  ],
+  "nonGoals": [
+    "Do not migrate historical legacy task records.",
+    "Do not remove actor id from claim records."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert lane fields on claim, work-session linkage, and task direction metadata while preserving actor-only fallback.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.task-claim-lifecycle",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-claim-stamping",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/next/claim-orchestration.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.task-direction-lane-metadata",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/task-direction.ts",
+        "disposition": "follow-up-card",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/lane-session/resolve.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/claim-helpers.ts",
+        "packages/cli/src/commands/task-direction.ts",
+        "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+        "packages/cli/src/commands/tasks/claim-preparation.ts",
+        "packages/cli/src/commands/tasks/task-transition-helpers.ts",
+        "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+        "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": "This card only records lane metadata. It does not yet make conflict decisions\ncompare lane ids; that policy lands in `TASK-LANE-0017`.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0012-claim-stamping-direction-metadata.task.md",
+    "sectionTitle": "TASK-LANE-0012",
+    "headingLine": 63,
+    "hash": "943f42abc92e4242",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0012-claim-stamping-direction-metadata.task.md",
+      "planningCommitSha": "c0ef3957558cf3255920da203f2e8884d57d3f8c",
+      "contentDigest": "sha256:943f42abc92e4242c5f2d368562d21f7af33b78aa4acf9e95ac9a4bec950a5f1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T17:16:17.161Z"
+    }
+  },
+  "importedAt": "2026-07-16T17:16:17.161Z",
+  "lastTransitionId": "2026-07-16T17-16-38-113Z-claim-4364b0ce4c0e",
+  "lastTransitionAt": "2026-07-16T17:16:38.113Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0012",
+  "reservedAt": "2026-07-16T17:16:34.125Z",
+  "promotedAt": "2026-07-16T17:16:34.128Z",
+  "claim": {
+    "actorId": "codex-lane-0012",
+    "leaseId": "lease-cb7901d937c0",
+    "claimedAt": "2026-07-16T17:16:34.131Z",
+    "heartbeatAt": "2026-07-16T17:16:34.131Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-LANE-0012.json",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T17:16:34.131Z",
+  "startedByActor": "codex-lane-0012",
+  "startedBySessionId": "session-20260716171634-codex-lane-0012-TASK-LANE-0012-f804364589",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0012",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0012.*",
+      ".atm/history/task-events/TASK-LANE-0012/**",
+      ".atm/history/tasks/TASK-LANE-0012.json",
+      "packages/cli/src/commands/lane-session/resolve.ts",
+      "packages/cli/src/commands/next/claim-helpers.ts",
+      "packages/cli/src/commands/next/claim-orchestration.ts",
+      "packages/cli/src/commands/task-direction.ts",
+      "packages/cli/src/commands/tasks/__tests__/lifecycle-state.test.ts",
+      "packages/cli/src/commands/tasks/claim-orchestrator.ts",
+      "packages/cli/src/commands/tasks/claim-preparation.ts",
+      "packages/cli/src/commands/tasks/task-ledger-readers.ts",
+      "packages/cli/src/commands/tasks/task-transition-helpers.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "511c44df6f212f264b6c309edba21b010d49c436f74f07c4e66fd8e34da65001",
+    "actorId": "codex-lane-0012",
+    "sessionId": "session-20260716171634-codex-lane-0012-TASK-LANE-0012-f804364589",
+    "createdAt": "2026-07-16T17:16:38.112Z",
+    "status": "active"
+  }
+}
