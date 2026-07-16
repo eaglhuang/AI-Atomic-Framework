@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0092",
+  "title": "Split replacement lane atom map under 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0091"
+  ],
+  "acceptance": [
+    "`packages/core/src/registry/replacement-lane.ts` is below 600 physical lines.",
+    "Every newly created physical source file is below 600 physical lines.",
+    "`transitionReplacementMode` and `ReplacementMode` remain import-compatible for the CLI and core callers.",
+    "Replacement lane transition behavior remains deterministic, including map spec writes, lineage log appends, registry lifecycle updates, and validation errors.",
+    "The path-to-atom owner shard maps both the facade and extracted support modules to `atom-core-registry`.",
+    "Validation evidence is command-backed, including the guided `behavior.split` dry-run proposal."
+  ],
+  "deliverables": [
+    "packages/core/src/registry/replacement-lane.ts",
+    "packages/core/src/registry/replacement-lane/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/core/src/registry/replacement-lane.ts",
+    "packages/core/src/registry/replacement-lane/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-core-registry --to 0.1.1 --legacy-target \"packages/core/src/registry/replacement-lane.ts#transitionReplacementMode\" --guidance-session guidance-20260716131837-247dc3c7eb --dry-run --json",
+    "node --strip-types scripts/validate-registry-core.ts --mode validate",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-core-registry",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atom-core-registry-replacement-transition",
+        "pattern": "Transition Orchestrator Facade",
+        "source": "packages/core/src/registry/replacement-lane.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-core-registry-replacement-target-loader",
+        "pattern": "Target Loading Module",
+        "source": "packages/core/src/registry/replacement-lane.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-core-registry-replacement-evidence",
+        "pattern": "Evidence Validation Module",
+        "source": "packages/core/src/registry/replacement-lane.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-core-registry-replacement-normalization",
+        "pattern": "Normalization and IO Module",
+        "source": "packages/core/src/registry/replacement-lane.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Do not redesign replacement-lane semantics in this card.\n- Do not touch the stale foreign `next/playbook-projection` lock scope.\n- If a high-value governance defect appears during closeout, amend scope before fixing it.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0092-replacement-lane-map.task.md",
+    "sectionTitle": "TASK-RFT-0092",
+    "headingLine": 61,
+    "hash": "8a2fadd03ec3f658",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0092-replacement-lane-map.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:8a2fadd03ec3f6589c87b051369eaef9aadfe1319d09e0b30564c10065db0dc9",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T13:20:27.814Z"
+    }
+  },
+  "importedAt": "2026-07-16T13:20:27.814Z",
+  "lastTransitionId": "2026-07-16T13-24-08-283Z-claim-c058a3ba7661",
+  "lastTransitionAt": "2026-07-16T13:24:08.283Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0092",
+  "reservedAt": "2026-07-16T13:24:04.660Z",
+  "promotedAt": "2026-07-16T13:24:04.663Z",
+  "claim": {
+    "actorId": "codex-task-rft-0092",
+    "leaseId": "lease-f7e4c02fd840",
+    "claimedAt": "2026-07-16T13:24:04.666Z",
+    "heartbeatAt": "2026-07-16T13:24:04.666Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0092.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/registry/replacement-lane.ts",
+      "packages/core/src/registry/replacement-lane/**"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T13:24:04.666Z",
+  "startedByActor": "codex-task-rft-0092",
+  "startedBySessionId": "session-20260716132404-codex-task-rft-0092-TASK-RFT-0092-24413f741d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0092",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0092.*",
+      ".atm/history/task-events/TASK-RFT-0092/**",
+      ".atm/history/tasks/TASK-RFT-0092.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/core/src/registry/replacement-lane.ts",
+      "packages/core/src/registry/replacement-lane/**"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "d154121bd6c8d18f5e811574d7f994cd4df255dae1fbdfa93ca157f33d781760",
+    "actorId": "codex-task-rft-0092",
+    "createdAt": "2026-07-16T13:24:08.282Z",
+    "status": "active"
+  }
+}
