@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0062",
+  "title": "Split prompt scoped next validator below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0061"
+  ],
+  "acceptance": [
+    "`npm run validate:prompt-scoped-next` remains the canonical regression command and exits successfully.",
+    "`scripts/validate-prompt-scoped-next.ts` remains directly executable with `node --strip-types`.",
+    "`tests/scripts/validate-prompt-scoped-next-final-600.test.ts` verifies the facade and extracted modules are below 600 lines and that the script owner shard maps the facade and module glob to `atm.next-router-map`.",
+    "No next routing, tasks lifecycle, team, quickfix, or batch behavior is changed in this card."
+  ],
+  "deliverables": [
+    "scripts/validate-prompt-scoped-next.ts",
+    "scripts/validate-prompt-scoped-next/**/*.ts",
+    "tests/scripts/validate-prompt-scoped-next-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-prompt-scoped-next.ts",
+    "scripts/validate-prompt-scoped-next/**/*.ts",
+    "tests/scripts/validate-prompt-scoped-next-final-600.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json"
+  ],
+  "validators": [
+    "node --strip-types tests/scripts/validate-prompt-scoped-next-final-600.test.ts",
+    "npm run validate:prompt-scoped-next",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the validator facade split and rebuild release artifacts only if ATM reports runner drift.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.next-router-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.prompt-scoped-next-validator-facade",
+        "pattern": "Facade",
+        "source": "scripts/validate-prompt-scoped-next.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.prompt-scoped-next-validator-scenarios",
+        "pattern": "Strategy Map",
+        "source": "scripts/validate-prompt-scoped-next.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0062-validate-prompt-scoped-next-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0062",
+    "headingLine": 49,
+    "hash": "7ab263e6bd57cf8d",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0062-validate-prompt-scoped-next-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:7ab263e6bd57cf8d1f516112eda69be0fc230a2a19419436ebe4d97bd961e8e4",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T04:30:18.203Z"
+    }
+  },
+  "importedAt": "2026-07-16T04:30:18.203Z",
+  "lastTransitionId": "2026-07-16T04-41-28-609Z-scope-amendment-3f3529292f7a",
+  "lastTransitionAt": "2026-07-16T04:41:28.609Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0062",
+  "reservedAt": "2026-07-16T04:30:27.219Z",
+  "promotedAt": "2026-07-16T04:30:27.221Z",
+  "claim": {
+    "actorId": "codex-task-rft-0062",
+    "leaseId": "lease-f835d5a3f96b",
+    "claimedAt": "2026-07-16T04:30:27.224Z",
+    "heartbeatAt": "2026-07-16T04:30:27.224Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-RFT-0062.*",
+      ".atm/history/task-events/TASK-RFT-0062/**",
+      ".atm/history/tasks/TASK-RFT-0062.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-prompt-scoped-next/**/*.ts",
+      "scripts/validate-prompt-scoped-next/assertions.ts",
+      "scripts/validate-prompt-scoped-next/batch-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/claim-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/fixture.ts",
+      "scripts/validate-prompt-scoped-next/import-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/main.ts",
+      "scripts/validate-prompt-scoped-next/route-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/worktree-team-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/writers.ts",
+      "tests/scripts/validate-prompt-scoped-next-final-600.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T04:30:27.224Z",
+  "startedByActor": "codex-task-rft-0062",
+  "startedBySessionId": "session-20260716043027-codex-task-rft-0062-TASK-RFT-0062-0fa2eddd0b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0062",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0062.*",
+      ".atm/history/task-events/TASK-RFT-0062/**",
+      ".atm/history/tasks/TASK-RFT-0062.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts*.json",
+      "scripts/validate-prompt-scoped-next.ts",
+      "scripts/validate-prompt-scoped-next/**/*.ts",
+      "scripts/validate-prompt-scoped-next/assertions.ts",
+      "scripts/validate-prompt-scoped-next/batch-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/claim-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/fixture.ts",
+      "scripts/validate-prompt-scoped-next/import-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/main.ts",
+      "scripts/validate-prompt-scoped-next/route-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/worktree-team-scenarios.ts",
+      "scripts/validate-prompt-scoped-next/writers.ts",
+      "tests/scripts/validate-prompt-scoped-next-final-600.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0062-validate-prompt-scoped-next-final-600.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-RFT-0062-validate-prompt-scoped-next-final-600.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "ebb09dcf1fef361f8cffd0ac1e3d61506ef7a971ba167c5d3b476e8d9ad35dd8",
+    "actorId": "codex-task-rft-0062",
+    "createdAt": "2026-07-16T04:30:30.360Z",
+    "status": "active"
+  }
+}
