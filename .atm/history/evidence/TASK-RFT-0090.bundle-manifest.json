@@ -1,0 +1,147 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0090",
+  "updatedAt": "2026-07-16T12:52:47.312Z",
+  "updatedBy": "codex-task-rft-0090",
+  "freshValidationPasses": [
+    "doctor",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:map-curator"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-map-curator.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3f6e3d547e3f0890a63d050e6682cd79f0321407aefabbf189d7d0f48988a7c8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:map-curator"
+      ],
+      "generatedAt": "2026-07-16T12:48:27.322Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0b8bbe999c663c8fd7ca61cf451457489b16421",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a596d82fc357feaf4e5796fa1c5356b731309a4273af686a1f480bd7d9518287",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T12:48:39.187Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0b8bbe999c663c8fd7ca61cf451457489b16421",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T12:48:46.760Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0b8bbe999c663c8fd7ca61cf451457489b16421",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:33f0206ee719779019e1055d8002867ec58451c1cfce4745d9f8f19659f58ee0",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T12:49:11.848Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0b8bbe999c663c8fd7ca61cf451457489b16421",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:aa038c3e299401bff5001597674846b9cf88af53f983bca521b1e25c1f6bdbcc",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T12:51:05.890Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f0b8bbe999c663c8fd7ca61cf451457489b16421",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a596d82fc357feaf4e5796fa1c5356b731309a4273af686a1f480bd7d9518287",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T12:52:12.121Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "213356af6fd385ca199eec1d2ed27d3dee86d26f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T12:52:19.998Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "213356af6fd385ca199eec1d2ed27d3dee86d26f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-map-curator.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3f6e3d547e3f0890a63d050e6682cd79f0321407aefabbf189d7d0f48988a7c8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:map-curator"
+      ],
+      "generatedAt": "2026-07-16T12:52:33.244Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "213356af6fd385ca199eec1d2ed27d3dee86d26f",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4194761b820f357e810ea1dfba1b93f93ad6f44cee700775ff72621e41f6d604",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T12:52:38.749Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "213356af6fd385ca199eec1d2ed27d3dee86d26f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e91c5b37e72fbde176e887ca2eaa56a872681e26cd0c8d2490d0e5b8d9237f20",
+      "stderrSha256": "sha256:532f952f0ed77bd222bc1307b8e3ba8f3059aae335c2cf65327197a4cdaac986",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T12:52:47.379Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "213356af6fd385ca199eec1d2ed27d3dee86d26f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

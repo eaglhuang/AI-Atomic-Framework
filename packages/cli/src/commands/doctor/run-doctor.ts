@@ -20,6 +20,18 @@ import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecy
 import { createBacklogSyncCheck, createGovernanceEntryReadinessCheck, hasRequiredScripts, isFrameworkContractExpected } from './readiness.ts';
 import { checkCharterIntegrityV2, listFiles, listPackageDirs, packageDirLabel, readJsonIfExists, createCheck, createIntegrationDriftRemediation } from './utilities.ts';
 
+function hasTsNoCheckPragma(source: string): boolean {
+  const withoutBom = source.replace(/^\uFEFF/, '');
+  const lines = withoutBom.split(/\r?\n/, 5);
+  for (const line of lines) {
+    if (/^\s*$/.test(line) || /^#!\s*/.test(line)) {
+      continue;
+    }
+    return /^\s*\/\/\s*@ts-nocheck\b/.test(line);
+  }
+  return false;
+}
+
 export async function runDoctor(argv: readonly string[]) {
   const trustMode = Array.isArray(argv) && argv.includes('--trust');
   const knownBadMode = Array.isArray(argv) && argv.includes('--known-bad');
@@ -41,7 +53,7 @@ export async function runDoctor(argv: readonly string[]) {
     .concat(listFiles(path.join(root, 'scripts')))
     .filter((filePath: string) => /\.(ts|js|mjs)$/.test(filePath))
     .filter((filePath: string) => !relativePathFrom(root, filePath).replace(/\\/g, '/').includes('/dist/'))
-    .filter((filePath: string) => /^\s*\/\/\s*@ts-nocheck\b/m.test(readFileSync(filePath, 'utf8')))
+    .filter((filePath: string) => hasTsNoCheckPragma(readFileSync(filePath, 'utf8')))
     .map((filePath: string) => relativePathFrom(root, filePath).replace(/\\/g, '/'))
     .sort();
   const unexpectedTsNoCheckFiles = tsNoCheckFiles.filter((filePath) => !knownTsNoCheckBaseline.has(filePath));
