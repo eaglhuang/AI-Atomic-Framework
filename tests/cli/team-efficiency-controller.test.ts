@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
-import { createTeamEfficiencyIncident, evaluateTeamEfficiency } from '../../packages/cli/src/commands/team/efficiency-controller.ts';
+import { readFileSync } from 'node:fs';
+import {
+  createTeamEfficiencyIncident,
+  evaluatePairedDogfoodSample,
+  evaluateTeamEfficiency
+} from '../../packages/cli/src/commands/team/efficiency-controller.ts';
 
 const base = {
   workloadClass: 'governance-code-change',
@@ -84,5 +89,20 @@ assert.equal(incident.severity, 'blocking');
 assert.equal(incident.routing, 'scale-down');
 assert.equal(incident.ratios.tokenRatio, 1.8);
 assert.equal(incident.tokenDiagnosticReasonCodes.includes('context-inflation'), true);
+
+const livePairedSample = JSON.parse(readFileSync('artifacts/generated/team-dogfood/real-paired-sample.json', 'utf8'));
+const liveEvaluation = evaluatePairedDogfoodSample({
+  sample: livePairedSample,
+  generatedAt: '2026-07-16T00:00:00.000Z'
+});
+assert.equal(liveEvaluation.decision.promotionEligible, false);
+assert.equal(liveEvaluation.decision.routing, 'scale-down');
+assert.equal(liveEvaluation.decision.scaleDownAction, 'cheaper-qualified-model');
+assert.equal(liveEvaluation.incident.schemaId, 'atm.teamEfficiencyIncident.v1');
+assert.equal(liveEvaluation.incident.severity, 'blocking');
+assert.equal(liveEvaluation.incident.sampleId, livePairedSample.sampleId);
+assert.ok(liveEvaluation.incident.reason.includes('fully-loaded-cost-threshold-miss'));
+assert.ok(liveEvaluation.incident.reason.includes('wall-clock-threshold-miss'));
+assert.ok((liveEvaluation.incident.ratios.tokenRatio ?? 0) > 1);
 
 console.log('[team-efficiency-controller] ok');
