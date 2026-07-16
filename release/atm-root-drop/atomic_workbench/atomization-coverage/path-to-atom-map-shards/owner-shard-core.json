@@ -3,6 +3,48 @@
   "owner": "core",
   "mappings": [
     {
+      "path_pattern": "packages/core/src/upgrade/map-curator.ts",
+      "atom_id": "atm.upgrade-map-curation-map",
+      "capability": "TASK-RFT-0090 bounded atom map curator facade preserving deterministic report and proposal orchestration exports.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0090"
+    },
+    {
+      "path_pattern": "packages/core/src/upgrade/map-curator/**",
+      "atom_id": "atm.upgrade-map-curation-map",
+      "capability": "TASK-RFT-0090 extracted atom map curator type contract modules for input, proposal, patch, and report boundaries.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0090"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-lane.ts",
+      "atom_id": "atm.team-broker-lane-map",
+      "capability": "TASK-RFT-0081 bounded team broker lane facade preserving lane evaluation, evidence, runtime activation, findings, and rearbitration exports.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0081"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/team-lane/**",
+      "atom_id": "atm.team-broker-lane-map",
+      "capability": "TASK-RFT-0081 extracted team broker lane support modules for session, branch, path normalization, file hash, atom refs, and proposal admission helpers.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0081"
+    },
+    {
+      "path_pattern": "packages/core/src/registry/atom-ref-readability.ts",
+      "atom_id": "atm.atom-ref-readability-map",
+      "capability": "atom readable reference sweep facade for validation, rewrite planning, and report orchestration",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0079"
+    },
+    {
+      "path_pattern": "packages/core/src/registry/atom-ref-readability/**",
+      "atom_id": "atm.atom-ref-readability-map",
+      "capability": "bounded atom readable reference catalog, callsite, rendering, and report contract modules",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0079"
+    },
+    {
       "path_pattern": "packages/core/src/**",
       "atom_id": "atom-core-registry",
       "capability": "core package fallback ownership (anything not matched above)",
@@ -69,10 +111,38 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/core/src/broker/decision.ts",
+      "atom_id": "atom-core-broker",
+      "capability": "TASK-RFT-0072 broker decision facade preserving calculateBrokerDecision import path.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0072"
+    },
+    {
+      "path_pattern": "packages/core/src/broker/decision/**/*.ts",
+      "atom_id": "atom-core-broker",
+      "capability": "TASK-RFT-0072 bounded broker decision modules for admission, proposal overlap, physical overlap, decomposition, shared surfaces, and failure reason attachment.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0072"
+    },
+    {
       "path_pattern": "packages/core/src/manager/**",
       "atom_id": "atom-core-atom-generator",
       "capability": "atom/map generation, id allocation",
       "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/manager/map-generator.ts",
+      "atom_id": "atom-core-map-generator",
+      "capability": "TASK-RFT-0088 bounded map generator facade preserving generateAtomicMap and createMinimalAtomicMapSpec exports.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0088"
+    },
+    {
+      "path_pattern": "packages/core/src/manager/map-generator/**",
+      "atom_id": "atom-core-map-generator",
+      "capability": "TASK-RFT-0088 extracted map generator support modules for request normalization, spec/hash creation, registry IO, generated test execution, and shared result types.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0088"
     },
     {
       "path_pattern": "packages/core/src/maps/**",
@@ -99,6 +169,34 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "packages/core/src/registry/registry.ts",
+      "atom_id": "atom-core-registry",
+      "capability": "TASK-RFT-0069 core registry facade preserving public registry entry, document, validation, and drift APIs.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0069"
+    },
+    {
+      "path_pattern": "packages/core/src/registry/registry/**/*.ts",
+      "atom_id": "atom-core-registry",
+      "capability": "TASK-RFT-0069 bounded core registry modules for entry creation, document IO, validation contracts, path helpers, and drift evaluation.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0069"
+    },
+    {
+      "path_pattern": "packages/core/src/registry/replacement-lane.ts",
+      "atom_id": "atom-core-registry",
+      "capability": "TASK-RFT-0092 bounded replacement lane facade preserving ReplacementMode and transitionReplacementMode exports.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0092"
+    },
+    {
+      "path_pattern": "packages/core/src/registry/replacement-lane/**",
+      "atom_id": "atom-core-registry",
+      "capability": "TASK-RFT-0092 extracted replacement lane support modules for target loading, transition validation, evidence checks, lineage rendering, and transition orchestration.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0092"
+    },
+    {
       "path_pattern": "packages/core/src/rescue/**",
       "atom_id": "atom-core-rescue",
       "capability": "rescue workflows for stuck atoms",
@@ -121,6 +219,20 @@
       "atom_id": "atom-core-test-runner",
       "capability": "atom/map test runner",
       "coverage_status": "partial"
+    },
+    {
+      "path_pattern": "packages/core/src/manager/test-runner.ts",
+      "atom_id": "atom-core-test-runner",
+      "capability": "TASK-RFT-0087 bounded core test runner facade preserving basic runner, extended runner, plugin planning, default gates, and report validation public exports.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0087"
+    },
+    {
+      "path_pattern": "packages/core/src/manager/test-runner/**",
+      "atom_id": "atom-core-test-runner",
+      "capability": "TASK-RFT-0087 extracted core test runner support modules for report assembly, schema validation, normalization, and portable path utilities.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0087"
     },
     {
       "path_pattern": "packages/core/src/upgrade/**",

@@ -1,3 +1,4 @@
+export { isPlanningMirrorPath, isTaskDirectionPathCandidate, sanitizeTaskDirectionAllowedFiles } from './task-direction/support.ts';
 export interface TaskDirectionTask {
     readonly workItemId: string;
     readonly title: string;
@@ -56,6 +57,7 @@ export interface TaskDirectionLock {
     readonly allowPlanningMirror: boolean;
     readonly promptHash: string | null;
     readonly actorId: string;
+    readonly sessionId: string | null;
     readonly createdAt: string;
     readonly status: 'active';
 }
@@ -108,6 +110,7 @@ export declare function writeTaskDirectionLock(input: {
     readonly planningMirrorPaths?: readonly string[];
     readonly allowPlanningMirror?: boolean;
     readonly prompt?: string | null;
+    readonly sessionId?: string | null;
 }): TaskDirectionLock;
 export declare function getCanonicalAllowedFilesForTask(cwd: string, taskId: string): readonly string[] | null;
 export interface TaskDirectionAllowedFilesDiagnosis {
@@ -145,7 +148,4 @@ export declare function buildTaskSelfAllowPaths(taskId: string): readonly string
 export declare function partitionTaskScope(task: TaskDirectionTask, options?: {
     readonly cwd?: string;
 }): TaskScopePartition;
-export declare function sanitizeTaskDirectionAllowedFiles(values: readonly string[]): readonly string[];
-export declare function isTaskDirectionPathCandidate(value: string): boolean;
-export declare function isPlanningMirrorPath(filePath: string, planningMirrorPaths: readonly string[]): boolean;
 export declare function toProjectPath(cwd: string, absolutePath: string): string;

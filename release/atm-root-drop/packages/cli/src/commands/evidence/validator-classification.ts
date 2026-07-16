@@ -17,7 +17,14 @@ export const VALIDATOR_GATE_ALIAS_MAP = new Map<string, string>([
 ]);
 
 export function normalizeValidatorToken(raw: string): string {
-  return raw.trim().replace(/\s+/g, ' ');
+  return normalizeShellQuotedCommandTokens(raw.trim().replace(/\s+/g, ' '));
+}
+
+function normalizeShellQuotedCommandTokens(value: string): string {
+  return value
+    .replace(/\\"([^"\s]+)\\"/g, '$1')
+    .replace(/"([^"\s]+)"/g, '$1')
+    .replace(/'([^'\s]+)'/g, '$1');
 }
 
 /**

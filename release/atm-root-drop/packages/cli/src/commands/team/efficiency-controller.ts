@@ -40,6 +40,50 @@ export type TeamEfficiencyControllerDecision = {
   readonly tokenDiagnosticReasonCodes: readonly string[];
 };
 
+export type TeamDogfoodPairedSampleForEfficiency = {
+  readonly sampleId: string;
+  readonly pricingCatalogVersion?: string | null;
+  readonly measurementStatus: 'measurement-incomplete' | 'complete';
+  readonly providerBillableUsage: boolean;
+  readonly modelIdentities?: readonly string[];
+  readonly wallClock: {
+    readonly baselineMs: number | null;
+    readonly teamMs: number | null;
+  };
+  readonly qualityOutcome: {
+    readonly baselinePassed: boolean | null;
+    readonly teamPassed: boolean | null;
+  };
+  readonly usage?: {
+    readonly baseline?: {
+      readonly inputTokens?: number;
+      readonly outputTokens?: number;
+      readonly cacheReadTokens?: number;
+      readonly reasoningTokens?: number;
+    };
+    readonly team?: {
+      readonly inputTokens?: number;
+      readonly outputTokens?: number;
+      readonly cacheReadTokens?: number;
+      readonly reasoningTokens?: number;
+    };
+  };
+};
+
+export type TeamEfficiencyPairedSampleEvaluation = {
+  readonly schemaId: 'atm.teamEfficiencyPairedSampleEvaluation.v1';
+  readonly sampleId: string;
+  readonly decision: TeamEfficiencyControllerDecision;
+  readonly incident: ReturnType<typeof createTeamEfficiencyIncident>;
+};
+
+type PairedSampleUsageSide = {
+  readonly inputTokens?: number;
+  readonly outputTokens?: number;
+  readonly cacheReadTokens?: number;
+  readonly reasoningTokens?: number;
+};
+
 export function evaluateTeamEfficiency(input: {
   readonly workloadClass: string | null;
   readonly rosterFingerprintDigest: string;
@@ -114,6 +158,59 @@ export function evaluateTeamEfficiency(input: {
   };
 }
 
+export function evaluatePairedDogfoodSample(input: {
+  readonly sample: TeamDogfoodPairedSampleForEfficiency;
+  readonly workloadClass?: string | null;
+  readonly generatedAt?: string;
+}): TeamEfficiencyPairedSampleEvaluation {
+  const sample = input.sample;
+  const baselineTokens = usageTokens(sample.usage?.baseline);
+  const teamTokens = usageTokens(sample.usage?.team);
+  const ratios: TeamEfficiencyRatios = {
+    fullyLoadedCostRatio: baselineTokens > 0 && teamTokens > 0 ? teamTokens / baselineTokens : null,
+    wallClockRatio: sample.wallClock.baselineMs && sample.wallClock.teamMs
+      ? sample.wallClock.teamMs / sample.wallClock.baselineMs
+      : null,
+    tokenRatio: baselineTokens > 0 && teamTokens > 0 ? teamTokens / baselineTokens : null,
+    repairResidueRatio: 1
+  };
+  const decision = evaluateTeamEfficiency({
+    workloadClass: input.workloadClass ?? 'paired-dogfood',
+    rosterFingerprintDigest: stableDigest(sample.modelIdentities ?? []),
+    modelMixDigest: stableDigest(sample.modelIdentities ?? []),
+    contextManifestDigest: stableDigest(sample.sampleId),
+    promptCachePolicy: 'sample-observed',
+    fanOutCap: 6,
+    quotaProbeDigest: stableDigest(sample.pricingCatalogVersion ?? 'unknown-pricing'),
+    pricingCatalogVersion: sample.pricingCatalogVersion ?? 'unknown-pricing',
+    priceEvidenceFresh: Boolean(sample.pricingCatalogVersion),
+    usageEvidenceComplete: sample.measurementStatus === 'complete' && sample.providerBillableUsage,
+    qualityParity: sample.qualityOutcome.baselinePassed === true && sample.qualityOutcome.teamPassed === true,
+    noWorseRepairResidue: true,
+    stopLossTriggered: false,
+    ratios,
+    telemetry: {
+      contextInflation: ratios.tokenRatio !== null && ratios.tokenRatio > 1,
+      cacheMiss: false,
+      retries: 0,
+      quotaOk: true,
+      queueWaitInflationRatio: null,
+      spendingCeilingRisk: false
+    }
+  });
+  return {
+    schemaId: 'atm.teamEfficiencyPairedSampleEvaluation.v1',
+    sampleId: sample.sampleId,
+    decision,
+    incident: createTeamEfficiencyIncident({
+      sampleId: sample.sampleId,
+      decision,
+      ratios,
+      generatedAt: input.generatedAt
+    })
+  };
+}
+
 export function createTeamEfficiencyIncident(input: {
   readonly sampleId: string;
   readonly decision: TeamEfficiencyControllerDecision;
@@ -182,6 +279,18 @@ function chooseScaleDownAction(input: Parameters<typeof evaluateTeamEfficiency>[
 
 function digestCohort(value: unknown): string {
   return `cohort-${sha256(JSON.stringify(value)).slice(0, 16)}`;
+}
+
+function usageTokens(value: PairedSampleUsageSide | undefined): number {
+  if (!value) return 0;
+  return (value.inputTokens ?? 0)
+    + (value.outputTokens ?? 0)
+    + (value.cacheReadTokens ?? 0)
+    + (value.reasoningTokens ?? 0);
+}
+
+function stableDigest(value: unknown): string {
+  return `sha256:${sha256(JSON.stringify(value))}`;
 }
 
 function sha256(value: string): string {

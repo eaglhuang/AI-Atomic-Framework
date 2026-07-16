@@ -1,1 +1,1 @@
-export declare function runRoute(argv: string[]): Promise<import("./shared.ts").CommandResult>;
+export { runRoute } from './route/main.ts';

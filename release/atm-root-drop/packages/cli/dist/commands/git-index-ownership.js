@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { listActorWorkSessions } from './actor-session.js';
 import { readActiveTaskDirectionLocks } from './task-direction.js';
 import { isPathAllowedByScope } from './work-channels.js';
 export const ATM_INDEX_FOREIGN_ACTIVE_STAGED = 'ATM_INDEX_FOREIGN_ACTIVE_STAGED';
@@ -7,11 +8,13 @@ export function inspectGitIndexOwnership(input) {
     const stagedFiles = uniqueSorted(input.stagedFiles ?? readStagedFiles(input.cwd));
     const stagedBlobs = readStagedBlobMap(input.cwd, stagedFiles);
     const activeLocks = readActiveTaskDirectionLocks(input.cwd);
+    const sessionsByTaskActor = readActiveSessionMap(input.cwd);
     const entries = stagedFiles.map((filePath) => {
         const governanceTaskId = extractGovernanceTaskId(filePath);
         const lockOwner = activeLocks.find((lock) => isPathAllowedByScope(filePath, lock.allowedFiles)) ?? null;
         const ownerTaskId = governanceTaskId ?? lockOwner?.taskId ?? null;
         const ownerActorId = lockOwner?.actorId ?? null;
+        const ownerSessionId = lockOwner?.sessionId ?? resolveOwnerSessionId(sessionsByTaskActor, ownerTaskId, ownerActorId);
         const stagedBlob = stagedBlobs.get(normalizeRelativePath(filePath).toLowerCase()) ?? null;
         if (ownerTaskId) {
             const normalizedOwner = normalizeTaskId(ownerTaskId);
@@ -22,6 +25,7 @@ export function inspectGitIndexOwnership(input) {
                 ownership: isCurrent ? 'current-task-owned' : isActive ? 'foreign-active-owned' : 'foreign-released-or-abandoned',
                 ownerTaskId: normalizedOwner,
                 ownerActorId,
+                ownerSessionId,
                 stagedBlobId: stagedBlob?.objectId ?? null,
                 stagedMode: stagedBlob?.mode ?? null,
                 source: governanceTaskId ? 'governance-path' : 'active-direction-lock'
@@ -34,6 +38,7 @@ export function inspectGitIndexOwnership(input) {
                 ownership: 'unknown-governance-artifact',
                 ownerTaskId: null,
                 ownerActorId: null,
+                ownerSessionId: null,
                 stagedBlobId: stagedBlob?.objectId ?? null,
                 stagedMode: stagedBlob?.mode ?? null,
                 source: 'governance-path'
@@ -44,6 +49,7 @@ export function inspectGitIndexOwnership(input) {
             ownership: 'ordinary-unowned',
             ownerTaskId: null,
             ownerActorId: null,
+            ownerSessionId: null,
             stagedBlobId: stagedBlob?.objectId ?? null,
             stagedMode: stagedBlob?.mode ?? null,
             source: 'ordinary'
@@ -65,6 +71,7 @@ export function buildForeignActiveStagedDiagnostic(report) {
         code: ATM_INDEX_FOREIGN_ACTIVE_STAGED,
         ownerTaskIds: owners,
         ownerActorIds: uniqueSorted(report.foreignActiveStaged.map((entry) => entry.ownerActorId ?? '').filter(Boolean)),
+        ownerSessionIds: uniqueSorted(report.foreignActiveStaged.map((entry) => entry.ownerSessionId ?? '').filter(Boolean)),
         stagedPaths: report.foreignActiveStaged.map((entry) => entry.path),
         indexLane: report.indexLane,
         safeNextActions: [
@@ -167,6 +174,7 @@ function buildIndexLane(currentTaskId, entries, foreignActiveStaged) {
             status: 'free',
             ownerTaskId: null,
             ownerActorId: null,
+            ownerSessionId: null,
             reason: 'No staged paths are present in the shared Git index.'
         };
     }
@@ -177,6 +185,7 @@ function buildIndexLane(currentTaskId, entries, foreignActiveStaged) {
             status: 'blocked-foreign-active-staged',
             ownerTaskId: owner.ownerTaskId,
             ownerActorId: owner.ownerActorId,
+            ownerSessionId: owner.ownerSessionId,
             reason: `The shared Git index contains foreign-active staged paths owned by ${owner.ownerTaskId ?? 'unknown-task'}.`
         };
     }
@@ -187,6 +196,7 @@ function buildIndexLane(currentTaskId, entries, foreignActiveStaged) {
             status: 'owned-by-task',
             ownerTaskId: currentTaskId,
             ownerActorId: currentOwned[0]?.ownerActorId ?? null,
+            ownerSessionId: currentOwned[0]?.ownerSessionId ?? null,
             reason: `The shared Git index currently belongs to ${currentTaskId ?? 'the current task'}.`
         };
     }
@@ -196,6 +206,7 @@ function buildIndexLane(currentTaskId, entries, foreignActiveStaged) {
             status: 'requires-staging-steward',
             ownerTaskId: null,
             ownerActorId: null,
+            ownerSessionId: null,
             reason: 'The shared Git index contains governance artifacts whose owner cannot be resolved.'
         };
     }
@@ -204,8 +215,26 @@ function buildIndexLane(currentTaskId, entries, foreignActiveStaged) {
         status: 'queued',
         ownerTaskId: null,
         ownerActorId: null,
+        ownerSessionId: null,
         reason: 'The shared Git index contains staged files but no current-task ownership proof.'
     };
+}
+function readActiveSessionMap(cwd) {
+    const sessions = new Map();
+    for (const session of listActorWorkSessions(cwd)) {
+        if (session.status !== 'active')
+            continue;
+        sessions.set(sessionKey(session.taskId, session.actorId), session.sessionId);
+    }
+    return sessions;
+}
+function resolveOwnerSessionId(sessionsByTaskActor, ownerTaskId, ownerActorId) {
+    if (!ownerTaskId || !ownerActorId)
+        return null;
+    return sessionsByTaskActor.get(sessionKey(ownerTaskId, ownerActorId)) ?? null;
+}
+function sessionKey(taskId, actorId) {
+    return `${normalizeTaskId(taskId) ?? taskId}::${actorId}`;
 }
 function readStagedFiles(cwd) {
     try {

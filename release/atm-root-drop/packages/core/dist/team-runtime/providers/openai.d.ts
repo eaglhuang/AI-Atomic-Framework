@@ -135,6 +135,7 @@ export declare function defaultHttpJsonExecutor(input: {
     readonly body: unknown;
     readonly timeoutMs?: number;
 }): Promise<TeamProviderExecutionResult>;
+export declare function extractOpenAIResponsesBillableUsage(value: unknown): TeamProviderBillableUsage | undefined;
 export declare function normalizeHttpExecutionResult(result: TeamProviderExecutionResult, label: string): TeamProviderExecutionResult;
 export declare function missingSecretResult(secretRef: string, label: string): TeamProviderExecutionResult;
 export declare function blockedExecutionResult(): TeamProviderExecutionResult;

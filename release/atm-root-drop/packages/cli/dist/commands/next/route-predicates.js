@@ -1,5 +1,7 @@
-import { isQueueRequestedPrompt, normalizeSearchText, normalizeTaskRouteStatus } from './intent-normalizers.js';
+import { isJournalingPrompt, isQueueRequestedPrompt, normalizeSearchText, normalizeTaskRouteStatus } from './intent-normalizers.js';
 function isFrameworkMaintenancePrompt(prompt) {
+    if (isJournalingPrompt(prompt))
+        return false;
     const normalized = normalizeSearchText(prompt);
     return [
         'framework',
@@ -100,4 +102,4 @@ function shouldDiscoverMarkdownTaskCards(intent) {
         || intent.taskRootHints.length > 0
         || intent.mentionedPlanPaths.length > 0;
 }
-export { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards };
+export { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isJournalingPrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards };

@@ -28,6 +28,41 @@ export type TeamEfficiencyControllerDecision = {
     readonly optimizationBacklogTarget: string | null;
     readonly tokenDiagnosticReasonCodes: readonly string[];
 };
+export type TeamDogfoodPairedSampleForEfficiency = {
+    readonly sampleId: string;
+    readonly pricingCatalogVersion?: string | null;
+    readonly measurementStatus: 'measurement-incomplete' | 'complete';
+    readonly providerBillableUsage: boolean;
+    readonly modelIdentities?: readonly string[];
+    readonly wallClock: {
+        readonly baselineMs: number | null;
+        readonly teamMs: number | null;
+    };
+    readonly qualityOutcome: {
+        readonly baselinePassed: boolean | null;
+        readonly teamPassed: boolean | null;
+    };
+    readonly usage?: {
+        readonly baseline?: {
+            readonly inputTokens?: number;
+            readonly outputTokens?: number;
+            readonly cacheReadTokens?: number;
+            readonly reasoningTokens?: number;
+        };
+        readonly team?: {
+            readonly inputTokens?: number;
+            readonly outputTokens?: number;
+            readonly cacheReadTokens?: number;
+            readonly reasoningTokens?: number;
+        };
+    };
+};
+export type TeamEfficiencyPairedSampleEvaluation = {
+    readonly schemaId: 'atm.teamEfficiencyPairedSampleEvaluation.v1';
+    readonly sampleId: string;
+    readonly decision: TeamEfficiencyControllerDecision;
+    readonly incident: ReturnType<typeof createTeamEfficiencyIncident>;
+};
 export declare function evaluateTeamEfficiency(input: {
     readonly workloadClass: string | null;
     readonly rosterFingerprintDigest: string;
@@ -45,6 +80,11 @@ export declare function evaluateTeamEfficiency(input: {
     readonly ratios: TeamEfficiencyRatios;
     readonly telemetry: TeamEfficiencyTelemetry;
 }): TeamEfficiencyControllerDecision;
+export declare function evaluatePairedDogfoodSample(input: {
+    readonly sample: TeamDogfoodPairedSampleForEfficiency;
+    readonly workloadClass?: string | null;
+    readonly generatedAt?: string;
+}): TeamEfficiencyPairedSampleEvaluation;
 export declare function createTeamEfficiencyIncident(input: {
     readonly sampleId: string;
     readonly decision: TeamEfficiencyControllerDecision;

@@ -22,6 +22,8 @@ import {
   type WriteIntent
 } from '../../packages/core/src/broker/types.ts';
 import { validateRouteContext, type RouteContext, type RouteContextState } from '../../packages/core/src/routing/route-context.ts';
+import { buildMaoParallelBenchmarkReport } from './mao-parallel-routing-benchmark-runner/report.ts';
+export { renderMaoParallelRoutingBenchmarkMarkdown } from './mao-parallel-routing-benchmark-runner/report.ts';
 
 export type MaoParallelScenarioKind = 'conflict-matrix' | 'route-lifecycle' | 'steward-plan' | 'capsule-drift';
 
@@ -232,6 +234,10 @@ function evaluateConflictRegistryCase(
   registryCase: MaoConflictRegistryCase,
   options: { readonly kind?: MaoParallelScenarioKind; readonly sourceCapsuleCid?: string; readonly registryCapsuleCid?: string } = {}
 ): MaoRoutingVerdict {
+  if (registryCase.newIntent.atomRefs.length === 0) {
+    return 'steward-required';
+  }
+
   let routingVerdict = mapArbitrationVerdictToMaoRouting(
     evaluateConflictMatrix(registryCase.newIntent, registryCase.registry.activeIntents).arbitrationVerdict
   );
@@ -549,197 +555,4 @@ export function runCombinedMaoBenchmarkSuite(root: string): MaoCombinedBenchmark
     eventReplayReport,
     combinedShipSafe: staticReport.shipSafe && eventReplayReport.shipSafe
   };
-}
-
-function buildMaoParallelBenchmarkReport(
-  scenarioIds: readonly string[],
-  results: readonly MaoParallelScenarioResult[],
-  scenarios: readonly Pick<MaoParallelRoutingScenario | MaoEventReplayScenario, 'id' | 'groundTruth'>[]
-): MaoParallelBenchmarkReport {
-  const falseSafeRegressions: string[] = [];
-  const expectationFailures: string[] = [];
-  const perScenarioNs: Record<string, number> = {};
-  const capabilityCoverage: Record<MaoCapabilityTask, number> = {
-    'TASK-MAO-0003': 0,
-    'TASK-MAO-0006': 0,
-    'TASK-MAO-0007': 0,
-    'TASK-MAO-0009': 0,
-    'TASK-MAO-0015': 0,
-    'TASK-MAO-0046': 0,
-    'TASK-MAO-0047': 0,
-    'CID-AGR-INCIDENT': 0
-  };
-  const tierCoverage: Record<MaoCoverageTier, number> = {
-    'generic-mao': 0,
-    'm5-runner-extension': 0
-  };
-  let totalNs = 0;
-  let unsafeScenarioCount = 0;
-  let caughtCount = 0;
-  let missCount = 0;
-
-  for (const result of results) {
-    perScenarioNs[result.scenarioId] = result.latencyNs;
-    totalNs += result.latencyNs;
-    capabilityCoverage[result.capabilityIntroducedBy] += 1;
-    tierCoverage[result.coverageTier] += 1;
-
-    if (result.falseSafeRegression) {
-      falseSafeRegressions.push(result.scenarioId);
-    }
-    if (!result.matchedExpectation) {
-      expectationFailures.push(result.scenarioId);
-    }
-
-    const scenario = scenarios.find((entry) => entry.id === result.scenarioId);
-    if (!scenario?.groundTruth.safeToParallelize) {
-      unsafeScenarioCount += 1;
-      if (result.validatorOutcome === 'fail' || !PERMISSIVE_VERDICTS.has(result.routingVerdict)) {
-        caughtCount += 1;
-      } else {
-        missCount += 1;
-      }
-    }
-  }
-
-  const catchRatePercent = unsafeScenarioCount === 0
-    ? 100
-    : Math.round((caughtCount / unsafeScenarioCount) * 1000) / 10;
-
-  return {
-    scenarioCount: scenarioIds.length,
-    falseSafeRegressions,
-    expectationFailures,
-    catchRate: {
-      unsafeScenarioCount,
-      caughtCount,
-      missCount,
-      catchRatePercent
-    },
-    latency: {
-      totalNs,
-      averageNs: scenarioIds.length === 0 ? 0 : Math.round(totalNs / scenarioIds.length),
-      perScenarioNs
-    },
-    capabilityCoverage,
-    tierCoverage,
-    shipSafe: falseSafeRegressions.length === 0 && expectationFailures.length === 0 && missCount === 0
-  };
-}
-
-export function renderMaoParallelRoutingBenchmarkMarkdown(
-  combined: MaoCombinedBenchmarkReport,
-  staticScenarios: readonly MaoParallelRoutingScenario[],
-  replayScenarios: readonly MaoEventReplayScenario[]
-): string {
-  const staticRows = staticScenarios.map((scenario) => {
-    const result = evaluateMaoParallelScenario(scenario);
-    return `| ${scenario.id} | ${scenario.kind} | ${scenario.capabilityIntroducedBy} | ${scenario.coverageTier} | ${result.routingVerdict} | ${result.matchedExpectation ? 'pass' : 'fail'} |`;
-  });
-  const replayRows = replayScenarios.map((scenario) => {
-    const result = evaluateEventReplayScenario(scenario);
-    return `| ${scenario.id} | ${scenario.replayKind} | ${scenario.capabilityIntroducedBy} | ${scenario.replayProvenance.origin} | ${result.routingVerdict} | ${result.matchedExpectation ? 'pass' : 'fail'} |`;
-  });
-
-  const renderCatchSection = (label: string, report: MaoParallelBenchmarkReport) => [
-    `### ${label}`,
-    '',
-    `- Scenario count: ${report.scenarioCount}`,
-    `- Catch rate: ${report.catchRate.catchRatePercent}% (${report.catchRate.caughtCount}/${report.catchRate.unsafeScenarioCount} unsafe scenarios caught)`,
-    `- Average latency: ${report.latency.averageNs} ns per scenario`,
-    `- Ship-safe: ${report.shipSafe ? 'yes' : 'no'}`
-  ].join('\n');
-
-  return [
-    '# MAO Parallel Routing Benchmark',
-    '',
-    '> Generated by `scripts/validate-mao-parallel-routing.ts` for `TASK-MAO-0010` and extended by `TASK-MAO-0048` event replay.',
-    '> Deterministic offline simulator. Out of scope: real multi-process load testing and distributed broker consensus (see task card `outOfScope`).',
-    '',
-    '## Summary',
-    '',
-    `- Combined ship-safe: ${combined.combinedShipSafe ? 'yes' : 'no'}`,
-    renderCatchSection('Static hand-authored scenarios (TASK-MAO-0010)', combined.staticReport),
-    renderCatchSection('Event replay scenarios (TASK-MAO-0048)', combined.eventReplayReport),
-    '',
-    '## How to read event replay coverage',
-    '',
-    '- Static scenarios prove deterministic logic paths with hand-authored fixtures.',
-    '- Event replay scenarios are sanitized snapshots derived from `.atm/history/task-events/` and broker evidence; they do not import private chat transcripts.',
-    '- Replay coverage complements static coverage but does not prove all live concurrency cases.',
-    '- Freeze and patch-envelope replay cases use fixed timestamps so results stay deterministic in CI.',
-    '',
-    '## Capability coverage (static scenarios)',
-    '',
-    ...Object.entries(combined.staticReport.capabilityCoverage)
-      .filter(([, count]) => count > 0)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([taskId, count]) => `- ${taskId}: ${count} scenario(s)`),
-    '',
-    '## Event replay provenance',
-    '',
-    ...replayScenarios.map((scenario) => `- ${scenario.id}: ${scenario.replayProvenance.origin} ← ${scenario.replayProvenance.sanitizedFrom}`),
-    '',
-    '## Coverage tiers (static)',
-    '',
-    `- generic-mao: ${combined.staticReport.tierCoverage['generic-mao']} scenario(s)`,
-    `- m5-runner-extension: ${combined.staticReport.tierCoverage['m5-runner-extension']} scenario(s) — expected to grow with MAO-0011+ runner Broker cards`,
-    '',
-    '## CID / AGR incident lessons retained',
-    '',
-    '- Same-atom write/write and shared-surface collisions must not false-safe to parallel admission.',
-    '- Capsule CID drift and generated-artifact ownership remain freeze/block signals, not watch-only passes.',
-    '- Unknown or malformed scope fails closed through steward-required or blocked verdicts.',
-    '',
-    '## False-safe regressions',
-    '',
-    ...(combined.staticReport.falseSafeRegressions.length === 0 && combined.eventReplayReport.falseSafeRegressions.length === 0
-      ? ['- none']
-      : [
-        ...combined.staticReport.falseSafeRegressions.map((entry) => `- static:${entry}`),
-        ...combined.eventReplayReport.falseSafeRegressions.map((entry) => `- replay:${entry}`)
-      ]),
-    '',
-    '## Expectation failures',
-    '',
-    ...(combined.staticReport.expectationFailures.length === 0 && combined.eventReplayReport.expectationFailures.length === 0
-      ? ['- none']
-      : [
-        ...combined.staticReport.expectationFailures.map((entry) => `- static:${entry}`),
-        ...combined.eventReplayReport.expectationFailures.map((entry) => `- replay:${entry}`)
-      ]),
-    '',
-    '## Static scenario matrix',
-    '',
-    '| scenario | kind | capability | tier | verdict | matched |',
-    '| --- | --- | --- | --- | --- | --- |',
-    ...staticRows,
-    '',
-    '## Event replay matrix',
-    '',
-    '| scenario | replay kind | capability | source | verdict | matched |',
-    '| --- | --- | --- | --- | --- | --- |',
-    ...replayRows,
-    '',
-    '## Per-scenario latency (ns)',
-    '',
-    '### Static',
-    '',
-    ...Object.entries(combined.staticReport.latency.perScenarioNs)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([scenarioId, latencyNs]) => `- ${scenarioId}: ${latencyNs}`),
-    '',
-    '### Event replay',
-    '',
-    ...Object.entries(combined.eventReplayReport.latency.perScenarioNs)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([scenarioId, latencyNs]) => `- ${scenarioId}: ${latencyNs}`),
-    '',
-    '## Remaining risks',
-    '',
-    '- Harness still simulates route/steward paths locally; live `route` CLI and broker admission integration remain for later waves.',
-    '- Event replay fixtures are sanitized snapshots; they do not continuously ingest live `.atm/history` during CI.',
-    '- Runner-derived artifact scenarios are placeholders until M5 fixtures land (`TASK-MAO-0011` … `TASK-MAO-0016`).',
-    '- Live `route` CLI integration, real-broker admission, and distributed consensus are out of MAO-0010 scope; deferred to MAO-0011+ runner Broker cards and the December 2026 full-paper evaluation.'
-  ].join('\n');
 }

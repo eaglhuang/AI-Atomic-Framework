@@ -1,27 +1,38 @@
 import { spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 export function inspectRunnerSyncAdmission(input) {
     const dirtyFiles = normalizePaths(input.dirtyFiles ?? readGitDirtyFiles(input.cwd));
     const releaseWip = dirtyFiles.filter(isReleasePath);
     const foreignNonReleaseWip = dirtyFiles.filter((file) => !isReleasePath(file));
+    const queueHeadOwnership = inspectRunnerSyncQueueHeadOwnership(input);
     return {
         schemaId: 'atm.runnerSyncAdmission.v1',
-        ok: foreignNonReleaseWip.length === 0,
+        ok: foreignNonReleaseWip.length === 0 && queueHeadOwnership.ok,
         stewardActorId: input.stewardActorId,
         sealedSourceSha: input.sealedSourceSha ?? null,
         runnerSyncSteward: input.runnerSyncSteward ?? null,
+        queueHeadOwnership,
         foreignNonReleaseWip,
         releaseWip,
         ordinaryTaskReleaseAutoStageAllowed: false,
         requiredCommand: foreignNonReleaseWip.length > 0
             ? 'commit, stash, or close the foreign non-release WIP before runner sync; do not publish release/** from an ordinary task'
-            : null
+            : queueHeadOwnership.ok
+                ? null
+                : queueHeadOwnership.reason
     };
 }
 export function assertRunnerSyncAdmission(report) {
     if (!report.ok) {
-        const error = new Error(`Runner sync refused foreign non-release WIP: ${report.foreignNonReleaseWip.join(', ')}`);
+        const reason = report.foreignNonReleaseWip.length > 0
+            ? `Runner sync refused foreign non-release WIP: ${report.foreignNonReleaseWip.join(', ')}`
+            : report.queueHeadOwnership.reason ?? 'Runner sync requires steward queue-head ownership.';
+        const error = new Error(reason);
         Object.assign(error, {
-            code: 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED',
+            code: report.foreignNonReleaseWip.length > 0
+                ? 'ATM_RUNNER_SYNC_FOREIGN_WIP_BLOCKED'
+                : 'ATM_RUNNER_SYNC_QUEUE_HEAD_REQUIRED',
             details: report
         });
         throw error;
@@ -50,4 +61,78 @@ function normalizePaths(paths) {
 }
 function isReleasePath(file) {
     return file === 'release' || file.startsWith('release/');
+}
+function inspectRunnerSyncQueueHeadOwnership(input) {
+    const steward = input.runnerSyncSteward ?? readRunnerSyncStewardForSealedSource(input.cwd, input.sealedSourceSha);
+    if (!steward) {
+        return {
+            ok: false,
+            stewardWorkId: null,
+            queuePosition: null,
+            waitingTasks: [],
+            ownerActorIds: [],
+            reason: 'runner sync requires a broker runner-sync queue-head reservation before build or internal-release sync'
+        };
+    }
+    const ownerActorIds = normalizeOwnerActorIds(steward.requests);
+    const actorOwnsHead = ownerActorIds.length === 0 || ownerActorIds.includes(input.stewardActorId);
+    const ok = steward.queuePosition === 1 && actorOwnsHead;
+    return {
+        ok,
+        stewardWorkId: steward.stewardWorkId,
+        queuePosition: steward.queuePosition,
+        waitingTasks: normalizeStringArray(steward.waitingTasks),
+        ownerActorIds,
+        reason: ok
+            ? null
+            : steward.queuePosition !== 1
+                ? `runner sync steward ${steward.stewardWorkId} is queued at position ${steward.queuePosition}; wait for queue head before build or sync`
+                : `runner sync steward ${steward.stewardWorkId} is owned by ${ownerActorIds.join(', ') || 'unknown actor'}, not ${input.stewardActorId}`
+    };
+}
+function readRunnerSyncStewardForSealedSource(cwd, sealedSourceSha) {
+    const sealedSource = String(sealedSourceSha ?? '').trim();
+    if (!sealedSource)
+        return null;
+    const queuePath = path.join(cwd, '.atm', 'runtime', 'runner-sync-steward-queue.json');
+    if (!existsSync(queuePath))
+        return null;
+    try {
+        const parsed = JSON.parse(readFileSync(queuePath, 'utf8'));
+        const groups = Array.isArray(parsed.groups) ? parsed.groups : [];
+        for (const group of groups) {
+            if (!group || typeof group !== 'object')
+                continue;
+            const record = group;
+            if (record.sealedSourceSha !== sealedSource)
+                continue;
+            if (typeof record.stewardWorkId !== 'string' || typeof record.queuePosition !== 'number')
+                return null;
+            return {
+                stewardWorkId: record.stewardWorkId,
+                queuePosition: record.queuePosition,
+                suggestedNextAction: typeof record.suggestedNextAction === 'string' ? record.suggestedNextAction : '',
+                waitingTasks: record.waitingTasks,
+                requests: record.requests
+            };
+        }
+    }
+    catch {
+        return null;
+    }
+    return null;
+}
+function normalizeOwnerActorIds(value) {
+    if (!Array.isArray(value))
+        return [];
+    return [...new Set(value
+            .map((entry) => entry && typeof entry === 'object' ? String(entry.actorId ?? '').trim() : '')
+            .filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+}
+function normalizeStringArray(value) {
+    if (!Array.isArray(value))
+        return [];
+    return [...new Set(value.map((entry) => String(entry ?? '').trim()).filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
 }

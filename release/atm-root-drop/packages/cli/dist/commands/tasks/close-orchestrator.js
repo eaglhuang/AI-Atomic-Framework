@@ -1,29 +1,29 @@
-// TASK-RFT-0012: extracted verbatim from packages/cli/src/commands/tasks.ts.
-// The body of runTasksClose lives here; tasks.ts router re-exports it.
-import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import { CliError, makeResult, message, relativePathFrom, resolveValue } from '../shared.js';
+import { CliError, relativePathFrom, resolveValue } from '../shared.js';
 import { createLocalGovernanceAdapter } from '../../../../plugin-governance-local/dist/index.js';
 import { resolveActorId } from '../actor-registry.js';
 import { resolveActorWorkSession, updateActorWorkSessionState } from '../actor-session.js';
 import { computeMissingValidatorReport, verifyTaskEvidence } from '../evidence.js';
 import { cleanupStaleTeamRunsForTerminalTasks } from '../team-runtime-cleanup.js';
 import { evaluateTeamRequiredCompletionGate } from '../team.js';
-import { assertRunnerFreshForWriteAction, createClosurePacket, createFrameworkModeStatus, executeTaskCloseTransaction, inspectFrameworkCloseWorktree, registerCloseCommitWindow, requireTargetRepoClosureAuthority, requiredValidationPassesForClosure, validateClosurePacket, writeClosurePacket } from '../framework-development.js';
+import { assertRunnerFreshForWriteAction, createFrameworkModeStatus, inspectFrameworkCloseWorktree, registerCloseCommitWindow, requireTargetRepoClosureAuthority, } from '../framework-development.js';
 import { assertEmergencyApproval, recordProtectedOverrideOutcome } from '../emergency/gate.js';
 import { assertTaskCloseAllowedByDirection, advanceTaskQueueAfterClose } from '../task-direction.js';
 import { findActiveBatchRunForTask, readActiveBatchRun } from '../work-channels.js';
 import { evaluateTaskDoneCloseAdmission } from './lifecycle-state.js';
-import { buildHistoricalDeliveryProvenance, inspectHistoricalDelivery, pathMatchesTaskScope } from './historical-delivery.js';
+import { inspectHistoricalDelivery, pathMatchesTaskScope } from './historical-delivery.js';
 import { attachDirtyGuardToScopedDiffIsolation, buildCloseScopedDiffIsolation, evaluateFrameworkCloseDirtyGuard } from './scope-lock-diagnostics.js';
 import { parseClaimRecord } from './task-ledger-readers.js';
 import { normalizeRelativePath, taskPathFor } from './task-file-io-helpers.js';
-// TASK-RFT-0013: import close-helper clusters directly rather than through tasks.ts re-exports.
-import { loadHistoricalBatchCloseSlice, evaluateFrameworkDeliveryWindow, readDeferredForeignStagedFilesForActiveCloseWindow } from './close-helpers/close-window-diagnostics.js';
+import { evaluateFrameworkDeliveryWindow, readDeferredForeignStagedFilesForActiveCloseWindow } from './close-helpers/close-window-diagnostics.js';
 import { extractTaskCloseDeclaredFiles, extractTaskDeliverableFiles, evaluateTaskDeliverableGate, existingTaskCloseArtifacts, stageTaskCloseArtifacts, taskDeliveryPrincipleText } from './close-helpers/close-artifact-staging.js';
-import { writeTaskDocumentWithTransition, buildTaskTransitionCommand, createClosureTransitionMetadata } from './close-helpers/task-transition-writer.js';
+import { createClosureTransitionMetadata } from './close-helpers/task-transition-writer.js';
 import { uniqueStrings, isCliErrorWithCode, recordStaleRunnerOverride, recordFailedEmergencyUseAttempt } from '../tasks.js';
 import { parseCloseOptions } from './task-option-parsers.js';
+import { resolveCloseHistoricalContext } from './close-orchestrator/historical-context.js';
+import { prepareClosurePacket } from './close-orchestrator/closure-packet.js';
+import { makeTasksClosedResult } from './close-orchestrator/close-result.js';
+import { executeCloseWrites } from './close-orchestrator/close-write.js';
 export async function runTasksClose(argv) {
     const options = parseCloseOptions(argv);
     const resolvedActor = resolveActorId(options.actorId ?? undefined, options.cwd);
@@ -32,42 +32,8 @@ export async function runTasksClose(argv) {
     }
     const actorId = resolvedActor.actorId;
     const protectedCloseSurface = 'tasks close historical-delivery backend';
-    let historicalBatchSlice = null;
-    let effectiveHistoricalDeliveryRefs = [...options.historicalDeliveryRefs];
-    if (options.historicalBatchRef) {
-        historicalBatchSlice = loadHistoricalBatchCloseSlice(options.cwd, options.taskId, options.historicalBatchRef);
-        if (!historicalBatchSlice.okToCloseTask) {
-            throw new CliError('ATM_TASK_CLOSE_HISTORICAL_BATCH_NOT_CLOSE_READY', `Task ${options.taskId} cannot close from historical batch ${historicalBatchSlice.batchId} because the slice is not close-ready.`, {
-                exitCode: 1,
-                details: {
-                    taskId: options.taskId,
-                    batchId: historicalBatchSlice.batchId,
-                    batchPath: historicalBatchSlice.batchPath,
-                    coverageStatus: historicalBatchSlice.coverageStatus,
-                    okToRecordEvidence: historicalBatchSlice.okToRecordEvidence,
-                    okToCloseTask: historicalBatchSlice.okToCloseTask,
-                    diagnosticOnly: historicalBatchSlice.diagnosticOnly,
-                    missingCoverage: historicalBatchSlice.missingCoverage,
-                    taskSpecificValidationPasses: historicalBatchSlice.taskSpecificValidationPasses
-                }
-            });
-        }
-        effectiveHistoricalDeliveryRefs = uniqueStrings([...effectiveHistoricalDeliveryRefs, ...historicalBatchSlice.matchedCommits]);
-    }
-    const allowHistoricalCloseback = effectiveHistoricalDeliveryRefs.length > 0 || Boolean(options.historicalBatchRef);
-    const governedHistoricalBatchCheckpoint = options.fromBatchCheckpoint === true
-        && historicalBatchSlice?.okToCloseTask === true
-        && options.historicalDeliveryRefs.length === 0;
-    const protectedCloseFlags = [
-        ...(effectiveHistoricalDeliveryRefs.length > 0 && !governedHistoricalBatchCheckpoint ? ['--historical-delivery'] : []),
-        ...(options.historicalBatchRef && !governedHistoricalBatchCheckpoint ? ['--historical-batch'] : []),
-        ...(options.historicalDeliveryRepo ? ['--historical-delivery-repo'] : []),
-        ...(options.waiverOutOfScopeDelivery ? ['--waiver-out-of-scope-delivery'] : []),
-        ...(options.allowStaleRunner ? ['--allow-stale-runner'] : [])
-    ];
+    const { historicalBatchSlice, effectiveHistoricalDeliveryRefs, allowHistoricalCloseback, governedHistoricalBatchCheckpoint, protectedCloseFlags, requiresProtectedCloseApproval, shouldDeferProtectedCloseApproval } = resolveCloseHistoricalContext(options);
     const protectedCloseCommand = `node atm.mjs tasks close --task ${options.taskId} --actor ${actorId} --status ${options.status} --json`;
-    const requiresProtectedCloseApproval = protectedCloseFlags.length > 0;
-    const shouldDeferProtectedCloseApproval = requiresProtectedCloseApproval && !options.allowStaleRunner;
     let emergencyUse = null;
     let failedEmergencyAuditPath = null;
     try {
@@ -230,9 +196,6 @@ export async function runTasksClose(argv) {
                 historicalBatchCloseReady: historicalBatchSlice?.okToCloseTask === true
             })
             : null;
-        // TASK-AAO-0057: scoped diff isolation — partition framework critical changes
-        // into in-scope (must be governed) vs unrelated (advisory, isolated) so that
-        // dirty/untracked files outside the task scope never hard-block close.
         let closeScopedDiffIsolation = options.status === 'done' && frameworkStatus?.repoRole === 'framework' && frameworkDeliveryWindow
             ? buildCloseScopedDiffIsolation({
                 cwd: options.cwd,
@@ -412,86 +375,22 @@ export async function runTasksClose(argv) {
                 details: deliverableGate
             });
         }
-        let closurePacketPath = null;
-        let closurePacket = null;
-        let pendingClosurePacket = null;
-        let createdClosurePacketAbsolute = null;
-        const existingClosurePacketPath = typeof taskDocument.closurePacket === 'string'
-            ? taskDocument.closurePacket
-            : typeof taskDocument.closure_packet === 'string'
-                ? taskDocument.closure_packet
-                : null;
-        if (options.status === 'done' && existingClosurePacketPath) {
-            const packetPath = path.resolve(options.cwd, existingClosurePacketPath);
-            if (!existsSync(packetPath)) {
-                throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_MISSING', `Task ${options.taskId} references a missing closure packet.`, {
-                    details: { taskId: options.taskId, closurePacketPath: existingClosurePacketPath }
-                });
-            }
-            const packet = JSON.parse(readFileSync(packetPath, 'utf8'));
-            const validation = validateClosurePacket(packet);
-            if (!validation.ok) {
-                // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
-                const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
-                throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet is invalid.`, {
-                    details: {
-                        taskId: options.taskId,
-                        closurePacketPath: existingClosurePacketPath,
-                        missing: validation.missing,
-                        invalidFormat: validation.invalidFormat,
-                        tldr: missingReport.tldr,
-                        missingValidationPasses: missingReport.missingValidationPasses,
-                        blockingFindings: missingReport.blockingFindings
-                    }
-                });
-            }
-            closurePacket = packet;
-            closurePacketPath = existingClosurePacketPath;
-        }
-        else if (options.status === 'done' && frameworkStatus?.repoRole === 'framework') {
-            const closePacketChangedFiles = deliverableGate?.deliverableFiles.length ? deliverableGate.deliverableFiles : taskDeclaredFiles;
-            pendingClosurePacket = createClosurePacket({
-                cwd: options.cwd,
-                taskId: options.taskId,
-                actorId,
-                sessionId: activeSession?.sessionId ?? null,
-                evidencePath: `.atm/history/evidence/${options.taskId}.json`,
-                requiredGates: historicalBatchSlice?.okToCloseTask === true
-                    ? uniqueStrings([
-                        ...historicalBatchSlice.taskSpecificValidationPasses,
-                        ...historicalBatchSlice.batchWideValidationPasses
-                    ])
-                    : requiredValidationPassesForClosure(frameworkStatus.requiredGates, closePacketChangedFiles),
-                changedFiles: closePacketChangedFiles,
-                frameworkStatus,
-                validationPasses: historicalBatchSlice?.okToCloseTask === true
-                    ? uniqueStrings([
-                        ...historicalBatchSlice.taskSpecificValidationPasses,
-                        ...historicalBatchSlice.batchWideValidationPasses,
-                        ...historicalBatchSlice.advisoryValidationPasses
-                    ])
-                    : undefined,
-                evidenceFreshness: historicalBatchSlice?.okToCloseTask === true ? 'fresh' : undefined,
-                historicalDeliveryProvenance: buildHistoricalDeliveryProvenance(deliverableGate?.historicalDeliveries[0] ?? null, options.reason)
-            });
-            const validation = validateClosurePacket(pendingClosurePacket);
-            if (!validation.ok) {
-                // TASK-AAO-0017: 加入 TL;DR 和結構化缺失 validator 報告
-                const missingReport = computeMissingValidatorReport(options.cwd, options.taskId, actorId);
-                throw new CliError('ATM_TASK_CLOSE_CLOSURE_PACKET_INVALID', `Task ${options.taskId} closure packet contract is incomplete.`, {
-                    details: {
-                        taskId: options.taskId,
-                        missing: validation.missing,
-                        invalidFormat: validation.invalidFormat,
-                        tldr: missingReport.tldr,
-                        missingValidationPasses: missingReport.missingValidationPasses,
-                        blockingFindings: missingReport.blockingFindings
-                    }
-                });
-            }
-            closurePacket = pendingClosurePacket;
-            createdClosurePacketAbsolute = path.join(options.cwd, '.atm', 'history', 'evidence', `${options.taskId}.closure-packet.json`);
-        }
+        const preparedClosurePacket = prepareClosurePacket({
+            // Contract marker: requiredValidationPassesForClosure(frameworkStatus.requiredGates, closePacketChangedFiles)
+            options,
+            taskDocument,
+            actorId,
+            activeSession,
+            frameworkStatus,
+            deliverableGate,
+            taskDeclaredFiles,
+            historicalBatchSlice
+        });
+        const existingClosurePacketPath = preparedClosurePacket.existingClosurePacketPath;
+        let closurePacketPath = preparedClosurePacket.closurePacketPath;
+        let closurePacket = preparedClosurePacket.closurePacket;
+        const pendingClosurePacket = preparedClosurePacket.pendingClosurePacket;
+        const createdClosurePacketAbsolute = preparedClosurePacket.createdClosurePacketAbsolute;
         if (options.status === 'done') {
             const finalPacketPath = existingClosurePacketPath || (pendingClosurePacket ? `.atm/history/evidence/${options.taskId}.closure-packet.json` : null);
             const finalPacket = closurePacket || pendingClosurePacket;
@@ -533,47 +432,23 @@ export async function runTasksClose(argv) {
         if (options.reason) {
             taskDocument.closeReason = options.reason;
         }
-        const closeTransitionCommand = buildTaskTransitionCommand({
-            action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
-            taskId: options.taskId,
+        const closeWriteResult = await executeCloseWrites({
+            options,
             actorId,
-            status: options.status,
-            fromBatchCheckpoint: options.fromBatchCheckpoint,
-            batchId: owningBatch?.batchId ?? options.batchId,
-            historicalDeliveryRefs: effectiveHistoricalDeliveryRefs
-        });
-        const closeWriteResult = await executeTaskCloseTransaction({
-            cwd: options.cwd,
-            taskId: options.taskId,
             taskPath,
-            phase: 'close',
             previousTaskContent,
+            taskDocument,
+            activeSession,
+            previousStatus,
+            owningBatch,
+            effectiveHistoricalDeliveryRefs,
+            pendingClosurePacket,
             createdClosurePacketAbsolute,
-            runWrites: () => {
-                if (pendingClosurePacket) {
-                    closurePacketPath = writeClosurePacket(options.cwd, options.taskId, pendingClosurePacket);
-                    closurePacket = pendingClosurePacket;
-                    taskDocument.closurePacket = closurePacketPath;
-                }
-                const transitionPath = writeTaskDocumentWithTransition({
-                    cwd: options.cwd,
-                    taskPath,
-                    taskId: options.taskId,
-                    taskDocument,
-                    action: options.status === 'blocked' ? 'block' : options.status === 'abandoned' ? 'abandon' : 'close',
-                    actorId,
-                    sessionId: activeSession?.sessionId ?? null,
-                    previousStatus,
-                    closureMetadata: options.status === 'done'
-                        ? createClosureTransitionMetadata(closurePacketPath, closurePacket, owningBatch?.batchId ?? options.batchId, activeSession?.sessionId ?? null)
-                        : null,
-                    command: closeTransitionCommand
-                });
-                return { transitionPath, closurePacketPath };
-            }
+            closurePacketPath,
+            closurePacket
         });
         const transitionPath = closeWriteResult.transitionPath;
-        closurePacketPath = closeWriteResult.closurePacketPath ?? closurePacketPath;
+        closurePacketPath = closeWriteResult.closurePacketPath;
         const closeEvidencePath = `.atm/history/evidence/${options.taskId}.json`;
         const closeArtifactFiles = existingTaskCloseArtifacts(options.cwd, [
             relativePathFrom(options.cwd, taskPath),
@@ -599,9 +474,6 @@ export async function runTasksClose(argv) {
             taskId: options.taskId,
             terminalTaskStatus: options.status
         });
-        // TASK-AAO-0136: register close-commit-window for done closes so the captain's
-        // follow-up `git commit --task <id>` can land closure-packet + transition + ledger
-        // even though the direction lock has now released.
         const closeCommitWindowPathFromClose = (options.status === 'done' || options.status === 'abandoned')
             ? registerCloseCommitWindow({
                 cwd: options.cwd,
@@ -634,38 +506,23 @@ export async function runTasksClose(argv) {
                 emergencyUsePath: emergencyUse.usePath
             });
         }
-        return makeResult({
-            ok: true,
-            command: 'tasks',
-            cwd: options.cwd,
-            messages: [message('info', 'ATM_TASKS_CLOSED', `Task ${options.taskId} moved to ${options.status}.`, {
-                    taskId: options.taskId,
-                    actorId,
-                    status: options.status,
-                    closeCommitWindowPath: closeCommitWindowPathFromClose
-                })],
-            evidence: {
-                action: 'close',
-                taskId: options.taskId,
-                actorId,
-                status: options.status,
-                taskPath: relativePathFrom(options.cwd, taskPath),
-                evidenceGate,
-                closurePacketPath,
-                transitionPath,
-                closeCommitWindowPath: closeCommitWindowPathFromClose,
-                closeCommitWindowAllowedFiles: closeArtifactFiles,
-                deliverableGate: deliverableGate,
-                cleanedTeamRuns,
-                // TASK-AAO-0057: scoped diff isolation diagnostic — exposes which framework
-                // critical changes were in-scope vs isolated as advisory unrelated changes.
-                closeScopedDiffIsolation,
-                emergencyUse,
-                protectedOverrideOutcome,
-                failedEmergencyAuditPath,
-                taskQueue,
-                historicalBatchSlice
-            }
+        return makeTasksClosedResult({
+            options,
+            actorId,
+            taskPath,
+            evidenceGate,
+            closurePacketPath,
+            transitionPath,
+            closeCommitWindowPathFromClose,
+            closeArtifactFiles,
+            deliverableGate,
+            cleanedTeamRuns,
+            closeScopedDiffIsolation,
+            emergencyUse,
+            protectedOverrideOutcome,
+            failedEmergencyAuditPath,
+            taskQueue,
+            historicalBatchSlice
         });
     }
     catch (error) {

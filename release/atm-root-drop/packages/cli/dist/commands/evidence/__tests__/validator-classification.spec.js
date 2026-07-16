@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
-import { classifyValidatorTier, isClosureRequiredValidator, normalizeValidatorGateName, resolveValidatorExpectedCommand, detectAutoLinkedValidator } from '../validator-classification.js';
+import { classifyValidatorTier, isClosureRequiredValidator, normalizeValidatorGateName, canonicalizeValidatorIdentity, resolveValidatorExpectedCommand, detectAutoLinkedValidator } from '../validator-classification.js';
 assert.equal(classifyValidatorTier('typecheck'), 'focused');
 assert.equal(classifyValidatorTier('doctor'), 'batch');
 assert.equal(classifyValidatorTier('validate:root-drop-release'), 'release');
 assert.equal(normalizeValidatorGateName('npm run typecheck'), 'typecheck');
 assert.equal(resolveValidatorExpectedCommand('typecheck'), 'npm run typecheck');
 assert.equal(detectAutoLinkedValidator('npm run typecheck'), 'typecheck');
+assert.equal(canonicalizeValidatorIdentity('node atm.mjs upgrade --propose --legacy-target "packages/core/src/registry/replacement-lane.ts#transitionReplacementMode" --dry-run --json'), canonicalizeValidatorIdentity('node atm.mjs upgrade --propose --legacy-target packages/core/src/registry/replacement-lane.ts#transitionReplacementMode --dry-run --json'));
+assert.equal(canonicalizeValidatorIdentity('node atm.mjs upgrade --propose --legacy-target \\"packages/core/src/registry/replacement-lane.ts#transitionReplacementMode\\" --dry-run --json'), canonicalizeValidatorIdentity('node atm.mjs upgrade --propose --legacy-target packages/core/src/registry/replacement-lane.ts#transitionReplacementMode --dry-run --json'));
 assert.equal(isClosureRequiredValidator('doctor', []), false);
 assert.equal(isClosureRequiredValidator('typecheck', []), true);
 assert.equal(isClosureRequiredValidator('validate:cli', [], ['docs/readme.md']), false);

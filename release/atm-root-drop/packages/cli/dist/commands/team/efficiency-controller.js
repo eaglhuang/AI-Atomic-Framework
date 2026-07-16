@@ -56,6 +56,54 @@ export function evaluateTeamEfficiency(input) {
         tokenDiagnosticReasonCodes
     };
 }
+export function evaluatePairedDogfoodSample(input) {
+    const sample = input.sample;
+    const baselineTokens = usageTokens(sample.usage?.baseline);
+    const teamTokens = usageTokens(sample.usage?.team);
+    const ratios = {
+        fullyLoadedCostRatio: baselineTokens > 0 && teamTokens > 0 ? teamTokens / baselineTokens : null,
+        wallClockRatio: sample.wallClock.baselineMs && sample.wallClock.teamMs
+            ? sample.wallClock.teamMs / sample.wallClock.baselineMs
+            : null,
+        tokenRatio: baselineTokens > 0 && teamTokens > 0 ? teamTokens / baselineTokens : null,
+        repairResidueRatio: 1
+    };
+    const decision = evaluateTeamEfficiency({
+        workloadClass: input.workloadClass ?? 'paired-dogfood',
+        rosterFingerprintDigest: stableDigest(sample.modelIdentities ?? []),
+        modelMixDigest: stableDigest(sample.modelIdentities ?? []),
+        contextManifestDigest: stableDigest(sample.sampleId),
+        promptCachePolicy: 'sample-observed',
+        fanOutCap: 6,
+        quotaProbeDigest: stableDigest(sample.pricingCatalogVersion ?? 'unknown-pricing'),
+        pricingCatalogVersion: sample.pricingCatalogVersion ?? 'unknown-pricing',
+        priceEvidenceFresh: Boolean(sample.pricingCatalogVersion),
+        usageEvidenceComplete: sample.measurementStatus === 'complete' && sample.providerBillableUsage,
+        qualityParity: sample.qualityOutcome.baselinePassed === true && sample.qualityOutcome.teamPassed === true,
+        noWorseRepairResidue: true,
+        stopLossTriggered: false,
+        ratios,
+        telemetry: {
+            contextInflation: ratios.tokenRatio !== null && ratios.tokenRatio > 1,
+            cacheMiss: false,
+            retries: 0,
+            quotaOk: true,
+            queueWaitInflationRatio: null,
+            spendingCeilingRisk: false
+        }
+    });
+    return {
+        schemaId: 'atm.teamEfficiencyPairedSampleEvaluation.v1',
+        sampleId: sample.sampleId,
+        decision,
+        incident: createTeamEfficiencyIncident({
+            sampleId: sample.sampleId,
+            decision,
+            ratios,
+            generatedAt: input.generatedAt
+        })
+    };
+}
 export function createTeamEfficiencyIncident(input) {
     return {
         schemaId: 'atm.teamEfficiencyIncident.v1',
@@ -133,6 +181,17 @@ function chooseScaleDownAction(input, reasonCodes) {
 }
 function digestCohort(value) {
     return `cohort-${sha256(JSON.stringify(value)).slice(0, 16)}`;
+}
+function usageTokens(value) {
+    if (!value)
+        return 0;
+    return (value.inputTokens ?? 0)
+        + (value.outputTokens ?? 0)
+        + (value.cacheReadTokens ?? 0)
+        + (value.reasoningTokens ?? 0);
+}
+function stableDigest(value) {
+    return `sha256:${sha256(JSON.stringify(value))}`;
 }
 function sha256(value) {
     return createHash('sha256').update(value).digest('hex');

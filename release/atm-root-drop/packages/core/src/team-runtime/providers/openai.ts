@@ -394,6 +394,7 @@ export async function defaultHttpJsonExecutor(input: {
       ok: response.ok,
       statusCode: response.status,
       outputText: extractProviderText(parsed) || text,
+      billableUsage: response.ok ? extractOpenAIResponsesBillableUsage(parsed) : undefined,
       retryable: response.status === 429 || response.status >= 500,
       summary: response.ok ? 'Vendor API request completed.' : `Vendor API request failed with HTTP ${response.status}.`,
       executionMode: 'vendor-api'
@@ -409,6 +410,53 @@ export async function defaultHttpJsonExecutor(input: {
   } finally {
     if (timeout) clearTimeout(timeout);
   }
+}
+
+export function extractOpenAIResponsesBillableUsage(value: unknown): TeamProviderBillableUsage | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const record = value as Record<string, unknown>;
+  const usage = record.usage;
+  if (!usage || typeof usage !== 'object') return undefined;
+  const usageRecord = usage as Record<string, unknown>;
+  const inputTokens = numberField(usageRecord.input_tokens);
+  const outputTokens = numberField(usageRecord.output_tokens);
+  const inputDetails = objectField(usageRecord.input_tokens_details);
+  const outputDetails = objectField(usageRecord.output_tokens_details);
+  const cacheReadTokens = numberField(inputDetails?.cached_tokens);
+  const reasoningTokens = numberField(outputDetails?.reasoning_tokens);
+  return {
+    schemaId: 'atm.teamProviderBillableUsage.v1',
+    providerId: 'openai',
+    modelId: stringField(record.model) ?? 'unknown-openai-model',
+    billingProduct: 'responses-api',
+    serviceTier: stringField(record.service_tier) ?? 'standard',
+    region: 'global',
+    currency: 'USD',
+    inputTokens,
+    outputTokens,
+    cacheReadTokens,
+    reasoningTokens,
+    requestCount: 1,
+    retryCount: 0,
+    billedFailedOrCancelled: false,
+    measurementIncompleteReasons: [
+      ...(inputTokens == null ? ['missing-input-tokens'] : []),
+      ...(outputTokens == null ? ['missing-output-tokens'] : [])
+    ]
+  };
+}
+
+function objectField(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+}
+
+function numberField(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function stringField(value: unknown): string | undefined {
+  const normalized = String(value ?? '').trim();
+  return normalized ? normalized : undefined;
 }
 
 export function normalizeHttpExecutionResult(result: TeamProviderExecutionResult, label: string): TeamProviderExecutionResult {

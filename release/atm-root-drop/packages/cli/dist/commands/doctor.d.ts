@@ -1,1 +1,1 @@
-export declare function runDoctor(argv: readonly string[]): Promise<import("./shared.ts").CommandResult>;
+export { runDoctor } from './doctor/run-doctor.ts';

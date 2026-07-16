@@ -1,4 +1,4 @@
-import { isQueueRequestedPrompt, type TaskIntent } from './intent-normalizers.ts';
+import { isJournalingPrompt, isQueueRequestedPrompt, type TaskIntent } from './intent-normalizers.ts';
 type PromptScopedRouteStatus = 'ready' | 'queue' | 'ambiguous' | 'not-found' | 'empty';
 interface PromptScopedTaskRoute {
     readonly status: PromptScopedRouteStatus;
@@ -65,4 +65,4 @@ declare function isTaskCardSurfaceOnlyMatch(task: ImportedTaskSummary): boolean;
 declare function isTaskRoutable(status: string, intent: TaskIntent | null): boolean;
 declare function isTaskExplicitlyMentioned(task: ImportedTaskSummary, intent: TaskIntent | null): boolean;
 declare function shouldDiscoverMarkdownTaskCards(intent: TaskIntent | null): boolean;
-export { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards, type ImportedTaskQueue, type ImportedTaskSummary, type PromptScopedRouteStatus, type PromptScopedTaskRoute };
+export { areTaskDependenciesSatisfied, canTaskBePreparedForClaim, hasRequiredPromptScopeMatch, isClosedTaskStatus, isExplicitSingleTaskRoute, isFrameworkMaintenancePrompt, isJournalingPrompt, isQueueRequestedPrompt, isTaskAlreadyActivelyClaimed, isTaskCardSurfaceOnlyMatch, isTaskExplicitlyMentioned, isTaskRoutable, shouldDiscoverMarkdownTaskCards, type ImportedTaskQueue, type ImportedTaskSummary, type PromptScopedRouteStatus, type PromptScopedTaskRoute };

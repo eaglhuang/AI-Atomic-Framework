@@ -19,6 +19,7 @@ export interface TaskIntent {
     readonly taskScopeMentioned: boolean;
 }
 export declare function isQueueRequestedPrompt(prompt: string): boolean;
+export declare function isJournalingPrompt(prompt: string): boolean;
 export declare function parseMarkdownFrontmatter(text: string): Record<string, unknown>;
 export declare function normalizeTaskRouteStatus(status: string): string;
 export declare function normalizeOptionalBoolean(value: unknown): boolean | null;

@@ -5,6 +5,7 @@ export interface GitIndexOwnershipEntry {
     readonly ownership: GitIndexOwnershipClass;
     readonly ownerTaskId: string | null;
     readonly ownerActorId: string | null;
+    readonly ownerSessionId: string | null;
     readonly stagedBlobId: string | null;
     readonly stagedMode: string | null;
     readonly source: 'governance-path' | 'active-direction-lock' | 'ordinary';
@@ -20,6 +21,7 @@ export interface GitIndexOwnershipReport {
         readonly status: GitIndexLaneStatus;
         readonly ownerTaskId: string | null;
         readonly ownerActorId: string | null;
+        readonly ownerSessionId: string | null;
         readonly reason: string;
     };
 }
@@ -52,12 +54,14 @@ export declare function buildForeignActiveStagedDiagnostic(report: GitIndexOwner
     code: string;
     ownerTaskIds: readonly string[];
     ownerActorIds: readonly string[];
+    ownerSessionIds: readonly string[];
     stagedPaths: string[];
     indexLane: {
         readonly schemaId: "atm.gitIndexLane.v1";
         readonly status: GitIndexLaneStatus;
         readonly ownerTaskId: string | null;
         readonly ownerActorId: string | null;
+        readonly ownerSessionId: string | null;
         readonly reason: string;
     };
     safeNextActions: string[];

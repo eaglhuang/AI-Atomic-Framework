@@ -8,6 +8,14 @@ export type RunnerSyncAdmissionReport = {
         readonly queuePosition: number;
         readonly suggestedNextAction: string;
     } | null;
+    readonly queueHeadOwnership: {
+        readonly ok: boolean;
+        readonly stewardWorkId: string | null;
+        readonly queuePosition: number | null;
+        readonly waitingTasks: readonly string[];
+        readonly ownerActorIds: readonly string[];
+        readonly reason: string | null;
+    };
     readonly foreignNonReleaseWip: readonly string[];
     readonly releaseWip: readonly string[];
     readonly ordinaryTaskReleaseAutoStageAllowed: false;

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { evaluateClaimAdmission, isBrokerVerdictAdmissible } from '../claim-admission.js';
+import { buildPreClaimWriteIntent } from '../claim-helpers.js';
 assert.equal(isBrokerVerdictAdmissible('allow'), true);
 const cleanImport = evaluateClaimAdmission({
     brokerVerdict: 'allow',
@@ -36,4 +37,32 @@ const input = {
 };
 evaluateClaimAdmission(input);
 assert.equal(JSON.stringify(input), before, 'admission policy must not mutate its input');
+const releaseMirrorIntent = buildPreClaimWriteIntent({
+    taskId: 'TASK-RUNNER-SYNC',
+    actorId: 'captain-a',
+    baseCommit: 'abc123',
+    targetFiles: ['release/atm-onefile/atm.mjs']
+});
+assert.deepEqual(releaseMirrorIntent.sharedSurfaces.generators, ['atm.runner-sync.coalescing-steward']);
+assert.deepEqual(releaseMirrorIntent.sharedSurfaces.artifacts, ['atm.release-mirror']);
+const backlogProjectionIntent = buildPreClaimWriteIntent({
+    taskId: 'TASK-BACKLOG-PROJECTION',
+    actorId: 'captain-b',
+    baseCommit: 'abc123',
+    targetFiles: ['docs/governance/atm-bug-and-optimization-backlog.md']
+});
+assert.deepEqual(backlogProjectionIntent.sharedSurfaces.projections, ['atm.generated-projection.governance-backlog']);
+const ordinaryIntent = buildPreClaimWriteIntent({
+    taskId: 'TASK-ORDINARY',
+    actorId: 'captain-c',
+    baseCommit: 'abc123',
+    targetFiles: ['src/ordinary.ts']
+});
+assert.deepEqual(ordinaryIntent.sharedSurfaces, {
+    generators: [],
+    projections: [],
+    registries: [],
+    validators: [],
+    artifacts: []
+});
 console.log('[claim-admission.spec] ok');

@@ -33,6 +33,20 @@
       "coverage_status": "active"
     },
     {
+      "path_pattern": "scripts/lib/admission-bench/operational-runner.ts",
+      "atom_id": "atm.operational-bench-map",
+      "capability": "OperationalBench scenario execution facade for broker admission, git boundary, and recovery routing measurements",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0085"
+    },
+    {
+      "path_pattern": "scripts/lib/admission-bench/operational-artifacts.ts",
+      "atom_id": "atm.operational-bench-map",
+      "capability": "OperationalBench summary contract, paper-table rendering, README rendering, JSON artifact writing, and hash manifest support",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0085"
+    },
+    {
       "path_pattern": "scripts/run-validators.ts",
       "atom_id": "atm.validator-envelope-map",
       "capability": "validator runner with quick/standard/full presets and standardized failure envelope aggregation",
@@ -84,6 +98,34 @@
       "coverage_status": "partial"
     },
     {
+      "path_pattern": "scripts/validate-task-import.ts",
+      "atom_id": "atm.task-import-validator-map",
+      "capability": "task import validator facade for plan parsing, task-card contracts, write import leases, route hygiene, and active claim repair scenarios",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0070"
+    },
+    {
+      "path_pattern": "scripts/validate-task-import/**/*.ts",
+      "atom_id": "atm.task-import-validator-map",
+      "capability": "bounded task import validator modules for fixture assertions, backlog duplicate checks, command helpers, dry-run, write, route hygiene, and claim-guard scenario groups",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0070"
+    },
+    {
+      "path_pattern": "scripts/validate-schemas.ts",
+      "atom_id": "atm.validate-schemas-script-map",
+      "capability": "TASK-RFT-0075 validate-schemas script facade preserving schema, fixture, and protected-surface validation order.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0075"
+    },
+    {
+      "path_pattern": "scripts/validate-schemas/**/*.ts",
+      "atom_id": "atm.validate-schemas-script-map",
+      "capability": "TASK-RFT-0075 bounded validate-schemas modules for context loading, core contracts, broker/team contracts, fixtures, and protected-surface checks.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0075"
+    },
+    {
       "path_pattern": "scripts/validate-cli.ts",
       "atom_id": "atm.validate-cli-script-map",
       "capability": "CLI validation facade for command surface, focused regression, and full fixture suites",
@@ -110,6 +152,20 @@
       "capability": "governance command validator facade implementation carrier for git wrapper, task lifecycle, evidence closeout, and cleanup regression phases",
       "coverage_status": "active",
       "source_task": "TASK-RFT-0055"
+    },
+    {
+      "path_pattern": "scripts/validate-git-hooks-enforcement.ts",
+      "atom_id": "atm.git-hooks-enforcement-validator-map",
+      "capability": "git hooks enforcement validator facade for hook template, pre-commit, pre-push, closure cross-check, and emergency audit scenarios",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0067"
+    },
+    {
+      "path_pattern": "scripts/validate-git-hooks-enforcement/**/*.ts",
+      "atom_id": "atm.git-hooks-enforcement-validator-map",
+      "capability": "bounded git hooks enforcement validator modules for shared harness context, lane execution, pre-push regressions, closure cross-checks, and root emergency audit",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0067"
     },
     {
       "path_pattern": "scripts/validate-map-spec-schema.ts",
@@ -150,6 +206,20 @@
       "capability": "broker evidence capture implementation modules for result contracts, summary extraction, report rendering, and command execution",
       "coverage_status": "active",
       "source_task": "TASK-RFT-0060"
+    },
+    {
+      "path_pattern": "scripts/collect-broker-evidence.ts",
+      "atom_id": "atm.broker-evidence-capture-map",
+      "capability": "broker evidence bundle collector facade for run summaries, team-run rows, registry admissions, git-boundary evidence, task artifact indexes, and Markdown/JSON output",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0071"
+    },
+    {
+      "path_pattern": "scripts/collect-broker-evidence/**/*.ts",
+      "atom_id": "atm.broker-evidence-capture-map",
+      "capability": "bounded broker evidence collector modules for CLI arguments, summary extraction, loader adapters, task artifact indexing, report rendering, and executable orchestration",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0071"
     },
     {
       "path_pattern": "scripts/validate-standard.ts",
@@ -196,6 +266,62 @@
       "capability": "bounded police family validator modules for context, dependencies, scenario groups, and final contract checks",
       "coverage_status": "active",
       "source_task": "TASK-RFT-0063"
+    },
+    {
+      "path_pattern": "scripts/validate-team-brokered-write.ts",
+      "atom_id": "atm.team-brokered-write-validator-map",
+      "capability": "team brokered write validator facade for transaction, runtime activation, composer, steward, and evidence capture scenarios",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0065"
+    },
+    {
+      "path_pattern": "scripts/validate-team-brokered-write/**/*.ts",
+      "atom_id": "atm.team-brokered-write-validator-map",
+      "capability": "bounded team brokered write validator modules for schema context, fixture helpers, linkage assertions, and proposal-gated hot-file flow",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0065"
+    },
+    {
+      "path_pattern": "scripts/validate-task-direction-governance.ts",
+      "atom_id": "atm.task-direction-governance-validator-map",
+      "capability": "task-direction governance validator facade for adopter, batch, framework, scope, and same-file ownership scenarios",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0066"
+    },
+    {
+      "path_pattern": "scripts/validate-task-direction-governance/**/*.ts",
+      "atom_id": "atm.task-direction-governance-validator-map",
+      "capability": "task-direction governance validator modules for fixture helpers, adopter journeys, framework-development checks, prompt scope, and same-file ownership",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0066"
+    },
+    {
+      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "MAO parallel routing benchmark runner facade for scenario loading, evaluation, event replay, steward planning, and combined benchmark orchestration",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0083"
+    },
+    {
+      "path_pattern": "scripts/lib/mao-parallel-routing-benchmark-runner/**",
+      "atom_id": "atm.mao-parallel-routing-benchmark-map",
+      "capability": "bounded MAO parallel routing benchmark support modules for report aggregation and markdown rendering",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0083"
+    },
+    {
+      "path_pattern": "scripts/validate-guidance.ts",
+      "atom_id": "atm.guidance-validator-map",
+      "capability": "guidance validator facade for orientation, legacy route, mutation gate, proposal pairing, runtime adapter, and host-local shadow evidence assertions",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0084"
+    },
+    {
+      "path_pattern": "scripts/lib/validate-guidance/**",
+      "atom_id": "atm.guidance-validator-map",
+      "capability": "bounded guidance validator support modules for host-local shadow mode, review flow, apply-ready, rollout-ready, and rollback proof assertions",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0084"
     }
   ]
 }

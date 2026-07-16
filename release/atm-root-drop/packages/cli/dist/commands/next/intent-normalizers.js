@@ -28,6 +28,17 @@ export function isQueueRequestedPrompt(prompt) {
     }
     return /\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u6240\u6709(?:[\s\S]{0,80})\u4efb\u52d9\u5361|\u5168\u90e8(?:[\s\S]{0,80})\u4efb\u52d9|\u5f8c\u9762(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u5f8c\u7e8c(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u5269\u9918(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u63a5\u4e0b\u4f86(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u9010\u4e00(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u4e00\u5f35\u5f35(?:[\s\S]{0,80})(?:\u4efb\u52d9\u5361|\u4efb\u52d9)|\u7e7c\u7e8c(?:[\s\S]{0,80})(?:backlog|bug|fix|\u4fee\u5fa9|\u4fee\u6b63|\u8655\u7406)|(?:backlog|bug)(?:[\s\S]{0,80})(?:\u7e7c\u7e8c|\u5f8c\u7e8c|\u5269\u9918|\u5168\u90e8|\u6240\u6709|\u4fee\u5fa9|\u4fee\u6b63|\u8655\u7406)|\u6574\u4efd\u8a08\u756b|\u6574\u500b\u8a08\u756b|all(?:[\s\S]{0,80})task\s+cards|all(?:[\s\S]{0,80})tasks|remaining(?:[\s\S]{0,80})(?:task\s+cards|tasks)|later(?:[\s\S]{0,80})(?:task\s+cards|tasks)|one\s+by\s+one(?:[\s\S]{0,80})(?:task\s+cards|tasks)|continue(?:[\s\S]{0,80})(?:backlog|bug|fix(?:es)?|repairs?)|(?:backlog|bug)(?:[\s\S]{0,80})(?:continuation|continue|remaining|all|fix(?:es)?|repairs?)|captain(?:[\s\S]{0,80})(?:backlog|bug)(?:[\s\S]{0,80})(?:continue|fix(?:es)?|repairs?)|entire\s+plan|whole\s+plan|through\s+all/i.test(prompt);
 }
+export function isJournalingPrompt(prompt) {
+    const hasBacklogSurface = /\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b|backlog|bug\s+backlog|journal(?:ing)?|\u8a18\u9304|\u56de\u5beb|\u5beb\u5165|\u65b0\u589e/i.test(prompt);
+    if (!hasBacklogSurface)
+        return false;
+    const hasWriteIntent = /\u8a18\u4e00\u7b46|\u8a18\u9304|\u56de\u5beb|\u5beb\u5165|\u65b0\u589e|\u52a0\u5165|\u767b\u9304|record|log|write(?:\s+back)?|append|add/i.test(prompt);
+    if (hasWriteIntent)
+        return true;
+    if (/\bATM-BUG-\d{4}-\d{2}-\d{2}-\d+\b/i.test(prompt) && !isQueueRequestedPrompt(prompt))
+        return true;
+    return false;
+}
 function detectRequestedTaskAction(prompt) {
     if (/\u91cd\u505a|redo/i.test(prompt))
         return 'redo';
@@ -122,24 +133,25 @@ export function normalizeTaskIntent(value, fallbackSource) {
     const taskRootHints = readStringArray(value.taskRootHints);
     const targetRepoHints = readStringArray(value.targetRepoHints);
     const prompt = userPrompt ?? '';
+    const journalingPrompt = isJournalingPrompt(prompt);
     return {
         schemaId: 'atm.taskIntent.v1',
         userPrompt,
         explicitTaskIds,
-        mentionedTaskIds,
-        mentionedPlanPaths,
-        taskRootHints,
+        mentionedTaskIds: journalingPrompt ? [] : mentionedTaskIds,
+        mentionedPlanPaths: journalingPrompt ? [] : mentionedPlanPaths,
+        taskRootHints: journalingPrompt ? [] : taskRootHints,
         targetRepoHints,
         requestedAction: normalizeRequestedTaskAction(value.requestedAction) ?? detectRequestedTaskAction(prompt),
         confidence: typeof value.confidence === 'number' && Number.isFinite(value.confidence) ? Math.max(0, Math.min(1, value.confidence)) : 0.5,
         source: normalizeTaskIntentSource(value.source) ?? fallbackSource,
         ordinalScope: normalizeOrdinalScope(value.ordinalScope),
-        queueRequested: value.queueRequested === true || isQueueRequestedPrompt(prompt),
-        taskScopeMentioned: value.taskScopeMentioned === true
+        queueRequested: !journalingPrompt && (value.queueRequested === true || isQueueRequestedPrompt(prompt)),
+        taskScopeMentioned: !journalingPrompt && (value.taskScopeMentioned === true
             || explicitTaskIds.length > 0
             || mentionedTaskIds.length > 0
             || mentionedPlanPaths.length > 0
-            || taskRootHints.length > 0
+            || taskRootHints.length > 0)
     };
 }
 // 6. normalizeOrdinalScope
