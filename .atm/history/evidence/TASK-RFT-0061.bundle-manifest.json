@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0061",
+  "updatedAt": "2026-07-16T04:23:27.838Z",
+  "updatedBy": "codex-task-rft-0061",
+  "freshValidationPasses": [
+    "node --strip-types tests/unit/task-option-parsers-final-600.test.ts",
+    "node --strip-types tests/unit/task-option-parsers.unit.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/unit/task-option-parsers-final-600.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:1f878d1ff81434780ca7d402e864fc1b85e8702cc5103084fc8a9ac3e2a89fd1",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/unit/task-option-parsers-final-600.test.ts"
+      ],
+      "generatedAt": "2026-07-16T04:23:19.277Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6853ccb38e93de431170a95bedbd385bce819052",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/unit/task-option-parsers.unit.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d7fe20e8d3235e0e93d10bd62f7a25881ca91f65b960b2774b9be757cdd1128b",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/unit/task-option-parsers.unit.test.ts"
+      ],
+      "generatedAt": "2026-07-16T04:23:19.365Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6853ccb38e93de431170a95bedbd385bce819052",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T04:23:27.950Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6853ccb38e93de431170a95bedbd385bce819052",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

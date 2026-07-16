@@ -583,7 +583,15 @@
       "path_pattern": "packages/cli/src/commands/tasks/task-option-parsers.ts",
       "atom_id": "atm.task-option-parsers-map",
       "capability": "Pure option parsing and CLI flags validators for task sub-commands (reconcile, deliver-and-close, scope add, create, mirror, close, reset, audit, queue, lock cleanup, legacy ledger migration, and claim lifecycle)",
-      "coverage_status": "active"
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0061"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/tasks/task-option-parsers/**/*.ts",
+      "atom_id": "atm.task-option-parsers-map",
+      "capability": "Extracted parser group modules behind the stable task option parsers facade",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0061"
     },
     {
       "path_pattern": "packages/cli/src/commands/tasks/task-transition-helpers.ts#assertLocalTaskLedgerEnabled",
