@@ -1,0 +1,82 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T06-42-48-469Z-close-3e282cf44d27",
+  "taskId": "TASK-RFT-0070",
+  "action": "close",
+  "actorId": "codex-task-rft-0070",
+  "sessionId": "session-20260716062837-codex-task-rft-0070-TASK-RFT-0070-845b265b79",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0070.json",
+  "taskSha256": "sha256:fdbe48f1b2384d3c12413341542f30d25df18baa45936d59aea2573922f4d48e",
+  "createdAt": "2026-07-16T06:42:48.469Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0070 --actor codex-task-rft-0070 --status done --historical-delivery 15b2f243be535108c0f0e15010291f16202692b8",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716062837-codex-task-rft-0070-TASK-RFT-0070-845b265b79",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0070.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-task-import-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:task-import"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T06:42:48.465Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0070.*",
+        ".atm/history/task-events/TASK-RFT-0070/**",
+        ".atm/history/tasks/TASK-RFT-0070.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-import/**/*.ts",
+        "scripts/validate-task-import/assertions.ts",
+        "scripts/validate-task-import/backlog.ts",
+        "scripts/validate-task-import/claim-guard-scenarios.ts",
+        "scripts/validate-task-import/context.ts",
+        "scripts/validate-task-import/dry-run-scenarios.ts",
+        "scripts/validate-task-import/route-hygiene-scenarios.ts",
+        "scripts/validate-task-import/suite.ts",
+        "scripts/validate-task-import/tasks.ts",
+        "scripts/validate-task-import/write-route-scenarios.ts",
+        "scripts/validate-task-import/write-scenarios.ts",
+        "tests/scripts/validate-task-import-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-task-import.ts",
+        "scripts/validate-task-import/**/*.ts",
+        "scripts/validate-task-import/assertions.ts",
+        "scripts/validate-task-import/backlog.ts",
+        "scripts/validate-task-import/claim-guard-scenarios.ts",
+        "scripts/validate-task-import/context.ts",
+        "scripts/validate-task-import/dry-run-scenarios.ts",
+        "scripts/validate-task-import/route-hygiene-scenarios.ts",
+        "scripts/validate-task-import/suite.ts",
+        "scripts/validate-task-import/tasks.ts",
+        "scripts/validate-task-import/write-route-scenarios.ts",
+        "scripts/validate-task-import/write-scenarios.ts",
+        "tests/scripts/validate-task-import-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
