@@ -1,0 +1,166 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0014",
+  "title": "Lane adoption and handoff command",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0012"
+  ],
+  "acceptance": [
+    "`atm lane adopt <lane-id> --json` validates that the lane is adoptable before changing current lane state.",
+    "Adoption writes a lane event and returns an export hint.",
+    "Closed lanes cannot be adopted.",
+    "Same-actor adoptable lanes remain advisory until the explicit adopt command.",
+    "Tests cover adoptable, closed, and unknown lane cases."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/lane.ts",
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/events.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane.ts",
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "packages/cli/src/commands/lane-session/__tests__/events.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+    "node --strip-types packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+    "node atm.mjs lane status --json",
+    "npm run typecheck"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Claim conflict policy",
+    "Broker lifecycle policy"
+  ],
+  "nonGoals": [
+    "Do not implicitly adopt a lane without an explicit command."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove adoption and handoff verbs while retaining lane status behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-adoption-policy",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/lane.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/lane-session/store.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+        "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0014-lane-adoption-handoff.task.md",
+    "sectionTitle": "TASK-LANE-0014",
+    "headingLine": 50,
+    "hash": "a9b7fe5b17e1ffa9",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0014-lane-adoption-handoff.task.md",
+      "planningCommitSha": "c0ef3957558cf3255920da203f2e8884d57d3f8c",
+      "contentDigest": "sha256:a9b7fe5b17e1ffa9cd357754363f577ddef435d4622f9db87251d6d0255b42fe",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T18:03:01.294Z"
+    }
+  },
+  "importedAt": "2026-07-16T18:03:01.294Z",
+  "lastTransitionId": "2026-07-16T18-04-55-811Z-scope-amendment-cccc01a68c36",
+  "lastTransitionAt": "2026-07-16T18:04:55.811Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0014",
+  "reservedAt": "2026-07-16T18:03:44.272Z",
+  "promotedAt": "2026-07-16T18:03:44.275Z",
+  "claim": {
+    "actorId": "codex-lane-0014",
+    "leaseId": "lease-3f648f5aafed",
+    "claimedAt": "2026-07-16T18:03:44.278Z",
+    "heartbeatAt": "2026-07-16T18:03:44.278Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-LANE-0014.*",
+      ".atm/history/task-events/TASK-LANE-0014/**",
+      ".atm/history/tasks/TASK-LANE-0014.json",
+      "packages/cli/src/commands/command-specs/lane.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts",
+      "packages/cli/src/commands/lane.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T18:03:44.278Z",
+  "startedByActor": "codex-lane-0014",
+  "startedBySessionId": "session-20260716180344-codex-lane-0014-TASK-LANE-0014-d2c2b11ba2",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0014",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0014.*",
+      ".atm/history/task-events/TASK-LANE-0014/**",
+      ".atm/history/tasks/TASK-LANE-0014.json",
+      "packages/cli/src/commands/command-specs/lane.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/events.spec.ts",
+      "packages/cli/src/commands/lane-session/__tests__/store.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts",
+      "packages/cli/src/commands/lane.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0014-lane-adoption-handoff.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0014-lane-adoption-handoff.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "61ac9de2ef7e40a7198811446276a97e2e89c9652e2e9cabcbe29c7db0214167",
+    "actorId": "codex-lane-0014",
+    "sessionId": null,
+    "createdAt": "2026-07-16T18:03:47.718Z",
+    "status": "active"
+  }
+}

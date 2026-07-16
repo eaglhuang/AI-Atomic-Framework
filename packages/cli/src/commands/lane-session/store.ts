@@ -61,6 +61,28 @@ export interface MintLaneSessionInput {
   readonly lastCommand?: LaneSessionLastCommand | null;
 }
 
+export interface AdoptLaneSessionInput {
+  readonly cwd: string;
+  readonly laneId: string;
+  readonly actorId: string;
+  readonly reason?: string | null;
+  readonly timestamp?: string;
+  readonly lastCommand?: LaneSessionLastCommand | null;
+}
+
+export type LaneSessionAdoptionFailureReason = 'not-found' | 'closed';
+
+export type LaneSessionAdoptionResult = {
+  readonly ok: true;
+  readonly session: LaneSessionDocument;
+  readonly previousSession: LaneSessionDocument;
+  readonly sessionPath: string;
+} | {
+  readonly ok: false;
+  readonly reason: LaneSessionAdoptionFailureReason;
+  readonly session: LaneSessionDocument | null;
+};
+
 export function mintLaneSession(input: MintLaneSessionInput): {
   readonly session: LaneSessionDocument;
   readonly sessionPath: string;
@@ -91,6 +113,46 @@ export function mintLaneSession(input: MintLaneSessionInput): {
     session,
     sessionPath: relativePathFrom(cwd, absolutePath)
   };
+}
+
+export function adoptLaneSession(input: AdoptLaneSessionInput): LaneSessionAdoptionResult {
+  const cwd = path.resolve(input.cwd);
+  const previousSession = readLaneSession(cwd, input.laneId);
+  if (!previousSession) {
+    return { ok: false, reason: 'not-found', session: null };
+  }
+  if (!isLaneSessionAdoptable(previousSession)) {
+    return { ok: false, reason: 'closed', session: previousSession };
+  }
+  const nowIso = normalizeIsoString(input.timestamp) ?? new Date().toISOString();
+  const ttlMs = normalizePositiveInteger(previousSession.ttlMs, 0);
+  const session: LaneSessionDocument = {
+    ...previousSession,
+    actorId: input.actorId,
+    status: 'adopted',
+    updatedAt: nowIso,
+    expiresAt: new Date(Date.parse(nowIso) + ttlMs).toISOString(),
+    identity: snapshotLaneIdentity(cwd, input.actorId),
+    adoptionSource: {
+      kind: 'adoption',
+      sourceLaneId: previousSession.laneId,
+      sourceActorId: previousSession.actorId,
+      reason: normalizeOptionalString(input.reason) ?? null
+    },
+    lastCommand: normalizeLastCommand(input.lastCommand)
+  };
+  const absolutePath = laneSessionPathFor(cwd, previousSession.laneId);
+  atomicWriteJson(absolutePath, session);
+  return {
+    ok: true,
+    session,
+    previousSession,
+    sessionPath: relativePathFrom(cwd, absolutePath)
+  };
+}
+
+export function isLaneSessionAdoptable(session: LaneSessionDocument): boolean {
+  return session.status !== 'released' && session.status !== 'expired';
 }
 
 export function readLaneSession(cwd: string, laneId: string): LaneSessionDocument | null {
