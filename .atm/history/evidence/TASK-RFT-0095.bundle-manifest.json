@@ -1,0 +1,123 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0095",
+  "updatedAt": "2026-07-16T15:33:03.943Z",
+  "updatedBy": "codex-task-rft-0095",
+  "freshValidationPasses": [
+    "node --strip-types tests/upgrade/propose-map-evidence-closure.test.ts",
+    "node --strip-types tests/upgrade/propose-map-rollback.test.ts",
+    "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split",
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-upgrade-proposal --to 0.1.1 --legacy-target packages/cli/src/commands/upgrade/proposal.ts#runGuidedLegacyDryRunProposal --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade --goal Split",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:08ebf49c99ef7cacefc29f6e2950021e97f76acb01376b069b5525bc277d0b99",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split"
+      ],
+      "generatedAt": "2026-07-16T15:30:55.813Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade --goal Split",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:fb02d537a22cc2e2ce40e9ebe6c813b0d678db09d78b61696db64574beb3cc99",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split"
+      ],
+      "generatedAt": "2026-07-16T15:31:20.137Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/upgrade/propose-map-evidence-closure.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:ed791dafcb0210ab2ba924eaf5556e53880cb72d27590da2b4388cd78da1ef18",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/upgrade/propose-map-evidence-closure.test.ts"
+      ],
+      "generatedAt": "2026-07-16T15:31:48.432Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types tests/upgrade/propose-map-rollback.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:93f9ae2a390145561ef79e3436a2ee1fbc7d5018b7d1a8d432a113ec8d1d4abd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/upgrade/propose-map-rollback.test.ts"
+      ],
+      "generatedAt": "2026-07-16T15:31:59.422Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:7fbf357d26fcd9c8217b4d5d078e63cf3bee60a6cab4c7386a37f1824260e61e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T15:32:06.482Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T15:32:26.126Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:da1f87a2321706989652c0f294c29b7a6c134c183c63abfdee52486ebc9e8375",
+      "stderrSha256": "sha256:5e69fa3c028eb308424b3a3b53e58fe8edff12b60c2f01feda43814ae5151e66",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T15:32:53.806Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-upgrade-proposal --to 0.1.1 --legacy-target packages/cli/src/commands/upgrade/proposal.ts#runGuidedLegacyDryRunProposal --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:524dc032235e8a42947c31ddaa356f057798623fe3c4b5ad837c96ac285f7ea4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-upgrade-proposal --to 0.1.1 --legacy-target packages/cli/src/commands/upgrade/proposal.ts#runGuidedLegacyDryRunProposal --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json"
+      ],
+      "generatedAt": "2026-07-16T15:33:04.090Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "a9a3ca293a001ea63f55e31c9ac132f7a730737f",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
