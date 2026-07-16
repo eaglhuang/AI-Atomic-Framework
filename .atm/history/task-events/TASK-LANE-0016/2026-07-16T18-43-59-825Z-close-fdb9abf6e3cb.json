@@ -1,0 +1,59 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T18-43-59-825Z-close-fdb9abf6e3cb",
+  "taskId": "TASK-LANE-0016",
+  "action": "close",
+  "actorId": "codex-lane-0016",
+  "sessionId": "session-20260716183335-codex-lane-0016-TASK-LANE-0016-57201de27b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0016.json",
+  "taskSha256": "sha256:57cb907c81495fa83f580dbdeed8f4fe1bc04110b582e8c17ee823596ac0a32d",
+  "createdAt": "2026-07-16T18:43:59.825Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0016 --actor codex-lane-0016 --status done --historical-delivery b6fbaa27d39e44cec3ca23e16213d625e12c4093",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716183335-codex-lane-0016-TASK-LANE-0016-57201de27b",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0016.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T18:43:59.815Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0016.*",
+        ".atm/history/task-events/TASK-LANE-0016/**",
+        ".atm/history/tasks/TASK-LANE-0016.json",
+        "packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/next/__tests__/fresh-task-reservation.spec.ts",
+        "packages/cli/src/commands/next/claim-orchestration.ts",
+        "packages/cli/src/commands/next/playbook-projection/active-work-summary.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
