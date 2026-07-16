@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-009",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Open",
+  "area": "Taskflow / Scope",
+  "finding": "TASK-RFT-0062 declared scripts/validate-prompt-scoped-next/**/*.ts in scope, but taskflow pre-close initially excluded the newly created module files from the governed close bundle until tasks scope add listed each file explicitly.",
+  "expectedBehavior": "Taskflow close and pre-close should expand in-scope glob patterns against newly created files, or surface a direct scope-amendment command before excluding those files from the governed bundle.",
+  "evidenceOrRepro": "During TASK-RFT-0062, taskflow pre-close reported excludedDirtyFiles for scripts/validate-prompt-scoped-next/*.ts even though the task card scope included scripts/validate-prompt-scoped-next/**/*.ts. Running tasks scope add for the nine module files resolved the close bundle.",
+  "followUp": "Add a taskflow scope glob expansion test covering newly created files under declared glob scope, then either include those files automatically in governed bundles or emit a precise pre-close remediation command."
+}
