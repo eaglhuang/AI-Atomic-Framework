@@ -1,0 +1,567 @@
+{
+  "taskId": "TASK-RFT-0094",
+  "updatedAt": "2026-07-16T15:13:10.310Z",
+  "evidence": [
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types scripts/validate-hook-atomic-map.ts --mode validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:10:21.405Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:hook-atomic-map"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types scripts/validate-hook-atomic-map.ts --mode validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:b33c4e1e82ec6d01f43a3a90f5f547a26e06ebeb59e6420f982a93ddb56e5338",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:hook-atomic-map"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "24bb139c92573beb390f042f30140d74164785a6",
+            "cacheKey": "sha256:8fc4fef4314e5e9f9fec27ca8c3379c4e63124d0c64a0f5e8a2ac50323d3d568",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:10:21.617Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:afbdcf2b2f79e16f550ced1cf006151b31aa51c49a5a8ad11d808b816f4bd06c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:10:35.029Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:3d53239be5a095503bf408eff51ff31a6e2b86fc945b999da75cffb3875067e0",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "24bb139c92573beb390f042f30140d74164785a6",
+            "cacheKey": "sha256:5b62a0f07958a8ea4c5bca99e90e5405cacd26ff83dffc2d045eb04a67046eb7",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:10:35.303Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:c5a63cdfd2cd99a5d47c3ea773ecc4d4029b676d2eb7b93cee6a4a10aa7143df",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:10:47.071Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:262e0fccd5656c611a26f93317cec04da1a20e28c0bc2d8fdd3cb123de0b1a45",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "0d85609ec603968fb354d49053818872bf0e4466",
+            "cacheKey": "sha256:86bacc2cee223af236df8be20a387114783274b36bd9bb9a0748acfc282eb0ff",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:10:47.306Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a6d2068a6f2d03f137f808e08d7abaebf75ba059603a41ed456c9ca85cb43e0f",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run typecheck",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:10:48.175Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "typecheck"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run typecheck",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "typecheck"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "0d85609ec603968fb354d49053818872bf0e4466",
+            "cacheKey": "sha256:22f277b7569d8ff1f539a0635469b5a7c442573e37025ed029231bda80a11d04",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:10:48.399Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a49635cbda05df3a2f4b9d1173174862690c19fee5e324e276c64f91d2af782e",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:cli",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:10:55.789Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:cli"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:cli",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:82e024706ad164b04dbe2c4649c0c5df17ff42f311fe0fc05fcecd5d95a1f784",
+            "stderrSha256": "sha256:6b7d39f08df47e65b4f91660e1b983e686980b62f3b3fe931f899659697b9e5e",
+            "validators": [
+              "validate:cli"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+            "cacheKey": "sha256:9f873677bfae3f450a7f31e40b35b0e22da723974c491f98cadf638f00b75061",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:10:56.037Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:a2702647bad0d22c71863eb902bfb16d0ace205d4d3a8f15c4445683b42ad6bb",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include pipelines/**/*.py --goal \" Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:12:09.748Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": false
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal \" Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules",
+            "exitCode": 1,
+            "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderrSha256": "sha256:a2c040ca05dc5891acb2547da5e7354f7d092a728ecf17721c532176cacd7e1f",
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+            "cacheKey": "sha256:eebf9e96f416e4b726e94b1c9f751fc1e02b2c6ea1969725dc3aa2dd0d794275",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:12:09.981Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:0a930c9e2c7741e8d16b4f7992ec6cb4e756313df13da1b69a00a5abed18d931",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:12:11.170Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e0fa25a6cbb7ba002687d30d6f11687407db3c9a2a2e0cf5c264d0dd758280ce",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+            "cacheKey": "sha256:1b28c621456d42794b67ca6835bb038dba64559f387d118fdeccab5c94f91a1a",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:12:11.416Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:459b7c79a455fe4a1a13c6fcbcbfcc2a527b3423776c28a5882c75dec8293eff",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:12:57.522Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+            "cacheKey": "sha256:d89e5dc2ec64c0a14253cacb430dee9f76bccb1e240bf0b199115368869124ca",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:12:57.670Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:9e4781b898d71ff78bf1aef3f62f431186da93de80d297d9119d8afe47b3a856",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0094",
+      "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+      "createdAt": "2026-07-16T15:13:10.310Z",
+      "details": {
+        "actorId": "codex-task-rft-0094",
+        "sessionId": "session-20260716150540-codex-task-rft-0094-TASK-RFT-0094-bea9e2841d",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-hook-commit-range-guard",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:d9fd3a807b7f35745f6a476dd843a9546e03106881621ca2dfbe34ad6953422e",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+            "cacheKey": "sha256:8e3856f2b37862eb56bf73b7930ceb50efe599982256aabede9087a98e63fa1c",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:13:10.463Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:21d0054395b005fa7197f7a3353896dd4c13e290e7c85205f5cd8cf776ecba7c",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0094",
+  "updatedAt": "2026-07-16T15:13:10.310Z",
+  "updatedBy": "codex-task-rft-0094",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+    "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:hook-atomic-map"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-hook-atomic-map.ts --mode validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b33c4e1e82ec6d01f43a3a90f5f547a26e06ebeb59e6420f982a93ddb56e5338",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:hook-atomic-map"
+      ],
+      "generatedAt": "2026-07-16T15:10:21.617Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "24bb139c92573beb390f042f30140d74164785a6",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3d53239be5a095503bf408eff51ff31a6e2b86fc945b999da75cffb3875067e0",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T15:10:35.303Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "24bb139c92573beb390f042f30140d74164785a6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:262e0fccd5656c611a26f93317cec04da1a20e28c0bc2d8fdd3cb123de0b1a45",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/hook/__tests__/commit-range-guard.spec.ts"
+      ],
+      "generatedAt": "2026-07-16T15:10:47.306Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d85609ec603968fb354d49053818872bf0e4466",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T15:10:48.399Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0d85609ec603968fb354d49053818872bf0e4466",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:82e024706ad164b04dbe2c4649c0c5df17ff42f311fe0fc05fcecd5d95a1f784",
+      "stderrSha256": "sha256:6b7d39f08df47e65b4f91660e1b983e686980b62f3b3fe931f899659697b9e5e",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T15:10:56.037Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e0fa25a6cbb7ba002687d30d6f11687407db3c9a2a2e0cf5c264d0dd758280ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-hook-commit-range-guard --to 0.1.1 --legacy-target packages/cli/src/commands/hook/commit-range-guard.ts#createCommitRangeGuardReport --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json"
+      ],
+      "generatedAt": "2026-07-16T15:12:11.416Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T15:12:57.670Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d9fd3a807b7f35745f6a476dd843a9546e03106881621ca2dfbe34ad6953422e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/hook/commit-range-guard.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve behavior and ATM evidence.\" --json"
+      ],
+      "generatedAt": "2026-07-16T15:13:10.463Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "6137d7d52b974e921fa1699d9ee1546afcdf94b6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

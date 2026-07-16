@@ -15,6 +15,13 @@ const phaseModules = [
   'packages/cli/src/commands/hook/git-index-diagnostics.ts'
 ] as const;
 
+const commitRangeGuardModules = [
+  'packages/cli/src/commands/hook/commit-range-guard/args.ts',
+  'packages/cli/src/commands/hook/commit-range-guard/baseline.ts',
+  'packages/cli/src/commands/hook/commit-range-guard/implementation.ts',
+  'packages/cli/src/commands/hook/commit-range-guard/support.ts'
+] as const;
+
 const phaseSpecs = [
   'packages/cli/src/commands/hook/__tests__/pre-commit.spec.ts',
   'packages/cli/src/commands/hook/__tests__/pre-push.spec.ts',
@@ -55,6 +62,17 @@ for (const phaseModule of phaseModules) {
   }
   if (!report.includes(phaseModule)) {
     fail(`report must reference phase owner: ${phaseModule}`);
+  }
+}
+
+for (const modulePath of commitRangeGuardModules) {
+  const absolute = path.join(root, modulePath);
+  if (!existsSync(absolute)) {
+    fail(`missing commit-range guard module: ${modulePath}`);
+  }
+  const lineCount = readFileSync(absolute, 'utf8').split('\n').length;
+  if (lineCount >= hookFacadeLineCap) {
+    fail(`${modulePath} has ${lineCount} lines; module must stay below ${hookFacadeLineCap}`);
   }
 }
 
