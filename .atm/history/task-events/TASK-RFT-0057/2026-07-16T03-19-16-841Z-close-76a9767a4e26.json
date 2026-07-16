@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T03-19-16-841Z-close-76a9767a4e26",
+  "taskId": "TASK-RFT-0057",
+  "action": "close",
+  "actorId": "codex-task-rft-0057",
+  "sessionId": "session-20260716031441-codex-task-rft-0057-TASK-RFT-0057-cdbd23be87",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0057.json",
+  "taskSha256": "sha256:2e1ba2d9edb4d839b2e3b2da907fa48dc3bcbb6f3ac96ee766c05eae93960906",
+  "createdAt": "2026-07-16T03:19:16.841Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0057 --actor codex-task-rft-0057 --status done --historical-delivery 715cad04aa716563e1800c14970338dee856931c",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716031441-codex-task-rft-0057-TASK-RFT-0057-cdbd23be87",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0057.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/batch-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T03:19:16.830Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0057.*",
+        ".atm/history/task-events/TASK-RFT-0057/**",
+        ".atm/history/tasks/TASK-RFT-0057.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch/**/*.ts",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "tests/cli/batch-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/batch.ts",
+        "packages/cli/src/commands/batch/**/*.ts",
+        "packages/cli/src/commands/batch/implementation.ts",
+        "tests/cli/batch-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
