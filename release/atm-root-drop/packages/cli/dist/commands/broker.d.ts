@@ -1,1 +1,1 @@
-export declare function runBroker(argv: string[]): Promise<import("./shared.ts").CommandResult>;
+export { runBroker } from './broker/implementation.ts';

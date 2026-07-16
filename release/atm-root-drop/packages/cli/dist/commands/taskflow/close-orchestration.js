@@ -10,13 +10,7 @@ import { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDec
 import { resolveStoredPlanningPath } from '../planning-repo-root.js';
 import { assertPlanningSourceSealValid } from '../tasks/import-task.js';
 function buildTasksCloseCommand(input) {
-    const parts = [
-        'node atm.mjs tasks close',
-        `--task ${input.taskId}`,
-        `--actor ${input.actorId}`,
-        '--status done',
-        '--json'
-    ];
+    const parts = ['node atm.mjs tasks close', `--task ${input.taskId}`, `--actor ${input.actorId}`, '--status done', '--json'];
     for (const ref of input.historicalDeliveryRefs ?? []) {
         parts.push(`--historical-delivery ${ref}`);
     }
@@ -35,12 +29,7 @@ function buildTasksCloseCommand(input) {
     return parts.join(' ');
 }
 function buildTasksReconcileCommand(input) {
-    const parts = [
-        'node atm.mjs tasks reconcile',
-        `--task ${input.taskId}`,
-        `--actor ${input.actorId}`,
-        '--json'
-    ];
+    const parts = ['node atm.mjs tasks reconcile', `--task ${input.taskId}`, `--actor ${input.actorId}`, '--json'];
     if (input.deliveryCommit) {
         parts.push(`--delivery-commit ${input.deliveryCommit}`);
     }
@@ -59,48 +48,24 @@ function buildTasksImportCommand(fromPath, force = false) {
     }
     return parts.join(' ');
 }
-function buildTasksRepairClosureCommand(taskId, actorId) {
-    const parts = ['node atm.mjs tasks repair-closure', `--task ${taskId}`, '--json'];
-    if (actorId) {
-        parts.push(`--actor ${actorId}`);
-    }
-    return parts.join(' ');
-}
-function buildTasksStatusCommand(taskId) {
-    return `node atm.mjs tasks status --task ${taskId} --json`;
-}
-function buildRosterClosebackCommand(input) {
-    return `node atm.mjs tasks roster update --index ${input.indexPath} --from ${input.fromPath} --json`;
-}
+function buildTasksRepairClosureCommand(taskId, actorId) { const parts = ['node atm.mjs tasks repair-closure', `--task ${taskId}`, '--json']; if (actorId) {
+    parts.push(`--actor ${actorId}`);
+} return parts.join(' '); }
+function buildTasksStatusCommand(taskId) { return `node atm.mjs tasks status --task ${taskId} --json`; }
+function buildRosterClosebackCommand(input) { return `node atm.mjs tasks roster update --index ${input.indexPath} --from ${input.fromPath} --json`; }
 export function buildClosebackPlan(input) {
-    const closeMode = resolveTaskflowCloseMode({
-        bucket: input.diagnosis.bucket,
-        liveStatus: input.diagnosis.triangulation.liveLedger.status,
-        planningStatus: input.diagnosis.triangulation.planningFrontmatter.status,
-        historicalDeliveryRefs: input.historicalDeliveryRefs,
-        planningAuthorityDeliveryOk: input.planningAuthorityDeliveryGate?.ok === true,
-        divergenceCount: input.diagnosis.triangulation.divergence.length
-    });
-    const backendSurface = input.planningAuthorityDeliveryGate?.ok === true
-        ? 'tasks-close'
+    const closeMode = resolveTaskflowCloseMode({ bucket: input.diagnosis.bucket, liveStatus: input.diagnosis.triangulation.liveLedger.status,
+        planningStatus: input.diagnosis.triangulation.planningFrontmatter.status, historicalDeliveryRefs: input.historicalDeliveryRefs, planningAuthorityDeliveryOk: input.planningAuthorityDeliveryGate?.ok === true, divergenceCount: input.diagnosis.triangulation.divergence.length });
+    const backendSurface = input.planningAuthorityDeliveryGate?.ok === true ? 'tasks-close'
         : resolveTaskflowCloseBackend(input.diagnosis.bucket, closeMode);
     const planningMirrorPath = input.diagnosis.triangulation.planningFrontmatter.source;
     const rosterIndexPath = input.delegationContract.policy.rosterSync.indexPath;
-    const rosterClosebackCommand = rosterIndexPath && planningMirrorPath
-        ? buildRosterClosebackCommand({ indexPath: rosterIndexPath, fromPath: planningMirrorPath })
-        : null;
+    const rosterClosebackCommand = rosterIndexPath && planningMirrorPath ? buildRosterClosebackCommand({ indexPath: rosterIndexPath, fromPath: planningMirrorPath }) : null;
     let backendCommand = buildTasksStatusCommand(input.taskId);
     const followUpSteps = ['diagnose-residue-via-finalize'];
     if (backendSurface === 'tasks-close') {
-        backendCommand = buildTasksCloseCommand({
-            taskId: input.taskId,
-            actorId: input.actorId,
-            historicalDeliveryRefs: input.historicalDeliveryRefs,
-            historicalBatchRef: input.historicalBatchRef ?? null,
-            historicalDeliveryRepo: input.planningAuthorityDeliveryGate?.repoRoot ?? null,
-            waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
-            waiverReason: input.waiverReason ?? null
-        });
+        backendCommand = buildTasksCloseCommand({ taskId: input.taskId, actorId: input.actorId, historicalDeliveryRefs: input.historicalDeliveryRefs, historicalBatchRef: input.historicalBatchRef ?? null,
+            historicalDeliveryRepo: input.planningAuthorityDeliveryGate?.repoRoot ?? null, waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true, waiverReason: input.waiverReason ?? null });
         followUpSteps.push('close-live-ledger');
         if (planningMirrorPath) {
             followUpSteps.push('planning-mirror-closeback');
@@ -108,18 +73,13 @@ export function buildClosebackPlan(input) {
     }
     else if (backendSurface === 'tasks-reconcile') {
         backendCommand = buildTasksReconcileCommand({
-            taskId: input.taskId,
-            actorId: input.actorId,
-            deliveryCommit: input.historicalDeliveryRefs[0] ?? null,
-            waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
-            waiverReason: input.waiverReason ?? null
+            taskId: input.taskId, actorId: input.actorId, deliveryCommit: input.historicalDeliveryRefs[0] ?? null, waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true, waiverReason: input.waiverReason ?? null
         });
         followUpSteps.push('reconcile-historical-delivery');
     }
     else if (backendSurface === 'tasks-import') {
         backendCommand = planningMirrorPath
-            ? buildTasksImportCommand(planningMirrorPath, input.diagnosis.bucket === 'stale-import')
-            : input.diagnosis.nextCommand;
+            ? buildTasksImportCommand(planningMirrorPath, input.diagnosis.bucket === 'stale-import') : input.diagnosis.nextCommand;
         followUpSteps.push('refresh-planning-mirror');
     }
     else if (backendSurface === 'tasks-repair-closure') {
@@ -140,49 +100,12 @@ export function buildClosebackPlan(input) {
     if (closeMode === 'historical-delivery-close' || closeMode === 'normal-close') {
         evidenceValidators.push(taskflowCloseGovernanceEvidenceValidator);
     }
-    return {
-        closeMode,
-        backendSurface,
-        backendCommand,
-        followUpSteps,
-        writerBoundary: {
-            adopterAware: true,
-            planningMirrorPath,
-            writerSurface: 'planning-mirror-adopter-flow',
-            generationSurface: 'tasks-new',
-            rosterSyncPolicy: input.delegationContract.policy.rosterSyncPolicy,
-            rosterIndexPath,
-            rosterClosebackCommand,
-            closebackNote: 'Planning-mirror closeback reuses tasks import and tasks roster update inside the same adopter-aware flow; ATM does not add a second closeback writer.'
-        },
-        historicalDeliveryGate: {
-            required: historicalDeliveryRequired && input.historicalDeliveryRefs.length === 0 && backendSurface === 'tasks-close',
-            refs: input.historicalDeliveryRefs,
-            validatorSurfaces: [
-                'atm.frameworkDeliveryWindow.v1',
-                'tasks close scoped-diff isolation'
-            ]
-        },
-        planningAuthorityDeliveryGate: input.planningAuthorityDeliveryGate ?? {
-            required: false,
-            ok: false,
-            repoRoot: null,
-            matchedFiles: [],
-            reason: null
-        },
-        waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true,
-        waiverReason: input.waiverReason ?? null,
-        evidenceValidators,
-        residue: {
-            bucket: input.diagnosis.bucket,
-            truth: input.diagnosis.truth,
-            residue: input.diagnosis.residue,
-            reason: input.diagnosis.reason,
-            nextCommand: input.diagnosis.nextCommand
-        },
-        amendmentHistory: [...(input.diagnosis.triangulation.amendmentHistory ?? [])],
-        closebackPathResolution: input.closebackPathResolution
-    };
+    return { closeMode, backendSurface, backendCommand, followUpSteps, writerBoundary: { adopterAware: true,
+            planningMirrorPath, writerSurface: 'planning-mirror-adopter-flow', generationSurface: 'tasks-new', rosterSyncPolicy: input.delegationContract.policy.rosterSyncPolicy, rosterIndexPath, rosterClosebackCommand, closebackNote: 'Planning-mirror closeback reuses tasks import and tasks roster update inside the same adopter-aware flow; ATM does not add a second closeback writer.' }, historicalDeliveryGate: {
+            required: historicalDeliveryRequired && input.historicalDeliveryRefs.length === 0 && backendSurface === 'tasks-close', refs: input.historicalDeliveryRefs, validatorSurfaces: ['atm.frameworkDeliveryWindow.v1', 'tasks close scoped-diff isolation']
+        }, planningAuthorityDeliveryGate: input.planningAuthorityDeliveryGate ?? { required: false, ok: false, repoRoot: null, matchedFiles: [], reason: null },
+        waiverOutOfScopeDelivery: input.waiverOutOfScopeDelivery === true, waiverReason: input.waiverReason ?? null, evidenceValidators, residue: { bucket: input.diagnosis.bucket, truth: input.diagnosis.truth, residue: input.diagnosis.residue, reason: input.diagnosis.reason, nextCommand: input.diagnosis.nextCommand }, amendmentHistory: [...(input.diagnosis.triangulation.amendmentHistory ?? [])],
+        closebackPathResolution: input.closebackPathResolution };
 }
 export function buildTaskflowCloseDiagnostics(input) {
     const codes = [];
@@ -247,65 +170,26 @@ export function buildCloseBackendArgv(input) {
     }
     return argv;
 }
-function readTaskDocumentSourcePlanPath(taskDocument) {
-    const source = taskDocument.source;
-    if (!source || typeof source !== 'object' || Array.isArray(source))
-        return null;
-    const planPath = source.planPath;
-    return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null;
-}
-function extractTaskStringList(taskDocument, key) {
-    const value = taskDocument[key];
-    return Array.isArray(value)
-        ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean)
-        : [];
-}
+function readTaskDocumentSourcePlanPath(taskDocument) { const source = taskDocument.source; if (!source || typeof source !== 'object' || Array.isArray(source))
+    return null; const planPath = source.planPath; return typeof planPath === 'string' && planPath.trim() ? planPath.trim() : null; }
+function extractTaskStringList(taskDocument, key) { const value = taskDocument[key]; return Array.isArray(value) ? value.map((entry) => typeof entry === 'string' ? entry.trim() : '').filter(Boolean) : []; }
 function readTaskDirectionPlanningCandidates(taskDocument) {
-    const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock)
-        ? taskDocument.taskDirectionLock
-        : {};
-    return [
-        ...extractTaskStringList(taskDirectionLock, 'planningReadOnlyPaths'),
-        ...extractTaskStringList(taskDirectionLock, 'planningMirrorPaths'),
-        ...extractTaskStringList(taskDocument, 'planningReadOnlyPaths'),
-        ...extractTaskStringList(taskDocument, 'planningMirrorPaths')
-    ];
+    const taskDirectionLock = taskDocument.taskDirectionLock && typeof taskDocument.taskDirectionLock === 'object' && !Array.isArray(taskDocument.taskDirectionLock) ? taskDocument.taskDirectionLock : {};
+    return [...extractTaskStringList(taskDirectionLock, 'planningReadOnlyPaths'), ...extractTaskStringList(taskDirectionLock, 'planningMirrorPaths'),
+        ...extractTaskStringList(taskDocument, 'planningReadOnlyPaths'), ...extractTaskStringList(taskDocument, 'planningMirrorPaths')];
 }
-function readTaskDocumentRelatedPlanPath(taskDocument) {
-    const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan;
-    return typeof relatedPlan === 'string' && relatedPlan.trim() ? relatedPlan.trim() : null;
-}
-function tryResolvePlanningCandidate(candidatePath, normalizedTaskId, cwd) {
-    const absolutePath = resolveStoredPlanningPath(cwd, candidatePath).absolutePath;
-    if (!existsSync(absolutePath))
-        return null;
-    const metadata = readPlanningCardMetadata(absolutePath);
-    if (metadata.taskId && metadata.taskId !== normalizedTaskId)
-        return null;
-    return {
-        absolutePath,
-        metadata
-    };
-}
-function slugifyPlanningTitle(title) {
-    const slug = title
-        .trim()
-        .toLowerCase()
-        .replace(/['"]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-    return slug || 'task';
-}
+function readTaskDocumentRelatedPlanPath(taskDocument) { const relatedPlan = taskDocument.related_plan ?? taskDocument.relatedPlan; return typeof relatedPlan === 'string' && relatedPlan.trim() ? relatedPlan.trim() : null; }
+function tryResolvePlanningCandidate(candidatePath, normalizedTaskId, cwd) { const absolutePath = resolveStoredPlanningPath(cwd, candidatePath).absolutePath; if (!existsSync(absolutePath))
+    return null; const metadata = readPlanningCardMetadata(absolutePath); if (metadata.taskId && metadata.taskId !== normalizedTaskId)
+    return null; return { absolutePath, metadata }; }
+function slugifyPlanningTitle(title) { const slug = title.trim().toLowerCase().replace(/['"]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); return slug || 'task'; }
 function resolveCanonicalPlanningRelativePath(taskId, title, policy) {
     const pattern = policy.resolveCanonicalOutputPath.pattern;
     if (!pattern || !pattern.includes('${taskId}')) {
         return null;
     }
     const slug = slugifyPlanningTitle(title ?? taskId);
-    return pattern
-        .split('${taskId}').join(taskId)
-        .split('${slug}').join(slug)
-        .replace(/\\/g, '/');
+    return pattern.split('${taskId}').join(taskId).split('${slug}').join(slug).replace(/\\/g, '/');
 }
 function readPlanningCardMetadata(absolutePath) {
     if (!existsSync(absolutePath)) {
@@ -315,25 +199,13 @@ function readPlanningCardMetadata(absolutePath) {
     if (!frontMatter) {
         return { taskId: null, status: null };
     }
-    const rawTaskId = typeof frontMatter.data.task_id === 'string'
-        ? frontMatter.data.task_id
-        : typeof frontMatter.data.id === 'string'
-            ? frontMatter.data.id
-            : null;
-    return {
-        taskId: rawTaskId ? normalizeTaskId(rawTaskId) : null,
-        status: typeof frontMatter.data.status === 'string' ? frontMatter.data.status : null
-    };
+    const rawTaskId = typeof frontMatter.data.task_id === 'string' ? frontMatter.data.task_id : typeof frontMatter.data.id === 'string' ? frontMatter.data.id : null;
+    return { taskId: rawTaskId ? normalizeTaskId(rawTaskId) : null,
+        status: typeof frontMatter.data.status === 'string' ? frontMatter.data.status : null };
 }
-function normalizeComparablePath(filePath) {
-    return path.resolve(filePath).replace(/\\/g, '/');
-}
+function normalizeComparablePath(filePath) { return path.resolve(filePath).replace(/\\/g, '/'); }
 export function resolveClosebackPlanningPath(input) {
-    const planningSourceSealValidation = assertPlanningSourceSealValid({
-        cwd: input.cwd,
-        taskDocument: input.taskDocument,
-        surface: 'close'
-    });
+    const planningSourceSealValidation = assertPlanningSourceSealValid({ cwd: input.cwd, taskDocument: input.taskDocument, surface: 'close' });
     const normalizedTaskId = normalizeTaskId(input.taskId);
     const title = typeof input.taskDocument.title === 'string' ? input.taskDocument.title : null;
     const profileFallbackAvailable = Boolean(input.profile && input.profileRepoRoot);
@@ -347,127 +219,55 @@ export function resolveClosebackPlanningPath(input) {
         else {
             const metadata = readPlanningCardMetadata(absolutePath);
             if (metadata.taskId && metadata.taskId !== normalizedTaskId) {
-                return {
-                    route: 'missing',
-                    planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
-                    profileRepoRoot: null,
-                    planningStatus: metadata.status,
-                    diagnostics: {
-                        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
-                        messages: [`Planning card task id ${metadata.taskId} does not match runtime task ${normalizedTaskId}.`]
-                    }
-                };
+                return { route: 'missing', planningMirrorPath: directPlanPath.replace(/\\/g, '/'), profileRepoRoot: null, planningStatus: metadata.status, diagnostics: {
+                        codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'], messages: [`Planning card task id ${metadata.taskId} does not match runtime task ${normalizedTaskId}.`]
+                    } };
             }
-            return {
-                route: 'source-plan-path',
-                planningMirrorPath: directPlanPath.replace(/\\/g, '/'),
-                profileRepoRoot: null,
-                planningStatus: metadata.status,
-                diagnostics: {
-                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT', ...planningSourceSealValidation.diagnostics.codes],
-                    messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`, ...planningSourceSealValidation.diagnostics.messages]
-                }
-            };
+            return { route: 'source-plan-path', planningMirrorPath: directPlanPath.replace(/\\/g, '/'), profileRepoRoot: null, planningStatus: metadata.status, diagnostics: {
+                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_DIRECT', ...planningSourceSealValidation.diagnostics.codes], messages: [`Closeback planning path resolved from source.planPath: ${directPlanPath}.`, ...planningSourceSealValidation.diagnostics.messages]
+                } };
         }
     }
     for (const candidatePath of readTaskDirectionPlanningCandidates(input.taskDocument)) {
         const resolved = tryResolvePlanningCandidate(candidatePath, normalizedTaskId, input.cwd);
         if (!resolved)
             continue;
-        return {
-            route: 'task-direction-fallback',
-            planningMirrorPath: resolved.absolutePath.replace(/\\/g, '/'),
-            profileRepoRoot: null,
-            planningStatus: resolved.metadata.status,
-            diagnostics: {
-                codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_DIRECTION_FALLBACK'],
-                messages: [`Recovered planning path from task-direction runtime context: ${candidatePath}.`]
-            }
-        };
+        return { route: 'task-direction-fallback', planningMirrorPath: resolved.absolutePath.replace(/\\/g, '/'), profileRepoRoot: null, planningStatus: resolved.metadata.status, diagnostics: { codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_DIRECTION_FALLBACK'],
+                messages: [`Recovered planning path from task-direction runtime context: ${candidatePath}.`] } };
     }
     if (!profileFallbackAvailable) {
-        return {
-            route: 'missing',
-            planningMirrorPath: null,
-            profileRepoRoot: null,
-            planningStatus: null,
-            diagnostics: {
-                codes: [directPlanPathMissingMessage ? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING' : 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE'],
-                messages: [directPlanPathMissingMessage ?? 'source.planPath is absent and no taskflow profile was supplied for governed fallback recovery.']
-            }
-        };
+        return { route: 'missing', planningMirrorPath: null, profileRepoRoot: null, planningStatus: null, diagnostics: { codes: [directPlanPathMissingMessage ? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING' : 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_UNAVAILABLE'],
+                messages: [directPlanPathMissingMessage ?? 'source.planPath is absent and no taskflow profile was supplied for governed fallback recovery.'] } };
     }
     const profileRepoRoot = input.profileRepoRoot;
     const relativeOutput = resolveCanonicalPlanningRelativePath(normalizedTaskId, title, input.delegationContract.policy);
     if (!relativeOutput) {
-        return {
-            route: 'missing',
-            planningMirrorPath: null,
-            profileRepoRoot,
-            planningStatus: null,
-            diagnostics: {
-                codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_POLICY_MISSING'],
-                messages: ['Profile canonical output-path policy cannot deterministically resolve a planning card path for closeback.']
-            }
-        };
+        return { route: 'missing', planningMirrorPath: null, profileRepoRoot,
+            planningStatus: null, diagnostics: { codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_POLICY_MISSING'], messages: ['Profile canonical output-path policy cannot deterministically resolve a planning card path for closeback.'] } };
     }
     const profileAbsolutePath = path.resolve(profileRepoRoot, relativeOutput);
     const relatedPlanPath = readTaskDocumentRelatedPlanPath(input.taskDocument);
     if (relatedPlanPath) {
-        const relatedAbsolutePath = path.isAbsolute(relatedPlanPath)
-            ? path.resolve(relatedPlanPath)
-            : path.resolve(input.cwd, relatedPlanPath);
-        if (existsSync(relatedAbsolutePath)
-            && normalizeComparablePath(relatedAbsolutePath) !== normalizeComparablePath(profileAbsolutePath)) {
-            return {
-                route: 'ambiguous',
-                planningMirrorPath: null,
-                profileRepoRoot,
-                planningStatus: null,
-                diagnostics: {
-                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS'],
-                    messages: [
-                        `Profile canonical path ${relativeOutput} conflicts with related_plan ${relatedPlanPath}; closeback requires one deterministic planning path.`
-                    ]
-                }
-            };
+        const relatedAbsolutePath = path.isAbsolute(relatedPlanPath) ? path.resolve(relatedPlanPath) : path.resolve(input.cwd, relatedPlanPath);
+        if (existsSync(relatedAbsolutePath) && normalizeComparablePath(relatedAbsolutePath) !== normalizeComparablePath(profileAbsolutePath)) {
+            return { route: 'ambiguous', planningMirrorPath: null, profileRepoRoot, planningStatus: null, diagnostics: {
+                    codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_AMBIGUOUS'], messages: [`Profile canonical path ${relativeOutput} conflicts with related_plan ${relatedPlanPath}; closeback requires one deterministic planning path.`]
+                } };
         }
     }
     if (!existsSync(profileAbsolutePath)) {
-        return {
-            route: 'missing',
-            planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
-            profileRepoRoot,
-            planningStatus: null,
-            diagnostics: {
-                codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'],
-                messages: [`Recovered profile-root planning path does not exist: ${relativeOutput}.`]
-            }
-        };
+        return { route: 'missing', planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'), profileRepoRoot, planningStatus: null, diagnostics: {
+                codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING'], messages: [`Recovered profile-root planning path does not exist: ${relativeOutput}.`]
+            } };
     }
     const metadata = readPlanningCardMetadata(profileAbsolutePath);
     if (!metadata.taskId || metadata.taskId !== normalizedTaskId) {
-        return {
-            route: 'missing',
-            planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
-            profileRepoRoot,
-            planningStatus: metadata.status,
-            diagnostics: {
-                codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'],
-                messages: [`Recovered planning card task id ${metadata.taskId ?? '<missing>'} does not match runtime task ${normalizedTaskId}.`]
-            }
-        };
+        return { route: 'missing', planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'), profileRepoRoot, planningStatus: metadata.status,
+            diagnostics: { codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_TASK_MISMATCH'], messages: [`Recovered planning card task id ${metadata.taskId ?? '<missing>'} does not match runtime task ${normalizedTaskId}.`] } };
     }
-    return {
-        route: 'profile-root-fallback',
-        planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'),
-        profileRepoRoot,
-        planningStatus: metadata.status,
-        diagnostics: {
-            codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_PROFILE_FALLBACK'],
-            messages: [`Recovered planning path ${relativeOutput} from profile canonical output policy.`]
-        }
-    };
+    return { route: 'profile-root-fallback', planningMirrorPath: profileAbsolutePath.replace(/\\/g, '/'), profileRepoRoot, planningStatus: metadata.status, diagnostics: {
+            codes: ['ATM_TASKFLOW_CLOSE_PLANNING_PATH_PROFILE_FALLBACK'], messages: [`Recovered planning path ${relativeOutput} from profile canonical output policy.`]
+        } };
 }
 export function assertClosebackPlanningPathReady(resolution, input) {
     if (!input.requirePlanningPath) {
@@ -477,9 +277,7 @@ export function assertClosebackPlanningPathReady(resolution, input) {
         return;
     }
     const code = resolution.diagnostics.codes[0] ?? 'ATM_TASKFLOW_CLOSE_PLANNING_PATH_MISSING';
-    throw new CliError(code, resolution.diagnostics.messages.join(' '), {
-        exitCode: 1,
-        details: { closebackPathResolution: resolution, profileSupplied: input.profileSupplied }
+    throw new CliError(code, resolution.diagnostics.messages.join(' '), { exitCode: 1, details: { closebackPathResolution: resolution, profileSupplied: input.profileSupplied }
     });
 }
 export function resolveCloseWriteSupport(input) {
@@ -493,11 +291,7 @@ export function resolveCloseWriteSupport(input) {
         return { requested: true, allowed: false, reason: 'ambiguous residue requires operator review before close write.' };
     }
     if (input.historicalDeliveryGateRequired && !input.historicalDeliverySupplied && input.closeMode === 'normal-close') {
-        return {
-            requested: true,
-            allowed: false,
-            reason: 'framework delivery already landed; supply --historical-delivery before taskflow close --write.'
-        };
+        return { requested: true, allowed: false, reason: 'framework delivery already landed; supply --historical-delivery before taskflow close --write.' };
     }
     return { requested: true, allowed: true, reason: 'closeback prerequisites satisfied' };
 }
@@ -516,35 +310,16 @@ function resolveGitExecutableForRollback() {
 }
 export function buildCloseWriteRollbackSnapshot(input) {
     const evidence = input.backendEvidence ?? {};
-    const stagedArtifacts = uniqueRelativePaths([
-        typeof evidence.taskPath === 'string' ? evidence.taskPath : `.atm/history/tasks/${input.taskId}.json`,
-        typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null,
-        typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null,
-        `.atm/history/evidence/${input.taskId}.json`,
-        ...(input.extraStagedArtifacts ?? [])
-    ]);
-    return {
-        taskPath: `.atm/history/tasks/${input.taskId}.json`,
-        previousTaskContent: input.previousTaskContent,
-        transitionPath: typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null,
-        closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null,
-        closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null,
-        closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
-        planningCard: input.planningCard,
-        stagedArtifacts,
-        preCloseStagedFiles: uniqueRelativePaths(input.preCloseStagedFiles ?? [])
-    };
+    const stagedArtifacts = uniqueRelativePaths([typeof evidence.taskPath === 'string' ? evidence.taskPath : `.atm/history/tasks/${input.taskId}.json`,
+        typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null, typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, `.atm/history/evidence/${input.taskId}.json`, ...(input.extraStagedArtifacts ?? [])]);
+    return { taskPath: `.atm/history/tasks/${input.taskId}.json`, previousTaskContent: input.previousTaskContent,
+        transitionPath: typeof evidence.transitionPath === 'string' ? evidence.transitionPath : null, closurePacketPath: typeof evidence.closurePacketPath === 'string' ? evidence.closurePacketPath : null, closeCommitWindowPath: typeof evidence.closeCommitWindowPath === 'string' ? evidence.closeCommitWindowPath : null, closeWindowStagedIndexLockActive: input.closeWindowStagedIndexLockActive === true,
+        planningCard: input.planningCard, stagedArtifacts, preCloseStagedFiles: uniqueRelativePaths(input.preCloseStagedFiles ?? []) };
 }
-function uniqueRelativePaths(values) {
-    return [...new Set(values.map((entry) => (typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '')).filter(Boolean))];
-}
+function uniqueRelativePaths(values) { return [...new Set(values.map((entry) => (typeof entry === 'string' ? entry.trim().replace(/\\/g, '/') : '')).filter(Boolean))]; }
 function readRollbackStagedFiles(cwd) {
     try {
-        const output = execFileSync(resolveGitExecutableForRollback(), ['diff', '--cached', '--name-only'], {
-            cwd,
-            encoding: 'utf8',
-            stdio: ['ignore', 'pipe', 'pipe']
-        });
+        const output = execFileSync(resolveGitExecutableForRollback(), ['diff', '--cached', '--name-only'], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
         return uniqueRelativePaths(output.split(/\r?\n/));
     }
     catch {
@@ -557,15 +332,10 @@ function restoreRollbackIndexBaseline(input) {
     if (unexpected.length === 0)
         return;
     try {
-        execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...unexpected], {
-            cwd: input.cwd,
-            stdio: ['ignore', 'pipe', 'pipe']
-        });
+        execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...unexpected], { cwd: input.cwd, stdio: ['ignore', 'pipe', 'pipe'] });
         input.rolledBackArtifacts.push(...unexpected.map((entry) => `${entry} (unstaged rollback-baseline)`));
     }
-    catch {
-        // preserve rollback report even if index cleanup fails
-    }
+    catch { }
 }
 export function rollbackCloseWriteTransaction(input) {
     const rolledBackArtifacts = [];
@@ -603,95 +373,34 @@ export function rollbackCloseWriteTransaction(input) {
     const staged = uniqueRelativePaths(input.snapshot.stagedArtifacts).filter((entry) => !preCloseStaged.has(entry));
     if (staged.length > 0) {
         try {
-            execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...staged], {
-                cwd: input.cwd,
-                stdio: ['ignore', 'pipe', 'pipe']
-            });
+            execFileSync(resolveGitExecutableForRollback(), ['restore', '--staged', '--', ...staged], { cwd: input.cwd, stdio: ['ignore', 'pipe', 'pipe'] });
             rolledBackArtifacts.push(...staged.map((entry) => `${entry} (unstaged)`));
         }
-        catch {
-            // preserve rollback report even if index cleanup fails
-        }
+        catch { }
     }
-    restoreRollbackIndexBaseline({
-        cwd: input.cwd,
-        preCloseStagedFiles: input.snapshot.preCloseStagedFiles,
-        rolledBackArtifacts
-    });
+    restoreRollbackIndexBaseline({ cwd: input.cwd, preCloseStagedFiles: input.snapshot.preCloseStagedFiles, rolledBackArtifacts });
     if (input.snapshot.closeWindowStagedIndexLockActive) {
-        const released = releaseCloseWindowStagedIndexLock({
-            cwd: input.cwd,
-            taskId: input.taskId,
-            actorId: input.actorId ?? 'rollback',
-            outcome: 'rolled_back'
-        });
+        const released = releaseCloseWindowStagedIndexLock({ cwd: input.cwd, taskId: input.taskId, actorId: input.actorId ?? 'rollback', outcome: 'rolled_back' });
         if (released) {
             rolledBackArtifacts.push('.atm/runtime/locks/close-window-staged-index.lock.json (released)');
         }
     }
-    return {
-        schemaId: 'atm.closeWriteTransaction.v1',
-        taskId: input.taskId,
-        phase: 'rolled_back',
-        ok: false,
-        failureStep: input.failureStep,
-        failureCode: input.failureCode,
-        failureReason: input.failureReason ?? null,
-        rolledBackArtifacts,
-        recoveryCommand: `node atm.mjs tasks status --task ${input.taskId} --json`,
-        backendCloseApplied: true,
-        commitBundleApplied: false
-    };
+    return { schemaId: 'atm.closeWriteTransaction.v1', taskId: input.taskId, phase: 'rolled_back', ok: false, failureStep: input.failureStep,
+        failureCode: input.failureCode, failureReason: input.failureReason ?? null, rolledBackArtifacts, recoveryCommand: `node atm.mjs tasks status --task ${input.taskId} --json`, backendCloseApplied: true, commitBundleApplied: false };
 }
 export async function executeCloseWriteCommitPhase(input) {
     try {
         const bundle = await input.commit();
         if (bundle.failClosed) {
-            return {
-                bundle,
-                transaction: rollbackCloseWriteTransaction({
-                    cwd: input.cwd,
-                    taskId: input.taskId,
-                    actorId: input.actorId,
-                    snapshot: input.snapshot,
-                    failureStep: 'commit-bundle',
-                    failureCode: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_FAILED',
-                    failureReason: 'Governed target/planning commit bundle did not complete.'
-                })
-            };
+            return { bundle, transaction: rollbackCloseWriteTransaction({ cwd: input.cwd, taskId: input.taskId, actorId: input.actorId, snapshot: input.snapshot, failureStep: 'commit-bundle', failureCode: 'ATM_TASKFLOW_CLOSE_COMMIT_BUNDLE_FAILED',
+                    failureReason: 'Governed target/planning commit bundle did not complete.' }) };
         }
-        return {
-            bundle,
-            transaction: {
-                schemaId: 'atm.closeWriteTransaction.v1',
-                taskId: input.taskId,
-                phase: 'committed',
-                ok: true,
-                failureStep: null,
-                failureCode: null,
-                failureReason: null,
-                rolledBackArtifacts: [],
-                recoveryCommand: null,
-                backendCloseApplied: true,
-                commitBundleApplied: true
-            }
-        };
+        return { bundle, transaction: { schemaId: 'atm.closeWriteTransaction.v1', taskId: input.taskId, phase: 'committed', ok: true, failureStep: null, failureCode: null, failureReason: null, rolledBackArtifacts: [], recoveryCommand: null, backendCloseApplied: true, commitBundleApplied: true } };
     }
     catch (error) {
         const failureCode = error instanceof CliError ? error.code : 'ATM_TASKFLOW_CLOSE_WRITE_FAILED';
         const failureReason = error instanceof Error ? error.message : String(error);
-        return {
-            bundle: { failClosed: true },
-            transaction: rollbackCloseWriteTransaction({
-                cwd: input.cwd,
-                taskId: input.taskId,
-                actorId: input.actorId,
-                snapshot: input.snapshot,
-                failureStep: 'commit-bundle',
-                failureCode,
-                failureReason
-            })
-        };
+        return { bundle: { failClosed: true }, transaction: rollbackCloseWriteTransaction({ cwd: input.cwd, taskId: input.taskId, actorId: input.actorId, snapshot: input.snapshot, failureStep: 'commit-bundle', failureCode, failureReason }) };
     }
 }
 export const TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID = 'atm.taskCloseCompletionChecklist.v1';
@@ -726,103 +435,35 @@ function readCloseTransitionCommand(cwd, taskId, transitionId) {
         return null;
     }
 }
-function closeCommandUsedWaiver(command) {
-    return Boolean(command && /--waiver-out-of-scope-delivery\b/.test(command));
-}
+function closeCommandUsedWaiver(command) { return Boolean(command && /--waiver-out-of-scope-delivery\b/.test(command)); }
 export function buildCloseCompletionChecklist(input) {
     const ledgerStatus = normalizeLifecycleStatus(typeof input.taskDocument.status === 'string' ? input.taskDocument.status : null);
     const planningStatus = normalizeLifecycleStatus(input.triangulation.planningFrontmatter.status);
     const ledgerDone = ledgerStatus === 'done';
-    const closurePacketPath = typeof input.taskDocument.closurePacket === 'string'
-        ? input.taskDocument.closurePacket
-        : null;
+    const closurePacketPath = typeof input.taskDocument.closurePacket === 'string' ? input.taskDocument.closurePacket : null;
     const closurePacket = readClosurePacketRecord(input.cwd, closurePacketPath);
     const targetCommit = typeof closurePacket?.targetCommit === 'string'
-        ? closurePacket.targetCommit
-        : (typeof input.taskDocument.delivery_commit === 'string' ? input.taskDocument.delivery_commit : null);
+        ? closurePacket.targetCommit : (typeof input.taskDocument.delivery_commit === 'string' ? input.taskDocument.delivery_commit : null);
     const closeReason = typeof input.taskDocument.closeReason === 'string' ? input.taskDocument.closeReason.trim() : '';
     const lastTransitionId = typeof input.taskDocument.lastTransitionId === 'string' ? input.taskDocument.lastTransitionId : null;
     const closeCommand = readCloseTransitionCommand(input.cwd, input.taskId, lastTransitionId);
     const waiverRequired = closeCommandUsedWaiver(closeCommand);
-    const closeEventRecorded = input.triangulation.lastTransitionEvent?.action === 'close'
-        && Boolean(lastTransitionId)
-        && existsSync(path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId, `${lastTransitionId}.json`));
+    const closeEventRecorded = input.triangulation.lastTransitionEvent?.action === 'close' && Boolean(lastTransitionId) && existsSync(path.join(input.cwd, '.atm', 'history', 'task-events', input.taskId, `${lastTransitionId}.json`));
     const targetGovernanceCommitted = Boolean(closurePacketPath && existsSync(path.isAbsolute(closurePacketPath) ? closurePacketPath : path.join(input.cwd, closurePacketPath)));
     const planningMirrorCommitted = !ledgerDone || planningStatus === 'done';
-    const fields = [
-        {
-            id: 'ledger-done',
-            ok: ledgerDone,
-            value: ledgerStatus,
-            detail: ledgerDone ? 'Live ledger records done.' : 'Live ledger is not done yet.'
-        },
-        {
-            id: 'target-governance-committed',
-            ok: targetGovernanceCommitted,
-            value: closurePacketPath,
-            detail: targetGovernanceCommitted
-                ? 'Closure packet is present in the target repo.'
-                : 'Closure packet is missing; target governance close may be incomplete.'
-        },
-        {
-            id: 'planning-mirror-committed',
-            ok: planningMirrorCommitted,
-            value: input.triangulation.planningFrontmatter.status,
-            detail: planningMirrorCommitted
-                ? 'Planning mirror agrees with governed close state.'
-                : 'Planning mirror is not done while the live ledger is done.'
-        },
-        {
-            id: 'lifecycle-events-recorded',
-            ok: closeEventRecorded,
-            value: lastTransitionId,
-            detail: closeEventRecorded
-                ? 'Close transition event is recorded under .atm/history/task-events.'
-                : 'No close transition event is recorded for this task.'
-        },
-        {
-            id: 'delivery-sha',
-            ok: Boolean(targetCommit),
-            value: targetCommit,
-            detail: targetCommit
-                ? 'Delivery commit SHA is recorded in closure provenance.'
-                : 'Delivery SHA is missing from closure provenance.'
-        },
-        {
-            id: 'waiver-reason',
-            ok: !waiverRequired || Boolean(closeReason),
-            value: closeReason || null,
-            detail: waiverRequired
-                ? (closeReason ? 'Waiver reason is recorded for out-of-scope delivery.' : 'Waiver was used but no durable reason is recorded.')
-                : 'No out-of-scope delivery waiver was required.'
-        }
-    ];
+    const fields = [{ id: 'ledger-done', ok: ledgerDone, value: ledgerStatus,
+            detail: ledgerDone ? 'Live ledger records done.' : 'Live ledger is not done yet.' }, { id: 'target-governance-committed', ok: targetGovernanceCommitted, value: closurePacketPath, detail: targetGovernanceCommitted ? 'Closure packet is present in the target repo.' : 'Closure packet is missing; target governance close may be incomplete.' }, { id: 'planning-mirror-committed', ok: planningMirrorCommitted,
+            value: input.triangulation.planningFrontmatter.status, detail: planningMirrorCommitted ? 'Planning mirror agrees with governed close state.' : 'Planning mirror is not done while the live ledger is done.' }, { id: 'lifecycle-events-recorded', ok: closeEventRecorded, value: lastTransitionId, detail: closeEventRecorded ? 'Close transition event is recorded under .atm/history/task-events.'
+                : 'No close transition event is recorded for this task.' }, { id: 'delivery-sha', ok: Boolean(targetCommit), value: targetCommit, detail: targetCommit ? 'Delivery commit SHA is recorded in closure provenance.' : 'Delivery SHA is missing from closure provenance.' }, { id: 'waiver-reason', ok: !waiverRequired || Boolean(closeReason), value: closeReason || null, detail: waiverRequired
+                ? (closeReason ? 'Waiver reason is recorded for out-of-scope delivery.' : 'Waiver was used but no durable reason is recorded.') : 'No out-of-scope delivery waiver was required.' }];
     const requiredFields = fields.filter((entry) => entry.id !== 'waiver-reason' || waiverRequired);
     const partialClose = ledgerDone && requiredFields.some((entry) => !entry.ok);
     const summary = partialClose
-        ? 'Task ledger is done, but close completion checklist shows a partial close.'
-        : ledgerDone
-            ? 'Task close completion checklist is satisfied.'
-            : 'Task is not done; close completion checklist is informational only.';
-    return {
-        schemaId: TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID,
-        taskId: input.taskId,
-        partialClose,
-        summary,
-        fields
-    };
+        ? 'Task ledger is done, but close completion checklist shows a partial close.' : ledgerDone ? 'Task close completion checklist is satisfied.' : 'Task is not done; close completion checklist is informational only.';
+    return { schemaId: TASK_CLOSE_COMPLETION_CHECKLIST_SCHEMA_ID, taskId: input.taskId, partialClose, summary, fields };
 }
-// === TASK-MAO-0041 evidence-bundle-manifest (cursor-composer-2.5) START ===
-// 0041 close-orchestration hooks live in this region only.
 export { EVIDENCE_BUNDLE_MANIFEST_SCHEMA_ID, evidenceBundleManifestRelativePath, evidenceBundleManifestPathForTask, readEvidenceBundleManifest };
 export { DIRECTORY_DELIVERABLE_MANIFEST_SCHEMA_ID, expandDirectoryDeliverableDeclarations, isDirectoryStyleDeliverableDeclaration, listFilesUnderDeclaredDirectory };
-export function listOptionalEvidenceBundleGovernanceArtifacts(cwd, taskId) {
-    const relativePath = evidenceBundleManifestRelativePath(taskId);
-    return existsSync(path.join(cwd, relativePath)) ? [relativePath] : [];
-}
-// === TASK-MAO-0041 evidence-bundle-manifest END ===
-// === TASK-MAO-0042 validator-scope-taxonomy (antigravity-gemini-3.5-flash) START ===
-// 0042 close gating taxonomy hooks live in this region only.
+export function listOptionalEvidenceBundleGovernanceArtifacts(cwd, taskId) { const relativePath = evidenceBundleManifestRelativePath(taskId); return existsSync(path.join(cwd, relativePath)) ? [relativePath] : []; }
 export { getValidatorScope } from '../validate.js';
-// === TASK-MAO-0042 validator-scope-taxonomy END ===
 export { buildHistoricalClosePreflight, preflightBlockersToWriteReadinessBlockers } from './historical-close-preflight.js';

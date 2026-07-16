@@ -16,6 +16,111 @@
       "coverage_status": "partial"
     },
     {
+      "path_pattern": "packages/cli/src/commands/next/playbook-projection.ts",
+      "atom_id": "atm.next-playbook-projection-contracts",
+      "capability": "TASK-RFT-0048 facade for next channel playbook projection contracts after extracting bounded contract modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0048"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/playbook-projection/**/*.ts",
+      "atom_id": "atm.next-playbook-projection-contracts",
+      "capability": "TASK-RFT-0048 bounded modules for legacy guidance, task routing, active-work summary, channel playbooks, message assembly, and governance readiness projection.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0048"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next.ts",
+      "atom_id": "atm.next-command-router-map",
+      "capability": "TASK-RFT-0049 bounded next command facade over extracted command routing, claim, prompt guidance, and result projection modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/next/**/*.ts",
+      "atom_id": "atm.next-command-router-map",
+      "capability": "TASK-RFT-0049 next command router modules for claim orchestration, prompt guidance, result compaction, and command facade support.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0049"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team.ts",
+      "atom_id": "atm.team-command-map",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for bounded team command facade.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/command-registry.ts",
+      "atom_id": "atm.team-command-map",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team command registry subcommand atom map.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/plan-command.ts",
+      "atom_id": "atm.team-plan-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team plan command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/start-command.ts",
+      "atom_id": "atm.team-start-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team start command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/status-command.ts",
+      "atom_id": "atm.team-status-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team status command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/execute-command.ts",
+      "atom_id": "atm.team-execute-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team execute command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/admission-command.ts",
+      "atom_id": "atm.team-admission-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team admission and validate command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/cost-command.ts",
+      "atom_id": "atm.team-cost-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team cost command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/report-command.ts",
+      "atom_id": "atm.team-report-command",
+      "capability": "TASK-RFT-0050 explicit atom-map coverage for team report command atom.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team-legacy.ts",
+      "atom_id": "atm.team-legacy-command-facade",
+      "capability": "TASK-RFT-0050 bounded Team legacy command facade over extracted team/legacy command handler atoms.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/team/legacy/**/*.ts",
+      "atom_id": "atm.team-legacy-command-facade",
+      "capability": "TASK-RFT-0050 Team legacy support modules for command runner, planning context, status, patrol, lifecycle, handoff, and utility atoms.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0050"
+    },
+    {
       "path_pattern": "packages/cli/src/atm.ts",
       "atom_id": "atom-cli-router",
       "capability": "CLI entrypoint, argv dispatch",
@@ -64,6 +169,20 @@
       "capability": "Seven-layer CID-gated shared-surface queue admission and owner-first release ordering",
       "coverage_status": "active",
       "source_task": "TASK-TEAM-0076"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker.ts",
+      "atom_id": "atm.broker-command-map",
+      "capability": "TASK-RFT-0051 bounded Broker command facade over extracted command handler modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0051"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/broker/**/*.ts",
+      "atom_id": "atm.broker-command-map",
+      "capability": "TASK-RFT-0051 Broker command map modules for parser, persistence, shared-surface registry handling, steward queues, proposals, runtime activation, and mutation batch planning.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0051"
     },
     {
       "path_pattern": "packages/cli/src/commands/command-specs.ts",
@@ -322,7 +441,15 @@
       "path_pattern": "packages/cli/src/commands/taskflow.ts",
       "atom_id": "atm.task-closure-map",
       "capability": "taskflow close operator orchestration: historical-batch references are resolved into matched historical delivery commits before close mode, planning-authority verification, and governed commit bundle planning, so batch-backed close flows fall back to the normal close lane once the historical delivery gate is satisfied.",
-      "coverage_status": "active"
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0054"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/taskflow/**/*.ts",
+      "atom_id": "atm.task-closure-map",
+      "capability": "taskflow command implementation carrier and support modules for open, pre-close, close, auto-evidence, and closeback orchestration",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0054"
     },
     {
       "path_pattern": "packages/cli/src/commands/taskflow/close-orchestration.ts",
@@ -497,6 +624,20 @@
       "atom_id": "atm.task-direction-map",
       "capability": "isPathAllowedByScope is the quickfix/batch scope path matcher; explicitly NOT the SSOT for task direction allowed files (TASK-AAO-0012).",
       "coverage_status": "active"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/integration-hooks.ts",
+      "atom_id": "atm.cli-integration-hooks-command-map",
+      "capability": "TASK-RFT-0056 bounded integration-hooks command facade over extracted hook invocation, install, verify, and readiness implementation modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0056"
+    },
+    {
+      "path_pattern": "packages/cli/src/commands/integration-hooks/**/*.ts",
+      "atom_id": "atm.cli-integration-hooks-command-map",
+      "capability": "TASK-RFT-0056 integration-hooks extracted command implementation carrier modules.",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0056"
     }
   ]
 }

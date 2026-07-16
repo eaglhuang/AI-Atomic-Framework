@@ -36,7 +36,15 @@
       "path_pattern": "scripts/run-validators.ts",
       "atom_id": "atm.validator-envelope-map",
       "capability": "validator runner with quick/standard/full presets and standardized failure envelope aggregation",
-      "coverage_status": "active"
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0053"
+    },
+    {
+      "path_pattern": "scripts/run-validators/**/*.ts",
+      "atom_id": "atm.validator-envelope-map",
+      "capability": "validator runner facade implementation carrier for CLI parsing, selection, receipts, execution, cache, and summary reporting",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0053"
     },
     {
       "path_pattern": "scripts/src/atomization-register-receipt.js",
@@ -77,15 +85,31 @@
     },
     {
       "path_pattern": "scripts/validate-cli.ts",
-      "atom_id": "atom-cli-command-specs",
-      "capability": "CLI command surface validation and runner/spec/help drift guards",
-      "coverage_status": "partial"
+      "atom_id": "atm.validate-cli-script-map",
+      "capability": "CLI validation facade for command surface, focused regression, and full fixture suites",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0052"
+    },
+    {
+      "path_pattern": "scripts/validate-cli/**/*.ts",
+      "atom_id": "atm.validate-cli-script-map",
+      "capability": "validate-cli harness, suite orchestration, focused regression runner, and full fixture shards",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0052"
     },
     {
       "path_pattern": "scripts/validate-governance-commands.ts",
       "atom_id": "atm.git-governance-map",
       "capability": "governance command regression validation, including git wrapper, trailer attribution behavior, mirror-sync-only commits, and historical ledger restore refusal cases",
-      "coverage_status": "active"
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0055"
+    },
+    {
+      "path_pattern": "scripts/validate-governance-commands/**/*.ts",
+      "atom_id": "atm.git-governance-map",
+      "capability": "governance command validator facade implementation carrier for git wrapper, task lifecycle, evidence closeout, and cleanup regression phases",
+      "coverage_status": "active",
+      "source_task": "TASK-RFT-0055"
     },
     {
       "path_pattern": "scripts/validate-map-spec-schema.ts",
