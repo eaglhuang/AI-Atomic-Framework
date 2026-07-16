@@ -1,0 +1,73 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T06-26-27-915Z-close-4cad83f40591",
+  "taskId": "TASK-RFT-0069",
+  "action": "close",
+  "actorId": "codex-task-rft-0069",
+  "sessionId": "session-20260716061839-codex-task-rft-0069-TASK-RFT-0069-f64d8a8452",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0069.json",
+  "taskSha256": "sha256:aaf7108b8010e877b38790d20e0d0f89da3d1d8a6f44023830bad502deda6cc0",
+  "createdAt": "2026-07-16T06:26:27.915Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0069 --actor codex-task-rft-0069 --status done --historical-delivery 8f3918c8ffc2603687a2175f6f0c8674ac0638d5",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716061839-codex-task-rft-0069-TASK-RFT-0069-f64d8a8452",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0069.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/registry/registry-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T06:26:27.909Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0069.*",
+        ".atm/history/task-events/TASK-RFT-0069/**",
+        ".atm/history/tasks/TASK-RFT-0069.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "packages/core/src/registry/registry.ts",
+        "packages/core/src/registry/registry/**/*.ts",
+        "packages/core/src/registry/registry/document.ts",
+        "packages/core/src/registry/registry/drift.ts",
+        "packages/core/src/registry/registry/entry.ts",
+        "packages/core/src/registry/registry/paths.ts",
+        "packages/core/src/registry/registry/types.ts",
+        "packages/core/src/registry/registry/validation.ts",
+        "tests/registry/registry-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/core/src/registry/registry.ts",
+        "packages/core/src/registry/registry/**/*.ts",
+        "packages/core/src/registry/registry/document.ts",
+        "packages/core/src/registry/registry/drift.ts",
+        "packages/core/src/registry/registry/entry.ts",
+        "packages/core/src/registry/registry/paths.ts",
+        "packages/core/src/registry/registry/types.ts",
+        "packages/core/src/registry/registry/validation.ts",
+        "tests/registry/registry-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
