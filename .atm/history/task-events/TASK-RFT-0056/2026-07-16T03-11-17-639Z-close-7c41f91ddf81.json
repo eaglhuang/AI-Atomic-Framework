@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T03-11-17-639Z-close-7c41f91ddf81",
+  "taskId": "TASK-RFT-0056",
+  "action": "close",
+  "actorId": "codex-task-rft-0056",
+  "sessionId": "session-20260716030515-codex-task-rft-0056-TASK-RFT-0056-16215849ac",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0056.json",
+  "taskSha256": "sha256:fc0a9846d5f95bb46397003b451c87ab0d8293bb8729870fc535cb1a9e617fda",
+  "createdAt": "2026-07-16T03:11:17.639Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0056 --actor codex-task-rft-0056 --status done --historical-delivery 09aabaa656b677628085928299cbe9fd9205a884",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716030515-codex-task-rft-0056-TASK-RFT-0056-16215849ac",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0056.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/integration-hooks-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T03:11:17.629Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0056.*",
+        ".atm/history/task-events/TASK-RFT-0056/**",
+        ".atm/history/tasks/TASK-RFT-0056.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/integration-hooks/**/*.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "tests/cli/integration-hooks-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/integration-hooks.ts",
+        "packages/cli/src/commands/integration-hooks/**/*.ts",
+        "packages/cli/src/commands/integration-hooks/implementation.ts",
+        "tests/cli/integration-hooks-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
