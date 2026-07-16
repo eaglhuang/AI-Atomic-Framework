@@ -1,0 +1,76 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T05-48-52-296Z-close-82819be9720c",
+  "taskId": "TASK-RFT-0066",
+  "action": "close",
+  "actorId": "codex-task-rft-0066",
+  "sessionId": "session-20260716053026-codex-task-rft-0066-TASK-RFT-0066-6f2a719305",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0066.json",
+  "taskSha256": "sha256:73bfe4b4af32ff8fde2186a8064b4012b86f20d4dc03750c2f46b34de576c4bb",
+  "createdAt": "2026-07-16T05:48:52.296Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0066 --actor codex-task-rft-0066 --status done --historical-delivery e541ba1aadbd3b1e80ba06123db8714352ea2271",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716053026-codex-task-rft-0066-TASK-RFT-0066-6f2a719305",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0066.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/scripts/validate-task-direction-governance-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections",
+      "validate:task-direction-governance"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T05:48:52.290Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0066.*",
+        ".atm/history/task-events/TASK-RFT-0066/**",
+        ".atm/history/tasks/TASK-RFT-0066.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-011.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "scripts/validate-task-direction-governance.ts",
+        "scripts/validate-task-direction-governance/**/*.ts",
+        "scripts/validate-task-direction-governance/adopter-core.ts",
+        "scripts/validate-task-direction-governance/context.ts",
+        "scripts/validate-task-direction-governance/framework-development.ts",
+        "scripts/validate-task-direction-governance/main.ts",
+        "scripts/validate-task-direction-governance/prompt-scope.ts",
+        "scripts/validate-task-direction-governance/same-file-ownership.ts",
+        "tests/scripts/validate-task-direction-governance-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-task-direction-governance.ts",
+        "scripts/validate-task-direction-governance/**/*.ts",
+        "scripts/validate-task-direction-governance/adopter-core.ts",
+        "scripts/validate-task-direction-governance/context.ts",
+        "scripts/validate-task-direction-governance/framework-development.ts",
+        "scripts/validate-task-direction-governance/main.ts",
+        "scripts/validate-task-direction-governance/prompt-scope.ts",
+        "scripts/validate-task-direction-governance/same-file-ownership.ts",
+        "tests/scripts/validate-task-direction-governance-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
