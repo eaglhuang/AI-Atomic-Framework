@@ -1,13 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-LANE-0017",
-  "updatedAt": "2026-07-16T18:51:45.828Z",
+  "updatedAt": "2026-07-16T18:54:04.033Z",
   "updatedBy": "codex-lane-0017",
   "freshValidationPasses": [
     "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
     "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
     "typecheck",
-    "validate:cli"
+    "validate:cli",
+    "validate:git-head-evidence"
   ],
   "staleValidationPasses": [],
   "commandRuns": [
@@ -61,6 +62,19 @@
       "generatedAt": "2026-07-16T18:51:45.960Z",
       "runnerKind": "dev-source",
       "sourceCommit": "c1b2e768a0e89241ccd3cbe8d2839a49a8079509",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T18:54:04.168Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "eced74c7530f0be34f7d4772f7b190096c9325c6",
       "cached": false
     }
   ],

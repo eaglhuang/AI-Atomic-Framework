@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T18-58-54-322Z-close-fa4cd2ad1d56",
+  "taskId": "TASK-LANE-0017",
+  "action": "close",
+  "actorId": "codex-lane-0017",
+  "sessionId": "session-20260716184621-codex-lane-0017-TASK-LANE-0017-b373036a1b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0017.json",
+  "taskSha256": "sha256:bdb3d186e7d00900c0153a0736e09acfab7fac82e0490728e94360ac594926bb",
+  "createdAt": "2026-07-16T18:58:54.322Z",
+  "command": "node atm.mjs tasks close --task TASK-LANE-0017 --actor codex-lane-0017 --status done --historical-delivery eced74c7530f0be34f7d4772f7b190096c9325c6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716184621-codex-lane-0017-TASK-LANE-0017-b373036a1b",
+    "closurePacketPath": ".atm/history/evidence/TASK-LANE-0017.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T18:58:54.312Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-LANE-0017.*",
+        ".atm/history/task-events/TASK-LANE-0017/**",
+        ".atm/history/tasks/TASK-LANE-0017.json",
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/broker-queue-admission.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-conflict-log.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "packages/cli/src/commands/next/broker-queue-admission.ts",
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/claim-conflict-log.ts",
+        "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
