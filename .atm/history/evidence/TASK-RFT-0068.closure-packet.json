@@ -1,0 +1,188 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0068",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "e4a824fd15bf54ec2ff0ff22b681ed965e8f1449",
+  "governedTreeSha": "d6320929cfd0c4fa93baf9672045ed259079b4c5",
+  "targetCommitDelta": {
+    "currentCommitSha": "e4a824fd15bf54ec2ff0ff22b681ed965e8f1449",
+    "parentCommitShas": [
+      "e4a824fd15bf54ec2ff0ff22b681ed965e8f1449"
+    ],
+    "governedTreeSha": "d6320929cfd0c4fa93baf9672045ed259079b4c5",
+    "changedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/cli/src/commands/route/files.ts",
+      "packages/cli/src/commands/route/freeze-patch.ts",
+      "packages/cli/src/commands/route/lifecycle.ts",
+      "packages/cli/src/commands/route/main.ts",
+      "packages/cli/src/commands/route/parser.ts",
+      "packages/cli/src/commands/route/takeover.ts",
+      "packages/cli/src/commands/route/types.ts",
+      "packages/cli/src/commands/route/validation.ts",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/packages/cli/dist/commands/route.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/route.js",
+      "release/atm-root-drop/packages/cli/src/commands/route.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-task-direction-governance.ts",
+      "release/atm-root-drop/scripts/validate-team-brokered-write.ts",
+      "tests/cli/route-command-final-600.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/route-command-final-600.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:f5fe4161dc63c5b121ba842b295fd98f10cd180560abe7d1831e8cf009b77bb7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a33945ff35fbd5d9c516c38ad8973316251efec8ac8ff2c756d4d9ee7d69424c",
+      "stderrSha256": "sha256:f327dc0d6da92b7435c2320fed3940b4b630ef2ca10530c8b350a48466d1ccf4",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:governance-projections",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:b5c62f2fce543a0119a905f1c9e9a8c41def30a21bf567ba23f8446bb72cc46a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "node --strip-types tests/cli/route-command-final-600.test.ts",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:governance-projections"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T06:14:10.447Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0068.*",
+      ".atm/history/task-events/TASK-RFT-0068/**",
+      ".atm/history/tasks/TASK-RFT-0068.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/cli/src/commands/route/**/*.ts",
+      "packages/cli/src/commands/route/files.ts",
+      "packages/cli/src/commands/route/freeze-patch.ts",
+      "packages/cli/src/commands/route/lifecycle.ts",
+      "packages/cli/src/commands/route/main.ts",
+      "packages/cli/src/commands/route/parser.ts",
+      "packages/cli/src/commands/route/takeover.ts",
+      "packages/cli/src/commands/route/types.ts",
+      "packages/cli/src/commands/route/validation.ts",
+      "tests/cli/route-command-final-600.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "packages/cli/src/commands/route.ts",
+      "packages/cli/src/commands/route/**/*.ts",
+      "packages/cli/src/commands/route/files.ts",
+      "packages/cli/src/commands/route/freeze-patch.ts",
+      "packages/cli/src/commands/route/lifecycle.ts",
+      "packages/cli/src/commands/route/main.ts",
+      "packages/cli/src/commands/route/parser.ts",
+      "packages/cli/src/commands/route/takeover.ts",
+      "packages/cli/src/commands/route/types.ts",
+      "packages/cli/src/commands/route/validation.ts",
+      "tests/cli/route-command-final-600.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0068.json",
+  "closedAt": "2026-07-16T06:14:10.447Z",
+  "closedByActor": "codex-task-rft-0068",
+  "sessionId": "session-20260716060507-codex-task-rft-0068-TASK-RFT-0068-9a92cfdf50",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "e4a824fd15bf54ec2ff0ff22b681ed965e8f1449",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "packages/cli/src/commands/route.ts",
+      "packages/cli/src/commands/route/files.ts",
+      "packages/cli/src/commands/route/freeze-patch.ts",
+      "packages/cli/src/commands/route/lifecycle.ts",
+      "packages/cli/src/commands/route/main.ts",
+      "packages/cli/src/commands/route/parser.ts",
+      "packages/cli/src/commands/route/takeover.ts",
+      "packages/cli/src/commands/route/types.ts",
+      "packages/cli/src/commands/route/validation.ts",
+      "tests/cli/route-command-final-600.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0068.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0068/2026-07-16T06-04-50-565Z-import-01b88be19ffd.json",
+      ".atm/history/task-events/TASK-RFT-0068/2026-07-16T06-05-07-012Z-reserve-561a5e667031.json",
+      ".atm/history/task-events/TASK-RFT-0068/2026-07-16T06-05-07-014Z-promote-eff9f1bac31e.json",
+      ".atm/history/task-events/TASK-RFT-0068/2026-07-16T06-05-10-141Z-claim-920b1a1b2dc8.json",
+      ".atm/history/task-events/TASK-RFT-0068/2026-07-16T06-11-47-236Z-scope-amendment-7057b4d1dbbf.json",
+      ".atm/history/tasks/TASK-RFT-0068.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

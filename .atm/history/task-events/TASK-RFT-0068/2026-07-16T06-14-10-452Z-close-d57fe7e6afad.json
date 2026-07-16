@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T06-14-10-452Z-close-d57fe7e6afad",
+  "taskId": "TASK-RFT-0068",
+  "action": "close",
+  "actorId": "codex-task-rft-0068",
+  "sessionId": "session-20260716060507-codex-task-rft-0068-TASK-RFT-0068-9a92cfdf50",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0068.json",
+  "taskSha256": "sha256:8ebfa0f227cc3649d860183818a0fee5dd8161339d4d267e45f382b86d0592d8",
+  "createdAt": "2026-07-16T06:14:10.452Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0068 --actor codex-task-rft-0068 --status done --historical-delivery e4a824fd15bf54ec2ff0ff22b681ed965e8f1449",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716060507-codex-task-rft-0068-TASK-RFT-0068-9a92cfdf50",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0068.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/route-command-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T06:14:10.447Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0068.*",
+        ".atm/history/task-events/TASK-RFT-0068/**",
+        ".atm/history/tasks/TASK-RFT-0068.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/route.ts",
+        "packages/cli/src/commands/route/**/*.ts",
+        "packages/cli/src/commands/route/files.ts",
+        "packages/cli/src/commands/route/freeze-patch.ts",
+        "packages/cli/src/commands/route/lifecycle.ts",
+        "packages/cli/src/commands/route/main.ts",
+        "packages/cli/src/commands/route/parser.ts",
+        "packages/cli/src/commands/route/takeover.ts",
+        "packages/cli/src/commands/route/types.ts",
+        "packages/cli/src/commands/route/validation.ts",
+        "tests/cli/route-command-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/route.ts",
+        "packages/cli/src/commands/route/**/*.ts",
+        "packages/cli/src/commands/route/files.ts",
+        "packages/cli/src/commands/route/freeze-patch.ts",
+        "packages/cli/src/commands/route/lifecycle.ts",
+        "packages/cli/src/commands/route/main.ts",
+        "packages/cli/src/commands/route/parser.ts",
+        "packages/cli/src/commands/route/takeover.ts",
+        "packages/cli/src/commands/route/types.ts",
+        "packages/cli/src/commands/route/validation.ts",
+        "tests/cli/route-command-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
