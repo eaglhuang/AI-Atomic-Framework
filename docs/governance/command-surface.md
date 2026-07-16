@@ -65,6 +65,7 @@ The guard checks that:
 | `node atm.mjs init` | Adopt ATM in a repository. |
 | `node atm.mjs integration` | Manage agent integration adapters and hooks. |
 | `node atm.mjs internal-release` | Build and sync the framework runner to internal repos. |
+| `node atm.mjs lane` | Inspect, lazily mint, heartbeat, sweep, or explicitly adopt an ATM lane session. |
 | `node atm.mjs lock` | Check, acquire, or release a governed scope lock. |
 | `node atm.mjs migrate` | Plan, apply, or verify schema migration codemods. |
 | `node atm.mjs next` | Route work into the official ATM channel. |
@@ -117,3 +118,23 @@ Policy note:
 - local hooks are detectable but bypassable;
 - protected branch / server-side enforcement remains a deployment policy layer,
   not a local MVP guarantee.
+
+## Lane Session Maintenance
+
+The public `lane` surface owns the local lane-session runtime envelope used by
+agents and tools that need stable per-session governance identity.
+
+- `node atm.mjs lane status --json` resolves the current lane, lazily minting a
+  new lane when no usable `ATM_LANE_SESSION_ID` exists.
+- `node atm.mjs lane heartbeat <lane-id> --actor <actor> --json` records an
+  explicit heartbeat, extends the lane TTL, and writes a lane-session event.
+- `node atm.mjs lane sweep --json` reports TTL-expired lane sessions without
+  changing runtime state.
+- `node atm.mjs lane sweep --write --json` expires only sweepable TTL-expired
+  lane sessions and records sweep events as command-backed evidence.
+- `node atm.mjs lane adopt <lane-id> --actor <actor> --json` transfers an
+  adoptable lane to another actor and records the adoption event.
+
+Sweeps are intentionally report-only unless `--write` is present. This keeps
+lane cleanup auditable and prevents maintenance commands from silently
+destroying active coordination state.

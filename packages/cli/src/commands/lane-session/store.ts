@@ -46,6 +46,7 @@ export interface LaneSessionDocument {
   readonly adoptionSource: LaneSessionAdoptionSource;
   readonly handoffTokenHash: string | null;
   readonly lastCommand: LaneSessionLastCommand | null;
+  readonly lastHeartbeatAt: string | null;
 }
 
 export interface MintLaneSessionInput {
@@ -68,6 +69,60 @@ export interface AdoptLaneSessionInput {
   readonly reason?: string | null;
   readonly timestamp?: string;
   readonly lastCommand?: LaneSessionLastCommand | null;
+}
+
+export interface RecordLaneSessionHeartbeatInput {
+  readonly cwd: string;
+  readonly laneId: string;
+  readonly actorId?: string | null;
+  readonly timestamp?: string;
+  readonly lastCommand?: LaneSessionLastCommand | null;
+}
+
+export type LaneSessionHeartbeatFailureReason = 'not-found' | 'closed' | 'expired';
+
+export type LaneSessionHeartbeatResult = {
+  readonly ok: true;
+  readonly session: LaneSessionDocument;
+  readonly previousSession: LaneSessionDocument;
+  readonly sessionPath: string;
+  readonly ttlPhaseBefore: LaneSessionTtlPhase;
+} | {
+  readonly ok: false;
+  readonly reason: LaneSessionHeartbeatFailureReason;
+  readonly session: LaneSessionDocument | null;
+  readonly ttlPhaseBefore: LaneSessionTtlPhase | null;
+};
+
+export interface LaneSessionSweepInput {
+  readonly cwd: string;
+  readonly now?: string;
+  readonly graceMs?: number;
+  readonly write?: boolean;
+  readonly actorId?: string | null;
+  readonly lastCommand?: LaneSessionLastCommand | null;
+}
+
+export interface LaneSessionSweepEntry {
+  readonly laneId: string;
+  readonly actorId: string;
+  readonly taskId: string | null;
+  readonly status: LaneSessionStatus;
+  readonly updatedAt: string;
+  readonly expiresAt: string;
+  readonly ttlPhase: LaneSessionTtlPhase;
+  readonly sweepable: boolean;
+  readonly reason: string;
+}
+
+export interface LaneSessionSweepResult {
+  readonly generatedAt: string;
+  readonly graceMs: number;
+  readonly write: boolean;
+  readonly entries: readonly LaneSessionSweepEntry[];
+  readonly staleCount: number;
+  readonly sweptCount: number;
+  readonly sweptSessions: readonly LaneSessionDocument[];
 }
 
 export type LaneSessionAdoptionFailureReason = 'not-found' | 'closed';
@@ -105,7 +160,8 @@ export function mintLaneSession(input: MintLaneSessionInput): {
     identity: snapshotLaneIdentity(cwd, input.actorId),
     adoptionSource: normalizeAdoptionSource(input.adoptionSource),
     handoffTokenHash: input.handoffToken ? hashHandoffToken(input.handoffToken) : null,
-    lastCommand: normalizeLastCommand(input.lastCommand)
+    lastCommand: normalizeLastCommand(input.lastCommand),
+    lastHeartbeatAt: nowIso
   };
   const absolutePath = laneSessionPathFor(cwd, laneId);
   atomicWriteJson(absolutePath, session);
@@ -139,7 +195,8 @@ export function adoptLaneSession(input: AdoptLaneSessionInput): LaneSessionAdopt
       sourceActorId: previousSession.actorId,
       reason: normalizeOptionalString(input.reason) ?? null
     },
-    lastCommand: normalizeLastCommand(input.lastCommand)
+    lastCommand: normalizeLastCommand(input.lastCommand),
+    lastHeartbeatAt: nowIso
   };
   const absolutePath = laneSessionPathFor(cwd, previousSession.laneId);
   atomicWriteJson(absolutePath, session);
@@ -148,6 +205,92 @@ export function adoptLaneSession(input: AdoptLaneSessionInput): LaneSessionAdopt
     session,
     previousSession,
     sessionPath: relativePathFrom(cwd, absolutePath)
+  };
+}
+
+export function recordLaneSessionHeartbeat(input: RecordLaneSessionHeartbeatInput): LaneSessionHeartbeatResult {
+  const cwd = path.resolve(input.cwd);
+  const previousSession = readLaneSession(cwd, input.laneId);
+  if (!previousSession) {
+    return { ok: false, reason: 'not-found', session: null, ttlPhaseBefore: null };
+  }
+  const nowIso = normalizeIsoString(input.timestamp) ?? new Date().toISOString();
+  const ttlPhaseBefore = classifyLaneSessionTtl({ now: nowIso, expiresAt: previousSession.expiresAt });
+  if (previousSession.status === 'released' || previousSession.status === 'expired') {
+    return { ok: false, reason: 'closed', session: previousSession, ttlPhaseBefore };
+  }
+  if (ttlPhaseBefore === 'expired') {
+    return { ok: false, reason: 'expired', session: previousSession, ttlPhaseBefore };
+  }
+  const ttlMs = normalizePositiveInteger(previousSession.ttlMs, 0);
+  const session: LaneSessionDocument = {
+    ...previousSession,
+    actorId: normalizeOptionalString(input.actorId) ?? previousSession.actorId,
+    updatedAt: nowIso,
+    expiresAt: new Date(Date.parse(nowIso) + ttlMs).toISOString(),
+    identity: snapshotLaneIdentity(cwd, normalizeOptionalString(input.actorId) ?? previousSession.actorId),
+    lastCommand: normalizeLastCommand(input.lastCommand) ?? previousSession.lastCommand,
+    lastHeartbeatAt: nowIso
+  };
+  const absolutePath = laneSessionPathFor(cwd, previousSession.laneId);
+  atomicWriteJson(absolutePath, session);
+  return {
+    ok: true,
+    session,
+    previousSession,
+    sessionPath: relativePathFrom(cwd, absolutePath),
+    ttlPhaseBefore
+  };
+}
+
+export function inspectLaneSessionSweep(input: LaneSessionSweepInput): LaneSessionSweepResult {
+  return sweepLaneSessions({ ...input, write: false });
+}
+
+export function sweepLaneSessions(input: LaneSessionSweepInput): LaneSessionSweepResult {
+  const cwd = path.resolve(input.cwd);
+  const generatedAt = normalizeIsoString(input.now) ?? new Date().toISOString();
+  const graceMs = normalizePositiveInteger(input.graceMs ?? 0, 0);
+  const entries: LaneSessionSweepEntry[] = [];
+  const sweptSessions: LaneSessionDocument[] = [];
+  for (const session of listLaneSessions(cwd)) {
+    const ttlPhase = classifyLaneSessionTtl({ now: generatedAt, expiresAt: session.expiresAt, graceMs });
+    const sweepable = ttlPhase === 'expired' && session.status !== 'released' && session.status !== 'expired';
+    entries.push({
+      laneId: session.laneId,
+      actorId: session.actorId,
+      taskId: session.taskId,
+      status: session.status,
+      updatedAt: session.updatedAt,
+      expiresAt: session.expiresAt,
+      ttlPhase,
+      sweepable,
+      reason: sweepable
+        ? 'ttl-expired'
+        : session.status === 'released' || session.status === 'expired'
+          ? 'already-closed'
+          : ttlPhase === 'grace'
+            ? 'within-grace'
+            : 'fresh'
+    });
+    if (!input.write || !sweepable) continue;
+    const nextSession: LaneSessionDocument = {
+      ...session,
+      status: 'expired',
+      updatedAt: generatedAt,
+      lastCommand: normalizeLastCommand(input.lastCommand) ?? session.lastCommand
+    };
+    atomicWriteJson(laneSessionPathFor(cwd, session.laneId), nextSession);
+    sweptSessions.push(nextSession);
+  }
+  return {
+    generatedAt,
+    graceMs,
+    write: input.write === true,
+    entries,
+    staleCount: entries.filter((entry) => entry.sweepable).length,
+    sweptCount: sweptSessions.length,
+    sweptSessions
   };
 }
 
@@ -222,7 +365,8 @@ function readLaneSessionFile(filePath: string): LaneSessionDocument | null {
       identity: normalizeIdentity(parsed.identity, parsed.actorId!.trim()),
       adoptionSource: normalizeAdoptionSource(parsed.adoptionSource),
       handoffTokenHash: normalizeOptionalString(parsed.handoffTokenHash) ?? null,
-      lastCommand: normalizeLastCommand(parsed.lastCommand)
+      lastCommand: normalizeLastCommand(parsed.lastCommand),
+      lastHeartbeatAt: normalizeIsoString(parsed.lastHeartbeatAt) ?? null
     };
   } catch {
     return null;

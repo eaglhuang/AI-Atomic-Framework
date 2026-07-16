@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0018",
+  "title": "Lane heartbeat sweep analyzer and docs",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0014",
+    "TASK-LANE-0017"
+  ],
+  "acceptance": [
+    "Lane sessions can record heartbeat events.",
+    "Stale lanes can be reported and swept through explicit command-backed behavior.",
+    "Error-code registry covers lane minted, stale env, adoptable, adoption denied, and sweep outcomes.",
+    "Command surface docs describe `atm lane` in neutral English.",
+    "Validation proves the optional lane envelope remains schema compatible."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/lane.ts",
+    "packages/cli/src/commands/lane-session/store.ts",
+    "docs/governance/error-code-registry.json",
+    "docs/governance/command-surface.md"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/lane.ts",
+    "packages/cli/src/commands/lane-session/store.ts",
+    "packages/cli/src/commands/lane-session/events.ts",
+    "docs/governance/error-code-registry.json",
+    "docs/governance/command-surface.md",
+    "tests/cli/cli-result-contract.test.ts"
+  ],
+  "validators": [
+    "node atm.mjs lane status --json",
+    "node --strip-types tests/cli/cli-result-contract.test.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Claim conflict policy",
+    "Git commit attribution"
+  ],
+  "nonGoals": [
+    "Do not make lane sweep destructive without explicit command-backed evidence."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Remove heartbeat, sweep, analyzer, and error-code additions.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.lane-session-runtime",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-heartbeat-sweep",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/lane-session/store.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/lane.ts",
+        "packages/cli/src/commands/lane-session/store.ts",
+        "packages/cli/src/commands/lane-session/events.ts",
+        "docs/governance/error-code-registry.json",
+        "docs/governance/command-surface.md",
+        "tests/cli/cli-result-contract.test.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0018-lane-heartbeat-sweep-docs.task.md",
+    "sectionTitle": "TASK-LANE-0018",
+    "headingLine": 53,
+    "hash": "8fe390c371869119",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0018-lane-heartbeat-sweep-docs.task.md",
+      "planningCommitSha": "c0ef3957558cf3255920da203f2e8884d57d3f8c",
+      "contentDigest": "sha256:8fe390c37186911902b1931e2a322ec300e775d725e8643cb00c2be36f2891d7",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T19:02:16.880Z"
+    }
+  },
+  "importedAt": "2026-07-16T19:02:16.880Z",
+  "lastTransitionId": "2026-07-16T19-06-38-384Z-scope-amendment-a36e2baea7ba",
+  "lastTransitionAt": "2026-07-16T19:06:38.384Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0018",
+  "reservedAt": "2026-07-16T19:02:43.640Z",
+  "promotedAt": "2026-07-16T19:02:43.642Z",
+  "claim": {
+    "actorId": "codex-lane-0018",
+    "leaseId": "lease-e95feb83e982",
+    "claimedAt": "2026-07-16T19:02:43.646Z",
+    "heartbeatAt": "2026-07-16T19:02:43.646Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-LANE-0018.*",
+      ".atm/history/task-events/TASK-LANE-0018/**",
+      ".atm/history/tasks/TASK-LANE-0018.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/command-specs/lane.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts",
+      "packages/cli/src/commands/lane.ts",
+      "tests/cli/cli-result-contract.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T19:02:43.646Z",
+  "startedByActor": "codex-lane-0018",
+  "startedBySessionId": "session-20260716190243-codex-lane-0018-TASK-LANE-0018-c0892ef4b5",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0018",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0018.*",
+      ".atm/history/task-events/TASK-LANE-0018/**",
+      ".atm/history/tasks/TASK-LANE-0018.json",
+      "docs/governance/command-surface.md",
+      "docs/governance/error-code-registry.json",
+      "packages/cli/src/commands/command-specs/lane.spec.ts",
+      "packages/cli/src/commands/lane-session/events.ts",
+      "packages/cli/src/commands/lane-session/store.ts",
+      "packages/cli/src/commands/lane.ts",
+      "tests/cli/cli-result-contract.test.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0018-lane-heartbeat-sweep-docs.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0018-lane-heartbeat-sweep-docs.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "4c5c208a8fb505d1c90c7325a929bd181c75d12059d3aa88f770781805d84c7d",
+    "actorId": "codex-lane-0018",
+    "sessionId": null,
+    "createdAt": "2026-07-16T19:02:46.878Z",
+    "status": "active"
+  }
+}

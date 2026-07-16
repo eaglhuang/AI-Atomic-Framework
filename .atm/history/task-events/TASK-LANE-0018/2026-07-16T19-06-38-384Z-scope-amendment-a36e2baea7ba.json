@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T19-06-38-384Z-scope-amendment-a36e2baea7ba",
+  "taskId": "TASK-LANE-0018",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-0018",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0018.json",
+  "taskSha256": "sha256:c53ab8fff57b849f785f716a736e4364295ecaf75c4d8ae3c57f39aed4617317",
+  "createdAt": "2026-07-16T19:06:38.384Z",
+  "command": "node atm.mjs tasks scope add --task TASK-LANE-0018 --actor codex-lane-0018 --add packages/cli/src/commands/command-specs/lane.spec.ts --reason \"Lane heartbeat and sweep change the public lane command help surface, so the lane command spec source-of-truth must be included with the CLI implementation and docs.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Lane heartbeat and sweep change the public lane command help surface, so the lane command spec source-of-truth must be included with the CLI implementation and docs."
+  }
+}

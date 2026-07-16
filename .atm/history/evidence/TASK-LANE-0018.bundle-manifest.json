@@ -1,0 +1,40 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-LANE-0018",
+  "updatedAt": "2026-07-16T19:07:58.695Z",
+  "updatedBy": "codex-lane-0018",
+  "freshValidationPasses": [
+    "node --strip-types tests/cli/cli-result-contract.test.ts",
+    "typecheck"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types tests/cli/cli-result-contract.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:24c88b8cb3232dd28a19f672d712e423ead62c9e19699cbea35790550c5c621f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types tests/cli/cli-result-contract.test.ts"
+      ],
+      "generatedAt": "2026-07-16T19:07:52.948Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "abc1e24aba66857b060748f1d98335f0ae9160d7",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T19:07:58.838Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "abc1e24aba66857b060748f1d98335f0ae9160d7",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -276,12 +276,36 @@ try {
   assert.ok(secondLane.payload.diagnostics.warningCodes.includes('ATM_LANE_SESSION_ADOPTABLE'));
   assert.equal(validateCliResult(secondLane.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
 
+  const laneId = mintedLane.payload.laneSession?.laneSessionId as string;
+  const heartbeatLane = await captureCli(['lane', 'heartbeat', laneId, '--cwd', laneRepo, '--actor', 'agent-a', '--json']);
+  assert.equal(heartbeatLane.exitCode, 0);
+  assert.equal(heartbeatLane.payload.laneSession?.laneSessionId, laneId);
+  assert.ok(heartbeatLane.payload.diagnostics.infoCodes.includes('ATM_LANE_SESSION_HEARTBEAT_RECORDED'));
+  assert.equal(validateCliResult(heartbeatLane.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+
   process.env.ATM_LANE_SESSION_ID = 'missing-lane';
   const staleEnvLane = await captureCli(['lane', 'status', '--cwd', laneRepo, '--actor', 'agent-a', '--json']);
   assert.equal(staleEnvLane.exitCode, 0);
   assert.equal(staleEnvLane.payload.laneSession?.source, 'minted');
   assert.ok(staleEnvLane.payload.diagnostics.warningCodes.includes('ATM_LANE_SESSION_STALE_ENV'));
   assert.equal(validateCliResult(staleEnvLane.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+
+  const lanePath = path.join(laneRepo, '.atm/runtime/lane-sessions', `${laneId}.json`);
+  const laneDocument = JSON.parse(readFileSync(lanePath, 'utf8'));
+  laneDocument.expiresAt = '2026-07-16T00:00:00.000Z';
+  writeFileSync(lanePath, `${JSON.stringify(laneDocument, null, 2)}\n`, 'utf8');
+
+  const sweepReport = await captureCli(['lane', 'sweep', '--cwd', laneRepo, '--json']);
+  assert.equal(sweepReport.exitCode, 0);
+  assert.ok(sweepReport.payload.diagnostics.infoCodes.includes('ATM_LANE_SESSION_SWEEP_REPORTED'));
+  assert.equal(sweepReport.payload.evidence.sweep.staleCount >= 1, true);
+  assert.equal(validateCliResult(sweepReport.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
+
+  const sweepWrite = await captureCli(['lane', 'sweep', '--cwd', laneRepo, '--write', '--json']);
+  assert.equal(sweepWrite.exitCode, 0);
+  assert.ok(sweepWrite.payload.diagnostics.infoCodes.includes('ATM_LANE_SESSION_SWEEP_APPLIED'));
+  assert.equal(sweepWrite.payload.evidence.sweep.sweptCount >= 1, true);
+  assert.equal(validateCliResult(sweepWrite.payload), true, JSON.stringify(validateCliResult.errors, null, 2));
 } finally {
   if (previousLaneEnv === undefined) {
     delete process.env.ATM_LANE_SESSION_ID;
