@@ -4,6 +4,7 @@ import path from 'node:path';
 import { runBroker } from '../broker.ts';
 import { CliError } from '../shared.ts';
 import { prepareTaskForClaim } from '../tasks/public-surface.ts';
+import { projectGovernanceSharedSurfacesFromPaths } from '../../../../core/src/broker/global-resource-projection.ts';
 import { normalizeTaskRouteStatus } from './intent-normalizers.ts';
 import type { ImportedTaskSummary } from './route-predicates.ts';
 
@@ -49,18 +50,12 @@ export async function registerPreClaimBrokerTransaction(input: {
   if (!baseCommit) {
     throw new CliError('ATM_BROKER_TRANSACTION_BASE_MISSING', 'next --claim requires a resolvable HEAD before registering its Broker transaction.', { exitCode: 1 });
   }
-  const intent = {
-    schemaId: 'atm.writeIntent.v1',
-    specVersion: '0.1.0',
-    migration: { strategy: 'none', fromVersion: null, notes: 'next pre-claim Broker transaction' },
+  const intent = buildPreClaimWriteIntent({
     taskId: input.taskId,
     actorId: input.actorId,
     baseCommit,
-    targetFiles: input.targetFiles,
-    atomRefs: [],
-    sharedSurfaces: { generators: [], projections: [], registries: [], validators: [], artifacts: [] },
-    requestedLane: 'auto'
-  } as const;
+    targetFiles: input.targetFiles
+  });
   const intentPath = path.join(input.cwd, '.atm', 'runtime', 'broker-intents', `${input.taskId}.json`);
   mkdirSync(path.dirname(intentPath), { recursive: true });
   writeFileSync(intentPath, `${JSON.stringify(intent, null, 2)}\n`, 'utf8');
@@ -82,3 +77,23 @@ export async function registerPreClaimBrokerTransaction(input: {
   };
 }
 
+export function buildPreClaimWriteIntent(input: {
+  readonly taskId: string;
+  readonly actorId: string;
+  readonly baseCommit: string;
+  readonly targetFiles: readonly string[];
+}) {
+  const targetFiles = [...new Set(input.targetFiles.map((entry) => entry.replace(/\\/g, '/').replace(/^\.\//, '').trim()).filter(Boolean))].sort();
+  return {
+    schemaId: 'atm.writeIntent.v1',
+    specVersion: '0.1.0',
+    migration: { strategy: 'none', fromVersion: null, notes: 'next pre-claim Broker transaction' },
+    taskId: input.taskId,
+    actorId: input.actorId,
+    baseCommit: input.baseCommit,
+    targetFiles,
+    atomRefs: [],
+    sharedSurfaces: projectGovernanceSharedSurfacesFromPaths(targetFiles),
+    requestedLane: 'auto'
+  } as const;
+}

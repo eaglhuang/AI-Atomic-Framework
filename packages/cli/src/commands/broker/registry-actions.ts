@@ -32,6 +32,51 @@ import { updateSharedSurfaceQueues, createSharedSurfaceFreezeRecords, markReleas
 import { loadComposeProposals, relativeStorePath, resolveBrokerRunEvidenceDir, normalizeEvidencePath } from './parser.ts';
 import { classifyExplicitMutationRequest, buildMutationEvidence, extractMutationRequestTransactionIds } from './mutation-helpers.ts';
 
+function readBrokerWriteIntent(intentFilePath: string, displayPath: string): WriteIntent {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(intentFilePath, 'utf8'));
+  } catch (error) {
+    throw new CliError('ATM_BROKER_INTENT_INVALID_JSON', `Intent file is not valid JSON: ${displayPath}`, {
+      exitCode: 2,
+      details: { intentFile: displayPath, error: error instanceof Error ? error.message : String(error) }
+    });
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new CliError('ATM_BROKER_INTENT_INVALID', 'Broker intent file must contain a JSON object.', {
+      exitCode: 2,
+      details: { intentFile: displayPath }
+    });
+  }
+  const record = parsed as Record<string, unknown>;
+  const missing = [
+    record.schemaId === 'atm.writeIntent.v1' ? null : 'schemaId',
+    typeof record.taskId === 'string' && record.taskId.trim() ? null : 'taskId',
+    typeof record.actorId === 'string' && record.actorId.trim() ? null : 'actorId',
+    typeof record.baseCommit === 'string' && record.baseCommit.trim() ? null : 'baseCommit',
+    Array.isArray(record.targetFiles) ? null : 'targetFiles',
+    Array.isArray(record.atomRefs) ? null : 'atomRefs',
+    record.sharedSurfaces && typeof record.sharedSurfaces === 'object' && !Array.isArray(record.sharedSurfaces) ? null : 'sharedSurfaces',
+    typeof record.requestedLane === 'string' && record.requestedLane.trim() ? null : 'requestedLane'
+  ].filter(Boolean) as string[];
+  const sharedSurfaces = record.sharedSurfaces as Record<string, unknown> | undefined;
+  if (sharedSurfaces) {
+    for (const key of ['generators', 'projections', 'registries', 'validators', 'artifacts']) {
+      if (!Array.isArray(sharedSurfaces[key])) missing.push(`sharedSurfaces.${key}`);
+    }
+  }
+  if (missing.length > 0) {
+    throw new CliError('ATM_BROKER_INTENT_INVALID', 'Broker intent file is missing required WriteIntent fields.', {
+      exitCode: 2,
+      details: {
+        intentFile: displayPath,
+        missingFields: missing
+      }
+    });
+  }
+  return record as WriteIntent;
+}
+
 
 export function handleBrokerRegistryActions(options: ParsedBrokerOptions, context: BrokerCommandContext) {
   const registryPath = context.registryPath;
@@ -49,7 +94,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       throw new CliError('ATM_FILE_NOT_FOUND', `Intent file not found: ${options.intentFile}`, { exitCode: 1 });
     }
 
-    const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8')) as WriteIntent;
+    const newIntent = readBrokerWriteIntent(intentFilePath, options.intentFile);
     assertBrokerRegisterCliParity(newIntent, options);
     let registry = cleanupStale(loadRegistry(registryPath));
     const decision = calculateBrokerDecision(newIntent, registry);
@@ -135,7 +180,7 @@ export function handleBrokerRegistryActions(options: ParsedBrokerOptions, contex
       throw new CliError('ATM_FILE_NOT_FOUND', `Intent file not found: ${options.intentFile}`, { exitCode: 1 });
     }
 
-    const newIntent = JSON.parse(readFileSync(intentFilePath, 'utf8')) as WriteIntent;
+    const newIntent = readBrokerWriteIntent(intentFilePath, options.intentFile);
     const registry = cleanupStale(loadRegistry(registryPath));
     const decision = calculateBrokerDecision(newIntent, registry);
 

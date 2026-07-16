@@ -37,6 +37,7 @@ import {
 } from '../../work-channels.ts';
 import {
   parseMarkdownFrontmatter,
+  isJournalingPrompt,
   normalizeTaskRouteStatus,
   normalizeOptionalBoolean,
   normalizeSearchText,
@@ -152,12 +153,13 @@ function readTaskIntentFile(cwd: string, intentPath: string): TaskIntent {
 }
 
 export function createDeterministicTaskIntent(prompt: string, explicitTaskIds: readonly string[] = []): TaskIntent {
-  const mentionedTaskIds = uniqueSorted(extractTaskIdReferencesFromPrompt(prompt).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
-  const mentionedPlanPaths = uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
+  const journalingPrompt = isJournalingPrompt(prompt);
+  const mentionedTaskIds = journalingPrompt ? [] : uniqueSorted(extractTaskIdReferencesFromPrompt(prompt).flatMap((entry) => expandTaskIdReferenceAliases(entry)));
+  const mentionedPlanPaths = journalingPrompt ? [] : uniqueSorted(extractPromptPathHints(prompt).filter((entry) => /\.md$/i.test(entry)));
   const targetRepoHints = uniqueSorted([
     ...(/AI-Atomic-Framework|ATM\s*framework|ATM\s*\u6846\u67b6|ATM\u6846\u67b6|\u539f\u5b50\u6846\u67b6/i.test(prompt) ? ['AI-Atomic-Framework'] : [])
   ]);
-  const taskRootHints = uniqueSorted([
+  const taskRootHints = journalingPrompt ? [] : uniqueSorted([
     ...(/self[-_ ]?atomization|\u81ea\u6211\u539f\u5b50\u5316|100%/i.test(prompt) ? ['atm-self-atomization'] : []),
     ...extractTaskFamilyRootHintsFromPrompt(prompt),
     ...extractTaskRootHintsFromPrompt(prompt, mentionedTaskIds),
@@ -168,14 +170,14 @@ export function createDeterministicTaskIntent(prompt: string, explicitTaskIds: r
     : /\u524d\s*(?:2|\u5169|\u4e8c)\s*\u5f35|first\s+2/i.test(prompt)
       ? { kind: 'first' as const, count: 2 }
       : null;
-  const queueRequested = isQueueRequestedPrompt(prompt) || Boolean(ordinalScope);
+  const queueRequested = !journalingPrompt && (isQueueRequestedPrompt(prompt) || Boolean(ordinalScope));
   const orderedExplicitTaskIds = uniqueInOrder(explicitTaskIds.map((entry) => entry.toUpperCase()));
-  const taskScopeMentioned = orderedExplicitTaskIds.length > 0
+  const taskScopeMentioned = !journalingPrompt && (orderedExplicitTaskIds.length > 0
     || mentionedTaskIds.length > 0
     || mentionedPlanPaths.length > 0
     || taskRootHints.length > 0
     || queueRequested
-    || /\u4efb\u52d9\u5361|task\s*card|task[-_ ]?asa|\u8a08\u756b\u66f8/i.test(prompt);
+    || /\u4efb\u52d9\u5361|task\s*card|task[-_ ]?asa|\u8a08\u756b\u66f8/i.test(prompt));
   return {
     schemaId: 'atm.taskIntent.v1',
     userPrompt: prompt,

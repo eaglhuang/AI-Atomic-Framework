@@ -1,4 +1,5 @@
 import {
+  isJournalingPrompt,
   isQueueRequestedPrompt,
   normalizeSearchText,
   normalizeTaskRouteStatus,
@@ -65,6 +66,7 @@ interface ImportedTaskQueue {
 }
 
 function isFrameworkMaintenancePrompt(prompt: string) {
+  if (isJournalingPrompt(prompt)) return false;
   const normalized = normalizeSearchText(prompt);
   return [
     'framework',
@@ -177,6 +179,7 @@ export {
   isClosedTaskStatus,
   isExplicitSingleTaskRoute,
   isFrameworkMaintenancePrompt,
+  isJournalingPrompt,
   isQueueRequestedPrompt,
   isTaskAlreadyActivelyClaimed,
   isTaskCardSurfaceOnlyMatch,
