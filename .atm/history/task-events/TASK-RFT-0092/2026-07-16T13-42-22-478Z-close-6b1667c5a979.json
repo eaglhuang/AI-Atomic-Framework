@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T13-42-22-478Z-close-6b1667c5a979",
+  "taskId": "TASK-RFT-0092",
+  "action": "close",
+  "actorId": "codex-task-rft-0092",
+  "sessionId": "session-20260716132404-codex-task-rft-0092-TASK-RFT-0092-24413f741d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0092.json",
+  "taskSha256": "sha256:627e55ef24366b9b3e3765dd6cc7aa4fdf07db63a208c3f0795caad00ac7f904",
+  "createdAt": "2026-07-16T13:42:22.478Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0092 --actor codex-task-rft-0092 --status done --historical-delivery 103eeb24405ec568b73ffced86ed2728b72e752e --historical-delivery d235d416714724dbd4a54342e762fe4d600640e6 --historical-delivery d69187291d06809673cc91a0d49444a7831d536d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716132404-codex-task-rft-0092-TASK-RFT-0092-24413f741d",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0092.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-core-registry --to 0.1.1 --legacy-target packages/core/src/registry/replacement-lane.ts#transitionReplacementMode --guidance-session guidance-20260716131837-247dc3c7eb --dry-run --json",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:registry-core",
+      "validate:validator-classification"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T13:42:22.469Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0092.*",
+        ".atm/history/task-events/TASK-RFT-0092/**",
+        ".atm/history/tasks/TASK-RFT-0092.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/evidence/__tests__/validator-classification.spec.ts",
+        "packages/cli/src/commands/evidence/validator-classification.ts",
+        "packages/core/src/registry/replacement-lane.ts",
+        "packages/core/src/registry/replacement-lane/**",
+        "release/atm-onefile/**",
+        "release/atm-root-drop/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/evidence/__tests__/validator-classification.spec.ts",
+        "packages/cli/src/commands/evidence/validator-classification.ts",
+        "packages/core/src/registry/replacement-lane.ts",
+        "packages/core/src/registry/replacement-lane/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
