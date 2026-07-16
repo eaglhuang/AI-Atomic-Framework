@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0080",
+  "title": "Split plugin governance local stores below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`packages/plugin-governance-local/src/stores.ts` is below 600 physical lines.",
+    "Every new file under `packages/plugin-governance-local/src/stores/**` is below 600 physical lines.",
+    "`createLocalGovernanceStores(config)` remains the public entry point used by `packages/plugin-governance-local/src/index.ts` and bootstrap callers.",
+    "Task, lock, document, shard, artifact, log, run report, state, rule, evidence, registry, context budget, and context summary behavior remains semantically equivalent.",
+    "Atomization coverage maps `packages/plugin-governance-local/src/stores.ts` and `packages/plugin-governance-local/src/stores/**` to `atm.plugin-governance-stores-map`."
+  ],
+  "deliverables": [
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-governance-local/src/stores/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json"
+  ],
+  "scopePaths": [
+    "packages/plugin-governance-local/src/stores.ts",
+    "packages/plugin-governance-local/src/stores/**",
+    "packages/plugin-governance-local/src/index.ts",
+    "scripts/validate-governance-local.ts",
+    "tests/atomic-map-physical-cap.test.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-governance-local.ts",
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "npm run typecheck",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert the delivery commit and generated taskflow governance commits; rerun atomization map shard merge if projection drift remains.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.plugin-governance-stores-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.plugin-governance-stores-map",
+        "pattern": "Facade",
+        "source": "packages/plugin-governance-local/src/stores.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.plugin-governance-store-adapters",
+        "pattern": "Adapter/Port",
+        "source": "packages/plugin-governance-local/src/stores/**",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "This card continues the TASK-RFT final-600 series after TASK-RFT-0079. The candidate was selected by source line scan on 2026-07-16: it was the largest remaining non-release, non-dist, non-fixture source file above 600 lines.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0080-plugin-governance-stores-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0080",
+    "headingLine": 55,
+    "hash": "52a8f2091a20b540",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0080-plugin-governance-stores-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:52a8f2091a20b540a5c5fa50f40a88fbd026c58a1f8471cdb63fbc8428cc826a",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T10:02:15.610Z"
+    }
+  },
+  "importedAt": "2026-07-16T10:02:15.610Z",
+  "lastTransitionId": "2026-07-16T10-02-29-592Z-claim-73d5474870ef",
+  "lastTransitionAt": "2026-07-16T10:02:29.592Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0080",
+  "reservedAt": "2026-07-16T10:02:26.127Z",
+  "promotedAt": "2026-07-16T10:02:26.130Z",
+  "claim": {
+    "actorId": "codex-task-rft-0080",
+    "leaseId": "lease-4ed76a0a3ed5",
+    "claimedAt": "2026-07-16T10:02:26.133Z",
+    "heartbeatAt": "2026-07-16T10:02:26.133Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0080.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/plugin-governance-local/src/index.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "packages/plugin-governance-local/src/stores/**",
+      "scripts/validate-governance-local.ts",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T10:02:26.133Z",
+  "startedByActor": "codex-task-rft-0080",
+  "startedBySessionId": "session-20260716100226-codex-task-rft-0080-TASK-RFT-0080-7ff66bc56a",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0080",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0080.*",
+      ".atm/history/task-events/TASK-RFT-0080/**",
+      ".atm/history/tasks/TASK-RFT-0080.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/plugin-governance-local/src/index.ts",
+      "packages/plugin-governance-local/src/stores.ts",
+      "packages/plugin-governance-local/src/stores/**",
+      "scripts/validate-governance-local.ts",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "63de8812aa10d1ee8a04a4c51f1ade045ac4b9c459d7dd1bb8f9f817b861e961",
+    "actorId": "codex-task-rft-0080",
+    "createdAt": "2026-07-16T10:02:29.591Z",
+    "status": "active"
+  }
+}
