@@ -1,11 +1,14 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0085",
-  "updatedAt": "2026-07-16T11:23:48.604Z",
+  "updatedAt": "2026-07-16T11:28:40.639Z",
   "updatedBy": "codex-task-rft-0085",
   "freshValidationPasses": [
+    "doctor",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
     "validate:operational-bench"
   ],
   "staleValidationPasses": [],
@@ -47,6 +50,45 @@
       "generatedAt": "2026-07-16T11:23:48.656Z",
       "runnerKind": "dev-source",
       "sourceCommit": "0e85f554924843657b5e9e12298fe4bfe76f95f2",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:049297b37beace9cbe455e907d7130134256350fd6117e8f9e3b2706c82de7bd",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "doctor"
+      ],
+      "generatedAt": "2026-07-16T11:27:01.940Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10b9e1131e1d6d913c30a78e9135c0677eb0790950179ef7fc01f1bd9e85fb17",
+      "stderrSha256": "sha256:965e80ca057d97434d6b6d2dc72767e083176cc583fff2639ae0ec67ab9dfc91",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T11:28:13.747Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T11:28:40.697Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

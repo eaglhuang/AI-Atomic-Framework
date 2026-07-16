@@ -1,0 +1,62 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T11-29-31-388Z-close-8627dab76d3e",
+  "taskId": "TASK-RFT-0085",
+  "action": "close",
+  "actorId": "codex-task-rft-0085",
+  "sessionId": "session-20260716111926-codex-task-rft-0085-TASK-RFT-0085-86ca3afe81",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0085.json",
+  "taskSha256": "sha256:45b5b2b5c6c47bc0ccead5c1b738d63dd37149ea74ea8bbe717a8921b9020462",
+  "createdAt": "2026-07-16T11:29:31.388Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0085 --actor codex-task-rft-0085 --status done --historical-delivery a02682347f3f269d94432296adb1abda558f8bbc",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716111926-codex-task-rft-0085-TASK-RFT-0085-86ca3afe81",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0085.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:operational-bench"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T11:29:31.378Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0085.*",
+        ".atm/history/task-events/TASK-RFT-0085/**",
+        ".atm/history/tasks/TASK-RFT-0085.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "scripts/lib/admission-bench/operational-artifacts.ts",
+        "scripts/lib/admission-bench/operational-runner.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/admission-bench/operational-artifacts.ts",
+        "scripts/lib/admission-bench/operational-runner.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
