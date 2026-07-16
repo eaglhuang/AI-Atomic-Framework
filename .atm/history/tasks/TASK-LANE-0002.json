@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-LANE-0002",
   "title": "Runner-sync queue health admission",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-LANE-0001"
@@ -89,8 +89,8 @@
     }
   },
   "importedAt": "2026-07-16T15:04:40.717Z",
-  "lastTransitionId": "2026-07-16T16-17-30-512Z-scope-amendment-bb48eaceee9a",
-  "lastTransitionAt": "2026-07-16T16:17:30.512Z",
+  "lastTransitionId": "2026-07-16T16-24-59-993Z-close-b2942d663fd2",
+  "lastTransitionAt": "2026-07-16T16:24:59.993Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-lane-0002",
   "reservedAt": "2026-07-16T16:11:27.210Z",
@@ -99,7 +99,7 @@
     "actorId": "codex-lane-0002",
     "leaseId": "lease-cc5c2947df54",
     "claimedAt": "2026-07-16T16:11:27.218Z",
-    "heartbeatAt": "2026-07-16T16:11:27.218Z",
+    "heartbeatAt": "2026-07-16T16:24:59.989Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-LANE-0002.*",
@@ -111,8 +111,8 @@
       "tests/cli/runner-sync-orphan-head.test.ts",
       "tests/cli/runner-sync-steward-release.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-16T16:11:27.218Z",
   "startedByActor": "codex-lane-0002",
@@ -150,5 +150,9 @@
     "sessionId": null,
     "createdAt": "2026-07-16T16:11:31.082Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-16T16:24:59.989Z",
+  "closedByActor": "codex-lane-0002",
+  "closedBySessionId": "session-20260716161127-codex-lane-0002-TASK-LANE-0002-6140ee722d",
+  "closurePacket": ".atm/history/evidence/TASK-LANE-0002.closure-packet.json"
 }
