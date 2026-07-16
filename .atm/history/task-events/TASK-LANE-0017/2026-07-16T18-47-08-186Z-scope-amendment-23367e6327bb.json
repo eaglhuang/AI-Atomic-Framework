@@ -1,0 +1,21 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T18-47-08-186Z-scope-amendment-23367e6327bb",
+  "taskId": "TASK-LANE-0017",
+  "action": "scope-amendment",
+  "actorId": "codex-lane-0017",
+  "sessionId": null,
+  "fromStatus": "running",
+  "toStatus": "running",
+  "taskPath": ".atm/history/tasks/TASK-LANE-0017.json",
+  "taskSha256": "sha256:a8f113f177cf7e5f8b959335f97c3b80351ed742f5aab5a9b99505c9c5ed8f0f",
+  "createdAt": "2026-07-16T18:47:08.186Z",
+  "command": "node atm.mjs tasks scope add --task TASK-LANE-0017 --actor codex-lane-0017 --add packages/cli/src/commands/next/claim-parallel-preflight.ts --reason \"Required caller wiring so next --claim uses the lane-aware owner comparison policy implemented by TASK-LANE-0017.\" --json",
+  "amendmentMetadata": {
+    "amendmentClass": "linked-surface",
+    "amendmentPhase": "during-implementation",
+    "amendmentMode": "normal",
+    "reason": "Required caller wiring so next --claim uses the lane-aware owner comparison policy implemented by TASK-LANE-0017."
+  }
+}

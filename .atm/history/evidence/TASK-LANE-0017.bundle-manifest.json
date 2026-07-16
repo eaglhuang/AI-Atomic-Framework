@@ -1,0 +1,68 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-LANE-0017",
+  "updatedAt": "2026-07-16T18:51:45.828Z",
+  "updatedBy": "codex-lane-0017",
+  "freshValidationPasses": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+    "typecheck",
+    "validate:cli"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:5c861bff6ac517c5aed08760e80db1a5cbeabdfe13f4c62337bc678a6853e9d7",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts"
+      ],
+      "generatedAt": "2026-07-16T18:51:00.998Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b2e768a0e89241ccd3cbe8d2839a49a8079509",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3cae9b394d442deae6d311b82bf406b312fa06d3e33b9f2ee857ae3e2d1cd16f",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts"
+      ],
+      "generatedAt": "2026-07-16T18:51:07.857Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b2e768a0e89241ccd3cbe8d2839a49a8079509",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T18:51:23.361Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b2e768a0e89241ccd3cbe8d2839a49a8079509",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:241057d795030e5ffb87e8acee4011de215e01ba0c65b548c398930009cd8212",
+      "stderrSha256": "sha256:4e5e402d81bb63905615b527ee3e07666d4b6ca60113a4c93d083b6c9b13e72f",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T18:51:45.960Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "c1b2e768a0e89241ccd3cbe8d2839a49a8079509",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

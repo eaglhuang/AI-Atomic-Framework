@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-LANE-0017",
+  "title": "Lane-aware claim conflict and broker lifecycle",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-LANE-0012",
+    "TASK-LANE-0016"
+  ],
+  "acceptance": [
+    "Same actor with different lane ids is treated as different ownership when both claims include lane ids.",
+    "Same lane is treated as the same owner even when actor metadata differs after an explicit adoption/handoff.",
+    "Legacy actor-only records retain current behavior.",
+    "Diagnostics report the comparison mode: `lane-id` or `actor-fallback`.",
+    "Claim repair and broker conflict guidance include lane id where available."
+  ],
+  "deliverables": [
+    "packages/cli/src/commands/next/claim-admission.ts",
+    "packages/cli/src/commands/next/broker-queue-admission.ts",
+    "packages/cli/src/commands/next/claim-conflict-log.ts",
+    "packages/cli/src/commands/broker/implementation.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+  ],
+  "scopePaths": [
+    "packages/cli/src/commands/next/claim-admission.ts",
+    "packages/cli/src/commands/next/broker-queue-admission.ts",
+    "packages/cli/src/commands/next/claim-conflict-log.ts",
+    "packages/cli/src/commands/broker/implementation.ts",
+    "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+    "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts"
+  ],
+  "validators": [
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+    "node --strip-types packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [
+    "Lane adoption command implementation",
+    "Framework temp lock keying"
+  ],
+  "nonGoals": [
+    "Do not bypass broker conflict blocked decisions."
+  ],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": "Revert conflict ownership comparisons to actor-only behavior.",
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.claim-admission-broker-lifecycle",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.lane-aware-owner-comparison",
+        "pattern": "Policy Object",
+        "source": "packages/cli/src/commands/next/claim-admission.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [
+    {
+      "code": "ATM_TASK_IMPORT_MECHANICAL_SPLIT_SCOPE_CHECKLIST",
+      "severity": "warning",
+      "field": "scopePaths",
+      "message": "Mechanical split/facade/module task appears to declare a narrow file boundary. Before the first delivery commit, review sibling files such as types.ts, shared.ts, constants.ts, registry files, and lane modules; add all expected paths once with `node atm.mjs tasks scope add --task <id> --paths <paths> --json`.",
+      "candidates": [
+        "packages/cli/src/commands/next/claim-admission.ts",
+        "packages/cli/src/commands/next/broker-queue-admission.ts",
+        "packages/cli/src/commands/next/claim-conflict-log.ts",
+        "packages/cli/src/commands/broker/implementation.ts",
+        "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts",
+        "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+        "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json"
+      ]
+    }
+  ],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-LANE-0017-lane-aware-conflict-broker-lifecycle.task.md",
+    "sectionTitle": "TASK-LANE-0017",
+    "headingLine": 55,
+    "hash": "632b95a41efa8a89",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-LANE-0017-lane-aware-conflict-broker-lifecycle.task.md",
+      "planningCommitSha": "c0ef3957558cf3255920da203f2e8884d57d3f8c",
+      "contentDigest": "sha256:632b95a41efa8a89cdb8cd7a05d65b1b16ccf8ebcf5545b31397027b35c37fa8",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T18:45:49.919Z"
+    }
+  },
+  "importedAt": "2026-07-16T18:45:49.919Z",
+  "lastTransitionId": "2026-07-16T18-47-08-186Z-scope-amendment-23367e6327bb",
+  "lastTransitionAt": "2026-07-16T18:47:08.186Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-lane-0017",
+  "reservedAt": "2026-07-16T18:46:21.752Z",
+  "promotedAt": "2026-07-16T18:46:21.755Z",
+  "claim": {
+    "actorId": "codex-lane-0017",
+    "leaseId": "lease-84b53a367263",
+    "claimedAt": "2026-07-16T18:46:21.758Z",
+    "heartbeatAt": "2026-07-16T18:46:21.758Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/evidence/TASK-LANE-0017.*",
+      ".atm/history/task-events/TASK-LANE-0017/**",
+      ".atm/history/tasks/TASK-LANE-0017.json",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "packages/cli/src/commands/next/broker-queue-admission.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T18:46:21.758Z",
+  "startedByActor": "codex-lane-0017",
+  "startedBySessionId": "session-20260716184621-codex-lane-0017-TASK-LANE-0017-b373036a1b",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-LANE-0017",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-LANE-0017.*",
+      ".atm/history/task-events/TASK-LANE-0017/**",
+      ".atm/history/tasks/TASK-LANE-0017.json",
+      "packages/cli/src/commands/broker/implementation.ts",
+      "packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "packages/cli/src/commands/next/__tests__/claim-broker-resolution.spec.ts",
+      "packages/cli/src/commands/next/broker-queue-admission.ts",
+      "packages/cli/src/commands/next/claim-admission.ts",
+      "packages/cli/src/commands/next/claim-conflict-log.ts",
+      "packages/cli/src/commands/next/claim-parallel-preflight.ts",
+      "packages/cli/src/commands/tasks/claim-repair-diagnostics.ts"
+    ],
+    "planningReadOnlyPaths": [
+      "C:/Users/User/3KLife/docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0017-lane-aware-conflict-broker-lifecycle.task.md"
+    ],
+    "planningMirrorPaths": [
+      "docs/ai_atomic_framework/",
+      "docs/ai_atomic_framework/governance-optimization/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/",
+      "docs/ai_atomic_framework/governance-optimization/tasks/TASK-LANE-0017-lane-aware-conflict-broker-lifecycle.task.md"
+    ],
+    "allowPlanningMirror": false,
+    "promptHash": "22b565c223d4f1098ee48507d59572ff56adea764ff3c9d9a0082254137edd9e",
+    "actorId": "codex-lane-0017",
+    "sessionId": null,
+    "createdAt": "2026-07-16T18:46:25.384Z",
+    "status": "active"
+  }
+}

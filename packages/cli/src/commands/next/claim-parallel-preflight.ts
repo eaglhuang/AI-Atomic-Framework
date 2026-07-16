@@ -2,7 +2,7 @@ import { collectResolutionAuthorizedForeignTaskIds } from '../broker-conflict-re
 import { buildBrokerConflictUxProjection } from '../team.ts';
 import { runTasks } from '../tasks/public-surface.ts';
 import { CliError } from '../shared.ts';
-import { deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission, resolveEffectiveShouldBlockPerCid } from './claim-admission.ts';
+import { compareClaimLifecycleOwners, deriveActiveWriteConflictFromOwnerComparison, deriveBrokerVerdict, deriveCidVerdict, evaluateClaimAdmission, resolveEffectiveShouldBlockPerCid } from './claim-admission.ts';
 import { evaluateBrokerQueueAdmission, type BrokerQueueAdmission } from './broker-queue-admission.ts';
 import { buildClaimAdmissionDecisionLog } from './claim-conflict-log.ts';
 import type { NextClaimIntent } from './claim-readiness.ts';
@@ -56,10 +56,25 @@ export async function runClaimParallelPreflight(input: {
             const conflictActorId = typeof candidate.activeClaimActorId === 'string' && candidate.activeClaimActorId.trim().length > 0
               ? candidate.activeClaimActorId
               : null;
+            const conflictLaneSessionId = normalizeCandidateLaneSessionId(candidate);
+            const currentLaneSessionId = typeof process.env.ATM_LANE_SESSION_ID === 'string' && process.env.ATM_LANE_SESSION_ID.trim()
+              ? process.env.ATM_LANE_SESSION_ID.trim()
+              : null;
+            const ownerComparison = compareClaimLifecycleOwners({
+              current: {
+                actorId: input.actorId,
+                laneSessionId: currentLaneSessionId
+              },
+              conflicting: {
+                actorId: conflictActorId,
+                laneSessionId: conflictLaneSessionId
+              }
+            });
             const conflictIntent = typeof candidate.activeClaimIntent === 'string' ? candidate.activeClaimIntent : null;
-            const activeWriteConflict = Boolean(conflictActorId)
-              && conflictActorId !== input.actorId
-              && conflictIntent !== 'closeout-only';
+            const activeWriteConflict = deriveActiveWriteConflictFromOwnerComparison({
+              comparison: ownerComparison,
+              conflictIntent
+            });
             const brokerAdmission = finding.brokerAdmission && typeof finding.brokerAdmission === 'object'
               ? finding.brokerAdmission as { confirmedConflict?: unknown; mutationIntentStatus?: unknown }
               : null;
@@ -139,7 +154,8 @@ export async function runClaimParallelPreflight(input: {
               cidVerdict,
               candidateTaskId: input.claimableTask.workItemId,
               conflictingTaskId: candidate.taskId,
-              overlappingAtomIds
+              overlappingAtomIds,
+              ownerComparison
             });
             const admissionReason = admission.admitted
               ? (queueAdmission.status === 'queued-private-work'
@@ -162,6 +178,7 @@ export async function runClaimParallelPreflight(input: {
               queueAdmission,
               overlappingFiles,
               decision: admission,
+              ownerComparison,
               admissionReason
             });
             if (!admission.admitted) {
@@ -172,6 +189,10 @@ export async function runClaimParallelPreflight(input: {
                   taskId: input.claimableTask.workItemId,
                   conflictWithTaskId: candidate.taskId,
                   conflictClaimActorId: conflictActorId,
+                  conflictClaimLaneSessionId: conflictLaneSessionId,
+                  currentActorId: input.actorId,
+                  currentLaneSessionId,
+                  ownerComparisonMode: ownerComparison.mode,
                   blockedTaskIds: conflictUx.blockedTaskIds,
                   sharedPaths: conflictUx.sharedPaths,
                   overlappingAtomIds,
@@ -199,6 +220,10 @@ export async function runClaimParallelPreflight(input: {
                   : 'parallel-safe-with-cid-overlap-advisory',
                 conflictWithTaskId: candidate.taskId,
                 conflictClaimActorId: conflictActorId,
+                conflictClaimLaneSessionId: conflictLaneSessionId,
+                currentActorId: input.actorId,
+                currentLaneSessionId,
+                ownerComparisonMode: ownerComparison.mode,
                 admitted: true,
                 admissionReason,
                 brokerVerdict,
@@ -232,4 +257,23 @@ export async function runClaimParallelPreflight(input: {
     // Other parallel errors are handled as best-effort
   }
   return { parallelAdvisory, brokerQueueAdmission, claimAllowedFiles };
+}
+
+function normalizeCandidateLaneSessionId(candidate: Record<string, unknown>): string | null {
+  const direct = normalizeString(candidate.activeClaimLaneSessionId)
+    ?? normalizeString(candidate.activeClaimLaneId)
+    ?? normalizeString(candidate.laneSessionId)
+    ?? normalizeString(candidate.guidanceSessionId);
+  if (direct) return direct;
+  const activeClaim = candidate.activeClaim && typeof candidate.activeClaim === 'object' && !Array.isArray(candidate.activeClaim)
+    ? candidate.activeClaim as Record<string, unknown>
+    : null;
+  const claimLane = activeClaim?.laneSession && typeof activeClaim.laneSession === 'object' && !Array.isArray(activeClaim.laneSession)
+    ? activeClaim.laneSession as Record<string, unknown>
+    : null;
+  return normalizeString(claimLane?.laneSessionId) ?? normalizeString(claimLane?.laneId);
+}
+
+function normalizeString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
