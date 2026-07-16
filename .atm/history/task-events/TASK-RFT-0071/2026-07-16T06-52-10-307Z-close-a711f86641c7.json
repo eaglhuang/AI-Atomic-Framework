@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T06-52-10-307Z-close-a711f86641c7",
+  "taskId": "TASK-RFT-0071",
+  "action": "close",
+  "actorId": "codex-task-rft-0071",
+  "sessionId": "session-20260716064525-codex-task-rft-0071-TASK-RFT-0071-cc088543c7",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0071.json",
+  "taskSha256": "sha256:7e6bb6fa5391d20a7199dde345c25aea6a2b9f1291284059aa800ee016b91ccc",
+  "createdAt": "2026-07-16T06:52:10.307Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0071 --actor codex-task-rft-0071 --status done --historical-delivery 50f7386042ed3aa44c00c742d813dbc426e4351d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716064525-codex-task-rft-0071-TASK-RFT-0071-cc088543c7",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0071.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types scripts/collect-broker-evidence.ts --help",
+      "node --strip-types tests/scripts/collect-broker-evidence-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T06:52:10.301Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0071.*",
+        ".atm/history/task-events/TASK-RFT-0071/**",
+        ".atm/history/tasks/TASK-RFT-0071.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/collect-broker-evidence.ts",
+        "scripts/collect-broker-evidence/**/*.ts",
+        "scripts/collect-broker-evidence/args.ts",
+        "scripts/collect-broker-evidence/artifacts.ts",
+        "scripts/collect-broker-evidence/loaders.ts",
+        "scripts/collect-broker-evidence/main.ts",
+        "scripts/collect-broker-evidence/report.ts",
+        "scripts/collect-broker-evidence/strings.ts",
+        "scripts/collect-broker-evidence/summaries.ts",
+        "scripts/collect-broker-evidence/types.ts",
+        "tests/scripts/collect-broker-evidence-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/collect-broker-evidence.ts",
+        "scripts/collect-broker-evidence/**/*.ts",
+        "scripts/collect-broker-evidence/args.ts",
+        "scripts/collect-broker-evidence/artifacts.ts",
+        "scripts/collect-broker-evidence/loaders.ts",
+        "scripts/collect-broker-evidence/main.ts",
+        "scripts/collect-broker-evidence/report.ts",
+        "scripts/collect-broker-evidence/strings.ts",
+        "scripts/collect-broker-evidence/summaries.ts",
+        "scripts/collect-broker-evidence/types.ts",
+        "tests/scripts/collect-broker-evidence-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
