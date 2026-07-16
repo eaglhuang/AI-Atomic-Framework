@@ -120,7 +120,7 @@ export async function validateAaoThroughputAgentJourney(tempRoot: string) {
   const currentAfterCheckpoint = compactAfterCheckpoint.evidence.current as any;
   assert(currentAfterCheckpoint.held === true, 'compact current must show held state after checkpoint --hold');
   assert(currentAfterCheckpoint.commitInstruction?.timing === 'after-checkpoint', 'held status must expose after-checkpoint commit instruction. Got: ' + JSON.stringify(currentAfterCheckpoint));
-  assert((currentAfterCheckpoint.commitInstruction?.files ?? []).some((entry: string) => entry.includes('TASK-ADOPT-0002')), 'commit instruction must reference the current queue-head governance files');
+  assert((currentAfterCheckpoint.commitInstruction?.files ?? []).some((entry: string) => entry.includes('TASK-ADOPT-0001')), 'commit instruction must reference the just-checkpointed task governance files');
   assert(String(currentAfterCheckpoint.commands?.resume ?? '').includes(`--batch ${batchId}`), 'compact current must provide a batch-specific resume command');
 
   runGit(repo, ['add',
@@ -144,9 +144,9 @@ export async function validateAaoThroughputAgentJourney(tempRoot: string) {
     delete process.env.GIT_AUTHOR_NAME;
     delete process.env.GIT_AUTHOR_EMAIL;
   }
-  assert(preCommit.ok === false, 'checkpoint commit window currently blocks held batch commit until ATM resolves the held checkpoint contract');
+  assert(preCommit.ok === true, `checkpoint commit window must pass after checkpoint --hold. Got: ${JSON.stringify((preCommit.evidence as any)?.blockingFindings ?? preCommit.messages ?? [])}`);
   const preCommitFindings = ((preCommit.evidence as any).blockingFindings ?? []) as Array<Record<string, any>>;
-  assert(preCommitFindings.some((entry) => entry.code === 'ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT'), 'held checkpoint pre-commit block must expose ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT');
+  assert(!preCommitFindings.some((entry) => entry.code === 'ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT'), 'held checkpoint commit window must not expose ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT');
   runGit(repo, ['reset', '--', '.']);
   runGit(repo, ['checkout', '--', '.']);
 
@@ -330,6 +330,7 @@ export async function validateAdopterGoverned(tempRoot: string) {
   const checkpointCurrent = checkpointWindowStatus.evidence.current as any;
   assert(checkpointCurrent?.currentTaskId === 'TASK-ADOPT-0002', 'batch current --compact must advance to TASK-ADOPT-0002 after checkpoint. Got: ' + JSON.stringify(checkpointCurrent));
   assert(checkpointCurrent?.commitInstruction?.timing === 'after-checkpoint', 'batch current --compact must expose after-checkpoint commit instruction. Got: ' + JSON.stringify(checkpointCurrent));
+  assert((checkpointCurrent?.commitInstruction?.files ?? []).some((entry: string) => entry.includes('TASK-ADOPT-0001')), 'post-checkpoint commit instruction must reference the pending commit task. Got: ' + JSON.stringify(checkpointCurrent));
   const afterFirstClose = await runNext(['--cwd', repo, '--prompt', prompt]);
   assert((afterFirstClose.evidence.nextAction as any).queueHeadTaskId === 'TASK-ADOPT-0002', 'adopter queue must advance to second task after closing first');
   runGit(repo, ['add',

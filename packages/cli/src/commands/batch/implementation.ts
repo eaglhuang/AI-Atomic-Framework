@@ -276,13 +276,14 @@ const scope = queueHead ? partitionTaskScope(queueHead) : null;
 const validators = queueHead ? readTaskValidators(cwd, queueHead.taskPath) : [];
 const batchId = batchRun?.batchId ?? null;
 const currentTaskId = batchRun?.currentTaskId ?? taskQueue?.taskIds?.[taskQueue?.currentIndex ?? 0] ?? null;
+const commitInstructionTaskId = pendingCommitWindow?.taskId ?? batchRun?.pendingCommitTaskId ?? currentTaskId;
 const held = Boolean(batchRun?.hold);
 const resumeCommand = batchRun?.hold?.resumeCommand ?? (batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null); return { schemaId: 'atm.batchCurrent.v1', ok: consistency.ok, active: Boolean(batchRun), activeBatchCount, batchId, scopeKey: batchRun?.scopeKey ?? null, queueId: taskQueue?.queueId ?? batchRun?.queueId ?? null,
 currentIndex: batchRun?.currentIndex ?? taskQueue?.currentIndex ?? null, totalTasks: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, progress: buildCompactProgress(batchRun, taskQueue), held, hold: batchRun?.hold ?? null, skippedTasks: batchRun?.skippedTasks ?? [], auditSummary: buildBatchAuditSummary(batchRun), currentTaskId, currentTask: queueHead ? { workItemId: queueHead.workItemId,
 title: queueHead.title, taskPath: queueHead.taskPath, sourcePlanPath: queueHead.sourcePlanPath, targetRepo: queueHead.targetRepo }
 : null, allowedFiles: scope?.targetWork.allowedFiles ?? [], planningReadOnlyPaths: scope?.planningContext.readOnlyPaths ?? [], validators, pendingCommitWindow, checkpointCommand: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, commands: { checkpoint: batchId ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --json` : null, checkpointHold: batchId
 ? `node atm.mjs batch checkpoint --actor <id> --batch ${batchId} --hold --json` : null, resume: batchId ? `node atm.mjs batch resume --actor <id> --batch ${batchId} --json` : null, repair: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', status: batchId ? `node atm.mjs batch current --batch ${batchId} --compact --json`
-: 'node atm.mjs batch current --compact --json' }, commitInstruction: currentTaskId ? { timing: 'after-checkpoint', files: [ '<deliverables>', `.atm/history/tasks/${currentTaskId}.json`, `.atm/history/evidence/${currentTaskId}.json`, `.atm/history/task-events/${currentTaskId}/` ] }
+: 'node atm.mjs batch current --compact --json' }, commitInstruction: commitInstructionTaskId ? { timing: 'after-checkpoint', files: pendingCommitWindow?.commitFiles ?? [ '<deliverables>', `.atm/history/tasks/${commitInstructionTaskId}.json`, `.atm/history/evidence/${commitInstructionTaskId}.json`, `.atm/history/task-events/${commitInstructionTaskId}/` ] }
 : null, nextCommand: batchRun?.sourcePrompt ? `node atm.mjs next --claim --actor <id> --prompt "${batchRun.sourcePrompt}" --json` : null, resumeCommand, repairCommand: batchId ? `node atm.mjs batch repair --actor <id> --batch ${batchId} --json` : 'node atm.mjs batch repair --actor <id> --json', omitted: { taskIds: batchRun?.taskIds?.length ?? taskQueue?.taskIds?.length ?? 0, fullTaskQueue: true, fullBatchRun: true,
 useVerboseCommand: batchId ? `node atm.mjs batch status --batch ${batchId} --json` : 'node atm.mjs batch status --json' }, consistency };
 }
@@ -297,7 +298,7 @@ const lastTransitionId = typeof task.lastTransitionId === 'string' ? task.lastTr
 const eventFile = `.atm/history/task-events/${taskId}/${lastTransitionId}.json`; if (!lastTransitionId) continue; if (gitChanges.available && !changedFiles.includes(eventFile)) continue;
 const event = readJsonRecord(cwd, eventFile);
 const closure = event?.closure as { schemaId?: unknown; batchId?: unknown } | undefined;
-const checkpointClosure = typeof event?.command === 'string' && event.command.startsWith('node atm.mjs tasks close') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (event.command.includes(`--batch ${batchRun.batchId}`) || closure?.batchId === batchRun.batchId); if (!checkpointClosure) continue;
+const checkpointClosure = typeof event?.command === 'string' && event.command.startsWith('node atm.mjs ') && (event.command.includes('--from-batch-checkpoint') || closure?.schemaId === 'atm.taskClosureTransition.v1') && (event.command.includes(`--batch ${batchRun.batchId}`) || closure?.batchId === batchRun.batchId); if (!checkpointClosure) continue;
 const scope = extractTaskScopeFiles(task);
 const deliverableFiles = changedFiles.filter((file) => scope.some((allowed) => isPathAllowedByScope(file, [allowed])));
 const evidenceFile = `.atm/history/evidence/${taskId}.json`;

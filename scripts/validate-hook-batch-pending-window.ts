@@ -85,6 +85,10 @@ try {
 
   const report = inspectProtectedAtmStateChanges(tempRoot, staged);
   assert(
+    !report.findings.some((finding) => finding.reason === 'batch-commit-before-checkpoint'),
+    'pending batch checkpoint window should authorize the staged deliverable commit'
+  );
+  assert(
     !report.findings.some((finding) => finding.reason === 'evidence-file-missing-task-context'),
     'pending batch checkpoint window should authorize covered evidence artifacts'
   );

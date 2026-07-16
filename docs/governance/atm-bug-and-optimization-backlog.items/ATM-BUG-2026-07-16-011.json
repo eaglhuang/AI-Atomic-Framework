@@ -5,10 +5,10 @@
   "repo": "AI-Atomic-Framework",
   "type": "Bug",
   "severity": "High",
-  "status": "Open",
+  "status": "Fixed in TASK-CODEX-011190",
   "area": "Governance",
   "finding": "The task-direction governance validator exposed a batch checkpoint --hold contract mismatch: after a held checkpoint, compact batch current reports hold state and commitInstruction, but pre-commit still blocks the staged just-checkpointed deliverable with ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT.",
   "expectedBehavior": "A held checkpoint should either preserve a commit window that pre-commit accepts for the just-checkpointed task, or the batch current/close guidance should clearly state that commits are intentionally blocked until a different governed resume/commit path is used.",
-  "evidenceOrRepro": "TASK-RFT-0066 while running npm run validate:task-direction-governance: validateAaoThroughputAgentJourney saw batch current --compact return held=true and commitInstruction.timing=after-checkpoint, then runHook(pre-commit) blocked src/one.ts with ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT.",
-  "followUp": "Add a focused product task to reconcile batch checkpoint --hold, compact current commitInstruction, close-commit-window locks, and pre-commit protected-state checks; decide whether held checkpoint commits are allowed or explicitly unsupported."
+  "evidenceOrRepro": "TASK-RFT-0066 while running npm run validate:task-direction-governance: validateAaoThroughputAgentJourney saw batch current --compact return held=true and commitInstruction.timing=after-checkpoint, then runHook(pre-commit) blocked src/one.ts with ATM_PROTECTED_STATE_BATCH_COMMIT_BEFORE_CHECKPOINT. TASK-CODEX-011190 fixes the contract: compact status points commitInstruction at the just-checkpointed pending task, and pre-commit accepts staged checkpoint closure bundles including deliverables.",
+  "followUp": "Covered by node --strip-types scripts/validate-task-direction-governance.ts and node --strip-types scripts/validate-hook-batch-pending-window.ts."
 }
