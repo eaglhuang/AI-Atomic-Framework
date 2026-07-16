@@ -1,0 +1,78 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T09-00-33-409Z-close-4a3f4e4617ad",
+  "taskId": "TASK-RFT-0076",
+  "action": "close",
+  "actorId": "codex-task-rft-0076",
+  "sessionId": "session-20260716074027-codex-task-rft-0076-TASK-RFT-0076-025803fdc0",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0076.json",
+  "taskSha256": "sha256:09aae99e347037ad8368f3d7f018b82a0934f1f8290ce98280ff0d36980aa442",
+  "createdAt": "2026-07-16T09:00:33.409Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0076 --actor codex-task-rft-0076 --status done --historical-delivery ae3c6f8f67ac034db670832421135be8dd29022a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716074027-codex-task-rft-0076-TASK-RFT-0076-025803fdc0",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0076.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types tests/cli/doctor-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T09:00:33.397Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0076.*",
+        ".atm/history/task-events/TASK-RFT-0076/**",
+        ".atm/history/tasks/TASK-RFT-0076.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-014.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/doctor/**/*.ts",
+        "packages/cli/src/commands/doctor/constants.ts",
+        "packages/cli/src/commands/doctor/lifecycle.ts",
+        "packages/cli/src/commands/doctor/policy.ts",
+        "packages/cli/src/commands/doctor/readiness.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "packages/cli/src/commands/doctor/types.ts",
+        "packages/cli/src/commands/doctor/utilities.ts",
+        "tests/cli/doctor-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/doctor.ts",
+        "packages/cli/src/commands/doctor/**/*.ts",
+        "packages/cli/src/commands/doctor/constants.ts",
+        "packages/cli/src/commands/doctor/lifecycle.ts",
+        "packages/cli/src/commands/doctor/policy.ts",
+        "packages/cli/src/commands/doctor/readiness.ts",
+        "packages/cli/src/commands/doctor/run-doctor.ts",
+        "packages/cli/src/commands/doctor/types.ts",
+        "packages/cli/src/commands/doctor/utilities.ts",
+        "tests/cli/doctor-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
