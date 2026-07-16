@@ -1,0 +1,71 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T07-15-15-439Z-close-4f06fb755158",
+  "taskId": "TASK-RFT-0073",
+  "action": "close",
+  "actorId": "codex-task-rft-0073",
+  "sessionId": "session-20260716070425-codex-task-rft-0073-TASK-RFT-0073-346686340c",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0073.json",
+  "taskSha256": "sha256:45f8510e69c373283d7e10dfa16deaff0a8bc279011d5d31ab0fd6848012e788",
+  "createdAt": "2026-07-16T07:15:15.439Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0073 --actor codex-task-rft-0073 --status done --historical-delivery f9663ad1cf2dca8c8680cdeb3e873b948afd43c6",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716070425-codex-task-rft-0073-TASK-RFT-0073-346686340c",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0073.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/atm-chart-final-600.test.ts",
+      "node atm.mjs atm-chart render --json",
+      "node atm.mjs atm-chart verify --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T07:15:15.433Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0073.*",
+        ".atm/history/task-events/TASK-RFT-0073/**",
+        ".atm/history/tasks/TASK-RFT-0073.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/atm-chart.ts",
+        "packages/cli/src/commands/atm-chart/**/*.ts",
+        "packages/cli/src/commands/atm-chart/compatibility.ts",
+        "packages/cli/src/commands/atm-chart/constants.ts",
+        "packages/cli/src/commands/atm-chart/render-verify.ts",
+        "packages/cli/src/commands/atm-chart/types.ts",
+        "tests/cli/atm-chart-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/atm-chart.ts",
+        "packages/cli/src/commands/atm-chart/**/*.ts",
+        "packages/cli/src/commands/atm-chart/compatibility.ts",
+        "packages/cli/src/commands/atm-chart/constants.ts",
+        "packages/cli/src/commands/atm-chart/render-verify.ts",
+        "packages/cli/src/commands/atm-chart/types.ts",
+        "tests/cli/atm-chart-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

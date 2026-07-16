@@ -1,7 +1,7 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0073",
-  "updatedAt": "2026-07-16T07:10:46.876Z",
+  "updatedAt": "2026-07-16T07:14:36.816Z",
   "updatedBy": "codex-task-rft-0073",
   "freshValidationPasses": [
     "node --strip-types tests/cli/atm-chart-final-600.test.ts",
@@ -9,6 +9,7 @@
     "node atm.mjs atm-chart verify --json",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:governance-projections"
   ],
   "staleValidationPasses": [],
@@ -89,6 +90,19 @@
       "generatedAt": "2026-07-16T07:10:46.922Z",
       "runnerKind": "dev-source",
       "sourceCommit": "4e529e9118828b06945dc5caa8e3ae8e9b02ab2c",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T07:14:36.880Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "f9663ad1cf2dca8c8680cdeb3e873b948afd43c6",
       "cached": false
     }
   ],
