@@ -1,0 +1,219 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0078",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "53c7fa4246fe37c3d944d95c6358686d539054aa",
+  "governedTreeSha": "249eb2f2537e0f4395b24cffbcb944728846bfb7",
+  "targetCommitDelta": {
+    "currentCommitSha": "53c7fa4246fe37c3d944d95c6358686d539054aa",
+    "parentCommitShas": [
+      "53c7fa4246fe37c3d944d95c6358686d539054aa"
+    ],
+    "governedTreeSha": "249eb2f2537e0f4395b24cffbcb944728846bfb7",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0078.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0078.json",
+      ".atm/memory/atm-chart.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "release/atm-onefile/atm.mjs",
+      "release/atm-onefile/release-manifest.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-core.json",
+      "release/atm-root-drop/atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "release/atm-root-drop/docs/governance/atm-bug-and-optimization-backlog.md",
+      "release/atm-root-drop/package.json",
+      "release/atm-root-drop/packages/cli/dist/commands/atm-chart.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/atm-chart.js",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/doctor.js",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/framework-development/runner-sync-admission.js",
+      "release/atm-root-drop/packages/cli/dist/commands/integration.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/integration.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/__tests__/claim-admission.spec.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/intent-normalizers.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/intent-normalizers.js",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-predicates.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/next/route-predicates.js",
+      "release/atm-root-drop/packages/cli/dist/commands/route.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/route.js",
+      "release/atm-root-drop/packages/cli/dist/commands/tasks/close-orchestrator.js",
+      "release/atm-root-drop/packages/cli/dist/commands/team/efficiency-controller.d.ts",
+      "release/atm-root-drop/packages/cli/dist/commands/team/efficiency-controller.js",
+      "release/atm-root-drop/packages/cli/src/commands/atm-chart.ts",
+      "release/atm-root-drop/packages/cli/src/commands/doctor.ts",
+      "release/atm-root-drop/packages/cli/src/commands/framework-development/runner-sync-admission.ts",
+      "release/atm-root-drop/packages/cli/src/commands/integration.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/__tests__/claim-admission.spec.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/intent-normalizers.ts",
+      "release/atm-root-drop/packages/cli/src/commands/next/route-predicates.ts",
+      "release/atm-root-drop/packages/cli/src/commands/route.ts",
+      "release/atm-root-drop/packages/cli/src/commands/tasks/close-orchestrator.ts",
+      "release/atm-root-drop/packages/cli/src/commands/team/efficiency-controller.ts",
+      "release/atm-root-drop/packages/core/dist/broker/decision.js",
+      "release/atm-root-drop/packages/core/dist/registry/registry.d.ts",
+      "release/atm-root-drop/packages/core/dist/registry/registry.js",
+      "release/atm-root-drop/packages/core/dist/team-runtime/providers/openai.d.ts",
+      "release/atm-root-drop/packages/core/dist/team-runtime/providers/openai.js",
+      "release/atm-root-drop/packages/core/src/broker/decision.ts",
+      "release/atm-root-drop/packages/core/src/registry/registry.ts",
+      "release/atm-root-drop/packages/core/src/team-runtime/providers/openai.ts",
+      "release/atm-root-drop/release-manifest.json",
+      "release/atm-root-drop/scripts/collect-broker-evidence.ts",
+      "release/atm-root-drop/scripts/validate-git-hooks-enforcement.ts",
+      "release/atm-root-drop/scripts/validate-schemas.ts",
+      "release/atm-root-drop/scripts/validate-task-direction-governance.ts",
+      "release/atm-root-drop/scripts/validate-task-import.ts",
+      "release/atm-root-drop/scripts/validate-team-brokered-write.ts",
+      "release/atm-root-drop/tests/cli/runner-sync-foreign-dirty-owner.test.ts",
+      "release/atm-root-drop/tests/cli/team-agents-dogfood.test.ts",
+      "release/atm-root-drop/tests/cli/team-efficiency-controller.test.ts",
+      "tests/atomic-map-physical-cap.test.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node --strip-types scripts/validate-atomization-coverage.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:82f6f0cc41c642ca139d07f4a4ecf64b959b63e8e74d3a7c0dec0141e0cc29ce",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:04ca4d921a653228428ec90be89773edf73d78fb1befb0c6b9d0bfa98473bde8",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types tests/atomic-map-physical-cap.test.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:d6a5394961ecbeb0dd15beb80213bf56fd974337c827996e91b8c0422bcb4843",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a58e3489bbb9929ce3f3f21b65203a082cd03b5c11e24ee1ca6d2782b40464bb",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:10b9e1131e1d6d913c30a78e9135c0677eb0790950179ef7fc01f1bd9e85fb17",
+      "stderrSha256": "sha256:6c36d34550eacae08a4650da8d12df0dfc1e188eb91b9c37818f91d6a0caa8a9",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node --strip-types tests/atomic-map-physical-cap.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:atomization-coverage",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T09:39:30.581Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0078.*",
+      ".atm/history/task-events/TASK-RFT-0078/**",
+      ".atm/history/tasks/TASK-RFT-0078.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/manifest.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli-*.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "criticalChangedFiles": [
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0078.json",
+  "closedAt": "2026-07-16T09:39:30.581Z",
+  "closedByActor": "codex-task-rft-0078",
+  "sessionId": "session-20260716093220-codex-task-rft-0078-TASK-RFT-0078-da82ee218a",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "53c7fa4246fe37c3d944d95c6358686d539054aa",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "tests/atomic-map-physical-cap.test.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0078.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0078/2026-07-16T09-32-19-200Z-import-80f9abe02112.json",
+      ".atm/history/task-events/TASK-RFT-0078/2026-07-16T09-32-20-754Z-reserve-117cea36f5a6.json",
+      ".atm/history/task-events/TASK-RFT-0078/2026-07-16T09-32-20-756Z-promote-7651b7d00453.json",
+      ".atm/history/task-events/TASK-RFT-0078/2026-07-16T09-32-24-283Z-claim-ce7245f6f807.json",
+      ".atm/history/tasks/TASK-RFT-0078.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}
