@@ -1,12 +1,16 @@
 {
   "schemaId": "atm.evidenceBundleManifest.v1",
   "taskId": "TASK-RFT-0093",
-  "updatedAt": "2026-07-16T14:02:20.115Z",
+  "updatedAt": "2026-07-16T14:07:56.394Z",
   "updatedBy": "codex-task-rft-0093",
   "freshValidationPasses": [
+    "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/internal-release.ts into a facade plus internal-release/* support modules; every physical TypeScript file must stay under 600 lines; preserve behavior and ATM governance evidence.\" --json",
+    "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split",
+    "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-internal-release --to 0.1.1 --legacy-target packages/cli/src/commands/internal-release.ts#runInternalReleaseSync --guidance-session guidance-20260716134604-b8aceaf31b --dry-run --json",
     "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
     "typecheck",
     "validate:cli",
+    "validate:git-head-evidence",
     "validate:internal-release-sync"
   ],
   "staleValidationPasses": [],
@@ -72,6 +76,71 @@
       "generatedAt": "2026-07-16T14:02:20.236Z",
       "runnerKind": "dev-source",
       "sourceCommit": "41d335528a0058052c9121898f9bbdc1fbdad4f6",
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0d3ae3f8a18239ffa74b3f8d514c70d80d3bbebd3336b57b931358b005b4d99e",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split"
+      ],
+      "generatedAt": "2026-07-16T14:05:41.994Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-internal-release --to 0.1.1 --legacy-target packages/cli/src/commands/internal-release.ts#runInternalReleaseSync --guidance-session guidance-20260716134604-b8aceaf31b --dry-run --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:793f66b5108f2655fb7fd8d9c9724be143d93c329512e9a31a60d052826e8886",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-internal-release --to 0.1.1 --legacy-target packages/cli/src/commands/internal-release.ts#runInternalReleaseSync --guidance-session guidance-20260716134604-b8aceaf31b --dry-run --json"
+      ],
+      "generatedAt": "2026-07-16T14:05:42.372Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:git-head-evidence"
+      ],
+      "generatedAt": "2026-07-16T14:06:23.100Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:4d23c2f0e2585957519b7b6ac4d77079d3d79480fc2d9869254a74f807eebd01",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split"
+      ],
+      "generatedAt": "2026-07-16T14:06:42.250Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
+      "cached": false
+    },
+    {
+      "command": "node atm.mjs candidates rank --include \"pipelines/**/*.py\" --goal \"Split packages/cli/src/commands/internal-release.ts into a facade plus internal-release/* support modules; every physical TypeScript file must stay under 600 lines; preserve behavior and ATM governance evidence.\" --json",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "sha256:67f7d5e330ed73f45a5318139e631920f8dd56ab9e036ad95fa2266109278a73",
+      "validators": [
+        "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/internal-release.ts into a facade plus internal-release/* support modules; every physical TypeScript file must stay under 600 lines; preserve behavior and ATM governance evidence.\" --json"
+      ],
+      "generatedAt": "2026-07-16T14:07:38.3196035Z",
+      "runnerKind": "unknown",
+      "sourceCommit": null,
       "cached": false
     }
   ],

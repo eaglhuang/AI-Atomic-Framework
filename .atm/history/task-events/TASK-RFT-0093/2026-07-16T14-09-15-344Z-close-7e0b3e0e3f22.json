@@ -1,0 +1,65 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T14-09-15-344Z-close-7e0b3e0e3f22",
+  "taskId": "TASK-RFT-0093",
+  "action": "close",
+  "actorId": "codex-task-rft-0093",
+  "sessionId": "session-20260716135511-codex-task-rft-0093-TASK-RFT-0093-c7b34b0420",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0093.json",
+  "taskSha256": "sha256:754829358bcac5b3aae2936609e31766574677b759cfff479a85b478bd9a813f",
+  "createdAt": "2026-07-16T14:09:15.344Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0093 --actor codex-task-rft-0093 --status done --historical-delivery ae5d7f4bc05ce76b3880a997f53db66c7a443d98",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716135511-codex-task-rft-0093-TASK-RFT-0093-c7b34b0420",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0093.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node atm.mjs candidates rank --include pipelines/**/*.py --goal \"Split packages/cli/src/commands/internal-release.ts into a facade plus internal-release/* support modules; every physical TypeScript file must stay under 600 lines; preserve behavior and ATM governance evidence.\" --json",
+      "node atm.mjs candidates rank --include pipelines/**/*.py --goal Split",
+      "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-internal-release --to 0.1.1 --legacy-target packages/cli/src/commands/internal-release.ts#runInternalReleaseSync --guidance-session guidance-20260716134604-b8aceaf31b --dry-run --json",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:internal-release-sync"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T14:09:15.331Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0093.*",
+        ".atm/history/task-events/TASK-RFT-0093/**",
+        ".atm/history/tasks/TASK-RFT-0093.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "packages/cli/src/commands/internal-release.ts",
+        "packages/cli/src/commands/internal-release/**",
+        "scripts/validate-internal-release-sync.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/internal-release.ts",
+        "packages/cli/src/commands/internal-release/**",
+        "scripts/validate-internal-release-sync.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
