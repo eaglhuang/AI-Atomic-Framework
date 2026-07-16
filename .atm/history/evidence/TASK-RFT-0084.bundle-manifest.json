@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0084",
+  "updatedAt": "2026-07-16T11:09:39.886Z",
+  "updatedBy": "codex-task-rft-0084",
+  "freshValidationPasses": [
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:guidance"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:3ef6c2137f6c6fb0143b6aee79a181e26d4c8cc5280e8129a7c423ccfa288a29",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T11:09:10.600Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b78222db11839e9f1a8518e06dd8e06836d7b9a",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T11:09:21.025Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b78222db11839e9f1a8518e06dd8e06836d7b9a",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:guidance",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:e2dc57890066c9175a4b7ce834eaef1ea9c560dd02d9f125a1834bd946c7907c",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:guidance"
+      ],
+      "generatedAt": "2026-07-16T11:09:39.950Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "5b78222db11839e9f1a8518e06dd8e06836d7b9a",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

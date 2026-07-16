@@ -1,0 +1,141 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0084",
+  "title": "Split guidance validator below 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [],
+  "acceptance": [
+    "`scripts/validate-guidance.ts` is below 600 physical lines.",
+    "Every new file under `scripts/lib/validate-guidance/**` is below 600 physical lines.",
+    "`npm run validate:guidance` continues to pass.",
+    "`npm run typecheck` continues to pass.",
+    "Atomization coverage maps the validator facade and support directory to `atm.guidance-validator-map`."
+  ],
+  "deliverables": [
+    "scripts/validate-guidance.ts",
+    "scripts/lib/validate-guidance/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+  ],
+  "scopePaths": [
+    "scripts/validate-guidance.ts",
+    "scripts/lib/validate-guidance/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js"
+  ],
+  "validators": [
+    "npm run validate:guidance",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "npm run typecheck",
+    "node atm.mjs doctor --json"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atm.guidance-validator-map",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atm.guidance-validator-map",
+        "pattern": "Facade",
+        "source": "scripts/validate-guidance.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atm.guidance-host-local-shadow-evidence-map",
+        "pattern": "Result Contract Object",
+        "source": "scripts/lib/validate-guidance/**",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": null,
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0084-validate-guidance-final-600.task.md",
+    "sectionTitle": "TASK-RFT-0084",
+    "headingLine": 50,
+    "hash": "1d7c4fd5c2b3b2bf",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0084-validate-guidance-final-600.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:1d7c4fd5c2b3b2bf0985147acee60d585283dee7752556aa799823f174a685b1",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T11:05:39.573Z"
+    }
+  },
+  "importedAt": "2026-07-16T11:05:39.573Z",
+  "lastTransitionId": "2026-07-16T11-05-47-132Z-claim-bfcf9aec27a8",
+  "lastTransitionAt": "2026-07-16T11:05:47.132Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0084",
+  "reservedAt": "2026-07-16T11:05:43.850Z",
+  "promotedAt": "2026-07-16T11:05:43.852Z",
+  "claim": {
+    "actorId": "codex-task-rft-0084",
+    "leaseId": "lease-4148513765c4",
+    "claimedAt": "2026-07-16T11:05:43.854Z",
+    "heartbeatAt": "2026-07-16T11:05:43.854Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0084.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "scripts/lib/validate-guidance/**",
+      "scripts/validate-guidance.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T11:05:43.854Z",
+  "startedByActor": "codex-task-rft-0084",
+  "startedBySessionId": "session-20260716110543-codex-task-rft-0084-TASK-RFT-0084-49cf998b71",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0084",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0084.*",
+      ".atm/history/task-events/TASK-RFT-0084/**",
+      ".atm/history/tasks/TASK-RFT-0084.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "scripts/lib/validate-guidance/**",
+      "scripts/validate-guidance.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "fb236c4b20e3d397ca2d01d5507c206910376ed451d35eb278e0d581037628b1",
+    "actorId": "codex-task-rft-0084",
+    "createdAt": "2026-07-16T11:05:47.131Z",
+    "status": "active"
+  }
+}
