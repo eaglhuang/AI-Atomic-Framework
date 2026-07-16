@@ -1,6 +1,6 @@
 {
   "taskId": "TASK-RFT-0095",
-  "updatedAt": "2026-07-16T15:33:03.943Z",
+  "updatedAt": "2026-07-16T15:43:27.514Z",
   "evidence": [
     {
       "evidenceKind": "validation",
@@ -557,6 +557,194 @@
         "commandRunCache": {
           "schemaId": "atm.commandRunCache.v1",
           "cacheKey": "sha256:2200290694ea92809727e81fe4e4329b2195258aa1603b13df93450ed7e05932",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0095",
+      "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+      "createdAt": "2026-07-16T15:41:57.810Z",
+      "details": {
+        "actorId": "codex-task-rft-0095",
+        "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-upgrade-proposal",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:95644e6d398ac3d12e64cb9870d1946693d246e142cfdbd121c0a666d3113a7d",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "fd723237e323bff8d6f5dd9e03891b498a188b84",
+            "cacheKey": "sha256:31cec51886bc8c649f45a5cf0459102584ef472eb1c288f0ec7f4a6eb5f5a45a",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:41:58.013Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:4ad320071280a7084c305cb7f0d795860d7cee2b4dfc17a7ec00ba7be97b1f55",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: npm run validate:git-head-evidence",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0095",
+      "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+      "createdAt": "2026-07-16T15:42:59.091Z",
+      "details": {
+        "actorId": "codex-task-rft-0095",
+        "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "validate:git-head-evidence"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-upgrade-proposal",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "npm run validate:git-head-evidence",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "validate:git-head-evidence"
+            ],
+            "cwd": ".",
+            "runnerKind": "dev-source",
+            "sourceCommit": "02b3959e4159bc3a32c494233fc452df8918d808",
+            "cacheKey": "sha256:697744510bd8fc9f99e4c230e4b132979e1bb0a522f63032e04fd3a230881ead",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:42:59.315Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:3b89e3ab670797ceeab7e4588aa643621c28c61c358b8e1f0486cf6079004a4d",
+          "reusedRunCount": 0,
+          "runCount": 1,
+          "sourcePath": null
+        }
+      }
+    },
+    {
+      "evidenceKind": "validation",
+      "evidenceType": "test",
+      "summary": "Auto-run: node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal \"Split packages/cli/src/commands/upgrade/proposal.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve upgrade proposal behavior and ATM evidence.\" --json",
+      "artifactPaths": [],
+      "evidenceFreshness": "fresh",
+      "producedBy": "codex-task-rft-0095",
+      "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+      "createdAt": "2026-07-16T15:43:27.514Z",
+      "details": {
+        "actorId": "codex-task-rft-0095",
+        "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+        "kind": "test",
+        "freshness": "fresh",
+        "validationPasses": [
+          "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal \"Split packages/cli/src/commands/upgrade/proposal.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve upgrade proposal behavior and ATM evidence.\" --json"
+        ],
+        "atomHealthClaims": [
+          {
+            "atomOrMapId": "atom-cli-upgrade-proposal",
+            "kind": "owner",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          },
+          {
+            "atomOrMapId": "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+            "kind": "map-update",
+            "generatedByTask": true,
+            "validatorHealthy": true
+          }
+        ],
+        "commandRuns": [
+          {
+            "command": "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal \"Split packages/cli/src/commands/upgrade/proposal.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve upgrade proposal behavior and ATM evidence.\" --json",
+            "exitCode": 0,
+            "stdoutSha256": "sha256:e3df8811bf070b69cc0b47911a0653c62345f6f6acd2cfabddb9b8c577f0ae9b",
+            "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "validators": [
+              "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal \"Split packages/cli/src/commands/upgrade/proposal.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve upgrade proposal behavior and ATM evidence.\" --json"
+            ],
+            "cwd": ".",
+            "runnerKind": "unknown",
+            "cacheKey": "sha256:d99661c795a819b9a3683cbe54d806df926d0d04560347652942f91e52599759",
+            "cached": false,
+            "generatedAt": "2026-07-16T15:43:27.698Z"
+          }
+        ],
+        "commandRunCache": {
+          "schemaId": "atm.commandRunCache.v1",
+          "cacheKey": "sha256:709869729cb19d3fe996a0b48e242fc2fe1905a7018c5af7701378ac99dc5ddc",
           "reusedRunCount": 0,
           "runCount": 1,
           "sourcePath": null

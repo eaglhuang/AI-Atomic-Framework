@@ -1,0 +1,70 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T15-45-59-479Z-close-d7b500dee215",
+  "taskId": "TASK-RFT-0095",
+  "action": "close",
+  "actorId": "codex-task-rft-0095",
+  "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0095.json",
+  "taskSha256": "sha256:8ad63fd4cfaa7224f7c1a4d07fd8adf39ecdc0d85dbf50b0414bcfa822bf8c29",
+  "createdAt": "2026-07-16T15:45:59.479Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0095 --actor codex-task-rft-0095 --status done --historical-delivery da400e119fab195ce7420c3f039e238dd4cc2186",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716152406-codex-task-rft-0095-TASK-RFT-0095-2aa9f7eabd",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0095.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/upgrade/propose-map-evidence-closure.test.ts",
+      "node --strip-types tests/upgrade/propose-map-rollback.test.ts",
+      "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal \"Split packages/cli/src/commands/upgrade/proposal.ts into a facade plus focused support modules; every physical TypeScript source file must stay below 600 lines; preserve upgrade proposal behavior and ATM evidence.\" --json",
+      "node atm.mjs candidates rank --include packages/cli/src/commands/upgrade/proposal.ts --goal Split",
+      "node atm.mjs upgrade --propose --behavior behavior.split --atom atom-cli-upgrade-proposal --to 0.1.1 --legacy-target packages/cli/src/commands/upgrade/proposal.ts#runGuidedLegacyDryRunProposal --guidance-session guidance-20260716141346-edea9cc65a --dry-run --json",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T15:45:59.465Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0095.*",
+        ".atm/history/task-events/TASK-RFT-0095/**",
+        ".atm/history/tasks/TASK-RFT-0095.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-019.json",
+        "docs/governance/atm-bug-and-optimization-backlog.md",
+        "packages/cli/src/commands/__tests__/candidates-file-include.spec.ts",
+        "packages/cli/src/commands/candidates.ts",
+        "packages/cli/src/commands/upgrade/proposal.ts",
+        "packages/cli/src/commands/upgrade/proposal/**"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/__tests__/candidates-file-include.spec.ts",
+        "packages/cli/src/commands/candidates.ts",
+        "packages/cli/src/commands/upgrade/proposal.ts",
+        "packages/cli/src/commands/upgrade/proposal/**"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
