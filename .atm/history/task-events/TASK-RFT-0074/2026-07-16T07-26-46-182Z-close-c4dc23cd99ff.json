@@ -1,0 +1,77 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T07-26-46-182Z-close-c4dc23cd99ff",
+  "taskId": "TASK-RFT-0074",
+  "action": "close",
+  "actorId": "codex-task-rft-0074",
+  "sessionId": "session-20260716071723-codex-task-rft-0074-TASK-RFT-0074-9119512d0a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0074.json",
+  "taskSha256": "sha256:c30a1bb241e11e5a01d64b8d7009abc2719adf4b270a9f80f19e982f9ee5e22c",
+  "createdAt": "2026-07-16T07:26:46.182Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0074 --actor codex-task-rft-0074 --status done --historical-delivery e59b08a4258593e89771d1fe77ebff57b27faf48 --historical-delivery fc65fac38a04fec83cc8ab43467d09f477a72825",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716071723-codex-task-rft-0074-TASK-RFT-0074-9119512d0a",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0074.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/integration-final-600.test.ts",
+      "node atm.mjs integration list --json",
+      "node atm.mjs integration verify codex --json",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:governance-projections"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T07:26:46.174Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0074.*",
+        ".atm/history/task-events/TASK-RFT-0074/**",
+        ".atm/history/tasks/TASK-RFT-0074.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/integration/**/*.ts",
+        "packages/cli/src/commands/integration/adapters.ts",
+        "packages/cli/src/commands/integration/bootstrap.ts",
+        "packages/cli/src/commands/integration/health.ts",
+        "packages/cli/src/commands/integration/install.ts",
+        "packages/cli/src/commands/integration/list.ts",
+        "packages/cli/src/commands/integration/run.ts",
+        "packages/cli/src/commands/integration/types.ts",
+        "tests/cli/integration-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/integration.ts",
+        "packages/cli/src/commands/integration/**/*.ts",
+        "packages/cli/src/commands/integration/adapters.ts",
+        "packages/cli/src/commands/integration/bootstrap.ts",
+        "packages/cli/src/commands/integration/health.ts",
+        "packages/cli/src/commands/integration/install.ts",
+        "packages/cli/src/commands/integration/list.ts",
+        "packages/cli/src/commands/integration/run.ts",
+        "packages/cli/src/commands/integration/types.ts",
+        "tests/cli/integration-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
