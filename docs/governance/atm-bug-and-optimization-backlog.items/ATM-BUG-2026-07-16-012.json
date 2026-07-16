@@ -1,0 +1,14 @@
+{
+  "schemaId": "atm.governanceBacklogItem.v1",
+  "id": "ATM-BUG-2026-07-16-012",
+  "date": "2026-07-16",
+  "repo": "AI-Atomic-Framework",
+  "type": "Optimization",
+  "severity": "Medium",
+  "status": "Needs task card",
+  "area": "Task scope / closeout",
+  "finding": "During TASK-RFT-0067, the task card declared scripts/validate-git-hooks-enforcement/**/*.ts, but taskflow close dry-run still classified newly extracted modules under that glob as excluded dirty files until an explicit tasks scope add listed each module. The scope-amendment event also preserved stray quote characters around the first and last CSV entries in amendmentHistory.",
+  "expectedBehavior": "Imported task scope globs should admit newly created matching files consistently across claim, delivery commit, close preview, and close write. Scope amendment history should normalize CSV path values without embedded shell quote characters.",
+  "evidenceOrRepro": "TASK-RFT-0067 close dry-run before scope amendment excluded scripts/validate-git-hooks-enforcement/context.ts, initial-lanes.ts, pre-push-regressions.ts, closure-cross-checks.ts, root-emergency-audit.ts, and main.ts despite the imported glob. The later amendment event 2026-07-16T05-58-57-613Z-scope-amendment-b5d5c934e8b0 shows quoted first/last path values.",
+  "followUp": "Open a focused task to align taskflow glob expansion with task import/claim allowedFiles and to normalize tasks scope add --add CSV parsing before writing amendmentHistory."
+}
