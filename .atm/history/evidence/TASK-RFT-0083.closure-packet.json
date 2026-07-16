@@ -1,0 +1,160 @@
+{
+  "schemaId": "atm.closurePacket.v1",
+  "specVersion": "0.1.0",
+  "taskId": "TASK-RFT-0083",
+  "targetRepoIdentity": {
+    "isFrameworkRepo": true,
+    "score": 5,
+    "root": "C:\\Users\\User\\AI-Atomic-Framework",
+    "name": "ai-atomic-framework",
+    "signals": [
+      "package-name:ai-atomic-framework",
+      "packages/core/src/index.ts",
+      "packages/cli/src/atm.ts",
+      "atomic-registry.json",
+      "workspace:packages/*"
+    ]
+  },
+  "targetCommit": "83edb1f4107b79137cd4f78c01999a68a2cff1bb",
+  "governedTreeSha": "7ff97c31588ed226526a59118d994835814a5f8b",
+  "targetCommitDelta": {
+    "currentCommitSha": "83edb1f4107b79137cd4f78c01999a68a2cff1bb",
+    "parentCommitShas": [
+      "83edb1f4107b79137cd4f78c01999a68a2cff1bb"
+    ],
+    "governedTreeSha": "7ff97c31588ed226526a59118d994835814a5f8b",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0083.bundle-manifest.json",
+      ".atm/history/evidence/TASK-RFT-0083.json",
+      ".atm/memory/atm-chart.md",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "docs/reports/mao-parallel-routing-benchmark.md",
+      "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "scripts/lib/mao-parallel-routing-benchmark-runner/report.ts"
+    ]
+  },
+  "closedByCommand": "atm tasks close",
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:9210bbce8491b329c46a12bfb96233ebf1e9eba3970245ef35374c6baf2b584d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node --strip-types scripts/validate-mao-parallel-routing.ts",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:917f2dcf7c7d31a4fae4177dbb43b49e13ea7745f6060e5433bb648c66a1a20d",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "node atm.mjs doctor --json",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:83953024f2b8ae1564e62b62728f77585e9eefa83bf459743aa9e5fff0d139f4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:cli",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:07532c6059819752c88a818067ced5746a6208bb1f17a1de1f42c8ddf1e49421",
+      "stderrSha256": "sha256:c5a3871bf5ea39df7b21175d9a2ccbd85d3bdafc83b1682fc523102ceec03b5a",
+      "runnerVersion": "0.1.0"
+    },
+    {
+      "command": "npm run validate:git-head-evidence",
+      "cwd": ".",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6e2b6e3ba165762de98ce702e3663e615a792bb8e65b2c11f2dbcd7fc916e6b4",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runnerVersion": "0.1.0"
+    }
+  ],
+  "validationPasses": [
+    "doctor",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence",
+    "validate:mao-parallel-routing"
+  ],
+  "evidenceFreshness": "fresh",
+  "requiredGates": [
+    "typecheck",
+    "validate:cli",
+    "validate:git-head-evidence"
+  ],
+  "requiredGatesSnapshot": {
+    "schemaId": "atm.requiredGatesSnapshot.v1",
+    "generatedAt": "2026-07-16T11:02:43.455Z",
+    "source": "frameworkStatus.requiredGates",
+    "ruleVersion": "0.1.0",
+    "frameworkMode": "required",
+    "repoRole": "framework",
+    "changedFiles": [
+      ".atm/history/evidence/TASK-RFT-0083.*",
+      ".atm/history/task-events/TASK-RFT-0083/**",
+      ".atm/history/tasks/TASK-RFT-0083.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "scripts/lib/mao-parallel-routing-benchmark-runner/**",
+      "scripts/validate-mao-parallel-routing.ts"
+    ],
+    "criticalChangedFiles": [
+      "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "scripts/lib/mao-parallel-routing-benchmark-runner/**",
+      "scripts/validate-mao-parallel-routing.ts"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ]
+  },
+  "evidencePath": ".atm/history/evidence/TASK-RFT-0083.json",
+  "closedAt": "2026-07-16T11:02:43.455Z",
+  "closedByActor": "codex-task-rft-0083",
+  "sessionId": "session-20260716104054-codex-task-rft-0083-TASK-RFT-0083-5a079eea5d",
+  "attestation": null,
+  "historicalDeliveryProvenance": {
+    "schemaId": "atm.historicalDeliveryProvenance.v1",
+    "deliveryCommitSha": "83edb1f4107b79137cd4f78c01999a68a2cff1bb",
+    "taskMatchedFiles": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+      "scripts/lib/mao-parallel-routing-benchmark-runner/report.ts"
+    ],
+    "governanceFiles": [
+      ".atm/history/evidence/TASK-RFT-0083.json",
+      ".atm/history/evidence/git-head.jsonl",
+      ".atm/history/task-events/TASK-RFT-0083/2026-07-16T10-40-50-231Z-import-88bb0ef686b0.json",
+      ".atm/history/task-events/TASK-RFT-0083/2026-07-16T10-40-54-303Z-reserve-abd073be3221.json",
+      ".atm/history/task-events/TASK-RFT-0083/2026-07-16T10-40-54-306Z-promote-8899d6745ae1.json",
+      ".atm/history/task-events/TASK-RFT-0083/2026-07-16T10-40-57-435Z-claim-921267601cae.json",
+      ".atm/history/tasks/TASK-RFT-0083.json"
+    ],
+    "allowedRunnerOutputFiles": [],
+    "outOfScopeSourceFiles": [],
+    "waivedOutOfScopeFiles": [],
+    "waiverReason": null
+  },
+  "teamSummary": null
+}

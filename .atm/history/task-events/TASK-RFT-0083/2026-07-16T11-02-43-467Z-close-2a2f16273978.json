@@ -1,0 +1,64 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T11-02-43-467Z-close-2a2f16273978",
+  "taskId": "TASK-RFT-0083",
+  "action": "close",
+  "actorId": "codex-task-rft-0083",
+  "sessionId": "session-20260716104054-codex-task-rft-0083-TASK-RFT-0083-5a079eea5d",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0083.json",
+  "taskSha256": "sha256:08eb3fbbf913e0874a9a98341d4b75ed603e3edf52804a319cb6cc4374f86925",
+  "createdAt": "2026-07-16T11:02:43.467Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0083 --actor codex-task-rft-0083 --status done --historical-delivery 83edb1f4107b79137cd4f78c01999a68a2cff1bb",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716104054-codex-task-rft-0083-TASK-RFT-0083-5a079eea5d",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0083.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence",
+      "validate:mao-parallel-routing"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T11:02:43.455Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0083.*",
+        ".atm/history/task-events/TASK-RFT-0083/**",
+        ".atm/history/tasks/TASK-RFT-0083.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+        "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+        "scripts/lib/mao-parallel-routing-benchmark-runner/**",
+        "scripts/validate-mao-parallel-routing.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/lib/mao-parallel-routing-benchmark-runner.ts",
+        "scripts/lib/mao-parallel-routing-benchmark-runner/**",
+        "scripts/validate-mao-parallel-routing.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
