@@ -1,0 +1,54 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0085",
+  "updatedAt": "2026-07-16T11:23:48.604Z",
+  "updatedBy": "codex-task-rft-0085",
+  "freshValidationPasses": [
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:operational-bench"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:0a95a1b32a81bb265eae9d7666e9239ed5a6aab02431b2a53989cb6cdc43649a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T11:23:40.220Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0e85f554924843657b5e9e12298fe4bfe76f95f2",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:operational-bench",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:de805e1d34363848a5a416609a174011384636d6ddb37953c4d8fddc629dbde5",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:operational-bench"
+      ],
+      "generatedAt": "2026-07-16T11:23:41.341Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0e85f554924843657b5e9e12298fe4bfe76f95f2",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T11:23:48.656Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "0e85f554924843657b5e9e12298fe4bfe76f95f2",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}
