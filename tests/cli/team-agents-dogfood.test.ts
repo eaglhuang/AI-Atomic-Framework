@@ -187,6 +187,35 @@ const simulatedCheapDecision = evaluatePromotion(singleAgentBaseline, simulatedC
 assert.equal(simulatedCheapDecision.promote, false, 'simulation-only samples must stay blocked even when cost caps pass');
 assert.ok(simulatedCheapDecision.reasons.includes('measurement-incomplete'));
 
+const completeLiveBaseline: DogfoodRun = {
+  ...singleAgentBaseline,
+  label: 'live-single-agent-baseline',
+  sampleKind: 'live-paired-run',
+  measurementStatus: 'complete',
+  providerBillableUsage: true,
+  pairedRunId: 'paired-run-contract-2026-07-16',
+  pricingEvidenceKind: 'provider-bill',
+  wallClockMs: 120_000
+};
+const completeLiveTeam: DogfoodRun = {
+  ...controlledTeamDogfood,
+  label: 'live-team-run',
+  sampleKind: 'live-paired-run',
+  measurementStatus: 'complete',
+  providerBillableUsage: true,
+  pairedRunId: 'paired-run-contract-2026-07-16',
+  pricingEvidenceKind: 'provider-bill',
+  wallClockMs: 84_000,
+  fullyLoadedUsd: 0.52,
+  listPriceEquivalentUsd: 0.49
+};
+const completeLiveDecision = evaluatePromotion(completeLiveBaseline, completeLiveTeam);
+assert.equal(completeLiveDecision.promote, true, 'complete provider-billed paired samples may promote when speed and cost gates pass');
+assert.deepEqual(completeLiveDecision.reasons, []);
+assert.ok(completeLiveDecision.wallClockImprovementRatio >= 0.3);
+assert.ok(completeLiveDecision.fullyLoadedCostIncreaseRatio <= 0.1);
+assert.ok(completeLiveDecision.listPriceCostIncreaseRatio <= 0.1);
+
 const realPairedSample = JSON.parse(
   readFileSync('artifacts/generated/team-dogfood/real-paired-sample.json', 'utf8')
 ) as RealPairedSampleArtifact;
@@ -212,5 +241,5 @@ assert.match(liveBlocker, /provider billable usage/);
 assert.match(liveBlocker, /promotionEligible/);
 
 console.log(
-  `[team-agents-dogfood] ok (promote=${decision.promote}, wallClockImprovement=${decision.wallClockImprovementRatio.toFixed(2)}, fullyLoadedCostIncrease=${decision.fullyLoadedCostIncreaseRatio.toFixed(2)})`
+  `[team-agents-dogfood] ok (promote=${decision.promote}, completeLivePromote=${completeLiveDecision.promote}, wallClockImprovement=${decision.wallClockImprovementRatio.toFixed(2)}, fullyLoadedCostIncrease=${decision.fullyLoadedCostIncreaseRatio.toFixed(2)})`
 );

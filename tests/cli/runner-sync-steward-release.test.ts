@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -83,6 +83,33 @@ try {
   const queue = JSON.parse(readFileSync(queuePath, 'utf8'));
   assert.equal(queue.groups.length, 1);
   assert.deepEqual(queue.groups[0].waitingTasks, ['TASK-C']);
+
+  const staleQueue = {
+    ...queue,
+    groups: queue.groups.map((group: any) => ({
+      ...group,
+      waitingTasks: ['TASK-STALE'],
+      requests: group.requests.map((request: any) => ({
+        ...request,
+        taskId: 'TASK-STALE',
+        actorId: 'stale-captain',
+        heartbeatAt: '2026-07-15T00:00:00.000Z',
+        expiresAt: '2026-07-15T00:00:01.000Z',
+        ttlSeconds: 1
+      }))
+    }))
+  };
+  writeFileSync(queuePath, `${JSON.stringify(staleQueue, null, 2)}\n`, 'utf8');
+  const cleanup = runAtm([
+    'broker',
+    'runner-sync',
+    'cleanup'
+  ]);
+  assert.equal(cleanup.messages[0].code, 'ATM_BROKER_RUNNER_SYNC_CLEANUP');
+  assert.equal(cleanup.evidence.cleanup.staleReleases.length, 1);
+  assert.equal(cleanup.evidence.cleanup.staleReleases[0].taskId, 'TASK-STALE');
+  const cleanedQueue = JSON.parse(readFileSync(queuePath, 'utf8'));
+  assert.equal(cleanedQueue.groups.length, 0, 'stale runner-sync steward owner must be removed by CLI cleanup');
 
   console.log('[runner-sync-steward-release.test] ok');
 } finally {
