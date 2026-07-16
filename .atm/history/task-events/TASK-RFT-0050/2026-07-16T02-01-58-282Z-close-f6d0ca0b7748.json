@@ -1,0 +1,75 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T02-01-58-282Z-close-f6d0ca0b7748",
+  "taskId": "TASK-RFT-0050",
+  "action": "close",
+  "actorId": "codex-task-rft-0050",
+  "sessionId": "session-20260716015242-codex-task-rft-0050-TASK-RFT-0050-c50630a02a",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0050.json",
+  "taskSha256": "sha256:956de5cdf4915b4e887acbe417fd9f2e59196fe5e17b47a5ff5caa433c27495a",
+  "createdAt": "2026-07-16T02:01:58.282Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0050 --actor codex-task-rft-0050 --status done --historical-delivery c0adb1bafdcfe7367c19a658ebb2f5f875626e3a",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716015242-codex-task-rft-0050-TASK-RFT-0050-c50630a02a",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0050.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/team-command-facade-atomization.test.ts",
+      "node --strip-types tests/cli/team-legacy-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T02:01:58.275Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0050.*",
+        ".atm/history/task-events/TASK-RFT-0050/**",
+        ".atm/history/tasks/TASK-RFT-0050.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "packages/cli/src/commands/team/legacy/command-runner.ts",
+        "packages/cli/src/commands/team/legacy/handoff-handler.ts",
+        "packages/cli/src/commands/team/legacy/lifecycle-handler.ts",
+        "packages/cli/src/commands/team/legacy/patrol-handler.ts",
+        "packages/cli/src/commands/team/legacy/planning-context.ts",
+        "packages/cli/src/commands/team/legacy/team-run-runtime.ts",
+        "packages/cli/src/commands/team/legacy/team-utils.ts",
+        "tests/cli/team-legacy-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/team-legacy.ts",
+        "packages/cli/src/commands/team/legacy/**/*.ts",
+        "packages/cli/src/commands/team/legacy/command-runner.ts",
+        "packages/cli/src/commands/team/legacy/handoff-handler.ts",
+        "packages/cli/src/commands/team/legacy/lifecycle-handler.ts",
+        "packages/cli/src/commands/team/legacy/patrol-handler.ts",
+        "packages/cli/src/commands/team/legacy/planning-context.ts",
+        "packages/cli/src/commands/team/legacy/team-run-runtime.ts",
+        "packages/cli/src/commands/team/legacy/team-utils.ts",
+        "tests/cli/team-legacy-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
