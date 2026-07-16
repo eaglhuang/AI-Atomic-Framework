@@ -1,0 +1,60 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T02-19-43-363Z-close-ec439ca876dc",
+  "taskId": "TASK-RFT-0052",
+  "action": "close",
+  "actorId": "codex-task-rft-0052",
+  "sessionId": "session-20260716020520-codex-task-rft-0052-TASK-RFT-0052-b01299b1e6",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0052.json",
+  "taskSha256": "sha256:b22fb3ba33d43b4dd92800e34638f67ec6c93d6513f8556cd4436bed32240560",
+  "createdAt": "2026-07-16T02:19:43.363Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0052 --actor codex-task-rft-0052 --status done --historical-delivery 957917cee315295f6e0232a01bd6aea2fa032d26",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716020520-codex-task-rft-0052-TASK-RFT-0052-b01299b1e6",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0052.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/validate-cli-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T02:19:43.352Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0052.*",
+        ".atm/history/task-events/TASK-RFT-0052/**",
+        ".atm/history/tasks/TASK-RFT-0052.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-scripts.json",
+        "scripts/validate-cli.ts",
+        "scripts/validate-cli/**/*.ts",
+        "tests/cli/validate-cli-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "scripts/validate-cli.ts",
+        "scripts/validate-cli/**/*.ts",
+        "tests/cli/validate-cli-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
