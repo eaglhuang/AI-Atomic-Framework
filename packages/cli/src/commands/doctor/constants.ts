@@ -47,3 +47,37 @@ export const knownTsNoCheckBaseline = new Set([
   'packages/cli/src/commands/next/route-resolution/runtime.ts',
   'packages/cli/src/commands/next/route-resolution/task-card-discovery.ts'
 ]);
+
+export interface TsNoCheckCleanupOwner {
+  readonly ownerId: string;
+  readonly title: string;
+  readonly patterns: readonly string[];
+  readonly followUp: string;
+}
+
+export const knownTsNoCheckCleanupOwners: readonly TsNoCheckCleanupOwner[] = [
+  {
+    ownerId: 'broker',
+    title: 'Broker command transitional type cleanup',
+    patterns: ['packages/cli/src/commands/broker/'],
+    followUp: 'Open a focused broker cleanup card to remove @ts-nocheck from broker command modules and keep broker validators green.'
+  },
+  {
+    ownerId: 'next',
+    title: 'Next command route/projection transitional type cleanup',
+    patterns: ['packages/cli/src/commands/next/'],
+    followUp: 'Open a focused next cleanup card to type route-resolution, prompt-results, and playbook-projection modules.'
+  },
+  {
+    ownerId: 'hook-pre-commit',
+    title: 'Pre-commit hook transitional type cleanup',
+    patterns: ['packages/cli/src/commands/hook/pre-commit/'],
+    followUp: 'Open a focused pre-commit hook cleanup card to type hook input, ownership, support, and failure-envelope modules.'
+  },
+  {
+    ownerId: 'git-governance',
+    title: 'Git governance transitional type cleanup',
+    patterns: ['packages/cli/src/commands/git-governance/'],
+    followUp: 'Open a focused git-governance cleanup card to split and type the transitional implementation carrier.'
+  }
+];

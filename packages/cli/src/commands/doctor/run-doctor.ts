@@ -13,7 +13,7 @@ import { inspectRuntimeAdapterReadiness } from '../runtime-adapter-readiness.ts'
 import { makeResult, message, parseOptions, relativePathFrom } from '../shared.ts';
 import { detectCrossTaskMutation, readIncidentFlag } from '../../../../core/src/broker/cross-task-mutation-guard.ts';
 import { inspectRunnerSourceDrift } from '../framework-development/closure-packet-schema.ts';
-import { knownTsNoCheckBaseline, legacyBehaviorPackageNames } from './constants.ts';
+import { knownTsNoCheckBaseline, knownTsNoCheckCleanupOwners, legacyBehaviorPackageNames } from './constants.ts';
 import type { DoctorOptions, PackageJson } from './types.ts';
 import { applyDoctorPolicyToCheck, downgradeAdopterGitHeadEvidenceCheck, resolveDoctorPolicy } from './policy.ts';
 import { checkOnboardingLifecycle, createVersionSummaryMessages } from './lifecycle.ts';
@@ -30,6 +30,35 @@ function hasTsNoCheckPragma(source: string): boolean {
     return /^\s*\/\/\s*@ts-nocheck\b/.test(line);
   }
   return false;
+}
+
+function createTsNoCheckCleanupOwnerGroups(baselineFiles: readonly string[]) {
+  const remaining = new Set(baselineFiles);
+  const ownerGroups = knownTsNoCheckCleanupOwners
+    .map((owner) => {
+      const files = baselineFiles.filter((filePath) => owner.patterns.some((pattern) => filePath.startsWith(pattern)));
+      for (const filePath of files) {
+        remaining.delete(filePath);
+      }
+      return {
+        ownerId: owner.ownerId,
+        title: owner.title,
+        fileCount: files.length,
+        files,
+        followUp: owner.followUp
+      };
+    })
+    .filter((group) => group.fileCount > 0);
+  if (remaining.size > 0) {
+    ownerGroups.push({
+      ownerId: 'unmapped',
+      title: 'Unmapped transitional type cleanup',
+      fileCount: remaining.size,
+      files: [...remaining].sort(),
+      followUp: 'Assign these @ts-nocheck baseline files to an owner before retiring the transitional TypeScript escape-hatch baseline.'
+    });
+  }
+  return ownerGroups;
 }
 
 export async function runDoctor(argv: readonly string[]) {
@@ -57,6 +86,8 @@ export async function runDoctor(argv: readonly string[]) {
     .map((filePath: string) => relativePathFrom(root, filePath).replace(/\\/g, '/'))
     .sort();
   const unexpectedTsNoCheckFiles = tsNoCheckFiles.filter((filePath) => !knownTsNoCheckBaseline.has(filePath));
+  const baselineTsNoCheckFiles = tsNoCheckFiles.filter((filePath) => knownTsNoCheckBaseline.has(filePath));
+  const tsNoCheckCleanupOwnerGroups = createTsNoCheckCleanupOwnerGroups(baselineTsNoCheckFiles);
   const missingDist = packageDirs
     .map((packageDir) => ({ packageDir, js: path.join(root, packageDir, 'dist', 'index.js'), dts: path.join(root, packageDir, 'dist', 'index.d.ts') }))
     .filter((entry) => !existsSync(entry.js) || !existsSync(entry.dts))
@@ -113,9 +144,16 @@ export async function runDoctor(argv: readonly string[]) {
     }),
     createCheck('typescript-escape-hatches', unexpectedTsNoCheckFiles.length === 0, {
       hasTsNoCheck: tsNoCheckFiles.length > 0,
-      baselineCount: tsNoCheckFiles.length - unexpectedTsNoCheckFiles.length,
+      baselineCount: baselineTsNoCheckFiles.length,
       unexpectedFiles: unexpectedTsNoCheckFiles,
-      baselinePolicy: 'known transitional @ts-nocheck files are tracked as baseline debt; new files fail doctor'
+      cleanupOwnerGroups: tsNoCheckCleanupOwnerGroups,
+      recommendedCleanupCards: tsNoCheckCleanupOwnerGroups.map((group) => ({
+        ownerId: group.ownerId,
+        title: group.title,
+        fileCount: group.fileCount,
+        followUp: group.followUp
+      })),
+      baselinePolicy: 'known transitional @ts-nocheck files are tracked as baseline debt; new files fail doctor while baseline debt is retired by owner-map cleanup cards'
     }),
     createCheck(
       'package-dist',
