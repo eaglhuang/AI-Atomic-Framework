@@ -1,0 +1,69 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T09-24-54-006Z-close-5ebd1557d868",
+  "taskId": "TASK-RFT-0077",
+  "action": "close",
+  "actorId": "codex-task-rft-0077",
+  "sessionId": "session-20260716090515-codex-task-rft-0077-TASK-RFT-0077-af10dc163b",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0077.json",
+  "taskSha256": "sha256:a074d72653464d74debd0426adb5ae385f8140cf0b842cd47048da0375510f75",
+  "createdAt": "2026-07-16T09:24:54.006Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0077 --actor codex-task-rft-0077 --status done --historical-delivery b7f387089d0935895fa435876c31a8160f42f27d",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716090515-codex-task-rft-0077-TASK-RFT-0077-af10dc163b",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0077.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "doctor",
+      "node --strip-types tests/cli/close-orchestrator-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T09:24:53.994Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0077.*",
+        ".atm/history/task-events/TASK-RFT-0077/**",
+        ".atm/history/tasks/TASK-RFT-0077.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli.json",
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/**/*.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-result.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/historical-context.ts",
+        "tests/cli/close-orchestrator-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/tasks/close-orchestrator.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/**/*.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-result.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/close-write.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/closure-packet.ts",
+        "packages/cli/src/commands/tasks/close-orchestrator/historical-context.ts",
+        "tests/cli/close-orchestrator-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
   "schemaVersion": "atm.workItem.v0.2",
   "workItemId": "TASK-RFT-0077",
   "title": "Split close orchestrator below 600 lines",
-  "status": "running",
+  "status": "done",
   "milestone": null,
   "dependencies": [
     "TASK-RFT-0076"
@@ -80,8 +80,8 @@
     }
   },
   "importedAt": "2026-07-16T09:04:59.943Z",
-  "lastTransitionId": "2026-07-16T09-16-04-837Z-scope-amendment-e0dfd8b61d91",
-  "lastTransitionAt": "2026-07-16T09:16:04.837Z",
+  "lastTransitionId": "2026-07-16T09-24-54-006Z-close-5ebd1557d868",
+  "lastTransitionAt": "2026-07-16T09:24:54.006Z",
   "ledgerContractVersion": "task-ledger/v1",
   "owner": "codex-task-rft-0077",
   "reservedAt": "2026-07-16T09:05:15.075Z",
@@ -90,7 +90,7 @@
     "actorId": "codex-task-rft-0077",
     "leaseId": "lease-c532d2387094",
     "claimedAt": "2026-07-16T09:05:15.082Z",
-    "heartbeatAt": "2026-07-16T09:05:15.082Z",
+    "heartbeatAt": "2026-07-16T09:24:54.004Z",
     "ttlSeconds": 1800,
     "files": [
       ".atm/history/evidence/TASK-RFT-0077.*",
@@ -105,8 +105,8 @@
       "packages/cli/src/commands/tasks/close-orchestrator/historical-context.ts",
       "tests/cli/close-orchestrator-final-600.test.ts"
     ],
-    "state": "active",
-    "intent": "write"
+    "state": "released",
+    "reason": "closed"
   },
   "startedAt": "2026-07-16T09:05:15.082Z",
   "startedByActor": "codex-task-rft-0077",
@@ -146,5 +146,9 @@
     "actorId": "codex-task-rft-0077",
     "createdAt": "2026-07-16T09:05:18.918Z",
     "status": "active"
-  }
+  },
+  "closedAt": "2026-07-16T09:24:54.004Z",
+  "closedByActor": "codex-task-rft-0077",
+  "closedBySessionId": "session-20260716090515-codex-task-rft-0077-TASK-RFT-0077-af10dc163b",
+  "closurePacket": ".atm/history/evidence/TASK-RFT-0077.closure-packet.json"
 }
