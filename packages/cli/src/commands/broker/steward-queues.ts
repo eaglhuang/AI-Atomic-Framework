@@ -97,7 +97,13 @@ export function handleBrokerStewardQueues(options: ParsedBrokerOptions, context:
     }
 
     if (options.runnerSyncAction === 'cleanup') {
-      const cleanup = cleanupRunnerSyncStewardQueue(readRunnerSyncStewardQueue(runnerSyncQueuePath));
+      const cleanup = cleanupRunnerSyncStewardQueue(
+        readRunnerSyncStewardQueue(runnerSyncQueuePath),
+        new Date().toISOString(),
+        {
+          shouldReleaseRequest: (request) => !existsSync(path.join(options.cwd, '.atm', 'history', 'tasks', `${request.taskId}.json`))
+        }
+      );
       writeRunnerSyncStewardQueue(runnerSyncQueuePath, cleanup.queue);
       return makeResult({
         ok: true,

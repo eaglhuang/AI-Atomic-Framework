@@ -65,6 +65,7 @@ export type RunnerSyncStewardStaleRelease = {
   readonly stewardWorkId: string;
   readonly queuePosition: number;
   readonly expiredAt: string;
+  readonly reason: 'expired' | 'orphaned-task';
   readonly safeRetryCommand: string;
 };
 
@@ -82,6 +83,10 @@ export type RunnerSyncStewardReleaseInput = {
   readonly receiptRef?: string | null;
   readonly receiptDigest?: string | null;
   readonly releasedAt?: string;
+};
+
+export type RunnerSyncStewardCleanupOptions = {
+  readonly shouldReleaseRequest?: (request: RunnerSyncStewardRequest) => boolean;
 };
 
 export type RunnerSyncStewardReleaseRecord = {
@@ -161,14 +166,16 @@ export function enqueueRunnerSyncStewardRequest(
 
 export function cleanupRunnerSyncStewardQueue(
   queue: RunnerSyncStewardQueueDocument | null | undefined,
-  now = new Date().toISOString()
+  now = new Date().toISOString(),
+  options: RunnerSyncStewardCleanupOptions = {}
 ): RunnerSyncStewardCleanupResult {
   const base = normalizeQueue(queue, now);
   const staleReleases: RunnerSyncStewardStaleRelease[] = [];
   const groups = base.groups.flatMap((group, groupIndex) => {
     const live = group.requests.filter((request) => {
       const expired = isExpired(request, now);
-      if (expired) {
+      const orphanedTask = !expired && options.shouldReleaseRequest?.(request) === true;
+      if (expired || orphanedTask) {
         staleReleases.push({
           taskId: request.taskId,
           actorId: request.actorId,
@@ -176,10 +183,11 @@ export function cleanupRunnerSyncStewardQueue(
           stewardWorkId: group.stewardWorkId,
           queuePosition: groupIndex + 1,
           expiredAt: request.expiresAt,
+          reason: expired ? 'expired' : 'orphaned-task',
           safeRetryCommand: buildRetryCommand(request)
         });
       }
-      return !expired;
+      return !expired && !orphanedTask;
     });
     return live.length === 0 ? [] : [{ ...group, requests: live, updatedAt: now }];
   });

@@ -105,6 +105,40 @@ function testStaleOwnerCleanupReleasesExpiredRequests() {
   console.log('ok: expired runner-sync owners are released with safe retry diagnostics');
 }
 
+function testOrphanTaskCleanupReleasesHeadAndAdvancesWaitingGroup() {
+  let queue = emptyRunnerSyncStewardQueue(t0);
+  queue = enqueueRunnerSyncStewardRequest(queue, {
+    taskId: 'TASK-MISSING',
+    actorId: 'missing-captain',
+    sealedSourceSha: 'sha256:missing',
+    requestedSurfaces: ['release/atm-onefile/atm.mjs'],
+    createdAt: t0,
+    heartbeatAt: t0,
+    ttlSeconds: 420
+  }).queue;
+  queue = enqueueRunnerSyncStewardRequest(queue, {
+    taskId: 'TASK-WAITING',
+    actorId: 'waiting-captain',
+    sealedSourceSha: 'sha256:waiting',
+    requestedSurfaces: ['release/atm-root-drop/atm.mjs'],
+    createdAt: '2026-07-15T00:00:02.000Z',
+    heartbeatAt: '2026-07-15T00:00:02.000Z',
+    ttlSeconds: 420
+  }).queue;
+
+  const cleanup = cleanupRunnerSyncStewardQueue(queue, '2026-07-15T00:00:03.000Z', {
+    shouldReleaseRequest: (request) => request.taskId === 'TASK-MISSING'
+  });
+
+  assert.equal(cleanup.staleReleases.length, 1);
+  assert.equal(cleanup.staleReleases[0].taskId, 'TASK-MISSING');
+  assert.equal(cleanup.staleReleases[0].reason, 'orphaned-task');
+  assert.equal(cleanup.queue.groups.length, 1);
+  assert.equal(cleanup.queue.groups[0].queuePosition, 1);
+  assert.equal(cleanup.queue.groups[0].waitingTasks[0], 'TASK-WAITING');
+  console.log('ok: orphaned runner-sync task requests are released and waiting work advances');
+}
+
 function testCliFacingJsonShape() {
   const result = enqueueRunnerSyncStewardRequest(emptyRunnerSyncStewardQueue(t0), {
     taskId: 'ATM-GOV-0150',
@@ -218,6 +252,7 @@ function testReleaseRequiresReceiptQueueHeadAndWaitingTask() {
 testSameSealedSourceCoalesces();
 testDifferentSealedSourcesStayOrdered();
 testStaleOwnerCleanupReleasesExpiredRequests();
+testOrphanTaskCleanupReleasesHeadAndAdvancesWaitingGroup();
 testCliFacingJsonShape();
 testLiveReleaseClearsQueueHeadAndAdvancesNextGroup();
 testReleaseRequiresReceiptQueueHeadAndWaitingTask();
