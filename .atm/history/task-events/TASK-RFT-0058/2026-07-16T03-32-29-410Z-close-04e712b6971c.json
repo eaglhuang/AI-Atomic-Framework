@@ -1,0 +1,66 @@
+{
+  "schemaId": "atm.taskTransition.v1",
+  "specVersion": "0.1.0",
+  "transitionId": "2026-07-16T03-32-29-410Z-close-04e712b6971c",
+  "taskId": "TASK-RFT-0058",
+  "action": "close",
+  "actorId": "codex-task-rft-0058",
+  "sessionId": "session-20260716032325-codex-task-rft-0058-TASK-RFT-0058-a68e44c4cb",
+  "fromStatus": "running",
+  "toStatus": "done",
+  "taskPath": ".atm/history/tasks/TASK-RFT-0058.json",
+  "taskSha256": "sha256:6c08d1e1b2b1ce4e6c322ff5dd2f1feb17fde77f323fef3a300312347c97d76f",
+  "createdAt": "2026-07-16T03:32:29.410Z",
+  "command": "node atm.mjs tasks close --task TASK-RFT-0058 --actor codex-task-rft-0058 --status done --historical-delivery ac0930d13a9702a3a6e04ce39573489ae142f70e",
+  "closure": {
+    "schemaId": "atm.taskClosureTransition.v1",
+    "batchId": null,
+    "sessionId": "session-20260716032325-codex-task-rft-0058-TASK-RFT-0058-a68e44c4cb",
+    "closurePacketPath": ".atm/history/evidence/TASK-RFT-0058.closure-packet.json",
+    "evidenceFreshness": "fresh",
+    "validationPasses": [
+      "node --strip-types tests/cli/shared-final-600.test.ts",
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGates": [
+      "typecheck",
+      "validate:cli",
+      "validate:git-head-evidence"
+    ],
+    "requiredGatesSnapshot": {
+      "schemaId": "atm.requiredGatesSnapshot.v1",
+      "generatedAt": "2026-07-16T03:32:29.401Z",
+      "source": "frameworkStatus.requiredGates",
+      "ruleVersion": "0.1.0",
+      "frameworkMode": "required",
+      "repoRole": "framework",
+      "changedFiles": [
+        ".atm/history/evidence/TASK-RFT-0058.*",
+        ".atm/history/task-events/TASK-RFT-0058/**",
+        ".atm/history/tasks/TASK-RFT-0058.json",
+        "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-cli*.json",
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/shared/**/*.ts",
+        "packages/cli/src/commands/shared/command-spec-output.ts",
+        "packages/cli/src/commands/shared/option-and-file-tools.ts",
+        "packages/cli/src/commands/shared/result-core.ts",
+        "tests/cli/shared-final-600.test.ts"
+      ],
+      "criticalChangedFiles": [
+        "packages/cli/src/commands/shared.ts",
+        "packages/cli/src/commands/shared/**/*.ts",
+        "packages/cli/src/commands/shared/command-spec-output.ts",
+        "packages/cli/src/commands/shared/option-and-file-tools.ts",
+        "packages/cli/src/commands/shared/result-core.ts",
+        "tests/cli/shared-final-600.test.ts"
+      ],
+      "requiredGates": [
+        "typecheck",
+        "validate:cli",
+        "validate:git-head-evidence"
+      ]
+    }
+  }
+}
