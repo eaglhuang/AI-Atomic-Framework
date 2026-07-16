@@ -1,0 +1,121 @@
+{
+  "schemaId": "atm.evidenceBundleManifest.v1",
+  "taskId": "TASK-RFT-0091",
+  "updatedAt": "2026-07-16T13:07:12.432Z",
+  "updatedBy": "codex-task-rft-0091",
+  "freshValidationPasses": [
+    "node --test packages/language-python/test/atomization-planning.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "typecheck",
+    "validate:cli",
+    "validate:python-adapter"
+  ],
+  "staleValidationPasses": [],
+  "commandRuns": [
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6bad9a59cb1dcafe0ed6e089ce9b37f98a85544c76e53b79b93ee300dc47ee0a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T13:06:29.966Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-python-adapter.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a9f98722fc3a3318270d49ab18413aaa48c13cc88079cf4a4ac48810b7dc9f70",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:python-adapter"
+      ],
+      "generatedAt": "2026-07-16T13:06:30.012Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "node --test packages/language-python/test/atomization-planning.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74c21b651002581abec2c411d8804ee13955da0c03c54b211516e62bdfd6ba80",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --test packages/language-python/test/atomization-planning.test.ts"
+      ],
+      "generatedAt": "2026-07-16T13:06:30.083Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "node --strip-types scripts/validate-python-adapter.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:a9f98722fc3a3318270d49ab18413aaa48c13cc88079cf4a4ac48810b7dc9f70",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "validate:python-adapter"
+      ],
+      "generatedAt": "2026-07-16T13:06:41.425Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "node --test packages/language-python/test/atomization-planning.test.ts",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:74cfdc838a7a284e412fe9e98ec8f028a260a9cdf0c60bacfa4a2eecc1d22893",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node --test packages/language-python/test/atomization-planning.test.ts"
+      ],
+      "generatedAt": "2026-07-16T13:06:43.692Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6bad9a59cb1dcafe0ed6e089ce9b37f98a85544c76e53b79b93ee300dc47ee0a",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate"
+      ],
+      "generatedAt": "2026-07-16T13:06:46.527Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:20bc64dd1e7d9ced9ee8d9a6f70d346027ffdc0c19e3bd261700fedc24ca2d15",
+      "stderrSha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validators": [
+        "typecheck"
+      ],
+      "generatedAt": "2026-07-16T13:06:56.918Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    },
+    {
+      "command": "npm run validate:cli",
+      "exitCode": 0,
+      "stdoutSha256": "sha256:6f42be7fa4b6055769d1034d3bf71251c4d39ecd68114937aa51b56ee5609700",
+      "stderrSha256": "sha256:73bdbbbeb9d9820f5b722ed17df8d24bb89c40ca009cb2235105eab1df39dc74",
+      "validators": [
+        "validate:cli"
+      ],
+      "generatedAt": "2026-07-16T13:07:12.486Z",
+      "runnerKind": "dev-source",
+      "sourceCommit": "d233026fc793be3531fef88ace185e83a7df27a6",
+      "cached": false
+    }
+  ],
+  "artifactPaths": []
+}

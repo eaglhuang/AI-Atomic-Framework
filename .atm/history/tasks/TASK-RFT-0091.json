@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "atm.workItem.v0.2",
+  "workItemId": "TASK-RFT-0091",
+  "title": "Split Python language adapter atom map under 600 lines",
+  "status": "running",
+  "milestone": null,
+  "dependencies": [
+    "TASK-RFT-0090"
+  ],
+  "acceptance": [
+    "`packages/language-python/src/language-python-adapter.ts` is below 600 physical lines.",
+    "Every newly created physical source or test file is below 600 physical lines.",
+    "Existing public exports from `packages/language-python/src/index.ts` continue to work.",
+    "`createPythonLanguageAdapter`, `detectPythonProjectProfile`, `scanPythonEntrypoints`, `scanPythonImports`, `planPythonAtomize`, `discoverPythonAtomCandidates`, `planPythonAtomizeFromCandidate`, and `createPythonAtomizationPlanningAdapter` remain import-compatible.",
+    "The path-to-atom owner shard maps both the facade and extracted support modules to `atom-language-python-adapter`.",
+    "Validation evidence is command-backed."
+  ],
+  "deliverables": [
+    "packages/language-python/src/language-python-adapter.ts",
+    "packages/language-python/src/language-python-adapter/**",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "scopePaths": [
+    "packages/language-python/src/language-python-adapter.ts",
+    "packages/language-python/src/language-python-adapter/**",
+    "packages/language-python/src/index.ts",
+    "packages/language-python/test/atomization-planning.test.ts",
+    "scripts/validate-python-adapter.ts",
+    "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+    "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+  ],
+  "validators": [
+    "node --strip-types scripts/validate-python-adapter.ts",
+    "node --test packages/language-python/test/atomization-planning.test.ts",
+    "node atomic_workbench/atomization-coverage/path-to-atom-map-shards/merge.js . validate",
+    "npm run typecheck",
+    "npm run validate:cli"
+  ],
+  "planningRepo": "3KLife",
+  "targetRepo": "AI-Atomic-Framework",
+  "closureAuthority": "target_repo",
+  "planningReadOnlyPaths": [],
+  "planningMirrorPaths": [],
+  "outOfScope": [],
+  "nonGoals": [],
+  "evidenceRequired": "command-backed",
+  "rollbackStrategy": "revert-commit",
+  "rollbackNotes": null,
+  "atomizationImpact": {
+    "ownerAtomOrMap": "atom-language-python-adapter",
+    "atomCid": null,
+    "mapUpdates": [
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json"
+    ],
+    "extractionCandidates": [
+      {
+        "atom": "atom-language-python-adapter-profile",
+        "pattern": "Project Profile Module",
+        "source": "packages/language-python/src/language-python-adapter.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-language-python-adapter-scanner",
+        "pattern": "Scanner Module",
+        "source": "packages/language-python/src/language-python-adapter.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-language-python-adapter-planner",
+        "pattern": "Atomization Planning Module",
+        "source": "packages/language-python/src/language-python-adapter.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      },
+      {
+        "atom": "atom-language-python-adapter-validation",
+        "pattern": "Validation Module",
+        "source": "packages/language-python/src/language-python-adapter.ts",
+        "disposition": "extract",
+        "inlineReason": "null"
+      }
+    ]
+  },
+  "legacyImportAliases": {},
+  "importDiagnostics": [],
+  "tags": [],
+  "notes": "- Do not redesign adapter semantics in this card.\n- Prefer extraction over inline edits. Behavior changes are out of scope unless required to preserve validators.\n- If a high-value governance defect appears during closeout, amend scope before fixing it.",
+  "source": {
+    "planPath": "governance-optimization/tasks/TASK-RFT-0091-python-language-adapter-map.task.md",
+    "sectionTitle": "TASK-RFT-0091",
+    "headingLine": 64,
+    "hash": "656673fc88ecffb2",
+    "planningSourceSeal": {
+      "schemaId": "atm.planningSourceSeal.v1",
+      "repoIdentity": "https://github.com/eaglhuang/3klife.git",
+      "repoRoot": "C:/Users/User/3KLife",
+      "taskCardPath": "governance-optimization/tasks/TASK-RFT-0091-python-language-adapter-map.task.md",
+      "planningCommitSha": null,
+      "contentDigest": "sha256:656673fc88ecffb25f2a16bcacf42bd2a0013d749a6e00d108f7203bb0382299",
+      "amendmentEpoch": 0,
+      "sealedAt": "2026-07-16T13:02:00.871Z"
+    }
+  },
+  "importedAt": "2026-07-16T13:02:00.871Z",
+  "lastTransitionId": "2026-07-16T13-02-26-357Z-claim-8114fca3b4af",
+  "lastTransitionAt": "2026-07-16T13:02:26.357Z",
+  "ledgerContractVersion": "task-ledger/v1",
+  "owner": "codex-task-rft-0091",
+  "reservedAt": "2026-07-16T13:02:23.195Z",
+  "promotedAt": "2026-07-16T13:02:23.198Z",
+  "claim": {
+    "actorId": "codex-task-rft-0091",
+    "leaseId": "lease-a2e47d93626f",
+    "claimedAt": "2026-07-16T13:02:23.201Z",
+    "heartbeatAt": "2026-07-16T13:02:23.201Z",
+    "ttlSeconds": 1800,
+    "files": [
+      ".atm/history/tasks/TASK-RFT-0091.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/language-python/src/index.ts",
+      "packages/language-python/src/language-python-adapter.ts",
+      "packages/language-python/src/language-python-adapter/**",
+      "packages/language-python/test/atomization-planning.test.ts",
+      "scripts/validate-python-adapter.ts"
+    ],
+    "state": "active",
+    "intent": "write"
+  },
+  "startedAt": "2026-07-16T13:02:23.201Z",
+  "startedByActor": "codex-task-rft-0091",
+  "startedBySessionId": "session-20260716130223-codex-task-rft-0091-TASK-RFT-0091-188b56ac3d",
+  "taskDirectionLock": {
+    "schemaId": "atm.taskDirectionLock.v1",
+    "specVersion": "0.1.0",
+    "taskId": "TASK-RFT-0091",
+    "batchId": null,
+    "scopeKey": null,
+    "queueId": null,
+    "queueIndex": null,
+    "allowedFiles": [
+      ".atm/history/evidence/TASK-RFT-0091.*",
+      ".atm/history/task-events/TASK-RFT-0091/**",
+      ".atm/history/tasks/TASK-RFT-0091.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map-shards/owner-shard-plugins.json",
+      "atomic_workbench/atomization-coverage/path-to-atom-map.json",
+      "packages/language-python/src/index.ts",
+      "packages/language-python/src/language-python-adapter.ts",
+      "packages/language-python/src/language-python-adapter/**",
+      "packages/language-python/test/atomization-planning.test.ts",
+      "scripts/validate-python-adapter.ts"
+    ],
+    "planningReadOnlyPaths": [],
+    "planningMirrorPaths": [],
+    "allowPlanningMirror": false,
+    "promptHash": "c8b83332b73dfffe8f7c208312930d2ce3b27ef8f7cf37aff3dc0c129db20414",
+    "actorId": "codex-task-rft-0091",
+    "createdAt": "2026-07-16T13:02:26.356Z",
+    "status": "active"
+  }
+}
