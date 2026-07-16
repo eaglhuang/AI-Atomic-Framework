@@ -1,34 +1,87 @@
 {
   "schemaId": "atm.teamDogfoodPairedSample.v1",
   "specVersion": "0.1.0",
-  "sampleId": "ATM-GOV-0153-live-paired-sample-blocked-2026-07-16",
+  "sampleId": "ATM-GOV-0153-paired-openai-2026-07-16T08-48-27-740Z",
   "taskId": "ATM-GOV-0153",
-  "generatedAt": "2026-07-16T00:00:00.000+08:00",
-  "sampleKind": "live-paired-run-blocked",
-  "measurementStatus": "measurement-incomplete",
+  "generatedAt": "2026-07-16T08:50:25.062Z",
+  "sampleKind": "live-paired-run",
+  "measurementStatus": "complete",
   "promotionEligible": false,
-  "providerBillableUsage": false,
-  "pairedRunId": null,
-  "pricingEvidenceKind": "missing",
-  "pricingCatalogVersion": null,
-  "modelIdentities": [],
+  "providerBillableUsage": true,
+  "pairedRunId": "paired-openai-2026-07-16T08-48-27-740Z",
+  "pricingEvidenceKind": "provider-bill",
+  "pricingCatalogVersion": "2026-07-15.standard",
+  "modelIdentities": [
+    "gpt-5-mini"
+  ],
   "wallClock": {
-    "baselineMs": null,
-    "teamMs": null
+    "baselineMs": 9100,
+    "teamMs": 108220
   },
   "qualityOutcome": {
-    "baselinePassed": null,
-    "teamPassed": null
+    "baselinePassed": true,
+    "teamPassed": true
   },
-  "missingEvidence": [
-    "provider-billable-usage",
-    "paired-wall-clock-sample",
-    "provider-model-identities",
-    "pricing-catalog-version",
-    "quality-outcome"
-  ],
+  "usage": {
+    "baseline": {
+      "schemaId": "atm.teamProviderBillableUsage.v1",
+      "providerId": "openai",
+      "modelId": "gpt-5-mini-2025-08-07",
+      "billingProduct": "responses-api",
+      "serviceTier": "default",
+      "region": "global",
+      "currency": "USD",
+      "inputTokens": 46,
+      "outputTokens": 780,
+      "cacheReadTokens": 0,
+      "reasoningTokens": 576,
+      "requestCount": 1,
+      "retryCount": 0,
+      "billedFailedOrCancelled": false,
+      "measurementIncompleteReasons": []
+    },
+    "team": {
+      "schemaId": "atm.teamProviderBillableUsage.v1",
+      "providerId": "openai",
+      "modelId": "gpt-5-mini",
+      "billingProduct": "responses-api",
+      "serviceTier": "standard",
+      "region": "global",
+      "currency": "USD",
+      "inputTokens": 1831,
+      "outputTokens": 9331,
+      "cacheReadTokens": 0,
+      "reasoningTokens": 4544,
+      "requestCount": 6,
+      "retryCount": 0,
+      "billedFailedOrCancelled": false,
+      "measurementIncompleteReasons": []
+    }
+  },
+  "evidence": {
+    "baselineSessionId": "team-provider:ATM-GOV-0153:singleAgentBaseline:openai:gpt-5-mini",
+    "teamRunId": "team-bb758380497b",
+    "providerExecutionCount": 6,
+    "providerStatusCodes": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "rawSecretsLogged": false,
+    "secretRefs": [
+      "ANTHROPIC_API_KEY",
+      "AZURE_AI_FOUNDRY_API_VERSION",
+      "AZURE_OPENAI_API_VERSION",
+      "GEMINI_API_KEY",
+      "OPENAI_API_KEY"
+    ]
+  },
+  "missingEvidence": [],
   "decision": {
     "teamPromotionAllowed": false,
-    "reason": "Paid/provider paired execution was not available in the current local environment. ATM-GOV-0153 must remain open until a real paired sample with provider billable usage is collected."
+    "reason": "Live provider-billed paired sample collected. Promotion remains false because this sample is evidence for measurement completion, not an automatic default-Team rollout decision."
   }
 }

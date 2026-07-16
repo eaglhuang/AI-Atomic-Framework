@@ -52,6 +52,18 @@ type RealPairedSampleArtifact = {
     teamPassed: boolean | null;
   };
   missingEvidence: readonly string[];
+  usage?: {
+    baseline?: {
+      inputTokens?: number;
+      outputTokens?: number;
+      requestCount?: number;
+    };
+    team?: {
+      inputTokens?: number;
+      outputTokens?: number;
+      requestCount?: number;
+    };
+  };
 };
 
 const singleAgentBaseline: DogfoodRun = {
@@ -220,20 +232,24 @@ const realPairedSample = JSON.parse(
   readFileSync('artifacts/generated/team-dogfood/real-paired-sample.json', 'utf8')
 ) as RealPairedSampleArtifact;
 assert.equal(realPairedSample.schemaId, 'atm.teamDogfoodPairedSample.v1');
-assert.equal(realPairedSample.sampleKind, 'live-paired-run-blocked');
-assert.equal(realPairedSample.measurementStatus, 'measurement-incomplete');
-assert.equal(realPairedSample.promotionEligible, false, 'incomplete live dogfood evidence must never promote Team as default');
-assert.equal(realPairedSample.providerBillableUsage, false);
-assert.equal(realPairedSample.pairedRunId, null);
-assert.equal(realPairedSample.pricingEvidenceKind, 'missing');
-assert.equal(realPairedSample.pricingCatalogVersion, null);
-assert.equal(realPairedSample.wallClock.baselineMs, null);
-assert.equal(realPairedSample.wallClock.teamMs, null);
-assert.equal(realPairedSample.qualityOutcome.baselinePassed, null);
-assert.equal(realPairedSample.qualityOutcome.teamPassed, null);
-assert.ok(realPairedSample.missingEvidence.includes('provider-billable-usage'));
-assert.ok(realPairedSample.missingEvidence.includes('paired-wall-clock-sample'));
-assert.ok(realPairedSample.missingEvidence.includes('quality-outcome'));
+assert.equal(realPairedSample.sampleKind, 'live-paired-run');
+assert.equal(realPairedSample.measurementStatus, 'complete');
+assert.equal(realPairedSample.promotionEligible, false, 'measurement completion alone must not auto-promote Team as default');
+assert.equal(realPairedSample.providerBillableUsage, true);
+assert.ok(realPairedSample.pairedRunId);
+assert.equal(realPairedSample.pricingEvidenceKind, 'provider-bill');
+assert.ok(realPairedSample.pricingCatalogVersion);
+assert.ok((realPairedSample.wallClock.baselineMs ?? 0) > 0);
+assert.ok((realPairedSample.wallClock.teamMs ?? 0) > 0);
+assert.equal(realPairedSample.qualityOutcome.baselinePassed, true);
+assert.equal(realPairedSample.qualityOutcome.teamPassed, true);
+assert.deepEqual(realPairedSample.missingEvidence, []);
+assert.ok((realPairedSample.usage?.baseline?.requestCount ?? 0) > 0);
+assert.ok((realPairedSample.usage?.baseline?.inputTokens ?? 0) > 0);
+assert.ok((realPairedSample.usage?.baseline?.outputTokens ?? 0) > 0);
+assert.ok((realPairedSample.usage?.team?.requestCount ?? 0) > 0);
+assert.ok((realPairedSample.usage?.team?.inputTokens ?? 0) > 0);
+assert.ok((realPairedSample.usage?.team?.outputTokens ?? 0) > 0);
 
 const liveBlocker = readFileSync('docs/governance/atm-bug-and-optimization-backlog.items/ATM-BUG-2026-07-16-004.json', 'utf8');
 assert.match(liveBlocker, /ATM-GOV-0153/);

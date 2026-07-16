@@ -26,6 +26,7 @@ export type DirectTeamRoleHandoffArtifact = {
 };
 
 type DirectTeamProviderRoleResult = Awaited<ReturnType<typeof runProviderOrchestration>> & {
+  readonly providerRunArtifact: Awaited<ReturnType<typeof launchOpenAITeamProviderRun>>['artifact'];
   readonly handoffArtifact: DirectTeamRoleHandoffArtifact;
   readonly contextTelemetry: {
     readonly baseInstructionChars: number;
@@ -253,6 +254,7 @@ export async function runDirectTeamProviderRole(input: {
     attempts: 1,
     sessionId: bridgeResult.sessionId,
     providerId: bridgeResult.providerId,
+    providerRunArtifact: bridgeResult.artifact,
     coordinatorOwnedAuthority: true,
     stepResult: {
       ok: bridgeResult.ok,
