@@ -27,6 +27,8 @@ export const knownTsNoCheckBaseline = new Set([
   'packages/cli/src/commands/git-governance/implementation.ts',
   'packages/cli/src/commands/hook/pre-commit/failure-envelope.ts',
   'packages/cli/src/commands/hook/pre-commit/implementation.ts',
+  'packages/cli/src/commands/hook/pre-commit/input-state.ts',
+  'packages/cli/src/commands/hook/pre-commit/scope-ownership.ts',
   'packages/cli/src/commands/hook/pre-commit/support.ts',
   'packages/cli/src/commands/next/playbook-projection.ts',
   'packages/cli/src/commands/next/playbook-projection/active-work-summary.ts',
